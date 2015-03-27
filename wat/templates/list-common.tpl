@@ -54,7 +54,12 @@
                                 <select name="<%= name %>" class="<%= filter.class %>" data-filter-field="<%= filter.filterField %>">
                                     <% 
                                     if (!filter.fillable) {
-                                        _.each(filter.options, function(option) { 
+                                        _.each(filter.options, function(option) {
+                                            // If is a not filter add a special attribute with value to be checked
+                                            var notAttr = '';
+                                            if (option.not != undefined) {
+                                                notAttr = 'data-not="' + option.not + '"';
+                                            }
                                     %>
                                             <% 
                                                 var selectedAttr = '';
@@ -62,7 +67,7 @@
                                                     selectedAttr = 'selected="selected"';
                                                 }
                                             %>
-                                            <option value="<%= option.value %>" <%= selectedAttr %> <%= translationAttr %>><%= option.text %></option>
+                                            <option value="<%= option.value %>" <%= selectedAttr %> <%= notAttr %> <%= translationAttr %>><%= option.text %></option>
                                     <% 
                                         }); 
                                     }

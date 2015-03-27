@@ -15,6 +15,11 @@ Wat.U = {
 
         if (rawRemainingTime.days < 1 && rawRemainingTime.months == 0) {
             priorityClass = 'error';
+            
+            rawRemainingTime.hours = rawRemainingTime.hours < 10 ? '0' + rawRemainingTime.hours : rawRemainingTime.hours;
+            rawRemainingTime.minutes = rawRemainingTime.minutes < 10 ? '0' + rawRemainingTime.minutes : rawRemainingTime.minutes;
+            rawRemainingTime.seconds = rawRemainingTime.seconds < 10 ? '0' + rawRemainingTime.seconds : rawRemainingTime.seconds;
+                
             remainingTime = rawRemainingTime.hours + ':' + rawRemainingTime.minutes + ':' + rawRemainingTime.seconds;
             returnType = 'exact';
         }

@@ -153,6 +153,34 @@ Wat.I.formFilters[qvdObj] = {
         'displayDesktop': true,
         'acls': 'log.see-main.'
     },
+    'response': {
+        'filterField': 'status',
+        'type': 'select',
+        'text': 'Response',
+        'class': 'chosen-single',
+        'fillable': false,
+        'options': [
+            {
+                'value': -1,
+                'text': 'All',
+                'selected': true
+            },
+            {
+                'value': STATUS_SUCCESS,
+                'text': 'Success'
+            },
+            {
+                'value': STATUS_SUCCESS,
+                'not': STATUS_SUCCESS,
+                'text': 'Not success'
+            },
+                    ],
+        'displayMobile': false,
+        'displayDesktop': true,
+        'acls': 'log.see-main.',
+        'displayMobile': true,
+        'displayDesktop': true
+    },
 };
 
 $.each(LOG_TYPE_OBJECTS, function(typeObject, typeObjectName) {

@@ -26,15 +26,24 @@
                                 <span class="filter-control desktop">
                                     <label for="<%= name %>" <%= translationAttr %>><%= filter.text %></label>
                                     <select name="<%= name %>" class="<%= filter.class %> mobile-filter" data-filter-field="<%= filter.filterField %>">
-                                        <% _.each(filter.options, function(option) { %>
-                                            <% 
-                                                var selectedAttr = '';
-                                                if(option.selected) { 
-                                                    selectedAttr = 'selected="selected"';
-                                                }
-                                            %>
-                                            <option value="<%= option.value %>" <%= selectedAttr %> <%= translationAttr %>><%= option.text %></option>
-                                        <% }); %>
+                                        <% 
+                                        _.each(filter.options, function(option) {
+                                            // If is a not filter add a special attribute with value to be checked
+                                            var notAttr = '';
+                                            if (option.not != undefined) {
+                                                notAttr = 'data-not="' + option.not + '"';
+                                            
+                                            }
+                                            
+                                            var selectedAttr = '';
+                                            if(option.selected) { 
+                                                selectedAttr = 'selected="selected"';
+                                            }
+                                         %>
+                                            <option value="<%= option.value %>" <%= selectedAttr %>  <%= notAttr %> <%= translationAttr %>><%= option.text %></option>
+                                        <% 
+                                        }); 
+                                        %>
                                     </select>
                                 </span>
                             <%

@@ -116,7 +116,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             case 'configwat':
                 break;
             case 'log':
-                nextBread.screen = this.model.get('time');
+                nextBread.screen = this.model.get('id');
                 break;
             default:
                 nextBread.screen = this.model.get('name');

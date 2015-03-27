@@ -8,14 +8,23 @@
     if (Wat.C.checkACL('log.see-details.')) { 
     %>
         <tr>
+            <td><i class="fa fa-male"></i><span data-i18n="Id"></span></td>
+            <td>
+                <%= model.get('id') %>
+            </td>
+        </tr>  
+        <tr>
             <td><i class="<%= CLASS_ICON_ADMINS %>"></i><span data-i18n="Administrator"></span></td>
             <td>
+                <%
+                    var showAdminLink = (Wat.C.isSuperadmin() || !model.get('superadmin')) && !model.get('admin_deleted'); 
+                %>
                 <%= 
-                model.get('admin_deleted') ? '' : Wat.C.ifACL('<a href="#/administrator/' + model.get('admin_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'administrator.see-details.') 
+                !showAdminLink ? '' : Wat.C.ifACL('<a href="#/administrator/' + model.get('admin_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'administrator.see-details.') 
                 %>
                     <span class="text"><%= model.get('admin_name') %></span>
                 <%= 
-                model.get('admin_deleted') ? '' : Wat.C.ifACL('</a>', 'administrator.see-details.') 
+                !showAdminLink ? '' : Wat.C.ifACL('</a>', 'administrator.see-details.') 
                 %>
             </td>
         </tr>
@@ -31,6 +40,12 @@
                 <span><%= model.get('action') %></span>
             </td>
         </tr>
+        <tr>
+            <td><i class="fa fa-stethoscope"></i><span data-i18n="Response"></span></td>
+            <td>
+                <%= $.i18n.t(ALL_STATUS[model.get('status')]) %>
+            </td>
+        </tr>  
         <% if (model.get('action') != 'login') { %>
         <tr>
             <td><i class="fa fa-cube"></i><span data-i18n="Object type"></span></td>
@@ -86,7 +101,13 @@
         <tr>
             <td><i class="fa fa-clock-o"></i><span data-i18n="Date time"></span></td>
             <td>
-                <span><%= i18n.t(model.get('time')) %></span>
+                <span><%= model.get('time').replace('T', ' ') %></span>
+            </td>
+        </tr>
+        <tr>
+            <td><i class="fa fa-clock-o"></i><span data-i18n="Passed time"></span></td>
+            <td>
+                <span><%= model.get('antiquityHTML') %></span>
             </td>
         </tr>
         <tr>

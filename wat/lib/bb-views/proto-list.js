@@ -208,7 +208,15 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                         return true;
                     }
                     
-                    filters[filterControl.attr('data-filter-field')] = filterControl.val();
+                    // If is a "not" filter, store it with negation operation
+                    if (filterControl.find('option:selected[data-not]').length == 1) {
+                        filters[filterControl.attr('data-filter-field')] = {
+                            "!=": filterControl.val()
+                        };
+                    }
+                    else {
+                        filters[filterControl.attr('data-filter-field')] = filterControl.val();
+                    }
                     break;
                 case 'text':
                     if (filterControl.val() == '' || filterControl.val() == undefined) {

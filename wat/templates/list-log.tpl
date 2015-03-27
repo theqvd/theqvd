@@ -39,7 +39,7 @@
                             break;
                         case 'qvd_object':
             %>
-                            <th class="<%= sortAttr %>" data-sortby="qvd_object">
+                            <th class="<%= sortAttr %> desktop" data-sortby="qvd_object">
                                 <span data-i18n="Object type"><%= i18n.t('Object type') %></span>
                             </th>
             <%
@@ -53,21 +53,21 @@
                             break;
                         case 'administrator':
             %>
-                            <th class="<%= sortAttr %>" data-sortby="admin_name">
+                            <th class="<%= sortAttr %> desktop" data-sortby="admin_name">
                                 <span data-i18n="Administrator"><%= i18n.t('Administrator') %></span>
                             </th>
             <%
                             break;
                         case 'datetime':
             %>
-                            <th class="<%= sortAttr %>" data-sortby="time">
-                                <span data-i18n="Date time"><%= i18n.t('Date time') %></span>
+                            <th class="<%= sortAttr %> desktop" data-sortby="time">
+                                <span data-i18n="Passed time"><%= i18n.t('Passed time') %></span>
                             </th>
             <%
                             break;
                         case 'source':
             %>
-                            <th class="<%= sortAttr %>" data-sortby="time">
+                            <th class="<%= sortAttr %> desktop" data-sortby="time">
                                 <span data-i18n="Source"><%= i18n.t('Source') %></span>
                             </th>
             <%
@@ -124,6 +124,14 @@
                             case 'action':
                 %>
                                 <td class="">
+                                        <%
+                                        if (model.get('status') != STATUS_SUCCESS) {
+                                        %>
+                                            <i class="fa fa-warning" data-i18n="[title]<%= ALL_STATUS[model.get('status')] %>" title="<%= $.i18n.t(ALL_STATUS[model.get('status')]) %>"></i>
+                                        <%
+                                        }
+                                        %>
+
                                         <span class="text" data-i18n="<%= LOG_TYPE_ACTIONS[model.get('type_of_action')] %>"><%= i18n.t(LOG_TYPE_ACTIONS[model.get('type_of_action')]) %></span>
                                 </td>
                 <%
@@ -184,16 +192,19 @@
                             case 'administrator':
                 %>
                                 <td class="desktop">
-                                    <%= Wat.C.ifACL('<a href="#/administrator/' + model.get('admin_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'administrator.see-details.') %>
+                                    <%
+                                        var showAdminLink = (Wat.C.isSuperadmin() || !model.get('superadmin')) && !model.get('admin_deleted'); 
+                                    %>
+                                    <%= !showAdminLink ? '' : Wat.C.ifACL('<a href="#/administrator/' + model.get('admin_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'administrator.see-details.') %>
                                         <span class="text"><%= model.get('admin_name') %></span>
-                                    <%= Wat.C.ifACL('</a>', 'administrator.see-details.') %>
+                                    <%= !showAdminLink ? '' : Wat.C.ifACL('</a>', 'administrator.see-details.') %>
                                 </td>
                 <%
                                 break;
                             case 'datetime':
                 %>
                                 <td class="desktop">
-                                        <span class="text"><%= model.get('time') %></span>
+                                        <span class="text"><%= model.get('antiquityHTML') %></span>
                                 </td>
                 <%
                                 break;
