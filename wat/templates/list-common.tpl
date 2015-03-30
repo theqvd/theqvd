@@ -43,7 +43,7 @@
                         %>
                             <span class="filter-control">
                                 <label for="<%= name %>" <%= translationAttr %>><%= filter.text %></label>
-                                <input type="text" name="<%= name %>" data-filter-field="<%= filter.filterField %>"/>
+                                <input type="text" class="<%= filter.class %>" name="<%= name %>" data-filter-field="<%= filter.filterField %>"/>
                             </span>
                         <%
                         break;            

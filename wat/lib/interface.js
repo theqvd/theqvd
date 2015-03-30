@@ -374,6 +374,18 @@ Wat.I = {
             format:'Y-m-d H:i',
             minDate: 0
         });
+        
+        $('.datepicker-past').datetimepicker({
+            dayOfWeekStart: 1,
+            lang: 'en',
+            format:'Y-m-d',
+            maxDate: 0,
+            timepicker: false,
+            onSelectDate: function () {
+                $('.datepicker-past').trigger('input');
+            },
+            closeOnDateSelect: true
+        });
     },
     
     chosenConfiguration: function () {

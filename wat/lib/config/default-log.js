@@ -10,6 +10,7 @@ Wat.I.listFields[qvdObj] = {
         ],
         'acls': 'log.see-details.',
         'sortable': false,
+        'fixed': true
     },
     'id': {
         'display': false,
@@ -18,6 +19,7 @@ Wat.I.listFields[qvdObj] = {
         ],
         'text': 'Id',
         'sortable': true,
+        'acls': 'log.see-main.',
     },
     'qvd_object': {
         'display': false,
@@ -25,7 +27,6 @@ Wat.I.listFields[qvdObj] = {
             'qvd_object'
         ],
         'text': 'Object',
-        'fixed': true,
         'sortable': true,
     },
     'action': {
@@ -34,7 +35,6 @@ Wat.I.listFields[qvdObj] = {
             'type_of_action'
         ],
         'text': 'Action',
-        'fixed': true,
         'sortable': true,
     },
     'object_name': {
@@ -45,7 +45,6 @@ Wat.I.listFields[qvdObj] = {
             'object_name'
         ],
         'text': 'Name',
-        'fixed': true,
         'sortable': true,
     },
     'administrator': {
@@ -55,7 +54,6 @@ Wat.I.listFields[qvdObj] = {
             'admin_name'
         ],
         'text': 'Administrator',
-        'fixed': true,
         'sortable': true,
     },
     'datetime': {
@@ -63,8 +61,7 @@ Wat.I.listFields[qvdObj] = {
         'fields': [
             'time'
         ],
-        'text': 'Datetime',
-        'fixed': true,
+        'text': 'Passed time',
         'sortable': true,
     },
     'source': {
@@ -73,7 +70,6 @@ Wat.I.listFields[qvdObj] = {
             'source'
         ],
         'text': 'Source',
-        'fixed': true,
         'sortable': true,
     }
 };
@@ -83,6 +79,68 @@ Wat.I.listDefaultFields[qvdObj] = $.extend({}, Wat.I.listFields[qvdObj]);
         
 // Filters configuration on list view
 Wat.I.formFilters[qvdObj] = {
+    'antiquity': {
+        'filterField': 'time',
+        'type': 'select',
+        'text': 'Antiquity',
+        'class': 'chosen-single',
+        'fillable': false,
+        'transform': 'dateGreatThan',
+        'options': [
+            {
+                'value': -1,
+                'text': 'All',
+                'selected': true
+            },
+            {
+                'value': 3600,
+                'text': '<1 hour'
+            },
+            {
+                'value': 21600,
+                'text': '<6 hours'
+            },
+            {
+                'value': 43200,
+                'text': '<12 hours'
+            },
+            {
+                'value': 86400,
+                'text': '<1 day'
+            },
+            {
+                'value': 604800,
+                'text': '<1 week'
+            },
+            {
+                'value': 2592000,
+                'text': '<1 month'
+            },
+                    ],
+        'displayMobile': false,
+        'displayDesktop': false,
+        'acls': 'log.see-main.'
+    },
+    'min_date': {
+        'filterField': 'time',
+        'type': 'text',
+        'text': 'Min Date',
+        'transform': 'dateMin',
+        'class': 'datepicker-past date-filter',
+        'displayMobile': false,
+        'displayDesktop': true,
+        'acls': 'log.see-main.'
+    },
+    'max_date': {
+        'filterField': 'time',
+        'type': 'text',
+        'text': 'Max Date',
+        'transform': 'dateMax',
+        'class': 'datepicker-past date-filter',
+        'displayMobile': false,
+        'displayDesktop': true,
+        'acls': 'log.see-main.'
+    },
     'source': {
         'filterField': 'source',
         'type': 'select',
@@ -180,7 +238,7 @@ Wat.I.formFilters[qvdObj] = {
         'acls': 'log.see-main.',
         'displayMobile': true,
         'displayDesktop': true
-    },
+    }
 };
 
 $.each(LOG_TYPE_OBJECTS, function(typeObject, typeObjectName) {

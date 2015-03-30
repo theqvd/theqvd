@@ -35,7 +35,6 @@ Wat.Views.MyViewsView = Wat.Views.ViewsView.extend({
         this.currentColumns = Wat.I.getListColumns(this.selectedSection);
         
         this.renderForm();
-
     },
     
     // Perform the reset action on DB and update interface

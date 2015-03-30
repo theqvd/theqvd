@@ -264,6 +264,7 @@ LOG_TYPE_OBJECTS = {
     admin_view: 'Administrator view',
     tenant_view: 'Default view',
     config: 'Configuration',
+    log: 'Log',
 };
 
 LOG_TYPE_OBJECTS_ICONS = {

@@ -55,6 +55,11 @@
                         <option data-i18n="Roles" value="role" <%= selectedSection == "role" ? 'selected' : '' %>></option>
                     <%
                     }
+                    if (!limitByACLs || Wat.C.checkACL('log.see-main.')) {
+                    %>
+                        <option data-i18n="Log" value="log" <%= selectedSection == "log" ? 'selected' : '' %>></option>
+                    <%
+                    }
                     %>
                 </select>
             </div>

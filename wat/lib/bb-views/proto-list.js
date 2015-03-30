@@ -137,6 +137,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         'click .last': 'paginationLast',
         'click a[name="filter_button"]': 'filter',
         'change .filter-control select': 'filter',
+        'input .filter-control input.date-filter': 'filter',
         'click .js-button-new': 'openNewElementDialog',
         'click [name="selected_actions_button"]': 'applySelectedAction'
     },
@@ -214,6 +215,20 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                             "!=": filterControl.val()
                         };
                     }
+                    else if (filter.transform) {
+                        switch (filter.transform) {
+                            case 'dateLessThan':
+                                filters[filterControl.attr('data-filter-field')] = {
+                                    "<": Wat.U.getRelativeDate(filterControl.val() * -1)
+                                };
+                                break;
+                            case 'dateGreatThan':
+                                filters[filterControl.attr('data-filter-field')] = {
+                                    ">": Wat.U.getRelativeDate(filterControl.val() * -1)
+                                };
+                                break;
+                        }
+                    }
                     else {
                         filters[filterControl.attr('data-filter-field')] = filterControl.val();
                     }
@@ -223,10 +238,30 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                         return true;
                     }
                     
-                    // Substring search syntax
-                    filters[filterControl.attr('data-filter-field')] = {
-                        "~" : '%25' + filterControl.val() + '%25'
-                    };
+                    if (filter.transform) {
+                        switch (filter.transform) {
+                            case 'dateMin':
+                                if (filters[filterControl.attr('data-filter-field')] == undefined) {
+                                    filters[filterControl.attr('data-filter-field')] = {};
+                                }
+                                
+                                filters[filterControl.attr('data-filter-field')][">="] = filterControl.val() + ' 00:00:00';
+                                break;
+                            case 'dateMax':
+                                if (filters[filterControl.attr('data-filter-field')] == undefined) {
+                                    filters[filterControl.attr('data-filter-field')] = {};
+                                }
+                                
+                                filters[filterControl.attr('data-filter-field')]["<="] = filterControl.val() + ' 23:59:59';
+                                break;
+                        }
+                    }
+                    else {
+                        // Substring search syntax
+                        filters[filterControl.attr('data-filter-field')] = {
+                            "~" : '%25' + filterControl.val() + '%25'
+                        };
+                    }
                     break;
             }
         });
@@ -656,6 +691,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         // When the list were rendered in actions such as sorting, filtering or pagination, 
         // the strings will be individually translated
         Wat.T.translate();
+        Wat.I.enableDataPickers();
     },    
     
     // Render only the list. Usefull to functions such as pagination, sorting and filtering where is not necessary render controls
