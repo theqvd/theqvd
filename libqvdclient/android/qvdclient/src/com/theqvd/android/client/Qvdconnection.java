@@ -29,6 +29,7 @@ import com.theqvd.android.xpro.Config;
 import com.theqvd.android.xpro.DummyActivity;
 import com.theqvd.android.xpro.XserverService;
 import com.theqvd.client.jni.QvdException;
+import com.theqvd.client.jni.QvdPaymentException;
 import com.theqvd.client.jni.QvdclientWrapper;
 import com.theqvd.client.jni.Vm;
 
@@ -105,7 +106,7 @@ public class Qvdconnection implements Runnable {
 			}
 			Log.d(tag, "The qvd object is "+qvd.toString());
 			qvd.qvd_list_of_vm();
-			paymentRequired = false ;// qvd.qvd_payment_required();
+			qvd.qvd_payment_required();
 			vmlist = qvd.getQvdclient().getVmlist();
 			Log.d(tag,"The vm list is "+vmlist);
 			if (vmlist == null) {
@@ -124,6 +125,19 @@ public class Qvdconnection implements Runnable {
 			Bundle b = new Bundle();
 			b.putString(QvdclientActivity.messageTitle, activity.getResources().getString(R.string.vmlisterrortitle));
 			b.putString(QvdclientActivity.messageText, e.toString());
+			m.setData(b);
+			Log.e(tag, "Error getting vmlist:" + e.toString());
+			handler.sendMessage(m);
+		} catch (QvdPaymentException e) {
+			setRunning(false);
+			setConnecting(false);
+			exception = e;
+			vmlist = null;
+			setVmid(-1);
+			Message m = handler.obtainMessage(QvdclientActivity.ERROR);
+			Bundle b = new Bundle();
+			b.putString(QvdclientActivity.messageTitle, activity.getResources().getString(R.string.paymentRequiredTitle));
+			b.putString(QvdclientActivity.messageText, activity.getResources().getString(R.string.paymentRequired));
 			m.setData(b);
 			Log.e(tag, "Error getting vmlist:" + e.toString());
 			handler.sendMessage(m);
@@ -274,9 +288,8 @@ public class Qvdconnection implements Runnable {
 			case 0:
 				setRunning(false);
 				if (paymentRequired) {
-					// TODO What do we do if payment is required...
-					sendAlert(activity.getResources().getString(R.string.novmsavailabletitle), 
-							activity.getResources().getString(R.string.novmsavailable));
+					sendAlert(activity.getResources().getString(R.string.paymentRequiredTitle), 
+							activity.getResources().getString(R.string.paymentRequired));
 				} else {
 					sendAlert(activity.getResources().getString(R.string.novmsavailabletitle), 
 							activity.getResources().getString(R.string.novmsavailable));
@@ -342,6 +355,23 @@ public class Qvdconnection implements Runnable {
 			Log.e(tag, "Error connecting to vm:" + e.toString());
 			handler.sendMessage(m);
 			
+		} catch (QvdPaymentException e) {
+			String title = activity.getString(R.string.paymentRequiredTitle);;
+			String text = activity.getString(R.string.paymentRequired);
+			Log.i(tag, "Error: Sent notify with title <" +title+"> and text <" + text +">");
+			
+			Notification notification = new Notification(R.drawable.icon, title, System.currentTimeMillis());
+			notification.flags |= Notification.FLAG_AUTO_CANCEL;
+			notification.setLatestEventInfo(activity, title, text, qvdclientActivityPI);
+			mNotificationManager.notify(connectnotify, notification);
+			
+			Message m = handler.obtainMessage(QvdclientActivity.ERROR);
+			Bundle b = new Bundle();
+			b.putString(QvdclientActivity.messageTitle, title);
+			b.putString(QvdclientActivity.messageText, text);
+			m.setData(b);
+			Log.e(tag, "Error connecting to vm:" + e.toString());
+			handler.sendMessage(m);
 		} finally {
 			setRunning(false);
 			try {

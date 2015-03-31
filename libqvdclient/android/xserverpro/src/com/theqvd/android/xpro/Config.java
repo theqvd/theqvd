@@ -186,7 +186,8 @@ public class Config {
 		try {
 			Log.d(tag, "setHeightAndWidth:The Build.VERSION is greater than 17:"+Build.VERSION.SDK_INT);
 		    Point realSize = new Point();
-		    Display.class.getMethod("getRealSize", Point.class).invoke(d, realSize);
+		    Display.class.getMethod("getSize", Point.class).invoke(d, realSize);  // We don't need the RealSize (full resolution) but the available in window..
+//		    Display.class.getMethod("getRealSize", Point.class).invoke(d, realSize);
 		    widthPixels = realSize.x;
 		    heightPixels = realSize.y;
 		    Log.d(tag, "setHeightAndWidth:The Build.VERSION is greater than 17:"+Build.VERSION.SDK_INT+

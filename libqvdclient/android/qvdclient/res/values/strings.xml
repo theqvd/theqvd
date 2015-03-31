@@ -96,4 +96,6 @@
     <string name="errorinstallfilemgr_alert">Error installing File Manager</string>
     <string name="nofilechosen">No file has been chosen</string>
     <string name="usegoogleauth_text">GoogleAuth</string>
+    <string name="paymentRequiredTitle">Account not active</string>
+    <string name="paymentRequired">Please, contact TheQVD Support for account activation.</string>
 </resources>
