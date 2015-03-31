@@ -303,6 +303,8 @@ Wat.A = {
 
                         var optGroup = '';
                         
+                        var storedIds = [];
+                        
                         $(data.rows).each(function(i,option) {
                             var selected = '';
 
@@ -322,6 +324,14 @@ Wat.A = {
                             if (params.startingOptions && params.startingOptions[id]) {
                                 return;
                             }
+                            
+                            // If one option is already in select, will be ignored
+                            if ($.inArray(id, storedIds) != -1) {
+                                return;
+                            }
+                            
+                            // Store option id
+                            storedIds.push(id);
 
                             if (params.selectedId !== undefined && params.selectedId == id) {
                                 selected = 'selected="selected"';
