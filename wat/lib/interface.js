@@ -370,14 +370,14 @@ Wat.I = {
     enableDataPickers: function () {
         $('.datetimepicker').datetimepicker({
             dayOfWeekStart: 1,
-            lang: 'en',
+            lang: Wat.C.language,
             format:'Y-m-d H:i',
             minDate: 0
         });
         
         $('.datepicker-past').datetimepicker({
             dayOfWeekStart: 1,
-            lang: 'en',
+            lang: Wat.C.language,
             format:'Y-m-d',
             maxDate: 0,
             timepicker: false,
