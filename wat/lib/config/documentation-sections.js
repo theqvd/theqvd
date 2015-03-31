@@ -41,7 +41,7 @@ Wat.I.docSections = {
         guide: 'stepbystep'
     },
     log: { 
-        es: '_vistas_por_defecto',
+        es: '_log',
         guide: 'stepbystep'
     },
     views_multitenant: { 

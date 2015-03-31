@@ -2319,6 +2319,48 @@ Edición
 <img src="images/doc_images/screenshot_watconfig_defaultviews_reset.png" alt="screenshot_watconfig_defaultviews_reset.png" width="960px" />
 </span></p></div>
 </div>
+<div class="sect2">
+<h3 id="_log">5.5. Log</h3>
+<div class="paragraph"><p>En este apartado se tiene acceso al log de las acciones llevadas a cabo en la API, ya bien sea desde el WAT o desde otras fuentes.</p></div>
+<div class="paragraph"><p>Los registros del log se presentan en una vista listado con filtros como el resto de elementos del WAT. Además, cada registro tendrá su propia vista detalle con información ampliada.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Vista listado
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>La vista principal es un listado con los registros del log.
+<span class="image">
+<img src="images/doc_images/screenshot_log_list.png" alt="screenshot_log_list.png" width="960px" />
+</span></p></div>
+<div class="paragraph"><p>La primera columna es un enlace a la vista detalle de cada registro del log. Hay otras columnas que pueden contener enlaces, pero en este caso serán enlaces a los diferentes componentes WAT mostrados.</p></div>
+<div class="paragraph"><p><em>Por ejemplo, en la columna Administrador habrá un enlace a la vista del administrador. Lo mismo ocurre en la columna donde figura el objeto de QVD afectado por la acción.</em></p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/important.png" alt="Important" />
+</td>
+<td class="content">Los elementos que ya no existan o bien aquellos a los que el administrador no tenga acceso, no aparecerán como un enlace.</td>
+</tr></table>
+</div>
+</div></div>
+</dd>
+<dt class="hdlist1">
+Vista detalle
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_log_details.png" alt="screenshot_log_details.png" width="960px" />
+</span></p></div>
+<div class="paragraph"><p>La vista detalle de un registro del log está compuesta por una pequeña <strong>cabecera</strong> donde figura la <strong>fecha y hora</strong> del registro, el <strong>tipo de acción</strong> y el <strong>tipo de objeto</strong> afectado. Seguida a esta cabecera, se describen los diferentes campos asociados al registro y su origen. Estos campos incluyen los parámetros <em>en crudo</em> de la llamada a la API.</p></div>
+<div class="paragraph"><p>Junto a los detalles, encontramos una lista con los registros del log relacionados con el mismo objeto al que hace referencia el registro actual. De este modo se puede navegar por el historial de acciones realizadas sobre este objeto desde su creación.</p></div>
+</div></div>
+</dd>
+</dl></div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -2441,7 +2483,7 @@ Ambos parámetros se pueden definir como <em>por defecto</em> adoptando así la 
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-01-29 14:14:53 CET
+Last updated 2015-03-27 08:45:46 CET
 </div>
 </div>
 </body>
