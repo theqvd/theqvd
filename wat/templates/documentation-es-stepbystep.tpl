@@ -2344,6 +2344,7 @@ Vista listado
 <td class="content">Los elementos que ya no existan o bien aquellos a los que el administrador no tenga acceso, no aparecerán como un enlace.</td>
 </tr></table>
 </div>
+<div class="paragraph"><p>También merece la pena mencionar que la columna <em>Acción</em> tendrá un icono de advertencia cuando haya habido algún fallo en la respuesta de la acción. Se puede saber más sobre el error pasando el ratón por encima del icono o entrando en la vista detalle.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
