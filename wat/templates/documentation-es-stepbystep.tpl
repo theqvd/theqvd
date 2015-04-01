@@ -992,9 +992,24 @@ Editar el usuario
 </li>
 </ul></div>
 <div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos del usuario</strong>, incluídas las propiedades, de haberlas.</p></div>
-<div class="paragraph"><p>Y en la parte derecha un <strong>cuadro con las máquinas virtuales asociadas</strong> a este usuario.</p></div>
+<div class="paragraph"><p>Y en la parte derecha encontramos dos cuadros:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Las máquinas virtuales asociadas</strong> a este usuario.
+</p>
+<div class="openblock">
+<div class="content">
 <div class="paragraph"><p>Si quisiéramos más acciones sobre ellas, con el botón de vista extendida iremos a la vista listado de las máquinas virtuales filtradas por este nodo.</p></div>
 <div class="paragraph"><p>En este caso, a diferencia de otras vistas detalle, también disponemos de un <strong>botón para crear una máquina virtual asociada al usuario</strong> actual, donde aparecerá el mismo formulario de creación de máquinas virtuales salvo el usuario al que se asociará la máquina, que va implícito al estar creándola desde aquí.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Los registros de log</strong> del usuario con un botón de acceso a los detalles del registro, la acción realizada y el tiempo transcurrido.
+</p>
+</li>
+</ul></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1288,8 +1303,25 @@ Editar la máquina virtual
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos de la máquina virtual</strong>, incluídas las propiedades, de haberlas.
-Y en la parte derecha un <strong>cuadro con las máquinas virtuales asociadas</strong> a este usuario.</p></div>
+<div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos de la máquina virtual</strong>, incluídas las propiedades, de haberlas.</p></div>
+<div class="paragraph"><p>En la parte derecha encontramos dos cuadros:</p></div>
+</div></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>El estado de ejecución</strong> de la máquina virtual
+</p>
+</li>
+<li>
+<p>
+<strong>Los registros de log</strong> de la máquina virtual con un botón de acceso a los detalles del registro, la acción realizada y el tiempo transcurrido.
+</p>
+</li>
+</ul></div>
+</dd>
+</dl></div>
+<div class="openblock">
+<div class="content">
 <div class="dlist"><dl>
 <dt class="hdlist1">
 Fechas de expiración
@@ -1415,7 +1447,7 @@ Si la imagen por defecto del OSF cambia, observamos que en los atributos aparece
 </dd>
 </dl></div>
 </div></div>
-</dd>
+<div class="dlist"><dl>
 <dt class="hdlist1">
 Edición
 </dt>
@@ -1617,7 +1649,23 @@ Editar el nodo
 </li>
 </ul></div>
 <div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos del nodo</strong>, incluídas las propiedades, de haberlas.</p></div>
-<div class="paragraph"><p>Y en la parte derecha un <strong>cuadro con las máquinas virtuales corriendo en el nodo</strong> solamente a modo informativo. Si quisiéramos más acciones sobre ellas, con el botón de vista extendida iremos a la vista listado de las máquinas virtuales filtradas por este nodo.</p></div>
+<div class="paragraph"><p>Y en la parte derecha encontramos dos cuadros:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Las máquinas virtuales corriendo en el nodo</strong>.
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Si quisiéramos más acciones sobre ellas, con el botón de vista extendida iremos a la vista listado de las máquinas virtuales filtradas por este nodo.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Los registros de log</strong> del nodo con un botón de acceso a los detalles del registro, la acción realizada y el tiempo transcurrido.
+</p>
+</li>
+</ul></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1717,16 +1765,27 @@ Vista detalle
 </span></p></div>
 <div class="paragraph"><p>Observamos una pequeña <strong>cabecera</strong> donde junto al <strong>nombre del OSF</strong> estan los <strong>botones para eliminarlo y editarlo</strong>.</p></div>
 <div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos del OSF</strong>, incluídas las propiedades, de haberlas.</p></div>
-<div class="paragraph"><p>Y en la parte derecha, en este caso, encontramos dos cuadros:</p></div>
+<div class="paragraph"><p>En la parte derecha, en este caso, encontramos tres cuadros:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>Las imágenes de este OSF</strong>. En este caso, a parte de ver los nombres de las imágenes y su columna informativa, podremos cambiar la imagen definida como imágen por defecto con una columna destinada al efecto. Además, como en el caso de las máquinas virtuales desde la vista de usuarios, también disponemos de un <strong>botón para crear una imagen de disco asociada al OSF</strong> actual, donde aparecerá el mismo formulario de creación de imágenes de disco salvo el OSF al que se asociará la imagen, que va implícito al estar creándola desde aquí.
+<strong>Las imágenes de este OSF</strong>.
 </p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>En este caso, a parte de ver los nombres de las imágenes y su columna informativa, podremos <strong>cambiar la imagen definida como imágen por defecto</strong> con marcando la casilla de la última columna.</p></div>
+<div class="paragraph"><p>Además, como en el caso de las máquinas virtuales desde la vista de usuarios, también disponemos de un <strong>botón para crear una imagen de disco asociada al OSF</strong> actual, donde aparecerá el mismo formulario de creación de imágenes de disco salvo el OSF al que se asociará la imagen, que va implícito al estar creándola desde aquí.</p></div>
+<div class="paragraph"><p>Si quisiéramos más acciones sobre ellas, con el botón de vista extendida iremos a la vista listado de las máquinas virtuales filtradas por esta imagen.</p></div>
+</div></div>
 </li>
 <li>
 <p>
 <strong>Las máquinas virtuales</strong> que están utilizando una imagen de este OSF, solamente a modo informativo. Si quisiéramos más acciones sobre ellas, con el botón de vista extendida iremos a la vista listado de las máquinas virtuales filtradas por este OSF.
+</p>
+</li>
+<li>
+<p>
+<strong>Los registros de log</strong> del OSF con un botón de acceso a los detalles del registro, la acción realizada y el tiempo transcurrido.
 </p>
 </li>
 </ul></div>
@@ -1947,8 +2006,23 @@ Editar la imagen
 </ul></div>
 <div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos de la imagen</strong>, incluídas las propiedades, de haberlas.</p></div>
 <div class="paragraph"><p>Dos de los campos de esta tabla serán para indicar si es la imagen por defecto o la última creada de su OSF (<strong>default y head</strong>). Estas filas solo aparecerán si se cumplen dichas premisas.</p></div>
-<div class="paragraph"><p>Y en la parte derecha se muestra, de forma informativa, un <strong>cuadro con las máquinas virtuales que utilizan</strong> esta imagen.</p></div>
+<div class="paragraph"><p>Y en la parte derecha encontramos dos cuadros:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Las máquinas virtuales que utiliza</strong> esta imagen.
+</p>
+<div class="openblock">
+<div class="content">
 <div class="paragraph"><p>Si quisiéramos más acciones sobre ellas, con el botón de vista extendida iremos a la vista listado de las máquinas virtuales filtradas por esta imagen.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Los registros de log</strong> de la imagen con un botón de acceso a los detalles del registro, la acción realizada y el tiempo transcurrido.
+</p>
+</li>
+</ul></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -2129,7 +2203,19 @@ Vista detalle
 <div class="paragraph"><p>Observamos una pequeña <strong>cabecera</strong> donde junto al <strong>nombre del administrador</strong> están los <strong>botones para eliminarlo y editarlo</strong>.</p></div>
 <div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos del administrador</strong>.</p></div>
 <div class="paragraph"><p>Debajo se encuentran los roles asociados al administrador, con un control de borrado junto a cada uno, y un selector para asignar cualquiera de los roles que haya configurados en el sistema.</p></div>
-<div class="paragraph"><p>A la derecha  encontramos un <strong>cuadro con el árbol de ACLs del administrador</strong>. Las ramas aparecen inicialmente cerradas. Haciendo click sobre el icono junto a cada rama podremos abrirlas y ver su contenido.</p></div>
+<div class="paragraph"><p>En la parte derecha encontramos dos cuadros:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>El árbol de ACLs del administrador</strong>. Las ramas aparecen inicialmente cerradas. Haciendo click sobre el icono junto a cada rama podremos abrirlas y ver su contenido.
+</p>
+</li>
+<li>
+<p>
+<strong>Los registros de log</strong> del administrador con un botón de acceso a los detalles del registro, la acción realizada y el tiempo transcurrido. Este log no se refiere a las acciones llevadas a cabo por el administrador, si no a las <strong>acciones llevadas a cabo sobre él</strong>.
+</p>
+</li>
+</ul></div>
 <div class="paragraph"><p>El árbol tiene dos modos de clasificación:</p></div>
 <div class="ulist"><ul>
 <li>
@@ -2247,7 +2333,19 @@ Vista detalle
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_role_internalroles.png" alt="screenshot_role_internalroles.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>A la derecha encontramos un <strong>cuadro con el árbol de ACLs</strong>. Las ramas aparecen inicialmente cerradas. Haciendo click sobre el icono junto a cada rama podremos abrirlas y ver su contenido. A diferencia del árbol de ACLs de la vista detalle de administradores, <strong>en los roles el árbol contiene todos los ACLs del sistema</strong>, y figuran como activos los que tiene asociado el rol.</p></div>
+<div class="paragraph"><p>En la parte derecha encontramos dos cuadros:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>El árbol de ACLs</strong>. Las ramas aparecen inicialmente cerradas. Haciendo click sobre el icono junto a cada rama podremos abrirlas y ver su contenido. A diferencia del árbol de ACLs de la vista detalle de administradores, <strong>en los roles el árbol contiene todos los ACLs del sistema</strong>, y figuran como activos los que tiene asociado el rol.
+</p>
+</li>
+<li>
+<p>
+<strong>Los registros de log</strong> del rol con un botón de acceso a los detalles del registro, la acción realizada y el tiempo transcurrido. Este log no se refiere a las acciones llevadas a cabo por el administrador, si no a las <strong>acciones llevadas a cabo sobre él</strong>.
+</p>
+</li>
+</ul></div>
 <div class="paragraph"><p>El árbol tiene, del mismo modo que en el árbol de la vista detalle de administradores, dos modos de clasificación:</p></div>
 <div class="ulist"><ul>
 <li>

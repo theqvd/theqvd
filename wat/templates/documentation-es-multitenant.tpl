@@ -976,6 +976,7 @@ Vista detalle
 </span></p></div>
 <div class="paragraph"><p>Observamos una <strong>cabecera</strong> donde junto al <strong>nombre del tenant</strong> están los <strong>botones para eliminarlo y editarlo</strong>.</p></div>
 <div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos del tenant</strong>.</p></div>
+<div class="paragraph"><p>En la parte derecha encontramos un cuadro que contiene <strong>los registros de log</strong> del tenant con un botón de acceso a los detalles del registro, la acción realizada y el tiempo transcurrido.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
