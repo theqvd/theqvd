@@ -381,8 +381,8 @@ Wat.I = {
             format:'Y-m-d',
             maxDate: 0,
             timepicker: false,
-            onSelectDate: function () {
-                $('.datepicker-past').trigger('input');
+            onSelectDate: function (content, target) {
+                $(target).trigger('input');
             },
             closeOnDateSelect: true
         });

@@ -255,6 +255,18 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                                 filters[filterControl.attr('data-filter-field')]["<="] = filterControl.val() + ' 23:59:59';
                                 break;
                         }
+                        
+                        // If dateMin and dateMax were defined, change them by -between special operator
+                        switch (filter.transform) {
+                            case 'dateMin':
+                            case 'dateMax':
+                                if (filters[filterControl.attr('data-filter-field')]["<="] != undefined && filters[filterControl.attr('data-filter-field')][">="] != undefined) {
+                                    filters[filterControl.attr('data-filter-field')]["-between"] = [filters[filterControl.attr('data-filter-field')][">="], filters[filterControl.attr('data-filter-field')]["<="]];
+                                    delete filters[filterControl.attr('data-filter-field')][">="];
+                                    delete filters[filterControl.attr('data-filter-field')]["<="];
+                                }
+                                break;
+                        }
                     }
                     else {
                         // Substring search syntax
