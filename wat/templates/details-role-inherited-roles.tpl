@@ -11,7 +11,7 @@
                     <td>
                         <%
                             var classFixed = '';
-                            if (model.get('fixed')) {
+                            if (model.get('fixed') && RESTRICT_INTERNAL_ROLES) {
                                 classFixed = 'invisible';
                             }
 
@@ -21,11 +21,11 @@
                                 <%
                                     if (Wat.C.checkACL('role.update.assign-role')) {
                                 %>
-                                        <i class="delete-role-button js-delete-role-button fa fa-trash-o <%= classFixed %>" data-id="<%= iRole %>" data-name="<%= role %>"></i>
+                                        <i class="delete-role-button js-delete-role-button fa fa-trash-o <%= classFixed %>" data-id="<%= iRole %>" data-name="<%= role.name %>"></i>
                                 <%
                                     }
                                 
-                                if (role.internal) {
+                                if (role.internal && RESTRICT_INTERNAL_ROLES) {
                                 %>
                                     <span class="text"><%= role.name %></span>
                                 <%
@@ -52,7 +52,7 @@
                     </td>
                 </tr>
                 
-                <% if(Wat.C.checkACL('role.update.assign-role') && !model.get('fixed')) { %>
+                <% if(Wat.C.checkACL('role.update.assign-role') && (!model.get('fixed') || !RESTRICT_INTERNAL_ROLES)) { %>
                 <tr>
                     <td>
                         <select name="role"></select>

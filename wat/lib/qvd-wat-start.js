@@ -12,6 +12,19 @@
     })(jQuery);
     
 	$(doc).ready(function() {
+        // Setup jQuery ajax to store all requests in a requests queue
+        $.ajaxSetup({
+            beforeSend: function(jqXHR) {
+                Wat.C.requests.push(jqXHR);
+            },
+            complete: function(jqXHR) {
+                var index = $.inArray(jqXHR, Wat.C.requests);
+                if (index > -1) {
+                    Wat.C.requests.splice(index, 1);
+                }
+            }
+        });
+        
         Wat.C.afterLogin = function () {
             // Load translation file
             Wat.T.initTranslate();

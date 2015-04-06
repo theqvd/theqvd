@@ -27,6 +27,9 @@ Wat.C = {
     sid: '',
     tenantID: -1,
     adminID: -1,
+    
+    // ajax requests
+    requests: [],
 
     // Get the base URL for API calls using credentials or session ID
     getBaseUrl: function () {
@@ -505,5 +508,25 @@ Wat.C = {
         else {
             return this.block;
         }
+    },
+    
+    // Abort stored ajax requests
+    abortRequests: function () {
+        var that = this;
+        
+        $.each(that.requests, function(idx, jqXHR) {
+            if (jqXHR == undefined) {
+                return;
+            }
+            
+            jqXHR.abort();
+        });
+
+        $.each(that.requests, function(idx, jqXHR) {
+            var index = $.inArray(jqXHR, that.requests);
+            if (index > -1) {
+                that.requests.splice(index, 1);
+            }
+        });
     }
 }

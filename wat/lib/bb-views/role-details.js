@@ -129,7 +129,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             subbranch += '<div class="subbranch ' + disabledClass + '" data-acl="' + acl.name + '" data-acl-id="' + acl.id + '">';
             
                 // Assignation checkbox
-                if (Wat.C.checkACL('role.update.assign-acl') && !that.model.get('fixed')) {
+                if (Wat.C.checkACL('role.update.assign-acl') && (!that.model.get('fixed') || !RESTRICT_INTERNAL_ROLES)) {
                     subbranch += '<span class="subbranch-piece">';
                         subbranch += '<input type="checkbox" class="js-acl-check acl-check" data-acl="' + acl.name + '" data-acl-id="' + acl.id + '" ' + checkedAttr + '/>';
                     subbranch += '</span>';
@@ -174,10 +174,10 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
                 
         switch (treeKind) {
             case 'actions':
-                filters = {'name': '%.' + branch + '.%'};
+                filters = {'name': {'~': '%.' + branch + '.%'}};
                 break;
             case 'sections':
-                filters = {'name': branch + '.%'};
+                filters = {'name': {'~': branch + '.%'}};
                 break;
         }
                 

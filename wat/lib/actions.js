@@ -94,6 +94,11 @@ Wat.A = {
                     that.retrievedData = response;
                 }
                 
+                // Aborted
+                if (that.retrievedData.readyState == 0) {
+                    return;
+                }
+                
                 successCallback(that);
 
                 if (!$.isEmptyObject(messages)) {
@@ -110,6 +115,11 @@ Wat.A = {
             },
             success: function (response, result, raw) {
                 if (Wat.C.sessionExpired(response)) {
+                    return;
+                }
+                
+                // Aborted
+                if (response.readyState == 0) {
                     return;
                 }
                 
@@ -146,7 +156,9 @@ Wat.A = {
             }
         };
         
-        $.ajax(params);
+        var request = $.ajax(params);
+        
+        Wat.C.requests.push(request);
     },
         
     // Get API info calling un-auth 'info' url
@@ -285,7 +297,7 @@ Wat.A = {
                 jsonUrl += '&order_by=' + JSON.stringify(params.order_by);
             }
             
-            $.ajax({
+            var request = $.ajax({
                 url: jsonUrl,
                 type: 'POST',
                 async: true,
@@ -296,6 +308,7 @@ Wat.A = {
                     if (Wat.C.sessionExpired(data)) {
                         return;
                     }
+                    
                     $.each($(controlSelector), function () {
                         var combo = $(this);
                         
@@ -365,6 +378,8 @@ Wat.A = {
                     }
                 }
             });
+                    
+            Wat.C.requests.push(request);
         }
         else {
             if (params.chosenType) {
