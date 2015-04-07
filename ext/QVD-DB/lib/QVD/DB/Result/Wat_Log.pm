@@ -1,8 +1,9 @@
 package QVD::DB::Result::Wat_Log;
 use base qw/DBIx::Class::Core/;
+use DateTime;
 
 __PACKAGE__->table_class('DBIx::Class::ResultSource::View');
-
+__PACKAGE__->load_components(qw/Core InflateColumn::DateTime/);
 __PACKAGE__->table('wat_log');
 
 
@@ -31,15 +32,24 @@ __PACKAGE__->add_columns( id                      => { data_type => 'integer',
 
 __PACKAGE__->set_primary_key('id');
 
+my @TIME_UNITS = qw(months days hours minutes seconds);
 
 sub antiquity
 {
     my $self = shift;
     my $time = $self->time;
+    return $self->difference(DateTime->now(),$self->time);
+}
 
-    $time =~ /^(?<year>[0-9]+)-(?<month>[0-9]+)-(?<day>[0-9]+) (?<hour>[0-9]+):(?<minutes>[0-9]+):(?<seconds>[0-9]+)$/;
-    my %time = %+;
-    return \%time;
+
+sub difference
+{
+    my ($self,$now,$then) = @_;
+
+    my %time_difference;
+    @time_difference{@TIME_UNITS} = $now->subtract_datetime($then)->in_units(@TIME_UNITS);
+
+    \%time_difference;
 }
 
 1;

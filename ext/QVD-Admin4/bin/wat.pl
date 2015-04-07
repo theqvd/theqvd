@@ -35,7 +35,9 @@ any [qw(POST GET)] => '/info' => sub {
   $c->res->headers->header('Access-Control-Allow-Origin' => '*');
 
   QVD::Config::reload();
+  my $localtime = localtime();
   my $json = { status => 0,
+               server_datetime => $localtime,
 	       multitenant => $c->qvd_admin4_api->_cfg('wat.multitenant'),
                version => { database => $c->qvd_admin4_api->database_version }};
 

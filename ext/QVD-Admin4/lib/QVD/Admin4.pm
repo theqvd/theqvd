@@ -1112,6 +1112,7 @@ sub vms_with_expiration_date
 {
     my ($self,$admin) = @_;
 
+
     my $is_not_null = 'IS NOT NULL';
     my $rs = $DB->resultset('VM')->search(
 	{ 'osf.tenant_id' => $admin->tenants_scoop,
