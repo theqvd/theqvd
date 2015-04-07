@@ -1,0 +1,155 @@
+-- Merging decision tree log ---
+manifest
+ADDED from AndroidManifest.xml:2:1
+	xmlns:android
+		ADDED from AndroidManifest.xml:2:11
+	package
+		ADDED from AndroidManifest.xml:3:5
+		INJECTED from AndroidManifest.xml:0:0
+		INJECTED from AndroidManifest.xml:0:0
+	android:versionName
+		ADDED from AndroidManifest.xml:5:5
+	android:versionCode
+		ADDED from AndroidManifest.xml:4:5
+		INJECTED from AndroidManifest.xml:0:0
+		INJECTED from AndroidManifest.xml:0:0
+uses-sdk
+ADDED from AndroidManifest.xml:7:5
+MERGED from qvdclient:zoomerWithKeys:unspecified:7:5
+	android:targetSdkVersion
+		ADDED from AndroidManifest.xml:7:41
+		INJECTED from AndroidManifest.xml:0:0
+		INJECTED from AndroidManifest.xml:0:0
+	android:minSdkVersion
+		ADDED from AndroidManifest.xml:7:15
+		INJECTED from AndroidManifest.xml:0:0
+		INJECTED from AndroidManifest.xml:0:0
+uses-permission#android.permission.INTERNET
+ADDED from AndroidManifest.xml:8:5
+	android:name
+		ADDED from AndroidManifest.xml:8:22
+uses-permission#android.permission.KILL_BACKGROUND_PROCESSES
+ADDED from AndroidManifest.xml:9:5
+	android:name
+		ADDED from AndroidManifest.xml:9:22
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from AndroidManifest.xml:10:5
+	android:name
+		ADDED from AndroidManifest.xml:10:22
+uses-permission#android.permission.GET_ACCOUNTS
+ADDED from AndroidManifest.xml:11:5
+	android:name
+		ADDED from AndroidManifest.xml:11:22
+uses-permission#android.permission.USE_CREDENTIALS
+ADDED from AndroidManifest.xml:12:5
+	android:name
+		ADDED from AndroidManifest.xml:12:22
+application
+ADDED from AndroidManifest.xml:14:5
+MERGED from qvdclient:zoomerWithKeys:unspecified:11:5
+	android:label
+		ADDED from AndroidManifest.xml:16:9
+	android:icon
+		ADDED from AndroidManifest.xml:15:9
+	android:theme
+		ADDED from AndroidManifest.xml:16:88
+	android:description
+		ADDED from AndroidManifest.xml:16:46
+activity#com.theqvd.android.client.QvdclientActivity
+ADDED from AndroidManifest.xml:17:9
+	android:label
+		ADDED from AndroidManifest.xml:19:13
+	android:name
+		ADDED from AndroidManifest.xml:18:13
+intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
+ADDED from AndroidManifest.xml:21:13
+action#android.intent.action.MAIN
+ADDED from AndroidManifest.xml:22:17
+	android:name
+		ADDED from AndroidManifest.xml:22:25
+category#android.intent.category.LAUNCHER
+ADDED from AndroidManifest.xml:24:17
+	android:name
+		ADDED from AndroidManifest.xml:24:27
+activity#com.theqvd.android.client.EditConnectionActivity
+ADDED from AndroidManifest.xml:27:9
+	android:name
+		ADDED from AndroidManifest.xml:27:19
+activity#com.theqvd.android.client.SelectVmActivity
+ADDED from AndroidManifest.xml:28:9
+	android:name
+		ADDED from AndroidManifest.xml:28:19
+activity#com.theqvd.android.xpro.XvncproActivity
+ADDED from AndroidManifest.xml:29:9
+	android:label
+		ADDED from AndroidManifest.xml:31:13
+	android:name
+		ADDED from AndroidManifest.xml:30:13
+activity#com.theqvd.android.xpro.DummyActivity
+ADDED from AndroidManifest.xml:37:9
+	android:screenOrientation
+		ADDED from AndroidManifest.xml:37:72
+	android:name
+		ADDED from AndroidManifest.xml:37:19
+intent-filter#android.intent.action.MAIN+android.intent.action.VIEW+android.intent.category.BROWSABLE+android.intent.category.DEFAULT
+ADDED from AndroidManifest.xml:38:13
+action#android.intent.action.VIEW
+ADDED from AndroidManifest.xml:40:17
+	android:name
+		ADDED from AndroidManifest.xml:40:25
+category#android.intent.category.DEFAULT
+ADDED from AndroidManifest.xml:41:17
+	android:name
+		ADDED from AndroidManifest.xml:41:27
+data
+ADDED from AndroidManifest.xml:42:17
+	android:scheme
+		ADDED from AndroidManifest.xml:42:23
+category#android.intent.category.BROWSABLE
+ADDED from AndroidManifest.xml:43:17
+	android:name
+		ADDED from AndroidManifest.xml:43:27
+service#com.theqvd.android.xpro.XserverService
+ADDED from AndroidManifest.xml:46:9
+	android:exported
+		ADDED from AndroidManifest.xml:46:95
+	android:enabled
+		ADDED from AndroidManifest.xml:46:18
+	android:name
+		ADDED from AndroidManifest.xml:46:41
+activity#android.androidVNC.androidVNC
+ADDED from AndroidManifest.xml:55:2
+	android:screenOrientation
+		ADDED from AndroidManifest.xml:55:90
+	android:label
+		ADDED from AndroidManifest.xml:55:12
+	android:name
+		ADDED from AndroidManifest.xml:55:45
+activity#android.androidVNC.VncCanvasActivity
+ADDED from AndroidManifest.xml:61:5
+	android:screenOrientation
+		ADDED from AndroidManifest.xml:61:15
+	android:configChanges
+		ADDED from AndroidManifest.xml:61:53
+	android:name
+		ADDED from AndroidManifest.xml:61:104
+intent-filter#android.intent.action.VIEW
+ADDED from AndroidManifest.xml:62:4
+intent-filter#android.intent.action.VIEW+android.intent.category.DEFAULT
+ADDED from AndroidManifest.xml:65:4
+activity#android.androidVNC.ConnectionListActivity
+ADDED from AndroidManifest.xml:71:2
+	android:label
+		ADDED from AndroidManifest.xml:71:69
+	android:name
+		ADDED from AndroidManifest.xml:71:12
+intent-filter#android.intent.action.CREATE_SHORTCUT+android.intent.category.DEFAULT
+ADDED from AndroidManifest.xml:72:4
+action#android.intent.action.CREATE_SHORTCUT
+ADDED from AndroidManifest.xml:73:6
+	android:name
+		ADDED from AndroidManifest.xml:73:14
+android:uses-permission#android.permission.READ_PHONE_STATE
+IMPLIED from AndroidManifest.xml:2:1 reason: com.antlersoft.android.zoomer has a targetSdkVersion < 4
+android:uses-permission#android.permission.READ_EXTERNAL_STORAGE
+IMPLIED from AndroidManifest.xml:2:1 reason: com.antlersoft.android.zoomer requested WRITE_EXTERNAL_STORAGE

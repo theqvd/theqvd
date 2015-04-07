@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/qvdclient.iml" filepath="$PROJECT_DIR$/qvdclient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/qvdclient/qvdclient-qvdclient.iml" filepath="$PROJECT_DIR$/qvdclient/qvdclient-qvdclient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zoomerWithKeys/zoomerWithKeys.iml" filepath="$PROJECT_DIR$/zoomerWithKeys/zoomerWithKeys.iml" />
+    </modules>
+  </component>
+</project>
+
