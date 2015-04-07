@@ -326,25 +326,25 @@ my $AVAILABLE_FILTERS =
 	      VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked 
                         expiration_soft expiration_hard state host host_id host_name di_name di_id 
                         user_state ip next_boot_ip ssh_port vnc_port serial_port tenant tenant_id tenant_name 
-                        creation_admin creation_date last_update_date last_start_date ip_in_use di_id_in_use  )],
+                        creation_date creation_admin_id creation_admin_name   ip_in_use di_id_in_use  )],
 
 	      DI_Tag => [qw(osf_id di_id name id tenant_id tenant_name)],
 
-	      User => [qw(id name blocked creation_admin creation_date last_update_date tenant_id tenant_name )],
+	      User => [qw(id name blocked creation_date last_update_date creation_admin_id creation_admin_name tenant_id tenant_name )],
 
-	      Host => [qw(id name address blocked frontend backend state vm_id creation_admin creation_date last_update_date)],
+	      Host => [qw(id name address blocked frontend backend state vm_id creation_date creation_admin_id creation_admin_name)],
 
-	      DI => [qw(id disk_image version  osf_id osf_name  tenant_id blocked tenant_name tag creation_date last_update_date)],
+	      DI => [qw(id disk_image version  osf_id osf_name  tenant_id blocked tenant_name tag creation_date creation_admin_id creation_admin_name)],
 
-	      OSF => [qw(id name overlay user_storage memory vm_id di_id  tenant_id tenant_name creation_date last_update_date)],
+	      OSF => [qw(id name overlay user_storage memory vm_id di_id  tenant_id tenant_name creation_date creation_admin_id creation_admin_name)],
 
 	      ACL => [qw(id name role_id admin_id)],
 
-	      Tenant => [qw(id name language block creation_date last_update_date)],
+	      Tenant => [qw(id name language block creation_date creation_admin_id creation_admin_name)],
 
-	      Role => [qw(name id fixed internal admin_id inheritor_id creation_date last_update_date)],
+	      Role => [qw(name id fixed internal admin_id inheritor_id creation_date creation_admin_id creation_admin_name)],
 
-	      Administrator => [qw(name  tenant_id tenant_name id language block creation_date last_update_date login_update_date)],
+	      Administrator => [qw(name  tenant_id tenant_name id language block creation_date creation_admin_id creation_admin_name)],
 
 	      Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
@@ -363,25 +363,25 @@ my $AVAILABLE_FILTERS =
 
 		 VM => [qw(storage id name  user_id user_name  osf_id osf_name di_tag blocked expiration_soft 
                            expiration_hard state host_id host_name di_name di_id user_state ip next_boot_ip ssh_port 
-                           vnc_port serial_port tenant_id tenant_name creation_admin creation_date last_update_date last_start_date ip_in_use di_id_in_use )],
+                           vnc_port serial_port tenant_id tenant_name  creation_date creation_admin_id creation_admin_name ip_in_use di_id_in_use )],
 
 		 DI_Tag => [qw(osf_id di_id name id tenant_id tenant_name)],
 
-		 User => [qw(id name blocked creation_admin creation_date last_update_date tenant_id tenant_name )],
+		 User => [qw(id name blocked creation_date creation_admin_id creation_admin_name tenant_id tenant_name )],
 
-		 Host => [qw(id name address blocked frontend backend state vm_id creation_admin creation_date last_update_date)],
+		 Host => [qw(id name address blocked frontend backend state vm_id creation_date creation_admin_id creation_admin_name)],
 
-		 DI => [qw(id disk_image version osf osf_id osf_name tenant_id blocked tenant_name tag creation_date last_update_date)],
+		 DI => [qw(id disk_image version osf osf_id osf_name tenant_id blocked tenant_name tag creation_date creation_admin_id creation_admin_name)],
 
-		 OSF => [qw(id name overlay user_storage memory vm_id di_id  tenant_id tenant_name creation_date last_update_date)],
+		 OSF => [qw(id name overlay user_storage memory vm_id di_id  tenant_id tenant_name creation_date creation_admin_id creation_admin_name)],
 
 		 ACL => [qw(id name role_id admin_id )],
 
-		 Role => [qw(name id fixed internal admin_id inheritor_id creation_date last_update_date)],
+		 Role => [qw(name id fixed internal admin_id inheritor_id creation_date creation_admin_id creation_admin_name)],
 
-		 Tenant => [qw(id name language block creation_date last_update_date)],
+		 Tenant => [qw(id name language block creation_date creation_admin_id creation_admin_name)],
 
-		 Administrator => [qw(name  tenant_id tenant_name role_id acl_id id role_name acl_name language block creation_date last_update_date login_update_date)],
+		 Administrator => [qw(name  tenant_id tenant_name role_id acl_id id role_name acl_name language block creation_date creation_admin_id creation_admin_name)],
 
 		 Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
@@ -418,25 +418,25 @@ my $AVAILABLE_FIELDS =
 
 	      Config => [qw(key value)],
 
-	      OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties creation_date last_update_date)],
+	      OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties creation_date creation_admin_id creation_admin_name)],
 
-	      Role => [qw(name id fixed internal acls roles creation_date last_update_date)],
+	      Role => [qw(name id fixed internal acls roles creation_date creation_admin_id creation_admin_name)],
 
-	      DI => [qw(id disk_image version osf_id osf_name blocked tags  properties creation_date last_update_date)],
+	      DI => [qw(id disk_image version osf_id osf_name blocked tags  properties creation_date creation_admin_id creation_admin_name)],
 
 	      VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
                         state host_id host_name  di_id user_state ip mac next_boot_ip ssh_port vnc_port serial_port 
-                        creation_admin creation_date last_update_date last_start_date di_version di_name di_id properties ip_in_use di_id_in_use )],
+                        creation_date creation_admin_id creation_admin_name di_version di_name di_id properties ip_in_use di_id_in_use )],
 
 	      ACL => [qw(id name)],
 
-	      Administrator => [qw(name roles id language block creation_date last_update_date login_update_date)],
+	      Administrator => [qw(name roles id language block creation_date creation_admin_id creation_admin_name)],
 
-	      Tenant => [qw(id name language block creation_date last_update_date)],
+	      Tenant => [qw(id name language block creation_date creation_admin_id creation_admin_name)],
 				   
-	      User => [qw(id name  blocked creation_admin creation_date last_update_date number_of_vms number_of_vms_connected  properties )],
+	      User => [qw(id name  blocked creation_date creation_admin_id creation_admin_name number_of_vms number_of_vms_connected  properties )],
 
-	      Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date last_update_date number_of_vms_connected properties )],
+	      Host => [qw(id name address blocked frontend backend state  load creation_date creation_admin_id creation_admin_name number_of_vms_connected properties )],
 
 	      DI_Tag => [qw(osf_id di_id name id )],
 
@@ -457,23 +457,23 @@ my $AVAILABLE_FIELDS =
 		 Wat_Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time antiquity status source ip type_of_action qvd_object object_deleted admin_deleted superadmin)],
 		 Config => [qw(key value)],
 
-		 OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties creation_date last_update_date)],
+		 OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties creation_date creation_admin_id creation_admin_name)],
 		 
-		 Role => [qw(name id fixed internal acls roles creation_date last_update_date)],
+		 Role => [qw(name id fixed internal acls roles creation_date creation_admin_id creation_admin_name)],
 		
-		 DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties creation_date last_update_date)],
+		 DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties creation_date creation_admin_id creation_admin_name)],
 		
 		 VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
                            time_until_expiration_soft time_until_expiration_hard state host_id host_name  di_id user_state ip mac next_boot_ip ssh_port vnc_port serial_port 
-                           creation_admin creation_date last_update_date last_start_date di_version di_name di_id properties ip_in_use di_id_in_use di_name_in_use )],
+                           creation_date creation_admin_id creation_admin_name di_version di_name di_id properties ip_in_use di_id_in_use di_name_in_use )],
 
 		 ACL => [qw(id name)],
 
-		 Administrator => [qw(name roles id language block creation_date last_update_date login_update_date)],
+		 Administrator => [qw(name roles id language block creation_date creation_admin_id creation_admin_name)],
 
-		 Tenant => [qw(id name language block creation_date last_update_date)],
+		 Tenant => [qw(id name language block creation_date creation_admin_id creation_admin_name)],
 
-		 User => [qw(id name  blocked creation_admin creation_date last_update_date number_of_vms number_of_vms_connected  properties )],
+		 User => [qw(id name  blocked  creation_date creation_admin_id creation_admin_name number_of_vms number_of_vms_connected  properties )],
 
 		 Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date last_update_date 
                              number_of_vms_connected properties )],
@@ -761,8 +761,8 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'acl_name' => 'acl.name',
 	'id' => 'me.id',
 	'creation_date' => 'creation_log_entry.time',
-	'last_update_date' => 'update_log_entry.time',
-	'last_login_date' => 'login_log_entry.time',
+	'creation_admin_id' => 'creation_log_entry.administrator_id',
+	'creation_admin_name' => 'creation_log_entry.administrator_name',
     },
 
     OSF => {
@@ -776,7 +776,8 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'tenant.name',
 	'creation_date' => 'creation_log_entry.time',
-	'last_update_date' => 'update_log_entry.time',
+	'creation_admin_id' => 'creation_log_entry.administrator_id',
+	'creation_admin_name' => 'creation_log_entry.administrator_name',
     },
 
     Host => {
@@ -788,9 +789,9 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'backend' => 'me.backend',
 	'state' => 'runtime.state',
 	'vm_id' => 'vms.vm_id',
-	'creation_admin' => 'me.creation_admin',
 	'creation_date' => 'creation_log_entry.time',
-	'last_update_date' => 'update_log_entry.time',
+	'creation_admin_id' => 'creation_log_entry.administrator_id',
+	'creation_admin_name' => 'creation_log_entry.administrator_name',
     },
 
     DI => {
@@ -804,18 +805,19 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'blocked' => 'me.blocked',
 	'tenant_name' => 'tenant.name',
 	'creation_date' => 'creation_log_entry.time',
-	'last_update_date' => 'update_log_entry.time',
+	'creation_admin_id' => 'creation_log_entry.administrator_id',
+	'creation_admin_name' => 'creation_log_entry.administrator_name',
     },
     User => {
 	'id' => 'me.id',
 	'name' => 'me.login',
 	'password' => 'me.password',
 	'blocked' => 'me.blocked',
-	'creation_admin' => 'me.creation_admin',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'tenant.name',
 	'creation_date' => 'creation_log_entry.time',
-	'last_update_date' => 'update_log_entry.time',
+	'creation_admin_id' => 'creation_log_entry.administrator_id',
+	'creation_admin_name' => 'creation_log_entry.administrator_name',
     },
 
     VM => {
@@ -844,12 +846,11 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'serial_port' => 'vm_runtime.vm_serial_port',
 	'tenant_id' => 'user.tenant_id',
 	'tenant_name' => 'tenant.name',
-	'creation_admin' => 'me.creation_admin',
 	'ip_in_use' => 'vm_runtime.vm_address',
 	'di_id_in_use' => 'vm_runtime.current_di_id',
 	'creation_date' => 'creation_log_entry.time',
-	'last_update_date' => 'update_log_entry.time',
-	'last_start_date' => 'start_log_entry.time',
+	'creation_admin_id' => 'creation_log_entry.administrator_id',
+	'creation_admin_name' => 'creation_log_entry.administrator_name',
     },
 
     Role => {
@@ -860,7 +861,8 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'admin_id' => 'admin_rels.administrator_id',
 	'inheritor_id' => 'parent_role_rels.inheritor_id',
 	'creation_date' => 'creation_log_entry.time',
-	'last_update_date' => 'update_log_entry.time',
+	'creation_admin_id' => 'creation_log_entry.administrator_id',
+	'creation_admin_name' => 'creation_log_entry.administrator_name',
     },
 
     Tenant => {
@@ -869,7 +871,8 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'language' => 'wat_setups.language',
 	'block' => 'wat_setups.block',
 	'creation_date' => 'creation_log_entry.time',
-	'last_update_date' => 'update_log_entry.time',
+	'creation_admin_id' => 'creation_log_entry.administrator_id',
+	'creation_admin_name' => 'creation_log_entry.administrator_name',
     },
     
     Tenant_Views_Setup => { 	
@@ -985,9 +988,9 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'backend' => 'me.backend',
 	'state' => 'runtime.state',
 	'load' => 'me.load',
-	'creation_admin' => 'me.creation_admin',
 	'creation_date' => 'creation_log_entry.time',
-	'last_update_date' => 'update_log_entry.time',
+	'creation_admin_id' => 'creation_log_entry.administrator_id',
+	'creation_admin_name' => 'creation_log_entry.administrator_name',
 	'number_of_vms_connected' => 'view.number_of_vms_connected',
 	'properties' => 'view.properties',
     },
@@ -1000,7 +1003,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'acls' => 'view.acls',
 	'roles' => 'view.roles',
 	'creation_date' => 'creation_log_entry.time',
-	'last_update_date' => 'update_log_entry.time',
+	'creation_admin_id' => 'creation_log_entry.administrator_id',
+	'creation_admin_name' => 'creation_log_entry.administrator_name',
     },
 
     User => {
@@ -1008,14 +1012,14 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'name' => 'me.login',
 	'password' => 'me.password',
 	'blocked' => 'me.blocked',
-	'creation_admin' => 'me.creation_admin',
 	'number_of_vms' => 'view.number_of_vms',
 	'number_of_vms_connected' => 'view.number_of_vms_connected',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'tenant.name',
 	'properties' => 'view.properties',
 	'creation_date' => 'creation_log_entry.time',
-	'last_update_date' => 'update_log_entry.time',
+	'creation_admin_id' => 'creation_log_entry.administrator_id',
+	'creation_admin_name' => 'creation_log_entry.administrator_name',
     },
 
     DI_Tag => {
@@ -1039,7 +1043,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'number_of_dis' => 'view.number_of_dis',
 	'properties' => 'view.properties',
 	'creation_date' => 'creation_log_entry.time',
-	'last_update_date' => 'update_log_entry.time',
+	'creation_admin_id' => 'creation_log_entry.administrator_id',
+	'creation_admin_name' => 'creation_log_entry.administrator_name',
     },
 
     VM => {
@@ -1070,7 +1075,6 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'serial_port' => 'vm_runtime.vm_serial_port',
 	'tenant_id' => 'user.tenant_id',
 	'tenant_name' => 'me.tenant_name',
-	'creation_admin' => 'me.creation_admin',
 	'di_version' => 'di.version',
 	'di_name' => 'di.path',
 	'di_id' => 'di.id',
@@ -1078,8 +1082,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'di_name_in_use' => 'vm_runtime.current_di_name',
 	'properties' => 'view.properties',
     	'creation_date' => 'creation_log_entry.time',
-	'last_update_date' => 'update_log_entry.time',
-	'last_start_date' => 'start_log_entry.time',
+	'creation_admin_id' => 'creation_log_entry.administrator_id',
+	'creation_admin_name' => 'creation_log_entry.administrator_name',
     },
 
     DI => {
@@ -1094,7 +1098,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'tenant_name' => 'osf.tenant_name',
 	'properties' => 'view.properties',
 	'creation_date' => 'creation_log_entry.time',
-	'last_update_date' => 'update_log_entry.time',
+	'creation_admin_id' => 'creation_log_entry.administrator_id',
+	'creation_admin_name' => 'creation_log_entry.administrator_name',
     },
 
     Administrator => {
@@ -1107,8 +1112,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'roles' => 'me.get_roles_info',
 	'id' => 'me.id',
 	'creation_date' => 'creation_log_entry.time',
-	'last_update_date' => 'update_log_entry.time',
-	'last_login_date' => 'login_log_entry.time',
+	'creation_admin_id' => 'creation_log_entry.administrator_id',
+	'creation_admin_name' => 'creation_log_entry.administrator_name',
     },
     Tenant => {
 	'name' => 'me.name',
@@ -1116,7 +1121,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'language' => 'wat_setups.language',
 	'block' => 'wat_setups.block',
 	'creation_date' => 'creation_log_entry.time',
-	'last_update_date' => 'update_log_entry.time',
+	'creation_admin_id' => 'creation_log_entry.administrator_id',
+	'creation_admin_name' => 'creation_log_entry.administrator_name',
     },
 
     Tenant_Views_Setup => { 	
@@ -1197,23 +1203,23 @@ my $VALUES_NORMALIZATOR =
 
 my $DBIX_JOIN_VALUE = 
 { 
-    User => [qw(tenant creation_log_entry update_log_entry)],
+    User => [qw(tenant creation_log_entry)],
  
-    VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }, qw(creation_log_entry update_log_entry start_log_entry) ],
+    VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }, qw(creation_log_entry) ],
   
-    Host => ['runtime', 'vms', qw(creation_log_entry update_log_entry)],
+    Host => ['runtime', 'vms', qw(creation_log_entry)],
 
-    OSF => [ qw(tenant vms), { dis => 'tags' }, qw(creation_log_entry update_log_entry)],
+    OSF => [ qw(tenant vms), { dis => 'tags' }, qw(creation_log_entry)],
 
-    DI => [qw(vm_runtimes tags), {osf => 'tenant'}, qw(creation_log_entry update_log_entry)],
+    DI => [qw(vm_runtimes tags), {osf => 'tenant'}, qw(creation_log_entry)],
 
     DI_Tag => [{di => {osf => 'tenant'}}],
 
-    Role => [ 'admin_rels', {role_rels => 'inherited'}, {parent_role_rels => 'inheritor'}, { acl_rels => 'acl'}, qw(creation_log_entry update_log_entry)],
+    Role => [ 'admin_rels', {role_rels => 'inherited'}, {parent_role_rels => 'inheritor'}, { acl_rels => 'acl'}, qw(creation_log_entry)],
 		
-    Administrator => [qw(tenant wat_setups), { role_rels => { role => { acl_rels => 'acl' }}}, qw(creation_log_entry update_log_entry login_log_entry)],
+    Administrator => [qw(tenant wat_setups), { role_rels => { role => { acl_rels => 'acl' }}}, qw(creation_log_entry)],
 
-    Tenant => [qw(wat_setups creation_log_entry update_log_entry)],
+    Tenant => [qw(wat_setups creation_log_entry)],
     
     ACL => [{ role_rels => { role => { admin_rels => 'admin' }}}],
     
@@ -1224,25 +1230,25 @@ my $DBIX_JOIN_VALUE =
 
 my $DBIX_PREFETCH_VALUE = 
 { 
-    list => { User => [qw(tenant creation_log_entry update_log_entry)],
-	      VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }, qw(creation_log_entry update_log_entry start_log_entry)],
-	      Host => ['runtime', qw(creation_log_entry update_log_entry)],
-	      OSF => [ qw(tenant creation_log_entry update_log_entry)],
-	      DI => [{osf => 'tenant'}, qw(creation_log_entry update_log_entry)],
+    list => { User => [qw(tenant creation_log_entry)],
+	      VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }, qw(creation_log_entry)],
+	      Host => ['runtime', qw(creation_log_entry)],
+	      OSF => [ qw(tenant creation_log_entry)],
+	      DI => [{osf => 'tenant'}, qw(creation_log_entry)],
 	      DI_Tag => [{di => {osf => 'tenant'}}],
-	      Administrator => [qw(tenant wat_setups), qw(creation_log_entry update_log_entry login_log_entry)],
-	      Tenant => [qw(wat_setups creation_log_entry update_log_entry)],
+	      Administrator => [qw(tenant wat_setups), qw(creation_log_entry)],
+	      Tenant => [qw(wat_setups creation_log_entry)],
 	      Tenant_Views_Setup => [ qw(tenant)],
 	      Administrator_Views_Setup => [ { administrator => 'tenant' }] },
 
-    details => {User => [qw(tenant creation_log_entry update_log_entry)],
-		VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }, qw(creation_log_entry update_log_entry start_log_entry)],
-		Host => ['runtime', qw(creation_log_entry update_log_entry)],
-		OSF => [ qw(tenant creation_log_entry update_log_entry)],
-		DI => [{osf => 'tenant'}, qw(creation_log_entry update_log_entry)],
+    details => {User => [qw(tenant creation_log_entry)],
+		VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }, qw(creation_log_entry)],
+		Host => ['runtime', qw(creation_log_entry)],
+		OSF => [ qw(tenant creation_log_entry)],
+		DI => [{osf => 'tenant'}, qw(creation_log_entry)],
 		DI_Tag => [{di => {osf => 'tenant'}}],
-		Administrator => [qw(tenant wat_setups creation_log_entry update_log_entry login_log_entry)],
-		Tenant => [qw(wat_setups creation_log_entry update_log_entry)],
+		Administrator => [qw(tenant wat_setups creation_log_entry)],
+		Tenant => [qw(wat_setups creation_log_entry)],
 		Tenant_Views_Setup => [ qw(tenant)],
 		Administrator_Views_Setup => [ { administrator => 'tenant' }]}
 };

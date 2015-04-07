@@ -25,10 +25,6 @@ __PACKAGE__->has_one (wat_setups   => 'QVD::DB::Result::Wat_Setups_By_Administra
 
 __PACKAGE__->has_one(creation_log_entry => 'QVD::DB::Result::Wat_Log', 
 		     \&creation_log_entry_join_condition, {join_type => 'LEFT'});
-__PACKAGE__->has_one(update_log_entry => 'QVD::DB::Result::Wat_Log', 
-		     \&update_log_entry_join_condition, {join_type => 'LEFT'});
-__PACKAGE__->has_one(login_log_entry => 'QVD::DB::Result::Wat_Log', 
-		     \&login_log_entry_join_condition, {join_type => 'LEFT'});
 
 sub creation_log_entry_join_condition
 { 
