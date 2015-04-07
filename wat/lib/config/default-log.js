@@ -55,6 +55,7 @@ Wat.I.listFields[qvdObj] = {
         ],
         'text': 'Administrator',
         'sortable': true,
+        'acls': 'log.see.administrator',
     },
     'datetime': {
         'display': true,
@@ -71,6 +72,16 @@ Wat.I.listFields[qvdObj] = {
         ],
         'text': 'Source',
         'sortable': true,
+        'acls': 'log.see.source',
+    },
+    'address': {
+        'display': false,
+        'fields': [
+            'ip'
+        ],
+        'text': 'Address',
+        'sortable': true,
+        'acls': 'log.see.address',
     }
 };
 
@@ -119,7 +130,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'log.see-main.'
+        'acls': 'log.filter.date'
     },
     'min_date': {
         'filterField': 'time',
@@ -129,7 +140,7 @@ Wat.I.formFilters[qvdObj] = {
         'class': 'datepicker-past date-filter',
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'log.see-main.'
+        'acls': 'log.filter.date'
     },
     'max_date': {
         'filterField': 'time',
@@ -139,7 +150,7 @@ Wat.I.formFilters[qvdObj] = {
         'class': 'datepicker-past date-filter',
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'log.see-main.'
+        'acls': 'log.filter.date'
     },
     'source': {
         'filterField': 'source',
@@ -158,7 +169,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'log.see-main.'
+        'acls': 'log.filter.source'
     },
     'admin': {
         'filterField': 'admin_name',
@@ -176,7 +187,7 @@ Wat.I.formFilters[qvdObj] = {
         'displayMobile': false,
         'displayDesktop': true,
         'nameAsId': true,
-        'acls': 'log.see-main.'
+        'acls': 'log.filter.administrator'
     },
     'action': {
         'filterField': 'type_of_action',
@@ -193,7 +204,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'log.see-main.'
+        'acls': 'log.filter.action'
     },
     'object': {
         'filterField': 'qvd_object',
@@ -210,7 +221,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'log.see-main.'
+        'acls': 'log.filter.object'
     },
     'response': {
         'filterField': 'status',
@@ -236,7 +247,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'log.see-main.',
+        'acls': 'log.filter.response',
         'displayMobile': true,
         'displayDesktop': true
     }
