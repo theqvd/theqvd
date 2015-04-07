@@ -172,11 +172,11 @@ Wat.I.formFilters[qvdObj] = {
         'acls': 'log.filter.source'
     },
     'admin': {
-        'filterField': 'admin_name',
+        'filterField': 'admin_id',
         'type': 'select',
         'text': 'Administrator',
         'class': 'chosen-advanced',
-        'fillable': true,
+        'fillable': false,
         'options': [
             {
                 'value': -1,
@@ -186,7 +186,6 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'nameAsId': true,
         'acls': 'log.filter.administrator'
     },
     'action': {
