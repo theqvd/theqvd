@@ -1,6 +1,13 @@
 ECLIPSE ANDROID PROJECT IMPORT SUMMARY
 ======================================
 
+ * Project
+   xvncpro:/home/juanan/Proyectos/qvd/libqvdclient/android/xserverpro/.classpath
+   
+   Could not resolve source path /ZoomerWithKeys in project xvncpro: ignored.
+   The project may not compile if the given source path provided source code.
+
+
 Manifest Merging:
 -----------------
 Your project uses libraries that provide manifests, and your Eclipse
@@ -16,41 +23,19 @@ The following files were *not* copied into the new Gradle project; you
 should evaluate whether these are still needed in your project and if
 so manually move them:
 
-From ZoomerWithKeys:
-* proguard.cfg
-From qvdclient:
-* ant.properties
-* build.properties
-* build.xml
-* patch/
-* patch/vnc4-4.1.1+xorg4.3.0.patch
 * proguard-project.txt
-* proguard.cfg
-* test
 
 Moved Files:
 ------------
 Android Gradle projects use a different directory structure than ADT
 Eclipse projects. Here's how the projects were restructured:
 
-In ZoomerWithKeys:
-* AndroidManifest.xml => zoomerWithKeys/src/main/AndroidManifest.xml
-* assets/ => zoomerWithKeys/src/main/assets/
-* res/ => zoomerWithKeys/src/main/res/
-* src/ => zoomerWithKeys/src/main/java/
-In qvdclient:
-* AndroidManifest.xml => qvdclient/src/main/AndroidManifest.xml
-* assets/ => qvdclient/src/main/assets/
-* libs/armeabi/libqvdclient.so => qvdclient/src/main/jniLibs/armeabi/libqvdclient.so
-* libs/armeabi/libqvdclientwrapper.so => qvdclient/src/main/jniLibs/armeabi/libqvdclientwrapper.so
-* libs/com.antlersoft.android.contentxml.jar => qvdclient/libs/com.antlersoft.android.contentxml.jar
-* libs/com.antlersoft.android.db.jar => qvdclient/libs/com.antlersoft.android.db.jar
-* libs/qvdclientjni-0.3.0.jar => qvdclient/libs/qvdclientjni-0.3.0.jar
-* libs/x86/libqvdclient.so => qvdclient/src/main/jniLibs/x86/libqvdclient.so
-* libs/x86/libqvdclientwrapper.so => qvdclient/src/main/jniLibs/x86/libqvdclientwrapper.so
-* lint.xml => qvdclient/lint.xml
-* res/ => qvdclient/src/main/res/
-* src/ => qvdclient/src/main/java/
+* AndroidManifest.xml => xvncpro/src/main/AndroidManifest.xml
+* assets/ => xvncpro/src/main/assets/
+* libs/com.antlersoft.android.contentxml.jar => xvncpro/libs/com.antlersoft.android.contentxml.jar
+* libs/com.antlersoft.android.db.jar => xvncpro/libs/com.antlersoft.android.db.jar
+* res/ => xvncpro/src/main/res/
+* src/ => xvncpro/src/main/java/
 
 Next Steps:
 -----------

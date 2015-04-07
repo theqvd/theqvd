@@ -10,6 +10,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/qvdclient" />
+            <option value="$PROJECT_DIR$/xvncpro" />
             <option value="$PROJECT_DIR$/zoomerWithKeys" />
           </set>
         </option>
