@@ -560,7 +560,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         // The superadmin have an extra field on lists: tenant
         
-        // Every element but the hosts has tenant
+        // Add tenant column to any element where it has sense
         var classifiedByTenant = $.inArray(this.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
         if (Wat.C.isSuperadmin() && classifiedByTenant) {
             this.columns.tenant = {

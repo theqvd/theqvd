@@ -79,6 +79,13 @@
                             </th>
             <%
                             break;
+                        case 'tenant':
+            %>
+                            <th class="<%= sortAttr %> desktop" data-sortby="tenant_name">
+                                <span data-i18n="Tenant"><%= i18n.t('Tenant') %></span>
+                            </th>
+            <%
+                            break;
                     }
                 });                    
             %>
@@ -226,6 +233,13 @@
                 %>
                                 <td class="desktop">
                                         <span class="text"><%= model.get('ip') %></span>
+                                </td>
+                <%
+                                break;
+                            case 'tenant':
+                %>
+                                <td class="desktop">
+                                    <%= model.get('tenant_name') %>
                                 </td>
                 <%
                                 break;
