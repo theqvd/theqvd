@@ -14,7 +14,8 @@ __PACKAGE__->add_columns( id     => { data_type => 'integer',
 
                           # TODO: rename "path" as "file"
                           path  => { data_type => 'varchar(4096)' },
-                          version => { data_type => 'varchar(64)' } );
+                          version => { data_type => 'varchar(64)' },
+ );
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->belongs_to(osf => 'QVD::DB::Result::OSF', 'osf_id', { cascade_delete => 0 } );
@@ -25,6 +26,33 @@ __PACKAGE__->has_many(vm_runtimes => 'QVD::DB::Result::VM_Runtime', 'current_di_
 __PACKAGE__->has_many(tags => 'QVD::DB::Result::DI_Tag', 'di_id', { order_by => { '-desc' => 'tag' }});
 
 __PACKAGE__->add_unique_constraint(['osf_id', 'version']);
+
+######### Log info
+
+__PACKAGE__->has_one(creation_log_entry => 'QVD::DB::Result::Wat_Log', 
+		     \&creation_log_entry_join_condition, {join_type => 'LEFT'});
+__PACKAGE__->has_one(update_log_entry => 'QVD::DB::Result::Wat_Log', 
+		     \&update_log_entry_join_condition, {join_type => 'LEFT'});
+
+sub creation_log_entry_join_condition
+{ 
+    my $args = shift; 
+
+    { "$args->{foreign_alias}.object_id" => { -ident => "$args->{self_alias}.id" },
+      "$args->{foreign_alias}.qvd_object"     => { '=' => 'di' },
+      "$args->{foreign_alias}.type_of_action"     => { '=' => 'create' } };
+}
+
+sub update_log_entry_join_condition
+{ 
+    my $args = shift; 
+
+    my $sql = "IN (select id from wat_log where object_id=$args->{self_alias}.id and 
+                   qvd_object='di' and type_of_action='update' order by id DESC LIMIT 1)";
+    { "$args->{foreign_alias}.id"     => \$sql , };
+}
+
+###################
 
 sub tag_list {
     my $di = shift;

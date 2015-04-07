@@ -21,6 +21,44 @@ __PACKAGE__->has_many(views => 'QVD::DB::Result::Administrator_Views_Setup', 'ad
 __PACKAGE__->belongs_to(tenant => 'QVD::DB::Result::Tenant',  'tenant_id', { cascade_delete => 0 });
 __PACKAGE__->has_one (wat_setups   => 'QVD::DB::Result::Wat_Setups_By_Administrator',  'administrator_id');
 
+######### Log info
+
+__PACKAGE__->has_one(creation_log_entry => 'QVD::DB::Result::Wat_Log', 
+		     \&creation_log_entry_join_condition, {join_type => 'LEFT'});
+__PACKAGE__->has_one(update_log_entry => 'QVD::DB::Result::Wat_Log', 
+		     \&update_log_entry_join_condition, {join_type => 'LEFT'});
+__PACKAGE__->has_one(login_log_entry => 'QVD::DB::Result::Wat_Log', 
+		     \&login_log_entry_join_condition, {join_type => 'LEFT'});
+
+sub creation_log_entry_join_condition
+{ 
+    my $args = shift; 
+
+    { "$args->{foreign_alias}.object_id" => { -ident => "$args->{self_alias}.id" },
+      "$args->{foreign_alias}.qvd_object"     => { '=' => 'administrator' },
+      "$args->{foreign_alias}.type_of_action"     => { '=' => 'create' } };
+}
+
+sub update_log_entry_join_condition
+{ 
+    my $args = shift; 
+
+    my $sql = "IN (select id from wat_log where object_id=$args->{self_alias}.id and 
+                   qvd_object='administrator' and type_of_action='update' order by id DESC LIMIT 1)";
+    { "$args->{foreign_alias}.id"     => \$sql , };
+}
+
+sub login_log_entry_join_condition
+{ 
+    my $args = shift; 
+
+    my $sql = "IN (select id from wat_log where object_id=$args->{self_alias}.id and 
+                   action='login' order by id DESC LIMIT 1)";
+    { "$args->{foreign_alias}.id"     => \$sql , };
+}
+
+##################
+
 my $DB;
 
 sub roles

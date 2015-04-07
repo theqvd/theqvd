@@ -17,7 +17,9 @@ __PACKAGE__->add_columns(
 			  ip      => { data_type         => 'varchar(15)',
 				       is_nullable       => 1 },
 			  storage => { data_type         => 'varchar(4096)',
-				       is_nullable       => 1 } );
+				       is_nullable       => 1 },
+);
+
 __PACKAGE__->set_primary_key('id');
 
 __PACKAGE__->add_unique_constraint(['name']);
@@ -42,6 +44,47 @@ EOIN
 				   "$args->{foreign_alias}.id" => { -in => \$in } };
 
 			});
+
+######### Log info
+
+__PACKAGE__->has_one(creation_log_entry => 'QVD::DB::Result::Wat_Log', 
+		     \&creation_log_entry_join_condition, {join_type => 'LEFT'});
+__PACKAGE__->has_one(update_log_entry => 'QVD::DB::Result::Wat_Log', 
+		     \&update_log_entry_join_condition, {join_type => 'LEFT'});
+__PACKAGE__->has_one(start_log_entry => 'QVD::DB::Result::Wat_Log', 
+		     \&start_log_entry_join_condition, {join_type => 'LEFT'});
+
+
+
+sub creation_log_entry_join_condition
+{ 
+    my $args = shift; 
+
+    { "$args->{foreign_alias}.object_id" => { -ident => "$args->{self_alias}.id" },
+      "$args->{foreign_alias}.qvd_object"     => { '=' => 'vm' },
+      "$args->{foreign_alias}.type_of_action"     => { '=' => 'create' } };
+}
+
+sub update_log_entry_join_condition
+{ 
+    my $args = shift; 
+
+    my $sql = "IN (select id from wat_log where object_id=$args->{self_alias}.id and 
+                   qvd_object='vm' and type_of_action='update' order by id DESC LIMIT 1)";
+    { "$args->{foreign_alias}.id"     => \$sql , };
+}
+
+sub start_log_entry_join_condition
+{ 
+    my $args = shift; 
+
+    my $sql = "IN (select id from wat_log where object_id=$args->{self_alias}.id and 
+                   qvd_object='vm' and action='vm_start' order by id DESC LIMIT 1)";
+    { "$args->{foreign_alias}.id"     => \$sql , };
+}
+
+###################
+
 
 sub combined_properties {
     my $vm = shift;
@@ -89,6 +132,7 @@ sub creation_admin
     my $self = shift;
     return undef;
 }
+
 
 sub custom_join_condition
 { 

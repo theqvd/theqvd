@@ -9,26 +9,19 @@ sub option_spec {
 sub usage_text { 
 
 "======================================================================================================
-                                             VM COMMAND USAGE
+                                             LOG COMMAND USAGE
 ======================================================================================================
 
-== CREATING A NEW VM
+== GETTING LOG entries
 
-  vm new <ARGUMENTS>
-  
-  For example: 
-  vm new name=myvm, user=myuser, osf=myosf (Creates a VM with user 'myuser', osf 'myosf' and name 'myvm') 
-
-== GETTING VMs
-
-  vm get
-  vm <FILTERS> get
-  vm <FILTERS> get <FIELDS TO RETRIEVE>
+  log get
+  log <FILTERS> get
+  log <FILTERS> get <FIELDS TO RETRIEVE>
 
   For example: 
-  vm get (retrieves default fields of all VMs)
-  vm name=myvm get (retrieves default fields of all VMs with name 'myvm')
-  vm name=myvm get name, id, ip (retrieves 'name', 'id' and 'ip' of VMs with name 'myvm') 
+  log get (retrieves default fields of all LOG entries)
+  log action=login get (retrieves default fields of all LOG entries regarding login actions)
+  log action=login get action, time, status (retrieves 'action', 'time', and 'status fields)
 
   Ordering:
 
@@ -108,3 +101,4 @@ sub run
 
 
 1;
+

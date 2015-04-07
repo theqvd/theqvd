@@ -88,23 +88,29 @@ my $FILTERS =
     vm => { storage => 'storage', id => 'id', name => 'name', user => 'user_name', osf => 'osf_name', tag => 'di_tag', blocked => 'blocked', 
 	    expiration_soft => 'expiration_soft', expiration_hard => 'expiration_hard', state => 'state', host =>  'host_name', di => 'di_name', 
 	    user_state => 'user_state', ip => 'ip', ssh_port => 'ssh_port', vnc_port => 'vnv_port', serial_port => 'serial_port',
-	    tenant =>  'tenant_name', ip_in_use => 'ip_in_use', di_in_use => 'di_name_in_use' },
+	    tenant =>  'tenant_name', ip_in_use => 'ip_in_use', di_in_use => 'di_name_in_use', creation_date => 'creation_date', 
+            last_update_date => 'last_update_date', last_start_date => 'last_start_date' },
 
-    user => { id => 'id', name => 'name', blocked => 'blocked', tenant => 'tenant_name'},
+    user => { id => 'id', name => 'name', blocked => 'blocked', tenant => 'tenant_name', creation_date => 'creation_date', last_update_date => 'last_update_date',},
 
-    host => { id => 'id', name => 'name', address => 'address', blocked => 'blocked', frontend => 'frontend', backend => 'backend', state => 'state'},
+    host => { id => 'id', name => 'name', address => 'address', blocked => 'blocked', frontend => 'frontend', backend => 'backend', state => 'state',
+	      creation_date => 'creation_date', last_update_date => 'last_update_date'},
 
-    osf => { id => 'id', name => 'name', overlay => 'overlay', user_storage => 'user_storage', memory => 'memory', tenant =>  'tenant_name' },
+    osf => { id => 'id', name => 'name', overlay => 'overlay', user_storage => 'user_storage', memory => 'memory', tenant =>  'tenant_name',
+	     creation_date => 'creation_date', last_update_date => 'last_update_date' },
 
-    di => { id => 'id', name => 'disk_image', version => 'version', osf => 'osf_name', tenant => 'tenant_name', blocked => 'blocked', tag => 'tag' },
+    di => { id => 'id', name => 'disk_image', version => 'version', osf => 'osf_name', tenant => 'tenant_name', blocked => 'blocked', tag => 'tag',
+	    creation_date => 'creation_date', last_update_date => 'last_update_date'},
 
-    tenant => { id => 'id', name => 'name', language => 'language', block => 'block' },
+    tenant => { id => 'id', name => 'name', language => 'language', block => 'block',
+		creation_date => 'creation_date', last_update_date => 'last_update_date' },
 
     config => { key_re => 'key_re' },
 
-    admin => { id => 'id', name => 'name', tenant => 'tenant_name', language => 'language', block => 'block' },
+    admin => { id => 'id', name => 'name', tenant => 'tenant_name', language => 'language', block => 'block',
+	       creation_date => 'creation_date', last_update_date => 'last_update_date', last_login_date => 'last_login_date' },
 
-    role => { id => 'id', name => 'name', fixed => 'fixed', internal => 'internal' },
+    role => { id => 'id', name => 'name', fixed => 'fixed', internal => 'internal', creation_date => 'creation_date', last_update_date => 'last_update_date' },
 
     acl => { id => 'id', name => 'name', role => 'role_id', admin => 'admin_id', operative => 'operative'},
 
@@ -119,21 +125,26 @@ my $ORDER =
     vm => { storage => 'storage', id => 'id', name => 'name', user => 'user_name', osf => 'osf_name', tag => 'di_tag', blocked => 'blocked', 
 	    expiration_soft => 'expiration_soft', expiration_hard => 'expiration_hard', state => 'state', host =>  'host_name', di => 'di_name', 
 	    user_state => 'user_state', ip => 'ip', ssh_port => 'ssh_port', vnc_port => 'vnv_port', serial_port => 'serial_port',
-	    tenant =>  'tenant_name', ip_in_use => 'ip_in_use'},
+	    tenant =>  'tenant_name', ip_in_use => 'ip_in_use', creation_date => 'creation_date', 
+            last_update_date => 'last_update_date', last_start_date => 'last_start_date'},
 
-    user => { id => 'id', name => 'name', blocked => 'blocked', tenant => 'tenant_name'},
+    user => { id => 'id', name => 'name', blocked => 'blocked', tenant => 'tenant_name', creation_date => 'creation_date', last_update_date => 'last_update_date'},
 
-    host => { id => 'id', name => 'name', address => 'address', blocked => 'blocked', frontend => 'frontend', backend => 'backend',state => 'state'},
+    host => { id => 'id', name => 'name', address => 'address', blocked => 'blocked', frontend => 'frontend', backend => 'backend',state => 'state',
+	      creation_date => 'creation_date', last_update_date => 'last_update_date'},
 
-    osf => { id => 'id', name => 'name', overlay => 'overlay', user_storage => 'user_storage', memory => 'memory', tenant =>  'tenant_name' },
+    osf => { id => 'id', name => 'name', overlay => 'overlay', user_storage => 'user_storage', memory => 'memory', tenant =>  'tenant_name',
+	     creation_date => 'creation_date', last_update_date => 'last_update_date' },
 
-    di => { id => 'id', name => 'disk_image', version => 'version', osf => 'osf_name', tenant => ' tenant_name', blocked => 'blocked', tag => 'tag' },
+    di => { id => 'id', name => 'disk_image', version => 'version', osf => 'osf_name', tenant => ' tenant_name', blocked => 'blocked', tag => 'tag',
+	    creation_date => 'creation_date', last_update_date => 'last_update_date' },
 
-    tenant => { id => 'id', name => 'name', language => 'language', block => 'block' },
+    tenant => { id => 'id', name => 'name', language => 'language', block => 'block', creation_date => 'creation_date', last_update_date => 'last_update_date' },
 
-    admin => { id => 'id', name => 'name', tenant => 'tenant_name', language => 'language', block => 'block' },
+    admin => { id => 'id', name => 'name', tenant => 'tenant_name', language => 'language', block => 'block',
+	       creation_date => 'creation_date', last_update_date => 'last_update_date', last_login_date => 'last_login_date' },
 
-    role => { id => 'id', name => 'name', fixed => 'fixed', internal => 'internal' },
+    role => { id => 'id', name => 'name', fixed => 'fixed', internal => 'internal', creation_date => 'creation_date', last_update_date => 'last_update_date' },
 
     acl => { id => 'id', name => 'name' },
 
@@ -147,23 +158,30 @@ my $FIELDS =
     vm => { storage => 'storage', id => 'id', name => 'name', user => 'user_name', osf => 'osf_name', tag => 'di_tag', blocked => 'blocked', 
 	    expiration_soft => 'expiration_soft', expiration_hard => 'expiration_hard', state => 'state', host =>  'host_name', di => 'di_name', 
 	    user_state => 'user_state', ip => 'ip', mac => 'mac', ssh_port => 'ssh_port', vnc_port => 'vnv_port', serial_port => 'serial_port', 
-	    tenant =>  'tenant_name', ip_in_use => 'ip_in_use', di_in_use => 'di_name_in_use' },
+	    tenant =>  'tenant_name', ip_in_use => 'ip_in_use', di_in_use => 'di_name_in_use',
+	    creation_date => 'creation_date', last_update_date => 'last_update_date', last_start_date => 'last_start_date' },
 
-    user => { id => 'id', name => 'name', tenant => 'tenant_name', blocked => 'blocked', number_of_vms => 'number_of_vms', number_of_vms_connected => 'number_of_vms_connected'},
+    user => { id => 'id', name => 'name', tenant => 'tenant_name', blocked => 'blocked', number_of_vms => 'number_of_vms', 
+	      number_of_vms_connected => 'number_of_vms_connected', creation_date => 'creation_date', last_update_date => 'last_update_date'},
 
-    host => { id => 'id', name => 'name', address => 'address', blocked => 'blocked', frontend => 'frontend', backend => 'backend', state => 'state', number_of_vms_connected => 'number_of_vms_connected'},
+    host => { id => 'id', name => 'name', address => 'address', blocked => 'blocked', frontend => 'frontend', backend => 'backend', state => 'state', 
+	      number_of_vms_connected => 'number_of_vms_connected', creation_date => 'creation_date', last_update_date => 'last_update_date'},
 
-    osf => { id => 'id', name => 'name', overlay => 'overlay', user_storage => 'user_storage', memory => 'memory', tenant =>  'tenant_name', number_of_vms => 'number_of_vms', number_of_dis => 'number_of_dis'},
+    osf => { id => 'id', name => 'name', overlay => 'overlay', user_storage => 'user_storage', memory => 'memory', tenant =>  'tenant_name', 
+	     number_of_vms => 'number_of_vms', number_of_dis => 'number_of_dis', creation_date => 'creation_date', last_update_date => 'last_update_date'},
 
-    di => { id => 'id', name => 'disk_image', tenant => 'tenant_name', version => 'version', osf => 'osf_name', blocked => 'blocked', tags => 'tags'},
+    di => { id => 'id', name => 'disk_image', tenant => 'tenant_name', version => 'version', osf => 'osf_name', blocked => 'blocked', tags => 'tags',
+	    creation_date => 'creation_date', last_update_date => 'last_update_date'},
 
-    tenant => { id => 'id', name => 'name', language => 'language', block => 'block' },
+    tenant => { id => 'id', name => 'name', language => 'language', block => 'block', creation_date => 'creation_date', last_update_date => 'last_update_date' },
 
     config => { key => 'key', value => 'operative_value', default => 'default_value'  },
 
-    admin => { id => 'id', name => 'name', roles => 'roles', tenant => 'tenant_name', language => 'language', block => 'block' },
+    admin => { id => 'id', name => 'name', roles => 'roles', tenant => 'tenant_name', language => 'language', block => 'block',
+	       creation_date => 'creation_date', last_update_date => 'last_update_date', last_login_date => 'last_login_date' },
 
-    role => { id => 'id', name => 'name', fixed => 'fixed', internal => 'internal', roles => 'roles', acls => 'acls'},
+    role => { id => 'id', name => 'name', fixed => 'fixed', internal => 'internal', roles => 'roles', acls => 'acls',
+	      creation_date => 'creation_date', last_update_date => 'last_update_date'},
 
     acl => { id => 'id', name => 'name' },
 

@@ -23,6 +23,34 @@ __PACKAGE__->has_many(properties => 'QVD::DB::Result::OSF_Property', \&custom_jo
 		      {join_type => 'LEFT', order_by => {'-asc' => 'key'}});
 __PACKAGE__->has_many(dis => 'QVD::DB::Result::DI', 'osf_id', { cascade_delete => 0 } );
 
+
+######### Log info
+
+__PACKAGE__->has_one(creation_log_entry => 'QVD::DB::Result::Wat_Log', 
+		     \&creation_log_entry_join_condition, {join_type => 'LEFT'});
+__PACKAGE__->has_one(update_log_entry => 'QVD::DB::Result::Wat_Log', 
+		     \&update_log_entry_join_condition, {join_type => 'LEFT'});
+
+sub creation_log_entry_join_condition
+{ 
+    my $args = shift; 
+
+    { "$args->{foreign_alias}.object_id" => { -ident => "$args->{self_alias}.id" },
+      "$args->{foreign_alias}.qvd_object"     => { '=' => 'osf' },
+      "$args->{foreign_alias}.type_of_action"     => { '=' => 'create' } };
+}
+
+sub update_log_entry_join_condition
+{ 
+    my $args = shift; 
+
+    my $sql = "IN (select id from wat_log where object_id=$args->{self_alias}.id and 
+                   qvd_object='osf' and type_of_action='update' order by id DESC LIMIT 1)";
+    { "$args->{foreign_alias}.id"     => \$sql , };
+}
+
+###################
+
 sub _dis_by_tag {
     my ($osf, $tag, $fixed) = @_;
 

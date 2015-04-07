@@ -8,7 +8,8 @@ __PACKAGE__->add_columns( id       => { data_type => 'integer',
                           name     => { data_type => 'varchar(127)' },
                           address  => { data_type => 'varchar(127)' },
 			  frontend => { data_type => 'boolean' },
-			  backend  => { data_type => 'boolean' } );
+			  backend  => { data_type => 'boolean' },
+ );
 
 __PACKAGE__->set_primary_key('id');
 
@@ -21,6 +22,34 @@ __PACKAGE__->has_many(vms        => 'QVD::DB::Result::VM_Runtime',    'host_id',
 __PACKAGE__->has_many(vm_l7rs    => 'QVD::DB::Result::VM_Runtime',    'l7r_host_id', { cascade_delete => 0 }); #FIXME COMMENTED BECAUSE TRIGGERS ERROR WHEN ASKING DB
 __PACKAGE__->has_one (runtime    => 'QVD::DB::Result::Host_Runtime',  'host_id');
 __PACKAGE__->has_one (counters   => 'QVD::DB::Result::Host_Counter',  'host_id');
+
+######### Log info
+
+__PACKAGE__->has_one(creation_log_entry => 'QVD::DB::Result::Wat_Log', 
+		     \&creation_log_entry_join_condition, {join_type => 'LEFT'});
+__PACKAGE__->has_one(update_log_entry => 'QVD::DB::Result::Wat_Log', 
+		     \&update_log_entry_join_condition, {join_type => 'LEFT'});
+
+sub creation_log_entry_join_condition
+{ 
+    my $args = shift; 
+
+    { "$args->{foreign_alias}.object_id" => { -ident => "$args->{self_alias}.id" },
+      "$args->{foreign_alias}.qvd_object"     => { '=' => 'host' },
+      "$args->{foreign_alias}.type_of_action"     => { '=' => 'create' } };
+}
+
+sub update_log_entry_join_condition
+{ 
+    my $args = shift; 
+
+    my $sql = "IN (select id from wat_log where object_id=$args->{self_alias}.id and 
+                   qvd_object='host' and type_of_action='update' order by id DESC LIMIT 1)";
+    { "$args->{foreign_alias}.id"     => \$sql , };
+}
+
+###################
+
 
 sub load { return undef; }
 sub creation_admin { return undef; }

@@ -57,8 +57,6 @@ sub select
     eval { $rs = $DB->resultset($request->table)->search($request->filters,$request->modifiers);
 	   @rows = $rs->all };
 
-    use Data::Dumper; print Dumper "FUNCIÓN PRINCIPAL";
-
     QVD::Admin4::Exception->throw(exception => $@, query => 'select') if $@;
 
     { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
@@ -76,7 +74,6 @@ sub get_extra_info_from_related_views
 
     my $vrs = $DB->resultset($view_name)->search();
     $extra->{$_->id} = $_ for $vrs->all;
-    use Data::Dumper; print Dumper "FUNCIÓN EXTRA";
     $extra;
 }
 
