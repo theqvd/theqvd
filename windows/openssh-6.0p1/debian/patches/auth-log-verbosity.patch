@@ -1,0 +1,123 @@
+Description: Quieten logs when multiple from= restrictions are used
+Author: Colin Watson <cjwatson@debian.org>
+Bug-Debian: http://bugs.debian.org/630606
+Forwarded: no
+Last-Update: 2011-07-28
+
+Index: b/auth-options.c
+===================================================================
+--- a/auth-options.c
++++ b/auth-options.c
+@@ -58,9 +58,20 @@
+ /* "principals=" option. */
+ char *authorized_principals = NULL;
+ 
++/* Throttle log messages. */
++int logged_from_hostip = 0;
++int logged_cert_hostip = 0;
++
+ extern ServerOptions options;
+ 
+ void
++auth_start_parse_options(void)
++{
++	logged_from_hostip = 0;
++	logged_cert_hostip = 0;
++}
++
++void
+ auth_clear_options(void)
+ {
+ 	no_agent_forwarding_flag = 0;
+@@ -288,10 +299,13 @@
+ 				/* FALLTHROUGH */
+ 			case 0:
+ 				xfree(patterns);
+-				logit("Authentication tried for %.100s with "
+-				    "correct key but not from a permitted "
+-				    "host (host=%.200s, ip=%.200s).",
+-				    pw->pw_name, remote_host, remote_ip);
++				if (!logged_from_hostip) {
++					logit("Authentication tried for %.100s with "
++					    "correct key but not from a permitted "
++					    "host (host=%.200s, ip=%.200s).",
++					    pw->pw_name, remote_host, remote_ip);
++					logged_from_hostip = 1;
++				}
+ 				auth_debug_add("Your host '%.200s' is not "
+ 				    "permitted to use this key for login.",
+ 				    remote_host);
+@@ -512,11 +526,14 @@
+ 					break;
+ 				case 0:
+ 					/* no match */
+-					logit("Authentication tried for %.100s "
+-					    "with valid certificate but not "
+-					    "from a permitted host "
+-					    "(ip=%.200s).", pw->pw_name,
+-					    remote_ip);
++					if (!logged_cert_hostip) {
++						logit("Authentication tried for %.100s "
++						    "with valid certificate but not "
++						    "from a permitted host "
++						    "(ip=%.200s).", pw->pw_name,
++						    remote_ip);
++						logged_cert_hostip = 1;
++					}
+ 					auth_debug_add("Your address '%.200s' "
+ 					    "is not permitted to use this "
+ 					    "certificate for login.",
+Index: b/auth-options.h
+===================================================================
+--- a/auth-options.h
++++ b/auth-options.h
+@@ -33,6 +33,7 @@
+ extern int key_is_cert_authority;
+ extern char *authorized_principals;
+ 
++void	auth_start_parse_options(void);
+ int	auth_parse_options(struct passwd *, char *, char *, u_long);
+ void	auth_clear_options(void);
+ int	auth_cert_options(Key *, struct passwd *);
+Index: b/auth-rsa.c
+===================================================================
+--- a/auth-rsa.c
++++ b/auth-rsa.c
+@@ -175,6 +175,8 @@
+ 	if ((f = auth_openkeyfile(file, pw, options.strict_modes)) == NULL)
+ 		return 0;
+ 
++	auth_start_parse_options();
++
+ 	/*
+ 	 * Go though the accepted keys, looking for the current key.  If
+ 	 * found, perform a challenge-response dialog to verify that the
+Index: b/auth2-pubkey.c
+===================================================================
+--- a/auth2-pubkey.c
++++ b/auth2-pubkey.c
+@@ -211,6 +211,7 @@
+ 		restore_uid();
+ 		return 0;
+ 	}
++	auth_start_parse_options();
+ 	while (read_keyfile_line(f, file, line, sizeof(line), &linenum) != -1) {
+ 		/* Skip leading whitespace. */
+ 		for (cp = line; *cp == ' ' || *cp == '\t'; cp++)
+@@ -281,6 +282,8 @@
+ 	found_key = 0;
+ 	found = key_new(key_is_cert(key) ? KEY_UNSPEC : key->type);
+ 
++	auth_start_parse_options();
++
+ 	while (read_keyfile_line(f, file, line, sizeof(line), &linenum) != -1) {
+ 		char *cp, *key_options = NULL;
+ 
+@@ -417,6 +420,7 @@
+ 	if (key_cert_check_authority(key, 0, 1,
+ 	    principals_file == NULL ? pw->pw_name : NULL, &reason) != 0)
+ 		goto fail_reason;
++	auth_start_parse_options();
+ 	if (auth_cert_options(key, pw) != 0)
+ 		goto out;
+ 

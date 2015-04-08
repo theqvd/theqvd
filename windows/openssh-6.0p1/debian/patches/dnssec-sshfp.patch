@@ -1,0 +1,82 @@
+Description: Force use of DNSSEC even if "options edns0" isn't in resolv.conf
+ This allows SSHFP DNS records to be verified if glibc 2.11 is installed.
+Origin: vendor, https://cvs.fedoraproject.org/viewvc/F-12/openssh/openssh-5.2p1-edns.patch?revision=1.1&view=markup
+Bug: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=572049
+Bug-Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=572049
+Last-Update: 2010-04-06
+
+Index: b/dns.c
+===================================================================
+--- a/dns.c
++++ b/dns.c
+@@ -177,6 +177,7 @@
+ {
+ 	u_int counter;
+ 	int result;
++	unsigned int rrset_flags = 0;
+ 	struct rrsetinfo *fingerprints = NULL;
+ 
+ 	u_int8_t hostkey_algorithm;
+@@ -200,8 +201,19 @@
+ 		return -1;
+ 	}
+ 
++	/*
++	 * Original getrrsetbyname function, found on OpenBSD for example,
++	 * doesn't accept any flag and prerequisite for obtaining AD bit in
++	 * DNS response is set by "options edns0" in resolv.conf.
++	 *
++	 * Our version is more clever and use RRSET_FORCE_EDNS0 flag.
++	 */
++#ifndef HAVE_GETRRSETBYNAME
++	rrset_flags |= RRSET_FORCE_EDNS0;
++#endif
+ 	result = getrrsetbyname(hostname, DNS_RDATACLASS_IN,
+-	    DNS_RDATATYPE_SSHFP, 0, &fingerprints);
++	    DNS_RDATATYPE_SSHFP, rrset_flags, &fingerprints);
++
+ 	if (result) {
+ 		verbose("DNS lookup error: %s", dns_result_totext(result));
+ 		return -1;
+Index: b/openbsd-compat/getrrsetbyname.c
+===================================================================
+--- a/openbsd-compat/getrrsetbyname.c
++++ b/openbsd-compat/getrrsetbyname.c
+@@ -209,8 +209,8 @@
+ 		goto fail;
+ 	}
+ 
+-	/* don't allow flags yet, unimplemented */
+-	if (flags) {
++	/* Allow RRSET_FORCE_EDNS0 flag only. */
++	if ((flags & !RRSET_FORCE_EDNS0) != 0) {
+ 		result = ERRSET_INVAL;
+ 		goto fail;
+ 	}
+@@ -226,9 +226,9 @@
+ #endif /* DEBUG */
+ 
+ #ifdef RES_USE_DNSSEC
+-	/* turn on DNSSEC if EDNS0 is configured */
+-	if (_resp->options & RES_USE_EDNS0)
+-		_resp->options |= RES_USE_DNSSEC;
++	/* turn on DNSSEC if required  */
++	if (flags & RRSET_FORCE_EDNS0)
++		_resp->options |= (RES_USE_EDNS0|RES_USE_DNSSEC);
+ #endif /* RES_USE_DNSEC */
+ 
+ 	/* make query */
+Index: b/openbsd-compat/getrrsetbyname.h
+===================================================================
+--- a/openbsd-compat/getrrsetbyname.h
++++ b/openbsd-compat/getrrsetbyname.h
+@@ -72,6 +72,9 @@
+ #ifndef RRSET_VALIDATED
+ # define RRSET_VALIDATED	1
+ #endif
++#ifndef RRSET_FORCE_EDNS0
++# define RRSET_FORCE_EDNS0	0x0001
++#endif
+ 
+ /*
+  * Return codes for getrrsetbyname()

@@ -1,0 +1,31 @@
+Description: Fix a bashism in configure
+Author: Colin Watson <cjwatson@debian.org>
+Forwarded: https://bugzilla.mindrot.org/show_bug.cgi?id=2010
+Last-Update: 2012-05-18
+
+Index: b/configure
+===================================================================
+--- a/configure
++++ b/configure
+@@ -11918,7 +11918,7 @@
+ 
+ elif test "x$sandbox_arg" = "xseccomp_filter" || \
+      ( test -z "$sandbox_arg" && \
+-       test "x$have_seccomp_filter" == "x1" && \
++       test "x$have_seccomp_filter" = "x1" && \
+        test "x$ac_cv_header_linux_audit_h" = "xyes" && \
+        test "x$have_seccomp_audit_arch" = "x1" && \
+        test "x$have_linux_no_new_privs" = "x1" && \
+Index: b/configure.ac
+===================================================================
+--- a/configure.ac
++++ b/configure.ac
+@@ -2615,7 +2615,7 @@
+ 	AC_DEFINE([SANDBOX_DARWIN], [1], [Sandbox using Darwin sandbox_init(3)])
+ elif test "x$sandbox_arg" = "xseccomp_filter" || \
+      ( test -z "$sandbox_arg" && \
+-       test "x$have_seccomp_filter" == "x1" && \
++       test "x$have_seccomp_filter" = "x1" && \
+        test "x$ac_cv_header_linux_audit_h" = "xyes" && \
+        test "x$have_seccomp_audit_arch" = "x1" && \
+        test "x$have_linux_no_new_privs" = "x1" && \

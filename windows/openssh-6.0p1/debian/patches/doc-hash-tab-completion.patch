@@ -1,0 +1,20 @@
+Description: Document that HashKnownHosts may break tab-completion
+Author: Colin Watson <cjwatson@debian.org>
+Bug: https://bugzilla.mindrot.org/show_bug.cgi?id=1727
+Bug-Debian: http://bugs.debian.org/430154
+Last-Update: 2010-03-01
+
+Index: b/ssh_config.5
+===================================================================
+--- a/ssh_config.5
++++ b/ssh_config.5
+@@ -585,6 +585,9 @@
+ will not be converted automatically,
+ but may be manually hashed using
+ .Xr ssh-keygen 1 .
++Use of this option may break facilities such as tab-completion that rely
++on being able to read unhashed host names from
++.Pa ~/.ssh/known_hosts .
+ .It Cm HostbasedAuthentication
+ Specifies whether to try rhosts based authentication with public key
+ authentication.

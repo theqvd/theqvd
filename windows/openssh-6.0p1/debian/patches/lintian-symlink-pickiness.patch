@@ -1,0 +1,23 @@
+Description: Fix picky lintian errors about slogin symlinks
+ Apparently this breaks some SVR4 packaging systems, so upstream can't win
+ either way and opted to keep the status quo.  We need this patch anyway.
+Author: Colin Watson <cjwatson@debian.org>
+Bug: https://bugzilla.mindrot.org/show_bug.cgi?id=1728
+Last-Update: 2010-04-10
+
+Index: b/Makefile.in
+===================================================================
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -283,9 +283,9 @@
+ 	$(INSTALL) -m 644 ssh-pkcs11-helper.8.out $(DESTDIR)$(mandir)/$(mansubdir)8/ssh-pkcs11-helper.8
+ 	$(INSTALL) -m 644 ssh-vulnkey.1.out $(DESTDIR)$(mandir)/$(mansubdir)1/ssh-vulnkey.1
+ 	-rm -f $(DESTDIR)$(bindir)/slogin
+-	ln -s ./ssh$(EXEEXT) $(DESTDIR)$(bindir)/slogin
++	ln -s ssh$(EXEEXT) $(DESTDIR)$(bindir)/slogin
+ 	-rm -f $(DESTDIR)$(mandir)/$(mansubdir)1/slogin.1
+-	ln -s ./ssh.1 $(DESTDIR)$(mandir)/$(mansubdir)1/slogin.1
++	ln -s ssh.1 $(DESTDIR)$(mandir)/$(mansubdir)1/slogin.1
+ 
+ install-sysconf:
+ 	if [ ! -d $(DESTDIR)$(sysconfdir) ]; then \

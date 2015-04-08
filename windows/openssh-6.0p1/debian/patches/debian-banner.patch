@@ -1,0 +1,99 @@
+Description: Add DebianBanner server configuration option
+ Setting this to "no" causes sshd to omit the Debian revision from its
+ initial protocol handshake, for those scared by package-versioning.patch.
+Author: Kees Cook <kees@debian.org>
+Bug-Debian: http://bugs.debian.org/562048
+Forwarded: not-needed
+Last-Update: 2010-02-28
+
+Index: b/servconf.c
+===================================================================
+--- a/servconf.c
++++ b/servconf.c
+@@ -142,6 +142,7 @@
+ 	options->authorized_principals_file = NULL;
+ 	options->ip_qos_interactive = -1;
+ 	options->ip_qos_bulk = -1;
++	options->debian_banner = -1;
+ }
+ 
+ void
+@@ -289,6 +290,8 @@
+ 		options->ip_qos_interactive = IPTOS_LOWDELAY;
+ 	if (options->ip_qos_bulk == -1)
+ 		options->ip_qos_bulk = IPTOS_THROUGHPUT;
++	if (options->debian_banner == -1)
++		options->debian_banner = 1;
+ 
+ 	/* Turn privilege separation on by default */
+ 	if (use_privsep == -1)
+@@ -338,6 +341,7 @@
+ 	sZeroKnowledgePasswordAuthentication, sHostCertificate,
+ 	sRevokedKeys, sTrustedUserCAKeys, sAuthorizedPrincipalsFile,
+ 	sKexAlgorithms, sIPQoS,
++	sDebianBanner,
+ 	sDeprecated, sUnsupported
+ } ServerOpCodes;
+ 
+@@ -473,6 +477,7 @@
+ 	{ "authorizedprincipalsfile", sAuthorizedPrincipalsFile, SSHCFG_ALL },
+ 	{ "kexalgorithms", sKexAlgorithms, SSHCFG_GLOBAL },
+ 	{ "ipqos", sIPQoS, SSHCFG_ALL },
++	{ "debianbanner", sDebianBanner, SSHCFG_GLOBAL },
+ 	{ NULL, sBadOption, 0 }
+ };
+ 
+@@ -1436,6 +1441,10 @@
+ 		}
+ 		break;
+ 
++	case sDebianBanner:
++		intptr = &options->debian_banner;
++		goto parse_int;
++
+ 	case sDeprecated:
+ 		logit("%s line %d: Deprecated option %s",
+ 		    filename, linenum, arg);
+Index: b/servconf.h
+===================================================================
+--- a/servconf.h
++++ b/servconf.h
+@@ -166,6 +166,8 @@
+ 
+ 	int	num_permitted_opens;
+ 
++	int	debian_banner;
++
+ 	char   *chroot_directory;
+ 	char   *revoked_keys_file;
+ 	char   *trusted_user_ca_keys;
+Index: b/sshd.c
+===================================================================
+--- a/sshd.c
++++ b/sshd.c
+@@ -424,7 +424,8 @@
+ 		minor = PROTOCOL_MINOR_1;
+ 	}
+ 	snprintf(buf, sizeof buf, "SSH-%d.%d-%.100s%s", major, minor,
+-	    SSH_RELEASE, newline);
++	    options.debian_banner ? SSH_RELEASE : SSH_RELEASE_MINIMUM,
++	    newline);
+ 	server_version_string = xstrdup(buf);
+ 
+ 	/* Send our protocol version identification. */
+Index: b/sshd_config.5
+===================================================================
+--- a/sshd_config.5
++++ b/sshd_config.5
+@@ -340,6 +340,11 @@
+ .Dq no .
+ The default is
+ .Dq delayed .
++.It Cm DebianBanner
++Specifies whether the distribution-specified extra version suffix is
++included during initial protocol handshake.
++The default is
++.Dq yes .
+ .It Cm DenyGroups
+ This keyword can be followed by a list of group name patterns, separated
+ by spaces.
