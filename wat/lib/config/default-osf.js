@@ -171,16 +171,19 @@ Wat.I.detailsFields[qvdObj] = {
         'fields': [
             'creation_date'
         ],
-        'acls': 'osf.see.creation-date',
-        'display': false
+        'acls': 'osf.see.log',
+        'display': false,
+        'sortable': true,
     },
-    'creation_admin': {
+    'creation_admin_name': {
         'text': 'Created by',
         'fields': [
-            'creation_admin'
+            'creation_admin_name',
+            'creation_admin_id'
         ],
-        'acls': 'osf.see.created-by',
-        'display': false
+        'acls': 'osf.see.log',
+        'display': false,
+        'sortable': true,
     }
 };
 
@@ -229,6 +232,55 @@ Wat.I.formFilters[qvdObj] = {
         'displayMobile': false,
         'displayDesktop': true,
         'acls': 'osf.filter.di'
+    },
+    'admin': {
+        'filterField': 'creation_admin_id',
+        'type': 'select',
+        'text': 'Created by',
+        'class': 'chosen-advanced',
+        'fillable': false,
+        'options': [
+            {
+                'value': -1,
+                'text': 'All',
+                'selected': true
+            }
+                    ],
+        'displayMobile': false,
+        'displayDesktop': false,
+        'acls': 'osf.filter.created-by',
+    },
+    'antiquity': {
+        'filterField': 'creation_date',
+        'type': 'select',
+        'text': 'Antiquity',
+        'class': 'chosen-single',
+        'fillable': false,
+        'transform': 'dateGreatThan',
+        'options': ANTIQUITY_OPTIONS,
+        'displayMobile': false,
+        'displayDesktop': false,
+        'acls': 'osf.filter.creation-date'
+    },
+    'min_date': {
+        'filterField': 'creation_date',
+        'type': 'text',
+        'text': 'Min creation date',
+        'transform': 'dateMin',
+        'class': 'datepicker-past date-filter',
+        'displayMobile': false,
+        'displayDesktop': false,
+        'acls': 'osf.filter.creation-date'
+    },
+    'max_date': {
+        'filterField': 'creation_date',
+        'type': 'text',
+        'text': 'Max creation date',
+        'transform': 'dateMax',
+        'class': 'datepicker-past date-filter',
+        'displayMobile': false,
+        'displayDesktop': false,
+        'acls': 'osf.filter.creation-date'
     }
 };
 

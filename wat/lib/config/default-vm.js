@@ -177,18 +177,19 @@ Wat.I.listFields[qvdObj] = {
         'fields': [
             'creation_date'
         ],
-        'acls': 'vm.see.creation-date',
+        'acls': 'vm.see.log',
         'display': false,
-        'sortable': false,
+        'sortable': true,
     },
-    'creation_admin': {
+    'creation_admin_name': {
         'text': 'Created by',
         'fields': [
-            'creation_admin'
+            'creation_admin_name',
+            'creation_admin_id'
         ],
-        'acls': 'vm.see.created-by',
+        'acls': 'vm.see.log',
         'display': false,
-        'sortable': false,
+        'sortable': true,
     }
 };
 
@@ -356,7 +357,8 @@ Wat.I.detailsFields[qvdObj] = {
     'creation_admin': {
         'text': 'Created by',
         'fields': [
-            'creation_admin'
+            'creation_admin_id',
+            'creation_admin_name'
         ],
         'acls': 'vm.see.created-by',
         'display': true
@@ -476,6 +478,55 @@ Wat.I.formFilters[qvdObj] = {
         'displayMobile': false,
         'displayDesktop': true,
         'acls': 'vm.filter.block'
+    },
+    'admin': {
+        'filterField': 'creation_admin_id',
+        'type': 'select',
+        'text': 'Created by',
+        'class': 'chosen-advanced',
+        'fillable': false,
+        'options': [
+            {
+                'value': -1,
+                'text': 'All',
+                'selected': true
+            }
+                    ],
+        'displayMobile': false,
+        'displayDesktop': false,
+        'acls': 'vm.filter.created-by',
+    },
+    'antiquity': {
+        'filterField': 'creation_date',
+        'type': 'select',
+        'text': 'Antiquity',
+        'class': 'chosen-single',
+        'fillable': false,
+        'transform': 'dateGreatThan',
+        'options': ANTIQUITY_OPTIONS,
+        'displayMobile': false,
+        'displayDesktop': false,
+        'acls': 'vm.filter.creation-date'
+    },
+    'min_date': {
+        'filterField': 'creation_date',
+        'type': 'text',
+        'text': 'Min creation date',
+        'transform': 'dateMin',
+        'class': 'datepicker-past date-filter',
+        'displayMobile': false,
+        'displayDesktop': false,
+        'acls': 'vm.filter.creation-date'
+    },
+    'max_date': {
+        'filterField': 'creation_date',
+        'type': 'text',
+        'text': 'Max creation date',
+        'transform': 'dateMax',
+        'class': 'datepicker-past date-filter',
+        'displayMobile': false,
+        'displayDesktop': false,
+        'acls': 'vm.filter.creation-date'
     }
 };
 

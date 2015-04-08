@@ -285,3 +285,36 @@ LOG_TYPE_OBJECTS_ICONS = {
     tenant_view: CLASS_ICON_VIEWS,
     config: CLASS_ICON_QVDCONFIG,
 };
+
+// Antiquity standard options for selects
+ANTIQUITY_OPTIONS = [
+    {
+        'value': -1,
+        'text': 'All',
+        'selected': true
+    },
+    {
+        'value': 3600,
+        'text': '<1 hour'
+    },
+    {
+        'value': 21600,
+        'text': '<6 hours'
+    },
+    {
+        'value': 43200,
+        'text': '<12 hours'
+    },
+    {
+        'value': 86400,
+        'text': '<1 day'
+    },
+    {
+        'value': 604800,
+        'text': '<1 week'
+    },
+    {
+        'value': 2592000,
+        'text': '<1 month'
+    },
+];

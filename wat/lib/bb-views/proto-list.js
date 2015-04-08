@@ -739,6 +739,63 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         Wat.I.addSortIcons(this.cid);
         
         Wat.I.adaptSideSize();
+        
+        this.fillAdminSelect();
+    },
+    
+    fillAdminSelect: function () {
+        // If exist admin select and is not filled yet, fill it
+        if ($('select[name="admin"]').length > 0 && $('select[name="admin"] option').length < 2) {
+            if (Wat.C.isSuperadmin()) {
+                // If tenant select is defined, we wait to be loaded to load administrators select
+                Wat.A.performAction ('tenant_tiny_list', {}, {}, {}, function(e) {
+
+                    var fillTenantAdmins = function (tenants) {
+                        if (tenants.length > 0) {
+                            var tenant = tenants.shift();
+
+                            var params = {
+                                'action': 'admin_tiny_list',
+                                'selectedId': '',
+                                'controlName': 'admin',
+                                'filters': {
+                                    "tenant_id": tenant.id
+                                },
+                                'order_by': {
+                                    "field": ["name"],
+                                    "order": "-asc"
+                                },
+                                'group': tenant.name,
+                                'chosenType': 'advanced100'
+                            };
+
+                            Wat.A.fillSelect(params, function () {
+                                fillTenantAdmins(tenants);
+                            });
+                        }
+                    };
+
+                    fillTenantAdmins(e.retrievedData.rows);
+                }, this);
+
+            }
+            else {
+                // If administrator is not superadmin, administrators combo will be charged normally
+                var params = {
+                    'action': 'admin_tiny_list',
+                    'selectedId': '',
+                    'controlName': 'admin',
+                    'order_by': {
+                        "field": ["name"],
+                        "order": "-asc"
+                    },
+                    'chosenType': 'advanced100'
+                };
+
+                Wat.A.fillSelect(params, function () {
+                });
+            }
+        }
     },
     
     // Fill filter selects 

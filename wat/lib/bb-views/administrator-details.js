@@ -154,7 +154,10 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     
     // Fill branch with retreived ACLs from API
     fillBranch: function (that) {
-        $.each(that.retrievedData.rows, function (iACL, acl) {
+        // Sort acls
+        var sortedAcls = Wat.U.sortTranslatedACLs(that.retrievedData.rows);
+        
+        $.each(sortedAcls, function (iACL, acl) {
             var disabledClass = 'disabled-branch';
             var checkedAttr = '';
             

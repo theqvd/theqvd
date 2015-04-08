@@ -80,9 +80,36 @@ Wat.U = {
         return this.getDate();
     },
     
+    // Add 0 to the left of numbers less tan 10
     padNumber: function (number) {
         number = number < 10 ? '0' + number : number;
         
         return number;
-    }
+    },
+    
+    // Sort acl list by translated description
+    sortTranslatedACLs: function (acls) {
+        var translatedAcls = [];
+        
+        $.each(acls, function (iAcl, acl) {
+            var translatedAcl = $.i18n.t(ACLS[acl.name]);
+            acls[iAcl].translatedACL = translatedAcl;
+            translatedAcls.push(translatedAcl);
+        });
+        
+        translatedAcls.sort();
+        
+        var sortedAcls = [];
+        
+        $.each(translatedAcls, function (iTacl, tacl) {
+            $.each(acls, function (iAcl, acl) {
+                if (acl.translatedACL == tacl) {
+                    sortedAcls.push(acl);
+                    return false;
+                }
+            });
+        });
+        
+        return sortedAcls;
+    },
 }

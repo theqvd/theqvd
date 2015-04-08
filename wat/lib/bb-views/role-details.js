@@ -103,9 +103,12 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     
     // Fill branch with retreived ACLs from API
     fillBranch: function (that) {
+        // Sort acls
+        var sortedAcls = Wat.U.sortTranslatedACLs(that.retrievedData.rows);
+
         var showNotVisibleAcls = Wat.C.checkACL('role.update.assign-acl');
 
-        $.each(that.retrievedData.rows, function (iACL, acl) {
+        $.each(sortedAcls, function (iACL, acl) {
             var disabledClass = 'disabled-branch';
             var checkedAttr = '';
             

@@ -47,6 +47,25 @@ Wat.I.listFields[qvdObj] = {
         'acls': 'role.see.acl-list-roles',
         'text': 'Inherited roles',
         'sortable': false,
+    },
+    'creation_date': {
+        'text': 'Creation date',
+        'fields': [
+            'creation_date'
+        ],
+        'acls': 'role.see.log',
+        'display': false,
+        'sortable': true,
+    },
+    'creation_admin_name': {
+        'text': 'Created by',
+        'fields': [
+            'creation_admin_name',
+            'creation_admin_id'
+        ],
+        'acls': 'role.see.log',
+        'display': false,
+        'sortable': true,
     }
 };
 
@@ -60,6 +79,55 @@ Wat.I.formFilters[qvdObj] = {
         'text': 'Search by name',
         'displayMobile': true,
         'displayDesktop': true
+    },
+    'admin': {
+        'filterField': 'creation_admin_id',
+        'type': 'select',
+        'text': 'Created by',
+        'class': 'chosen-advanced',
+        'fillable': false,
+        'options': [
+            {
+                'value': -1,
+                'text': 'All',
+                'selected': true
+            }
+                    ],
+        'displayMobile': false,
+        'displayDesktop': false,
+        'acls': 'role.filter.created-by',
+    },
+    'antiquity': {
+        'filterField': 'creation_date',
+        'type': 'select',
+        'text': 'Antiquity',
+        'class': 'chosen-single',
+        'fillable': false,
+        'transform': 'dateGreatThan',
+        'options': ANTIQUITY_OPTIONS,
+        'displayMobile': false,
+        'displayDesktop': false,
+        'acls': 'role.filter.creation-date'
+    },
+    'min_date': {
+        'filterField': 'creation_date',
+        'type': 'text',
+        'text': 'Min creation date',
+        'transform': 'dateMin',
+        'class': 'datepicker-past date-filter',
+        'displayMobile': false,
+        'displayDesktop': false,
+        'acls': 'role.filter.creation-date'
+    },
+    'max_date': {
+        'filterField': 'creation_date',
+        'type': 'text',
+        'text': 'Max creation date',
+        'transform': 'dateMax',
+        'class': 'datepicker-past date-filter',
+        'displayMobile': false,
+        'displayDesktop': false,
+        'acls': 'role.filter.creation-date'
     }
 };
 

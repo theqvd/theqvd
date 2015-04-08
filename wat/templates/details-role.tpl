@@ -23,6 +23,26 @@ if (Wat.C.checkACL('role.see.id')) {
         </tr>
         <% 
         }
+        if (Wat.C.checkACL('role.see.created-by')) {
+        %>
+            <tr>
+                <td><i class="<%= CLASS_ICON_ADMINS %>"></i><span data-i18n="Created by"></span></td>
+                <td>
+                    <span><%= model.get('creation_admin_name') %></span>
+                </td>
+            </tr>
+        <% 
+        }
+        if (Wat.C.checkACL('role.see.creation-date')) {
+        %>
+            <tr>
+                <td><i class="fa fa-clock-o"></i><span data-i18n="Creation date"></span></td>
+                <td>
+                    <span><%= model.get('creation_date') %></span>
+                </td>
+            </tr>
+        <% 
+        }
         %>
     </table>
 <% 

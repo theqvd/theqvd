@@ -97,37 +97,7 @@ Wat.I.formFilters[qvdObj] = {
         'class': 'chosen-single',
         'fillable': false,
         'transform': 'dateGreatThan',
-        'options': [
-            {
-                'value': -1,
-                'text': 'All',
-                'selected': true
-            },
-            {
-                'value': 3600,
-                'text': '<1 hour'
-            },
-            {
-                'value': 21600,
-                'text': '<6 hours'
-            },
-            {
-                'value': 43200,
-                'text': '<12 hours'
-            },
-            {
-                'value': 86400,
-                'text': '<1 day'
-            },
-            {
-                'value': 604800,
-                'text': '<1 week'
-            },
-            {
-                'value': 2592000,
-                'text': '<1 month'
-            },
-                    ],
+        'options': ANTIQUITY_OPTIONS,
         'displayMobile': false,
         'displayDesktop': false,
         'acls': 'log.filter.date'
