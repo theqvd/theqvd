@@ -53,7 +53,7 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
     
     renderSide: function () {
         // No side rendered
-        if (this.checkSide({'log.see-main.': '.js-side-component1'}) === false) {
+        if (this.checkSide({'tenant.see.log': '.js-side-component1'}) === false) {
             return;
         }
         

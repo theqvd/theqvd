@@ -12,7 +12,7 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
     renderSide: function () {
         var sideCheck = this.checkSide({
             'di.see.vm-list': '.js-side-component1', 
-            'log.see-main.': '.js-side-component2', 
+            'di.see.log': '.js-side-component2', 
         });
 
         if (sideCheck === false) {

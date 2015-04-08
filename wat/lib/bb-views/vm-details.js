@@ -44,7 +44,7 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
     
     renderSide: function () {
         // No side rendered
-        if (this.checkSide({'log.see-main.': '.js-side-component2'}) === false) {
+        if (this.checkSide({'vm.see.state': '.js-side-component1', 'vm.see.log': '.js-side-component2'}) === false) {
             return;
         }
         

@@ -11,7 +11,7 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
         var sideCheck = this.checkSide({
             'osf.see.vm-list': '.js-side-component1', 
             'osf.see.di-list': '.js-side-component2', 
-            'log.see-main.': '.js-side-component3'
+            'osf.see.log': '.js-side-component3'
         });
 
         if (sideCheck === false) {

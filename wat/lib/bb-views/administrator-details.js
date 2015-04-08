@@ -79,7 +79,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     
     renderSide: function () {
         // No side rendered
-        if (this.checkSide({'log.see-main.': '.js-side-component2'}) === false) {
+        if (this.checkSide({'administrator.see.acl-list': '.js-side-component1', 'administrator.see.log': '.js-side-component2'}) === false) {
             return;
         }
         

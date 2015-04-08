@@ -8,7 +8,7 @@ Wat.Views.HostDetailsView = Wat.Views.DetailsView.extend({
     },
     
     renderSide: function () {
-        var sideCheck = this.checkSide({'host.see.vm-list': '.js-side-component1', 'log.see-main.': '.js-side-component2'});
+        var sideCheck = this.checkSide({'host.see.vm-list': '.js-side-component1', 'host.see.log': '.js-side-component2'});
 
         if (sideCheck === false) {
             return;

@@ -103,11 +103,11 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     
     // Fill branch with retreived ACLs from API
     fillBranch: function (that) {
-        // Sort acls
-        var sortedAcls = Wat.U.sortTranslatedACLs(that.retrievedData.rows);
-
         var showNotVisibleAcls = Wat.C.checkACL('role.update.assign-acl');
 
+        // Sort acls
+        var sortedAcls = Wat.U.sortTranslatedACLs(that.retrievedData.rows);
+        
         $.each(sortedAcls, function (iACL, acl) {
             var disabledClass = 'disabled-branch';
             var checkedAttr = '';
@@ -319,7 +319,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     
     renderSide: function () {
         // No side rendered
-        if (this.checkSide({'log.see-main.': '.js-side-component2'}) === false) {
+        if (this.checkSide({'role.see.acl-list': '.js-side-component1', 'role.see.log': '.js-side-component2'}) === false) {
             return;
         }
         
