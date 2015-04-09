@@ -144,6 +144,7 @@ sub create
     print $@ if $@;
     my $e = $@ ? QVD::Admin4::Exception->new(exception => $@, query => 'create') : undef;
     $self->report_in_log($request,$obj, $e ? $e->code : 0);
+
     $e->throw if $e;
     $result->{total} = 1;
     $result->{extra} = {};
@@ -155,45 +156,37 @@ sub report_in_log
 {
    my ($self,$request,$obj,$status) = @_; 
 
-   my $localtime = localtime;
-   
-   my $request_args = eval { $request->json_wrapper->original_request->{arguments} } // {};
-   $request_args->{password} = '**********' if exists $request_args->{password};
+   my $arguments = eval { $request->json_wrapper->original_request->{arguments} } // {};
    my $qvd_object = $request->qvd_object_model->qvd_object_log_style;
    my $type_of_action = $request->qvd_object_model->type_of_action;
 
    if ($qvd_object eq 'config' && $type_of_action eq 'delete')
    {
-       @{$request_args}{qw(key value)} = ($obj->key,$obj->value);
+       @{$arguments}{qw(key value)} = ($obj->key,$obj->value);
    }
 
    if ($qvd_object =~ /^(tenant|admin)_view$/ && $type_of_action eq 'delete')
    {
-       @{$request_args}{qw(field visible view_type device_type qvd_object property)} = 
+       @{$arguments}{qw(field visible view_type device_type qvd_object property)} = 
 	   ($obj->field, $obj->visible, $obj->view_type, $obj->device_type, 
 	    $obj->qvd_object, $obj->property);
    }
 
-   my $arguments = { time => $localtime,
-		     action => $request->json_wrapper->action, 
-		     type_of_action => $type_of_action, 
-		     qvd_object => $qvd_object,
-		     tenant_id => eval { $obj->tenant_id } // undef,
-		     tenant_name => eval { $obj->tenant_name } // undef,
-		     object_id => eval { $obj->id } // undef,
-		     object_name => eval { $obj->name } // undef,
-		     administrator_id => $request->get_parameter_value('administrator')->id,
-		     administrator_name => $request->get_parameter_value('administrator')->name,
-		     superadmin => $request->get_parameter_value('administrator')->is_superadmin,
-		     ip => $request->get_parameter_value('remote_address'),
-		     source => $request->get_parameter_value('source'),
-		     arguments => encode_json($request_args),
-		     status => $status };
+   QVD::Admin4::LogReporter->new(
 
-   eval { $DB->resultset('Wat_Log')->create($arguments) };
-   print $@ if $@;
+       action => { action => $request->json_wrapper->action,
+		   type_of_action => $type_of_action },
+       qvd_object => $qvd_object,
+       tenant => eval { $obj->tenant } // undef,
+       object => $obj,
+       administrator => $request->get_parameter_value('administrator'),
+       ip => $request->get_parameter_value('remote_address'),
+       source => $request->get_parameter_value('source'),
+       arguments => $arguments,
+       status => $status 
+
+       )->report;
 }
-
 
 sub create_or_update
 {
@@ -433,7 +426,10 @@ sub del_roles_to_role
 {
     my ($self,$roles_to_unassign,$this_role) = @_;
 
-    for my $id (@$roles_to_unassign)
+    my $roles_ids = $self->as_ids($roles_to_unassign,'roles') ? 
+	$roles_to_unassign : $self->switch_names_to_ids('Role',$roles_to_unassign);
+
+    for my $id (@$roles_ids)
     {
 	$id = undef if defined $id && $id eq '';
 	$self->unassign_role_to_role($this_role,$id) 
@@ -444,7 +440,6 @@ sub del_roles_to_role
     {
 	$self->unassign_acl_to_role($this_role,$neg_acl_name) 
 	    unless $this_role->has_inherited_acl($neg_acl_name);
-
     }
 }
 
@@ -524,6 +519,7 @@ sub unassign_role_to_role
     my ($self,$role,$role_ids) = @_;
 
     eval { $role->search_related('role_rels', { inherited_id => $role_ids })->delete_all };
+
     QVD::Admin4::Exception->throw(exception => $@, 
 				  query => 'roles') if $@;
 }
@@ -918,6 +914,7 @@ sub get_acls_in_admins
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin_id => $admin_id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
 
+
     eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
 	       $request->filters, $request->modifiers);
 	   @rows = $rs->all };
@@ -935,7 +932,7 @@ sub get_acls_in_roles
     my $admin = $request->get_parameter_value('administrator');
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin => $admin, admin_id => $admin->id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_hide_re];
-
+    use Data::Dumper; print Dumper $request->filters;
     eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
 	       $request->filters, $request->modifiers);
 	   @rows = $rs->all };

@@ -4,10 +4,11 @@ use warnings;
 use Moo;
 use QVD::Admin4::Exception;
 
-has 'name', is => 'ro', isa => sub {};
+has 'name', is => 'ro', isa => sub {}, required => 1;
+has 'administrator', is => 'ro', isa => sub { die "Invalid type for attribute administrator" 
+						  unless ref(+shift) eq 'QVD::DB::Result::Administrator'; }, required => 1;
 
 my $AVAILABLE_ACTION_SIZES = { default => 'normal', normal => 'normal', heavy => 'heavy' };
-
 
 my $ACTIONS =
 {
@@ -478,17 +479,23 @@ qvd_objects_statistics => { type_of_action =>  'multiple',
 			    acls => [qr/^[^.]+\.stats\./]},
 };
 
-
 sub BUILD
 {
     my $self = shift;
-
     my $name = $self->name;
-    QVD::Admin4::Exception->throw(code => 4110) if
-	ref($name) || (not defined $name) || $name eq '';
 
-    QVD::Admin4::Exception->throw(code => 4100) 
-	unless $self->available;
+    eval {
+	QVD::Admin4::Exception->throw(code => 4110) if
+	    ref($name) || (not defined $name) || $name eq '';
+
+	QVD::Admin4::Exception->throw(code => 4100) 
+	    unless $self->available;
+
+	QVD::Admin4::Exception->throw(code => 4210) 
+	    unless $self->available_for_admin;
+    };
+
+    QVD::Admin4::Exception->throw(exception => $@) if $@; 
 }
 
 sub available
@@ -499,7 +506,6 @@ sub available
 	return 1 : 
 	return 0;
 }
-
 
 sub channels
 {
@@ -513,7 +519,6 @@ sub size
     $ACTIONS->{$self->name}->{'size'} || 
 	$AVAILABLE_ACTION_SIZES->{default};
 }
-
 
 sub type
 {
@@ -567,8 +572,9 @@ sub restmethod
 
 sub available_for_admin
 {
-    my ($self,$admin) = @_;
-    $admin->re_is_allowed_to($self->acls);
+    my $self = shift;
+    
+    $self->administrator->re_is_allowed_to($self->acls);
 }
 
 sub available_nested_action_for_admin

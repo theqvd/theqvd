@@ -12,12 +12,14 @@ use QVD::Admin4::Action;
 use TryCatch;
 use AnyEvent::Pg::Pool;
 use QVD::Config;
+use QVD::Admin4::LogReporter;
 use Mojo::JSON qw(encode_json);
 use base qw(Mojolicious::Plugin);
 
 has 'administrator', is => 'ro', isa => sub { die "Invalid type for attribute administrator" 
 						  unless ref(+shift) eq 'QVD::DB::Result::Administrator'; };
 my $QVD_ADMIN;
+
 
 sub BUILD
 {
@@ -73,8 +75,6 @@ sub load_user
 	if $admin->is_superadmin;
 }
 
-
-
 sub process_query
 {
    my ($self,$json) = @_;
@@ -83,9 +83,8 @@ sub process_query
    try {
 
        $json_wrapper = QVD::Admin4::REST::JSON->new(json => $json);
-       $action = QVD::Admin4::Action->new(name => $json_wrapper->action );
-       QVD::Admin4::Exception->throw(code => 4210) 
-	   unless $action->available_for_admin($self->administrator);
+       $action = QVD::Admin4::Action->new(name => $json_wrapper->action,
+					  administrator => $self->administrator);
 
        $qvd_object_model = $self->get_qvd_object_model($action) 
 	   if $action->qvd_object;
@@ -167,10 +166,13 @@ sub get_request
 { 
     my ($self, $json_wrapper,$qvd_object_model) = @_;
 
-    QVD::Admin4::REST::Request->new(qvd_object_model => $qvd_object_model, 
-				    json_wrapper => $json_wrapper);
-}
+    my $request = eval { QVD::Admin4::REST::Request->new(qvd_object_model => $qvd_object_model, 
+							 json_wrapper => $json_wrapper) };
+    
+    QVD::Admin4::Exception->throw(exception => $@) if $@;
 
+    return $request; 
+}
 
 sub _cfg
 {

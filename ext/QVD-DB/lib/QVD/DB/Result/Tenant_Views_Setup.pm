@@ -26,5 +26,11 @@ sub tenant_name
     $self->tenant->name;
 }
 
+sub tenant
+{
+    my $self = shift;
+    $self->tenant;
+}
+
 1;
 

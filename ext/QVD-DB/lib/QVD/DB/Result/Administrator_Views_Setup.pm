@@ -32,4 +32,10 @@ sub tenant_name
     $self->administrator->tenant_name;
 }
 
+sub tenant
+{
+    my $self = shift;
+    $self->administrator->tenant;
+}
+
 1;

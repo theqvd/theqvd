@@ -500,7 +500,7 @@ sub parse_string
 	CLI::Framework::Exception->throw('Unable to parse request');
     $self->ambiguous($parsing) &&
 	CLI::Framework::Exception->throw('Ambiguos request');
-    
+
     shift @$parsing;
 }
 

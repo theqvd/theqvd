@@ -150,6 +150,12 @@ sub tenant_name
     $self->user->tenant->name;
 }
 
+sub tenant
+{
+    my $self = shift;
+    $self->user->tenant;
+}
+
 
 sub get_properties_key_value
 {

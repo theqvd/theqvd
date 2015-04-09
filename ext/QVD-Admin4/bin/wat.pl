@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 use Mojolicious::Lite;
-use lib::glob '/home/ubuntu/wat/*/lib/';
+use lib::glob '/home/benjamin/wat/*/lib/';
 use Mojo::JSON qw(encode_json decode_json j);
 use QVD::Admin4::Exception;
 use MojoX::Session;
@@ -67,7 +67,7 @@ package MojoX::Session::Transport::WAT
 
 # GENERAL CONFIG AND PLUGINS
 
-app->config(hypnotoad => {listen => ['http://192.168.3.7:3000']});
+app->config(hypnotoad => {listen => ['http://localhost:3000']});
 
 # HELPERS
 
@@ -345,28 +345,19 @@ sub create_session
     $args{tenant} = $json->{tenant} if defined $json->{tenant};
     my $admin = $c->qvd_admin4_api->validate_user(%args);
 
-   my $localtime = localtime;
-    $args{password} = '**********' if exists $args{password};
+   QVD::Admin4::LogReporter->new(
 
-    eval {
-    $c->qvd_admin4_api->_db->resultset('Wat_Log')->create(
-	{ time => $localtime,
-	  action => 'login', 
-	  type_of_action => 'login',
-	  qvd_object => 'administrator',
-	  tenant_id => eval { $admin->tenant_id } // undef,
-	  tenant_name => eval { $admin->tenant_name } // undef,
-	  administrator_id => eval { $admin->id } // undef,
-	  administrator_name => eval { $admin->name } // undef,
-	  superadmin => eval { $admin->is_superadmin } // undef,
-	  object_id => eval { $admin->id } // undef,
-	  object_name => eval { $admin->name } // undef,
-	  ip => $c->tx->remote_address,
-	  source => eval { $json->{parameters}->{source} } // undef,
-	  arguments => encode_json(\%args),
-	  status => ($admin ? 0 : 3200) }) };
+       action => { action => 'login', type_of_action => 'login' },
+       qvd_object => 'administrator',
+       tenant => eval { $admin->tenant } // undef,
+       object => $admin,
+       administrator => $admin,
+       ip => $c->tx->remote_address,
+       source => eval { $json->{parameters}->{source} } // undef,
+       arguments => \%args,
+       status => ($admin ? 0 : 3200)
 
-    print $@ if $@;
+       )->report;
 
     return (0,QVD::Admin4::Exception->new(code =>3200)) 
 	unless $admin;
@@ -378,6 +369,7 @@ sub create_session
 
     return 1;
 }
+
 
 sub update_session
 {

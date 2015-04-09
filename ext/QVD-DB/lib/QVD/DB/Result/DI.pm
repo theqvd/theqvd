@@ -99,6 +99,11 @@ sub tenant_name
     $self->osf->tenant->name;
 }
 
+sub tenant
+{
+    my $self = shift;
+    $self->osf->tenant;
+}
 
 sub get_properties_key_value
 {
