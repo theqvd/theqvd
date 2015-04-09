@@ -150,7 +150,7 @@ sub message
 {
     my $self = shift;
     my $message = $code2message_mapper->{$self->code};
-#    $message .= " (".$self->object.")" if defined $self->object;
+    $message .= " (".$self->object.")" if defined $self->object;
     $message; 
 }
 

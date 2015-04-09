@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 use Mojolicious::Lite;
-use lib::glob '/home/benjamin/wat/*/lib/';
+use lib::glob '/home/ubuntu/wat/*/lib/';
 use Mojo::JSON qw(encode_json decode_json j);
 use QVD::Admin4::Exception;
 use MojoX::Session;
@@ -16,6 +16,8 @@ plugin 'QVD::Admin4::REST';
 
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 0;
 $ENV{MOJO_TMPDIR} = app->qvd_admin4_api->_cfg('path.storage.images');
+
+#app->log( Mojo::Log->new( path => app->qvd_admin4_api->_cfg('wat.log.filename'), level => 'debug' ) );
 
 app->hook(after_build_tx => sub {
     my ($tx, $app) = @_;
@@ -65,7 +67,7 @@ package MojoX::Session::Transport::WAT
 
 # GENERAL CONFIG AND PLUGINS
 
-app->config(hypnotoad => {listen => ['http://localhost:3000']});
+app->config(hypnotoad => {listen => ['http://192.168.3.7:3000']});
 
 # HELPERS
 

@@ -14,11 +14,11 @@ my $ACTIONS =
 
 sources_in_log => {type_of_action => 'general',
 		       admin4method => 'sources_in_wat_log',
-		  acls => [qr/^log\.see-main\./],},
+		  acls => [qr/^(log\.see-(main|details)|(administrator|di|host|osf|role|tenant|user|vm)\.see\.log)$/],},
 
 log_get_list => {type_of_action => 'list',
 		  admin4method => 'select',
-		  acls => [qr/^log\.see-main\./],
+		  acls => [qr/^(log\.see-(main|details)|(administrator|di|host|osf|role|tenant|user|vm)\.see\.log)$/],
 		  qvd_object => 'Wat_Log'},
 
 log_get_details => {type_of_action => 'list',

@@ -126,7 +126,8 @@ my $ACLS_FOR_FILTER_VALUES =
 
 my $ACLS_FOR_FIELDS = 
 {
-    OSF => { creation_admin => [qr/^osf\.see\.created-by$/],
+    OSF => { creation_admin_id => [qr/^osf\.see\.created-by$/],
+	     creation_admin_name => [qr/^osf\.see\.created-by$/],
 	     creation_date => [qr/^osf\.see\.creation-date$/],
 	     overlay => [qr/^osf\.see\.overlay$/],
 	     user_storage => [qr/^osf\.see\.user-storage$/],
@@ -141,7 +142,8 @@ my $ACLS_FOR_FIELDS =
 	      acls => [qr/^role\.see\.acl-list$/],
 	      number_of_acls => [qr/^role\.see\.acl-list$/] },
 
-    DI => { creation_admin => [qr/^di\.see\.created-by$/],
+    DI => { creation_admin_id => [qr/^di\.see\.created-by$/],
+	    creation_admin_name => [qr/^di\.see\.created-by$/],
 	    creation_date => [qr/^di\.see\.creation-date$/],
 	    version => [qr/^di\.see\.version$/],
 	    osf_id => [qr/^di\.see\.osf$/],
@@ -169,7 +171,8 @@ my $ACLS_FOR_FIELDS =
 	    ssh_port => [qr/^vm\.see\.port-ssh$/],
 	    vnc_port => [qr/^vm\.see\.port-vnc$/],
 	    serial_port => [qr/^vm\.see\.port-serial$/], 
-	    creation_admin => [qr/^vm\.see\.created-by$/],
+	    creation_admin_id => [qr/^vm\.see\.created-by$/],
+	    creation_admin_name => [qr/^vm\.see\.created-by$/],
 	    creation_date => [qr/^vm\.see\.creation-date$/],
 	    di_version => [qr/^vm\.see\.di-version$/],
 	    di_name => [qr/^vm\.see\.di$/],
@@ -181,7 +184,8 @@ my $ACLS_FOR_FIELDS =
 
     User => { id => [qr/^user\.see\.id$/],
 	      blocked => [qr/^user\.see\.block$/],
-	      creation_admin => [qr/^user\.see\.created-by$/],
+	      creation_admin_id => [qr/^user\.see\.created-by$/],
+	      creation_admin_name => [qr/^user\.see\.created-by$/],
 	      creation_date => [qr/^user\.see\.creation-date$/],
 	      number_of_vms => [qr/^user\.see\.vms-info$/],
 	      number_of_vms_connected => [qr/^user\.see\.vm-list-state$/],
@@ -191,7 +195,8 @@ my $ACLS_FOR_FIELDS =
 	      address => [qr/^host\.see\.address$/],
 	      blocked => [qr/^host\.see\.block$/],
 	      state => [qr/^host\.see\.state$/],
-	      creation_admin => [qr/^host\.see\.created-by$/],
+	      creation_admin_id => [qr/^host\.see\.created-by$/],
+	      creation_admin_name => [qr/^host\.see\.created-by$/],
 	      creation_date => [qr/^host\.see\.creation-date$/],
 	      number_of_vms_connected => [qr/^host\.see\.vms-info$/],
 	      properties => [qr/^host\.see\.properties$/] },
@@ -330,7 +335,7 @@ my $AVAILABLE_FILTERS =
 
 	      DI_Tag => [qw(osf_id di_id name id tenant_id tenant_name)],
 
-	      User => [qw(id name blocked creation_date last_update_date creation_admin_id creation_admin_name tenant_id tenant_name )],
+	      User => [qw(id name blocked creation_date creation_admin_id creation_admin_name tenant_id tenant_name )],
 
 	      Host => [qw(id name address blocked frontend backend state vm_id creation_date creation_admin_id creation_admin_name)],
 
@@ -475,7 +480,7 @@ my $AVAILABLE_FIELDS =
 
 		 User => [qw(id name  blocked  creation_date creation_admin_id creation_admin_name number_of_vms number_of_vms_connected  properties )],
 
-		 Host => [qw(id name address blocked frontend backend state  load creation_admin creation_date last_update_date 
+		 Host => [qw(id name address blocked frontend backend state  load creation_admin_id creation_admin_name creation_date 
                              number_of_vms_connected properties )],
 
 		 DI_Tag => [qw(di_id osf_id name id )],
@@ -1230,7 +1235,8 @@ my $DBIX_JOIN_VALUE =
 
 my $DBIX_PREFETCH_VALUE = 
 { 
-    list => { User => [qw(tenant creation_log_entry)],
+    list => { Role => [qw(creation_log_entry)],
+	      User => [qw(tenant creation_log_entry)],
 	      VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }, qw(creation_log_entry)],
 	      Host => ['runtime', qw(creation_log_entry)],
 	      OSF => [ qw(tenant creation_log_entry)],
@@ -1241,7 +1247,8 @@ my $DBIX_PREFETCH_VALUE =
 	      Tenant_Views_Setup => [ qw(tenant)],
 	      Administrator_Views_Setup => [ { administrator => 'tenant' }] },
 
-    details => {User => [qw(tenant creation_log_entry)],
+    details => {Role => [qw(creation_log_entry)],
+		User => [qw(tenant creation_log_entry)],
 		VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }, qw(creation_log_entry)],
 		Host => ['runtime', qw(creation_log_entry)],
 		OSF => [ qw(tenant creation_log_entry)],
