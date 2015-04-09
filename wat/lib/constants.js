@@ -3,6 +3,9 @@
 // If true, the internal or fixed roles cannot be edited from WAT
 RESTRICT_INTERNAL_ROLES = true;
 
+// Debug constants
+DEBUG_ACL_FAILS = false;
+
 // Status codes returned by the API
 ALL_STATUS = {
     0000: 'Successful completion',

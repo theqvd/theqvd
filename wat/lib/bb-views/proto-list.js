@@ -626,7 +626,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     render: function () {
         var that = this;
         
-        var embeddedView = that.qvdObj != Wat.CurrentView.qvdObj;
+        var embeddedView = that.cid != Wat.CurrentView.cid;
         
         // If user have not access to main section, redirect to home
         if (!embeddedView && that.whatRender && !Wat.C.checkACL(that.qvdObj + '.see-main.')) {

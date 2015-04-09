@@ -326,6 +326,11 @@ Wat.C = {
         else {
             return $.inArray(acl, this.acls) != -1;
         }
+        
+        if (DEBUG_ACL_FAILS) {
+            console.warn('ACL Fail for user ' + this.login + ':');
+            console.warn(acl);
+        }
 
         return false;
     },
