@@ -248,6 +248,11 @@ Wat.C = {
         // Store tenant mode
         Wat.C.multitenant = parseInt(that.retrievedData.multitenant);
         
+        // Store time lag between server and client
+        var currentDate = new Date();
+        var serverDate = new Date(that.retrievedData.server_datetime);
+        Wat.C.serverClientTimeLag = parseInt((serverDate - currentDate) / 1000);
+        
         // Configure visability
         Wat.C.configureVisibility();
         

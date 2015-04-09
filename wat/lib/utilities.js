@@ -71,7 +71,8 @@ Wat.U = {
     
     // Get the current date plus the given diffMilliseconds
     getRelativeDate: function (diffSeconds) {
-        var milliseconds = new Date().getTime() + (diffSeconds * 1000);
+        // Obtain the relative date with the current one OF THE SERVER
+        var milliseconds = new Date().getTime() + (diffSeconds * 1000) + (Wat.C.serverClientTimeLag * 1000);
         
         return this.getDate(milliseconds);
     },

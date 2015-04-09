@@ -119,3 +119,8 @@ input[type="checkbox"], input[type="radio"] {
 .chosen-container * {
     font-weight: normal;
 }
+
+.scrollable {
+    max-height: 300px;
+    overflow-x: auto;
+}
