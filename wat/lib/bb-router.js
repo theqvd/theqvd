@@ -56,8 +56,10 @@ Wat.Router = Backbone.Router.extend({
             Wat.WS.closeAllWebsockets();
         }
         
-		// Abort current requests
-        Wat.C.abortRequests();
+		// Abort pending requests
+        if (Wat.C.abortOldRequests) {
+            Wat.C.abortRequests();
+        }
         
         Wat.CurrentView = new view(params);
     }

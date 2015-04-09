@@ -28,8 +28,17 @@ Wat.C = {
     tenantID: -1,
     adminID: -1,
     
+    // Abort old requests when navigate or not
+    abortOldRequests: true,
+    
     // ajax requests
     requests: [],
+    
+    // Init Api address configuration
+    initApiAddress: function () {
+        this.apiUrl = 'http://' + apiAddress + '/';
+        this.apiWSUrl = 'ws://' + apiAddress + '/ws';
+    },
 
     // Get the base URL for API calls using credentials or session ID
     getBaseUrl: function () {
@@ -75,6 +84,11 @@ Wat.C = {
     // Set calls source
     setSource: function (newSource) {
         this.source = newSource;
+    },
+    
+    // Set aborting old requests flag
+    setAbortOldRequests: function (newValue) {
+        this.abortOldRequests = newValue;
     },
     
     // Return if WAT administrator should know about multitenant enviroment

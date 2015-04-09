@@ -304,6 +304,7 @@ ACLS = {
     "vm.filter.block": "Filter virtual machines by blocking state",
     "vm.filter.created-by": "Filter virtual machines by creator",
     "vm.filter.creation-date": "Filter virtual machines by creation date",
+    "vm.filter.expiration-date": "Filter virtual machines by expiration date",
     "vm.filter.host": "Filter virtual machines by node",
     "vm.filter.name": "Filter virtual machines by name",
     "vm.filter.osf": "Filter virtual machines by OS Flavour",

@@ -10,6 +10,7 @@ var roleLong = {"1": {
 };
 
 Wat.C.setSource('TESTING superadmin');
+Wat.C.setAbortOldRequests(false);
 
 // Backbone's Models and Collections instantiation
 backboneTest();

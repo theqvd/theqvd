@@ -1,5 +1,5 @@
 <div class="related-doc">
-    <div class="related-doc-title">Related documentation</div>
+    <div class="related-doc-title" data-i18n="Related documentation">Related documentation</div>
 
     <%
     $.each(relatedDoc, function (docSection, docName) {

@@ -180,7 +180,7 @@ Wat.I.formFilters[qvdObj] = {
         'text': 'Antiquity',
         'class': 'chosen-single',
         'fillable': false,
-        'transform': 'dateGreatThan',
+        'transform': 'dateGreatThanPast',
         'options': ANTIQUITY_OPTIONS,
         'displayMobile': false,
         'displayDesktop': false,

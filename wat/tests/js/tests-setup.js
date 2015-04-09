@@ -251,8 +251,6 @@ WatTests.fakeValues = {
             next_boot_ip: getRandomInt() + '.' + getRandomInt() + '.' + getRandomInt() + '.' + getRandomInt(),
             expiration_hard: getRandomStr(),
             expiration_soft: getRandomStr(),
-            creation_date: getRandomStr(),
-            creation_admin: getRandomStr(),
             properties: {
                 'property 1': getRandomStr(),
                 'property N': getRandomStr()

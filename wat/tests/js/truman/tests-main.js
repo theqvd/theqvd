@@ -8,6 +8,7 @@ var tenantDIId = 14;
 var tenantHostId = 1;
 
 Wat.C.setSource('TESTING truman');
+Wat.C.setAbortOldRequests(false);
 
 // Backbone's Models and Collections instantiation
 backboneTest();

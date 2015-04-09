@@ -76,7 +76,8 @@ Wat.I = {
         user: {},
         host: {},
         osf: {},
-        di: {}
+        di: {},
+        log: {}
     }, 
     
     formDefaultFilters: {
@@ -84,7 +85,8 @@ Wat.I = {
         user: {},
         host: {},
         osf: {},
-        di: {}
+        di: {},
+        log: {}
     },
     
     getFormFilters: function (qvdObj) {

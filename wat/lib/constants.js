@@ -320,4 +320,8 @@ ANTIQUITY_OPTIONS = [
         'value': 2592000,
         'text': '<1 month'
     },
+    {
+        'value': 31536000,
+        'text': '<1 year'
+    },
 ];

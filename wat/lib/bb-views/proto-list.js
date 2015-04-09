@@ -217,14 +217,24 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     }
                     else if (filter.transform) {
                         switch (filter.transform) {
-                            case 'dateLessThan':
+                            case 'dateLessThanPast':
                                 filters[filterControl.attr('data-filter-field')] = {
                                     "<": Wat.U.getRelativeDate(filterControl.val() * -1)
                                 };
                                 break;
-                            case 'dateGreatThan':
+                            case 'dateGreatThanPast':
                                 filters[filterControl.attr('data-filter-field')] = {
                                     ">": Wat.U.getRelativeDate(filterControl.val() * -1)
+                                };
+                                break;
+                            case 'dateLessThanFuture':
+                                filters[filterControl.attr('data-filter-field')] = {
+                                    "<": Wat.U.getRelativeDate(filterControl.val())
+                                };
+                                break;
+                            case 'dateGreatThanFuture':
+                                filters[filterControl.attr('data-filter-field')] = {
+                                    ">": Wat.U.getRelativeDate(filterControl.val())
                                 };
                                 break;
                         }
