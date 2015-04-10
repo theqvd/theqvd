@@ -25,6 +25,9 @@ my $DBConfigProvider;
 my $QVD_OBJECTS_TO_LOG_MAPPER = { User => 'user', VM => 'vm', DI => 'di', OSF => 'osf', Host => 'host', Administrator => 'administrator', Tenant => 'tenant', 
 				  Role => 'role', Config => 'config', Tenant_Views_Setup => 'tenant_view', Administrator_Views_Setup => 'admin_view',  };
 
+my $TYPES_OF_ACTION_TO_LOG_MAPPER = { list => 'see', details => 'see', tiny => 'see', delete => 'delete', update => 'update', create_or_update => 'create_or_update', exec => 'exec', 
+				      state => 'see', create => 'create' };
+
 my $DIRECTLY_TENANT_RELATED = [qw(User Administrator OSF Tenant_Views_Setup)];
 
 
@@ -1965,6 +1968,13 @@ sub qvd_object_log_style
 {
     my $self = shift;
     $QVD_OBJECTS_TO_LOG_MAPPER->{$self->qvd_object};    
+}
+
+
+sub type_of_action_log_style
+{
+    my $self = shift;
+    $TYPES_OF_ACTION_TO_LOG_MAPPER->{$self->type_of_action};    
 }
 
 1;

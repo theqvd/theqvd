@@ -9,7 +9,7 @@ sub usage_text {
                                              PASSWORD COMMAND USAGE
 ======================================================================================================
 
-  password (Starts a form intended to change the current QVD administrator session)
+  password (Starts a form intended to change the current QVD administrator password)
 
 "
 

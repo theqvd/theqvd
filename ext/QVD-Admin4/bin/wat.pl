@@ -228,7 +228,6 @@ any [qw(POST OPTIONS)] => '/di/upload' => sub {
     $c->render(text => b(encode_json($response))->decode('UTF-8'));
 };
 
-
 websocket '/di/download' => sub {
     
     my $c = shift;
@@ -365,6 +364,10 @@ sub create_session
     $c->qvd_admin4_api->load_user($admin);
     $session->create;
     $session->data(admin_id => $admin->id);
+    $session->data(admin_name => $admin->name);
+    $session->data(tenant_id => $admin->tenant_id);
+    $session->data(tenant_name => $admin->tenant_name);
+    $session->data(superadmin => $admin->is_superadmin);
     $session->flush; 
 
     return 1;
@@ -377,6 +380,25 @@ sub update_session
 
     if ($session->is_expired)
     { $session->flush;
+
+      QVD::Admin4::LogReporter->new(
+
+	  action => { action => 'login', type_of_action => 'login' },
+	  qvd_object => 'administrator',
+	  tenant => { tenant_id => $session->data('tenant_id'), 
+		      tenant_name => $session->data('tenant_name') },
+	  object => { object_id =>  $session->data('admin_id'), 
+		      object_name =>  $session->data('admin_name')},
+	  administrator => { administrator_id =>  $session->data('admin_id'), 
+			     administrator_name =>  $session->data('admin_name'),
+			     superadmin =>  $session->data('superadmin') },
+	  ip => $c->tx->remote_address,
+	  source => eval { $json->{parameters}->{source} } // undef,
+	  arguments => {},
+	  status => 3300
+	  
+	  )->report;
+
       return (0,QVD::Admin4::Exception->new(code =>3300));}
     
     my ($bool,$exception) = (1, undef);

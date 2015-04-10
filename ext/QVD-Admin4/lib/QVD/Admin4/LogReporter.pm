@@ -4,6 +4,7 @@ use warnings;
 use Moo;
 use QVD::DB::Simple;
 use Mojo::JSON qw(encode_json);
+use Scalar::Util qw(blessed);
 
 has 'administrator', is => 'ro', isa => \&check_administrator_attr, required => 1;
 has 'object', is => 'ro', isa => \&check_object_attr, required => 1;
@@ -38,7 +39,7 @@ sub check_object_attr
 {
     my $object = shift;
     return unless defined $object;
-    if (eval { ref($object) =~ /^QVD::DB::Result::.+$/ })
+    if (ref($object) =~ /^QVD::DB::Result::.+$/ )
     {
 	return 1;
     }
@@ -116,7 +117,8 @@ sub set_administrator_in_log_entry
 {
     my $self = shift;
 
-    if (eval { $self->administrator->isa('QVD::DB::Result::Administrator') })
+    if (blessed $self->administrator &&
+	$self->administrator->isa('QVD::DB::Result::Administrator'))
     {
 	@{$self->{log_entry}}{qw(administrator_id administrator_name superadmin)} = 
 	    ($self->administrator->id, $self->administrator->name, 
@@ -132,7 +134,7 @@ sub set_object_in_log_entry
 {
     my $self = shift;
 
-    if (eval { ref($self->object) =~ /^QVD::DB::Result::.+$/ })
+    if (ref($self->object) =~ /^QVD::DB::Result::.+$/)
     {
 	@{$self->{log_entry}}{qw(object_id object_name)} = 
 	    (eval { $self->object->id } // undef, eval { $self->object->name } // undef);
@@ -147,7 +149,8 @@ sub set_tenant_in_log_entry
 {
     my $self = shift;
 
-    if (eval { $self->object->isa('QVD::DB::Result::Tenant') })
+    if (blessed $self->object &&
+	$self->object->isa('QVD::DB::Result::Tenant'))
     {
 	@{$self->{log_entry}}{qw(tenant_id tenant_name)} = 
 	    ($self->id, $self->name);
@@ -162,7 +165,8 @@ sub set_action_in_log_entry
 {
     my $self = shift;
 
-    if (eval { $self->object->isa('QVD::Admin4::Action') })
+    if (blessed $self->action && 
+	$self->action->isa('QVD::Admin4::Action'))
     {
 	@{$self->{log_entry}}{qw(action type_of_action)} = 
 	    ($self->action->name, $self->action->type);

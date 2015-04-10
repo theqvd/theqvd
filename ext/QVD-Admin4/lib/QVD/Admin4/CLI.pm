@@ -10,6 +10,7 @@ use QVD::Admin4::CLI::Parser;
 use QVD::Admin4::CLI::Tokenizer;
 use Mojo::UserAgent;
 use Mojo::URL;
+use Term::ReadKey;
 
 sub usage_text { 
 "
@@ -30,6 +31,8 @@ sub usage_text {
    logout (Intended to log out)
    
    password (Intended to change current QVD administrator password)
+
+   password (Intended to change current QVD administrator pagination block)
    
    version (Retrieves information about the QVD version the app is connected to)
       
@@ -67,25 +70,26 @@ sub option_spec {
 
 sub command_map {
 
-    log => 'QVD::Admin4::CLI::Command::Log',
-    usage => 'QVD::Admin4::CLI::Command::Usage',
-    version => 'QVD::Admin4::CLI::Command::Version',
-    config => 'QVD::Admin4::CLI::Command::Config',
-    tenant => 'QVD::Admin4::CLI::Command::Tenant',
-    role => 'QVD::Admin4::CLI::Command::Role',
-    acl => 'QVD::Admin4::CLI::Command::ACL',
-    admin => 'QVD::Admin4::CLI::Command::Admin',
-    tag => 'QVD::Admin4::CLI::Command::Tag',
+    log      => 'QVD::Admin4::CLI::Command::Log',
+    usage    => 'QVD::Admin4::CLI::Command::Usage',
+    version  => 'QVD::Admin4::CLI::Command::Version',
+    config   => 'QVD::Admin4::CLI::Command::Config',
+    tenant   => 'QVD::Admin4::CLI::Command::Tenant',
+    role     => 'QVD::Admin4::CLI::Command::Role',
+    acl      => 'QVD::Admin4::CLI::Command::ACL',
+    admin    => 'QVD::Admin4::CLI::Command::Admin',
+    tag      => 'QVD::Admin4::CLI::Command::Tag',
     property => 'QVD::Admin4::CLI::Command::Property',
-    vm => 'QVD::Admin4::CLI::Command::VM',
-    user => 'QVD::Admin4::CLI::Command::User',
-    host => 'QVD::Admin4::CLI::Command::Host',
-    osf => 'QVD::Admin4::CLI::Command::OSF',
-    di => 'QVD::Admin4::CLI::Command::DI',
+    vm       => 'QVD::Admin4::CLI::Command::VM',
+    user     => 'QVD::Admin4::CLI::Command::User',
+    host     => 'QVD::Admin4::CLI::Command::Host',
+    osf      => 'QVD::Admin4::CLI::Command::OSF',
+    di       => 'QVD::Admin4::CLI::Command::DI',
     login    => 'QVD::Admin4::CLI::Command::Login',
     logout   => 'QVD::Admin4::CLI::Command::Logout',
     password => 'QVD::Admin4::CLI::Command::Password',
-    menu    => 'QVD::Admin4::CLI::Command::Menu',
+    block    => 'QVD::Admin4::CLI::Command::Block',
+    menu     => 'QVD::Admin4::CLI::Command::Menu',
     }
 
 sub init {
@@ -116,6 +120,7 @@ sub init {
     $self->cache->set( login => undef ); 
     $self->cache->set( tenant_name => undef ); 
     $self->cache->set( password => undef ); 
+    $self->cache->set( block => 25 ); 
 }
 
 
@@ -130,6 +135,7 @@ sub handle_exception
 {
     my ($self,$e) = @_;
 
+    ReadMode(0);
     print $e->message, "\n";
 }
 

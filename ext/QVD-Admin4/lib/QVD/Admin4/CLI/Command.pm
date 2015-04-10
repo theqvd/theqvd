@@ -359,8 +359,8 @@ sub _get
 {
     my ($self,$parsing) = @_;
     my $query = $self->make_api_query($parsing);
-    my $res = $self->ask_api($query);
-    $self->print_table($res,$parsing);
+
+    $self->run_in_pagination_mode($query,$parsing);
 }
 
 sub _create 
@@ -393,10 +393,48 @@ sub _can
     my $filters = { $id_key => $ids, operative => 1 }; 
     $filters->{acl_name} = { 'LIKE' => $acl_name } if defined $acl_name;
     my $action = $parsing->qvd_object eq 'admin' ? 'get_acls_in_admins' : 'get_acls_in_roles';
+    my $query = { action => $action,filters => $filters,order_by => $self->get_order($parsing)};
+    $parsing = QVD::Admin4::CLI::Grammar::Response->new(
+	response => { command => 'get', obj1 => { qvd_object => 'acl' }});
 
-    my $res = $self->ask_api({ action => $action,filters => $filters,order_by => $self->get_order($parsing)});
-    $self->print_table($res,QVD::Admin4::CLI::Grammar::Response->new(
-			   response => { command => 'get', obj1 => { qvd_object => 'acl' }}));
+    $self->run_in_pagination_mode($query,$parsing);
+}
+
+sub run_in_pagination_mode
+{
+    my ($self,$query,$parsing) = @_;
+
+    ReadMode("cbreak");
+
+    my ($pause_time, $char);
+    my $offset = 1;
+    $query->{offset} = $offset;
+    my $app = $self->get_app;
+    $query->{block} =  $app->cache->get('block');
+
+    my $res = $self->ask_api($query);
+
+    $self->print_table($res,$parsing);
+
+    if ($res->json('/total') > $query->{block} )
+    {
+	print STDOUT "--- page $offset ('n' for next, 'b' for back, 'q' for quit) ---\n";
+
+	while ($char = ReadKey($pause_time)) {
+	    last if $char eq 'q';
+
+	    $offset++ if $char eq 'n' &&
+		$res->json('/total') >= ($query->{block} * $query->{offset}) + 1;
+	    $offset-- if $char eq 'b' && $query->{offset} > 1;
+	    $query->{offset} = $offset;
+
+	    $res = $self->ask_api($query);
+	    $self->print_table($res,$parsing);
+	    print STDOUT "--- page $offset ('n' for next, 'b' for back, 'q' for quit) ---\n";
+	}
+    }
+
+    ReadMode(0);
 }
 
 sub _cmd

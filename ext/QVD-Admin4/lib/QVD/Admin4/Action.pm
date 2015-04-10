@@ -15,11 +15,11 @@ my $ACTIONS =
 
 sources_in_log => {type_of_action => 'general',
 		       admin4method => 'sources_in_wat_log',
-		  acls => [qr/^(log\.see-(main|details)|(administrator|di|host|osf|role|tenant|user|vm)\.see\.log)$/],},
+		  acls => [qr/^(log\.see-(main|details)\.|(administrator|di|host|osf|role|tenant|user|vm)\.see\.log)$/],},
 
 log_get_list => {type_of_action => 'list',
 		  admin4method => 'select',
-		  acls => [qr/^(log\.see-(main|details)|(administrator|di|host|osf|role|tenant|user|vm)\.see\.log)$/],
+		  acls => [qr/^(log\.see-(main|details)\.|(administrator|di|host|osf|role|tenant|user|vm)\.see\.log)$/],
 		  qvd_object => 'Wat_Log'},
 
 log_get_details => {type_of_action => 'list',
@@ -484,18 +484,11 @@ sub BUILD
     my $self = shift;
     my $name = $self->name;
 
-    eval {
-	QVD::Admin4::Exception->throw(code => 4110) if
-	    ref($name) || (not defined $name) || $name eq '';
+    QVD::Admin4::Exception->throw(code => 4110) if
+	ref($name) || (not defined $name) || $name eq '';
 
-	QVD::Admin4::Exception->throw(code => 4100) 
-	    unless $self->available;
-
-	QVD::Admin4::Exception->throw(code => 4210) 
-	    unless $self->available_for_admin;
-    };
-
-    QVD::Admin4::Exception->throw(exception => $@) if $@; 
+    QVD::Admin4::Exception->throw(code => 4100) 
+	unless $self->available;
 }
 
 sub available

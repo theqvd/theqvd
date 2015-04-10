@@ -158,7 +158,7 @@ sub report_in_log
 
    my $arguments = eval { $request->json_wrapper->original_request->{arguments} } // {};
    my $qvd_object = $request->qvd_object_model->qvd_object_log_style;
-   my $type_of_action = $request->qvd_object_model->type_of_action;
+   my $type_of_action = $request->qvd_object_model->type_of_action_log_style;
 
    if ($qvd_object eq 'config' && $type_of_action eq 'delete')
    {
@@ -932,7 +932,7 @@ sub get_acls_in_roles
     my $admin = $request->get_parameter_value('administrator');
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin => $admin, admin_id => $admin->id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_hide_re];
-    use Data::Dumper; print Dumper $request->filters;
+
     eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
 	       $request->filters, $request->modifiers);
 	   @rows = $rs->all };
@@ -946,7 +946,10 @@ sub current_admin_setup
 {
     my ($self,$administrator,$json_wrapper) = @_;
 
-    { multitenant => cfg('wat.multitenant'),
+    my $localtime = localtime();
+
+    { server_datetime => $localtime,
+      multitenant => cfg('wat.multitenant'),
       admin_language => $administrator->wat_setups->language,
       tenant_language => $administrator->tenant->wat_setups->language,
       admin_block => $administrator->wat_setups->block,
@@ -1130,7 +1133,7 @@ sub vms_with_expiration_date
 sub calculate_date_time_difference
 {
     my ($self,$now,$then) = @_;
-    my @time_units = qw(days hours minutes seconds);
+    my @time_units = qw(months days hours minutes seconds);
     my %time_difference;
 
     @time_difference{@time_units} = $then->subtract_datetime($now)->in_units(@time_units);

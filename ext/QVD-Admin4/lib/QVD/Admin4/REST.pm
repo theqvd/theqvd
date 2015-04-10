@@ -89,6 +89,28 @@ sub process_query
        $qvd_object_model = $self->get_qvd_object_model($action) 
 	   if $action->qvd_object;
 
+       eval { QVD::Admin4::Exception->throw(code => 4210) 
+		  unless $action->available_for_admin };
+
+       my $e = $@ ? QVD::Admin4::Exception->new(exception => $@) : undef;
+
+       QVD::Admin4::LogReporter->new(
+
+	   action => { action => $action->name,
+		       type_of_action => $qvd_object_model->type_of_action_log_style },
+	   qvd_object => $qvd_object_model->qvd_object_log_style,
+	   tenant => undef,
+	   object => undef,
+	   administrator => $self->administrator,
+	   ip => $json_wrapper->get_parameter_value('remote_address'),
+	   source => $json_wrapper->get_parameter_value('source'),
+	   arguments => {},
+	   status => $e->code 
+	   
+	   )->report if $e;
+    
+       $e->throw if $e;
+
        my $restmethod = $action->restmethod;
 	
        my $result = $self->$restmethod($action,$json_wrapper,$qvd_object_model);
@@ -168,8 +190,25 @@ sub get_request
 
     my $request = eval { QVD::Admin4::REST::Request->new(qvd_object_model => $qvd_object_model, 
 							 json_wrapper => $json_wrapper) };
+
+    my $e = $@ ? QVD::Admin4::Exception->new(exception => $@) : undef;
+
+    QVD::Admin4::LogReporter->new(
+
+	action => { action => $json_wrapper->action,
+		    type_of_action => $qvd_object_model->type_of_action_log_style },
+	qvd_object => $qvd_object_model->qvd_object_log_style,
+	tenant => undef,
+	object => undef,
+	administrator => $self->administrator,
+	ip => $json_wrapper->get_parameter_value('remote_address'),
+	source => $json_wrapper->get_parameter_value('source'),
+	arguments => {},
+	status => $e->code 
+	
+	)->report if $e;
     
-    QVD::Admin4::Exception->throw(exception => $@) if $@;
+    $e->throw if $e;
 
     return $request; 
 }
