@@ -55,7 +55,7 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
             this.sideView = new Wat.Views.VMListView(params);
         }
         
-        if (sideCheck['log.see-main.']) { 
+        if (sideCheck['di.see.log']) { 
             var sideContainer = '.' + this.cid + ' .bb-details-side2';
 
             // Render Related log list on side

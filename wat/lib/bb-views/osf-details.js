@@ -92,7 +92,7 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
         }
         
         
-        if (sideCheck['log.see-main.']) { 
+        if (sideCheck['osf.see.log']) { 
             var sideContainer = '.' + this.cid + ' .bb-details-side3';
 
             // Render Related log list on side

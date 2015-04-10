@@ -51,7 +51,7 @@ Wat.Views.HostDetailsView = Wat.Views.DetailsView.extend({
         }
         
         
-        if (sideCheck['log.see-main.']) { 
+        if (sideCheck['host.see.log']) { 
             var sideContainer = '.' + this.cid + ' .bb-details-side2';
 
             // Render Related log list on side
