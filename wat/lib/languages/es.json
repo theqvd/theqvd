@@ -287,7 +287,7 @@
     "Tenants": "Tenants",
     "Text input": "Caja de texto",
     "The operation will be performed over Virtual machines with different associated OSFs": "La operación se llevará a cabo en máquinas virtuales con diferentes OSFs asociados",
-    "The virtual machine is running with different image. Restart it to update it to new image": "La máquina virtual está corriendo con una imagen diferente. Reiniciala para actualizarla a la nueva imagen",
+    "The virtual machine is running with different image - Restart it to update it to new image": "La máquina virtual está corriendo con una imagen diferente - Reiníciala para actualizarla a la nueva imagen",
     "The default block size of the system": "El tamaño de bloque predeterminado del sistema",
     "The default language of the system": "El idioma predeterminado del sistema",
     "There are more items than the visible ones on this page": "Hay más elementos que los mostrados en esta página",

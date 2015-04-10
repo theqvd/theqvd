@@ -287,7 +287,7 @@
     "The default block size of the system": "The default block size of the system",
     "The default language of the system": "The default language of the system",
     "The operation will be performed over Virtual machines with different associated OSFs": "The operation will be performed over Virtual machines with different associated OSFs",
-    "The virtual machine is running with different image. Restart it to update it to new image": "The virtual machine is running with different image. Restart it to update it to new image",
+    "The virtual machine is running with different image - Restart it to update it to new image": "The virtual machine is running with different image - Restart it to update it to new image",
     "There are more items than the visible ones on this page": "There are more items than the visible ones on this page",
     "There are not elements": "There are not elements",
     "There are not tags": "There are not tags",

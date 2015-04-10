@@ -48,6 +48,9 @@ Wat.Views.TenantListView = Wat.Views.ListView.extend({
         
         this.dialogConf.title = $.i18n.t('New Tenant');
         Wat.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
+        
+        Wat.I.chosenElement('[name="language"]', 'single100');
+        Wat.I.chosenElement('[name="block"]', 'single100');
     },
     
     createElement: function () {
