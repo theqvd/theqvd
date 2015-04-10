@@ -12,6 +12,9 @@
     })(jQuery);
     
 	$(doc).ready(function() {
+        // Init API address variables
+        Wat.C.initApiAddress();
+        
         // Setup jQuery ajax to store all requests in a requests queue
         $.ajaxSetup({
             beforeSend: function(jqXHR) {

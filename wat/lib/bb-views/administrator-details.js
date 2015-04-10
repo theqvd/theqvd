@@ -175,7 +175,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
             var subbranch = '';
             subbranch += '<div class="subbranch ' + disabledClass + '" data-acl="' + acl.name + '" data-acl-id="' + acl.id + '">';
                 // Name of the ACL
-                subbranch += '<span class="subbranch-piece" data-i18n="' + ACLS[acl.name] + '"></span>';
+                subbranch += '<span class="subbranch-piece" data-i18n="' + acl.description + '"></span>';
             
                 // Inheritence procendence indicator
                 if (Wat.C.checkACL('administrator.see.acl-list-roles') && inheritedRoles) {

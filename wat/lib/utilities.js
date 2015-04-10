@@ -93,7 +93,7 @@ Wat.U = {
         var translatedAcls = [];
         
         $.each(acls, function (iAcl, acl) {
-            var translatedAcl = $.i18n.t(ACLS[acl.name]);
+            var translatedAcl = $.i18n.t(acl.description);
             acls[iAcl].translatedACL = translatedAcl;
             translatedAcls.push(translatedAcl);
         });

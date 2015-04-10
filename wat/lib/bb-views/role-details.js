@@ -139,7 +139,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
                 }
             
                 // Name of the ACL
-                subbranch += '<span class="subbranch-piece" data-i18n="' + ACLS[acl.name] + '"></span>';
+                subbranch += '<span class="subbranch-piece" data-i18n="' + acl.description + '"></span>';
             
                 // Inheritence procendence indicator
                 if (Wat.C.checkACL('role.see.acl-list-roles') && inheritedRoles) {

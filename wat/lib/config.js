@@ -4,23 +4,11 @@ Wat.C = {
     login: '',
     password: '',
     loggedIn: false,
-    // Openstack preprod
-    //apiUrl: 'http://172.20.126.12:3000/',
-    //apiWSUrl: 'ws://172.20.126.12:3000/ws',  
-    //apiAddress: '172.20.126.12:3000',  
-    
-    // Openstack
-    apiUrl: 'http://172.20.126.16:3000/',
-    apiWSUrl: 'ws://172.20.126.16:3000/ws',
-    apiAddress: '172.20.126.16:3000',  
-
-    // Benja
-    //apiUrl: 'http://172.26.9.42/',
-    //apiWSUrl: 'ws://172.26.9.42/ws',
-    //apiAddress: '172.26.9.42',  
+    apiAddress: '172.20.126.16:3000',   
 
     // Source to be stored by API log
     source: 'WAT',
+    
     loginExpirationDays: 1,
     acls: [],
     aclGroups: {},
@@ -36,8 +24,8 @@ Wat.C = {
     
     // Init Api address configuration
     initApiAddress: function () {
-        this.apiUrl = 'http://' + apiAddress + '/';
-        this.apiWSUrl = 'ws://' + apiAddress + '/ws';
+        this.apiUrl = 'http://' + this.apiAddress + '/';
+        this.apiWSUrl = 'ws://' + this.apiAddress + '/ws';
     },
 
     // Get the base URL for API calls using credentials or session ID
