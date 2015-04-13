@@ -12,6 +12,8 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     viewKind: 'admin',
     currentTokensPrefix: '',
     
+    currentSearch: {},
+    
     breadcrumbs: {
         'screen': 'Home',
         'link': '#',
@@ -141,6 +143,9 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         $('.bb-config-tokens').html(HTML_MINI_LOADING);
 
         var search = $(e.target).val();
+            
+        Wat.C.currentSearch = search;
+        
         if (search == '') {
             $('.lateral-menu-option').eq(0).trigger('click');
         }
@@ -158,6 +163,10 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     },
     
     clickPrefixOption: function (e) {
+        // Restore current Search to empty
+        Wat.C.currentSearch = '';
+        
+        // Get new hash from data-prefix attribute of clicked menu option
         var newHash = '#/config/' + $(e.target).attr('data-prefix');
         
         // If pushState is not available in browser, redirect to new hash reloading page
@@ -316,8 +325,14 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
             Wat.A.performAction('config_get', {}, {'key_re': UNCLASSIFIED_CONFIG_REGEXP}, {}, that.processTokensRenderTokens, that);
         }
         else if ($.inArray(that.currentTokensPrefix, that.prefixes) != -1) {
+            // If there is a current search, filter by it. Otherwise filter by current selected prefix    
+            var filter = {'key_re':'^' + that.currentTokensPrefix + '\\.'};
+            if (!$.isEmptyObject(Wat.C.currentSearch)) {
+                filter = {'key': Wat.C.currentSearch};
+            }
+            
 			// If the prefix of the changed token exist, render it after change
-            Wat.A.performAction('config_get', {}, {'key_re':'^' + that.currentTokensPrefix + '\\.'}, {}, that.processTokensRenderTokens, that);
+            Wat.A.performAction('config_get', {}, filter, {}, that.processTokensRenderTokens, that);
         }
         else {
 			// If the prefix of the changed token doesnt exist, render all to create this new prefix in side menu
