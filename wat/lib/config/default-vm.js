@@ -143,7 +143,7 @@ Wat.I.listFields[qvdObj] = {
         ],
         'acls': 'vm.see.mac',
         'display': false,
-        'sortable': false,
+        'sortable': true,
     },
     'serial_port': {
         'text': 'Serial port',
