@@ -61,7 +61,7 @@
                         case 'datetime':
             %>
                             <th class="<%= sortAttr %> desktop" data-sortby="time">
-                                <span data-i18n="Passed time"><%= i18n.t('Passed time') %></span>
+                                <span data-i18n="Elapsed time"><%= i18n.t('Elapsed time') %></span>
                             </th>
             <%
                             break;

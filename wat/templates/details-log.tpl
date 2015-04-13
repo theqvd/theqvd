@@ -105,7 +105,7 @@
             </td>
         </tr>
         <tr>
-            <td><i class="fa fa-clock-o"></i><span data-i18n="Passed time"></span></td>
+            <td><i class="fa fa-clock-o"></i><span data-i18n="Elapsed time"></span></td>
             <td>
                 <span><%= model.get('antiquityHTML') %></span>
             </td>

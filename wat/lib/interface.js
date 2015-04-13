@@ -430,6 +430,11 @@ Wat.I = {
     updateChosenControls: function (selector) {
         var selector = selector || 'select.chosen-advanced, select.chosen-single';
         $(selector).trigger('chosen:updated');
+                                
+        if ($(selector).find('option').length == 0) {
+            $(selector + '+.chosen-container span').html($.i18n.t('Empty'));
+        }
+
     },
     
     // Set specific menu section as selected

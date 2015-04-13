@@ -55,9 +55,9 @@
         <tr>
             <td><i class="<%= CLASS_ICON_OSFS %>"></i><span data-i18n="OS Flavour"></span></td>
             <td>
-                <a href="#/osf/<%= model.get('osf_id') %>">
+                <%= Wat.C.ifACL('<a href="#/osf/' + model.get('osf_id') + '" data-i18n="[title]Click for details">', 'osf.see-details.') %>
                     <%= model.get('osf_name') %>
-                </a>
+                <%= Wat.C.ifACL('</a>', 'osf.see-details.') %>
             </td>
         </tr>
     <% 

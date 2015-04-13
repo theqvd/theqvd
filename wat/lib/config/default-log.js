@@ -62,7 +62,7 @@ Wat.I.listFields[qvdObj] = {
         'fields': [
             'time'
         ],
-        'text': 'Passed time',
+        'text': 'Elapsed time',
         'sortable': true,
     },
     'source': {

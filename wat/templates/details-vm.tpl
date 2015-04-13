@@ -167,9 +167,9 @@ switch (model.get('state')) {
             <tr class="js-execution-params execution-params">
                 <td><i class="<%= CLASS_ICON_DIS %>"></i><span data-i18n="Disk image"></span></td>
                 <td data-wsupdate="di" data-id="<%= model.get('id') %>">
-                    <a href="#/di/<%= model.get('di_id_in_use') %>">
+                    <%= Wat.C.ifACL('<a href="#/di/' + model.get('di_id_in_use') + '" data-i18n="[title]Click for details">', 'di.see-details.') %>
                         <%= model.get('di_name_in_use') %>
-                    </a>
+                    <%= Wat.C.ifACL('</a>', 'di.see-details.') %>
                 </td>
             </tr>
         <% 
@@ -281,9 +281,9 @@ switch (model.get('state')) {
         <tr>
             <td><i class="<%= CLASS_ICON_USERS %>"></i><span data-i18n="User"></span></td>
             <td>
-                <a href="#/user/<%= model.get('user_id') %>">
+                <%= Wat.C.ifACL('<a href="#/user/' + model.get('user_id') + '" data-i18n="[title]Click for details">', 'user.see-details.') %>
                     <%= model.get('user_name') %>
-                </a>
+                <%= Wat.C.ifACL('</a>', 'user.see-details.') %>
                 
                 <% 
                 if (Wat.C.checkACL('vm.see.user-state')) { 
@@ -349,9 +349,9 @@ switch (model.get('state')) {
         <tr>
             <td><i class="<%= CLASS_ICON_OSFS %>"></i><span data-i18n="OS Flavour"></span></td>
             <td>
-                <a href="#/osf/<%= model.get('osf_id') %>">
+                <%= Wat.C.ifACL('<a href="#/osf/' + model.get('osf_id') + '" data-i18n="[title]Click for details">', 'osf.see-details.') %>
                     <%= model.get('osf_name') %>
-                </a>
+                <%= Wat.C.ifACL('</a>', 'osf.see-details.') %>
             </td>
         </tr>
     <% 
@@ -371,9 +371,9 @@ switch (model.get('state')) {
         <tr>
             <td><i class="<%= CLASS_ICON_DIS %>"></i><span data-i18n="Disk image"></span></td>
             <td>
-                <a href="#/di/<%= model.get('di_id') %>">
+                <%= Wat.C.ifACL('<a href="#/di/' + model.get('di_id') + '" data-i18n="[title]Click for details">', 'di.see-details.') %>
                     <%= model.get('di_name') %>
-                </a>
+                <%= Wat.C.ifACL('</a>', 'di.see-details.') %>
                 <%
                     if (model.get('state') == 'running' && model.get('di_id') != model.get('di_id_in_use')) {
                 %>

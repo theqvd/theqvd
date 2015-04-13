@@ -83,7 +83,6 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             $('[name="osf_id"] option').remove();
             
             Wat.A.fillSelect(params, function () {
-                
                 // Fill DI Tags select on virtual machines creation form after fill OSF combo
                 var params = {
                     'action': 'tag_tiny_list',
@@ -109,9 +108,6 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             Wat.I.chosenElement('[name="user_id"]', 'advanced100');
             Wat.I.chosenElement('[name="osf_id"]', 'advanced100');
             Wat.I.chosenElement('[name="di_tag"]', 'advanced100');
-
-            $('[name="tenant_id"]').change(function () {
-            });
         }
          
     },

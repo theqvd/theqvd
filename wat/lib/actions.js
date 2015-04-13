@@ -258,6 +258,9 @@ Wat.A = {
         if (params.chosenType) {
             Wat.I.chosenElement(controlSelector, params.chosenType);
         }
+        
+        // Change content of chosen combo to Loading while data is loaded
+        $(controlSelector + '+.chosen-container span').html($.i18n.t('Loading'));
 
         // Some starting options can be added as first options
         if (params.startingOptions) {
@@ -366,11 +369,6 @@ Wat.A = {
 
                     if (params.chosenType) {
                         Wat.I.updateChosenControls(controlSelector);
-                    }
-                    
-                    // If no elements found, set label of chosen select as Empty
-                    if ($(controlSelector).find('option').length == 0) {
-                        $(controlSelector + '+.chosen-container span').html($.i18n.t('Empty'));
                     }
                     
                     if (afterCallBack != undefined) {
