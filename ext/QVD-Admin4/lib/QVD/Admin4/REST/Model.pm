@@ -20,6 +20,13 @@ has 'model_info', is => 'ro', isa => sub {die "Invalid type for attribute model_
 					      unless ref(+shift) eq 'HASH';}, 
     default => sub {{};};
 
+
+
+
+################
+# DB FUNCTIONS #
+################
+
 my $DBConfigProvider;
 
 my $QVD_OBJECTS_TO_LOG_MAPPER = { User => 'user', VM => 'vm', DI => 'di', OSF => 'osf', Host => 'host', Administrator => 'administrator', Tenant => 'tenant', 
@@ -118,7 +125,7 @@ my $ACLS_FOR_FILTER_VALUES =
 					   di => [qr/^di\.see-main\.$/],
 					   host => [qr/^host\.see-main\.$/],
 					   tenant => [qr/^tenant\.see-main\.$/],
-					   admin => [qr/^administrator\.see-main\.$/], 
+					   administrator => [qr/^administrator\.see-main\.$/], 
 					   role => [qr/^role\.see-main\.$/],
 					   acl => [qr/^administrator\.see\.acl-list$/],
 					   config => [qr/^config\.qvd\.$/],
@@ -322,6 +329,7 @@ my $ACLS_FOR_ARGUMENTS_IN_CREATION =
 	    __tags__ => [qr/^di\.create\.(tags|default)$/]}
 
 };
+
 
 my $AVAILABLE_FILTERS = 
 { 
@@ -714,6 +722,13 @@ my $DEFAULT_ARGUMENT_VALUES =
 };
 
 
+# This will be  VM->mac value in $FILTERS_TO_DBIX_FORMAT_MAPPER
+# cfg('vm.network.mac.prefix') should be refreshed, but it's not
+# relevant for ordering purposes
+
+my $ip2mac = "ip2mac(me.ip,'".cfg('vm.network.mac.prefix')."')";
+
+
 my $FILTERS_TO_DBIX_FORMAT_MAPPER = 
 {
     Wat_Log => { 
@@ -848,6 +863,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'di_name' => 'di.path',
 	'user_state' => 'vm_runtime.user_state',
 	'ip' => 'me.ip',
+	'mac' => \$ip2mac, # Only useful for ordering. Refs are not allowed as filter keys by dbic. mac must be forbidden in available_filtes
 	'next_boot_ip' => 'vm_runtime.vm_address',
 	'ssh_port' => 'vm_runtime.vm_ssh_port',
 	'vnc_port' => 'vm_runtime.vm_vnc_port',

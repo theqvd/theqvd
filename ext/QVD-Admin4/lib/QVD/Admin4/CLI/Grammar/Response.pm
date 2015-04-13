@@ -34,7 +34,7 @@ sub BUILD
     $self->{arguments} = $json->{arguments} // {};
     $self->{parameters} = $json->{parameters} // {};
     $self->{fields} = $json->{fields} // [];
-    $self->{order} = $json->{order} // {};
+    $self->{order} = $json->{order_by} // {};
 }
 
 

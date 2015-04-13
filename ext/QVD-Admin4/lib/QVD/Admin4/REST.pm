@@ -12,7 +12,7 @@ use QVD::Admin4::Action;
 use TryCatch;
 use AnyEvent::Pg::Pool;
 use QVD::Config;
-use QVD::Admin4::LogReporter;
+use QVD::Admin4::LogReport;
 use Mojo::JSON qw(encode_json);
 use base qw(Mojolicious::Plugin);
 
@@ -94,14 +94,14 @@ sub process_query
 
        my $e = $@ ? QVD::Admin4::Exception->new(exception => $@) : undef;
 
-       QVD::Admin4::LogReporter->new(
+       QVD::Admin4::LogReport->new(
 
 	   action => { action => $action->name,
 		       type_of_action => $qvd_object_model->type_of_action_log_style },
 	   qvd_object => $qvd_object_model->qvd_object_log_style,
 	   tenant => undef,
 	   object => undef,
-	   administrator => $self->administrator,
+	   administrator => ( $self->administrator->is_superadmin ? undef : $self->administrator->tenant ),
 	   ip => $json_wrapper->get_parameter_value('remote_address'),
 	   source => $json_wrapper->get_parameter_value('source'),
 	   arguments => {},
@@ -193,12 +193,12 @@ sub get_request
 
     my $e = $@ ? QVD::Admin4::Exception->new(exception => $@) : undef;
 
-    QVD::Admin4::LogReporter->new(
+    QVD::Admin4::LogReport->new(
 
 	action => { action => $json_wrapper->action,
 		    type_of_action => $qvd_object_model->type_of_action_log_style },
 	qvd_object => $qvd_object_model->qvd_object_log_style,
-	tenant => undef,
+	tenant => ( $self->administrator->is_superadmin ? undef : $self->administrator->tenant ),
 	object => undef,
 	administrator => $self->administrator,
 	ip => $json_wrapper->get_parameter_value('remote_address'),

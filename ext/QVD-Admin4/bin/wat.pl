@@ -344,7 +344,7 @@ sub create_session
     $args{tenant} = $json->{tenant} if defined $json->{tenant};
     my $admin = $c->qvd_admin4_api->validate_user(%args);
 
-   QVD::Admin4::LogReporter->new(
+   QVD::Admin4::LogReport->new(
 
        action => { action => 'login', type_of_action => 'login' },
        qvd_object => 'administrator',
@@ -381,7 +381,7 @@ sub update_session
     if ($session->is_expired)
     { $session->flush;
 
-      QVD::Admin4::LogReporter->new(
+      QVD::Admin4::LogReport->new(
 
 	  action => { action => 'login', type_of_action => 'login' },
 	  qvd_object => 'administrator',

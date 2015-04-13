@@ -172,14 +172,16 @@ sub report_in_log
 	    $obj->qvd_object, $obj->property);
    }
 
-   QVD::Admin4::LogReporter->new(
+   my $admin = $request->get_parameter_value('administrator');
+
+   QVD::Admin4::LogReport->new(
 
        action => { action => $request->json_wrapper->action,
 		   type_of_action => $type_of_action },
        qvd_object => $qvd_object,
-       tenant => eval { $obj->tenant } // undef,
+       tenant => eval { $obj->tenant } // ($admin->is_superadmin ? undef : $admin->tenant),
        object => $obj,
-       administrator => $request->get_parameter_value('administrator'),
+       administrator => $admin,
        ip => $request->get_parameter_value('remote_address'),
        source => $request->get_parameter_value('source'),
        arguments => $arguments,
