@@ -90,7 +90,7 @@ sub process_query
 	   if $action->qvd_object;
 
        eval { QVD::Admin4::Exception->throw(code => 4210) 
-		  unless $action->available_for_admin };
+		  unless $action->available_for_admin($self->administrator) };
 
        my $e = $@ ? QVD::Admin4::Exception->new(exception => $@) : undef;
 
@@ -99,9 +99,9 @@ sub process_query
 	   action => { action => $action->name,
 		       type_of_action => $qvd_object_model->type_of_action_log_style },
 	   qvd_object => $qvd_object_model->qvd_object_log_style,
-	   tenant => undef,
+	   tenant => $self->administrator->tenant,
 	   object => undef,
-	   administrator => ( $self->administrator->is_superadmin ? undef : $self->administrator->tenant ),
+	   administrator => $self->administrator,
 	   ip => $json_wrapper->get_parameter_value('remote_address'),
 	   source => $json_wrapper->get_parameter_value('source'),
 	   arguments => {},
@@ -198,7 +198,7 @@ sub get_request
 	action => { action => $json_wrapper->action,
 		    type_of_action => $qvd_object_model->type_of_action_log_style },
 	qvd_object => $qvd_object_model->qvd_object_log_style,
-	tenant => ( $self->administrator->is_superadmin ? undef : $self->administrator->tenant ),
+	tenant => $self->administrator->tenant,
 	object => undef,
 	administrator => $self->administrator,
 	ip => $json_wrapper->get_parameter_value('remote_address'),

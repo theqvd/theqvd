@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 use Mojolicious::Lite;
-use lib::glob '/home/benjamin/wat/*/lib/';
+use lib::glob '/home/ubuntu/wat/*/lib/';
 use Mojo::JSON qw(encode_json decode_json j);
 use QVD::Admin4::Exception;
 use MojoX::Session;
@@ -67,7 +67,7 @@ package MojoX::Session::Transport::WAT
 
 # GENERAL CONFIG AND PLUGINS
 
-app->config(hypnotoad => {listen => ['http://localhost:3000']});
+app->config(hypnotoad => {listen => ['http://192.168.3.7:3000']});
 
 # HELPERS
 

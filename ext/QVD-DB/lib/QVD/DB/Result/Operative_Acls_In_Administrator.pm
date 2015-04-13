@@ -15,6 +15,7 @@ SELECT ad.id as admin_id,
        CASE WHEN a.name ~ ? THEN FALSE ELSE CASE WHEN a.name ~ ? THEN TRUE ELSE CASE WHEN j.acl_id IS NULL THEN FALSE ELSE TRUE END END END as operative,
        j.inheritor_id as role_id, 
        a.id as acl_id, 
+       a.description as acl_description, 
        json_agg(r.*)::text as roles_json, 
        a.name as acl_name
 
@@ -33,6 +34,7 @@ __PACKAGE__->add_columns(
     admin_id  => { data_type => 'integer' },
     acl_id  => { data_type => 'integer' },
     acl_name  => { data_type => 'varchar(64)' },
+    acl_description  => { data_type => 'varchar(80)' },
     roles_json  => { data_type => 'varchar' },
 );
 

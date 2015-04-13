@@ -16,6 +16,7 @@ __PACKAGE__->result_source_instance->view_definition(
 SELECT CASE WHEN a.name ~ ? OR (j.acl_id IS NULL AND jj.acl_id IS NULL) OR jj.positive=FALSE THEN FALSE ELSE TRUE END as operative, 
        rr.id as role_id, 
        a.id as acl_id, 
+       a.description as acl_description, 
        json_agg(r.*)::text as roles_json, 
        a.name as acl_name
 
@@ -35,6 +36,7 @@ __PACKAGE__->add_columns(
     operative  => { data_type => 'boolean' },
     role_id  => { data_type => 'integer' },
     acl_id  => { data_type => 'integer' },
+    acl_description  => { data_type => 'varchar(80)' },
     acl_name  => { data_type => 'varchar(64)' },
     roles_json  => { data_type => 'varchar' },
 );

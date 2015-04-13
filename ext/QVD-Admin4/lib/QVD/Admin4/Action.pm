@@ -5,8 +5,6 @@ use Moo;
 use QVD::Admin4::Exception;
 
 has 'name', is => 'ro', isa => sub {}, required => 1;
-has 'administrator', is => 'ro', isa => sub { die "Invalid type for attribute administrator" 
-						  unless ref(+shift) eq 'QVD::DB::Result::Administrator'; }, required => 1;
 
 my $AVAILABLE_ACTION_SIZES = { default => 'normal', normal => 'normal', heavy => 'heavy' };
 
@@ -565,9 +563,9 @@ sub restmethod
 
 sub available_for_admin
 {
-    my $self = shift;
+    my ($self,$admin) = @_;
     
-    $self->administrator->re_is_allowed_to($self->acls);
+    $admin->re_is_allowed_to($self->acls);
 }
 
 sub available_nested_action_for_admin

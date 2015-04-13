@@ -179,7 +179,7 @@ sub report_in_log
        action => { action => $request->json_wrapper->action,
 		   type_of_action => $type_of_action },
        qvd_object => $qvd_object,
-       tenant => eval { $obj->tenant } // ($admin->is_superadmin ? undef : $admin->tenant),
+       tenant => eval { $obj->tenant } // $admin->tenant,
        object => $obj,
        administrator => $admin,
        ip => $request->get_parameter_value('remote_address'),

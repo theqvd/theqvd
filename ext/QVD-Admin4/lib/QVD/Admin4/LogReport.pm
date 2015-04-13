@@ -149,11 +149,11 @@ sub set_tenant_in_log_entry
 {
     my $self = shift;
 
-    if (blessed $self->object &&
-	$self->object->isa('QVD::DB::Result::Tenant'))
+    if (blessed $self->tenant &&
+	$self->tenant->isa('QVD::DB::Result::Tenant'))
     {
 	@{$self->{log_entry}}{qw(tenant_id tenant_name)} = 
-	    ($self->id, $self->name);
+	    ($self->tenant->id, $self->tenant->name);
     }
     elsif (ref($self->object) eq 'HASH')
     {

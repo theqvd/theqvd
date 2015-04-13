@@ -354,7 +354,7 @@ my $AVAILABLE_FILTERS =
 
 	      OSF => [qw(id name overlay user_storage memory vm_id di_id  tenant_id tenant_name creation_date creation_admin_id creation_admin_name)],
 
-	      ACL => [qw(id name role_id admin_id)],
+	      ACL => [qw(id name role_id admin_id description)],
 
 	      Tenant => [qw(id name language block creation_date creation_admin_id creation_admin_name)],
 
@@ -364,9 +364,9 @@ my $AVAILABLE_FILTERS =
 
 	      Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
-	      Operative_Acls_In_Role => [qw(acl_name role_id operative name id)],
+	      Operative_Acls_In_Role => [qw(acl_name role_id operative name id description)],
 
-	      Operative_Acls_In_Administrator => [qw(acl_name admin_id operative name id)],
+	      Operative_Acls_In_Administrator => [qw(acl_name admin_id operative name id description)],
 
 	      Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
@@ -391,7 +391,7 @@ my $AVAILABLE_FILTERS =
 
 		 OSF => [qw(id name overlay user_storage memory vm_id di_id  tenant_id tenant_name creation_date creation_admin_id creation_admin_name)],
 
-		 ACL => [qw(id name role_id admin_id )],
+		 ACL => [qw(id name role_id admin_id description )],
 
 		 Role => [qw(name id fixed internal admin_id inheritor_id creation_date creation_admin_id creation_admin_name)],
 
@@ -401,9 +401,9 @@ my $AVAILABLE_FILTERS =
 
 		 Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
-	         Operative_Acls_In_Role => [qw(acl_name role_id operative id name)],
+	         Operative_Acls_In_Role => [qw(acl_name role_id operative id name description)],
 			   
-	         Operative_Acls_In_Administrator => [qw(acl_name admin_id operative id name)],
+	         Operative_Acls_In_Administrator => [qw(acl_name admin_id operative id name description)],
 
 		 Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
@@ -444,7 +444,7 @@ my $AVAILABLE_FIELDS =
                         state host_id host_name  di_id user_state ip mac next_boot_ip ssh_port vnc_port serial_port 
                         creation_date creation_admin_id creation_admin_name di_version di_name di_id properties ip_in_use di_id_in_use )],
 
-	      ACL => [qw(id name)],
+	      ACL => [qw(id name description)],
 
 	      Administrator => [qw(name roles id language block creation_date creation_admin_id creation_admin_name)],
 
@@ -458,9 +458,9 @@ my $AVAILABLE_FIELDS =
 
 	      Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
-	      Operative_Acls_In_Role => [qw(id name roles operative)],
+	      Operative_Acls_In_Role => [qw(id name roles operative description)],
 
-	      Operative_Acls_In_Administrator => [qw(id name roles operative)],
+	      Operative_Acls_In_Administrator => [qw(id name roles operative description)],
 
 	      Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
@@ -483,7 +483,7 @@ my $AVAILABLE_FIELDS =
                            time_until_expiration_soft time_until_expiration_hard state host_id host_name  di_id user_state ip mac next_boot_ip ssh_port vnc_port serial_port 
                            creation_date creation_admin_id creation_admin_name di_version di_name di_id properties ip_in_use di_id_in_use di_name_in_use )],
 
-		 ACL => [qw(id name)],
+		 ACL => [qw(id name description)],
 
 		 Administrator => [qw(name roles id language block creation_date creation_admin_id creation_admin_name)],
 
@@ -498,9 +498,9 @@ my $AVAILABLE_FIELDS =
 
 		 Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
-        	 Operative_Acls_In_Role => [qw(id name roles operative)],
+        	 Operative_Acls_In_Role => [qw(id name roles operative description)],
 
-	         Operative_Acls_In_Administrator => [qw(id name roles operative)],
+	         Operative_Acls_In_Administrator => [qw(id name roles operative description)],
 
 		 Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
@@ -760,6 +760,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'name' => 'me.name',
 	'role_id' => 'role.id',
 	'admin_id' => 'admin.id',
+	'description' => 'me.description',
     },
 
     DI_Tag => {
@@ -917,6 +918,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'name' => 'me.acl_name',
         'role_id' =>  'me.role_id',
 	'operative' => 'me.operative',
+	'description' => 'me.acl_description',
     },
 
     Operative_Acls_In_Administrator => { 
@@ -925,6 +927,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'id' => 'me.acl_id',
         'admin_id' =>  'me.admin_id',
 	'operative' => 'me.operative',
+	'description' => 'me.acl_description',
     },
 
     Operative_Views_In_Tenant => { 	
@@ -1001,6 +1004,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     ACL => {
 	'id' => 'me.id',
 	'name' => 'me.name',
+	'description' => 'me.description',
     },
 
     Host => {
@@ -1200,6 +1204,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
         'id' =>  'me.acl_id',
         'roles' =>  'me.roles',
 	'operative' => 'me.operative',
+	'description' => 'me.acl_description',
     },
 
     Operative_Acls_In_Administrator => { 
@@ -1207,7 +1212,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
         'id' =>  'me.acl_id',
         'roles' =>  'me.roles',
 	'operative' => 'me.operative',
-
+	'description' => 'me.acl_description',
     },
 
 };
