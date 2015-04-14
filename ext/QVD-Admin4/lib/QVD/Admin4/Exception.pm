@@ -25,6 +25,10 @@ my $code2message_mapper =
     2220 => 'Unable to find images directory in filesystem',
     2230 => 'Unable to find staging directory in filesystem',
     2240 => 'Unable to find disk image in staging directory',
+    2250 => 'Unable to upload disk image',
+    2251 => 'Unable to move uploaded disk image',
+    2260 => 'Unable to download disk image',
+    2261 => 'Unable to move downloaded disk image',
 
     3100 => 'No credentials provided for authentication',
     3200 => 'Wrong login or password - Login again',

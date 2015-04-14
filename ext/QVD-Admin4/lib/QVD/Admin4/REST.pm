@@ -136,6 +136,7 @@ sub process_query
 sub get_channels
 {
    my ($self,$action_name) = @_;
+
    QVD::Admin4::Action->new(name => $action_name )->channels;
 }
 

@@ -58,6 +58,8 @@ sub check_tenant_attr
 {
     my $tenant = shift;
     return unless defined $tenant;
+
+
     if (ref($tenant) eq 'QVD::DB::Result::Tenant')
     {
 	return 1;
@@ -155,7 +157,7 @@ sub set_tenant_in_log_entry
 	@{$self->{log_entry}}{qw(tenant_id tenant_name)} = 
 	    ($self->tenant->id, $self->tenant->name);
     }
-    elsif (ref($self->object) eq 'HASH')
+    elsif (ref($self->tenant) eq 'HASH')
     {
 	$self->{log_entry} = {%{$self->{log_entry}},%{$self->tenant}};
     }

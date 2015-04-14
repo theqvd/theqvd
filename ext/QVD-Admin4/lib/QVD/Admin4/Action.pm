@@ -257,19 +257,9 @@ di_update => { type_of_action => 'update',
 	       qvd_object => 'DI'},
 
 di_create => { type_of_action => 'create',
-	       admin4method => 'di_create_from_staging',
+	       admin4method => 'di_create',
 	       acls => [qr/^di\.create\./],
 	       qvd_object => 'DI'},
-
-di_create_from_staging => { type_of_action => 'create',
-			    admin4method => 'di_create_from_staging',
-			    acls => [qr/^di\.create\./],
-			    qvd_object => 'DI'},
-
-di_create_from_upload => { type_of_action => 'create',
-			   admin4method => 'di_create_from_upload',
-			   acls => [qr/^di\.create\./],
-			   qvd_object => 'DI'},
 
 di_delete => { type_of_action => 'delete',
 	       admin4method => 'di_delete',

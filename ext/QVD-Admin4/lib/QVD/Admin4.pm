@@ -580,7 +580,7 @@ sub vm_delete
 ###############################
 ###############################
 
-sub di_create_from_upload
+sub di_create
 {
     my ($self,$request) = @_;
 
