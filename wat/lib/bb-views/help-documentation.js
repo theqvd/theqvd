@@ -1,6 +1,7 @@
 Wat.Views.DocView = Wat.Views.MainView.extend({
     qvdObj: 'documentation',
     selectedGuide: 'introduction',
+    relatedDoc: {},
     
     breadcrumbs: {
         'screen': 'Home',

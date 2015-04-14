@@ -1,5 +1,6 @@
 Wat.Views.AboutView = Wat.Views.MainView.extend({
     qvdObj: 'about',
+    relatedDoc: {},
     
     breadcrumbs: {
         'screen': 'Home',
