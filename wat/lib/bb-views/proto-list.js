@@ -1048,7 +1048,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
 
         // Add specific parts of editor to dialog
         that.template = _.template(
-                    Wat.TPL.editor, {
+                    Wat.TPL.editorMassive, {
                         model: that.model
                     }
                 );

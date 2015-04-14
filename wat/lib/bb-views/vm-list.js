@@ -186,7 +186,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         
         var osfId = -1;
         // If there are returned more than 1 OSFs, it will restrict tag selection to head and default
-        if(that.retrievedData.rows.length == 1) {
+        if($.unique(that.retrievedData.rows).length == 1) {
             osfId = that.retrievedData.rows[0];
             $('.js-advice-various-osfs').hide();
         }
