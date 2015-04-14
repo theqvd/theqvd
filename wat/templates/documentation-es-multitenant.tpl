@@ -827,7 +827,7 @@ Cambios según tipo de administrador
 </li>
 <li>
 <p>
-<strong>Cambio de multitenant a monotenant</strong>: Este cambio puede realizarse con dos tipos de administradores: Un un administrador de tenant o un superadministrador. Ambos necesitarán permisos de configuración de QVD para ello.
+<strong>Cambio de multitenant a monotenant</strong>: Este cambio puede realizarse con dos tipos de administradores: Un administrador de tenant o un superadministrador. Ambos necesitarán permisos de configuración de QVD para ello.
 </p>
 </li>
 </ul></div>
@@ -851,7 +851,7 @@ Cambios según tipo de administrador
 </li>
 </ul></div>
 </div></div>
-<div class="paragraph"><p>Cambiando de multitenant a monotenant existe el peligro de perder el modo monotenant. Ver la sección <em>Situaciones de bloqueo</em> en el manual.</p></div>
+<div class="paragraph"><p>Cambiando de multitenant a monotenant existe el peligro de perder el modo multitenant. Ver la sección <em>Situaciones de bloqueo</em> en el manual.</p></div>
 <div class="openblock">
 <div class="content">
 </div></div>
@@ -1173,7 +1173,7 @@ Contraseña: to the rescue</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-04-14 09:08:31 CEST
+Last updated 2015-04-14 10:24:48 CEST
 </div>
 </div>
 </body>

@@ -2,6 +2,12 @@ Wat.Views.ConfigWatView = Wat.Views.DetailsView.extend({
     qvdObj: 'configwat',
     
     initialize: function () {
+        // If user have not access to main section, redirect to home
+        if (!Wat.C.checkACL('config.wat.')) {
+            Wat.Router.app_router.trigger('route:defaultRoute');
+            return;
+        }
+        
         var params = {id: Wat.C.tenantID};
         this.model = new Wat.Models.Tenant(params);
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
