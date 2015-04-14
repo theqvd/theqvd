@@ -355,7 +355,7 @@ Wat.Views.MainView = Backbone.View.extend({
     stopVM: function (filters, messages) {        
         var messages = messages || {
             'success': 'Stop request successfully performed',
-            'error': 'Error stopping VM'
+            'error': 'Error stopping Virtual machine'
         };
         
         Wat.A.performAction ('vm_stop', {}, filters, messages, function(){}, this);
@@ -364,7 +364,7 @@ Wat.Views.MainView = Backbone.View.extend({
     disconnectVMUser: function (filters, messages) {        
         var messages = messages || {
             'success': 'User successfully disconnected from VM',
-            'error': 'Error disconnecting user from VM'
+            'error': 'Error disconnecting user from Virtual machine'
         };
         
         Wat.A.performAction ('vm_user_disconnect', {}, filters, messages, this.fetchList, this);

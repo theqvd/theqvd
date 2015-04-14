@@ -125,7 +125,7 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
     
     startVM: function () {
         var messages = {
-            'success': 'Successfully require to be started',
+            'success': 'Successfully required to be started',
             'error': 'Error starting VM'
         }
         

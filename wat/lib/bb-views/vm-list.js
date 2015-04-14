@@ -153,7 +153,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
     startVM: function (filters) {        
         var messages = {
             'success': 'Successfully required to be started',
-            'error': 'Error starting VM'
+            'error': 'Error starting Virtual machine'
         }
         
         Wat.A.performAction ('vm_start', {}, filters, messages, function(){}, this);
