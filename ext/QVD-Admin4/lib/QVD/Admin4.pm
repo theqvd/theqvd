@@ -605,69 +605,6 @@ sub di_create
     $result;
 }
 
-sub di_create_from_staging
-{
-    my ($self,$request) = @_;
-
-    my $images_path  = cfg('path.storage.images');
-    QVD::Admin4::Exception->throw(code=>'2220')
-	unless -d $images_path;
-
-    my $staging_path = cfg('path.storage.staging');
-    QVD::Admin4::Exception->throw(code=>'2230')
-	unless -d $staging_path;
-
-    my $staging_file = basename($request->arguments->{path});
-    QVD::Admin4::Exception->throw(code=>'2240')
-	unless -e "$staging_path/$staging_file";
-
-    my $images_file = $request->get_parameter_value('tmp_file_name') 
-	// $staging_file;
-
-    for (1 .. 5)
-    {
-        eval { copy("$staging_path/$staging_file","$images_path/$images_file") };
-        $@ ? print $@ : last;
-    }
-    if ($@) { QVD::Admin4::Exception->throw(code=>'2210');}
-
-    my $staging_file_size = -s "$staging_path/$staging_file";
-    my $images_file_size = -s "$images_path/$images_file";
-
-    unless ($staging_file_size == $images_file_size)
-    { unlink "$images_path/$images_file";
-      QVD::Admin4::Exception->throw(code=>'2211');}
-
-    my $result = eval { $self->create($request) };
-    if ($@)
-    { unlink "$images_path/$images_file";
-      QVD::Admin4::Exception->throw(exception => $@,
-				    query => 'create')};
-
-    my $di = @{$result->{rows}}[0];
-
-    eval
-    {
-	$di->osf->delete_tag('head');
-	$di->osf->delete_tag($di->version);
-	$DB->resultset('DI_Tag')->create({di_id => $di->id, tag => $di->version, fixed => 1});
-	$DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'head'});
-	$DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'default'})
-	    unless $di->osf->di_by_tag('default');
-    };
-
-    if ($@)
-    { unlink "$images_path/$images_file";
-      QVD::Admin4::Exception->throw(exception => $@,
-				    query => 'tags')};
-
-    $di->update({path => $di->id . '-' . $staging_file});
-    move("$images_path/$images_file","$images_path/".$di->id . '-' . $staging_file);
-    
-    $result;
-}
-
-
 ##########################################
 ##########################################
 
