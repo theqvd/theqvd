@@ -758,7 +758,7 @@ asciidoc.install(2);
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>Un sistema por defecto es monotenant. Viene creado un usuario administrador con el que tenemos acceso total y con él podremos crear elementos de QVD y a otros administradores con los permisos más o menos limitados para gestionar diferentes partes del WAT.</p></div>
-<div class="paragraph"><p>Estos permisos harán referencia a qué elementos ver o gestionar (Usuarios, Máquinas virtuales, etc.) pero no a podrán dar acceso sobre un subconjunto de los mismos.</p></div>
+<div class="paragraph"><p>Estos permisos harán referencia a qué elementos ver o gestionar (Usuarios, Máquinas virtuales, etc.) pero no se podrá dar acceso sobre un subconjunto de los mismos.</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>Por ejemplo, si a un administrador le damos permisos de lectura sobre las imágenes de disco, podrá ver todas las imágenes del sistema, no podremos limitarlo a un subconjunto de ellas.</code></pre>
@@ -1173,7 +1173,7 @@ Contraseña: to the rescue</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-03-12 10:43:29 CET
+Last updated 2015-04-14 09:08:31 CEST
 </div>
 </div>
 </body>

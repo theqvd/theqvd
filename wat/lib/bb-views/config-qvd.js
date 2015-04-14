@@ -26,6 +26,12 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     },
     
     initialize: function (params) {
+        // If user have not access to main section, redirect to home
+        if (!Wat.C.checkACL('config.qvd.')) {
+            Wat.Router.app_router.trigger('route:defaultRoute');
+            return;
+        }
+        
         Wat.Views.MainView.prototype.initialize.apply(this, [params]);
         
         params.id = Wat.C.adminID;
