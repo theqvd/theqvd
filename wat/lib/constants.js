@@ -258,6 +258,7 @@ LOG_TYPE_ACTIONS = {
     delete: 'Deleted',
     exec: 'Executed',
     login: 'Logged-in',
+    see: 'Visualized'
 };
 
 LOG_TYPE_OBJECTS = {

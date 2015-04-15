@@ -447,7 +447,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         else {
             $('.filter-notes-list li').remove();
             $.each(filterNotes, function(fNoteName, fNote) {
-                var note = '<li><a href="javascript:" class="js-delete-filter-note fa fa-trash" data-filter-name="' + fNoteName + '" data-filter-type="' + fNote.type + '"></a>' + fNote.label;
+                var note = '<li><a href="javascript:" class="js-delete-filter-note fa fa-times" data-filter-name="' + fNoteName + '" data-filter-type="' + fNote.type + '"></a>' + fNote.label;
                 if (fNote.value != undefined) {
                     note += ': ' + fNote.value;
                 }

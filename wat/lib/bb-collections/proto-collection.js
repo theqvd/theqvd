@@ -6,7 +6,7 @@ Wat.Collections.Collection = Backbone.Collection.extend({
 
     filters: {},
     // Order by id by default
-    sort: {"field": "id", "order": "-asc"},
+    sort: {"field": "id", "order": "-desc"},
     
     initialize: function (params) {
         params = params || {};

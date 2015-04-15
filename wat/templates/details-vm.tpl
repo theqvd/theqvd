@@ -377,10 +377,11 @@ switch (model.get('state')) {
                 <%
                     if (model.get('state') == 'running' && model.get('di_id') != model.get('di_id_in_use')) {
                 %>
-                        <i class="fa fa-warning warning" data-i18n="[title]The virtual machine is running with different image - Restart it to update it to new image"></i>
+                        <i class="fa fa-warning warning" data-wsupdate="di_warning_icon" data-id="<%= model.get('id') %>" data-i18n="[title]The virtual machine is running with different image - Restart it to update it to new image"></i>
                 <%
                     }
                 %>
+                <div class="second_row"><span data-i18n="Version"></span>: <%= model.get('di_version') %></span>
             </td>
         </tr>
     <% 

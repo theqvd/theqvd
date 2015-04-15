@@ -106,10 +106,15 @@
             %>
                 <tr class="js-execution-params execution-params">
                     <td><i class="<%= CLASS_ICON_DIS %>"></i><span data-i18n="Disk image"></span></td>
-                    <td data-wsupdate="di" data-id="<%= model.get('id') %>">
-                        <a href="#/di/<%= model.get('di_id_in_use') %>">
-                            <%= model.get('di_name_in_use') %>
-                        </a>
+                    <td>
+                        <span data-wsupdate="di" data-id="<%= model.get('id') %>">
+                            <a href="#/di/<%= model.get('di_id_in_use') %>">
+                                <%= model.get('di_name_in_use') %>
+                            </a>
+                        </span>
+                        <div class="second_row">
+                            <span data-i18n="Version"></span>: <span data-wsupdate="di_version" data-id="<%= model.get('id') %>"><%= model.get('di_version_in_use') %></span>
+                        </span>
                     </td>
                 </tr>
             <% 

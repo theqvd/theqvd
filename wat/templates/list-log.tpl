@@ -147,6 +147,7 @@
                                         %>
 
                                         <span class="text" data-i18n="<%= LOG_TYPE_ACTIONS[model.get('type_of_action')] %>"><%= i18n.t(LOG_TYPE_ACTIONS[model.get('type_of_action')]) %></span>
+                                        <div class="second_row"><%= model.get('action') %></div>
                                 </td>
                 <%
                                 break;
