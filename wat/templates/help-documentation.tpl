@@ -35,5 +35,5 @@
 
 </div>
 
-<a class="back-top-button js-back-top-button fa fa-arrow-up button2" style="display:none;" data-i18n>Go top</a>
+<a class="back-top-button js-back-top-button js-back-top-doc-button fa fa-arrow-up button2" style="display:none;" data-i18n>Go top</a>
 

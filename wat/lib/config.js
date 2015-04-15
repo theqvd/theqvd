@@ -60,8 +60,11 @@ Wat.C = {
     },    
     
     // Return if current admin is recover admin
-    isRecoveradmin: function () {
-        return this.adminID == RECOVER_USER_ID;
+    isRecoveradmin: function (idToCheck) {
+        if (idToCheck == undefined) {
+            idToCheck = this.adminID;
+        }
+        return idToCheck == RECOVER_USER_ID;
     },
     
     // Return if system is configured as multitenant WAT

@@ -30,3 +30,5 @@
     </div>
 
 </div>
+
+<a class="back-top-button js-back-top-button js-back-top-generic-button fa fa-arrow-up button2" style="display:none;" data-i18n>Go top</a>

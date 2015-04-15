@@ -108,7 +108,8 @@ Wat.B = {
         this.bindEvent('click', 'a[data-docsection]', this.navigationBinds.clickScreenHelp);
         
         // Back to top button
-        this.bindEvent('click', '.js-back-top-button', this.navigationBinds.goDocTop);
+        this.bindEvent('click', '.js-back-top-doc-button', this.navigationBinds.goDocTop);
+        this.bindEvent('click', '.js-back-top-generic-button', this.navigationBinds.goSimpleTop);
         
         // On any scroll
         $(window).off('scroll');
@@ -221,6 +222,10 @@ Wat.B = {
             }
         },
         
+        goSimpleTop: function () {
+            Wat.I.goTop();
+        }, 
+        
         goDocTop: function () {
             Wat.I.goTop();    
             
@@ -249,7 +254,7 @@ Wat.B = {
         
         onScroll: function () {
             if ($('.js-back-top-button').length) {
-                if ($(window).scrollTop() > ($(window).height() / 2)) {
+                if ($(window).scrollTop() > $(window).height()) {
                     $('.js-back-top-button').show();
                 }
                 else {

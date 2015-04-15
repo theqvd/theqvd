@@ -208,7 +208,7 @@
                 %>
                                 <td class="desktop">
                                     <%
-                                        var showAdminLink = (Wat.C.isSuperadmin() || !model.get('superadmin')) && !model.get('admin_deleted'); 
+                                        var showAdminLink = (Wat.C.isSuperadmin() || !model.get('superadmin')) && !model.get('admin_deleted') && !Wat.C.isRecoveradmin(model.get('admin_id')); 
                                     %>
                                     <%= !showAdminLink ? '' : Wat.C.ifACL('<a href="#/administrator/' + model.get('admin_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'administrator.see-details.') %>
                                         <span class="text"><%= model.get('admin_name') %></span>
