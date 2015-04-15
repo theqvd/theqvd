@@ -59,6 +59,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             },
             editorNew: {
                 name: 'creator-' + this.qvdObj
+            },
+            sortingRow: {
+                name: 'list-sorting-row'
             }
         }
         
@@ -143,7 +146,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     // Render list sorted by a column
-    sort: function (e) { 
+    sort: function (e) {         
         // Find the TH cell, because sometimes you can click on the icon
         if ($(e.target).get(0).tagName == 'TH') {
             var sortCell = $(e.target).get(0);    
@@ -162,11 +165,12 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             this.sortedOrder = '-desc';
         }
         
-
         this.sortedBy = sortedBy;
                 
         var sort = {'field': this.sortedBy, 'order': this.sortedOrder};
 
+        this.showSortingMessage(sortCell, this.sortedOrder);
+          
         this.collection.setSort(sort);
         
         // If the current offset is not the first page, trigger click on first button of pagination to go to the first page. 
@@ -177,6 +181,33 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         else {   
             this.fetchList();
         }
+    },
+    
+    // Remove all rows and show one message while new sorting is loading
+    showSortingMessage: function (sortCell, sortedOrder) {
+        var sortedFieldName = $(sortCell).find('span').html();
+        var theader = $(sortCell).parent().parent();
+        var nColumns = theader.find('th').length;
+        var tbody = theader.parent().find('tbody');
+        var rows = tbody.find('tr');
+        // Order icon will be sort-alpha-asc or sort-alpha-desc from awesome webfont
+        var orderClass = 'fa fa-sort-alpha' + sortedOrder;
+
+        rows.remove();
+        
+        // Add common parts of editor to dialog
+        var template = _.template(
+                    Wat.TPL.sortingRow, {
+                        nColumns: nColumns,
+                        orderClass: orderClass,
+                        sortedFieldName: sortedFieldName
+                    }
+                );
+
+        tbody.append(template);
+        
+        // Remove sortable class form header cells to avoid stack of sort petitions
+        theader.find('th').removeClass('sortable');
     },
     
     // Get filter parameters of the form, set in collection, fetch list and render it

@@ -126,7 +126,7 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
     startVM: function () {
         var messages = {
             'success': 'Successfully required to be started',
-            'error': 'Error starting VM'
+            'error': 'Error starting Virtual machine'
         }
         
         Wat.A.performAction ('vm_start', {}, {id: this.elementId}, messages, function(){
@@ -138,7 +138,7 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
     stopVM: function () {
         var messages = {
             'success': 'Stop request successfully performed',
-            'error': 'Error stopping VM'
+            'error': 'Error stopping Virtual machine'
         }
         
         Wat.A.performAction ('vm_stop', {}, {id: this.elementId}, messages, function(){

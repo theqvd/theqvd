@@ -747,10 +747,22 @@ body {
   * {
     min-width: 0 !important; } }
 
+.super-wrapper {
+  padding-top: 60px; }
+
 .header-wrapper {
   height: 60px;
   border-bottom: 2px solid #cacaca;
-  background: #d7d7d7; }
+  background: #d7d7d7;
+  position: fixed;
+  top: 0px;
+  width: 100%;
+  z-index: 100; }
+  .header-wrapper.header-wrapper--mini {
+    height: 40px;
+    opacity: 0.8; }
+    .header-wrapper.header-wrapper--mini img.logo {
+      height: 35px; }
   .header-wrapper .header {
     position: relative;
     min-width: 0px;

@@ -1,5 +1,5 @@
 
-<div class="header-wrapper">
+<div class="header-wrapper js-header-wrapper">
     <div class="header">
         <a href="#">
             <img src="images/qvd-logo-header-trans.png" class="logo">

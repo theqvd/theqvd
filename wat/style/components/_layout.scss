@@ -23,13 +23,31 @@ body {
     }
 }
 
+.super-wrapper {
+    padding-top: 60px;
+}
+
 .header-wrapper {
     @extend %invisible;
 
     height: 60px;
     border-bottom: 2px solid darken($col_whiter, 20);
     background: darken($col_whiter, 15);
-
+    position: fixed;
+    top: 0px;
+    width: 100%;
+    z-index: 100;
+    
+    &.header-wrapper--mini {
+        height: 40px;
+        
+        img.logo {
+            height: 35px;
+        }
+        
+        opacity: 0.80;
+    }
+    
     .header {
         position: relative;    
                 

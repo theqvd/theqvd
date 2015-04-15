@@ -256,6 +256,15 @@ Wat.B = {
                     $('.js-back-top-button').hide();
                 }
             }
+            
+            // When move scroll, minify header
+            if ($(window).scrollTop() > 0) {
+                $('.js-header-wrapper').addClass('header-wrapper--mini');
+            }
+            else {
+                $('.js-header-wrapper').removeClass('header-wrapper--mini');
+            }
+
         },
         
         clickScreenHelp: function (e) {
