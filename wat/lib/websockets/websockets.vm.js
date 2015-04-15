@@ -22,6 +22,10 @@ Wat.WS.changeWebsocketVm = function (id, field, data, viewType) {
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('title', i18n.t('Stopped'));
                     $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(i18n.t('Stopped'));
                     $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-stop-vm fa-stop').addClass('js-button-start-vm fa-play').attr('title', i18n.t('Start'));
+                    if (Wat.CurrentView.restarting) {
+                        Wat.CurrentView.restarting = false;
+                        Wat.CurrentView.startVM();
+                    }
                     break;
                 case 'starting':
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('class', 'fa fa-spinner fa-spin');

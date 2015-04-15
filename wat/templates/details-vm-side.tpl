@@ -39,6 +39,7 @@
                     if (model.get('state') != 'stopped') { 
                 %>
                         <a class="button fright button-icon js-button-stop-vm fa fa-stop fright" href="javascript:" data-i18n="[title]Stop" data-wsupdate="state-button" data-id="<%= model.get('id') %>"></a>
+                        <!--<a style="margin-right: 6px;" class="button fright button-icon js-button-restart-vm fa fa-refresh fright" href="javascript:" data-i18n="[title]Restart" data-wsupdate="state-button-restart" data-id="<%= model.get('id') %>"></a>-->
                 <% 
                     }
                     else { 

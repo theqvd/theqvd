@@ -1,7 +1,6 @@
 Wat.Views.DocView = Wat.Views.MainView.extend({
     qvdObj: 'documentation',
     selectedGuide: 'introduction',
-    relatedDoc: {},
     
     breadcrumbs: {
         'screen': 'Home',
@@ -85,7 +84,8 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
         $(this.el).html(this.template);
         
         this.printBreadcrumbs(this.breadcrumbs, '');
-        
+        this.renderRelatedDocs();
+
         if (this.currentSearchKey) {
             var that = this;
             

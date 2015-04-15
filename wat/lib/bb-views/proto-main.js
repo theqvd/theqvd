@@ -351,7 +351,6 @@ Wat.Views.MainView = Backbone.View.extend({
         this.editorElement (e);
     },
     
-    
     stopVM: function (filters, messages) {        
         var messages = messages || {
             'success': 'Stop request successfully performed',

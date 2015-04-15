@@ -145,5 +145,11 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
             // After start/stop VM render side to update log
             Wat.CurrentView.renderSide();
         }, this);
-    }
+    },
+    
+    
+    restartVM: function () {   
+        Wat.CurrentView.restarting = true;
+        Wat.stopVM();
+    },  
 });

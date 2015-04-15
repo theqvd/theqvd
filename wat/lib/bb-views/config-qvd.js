@@ -124,7 +124,8 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         $('.bb-config-tokens').html(this.template);
                 
         this.printBreadcrumbs(this.breadcrumbs, '');
-        
+        this.renderRelatedDocs();
+
         Wat.I.chosenConfiguration();
         
         Wat.I.chosenElement('.token-action-select', 'single');
