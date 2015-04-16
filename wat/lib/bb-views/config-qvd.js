@@ -130,7 +130,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         
         Wat.I.chosenElement('.token-action-select', 'single');
         
-        Wat.T.translate();
+        Wat.T.translateAndShow();
         
         // If pushState is available in browser, modify hash with current token
         if (history.pushState) {

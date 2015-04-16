@@ -98,7 +98,7 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
             this.fillDocumentation();
         }
 
-        Wat.T.translate();       
+        Wat.T.translateAndShow();       
     },
     
     // Fill guide doc content
@@ -148,7 +148,7 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
         );
 
         target.html(template);
-                           
+        
         // Translate rendered strings
         Wat.T.translate();       
 

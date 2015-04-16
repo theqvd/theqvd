@@ -72,7 +72,7 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         this.printBreadcrumbs(this.breadcrumbs, '');
         this.renderRelatedDocs();
 
-        Wat.T.translate();
+        Wat.T.translateAndShow();
 
         // Extend the common events
         this.extendEvents(this.eventsDetails);

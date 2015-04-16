@@ -676,7 +676,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         
         this.collection.fetch({      
-            complete: function () {
+            success: function () {
                 switch(that.whatRender) {
                     case 'all':
                         that.renderAll();
@@ -743,6 +743,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         // This translation is only done here, in the first charge. 
         // When the list were rendered in actions such as sorting, filtering or pagination, 
         // the strings will be individually translated
+        
         Wat.T.translate();
         Wat.I.enableDataPickers();
     },    
@@ -773,7 +774,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             Wat.WS.openListWebsockets(this.qvdObj, this.collection.models, this.liveFields, this.cid);
         }
         
-        Wat.T.translate();
+        Wat.T.translateAndShow();
         
         this.updateFilterNotes();
         

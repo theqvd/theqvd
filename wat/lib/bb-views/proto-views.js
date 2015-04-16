@@ -316,7 +316,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         
         $('.js-custom-views-container').show();
         
-        Wat.T.translate();
+        Wat.T.translateAndShow();
     },
     
     addIDToArgs: function (args) {

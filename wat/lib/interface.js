@@ -600,6 +600,7 @@ Wat.I = {
         var summaryMessage = '<summary>' + $.i18n.t(msg.message) + '</summary>';
         
         $('.message').html(expandIcon + summaryMessage + expandedMessage);
+        
         Wat.T.translate();
 
         $('.message-container').hide().slideDown(500);

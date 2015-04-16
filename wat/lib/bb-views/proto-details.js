@@ -67,7 +67,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     fetchDetails: function (that) {
         var that = that || this;
         that.model.fetch({      
-            complete: function () {
+            success: function () {
                 that.render();
             }
         });
@@ -184,7 +184,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
 
         this.renderRelatedDocs();
         
-        Wat.T.translate();
+        Wat.T.translateAndShow();
         
         // Open websockets for live fields
         if (this.liveFields) {

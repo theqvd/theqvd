@@ -370,10 +370,6 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     renderRelatedDocs: function () {
-        if ($('.related-doc').length > 0) {
-            //$('.related-doc').html('');
-        }
-        
         var sectionDoc = [];
         sectionDoc[this.qvdObj] = "This section step by step";
         this.relatedDoc = $.extend({}, sectionDoc, this.relatedDoc);
@@ -388,8 +384,6 @@ Wat.Views.MainView = Backbone.View.extend({
                 );
 
             $('.bb-related-docs').html(that.template);
-
-            Wat.T.translate();
         }
     }
 });

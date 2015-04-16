@@ -22,7 +22,7 @@ Wat.T = {
             useLocalStorage: false,
             debug: false,
             fallbackLng: 'en',
-        }, this.translate);
+        }, this.translateAndShow);
         
         this.lan = lan;
     },
@@ -60,11 +60,15 @@ Wat.T = {
         Wat.I.updateSortIcons();
         
         // Update all the chosen select controls
-        $('select').trigger('chosen:updated');
+        $('select').trigger('chosen:updated');  
+    },
+    
+    // Translate and show all
+    translateAndShow: function () {
+        Wat.T.translate();
         
         // When all is translated and loaded, hide loading spinner and show content
-        Wat.I.showAll();
-        
+        Wat.I.showAll(); 
     },
     
     // Translate the content of an element passing the selector

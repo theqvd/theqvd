@@ -40,6 +40,6 @@ Wat.Views.AboutView = Wat.Views.MainView.extend({
         this.printBreadcrumbs(this.breadcrumbs, '');
         this.renderRelatedDocs();
 
-        Wat.T.translate();       
+        Wat.T.translateAndShow();       
     }
 });
