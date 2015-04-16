@@ -72,7 +72,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         
         $('.bb-details-side1').html(that.template);
         
-        Wat.I.chosenElement('select.js-acl-tree-selector', 'single');
+        Wat.I.chosenElement('select.js-acl-tree-selector', 'single100');
 
         Wat.T.translate();
     },

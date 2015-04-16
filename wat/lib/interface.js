@@ -504,7 +504,7 @@ Wat.I = {
                 callback($(this).prop('title').replace('\n', '<br />')); 
             },
             open: function (event, ui) {
-                $(ui.tooltip).mouseleave(function() {
+                $(ui.tooltip).parent().mouseleave(function() {
                     $(ui.tooltip).hide();
                 });
             }

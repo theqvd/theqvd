@@ -6,6 +6,7 @@
 
 <div class="acls-tree js-acls-tree js-sections-tree">
     <%
+    var nBranches = 0;
     $.each(sections, function (branch, branchName) {
         var pattern = aclPatterns[branch];
         
@@ -16,7 +17,10 @@
             disabledClass = 'disabled-branch';
             invisibleClass = 'invisible';
             hiddenClass = 'hidden';
-        }        
+        }
+        else {
+            nBranches++;
+        }
     %>
         <div class="acls-branch js-acls-branch <%= hiddenClass %>" data-branch="<%= branch %>">
             <a class="js-branch-button branch-button fa fa-plus-square-o <%= invisibleClass %>" href="javascript:" data-branch="<%= branch %>" data-tree-kind="sections" data-open="0"></a>
@@ -24,10 +28,18 @@
         </div>
     <%
     });
+    if (nBranches == 0) {
+    %>
+        <span class="no-elements" data-i18n="There are not elements">
+            <%= i18n.t('There are not elements') %>
+        </span>
+    <%
+    }
     %>
 </div>
 <div class="acls-tree js-acls-tree js-actions-tree hidden">
     <%
+    var nBranches = 0;
     $.each(actions, function (branch, branchName) {
         var pattern = aclPatterns[branch];
         
@@ -40,6 +52,9 @@
             invisibleClass = 'invisible';
             var hiddenClass = 'hidden';
         }
+        else {
+            nBranches++;
+        }
     %>
         <div class="acls-branch js-acls-branch <%= hiddenClass %>" data-branch="<%= branch %>">
             <a class="js-branch-button branch-button fa fa-plus-square-o <%= invisibleClass %>" href="javascript:" data-branch="<%= branch %>" data-tree-kind="actions" data-open="0"></a>
@@ -47,5 +62,12 @@
         </div>
     <%
     });
+    if (nBranches == 0) {
+    %>
+        <span class="no-elements" data-i18n="There are not elements">
+            <%= i18n.t('There are not elements') %>
+        </span>
+    <%
+    }
     %>
 </div>
