@@ -5,7 +5,7 @@ use Moo;
 use QVD::Config::Network qw(nettop_n netstart_n net_aton net_ntoa);
 use QVD::Config;
 use File::Basename qw(basename);
-use QVD::Admin4::DBConfigProvider;
+use QVD::DB::Simple qw(db);
 use Clone qw(clone);
 
 has 'current_qvd_administrator', is => 'ro', isa => 
@@ -21,15 +21,14 @@ has 'model_info', is => 'ro', isa => sub {die "Invalid type for attribute model_
     default => sub {{};};
 
 
-
+my $DB;
 
 ################
 # DB FUNCTIONS #
 ################
 
-my $DBConfigProvider;
 
-my $QVD_OBJECTS_TO_LOG_MAPPER = { User => 'user', VM => 'vm', DI => 'di', OSF => 'osf', Host => 'host', Administrator => 'administrator', Tenant => 'tenant', 
+my $QVD_OBJECTS_TO_LOG_MAPPER = { Log => 'log', User => 'user', VM => 'vm', DI => 'di', OSF => 'osf', Host => 'host', Administrator => 'administrator', Tenant => 'tenant', 
 				  Role => 'role', Config => 'config', Tenant_Views_Setup => 'tenant_view', Administrator_Views_Setup => 'admin_view',  };
 
 my $TYPES_OF_ACTION_TO_LOG_MAPPER = { list => 'see', details => 'see', tiny => 'see', delete => 'delete', update => 'update', create_or_update => 'create_or_update', exec => 'exec', 
@@ -63,7 +62,6 @@ my $RELATED_VIEWS_IN_DB =
 	      Host => [qw(Host_View)],
 	      OSF => [qw(OSF_View)],
 	      DI => [qw(DI_View)],
-	      Wat_Log => [qw(Wat_Log_View)],
 	      Role => [qw(Role_View)],},
 
     details => { User => [qw(User_View)],
@@ -71,7 +69,6 @@ my $RELATED_VIEWS_IN_DB =
 		 Host => [qw(Host_View)],
 		 OSF => [qw(OSF_View)],
 		 DI => [qw(DI_View)],
-		 Wat_Log => [qw(Wat_Log_View)],
 		 Role => [qw(Role_View)],},		 
 };
 
@@ -119,7 +116,7 @@ my $ACLS_FOR_FILTERS =
 
 my $ACLS_FOR_FILTER_VALUES = 
 {
-    list => { Wat_Log => { qvd_object => { vm => [qr/^vm\.see-main\.$/],
+    list => { Log => { qvd_object => { vm => [qr/^vm\.see-main\.$/],
 					   user => [qr/^user\.see-main\.$/],
 					   osf => [qr/^osf\.see-main\.$/],
 					   di => [qr/^di\.see-main\.$/],
@@ -335,7 +332,7 @@ my $AVAILABLE_FILTERS =
 { 
     list => { default => [],
 
-	      Wat_Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time status source ip type_of_action qvd_object superadmin)],
+	      Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time status source ip type_of_action qvd_object superadmin)],
 	      
 	      Config => [qw(key value)],
 	      
@@ -430,7 +427,7 @@ my $AVAILABLE_FIELDS =
 { 
     list => { default => [],
 
-	      Wat_Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time antiquity status source ip type_of_action qvd_object object_deleted admin_deleted superadmin)],
+	      Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time antiquity status source ip type_of_action qvd_object object_deleted admin_deleted superadmin)],
 
 	      Config => [qw(key value)],
 
@@ -442,7 +439,7 @@ my $AVAILABLE_FIELDS =
 
 	      VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
                         state host_id host_name  di_id user_state ip mac next_boot_ip ssh_port vnc_port serial_port 
-                        creation_date creation_admin_id creation_admin_name di_version di_name di_id properties ip_in_use di_id_in_use )],
+                        creation_date creation_admin_id creation_admin_name di_version di_name di_id properties ip_in_use di_id_in_use di_name_in_use di_version_in_use )],
 
 	      ACL => [qw(id name description)],
 
@@ -470,7 +467,7 @@ my $AVAILABLE_FIELDS =
 
     details => { default => [],
 
-		 Wat_Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time antiquity status source ip type_of_action qvd_object object_deleted admin_deleted superadmin)],
+		 Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time antiquity status source ip type_of_action qvd_object object_deleted admin_deleted superadmin)],
 		 Config => [qw(key value)],
 
 		 OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties creation_date creation_admin_id creation_admin_name)],
@@ -481,7 +478,7 @@ my $AVAILABLE_FIELDS =
 		
 		 VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
                            time_until_expiration_soft time_until_expiration_hard state host_id host_name  di_id user_state ip mac next_boot_ip ssh_port vnc_port serial_port 
-                           creation_date creation_admin_id creation_admin_name di_version di_name di_id properties ip_in_use di_id_in_use di_name_in_use )],
+                           creation_date creation_admin_id creation_admin_name di_version di_name di_id properties ip_in_use di_id_in_use di_name_in_use di_version_in_use )],
 
 		 ACL => [qw(id name description)],
 
@@ -731,7 +728,7 @@ my $ip2mac = "ip2mac(me.ip,'".cfg('vm.network.mac.prefix')."')";
 
 my $FILTERS_TO_DBIX_FORMAT_MAPPER = 
 {
-    Wat_Log => { 
+    Log => { 
 	id => 'me.id',
 	admin_id => 'me.administrator_id',
 	admin_name => 'me.administrator_name',
@@ -974,7 +971,7 @@ my $ORDER_CRITERIA_TO_DBIX_FORMAT_MAPPER =
 
 my $FIELDS_TO_DBIX_FORMAT_MAPPER = 
 {
-    Wat_Log => { 
+    Log => { 
 	id => 'me.id',
 	admin_id => 'me.administrator_id',
 	admin_name => 'me.administrator_name',
@@ -991,8 +988,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	ip => 'me.ip',
 	type_of_action => 'me.type_of_action',
 	qvd_object => 'me.qvd_object',
-	object_deleted => 'view.object_deleted',
-	admin_deleted => 'view.administrator_deleted',
+	object_deleted => 'me.object_deleted',
+	admin_deleted => 'me.administrator_deleted',
     	superadmin => 'me.superadmin',
     },
 
@@ -1108,6 +1105,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'di_id' => 'di.id',
 	'di_id_in_use' => 'vm_runtime.current_di_id',
 	'di_name_in_use' => 'vm_runtime.current_di_name',
+	'di_version_in_use' => 'vm_runtime.current_di_version',
 	'properties' => 'view.properties',
     	'creation_date' => 'creation_log_entry.time',
 	'creation_admin_id' => 'creation_log_entry.administrator_id',
@@ -1232,9 +1230,11 @@ my $VALUES_NORMALIZATOR =
 
 my $DBIX_JOIN_VALUE = 
 { 
+    Log => [qw(deletion_log_entry administrator)],
+
     User => [qw(tenant creation_log_entry)],
  
-    VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }, qw(creation_log_entry) ],
+    VM => ['di', 'osf', { vm_runtime => qw(host) }, { user => 'tenant' }, qw(creation_log_entry) ],
   
     Host => ['runtime', 'vms', qw(creation_log_entry)],
 
@@ -1259,9 +1259,10 @@ my $DBIX_JOIN_VALUE =
 
 my $DBIX_PREFETCH_VALUE = 
 { 
-    list => { Role => [qw(creation_log_entry)],
+    list => { Log => [qw(deletion_log_entry administrator)],
+	      Role => [qw(creation_log_entry)],
 	      User => [qw(tenant creation_log_entry)],
-	      VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }, qw(creation_log_entry)],
+	      VM => ['di', 'osf', { vm_runtime => qw(host) }, { user => 'tenant' }, qw(creation_log_entry)],
 	      Host => ['runtime', qw(creation_log_entry)],
 	      OSF => [ qw(tenant creation_log_entry)],
 	      DI => [{osf => 'tenant'}, qw(creation_log_entry)],
@@ -1271,9 +1272,10 @@ my $DBIX_PREFETCH_VALUE =
 	      Tenant_Views_Setup => [ qw(tenant)],
 	      Administrator_Views_Setup => [ { administrator => 'tenant' }] },
 
-    details => {Role => [qw(creation_log_entry)],
+    details => {Log => [qw(deletion_log_entry administrator)],
+		Role => [qw(creation_log_entry)],
 		User => [qw(tenant creation_log_entry)],
-		VM => ['di', 'osf', { vm_runtime => 'host' }, { user => 'tenant' }, qw(creation_log_entry)],
+		VM => ['di', 'osf', { vm_runtime => qw(host) }, { user => 'tenant' }, qw(creation_log_entry)],
 		Host => ['runtime', qw(creation_log_entry)],
 		OSF => [ qw(tenant creation_log_entry)],
 		DI => [{osf => 'tenant'}, qw(creation_log_entry)],
@@ -1296,7 +1298,7 @@ sub BUILD
 {
     my $self = shift;
 
-    $DBConfigProvider = QVD::Admin4::DBConfigProvider->new();
+    $DB = db();
 
     $self->initialize_info_model;
 
@@ -1403,7 +1405,7 @@ sub custom_properties_keys
     return @{$self->{custom_properties_keys}} 
     if defined $self->{custom_properties_keys}; 
     $self->{custom_properties_keys} =
-	[ $DBConfigProvider->get_custom_properties_keys($self->qvd_object) ];
+	[ $self->get_custom_properties_keys ];
     @{$self->{custom_properties_keys}};
 }
 
@@ -1846,7 +1848,7 @@ sub get_free_ip {
     my $netstart = netstart_n;
 
     my %ips = map { net_aton($_->ip) => 1 } 
-    $DBConfigProvider->db->resultset('VM')->all;
+    $DB->resultset('VM')->all;
 
     while ($nettop-- > $netstart) {
         return net_ntoa($nettop) unless $ips{$nettop}
@@ -1861,7 +1863,7 @@ sub get_default_di_version
 
     my $osf_id = $json_wrapper->get_argument_value('osf_id') // return;
     my ($y, $m, $d) = (localtime)[5, 4, 3]; $m ++; $y += 1900;
-    my $osf = $DBConfigProvider->db->resultset('OSF')->search({id => $osf_id})->first;
+    my $osf = $DB->resultset('OSF')->search({id => $osf_id})->first;
     QVD::Admin4::Exception->throw(code => 7100, object => 'osf_id') unless $osf; 
     my $version;
 
@@ -1983,8 +1985,6 @@ sub get_acls
     return @acls;
 }
 
-
-
 sub qvd_object_log_style
 {
     my $self = shift;
@@ -1997,5 +1997,20 @@ sub type_of_action_log_style
     my $self = shift;
     $TYPES_OF_ACTION_TO_LOG_MAPPER->{$self->type_of_action};    
 }
+
+sub get_custom_properties_keys
+{
+    my $self = shift;
+    my $qvd_object_table = $self->qvd_object;
+    my $properties_table = $qvd_object_table."_Property";
+    my @properties_keys;
+    
+    eval { my %properties_keys = map {$_->key => 1 } 
+	   $self->db->resultset($properties_table)->search()->all;
+	   @properties_keys = keys %properties_keys };
+
+    @properties_keys;
+}
+
 
 1;

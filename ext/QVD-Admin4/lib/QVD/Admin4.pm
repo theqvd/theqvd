@@ -718,7 +718,7 @@ sub sources_in_wat_log
     my @sources = 
     grep { defined $_->{name} }
     map { { name => $_->source } }  
-    $DB->resultset('Wat_Log')->search(
+    $DB->resultset('Log')->search(
 	{},{ distinct => 1, select => [qw(source)]})->all;
 
     { rows => \@sources , total => scalar @sources };
@@ -1063,20 +1063,9 @@ sub vms_with_expiration_date
       map {{ name            => $_->name, 
 	     id              => $_->id,
 	     expiration      => $_->vm_runtime->vm_expiration_hard,
-	     remaining_time  => $self->calculate_date_time_difference($now,
-								      $_->vm_runtime->vm_expiration_hard) }}
+	     remaining_time  => $_->remaining_time_until_expiration_hard }}
 
       $rs->all ];
-}
-
-sub calculate_date_time_difference
-{
-    my ($self,$now,$then) = @_;
-    my @time_units = qw(months days hours minutes seconds);
-    my %time_difference;
-
-    @time_difference{@time_units} = $then->subtract_datetime($now)->in_units(@time_units);
-    \%time_difference;
 }
 
 sub top_populated_hosts

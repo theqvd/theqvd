@@ -153,7 +153,7 @@ sub process_standard_query
     my $result = $QVD_ADMIN->$admin4method($self->get_request($json_wrapper,$qvd_object_model));
 }
 
-sub process_general_query
+sub process_ad_hoc_query
 {
     my ($self,$action,$json_wrapper) = @_;
     my $admin4method = $action->admin4method;

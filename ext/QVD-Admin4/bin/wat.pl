@@ -214,7 +214,7 @@ websocket '/staging' => sub {
 	      }
 	      else
 	      {
-		  $response = $c->qvd_admin4_api->process_query($json);
+		  $response = $c->process_api_query($json);
 		  if ($response->{status} eq 0)
 		  {
 		      my $di_id = ${$response->{rows}}[0]->{id};
@@ -223,7 +223,7 @@ websocket '/staging' => sub {
 		      if ($@) 
 		      {
 			  $c->qvd_admin4_api->_db->resultset('DI')->find({ id => $di_id })->delete;
-			  $c->qvd_admin4_api->_db->resultset('Wat_Log')->find(
+			  $c->qvd_admin4_api->_db->resultset('Log')->find(
 			      { object_id => $di_id, qvd_object => 'di' })->update(
 			      { object_id => undef, object_name => undef, status => 2210});
 			  $response = QVD::Admin4::Exception->new(code => 2210)->json;
@@ -266,7 +266,7 @@ any [qw(POST OPTIONS)] => '/di/upload' => sub {
 		if ($@) 
 		{
 		    $c->qvd_admin4_api->_db->resultset('DI')->find({ id => $di_id })->delete;
-		    $c->qvd_admin4_api->_db->resultset('Wat_Log')->find(
+		    $c->qvd_admin4_api->_db->resultset('Log')->find(
 			{ object_id => $di_id, qvd_object => 'di' })->update(
 			{ object_id => undef, object_name => undef, status => 2251});
 			$response = QVD::Admin4::Exception->new(code => 2251)->json;
@@ -331,7 +331,7 @@ websocket '/di/download' => sub {
 				      if ($@) 
 				      {
 					  $c->qvd_admin4_api->_db->resultset('DI')->find({ id => $di_id })->delete;
-					  $c->qvd_admin4_api->_db->resultset('Wat_Log')->find(
+					  $c->qvd_admin4_api->_db->resultset('Log')->find(
 					      { object_id => $di_id, qvd_object => 'di' })->update(
 					      { object_id => undef, object_name => undef, status => 2261});
 					  $response = QVD::Admin4::Exception->new(code => 2261)->json;
@@ -362,28 +362,30 @@ sub get_input_json
     my $c = shift;
     my $json = $c->req->json;
     deep_utf8_decode($json) if $json;
-    return $json if $json;
-
-    $json =  { map { $_ => b($c->param($_))->encode('UTF-8')->to_string } $c->param };
- 
-    eval
+    
+    unless ($json)
     {
-        $json->{filters} =  decode_json($json->{filters}) if exists $json->{filters};
-        $json->{arguments} = decode_json($json->{arguments}) if exists $json->{arguments};
-        $json->{order_by} = decode_json($json->{order_by}) if exists $json->{order_by};
-        $json->{fields} = decode_json($json->{fields}) if exists $json->{fields};
-        $json->{parameters} = decode_json($json->{parameters}) if exists $json->{parameters}
-    };
+	$json =  { map { $_ => b($c->param($_))->encode('UTF-8')->to_string } $c->param };
+ 
+	eval
+	{
+	    $json->{filters} =  decode_json($json->{filters}) if exists $json->{filters};
+	    $json->{arguments} = decode_json($json->{arguments}) if exists $json->{arguments};
+	    $json->{order_by} = decode_json($json->{order_by}) if exists $json->{order_by};
+	    $json->{fields} = decode_json($json->{fields}) if exists $json->{fields};
+	    $json->{parameters} = decode_json($json->{parameters}) if exists $json->{parameters}
+	};
 
-    $c->render(json => QVD::Admin4::Exception->new(code => 6100)->json) if $@;
-
+	$c->render(json => QVD::Admin4::Exception->new(code => 6100)->json) if $@;
+    }
+    $json->{parameters}->{remote_address} = $c->tx->remote_address; # For Log purposes
     $json;
 }
 
 sub process_api_query
 {
     my ($c,$json) = @_;
-    $json->{parameters}->{remote_address} = $c->tx->remote_address; # For Log purposes
+
     my $response = $c->qvd_admin4_api->process_query($json);
     $response->{sid} = $c->res->headers->header('sid');
     return $response;

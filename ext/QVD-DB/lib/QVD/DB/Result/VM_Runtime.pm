@@ -214,4 +214,9 @@ sub current_di_name {
     $self->current_di->path;
 }
 
+sub current_di_version {
+    my $self = shift;
+    $self->current_di->version;
+}
+
 1;

@@ -25,7 +25,7 @@ __PACKAGE__->has_one (counters   => 'QVD::DB::Result::Host_Counter',  'host_id')
 
 ######### Log info
 
-__PACKAGE__->has_one(creation_log_entry => 'QVD::DB::Result::Wat_Log', 
+__PACKAGE__->has_one(creation_log_entry => 'QVD::DB::Result::Log', 
 		     \&creation_log_entry_join_condition, {join_type => 'LEFT'});
 
 sub creation_log_entry_join_condition

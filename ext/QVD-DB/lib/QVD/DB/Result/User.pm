@@ -22,11 +22,9 @@ __PACKAGE__->has_many(vms => 'QVD::DB::Result::VM', 'user_id', { cascade_delete 
 __PACKAGE__->has_many(properties => 'QVD::DB::Result::User_Property', \&custom_join_condition, 
 		      {join_type => 'LEFT', order_by => {'-asc' => 'key'}});
 
-__PACKAGE__->has_many(log_entries => 'QVD::DB::Result::Wat_Log', 'object_id', { cascade_delete => 0 } );
-
 ######### Log info
 
-__PACKAGE__->has_one(creation_log_entry => 'QVD::DB::Result::Wat_Log', 
+__PACKAGE__->has_one(creation_log_entry => 'QVD::DB::Result::Log', 
 		     \&creation_log_entry_join_condition, {join_type => 'LEFT'});
 
 sub creation_log_entry_join_condition

@@ -4,6 +4,8 @@ use base qw/DBIx::Class/;
 use strict;
 use warnings;
 use QVD::Admin4::VMExpiration;
+use DateTime;
+use List::Util qw(sum);
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('vms');
@@ -47,7 +49,7 @@ EOIN
 
 ######### Log info
 
-__PACKAGE__->has_one(creation_log_entry => 'QVD::DB::Result::Wat_Log', 
+__PACKAGE__->has_one(creation_log_entry => 'QVD::DB::Result::Log', 
 		     \&creation_log_entry_join_condition, {join_type => 'LEFT'});
 
 
@@ -156,7 +158,6 @@ sub tenant
     $self->user->tenant;
 }
 
-
 sub get_properties_key_value
 {
     my $self = shift;
@@ -178,15 +179,24 @@ sub vm_mac
 sub remaining_time_until_expiration_hard
 {
     my $self = shift;
-    my $exp = QVD::Admin4::VMExpiration->new(vm => $self);
-    return $exp->time_until_expiration_hard;
+    $self->remaining_time_until($self->vm_runtime->vm_expiration_hard);
 }
 
 sub remaining_time_until_expiration_soft
 {
     my $self = shift;
-    my $exp = QVD::Admin4::VMExpiration->new(vm => $self);
-    return $exp->time_until_expiration_soft;
+    $self->remaining_time_until($self->vm_runtime->vm_expiration_soft);
+}
+
+sub remaining_time_until
+{
+    my ($self,$then) = @_;
+    my @TIME_UNITS = qw(months days hours minutes seconds);
+    my %time_difference;
+    @time_difference{@TIME_UNITS} = $then->subtract_datetime(DateTime->now())->in_units(@TIME_UNITS);
+    $time_difference{expired} = sum(values %time_difference) > 0 ? 0 : 1;
+
+    \%time_difference;
 }
 
 1;

@@ -189,7 +189,7 @@ sub report
 {
     my ($self,%args) = @_; 
 
-    $DB->resultset('Wat_Log')->create($self->log_entry);
+    $DB->resultset('Log')->create($self->log_entry);
 }
 
 1;

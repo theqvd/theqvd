@@ -11,33 +11,33 @@ my $AVAILABLE_ACTION_SIZES = { default => 'normal', normal => 'normal', heavy =>
 my $ACTIONS =
 {
 
-sources_in_log => {type_of_action => 'general',
+sources_in_log => {type_of_action => 'ad_hoc',
 		       admin4method => 'sources_in_wat_log',
 		  acls => [qr/^(log\.see-(main|details)\.|(administrator|di|host|osf|role|tenant|user|vm)\.see\.log)$/],},
 
 log_get_list => {type_of_action => 'list',
 		  admin4method => 'select',
 		  acls => [qr/^(log\.see-(main|details)\.|(administrator|di|host|osf|role|tenant|user|vm)\.see\.log)$/],
-		  qvd_object => 'Wat_Log'},
+		  qvd_object => 'Log'},
 
 log_get_details => {type_of_action => 'list',
 		    admin4method => 'select',
 		    acls => [qr/^log\.see-details\./],
-		    qvd_object => 'Wat_Log'},
+		    qvd_object => 'Log'},
 
-dis_in_staging => { type_of_action =>  'general',
+dis_in_staging => { type_of_action =>  'ad_hoc',
 		    acls => [qr/^di\.create\./],
 		    admin4method => 'dis_in_staging'},
 
-config_ssl => { type_of_action =>  'general',
+config_ssl => { type_of_action =>  'ad_hoc',
 		acls => [qr/^config\.update\./],
 		admin4method => 'config_ssl'},
 
-config_get => { type_of_action =>  'general',
+config_get => { type_of_action =>  'ad_hoc',
 		acls => [qr/^config\.qvd\./],
 		admin4method => 'config_get'},
 
-config_preffix_get => { type_of_action =>  'general',
+config_preffix_get => { type_of_action =>  'ad_hoc',
 			acls => [qr/^config\.qvd\./],
 			admin4method => 'config_preffix_get'},
 
@@ -394,11 +394,11 @@ get_acls_in_admins => { type_of_action => 'list',
 		      admin4method => 'get_acls_in_admins'},
 
 
-number_of_acls_in_role => { type_of_action =>  'general',
+number_of_acls_in_role => { type_of_action =>  'ad_hoc',
 			    acls => [qr/^administrator\.see\.acl-list$/],
 			    admin4method => 'get_number_of_acls_in_role'},
 
-number_of_acls_in_admin => { type_of_action =>  'general',
+number_of_acls_in_admin => { type_of_action =>  'ad_hoc',
 			     acls => [qr/^administrator\.see\.acl-list$/],
 			     admin4method => 'get_number_of_acls_in_admin'},
 
@@ -442,7 +442,7 @@ admin_view_reset => { type_of_action => 'delete',
 		       acls => [],
 		       qvd_object => 'Administrator_Views_Setup'},
 
-current_admin_setup => {type_of_action => 'general',
+current_admin_setup => {type_of_action => 'ad_hoc',
 		       admin4method => 'current_admin_setup'},
 
 qvd_objects_statistics => { type_of_action =>  'multiple',
@@ -546,8 +546,8 @@ sub restmethod
 
     return 'process_multiple_query' if 
 	$ACTIONS->{$self->name}->{type_of_action} eq 'multiple';
-    return 'process_general_query' if 
-	$ACTIONS->{$self->name}->{type_of_action} eq 'general';
+    return 'process_ad_hoc_query' if 
+	$ACTIONS->{$self->name}->{type_of_action} eq 'ad_hoc';
     return 'process_standard_query';
 }
 
