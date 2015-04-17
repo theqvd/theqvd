@@ -306,23 +306,32 @@ Wat.B = {
             
             switch(type) {
                 case 'select':
-                    $('[name="' + name + '"]').val(-1);
-                    $('[name="' + name + '"]').trigger('chosen:updated');
-                    
                     Wat.CurrentView.cleanFilter($('[name="' + name + '"]').attr('data-filter-field'));
                     
-                    $('[name="' + name + '"]:not(.mobile-filter)').trigger('change');
+                    $('[name="' + name + '"]').val(-1);
+                    $('[name="' + name + '"]').trigger('chosen:updated');
                     break;
                 case 'text':
+                    Wat.CurrentView.cleanFilter($('[name="' + name + '"]').attr('data-filter-field'));
+                    
                     $('[name="' + name + '"]').val('');
-                    $('[name="' + name + '"]:not(.mobile-filter)').trigger('input');
                     break;
                 case 'filter':
-                    Wat.CurrentView.cleanFilter(name);
-                    
-                    Wat.CurrentView.fetchList();
+                    // If is fussion note clean both filters
+                    if (name.indexOf('__') > -1) {
+                        var fussionNames = name.split('__');
+                        $.each(fussionNames, function (iFN, fName) {
+                            Wat.A.cleanFussionFilter(fName);
+                        });
+                    }
+                    else {
+                        Wat.CurrentView.cleanFilter(name);
+                    }
                     break;
-            }           
+            }
+            
+            Wat.CurrentView.updateFilterNotes();
+            Wat.CurrentView.filter();
         }
     },
     

@@ -217,11 +217,16 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         // Show loading animation while loading
         $('.list').html(HTML_MID_LOADING);
         
-        if ($(e.target).hasClass('mobile-filter')) {
+        if (e && $(e.target).hasClass('mobile-filter')) {
             var filtersContainer = '.' + this.cid + ' .filter-mobile';
         }
         else {
             var filtersContainer = '.' + this.cid + ' .filter';
+        }
+        
+        // Solve dependences in case of fussioned filters
+        if (e) {
+            Wat.A.solveFilterDependences($(e.target).attr('name'), $(e.target).attr('data-filter-field'));
         }
         
         var filters = {};
@@ -355,7 +360,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         Wat.CurrentView.collection.deleteFilter(fKey);
     },
     
-    updateFilterNotes: function () {        
+    updateFilterNotes: function () {     
+        var that = this;
+        
         // Show-Hide filter notes only when view is not embeded
         if (this.cid == Wat.CurrentView.cid) {
             var filtersContainer = '.' + this.cid + ' .filter';
@@ -389,8 +396,10 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                             };
                             break;
                         case 'object_id':
+                            var filterLabel = $.i18n.t(LOG_TYPE_OBJECTS[that.initFilters['qvd_object']]);
+                            
                             filterNotes['object_id'] = {
-                                'label': $.i18n.t('Id'),
+                                'label': filterLabel,
                                 'type': 'filter',
                                 'value': filterValue
                             };
@@ -446,10 +455,32 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         else {
             $('.filter-notes-list li').remove();
+            
+            // Perform fussion notes
+            $.each (FUSSION_NOTES, function (fKey, obj) {
+                if (filterNotes[obj.label] != undefined && filterNotes[obj.value] != undefined) {
+                    filterNotes[fKey] = {
+                        label: filterNotes[obj.label].value,
+                        value: filterNotes[obj.value].value,
+                        type: filterNotes[obj.value].type,
+                        replaceValue: obj.replaceValue
+                    };
+                    
+                    delete filterNotes[obj.label];
+                    delete filterNotes[obj.value];
+                }
+            });
+            
             $.each(filterNotes, function(fNoteName, fNote) {
-                var note = '<li><a href="javascript:" class="js-delete-filter-note fa fa-times" data-filter-name="' + fNoteName + '" data-filter-type="' + fNote.type + '"></a>' + fNote.label;
+                if (fNote.replaceValue) {
+                    if (Wat.CurrentView.collection.length) {
+                        fNote.value = Wat.CurrentView.collection.models[0].get(fNote.replaceValue);
+                    }
+                }
+                var note = '<li><a href="javascript:" class="js-delete-filter-note fa fa-times" data-filter-name="' + fNoteName + '" data-filter-type="' + fNote.type + '"></a>';
+                note += '<span class="note-label">' + fNote.label + '</span>';
                 if (fNote.value != undefined) {
-                    note += ': ' + fNote.value;
+                    note += ': <span class="note-value">' + fNote.value + '</span>';
                 }
                 
                 note += '</li>';

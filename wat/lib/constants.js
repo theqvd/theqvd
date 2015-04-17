@@ -326,3 +326,13 @@ ANTIQUITY_OPTIONS = [
         'text': '<1 year'
     },
 ];
+
+// Filters that will be fussioned in one filter note
+var FUSSION_NOTES = {
+    object__object_id: {
+        label: 'object',
+        value: 'object_id',
+        qvdObj: 'log',
+        replaceValue: 'object_name'
+    }
+};

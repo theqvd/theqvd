@@ -24,10 +24,18 @@ Wat.Views.LogDetailsView = Wat.Views.DetailsView.extend({
         
         params.forceSelectedActions = {};
         params.block = 5;
-        params.filters = {
-            qvd_object: this.model.get('qvd_object'), 
-            object_id: this.model.get('object_id')
-        };
+        params.filters = {};
+        params.filters.qvd_object = this.model.get('qvd_object');
+        
+        // If log register is about defined object id, show log registers of this same object as related log
+        if (this.model.get('object_id')) {
+            params.filters.object_id = this.model.get('object_id');
+        }
+        // If log register is not about defined object id, show log registers of same action and result on same object section as related log
+        else {
+            params.filters.action = this.model.get('action');
+            params.filters.status = this.model.get('status');
+        }
 
         this.sideView = new Wat.Views.LogListView(params);
     },
