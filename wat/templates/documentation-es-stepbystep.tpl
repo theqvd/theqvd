@@ -2456,6 +2456,7 @@ Vista detalle
 </span></p></div>
 <div class="paragraph"><p>La vista detalle de un registro del log está compuesta por una pequeña <strong>cabecera</strong> donde figura la <strong>fecha y hora</strong> del registro, el <strong>tipo de acción</strong> y el <strong>tipo de objeto</strong> afectado. Seguida a esta cabecera, se describen los diferentes campos asociados al registro y su origen. Estos campos incluyen los parámetros <em>en crudo</em> de la llamada a la API.</p></div>
 <div class="paragraph"><p>Junto a los detalles, encontramos una lista con los registros del log relacionados con el mismo objeto al que hace referencia el registro actual. De este modo se puede navegar por el historial de acciones realizadas sobre este objeto desde su creación.</p></div>
+<div class="paragraph"><p>Si el registro del log no hace referencia a ningún objeto por ser un fallo, los registros de log relacionados serán los de la misma acción en el mismo tipo de objeto (máquina virtual, usuario, osf&#8230;) y con el mismo estado. De este modo se podrán ver los fallos relacionados.</p></div>
 </div></div>
 </dd>
 </dl></div>

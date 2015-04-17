@@ -208,7 +208,7 @@ Wat.B = {
             var targetId = $(e.target).attr('href');
             
             $('html,body').animate({
-                scrollTop: $(targetId).offset().top
+                scrollTop: $(targetId).offset().top - 50
             }, 'fast');
             
             // Remove prefix '#_' from id

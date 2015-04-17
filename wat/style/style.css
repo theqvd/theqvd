@@ -2914,7 +2914,8 @@ td {
   .doc-text div.admonitionblock td.content {
     padding-left: 0.5em;
     border-left: 2px solid #dddddd;
-    margin: 0; }
+    margin: 0;
+    display: table-cell; }
   .doc-text div.exampleblock > div.content {
     border-left: 2px solid #dddddd;
     padding-left: 0.5em;

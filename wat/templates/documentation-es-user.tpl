@@ -1910,11 +1910,152 @@ En la vista detalle tenemos <strong>dos herramientas</strong> disponibles:
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_propiedades_libres">7. Propiedades libres</h2>
+<div class="sectionbody">
+<div class="paragraph"><p><strong>Los elementos de QVD tienen atributos</strong> como por ejemplo el nombre, su estado de bloqueo, su dirección IP asociada (en el caso de las máquinas virtuales o nodos) o la referencia a otros objetos de QVD a los que están asociados. Por ejemplo las imágenes de disco tienen asignado un OSF o las máquinas virtuales están unívocamente relacionadas con un usuario.</p></div>
+<div class="paragraph"><p>Todos estos atributos nos describen cómo son los objetos de QVD, nos permiten diferenciarlos del resto, nos dan información de qué dependencias tienen y nos enseñan a cerca de su comportamiento. Esta información será fija, aunque puede configurarse su visibilidad a través de los ACLs, pudiendo crearse roles de administradores que solo permitan ver parte de ellos.</p></div>
+<div class="paragraph"><p>Debido a las diversas necesidades que puedan tenerse en diferentes entornos QVD, existe una manera de <strong>personalizar la información</strong> que se almacena de cada objeto QVD. Esta personalización es posible gracias a las <strong>propiedades libres</strong>, que son unos <strong>atributos especiales de los objetos de QVD</strong> creados por los administradores para cubrir sus necesidades.</p></div>
+<div class="paragraph"><p>Estas propiedades serán atributos extra que podrán configurarse como una columna más así como habilitarlos como filtro en la vista listado.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/tip.png" alt="Tip" />
+</td>
+<td class="content">Podemos crear una propiedad en los usuarios llamada <em>Company</em>, para almacenar la empresa a la que pertenecen los diferentes usuarios y luego filtrar el listado por ese dato. Otra interesante utilidad de estas propiedades es utilizarlas por scripts externos a través del CLI para realizar acciones por lotes sobre un subconjunto de elementos filtrados según nuestras necesidades.</td>
+</tr></table>
+</div>
+<div class="paragraph"><p>Estos atributos especiales <strong>podrán restringirse también a través de ACLs</strong> pero en <strong>bloque</strong>. Osea podemos <strong>permitir o denegar la visualización de todas las propiedades</strong> libres por cada tipo de objeto de QVD (Usuarios, Máquinas virtuales, OSFs&#8230;), pero no permitir unas propiedades sí y otras no.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/important.png" alt="Important" />
+</td>
+<td class="content">Los elementos con propiedades libres son: Usuarios, Máquinas virtuales, Nodos, OSFs e Imágenes de disco.</td>
+</tr></table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_acciones_masivas">8. Acciones masivas</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>En algunas vistas listado existe la posibilidad de realizar acciones masivas. Cuando esto sucede observaremos que la primera columna de la tabla listado es una columna de casillas de verificación.</p></div>
+<div class="sect2">
+<h3 id="_selección_de_elementos">8.1. Selección de elementos</h3>
+<div class="paragraph"><p>Con la columna de casillas de verificación se podrán seleccionar los elementos a los que queramos aplicar la misma acción. Esta selección se puede hacer de uno en uno o de forma múltiple.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Selección de uno en uno
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Se pueden ir seleccionando los elementos de uno en uno marcando las casillas de verificación de la primera columna.</p></div>
+<div class="paragraph"><p>Cuando hay más de una página de elementos, se puede ir navegando entre ellas sin perder los elementos seleccionados. Esto hace posible <strong>seleccionar a la vez elementos de diferentes páginas</strong>.</p></div>
+</div></div>
+</dd>
+<dt class="hdlist1">
+Selección múltiple
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>La columna de casillas de verificación dispone de una <strong>casilla especial en la cabecera de la tabla</strong>. Con esta casilla podremos hacer una selección múltiple. Al seleccionar esta casilla, se seleccionarán automáticamente todos los elementos del listado.</p></div>
+<div class="paragraph"><p>Pueden darse dos situaciones:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+No haya elementos fuera del listado:
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>El número de elementos del listado sea menor o igual al bloque de paginación, por lo que solo haya una página y todos los elementos estén mostrándose.</p></div>
+<div class="paragraph"><p>En este caso, al marcar la casilla de selección múltiple <strong>se marcarán todos los elementos de forma inmediata</strong>.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+Haya elementos fuera del listado:
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>El número de elementos del listado sea mayor que el bloque de paginación, por lo que se muestre una página de X páginas totales.</p></div>
+<div class="paragraph"><p>En este caso, al marcar la casilla de selección múltiple <strong>aparecerá un diálogo advirtiéndonos de que hay elementos fuera de la vista</strong> y dándonos dos opciones:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Seleccionar sólamente los elementos que están a la vista
+</p>
+</li>
+<li>
+<p>
+Seleccionar todos los elementos del listado, incluyendo los de otras páginas
+</p>
+</li>
+</ul></div>
+</div></div>
+</li>
+</ul></div>
+</div></div>
+</dd>
+</dl></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/tip.png" alt="Tip" />
+</td>
+<td class="content">En la parte izquierda justo debajo de la tabla del listado podremos ver en cada momento el número de elementos que tenemos seleccionados.</td>
+</tr></table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_selector_de_acciones_masivas">8.2. Selector de acciones masivas</h3>
+<div class="paragraph"><p>De estar disponibles, debajo de la tabla de un listado, habrá un control de selección de acciones masivas. Bastará con seleccionar la acción deseada y hacer click en el botón <em>Aplicar</em> para llevarlas a cabo <strong>sobre los elementos seleccionados</strong>.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_tipos_de_acciones_masivas">8.3. Tipos de acciones masivas</h3>
+<div class="paragraph"><p>Las acciones masivas pueden ser de diferente naturaleza:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Edición:
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Con la acción de edición se pueden editar los <strong>atributos comunes</strong> de los elementos que se seleccionen.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+Borrado:
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Con la acción de borrado se pueden eliminar elementos de forma masiva.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+Ejecución:
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>En esta categoría se engloban las acciones que no son ni de edición ni de borrado: <em>Arrancar/Detener máquinas virtuales, desconectar usuarios, bloquear/desbloquear elementos&#8230;</em></p></div>
+</div></div>
+</li>
+</ul></div>
+</div>
+<div class="sect2">
+<h3 id="_restricción_de_acciones_masivas">8.4. Restricción de acciones masivas</h3>
+<div class="paragraph"><p>Por medio del control de ACLs, se puede permitir o no realizar las diversas acciones masivas <strong>con independencia de las acciones normales</strong>. Esto quiere decir que, por ejemplo, <em>la acción de eleminar una máquina virtual y la opción de eliminar máquinas virtuales a través de acciones masivas están reguladas por ACLs diferentes</em>.</p></div>
+</div>
+</div>
+</div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-02-13 09:13:28 CET
+Last updated 2015-04-17 14:57:59 CEST
 </div>
 </div>
 </body>

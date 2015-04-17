@@ -778,6 +778,14 @@ asciidoc.install(2);
 </div></div>
 <div class="paragraph"><p>Los administradores de un tenant estarán <strong>aislados en su tenant</strong>, sin que sepan que existen otros ámbitos. Solo verán los elementos de QVD que hay en ese tenant. El administrador ni siquiera será consciente de si está trabajando en un WAT monotenant o en un tenant dentro de un WAT multitenant.</p></div>
 <div class="paragraph"><p>En un WAT multitenant, existirá un <strong>ámbito superior</strong> al que denominaremos <strong>Supertenant ó Tenant <em></strong></em>* que englobará a todos los demás. Los administradores de este Supertenant están pensados para tareas de <strong>configuración y supervisión</strong> ya que podrán gestionar elementos de QVD de <strong>cualquier tenant</strong> siendo conscientes de la distribución, pudiendo filtrar elementos por tenant, o elegir en qué tenant crear un determinado elemento.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/tip.png" alt="Tip" />
+</td>
+<td class="content">Cuando un administrador del Supertenant crea elementos, puede <strong>escoger en qué Tenant</strong> hacerlo. Del mismo modo, deberá tener en cuenta que <strong>no puede relacionar elementos de diferentes Tenants entre sí</strong>, por lo que, por ejemplo, si desea crear una máquina virtual en el Tenant A, deberá existir al menos un OSF, una Imagen de disco asociada a dicho OSF y un usuario en el Tenant A.</td>
+</tr></table>
+</div>
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/Monotenant-Multitenant.png" alt="Monotenant-Multitenant.png" width="600px" />
 </span></p></div>
@@ -1116,7 +1124,7 @@ Distribución de administradores por tenants
 </dl></div>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>Al crear un administrador, si estamos en un entorno multitenant y somos superadministradores, aparecerá un campo para escoger en que tenant queremos crearlo. <strong>El administrador no podrá ser movido de tenant una vez creado</strong>.</p></div>
+<div class="paragraph"><p>Al crear un administrador, si estamos en un entorno multitenant y somos superadministradores, aparecerá un campo para escoger en qué tenant queremos crearlo. <strong>El administrador no podrá ser movido de tenant una vez creado</strong>.</p></div>
 <div class="paragraph"><p>En la vista listado de administradores figurará en una <strong>columna extra</strong> el tenant al que pertenece cada administrador, y además un <strong>nuevo control de filtrado</strong> nos ayudará a ver solamente los administradores del tenant que elijamos.</p></div>
 </div></div>
 <div class="dlist"><dl>
@@ -1152,7 +1160,7 @@ La gestión de un tenant no va más allá de modificar dichos parámetros o elim
 <div class="sectionbody">
 <div class="paragraph"><p>En un sistema multitenant, surgen nuevas formas de entrar en una situación de bloqueo. Aunque en los tenants tengamos los administradores bien configurados, puede que en en el supertenant <strong>perdamos por descuido el control del único superadministrador que pueda gestionar los permisos</strong>, por lo que perderíamos funcionalidades.</p></div>
 <div class="paragraph"><p>Otra nueva situación de bloqueo puede ocurrir <strong>al cambiar de modo multitenant a monotenant</strong>.</p></div>
-<div class="paragraph"><p>Ocurrirá si cambiamos el modo multitenant a monotenant en el caso en que no exista ningún administrador de tenant con capacidad para volver a poner el sistema en modo multitenant ni para otorgar dichos permisos a otro administrador (o a sí mismo).</p></div>
+<div class="paragraph"><p>Ocurrirá si cambiamos el modo multitenant a monotenant en el caso de que no exista ningún administrador de tenant con capacidad para volver a poner el sistema en modo multitenant ni para otorgar dichos permisos a otro administrador (o a sí mismo).</p></div>
 <div class="paragraph"><p>En este caso quedaríamos atrapados en el modo monotenant, lo que también consideramos situación de bloqueo.</p></div>
 </div>
 </div>
@@ -1173,7 +1181,7 @@ Contraseña: to the rescue</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-04-14 10:24:48 CEST
+Last updated 2015-04-17 13:57:23 CEST
 </div>
 </div>
 </body>
