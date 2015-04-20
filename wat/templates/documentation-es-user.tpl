@@ -2018,7 +2018,7 @@ Seleccionar todos los elementos del listado, incluyendo los de otras páginas
 <div class="ulist"><ul>
 <li>
 <p>
-Edición:
+<strong>Edición</strong>:
 </p>
 <div class="openblock">
 <div class="content">
@@ -2027,7 +2027,7 @@ Edición:
 </li>
 <li>
 <p>
-Borrado:
+<strong>Borrado</strong>:
 </p>
 <div class="openblock">
 <div class="content">
@@ -2036,7 +2036,7 @@ Borrado:
 </li>
 <li>
 <p>
-Ejecución:
+<strong>Ejecución</strong>:
 </p>
 <div class="openblock">
 <div class="content">
@@ -2055,7 +2055,7 @@ Ejecución:
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-04-17 14:57:59 CEST
+Last updated 2015-04-20 08:47:43 CEST
 </div>
 </div>
 </body>

@@ -19,7 +19,7 @@ Wat.I = {
         di: {},
         role: {},
         administrator: {},
-        acl: {}
+        log: {}
     }, 
     
     detailsDefaultFields: {
@@ -30,7 +30,7 @@ Wat.I = {
         di: {},
         role: {},
         administrator: {},
-        acl: {}
+        log: {}
     },
     
     getDetailsFields: function (qvdObj) {
@@ -45,7 +45,7 @@ Wat.I = {
         di: {},
         role: {},
         administrator: {},
-        acl: {}
+        log: {}
     },
     
     listDefaultFields: {
@@ -56,7 +56,7 @@ Wat.I = {
         di: {},
         role: {},
         administrator: {},
-        acl: {}
+        log: {}
     }, 
     
     getListColumns: function (qvdObj) {

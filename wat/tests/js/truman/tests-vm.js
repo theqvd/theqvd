@@ -85,48 +85,46 @@ function vmTestReal () {
                         // After get list of osfs, update it
                         //////////////////////////////////////////////////////////////////
                         Wat.CurrentView.updateModel(WatTests.updateValues.vm, {'id': WatTests.values.vm.id}, function (e) { 
-                            equal(e.retrievedData.status, STATUS_FORBIDDEN_ARGUMENT, "VM cannot be updated due ACLs restriction (" + JSON.stringify(WatTests.updateValues.vm) + ")");
-                        }, Wat.CurrentView.model);
-                        
-                        
-                        // Truman will not be able to update properties 
-                        delete WatTests.updateValues.vm.__properties_changes__;
-                        
-                        // Perform changes in testing virtual machine values
-                        performUpdation(WatTests.values.vm, WatTests.updateValues.vm);
+                            equal(e.retrievedData.status, STATUS_FORBIDDEN_ARGUMENT, "VM cannot be updated due ACLs restriction (" + JSON.stringify(WatTests.updateValues.vm) + ")");                        
+                            // Truman will not be able to update properties 
+                            delete WatTests.updateValues.vm.__properties_changes__;
 
-                        //////////////////////////////////////////////////////////////////
-                        // After get list of virtual machines, update it
-                        //////////////////////////////////////////////////////////////////
-                        Wat.CurrentView.updateModel(WatTests.updateValues.vm, {'id': WatTests.values.vm.id}, function (e) { 
-                            equal(e.retrievedData.status, 0, "Virtual machine updated succesfully (" + JSON.stringify(WatTests.updateValues.vm) + ")");
+                            // Perform changes in testing virtual machine values
+                            performUpdation(WatTests.values.vm, WatTests.updateValues.vm);
 
                             //////////////////////////////////////////////////////////////////
-                            // After update, get list ofvirtual machines matching by name
+                            // After get list of virtual machines, update it
                             //////////////////////////////////////////////////////////////////
-                            
-                            WatTests.values.vm.osf_id = tenantOSFId;
-                            
-                            WatTests.models.vm.fetch({   
-                                complete: function (e) {
-                                    WatTests.values.vm.id = WatTests.models.vm.attributes['id'];
-                                    $.each (WatTests.fakeValues.vm, function (fieldName) {
-                                        var valRetrieved = WatTests.models.vm.attributes[fieldName];
+                            Wat.CurrentView.updateModel(WatTests.updateValues.vm, {'id': WatTests.values.vm.id}, function (e) { 
+                                equal(e.retrievedData.status, 0, "Virtual machine updated succesfully (" + JSON.stringify(WatTests.updateValues.vm) + ")");
 
-                                        if ($.inArray(fieldName, restrictedFields) != -1) {
-                                            equal(WatTests.models.vm.attributes[fieldName], undefined, "DI field '" + fieldName + "' cannot be retrieved due ACLs restriction (" + valRetrieved + ")");
-                                        }
-                                        else if (WatTests.values.vm[fieldName] != undefined) {
-                                            equal(valRetrieved, WatTests.values.vm[fieldName], "Virtual machine '" + fieldName + "' retrieved successfully and match with updated value (" + valRetrieved + ")");
-                                        }
-                                        else {
-                                            notStrictEqual(WatTests.models.vm.attributes[fieldName], undefined, "Virtual machine field '" + fieldName + "' retrieved successfully (" + valRetrieved + ")");
-                                        }
-                                    });
-                                    
-                                    start();
-                                }
-                            });
+                                //////////////////////////////////////////////////////////////////
+                                // After update, get list ofvirtual machines matching by name
+                                //////////////////////////////////////////////////////////////////
+
+                                WatTests.values.vm.osf_id = tenantOSFId;
+
+                                WatTests.models.vm.fetch({   
+                                    complete: function (e) {
+                                        WatTests.values.vm.id = WatTests.models.vm.attributes['id'];
+                                        $.each (WatTests.fakeValues.vm, function (fieldName) {
+                                            var valRetrieved = WatTests.models.vm.attributes[fieldName];
+
+                                            if ($.inArray(fieldName, restrictedFields) != -1) {
+                                                equal(WatTests.models.vm.attributes[fieldName], undefined, "DI field '" + fieldName + "' cannot be retrieved due ACLs restriction (" + valRetrieved + ")");
+                                            }
+                                            else if (WatTests.values.vm[fieldName] != undefined) {
+                                                equal(valRetrieved, WatTests.values.vm[fieldName], "Virtual machine '" + fieldName + "' retrieved successfully and match with updated value (" + valRetrieved + ")");
+                                            }
+                                            else {
+                                                notStrictEqual(WatTests.models.vm.attributes[fieldName], undefined, "Virtual machine field '" + fieldName + "' retrieved successfully (" + valRetrieved + ")");
+                                            }
+                                        });
+
+                                        start();
+                                    }
+                                });
+                            }, Wat.CurrentView.model);
                         }, Wat.CurrentView.model);
                     }
                 });

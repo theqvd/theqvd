@@ -237,32 +237,32 @@ function vmTestReal () {
 
                                                     Wat.CurrentView.deleteModel({'id': WatTests.values.user.id}, function (e) { 
                                                         equal(e.retrievedData.status, 0, "User deleted succesfully (ID: " + JSON.stringify(WatTests.values.user.id) + ")");
-                                                    }, Wat.CurrentView.model);
-
-                                                    //////////////////////////////////////////////////////////////////
-                                                    // After delete virtual machine, delete the dependency disk image
-                                                    //////////////////////////////////////////////////////////////////
-
-                                                    Wat.Router.app_router.trigger('route:listDI');
-
-                                                    Wat.CurrentView.model = new Wat.Models.DI();
-
-                                                    Wat.CurrentView.deleteModel({'id': WatTests.values.di.id}, function (e) { 
-                                                        equal(e.retrievedData.status, 0, "DI deleted succesfully (ID: " + JSON.stringify(WatTests.values.di.id) + ")");
 
                                                         //////////////////////////////////////////////////////////////////
-                                                        // After delete di, delete the dependency osf
+                                                        // After delete user, delete the dependency disk image
                                                         //////////////////////////////////////////////////////////////////
 
-                                                        Wat.Router.app_router.trigger('route:listOSF');
+                                                        Wat.Router.app_router.trigger('route:listDI');
 
-                                                        Wat.CurrentView.model = new Wat.Models.OSF();
+                                                        Wat.CurrentView.model = new Wat.Models.DI();
 
-                                                        Wat.CurrentView.deleteModel({'id': WatTests.values.di.osf_id}, function (e) { 
-                                                            equal(e.retrievedData.status, 0, "OSF deleted succesfully (ID: " + JSON.stringify(WatTests.values.osf.id) + ")");
+                                                        Wat.CurrentView.deleteModel({'id': WatTests.values.di.id}, function (e) { 
+                                                            equal(e.retrievedData.status, 0, "DI deleted succesfully (ID: " + JSON.stringify(WatTests.values.di.id) + ")");
 
-                                                            // Unblock task runner
-                                                            start();
+                                                            //////////////////////////////////////////////////////////////////
+                                                            // After delete di, delete the dependency osf
+                                                            //////////////////////////////////////////////////////////////////
+
+                                                            Wat.Router.app_router.trigger('route:listOSF');
+
+                                                            Wat.CurrentView.model = new Wat.Models.OSF();
+
+                                                            Wat.CurrentView.deleteModel({'id': WatTests.values.di.osf_id}, function (e) { 
+                                                                equal(e.retrievedData.status, 0, "OSF deleted succesfully (ID: " + JSON.stringify(WatTests.values.osf.id) + ")");
+
+                                                                // Unblock task runner
+                                                                start();
+                                                            }, Wat.CurrentView.model);
                                                         }, Wat.CurrentView.model);
                                                     }, Wat.CurrentView.model);
                                                 }, Wat.CurrentView.model);
