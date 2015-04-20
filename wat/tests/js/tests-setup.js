@@ -1,3 +1,6 @@
+// Set timeout of 60 seconds per test
+QUnit.config.testTimeout = 60000;
+
 // Override configuration constants
 APP_PATH = '../';
 
