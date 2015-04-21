@@ -20,4 +20,8 @@
     <div class="bb-details-side2">
         <div class="mini-loading"><i class="fa fa-gear fa-spin"></i></div>
     </div>
+
+    <div id="graph-log" style="width:95%;height:200px;">
+        <div class="mini-loading" style="padding-top: 70px;"><i class="fa fa-bar-chart-o fa-spin"></i></div>
+    </div>
 </div>

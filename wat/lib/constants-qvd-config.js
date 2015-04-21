@@ -142,6 +142,7 @@ QVD_CONFIG_HELP = {
     'wat.admin.login': 'Username of the WAT administrator',
     'wat.admin.password': 'Password of the WAT administrator',
     'wat.log.filename': 'WAT logs go into its own file to avoid permission issues as the process is not run as root',
+    'wat.multitenant': 'WAT multitenant flag to establish mode (0=>Monotenant, 1=>Multitenant)',
     'nodename': 'Name of this node in QVD. Usually the machine\'s hostname.',
 }
 

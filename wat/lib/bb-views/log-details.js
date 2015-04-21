@@ -38,5 +38,7 @@ Wat.Views.LogDetailsView = Wat.Views.DetailsView.extend({
         }
 
         this.sideView = new Wat.Views.LogListView(params);
+        
+        this.renderLogGraph(params);
     },
 });

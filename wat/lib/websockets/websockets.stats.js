@@ -53,7 +53,7 @@ Wat.WS.changeWebsocketStats = function (field, data) {
                 hostsMoreVMSData.push(population);
             });
             
-            Wat.I.G.drawBarChartSimple('hosts-more-vms', hostsMoreVMSData);
+            Wat.I.G.drawBarChartRunningVMsSimple('hosts-more-vms', hostsMoreVMSData);
             break;
     }
     

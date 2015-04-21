@@ -91,6 +91,8 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         
         this.renderRelatedDocs();
         
+        Wat.T.translateAndShow();
+        
         // Open websockets for live fields
         Wat.WS.openStatsWebsockets(this.qvdObj, this.liveFields, this.cid);
     },
@@ -108,8 +110,6 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         );
         
         $(".bb-vms-expire").html(this.template);
-        
-        Wat.T.translate();
     },
     
     loadData: function (stats) {
@@ -134,7 +134,7 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
                         hostsMoreVMSData.push(population);
                     });
 
-                    Wat.I.G.drawBarChart('hosts-more-vms', hostsMoreVMSData);
+                    Wat.I.G.drawBarChartRunningVMs('hosts-more-vms', hostsMoreVMSData);
                 }
             }, 50);
         }

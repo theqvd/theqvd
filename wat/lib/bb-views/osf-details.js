@@ -99,6 +99,8 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
             var params = this.getSideLogParams(sideContainer);
 
             this.sideView3 = new Wat.Views.LogListView(params);
+        
+            this.renderLogGraph(params);
         }
     },
     

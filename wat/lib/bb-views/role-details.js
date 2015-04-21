@@ -329,6 +329,8 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         var params = this.getSideLogParams(sideContainer);
 
         this.sideView = new Wat.Views.LogListView(params);
+        
+        this.renderLogGraph(params);
     },
     
     render: function () {

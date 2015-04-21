@@ -294,4 +294,77 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         
         return params;
     },
+    
+    renderLogGraph: function (params) {
+        var fields = ["time"];
+        var filters = params.filters;
+        var orderBy = {
+            "field": "id",
+            "order": "-desc"
+        };
+        
+        var that = this;
+        
+        Wat.A.performAction ('log_get_list', {}, filters, {}, function(result){
+            var dataGroups = 50;
+            
+            if (result.retrievedData.total > 0) {
+                var rows = result.retrievedData.rows;
+                
+                var serverTimestamp = (Date.parse(Date()) / 1000) + Wat.C.serverClientTimeLag;
+                var olderTimestamp = Date.parse(rows[rows.length-1].time) / 1000;
+                var newerTimestamp = Date.parse(rows[0].time) / 1000;
+                
+                // Give it 20% margin
+                var timeFromOlder = parseInt((serverTimestamp - olderTimestamp) * 1);
+                
+                var step = parseInt(timeFromOlder / dataGroups);
+                
+                var graphData = [];
+                for (iMin=olderTimestamp-1; iMin<=serverTimestamp; iMin+=step) {
+                    var iMax = (iMin+step)<=serverTimestamp ? iMin+step : serverTimestamp;
+                    
+                    var groupCount = 0;
+                    var groupName = iMin;
+                    
+                    $.each(rows, function (i, v) {
+                        if (!v) {
+                            return;
+                        }
+                        
+                        var stepTimestamp = Date.parse(v.time) / 1000;
+                        if (stepTimestamp > iMin && stepTimestamp <= iMax) {
+                            groupCount++;
+                            //rows.shift();
+                        }
+                    });
+                    
+                    graphData.push({
+                        "id": iMin,
+                        "name": groupName,
+                        "registers": groupCount
+                        }
+                    );
+                }
+                
+                that.loadLogGraphData(graphData);                
+            }
+        }, this, fields, orderBy);
+    },
+    
+    loadLogGraphData: function (data) {
+        if (!data) {
+            return;
+        }
+
+        if ($('#graph-log').html() != undefined) {
+            // Trick to draw bar chart when the div where it will be located will be rendered
+            // We know that it is rendered when CSS width attribute change from 'XXX%' to 'XXXpx'
+            setTimeout(function () {
+                if ($('#graph-log').css('width').indexOf("%") == -1) {
+                    Wat.I.G.drawBarChartLog('graph-log', data);
+                }
+            }, 50);
+        }
+    },
 });

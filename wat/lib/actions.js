@@ -65,7 +65,9 @@ Wat.A = {
     //      messages: hash with messages to be showed in success and error cases.
     //      successCallback: function that will be executed after action execution.
     //      that: current context where will be stored retrieved response and passed as parameter to successCallback function.
-    performAction: function (action, arguments, filters, messages, successCallback, that) {
+    //      fields: fields to be returned by the API
+    //      orderBy: Order factor
+    performAction: function (action, arguments, filters, messages, successCallback, that, fields, orderBy) {
         var url = Wat.C.getBaseUrl() + 
             '&action=' + action;
         
@@ -75,6 +77,14 @@ Wat.A = {
         
         if (arguments && !$.isEmptyObject(arguments)) {
             url += '&arguments=' + JSON.stringify(arguments);
+        }       
+        
+        if (fields && !$.isEmptyObject(fields)) {
+            url += '&fields=' + JSON.stringify(fields);
+        }      
+        
+        if (orderBy && !$.isEmptyObject(orderBy)) {
+            url += '&order_by=' + JSON.stringify(orderBy);
         }
         
         // Add source argument to all queries to be stored by API log
