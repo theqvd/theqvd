@@ -901,7 +901,6 @@ sub current_admin_setup
 		     {administrator_id => $administrator->id})->all ]};
 }
 
-
 sub get_number_of_acls_in_admin
 {
     my ($self,$administrator,$json_wrapper) = @_;
@@ -913,17 +912,10 @@ sub get_number_of_acls_in_admin
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin_id => $admin_id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
 
-    my $output;
-    for my $acl_pattern (@$acl_patterns)
-    {
-	my $rs = $DB->resultset('Operative_Acls_In_Administrator')->search(
-	    {},{bind => $bind})->search({admin_id => $admin_id, acl_name => { ILIKE => $acl_pattern}});
-	my @total = $rs->all;
-	my @effective = grep { $_->operative } @total;
-	$output->{$acl_pattern} = { total => scalar @total,effective => scalar @effective };
-    }
+    my $rs = $DB->resultset('Operative_Acls_In_Administrator')->search(
+        {},{bind => $bind})->search({admin_id => $admin_id});
 
-    $output;
+    $self->get_number_of_acls($rs,$acl_patterns);
 }
 
 sub get_number_of_acls_in_role
@@ -937,19 +929,39 @@ sub get_number_of_acls_in_role
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin => $administrator,admin_id => $administrator->id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_hide_re];
 
-    my $output;
-    for my $acl_pattern (@$acl_patterns)
-    {
-	my $rs = $DB->resultset('Operative_Acls_In_Role')->search(
-	    {},{bind => $bind})->search({role_id => $role_id, acl_name => { ILIKE => $acl_pattern }});
+    my $rs = $DB->resultset('Operative_Acls_In_Role')->search(
+        {},{bind => $bind})->search({role_id => $role_id});
 
-	my @total = $rs->all;
-	my @effective = grep { $_->operative } @total;
-	$output->{$acl_pattern} = { total => scalar @total,effective => scalar @effective };
+    $self->get_number_of_acls($rs,$acl_patterns);
+}
+
+sub get_number_of_acls
+{
+    my ($self,$rs,$acl_patterns) = @_;
+
+    my @acl_patterns = @$acl_patterns;
+    $_ =~ s/\./[.]/g for @acl_patterns;
+    $_ =~ s/%/.*/g for @acl_patterns;
+    my %acl_patterns;
+    @acl_patterns{@$acl_patterns} = @acl_patterns;
+
+    my $output;
+    $output->{$_} = { total => 0, effective => 0} for @$acl_patterns;
+
+    for my $acl ($rs->all)
+    {
+        for my $acl_pattern (@$acl_patterns)
+        {
+            my $re = $acl_patterns{$acl_pattern};
+            next unless $acl->acl_name =~ /$re/;
+            $output->{$acl_pattern}->{total}++;
+            $output->{$acl_pattern}->{effective}++ if $acl->operative;
+        }
     }
 
     $output;
 }
+
 
 
 ##################################
@@ -1115,7 +1127,6 @@ sub config_get
     my @keys = cfg_keys;
     @keys = grep { $_ =~ /\Q$cp\E/ } @keys if $cp;
     @keys = grep { $_ =~ /$cp_re/ } @keys if $cp_re;
-
 
     my $od = $json_wrapper->order_direction // '-asc';
 
