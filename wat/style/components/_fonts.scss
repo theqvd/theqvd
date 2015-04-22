@@ -1,0 +1,190 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                @FONTS
+                components/_fonts.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+body {
+    font-size: 14px;
+}
+
+* {
+    font-family: 'Droid Sans', Lato, 'Open Sans', FontAwesome !important; 
+    
+    @include font-size(1);
+
+    @include in(desktop) {
+        @include font-size(3);
+    }
+}
+
+th, td * {
+    font-size: 14px;
+
+    @include in(desktop) {
+        @include font-size(2);
+    }
+}
+
+.doc-text {
+    @include font-size(1);
+}
+
+editor-table th, editor-table td * {
+    //@include font-size(2);
+}
+
+table.expiration-table td, table.state-table td {
+    @include in(mobile) {
+        font-size: 11px;
+    }
+}
+
+.h1 {
+    font-weight: normal;
+    
+    @include font-size(4);
+    
+    .subtitle {
+        font-weight: normal;   
+    }
+}
+
+.h2 {
+    font-weight: normal;
+    @include font-size(3);
+}
+
+// Buttons
+a, button.actions_button:before {
+    @include font-size(2);
+}
+
+a.button, a.button2, button {
+    @include font-size(2);
+}
+
+// Forms
+label {
+    @include font-size(1);
+}
+
+.chosen-container {
+    @include font-size(2);
+}
+
+.actions_button, select[name="selected_actions_select"] {
+    @include font-size(2);
+    line-height: 1.6em;
+}
+
+input {
+    line-height: 20px;
+}
+
+// Layout
+
+.details-block .details-item  {
+    font-size: 15px;
+    
+    @include in(desktop) {
+        @include font-size(3);
+    }
+}
+
+.details-block .details-item {
+    font-weight: normal;
+}
+
+// Menu
+.menu-option {
+    @include font-size(3);
+}
+
+// Navigation
+.breadcrumbs * {
+    @include font-size(1);
+}
+
+// Pagination
+.pagination {
+    @include font-size(2);
+}
+
+// Tables
+
+td {
+    font-size: 14px;
+}
+
+.second_row {
+    font-size: 0.9em;
+    line-height: 1.3em;
+    font-weight: normal;
+}
+
+.footer {
+    @include in(mobile) {
+        font-size: 9px;
+        line-height: 9px;
+    }
+}
+
+.footer a {
+    font-size: 9px;
+    line-height: 9px;
+
+    @include in(desktop) {
+        font-size: inherit;
+    }
+}
+
+
+// Home
+
+.welcome-message {
+    @include font-size(4);
+    text-align: center;
+    
+    .welcome-help a {
+        font-size: 0.8em;
+    }
+}
+
+.home-wrapper {
+    .home-cell {
+        .home-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .summary-table, .summary-table a {
+            font-size: 15px;
+            @include in(desktop) {
+                font-size: 17px;
+            }
+        }
+        
+        .home-percent-wrapper {
+            .home-percent {
+                font-weight: normal;
+                font-size: 35px;
+            }
+        }
+    }
+}
+
+// Messages
+
+.message-container .message {
+    font-size: 1.1em;
+
+    @include in(desktop) {
+        @include font-size(3);
+    }
+}
