@@ -460,7 +460,7 @@ sub _run {
 	    # FIXME: we should read /etc/pulseaudio/client.conf and
 	    # honor it and also be able to forward media to a UNIX
 	    # socket!!!
-	    if ($ps =~ /^(?:tcp:localhost:)?(\d+)$ /) {
+	    if ($ps =~ /^(?:tcp:localhost:)?(\d+)$/) {
 		$o{media} = $1;
 	    }
 	    else {
