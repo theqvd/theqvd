@@ -99,6 +99,7 @@ my $DB;
 sub BUILD
 {
     my $self = shift;
+
     $DB = db();
     
     my $localtime = localtime;
@@ -137,9 +138,10 @@ sub set_object_in_log_entry
     my $self = shift;
 
     if (ref($self->object) =~ /^QVD::DB::Result::.+$/)
-    {
+    {  
 	@{$self->{log_entry}}{qw(object_id object_name)} = 
-	    (eval { $self->object->id } // undef, eval { $self->object->name } // undef);
+	    ( eval { $self->object->get_column('id') } , eval { $self->object->name } // undef);
+
     }
     elsif (ref($self->object) eq 'HASH')
     {
