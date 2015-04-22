@@ -1,4 +1,4 @@
-package QVD::Admin4::AclsOverwriteList;
+package QVD::Admin4::ConfigsOverwriteList;
 use Moo;
 use  5.010;
 use strict;
@@ -10,9 +10,8 @@ use QVD::Config;
 has 'admin_id', is => 'ro', isa => sub { my $name = shift; die "Invalid type for attribute admin_id" if ref($name) &&  (not ref($name) eq 'ARRAY'); }, required => 1;
 has 'admin', is => 'ro', isa => sub { my $name = shift; die "Invalid type for attribute admin" unless ref($name) eq 'QVD::DB::Result::Administrator'; };
 
-my $FOR_NON_SUPERADMINS_RE = 'tenant\..*';
-my $FOR_RECOVERY_ADMINS_RE = '(administrator|config|tenant|role)\..*';
-my $NOTHING_RE = '^$';
+my $AT_GENERAL_LEVEL = '^(?!(vma|internal|client)\.)';
+my $AT_TENANT_LEVEL = '^$';
 
 sub BUILD
 {
@@ -25,26 +24,20 @@ sub BUILD
 }
 
 
-sub acls_to_open_re
+sub configs_to_show_re
 {
     my $self = shift;
-    $self->admin->is_recovery_admin ?
-	return $FOR_RECOVERY_ADMINS_RE:
-	return $NOTHING_RE;
-}
-
-sub acls_to_close_re
-{
-    $NOTHING_RE;
-}
-
-sub acls_to_hide_re
-{
-    my $self = shift;
-
-    ($self->admin->is_superadmin && 
-     cfg('wat.multitenant')) ? return $NOTHING_RE : 
-     return $FOR_NON_SUPERADMINS_RE;
+ 
+    if ($self->admin->is_superadmin)
+    {
+	return $AT_GENERAL_LEVEL;
+    }
+    else
+    {
+	cfg('wat.multitenant') ? 
+	    return $AT_TENANT_LEVEL :
+	    return $AT_GENERAL_LEVEL;
+    }
 }
 
 1;

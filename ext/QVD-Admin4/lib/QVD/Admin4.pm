@@ -21,6 +21,7 @@ use TryCatch;
 use Data::Page;
 use Clone qw(clone);
 use QVD::Admin4::AclsOverwriteList;
+use QVD::Admin4::ConfigsOverwriteList;
 use Mojo::JSON qw(encode_json);
 
 our $VERSION = '0.01';
@@ -92,7 +93,7 @@ sub update
 				  $self->update_related_objects($request,$obj);
 				  $self->exec_nested_queries($request,$obj); } ) };
 	$failures->{$obj->id} = QVD::Admin4::Exception->new(exception => $@, query => 'update')->json if $@; 
-	
+
 	$self->report_in_log($request,$obj,$failures && exists $failures->{$obj->id} ? $failures->{$obj->id}->{status} : 0);
     }
 
@@ -207,6 +208,7 @@ sub create_or_update
     }
 
     my $e = $@ ? QVD::Admin4::Exception->new(exception => $@, query => 'set') : undef;
+
     $self->report_in_log($request,$obj, $e ? $e->code : 0);
     $e->throw if $e;
 
@@ -1122,11 +1124,14 @@ sub config_get
 {
     my ($self,$admin,$json_wrapper) = @_;
 
+    my $col = QVD::Admin4::ConfigsOverwriteList->new(admin_id => $admin->id);
+    my $col_re = $col->configs_to_show_re;
     my $cp = $json_wrapper->get_filter_value('key');
     my $cp_re = $json_wrapper->get_filter_value('key_re');
     my @keys = cfg_keys;
     @keys = grep { $_ =~ /\Q$cp\E/ } @keys if $cp;
     @keys = grep { $_ =~ /$cp_re/ } @keys if $cp_re;
+    @keys = grep { $_ =~ /$col_re/ } @keys;
 
     my $od = $json_wrapper->order_direction // '-asc';
 
