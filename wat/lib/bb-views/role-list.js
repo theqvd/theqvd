@@ -6,7 +6,11 @@ Wat.Views.RoleListView = Wat.Views.ListView.extend({
     
     initialize: function (params) {
         params.whatRender = 'list';
-        params.filters = {'internal': false};
+        if (params.filters == undefined) {
+            params.filters = {};
+        }
+        
+        params.filters.internal = false;
         
         this.collection = new Wat.Collections.Roles(params);
         

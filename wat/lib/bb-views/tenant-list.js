@@ -14,9 +14,6 @@ Wat.Views.TenantListView = Wat.Views.ListView.extend({
         this.renderTenants();
     },
     
-    events: {
-    },
-    
     renderTenants: function () {
         var cornerMenu = Wat.I.getCornerMenu();
         

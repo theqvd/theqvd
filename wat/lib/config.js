@@ -433,7 +433,7 @@ Wat.C = {
             'administrator.see-main.' : 'administrators',
             'tenant.see-main.' : 'tenants',
             'views.see-main.' : 'views',
-            'log.see-main.' : 'log',
+            'log.see-main.' : 'logs',
         };
         
         $.each(aclSetupMenu, function (acl, menu) {

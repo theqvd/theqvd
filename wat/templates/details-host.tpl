@@ -94,7 +94,7 @@
             <td><i class="fa fa-cloud"></i><span data-i18n="Running VMs"></span></td>
             <td>
                 <% if (model.get('number_of_vms_connected') > 0) { %>
-                <%= Wat.C.ifACL('<a href="#/vms/host/' + model.get('id') + '">', 'vm.see-main.') %>
+                <%= Wat.C.ifACL('<a href="#/vms/' + Wat.U.transformFiltersToSearchHash({host_id: model.get('id')}) + '">', 'vm.see-main.') %>
                     <span data-wsupdate="number_of_vms_connected" data-id="<%= model.get('id') %>"><%= model.get('number_of_vms_connected') %></span>
                 </a>
                 <% } else {%>

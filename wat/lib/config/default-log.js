@@ -257,7 +257,7 @@ Wat.I.detailsBreadCrumbs[qvdObj].next = {
             'screen': 'WAT Management',
             'next': {
                 'screen': 'Log registers',
-                'link': '#/log',
+                'link': '#/logs',
                 'linkACL': 'log.see-main.',
                 'next': {
                     'screen': '' // Will be filled dinamically

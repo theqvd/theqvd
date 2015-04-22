@@ -2,7 +2,7 @@
     <div class="side-header">
         <span class="h2" data-i18n="Related log"></span>
         <% if (Wat.C.checkACL('log.see-main.') && model.get('object_id')) { %>
-        <a class="button2 button-right fa fa-arrows-h" href="#/log/object/<%= model.get('qvd_object') + '-' + model.get('object_id') %>" data-i18n="Extended view"></a>
+        <a class="button2 button-right fa fa-arrows-h" href="#/logs/<%= Wat.U.transformFiltersToSearchHash({qvd_object: model.get('qvd_object'), object_id: model.get('object_id')}) %>" data-i18n="Extended view"></a>
         <% } %>
     </div>
     <div class="bb-details-side1">

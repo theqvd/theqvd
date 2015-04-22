@@ -2,7 +2,7 @@
     <div class="side-header">
         <span class="h2" data-i18n="Disk images"></span>
         <% if (Wat.C.checkACL('vm.see-main.')) { %>
-        <a class="button2 button-right fa fa-arrows-h" href="#/dis/osf/<%= model.get('id') %>" data-i18n="Extended view"></a>
+        <a class="button2 button-right fa fa-arrows-h" href="#/dis/<%= Wat.U.transformFiltersToSearchHash({osf_id: model.get('id')}) %>" data-i18n="Extended view"></a>
         <% } %>
     </div>
     <div class="bb-details-side1">
@@ -14,7 +14,7 @@
     <div class="side-header">
         <span class="h2" data-i18n="Virtual machines"></span>
         <% if (Wat.C.checkACL('di.see-main.')) { %>
-        <a class="button2 button-right fa fa-arrows-h" href="#/vms/osf/<%= model.get('id') %>" data-i18n="Extended view"></a>
+        <a class="button2 button-right fa fa-arrows-h" href="#/vms/<%= Wat.U.transformFiltersToSearchHash({osf_id: model.get('id')}) %>" data-i18n="Extended view"></a>
         <% } %>
     </div>
     <div class="bb-details-side2">
@@ -26,7 +26,7 @@
     <div class="side-header">
         <span class="h2" data-i18n="Log"></span>
         <% if (Wat.C.checkACL('log.see-main.')) { %>
-        <a class="button2 button-right fa fa-arrows-h" href="#/log/object/<%= Wat.CurrentView.qvdObj %>-<%= model.get('id') %>" data-i18n="Extended view"></a>
+        <a class="button2 button-right fa fa-arrows-h" href="#/logs/<%= Wat.U.transformFiltersToSearchHash({qvd_object: Wat.CurrentView.qvdObj, object_id: model.get('id')}) %>" data-i18n="Extended view"></a>
         <% } %>
     </div>
     <div class="bb-details-side3">

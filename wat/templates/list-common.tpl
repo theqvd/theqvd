@@ -42,8 +42,25 @@
                     case 'text':
                         %>
                             <span class="filter-control">
+                                <% 
+                                    var textValue = '';
+                                    if (currentFilters[filter.filterField] != undefined) {
+                                        if (typeof currentFilters[filter.filterField] == 'string') {
+                                            textValue = currentFilters[filter.filterField];
+                                        }
+                                        else {
+                                            var firstKey = Object.keys(currentFilters[filter.filterField])[0];
+                                            textValue = currentFilters[filter.filterField][firstKey];
+                                            
+                                            if (firstKey == '~') {
+                                                // Remove wildcards (%25)
+                                                textValue = textValue.substring(3, textValue.length-3);
+                                            }
+                                        }
+                                    }
+                                %>
                                 <label for="<%= name %>" <%= translationAttr %>><%= filter.text %></label>
-                                <input type="text" class="<%= filter.class %>" name="<%= name %>" data-filter-field="<%= filter.filterField %>"/>
+                                <input type="text" class="<%= filter.class %>" name="<%= name %>" data-filter-field="<%= filter.filterField %>" value="<%= textValue %>"/>
                             </span>
                         <%
                         break;            
@@ -53,6 +70,13 @@
                                 <label for="<%= name %>" <%= translationAttr %>><%= filter.text %></label>
                                 <select name="<%= name %>" class="<%= filter.class %>" data-filter-field="<%= filter.filterField %>">
                                     <% 
+                                    /*
+                                    var forceSelected = undefined;
+                                    if (currentFilters[filter.filterField] != undefined) {
+                                        forceSelected = currentFilters[filter.filterField];
+                                    }
+                                    */
+                                    
                                     if (!filter.fillable) {
                                         _.each(filter.options, function(option) {
                                             // If is a not filter add a special attribute with value to be checked
@@ -62,6 +86,12 @@
                                             }
                                     %>
                                             <% 
+                                                /*
+                                                if (forceSelected != undefined && forceSelected == option.value) {
+                                                    option.selected = true;
+                                                }
+                                                */
+                                                
                                                 var selectedAttr = '';
                                                 if(option.selected) { 
                                                     selectedAttr = 'selected="selected"';

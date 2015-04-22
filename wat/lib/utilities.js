@@ -113,4 +113,48 @@ Wat.U = {
         
         return sortedAcls;
     },
+    
+    // Base64 encode and decode functions catching errors to avoid crashes
+    base64: {
+        encode: function (s) {
+            try { 
+                return btoa(s);
+            } 
+            catch (e) { 
+                return false;
+            }
+        },
+        decode: function (s) {
+            try { 
+                return atob(s);
+            } 
+            catch (e) { 
+                return false;
+            }
+        },
+        // Special functions to encode/decode objects
+        encodeObj: function (s) {
+            try { 
+                return btoa(JSON.stringify(s));
+            } 
+            catch (e) { 
+                return false;
+            }
+        },
+        decodeObj: function (s) {
+            try { 
+                return JSON.parse(atob(s));
+            } 
+            catch (e) { 
+                return {};
+            }
+        }
+    },
+    
+    // Encode filters to searchHash for url
+    transformFiltersToSearchHash: function (filters) {
+        return this.base64.encodeObj({
+            filters: filters
+        });
+    }
 }

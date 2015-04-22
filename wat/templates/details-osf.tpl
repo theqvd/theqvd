@@ -66,7 +66,7 @@
         <tr>
             <td><i class="<%= CLASS_ICON_VMS %>"></i><span data-i18n="VMs"></span></td>
             <td>
-                <%= Wat.C.ifACL('<a href="#/vms/osf/' + model.get('id') + '">', 'vm.see-main.') %>
+                <%= Wat.C.ifACL('<a href="#/vms/' + Wat.U.transformFiltersToSearchHash({osf_id: model.get('id')}) + '">', 'vm.see-main.') %>
                 <span data-wsupdate="number_of_vms" data-id="<%= model.get('id') %>"><%= model.get('number_of_vms') %></span>
                 <%= Wat.C.ifACL('</a>', 'vm.see-main.') %>
             </td>
@@ -78,7 +78,7 @@
         <tr>
             <td><i class="<%= CLASS_ICON_DIS %>"></i><span data-i18n="DIs"></span></td>
             <td>
-                <%= Wat.C.ifACL('<a href="#/dis/osf/' + model.get('id') + '">', 'di.see-main.') %>
+                <%= Wat.C.ifACL('<a href="#/dis/' + Wat.U.transformFiltersToSearchHash({osf_id: model.get('id')}) + '">', 'di.see-main.') %>
                 <span data-wsupdate="number_of_dis" data-id="<%= model.get('id') %>"><%= model.get('number_of_dis') %></span>
                 <%= Wat.C.ifACL('</a>', 'di.see-main.') %>
             </td>

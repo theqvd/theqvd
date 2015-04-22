@@ -215,7 +215,7 @@
     <div class="side-header">
         <span class="h2" data-i18n="Log"></span>
         <% if (Wat.C.checkACL('log.see-main.')) { %>
-        <a class="button2 button-right fa fa-arrows-h" href="#/log/object/<%= Wat.CurrentView.qvdObj %>-<%= model.get('id') %>" data-i18n="Extended view"></a>
+        <a class="button2 button-right fa fa-arrows-h" href="#/logs/<%= Wat.U.transformFiltersToSearchHash({qvd_object: Wat.CurrentView.qvdObj, object_id: model.get('id')}) %>" data-i18n="Extended view"></a>
         <% } %>
     </div>
     <div class="bb-details-side2">

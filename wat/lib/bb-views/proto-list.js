@@ -28,9 +28,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     **  filters (object): Conditions under the list will be filtered. Format {user: 23, ...}
     */
     
-    initialize: function (params) {
+    initialize: function (params) {        
         Wat.Views.MainView.prototype.initialize.apply(this);
-        
+                
         this.setFilters();
         this.setColumns();
         this.setSelectedActions();
@@ -334,6 +334,14 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
 
         this.resetSelectedItems ();
         
+        var searchHash = Wat.U.transformFiltersToSearchHash(filters);
+        var currentHash = '#' + this.qvdObj + 's/' + searchHash;
+
+        // If pushState is available in browser, modify hash with current section
+        if (history.pushState) {
+            history.pushState(searchHash, null, currentHash);
+        }
+        
         // If the current offset is not the first page, trigger click on first button of pagination to go to the first page. 
         // This button render the list so is not necessary render in this case
         if (this.collection.offset != 1 && existsPagination) {
@@ -407,7 +415,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     }
                     
                     // If the filtered field has not filter control, show generic filter note
-                    if ($('.filter [data-filter-field="' + filterField + '"]').length > 0) {
+                    if (filterNotes[filterField] && $('.filter [data-filter-field="' + filterField + '"]').length > 0) {
                         if ($('.filter [data-filter-field="' + filterField + '"] option[value="' + filterValue + '"]').val() == undefined) {
                             filterNotes[filterField].value = '<i class="fa fa-spin fa-gear"></i>';
                         }
@@ -726,6 +734,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         var template = _.template(
             Wat.TPL.listCommonList, {
                 formFilters: this.formFilters,
+                currentFilters: this.collection.filters,
                 cid: this.cid
             });
         

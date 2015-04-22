@@ -13,9 +13,9 @@
                 <div class="home-title" data-i18n="Running virtual machines"></div>
                 <div class="home-percent-wrapper">
                     <div class="js-running-vms-percent home-title home-percent js-home-percent"></div>
-                    <div id="running-vms" class="pie-chart js-pie-chart" data-target="vms/state/running" width="200px" height="200px"></div>
+                    <div id="running-vms" class="pie-chart js-pie-chart" data-target="vms/<%= Wat.U.transformFiltersToSearchHash({state: "running"}) %>" width="200px" height="200px"></div>
                 </div>
-                <%= Wat.C.ifACL('<a href="#/vms/state/running">', 'vm.see-main.') %>
+                <%= Wat.C.ifACL('<a href="#/vms/' + Wat.U.transformFiltersToSearchHash({state: "running"}) + '">', 'vm.see-main.') %>
                     <div class="js-running-vms-data home-title"></div>
                 <%= Wat.C.ifACL('</a>', 'vm.see-main.') %>
             </div>
@@ -107,9 +107,9 @@
                 <div class="home-title" data-i18n="Running nodes"></div>
                 <div class="home-percent-wrapper">
                     <div class="js-running-hosts-percent home-title home-percent js-home-percent"></div>
-                    <div id="running-hosts" class="pie-chart js-pie-chart" data-target="hosts/state/running" width="200px" height="200px"></div>
+                    <div id="running-hosts" class="pie-chart js-pie-chart" data-target="hosts/<%= Wat.U.transformFiltersToSearchHash({state: "running"}) %>" width="200px" height="200px"></div>
                 </div>
-                <%= Wat.C.ifACL('<a href="#/hosts/state/running">', 'host.see-main.') %>
+                <%= Wat.C.ifACL('<a href="#/hosts/' + Wat.U.transformFiltersToSearchHash({state: "running"}) + '">', 'host.see-main.') %>
                     <div class="js-running-hosts-data home-title"></div>
                 <%= Wat.C.ifACL('</a>', 'host.see-main.') %>
             </div>
@@ -142,7 +142,7 @@
                                 <i class="<%= CLASS_ICON_USERS %>"></i>
                             </td>                    
                             <td>
-                                <%= Wat.C.ifACL('<a href="#/users/blocked/1" data-i18n="Users">', 'user.see-main.') %>
+                                <%= Wat.C.ifACL('<a href="#/users/' + Wat.U.transformFiltersToSearchHash({blocked: 1}) + '" data-i18n="Users">', 'user.see-main.') %>
                                     <%= i18n.t('Users') %>
                                 <%= Wat.C.ifACL('</a>', 'user.see-main.') %>
                             </td>
@@ -156,7 +156,7 @@
                                 <i class="<%= CLASS_ICON_VMS %>"></i>
                             </td>        
                             <td>
-                                <%= Wat.C.ifACL('<a href="#/vms/blocked/1" data-i18n="Virtual machines">', 'vm.see-main.') %>
+                                <%= Wat.C.ifACL('<a href="#/vms/' + Wat.U.transformFiltersToSearchHash({blocked: 1}) + '" data-i18n="Virtual machines">', 'vm.see-main.') %>
                                     <%= i18n.t('Virtual machines') %>
                                 <%= Wat.C.ifACL('</a>', 'vm.see-main.') %>
                             </td>
@@ -170,7 +170,7 @@
                                 <i class="<%= CLASS_ICON_HOSTS %>"></i>
                             </td>       
                             <td>
-                                <%= Wat.C.ifACL('<a href="#/hosts/blocked/1" data-i18n="Nodes">', 'host.see-main.') %>
+                                <%= Wat.C.ifACL('<a href="#/hosts/' + Wat.U.transformFiltersToSearchHash({blocked: 1}) + '" data-i18n="Nodes">', 'host.see-main.') %>
                                     <%= i18n.t('Nodes') %>
                                 <%= Wat.C.ifACL('</a>', 'host.see-main.') %>
                             </td>
@@ -184,7 +184,7 @@
                                 <i class="<%= CLASS_ICON_DIS %>"></i>
                             </td>                
                             <td>
-                                <%= Wat.C.ifACL('<a href="#/dis/blocked/1" data-i18n="Disk images">', 'di.see-main.') %>
+                                <%= Wat.C.ifACL('<a href="#/dis/' + Wat.U.transformFiltersToSearchHash({blocked: 1}) + '" data-i18n="Disk images">', 'di.see-main.') %>
                                     <%= i18n.t('Disk images') %>
                                 <%= Wat.C.ifACL('</a>', 'di.see-main.') %>
                             </td>

@@ -63,9 +63,9 @@ Wat.I.menuSetupOriginal = {
         link: '#/views',
         icon: CLASS_ICON_VIEWS
     },
-    log: {
+    logs: {
         text: 'Log',
-        link: '#/log',
+        link: '#/logs',
         icon: CLASS_ICON_LOG
     }
 };
