@@ -4,41 +4,18 @@ Wat.Views.RoleListView = Wat.Views.ListView.extend({
     setupOption: 'roles',
     qvdObj: 'role',
     
-    initialize: function (params) {
-        params.whatRender = 'list';
+    initialize: function (params) {        
+        this.collection = new Wat.Collections.Roles(params);
         if (params.filters == undefined) {
             params.filters = {};
         }
         
         params.filters.internal = false;
         
-        this.collection = new Wat.Collections.Roles(params);
-        
-        this.renderSetupCommon();
+        Wat.Views.ListView.prototype.initialize.apply(this, [params]);
     },
     
-    renderSetupCommon: function () {
-        var cornerMenu = Wat.I.getCornerMenu();
-        
-        // Fill the html with the template and the model
-        this.template = _.template(
-            Wat.TPL.setupCommon, {
-                model: this.model,
-                cid: this.cid,
-                selectedOption: this.setupOption,
-                setupMenu: null,
-                //setupMenu: cornerMenu.wat.subMenu
-            }
-        );
-        
-        $(this.el).html(this.template);
-        
-        this.printBreadcrumbs(this.breadcrumbs, '');
-
-        // After render the side menu, embed the content of the view in secondary container
-        this.embedContent();
-    },
-    
+    // Enlarge render list function to load dinamically column of number of ACLs of each role
     renderList: function () {
         Wat.Views.ListView.prototype.renderList.apply(this, []);
 
@@ -52,14 +29,7 @@ Wat.Views.RoleListView = Wat.Views.ListView.extend({
             }, that);
         });
     },
-    
-    embedContent: function () {
-        $(this.secondaryContainer).html('<div class="bb-content-secondary"></div>');
 
-        this.el = '.bb-content-secondary';
-        Wat.Views.ListView.prototype.initialize.apply(this, []);
-    },
-    
     openNewElementDialog: function (e) {
         this.model = new Wat.Models.Role();
         

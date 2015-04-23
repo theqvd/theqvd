@@ -4,41 +4,10 @@ Wat.Views.AdminListView = Wat.Views.ListView.extend({
     setupOption: 'administrators',
     qvdObj: 'administrator',
     
-    initialize: function (params) {
-        params.whatRender = 'list';
-        
+    initialize: function (params) {        
         this.collection = new Wat.Collections.Admins(params);
         
-        this.renderSetupCommon();
-    },
-    
-    renderSetupCommon: function () {
-        var cornerMenu = Wat.I.getCornerMenu();
-        
-        // Fill the html with the template and the model
-        this.template = _.template(
-            Wat.TPL.setupCommon, {
-                model: this.model,
-                cid: this.cid,
-                selectedOption: this.setupOption,
-                setupMenu: null,
-                //setupMenu: cornerMenu.wat.subMenu
-            }
-        );
-        
-        $(this.el).html(this.template);
-        
-        this.printBreadcrumbs(this.breadcrumbs, '');
-
-        // After render the side menu, embed the content of the view in secondary container
-        this.embedContent();
-    },
-    
-    embedContent: function () {
-        $(this.secondaryContainer).html('<div class="bb-content-secondary"></div>');
-
-        this.el = '.bb-content-secondary';
-        Wat.Views.ListView.prototype.initialize.apply(this, []);
+        Wat.Views.ListView.prototype.initialize.apply(this, [params]);
     },
     
     openNewElementDialog: function (e) {

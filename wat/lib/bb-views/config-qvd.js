@@ -64,15 +64,18 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     
     processPrefixes: function (that) {
         that.prefixes = that.retrievedData.rows;
-        
-        that.prefixes.push(UNCLASSIFIED_CONFIG_CATEGORY);
-        
+                
         // If current Token is not among the recovered fixes, set first one
         if ($.inArray(that.currentTokensPrefix, that.prefixes) == -1) {
             that.currentTokensPrefix = that.prefixes[0];
         }
         
-        Wat.A.performAction('config_get', {}, {'key_re':'^' + that.currentTokensPrefix + '\\.'}, {}, that.processTokensRender, that);
+        if (that.currentTokensPrefix == UNCLASSIFIED_CONFIG_CATEGORY) {
+            Wat.A.performAction('config_get', {}, {'key_re': UNCLASSIFIED_CONFIG_REGEXP}, {}, that.processTokensRender, that);
+        }
+        else {
+            Wat.A.performAction('config_get', {}, {'key_re':'^' + that.currentTokensPrefix + '\\.'}, {}, that.processTokensRender, that);
+        }
     },
     
     processTokensRender: function (that) {

@@ -48,6 +48,6 @@ Wat.Views.LoginView = Wat.Views.MainView.extend({
         
         $(this.el).html(this.template);
         
-        Wat.T.translate();        
+        Wat.T.translateAndShow();        
     }
 });
