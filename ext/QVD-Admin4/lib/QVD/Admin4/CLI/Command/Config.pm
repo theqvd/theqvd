@@ -56,8 +56,8 @@ sub run
     }
 
     my $query = $self->make_api_query($parsing); 
-    my $res = $self->ask_api($query);
-    $self->print_table($res,$parsing);
+
+    $self->run_in_pagination_mode($query,$parsing);
 }
 
 1;
