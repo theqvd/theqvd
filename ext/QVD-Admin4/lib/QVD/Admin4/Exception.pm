@@ -64,6 +64,7 @@ my $code2message_mapper =
     6350 => 'Invalid tag value',
     6360 => 'Invalid acl value',
     6370 => 'Invalid role value',
+    6380 => 'Invalid config token',
     6410 => 'Lack of value for a not nullable field',
     6420 => 'No property value provided',
     6430 => 'No tag provided',

@@ -4,7 +4,7 @@ use warnings;
 use Moo;
 use QVD::Admin4::Exception;
 use QVD::Admin4::REST::Filter;
-
+use QVD::Admin4::ConfigsOverwriteList;
 has 'json_wrapper', is => 'ro', isa => sub { die "Invalid type for attribute json_wrapper" 
 						 unless ref(+shift) eq 'QVD::Admin4::REST::JSON'; }, required => 1;
 has 'qvd_object_model', is => 'ro', isa => sub { die "Invalid type for attribute qvd_object_model" 
@@ -37,6 +37,10 @@ sub BUILD
     $ADMIN = $self->qvd_object_model->current_qvd_administrator;
 
 # CHECKS OR DIE
+
+    $self->check_config_token_availability
+	if $self->qvd_object_model->qvd_object eq 
+	'Config';
 
     $self->check_unique_role_in_acls_search
 	if $self->qvd_object_model->qvd_object eq 
@@ -112,6 +116,23 @@ sub BUILD
 ## CHECKING ##
 ##############
 ## DIE UNLESS
+
+
+sub check_config_token_availability
+{
+    my $self = shift;
+
+    my $col = QVD::Admin4::ConfigsOverwriteList->new(admin_id => $ADMIN->id);
+    my $col_re = $col->configs_to_show_re;
+
+    my $token = $self->qvd_object_model->type_of_action eq 'delete' ?
+	$self->json_wrapper->get_filter_value('key') : 
+	$self->json_wrapper->get_argument_value('key');
+
+    QVD::Admin4::Exception->throw(code => 6380, object => $token) 
+	unless $token =~ /$col_re/;
+}
+
 
 sub check_unique_admin_in_acls_search
 {
@@ -678,6 +699,5 @@ sub add_to_order_by
 	$self->modifiers->{order_by}->{'-asc'};
     push @$order_criteria, $key;
 }
-
 
 1;
