@@ -1112,15 +1112,22 @@ sub config_preffix_get
 
     my $col = QVD::Admin4::ConfigsOverwriteList->new(admin_id => $admin->id);
     my $col_re = $col->configs_to_show_re;
+    my $unclassified;
 
     for (@keys)
     {
 	next unless m/$col_re/;
-	next unless m/^([^.]+)\./;
-	$preffix{$1} = 1;
+	if (m/^([^.]+)\./) 
+	{  
+	    $preffix{$1} = 1;
+	}
+	else
+	{
+	    $unclassified = 1;
+	}
     }
     my @preffix = sort keys %preffix; 
-
+    push @preffix, 'unclassified' if $unclassified;
     { total => scalar @preffix,
       rows => \@preffix };
 }
