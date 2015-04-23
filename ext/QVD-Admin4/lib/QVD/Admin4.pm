@@ -1106,11 +1106,16 @@ sub top_populated_hosts
 
 sub config_preffix_get
 {
+    my ($self,$admin,$json_wrapper) = @_;
     my @keys = cfg_keys; 
     my %preffix;
 
+    my $col = QVD::Admin4::ConfigsOverwriteList->new(admin_id => $admin->id);
+    my $col_re = $col->configs_to_show_re;
+
     for (@keys)
     {
+	next unless m/$col_re/;
 	next unless m/^([^.]+)\./;
 	$preffix{$1} = 1;
     }
