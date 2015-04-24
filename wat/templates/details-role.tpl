@@ -43,6 +43,61 @@ if (Wat.C.checkACL('role.see.id')) {
             </tr>
         <% 
         }
+        if (Wat.C.checkACL('role.see.inherited-roles')) {
+        %>
+            <tr>
+                <td><i class="<%= CLASS_ICON_ROLES %>"></i><span data-i18n="Inherited roles"></span></td>
+                <td>
+                    <table class="roles-inherit-table">
+                        <tr>
+                            <td>
+                                <%
+                                    var classFixed = '';
+                                    if (model.get('fixed') && RESTRICT_INTERNAL_ROLES) {
+                                        classFixed = 'invisible';
+                                    }
+
+                                    $.each(model.get('roles'), function (iRole, role) {
+                                %>
+                                    <div>
+                                        <%
+                                            if (Wat.C.checkACL('role.update.assign-role')) {
+                                        %>
+                                                <i class="delete-role-button js-delete-role-button fa fa-trash-o <%= classFixed %>" data-id="<%= iRole %>" data-name="<%= role.name %>"></i>
+                                        <%
+                                            }
+
+                                        if (role.internal && RESTRICT_INTERNAL_ROLES) {
+                                        %>
+                                            <span class="text"><%= role.name %></span>
+                                        <%
+                                        }
+                                        else {
+                                        %>
+                                            <%= Wat.C.ifACL('<a href="#/role/' + iRole + '">', 'role.see-details.') %>
+                                            <span class="text"><%= role.name %></span>
+                                            <%= Wat.C.ifACL('</a>', 'role.see-details.') %>
+                                        <%
+                                        }
+                                        %>
+                                    </div>
+                                <%
+                                    }); 
+                                %>  
+                                <%
+                                    if (Object.keys(model.get('roles')).length == 0) {
+                                %>
+                                        <span data-i18n="No elements found"></span>
+                                <%
+                                    }
+                                %>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        <% 
+        }
         %>
     </table>
 <% 

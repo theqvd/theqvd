@@ -72,6 +72,7 @@ Wat.B = {
 
             // Add inherited Role
             this.bindEvent('click', '.js-add-role-button', this.roleEditorBinds.addRole);
+            this.bindEvent('click', '.js-add-template-button', this.roleEditorBinds.addTemplate);
 
             // Delete inherited Role
             this.bindEvent('click', '.js-delete-role-button', this.roleEditorBinds.deleteRole);
@@ -600,6 +601,30 @@ Wat.B = {
         },
         addRole: function () {
             var roleId = $('select[name="role"]').val();
+            
+            var filters = {
+                id: Wat.CurrentView.id
+            };
+            var arguments = {
+                "__roles_changes__": {
+                    assign_roles: [roleId]
+                }
+            };
+            
+            Wat.CurrentView.updateModel(arguments, filters, function() {
+                Wat.CurrentView.model.fetch({      
+                    complete: function () {
+                        Wat.CurrentView.afterUpdateRoles();
+                    }
+                });
+            });
+        },
+        addTemplate: function (e) {
+            if ($(e.target).hasClass('disabled')) {
+                return;
+            }
+            
+            var roleId = $(e.target).attr('data-role-template-id');
             
             var filters = {
                 id: Wat.CurrentView.id

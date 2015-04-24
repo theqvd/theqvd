@@ -79,9 +79,18 @@ table.state-table tr {
 }
 
 table.roles-inherit-table {
+    td {
+        padding-left: 0px !important;
+    }
+}
+
+table.roles-inherit-tools-table {
     width: 100%;
     tr:first-child>td>div {
         padding-bottom: 4px;
+    }
+    td {
+        padding: 6px;
     }
 }
 
@@ -181,4 +190,19 @@ table.list {
     td, th {
         white-space: nowrap;
     }     
+}
+
+table.role-template-matrix {
+    width: 100%;
+    @include table-base (alternate-rows);
+    td {
+        padding: 8px !important;
+        a.no-text-button {
+            text-align: center;
+            &:before {
+                margin: 0px;
+                text-align: center;
+            }
+        }
+    }
 }

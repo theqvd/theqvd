@@ -1,9 +1,9 @@
 /* INCLUDED: variables */
 /* INCLUDED: place_holders */
-.wrapper .content::after, .wrapper .content .list-block .list-navigation::after, .wrapper .content .details-side .list-navigation::after, .wrapper .content .list-block .list-navigation .action-new-item::after, .wrapper .content .details-side .list-navigation .action-new-item::after, .wrapper .content .list-block .action-selected::after, .wrapper .content .details-side .action-selected::after, .footer::after, .clear::after, .wrapper .content::before, .wrapper .content .list-block .list-navigation::before, .wrapper .content .details-side .list-navigation::before, .wrapper .content .list-block .list-navigation .action-new-item::before, .wrapper .content .details-side .list-navigation .action-new-item::before, .wrapper .content .list-block .action-selected::before, .wrapper .content .details-side .action-selected::before, .footer::before, .clear::before {
+.wrapper .content::after, .wrapper .content .list-block .list-navigation::after, .wrapper .content .details-side .list-navigation::after, .wrapper .content .list-block .list-navigation .action-new-item::after, .wrapper .content .details-side .list-navigation .action-new-item::after, .wrapper .content fieldset::after, .footer::after, .clear::after, .wrapper .content::before, .wrapper .content .list-block .list-navigation::before, .wrapper .content .details-side .list-navigation::before, .wrapper .content .list-block .list-navigation .action-new-item::before, .wrapper .content .details-side .list-navigation .action-new-item::before, .wrapper .content fieldset::before, .footer::before, .clear::before {
   content: "";
   clear: both; }
-.wrapper .content::after, .wrapper .content .list-block .list-navigation::after, .wrapper .content .details-side .list-navigation::after, .wrapper .content .list-block .list-navigation .action-new-item::after, .wrapper .content .details-side .list-navigation .action-new-item::after, .wrapper .content .list-block .action-selected::after, .wrapper .content .details-side .action-selected::after, .footer::after, .clear::after {
+.wrapper .content::after, .wrapper .content .list-block .list-navigation::after, .wrapper .content .details-side .list-navigation::after, .wrapper .content .list-block .list-navigation .action-new-item::after, .wrapper .content .details-side .list-navigation .action-new-item::after, .wrapper .content fieldset::after, .footer::after, .clear::after {
   display: table; }
 
 .header-wrapper .header, .wrapper {
@@ -12,7 +12,7 @@
   padding-left: 20px;
   padding-right: 20px; }
 
-.menu > ul .menu-option, .menu > ul .lateral-menu-option, .menu > ul .lateral-menu-option-discrete, a.button, button.button, a.button2, button.button2, a.button--green, button.button--green, a.button--red, button.button--red, a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.disabled, .wrapper .content .home-wrapper th, .wrapper .content .home-wrapper .home-row .home-cell .summary-table th, .wrapper .content .home-wrapper .log-table th, table.list th, table.customize-fields th, table.custom-props th, table.details th, .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus, .not-selectable {
+.menu > ul .menu-option, .menu > ul .lateral-menu-option, .menu > ul .lateral-menu-option-discrete, a.button, button.button, a.button2, button.button2, a.button--green, button.button--green, a.button--red, button.button--red, a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.disabled, .wrapper .content .home-wrapper th, .wrapper .content .home-wrapper .home-row .home-cell .summary-table th, .wrapper .content .home-wrapper .log-table th, table.list th, table.customize-fields th, table.custom-props th, table.details th, table.role-template-matrix th, .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus, .not-selectable {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -1227,25 +1227,6 @@ body {
         @media screen and (min-width: 40em) {
           .wrapper .content .list-block .list-navigation .action-new-item, .wrapper .content .details-side .list-navigation .action-new-item {
             float: left; } }
-    .wrapper .content .list-block .action-selected, .wrapper .content .details-side .action-selected {
-      margin-top: 15px;
-      width: 100%;
-      clear: both;
-      background: #f5f5f5;
-      border: 2px solid #ebebeb;
-      padding: 20px;
-      margin-top: 60px; }
-      .wrapper .content .list-block .action-selected .chosen-container, .wrapper .content .details-side .action-selected .chosen-container {
-        margin-top: -6px; }
-      .wrapper .content .list-block .action-selected .action-selected-select, .wrapper .content .details-side .action-selected .action-selected-select {
-        margin-bottom: 10px;
-        width: 100%; }
-      .wrapper .content .list-block .action-selected .action-selected-button a, .wrapper .content .details-side .action-selected .action-selected-button a {
-        float: right; }
-      .wrapper .content .list-block .action-selected legend, .wrapper .content .details-side .action-selected legend {
-        text-align: left;
-        color: #444;
-        padding: 0px 10px; }
     .wrapper .content .list-block .shown-elements, .wrapper .content .details-side .shown-elements {
       margin-top: 9px;
       float: right; }
@@ -1254,6 +1235,26 @@ body {
       float: left; }
     .wrapper .content .more-tags {
       margin-top: 8px; }
+    .wrapper .content fieldset {
+      margin-top: 15px;
+      width: 100%;
+      clear: both;
+      background: #f5f5f5;
+      border: 2px solid #ebebeb;
+      padding: 20px; }
+      .wrapper .content fieldset.action-select {
+        margin-top: 60px; }
+      .wrapper .content fieldset .chosen-container {
+        margin-top: -6px; }
+      .wrapper .content fieldset .action-selected-select {
+        margin-bottom: 10px;
+        width: 100%; }
+      .wrapper .content fieldset .action-selected-button a {
+        float: right; }
+      .wrapper .content fieldset legend {
+        text-align: left;
+        color: #444;
+        padding: 0px 10px; }
     .wrapper .content .details-side {
       display: none;
       margin-bottom: 15px;
@@ -1873,10 +1874,15 @@ table.state-table tr td {
   table.state-table tr td:first-child {
     font-weight: normal; }
 
-table.roles-inherit-table {
+table.roles-inherit-table td {
+  padding-left: 0px !important; }
+
+table.roles-inherit-tools-table {
   width: 100%; }
-  table.roles-inherit-table tr:first-child > td > div {
+  table.roles-inherit-tools-table tr:first-child > td > div {
     padding-bottom: 4px; }
+  table.roles-inherit-tools-table td {
+    padding: 6px; }
 
 .second_row {
   margin-top: 4px;
@@ -2270,6 +2276,68 @@ div.list-block div:first-child {
 
 table.list td, table.list th {
   white-space: nowrap; }
+
+table.role-template-matrix {
+  width: 100%;
+  width: 100%;
+  background-color: #fdfdfd;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  border-collapse: separate; }
+  table.role-template-matrix th {
+    font-weight: bold;
+    text-align: left;
+    border-bottom: #ccc solid 1px;
+    background: #d7d7d7; }
+    table.role-template-matrix th .sort-icon {
+      float: right;
+      width: auto; }
+    table.role-template-matrix th.sortable {
+      cursor: pointer; }
+    table.role-template-matrix th.sorted {
+      background-color: #e35e0c;
+      color: #fdfdfd; }
+    table.role-template-matrix th i {
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: bold; }
+      table.role-template-matrix th i.sort-icon:before {
+        float: right;
+        margin-left: 5px;
+        font-weight: normal; }
+  table.role-template-matrix tr td, table.role-template-matrix tr th {
+    padding: 12px 8px 8px 8px;
+    vertical-align: top;
+    border-right: dotted 1px #e4e4e4;
+    border-bottom: dotted 1px #e4e4e4; }
+    table.role-template-matrix tr td:last-child, table.role-template-matrix tr th:last-child {
+      border-right: 0px; }
+  table.role-template-matrix tr:last-child td {
+    border-bottom: 0; }
+  table.role-template-matrix > tbody:nth-child(2) tr:first-child td:first-child {
+    border-right: dotted 1px #e4e4e4; }
+  table.role-template-matrix > tbody:nth-child(2) tr:first-child td {
+    border-top: dotted 1px #e4e4e4; }
+  table.role-template-matrix > tbody > tr:nth-child(even) {
+    background-color: #fdfdfd; }
+  table.role-template-matrix > tbody > tr:nth-child(odd) {
+    background-color: #f3f3f3; }
+  table.role-template-matrix tr:last-child td:first-child {
+    border-bottom-left-radius: 4px; }
+  table.role-template-matrix tr:last-child td:last-child {
+    border-bottom-right-radius: 4px; }
+  table.role-template-matrix .info-in-name-cell {
+    margin-top: 8px;
+    float: right; }
+  table.role-template-matrix td {
+    padding: 8px !important; }
+    table.role-template-matrix td a.no-text-button {
+      text-align: center; }
+      table.role-template-matrix td a.no-text-button:before {
+        margin: 0px;
+        text-align: center; }
 
 /********************************************************************
 *********************************************************************
@@ -2745,6 +2813,9 @@ td {
 
 .hidden-forced {
   display: none !important; }
+
+.bold {
+  font-weight: bold; }
 
 .doc-text {
   /* Shared CSS for AsciiDoc xhtml11 and html5 backends */

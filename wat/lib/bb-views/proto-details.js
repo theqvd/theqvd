@@ -311,7 +311,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             if (result.retrievedData.total > 0) {
                 var rows = result.retrievedData.rows;
                 
-                var serverTimestamp = (Date.parse(Date()) / 1000) + Wat.C.serverClientTimeLag;
+                var serverTimestamp = (Date.parse(Date()) / 1000);
                 var olderTimestamp = Date.parse(rows[rows.length-1].time) / 1000;
                 var newerTimestamp = Date.parse(rows[0].time) / 1000;
                 
@@ -321,8 +321,8 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
                 var step = parseInt(timeFromOlder / dataGroups);
                 
                 var graphData = [];
-                for (iMin=olderTimestamp-1; iMin<=serverTimestamp; iMin+=step) {
-                    var iMax = (iMin+step)<=serverTimestamp ? iMin+step : serverTimestamp;
+                for (iMin=olderTimestamp-1; iMin<=serverTimestamp-step; iMin+=step) {
+                    var iMax = (iMin+step)<=serverTimestamp ? iMin+step : serverTimestamp + 1;
                     
                     var groupCount = 0;
                     var groupName = iMin;
@@ -335,7 +335,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
                         var stepTimestamp = Date.parse(v.time) / 1000;
                         if (stepTimestamp > iMin && stepTimestamp <= iMax) {
                             groupCount++;
-                            //rows.shift();
+                            delete rows[i];
                         }
                     });
                     

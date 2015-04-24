@@ -110,37 +110,6 @@
         }
 
     }
-
-    .action-selected {
-        @extend %clearfix;
-        margin-top: 15px;
-        width: 100%;
-        clear: both;
-        
-        background: darken($col_whiter, 3);
-        border: 2px solid darken($col_whiter, 7);
-        padding: 20px;
-        margin-top: 60px;
-        
-        .chosen-container {
-            margin-top: -6px;
-        }
-        
-        .action-selected-select {
-            margin-bottom: 10px;
-            width: 100%;
-        } 
-        
-        .action-selected-button a {
-            float: right;
-        }       
-        
-        legend {
-            text-align: left;
-            color: $col_blacker;
-            padding: 0px 10px;
-        }
-    }
     
     .shown-elements {
         margin-top: 9px;
@@ -155,4 +124,38 @@
 
 .more-tags {
     margin-top: 8px;
+}
+
+fieldset {
+    @extend %clearfix;
+    margin-top: 15px;
+    width: 100%;
+    clear: both;
+
+    background: darken($col_whiter, 3);
+    border: 2px solid darken($col_whiter, 7);
+    padding: 20px;
+    
+    &.action-select {
+        margin-top: 60px;
+    }
+
+    .chosen-container {
+        margin-top: -6px;
+    }
+
+    .action-selected-select {
+        margin-bottom: 10px;
+        width: 100%;
+    } 
+
+    .action-selected-button a {
+        float: right;
+    }       
+
+    legend {
+        text-align: left;
+        color: $col_blacker;
+        padding: 0px 10px;
+    }
 }

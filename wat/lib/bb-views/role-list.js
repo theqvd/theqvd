@@ -10,7 +10,7 @@ Wat.Views.RoleListView = Wat.Views.ListView.extend({
             params.filters = {};
         }
         
-        params.filters.internal = false;
+        //params.filters.internal = false;
         
         Wat.Views.ListView.prototype.initialize.apply(this, [params]);
     },

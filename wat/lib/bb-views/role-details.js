@@ -2,6 +2,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     setupOption: 'roles',
     secondaryContainer: '.bb-setup',
     qvdObj: 'role',
+    inheritanceSelectedMode: 'role',
     
     filterSection: '-1',
     filterAction: '-1',
@@ -27,8 +28,8 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         Wat.I.chosenConfiguration();
         
         var templates = {
-            inheritedRoles: {
-                name: 'details-role-inherited-roles'
+            inheritanceTools: {
+                name: 'details-role-inheritance-tools'
             },
             aclsRoles: {
                 name: 'details-role-acls-tree'
@@ -43,6 +44,25 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         'change .js-branch-check': 'checkBranch',
         'change .js-acl-check': 'checkACL',
         'change .js-acl-tree-selector': 'toggleTree',
+        'change .js-role-inherit-mode': 'toggleInheritModes',
+        'click .js-role-inherit-mode': 'inheritTemplate'
+    },
+    
+    toggleInheritModes: function (e) {
+        // Store new selected value
+        Wat.CurrentView.inheritanceSelectedMode = $(e.target).val();
+        
+        switch ($(e.target).val()) {
+            case 'role':
+                $('.inherit-role').show();
+                $('.inherit-template').hide();
+                break;
+            case 'template':
+                $('.inherit-role').hide();
+                $('.inherit-template').show();
+                break;
+
+        }
     },
     
     toggleTree: function (e) {
@@ -357,11 +377,18 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     renderManagerInheritedRoles: function () {
         // Fill the html with the template and the model
         this.template = _.template(
-            Wat.TPL.inheritedRoles, {
-                model: this.model
+            Wat.TPL.inheritanceTools, {
+                model: this.model,
+                inheritanceSelectedMode: this.inheritanceSelectedMode
             }
         );
         $('.bb-role-inherited-roles').html(this.template);
+            
+        if (this.inheritanceSelectedMode != 'role') {
+            $('.js-role-inherit-mode[value="template"]').trigger('change');
+        }
+        
+        Wat.I.chosenElement('select[name="role-inherit-mode"]', 'single100');
         
         var params = {
             'action': 'role_tiny_list',
@@ -374,7 +401,6 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
                 "field": ["internal","name"],
                 "order": "-asc"
             },
-            'group': $.i18n.t("Roles"),
             'chosenType': 'advanced100'
         };
         
@@ -385,21 +411,24 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
 
             $.each(that.model.get('roles'), function (iRole, role) {
                 $('select[name="role"] option[value="' + iRole + '"]').remove();
-            });    
+            });
             
-            params.filters.internal = true;
-            params.group = $.i18n.t("Internal roles");
-
-            Wat.A.fillSelect(params, function () {
-                // Remove from inherited roles selector, current role and already inherited ones (for internal roles)
-                $('select[name="role"] option[value="' + that.elementId + '"]').remove();
-
-                $.each(that.model.get('roles'), function (iRole, role) {
-                    $('select[name="role"] option[value="' + iRole + '"]').remove();
-                });           
-            }); 
+            Wat.T.translate();
         });
-
+        
+        Wat.A.performAction('role_tiny_list', {}, {internal: "1"}, {}, function (that) {
+            var currentRoles = that.model.get('roles');
+            
+            $.each(that.retrievedData.rows, function (iTemplate, template) {
+                var button = $('td[data-role-template-cell="' + template.name + '"]>a');
+                button.removeClass('invisible');
+                button.attr('data-role-template-id', template.id);
+                
+                if (currentRoles[template.id] != undefined) {
+                    button.addClass('disabled');
+                }
+            });
+        }, this);
     },    
     
     renderACLsTree: function (that) {
@@ -425,7 +454,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         
         $('.bb-details-side1').html(that.template);
         
-        Wat.I.chosenElement('select.js-acl-tree-selector', 'single');
+        Wat.I.chosenElement('select.js-acl-tree-selector', 'single100');
         
         Wat.T.translate();
     },
