@@ -23,26 +23,6 @@ if (Wat.C.checkACL('role.see.id')) {
         </tr>
         <% 
         }
-        if (Wat.C.checkACL('role.see.created-by')) {
-        %>
-            <tr>
-                <td><i class="<%= CLASS_ICON_ADMINS %>"></i><span data-i18n="Created by"></span></td>
-                <td>
-                    <span><%= model.get('creation_admin_name') %></span>
-                </td>
-            </tr>
-        <% 
-        }
-        if (Wat.C.checkACL('role.see.creation-date')) {
-        %>
-            <tr>
-                <td><i class="fa fa-clock-o"></i><span data-i18n="Creation date"></span></td>
-                <td>
-                    <span><%= model.get('creation_date') %></span>
-                </td>
-            </tr>
-        <% 
-        }
         if (Wat.C.checkACL('role.see.inherited-roles')) {
         %>
             <tr>
@@ -54,7 +34,7 @@ if (Wat.C.checkACL('role.see.id')) {
                                 <%
                                     var classFixed = '';
                                     if (model.get('fixed') && RESTRICT_INTERNAL_ROLES) {
-                                        classFixed = 'invisible';
+                                        classFixed = 'hidden';
                                     }
 
                                     $.each(model.get('roles'), function (iRole, role) {
@@ -69,7 +49,7 @@ if (Wat.C.checkACL('role.see.id')) {
 
                                         if (role.internal && RESTRICT_INTERNAL_ROLES) {
                                         %>
-                                            <span class="text"><%= role.name %></span>
+                                            <span class="text"><%= role.name + ' (' + $.i18n.t('Template') + ')' %></span>
                                         <%
                                         }
                                         else {
@@ -94,6 +74,26 @@ if (Wat.C.checkACL('role.see.id')) {
                             </td>
                         </tr>
                     </table>
+                </td>
+            </tr>
+        <% 
+        }
+        if (Wat.C.checkACL('role.see.created-by')) {
+        %>
+            <tr>
+                <td><i class="<%= CLASS_ICON_ADMINS %>"></i><span data-i18n="Created by"></span></td>
+                <td>
+                    <span><%= model.get('creation_admin_name') %></span>
+                </td>
+            </tr>
+        <% 
+        }
+        if (Wat.C.checkACL('role.see.creation-date')) {
+        %>
+            <tr>
+                <td><i class="fa fa-clock-o"></i><span data-i18n="Creation date"></span></td>
+                <td>
+                    <span><%= model.get('creation_date') %></span>
                 </td>
             </tr>
         <% 

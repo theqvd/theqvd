@@ -5,13 +5,14 @@ Wat.Views.RoleListView = Wat.Views.ListView.extend({
     qvdObj: 'role',
     
     initialize: function (params) {        
-        this.collection = new Wat.Collections.Roles(params);
         if (params.filters == undefined) {
             params.filters = {};
         }
         
-        //params.filters.internal = false;
+        params.filters.internal = false;
         
+        this.collection = new Wat.Collections.Roles(params);
+
         Wat.Views.ListView.prototype.initialize.apply(this, [params]);
     },
     
