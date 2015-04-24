@@ -338,5 +338,5 @@ var FUSSION_NOTES = {
 };
 
 // Role templates
-ROLE_TEMPLATE_SCOPE = ['Users', 'VMs', 'Nodes', 'OSFs', 'Images', 'Administrators', 'Roles', 'Tenants', 'Logs', 'QVD Config', 'WAT Config', 'QVD', 'WAT'];
+ROLE_TEMPLATE_SCOPE = ['Users', 'VMs', 'Nodes', 'OSFs', 'Images', 'Administrators', 'Roles', 'Tenants', 'Logs', 'Views', 'QVD Config', 'WAT Config', 'QVD', 'WAT'];
 ROLE_TEMPLATE_ACTIONS = ['Reader', 'Operator', 'Performer', 'Creator', 'Updater', 'Eraser', 'Manager'];

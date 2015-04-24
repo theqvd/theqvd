@@ -74,6 +74,10 @@
                                 <th>Master</th>
                                 <td colspan=7 data-role-template-cell="Master"><a class="button no-text-button add-role-button js-add-role-button fa fa-sitemap invisible" title="Master" style="width: 100%" href="javascript:"></a></td>
                             </tr>
+                            <tr>
+                                <th>Total Master</th>
+                                <td colspan=7 data-role-template-cell="Total Master"><a class="button no-text-button add-role-button js-add-role-button fa fa-sitemap invisible" title="Total Master" style="width: 100%" href="javascript:"></a></td>
+                            </tr>
                     </table>
                 </td>
             </tr>

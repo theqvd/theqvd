@@ -2327,12 +2327,108 @@ Vista detalle
 <img src="images/doc_images/screenshot_role_details.png" alt="screenshot_role_details.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>En esta vista muy similar a la de administradores, observamos una pequeña <strong>cabecera</strong> donde junto al <strong>nombre del rol</strong> está el <strong>botón para eliminarlo, y el botón de edición</strong>.</p></div>
-<div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos del rol</strong>.</p></div>
-<div class="paragraph"><p>Debajo se encuentra la lista de <strong>roles heredados</strong>, con un control de borrado junto a cada uno, y un selector para heredar cualquiera de los roles que haya configurados en el sistema.</p></div>
-<div class="paragraph"><p>En este caso, además de los <strong>roles del sistema</strong>, se pueden heredar una serie de <strong>roles internos</strong>. Los roles internos vienen de serie en el WAT y <strong>solamente están disponibles para ser heredados</strong> por otros roles. En el menú desplegable, aparecen los roles <em>normales</em> seguidos de los internos.</p></div>
+<div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos del rol</strong>. Entre los atributos se encuentra la lista de <strong>roles heredados</strong> con un enlace para eliminarlos.</p></div>
+<div class="paragraph"><p>En el listado de roles heredados pueden aparecer <strong>dos tipos de elementos</strong>:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Rol</strong>: Se trata de un rol de los definidos en el sistema. El nombre de este rol, será un enlace a su vista detalle.
+</p>
+</li>
+<li>
+<p>
+<strong>Plantilla</strong>: Se trata de un conjunto de ACLs predefinido para <strong>ayudar a la construcción de roles</strong>. Hay plantillas para diferentes niveles de acceso en los elementos de QVD.
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Por ejemplo:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Acceso de solo lectura en Usuarios
+</p>
+</li>
+<li>
+<p>
+Acceso de operación en Imágenes de disco (se considera operación a acciones tales como bloquear/desbloquear, desconectar usuarios, arrancar una máquina virtual&#8230;)
+</p>
+</li>
+<li>
+<p>
+Acceso de actualización en Máquinas virtuales
+</p>
+</li>
+<li>
+<p>
+Acceso de eliminación en Usuarios
+</p>
+</li>
+<li>
+<p>
+&#8230;
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Otras plantillas son la composición de varios niveles de acceso:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Gestión: Incluyen Lectura, Operación, Creación, Actualización, Borrado
+</p>
+</li>
+<li>
+<p>
+Plantillas de QVD: Las plantillas de QVD engloban las plantillas del mismo nivel de acceso de Usuarios, Máquinas virtuales, OSFs e Imágenes. Por ejemplo: QVD Updater.
+</p>
+</li>
+<li>
+<p>
+Plantillas de WAT: Las plantillas de WAT engloban las plantillas del mismo nivel de acceso de Administradores, Roles y Vistas.
+</p>
+</li>
+<li>
+<p>
+Master: Esta plantilla engloba las plantillas de Gestión de WAT y Gestión de QVD.
+</p>
+</li>
+<li>
+<p>
+Total Master: Esta plantilla engloba la plantilla Master, Gestión de Tenants y Gestión de Nodos.
+</p>
+</li>
+</ul></div>
+</div></div>
+</li>
+</ul></div>
+<div class="paragraph"><p>Debajo se encuentra un cuadro de controles de herencia de ACLs. La herencia de ACLs tiene dos modos:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Heredar ACLs de otros roles</strong>: En este modo se escoge qué rol se desea heredar con un selector de roles. Una vez heredado un rol, desaparecerá de este selector. Igualmente si se elimina de la lista de roles heredados, volverá a aparecer entre los roles heredados disponibles.
+</p>
+</li>
+</ul></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_internalroles.png" alt="screenshot_role_internalroles.png" width="960px" />
+<img src="images/doc_images/screenshot_role_inherit_roles.png" alt="screenshot_role_inherit_roles.png" width="600px" />
 </span></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Heredar ACLs de plantillas</strong>: En este modo se escogen las plantillas de las que se deseen heredar los ACLs de una matriz de botones donde se distribuyen las diferentes plantillas según los objetos o nivel de privilegios de cada una. Por ejemplo, la plantilla con los ACLs de actualización de un Nodo estará en la intersección de la fila de Nodos y la columna de Actualizado.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_role_inherit_templates.png" alt="screenshot_role_inherit_templates.png" width="600px" />
+</span></p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/tip.png" alt="Tip" />
+</td>
+<td class="content">Si se hereda de uno o más roles/plantillas, se heredará la suma de sus ACLs sin importar los ACLs comunes. Tras esta herencia, se pueden quitar o agregar ACLs sueltos manualmente desde el Árbol de ACLs para personalizar las credenciales obtenidas por ellos según las necesidades del administrador. De este modo, si nos interesan todos los ACLs de un rol o plantilla excepto uno, será tan fácil como heredar el rol/plantilla y quitar a mano el ACL sobrante.</td>
+</tr></table>
+</div>
 <div class="paragraph"><p>En la parte derecha encontramos dos cuadros:</p></div>
 <div class="ulist"><ul>
 <li>
