@@ -2,6 +2,9 @@
 = La API del sistema de administración de QVD4
 
 
+== Estructura general
+
+
 La API es una aplicación `Mojolicious::Lite` definida en el archivo `wat.pl`. Es una interfaz REST que recibe una _query_ en formato JSON, ejecuta la tarea  correspondiente a esa petición, y devuelve a su vez un JSON como respuesta. El cerebro de la aplicación es un objeto `QVD::Admin4::REST`. Cuando la API recibe una _query_, se la pasa a este objeto, que será el encargado de orquestar todo el procesamiento y devolver una respuesta. Concretamente, el objeto `QVD::Admin4::REST` articula las siguientes clases para llevar a cabo su cometido: `QVD::Admin4::Action`, `QVD::Admin4::REST::Model`, `QVD::Admin4::REST::Request` y `QVD::Admin4`. 
 
 `QVD::Admin4` proporciona todos los métodos que en última instancia ejecutan las acciones que piden las _queries_. Por tanto, pudiera decirse que `QVD::Admin4::REST`, al recibir una petición, se la pasa como argumento a un método de `QVD::Admin4` y devuelve el resultado que arroja este. 
@@ -14,11 +17,11 @@ Así pues, la _query_ que recibe `QVD::Admin4::REST` no es exactamente la que es
 
 En resumen, la API recibe una _query_ en formato JSON. Esta _query_ se le pasa al objeto `QVD::Admin4::REST`, encargado de gestionarla y devolver una respuesta. Este objeto recupera cierta información relevante sobre la acción solicitada, en forma de objetos `QVD::Admin4::Action` y `QVD::Admin4::REST::Model`. Con dicha información crea un objeto `QVD::Admin4::REST::Request` (una nueva versión de la _query_,  corregida y ajustada a un determinado formato). A continuación, ejecuta el método de `QVD::Admin4` correspondiente a la acción solicitada pasándole como argumento el objeto `QVD::Admin4::REST::Request`. La salida de ese método es lo que la API devuelve como respuesta, también en formato JSON.
 
-=== `QVD::Admin4::REST::JSON`
+=== La clase `QVD::Admin4::REST::JSON`
 
 La API recibe la _query_ en formato JSON. Lo primero que hace el sistema con este JSON es crear un objeto de tipo `QVD::Admin4::REST::JSON`. Es un _wrapper_ que permite gestionar la _query_ con facilidad. Una vez creado el objeto, toda la información que se quiera sacar de la _query_ se le consultará a este. Por comodidad, en la documentación se habla de la _query_ de entrada. En realidad, esas alusiones hacen referencia al objeto  `QVD::Admin4::REST::JSON` que hace de _wrapper_ de la _query_ original.
 
-=== `QVD::Admin4::Action`
+=== La clase `QVD::Admin4::Action`
 
 Un objeto `QVD::Admin4::Action` se crea con un parámetro obligatorio `name` (el nombre de la acción que se está pidiendo realizar, tomado de la _query_). Este objeto contiene la información básica, de arranque, de la acción que se ha solicitado. Concretamente, cuenta con los siguientes atributos:
 
@@ -32,18 +35,37 @@ Un objeto `QVD::Admin4::Action` se crea con un parámetro obligatorio `name` (el
 
 La clase `QVD::Admin4::Action` define una lista cerrada de posibles acciones que la API permite realizar. El nombre de la acción solicitada se le pasa al constructor de `QVD::Admin4::Action` en el parámetro `name`. Si el valor de `name` no estuviera contemplado en la lista de acciones disponibles, la creación del objeto `QVD::Admin4::Action` fallaría. Este es el sistema que comprueba  que las peticiones que se hacen a la API estén soportadas por ella. En la clase `QVD::Admin4::Action`  también se codifican, para cada acción disponible en la API, los acls necesarios para ejecutarla. Una vez creado el objeto, se comprueba que el administrador que hace la petición cuente con los permisos necesarios. En caso contrario, se lanza un error.
 
-=== `QVD::Admin4::REST::Model`
+=== La clase `QVD::Admin4::REST::Model`
 
 La clase `QVD::Admin4::REST::Model` es un repositorio de información donde se especifica, para cada tipo de acción, qué filtros admite esta acción, qué argumentos, qué criterios de ordenación; qué campos devuelve; qué valores por defecto pudieran tener esos elementos; qué acls necesita un administrador para usarlos; cómo se traduce cada uno de ellos al formato adecuado para consultar a la base de datos (`DBIx::Class`), etc. Toda esta información se guarda en la clase  `QVD::Admin4::REST::Model` en forma de variables de clase.  
 
 
 Cuando se crea un objeto `QVD::Admin4::REST::Model`, se le pasan al constructor los parámetros `qvd_object` y `type_of_action`. El valor de estos parámetros determina el tipo de acción para el que se crea el objeto, y con ello, el tipo de información que se debe cargar en él. En concreto, se toma de las variables de clase la información correspondiente  a los valores de estos parámetros y se crea un repositorio con esa información.  Después, el objeto creado cuenta con una serie de métodos _accessors_ que permiten consultar el repositorio: `available_filters` devuelve la lista de filtros disponibles, `available_filter` chequea si un filtro concreto está disponible, `get_acls_for_filter` devuelve los acls necesarios para usar un filtro concreto, `map_filter_to_dbix_format` devuelve la traducción de un filtro al formato de `DBIx::Class`, etc.
 
-=== `QVD::Admin4::REST::Request`
+=== La clase `QVD::Admin4::REST::Request`
 
 Una vez creados el _wrapper_ para la _query_ de entrada (`QVD::Admin4::REST::JSON`) y el modelo de la acción solicitada (`QVD::Admin4::REST::Model`) ya es posible crear una petición de tipo `QVD::Admin4::REST::Request`. Este objeto será lo que se le pase como argumento al método encargado de ejecutar la acción (un método de `QVD::Admin4`). Representa una petición que puede hacerse a la base de datos a través de `DBIx::Class`. Provee toda la información necesaria para efectuar la petición: tabla a la que consultar, _joins_ de otras tablas, filtros, argumentos si los hubiera, criterios de ordenación, etc. Este objeto se construye cotejando la _query_ de entrada con el modelo correspondiente. Su constructor lanza una serie de chequeos que comprueban que, conforme al modelo, la _query_ es correcta: los filtros, argumentos... son adecuados; y el administrador que hace la petición tiene acls suficientes para utilizar esos elementos. También se fuerzan, cuando es necesario, ciertos filtros, como el de tenant (un administrador de tenant solo debe poder ver la información de su tenant). Además, se traducen los elementos de la _query_ al formato utilizado por `DBIx::Class`.
 
-=== `QVD::Admin4::REST`
+
+==== El filtrado por tenant
+
+Uno de los cometidos cruciales de la clase `QVD::Admin4::REST::Request` es forzar el filtrado por tenant. Un administrador puede ser o no superadministrador. Lo que caracteriza a un superadministrador es su asociación con el tenant de `id`  0 (desde ahora tenant 0). Cualquier administrador asociado a un tenant distinto de 0 no es un superadministrador. A efectos funcionales, la diferencia entre un administrador normal y un superadministrador es el ámbito sobre el que pueden operar.
+
+* El ámbito de un superadministrador es el conjunto de los tenants del sistema.
+
+* El ámbito de un administrador normal es exclusivamente el tenant al que está asociado.  
+
+Un administrador puede efectuar todas las operaciones que le permitan sus acls. Pero esas operaciones las podrá efectuar solo dentro de su ámbito. Así pues, un administrador del tenant 1 con acls para crear máquinas virtuales podrá crear máquinas virtuales, pero solo dentro del tenant 1. Además, si dicho administrador tiene acls para ver las máquinas virtuales, podrá ver solo las máquinas virtuales del tenant 1. En cambio un superadministrador con los mismos acls podrá crear las máquinas virtuales en cualquiera de los tenants del sistema, y podrá ver las máquinas virtuales de todos los tenants.
+
+Esto tiene ciertas implicaciones a la hora de crear las _queries_ que un administrador manda a la API. Un administrador normal debe obviar en todo caso el concepto de tenant. Las _queries_ que mande a la API no deben incluir filtros ni argumentos relativos al tenant. Será la API misma la que, en función del tenant del administrador, efectúe el filtrado oportuno o añada los argumentos oportunos. En cambio, un superadministrador sí debe contemplar el concepto de tenant: debe mandar en sus _queries_ los filtros y argumentos oportunos relativos al concepto de tenant.
+
+El control sobre estas cuestiones lo efectúa la clase `QVD::Admin4::REST::Request`. Un objeto de esta clase representa una petición a la base de datos. Así pues, cuando se construye esta petición es necesario comprobar que el filtrado por tenant es el adecuado para el administrador que efectúa la petición, o que los objetos a crear se crearán en cada caso en el tenant adecuado. Para ello, `QVD::Admin4::REST::Request` efectúa una serie de operaciones sobre la _query_ de entrada:
+
+* Si el administrador es superadministrador y fuera necesario para la acción solicitada, se comprueba si la _query_ tiene el filtro o argumento necesario relativo al tenant sobre el que operar. 
+* Si el administrador no es superadministrador, se comprueba que la _query_ no incluya especificaciones sobre el tenant en el que operar.
+* Si el administrador no es superadministrador y la acción lo requiere, se añade un filtro o argumento que restrinja el tenant sobre el que operar. El valor de ese filtro o argumento será el correspondiente al tenant del administrador. 
+
+=== La clase `QVD::Admin4::REST`
 
 Una vez creado el objeto `QVD::Admin4::REST::Request`, se ejecuta propiamente la acción solicitada. Para ello, se usan los atributos `restmethod` y `admin4method` del objeto `QVD::Admin4::Action` que representa a la acción. El atributo `restmethod` especifica el nombre de un método de `QVD::Admin4::REST` (en adelante *R*). Y el atributo `admin4method` especifica el nombre de un método de `QVD::Admin4` (en adelante *A*). Para ejecutar la acción, en primer lugar se ejecuta *R*, y dentro de *R* se ejecuta *A*. En realidad, es este segundo el método  que propiamente ejecuta la acción (la clase `QVD::Admin4` es la  que opera sobre la base de datos). La razón de que *A* no se ejecute directamente, sino a través de *R*, es que `QVD::Admin4` cuenta con distintos tipos de métodos, y cada uno de ellos se invoca de un modo distinto. El método *R* es el encargado de invocar *A* del modo adecuado.
 
@@ -55,6 +77,143 @@ Los métodos *R* posibles son:
 
 Los métodos *A* pueden llegar a ser muchos, pero la inmensa mayor parte de las acciones de funcionamiento regular usan los mismos métodos: `select`, `update`, `create`, `create_or_update`, `delete`. En realidad, los objetos `QVD::Admin4::REST::Model` y `QVD::Admin4::REST::Request` vistos arriba están pensados solo para las acciones regulares (ejecutadas desde `process_standard_query`). De hecho, el objeto  `QVD::Admin4::REST::Request` se crea en `process_standard_query`. El resto de acciones (ejecutadas desde `process_ad_hoc_query` y `process_multiple_query`) se ejecutan mediante métodos _ad hoc_ que efectúan sus chequeos de forma independiente. En concreto, estos métodos toman como argumento un objeto de tipo un `QVD::Admin4::REST::JSON`.
 
-=== `QVD::Admin4`
+=== La clase `QVD::Admin4`
 
-La clase `QVD::Admin4` no es mucho más que un conjunto de funciones. Estas son las funciones que, en última instancia ejecutan las acciones que se solicitana la API. La mayor parte de estas funciones efectúan una operación contra la base de datos y devuelven el resultado que esta arroja.
+La clase `QVD::Admin4` no es mucho más que un conjunto de funciones. Estas son las funciones que, en última instancia, ejecutan las acciones que se solicitan a la API. 
+
+==== Métodos regulares
+
+La mayor parte de estas funciones efectúan una operación contra la base de datos (a través de `DBIx::Class`) y devuelven el resultado que esta arroja. Hay cinco funciones principales, encargadas de ejecutar la inmensa mayor parte de las aciones:
+
+* `delete` borra objetos de la base de datos.
+
+* `create` crea objetos nuevos en la base de datos.
+
+* `update` actualiza información de la base de datos.
+
+* `create_or_update` intenta actualizar un objeto, pero si este no existiese, lo crea. Se utiliza solo para algunos objetos del sistema para los cuales esta abstracción se ha visto útil (_tokens_ de configuración).
+
+* `select` devuelve información de la base de datos. 
+
+
+Además, existen otros métodos que en última instancia ejecutan  esas funciones principales , pero que, además, efectúan chequeos u operaciones extra. Por ejemplo, los métodos `vm_delete` o `di_delete` son los encargados de ejecutar las aciones de borrado de  `vm` y `di`. En definitiva, estos métodos ejecutan el método regular `delete`, pero establecen ciertas condiciones extra que han de cumplir los objetos para que de hecho se puedan borrar. Por su parte, el método  `di_create` crea un `di` lanzando el método `create`, pero, además, crea las _tags_ de ese `di` y actualiza su columna `path`. 
+
+Por último, existen en la clase métodos de ejecución de máquinas virtuales: `vm_start`, `vm_stop` y `vm_user_disconnect`.
+
+Todas estas acciones regulares, como ya se ha dicho, reciben como argumento un objeto `QVD::Admin4::REST::Request` que representa la _query_ de entrada. Este objeto proporciona varios _accessors_ cruciales que devuelven la información necesaria para hacer las peticiones a través de `DBIx::Class` :
+
+* `table` establece el `Schema` contra el cual se debe ejecutar la consulta a la base de datos.
+* `filters` define los filtros de las peticiones.
+* `modifiers` define otros rasgos necesarios para definir adecuadamente una petición (_join_, _prefetch_, _order_, etc.).  
+* `arguments` define los argumentos necesarios en las funciones de creación o actualización.
+* `related_objects_arguments` define los argumentos necesarios en las funciones de creación o actualización que no se encuentran en la base de datos en la tabla propia del objeto afectado, sino en una tabla relacionada.
+
+El diseño del método `select`  ha tenido que solucionar cuestiones de eficiencia. Lo hace de dos modos:
+
+* Ante la consulta a una tabla de la base de datos, `DBIx::Class` devuelve un conjunto de objetos. Normalmente, parte de la información de esos objetos reside en tablas relacionadas con la tabla original. Por ello, para que el objeto en cuestión pueda devolver tal información tiene que hacer consultas extra a la base de datos. Cuando se devuelve un número considerable de objetos, las consultas se multiplican y el tiempo de respuesta se dispara. La solución es usar el rasgo _prefetch_ de `DBIx::Class`. Este rasgo permite recoger esa información relacionada directamente en la primera consulta. El  _prefetch_ para cada acción se codifica en la clase `QVD::Admin4::REST::Model` y se le pasa al método `select` mediante el objeto `QVD::Admin4::REST::Request`.
+* Pero cierta  información relacionada con un objeto, la que se encuentra en una relación de uno a muchos, no puede seleccionarse mediante el rasgo _prefetch_. Por ejemplo, una `vm` puede tener muchas `properties`. Pues bien, estas `properties` no pueden extraerse en una única consulta junto a la `vm`. Por ello, este tipo de información nunca se extrae de la consulta principal a la base de datos. En cambio, se ha diseñado un sistema que, en una segunda consulta, extrae la información extra pesada. Esta segunda consulta utiliza una vista. Cada objeto de QVD con información pesada cuenta con una vista que devuelve esa información. Una vez hechas la consulta principal y la consulta extra, la información de la segunda se le inyecta al resultado de la primera. De nuevo, es en `QVD::Admin4::REST::Model` donde se codifica qué vista se relaciona con cada objeto de QVD; y es a través de `QVD::Admin4::REST::Request` como se hace llegar esa información al método `select`.
+
+Los métodos `create` y `update` no solo permiten crear y actualizar objetos. También permiten establecer relaciones entre estos objetos y otros objetos del sistema. Estas operaciones se han llamado _nested queries_ (son acciones secundarias, anidadas en la petición principal). Las _nested quieries_ existentes en el sistema son de tres tipos:
+
+* Asignación y borrado de _custom properties_ para `vm`, `user`, `di`, `osf`, `host`.
+
+* Asignación y eliminación de _tags_ para `di`.
+
+* Asignación y desasignación acls y roles para administradores y roles.
+
+La API admite _nested queries_ para ciertas acciones. En la sintaxis de la API, estas _nested queries_ se codifican como argumentos con una clave especial, reservada. Si la _query_ cuenta con argumentos de este estilo, los métodos  `create` y `update`, además de efectuar sus operaciones principales, ejecutan funciones que llevan a cabo las asignaciones o desasignaciones de elementos oportunas.
+
+==== Métodos irregulares
+
+Hay otros métodos en `QVD::Admin4` que pudieran llamarse irregulares. Estos métodos no toman como argumento un objeto de tipo `QVD::Admin4::REST::Request`, sino de tipo `QVD::Admin4::REST::JSON`. Este objeto es una versión de la _query_ de entrada que no ha sido chequeada ni traducida al formato de `DBIx::Class`. Métodos de este tipo son, por ejemplo, aquellos que no trabajan contra la base de datos. Es el caso de  `config_get`, que devuelve los _tokens_ de configuración del sistema. Estos _tokens_ los proporcionax la clase `QVD::Config`, no la base de datos. También hay métodos que, por su particularidad, aunque usan la base de datos, no es posible asimilarlos al sistema general (`current_admin_setup`, `get_number_of_acls_in_admin`, etc.).    
+
+==== Métodos con vistas
+
+Por último, existen en `QVD::Admin4` métodos regulares (en el sentido de que toman por argumento un objeto `QVD::Admin4::REST::Request`) pero de comportamiento particular. Los métodos regulares al uso operan sobre objetos reales, correspondientes a tablas concretas de la base de datos: `vm`, `user`, `host` etc. Pero existen otros métodos que operan sobre objetos virtuales: vistas. Estas vistas se han creado como objetos de `DBIx::Class` y son objetos válidos en `QVD::Admin4::Action` y `QVD::Admin4::REST::Model`. Es decir, el sistema los contempla  como objetos igualmente válidos que el resto de objetos de QVD, pero a nivel de base de datos no existen. Esto hace que solo se pueda efectuar sobre ellos operaciones de búsqueda. Sin embargo, no es posible consultar estas vistas con  el método general `select`, pues en `DBIx::Class` la consulta sobre vistas (el filtrado, en realidad) se hace de un modo ligéramente distinto de la consulta sobre tablas reales. 
+
+Por ejemplo, en el sistema se contemplan los siguientes objetos virtuales relativos a acls:
+
+* `Operative_Acls_In_Role`. La vista a la que está asociado este objeto es el producto cartesiano de los acls y los roles del sistema. Para cada par acl/rol, se establece un _flag_ que dice si el rol en cuentión tiene habilidato el acl. El objeto admite filtros que permiten restringir esta información para un rol determinado. Con ello, el método `get_acls_in_roles` permite consultar qué acls están  operativos en un rol determinado y qué acls no lo están.  
+
+* `Operative_Acls_In_Administrator`. La vista a la que está asociado este objeto es el producto cartesiano de los acls y los administradores del sistema. Para cada par acl/administrador, se establece un _flag_ que dice si el administrador en cuentión tiene habilidato el acl. El objeto admite filtros que permiten restringir esta información para un administrador determinado. Con ello, el método `get_acls_in_admins` permite consultar qué acls están  operativos en un administrador determinado y qué acls no lo están.  
+
+Los otros dos objetos virtuales que contempla el sistema son `Operative_Views_In_Tenant` y `Operative_Views_In_Administrator`.
+
+== El sistema de acls
+
+El sistema cuenta con una lista cerrada de acls. Estos acls están asociados en el código a las distintas operaciones que requieran control de permisos. El sistema permite a un administrador efectuar una operación solo si tiene los acls necesarios para ello según el código. En concreto, existen dos niveles de control de permisos en el código:
+
+* Cada acción  soportada por la API puede tener asociada una lista con los acls necesarios para ejecutarse. Esta asociación se establece en la clase `QVD::Admin4::Action`. Cuando la API recibe la petición de ejecutar una acción, crea un objeto `QVD::Admin4::Action` correspondiente a esa acción. Este objeto tiene un método que permite comprobar si un administrador determinado tiene los acls requeridos para ejecutar la acción en cuestión.
+
+* Aunque un administrador pueda ejecutar una acción, quizá no pueda hacer todo aquello que la acción permite. Por ejemplo, un administrador puede tener permisos para ejecutar una acción de actualización de máquinas virtuales. Pero aun así, este administrador puede no tener permisos para actualizar todos los campos de las máquinas virtuales. Quizá haya algún campo en concreto que no pueda actualizar. Por tanto, el sistema contempla un segundo nivel de control de acls: cada uno de los filtros, argumentos, etc. que admite la API puede tener también asociada una lista de acls. Si el administrador no tiene esos acls, no puede usar el elemento en cuestión. La asociación de esos elementos con los acls se hace en la clase `QVD::Admin4::REST::Model`. Un objeto de esta clase permite comprobar si un administrador tiene los acls necesarios para usar cada uno de estos elementos. 
+
+Estas asociaciones de acls a acciones o elementos de una acción siempre siguen la misma estructura. Una acción o elemento lleva asociada una lista de expresiones regulares. Cada expresión regular define un conjunto de acls. Se considera que un administrador tiene acls suficientes para utilizar una acción o elemento si, para cada una de esas expresiones regulares, tiene algún acl que unifique con ella. Esta comprobación se hace, en última instancia, siempre mediante el método `re_is_allowed_to` de la clase `QVD::DB::Result::Administrator`. 
+
+En concreto, cuando la API recibe una _query_ efectúa estas comprobaciones de acls en dos puntos:
+
+* Primero se comprueba que la acción en sí se pueda ejecutar.  En la clase `QVD::Admin4::REST` se crea el objeto `QVD::Admin4::Action` y se ejecuta un método de esta clase que hace la comprobación.
+
+* En segundo lugar, se comprueba que todos los elementos de la _query_ se pueden usar.  En la clase `QVD::Admin4::REST::Request` se cotejan los elementos incluidos en la _query_ con los acls asociados a esos elementos en el modelo `QVD::Admin4::REST::Model` correspondiente. En este caso, las comprobaciones son múltiples y usan diversos métodos (para filtros, argumentos, campos a devolver...).
+
+=== Herencia de acls
+
+Cada administrador tiene asociados varios roles. Los acls con los que cuenta un administrador son los acls operativos en sus roles. Un administrador tendrá disponible un acl **a** si y solo si **a** es un acl operativo en alguno de sus roles. Las relaciones de asignación entre administradores y roles se establecen en la base de datos en la tabla  `role_administrator_relations` que se corresponde con el objeto `QVD::DB::Result::Role_Administrator_Relation`.
+
+Por su parte, un rol tiene asignados acls. Estos acls son los que, en principio, están operativos en él. Un rol admite tres tipos de asignaciones de acls:
+
+* A un rol se le pueden asignar directamente acls para que estén operativos en él (acls positivos).
+
+* A un rol se le pueden asignar también otros roles. En este caso, el rol en cuestión asume como operativos todos los acls operativos en los roles heredados. 
+
+* A un rol se le puede eliminar un acl heredado si se le asigna un acl negativo. Si un rol hereda el acl **a**, en principio, tendría **a** como acl operativo. Pero si además se le asigna directamente **a** como acl negativo, el rol en cuestión deja de tener **a** como acl operativo.
+
+La asignación de un rol a otro se establece mediante la tabla de la base de datos `role_role_relations`, a la que corresponde la clase `QVD::DB::Result::Role_Role_Relation`. La asignación de acls a roles (acls tanto positivos como negativos) se hace mediante la tabla de la base de datos `acl_role_relations`. La clase correspondiente es `QVD::DB::Result::ACL_Role_Relation`. Esta tabla y estos objetos tienen un flag `positive` que determina si el acl se asigna al rol como acl positivo o negativo.
+
+NOTE: Por tanto, los acls _per se_ no son positivos ni negativos. Lo que puede ser positivo o negativo es la asignación de acl a rol. El acl se puede asignar como acl positivo o como acl negativo.
+
+La API permite asignar y desasignar acls y roles a un rol. Para ello se usan  _nested quieries_ dentro de las acciones `role_update` y `role_create`. Los métodos de `QVD::Admin4` encargados de efectuar estas asignaciones efectúan una serie de operaciones que no resultan del todo transparentes. A saber:
+
+* Cuando se solicita el añadido de un acl **a** a un rol, este no se efectúa si, de hecho, **a** ya estaba operativo en el rol. 
+
+* Cuando se solicita el añadido de un acl **a** a un rol, y en el rol ya existía **a** como negativo, se elimina esa asignación. 
+
+* Cuando se solicita la eliminación de un acl **a** y en el rol afectado existía **a** como heredado, se añade una asignación de **a** como acl negativo. 
+
+* Cuando a un rol **R1** que tiene asignado un acl **a** (ya sea como positivo o negativo) se le añade un rol **R2**, se elimina de **R1** el acl **a** si **R2** tiene como acl operativo a **a**. 
+
+* No se permite asignar el rol **R2** a **R1** si **R1** hereda de **R2**. 
+
+
+Estas operaciones se llevan a cabo a fin de mantener cierta integridad en el sistema de acls de la base de datos, a fin de asegurar que en este sistema se dan ciertas condiciones. El sistema que calcula qué acls operativos hay en un administrador o rol asume que la base de datos es consistente con estas condiciones. Las condiciones que se pretenden mantener son:
+
+* La asignación directa de acls y la asignación de acls por herencia no debe ser redundante. Si un rol hereda un acl **a**, no puede tener también a **a** asignado directamente.
+
+* Un acl **a** no puede estar asignado a un rol al tiempo como positivo y como negativo. 
+
+* Las relaciones de herencia tienen que tener forma de árbol, no pueden darse bucles donde un rol termine heredando de sí mismo.
+
+En la base de datos, existe una tabla de acls `acls`  y otra de roles `roles`. Y, como se ha visto, existe una tabla `role_role_relations` de relaciones rol/rol y otra `acl_role_relations` de relaciones acl/rol. Además, se ha definido una vista llamada `all_acl_role_relations`, encargada de hacer el trabajo duro. Esta vista toma la información de las tablas anteriores, y con ella calcula, para cada rol, qué acls tiene operativos teniendo en cuenta las relaciones de herencia y la asignación de acls positivos y negativos. A su vez, esta vista es utilizada por las dos _shemas_ de `DBIx::Class` que se usan en todo el sistema para extraer los acls operativos en un administrador o rol:  
+
+* `QVD::DB::Result::Operative_Acls_In_Administrator` y
+
+* `QVD::DB::Result::Operative_Acls_In_Role`.
+
+Estos _schemas_ son, a su vez, vistas, pero no codificadas directamente en la base de datos, sino mediante `DBIx::Class`.
+
+=== Sobrescritura de acls
+
+Existen ciertos contextos en los que el sistema sobrescribe el sistema de acls. Por ejemplo, en un determinado contexto, el administrador que consulta la API pudiera no recibir como operativos ciertos acls, que, sin embargo, sí pudiera tener asignados directamente o por herencia. O puede interesar que, en una determinada situación, el administración reciba siempre una lista determinada de acls, aunque esos acls no le hayan sido asignados ni directamente ni por herencia.
+
+La primera situación se da cuando el administrador no es superadministrador. No debería ser posible que tales administradores tengan permisos para administrar tenants, pues solo deben poder administrar los elementos de dentro de su tenant. Por tanto, 
+
+* Que un grupo de acls no sean nunca operativos para un administrador, con independencia de los roles que tenga asignados. 
+
+* Que un grupo de acls estén siempre operativos para un administrador, con independencia de los roles que tenga asignados. 
+
+* Que un grupo de acls estén econdidos para un administrador: no solo que no estén operativos con independencia de los roles que tenga asignados, sino que ni siquiera pueda visualizarlos como acls existentes en el sistema. 
+
+Para dar forma a cualquiera de estas situaciones, se necesitaría sobrescribir el sistema de acls estableciendo unas listas negras o listas blancas que, con independencia de aquel, quiten o añadan acls a los administradores. 
+
+El segundo supuesto es el propio del administrador de recuperación. Este administrador nunca tiene roles asignados. Sin embargo, el sistema cuenta con una lista blanca de acls que se aplican al administrador si este es administrador de recuperación. De este modo, este tipo de administrador siempre tiene los mismos acls, pues no es posible configurarlos.
+
+El tercer supuesto es el propio de los administradores no superadministradores. Estos administradores, por definición, no pueden gestionar los tenants en sí, sino solo lo que exista dentro de su único tenant. Por tanto, para ellos no solo no tiene sentido que pudieran tener acls relativos a tenants, sino que tampoco tiene sentido que puedan visualizarlos. Por tanto, a estos administradores se les  aplica una lista negra que asegura que, con independencia de la asignación de roles que se les haga, van a poder ver ni tener ciertos acls.  
