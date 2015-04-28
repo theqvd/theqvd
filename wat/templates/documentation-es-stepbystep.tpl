@@ -2178,16 +2178,11 @@ Vista detalle
 <div class="paragraph"><p>Observamos una pequeña <strong>cabecera</strong> donde junto al <strong>nombre del administrador</strong> están los <strong>botones para eliminarlo y editarlo</strong>.</p></div>
 <div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos del administrador</strong>. Entre ellos se encuentran los roles asociados al administrador con un control de borrado junto a cada uno. Haciendo click en el nombre de los roles, se irá a la vista detalle de cada rol.</p></div>
 <div class="paragraph"><p>Debajo, hay un panel con un selector para asignar cualquiera de los roles que haya configurados en el sistema. Esta asignación otorga al administrador los ACLs que contengan los roles asignados, sin importar si tienen ACLs comunes. En el árbol de ACLs podremos ir viendo los ACLs computados de la asignación.</p></div>
-<div class="paragraph"><p>En la parte derecha encontramos dos cuadros:</p></div>
+<div class="paragraph"><p>En la parte derecha encontramos:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
 <strong>El árbol de ACLs del administrador</strong>. Las ramas aparecen inicialmente cerradas. Haciendo click sobre el icono junto a cada rama podremos abrirlas y ver su contenido.
-</p>
-</li>
-<li>
-<p>
-<strong>Los registros de log</strong> del administrador con un botón de acceso a los detalles del registro, la acción realizada y el tiempo transcurrido. Este log no se refiere a las acciones llevadas a cabo por el administrador, si no a las <strong>acciones llevadas a cabo sobre él</strong>.
 </p>
 </li>
 </ul></div>
@@ -2404,16 +2399,11 @@ Total Master: Esta plantilla engloba la plantilla Master, Gestión de Tenants y 
 <td class="content">Si se hereda de uno o más roles/plantillas, se heredará la suma de sus ACLs sin importar los ACLs comunes. Tras esta herencia, se pueden quitar o agregar ACLs sueltos manualmente desde el Árbol de ACLs para personalizar las credenciales obtenidas por ellos según las necesidades del administrador. De este modo, si nos interesan todos los ACLs de un rol o plantilla excepto uno, será tan fácil como heredar el rol/plantilla y quitar a mano el ACL sobrante.</td>
 </tr></table>
 </div>
-<div class="paragraph"><p>En la parte derecha encontramos dos cuadros:</p></div>
+<div class="paragraph"><p>En la parte derecha encontramos:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
 <strong>El árbol de ACLs</strong>. Las ramas aparecen inicialmente cerradas. Haciendo click sobre el icono junto a cada rama podremos abrirlas y ver su contenido. A diferencia del árbol de ACLs de la vista detalle de administradores, <strong>en los roles el árbol contiene todos los ACLs del sistema</strong>, y figuran como activos los que tiene asociado el rol.
-</p>
-</li>
-<li>
-<p>
-<strong>Los registros de log</strong> del rol con un botón de acceso a los detalles del registro, la acción realizada y el tiempo transcurrido. Este log no se refiere a las acciones llevadas a cabo por el administrador, si no a las <strong>acciones llevadas a cabo sobre él</strong>.
 </p>
 </li>
 </ul></div>
