@@ -12,9 +12,10 @@
 /* #define BUFFER_SIZE CURL_MAX_WRITE_SIZE * 2 */
 #define BUFFER_SIZE 65536
 #include "qvdbuffer.h"
-#define QVDVERSION 115
-#define QVDABOUT "Version: 1.1.5. $Id$"
-#define QVDCHANGELOG "1.1.5  5/12/2014 Support for HTTP code 402\n" \
+#define QVDVERSION 116
+#define QVDABOUT "Version: 1.1.6. $Id$"
+#define QVDCHANGELOG "1.1.6 28/04/2015 More time to session takeover\n" \
+                     "1.1.5  5/12/2014 Support for HTTP code 402\n" \
                      "1.1.4 23/11/2014 Extend pass length to 256\n" \
                      "1.1.3 21/07/2014 Fix -r switch (not in the qvdclient binary only in the lib\n" \
                      "1.1.2 18/07/2014 Fix hardcoded ip in reconnect (option -2)\n" \
@@ -33,7 +34,8 @@
 #define MAX_ERROR_BUFFER 256
 #define MAXDISPLAYSTRING 256
 #define MAX_PATH_STRING 256
-#define MAX_HTTP_RESPONSES_FOR_UPGRADE 10
+/* This can be also a session takeover or VM start */
+#define MAX_HTTP_RESPONSES_FOR_UPGRADE 60
 #define DEFAULT_USERAGENT_PRODUCT "QVD/3.1"
 #define MAX_USERAGENT 128
 #define MAX_OS 128

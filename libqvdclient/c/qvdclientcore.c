@@ -226,6 +226,10 @@ vmlist *qvd_list_of_vm(qvdclient *qvd) {
     {
       qvd->payment_required = 1;
       qvd_error(qvd, "Error no subscription available\n");
+      /*      qvd->numvms = 0;
+      QvdVmListInit(qvd->vmlist);
+      return qvd->vmlist;
+      */
       return NULL;
     }
   qvd_printf("No error and no auth error after curl_easy_perform\n");
@@ -832,7 +836,7 @@ V/qvd     ( 7551): 1 input received was <The requested virtual machine is offlin
 #endif
     }
 
-    /* TODO cleanup printf */
+    /* TODO verify for 402 */
     if (strstr(qvd->buffer.data, "HTTP/1.1 2")
 	|| strstr(qvd->buffer.data, "HTTP/1.1 3")
 	|| strstr(qvd->buffer.data, "HTTP/1.1 4")
