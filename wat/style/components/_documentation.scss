@@ -452,11 +452,22 @@
       margin-bottom: 1.5em;
     }
     div.tableblock > table {
-      border: 3px solid #527bbd;
+      border: 1px solid $col_brand;
+      tbody tr {
+        @include alternate;
+      }
+      thead tr {
+          background: $col_whiter;
+          font-size: 15px;
+          border-bottom: 1px solid $col_brand;
+      }
+      td, th {
+        padding: 4px;
+      }
     }
     thead, p.table.header {
       font-weight: bold;
-      color: #527bbd;
+      color: $col_brand;
     }
     p.table {
       margin-top: 0;
@@ -486,13 +497,13 @@
     }
     thead, p.tableblock.header {
       font-weight: bold;
-      color: #527bbd;
+      color: $col_brand;
     }
     p.tableblock {
       margin-top: 0;
     }
     table.tableblock {
-      border-width: 3px;
+      border-width: 2px;
       border-spacing: 0px;
       border-style: solid;
       border-color: #527bbd;

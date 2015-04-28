@@ -1079,35 +1079,14 @@ Poderes de <em>superadmin</em>
 <div class="paragraph"><p>En entornos multitenant hay algunas cosas que debemos saber cuando gestionamos los administradores y sus permisos.</p></div>
 <div class="paragraph"><p>Las diferencias en la interfaz y en su gestión que comentaremos a continuación solamente aparecerán para los superadministradores.</p></div>
 <div class="paragraph"><p>Aunque un entorno sea multitenant, para los administradores de un tenant, esta condición es transparente. Para ellos, no habrá diferencia con un entorno monotenant.</p></div>
-<div class="dlist"><dl>
-<dt class="hdlist1">
-Independencia de roles
-</dt>
-<dd>
-<div class="openblock">
-<div class="content">
+<div class="sect2">
+<h3 id="_independencia_de_roles">7.1. Independencia de roles</h3>
 <div class="paragraph"><p>Los roles son independientes a los tenants. Lo que es lo mismo, son comunes a todos ellos. Por ello, en la vista listado de roles no se observarán cambios respecto al modo monotenant.</p></div>
-</div></div>
-</dd>
-<dt class="hdlist1">
-ACLs adicionales
-</dt>
-<dd>
-<div class="openblock">
-<div class="content">
-<div class="paragraph"><p>Algunos ACLs son exclusivos de entornos multitenant. Este es el caso de los ACLs responsables de la gestión de Tenants.</p></div>
-<div class="paragraph"><p>Dichos ACLs serán inexistentes en sistemas monotenant. De esta manera, en la gestión de roles así como cuando gestionemos administradores en un entorno multitenant, los árboles de ACLs tendrán ciertos ACLs extras además de los mismos que habrá en el caso de monotenant.</p></div>
-</div></div>
-</dd>
-<dt class="hdlist1">
-Distribución de administradores por tenants
-</dt>
-<dd>
-<div class="openblock">
-<div class="content">
+</div>
+<div class="sect2">
+<h3 id="_distribución_de_administradores_por_tenants">7.2. Distribución de administradores por tenants</h3>
 <div class="paragraph"><p>En un entorno multitenant, <strong>los administradores estarán alojados inequívocamente en un tenant</strong>, bien sea un tenant normal o el supertenant en el caso de los superadministradores.</p></div>
 <div class="paragraph"><p>Atendiendo a la creación de un administrador, distinguimos <strong>dos casos en función del ámbito</strong>:</p></div>
-</div></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1120,20 +1099,11 @@ Distribución de administradores por tenants
 </p>
 </li>
 </ul></div>
-</dd>
-</dl></div>
-<div class="openblock">
-<div class="content">
 <div class="paragraph"><p>Al crear un administrador, si estamos en un entorno multitenant y somos superadministradores, aparecerá un campo para escoger en qué tenant queremos crearlo. <strong>El administrador no podrá ser movido de tenant una vez creado</strong>.</p></div>
 <div class="paragraph"><p>En la vista listado de administradores figurará en una <strong>columna extra</strong> el tenant al que pertenece cada administrador, y además un <strong>nuevo control de filtrado</strong> nos ayudará a ver solamente los administradores del tenant que elijamos.</p></div>
-</div></div>
-<div class="dlist"><dl>
-<dt class="hdlist1">
-Gestión de tenants
-</dt>
-<dd>
-<div class="openblock">
-<div class="content">
+</div>
+<div class="sect2">
+<h3 id="_gestión_de_tenants">7.3. Gestión de tenants</h3>
 <div class="paragraph"><p>En los entornos multitenant se introduce la gestión de tenants.</p></div>
 <div class="paragraph"><p>Podemos crear tantos tenants como queramos, sin límite de administradores por tenant.</p></div>
 <div class="paragraph"><p>Al crear un tenant definiremos su nombre, el idioma y el tamaño de bloque del WAT por defecto para sus administradores.</p></div>
@@ -1150,9 +1120,169 @@ La gestión de un tenant no va más allá de modificar dichos parámetros o elim
 </p>
 </li>
 </ul></div>
-</div></div>
+</div>
+<div class="sect2">
+<h3 id="_referencia_de_acls_multitenant">7.4. Referencia de ACLs (Multitenant)</h3>
+<div class="paragraph"><p>Algunos ACLs son exclusivos de entornos multitenant.</p></div>
+<div class="paragraph"><p>De esta manera, en la gestión de roles así como cuando gestionemos administradores en un entorno multitenant, los árboles de ACLs tendrán ciertos ACLs extras además de los mismos que habrá en el caso de monotenant.</p></div>
+<div class="paragraph"><p>Este es el caso de los ACLs responsables de la gestión de Tenants.</p></div>
+<div class="sect3">
+<h4 id="_acls_de_tenants">7.4.1. ACLs de Tenants</h4>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+<thead>
+<tr>
+<th align="left" valign="top">ACL    </th>
+<th align="left" valign="top">ACL code       </th>
+<th align="left" valign="top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Create tenants</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.create.</p></td>
+<td align="left" valign="top"><p class="table">Creation of tenants including initial settings for name.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete tenants (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.delete-massive.</p></td>
+<td align="left" valign="top"><p class="table">Deletion of tenants massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete tenants</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.delete.</p></td>
+<td align="left" valign="top"><p class="table">Deletion of tenants one by one</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter tenants by creator</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.filter.created-by</p></td>
+<td align="left" valign="top"><p class="table">Filter of tenants list by administrator who created it</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter tenants by creation date</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.filter.creation-date</p></td>
+<td align="left" valign="top"><p class="table">Filter of tenants list by date when it was created</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter tenants by name</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.filter.name</p></td>
+<td align="left" valign="top"><p class="table">Filter of tenants list by tenant&#8217;s name</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Access to tenant&#8217;s details view</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.see-details.</p></td>
+<td align="left" valign="top"><p class="table">Access to details view of Tenants. This view includes name</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Access to tenant&#8217;s main section</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.see-main.</p></td>
+<td align="left" valign="top"><p class="table">Access to the tenants list. This view includes name</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s block size</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.see.block</p></td>
+<td align="left" valign="top"><p class="table">The block size in lists pagination of the tenants.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s creator</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.see.created-by</p></td>
+<td align="left" valign="top"><p class="table">Wat administrator who created a tenant</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s creation date</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.see.creation-date</p></td>
+<td align="left" valign="top"><p class="table">Datetime when a tenant was created</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s ID</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.see.id</p></td>
+<td align="left" valign="top"><p class="table">The database identiefier of the tenants. Useful to make calls from CLI.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s language</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.see.language</p></td>
+<td align="left" valign="top"><p class="table">The language setted by default for any administrar that belong to a tenant</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update tenant&#8217;s block size</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.update.block</p></td>
+<td align="left" valign="top"><p class="table">Update the block size in lists pagination of tenants.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update tenant&#8217;s language</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.update.language</p></td>
+<td align="left" valign="top"><p class="table">Update the language of tenants.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update tenant&#8217;s name</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.update.name</p></td>
+<td align="left" valign="top"><p class="table">Update the name of tenants.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_referencia_de_plantillas_multitenant">7.5. Referencia de Plantillas (Multitenant)</h3>
+<div class="paragraph"><p>También hay Plantillas de ACLs adicionales exclusivas del modo multitenant:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Tenants Manager
+</p>
+<div class="openblock">
+<div class="content">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Hereda de
+</dt>
+<dd>
 </dd>
 </dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Tenants Reader
+</p>
+</li>
+<li>
+<p>
+Tenants Creator
+</p>
+</li>
+<li>
+<p>
+Tenants Updater
+</p>
+</li>
+<li>
+<p>
+Tenants Eraser
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/Templates_Hierarchy_-_Tenants_Manager.png" alt="Templates_Hierarchy_-_Tenants_Manager.png" width="600px" />
+</span></p></div>
+<div class="paragraph"><p>Los Tenants no tienen plantilla de operación al no tener operativa más allá de ver, crear, actualizar y borrar. Si en un futuro se añadiera, sería heredada por esta plantilla de gestión.</p></div>
+</div></div>
+</li>
+</ul></div>
+<div class="sect3">
+<h4 id="_jerarquía_de_plantillas_multitenant">7.5.1. Jerarquía de Plantillas (Multitenant)</h4>
+<div class="paragraph"><p>Cuando el sistema está en modo multitenant, la jerarquía de Plantillas tiene Plantillas adicionales. Se pueden ver de un vistazo en el siguiente esquema:</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/Templates_Hierarchy_Monotenant.png" alt="Templates_Hierarchy_Monotenant.png" width="960px" />
+</span></p></div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1181,7 +1311,7 @@ Contraseña: to the rescue</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-04-17 13:57:23 CEST
+Last updated 2015-04-28 13:43:44 CEST
 </div>
 </div>
 </body>

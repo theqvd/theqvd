@@ -1829,77 +1829,86 @@ En la vista detalle tenemos <strong>dos herramientas</strong> disponibles:
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>Árbol de ACLs</strong>: Se mostrarán los ACLs del sistema en forma de árbol con casillas de verificación. Seleccionaremos aquellos ACLs que queremos que el rol contenga.
+<strong>Herencia de ACLs</strong>: Se podrán heredar grupos de ACLs.
 </p>
 <div class="openblock">
 <div class="content">
+<div class="paragraph"><p>Para facilitar la tediosa labor de asignar ACLs a un rol, se pueden crear vínculos de herencia entre grupos de ACLs.</p></div>
+<div class="paragraph"><p>Existen dos tipos de grupos de ACLs de los que se puede heredar:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Roles</strong>: Serán todos aquellos roles del WAT, ya vengan por defecto o se hayan creado posteriormente.
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Son los roles normales que <strong>se muestran en la lista de roles</strong> y a parte de poder heredarse, se pueden asignar a los administradores.</p></div>
+<div class="paragraph"><p>Existe una <strong>protección frente a bucles infinitos de herencia</strong> por la que <em>un rol A no puede heredar de un rol B si el rol B ya hereda del rol A</em>.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Plantillas</strong>: Las plantillas son agrupaciones de ACLs cuyo único objetivo es ser heredadas por los roles. <strong>Su utilización es recomendada</strong> por razones de mantenibilidad.
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Los nombres de las plantillas son descriptivos de los ACLs que poseen, haciendo referencia normalmente a qué elementos afectan y en qué grado.</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>Por ejemplo: Users Creator, Images Operator, VMs Manager, Roles Eraser...</code></pre>
+</div></div>
+<div class="paragraph"><p>En las <strong>futuras actualizaciones</strong> del WAT puedan aparecer <strong>nuevos ACLs</strong>. Para evitar tener que re-configurar los ACLs de nuestros administradores tras una actualización, <strong>se recomienda utilizar la herencia de Plantillas</strong> para configurar nuestros roles. Estos roles, serán actualizados con el WAT, conteniendo los nuevos ACLs de una forma coherente con su uso.</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>Por ejemplo: Si se añadie un nuevo campo en la vista de usuarios, el ACL que permita su visualización será añadido el rol interno Users Reader. Los roles que hereden de este rol interno, se actualizarán y tendrán automáticamente dicho nuevo acceso.</code></pre>
+</div></div>
+</div></div>
+</li>
+</ul></div>
+<div class="paragraph"><p>Cuando heredemos un rol o plantilla, observaremos como en el árbol de ACLs cambia, activándose los nuevos ACLs, sirviéndonos de guía sobre cuanto nos estamos acercando a los ACLs deseados a medida que configuramos el rol.</p></div>
+<div class="paragraph"><p>Una ventaja de la herencia es que si en el futuro <strong>cambian los ACLs de un rol</strong>, todos los que lo hereden sufrirán sus cambios con él. Por eso hay que utilizar esta técnica con cuidado.</p></div>
+<div class="paragraph"><p>Para conocer los roles y plantillas que una instalación de QVD incluye, ver la guía de usuario: <em>Referencia de ACLs Plantillas y Roles</em>.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Árbol de ACLs</strong>: Se mostrarán los ACLs del sistema en forma de árbol con casillas de verificación.
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Seleccionaremos aquellos ACLs que queremos que el rol contenga, y así mismo deseleccionaremos los que queramos que deje de contener, hayan sido añadidos manualmente o provengan de la herencia de un rol o plantilla.</p></div>
 <div class="paragraph"><p>Las ramas, a su vez, también disponen de casilla de verificación para seleccionar/deseleccionar ramas enteras con un solo click.</p></div>
+<div class="paragraph"><p>Junto a cada ACL que provenga de un rol o plantilla heredado, aparecerá un icono. Al pasar el ratón sobre él nos aparecerá información a cerca de qué rol o plantilla procede.</p></div>
+<div class="paragraph"><p><strong>Un ACL puede provenir de varios roles o plantillas</strong> si éstos tienen ACLs en común. Esto no tiene importancia más alla de que si dejamos de heredar un rol o plantilla de los que nos proporcionan estos ACLs no estaremos quitando el ACL, ya que aún permanecería heredado por otros. No obstante, ese ACL, como los demás, podrá ser eliminado manualmente deseleccionándolo desde el árbol de ACLs sin importar de cuantos roles o plantillas provenga.</p></div>
 <div class="paragraph"><p>Según nuestras preferencias, podemos representar el árbol en <strong>dos clasificaciones</strong> distintas:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
 <strong>Por secciones</strong>: Si deseamos agrupar los ACLs según las secciones del WAT a las que afectan: usuarios, máquinas virtuales, nodos, administradores&#8230;
 </p>
-</li>
-</ul></div>
-<div class="paragraph"><p>Útil si queremos crear un rol que otorgue permisos con mucha profundidad pero poca amplitud.</p></div>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Útil si queremos crear un rol que otorgue permisos con <strong>mucha profundidad pero poca amplitud</strong>.</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>Por ejemplo, permisos totales en usuarios y máquinas virtuales.</code></pre>
 </div></div>
-<div class="ulist"><ul>
+</div></div>
+</li>
 <li>
 <p>
 <strong>Por acciones</strong>: Si nos es más cómodo agrupar los ACLs según el tipo de acción que permiten: crear, eliminar, acceder a vista principal, filtrar&#8230;
 </p>
-</li>
-</ul></div>
-<div class="paragraph"><p>Útil si queremos crear un rol que otorgue permisos con poca profundidad y mucha amplitud.</p></div>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Útil si queremos crear un rol que otorgue permisos con <strong>poca profundidad y mucha amplitud</strong>.</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>Por ejemplo, permisos de solo lectura en casi todas las secciones.</code></pre>
 </div></div>
 </div></div>
 </li>
-<li>
-<p>
-<strong>Herencia de roles</strong>: Se podrán heredar tantos roles como queramos, adoptando sus ACLs.
-</p>
-<div class="openblock">
-<div class="content">
-<div class="paragraph"><p>Cuando heredemos un rol, observaremos como en el árbol cambia, activándose los nuevos ACLs.</p></div>
-<div class="paragraph"><p>Junto a cada ACL que provenga de uno o varios roles heredados, aparecerá un icono. Al pasar el ratón sobre él nos aparecerá información a cerca de qué roles procede.</p></div>
-<div class="paragraph"><p>Se podrán heredar dos tipos de roles:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<strong>Roles normales</strong>: Son los roles creados a través del WAT. Serán los que <strong>se muestran en la lista de roles</strong> y se pueden asignar a los administradores.
-</p>
-</li>
-<li>
-<p>
-<strong>Roles internos</strong>: Estos roles son roles especiales que vienen en la instalación de QVD y no pueden ser gestionados ni asignados a un administrador. <strong>No saldrán en la lista de roles</strong>.
-</p>
-<div class="openblock">
-<div class="content">
-<div class="paragraph"><p>Estos roles solamente aparecen como roles heredables en la gestión de un rol.</p></div>
-<div class="paragraph"><p>Están pensados para facilitar la gestión de roles abstrayendo al administrador de los ACLs.</p></div>
-<div class="paragraph"><p>Los nombres de los roles internos son descriptivos de los ACLs que poseen.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>Por ejemplo: Users Creator, Images Operator, VMs Manager o Master.</code></pre>
-</div></div>
-<div class="paragraph"><p>No obstante heredándolos en un rol y observando los cambios en el árbol de ACLs podemos observar los ACLs que nos aportarán.</p></div>
-</div></div>
-</li>
 </ul></div>
-<div class="paragraph"><p>Para conocer los roles, tanto internos como normales, que una instalación de QVD incluye, ver Referencia de roles en el manual.</p></div>
-<div class="paragraph"><p>Un inconveniente de la herencia es que si en el futuro <strong>cambian los ACLs de un rol</strong>, todos los que lo hereden sufrirán cambios con él. Por eso hay que utilizar esta técnica con cuidado.</p></div>
-<div class="paragraph"><p>Otro inconveniente son las futuras actualizaciones del WAT dónde puedan aparecer <strong>nuevos ACLs</strong>. Para evitar esto heredaremos, en la medida de lo posible, los roles Internos para configurar nuestros roles. Estos roles, serán actualizados con el WAT, conteniendo los nuevos ACLs de una forma coherente con su uso.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>Por ejemplo: Si se añadie un nuevo campo en la vista de usuarios, el ACL que permita su visualización será añadido el rol interno Users Reader. Los roles que hereden de este rol interno, se actualizarán y no perderán funcionalidad, evitando molestas revisiones de los roles en cada actualización.</code></pre>
-</div></div>
 </div></div>
 </li>
 </ul></div>
@@ -1911,7 +1920,2733 @@ En la vista detalle tenemos <strong>dos herramientas</strong> disponibles:
 </div>
 </div>
 <div class="sect1">
-<h2 id="_propiedades_libres">7. Propiedades libres</h2>
+<h2 id="_referencia_de_acls_plantillas_y_roles">7. Referencia de ACLs, Plantillas y Roles</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>En la siguiente guía de referencia se describen los diferentes ACLs del sistema así como las Plantillas y los Roles predefinidos.</p></div>
+<div class="sect2">
+<h3 id="_referencia_de_acls">7.1. Referencia de ACLs</h3>
+<div class="paragraph"><p>Lista de ACLs repartidos por los distintos tipos de objetos a los que afectan. Cada categoría tiene una tabla donde hay una descipción corta, el código interno y una descripción más detallada para cada uno de los ACLs.</p></div>
+<div class="sect3">
+<h4 id="_acls_de_usuarios">7.1.1. ACLs de Usuarios</h4>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+<thead>
+<tr>
+<th align="left" valign="top">ACL    </th>
+<th align="left" valign="top">ACL code       </th>
+<th align="left" valign="top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Create users</strong></p></td>
+<td align="left" valign="top"><p class="table">user.create.</p></td>
+<td align="left" valign="top"><p class="table">Creation of users including initial settings for name and password.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Set properties on users in creation</strong></p></td>
+<td align="left" valign="top"><p class="table">user.create.properties</p></td>
+<td align="left" valign="top"><p class="table">Setting of custom properties in the creation process of users.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete users (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">user.delete-massive.</p></td>
+<td align="left" valign="top"><p class="table">Deletion of users massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete users</strong></p></td>
+<td align="left" valign="top"><p class="table">user.delete.</p></td>
+<td align="left" valign="top"><p class="table">Deletion of users one by one.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter users by blocking status</strong></p></td>
+<td align="left" valign="top"><p class="table">user.filter.block</p></td>
+<td align="left" valign="top"><p class="table">Filter of users list by disk image&#8217;s blocking status</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter users by creator</strong></p></td>
+<td align="left" valign="top"><p class="table">user.filter.created-by</p></td>
+<td align="left" valign="top"><p class="table">Filter of users list by administrator who created it</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter users by creation date</strong></p></td>
+<td align="left" valign="top"><p class="table">user.filter.creation-date</p></td>
+<td align="left" valign="top"><p class="table">Filter of users list by date when it was created</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter users by name</strong></p></td>
+<td align="left" valign="top"><p class="table">user.filter.name</p></td>
+<td align="left" valign="top"><p class="table">Filter of users list by user&#8217;s name.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter users by properties</strong></p></td>
+<td align="left" valign="top"><p class="table">user.filter.properties</p></td>
+<td align="left" valign="top"><p class="table">Filter of users list by desired custom property.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Access to user&#8217;s details view</strong></p></td>
+<td align="left" valign="top"><p class="table">user.see-details.</p></td>
+<td align="left" valign="top"><p class="table">This ACL grants the access to the details view. The minimum data on it is name</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Access to user&#8217;s main section</strong></p></td>
+<td align="left" valign="top"><p class="table">user.see-main.</p></td>
+<td align="left" valign="top"><p class="table">This ACL grants the access to the list. The minimum data on it is name</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See user&#8217;s blocking state</strong></p></td>
+<td align="left" valign="top"><p class="table">user.see.block</p></td>
+<td align="left" valign="top"><p class="table">Blocking state (blocked/unblocked) of users</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See user&#8217;s creator</strong></p></td>
+<td align="left" valign="top"><p class="table">user.see.created-by</p></td>
+<td align="left" valign="top"><p class="table">WAT administrator who created a user.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See user&#8217;s creation date</strong></p></td>
+<td align="left" valign="top"><p class="table">user.see.creation-date</p></td>
+<td align="left" valign="top"><p class="table">Datetime when a user was created</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See user&#8217;s ID</strong></p></td>
+<td align="left" valign="top"><p class="table">user.see.id</p></td>
+<td align="left" valign="top"><p class="table">The database identiefier of the users. Useful to make calls from CLI.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See user&#8217;s properties</strong></p></td>
+<td align="left" valign="top"><p class="table">user.see.properties</p></td>
+<td align="left" valign="top"><p class="table">The custom properties of the users.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See user&#8217;s virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table">user.see.vm-list</p></td>
+<td align="left" valign="top"><p class="table">See the virtual machines of one user in his details view. This view will contain: name, state, block and expire information of each vm</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See user&#8217;s virtual machines' blocking state</strong></p></td>
+<td align="left" valign="top"><p class="table">user.see.vm-list-block</p></td>
+<td align="left" valign="top"><p class="table">Blocking info of the virtual machines shown in user details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See user&#8217;s virtual machines' expiration</strong></p></td>
+<td align="left" valign="top"><p class="table">user.see.vm-list-expiration</p></td>
+<td align="left" valign="top"><p class="table">Expiration info of the virtual machines shown in user details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See user&#8217;s virtual machines' running state</strong></p></td>
+<td align="left" valign="top"><p class="table">user.see.vm-list-state</p></td>
+<td align="left" valign="top"><p class="table">State (stopped/started) of the virtual machines shown in user details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See user&#8217;s virtual machines' user state</strong></p></td>
+<td align="left" valign="top"><p class="table">user.see.vm-list-user-state</p></td>
+<td align="left" valign="top"><p class="table">User state (connected/disconnected)) of the virtual machines shown in user details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See number of user&#8217;s virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table">user.see.vms-info</p></td>
+<td align="left" valign="top"><p class="table">Total and connected virtual machines of this user</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See statistics of number of users</strong></p></td>
+<td align="left" valign="top"><p class="table">user.stats.blocked</p></td>
+<td align="left" valign="top"><p class="table">Total of blocked users in current tenant or all system for superadministrators.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See statistics of number of blocked users</strong></p></td>
+<td align="left" valign="top"><p class="table">user.stats.summary</p></td>
+<td align="left" valign="top"><p class="table">Total of users in current tenant or all system for superadministrators.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Block-Unblock users (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">user.update-massive.block</p></td>
+<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of users massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Create properties when update users (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">user.update-massive.properties-create</p></td>
+<td align="left" valign="top"><p class="table">Create properties in user&#8217;s massive update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete properties when update users (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">user.update-massive.properties-delete</p></td>
+<td align="left" valign="top"><p class="table">Update properties in user&#8217;s massive update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Change properties when update users (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">user.update-massive.properties-update</p></td>
+<td align="left" valign="top"><p class="table">Delete properties in user&#8217;s massive update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Block-Unblock users</strong></p></td>
+<td align="left" valign="top"><p class="table">user.update.block</p></td>
+<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of users one by one.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update user&#8217;s password</strong></p></td>
+<td align="left" valign="top"><p class="table">user.update.password</p></td>
+<td align="left" valign="top"><p class="table">Update the password of users.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Create properties when update users</strong></p></td>
+<td align="left" valign="top"><p class="table">user.update.properties-create</p></td>
+<td align="left" valign="top"><p class="table">Create properties in user&#8217;s one by one update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete properties when update users</strong></p></td>
+<td align="left" valign="top"><p class="table">user.update.properties-delete</p></td>
+<td align="left" valign="top"><p class="table">Update properties in user&#8217;s one by one update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Change properties when update users</strong></p></td>
+<td align="left" valign="top"><p class="table">user.update.properties-update</p></td>
+<td align="left" valign="top"><p class="table">Delete properties in user&#8217;s one by one update process.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_acls_de_máquinas_virtuales">7.1.2. ACLs de Máquinas virtuales</h4>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+<thead>
+<tr>
+<th align="left" valign="top">ACL    </th>
+<th align="left" valign="top">ACL code       </th>
+<th align="left" valign="top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Create virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.create.</p></td>
+<td align="left" valign="top"><p class="table">Creation of virtual machines including initial setting for name, user and OS flavour.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Set tag in virtual macine&#8217;s creation</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.create.di-tag</p></td>
+<td align="left" valign="top"><p class="table">Setting of disk image&#8217;s tag in the creation process of virtual machines. Without this ACL, the system will set <em>default</em> automatically.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Set properties in virtual machine&#8217;s creation</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.create.properties</p></td>
+<td align="left" valign="top"><p class="table">Setting of custom properties in the creation process of virtual machines.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete virtual machines (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.delete-massive.</p></td>
+<td align="left" valign="top"><p class="table">Deletion of virtual machines massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.delete.</p></td>
+<td align="left" valign="top"><p class="table">Deletion of virtual machines one by one.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by creator</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.filter.created-by</p></td>
+<td align="left" valign="top"><p class="table">Filter of virtual machines list by administrator who created it</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by creation date</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.filter.creation-date</p></td>
+<td align="left" valign="top"><p class="table">Filter of virtual machines list by date when it was created</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by expiration date</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.filter.expiration-date</p></td>
+<td align="left" valign="top"><p class="table">Filter of virtual machines list by date when it will expire. This is refered to the hard expiration.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by host</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.filter.host</p></td>
+<td align="left" valign="top"><p class="table">Filter of virtual machines list by host where the virtual machines are running.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by name</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.filter.name</p></td>
+<td align="left" valign="top"><p class="table">Filter of virtual machines list by virtual machine&#8217;s name</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by OS Flavour</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.filter.osf</p></td>
+<td align="left" valign="top"><p class="table">Filter of virtual machines list by OS flavour assigned to the virtual machine.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by properties</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.filter.properties</p></td>
+<td align="left" valign="top"><p class="table">Filter of virtual machines list by desired custom property.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by running state</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.filter.state</p></td>
+<td align="left" valign="top"><p class="table">Filter of virtual machines list by virtual machine&#8217;s state (stopped/started)</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by user</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.filter.user</p></td>
+<td align="left" valign="top"><p class="table">Filter of virtual machines list by user who the virtual machines belong.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Access to virtual machine&#8217;s details view</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see-details.</p></td>
+<td align="left" valign="top"><p class="table">This ACL grants the access to the details view. The minimum data on it is name</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Access to virtual machine&#8217;s main section</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see-main.</p></td>
+<td align="left" valign="top"><p class="table">This ACL grants the access to the list. The minimum data on it is disk_image</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s blocking status</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see.block</p></td>
+<td align="left" valign="top"><p class="table">Blocking state (blocked/unblocked) of virtual machines</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s creator</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see.created-by</p></td>
+<td align="left" valign="top"><p class="table">WAT administrator who created a virtual machine.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s creation date</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see.creation-date</p></td>
+<td align="left" valign="top"><p class="table">Datetime when a virtual machine was created</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s disk image</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see.di</p></td>
+<td align="left" valign="top"><p class="table">Disk images used by each virtual machine</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s disk image&#8217;s tag</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see.di-tag</p></td>
+<td align="left" valign="top"><p class="table">Disk image&#8217;s tag assigned in each virtual machine to define which disk image will be used.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s disk image&#8217;s version</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see.di-version</p></td>
+<td align="left" valign="top"><p class="table">Disk image&#8217;s version used by each virtual machine</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s Expiration</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see.expiration</p></td>
+<td align="left" valign="top"><p class="table">Expiration info of the virtual machines.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s Node</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see.host</p></td>
+<td align="left" valign="top"><p class="table">Host where each virtual machines are running</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s ID</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see.id</p></td>
+<td align="left" valign="top"><p class="table">The database identiefier of the virtual machines. Useful to make calls from CLI.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s IP address</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see.ip</p></td>
+<td align="left" valign="top"><p class="table">Current IP addres of the virtual machines.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s MAC address</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see.mac</p></td>
+<td align="left" valign="top"><p class="table">MAC address of the virtual machines.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s IP address for next boot</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see.next-boot-ip</p></td>
+<td align="left" valign="top"><p class="table">IP address that will be assigned in the next boot of the virtual machines.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s OS Flavour</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see.osf</p></td>
+<td align="left" valign="top"><p class="table">OS flavours assigned to each virtual machine.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s Serial port</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see.port-serial</p></td>
+<td align="left" valign="top"><p class="table">Serial port assigned to a running virtual machine.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s SSH port</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see.port-ssh</p></td>
+<td align="left" valign="top"><p class="table">SSH port assigned to a running virtual machine.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s VNC port</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see.port-vnc</p></td>
+<td align="left" valign="top"><p class="table">VNC port assigned to a running virtual machine.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s properties</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see.properties</p></td>
+<td align="left" valign="top"><p class="table">The custom properties of the virtual machines.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s state</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see.state</p></td>
+<td align="left" valign="top"><p class="table">The status of the virtual machines (stopped/started)</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s user</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see.user</p></td>
+<td align="left" valign="top"><p class="table">The user owner of the virtual machines.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s user&#8217;s connection state</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see.user-state</p></td>
+<td align="left" valign="top"><p class="table">The user state of a virtual machine (connected/disconnected)</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See statistics of number of blocked virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.stats.blocked</p></td>
+<td align="left" valign="top"><p class="table">Total of blocked virtual machines in current tenant or all system for superadministrators.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See statistics of virtual machines close to expire</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.stats.close-to-expire</p></td>
+<td align="left" valign="top"><p class="table">Info of the virutal machines that will be expire (hard expiration) in next 7 days.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See statistics of running virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.stats.running-vms</p></td>
+<td align="left" valign="top"><p class="table">Total of running virtual machines in current tenant or all system for superadministrators.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See statistics of number of virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.stats.summary</p></td>
+<td align="left" valign="top"><p class="table">Total of virtual machines in current tenant or all system for superadministrators.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Block-Unblock virtual machines (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.update-massive.block</p></td>
+<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of virtual machines massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s tag (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.update-massive.di-tag</p></td>
+<td align="left" valign="top"><p class="table">Update the disk image&#8217;s tag setted on virtual machines massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Disconnect user from virtual machine (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.update-massive.disconnect-user</p></td>
+<td align="left" valign="top"><p class="table">Disconnect the user connected to virtual machines massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s expiration (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.update-massive.expiration</p></td>
+<td align="left" valign="top"><p class="table">Update the expiration date times of virtual machines massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Create properties when update virtual machines (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.update-massive.properties-create</p></td>
+<td align="left" valign="top"><p class="table">Create properties in virtual machine&#8217;s massive update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete properties when update virtual machines (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.update-massive.properties-delete</p></td>
+<td align="left" valign="top"><p class="table">Update properties in virtual machine&#8217;s massive update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Change properties when update virtual machines (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.update-massive.properties-update</p></td>
+<td align="left" valign="top"><p class="table">Delete properties in virtual machine&#8217;s massive update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Start-Stop virtual machines (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.update-massive.state</p></td>
+<td align="left" valign="top"><p class="table">Start/Stop virtual machines massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Block-Unblock virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.update.block</p></td>
+<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of virtual machines one by one.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s tag</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.update.di-tag</p></td>
+<td align="left" valign="top"><p class="table">Update the disk image&#8217;s tag setted on virtual machines one by one.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Disconnect user from virtual machine</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.update.disconnect-user</p></td>
+<td align="left" valign="top"><p class="table">Disconnect the user connected to virtual machines one by one.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s expiration</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.update.expiration</p></td>
+<td align="left" valign="top"><p class="table">Update the expiration date times of virtual machines one by one.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s name</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.update.name</p></td>
+<td align="left" valign="top"><p class="table">Update the name of virtual machines.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Create properties when update virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.update.properties-create</p></td>
+<td align="left" valign="top"><p class="table">Create properties in virtual machine&#8217;s one by one update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete properties when update virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.update.properties-delete</p></td>
+<td align="left" valign="top"><p class="table">Update properties in virtual machine&#8217;s one by one update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Change properties when update virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.update.properties-update</p></td>
+<td align="left" valign="top"><p class="table">Delete properties in virtual machine&#8217;s one by one update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Start-Stop virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.update.state</p></td>
+<td align="left" valign="top"><p class="table">Start/Stop virtual machines one by one.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_acls_de_nodos">7.1.3. ACLs de Nodos</h4>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+<thead>
+<tr>
+<th align="left" valign="top">ACL    </th>
+<th align="left" valign="top">ACL code       </th>
+<th align="left" valign="top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Create nodes</strong></p></td>
+<td align="left" valign="top"><p class="table">host.create.</p></td>
+<td align="left" valign="top"><p class="table">Creation of hosts including initial setting for name and address.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Set properties on nodes in creation</strong></p></td>
+<td align="left" valign="top"><p class="table">host.create.properties</p></td>
+<td align="left" valign="top"><p class="table">Setting of custom properties in the creation process of hosts.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete nodes (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">host.delete-massive.</p></td>
+<td align="left" valign="top"><p class="table">Deletion of hosts massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete nodes</strong></p></td>
+<td align="left" valign="top"><p class="table">host.delete.</p></td>
+<td align="left" valign="top"><p class="table">Deletion of hosts one by one.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter nodes by blocking status</strong></p></td>
+<td align="left" valign="top"><p class="table">host.filter.block</p></td>
+<td align="left" valign="top"><p class="table">Filter of hosts list by disk image&#8217;s blocking status</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter nodes by creator</strong></p></td>
+<td align="left" valign="top"><p class="table">host.filter.created-by</p></td>
+<td align="left" valign="top"><p class="table">Filter of hosts list by administrator who created it</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter nodes by creation date</strong></p></td>
+<td align="left" valign="top"><p class="table">host.filter.creation-date</p></td>
+<td align="left" valign="top"><p class="table">Filter of hosts list by date when it was created</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter nodes by name</strong></p></td>
+<td align="left" valign="top"><p class="table">host.filter.name</p></td>
+<td align="left" valign="top"><p class="table">Filter of hosts list by host&#8217;s name</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter nodes by properties</strong></p></td>
+<td align="left" valign="top"><p class="table">host.filter.properties</p></td>
+<td align="left" valign="top"><p class="table">Filter of hosts list by desired custom property.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter nodes by running state</strong></p></td>
+<td align="left" valign="top"><p class="table">host.filter.state</p></td>
+<td align="left" valign="top"><p class="table">Filter of hosts list by running state.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter nodes by virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table">host.filter.vm</p></td>
+<td align="left" valign="top"><p class="table">Filter of hosts list by virtual machine that is running in the host.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Access to node&#8217;s details view</strong></p></td>
+<td align="left" valign="top"><p class="table">host.see-details.</p></td>
+<td align="left" valign="top"><p class="table">This ACL grants the access to the details view. The minimum data on it is name</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Access to node&#8217;s main section</strong></p></td>
+<td align="left" valign="top"><p class="table">host.see-main.</p></td>
+<td align="left" valign="top"><p class="table">Access to hosts section (without it, it won&#8217;t appear in menu)</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See node&#8217;s IP address</strong></p></td>
+<td align="left" valign="top"><p class="table">host.see.address</p></td>
+<td align="left" valign="top"><p class="table">IP address of the hosts.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See node&#8217;s blocking state</strong></p></td>
+<td align="left" valign="top"><p class="table">host.see.block</p></td>
+<td align="left" valign="top"><p class="table">Blocking state (blocked/unblocked) of hosts</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See node&#8217;s creator</strong></p></td>
+<td align="left" valign="top"><p class="table">host.see.created-by</p></td>
+<td align="left" valign="top"><p class="table">WAT administrator who created a host.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See node&#8217;s creation date</strong></p></td>
+<td align="left" valign="top"><p class="table">host.see.creation-date</p></td>
+<td align="left" valign="top"><p class="table">Datetime when a host was created</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See node&#8217;s ID</strong></p></td>
+<td align="left" valign="top"><p class="table">host.see.id</p></td>
+<td align="left" valign="top"><p class="table">The database identiefier of the hosts. Useful to make calls from CLI.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See node&#8217;s properties</strong></p></td>
+<td align="left" valign="top"><p class="table">host.see.properties</p></td>
+<td align="left" valign="top"><p class="table">The custom properties of the hosts.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See node&#8217;s running state</strong></p></td>
+<td align="left" valign="top"><p class="table">host.see.state</p></td>
+<td align="left" valign="top"><p class="table">State of the hosts (stopped/started)</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See node&#8217;s running virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table">host.see.vm-list</p></td>
+<td align="left" valign="top"><p class="table">See the virtual machines running on one host in his details view. This view will contain: name, state, block and expire information of each vm</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See node&#8217;s running virtual machines' blocking state</strong></p></td>
+<td align="left" valign="top"><p class="table">host.see.vm-list-block</p></td>
+<td align="left" valign="top"><p class="table">Blocking info of the virtual machines shown in host details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See node&#8217;s running virtual machines' expiration</strong></p></td>
+<td align="left" valign="top"><p class="table">host.see.vm-list-expiration</p></td>
+<td align="left" valign="top"><p class="table">Expiration info of the virtual machines shown in host details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See node&#8217;s running virtual machines' running state</strong></p></td>
+<td align="left" valign="top"><p class="table">host.see.vm-list-state</p></td>
+<td align="left" valign="top"><p class="table">State (stopped/started) of the virtual machines shown in host details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See node&#8217;s running virtual machines' user state</strong></p></td>
+<td align="left" valign="top"><p class="table">host.see.vm-list-user-state</p></td>
+<td align="left" valign="top"><p class="table">User state (connected/disconnected) of the virtual machines shown in host details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See number of running vms running on nodes</strong></p></td>
+<td align="left" valign="top"><p class="table">host.see.vms-info</p></td>
+<td align="left" valign="top"><p class="table">Virtual machines information such as how many virtual machines are running in each host</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See statistics of number of blocked nodes</strong></p></td>
+<td align="left" valign="top"><p class="table">host.stats.blocked</p></td>
+<td align="left" valign="top"><p class="table">Total of blocked hosts in current tenant or all system for superadministrators.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See statistics of running nodes</strong></p></td>
+<td align="left" valign="top"><p class="table">host.stats.running-hosts</p></td>
+<td align="left" valign="top"><p class="table">Total of running hosts in current tenant or all system for superadministrators.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See statistics of number of nodes</strong></p></td>
+<td align="left" valign="top"><p class="table">host.stats.summary</p></td>
+<td align="left" valign="top"><p class="table">Total of hosts in current tenant or all system for superadministrators.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See statistics of nodes with most running Vms</strong></p></td>
+<td align="left" valign="top"><p class="table">host.stats.top-hosts-most-vms</p></td>
+<td align="left" valign="top"><p class="table">Top 5 of hosts with most running virtual machines.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Block-Unblock nodes (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">host.update-massive.block</p></td>
+<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of hosts massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Create properties when update nodes (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">host.update-massive.properties-create</p></td>
+<td align="left" valign="top"><p class="table">Create properties in host&#8217;s massive update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete properties when update nodes (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">host.update-massive.properties-delete</p></td>
+<td align="left" valign="top"><p class="table">Delete properties in host&#8217;s massive update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Change properties when update nodes (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">host.update-massive.properties-update</p></td>
+<td align="left" valign="top"><p class="table">Update properties in host&#8217;s massive update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Stop all virtual machines of a node (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">host.update-massive.stop-vms</p></td>
+<td align="left" valign="top"><p class="table">Stop all the virtual machines of hosts massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update node&#8217;s address</strong></p></td>
+<td align="left" valign="top"><p class="table">host.update.address</p></td>
+<td align="left" valign="top"><p class="table">Update the IP address of the hosts.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Block-Unblock nodes</strong></p></td>
+<td align="left" valign="top"><p class="table">host.update.block</p></td>
+<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of hosts one by one.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update node&#8217;s name</strong></p></td>
+<td align="left" valign="top"><p class="table">host.update.name</p></td>
+<td align="left" valign="top"><p class="table">Update the name of the hosts.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Create properties when update nodes</strong></p></td>
+<td align="left" valign="top"><p class="table">host.update.properties-create</p></td>
+<td align="left" valign="top"><p class="table">Create properties in host&#8217;s one by one update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete properties when update nodes</strong></p></td>
+<td align="left" valign="top"><p class="table">host.update.properties-delete</p></td>
+<td align="left" valign="top"><p class="table">Delete properties in host&#8217;s one by one update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Change properties when update nodes</strong></p></td>
+<td align="left" valign="top"><p class="table">host.update.properties-update</p></td>
+<td align="left" valign="top"><p class="table">Update properties in host&#8217;s one by one update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Stop all virtual machines of a node</strong></p></td>
+<td align="left" valign="top"><p class="table">host.update.stop-vms</p></td>
+<td align="left" valign="top"><p class="table">Stop all the virtual machines of hosts one by one.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_acls_de_osfs">7.1.4. ACLs de OSFs</h4>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+<thead>
+<tr>
+<th align="left" valign="top">ACL    </th>
+<th align="left" valign="top">ACL code       </th>
+<th align="left" valign="top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Create OS Flavours</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.create.</p></td>
+<td align="left" valign="top"><p class="table">Creation of OS flavours including initial setting for name.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Set memory in OS Flavour&#8217;s creation</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.create.memory</p></td>
+<td align="left" valign="top"><p class="table">Setting of memory in the creation process of OS flavours.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Set properties in OS Flavour&#8217;s creation</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.create.properties</p></td>
+<td align="left" valign="top"><p class="table">Setting of custom properties in the creation process of OS flavours.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Set user storage in OS Flavour&#8217;s creation</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.create.user-storage</p></td>
+<td align="left" valign="top"><p class="table">Setting of user storage in the creation process of OS flavours.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete OS Flavours (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.delete-massive.</p></td>
+<td align="left" valign="top"><p class="table">Deletion of OS flavours massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete OS Flavours</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.delete.</p></td>
+<td align="left" valign="top"><p class="table">Deletion of OS flavours one by one.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter OS Flavours by creator</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.filter.created-by</p></td>
+<td align="left" valign="top"><p class="table">Filter of OS flavours list by administrator who created it</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter OS Flavours by creation date</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.filter.creation-date</p></td>
+<td align="left" valign="top"><p class="table">Filter of OS flavours list by date when it was created</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter OS Flavours by disk image</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.filter.di</p></td>
+<td align="left" valign="top"><p class="table">Filter of OS flavours list by disk image&#8217;s that belong to the OSF.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter OS Flavours by name</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.filter.name</p></td>
+<td align="left" valign="top"><p class="table">Filter of OS flavours list by OSF&#8217;s name.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter OS Flavours by properties</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.filter.properties</p></td>
+<td align="left" valign="top"><p class="table">Filter of OSF flavours list by desired custom property.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter OS Flavours by virtual machine</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.filter.vm</p></td>
+<td align="left" valign="top"><p class="table">Filter of OS flavours list by virtual machines assigned to the OSFs.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Access to OS Flavour&#8217;s details view</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see-details.</p></td>
+<td align="left" valign="top"><p class="table">This ACL grants the access to the details view. The minimum data on it is name</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Access to OS Flavour&#8217;s main section</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see-main.</p></td>
+<td align="left" valign="top"><p class="table">This ACL grants the access to the list. The minimum data on it is nname</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s creator</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.created-by</p></td>
+<td align="left" valign="top"><p class="table">WAT administrator who created an OS flavour.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s creation date</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.creation-date</p></td>
+<td align="left" valign="top"><p class="table">Datetime when an OS flavour image was created</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s disk images</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.di-list</p></td>
+<td align="left" valign="top"><p class="table">See the disk images of this osf in his details view. This view will contain: name, block, tags, default, head and the feature of change which is default one</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s disk blocking state</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.di-list-block</p></td>
+<td align="left" valign="top"><p class="table">Blocking info of the disk images shown in osf details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s disk images' default state</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.di-list-default</p></td>
+<td align="left" valign="top"><p class="table">What of the Dis is the default one in osf details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Change OS Flavour&#8217;s disk images' default info</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.di-list-default-update</p></td>
+<td align="left" valign="top"><p class="table">Controls to change the default disk image of an osf in osf details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s disk images' head info</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.di-list-head</p></td>
+<td align="left" valign="top"><p class="table">What of the Dis is the head (last created) in osf details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s disk images' tags</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.di-list-tags</p></td>
+<td align="left" valign="top"><p class="table">Tags of the disk images shown in osf details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See number of OS Flavour&#8217;s disk images</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.dis-info</p></td>
+<td align="left" valign="top"><p class="table">Number of disk images assigned to each OS flavours</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s ID</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.id</p></td>
+<td align="left" valign="top"><p class="table">The database identiefier of the OS flavours. Useful to make calls from CLI.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s memory</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.memory</p></td>
+<td align="left" valign="top"><p class="table">Amount of memory in the OS flavours</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s overlay</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.overlay</p></td>
+<td align="left" valign="top"><p class="table">Overlay configuration of the OS flavours</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s properties</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.properties</p></td>
+<td align="left" valign="top"><p class="table">The custom properties of the OS flavours</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s user storage</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.user-storage</p></td>
+<td align="left" valign="top"><p class="table">User storage of the OS flavours</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.vm-list</p></td>
+<td align="left" valign="top"><p class="table">See the virtual machines using this osf in his details view. This view will contain: name, state, block, di tag and expire information of each vm</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s virtual machines' blocking state</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.vm-list-block</p></td>
+<td align="left" valign="top"><p class="table">Blocking info of the virtual machines shown in osf details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s virtual machines' expiration</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.vm-list-expiration</p></td>
+<td align="left" valign="top"><p class="table">Expiration info of the virtual machines shown in osf details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s virtual machines' running state</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.vm-list-state</p></td>
+<td align="left" valign="top"><p class="table">State (stopped/started) of the virtual machines shown in osf details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s virtual machines' user state</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.vm-list-user-state</p></td>
+<td align="left" valign="top"><p class="table">User state (connected/disconnected) of the virtual machines shown in osf details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See number of OS Flavour&#8217;s virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.vms-info</p></td>
+<td align="left" valign="top"><p class="table">Number of virtual machines that are using a Disk image of each OS flavours</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See statistics of number of OS Flavours</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.stats.summary</p></td>
+<td align="left" valign="top"><p class="table">Total of OS flavours in current tenant or all system for superadministrators.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s memory (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.update-massive.memory</p></td>
+<td align="left" valign="top"><p class="table">Update the memory of OSF flavours massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Create properties when update OS Flavours (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.update-massive.properties-create</p></td>
+<td align="left" valign="top"><p class="table">Create properties in OS flavour&#8217;s massive update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete properties when update OS Flavours (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.update-massive.properties-delete</p></td>
+<td align="left" valign="top"><p class="table">Update properties in OS flavour&#8217;s massive update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Change properties when update OS Flavours (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.update-massive.properties-update</p></td>
+<td align="left" valign="top"><p class="table">Delete properties in OS flavour&#8217;s massive update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s user storage (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.update-massive.user-storage</p></td>
+<td align="left" valign="top"><p class="table">Update the memory of OSF flavours massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s memory</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.update.memory</p></td>
+<td align="left" valign="top"><p class="table">Update the memory of OSF flavours one by one.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s name</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.update.name</p></td>
+<td align="left" valign="top"><p class="table">Update the name of OSF flavour&#8217;s.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Create properties when update OS Flavours</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.update.properties-create</p></td>
+<td align="left" valign="top"><p class="table">Create properties in OS flavour&#8217;s one by one update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete properties when update OS Flavours</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.update.properties-delete</p></td>
+<td align="left" valign="top"><p class="table">Update properties in OS flavour&#8217;s one by one update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Change properties when update OS Flavours</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.update.properties-update</p></td>
+<td align="left" valign="top"><p class="table">Delete properties in OS flavour&#8217;s one by one update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s user storage</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.update.user-storage</p></td>
+<td align="left" valign="top"><p class="table">Update the user storage of OSF flavours one by one.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_acls_de_imágenes_de_disco">7.1.5. ACLs de Imágenes de disco</h4>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+<thead>
+<tr>
+<th align="left" valign="top">ACL    </th>
+<th align="left" valign="top">ACL code       </th>
+<th align="left" valign="top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Create disk images</strong></p></td>
+<td align="left" valign="top"><p class="table">di.create.</p></td>
+<td align="left" valign="top"><p class="table">Creation of hosts including initial setting for disk image and OS flavour.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Set disk images as default on disk images creation</strong></p></td>
+<td align="left" valign="top"><p class="table">di.create.default</p></td>
+<td align="left" valign="top"><p class="table">Setting of disk image as default in the creation process of disk images.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Set properties on disk images creation</strong></p></td>
+<td align="left" valign="top"><p class="table">di.create.properties</p></td>
+<td align="left" valign="top"><p class="table">Setting of custom properties in the creation process of disk images.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Set tags on disk images creation</strong></p></td>
+<td align="left" valign="top"><p class="table">di.create.tags</p></td>
+<td align="left" valign="top"><p class="table">Setting of tags in the creation process of disk images.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Set version on disk images creation</strong></p></td>
+<td align="left" valign="top"><p class="table">di.create.version</p></td>
+<td align="left" valign="top"><p class="table">Setting of version in the creation process of disk images. Without this ACL, the system will set it automatically with a string based on the timestamp and an order digit.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete disk images (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">di.delete-massive.</p></td>
+<td align="left" valign="top"><p class="table">Deletion of disk images massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete disk images</strong></p></td>
+<td align="left" valign="top"><p class="table">di.delete.</p></td>
+<td align="left" valign="top"><p class="table">Deletion of disk images one by one.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter disk images by blocking status</strong></p></td>
+<td align="left" valign="top"><p class="table">di.filter.block</p></td>
+<td align="left" valign="top"><p class="table">Filter of disk images list by disk image&#8217;s blocking status</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter disk images by creator</strong></p></td>
+<td align="left" valign="top"><p class="table">di.filter.created-by</p></td>
+<td align="left" valign="top"><p class="table">Filter of disk images list by administrator who created it</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter disk images by creation date</strong></p></td>
+<td align="left" valign="top"><p class="table">di.filter.creation-date</p></td>
+<td align="left" valign="top"><p class="table">Filter of disk images list by date when it was created</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter disk images by DI&#8217;s name</strong></p></td>
+<td align="left" valign="top"><p class="table">di.filter.disk-image</p></td>
+<td align="left" valign="top"><p class="table">Filter of disk images list by disk image&#8217;s name</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter disk images by OS Flavour</strong></p></td>
+<td align="left" valign="top"><p class="table">di.filter.osf</p></td>
+<td align="left" valign="top"><p class="table">Filter of disk images list by OS flavour</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter disk images by properties</strong></p></td>
+<td align="left" valign="top"><p class="table">di.filter.properties</p></td>
+<td align="left" valign="top"><p class="table">Filter of disk images list by desired custom property.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Access to disk image&#8217;s details view</strong></p></td>
+<td align="left" valign="top"><p class="table">di.see-details.</p></td>
+<td align="left" valign="top"><p class="table">This ACL grants the access to the details view. The minimum data on it is disk image</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Access to disk image&#8217;s main section</strong></p></td>
+<td align="left" valign="top"><p class="table">di.see-main.</p></td>
+<td align="left" valign="top"><p class="table">This ACL grants the access to the list. The minimum data on it is disk_image</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s blocking state</strong></p></td>
+<td align="left" valign="top"><p class="table">di.see.block</p></td>
+<td align="left" valign="top"><p class="table">Blocking state of disk images</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s creator</strong></p></td>
+<td align="left" valign="top"><p class="table">di.see.created-by</p></td>
+<td align="left" valign="top"><p class="table">Wat administrator who created a disk image</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s creation date</strong></p></td>
+<td align="left" valign="top"><p class="table">di.see.creation-date</p></td>
+<td align="left" valign="top"><p class="table">Datetime when a disk image was created</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See OSF&#8217;s default disk image</strong></p></td>
+<td align="left" valign="top"><p class="table">di.see.default</p></td>
+<td align="left" valign="top"><p class="table">If a disk image is setted as default image within the OSF where it belongs</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See OSF&#8217;s last created disk image</strong></p></td>
+<td align="left" valign="top"><p class="table">di.see.head</p></td>
+<td align="left" valign="top"><p class="table">If a disk image is the last created image within the OSF where it belongs</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s ID</strong></p></td>
+<td align="left" valign="top"><p class="table">di.see.id</p></td>
+<td align="left" valign="top"><p class="table">The database identiefier of disk images. Useful to make calls from CLI.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s OS Flavour</strong></p></td>
+<td align="left" valign="top"><p class="table">di.see.osf</p></td>
+<td align="left" valign="top"><p class="table">The OS Flavour associated to the disk images.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s properties</strong></p></td>
+<td align="left" valign="top"><p class="table">di.see.properties</p></td>
+<td align="left" valign="top"><p class="table">The custom properties of the disk images.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s tags</strong></p></td>
+<td align="left" valign="top"><p class="table">di.see.tags</p></td>
+<td align="left" valign="top"><p class="table">The disk images tags</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s version</strong></p></td>
+<td align="left" valign="top"><p class="table">di.see.version</p></td>
+<td align="left" valign="top"><p class="table">The disk images version</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s list of virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table">di.see.vm-list</p></td>
+<td align="left" valign="top"><p class="table">Virtual machines using this image in his details view. This view will contain: name and tag of each vm</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See blocking state of VM&#8217;s list of DI&#8217;s</strong></p></td>
+<td align="left" valign="top"><p class="table">di.see.vm-list-block</p></td>
+<td align="left" valign="top"><p class="table">Blocking info of the virtual machines shown in DI details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See expiration of VM&#8217;s list of DI&#8217;s</strong></p></td>
+<td align="left" valign="top"><p class="table">di.see.vm-list-expiration</p></td>
+<td align="left" valign="top"><p class="table">Expiration info of the virtual machines shown in DI details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See running state of VM&#8217;s list of DI&#8217;s</strong></p></td>
+<td align="left" valign="top"><p class="table">di.see.vm-list-state</p></td>
+<td align="left" valign="top"><p class="table">State (stop/started) of the virtual machines shown in DI details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See user state of VM&#8217;s list of DI&#8217;s</strong></p></td>
+<td align="left" valign="top"><p class="table">di.see.vm-list-user-state</p></td>
+<td align="left" valign="top"><p class="table">User state (connected/disconnected) of the virtual machines shown in DI details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See statistics of number of blocked disk images</strong></p></td>
+<td align="left" valign="top"><p class="table">di.stats.blocked</p></td>
+<td align="left" valign="top"><p class="table">Total of blocked disk images in current tenant or all system for superadministrators.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See statistics of number of disk images</strong></p></td>
+<td align="left" valign="top"><p class="table">di.stats.summary</p></td>
+<td align="left" valign="top"><p class="table">Total of disk images in current tenant or all system for superadministrators.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Block-Unblock disk images (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">di.update-massive.block</p></td>
+<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of disk images massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Create properties when update disk images (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">di.update-massive.properties-create</p></td>
+<td align="left" valign="top"><p class="table">Create properties in disk image&#8217;s massive update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete properties when update disk images (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">di.update-massive.properties-delete</p></td>
+<td align="left" valign="top"><p class="table">Update properties in disk image&#8217;s massive update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Change properties when update disk images (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">di.update-massive.properties-update</p></td>
+<td align="left" valign="top"><p class="table">Delete properties in disk image&#8217;s massive update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update disk image&#8217;s tags (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">di.update-massive.tags</p></td>
+<td align="left" valign="top"><p class="table">Update the tags (create and delete) of disk images massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Block-Unblock disk images</strong></p></td>
+<td align="left" valign="top"><p class="table">di.update.block</p></td>
+<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of disk images one by one.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Set disk images as default</strong></p></td>
+<td align="left" valign="top"><p class="table">di.update.default</p></td>
+<td align="left" valign="top"><p class="table">Set as default a disk image in the OS flavour where it belongs.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Create properties when update disk images</strong></p></td>
+<td align="left" valign="top"><p class="table">di.update.properties-create</p></td>
+<td align="left" valign="top"><p class="table">Create properties in disk image&#8217;s one by one update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete properties when update disk images</strong></p></td>
+<td align="left" valign="top"><p class="table">di.update.properties-delete</p></td>
+<td align="left" valign="top"><p class="table">Update properties in disk image&#8217;s one by one update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Change properties when update disk images</strong></p></td>
+<td align="left" valign="top"><p class="table">di.update.properties-update</p></td>
+<td align="left" valign="top"><p class="table">Delete properties in disk image&#8217;s one by one update process.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update disk image&#8217;s tags</strong></p></td>
+<td align="left" valign="top"><p class="table">di.update.tags</p></td>
+<td align="left" valign="top"><p class="table">Update the tags (create and delete) of disk images one by one.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_acls_de_administradores">7.1.6. ACLs de Administradores</h4>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+<thead>
+<tr>
+<th align="left" valign="top">ACL    </th>
+<th align="left" valign="top">ACL code       </th>
+<th align="left" valign="top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Create administrators</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.create.</p></td>
+<td align="left" valign="top"><p class="table">Create WAT Administrators. It includes name and password setting</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Set language on administrator creation</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.create.language</p></td>
+<td align="left" valign="top"><p class="table">Setting of language in the creation process of administrators.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete administrators</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.delete-massive.</p></td>
+<td align="left" valign="top"><p class="table">Deletion of WAT administrators massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete administrators (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.delete.</p></td>
+<td align="left" valign="top"><p class="table">Deletion of WAT administrators one by one.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter administrators by creator</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.filter.created-by</p></td>
+<td align="left" valign="top"><p class="table">Filter of administrators list by administrator who created it</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter administrators by creation date</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.filter.creation-date</p></td>
+<td align="left" valign="top"><p class="table">Filter of administrators list by date when it were created</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter administrators by name</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.filter.name</p></td>
+<td align="left" valign="top"><p class="table">Filter of administrators list by administrator&#8217;s name</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Access to administrator&#8217;s details view</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.see-details.</p></td>
+<td align="left" valign="top"><p class="table">Access to details view of WAT administrators. This view includes name</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Access to administrator&#8217;s main section</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.see-main.</p></td>
+<td align="left" valign="top"><p class="table">Access to WAT Administrators section (without it, it won&#8217;t appear in menu). This list view includes name</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See administrator&#8217;s ACLs</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.see.acl-list</p></td>
+<td align="left" valign="top"><p class="table">Effective ACL list for a WAT administrator calculated from the assigned roles</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Source roles of Administrator&#8217;s ACL</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.see.acl-list-roles</p></td>
+<td align="left" valign="top"><p class="table">Which role is the origin of each effective acls in WAT administrator details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See disk administrator&#8217;s creator</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.see.created-by</p></td>
+<td align="left" valign="top"><p class="table">Wat administrator who created an administrator</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See disk administrator&#8217;s creation date</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.see.creation-date</p></td>
+<td align="left" valign="top"><p class="table">Datetime when an administrator was created</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See administrator&#8217;s ID</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.see.id</p></td>
+<td align="left" valign="top"><p class="table">The database identiefier of the WAT administrators. Useful to make calls from CLI.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See administrator&#8217;s language</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.see.language</p></td>
+<td align="left" valign="top"><p class="table">Language of the WAT administrators.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See administrator&#8217;s Roles</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.see.roles</p></td>
+<td align="left" valign="top"><p class="table">Assigned roles to the WAT administrator</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Assign-Unassign administrator&#8217;s roles</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.update.assign-role</p></td>
+<td align="left" valign="top"><p class="table">Assign roles to WAT administrators to give to them their ACLs.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update administrator&#8217;s language</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.update.language</p></td>
+<td align="left" valign="top"><p class="table">Update the language of administrators one by one.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Change administrator&#8217;s password</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.update.password</p></td>
+<td align="left" valign="top"><p class="table">Update WAT administrator password (it doesn&#8217;t include roles management)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_acls_de_roles">7.1.7. ACLs de Roles</h4>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+<thead>
+<tr>
+<th align="left" valign="top">ACL    </th>
+<th align="left" valign="top">ACL code       </th>
+<th align="left" valign="top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Create roles</strong></p></td>
+<td align="left" valign="top"><p class="table">role.create.</p></td>
+<td align="left" valign="top"><p class="table">Creation of roles including initial setting for name.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete roles (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">role.delete-massive.</p></td>
+<td align="left" valign="top"><p class="table">Deletion of roles massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Delete roles</strong></p></td>
+<td align="left" valign="top"><p class="table">role.delete.</p></td>
+<td align="left" valign="top"><p class="table">Deletion of roles one by one.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter roles by creator</strong></p></td>
+<td align="left" valign="top"><p class="table">role.filter.created-by</p></td>
+<td align="left" valign="top"><p class="table">Filter of roles list by administrator who created it</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter roles by creation date</strong></p></td>
+<td align="left" valign="top"><p class="table">role.filter.creation-date</p></td>
+<td align="left" valign="top"><p class="table">Filter of roles list by date when it was created</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Filter roles by name</strong></p></td>
+<td align="left" valign="top"><p class="table">role.filter.name</p></td>
+<td align="left" valign="top"><p class="table">Filter of roles list by role&#8217;s name</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Access to role&#8217;s details view</strong></p></td>
+<td align="left" valign="top"><p class="table">role.see-details.</p></td>
+<td align="left" valign="top"><p class="table">Access to details view of Roles. This view includes name</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Access to role&#8217;s main section</strong></p></td>
+<td align="left" valign="top"><p class="table">role.see-main.</p></td>
+<td align="left" valign="top"><p class="table">Access to the roles view. The minimum data on it is name</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See role&#8217;s acls</strong></p></td>
+<td align="left" valign="top"><p class="table">role.see.acl-list</p></td>
+<td align="left" valign="top"><p class="table">Effective ACL list for a role  calculated from the inherited roles</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See role&#8217;s acls' origin roles</strong></p></td>
+<td align="left" valign="top"><p class="table">role.see.acl-list-roles</p></td>
+<td align="left" valign="top"><p class="table">Which role is the origin of each effective acls in role details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See role&#8217;s creator</strong></p></td>
+<td align="left" valign="top"><p class="table">role.see.created-by</p></td>
+<td align="left" valign="top"><p class="table">Wat administrator who created a role</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See role&#8217;s creation date</strong></p></td>
+<td align="left" valign="top"><p class="table">role.see.creation-date</p></td>
+<td align="left" valign="top"><p class="table">Datetime when a role was created</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See role&#8217;s ID</strong></p></td>
+<td align="left" valign="top"><p class="table">role.see.id</p></td>
+<td align="left" valign="top"><p class="table">The database identiefier of the roles. Useful to make calls from CLI.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See role&#8217;s inherited roles</strong></p></td>
+<td align="left" valign="top"><p class="table">role.see.inherited-roles</p></td>
+<td align="left" valign="top"><p class="table">Inherited roles of a role.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Assign-Unassign role&#8217;s ACLs</strong></p></td>
+<td align="left" valign="top"><p class="table">role.update.assign-acl</p></td>
+<td align="left" valign="top"><p class="table">Add/Remove acl on role.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Assign-Unassign role&#8217;s inherited roles</strong></p></td>
+<td align="left" valign="top"><p class="table">role.update.assign-role</p></td>
+<td align="left" valign="top"><p class="table">Manage the inheritance of roles adding rolles in others.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update role&#8217;s name</strong></p></td>
+<td align="left" valign="top"><p class="table">role.update.name</p></td>
+<td align="left" valign="top"><p class="table">Update the name of roles.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_acls_de_vistas">7.1.8. ACLs de Vistas</h4>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+<thead>
+<tr>
+<th align="left" valign="top">ACL    </th>
+<th align="left" valign="top">ACL code       </th>
+<th align="left" valign="top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Access to default view&#8217;s main section</strong></p></td>
+<td align="left" valign="top"><p class="table">views.see-main.</p></td>
+<td align="left" valign="top"><p class="table">Access to WAT Customize section (without it, it won&#8217;t appear in menu).</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Set default columns on list views</strong></p></td>
+<td align="left" valign="top"><p class="table">views.update.columns</p></td>
+<td align="left" valign="top"><p class="table">Set what columns will be shown in list views by default by tenant</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Set default filters on list views for desktop</strong></p></td>
+<td align="left" valign="top"><p class="table">views.update.filters-desktop</p></td>
+<td align="left" valign="top"><p class="table">Set what filters will be shown in list views by default for desktop version by tenant</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Set default filters on list views for mobile</strong></p></td>
+<td align="left" valign="top"><p class="table">views.update.filters-mobile</p></td>
+<td align="left" valign="top"><p class="table">Set what filters will be shown in list views by default for mobile version by tenant</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_acls_de_configuración">7.1.9. ACLs de Configuración</h4>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+<thead>
+<tr>
+<th align="left" valign="top">ACL    </th>
+<th align="left" valign="top">ACL code       </th>
+<th align="left" valign="top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>QVD&#8217;s configuration management</strong></p></td>
+<td align="left" valign="top"><p class="table">config.qvd.</p></td>
+<td align="left" valign="top"><p class="table">Manage QVD configuration (add/update tokens).</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>WAT&#8217;s configuration management</strong></p></td>
+<td align="left" valign="top"><p class="table">config.wat.</p></td>
+<td align="left" valign="top"><p class="table">Manage WAT configuration (language&#8230;).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_referencia_de_plantillas">7.2. Referencia de Plantillas</h3>
+<div class="paragraph"><p>Lista de plantillas predefinidas en el sistema. Las plantillas son conjuntos de ACLs, pero al igual que los Roles, utilizan herencia entre ellas.</p></div>
+<div class="paragraph"><p>En esta guía de referencia se encuentran las plantillas predefinidas en el sistema incluyendo diagramas con la relación entre ellas.</p></div>
+<div class="sect3">
+<h4 id="_plantillas_primitivas">7.2.1. Plantillas primitivas</h4>
+<div class="paragraph"><p>Tienen asignados sólamente ACLs.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Notación
+</dt>
+<dd>
+<p>
+<span class="image">
+<img src="images/doc_images/Templates_Hierarchy_Legend_-_Primitives.png" alt="Templates_Hierarchy_Legend_-_Primitives.png" width="300px" />
+</span>
+</p>
+</dd>
+<dt class="hdlist1">
+Listado
+</dt>
+<dd>
+<div class="ulist"><ul>
+<li>
+<p>
+Administrators
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Administrators Creator
+</p>
+</li>
+<li>
+<p>
+Administrators Eraser
+</p>
+</li>
+<li>
+<p>
+Administrators Operator
+</p>
+</li>
+<li>
+<p>
+Administrators Reader
+</p>
+</li>
+<li>
+<p>
+Administrators Updater
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Configuration
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+QVD Config Manager
+</p>
+</li>
+<li>
+<p>
+WAT Config Manager
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Images
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Images Creator
+</p>
+</li>
+<li>
+<p>
+Images Eraser
+</p>
+</li>
+<li>
+<p>
+Images Operator
+</p>
+</li>
+<li>
+<p>
+Images Reader
+</p>
+</li>
+<li>
+<p>
+Images Updater
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
+</dd>
+</dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Nodes
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Nodes Creator
+</p>
+</li>
+<li>
+<p>
+Nodes Eraser
+</p>
+</li>
+<li>
+<p>
+Nodes Operator
+</p>
+</li>
+<li>
+<p>
+Nodes Reader
+</p>
+</li>
+<li>
+<p>
+Nodes Updater
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+OSFs
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+OSFs Creator
+</p>
+</li>
+<li>
+<p>
+OSFs Eraser
+</p>
+</li>
+<li>
+<p>
+OSFs Operator
+</p>
+</li>
+<li>
+<p>
+OSFs Reader
+</p>
+</li>
+<li>
+<p>
+OSFs Updater
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Roles
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Roles Creator
+</p>
+</li>
+<li>
+<p>
+Roles Eraser
+</p>
+</li>
+<li>
+<p>
+Roles Operator
+</p>
+</li>
+<li>
+<p>
+Roles Reader
+</p>
+</li>
+<li>
+<p>
+Roles Updater
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Users
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Users Creator
+</p>
+</li>
+<li>
+<p>
+Users Eraser
+</p>
+</li>
+<li>
+<p>
+Users Operator
+</p>
+</li>
+<li>
+<p>
+Users Reader
+</p>
+</li>
+<li>
+<p>
+Users Updater
+</p>
+</li>
+<li>
+<p>
+Users Operator
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Views
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Views Operator
+</p>
+</li>
+<li>
+<p>
+Views Reader
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+VMs
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+VMs Creator
+</p>
+</li>
+<li>
+<p>
+VMs Eraser
+</p>
+</li>
+<li>
+<p>
+VMs Operator
+</p>
+</li>
+<li>
+<p>
+VMs Reader
+</p>
+</li>
+<li>
+<p>
+VMs Updater
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
+</div>
+<div class="sect3">
+<h4 id="_plantillas_de_acción">7.2.2. Plantillas de acción</h4>
+<div class="paragraph"><p>Heredan Plantillas primitivas y compenden los ACLs relacionados por el tipo de acción de todos los elementos de QVD. Por ejemplo 'QVD Reader" reúne los permisos de lectura sobre Usuarios, Máquinas virtuales, OSFs e Imágenes de disco.*</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Notación
+</dt>
+<dd>
+<p>
+<span class="image">
+<img src="images/doc_images/Templates_Hierarchy_Legend_-_Action.png" alt="Templates_Hierarchy_Legend_-_Action.png" width="300px" />
+</span>
+</p>
+</dd>
+<dt class="hdlist1">
+Listado
+</dt>
+<dd>
+<div class="ulist"><ul>
+<li>
+<p>
+QVD Creator
+</p>
+<div class="openblock">
+<div class="content">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Hereda de
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Users Creator
+</p>
+</li>
+<li>
+<p>
+VMs Creator
+</p>
+</li>
+<li>
+<p>
+OSFs Creator
+</p>
+</li>
+<li>
+<p>
+Images Creator
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/Templates_Hierarchy_-_QVD_Creator.png" alt="Templates_Hierarchy_-_QVD_Creator.png" width="600px" />
+</span></p></div>
+</div></div>
+</li>
+<li>
+<p>
+QVD Updater
+</p>
+<div class="openblock">
+<div class="content">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Hereda de
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Users Updater
+</p>
+</li>
+<li>
+<p>
+VMs Updater
+</p>
+</li>
+<li>
+<p>
+OSFs Updater
+</p>
+</li>
+<li>
+<p>
+Images Updater
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/Templates_Hierarchy_-_QVD_Updater.png" alt="Templates_Hierarchy_-_QVD_Updater.png" width="600px" />
+</span></p></div>
+</div></div>
+</li>
+<li>
+<p>
+QVD Reader
+</p>
+<div class="openblock">
+<div class="content">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Hereda de
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Users Reader
+</p>
+</li>
+<li>
+<p>
+VMs Reader
+</p>
+</li>
+<li>
+<p>
+OSFs Reader
+</p>
+</li>
+<li>
+<p>
+Images Reader
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/Templates_Hierarchy_-_QVD_Reader.png" alt="Templates_Hierarchy_-_QVD_Reader.png" width="600px" />
+</span></p></div>
+</div></div>
+</li>
+<li>
+<p>
+QVD Operator
+</p>
+<div class="openblock">
+<div class="content">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Hereda de
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Users Operator
+</p>
+</li>
+<li>
+<p>
+VMs Operator
+</p>
+</li>
+<li>
+<p>
+OSFs Operator
+</p>
+</li>
+<li>
+<p>
+Images Operator
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/Templates_Hierarchy_-_QVD_Operator.png" alt="Templates_Hierarchy_-_QVD_Operator.png" width="600px" />
+</span></p></div>
+</div></div>
+</li>
+<li>
+<p>
+QVD Eraser
+</p>
+<div class="openblock">
+<div class="content">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Hereda de
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Users Eraser
+</p>
+</li>
+<li>
+<p>
+VMs Eraser
+</p>
+</li>
+<li>
+<p>
+OSFs Eraser
+</p>
+</li>
+<li>
+<p>
+Images Eraser
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/Templates_Hierarchy_-_QVD_Eraser.png" alt="Templates_Hierarchy_-_QVD_Eraser.png" width="600px" />
+</span></p></div>
+</div></div>
+</li>
+</ul></div>
+</dd>
+</dl></div>
+</div>
+<div class="sect3">
+<h4 id="_plantillas_de_gestión">7.2.3. Plantillas de gestión</h4>
+<div class="paragraph"><p>Heredan Plantillas primitivas y compenden los ACLs relacionados por el elemento afectado, otorgándole todos los tipos de acción posibles sobre él. Por ejemplo <em>Users Manager</em> reúne los permisos de lectura, operación, actualización, creación y borrado sobre los Usuarios de QVD.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Notación
+</dt>
+<dd>
+<p>
+<span class="image">
+<img src="images/doc_images/Templates_Hierarchy_Legend_-_Manager.png" alt="Templates_Hierarchy_Legend_-_Manager.png" width="300px" />
+</span>
+</p>
+</dd>
+<dt class="hdlist1">
+Listado
+</dt>
+<dd>
+<div class="ulist"><ul>
+<li>
+<p>
+Users Manager
+</p>
+<div class="openblock">
+<div class="content">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Hereda de
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Users Reader
+</p>
+</li>
+<li>
+<p>
+Users Creator
+</p>
+</li>
+<li>
+<p>
+Users Updater
+</p>
+</li>
+<li>
+<p>
+Users Operator
+</p>
+</li>
+<li>
+<p>
+Users Eraser
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/Templates_Hierarchy_-_Users_Manager.png" alt="Templates_Hierarchy_-_Users_Manager.png" width="600px" />
+</span></p></div>
+</div></div>
+</li>
+<li>
+<p>
+VMs Manager
+</p>
+<div class="openblock">
+<div class="content">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Hereda de
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+VMs Reader
+</p>
+</li>
+<li>
+<p>
+VMs Creator
+</p>
+</li>
+<li>
+<p>
+VMs Updater
+</p>
+</li>
+<li>
+<p>
+VMs Operator
+</p>
+</li>
+<li>
+<p>
+VMs Eraser
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/Templates_Hierarchy_-_VMs_Manager.png" alt="Templates_Hierarchy_-_VMs_Manager.png" width="600px" />
+</span></p></div>
+</div></div>
+</li>
+<li>
+<p>
+OSFs Manager
+</p>
+<div class="openblock">
+<div class="content">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Hereda de
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+OSFs Reader
+</p>
+</li>
+<li>
+<p>
+OSFs Creator
+</p>
+</li>
+<li>
+<p>
+OSFs Updater
+</p>
+</li>
+<li>
+<p>
+OSFs Operator
+</p>
+</li>
+<li>
+<p>
+OSFs Eraser
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/Templates_Hierarchy_-_OSFs_Manager.png" alt="Templates_Hierarchy_-_OSFs_Manager.png" width="600px" />
+</span></p></div>
+</div></div>
+</li>
+<li>
+<p>
+Images Manager
+</p>
+<div class="openblock">
+<div class="content">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Hereda de
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Images Reader
+</p>
+</li>
+<li>
+<p>
+Images Creator
+</p>
+</li>
+<li>
+<p>
+Images Updater
+</p>
+</li>
+<li>
+<p>
+Images Operator
+</p>
+</li>
+<li>
+<p>
+Images Eraser
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/Templates_Hierarchy_-_Images_Manager.png" alt="Templates_Hierarchy_-_Images_Manager.png" width="600px" />
+</span></p></div>
+</div></div>
+</li>
+<li>
+<p>
+Administrators Manager
+</p>
+<div class="openblock">
+<div class="content">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Hereda de
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Administrators Reader
+</p>
+</li>
+<li>
+<p>
+Administrators Creator
+</p>
+</li>
+<li>
+<p>
+Administrators Updater
+</p>
+</li>
+<li>
+<p>
+Administrators Operator
+</p>
+</li>
+<li>
+<p>
+Administrators Eraser
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/Templates_Hierarchy_-_Administrators_Manager.png" alt="Templates_Hierarchy_-_Administrators_Manager.png" width="600px" />
+</span></p></div>
+</div></div>
+</li>
+<li>
+<p>
+Roles Manager
+</p>
+<div class="openblock">
+<div class="content">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Hereda de
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Roles Reader
+</p>
+</li>
+<li>
+<p>
+Roles Creator
+</p>
+</li>
+<li>
+<p>
+Roles Updater
+</p>
+</li>
+<li>
+<p>
+Roles Operator
+</p>
+</li>
+<li>
+<p>
+Roles Eraser
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/Templates_Hierarchy_-_Roles_Manager.png" alt="Templates_Hierarchy_-_Roles_Manager.png" width="600px" />
+</span></p></div>
+</div></div>
+</li>
+<li>
+<p>
+Views Manager
+</p>
+<div class="openblock">
+<div class="content">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Hereda de
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Views Reader
+</p>
+</li>
+<li>
+<p>
+Views Operator
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/Templates_Hierarchy_-_Views_Manager.png" alt="Templates_Hierarchy_-_Views_Manager.png" width="600px" />
+</span></p></div>
+</div></div>
+</li>
+<li>
+<p>
+Nodes Manager
+</p>
+<div class="openblock">
+<div class="content">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Hereda de
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Nodes Reader
+</p>
+</li>
+<li>
+<p>
+Nodes Creator
+</p>
+</li>
+<li>
+<p>
+Nodes Updater
+</p>
+</li>
+<li>
+<p>
+Nodes Operator
+</p>
+</li>
+<li>
+<p>
+Nodes Eraser
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/Templates_Hierarchy_-_Nodes_Manager.png" alt="Templates_Hierarchy_-_Nodes_Manager.png" width="600px" />
+</span></p></div>
+</div></div>
+</li>
+</ul></div>
+</dd>
+</dl></div>
+</div>
+<div class="sect3">
+<h4 id="_plantillas_de_gestión_global_qvd_wat">7.2.4. Plantillas de gestión global (QVD/WAT)</h4>
+<div class="paragraph"><p>Heredan de las plantillas de gestión para formar una plantilla con los ACLs de gestión de todo QVD ó todo WAT.*</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Notación
+</dt>
+<dd>
+<p>
+<span class="image">
+<img src="images/doc_images/Templates_Hierarchy_Legend_-_Global_Manager.png" alt="Templates_Hierarchy_Legend_-_Global_Manager.png" width="300px" />
+</span>
+</p>
+</dd>
+<dt class="hdlist1">
+Listado
+</dt>
+<dd>
+<div class="ulist"><ul>
+<li>
+<p>
+WAT Manager
+</p>
+<div class="openblock">
+<div class="content">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Hereda de
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Views Manager
+</p>
+</li>
+<li>
+<p>
+Roles Manager
+</p>
+</li>
+<li>
+<p>
+Administrator Manager
+</p>
+</li>
+<li>
+<p>
+WAT Config Manager
+</p>
+</li>
+</ul></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Esquema
+</dt>
+<dd>
+<p>
+<span class="image">
+<img src="images/doc_images/Templates_Hierarchy_-_WAT_Manager.png" alt="Templates_Hierarchy_-_WAT_Manager.png" width="600px" />
+</span>
+</p>
+</dd>
+</dl></div>
+</div></div>
+</li>
+<li>
+<p>
+QVD Manager
+</p>
+<div class="openblock">
+<div class="content">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Hereda de
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Users Manager
+</p>
+</li>
+<li>
+<p>
+VMs Manager
+</p>
+</li>
+<li>
+<p>
+OSFs Manager
+</p>
+</li>
+<li>
+<p>
+Images Manager
+</p>
+</li>
+<li>
+<p>
+QVD Config Manager
+</p>
+</li>
+</ul></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Esquema
+</dt>
+<dd>
+<p>
+<span class="image">
+<img src="images/doc_images/Templates_Hierarchy_-_QVD_Manager.png" alt="Templates_Hierarchy_-_QVD_Manager.png" width="600px" />
+</span>
+</p>
+</dd>
+</dl></div>
+</div></div>
+</li>
+</ul></div>
+</dd>
+</dl></div>
+</div>
+<div class="sect3">
+<h4 id="_plantillas_maestras">7.2.5. Plantillas maestras</h4>
+<div class="paragraph"><p>Heredan de las Plantillas de gestión global formando una Plantilla con todos los ACLs. En esta tipología se encuentran dos plantillas:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Master
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Hereda de las plantillas de gestión global de QVD y WAT obteniendo todos los ACLs posibles excepto los de los Nodos.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Notación
+</dt>
+<dd>
+<p>
+<span class="image">
+<img src="images/doc_images/Templates_Hierarchy_Legend_-_Master.png" alt="Templates_Hierarchy_Legend_-_Master.png" width="300px" />
+</span>
+</p>
+</dd>
+<dt class="hdlist1">
+Esquema
+</dt>
+<dd>
+<p>
+<span class="image">
+<img src="images/doc_images/Templates_Hierarchy_-_Master.png" alt="Templates_Hierarchy_-_Master.png" width="600px" />
+</span>
+</p>
+</dd>
+</dl></div>
+</div></div>
+</li>
+<li>
+<p>
+Total master
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Hereda de la plantilla Master así como de la Plantilla de gestión de Nodos.*</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Notación
+</dt>
+<dd>
+<p>
+<span class="image">
+<img src="images/doc_images/Templates_Hierarchy_Legend_-_Total_Master.png" alt="Templates_Hierarchy_Legend_-_Total_Master.png" width="300px" />
+</span>
+</p>
+</dd>
+<dt class="hdlist1">
+Esquema
+</dt>
+<dd>
+<p>
+<span class="image">
+<img src="images/doc_images/Templates_Hierarchy_-_Total_Master.png" alt="Templates_Hierarchy_-_Total_Master.png" width="600px" />
+</span>
+</p>
+</dd>
+</dl></div>
+</div></div>
+</li>
+</ul></div>
+<div class="paragraph"><p>* Los nodos están fuera de la clasificación de QVD en las plantillas al ser elementos arquitectónicos físicos importantes. Tendrán sus propias plantillas de ACLs.</p></div>
+</div>
+<div class="sect3">
+<h4 id="_jerarquía_de_plantillas">7.2.6. Jerarquía de Plantillas</h4>
+<div class="paragraph"><p>En el siguiente esquema se observa de un solo vistazo toda la jerarquía de Plantillas.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/Templates_Hierarchy_Monotenant.png" alt="Templates_Hierarchy_Monotenant.png" width="960px" />
+</span></p></div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_referencia_de_roles">7.3. Referencia de Roles</h3>
+<div class="paragraph"><p>Esta es una referncia de los Roles del WAT que vienen por defecto en una instalación limpia de QVD.</p></div>
+<div class="paragraph"><p>Estos roles heredan la mayoría de los ACLs de plantillas.</p></div>
+<div class="paragraph"><p>Para evitar el mal funcionamiento indeseado, los roles por defecto estan <strong>bloqueados</strong>, por lo que no se podrán ni editar ni eliminar.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Lista de roles por defecto
+</dt>
+<dd>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Operador L1</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Este rol garantiza los permisos suficientes para poder ver los elementos de QVD aunque sin poder crear, editar, eliminar ni realizar cualquier otra acción sobre ellos. Es un <strong>rol de solo lectura</strong> enfocado a detección de problemas.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Hereda de
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+QVD Reader
+</p>
+</li>
+</ul></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Operador L2</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Este rol otorga los permisos del Operador L1 (de hecho, hereda ese rol) y además otorga permisos para realizar ciertas <strong>acciones operativas</strong> como iniciar/detener máquinas virtuales, desconectar usuarios o bloquear elementos.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Hereda de
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Operator L1
+</p>
+</li>
+<li>
+<p>
+QVD Operator
+</p>
+</li>
+</ul></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Operador L3</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Este rol otorga permisos totales para los elementos de QVD. Creación, Actualización, Operación y Eliminado. Además da acceso a los Nodos</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Hereda de
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+QVD Manager
+</p>
+</li>
+<li>
+<p>
+Node Manager
+</p>
+</li>
+</ul></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Root</strong>
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Este rol otorga <strong>poderes totales</strong> sobre todos los elementos de QVD y además del WAT: Administradores, roles, etc.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Hereda de
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Total Master
+</p>
+</li>
+</ul></div>
+</div></div>
+</li>
+</ul></div>
+</dd>
+</dl></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_propiedades_libres">8. Propiedades libres</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><strong>Los elementos de QVD tienen atributos</strong> como por ejemplo el nombre, su estado de bloqueo, su dirección IP asociada (en el caso de las máquinas virtuales o nodos) o la referencia a otros objetos de QVD a los que están asociados. Por ejemplo las imágenes de disco tienen asignado un OSF o las máquinas virtuales están unívocamente relacionadas con un usuario.</p></div>
 <div class="paragraph"><p>Todos estos atributos nos describen cómo son los objetos de QVD, nos permiten diferenciarlos del resto, nos dan información de qué dependencias tienen y nos enseñan a cerca de su comportamiento. Esta información será fija, aunque puede configurarse su visibilidad a través de los ACLs, pudiendo crearse roles de administradores que solo permitan ver parte de ellos.</p></div>
@@ -1937,11 +4672,11 @@ En la vista detalle tenemos <strong>dos herramientas</strong> disponibles:
 </div>
 </div>
 <div class="sect1">
-<h2 id="_acciones_masivas">8. Acciones masivas</h2>
+<h2 id="_acciones_masivas">9. Acciones masivas</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>En algunas vistas listado existe la posibilidad de realizar acciones masivas. Cuando esto sucede observaremos que la primera columna de la tabla listado es una columna de casillas de verificación.</p></div>
 <div class="sect2">
-<h3 id="_selección_de_elementos">8.1. Selección de elementos</h3>
+<h3 id="_selección_de_elementos">9.1. Selección de elementos</h3>
 <div class="paragraph"><p>Con la columna de casillas de verificación se podrán seleccionar los elementos a los que queramos aplicar la misma acción. Esta selección se puede hacer de uno en uno o de forma múltiple.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
@@ -2009,11 +4744,11 @@ Seleccionar todos los elementos del listado, incluyendo los de otras páginas
 </div>
 </div>
 <div class="sect2">
-<h3 id="_selector_de_acciones_masivas">8.2. Selector de acciones masivas</h3>
+<h3 id="_selector_de_acciones_masivas">9.2. Selector de acciones masivas</h3>
 <div class="paragraph"><p>De estar disponibles, debajo de la tabla de un listado, habrá un control de selección de acciones masivas. Bastará con seleccionar la acción deseada y hacer click en el botón <em>Aplicar</em> para llevarlas a cabo <strong>sobre los elementos seleccionados</strong>.</p></div>
 </div>
 <div class="sect2">
-<h3 id="_tipos_de_acciones_masivas">8.3. Tipos de acciones masivas</h3>
+<h3 id="_tipos_de_acciones_masivas">9.3. Tipos de acciones masivas</h3>
 <div class="paragraph"><p>Las acciones masivas pueden ser de diferente naturaleza:</p></div>
 <div class="ulist"><ul>
 <li>
@@ -2046,7 +4781,7 @@ Seleccionar todos los elementos del listado, incluyendo los de otras páginas
 </ul></div>
 </div>
 <div class="sect2">
-<h3 id="_restricción_de_acciones_masivas">8.4. Restricción de acciones masivas</h3>
+<h3 id="_restricción_de_acciones_masivas">9.4. Restricción de acciones masivas</h3>
 <div class="paragraph"><p>Por medio del control de ACLs, se puede permitir o no realizar las diversas acciones masivas <strong>con independencia de las acciones normales</strong>. Esto quiere decir que, por ejemplo, <em>la acción de eleminar una máquina virtual y la opción de eliminar máquinas virtuales a través de acciones masivas están reguladas por ACLs diferentes</em>.</p></div>
 </div>
 </div>
@@ -2055,7 +4790,7 @@ Seleccionar todos los elementos del listado, incluyendo los de otras páginas
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-04-20 08:47:43 CEST
+Last updated 2015-04-28 11:47:21 CEST
 </div>
 </div>
 </body>
