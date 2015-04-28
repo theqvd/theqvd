@@ -4577,7 +4577,7 @@ Hereda de
 <div class="ulist"><ul>
 <li>
 <p>
-Operator L1
+Operador L1
 </p>
 </li>
 <li>
@@ -4603,6 +4603,11 @@ Hereda de
 </dd>
 </dl></div>
 <div class="ulist"><ul>
+<li>
+<p>
+Operador L2
+</p>
+</li>
 <li>
 <p>
 QVD Manager
