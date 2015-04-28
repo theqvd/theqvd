@@ -157,7 +157,7 @@ En concreto, cuando la API recibe una _query_ efectúa estas comprobaciones de a
 
 === Herencia de acls
 
-Cada administrador tiene asociados varios roles. Los acls con los que cuenta un administrador son los acls operativos en sus roles. Un administrador tendrá disponible un acl **a** si y solo si **a** es un acl operativo en alguno de sus roles. Las relaciones de asignación entre administradores y roles se establecen en la base de datos en la tabla  `role_administrator_relations` que se corresponde con el objeto `QVD::DB::Result::Role_Administrator_Relation`.
+Cada administrador puede tener asociados varios roles. Los acls con los que cuenta un administrador son los acls operativos en sus roles. En principio, un administrador tendrá disponible un acl **a** si y solo si **a** es un acl operativo en alguno de sus roles. Las relaciones de asignación entre administradores y roles se establecen en la base de datos en la tabla  `role_administrator_relations` que se corresponde con el objeto `QVD::DB::Result::Role_Administrator_Relation`.
 
 Por su parte, un rol tiene asignados acls. Estos acls son los que, en principio, están operativos en él. Un rol admite tres tipos de asignaciones de acls:
 
@@ -202,18 +202,50 @@ Estos _schemas_ son, a su vez, vistas, pero no codificadas directamente en la ba
 
 === Sobrescritura de acls
 
-Existen ciertos contextos en los que el sistema sobrescribe el sistema de acls. Por ejemplo, en un determinado contexto, el administrador que consulta la API pudiera no recibir como operativos ciertos acls, que, sin embargo, sí pudiera tener asignados directamente o por herencia. O puede interesar que, en una determinada situación, el administración reciba siempre una lista determinada de acls, aunque esos acls no le hayan sido asignados ni directamente ni por herencia.
+Como se ha visto, el cálculo de los acls que tiene un administrador depende de los roles que tiene asignados. Sin embargo, ese conjunto de acls operativos para un administrador se puede sobrescribir, se puede modificar. Se ha creado un sistema que permite definir listas de acls que, en un contexto determinado, se le pueden  quitar o añadir a un  administrador o rol, con independencia de los acls que tenga asignados o heredados. En concreto, actualmente, se han definido dos casos de sobrescritura:
 
-La primera situación se da cuando el administrador no es superadministrador. No debería ser posible que tales administradores tengan permisos para administrar tenants, pues solo deben poder administrar los elementos de dentro de su tenant. Por tanto, 
+* Cuando el administrador no es superadministrador. En estos casos, con independencia de los roles que tenga asignados, se le anulan al administrador todos los acls que permitan gestionar tenants. Esto se debe a que, en estos contextos, el concepto de tenant debe quedar oculto, el sistema debe funcionar como si la diferencia entre tenants no existiera. 
 
-* Que un grupo de acls no sean nunca operativos para un administrador, con independencia de los roles que tenga asignados. 
+* Cuando el administrador es el administrador de recuperación. Este administrador no tiene asignado rol alguno. Sin embargo, mediante sobrescritura, se le añaden los acls necesarios para recuperar el sistema (relativos a tenants, roles, administradores y configuración). Gracias a ello, se asegura que siempre tenga los acls necesarios para llevar a cabo su cometido.
 
-* Que un grupo de acls estén siempre operativos para un administrador, con independencia de los roles que tenga asignados. 
+Mediante este sistema de sobrescritura de acls se puede forzar el particionado de las herramientas de administración de QVD. Eliminando grupos de acls es posible prohibir el acceso y/o visualización de ciertas partes del sistema. Esto es útil para una potencial separación de una versión libre y una versión _commercial_ del sistema. 
 
-* Que un grupo de acls estén econdidos para un administrador: no solo que no estén operativos con independencia de los roles que tenga asignados, sino que ni siquiera pueda visualizarlos como acls existentes en el sistema. 
+Para determinar en cada caso qué acls se deben sobrescribir, se usa `QVD::Admin4::AclsOverwriteList`. El constructor de esta clase toma como parámetro al administrador para el que se quiere efectuar la sobrescritura. Y el objeto resultante informa de los acls que deben sobrescribirse para él, mediante los siguientes  métodos:
 
-Para dar forma a cualquiera de estas situaciones, se necesitaría sobrescribir el sistema de acls estableciendo unas listas negras o listas blancas que, con independencia de aquel, quiten o añadan acls a los administradores. 
+* `acls_to_open_re`. Este método devuelve una expresión regular que define el conjunto de acls que deben habilitarse como operativos para el administrador.
 
-El segundo supuesto es el propio del administrador de recuperación. Este administrador nunca tiene roles asignados. Sin embargo, el sistema cuenta con una lista blanca de acls que se aplican al administrador si este es administrador de recuperación. De este modo, este tipo de administrador siempre tiene los mismos acls, pues no es posible configurarlos.
+* `acls_to_close_re`. Este método devuelve una expresión regular que define el conjunto de acls que deben prohibirse  para el administrador.
 
-El tercer supuesto es el propio de los administradores no superadministradores. Estos administradores, por definición, no pueden gestionar los tenants en sí, sino solo lo que exista dentro de su único tenant. Por tanto, para ellos no solo no tiene sentido que pudieran tener acls relativos a tenants, sino que tampoco tiene sentido que puedan visualizarlos. Por tanto, a estos administradores se les  aplica una lista negra que asegura que, con independencia de la asignación de roles que se les haga, van a poder ver ni tener ciertos acls.  
+* `acls_to_hide_re`. Este método devuelve una expresión regular que define el conjunto de acls que deben, no solo prohibirse, sino también esconderse,  para el administrador. Los acls arrojados por el método anterior son los que el administrador debe ver como no operativos para él. En cambio, los acls de este método son los acls que el administrador no debe ni siquiera ver que existen en el sistema.
+
+Como se ha dicho antes, las clases que permiten en todo el sistema ver qué acls están operativos en un administrador o rol son:
+
+
+* `QVD::DB::Result::Operative_Acls_In_Administrator` y
+
+* `QVD::DB::Result::Operative_Acls_In_Role`.
+
+Estas clases son _schemas_ de `DBIx::Class`. Son vistas que devuelven los acls operativos en cada administrador o rol. Es en estas vistas donde se efectúa la sobrescritura de acls. Para ello, se les ha colocado a las vistas  _placeholders_ que deben ser instanciados con el resultado de los métodos `acls_to_close_re`, `acls_to_open_re` y `acls_to_hide_re` de un objeto `QVD::Admin4::AclsOverwriteList` correspondiente al administrador para el cual se consultan los acls. Para instanciar estos _placeholders_ se usa el rasgo `bind` de `DBIx::Class`. 
+
+== Vistas configurables
+
+El WAT permite configurar qué elementos de los objetos de QVD se pueden ver. Por ejemplo, un administrador puede configurar si, para las máquinas virtuales, quiere que el WAT le muestre o no el nombre de la máquina, la ip, el usuario al que pertenece o el OSF al que está asociada. Esta configuración puede hacerse a nivel de tenant y de administrador. La configuración a nivel de tenant es la configuración por defecto para los administradores de cada tenant, y se puede sobrescribir después para cada administrador particular. Todo ello se guarda en las tablas `tenant_views_setups` y `administrator_views_setups` de la base de datos. En  cada una de las filas de estas tablas, se establece, para un tenant o administrador, si un elemento concreto debe mostrarse o no en un contexto determinado. En concreto, cada fila consta de estas columnas:
+
+* `qvd_object`. Establece el tipo de objeto de QVD para el cual se quiere mostrar u ocultar un elemento (`vm`, `user`...)
+* `field`. Establece el elemento que se quiere mostrar u ocultar. Para `vm`, por ejemplo, `name`, `ip`, `mac`, etc. Este es un campo libre en la base de datos. Los elementos que se guardan aquí son los que puede mostrar el WAT, que no son necesariamente idénticos a los que se contemplan en la API. 
+* `visible`. Tiene un valor booleano. Establece si el elemento en cuestión se quiere mostrar (`true`) u ocultar (`false`).
+* `device_type`. Establece el tipo de dispositivo (`mobile` o `desktop`) en el que se quiere mostrar u ocultar el elemento.
+* `view_type`. establece el tipo de contexto del WAT en el que se quiere mostrar u ocultar el elemento (`list`, `details` o `filters`).
+* Además, en la tabla `tenant_views_setups`, se identifica el tenant para el que se establece esa configuración en `tenant_id`; y, en `administrator_views_setups`, se establece el administrador para el que se configura en `administrator_id`.
+
+En resumen, para configurar en un tenant qué elementos de cada objeto de QVD se muestran en cada contexto del WAT, se introducen en la base de datos registros en la tabla `tenant_views_setups`. Cada uno de esos registros establece, para un determinado elemento de un objeto de QVD, en un contexto determinado, si tiene que mostrarse u ocultarse. Cada administrador de ese tenant puede después sobrescribir esa configuración introduciendo los registros correspondientes en la tabla `administrator_views_setups`. En adelante a este tipo de registros se le llamará _view_. En realidad, por defecto, todos los elementos del WAT son visibles a menos que existan _views_ que pidan lo contrario. Si un elemento determinado no tiene _views_ que hagan referencia a él, será un elemento visible en todo contexto. 
+
+La API, mediante la acción `current_admin_setup`, puede devolver las _views_ apropiadas para el administrador que hace la petición. Estas _views_ devueltas por la API serán, fundamentalmente, el resultado de cruzar las _views_ del tenant con las _views_ del administrador, donde, como se ha dicho, estas segundas sobrescriben a las primeras. Este juego de sobrescritura a partir de las tablas `tenant_views_setups` y `administrator_views_setups` lo hace una vista creada mediante `DBIx::Class`: `Operative_Views_In_Administrator`. Esta es la vista que consulta `current_admin_setup` para devolver las _views_ del administrador en funciones.
+
+=== Las _custom properties_
+
+Las _custom properties_ también son elementos susceptibles de ser mostrados u ocultados en el WAT de acuerdo con el sistema de _views_. Si una _property_ determinada no tuviera _views_ que hicieran referencia a ella, el WAT la mostraría en todos los contextos. Sin embargo, se ha considerado oportuno que las _properties_, por defecto, no se muestren. Para conseguir este efecto sin romper la lógica del WAT, es necesario que la API, por defecto, devuelva en `current_admin_setup`  _views_ que explícitamente marquen  cada _property_ como no visible en todos los contextos existentes. 
+
+De ello se encarga la vista `Operative_Views_In_Administrator`. Esta vista, además de calcular las _views_ de un administrador a partir del cruce de las _views_ de la base de datos, crea una serie de _views_ virtuales, no guardadas en la base de datos, pensadas para ocultar las _properties_ en todos los contextos existentes. Por supuesto, después, un administrador podría habilitar una _property_ para ser mostrada en un contexto determinado, mediante la creación de una _view_ real relativa a la _property_ en cuestión. Esta _view_ real sobrescribiría a la _view_ virtual correspondiente. Pero, a falta de ello, la API devuelve _views_ virtuales que ocultan las _properties_. El trabajo duro de creación de las _views_ virtuales lo hace una vista a la que se hace referencia desde `Operative_Views_In_Administrator`: la vista, codificada en la base de datos, `operative_views_in_tenants`. 
+
+Otra peculiaridad de las _custom properties_ es que pueden ser eliminadas del sistema. Los elementos de un objeto de QVD siempre existen en el sistema (las `vm` siempre tienen `ip` o `mac`). Sin embargo, las _properties_ pueden ser borradas. Cuando una _property_ se elimina del sistema, hay que borrar también las _views_ que pudiera tener asociadas. Para ello, a la acción de borrado de _properties_ de la base de datos se le ha añadido un _trigger_ que lanza una función de borrado de _views_. 
