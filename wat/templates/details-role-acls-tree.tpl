@@ -9,6 +9,11 @@
     $.each(sections, function (branch, branchName) {
         var pattern = aclPatterns[branch];
         
+        // If there are not ACLS in system for this pattern, not draw branch
+        if (branchStats[pattern].total == 0) {
+            return;
+        }
+        
         var disabledClass = '';
         if (branchStats[pattern].effective == 0) {
             disabledClass = 'disabled-branch';
@@ -37,6 +42,11 @@
     <%
     $.each(actions, function (branch, branchName) {
         var pattern = aclPatterns[branch];
+        
+        // If there are not ACLS in system for this pattern, not draw branch
+        if (branchStats[pattern].total == 0) {
+            return;
+        }
         
         var disabledClass = '';
         if (branchStats[pattern].effective == 0) {
