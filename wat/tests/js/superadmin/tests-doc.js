@@ -8,13 +8,12 @@ function languageDocTest() {
         }
     });
     
-        asyncTest("Screens Info modal doc", function() {
+        test("Screens Info modal doc", function() {
             // Number of Assertions we Expect
             var assertions = 0;
             
             assertions += Object.keys(Wat.I.docSections).length * DOC_AVAILABLE_LANGUAGES.length;
-
-            expect(assertions);
+            //expect(assertions);
             
             stop(assertions-1);
             
