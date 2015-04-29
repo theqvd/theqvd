@@ -1924,7 +1924,7 @@ Creación
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>Al crear una imagen escogeremos el <strong>fichero de imagen</strong>, <strong>la versión</strong> (si la dejamos en blanco se establecerá una versión automática basada en la fecha de creación) y <strong>el OSF</strong> donde queremos asociar la imagen. De forma opcional podemos marcarla como imagen <strong>por defecto</strong> para su OSF, añadirle <strong>tags</strong> y crearle <strong>propiedades</strong>.</p></div>
-<div class="paragraph"><p>El fichero de imagen se puede configurar de dos formas:</p></div>
+<div class="paragraph"><p>El fichero de imagen se puede configurar de tres formas:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1945,6 +1945,17 @@ Subiendo una imagen desde nuestra computadora:
 <div class="content">
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_di_create_upload.png" alt="screenshot_di_create_upload.png" width="960px" />
+</span></p></div>
+</div></div>
+</li>
+<li>
+<p>
+Proporcionando la URL de una imagen, que se descargará y alojará en el servidor:
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_di_create_url.png" alt="screenshot_di_create_url.png" width="960px" />
 </span></p></div>
 </div></div>
 </li>
