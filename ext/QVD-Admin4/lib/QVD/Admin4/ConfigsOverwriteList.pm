@@ -11,7 +11,7 @@ has 'admin_id', is => 'ro', isa => sub { my $name = shift; die "Invalid type for
 has 'admin', is => 'ro', isa => sub { my $name = shift; die "Invalid type for attribute admin" unless ref($name) eq 'QVD::DB::Result::Administrator'; };
 
 my $AT_GENERAL_LEVEL = '^(?!(vma|internal|client)\.)';
-my $AT_TENANT_LEVEL = '^$';
+my $AT_TENANT_LEVEL = '^auth\.';
 
 sub BUILD
 {

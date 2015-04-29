@@ -11,14 +11,51 @@ use Mojo::ByteStream 'b';
 use Deep::Encode;
 use File::Copy qw(copy move);
 
+# This plugin is the class intended to manage the API queries.
+# Almost all queries are processed by it
+
 plugin 'QVD::Admin4::REST';
 
-# MojoX::Session::Transport::WAT Package 
+# HELPERS
+
+# Intended to check and encode the JSON that receives the API as iunput
+
+helper (get_input_json => \&get_input_json); 
+
+# Intended to get the JSON query that the API receives, process it and return a response 
+
+helper (process_api_query => \&process_api_query); 
+
+# Every ACTION supported by the API can be related to one or more channels 
+# in the database. These channels notify when something happens in the database
+# that may change the output of the ACTION. 
+
+helper (get_action_channels => \&get_action_channels);
+
+# Helpers for authentication purposes.
+
+helper (get_auth_method => \&get_auth_method);
+helper (create_session => \&create_session);
+helper (update_session => \&update_session);
+helper (reject_access => \&reject_access);
+
+# Reports problems with disk images upload/download/copy in log
+
+helper (report_di_problem_in_log => \&report_di_problem_in_log);
+
+# Intended to avoid a max size for file uploads. 
+# Needed for disk images uploads.
 
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 0;
+
+# This var sets the place where disk images will be uploaded
+# It must be in the same filesystem that the storage/images directory
+# in order to avoid problems while moving the disk images after the upload
+# is accomplished.  
+
 $ENV{MOJO_TMPDIR} = app->qvd_admin4_api->_cfg('path.storage.images');
 
-#app->log( Mojo::Log->new( path => app->qvd_admin4_api->_cfg('wat.log.filename'), level => 'debug' ) );
+# This hook prints upload progress of large files in console
 
 app->hook(after_build_tx => sub {
     my ($tx, $app) = @_;
@@ -32,20 +69,17 @@ app->hook(after_build_tx => sub {
 		 })
 });
 
-any [qw(POST GET)] => '/info' => sub {
-  my $c = shift;
+# Intended to store log info about the API
 
-  $c->res->headers->header('Access-Control-Allow-Origin' => '*');
+app->log( Mojo::Log->new( path => app->qvd_admin4_api->_cfg('wat.log.filename'), level => 'debug' ) );
 
-  QVD::Config::reload();
-  my $localtime = localtime();
-  my $json = { status => 0,
-               server_datetime => $localtime,
-	       multitenant => $c->qvd_admin4_api->_cfg('wat.multitenant'),
-               version => { database => $c->qvd_admin4_api->database_version }};
+# Intended to set the daddress where the app is supposed to listen with hypnotoad
 
-  $c->render(json => $json );
-};
+app->config(hypnotoad => {listen => ['http://localhost:3000']});
+
+# Package that implements an ad hoc transport system for the sessions manager (MojoX::Session) 
+# According to MojoX::Session specifications, it must provide methods intended to get the session
+# id from the request and to set the session id in response.
 
 package MojoX::Session::Transport::WAT
 {
@@ -66,33 +100,40 @@ package MojoX::Session::Transport::WAT
     }
 }
 
-# GENERAL CONFIG AND PLUGINS
+######################
+######## URLS ########
+######################
 
-app->config(hypnotoad => {listen => ['http://localhost:3000']});
+# This url retrieves general info about the API.
+# This url can be accessed without authentication
 
-# HELPERS
+any [qw(POST GET)] => '/info' => sub {
+  my $c = shift;
 
-helper (api_info => \&api_info);
-helper (get_input_json => \&get_input_json);
-helper (process_api_query => \&process_api_query);
-helper (get_action_channels => \&get_action_channels);
-helper (get_auth_method => \&get_auth_method);
-helper (create_session => \&create_session);
-helper (update_session => \&update_session);
-helper (reject_access => \&reject_access);
-helper (report_di_problem_in_log => \&report_di_problem_in_log);
+  $c->res->headers->header('Access-Control-Allow-Origin' => '*');
 
-#######################
-### Routes Handlers ###
-#######################
+  QVD::Config::reload();
+  my $localtime = localtime();
+  my $json = { status => 0,
+               server_datetime => $localtime,
+	       multitenant => $c->qvd_admin4_api->_cfg('wat.multitenant'),
+               version => { database => $c->qvd_admin4_api->database_version }};
+
+  $c->render(json => $json );
+};
+
+# Mojolicious::Lite 'under' is intended to check authentication credentials
+# All urls written in this file after 'under' will be reached only after 
+# the 'under' function is executed and returns 'true'.
 
 under sub {
 
     my $c = shift;
 
-    $c->res->headers->header('Access-Control-Allow-Origin' => '*');
-    $c->res->headers->header('Access-Control-Expose-Headers' => 'sid');
-    QVD::Config::reload();
+    $c->res->headers->header('Access-Control-Allow-Origin' => '*'); # WAT requirement
+    $c->res->headers->header('Access-Control-Expose-Headers' => 'sid'); # WAT requirement
+    QVD::Config::reload(); # Needed to avoid QVD::Config refreshing problems
+
     my $json = $c->get_input_json;
     
     my %session_args = (
@@ -111,6 +152,8 @@ under sub {
 };
 
 
+# This is the main url in the API
+
 any [qw(POST GET)] => '/' => sub {
 
     my $c = shift;
@@ -118,10 +161,19 @@ any [qw(POST GET)] => '/' => sub {
     $c->inactivity_timeout(30000);     
     my $json = $c->get_input_json;
     my $response = $c->process_api_query($json);
-    deep_utf8_decode($response);
 
+# Retrieving the right encode is tricky. 
+# With this system accents and so on are supported. 
+# WARNING: we're rendering in json text mode. The json mode break the accents
+# Maybe a problem in Mojo?
+ 
+    deep_utf8_decode($response);
     $c->render(text => b(encode_json($response))->decode('UTF-8'));
 };
+
+
+# This websocket is intended to report the current state of the system in real time
+# number of vms running, number vms in a host and so on.
 
 websocket '/ws' => sub {
     my $c = shift;
@@ -130,8 +182,12 @@ websocket '/ws' => sub {
     my $json = $c->get_input_json;
     my $notification = 0;
 
-    my $res = $c->process_api_query($json);
-    $c->send(b(encode_json($res))->decode('UTF-8'));
+    my $res = $c->process_api_query($json);    $c->send(b(encode_json($res))->decode('UTF-8'));
+
+
+# For every action requested to the API we can get 0, 1 or more channels to listen in the
+# database. When the database notifies in those channels, this ws executes the action again 
+# and sends the updated info to the client 
 
     for my $channel ($c->get_action_channels($json))
     {
@@ -159,6 +215,11 @@ websocket '/ws' => sub {
         $c->app->log->debug("WebSocket closed with status $code");});
 };
 
+
+# URLs intended to DI creation
+# Three systems supported:
+
+# COPY OF DISK IMAGES FROM STAGING
 
 websocket '/staging' => sub {
     my $c = shift;
@@ -218,7 +279,7 @@ websocket '/staging' => sub {
 		  if ($response->{status} eq 0)
 		  {
 		      my $di_id = ${$response->{rows}}[0]->{id};
-		      eval { move("$images_path/$images_file","$images_path/".$di_id . '-' . $staging_file); die };
+		      eval { move("$images_path/$images_file","$images_path/".$di_id . '-' . $staging_file) };
 
 		      if ($@) 
 		      {
@@ -239,6 +300,9 @@ websocket '/staging' => sub {
               $c->send(b(encode_json($response))->decode('UTF-8')); }
         );
 };
+
+
+# UPLOAD OF DISK IMAGES
 
 any [qw(POST OPTIONS)] => '/di/upload' => sub {
 
@@ -286,6 +350,8 @@ any [qw(POST OPTIONS)] => '/di/upload' => sub {
     deep_utf8_decode($response);
     $c->render(text => b(encode_json($response))->decode('UTF-8'));
 };
+
+# DOWNLOAD OF DISK IMAGES
 
 websocket '/di/download' => sub {
     

@@ -12,7 +12,7 @@ my $ACTIONS =
 {
 
 sources_in_log => {type_of_action => 'ad_hoc',
-		       admin4method => 'sources_in_wat_log',
+		       admin4method => 'sources_in_log',
 		  acls => [qr/^(log\.see-(main|details)\.|(administrator|di|host|osf|role|tenant|user|vm)\.see\.log)$/],},
 
 log_get_list => {type_of_action => 'list',
@@ -353,7 +353,7 @@ tenant_delete => { type_of_action => 'delete',
 
 role_tiny_list => { type_of_action => 'tiny',
 		    admin4method => 'select',
-		   acls => [qr/^(administrator\.see|role\.see\.inherited)\.roles$/],
+		   acls => [qr/^(administrator\.see\.|role\.see\.inherited-)roles$/],
 		    qvd_object => 'Role'},
 
 role_get_list => { type_of_action => 'list',

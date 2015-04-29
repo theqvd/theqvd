@@ -107,7 +107,7 @@ sub process_query
 	   arguments => {},
 	   status => $e->code 
 	   
-	   )->report if $e;
+	   )->report if $e && $qvd_object_model;
     
        $e->throw if $e;
 

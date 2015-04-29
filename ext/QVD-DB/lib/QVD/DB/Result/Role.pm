@@ -2,7 +2,7 @@ package QVD::DB::Result::Role;
 use base qw/DBIx::Class/;
 use strict;
 use warnings;
-use QVD::DB;
+use QVD::DB::Simple qw(db);
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('roles');
@@ -46,8 +46,6 @@ sub update_log_entry_join_condition
 
 
 ##################
-
-my $DB;
 
 sub is_allowed_to
 {
@@ -101,11 +99,9 @@ sub acls_info
 sub reload_acls_info
 {
     my $self = shift;
-    $DB //= QVD::DB->new();
 
-    my @inherited_roles_ids = 
-	 map { $_->inherited_id } $DB->resultset('Role_Role_Relation')->search(
-	      {inheritor_id => $self->id})->all;
+    my $DB = db();
+    my @inherited_roles_ids = map { $_->inherited_id } $self->role_rels;
 
     my $rs = $DB->resultset('Operative_Acls_In_Role')->search(
 	{},{bind => ['^$','^$']})->search({role_id => [$self->id,@inherited_roles_ids], operative => 1});

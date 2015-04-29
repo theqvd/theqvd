@@ -143,9 +143,7 @@ my $ACLS_FOR_FIELDS =
 	     number_of_dis => [qr/^osf\.see\.dis-info$/],
 	     properties => [qr/^osf\.see\.properties$/] },
 
-    Role => { roles => [qr/^role\.see\.acl-list$/, 
-			qr/^role\.see\.acl-list-roles$/, 
-			qr/^role\.see\.inherited-roles$/],
+    Role => { roles => [qr/^role\.see\.(acl-list|(acl-list|inherited)-roles)$/],
 	      acls => [qr/^role\.see\.acl-list$/],
 	      number_of_acls => [qr/^role\.see\.acl-list$/] },
 
