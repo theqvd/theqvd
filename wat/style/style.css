@@ -3090,8 +3090,11 @@ td {
     margin-bottom: 0.1em;
     display: none; }
   .doc-text div.toclevel0, .doc-text div.toclevel1, .doc-text div.toclevel2, .doc-text div.toclevel3, .doc-text div.toclevel4 {
-    margin-top: 0;
+    margin-top: 5px;
     margin-bottom: 0; }
+  .doc-text div.toclevel1 {
+    margin-top: 9px;
+    margin-bottom: 4px; }
   .doc-text div.toclevel2 {
     margin-left: 2em;
     font-size: 0.9em; }

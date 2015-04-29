@@ -382,9 +382,13 @@
     }
 
     div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
-      margin-top: 0;
+      margin-top: 5px;
       margin-bottom: 0;
     }
+    div.toclevel1 {
+      margin-top: 9px;
+      margin-bottom: 4px;
+    }    
     div.toclevel2 {
       margin-left: 2em;
       font-size: 0.9em;
