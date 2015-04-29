@@ -1,7 +1,7 @@
 // Config
 Wat.WS = {
     websockets: {},
-    debug: 1,
+    debug: 0,
     openWebsocket: function (qvdObj, action, filters, arguments, fields, callback, stream, viewType) {        
         if ("WebSocket" in window) {
             if (Wat.WS.debug) {
