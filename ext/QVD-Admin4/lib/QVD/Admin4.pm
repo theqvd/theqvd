@@ -25,6 +25,9 @@ use Mojo::JSON qw(encode_json);
 
 our $VERSION = '0.01';
 
+# This class is a store with the functions intended to properly
+# execute the actions asked to the API.
+
 my $DB;
 
 #########################
@@ -91,7 +94,7 @@ sub get_extra_info_from_related_views
     $extra;
 }
 
-# Ad hoc function to tenant_view_get_list action in API
+# Ad hoc function for tenant_view_get_list action of API 
 
 sub tenant_view_get_list
 {
@@ -99,6 +102,11 @@ sub tenant_view_get_list
 
     my @rows;
     my $rs;
+
+# The table provided by $request is supposed to be a view
+# In DBIx::Class, views don't accept filters directly. But you can 
+# compose queries by adding 'search' methods in a recursive way.
+# So, in this case, filters are added in a second 'search' call
 
     eval { $rs = $DB->resultset($request->table)->search()->search(
 	       $request->filters,$request->modifiers);
@@ -110,12 +118,23 @@ sub tenant_view_get_list
       rows => \@rows};
 }
 
-# Ad hoc function to acl_get_list action in API
+# Ad hoc function for acl_get_list action of API
 
 sub acl_get_list
 {
     my ($self,$request) = @_;
     my (@rows, $rs);
+
+# The table provided by $request is supposed to be a view
+# In DBIx::Class, views don't accept filters directly. But you can 
+# compose queries by adding 'search' methods in a recursive way.
+# So, in this case, filters are added in a second 'search' call
+
+# This view needs to bind three placeholders. The values of the 
+# placeholders must be regular expresions that define lists of 
+# acls forbidden, allowed or hidden for the current administrator. 
+# Those lists of acls are the acls that should be overwritten 
+# over the regular assignation of acls for the administrator.
 
     my $admin = $request->get_parameter_value('administrator');
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin_id => $admin->id);
@@ -130,19 +149,29 @@ sub acl_get_list
       rows => \@rows};
 }
 
-# Ad hoc function to get_acls_in_admins action in API
+# Ad hoc function for get_acls_in_admins action of API
 
 sub get_acls_in_admins
 {
     my ($self,$request) = @_;
     my (@rows, $rs);
 
+# The table provided by $request is supposed to be a view
+# In DBIx::Class, views don't accept filters directly. But you can 
+# compose queries by adding 'search' methods in a recursive way.
+# So, in this case, filters are added in a second 'search' call
+
+# This view needs to bind three placeholders. The values of the 
+# placeholders must be regular expresions that define lists of 
+# acls forbidden, allowed or hidden for the current administrator. 
+# Those lists of acls are the acls that should be overwritten 
+# over the regular assignation of acls for the administrator.
+
     my $admin_id = $request->json_wrapper->get_filter_value('admin_id')
 	// $request->get_parameter_value('administrator')->id;
 
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin_id => $admin_id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
-
 
     eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
 	       $request->filters, $request->modifiers);
@@ -153,7 +182,7 @@ sub get_acls_in_admins
       rows => \@rows};
 }
 
-# Ad hoc function to get_acls_in_roles action in API
+# Ad hoc function for get_acls_in_roles action of API
 
 sub get_acls_in_roles
 {
@@ -163,6 +192,17 @@ sub get_acls_in_roles
     my $admin = $request->get_parameter_value('administrator');
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin => $admin, admin_id => $admin->id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_hide_re];
+
+# The table provided by $request is supposed to be a view
+# In DBIx::Class, views don't accept filters directly. But you can 
+# compose queries by adding 'search' methods in a recursive way.
+# So, in this case, filters are added in a second 'search' call
+
+# This view needs to bind two placeholders. The values of the 
+# placeholders must be regular expresions that define lists of 
+# acls forbidden or hidden for the current administrator. 
+# Those lists of acls are the acls that should be overwritten 
+# over the regular assignation of acls for the administrator.
 
     eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
 	       $request->filters, $request->modifiers);
@@ -239,7 +279,7 @@ sub delete
     $result;
 }
 
-# Ad hoc function to vm_delete action in API
+# Ad hoc function to vm_delete action of API
 
 sub vm_delete
 {
@@ -248,7 +288,7 @@ sub vm_delete
     $self->delete($request,conditions => [qw(vm_is_stopped)]);
 }
 
-# Ad hoc function to di_delete action in API
+# Ad hoc function to di_delete action of API
 
 sub di_delete {
     my ($self, $request) = @_;
@@ -327,7 +367,7 @@ sub create_related_objects
     }
 }
 
-# Ad hoc function to di_create action in API
+# Ad hoc function to di_create action of API
 
 sub di_create
 {
@@ -732,9 +772,12 @@ sub del_roles_to_role
 	$self->unassign_role_to_role($this_role,$id) 
     }
 
-    $this_role = $DB->resultset('Role')->search({id => $this_role->id})->first; # This is a reload of the object
-                                                                                # needed after deletion of roles
-                                                                                # in order to use the 'has_inherited_acl' of Role
+    # This is a reload of the object needed after deletion of roles
+    # in order to use the 'has_inherited_acl' method of Role.
+    # There must be a better solution... FIX ME
+
+    $this_role = $DB->resultset('Role')->search({id => $this_role->id})->first; 
+
     # Deletion of redundant acls after assignation of the new role
     for my $neg_acl_name ($this_role->get_negative_own_acl_names)
     {
@@ -894,6 +937,8 @@ sub vm_assign_host {
     }
 }
 
+# It dies unless the vm is stopped
+
 sub vm_is_stopped
 {
     my ($self,$vm) = @_;
@@ -901,6 +946,7 @@ sub vm_is_stopped
 	unless $vm->vm_runtime->vm_state eq 'stopped';
 }
 
+# It dies if the di has vm runtimes
 
 sub di_no_vm_runtimes
 {
@@ -909,6 +955,7 @@ sub di_no_vm_runtimes
 	unless $di->vm_runtimes->count == 0;
 }
 
+# It dies if the di has related vms  
 
 sub di_no_dependant_vms
 {
@@ -918,6 +965,9 @@ sub di_no_dependant_vms
         QVD::Admin4::Exception->throw(code => 7120, query => 'delete') 
 	    if $rs->count;
 }
+
+# When deleting a di with head or default tags, 
+# it reassigns head and default tags to other di 
 
 sub di_no_head_default_tags
 {
@@ -934,6 +984,8 @@ sub di_no_head_default_tags
     }
     return 1;
 }
+
+# When deleting a di, it deletes the related disk image 
 
 sub di_delete_disk_image
 {
@@ -1024,6 +1076,9 @@ sub current_admin_setup
 		     {administrator_id => $administrator->id})->all ]};
 }
 
+# This function receives an administrator and a list of acl patterns. 
+# And it returns the number of acls available for that administrator.
+
 sub get_number_of_acls_in_admin
 {
     my ($self,$administrator,$json_wrapper) = @_;
@@ -1032,6 +1087,13 @@ sub get_number_of_acls_in_admin
     $acl_patterns = ref($acl_patterns) ? $acl_patterns : [$acl_patterns];
     my $admin_id = $json_wrapper->get_filter_value('admin_id') //
         QVD::Admin4::Exception->throw(code=>'6220', object => 'admin_id');
+
+# This view needs to bind three placeholders. The values of the 
+# placeholders must be regular expresions that define lists of 
+# acls forbidden, allowed or hidden for the current administrator. 
+# Those lists of acls are the acls that should be overwritten 
+# over the regular assignation of acls for the administrator.
+
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin_id => $admin_id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
 
@@ -1041,6 +1103,9 @@ sub get_number_of_acls_in_admin
     $self->get_number_of_acls($rs,$acl_patterns);
 }
 
+# This function receives a role and a list of acl patterns. 
+# And it returns the number of acls available for that role.
+
 sub get_number_of_acls_in_role
 {
     my ($self,$administrator,$json_wrapper) = @_;
@@ -1049,6 +1114,13 @@ sub get_number_of_acls_in_role
     $acl_patterns = ref($acl_patterns) ? $acl_patterns : [$acl_patterns];
     my $role_id = $json_wrapper->get_filter_value('role_id') //
         QVD::Admin4::Exception->throw(code=>'6220', object => 'role_id');
+
+# This view needs to bind two placeholders. The values of the 
+# placeholders must be regular expresions that define lists of 
+# acls forbidden or hidden for the current administrator. 
+# Those lists of acls are the acls that should be overwritten 
+# over the regular assignation of acls for the administrator.
+
     my $aol = QVD::Admin4::AclsOverwriteList->new(admin => $administrator,admin_id => $administrator->id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_hide_re];
 
@@ -1085,6 +1157,7 @@ sub get_number_of_acls
     $output;
 }
 
+# Statistics functions
 
 sub users_count
 {
@@ -1178,7 +1251,6 @@ sub vms_with_expiration_date
 {
     my ($self,$admin) = @_;
 
-
     my $is_not_null = 'IS NOT NULL';
     my $rs = $DB->resultset('VM')->search(
 	{ 'osf.tenant_id' => $admin->tenants_scoop,
@@ -1216,11 +1288,19 @@ sub top_populated_hosts
     return [@hosts[0 .. $array_limit]];
 }
 
+# It returns the list of prefixes of the configuration tokens 
+# of the system: For example, for wat.multitenant, the prefix is
+# wat.
+
 sub config_preffix_get
 {
     my ($self,$admin,$json_wrapper) = @_;
     my @keys = cfg_keys; 
     my %preffix;
+
+# Several configuration tokens of the sistem are not allowed to be used from the API
+# The class QVD::Admin4::ConfigsOverwriteList provides the regex that defines the
+# tokens available from the API.
 
     my $col = QVD::Admin4::ConfigsOverwriteList->new(admin_id => $admin->id);
     my $col_re = $col->configs_to_show_re;
@@ -1247,6 +1327,10 @@ sub config_preffix_get
 sub config_get
 {
     my ($self,$admin,$json_wrapper) = @_;
+
+# Several configuration tokens of the sistem are not allowed to be used from the API
+# The class QVD::Admin4::ConfigsOverwriteList provides the regex that defines the
+# tokens available from the API.
 
     my $col = QVD::Admin4::ConfigsOverwriteList->new(admin_id => $admin->id);
     my $col_re = $col->configs_to_show_re;
@@ -1313,7 +1397,5 @@ sub config_ssl {
     { total => 1,
      rows => [ ] };
 }
-
-####################
 
 1;

@@ -14,18 +14,27 @@ use AnyEvent::Pg::Pool;
 use QVD::Config;
 use QVD::Admin4::LogReport;
 use Mojo::JSON qw(encode_json);
-use base qw(Mojolicious::Plugin);
+use base qw(Mojolicious::Plugin); # QVD::Admin4::REST is a Mojolicious plugin
+
+# This class is the general manager of the API. 
+# It takes the query received by the Mojolicious::Lite app,
+# checks that the query is right and send it to same function in QVD::Admin4.
+# After that, it receives the answer of that function and returns it to the
+# Mojo app.
 
 has 'administrator', is => 'ro', isa => sub { die "Invalid type for attribute administrator" 
 						  unless ref(+shift) eq 'QVD::DB::Result::Administrator'; };
 my $QVD_ADMIN;
-
 
 sub BUILD
 {
     my $self = shift;
     $QVD_ADMIN = QVD::Admin4->new();
 }
+
+# This function is used to register qvd_admin4_api
+# as a helper in the Mojolicious::Lite app. That helper
+# is an accessor to this class.
 
 sub register
 { 
@@ -34,6 +43,18 @@ sub register
 }
 
 sub _db { $QVD_ADMIN->_db; };
+
+
+##########################################################
+## FUNCTIONS TO VALIDATE USERS (administrators, really) ##
+##########################################################
+# These functions are user directly from the Mojolicious app
+# (wat.pl) in order lo login and manage sessions.
+
+# This function receives some credentials and tries to 
+# get from the database the administrator related to those credentials.
+# The credentials provided can be any filter available in the API for 
+# administrators (i.e. id), though typically name and password are used.
 
 sub validate_user
 {
@@ -51,6 +72,8 @@ sub validate_user
     my $rs = eval { $QVD_ADMIN->_db->resultset('Administrator')->search(\%params) };
     print $@ if $@;
     
+# This grep forbides login for superadmins in monotenant context
+
     my @admins = grep { $multitenant || $_->is_recovery_admin || 
 			    (not $_->is_superadmin) } $rs->all;
     return undef unless @admins;
@@ -60,6 +83,14 @@ sub validate_user
     return $admin;
 }
 
+# This method takes an administrator id and tries
+# to authenticate it. After that, it sets that admin
+# as the current administrator in the system.  
+# That will be a crucial info for many operations
+
+# validate_user was intended to authentication (getting an admin
+# from credentials). However, load_user is intended to setting
+# the current admin in the system
 
 sub load_user
 {
@@ -72,8 +103,13 @@ sub load_user
     $admin->set_tenants_scoop(
 	[ map { $_->id } 
 	  $QVD_ADMIN->_db->resultset('Tenant')->search()->all ])
-	if $admin->is_superadmin;
+	if $admin->is_superadmin; # This is the scope (set of tenants) 
+                                  # in which the admin is able to operate
 }
+
+########################################
+## MAIN METHOD TO PROCESS API QUERIES ##
+########################################
 
 sub process_query
 {
@@ -82,12 +118,16 @@ sub process_query
 
    try {
 
-       $json_wrapper = QVD::Admin4::REST::JSON->new(json => $json);
-       $action = QVD::Admin4::Action->new(name => $json_wrapper->action,
-					  administrator => $self->administrator);
+# Creates an action related to the input query
+# with all the info in the system for that action
 
-       $qvd_object_model = $self->get_qvd_object_model($action) 
-	   if $action->qvd_object;
+       $json_wrapper = QVD::Admin4::REST::JSON->new(json => $json);
+
+       $action = QVD::Admin4::Action->new(name => $json_wrapper->action);
+
+       $qvd_object_model = $self->get_qvd_object_model($action) if $action->qvd_object;
+
+# Checks if the asked action is available for the current admin
 
        eval { QVD::Admin4::Exception->throw(code => 4210) 
 		  unless $action->available_for_admin($self->administrator) };
@@ -111,7 +151,12 @@ sub process_query
     
        $e->throw if $e;
 
+# Gets the method that must be executed in order to execute the
+# requested action
+
        my $restmethod = $action->restmethod;
+
+# Executes that method and builds the answer
 	
        my $result = $self->$restmethod($action,$json_wrapper,$qvd_object_model);
 
@@ -133,18 +178,8 @@ sub process_query
    $response->json;
 }
 
-sub get_channels
-{
-   my ($self,$action_name) = @_;
-
-   QVD::Admin4::Action->new(name => $action_name )->channels;
-}
-
-sub get_size
-{
-   my ($self,$action_name) = @_;
-   QVD::Admin4::Action->new(name => $action_name )->size;
-}
+# Method to execute QVD::Admin4 methods with a QVD::Admin4::REST::Request
+# object as argument
 
 sub process_standard_query
 {
@@ -153,12 +188,18 @@ sub process_standard_query
     my $result = $QVD_ADMIN->$admin4method($self->get_request($json_wrapper,$qvd_object_model));
 }
 
+# Method to execute QVD::Admin4 methods with a QVD::Admin4::REST::JSON
+# object as argument
+
 sub process_ad_hoc_query
 {
     my ($self,$action,$json_wrapper) = @_;
     my $admin4method = $action->admin4method;
     my $result = $QVD_ADMIN->$admin4method($self->administrator,$json_wrapper);
 }
+
+# Method to execute multiple QVD::Admin4 methods
+# for the same requested action
 
 sub process_multiple_query
 {
@@ -214,12 +255,24 @@ sub get_request
     return $request; 
 }
 
-sub _cfg
-{
-    my ($self,$key) = @_;
+##########################################
+## OTHER METHODS USED FROM THE MOJO APP ##
+##########################################
 
-    return cfg($key);
+# Reports what channels of the database should be listened
+# for a specific action in order to know when sth. has been changed
+# Useful for monitorization via websocket
+
+sub get_channels
+{
+   my ($self,$action_name) = @_;
+
+   QVD::Admin4::Action->new(name => $action_name )->channels;
 }
+
+
+# Provides a pool to the database in order to listen events
+# from the mojo app
 
 sub _pool
 {
@@ -240,6 +293,17 @@ sub _pool
 
     return $self->{pool};
 }
+
+# Gives access to the configuration tokens to the mojo app
+
+sub _cfg
+{
+    my ($self,$key) = @_;
+
+    return cfg($key);
+}
+
+# Returns db version to the mojo app 
 
 sub database_version
 {

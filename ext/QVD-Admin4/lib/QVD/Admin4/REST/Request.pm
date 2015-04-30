@@ -5,10 +5,36 @@ use Moo;
 use QVD::Admin4::Exception;
 use QVD::Admin4::REST::Filter;
 use QVD::Admin4::ConfigsOverwriteList;
+
+# This class implements a request that can be done against the 
+# database via DBIx::Class. In fact, it's used by the methods in 
+# QVD::Admin4 in order to build requests via DBIx::Class.
+
+# The constructor takes two cruacial parameters: 
+# a) 'json_wrapper' denotes the input query
+# b) 'qvd_object_model' is the model that defines
+#    how the input query should be and how it should be 
+#    translated into DBIx::Class format
+
+# With these parameters, the constructor triggers several checks
+# over the input query. And it throws an informative exception
+# in case one check don't pass. Otherwise, the constructor
+# creates a repository with the information of the input query
+# translated to a certain format. When needed, some extra elements
+# are added to the repository.
+
+# The resultant object provides several accessors methods, that
+# let you get the info from the repository. These accessors
+# are used by the methods in QVD::Admin4 in order to build the
+# requests to DB
+
 has 'json_wrapper', is => 'ro', isa => sub { die "Invalid type for attribute json_wrapper" 
 						 unless ref(+shift) eq 'QVD::Admin4::REST::JSON'; }, required => 1;
 has 'qvd_object_model', is => 'ro', isa => sub { die "Invalid type for attribute qvd_object_model" 
 						     unless ref(+shift) eq 'QVD::Admin4::REST::Model'; } , required => 1;
+
+# These are the main accessors used in QVD::Admin4
+
 has 'modifiers', is => 'ro', isa => sub { die "Invalid type for attribute modifiers" 
 					      unless ref(+shift) eq 'HASH'; }, 
                              default => sub { {  group_by => [], # TO DO: default dbix grouping fails for ordering in related tables. This avoids 
@@ -391,8 +417,6 @@ sub forze_filtering_by_acls_for_filter_values
 	$self->filters->add_filter('-not',{ $filter_dbix => \@forbidden_values });
     }
 }
-
-
 
 
 sub forze_tenant_assignment_in_creation

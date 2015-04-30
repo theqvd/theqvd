@@ -8,6 +8,19 @@ use File::Basename qw(basename);
 use QVD::DB::Simple qw(db);
 use Clone qw(clone);
 
+# This class implements a store with all the info needed about 
+# an kind of action requested by the API. Kinds of action are 
+# defined by means of two parameters: qvd_object and type of action.
+
+# The class has many class variables with many info about filters, arguments
+# order criteria, etc. available for all kinds of actions.
+
+# The constructor of the class, according to the 'qvd_object' and 'type_of_action'
+# parameters, takes the correspondant info from those class variables and creates
+# a repository in 'model_info', with the info relative to the specific kind of action.
+
+# Many accessor methods let you get that info of the action.
+
 has 'current_qvd_administrator', is => 'ro', isa => 
     sub { die "Invalid type for attribute current_qvd_administrator" 
 	      unless ref(+shift) eq 'QVD::DB::Result::Administrator'; }, required => 1;
@@ -23,24 +36,41 @@ has 'model_info', is => 'ro', isa => sub {die "Invalid type for attribute model_
 
 my $DB;
 
-################
-# DB FUNCTIONS #
-################
+# Mapper from kinds of QVD objects in this class to available values for 
+# the 'qvd_object' column in the log table of DB
 
+my $QVD_OBJECTS_TO_LOG_MAPPER = 
+{ 
+    Log => 'log', User => 'user', VM => 'vm', DI => 'di', OSF => 'osf', Host => 'host', 
+    Administrator => 'administrator', Tenant => 'tenant', 
+    Role => 'role', Config => 'config', Tenant_Views_Setup => 'tenant_view', 
+    Administrator_Views_Setup => 'admin_view',  
+};
 
-my $QVD_OBJECTS_TO_LOG_MAPPER = { Log => 'log', User => 'user', VM => 'vm', DI => 'di', OSF => 'osf', Host => 'host', Administrator => 'administrator', Tenant => 'tenant', 
-				  Role => 'role', Config => 'config', Tenant_Views_Setup => 'tenant_view', Administrator_Views_Setup => 'admin_view',  };
+# Mapper from kinds of actions in this class to available values for 
+# the 'type_of_action' column in the log table of DB
 
-my $TYPES_OF_ACTION_TO_LOG_MAPPER = { list => 'see', details => 'see', tiny => 'see', delete => 'delete', update => 'update', create_or_update => 'create_or_update', exec => 'exec', 
-				      state => 'see', create => 'create' };
+my $TYPES_OF_ACTION_TO_LOG_MAPPER = 
+{ 
+    list => 'see', details => 'see', tiny => 'see', delete => 'delete', update => 'update', 
+    create_or_update => 'create_or_update', exec => 'exec', 
+    state => 'see', create => 'create' 
+};
+
+# List of QVD objects directly assigned to a tenant.
 
 my $DIRECTLY_TENANT_RELATED = [qw(User Administrator OSF Tenant_Views_Setup)];
 
+# Mappers for identity operators between API and DBIx::Class
+# The majority of operators are just the same
 
 my $OPERATORS_MAPPER = 
 {
     '~' => 'LIKE'
 };
+
+# For every kind of QVD object there must be one filter that 
+# identifies the objects unambiguously (typically, the id)
 
 my $UNAMBIGUOUS_FILTERS = 
 {   
@@ -54,6 +84,10 @@ my $UNAMBIGUOUS_FILTERS =
     delete => { default => [qw(id)] },
 };
 
+
+# Some QVD objects have complex info that system provides
+# via a secondary request to DB. That secondary request
+# uses a view. This var says the views related to the QVD objects
 
 my $RELATED_VIEWS_IN_DB = 
 {   
@@ -71,6 +105,9 @@ my $RELATED_VIEWS_IN_DB =
 		 DI => [qw(DI_View)],
 		 Role => [qw(Role_View)],},		 
 };
+
+# Acls needed for using every filter in actions regarding
+# a certain QVD object
 
 my $ACLS_FOR_FILTERS = 
 {
@@ -113,6 +150,8 @@ my $ACLS_FOR_FILTERS =
     Tenant => { name => [qr/^tenant\.filter\.name$/] }
 };
 
+# Acls needed for using a certain value of filters in actions regarding
+# a certain QVD object
 
 my $ACLS_FOR_FILTER_VALUES = 
 {
@@ -130,6 +169,8 @@ my $ACLS_FOR_FILTER_VALUES =
 					   admin_view => [qr/^views\.see-main\.$/],}}},
 };
 
+# Acls needed for retrieving every field in actions regarding
+# a certain QVD object
 
 my $ACLS_FOR_FIELDS = 
 {
@@ -207,6 +248,9 @@ my $ACLS_FOR_FIELDS =
 	      properties => [qr/^host\.see\.properties$/] },
 };
 
+# Acls needed to update every field in actions regarding
+# a certain QVD object
+
 my $ACLS_FOR_ARGUMENTS_IN_UPDATE = 
 { 
     User => { password => [qr/^user\.update\.password$/],
@@ -260,6 +304,8 @@ my $ACLS_FOR_ARGUMENTS_IN_UPDATE =
 
 };
 
+# Acls needed to perform massive updates for every field in actions regarding
+# a certain QVD object
 
 my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE = 
 { 
@@ -305,6 +351,8 @@ my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE =
 
 };
 
+# Acls needed to set every field in creation for actions regarding
+# a certain QVD object
 
 my $ACLS_FOR_ARGUMENTS_IN_CREATION = 
 { 
@@ -325,6 +373,56 @@ my $ACLS_FOR_ARGUMENTS_IN_CREATION =
 
 };
 
+
+
+# Acls needed to execute nested queries 
+# NOTE: nested queries are assignations to an object that
+#       can be requested inside of create and update actions
+#       for that object.
+
+my $NESTED_QUERIES_TO_ADMIN4_MAPPER = 
+{ 
+    User => { __properties__ => 'custom_properties_set',
+	      __properties_changes__set => 'custom_properties_set',
+	      __properties_changes__delete => 'custom_properties_del'},
+  
+    VM => { __properties__ => 'custom_properties_set',
+	    __properties_changes__set => 'custom_properties_set',
+	    __properties_changes__delete => 'custom_properties_del'},
+    
+    Host => { __properties__ => 'custom_properties_set',
+	      __properties_changes__set => 'custom_properties_set',
+	      __properties_changes__delete => 'custom_properties_del' },
+  
+    OSF => { __properties__ => 'custom_properties_set',
+	     __properties_changes__set => 'custom_properties_set',
+	     __properties_changes__delete => 'custom_properties_del'},
+  
+    DI => { __properties__ => 'custom_properties_set',
+	    __tags__ => 'tags_create',
+	    __properties_changes__set => 'custom_properties_set',
+	    __properties_changes__delete => 'custom_properties_del', 
+	    __tags_changes__create => 'tags_create',
+	    __tags_changes__delete => 'tags_delete'},
+    Tenant => {},
+
+    Role => { __acls__ => 'add_acls_to_role',
+	      __roles__ => 'add_roles_to_role',
+	      __acls_changes__assign_acls  => 'add_acls_to_role',
+	      __acls_changes__unassign_acls => 'del_acls_to_role',
+	      __roles_changes__assign_roles => 'add_roles_to_role', 
+	      __roles_changes__unassign_roles => 'del_roles_to_role'},
+
+    Administrator => { __roles__ => 'add_roles_to_admin',
+		       __roles_changes__assign_roles => 'add_roles_to_admin',
+		       __roles_changes__unassign_roles => 'del_roles_to_admin' },
+    Tenant_Views_Setup => {},
+    Operative_Views_In_Tenant => {},
+    Administrator_Views_Setup => {},
+    Operative_Views_In_Administrator => {},
+};
+
+# Available filters for every kind of action
 
 my $AVAILABLE_FILTERS = 
 { 
@@ -420,6 +518,8 @@ my $AVAILABLE_FILTERS =
 
     state => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]},
 };
+
+# Available fields to retrieve for every kind of action
 
 my $AVAILABLE_FIELDS = 
 { 
@@ -525,7 +625,7 @@ my $AVAILABLE_FIELDS =
 
 };
 
-
+# Mandatory filters to execute every kind of action
 
 my $MANDATORY_FILTERS = 
 { 
@@ -552,17 +652,7 @@ my $MANDATORY_FILTERS =
 		 Operative_Acls_In_Administrator => [qw()]}, # FIX ME. HAS DEFAULT VALUE IN Request.pm. DEFAULT SYSTEM FOR FILTERS NEEDED
 };
 
-my $SUBCHAIN_FILTERS = 
-{ 
-    list => { default => [qw(name)],
-	      DI => [qw(disk_image)]}
-};
-
-my $COMMODIN_FILTERS = 
-{ 
-tiny => { ACL => [qw(name)]},
-list => {Config => [qw(key value)], Operative_Acls_In_Role => [qw(acl_name name)], Operative_Acls_In_Administrator => [qw(acl_name name)]}
-};
+# Default order criteria for every kind of action
 
 my $DEFAULT_ORDER_CRITERIA = 
 { 
@@ -580,6 +670,12 @@ my $DEFAULT_ORDER_CRITERIA =
               Config => [qw(key)] }
 
 };
+
+
+# Available nested queries for every type of action
+# NOTE: nested queries are assignations to an object that
+#       can be requested inside of create and update actions
+#       for that object.
 
 my $AVAILABLE_NESTED_QUERIES = 
 { 
@@ -614,49 +710,7 @@ my $AVAILABLE_NESTED_QUERIES =
 		Operative_Views_In_Administrator => [qw()]}
 };
 
-
-
-my $NESTED_QUERIES_TO_ADMIN4_MAPPER = 
-{ 
-    User => { __properties__ => 'custom_properties_set',
-	      __properties_changes__set => 'custom_properties_set',
-	      __properties_changes__delete => 'custom_properties_del'},
-  
-    VM => { __properties__ => 'custom_properties_set',
-	    __properties_changes__set => 'custom_properties_set',
-	    __properties_changes__delete => 'custom_properties_del'},
-    
-    Host => { __properties__ => 'custom_properties_set',
-	      __properties_changes__set => 'custom_properties_set',
-	      __properties_changes__delete => 'custom_properties_del' },
-  
-    OSF => { __properties__ => 'custom_properties_set',
-	     __properties_changes__set => 'custom_properties_set',
-	     __properties_changes__delete => 'custom_properties_del'},
-  
-    DI => { __properties__ => 'custom_properties_set',
-	    __tags__ => 'tags_create',
-	    __properties_changes__set => 'custom_properties_set',
-	    __properties_changes__delete => 'custom_properties_del', 
-	    __tags_changes__create => 'tags_create',
-	    __tags_changes__delete => 'tags_delete'},
-    Tenant => {},
-
-    Role => { __acls__ => 'add_acls_to_role',
-	      __roles__ => 'add_roles_to_role',
-	      __acls_changes__assign_acls  => 'add_acls_to_role',
-	      __acls_changes__unassign_acls => 'del_acls_to_role',
-	      __roles_changes__assign_roles => 'add_roles_to_role', 
-	      __roles_changes__unassign_roles => 'del_roles_to_role'},
-
-    Administrator => { __roles__ => 'add_roles_to_admin',
-		       __roles_changes__assign_roles => 'add_roles_to_admin',
-		       __roles_changes__unassign_roles => 'del_roles_to_admin' },
-    Tenant_Views_Setup => {},
-    Operative_Views_In_Tenant => {},
-    Administrator_Views_Setup => {},
-    Operative_Views_In_Administrator => {},
-};
+# Available arguments for update actions
 
 my $AVAILABLE_ARGUMENTS = { Config => [qw(value)],
 			    User => [qw(name password blocked)],
@@ -670,6 +724,7 @@ my $AVAILABLE_ARGUMENTS = { Config => [qw(value)],
 			    Tenant_Views_Setup => [qw(visible)],
 			    Administrator_Views_Setup => [qw(visible)]};
 
+# Available arguments for creation actions
 
 my $MANDATORY_ARGUMENTS = { Config => [qw(key value)],
 			    User => [qw(tenant_id name password  blocked)],
@@ -683,6 +738,8 @@ my $MANDATORY_ARGUMENTS = { Config => [qw(key value)],
 			    Tenant_Views_Setup => [qw(tenant_id field visible view_type device_type qvd_object property)],
 			    Administrator_Views_Setup => [qw(field visible view_type device_type qvd_object property)]}; # Every admin is able to set just its own views, 
                                                                                                                          # Suitable admin_id forzed in Request.pm
+
+# Default values for some mandatory arguments in creation
 
 my $DEFAULT_ARGUMENT_VALUES = 
 {
@@ -723,6 +780,10 @@ my $DEFAULT_ARGUMENT_VALUES =
 
 my $ip2mac = "ip2mac(me.ip,'".cfg('vm.network.mac.prefix')."')";
 
+# Mapper that changes filters from API format to DBIx::Class format
+# the 'me' preffix depicts the main table in DB, other prefixes
+# depict related tables to that one. The element after the prefix 
+# depicts the column of the table.
 
 my $FILTERS_TO_DBIX_FORMAT_MAPPER = 
 {
@@ -961,11 +1022,24 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 
 };
 
+# Nowadays the mapper for arguments and order criteria
+# is equal to the mapper for filters. That's for
+# simplicity reasons, but it maybe shoult be changed
+
 my $ARGUMENTS_TO_DBIX_FORMAT_MAPPER = 
     $FILTERS_TO_DBIX_FORMAT_MAPPER;
 
 my $ORDER_CRITERIA_TO_DBIX_FORMAT_MAPPER = 
     $FILTERS_TO_DBIX_FORMAT_MAPPER;
+
+
+# Mapper that changes fields to retrieve from API format to DBIx::Class format
+# the 'me' preffix depicts the main table in DB, other prefixes
+# depict related tables to that one. The element after the prefix 
+# depicts the column of the table.
+
+# The special prefic 'view' means that the field must be taken
+# from a related view (See $RELATED_VIEWS_IN_DB).
 
 my $FIELDS_TO_DBIX_FORMAT_MAPPER = 
 {
@@ -1213,6 +1287,11 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 
 };
 
+# This var stores functions intended to 
+# normalize tha value provided to API 
+# for several filters/arguments/etc.
+# that need it.  
+
 my $VALUES_NORMALIZATOR = 
 { 
     DI => { disk_image => \&basename_disk_image},
@@ -1225,6 +1304,8 @@ my $VALUES_NORMALIZATOR =
     Tenant => { name => \&normalize_name }
 };
 
+# Joins of related tables needed in
+# actions regarding every QVD object
 
 my $DBIX_JOIN_VALUE = 
 { 
@@ -1255,6 +1336,14 @@ my $DBIX_JOIN_VALUE =
     Administrator_Views_Setup => [ { administrator => 'tenant' }] 
 };
 
+
+# Tables that must be prefetched (via the prefetch feature of DBIC).
+# These are tables joined to the main table whose content must
+# be feteched direclty in the first request to DB. Otherwise
+# the info of those tables must be accesed by means of multiple requests
+# That's all for performance.
+
+
 my $DBIX_PREFETCH_VALUE = 
 { 
     list => { Log => [qw(deletion_log_entry administrator)],
@@ -1284,6 +1373,10 @@ my $DBIX_PREFETCH_VALUE =
 		Administrator_Views_Setup => [ { administrator => 'tenant' }]}
 };
 
+# This is for creation actions. When creating
+# an object in DVB, you may have to create related objects as well.
+# These related objects are listed in here.
+
 my $DBIX_HAS_ONE_RELATIONSHIPS = 
 { 
     VM => [qw(vm_runtime counters)],
@@ -1292,16 +1385,28 @@ my $DBIX_HAS_ONE_RELATIONSHIPS =
     Administrator => [qw(wat_setups)],
 };
 
+
+
+##################################################
+## METHODS TO CREATE THE REPOSITORY OF INFO FOR ##
+## THE CURRENT ACTION                           ## 
+##################################################
+
+# The constructor of the class, according to the 'qvd_object' and 'type_of_action'
+# parameters, takes the correspondant info from those class variables and creates
+# a repository in 'model_info', with the info relative to the specific kind of action.
+# All these methods are setting that info in 'model_info'.
+
 sub BUILD
 {
     my $self = shift;
 
     $DB = db();
 
-    $self->initialize_info_model;
+    $self->initialize_info_model; # Creates a new hash reference to allocate 'model_info'
 
-    $self->custom_properties_keys;
-
+    $self->custom_properties_keys; # Sets in $self->{custom_properties_keys} a list with all
+                                   # custom properties related to the action requested to API
     $self->set_info_by_type_of_action_and_qvd_object(
 	'unambiguous_filters',$UNAMBIGUOUS_FILTERS);
 
@@ -1316,12 +1421,6 @@ sub BUILD
 
     $self->set_info_by_type_of_action_and_qvd_object(
 	'available_fields',$AVAILABLE_FIELDS,1);
-
-    $self->set_info_by_type_of_action_and_qvd_object(
-	'subchain_filters',$SUBCHAIN_FILTERS);
-
-    $self->set_info_by_type_of_action_and_qvd_object(
-	'commodin_filters',$COMMODIN_FILTERS);
 
     $self->set_info_by_type_of_action_and_qvd_object(
 	'default_order_criteria',$DEFAULT_ORDER_CRITERIA);
@@ -1365,8 +1464,16 @@ sub BUILD
     $self->set_info_by_qvd_object(
 	'dbix_has_one_relationships',$DBIX_HAS_ONE_RELATIONSHIPS);
 
+
+# For some actions, the fields tenant_id and tenant_name
+# are available only in case the current admin in superadmin
+# For that cases, these fields are added to the available_fields list
+# in here 
+
     $self->set_tenant_fields;  # The last one. It depends on others
 }
+
+# Auxiliar methods for setting the info
 
 sub initialize_info_model 
 {
@@ -1379,8 +1486,6 @@ sub initialize_info_model
     available_fields => [],                                                                  
     available_arguments => [],                                                               
     available_nested_queries => [],                                                               
-    subchain_filters => [],                                                                 
-    commodin_filters => [],                                                                  
     mandatory_arguments => [],                                                               
     mandatory_filters => [],                                                                 
     default_argument_values => {},                                                           
@@ -1397,6 +1502,8 @@ sub initialize_info_model
 };
 }
 
+# It sets custom properties
+
 sub custom_properties_keys
 {
     my $self = shift;
@@ -1407,28 +1514,24 @@ sub custom_properties_keys
     @{$self->{custom_properties_keys}};
 }
 
-sub has_property
-{
-    my ($self,$prop) = @_;
-    my %props = map { $_ => 1 } $self->custom_properties_keys;
+# Takes custom properties from DB
 
-    return exists $props{$prop} ? return 1 : return 0;
-}
-
-sub set_tenant_fields
+sub get_custom_properties_keys
 {
     my $self = shift;
+    my $qvd_object_table = $self->qvd_object;
+    my $properties_table = $qvd_object_table."_Property";
+    my @properties_keys;
+    
+    eval { my %properties_keys = map {$_->key => 1 } 
+	   $self->db->resultset($properties_table)->search()->all;
+	   @properties_keys = keys %properties_keys };
 
-    return unless $self->type_of_action =~ /^list|details$/;
-
-    return unless $self->current_qvd_administrator->is_superadmin;
-
-    push @{$self->{model_info}->{available_fields}},'tenant_id'
-	if defined $self->fields_to_dbix_format_mapper->{tenant_id};
-
-    push @{$self->{model_info}->{available_fields}},'tenant_name'
-	if defined $self->fields_to_dbix_format_mapper->{tenant_name};
+    @properties_keys;
 }
+
+# It sets info from variables that clasify
+# info both by qvd_object and by type_of_action
 
 sub set_info_by_type_of_action_and_qvd_object
 {
@@ -1448,6 +1551,9 @@ sub set_info_by_type_of_action_and_qvd_object
     }
 }
 
+# It sets info from variables that clasify
+# info only by qvd_object
+
 sub set_info_by_qvd_object
 {
     my ($self,$model_info_key,$INFO_REPO) = @_;
@@ -1456,9 +1562,37 @@ sub set_info_by_qvd_object
 	clone $INFO_REPO->{$self->qvd_object};
 }
 
-############
-###########
-##########
+# For some actions, the fields tenant_id and tenant_name
+# are available only in case the current admin in superadmin
+# For that cases, these fields are added to the available_fields list
+# in here 
+
+sub set_tenant_fields
+{
+    my $self = shift;
+
+    return unless $self->type_of_action =~ /^list|details$/;
+
+    return unless $self->current_qvd_administrator->is_superadmin;
+
+    push @{$self->{model_info}->{available_fields}},'tenant_id'
+	if defined $self->fields_to_dbix_format_mapper->{tenant_id};
+
+    push @{$self->{model_info}->{available_fields}},'tenant_name'
+	if defined $self->fields_to_dbix_format_mapper->{tenant_name};
+}
+
+############################################################
+## ACCESSORS TO PROVIDE THE INFO ABOUT THE CURRENT ACTION ##
+############################################################
+
+sub has_property
+{
+    my ($self,$prop) = @_;
+    my %props = map { $_ => 1 } $self->custom_properties_keys;
+
+    return exists $props{$prop} ? return 1 : return 0;
+}
 
 sub related_views_in_db
 {
@@ -1493,21 +1627,6 @@ sub unambiguous_filters
 {
     my $self = shift;
     my $filters =  $self->{model_info}->{unambiguous_filters} // [];
-    @$filters;
-}
-
-sub subchain_filters
-{
-    my $self = shift;
-    my $filters = $self->{model_info}->{subchain_filters} // [];
-    @$filters;
-}
-
-sub commodin_filters
-{
-    my $self = shift;
-
-    my $filters = $self->{model_info}->{commodin_filters} // [];
     @$filters;
 }
 
@@ -1614,10 +1733,6 @@ sub dbix_has_one_relationships
     @$rels;
 }
 
-#################
-################
-#################
-
 sub related_view_in_db
 {
     my $self = shift;
@@ -1657,27 +1772,6 @@ sub directly_tenant_related
     $_ eq $qvd_object && return 1
 	for @$DIRECTLY_TENANT_RELATED;
 
-    return 0;
-}
-
-
-sub subchain_filter
-{
-    my $self = shift;
-    my $filter = shift;
-
-    $_ eq $filter && return 1
-	for $self->subchain_filters;
-    return 0;
-}
-
-sub commodin_filter
-{
-    my $self = shift;
-    my $filter = shift;
-
-    $_ eq $filter && return 1
-	for $self->commodin_filters;
     return 0;
 }
 
@@ -1807,7 +1901,6 @@ sub normalize_value
     return ref($norm) ? $self->$norm($value) : $norm;
 }
 
-
 sub normalize_operator
 {
     my $self = shift;
@@ -1817,67 +1910,6 @@ sub normalize_operator
 
     return $nop;
 }
-
-
-sub get_default_memory { cfg('osf.default.memory'); }
-sub get_default_overlay { cfg('osf.default.overlay'); }
-sub basename_disk_image { my $self = shift; basename(+shift); };
-
-sub password_to_token 
-{
-    my ($self, $password) = @_;
-    require Digest::SHA;
-    Digest::SHA::sha256_base64(cfg('l7r.auth.plugin.default.salt') . $password);
-}
-
-sub normalize_name
-{
-    my ($self,$login) = @_;
-    $login =~ s/^\s*//; $login =~ s/\s*$//;
-    $login = lc($login)  
-	unless cfg('model.user.login.case-sensitive');
-    $login;
-}
-
-sub get_free_ip {
-
-    my $self = shift;
-    my $nettop = nettop_n;
-    my $netstart = netstart_n;
-
-    my %ips = map { net_aton($_->ip) => 1 } 
-    $DB->resultset('VM')->all;
-
-    while ($nettop-- > $netstart) {
-        return net_ntoa($nettop) unless $ips{$nettop}
-    }
-    die "No free IP addresses";
-}
-
-sub get_default_di_version
-{
-    my $self = shift;
-    my $json_wrapper = shift;
-
-    my $osf_id = $json_wrapper->get_argument_value('osf_id') // return;
-    my ($y, $m, $d) = (localtime)[5, 4, 3]; $m ++; $y += 1900;
-    my $osf = $DB->resultset('OSF')->search({id => $osf_id})->first;
-    QVD::Admin4::Exception->throw(code => 7100, object => 'osf_id') unless $osf; 
-    my $version;
-
-    for (0..999) 
-    {
-	$version = sprintf("%04d-%02d-%02d-%03d", $y, $m, $d, $_);
-	last unless $osf->di_by_tag($version);
-    }
-    
-    $version;
-}
-
-
-##################
-######## ACLS
-##################
 
 sub get_acls_for_filter
 {
@@ -1996,19 +2028,63 @@ sub type_of_action_log_style
     $TYPES_OF_ACTION_TO_LOG_MAPPER->{$self->type_of_action};    
 }
 
-sub get_custom_properties_keys
-{
-    my $self = shift;
-    my $qvd_object_table = $self->qvd_object;
-    my $properties_table = $qvd_object_table."_Property";
-    my @properties_keys;
-    
-    eval { my %properties_keys = map {$_->key => 1 } 
-	   $self->db->resultset($properties_table)->search()->all;
-	   @properties_keys = keys %properties_keys };
+#########################################
+## FUNCTIONS STORED IN CLASS VARIABLES ##
+#########################################
 
-    @properties_keys;
+sub get_default_memory { cfg('osf.default.memory'); }
+sub get_default_overlay { cfg('osf.default.overlay'); }
+sub basename_disk_image { my $self = shift; basename(+shift); };
+
+sub password_to_token 
+{
+    my ($self, $password) = @_;
+    require Digest::SHA;
+    Digest::SHA::sha256_base64(cfg('l7r.auth.plugin.default.salt') . $password);
 }
 
+sub normalize_name
+{
+    my ($self,$login) = @_;
+    $login =~ s/^\s*//; $login =~ s/\s*$//;
+    $login = lc($login)  
+	unless cfg('model.user.login.case-sensitive');
+    $login;
+}
+
+sub get_free_ip {
+
+    my $self = shift;
+    my $nettop = nettop_n;
+    my $netstart = netstart_n;
+
+    my %ips = map { net_aton($_->ip) => 1 } 
+    $DB->resultset('VM')->all;
+
+    while ($nettop-- > $netstart) {
+        return net_ntoa($nettop) unless $ips{$nettop}
+    }
+    die "No free IP addresses";
+}
+
+sub get_default_di_version
+{
+    my $self = shift;
+    my $json_wrapper = shift;
+
+    my $osf_id = $json_wrapper->get_argument_value('osf_id') // return;
+    my ($y, $m, $d) = (localtime)[5, 4, 3]; $m ++; $y += 1900;
+    my $osf = $DB->resultset('OSF')->search({id => $osf_id})->first;
+    QVD::Admin4::Exception->throw(code => 7100, object => 'osf_id') unless $osf; 
+    my $version;
+
+    for (0..999) 
+    {
+	$version = sprintf("%04d-%02d-%02d-%03d", $y, $m, $d, $_);
+	last unless $osf->di_by_tag($version);
+    }
+    
+    $version;
+}
 
 1;

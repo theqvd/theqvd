@@ -8,6 +8,12 @@ use 5.010;
 use Mojo::JSON qw(encode_json);
 our $VERSION = '0.01';
 
+# This class is a wrapper for the API input query.
+# It just provides access to that JSON info in an easy way
+# Morover, it performs some minimal process needed to
+# adjunst the input to some system requirements
+
+
 has 'json', is => 'ro', isa => sub { die "Invalid type for attribute json" 
 					 unless ref(+shift) eq 'HASH'; }, required => '1';
 
@@ -16,9 +22,19 @@ sub BUILD
     my $self = shift;
 
     my $json = $self->json;
-    $self->{original_request} = clone $json;
-    $self->{json} = clone $json;
+
+    # Clone cause the json may be used in other places
+
+    $self->{json} = clone $json;  # This is the json that the class will process
+    $self->{original_request} = clone $json; # This is a copy of the original input before processing
+
+    # Nested queries of update and create actions 
+    # are changed to a no nested list of key/values
+    
     $self->get_flatten_nested_queries;	
+
+    # Filters are changed from a raw json to an object 
+    # needed for manage complex filters that may have logical operatos
 
     $self->{filters_obj} = QVD::Admin4::REST::Filter->new(
 	hash => $self->{json}->{filters} // {} );

@@ -4,12 +4,37 @@ use  5.010;
 
 with 'Throwable';
 
+# This class implements the exceptions used by the API
+
+## PARAMETERS
+
+# Either code, exception or failures must be provided in order
+# to build a proper exception:
+
+# a) code: is a specific numeric code that must be supported by this class
+# b) exception: is another exception object that can be used to recursively build the current one
+# c) failures: is a set of multiple failures reported by some action. A certain kind of exception
+#              can be built from that multiple report
+
 has 'code', is => 'ro', isa => sub { die "Invalid type for attribute code" if ref(+shift); };
-has 'query', is => 'ro', isa => sub { die "Invalid type for attribute nested" if ref(+shift); };
-has 'object', is => 'ro', isa => sub { die "Invalid type for attribute object" if ref(+shift); };
 has 'exception', is => 'ro', isa => sub {};
 has 'failures', is => 'ro', isa => sub { die "Invalid type for attribute failures" 
 					      unless ref(+shift) eq 'HASH'; };
+
+## OPTIONAL PARAMETERS
+
+# When throwing an exception, it can be specified the kind of query to DB
+# that caused the exception (i.e. creation, update, etc.)
+has 'query', is => 'ro', isa => sub { die "Invalid type for attribute nested" if ref(+shift); };
+
+# When throwing an exception, it can be specified the object that 
+# caused the exception (i.e. a certain unavailable filter)
+has 'object', is => 'ro', isa => sub { die "Invalid type for attribute object" if ref(+shift); };
+
+## CLASS VARIABLES
+
+# This is the mapper that relates numeric codes of exceptions
+# with its correspondant messages. Supported codes must be listed in here
 
 my $code2message_mapper = 
 {
@@ -88,6 +113,10 @@ my $code2message_mapper =
     7372 => 'Unable to remove a core config item',
 };
 
+# When an exception is thrown by DBIx::Class, it is catched and passed as a parameter 
+# to the constructor of this class. In order to build a new exception of this class
+# from an exception of DBIx::Class, it's needed to identify the original class with one
+# of the numeric codes of this class. This is the mapper that relates both of them.
 
 my $exception2code_mapper = 
 {
@@ -109,9 +138,17 @@ my $exception2code_mapper =
 sub BUILD
 {
     my $self = shift;
+
+# At least one of these parameters must be  provided 
+# in order to build a proper exception
+
     $self->code || $self->exception || $self->failures ||
 	die "needed either code, exception or failures attribute";
 
+# This object is recursive if a QVD::Admin4::Exception object was 
+# provided via the exception parameter. In that case, this object 
+# is built from that one
+ 
     $self->rebuild_recursively if $self->recursive;
 
     $self->figure_out_code_from_exception
@@ -120,6 +157,7 @@ sub BUILD
     $self->figure_out_code_from_failures
 	if $self->failures;
 
+# prints useful error messages via console
 
     $self->print_unknown_exception
 	if $self->exception;
@@ -133,6 +171,10 @@ sub print_unknown_exception
     my $e = $self->exception; print "$e";
 }
 
+# Checks if this exception object 
+# has been built (or must be built)
+# from another exception object of the same class
+
 sub recursive
 {
     my $self = shift;
@@ -142,6 +184,9 @@ sub recursive
 	$self->exception->isa('QVD::Admin4::Exception'); 
 }
 
+# Sets object info from the info of another 
+# object of the same class
+
 sub rebuild_recursively
 {
     my $self = shift;
@@ -150,6 +195,8 @@ sub rebuild_recursively
     $self->{object} = $self->exception->object;
     $self->{exception} = $self->exception->exception;
 }
+
+# Provides the exception message
 
 sub message
 {
@@ -192,6 +239,12 @@ sub figure_out_code_from_failures
     my $self = shift;
     $self->{code} = 1200;
 }
+
+# Provides the exception info in JSON format.
+# It's crucial that the output of this method is 
+# equivalent to the output of the json method in QVD::Admin4::REST::Response
+# Thanks to that both exceptions and successful responses can be used
+# as equivalent objects to be retrieved by the API
 
 sub json
 {

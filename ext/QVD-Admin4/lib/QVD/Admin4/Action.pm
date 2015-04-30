@@ -4,9 +4,22 @@ use warnings;
 use Moo;
 use QVD::Admin4::Exception;
 
+# This class implements an action supported by the API.
+# The object provides some minimal info about the action
+# The object can be built only if the action requested 
+# is supported by the API.
+
+# This mandatory paramenter identifies the action
+# supported by the API that will be created
+
 has 'name', is => 'ro', isa => sub {}, required => 1;
 
-my $AVAILABLE_ACTION_SIZES = { default => 'normal', normal => 'normal', heavy => 'heavy' };
+# $ACTIONS stores the list of actions supported by the API
+# For all them, minimal info is stored:
+# a) type_of_action (ad_hoc is the generic value for non standard actions) 
+# b) qvd_object (not available form non standard actions)
+# c) acls (needed for execute this action)
+# d) admin4method (method to execute in order to execute the action) 
 
 my $ACTIONS =
 {
@@ -472,12 +485,16 @@ sub BUILD
     my $self = shift;
     my $name = $self->name;
 
+# If the name of the action is not available, the constructor
+# will complaint and die
+
     QVD::Admin4::Exception->throw(code => 4110) if
 	ref($name) || (not defined $name) || $name eq '';
 
     QVD::Admin4::Exception->throw(code => 4100) 
 	unless $self->available;
 }
+
 
 sub available
 {
@@ -494,13 +511,6 @@ sub channels
     $ACTIONS->{$self->name}->{'channels'} || [];
 }
 
-sub size
-{
-    my $self = shift;
-    $ACTIONS->{$self->name}->{'size'} || 
-	$AVAILABLE_ACTION_SIZES->{default};
-}
-
 sub type
 {
     my $self = shift;
@@ -513,11 +523,19 @@ sub qvd_object
     $ACTIONS->{$self->name}->{qvd_object};
 }
 
+# Returns the method of QVD::Admin4 that must be executed
+# in order to execute the action. This method will be executed from
+# another method in QVD::Admin4::REST. The name of that other method 
+# will be provided by the method 'restmethod' of this class
+
 sub admin4method
 {
     my $self = shift;
     $ACTIONS->{$self->name}->{admin4method};
 }
+
+# Returns the methods of QVD::Admin4 that must be
+# executed in order to execute a multiple action
 
 sub admin4methods
 {
@@ -533,12 +551,21 @@ sub acls
     @$acls;
 }
 
+# returns the acls needed to execute one of the actions
+# nested in a multiple action
+
 sub acls_for_nested_action
 {
     my ($self,$na) = @_;
     my $acls = eval { $ACTIONS->{$self->name}->{admin4methods}->{$na}->{acls} } // [];
     @$acls;
 }
+
+# Returns the method of QVD::Admin4::REST that must be executed
+# in order to execute the action.
+# It depends of the type_of_action value.
+# This method is the method from which the method provided by 
+# 'admin4method' will be executed
 
 sub restmethod
 {
@@ -557,6 +584,8 @@ sub available_for_admin
     
     $admin->re_is_allowed_to($self->acls);
 }
+
+# Checks if the admin is allowed to execute the actions of a multiple action
 
 sub available_nested_action_for_admin
 {
