@@ -63,7 +63,7 @@ const char *qvd_get_changelog(void) {
 /* Init and free functions */
 qvdclient *qvd_init(const char *hostname, const int port, const char *username, const char *password) {
   qvdclient *qvd;
-  qvd_printf("Starting qvd_init. %s", qvd_get_version_text);
+  qvd_printf("Starting qvd_init. %s", qvd_get_version_text());
   if (strlen(username) + strlen(password) + 2 > MAX_USERPWD) {
     qvd_error(qvd, "Length of username and password + 2 is longer than %d\n", MAX_USERPWD);
     return NULL;
