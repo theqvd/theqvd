@@ -24,7 +24,7 @@ sub BUILD
     my $self = shift;
     
     return if $self->admin;
-    my $DB = db();
+    my $DB = QVD::DB::Simple::db();
     $self->{admin} = $DB->resultset('Administrator')->search(
 	{'me.id' => $self->admin_id})->first;
 }

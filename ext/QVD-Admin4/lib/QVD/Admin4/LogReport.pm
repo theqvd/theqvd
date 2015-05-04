@@ -100,7 +100,7 @@ sub BUILD
 {
     my $self = shift;
 
-    $DB = db();
+    $DB = QVD::DB::Simple::db();
     
     my $localtime = localtime;
 

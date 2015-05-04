@@ -109,7 +109,7 @@ sub BUILD
 
     $self->check_filters_validity_in_json;
 
-# It checks if the arguments in the input query
+# It checks if the arguments in an update query
 # are available in the system and if the current
 # admin is allowed to use them
 
@@ -123,15 +123,31 @@ sub BUILD
 	$self->qvd_object_model->type_of_action eq 'update' &&
 	(not $self->json_wrapper->action eq 'myadmin_update');
 
+# It checks if the arguments in a creation query
+# are available in the system and if the current
+# admin is allowed to use them
+
     $self->check_create_arguments_validity_in_json if
 	$self->qvd_object_model->type_of_action =~ /^create(_or_update)?$/;
+
+# It checks if the nested queries (i.e. tags, custom properties, acls assignations...)
+# in a creation or update query are available in the system and if the current
+# admin is allowed to use them
 
     $self->check_nested_queries_validity_in_json if
 	$self->qvd_object_model->type_of_action =~ /^(cre|upd)ate$/;
 
+# It checks if the order criteria in a query
+# are available in the system and if the current
+# admin is allowed to use them
+
     $self->check_order_by_validity_in_json;
 
 # GENERAL SETTINGS ACCORDING MODEL
+
+# Creates the info repositories that will
+# be used by accessors methods in order to retrieve
+# info about the Request on DBIx::Class format
 
     $self->set_filters_in_request;
 
@@ -145,28 +161,62 @@ sub BUILD
 
 # AD HOC SETTING OF OBLIGATORY ELEMENTS 
 
+# The recovery administrator is stored in the database
+# but it cannot be neither seen, updated nor deleted.
+# This method adds to the request an extra filter
+# that avoids the recovery admin to be selected
+
     $self->hide_recovery_mode_administrator
 	if $self->qvd_object_model->qvd_object eq 'Administrator';
+
+# The accion 'get_acls_in_admins' without an admin_id filter 
+# is supposed to ask for the operative acls in the current admin.
+# This methods adds the corresponding filter 
 
     $self->set_default_admin_id_in_acls_search
 	if $self->qvd_object_model->qvd_object eq 
 	'Operative_Acls_In_Administrator';
 
+# Requests must include a proper filter by tenant, cause
+# non-superadmin admins can only operate over its own
+# tenant. The corresponding filters to filter by tenant
+# are added in here
+
     $self->forze_filtering_by_tenant;
+
+# The action 'myadmin_update' can be only used over the current
+# admin. This method adds the corresponding filters
 
     $self->forze_filtering_by_own_admin
 	if $self->json_wrapper->action eq 'myadmin_update';
 
+# Actions 'admin_view_set' and 'admin_view_reset' are supposed to operate
+# over the current admin. The correspondig filters are added in here
+
     $self->forze_own_admin_id_in_admin_views
 	if $self->qvd_object_model->qvd_object eq 'Administrator_Views_Setup';
 
+# Tenants must be filtered by tenant in a different way than other objects 
+
     $self->forze_filtering_tenants_by_tenant
         if $self->qvd_object_model->qvd_object eq 'Tenant';
+
+# When creating a new object it must be assigned to the right tenant
 
     $self->forze_tenant_assignment_in_creation
 	if $self->qvd_object_model->type_of_action =~ /^create(_or_update)?$/ &&
 	$self->qvd_object_model->directly_tenant_related;
 
+# This method adds filters in order to avoid selecting
+# objects the admin doesn't have acls for. These acls
+# are assigned to filter values
+
+# i.e. an admin allowed to use the 'log' table with the 
+# filter 'qvd_object' may not be allowed to select
+# 'log' entries with 'qvd_object' = 'vm'. In that case, 
+# a filter is added to avoid retrieving log entries with 
+# qvd_object=vm
+ 
     $self->forze_filtering_by_acls_for_filter_values;
 
 # After check and changes, filters are retrieved as a simple hash
@@ -174,15 +224,18 @@ sub BUILD
     $self->{filters} = $self->filters->hash;
 }
 
-##############
-## CHECKING ##
-##############
-## DIE UNLESS
+###############
+## CHECKINGS ##
+###############
 
 
 sub check_config_token_availability
 {
     my $self = shift;
+
+# This code gives a regex that denotes the set of acls that can be 
+# accessed via API. If the config token requested doesn't match this regex
+# it is an unavailable one
 
     my $col = QVD::Admin4::ConfigsOverwriteList->new(admin_id => $ADMIN->id);
     my $col_re = $col->configs_to_show_re;
@@ -217,7 +270,7 @@ sub check_filters_validity_in_json
     my $self = shift;
 
     $self->qvd_object_model->available_filter($_) || 
-	$self->qvd_object_model->has_property($_) ||
+	$self->qvd_object_model->has_property($_) || # is a custom property
 	QVD::Admin4::Exception->throw(code => 6210, object => $_)
 	for $self->json_wrapper->filters_list;
 
@@ -225,7 +278,7 @@ sub check_filters_validity_in_json
 
     $admin->re_is_allowed_to(
 	$self->qvd_object_model->get_acls_for_filter(
-	    $self->qvd_object_model->has_property($_) ? 'properties' : $_)) || 
+	    $self->qvd_object_model->has_property($_) ? 'properties' : $_)) || # There is just one acl for all custom properties 
 	QVD::Admin4::Exception->throw(code => 4220, object => $_)
 	for $self->json_wrapper->filters_list;
 
@@ -233,6 +286,10 @@ sub check_filters_validity_in_json
 	QVD::Admin4::Exception->throw(code => 6220, object => $_)
 	for $self->qvd_object_model->mandatory_filters;
 }
+
+# When needed, it checks if the admin can perform massive
+# deletions. An operation is massive if more than one
+# object are involved 
 
 sub check_acls_for_deleting
 {
@@ -253,6 +310,11 @@ sub check_update_arguments_validity_in_json
     $self->qvd_object_model->available_argument($_) || 
 	QVD::Admin4::Exception->throw(code => 6230, object => $_)
 	for $self->json_wrapper->arguments_list;
+
+# An operation is considered massive if it is applied over more than one 
+# object. For this kind of action, the 'id' is a mandatory filter
+# and it is the only filter available. So it can be known the amount of objects
+# will be involved by using that filter.
 
     my $id = $self->json_wrapper->get_filter_value('id');
     my ($method,$code) = ref($id) && scalar @$id > 1 ? 
@@ -285,6 +347,11 @@ sub check_create_arguments_validity_in_json
 	for $self->json_wrapper->arguments_list;
 }
 
+# Nested queries are queries inside either update or create
+# actions. The main action ask for the creation or update of a main
+# object, and these nested queries ask for assignations over that object
+# (i.e. custom properties can be assigned to vms, or acls to roles, tags to dis...) 
+
 sub check_nested_queries_validity_in_json
 {
     my $self = shift;
@@ -299,6 +366,11 @@ sub check_nested_queries_validity_in_json
     }
     elsif ($type_of_action eq 'update')
     {
+# An operation is considered massive if it is applied over more than one 
+# object. For this kind of action, the 'id' is a mandatory filter
+# and it is the only filter available. So it can be known the amount of objects
+# will be involved by using that filter.
+
 	my $id = $self->json_wrapper->get_filter_value('id');
 	($method,$code) = ref($id) && scalar @$id > 1 ? 
 	    ('get_acls_for_nested_query_in_massive_update',4240) : 
@@ -319,7 +391,7 @@ sub check_order_by_validity_in_json
     my $self = shift;
 }
 
-sub check_fields_validity_in_json
+sub check_fields_validity_in_json # Fields to retrieve
 {
     my $self = shift;
     my $admin = $self->qvd_object_model->current_qvd_administrator;
@@ -330,7 +402,7 @@ sub check_fields_validity_in_json
 
     $admin->re_is_allowed_to(
 	$self->qvd_object_model->get_acls_for_field(
-	    $self->qvd_object_model->has_property($_) ? 'properties' : $_)) || 
+	    $self->qvd_object_model->has_property($_) ? 'properties' : $_)) || # custom properties 
 	QVD::Admin4::Exception->throw(code => 4250, object => $_)
 	for $self->json_wrapper->fields_list;
 }
@@ -338,9 +410,6 @@ sub check_fields_validity_in_json
 #####################
 ## AD HOC SETTINGS ##
 ####################
-## ADD TO REQUEST ##
-####################
-## FOR FILTERS
 
 sub set_default_admin_id_in_acls_search
 {
@@ -354,7 +423,7 @@ sub hide_recovery_mode_administrator
 {
     my $self = shift;
     my $id = $self->qvd_object_model->map_filter_to_dbix_format('id');
-    $self->filters->add_filter($id,{ '!=' => 0 });
+    $self->filters->add_filter($id,{ '!=' => 0 }); # Recovery admin is by convention id 0
 }
 
 sub forze_filtering_by_own_admin
@@ -381,7 +450,7 @@ sub forze_own_admin_id_in_admin_views
 	my $admin_id = $self->qvd_object_model->map_argument_to_dbix_format('admin_id');
 	$self->instantiate_argument($admin_id,$ADMIN->id);
     }
-    else
+    else # delete actions
     {
 	my $admin_id = $self->qvd_object_model->map_filter_to_dbix_format('admin_id');
 	$self->filters->add_filter($admin_id,$ADMIN->id);
@@ -399,10 +468,11 @@ sub forze_filtering_by_tenant
     if ($self->json_wrapper->has_filter($tenant_id))
     {
 	QVD::Admin4::Exception->throw(code => 4220, object => 'tenant_id') 
-	    unless $ADMIN->is_superadmin;
+	    unless $ADMIN->is_superadmin; # Only superadmins can filter by tenant
     }
     elsif ($self->qvd_object_model->qvd_object eq 'Log' && $ADMIN->is_superadmin)
     {
+	# In log, entries without tenant specification must be retrieved as well
 	my $IS_NULL = "$tenant_id IS NULL";
 	$self->filters->add_filter('-or', [$tenant_id,$ADMIN->tenants_scoop,\$IS_NULL]);
     }
@@ -416,7 +486,11 @@ sub forze_filtering_tenants_by_tenant
 {
     my $self = shift;
 
-    my @ids = @{$ADMIN->tenants_scoop};
+    my @ids = @{$ADMIN->tenants_scoop}; # All tenants available for the admin
+
+# By convention, tenant 0 is the special tenant of superadmins 
+# Tenant 0 is special. It cannot be deleted and when listing
+# tenants it is not it doesn't appear
 
     @ids = grep { $_ ne 0 } @ids if 
 	$self->qvd_object_model->type_of_action =~ /^delete|list$/;
@@ -424,16 +498,26 @@ sub forze_filtering_tenants_by_tenant
     $self->filters->add_filter($id,\@ids);
 }
 
+# This method adds filters in order to avoid selecting
+# objects the admin doesn't have acls for. These acls
+# are assigned to filter values
+
+# i.e. an admin allowed to use the 'log' table with the 
+# filter 'qvd_object' may not be allowed to select
+# 'log' entries with 'qvd_object' = 'vm'. In that case, 
+# a filter is added to avoid retrieving log entries with 
+# qvd_object=vm
+
 sub forze_filtering_by_acls_for_filter_values
 {
     my $self = shift;
 
-    for my $filter ($self->qvd_object_model->get_filters_with_acls_for_values)
-    {
+    for my $filter ($self->qvd_object_model->get_filters_with_acls_for_values) # Filters whose values may have 
+    {                                                                          # acls associated
 	my @forbidden_values;
 
-	for my $value ($self->qvd_object_model->get_filter_values_with_acls($filter))
-	{
+	for my $value ($self->qvd_object_model->get_filter_values_with_acls($filter)) # Values of a filter that may
+	{                                                                             # have acls associated
 	    my @acls = $self->qvd_object_model->get_acls_for_filter_value($filter,$value);
 	    push @forbidden_values, $value unless $ADMIN->re_is_allowed_to(@acls);
 	}
@@ -460,12 +544,12 @@ sub forze_tenant_assignment_in_creation
     my $self = shift;
 
     if ($ADMIN->is_superadmin)
-    {
+    { # Mandatory argument for superadmins
 	QVD::Admin4::Exception->throw(code => 6240 , object => 'tenant_id')
 	    unless $self->json_wrapper->has_argument('tenant_id');
     }
     else
-    {
+    { # For non-superadmins a tenant_id assignation is forced according to the tenant_id of the admin
 	my $tenant_id = $self->qvd_object_model->map_argument_to_dbix_format('tenant_id');
 	$self->instantiate_argument($tenant_id,$ADMIN->tenant_id);
     }
@@ -567,7 +651,7 @@ sub set_arguments_in_request
 	my $value = $self->json_wrapper->get_argument_value($key);
 	my $value_normalized =  $self->qvd_object_model->normalize_value($key,$value);
 
-	$self->instantiate_argument($key_dbix_format,$value_normalized);
+	$self->instantiate_argument($key_dbix_format,$value_normalized); 
     }
 
     $self->set_arguments_in_request_with_defaults if 
@@ -595,16 +679,13 @@ sub instantiate_argument
 {
     my ($self,$dbix_key,$value) = @_;
     $value = undef if defined $value && $value eq '';
-    # WARNING: Is this the right solution to all fields??
 
     my ($table,$column) = $dbix_key =~ /^(.+)\.(.+)$/;
 
-    $table eq 'me'                                            ?
-    $self->set_argument($column,$value)                       :
+    $table eq 'me'                                            ? # The prefix me is for the main table in the request
+    $self->set_argument($column,$value)                       : 
     $self->set_related_object_argument($table,$column,$value);
 }
-
-
 
 sub set_order_by_in_request
 {
@@ -665,9 +746,9 @@ sub set_pagination_in_request
     $self->modifiers->{rows}  = $self->json_wrapper->block // 10000; 
 }
 
-###############
-## UTILITIES ##
-###############
+############################################
+## METHODS TO SET/GET INFO IN THE REQUEST ##
+############################################
 
 sub related_view
 {
@@ -705,6 +786,9 @@ sub table
     $self->qvd_object_model->qvd_object;
 }
 
+# Tables that must be created when creating an object
+# (i.e. vm_runtimes for vms)
+
 sub dependencies
 {
     my $self = shift;
@@ -733,6 +817,8 @@ sub set_argument
 
     $self->arguments->{$key} = $val;
 }
+
+# Arguments that are stored in related tables in DB
 
 sub set_related_object_argument
 {
