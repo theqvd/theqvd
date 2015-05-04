@@ -773,10 +773,13 @@ sub del_roles_to_role
     }
 
     # This is a reload of the object needed after deletion of roles
-    # in order to use the 'has_inherited_acl' method of Role.
+    # in order to refresh the info in the 'has_inherited_acl' method of Role.
     # There must be a better solution... FIX ME
+    # Maybe the reload could be triggered from the oibject itself
+    # always has_inherited_acl and other similar methods are executed
+    # That cpuld be more elegant, but it may involve performance issues
 
-    $this_role = $DB->resultset('Role')->search({id => $this_role->id})->first; 
+#    $this_role->discard_changes;
 
     # Deletion of redundant acls after assignation of the new role
     for my $neg_acl_name ($this_role->get_negative_own_acl_names)

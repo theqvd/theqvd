@@ -38,7 +38,7 @@ has 'qvd_object_model', is => 'ro', isa => sub { die "Invalid type for attribute
 has 'modifiers', is => 'ro', isa => sub { die "Invalid type for attribute modifiers" 
 					      unless ref(+shift) eq 'HASH'; }, 
                              default => sub { {  group_by => [], # TO DO: default dbix grouping fails for ordering in related tables. This avoids 
-						                # grouping, but turns off distinct...
+						                # grouping, but turns off DISTINCT...
 						join => [], order_by => { '-asc' => []}  }};
 has 'filters', is => 'ro', isa => sub { die "Invalid type for attribute failures" 
 					    unless ref(+shift) eq 'HASH'; }, default => sub { {}; };
@@ -56,6 +56,13 @@ has 'related_views', is => 'ro', isa => sub { die "Invalid type for attribute re
 
 my $ADMIN;
 
+# The constructor triggers several checks
+# over the input query. And it throws an informative exception
+# in case one check don't pass. Otherwise, the constructor
+# creates a repository with the information of the input query
+# translated to a certain format. When needed, some extra elements
+# are added to the repository.
+
 sub BUILD 
 {
     my $self = shift;
@@ -64,24 +71,53 @@ sub BUILD
 
 # CHECKS OR DIE
 
+# Not all config tokens can be updated from the API
+# This function checks if the requested config tokens
+# are available from the API
+
     $self->check_config_token_availability
 	if $self->qvd_object_model->qvd_object eq 
 	'Config';
+
+# Operative acls must be asked just for one role
+# Otherwise the request doesn't make sense 
 
     $self->check_unique_role_in_acls_search
 	if $self->qvd_object_model->qvd_object eq 
 	'Operative_Acls_In_Role';
 
+# Operative acls must be asked just for one admin
+# Otherwise the request doesn't make sense 
+
     $self->check_unique_admin_in_acls_search
 	if $self->qvd_object_model->qvd_object eq 
 	'Operative_Acls_In_Administrator';
 
+# It checks if the requested fields to retrieve 
+# are available
+
     $self->check_fields_validity_in_json;
+
+# It checks if the current admin is allowed to delete
 
     $self->check_acls_for_deleting if
 	$self->qvd_object_model->type_of_action eq 'delete';
 
+# It checks if the filters in the input query
+# are available in the system and if the current
+# admin is allowed to use them
+
     $self->check_filters_validity_in_json;
+
+# It checks if the arguments in the input query
+# are available in the system and if the current
+# admin is allowed to use them
+
+# The action 'myadmin_update' is used to change the 
+# personal configuration of the current admin
+# (password, language...). The checks are different  
+# in this case: an admin can only use 'myadmin_update'
+# to change its own values
 
     $self->check_update_arguments_validity_in_json if
 	$self->qvd_object_model->type_of_action eq 'update' &&

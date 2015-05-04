@@ -100,7 +100,8 @@ sub reload_acls_info
 {
     my $self = shift;
 
-    my $DB = db();
+    my $DB = QVD::DB::Simple::db();
+
     my @inherited_roles_ids = map { $_->inherited_id } $self->role_rels;
 
     my $rs = $DB->resultset('Operative_Acls_In_Role')->search(
