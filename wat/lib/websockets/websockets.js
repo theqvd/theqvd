@@ -2,14 +2,16 @@
 Wat.WS = {
     websockets: {},
     debug: 0,
-    openWebsocket: function (qvdObj, action, filters, arguments, fields, callback, stream, viewType) {        
+    openWebsocket: function (qvdObj, action, params, callback, stream, viewType) {        
         if ("WebSocket" in window) {
             if (Wat.WS.debug) {
                 console.info("WebSocket is supported by your Browser!");
             }
+            
+            var urlParams = Wat.U.objToUrl(params);
 
             // Let us open a web socket
-            var ws = new WebSocket('ws://' + Wat.C.apiAddress + '/' + stream + '?sid=' + Wat.C.sid + '&action=' + action + '&filters=' + JSON.stringify(filters) + '&arguments=' + JSON.stringify(arguments) + '&fields=' + JSON.stringify(fields) + '&parameters=' + JSON.stringify({source: Wat.C.source}));
+            var ws = new WebSocket('ws://' + Wat.C.apiAddress + '/' + stream + '?sid=' + Wat.C.sid + '&action=' + action + urlParams + '&parameters=' + JSON.stringify({source: Wat.C.source}));
             
             ws.onopen = function() {
                 // Web Socket is connected, send data using send()
@@ -24,12 +26,16 @@ Wat.WS = {
                 if (received_msg != 'AKN') {
                     var data = JSON.parse(received_msg);
                     
-                    if (Wat.WS.debug) {
-                        console.info("Message is received: ");
-                        console.info(action + ' : ' + filters.id + ' : ' + JSON.stringify(data));
+                    if (params.filters) {
+                        var id = params.filters.id
                     }
                     
-                    callback(qvdObj, filters.id, data, ws, viewType);
+                    if (Wat.WS.debug) {
+                        console.info("Message is received: ");
+                        console.info(action + ' : ' + id + ' : ' + JSON.stringify(data));
+                    }
+                    
+                    callback(qvdObj, id, data, ws, viewType);
                 }
                 setTimeout(function () {
                     if (ws.readyState == WS_OPEN) {
@@ -97,7 +103,10 @@ Wat.WS = {
         };
         
         $.each(fields, function (iField, field) {
-            that.openWebsocket(qvdObj, 'qvd_objects_statistics', filters, {}, field, that.changeWebsocket, 'ws', 'stats');
+            that.openWebsocket(qvdObj, 'qvd_objects_statistics', {
+                filters: filters, 
+                fields: field
+            }, that.changeWebsocket, 'ws', 'stats');
         });
     },
     
@@ -120,7 +129,10 @@ Wat.WS = {
             id: model.get('id')
         };
         
-        that.openWebsocket(qvdObj, qvdObj + '_get_details', filters, {}, fields, that.changeWebsocket, 'ws', viewType);
+        that.openWebsocket(qvdObj, qvdObj + '_get_details', {
+            filters: filters, 
+            fields: fields
+        }, that.changeWebsocket, 'ws', viewType);
     },
     
     changeWebsocket: function (qvdObj, id, data, ws, viewType) { 

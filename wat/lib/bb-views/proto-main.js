@@ -370,6 +370,11 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     renderRelatedDocs: function () {
+        // The related doc links only will be render for not embeded views
+        if (Wat.CurrentView.qvdObj != this.qvdObj) {
+            return;
+        }
+        
         var sectionDoc = [];
         sectionDoc[this.qvdObj] = "This section step by step";
         this.relatedDoc = $.extend({}, sectionDoc, this.relatedDoc);

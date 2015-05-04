@@ -777,7 +777,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
 
         that.renderList();
         
-        this.renderRelatedDocs();
+        this.renderRelatedDocs(this.qvdObj);
         
         // Translate the strings rendered. 
         // This translation is only done here, in the first charge. 

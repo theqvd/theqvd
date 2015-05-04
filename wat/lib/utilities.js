@@ -156,5 +156,22 @@ Wat.U = {
         return this.base64.encodeObj({
             filters: filters
         });
+    },
+    
+    // Convert a js object (a object of objects) to url parameters
+    objToUrl: function (params) {
+        var urlParams = '';
+        
+        $.each(params, function (pName, pValue) {
+            urlParams += '&' + pName + '=' + JSON.stringify(pValue);
+        });
+        
+        return urlParams;
+    },
+    
+    // Get url basename
+    basename: function (path) {
+        console.log(path);
+        return path.split(/[\\/]/).pop();
     }
 }

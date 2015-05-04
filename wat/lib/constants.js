@@ -10,6 +10,7 @@ DEBUG_ACL_FAILS = false;
 ALL_STATUS = {
     0000: 'Successful completion',
 
+    1000: 'In progress',
     1100: 'Internal server error',
     1200: 'Action not accomplished for all elements',
     1300: 'Zero items selected, no item has been changed',
@@ -20,6 +21,10 @@ ALL_STATUS = {
     2220: 'Unable to find images directory in filesystem',
     2230: 'Unable to find staging directory in filesystem',
     2240: 'Unable to find disk image in staging directory',
+    2250: 'Unable to upload disk image',
+    2251: 'Unable to move uploaded disk image',
+    2260: 'Unable to download disk image',
+    2261: 'Unable to move downloaded disk image',
 
     3100: 'No credentials provided for authentication',
     3200: 'Wrong login or password - Login again',
@@ -76,6 +81,7 @@ ALL_STATUS = {
 
 STATUS_SUCCESS = 0;
 
+STATUS_IN_PROGRESS = 1000;
 STATUS_INTERNAL_ERROR = 1100;
 STATUS_NOT_ALL_DONE = 1200;
 STATUS_ZERO_SELECTED = 1300;
@@ -85,6 +91,7 @@ STATUS_NOT_COPY_STAGING_DI = 2210;
 STATUS_NOT_FIND_DI_PATH = 2220;
 STATUS_NOT_FIND_STAGING_PATH = 2230;
 STATUS_NOT_FIND_STAGING_IMAGE = 2240;
+STATUS_UNABLE_TO_DOWNLOAD_DI = 2260;
 
 STATUS_CREDENTIALS_FAIL = 3100;
 STATUS_NOT_LOGIN = 3200;

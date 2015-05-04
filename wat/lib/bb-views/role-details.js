@@ -338,19 +338,28 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     },
     
     renderSide: function () {
-        // No side rendered
-        if (this.checkSide({'role.see.acl-list': '.js-side-component1', 'role.see.log': '.js-side-component2'}) === false) {
+        var sideCheck = this.checkSide({'role.see.acl-list': '.js-side-component1', 'role.see.log': '.js-side-component2'});
+        if (sideCheck === false) {
             return;
         }
         
-        var sideContainer = '.' + this.cid + ' .bb-details-side2';
-
-        // Render Related log list on side
-        var params = this.getSideLogParams(sideContainer);
-
-        this.sideView = new Wat.Views.LogListView(params);
+        if (sideCheck['role.see.log']) { 
+            var sideContainer = '.' + this.cid + ' .bb-details-side2';
+            
+            // Render Related log list on side
+            var params = this.getSideLogParams(sideContainer);
+            
+            this.sideView = new Wat.Views.LogListView(params);
+            
+            this.renderLogGraph(params);
+        }
         
-        this.renderLogGraph(params);
+        if (sideCheck['role.see.acl-list']) { 
+            this.aclPatterns = $.extend(ACL_SECTIONS_PATTERNS, ACL_ACTIONS_PATTERNS);
+            var aclPatternsArray = _.toArray(this.aclPatterns);
+            
+            Wat.A.performAction('number_of_acls_in_role', {}, {"role_id": this.id, "acl_pattern": aclPatternsArray}, {}, this.renderACLsTree, this);
+        }
     },
     
     render: function () {
@@ -362,14 +371,6 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         else {
             $('.js-menu-roles').hide();
         }
-        
-        this.aclPatterns = $.extend(ACL_SECTIONS_PATTERNS, ACL_ACTIONS_PATTERNS);
-        var aclPatternsArray = _.toArray(this.aclPatterns);
-        
-        Wat.A.performAction('number_of_acls_in_role', {}, {"role_id": this.id, "acl_pattern": aclPatternsArray}, {}, this.renderACLsTree, this);
-        
-        // Trigger click on first menu option by default
-        $('[data-show-submenu="acls-management-acls"]').trigger('click');
         
         Wat.T.translate();
     },
@@ -433,13 +434,6 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     
     renderACLsTree: function (that) {
         var branchStats = that.retrievedData;
-
-        // If acl list is not visible, we destroy div and increase the details layer to fill the gap
-        if (!Wat.C.checkACL('role.see.acl-list')) { 
-            $('.js-details-side').remove();
-            $('.details-block').addClass('col-width-100');
-            return;
-        }
         
         // Fill the html with the template and the model
         that.template = _.template(

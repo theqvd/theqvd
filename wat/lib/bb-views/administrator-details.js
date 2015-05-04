@@ -42,23 +42,11 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
 
         this.renderManagerRoles();
         
-        this.aclPatterns = $.extend({}, ACL_SECTIONS_PATTERNS, ACL_ACTIONS_PATTERNS);
-        
-        var aclPatternsArray = _.toArray(this.aclPatterns);
-        
-        Wat.A.performAction('number_of_acls_in_admin', {}, {"admin_id": this.id, "acl_pattern": aclPatternsArray}, {}, this.renderACLsTree, this);
-        
         Wat.T.translate();
     },
     
     renderACLsTree: function (that) {
         var branchStats = that.retrievedData;
-        // If acl list is not visible, we destroy div and increase the details layer to fill the gap
-        if (!Wat.C.checkACL('administrator.see.acl-list')) { 
-            $('.js-details-side').remove();
-            $('.details-block').addClass('col-width-100');
-            return;
-        }
 
         // Fill the html with the template and the model
         that.template = _.template(
@@ -78,19 +66,29 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     },
     
     renderSide: function () {
-        // No side rendered
-        if (this.checkSide({'administrator.see.acl-list': '.js-side-component1', 'administrator.see.log': '.js-side-component2'}) === false) {
+        var sideCheck = this.checkSide({'administrator.see.acl-list': '.js-side-component1', 'administrator.see.log': '.js-side-component2'});
+        if (sideCheck === false) {
             return;
         }
         
-        var sideContainer = '.' + this.cid + ' .bb-details-side2';
-
-        // Render Related log list on side
-        var params = this.getSideLogParams(sideContainer);
-
-        this.sideView = new Wat.Views.LogListView(params);
+        if (sideCheck['administrator.see.log']) {
+            var sideContainer = '.' + this.cid + ' .bb-details-side2';
+            
+            // Render Related log list on side
+            var params = this.getSideLogParams(sideContainer);
+            
+            this.sideView = new Wat.Views.LogListView(params);
+            
+            this.renderLogGraph(params);
+        }
         
-        this.renderLogGraph(params);
+        if (sideCheck['administrator.see.acl-list']) {
+            this.aclPatterns = $.extend({}, ACL_SECTIONS_PATTERNS, ACL_ACTIONS_PATTERNS);
+            
+            var aclPatternsArray = _.toArray(this.aclPatterns);
+            
+            Wat.A.performAction('number_of_acls_in_admin', {}, {"admin_id": this.id, "acl_pattern": aclPatternsArray}, {}, this.renderACLsTree, this);
+        }
     },
     
     events: {

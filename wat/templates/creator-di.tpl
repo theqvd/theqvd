@@ -5,6 +5,7 @@
             <select class="" name="images_source" data-any-selected>
                 <option value="computer" data-i18n="Your computer"></option>
                 <option value="staging" data-i18n="Staging directory"></option>
+                <option value="url" data-i18n="URL"></option>
             </select>
         </td>
     </tr>
@@ -20,6 +21,12 @@
             <form id="form_file_update">
             <input type="file" name="disk_image_file" class="col-width-100"></select>
             </form>
+        </td>
+    </tr>
+    <tr class="image_url_row">
+        <td data-i18n="Disk image's URL"></td>
+        <td>
+            <input type="text" name="disk_image_url" class="col-width-100"></select>
         </td>
     </tr>
     <% 

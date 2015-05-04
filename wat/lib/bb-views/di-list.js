@@ -140,11 +140,19 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
                 if (disk_image) {
                     arguments["disk_image"] = disk_image;
                 }
-                this.heavyCreate(arguments);
+                this.heavyCreateStaging(arguments);
                 break;
             case 'computer':
-                var disk_image_file = context.find('input[name="disk_image_file"]');
-                this.saveFile(arguments, disk_image_file);
+                var diskImageFile = context.find('input[name="disk_image_file"]');
+                
+                // In this case the progress is controlled by HTML5 API for files uploading
+                this.saveFile(arguments, diskImageFile);
+                break;
+            case 'url':
+                var diskImageUrl = context.find('input[name="disk_image_url"]').val();
+                arguments["disk_image"] = Wat.U.basename(diskImageUrl);
+                
+                this.heavyCreateDownload(arguments, diskImageUrl);
                 break;
         }
     },
@@ -214,52 +222,81 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         $('.loading-little-message').html($.i18n.t('Uploading image to server') + '<br><br>' + parseInt(e.loaded/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB / ' + parseInt(e.total/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB');
     },
     
-    heavyCreate: function (args) {
+    heavyCreateDownload: function (args, diskImageUrl) {
         // Di creation is a heavy operation. Screen will be blocked and a progress graph shown
         Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
-        Wat.WS.openWebsocket (this.qvdObj, 'di_create', {}, args, [], this.creatingProcess, 'staging');
+        Wat.WS.openWebsocket (this.qvdObj, 'di_create', {
+                arguments: args,
+                url: diskImageUrl
+        }, this.creatingProcessDownload, 'di/download/');
+    },   
+    
+    heavyCreateStaging: function (args) {
+        // Di creation is a heavy operation. Screen will be blocked and a progress graph shown
+        Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
+        Wat.WS.openWebsocket (this.qvdObj, 'di_create', {
+                arguments: args
+        }, this.creatingProcessStaging, 'staging');
     },
     
-    creatingProcess: function (qvdObj, id, data, ws) {
-        if (data.status == 1000) {
-            if (data.total_size == 0) {
-                var percent = 100;
-            }
-            else {
-                var percent = parseInt((data.copy_size / data.total_size) * 100);
-            }
-            
-            var progressData = [data.copy_size, data.total_size - data.copy_size];
-            Wat.I.G.drawPieChartSimple('loading-block', progressData);
-            
-            $('.loading-little-message').html($.i18n.t('Copying image from staging to images folder in server') + '<br><br>' + parseInt(data.copy_size/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB / ' + parseInt(data.total_size/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB');
-        }
-                
-        if (data.status == STATUS_SUCCESS) {
-            if (ws.readyState == WS_OPEN) {
-                ws.close();
-            }           
-            Wat.I.loadingUnblock();
-            $(".ui-dialog-buttonset button:first-child").trigger('click');
-            
-            if (qvdObj == Wat.CurrentView.qvdObj) {
-                Wat.CurrentView.fetchList();
-            }
-            else if (qvdObj == Wat.CurrentView.sideView2.qvdObj) {
-                Wat.CurrentView.sideView2.fetchList();
-            }
-            
-            Wat.I.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
-        }
-        
-        if (data.status == STATUS_ELEMENT_ALREADY_EXISTS) {
-            if (ws.readyState == WS_OPEN) {
-                ws.close();
-            }   
-            
-            Wat.I.loadingUnblock();
-            $(".ui-dialog-buttonset button:first-child").trigger('click');
-            Wat.I.showMessage({message: i18n.t('This element already exists'), messageType: 'error'});
+    creatingProcessStaging: function (qvdObj, id, data, ws) {
+        Wat.CurrentView.creatingProcess(qvdObj, id, data, ws, 'staging');
+    },
+    
+    creatingProcessDownload: function (qvdObj, id, data, ws) {
+        Wat.CurrentView.creatingProcess(qvdObj, id, data, ws, 'download');
+    },
+    
+    creatingProcess: function (qvdObj, id, data, ws, mode) {
+        switch (data.status) {
+            case STATUS_IN_PROGRESS:
+                if (data.total_size == 0) {
+                    var percent = 100;
+                }
+                else {
+                    var percent = parseInt((data.copy_size / data.total_size) * 100);
+                }
+
+                var progressData = [data.copy_size, data.total_size - data.copy_size];
+                Wat.I.G.drawPieChartSimple('loading-block', progressData);
+
+                var creatingMessage = '';
+                var progressMessage = parseInt(data.copy_size/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB / ' + parseInt(data.total_size/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB';
+                switch (mode) {
+                    case 'staging':
+                        creatingMessage = $.i18n.t('Copying image from staging to images folder in server');
+                        break;
+                    case 'download':
+                        creatingMessage = $.i18n.t('Downloading image from given URL to images folder in server');
+                        break;
+                }
+
+                $('.loading-little-message').html(creatingMessage + '<br><br>' + progressMessage); 
+                break;
+            case STATUS_SUCCESS:
+                if (ws.readyState == WS_OPEN) {
+                    ws.close();
+                }           
+                Wat.I.loadingUnblock();
+                $(".ui-dialog-buttonset button:first-child").trigger('click');
+
+                if (qvdObj == Wat.CurrentView.qvdObj) {
+                    Wat.CurrentView.fetchList();
+                }
+                else if (qvdObj == Wat.CurrentView.sideView2.qvdObj) {
+                    Wat.CurrentView.sideView2.fetchList();
+                }
+
+                Wat.I.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
+                break;
+            default:
+                if (ws.readyState == WS_OPEN) {
+                    ws.close();
+                }   
+
+                Wat.I.loadingUnblock();
+                $(".ui-dialog-buttonset button:first-child").trigger('click');
+                Wat.I.showMessage({message: i18n.t(ALL_STATUS[data.status]), messageType: 'error'});
         }
     }
 });

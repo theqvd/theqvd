@@ -245,10 +245,17 @@ Wat.B = {
                 case 'computer':
                     $('.image_computer_row').show();
                     $('.image_staging_row').hide();
+                    $('.image_url_row').hide();
                     break;
                 case 'staging':
                     $('.image_computer_row').hide();
                     $('.image_staging_row').show();
+                    $('.image_url_row').hide();
+                    break;
+                case 'url':
+                    $('.image_computer_row').hide();
+                    $('.image_staging_row').hide();
+                    $('.image_url_row').show();
                     break;
             }
         },

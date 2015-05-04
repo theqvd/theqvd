@@ -49,9 +49,14 @@ Wat.C = {
         return this.apiUrl;
     },   
     
-    // Get the API URL
+    // Get the API URL for update DIs
     getUpdateDiUrl: function () {
         return this.getApiUrl() + "di/upload?sid=" + this.sid;
+    }, 
+    
+    // Get the API URL for download DIs from URL
+    getDownloadDiUrl: function (url) {
+        return this.getApiUrl() + "di/download?sid=" + this.sid + "&url=" + url;
     },
     
     // Return if current admin is superadmin
@@ -209,6 +214,7 @@ Wat.C = {
             Wat.I.showMessage({message: "Wrong user or password", messageType: "error"});
             that.login = '';
             that.sid = '';
+            window.location.reload();
             return;
         }
         

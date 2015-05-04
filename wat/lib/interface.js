@@ -901,7 +901,7 @@ Wat.I = {
     loadDialogDoc: function (guideSection) {
         var dialogConf = {};
 
-        dialogConf.title ="Documentation";
+        dialogConf.title = $.i18n.t("Documentation");
 
         dialogConf.buttons = {
             "Read full documentation": function (e) {
