@@ -6,12 +6,12 @@ use QVD::Admin4::Exception;
 use QVD::Admin4::REST::Filter;
 use QVD::Admin4::ConfigsOverwriteList;
 
-# This class implements a request that can be done against the 
-# database via DBIx::Class. In fact, it's used by the methods in 
-# QVD::Admin4 in order to build requests via DBIx::Class.
+# This class implements a request to the database. In fact, 
+# it's used by the methods in QVD::Admin4 in order to ask 
+# the database via DBIx::Class.
 
 # The constructor takes two cruacial parameters: 
-# a) 'json_wrapper' denotes the input query
+# a) 'json_wrapper' denotes the input query to the API
 # b) 'qvd_object_model' is the model that defines
 #    how the input query should be and how it should be 
 #    translated into DBIx::Class format

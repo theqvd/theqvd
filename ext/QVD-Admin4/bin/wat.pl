@@ -358,17 +358,17 @@ websocket '/di/download' => sub {
     my $c = shift;
     $c->inactivity_timeout(30000);     
 
-    my $percent = 0;
+    my ($size,$len) = (0,0);
 
     $c->ua->on(start => sub {
 	my ($ua, $tx) = @_;
 	$tx->req->once(finish => sub {
 	    $tx->res->on(progress => sub {
 		my $msg = shift;
-		return unless my $len = $msg->headers->content_length;
+		return unless $len = $msg->headers->content_length;
 	      
-		my $size = $msg->content->progress;
-		$percent = $size == $len ? 100 : int($size / ($len / 100));
+		$size = $msg->content->progress;
+		my $percent = $size == $len ? 100 : int($size / ($len / 100));
 		print "\rProgress: ", $size == $len ? 100 : int($size / ($len / 100)), '%';
 			 });
 		       });
@@ -412,9 +412,13 @@ websocket '/di/download' => sub {
 
 			      $accomplished = 1; }); 
 
-    $c->on(message => sub { my ($c,$msg) = @_; $accomplished ? $c->finish : $c->send($percent); });
-    $c->on(finish => sub { my ($c,$msg) = @_; $c->send(encode_json($response)); });
-    $c->send($percent);
+    $c->on(message => sub { my ($c,$msg) = @_; 
+			    my $to_send = $accomplished ? $response : { status => 1000, total_size => $len, copy_size => $size };
+			    $c->send(encode_json($to_send)); });
+
+    $c->send(encode_json({ status => 1000,
+			   total_size => $len,
+			   copy_size => $size }));
 };
 
 app->start;

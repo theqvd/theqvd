@@ -14,7 +14,7 @@ with 'Throwable';
 # a) code: is a specific numeric code that must be supported by this class
 # b) exception: is another exception object that can be used to recursively build the current one
 # c) failures: is a set of multiple failures reported by some action. A certain kind of exception
-#              can be built from that multiple report
+#              can be built from this multiple report
 
 has 'code', is => 'ro', isa => sub { die "Invalid type for attribute code" if ref(+shift); };
 has 'exception', is => 'ro', isa => sub {};
@@ -34,12 +34,13 @@ has 'object', is => 'ro', isa => sub { die "Invalid type for attribute object" i
 ## CLASS VARIABLES
 
 # This is the mapper that relates numeric codes of exceptions
-# with its correspondant messages. Supported codes must be listed in here
+# with its corresponding messages. Supported codes must be listed in here
 
 my $code2message_mapper = 
 {
     0000 => 'Successful completion',
 
+    1000 => 'In progress', 
     1100 => 'Internal server error',
     1200 => 'Action not accomplished for all elements',
     1300 => 'Zero items selected, no item has been changed',
@@ -50,10 +51,10 @@ my $code2message_mapper =
     2220 => 'Unable to find images directory in filesystem',
     2230 => 'Unable to find staging directory in filesystem',
     2240 => 'Unable to find disk image in staging directory',
-    2250 => 'Unable to upload disk image',
-    2251 => 'Unable to move uploaded disk image',
-    2260 => 'Unable to download disk image',
-    2261 => 'Unable to move downloaded disk image',
+    2250 => 'Unable to upload disk image', 
+    2251 => 'Unable to move uploaded disk image', 
+    2260 => 'Unable to download disk image', 
+    2261 => 'Unable to move downloaded disk image', 
 
     3100 => 'No credentials provided for authentication',
     3200 => 'Wrong login or password - Login again',

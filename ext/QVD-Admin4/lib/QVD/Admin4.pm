@@ -1371,29 +1371,30 @@ sub config_ssl {
 
     my $ca = $json_wrapper->get_argument_value('ca');
 
-    rs(SSL_Config)->update_or_create({ key => 'l7r.ssl.cert',
+    rs("SSL_Config")->update_or_create({ key => 'l7r.ssl.cert',
                                        value => $cert });
-    rs(SSL_Config)->update_or_create({ key => 'l7r.ssl.key',
+    rs("SSL_Config")->update_or_create({ key => 'l7r.ssl.key',
                                        value => $key });
 
     if (defined $crl) {
-        rs(SSL_Config)->update_or_create({ key => 'l7r.ssl.crl',
+        rs("SSL_Config")->update_or_create({ key => 'l7r.ssl.crl',
                                            value => $crl })
     }
     else {
-        rs(SSL_Config)->search({ key => 'l7r.ssl.crl' })->delete;
+        rs("SSL_Config")->search({ key => 'l7r.ssl.crl' })->delete;
     }
 
     if (defined $ca) {
-        rs(SSL_Config)->update_or_create({key => 'l7r.ssl.ca',
+        rs("SSL_Config")->update_or_create({key => 'l7r.ssl.ca',
                                           value => $ca });
     }
     else {
-        rs(SSL_Config)->search({ key => 'l7r.ssl.ca' })->delete;
+        rs("SSL_Config")->search({ key => 'l7r.ssl.ca' })->delete;
     }
 
-    notify(qvd_config_changed);
-
+    QVD::Config::reload(); # To refresh config tokens in QVD::Config 
+#    notify('qvd_config_changed');
+    
     { total => 1,
      rows => [ ] };
 }
