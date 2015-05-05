@@ -38,9 +38,6 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             warn404: {
                 name: '404'
             },
-            warn404: {
-                name: '404'
-            },
             editor: {
                 name: 'editor-' + this.qvdObj
             }

@@ -137,12 +137,17 @@ Wat.WS = {
     
     changeWebsocket: function (qvdObj, id, data, ws, viewType) { 
         if (data.rows) {
-            var data = data.rows[0];
+            if (data.rows.length > 0) {
+                data = data.rows[0];
+            }
+            else {
+                data = [];
+            }
         }
         else {
-            var data = data;
+            data = data;
         }
-                    
+        
         $.each(data, function (field, value) {
             switch (qvdObj) {
                 case 'vm':

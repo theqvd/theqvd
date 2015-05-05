@@ -30,9 +30,19 @@ Wat.Models.Model = Backbone.Model.extend({
     
     processResponse: function (response) {
         // If found creation_date field, replace ugly T by blank space
-        if (response && response.creation_date) {
-            response.creation_date = response.creation_date.replace("T", " ");
+        if (response) {
+            if (response.creation_date) {
+                response.creation_date = response.creation_date.replace("T", " ");
+            }
+        
+            // Escape strings to avoid injections
+            $.each (response, function (field, value) {
+                if (typeof value == 'string') {
+                    response[field] = _.escape(value);
+                }
+            });
         }
+        
         return response;
     },
     

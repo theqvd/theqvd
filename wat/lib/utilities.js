@@ -171,7 +171,6 @@ Wat.U = {
     
     // Get url basename
     basename: function (path) {
-        console.log(path);
         return path.split(/[\\/]/).pop();
     }
 }

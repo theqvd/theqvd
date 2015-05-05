@@ -2,7 +2,6 @@ Wat.Models.DI = Wat.Models.Model.extend({
     actionPrefix: 'di',
     
     defaults: {
-        blocked: 0
     },
     
     parse: function (response) {

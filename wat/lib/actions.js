@@ -364,7 +364,7 @@ Wat.A = {
                             }
 
                             options += '<option value="' + id + '" ' + selected + '>' + 
-                                                                        name + 
+                                                                        _.escape(name) + 
                                                                         '<\/option>';
                         });
 

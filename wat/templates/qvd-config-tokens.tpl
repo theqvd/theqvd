@@ -23,7 +23,7 @@ $.each(configTokens, function (iTok, tok) {
 %>
     <tr class="js-token-row" data-prefix="<%= prefix %>">
         <td>
-            <%= token %>
+            <%= _.escape(token) %>
             
             <%
             if (QVD_CONFIG_HELP[token] != undefined) {
