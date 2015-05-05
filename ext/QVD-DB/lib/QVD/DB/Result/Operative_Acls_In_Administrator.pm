@@ -4,9 +4,19 @@ use base qw/DBIx::Class::Core/;
 use Mojo::JSON qw(decode_json);
 
 __PACKAGE__->table_class('DBIx::Class::ResultSource::View');
-
 __PACKAGE__->table('operative_acls_in_administrators');
 __PACKAGE__->result_source_instance->is_virtual(1);
+
+# The view has three placeholders:
+# El 1º se instancia con una regex que denota un grupo de acls que, en cualquier caso,
+# deben devolverse como no operativos para el administrador en cuestión
+
+# El 2º se instancia con una regex que denota un grupo de acls que, en cualquier caso,
+# deben devolverse como sí operativos para el administrador en cuestión
+
+# El 3º se instancia con una regex que denota un grupo de acls que, en cualquier caso,
+# no deben devolverse como sí operativos para al administrador en cuestión (se le esconden)
+
 __PACKAGE__->result_source_instance->view_definition(
 
 "
@@ -27,6 +37,7 @@ GROUP BY j.acl_id, a.name, j.inheritor_id, ad.id, a.id
 
 "
 );
+
 
 __PACKAGE__->add_columns(
 

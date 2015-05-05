@@ -45,10 +45,5 @@ sub set_state {
 sub block   { shift->update({ blocked => 'true'  }) }
 sub unblock { shift->update({ blocked => 'false' }) }
 
-sub get_has_many { qw(vms); };
-sub get_has_one { qw(); };
-sub get_belongs_to { qw(host rel_state rel_cmd); };
-sub get_required_cols { qw(host_id state blocked); };
-sub get_defaults { {}; };
 
 1;

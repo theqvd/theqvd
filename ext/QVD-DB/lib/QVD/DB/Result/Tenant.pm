@@ -19,7 +19,7 @@ __PACKAGE__->has_many(views => 'QVD::DB::Result::Tenant_Views_Setup', 'tenant_id
 __PACKAGE__->has_one (wat_setups   => 'QVD::DB::Result::Wat_Setups_By_Tenant',  'tenant_id');
 
 
-######### Log info
+######### FOR LOG #############################################################################
 
 __PACKAGE__->has_one(creation_log_entry => 'QVD::DB::Result::Log', 
 		     \&creation_log_entry_join_condition, {join_type => 'LEFT'});
@@ -43,6 +43,6 @@ sub update_log_entry_join_condition
 }
 
 
-##################
+###############################################################################################
 
 1;

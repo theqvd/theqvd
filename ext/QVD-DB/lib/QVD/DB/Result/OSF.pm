@@ -19,12 +19,11 @@ __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint(['name']);
 __PACKAGE__->belongs_to(tenant => 'QVD::DB::Result::Tenant',  'tenant_id', { cascade_delete => 0 });
 __PACKAGE__->has_many(vms => 'QVD::DB::Result::VM', 'osf_id', { cascade_delete => 0 } );
-__PACKAGE__->has_many(properties => 'QVD::DB::Result::OSF_Property', \&custom_join_condition, 
-		      {join_type => 'LEFT', order_by => {'-asc' => 'key'}});
+__PACKAGE__->has_many(properties => 'QVD::DB::Result::OSF_Property', 'osf_id', {join_type => 'LEFT', order_by => {'-asc' => 'key'}});
 __PACKAGE__->has_many(dis => 'QVD::DB::Result::DI', 'osf_id', { cascade_delete => 0 } );
 
 
-######### Log info
+######### FOR LOG ############################################################################
 
 __PACKAGE__->has_one(creation_log_entry => 'QVD::DB::Result::Log', 
 		     \&creation_log_entry_join_condition, {join_type => 'LEFT'});
@@ -47,7 +46,7 @@ sub update_log_entry_join_condition
     { "$args->{foreign_alias}.id"     => \$sql , };
 }
 
-###################
+##############################################################################################
 
 sub _dis_by_tag {
     my ($osf, $tag, $fixed) = @_;
@@ -89,25 +88,11 @@ sub dis_count
     $self->dis->count;
 }
 
-sub custom_join_condition
-{ 
-    my $args = shift; 
-    my $key = $ENV{QVD_ADMIN4_CUSTOM_JOIN_CONDITION};
-
-    { "$args->{foreign_alias}.osf_id" => { -ident => "$args->{self_alias}.id" },
-      "$args->{foreign_alias}.key"     => ($key ? { '=' => $key } : { -ident => "$args->{foreign_alias}.key"}) };
-}
 sub tenant_name
 {
     my $self = shift;
     $self->tenant->name;
 }
 
-sub get_properties_key_value
-{
-    my $self = shift;
-
-    ( properties => { map {  $_->key => $_->value  } $self->properties->all });
-} 
 
 1;

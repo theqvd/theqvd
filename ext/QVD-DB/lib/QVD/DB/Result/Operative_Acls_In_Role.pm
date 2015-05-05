@@ -11,6 +11,13 @@ __PACKAGE__->result_source_instance->is_virtual(1);
 __PACKAGE__->result_source_instance->view_definition(
 
 
+# The view has two placeholders:
+# El 1º se instancia con una regex que denota un grupo de acls que, en cualquier caso,
+# deben devolverse como no operativos para el administrador en cuestión
+
+# El 2º se instancia con una regex que denota un grupo de acls que, en cualquier caso,
+# no deben devolverse como sí operativos para al administrador en cuestión (se le esconden)
+
 "
 
 SELECT CASE WHEN a.name ~ ? OR (j.acl_id IS NULL AND jj.acl_id IS NULL) OR jj.positive=FALSE THEN FALSE ELSE TRUE END as operative, 

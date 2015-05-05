@@ -7,8 +7,8 @@ use QVD::Admin4::REST::Filter;
 use QVD::Admin4::ConfigsOverwriteList;
 
 # This class implements a request to the database. In fact, 
-# it's used by the methods in QVD::Admin4 in order to ask 
-# the database via DBIx::Class.
+# objects of this class are used by the methods in QVD::Admin4 
+# in order to ask the database via DBIx::Class.
 
 # The constructor takes two cruacial parameters: 
 # a) 'json_wrapper' denotes the input query to the API
@@ -27,6 +27,10 @@ use QVD::Admin4::ConfigsOverwriteList;
 # let you get the info from the repository. These accessors
 # are used by the methods in QVD::Admin4 in order to build the
 # requests to DB
+
+# All checks and translations in this class are operated over the 
+# input query ('json_wrapper') according the model for that kind 
+# of action ('qvd_object_model').
 
 has 'json_wrapper', is => 'ro', isa => sub { die "Invalid type for attribute json_wrapper" 
 						 unless ref(+shift) eq 'QVD::Admin4::REST::JSON'; }, required => 1;
@@ -62,6 +66,10 @@ my $ADMIN;
 # creates a repository with the information of the input query
 # translated to a certain format. When needed, some extra elements
 # are added to the repository.
+
+# All checks and translations in this class are operated over the 
+# input query ('json_wrapper') according the model for that kind 
+# of action ('qvd_object_model').
 
 sub BUILD 
 {
@@ -116,7 +124,7 @@ sub BUILD
 # The action 'myadmin_update' is used to change the 
 # personal configuration of the current admin
 # (password, language...). The checks are different  
-# in this case: an admin can only use 'myadmin_update'
+# in that case: an admin can only use 'myadmin_update'
 # to change its own values
 
     $self->check_update_arguments_validity_in_json if
@@ -130,9 +138,9 @@ sub BUILD
     $self->check_create_arguments_validity_in_json if
 	$self->qvd_object_model->type_of_action =~ /^create(_or_update)?$/;
 
-# It checks if the nested queries (i.e. tags, custom properties, acls assignations...)
-# in a creation or update query are available in the system and if the current
-# admin is allowed to use them
+# It checks if the nested queries in a creation or update query 
+# (tags, custom properties, role and acls assignations...) are 
+# available in the system and if the current admin is allowed to use them
 
     $self->check_nested_queries_validity_in_json if
 	$self->qvd_object_model->type_of_action =~ /^(cre|upd)ate$/;
@@ -147,7 +155,7 @@ sub BUILD
 
 # Creates the info repositories that will
 # be used by accessors methods in order to retrieve
-# info about the Request on DBIx::Class format
+# info about the Request in DBIx::Class format
 
     $self->set_filters_in_request;
 
@@ -171,7 +179,7 @@ sub BUILD
 
 # The accion 'get_acls_in_admins' without an admin_id filter 
 # is supposed to ask for the operative acls in the current admin.
-# This methods adds the corresponding filter 
+# This methods adds the corresponding filter if needed 
 
     $self->set_default_admin_id_in_acls_search
 	if $self->qvd_object_model->qvd_object eq 
@@ -179,7 +187,7 @@ sub BUILD
 
 # Requests must include a proper filter by tenant, cause
 # non-superadmin admins can only operate over its own
-# tenant. The corresponding filters to filter by tenant
+# tenant. The corresponding filters to filtering by tenant
 # are added in here
 
     $self->forze_filtering_by_tenant;
@@ -227,7 +235,6 @@ sub BUILD
 ###############
 ## CHECKINGS ##
 ###############
-
 
 sub check_config_token_availability
 {
@@ -564,7 +571,7 @@ sub forze_tenant_assignment_in_creation
 
 
 # This function creates an object QVD::Admin4::REST::Filter
-# that is a potentially complex set of filters.
+# that implements a potentially complex set of filters.
 # These are the filters of the request
 
 sub set_filters_in_request
@@ -575,16 +582,17 @@ sub set_filters_in_request
     $self->{filters} = QVD::Admin4::REST::Filter->new(
 	# The hash of filters in the input query
 	hash => $self->json_wrapper->filters_obj->hash, 
-        # A list of filters that must be unambiguous for this kind of query (i.e. id for delete/update queries) 
+        # A list of mandatory filters that must be unambiguous for this kind 
+        # of query (i.e. 'id' for delete/update queries) 
 	unambiguous_filters => [$self->qvd_object_model->unambiguous_filters]); 
                                                                                 
     my $found_properties = 0; # number of custom properties found
 
-# For every filter. This is the list of filters that appear in the
-# potentially complex filters structure of the input query. In that
-# complex structure, one filter may appear many times, in different places
-# (i.e. OR [ filter1 = A, filter1 = B ]). In this list we have every filter
-# just once
+    # For every filter. This is the list of filters that appear in the
+    # potentially complex filters structure of the input query. In that
+    # complex structure, one filter may appear many times, in different places
+    # (i.e. OR [ filter1 = A, filter1 = B ]). In this list we have every filter
+    # just once
 
     for my $k ($self->filters->list_filters) 
     {
@@ -595,7 +603,7 @@ sub set_filters_in_request
 	{ 
             # To filter by a property, the corresponding properties table must be joined.
             # This code uses the aliases system for multiple joins of the same table in DBIC
-	    $self->add_to_join('properties');
+	    $self->add_to_join('properties'); 
 	    $found_properties++;
 	    $key_dbix_format = $found_properties > 1 ?
 		"properties_$found_properties" : 'properties'; 
@@ -605,13 +613,17 @@ sub set_filters_in_request
 	    $key_dbix_format = $self->qvd_object_model->map_filter_to_dbix_format($k); 
 	}
 
-# For every value of the current filter in the input filters structure
-# For example, if the input filters structure is OR [ filter1 = A, filter1 = B ]
-# and $k = filter1, this list is (A, B) 
+        # For every value of the current filter in the input filters structure.
+        # For example, if the input filters structure is OR [ filter1 = A, filter1 = B ]
+        # and $k = filter1, this list is (A, B) 
 
 	for my $ref_v ($self->filters->get_filter_ref_value($k))
 	{
-	    my $v = $self->filters->get_value($ref_v);
+	    # $ref_v is a hash reference that points to the value of the filter $k
+            # in a specific place in the complex imput structure of filters
+            # We need to use a reference in order to operate over the filter value
+            # no matter where that value is in the complex input structure
+	    my $v = $self->filters->get_value($ref_v); # $v is the value as a string
 
 	    unless ($is_property)
 	    {
@@ -625,13 +637,16 @@ sub set_filters_in_request
 		}
 	    }
 
-	    my $op = $self->filters->get_operator($ref_v);
+	    my $op = $self->filters->get_operator($ref_v); # $k and $v must be related by a specific operator (=, <, >...)
 	    $op = $self->qvd_object_model->normalize_operator($op);
 
+            # This is according DBIC format
 	    my $value_normalized = $is_property ?  
 		[$key_dbix_format.".key" => { $op => $k },
 		 $key_dbix_format.".value" => { $op => $v } ] : { $op => $v };
 
+	    # This code sets the normalized value in the hash ref, in the original
+            # place of the value in the complex filters structure
 	    if ($is_property)
 	    {
 		$self->filters->set_filter($ref_v,'-and',$value_normalized);
@@ -642,6 +657,8 @@ sub set_filters_in_request
 	    }
 	}
     }
+    # If new filters have been added (properties), the flattened
+    # list of filters must be recalculated
     $self->filters->flatten_filters if $found_properties;
 }
 
@@ -692,6 +709,9 @@ sub set_arguments_in_request_with_defaults
 	$self->instantiate_argument($key_dbix_format,$value);
     }
 }
+
+# Arguments in the main table and arguments in other related
+# tables are stored in different places
 
 sub instantiate_argument
 {

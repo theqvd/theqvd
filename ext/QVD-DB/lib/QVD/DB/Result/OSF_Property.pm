@@ -10,8 +10,5 @@ __PACKAGE__->add_columns( osf_id => { data_type => 'integer' },
 __PACKAGE__->set_primary_key('osf_id', 'key');
 __PACKAGE__->belongs_to(osf => 'QVD::DB::Result::OSF', 'osf_id');
 
-sub get_has_many { qw(); }
-sub get_has_one { qw(); }
-sub get_belongs_to { qw(osf); }
 
 1;

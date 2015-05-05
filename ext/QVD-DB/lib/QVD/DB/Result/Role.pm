@@ -21,7 +21,7 @@ __PACKAGE__->has_many(role_rels => 'QVD::DB::Result::Role_Role_Relation', 'inher
 __PACKAGE__->has_many(parent_role_rels => 'QVD::DB::Result::Role_Role_Relation', 'inherited_id', { cascade_delete => 0 } );
 
 
-######### Log info
+######### FOR LOG ############################################################################
 
 __PACKAGE__->has_one(creation_log_entry => 'QVD::DB::Result::Log', 
 		     \&creation_log_entry_join_condition, {join_type => 'LEFT'});
@@ -45,7 +45,7 @@ sub update_log_entry_join_condition
 }
 
 
-##################
+###############################################################################################
 
 sub is_allowed_to
 {
@@ -65,13 +65,13 @@ sub get_all_inherited_role_ids
     return keys %{$self->acls_info->{all_inherited_role_ids}};
 }
 
-sub has_own_negative_acl
+sub has_own_negative_acl # not inherited
 {
     my ($self,$acl_name) = @_;
     return exists $self->acls_info->{own_negative_acls}->{$acl_name};
 }
 
-sub has_own_positive_acl
+sub has_own_positive_acl # not inherited
 {
     my ($self,$acl_name) = @_;
     return exists $self->acls_info->{own_positive_acls}->{$acl_name};

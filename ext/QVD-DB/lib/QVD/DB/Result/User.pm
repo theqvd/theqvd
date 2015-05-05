@@ -19,10 +19,9 @@ __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint(['login']);
 __PACKAGE__->belongs_to(tenant => 'QVD::DB::Result::Tenant',  'tenant_id', { cascade_delete => 0 });
 __PACKAGE__->has_many(vms => 'QVD::DB::Result::VM', 'user_id', { cascade_delete => 0 } );
-__PACKAGE__->has_many(properties => 'QVD::DB::Result::User_Property', \&custom_join_condition, 
-		      {join_type => 'LEFT', order_by => {'-asc' => 'key'}});
+__PACKAGE__->has_many(properties => 'QVD::DB::Result::User_Property', 'user_id', {join_type => 'LEFT', order_by => {'-asc' => 'key'}});
 
-######### Log info
+######### FOR LOG ###########################################################################
 
 __PACKAGE__->has_one(creation_log_entry => 'QVD::DB::Result::Log', 
 		     \&creation_log_entry_join_condition, {join_type => 'LEFT'});
@@ -45,25 +44,8 @@ sub update_log_entry_join_condition
     { "$args->{foreign_alias}.id"     => \$sql , };
 }
 
-###################
+#############################################################################################
 
-
-sub BEGIN
-{
-    my $self = shift;
-}
-
-sub creation_admin
-{ 
-    my $self = shift;
-    return undef;
-}
-
-sub creation_date
-{ 
-    my $self = shift;
-    return undef;
-}
 
 sub vms_count
 {
@@ -90,23 +72,6 @@ sub tenant_name
     my $self = shift;
     $self->tenant->name;
 }
-
-sub custom_join_condition
-{ 
-    my $args = shift; 
-    my $key = $ENV{QVD_ADMIN4_CUSTOM_JOIN_CONDITION};
-
-    { "$args->{foreign_alias}.user_id" => { -ident => "$args->{self_alias}.id" },
-      "$args->{foreign_alias}.key"     => ($key ? { '=' => $key } : { -ident => "$args->{foreign_alias}.key"}) };
-}
-
-sub get_properties_key_value
-{
-    my $self = shift;
-
-    ( properties => { map {  $_->key => $_->value  } $self->properties->all });
-} 
-
 
 sub name 
 {

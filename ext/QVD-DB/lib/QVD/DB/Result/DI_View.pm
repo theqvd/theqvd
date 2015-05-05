@@ -24,14 +24,12 @@ __PACKAGE__->add_columns(
     'id' => {
 	data_type => 'integer'
     },
-
-        'properties_json' => {
+    'properties_json' => {
 	data_type => 'JSON',
     },
     'tags_json' => {
 	data_type => 'JSON',
     },
-
     );
 
 sub properties

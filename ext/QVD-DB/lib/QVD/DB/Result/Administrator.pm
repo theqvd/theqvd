@@ -19,9 +19,9 @@ __PACKAGE__->add_unique_constraint([qw(name tenant_id)]);
 __PACKAGE__->has_many(role_rels => 'QVD::DB::Result::Role_Administrator_Relation', 'administrator_id');
 __PACKAGE__->has_many(views => 'QVD::DB::Result::Administrator_Views_Setup', 'administrator_id');
 __PACKAGE__->belongs_to(tenant => 'QVD::DB::Result::Tenant',  'tenant_id', { cascade_delete => 0 });
-__PACKAGE__->has_one (wat_setups   => 'QVD::DB::Result::Wat_Setups_By_Administrator',  'administrator_id');
+__PACKAGE__->has_one (wat_setups   => 'QVD::DB::Result::Wat_Setups_By_Administrator',  'administrator_id'); # Setups for the WAT client (language, block)
 
-######### Log info
+######### FOR LOG ##########################################################################################
 
 __PACKAGE__->has_one(creation_log_entry => 'QVD::DB::Result::Log', 
 		     \&creation_log_entry_join_condition, {join_type => 'LEFT'});
@@ -53,7 +53,7 @@ sub login_log_entry_join_condition
     { "$args->{foreign_alias}.id"     => \$sql , };
 }
 
-##################
+###########################################################################################################
 
 my $DB;
 
@@ -104,7 +104,6 @@ sub tenant_name
     $self->tenant->name;
 }
 
-
 sub get_roles_info
 {
     my $self = shift;
@@ -143,6 +142,8 @@ sub re_is_allowed_to
     }
     return 1;
 }
+
+# Tenants where the admin can operate
 
 sub set_tenants_scoop
 {

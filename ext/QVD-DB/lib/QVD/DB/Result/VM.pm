@@ -32,8 +32,7 @@ __PACKAGE__->belongs_to(osf  => 'QVD::DB::Result::OSF',  'osf_id',  { cascade_de
 
 __PACKAGE__->has_one (vm_runtime => 'QVD::DB::Result::VM_Runtime',  'vm_id');
 __PACKAGE__->has_one (counters   => 'QVD::DB::Result::VM_Counter',  'vm_id');
-__PACKAGE__->has_many(properties => 'QVD::DB::Result::VM_Property', \&custom_join_condition, 
-		      {join_type => 'LEFT', order_by => {'-asc' => 'key'}});
+__PACKAGE__->has_many(properties => 'QVD::DB::Result::VM_Property', 'vm_id',{join_type => 'LEFT', order_by => {'-asc' => 'key'}});
 __PACKAGE__->belongs_to(di => 'QVD::DB::Result::DI',
 			sub {
   			  my $args = shift;
@@ -47,7 +46,7 @@ EOIN
 
 			});
 
-######### Log info
+######### FOR LOG ##############################################################################
 
 __PACKAGE__->has_one(creation_log_entry => 'QVD::DB::Result::Log', 
 		     \&creation_log_entry_join_condition, {join_type => 'LEFT'});
@@ -80,7 +79,7 @@ sub start_log_entry_join_condition
     { "$args->{foreign_alias}.id"     => \$sql , };
 }
 
-###################
+################################################################################################
 
 
 sub combined_properties {
@@ -130,16 +129,6 @@ sub creation_admin
     return undef;
 }
 
-
-sub custom_join_condition
-{ 
-    my $args = shift; 
-    my $key = $ENV{QVD_ADMIN4_CUSTOM_JOIN_CONDITION};
-
-    { "$args->{foreign_alias}.vm_id" => { -ident => "$args->{self_alias}.id" },
-      "$args->{foreign_alias}.key"     => ($key ? { '=' => $key } : { -ident => "$args->{foreign_alias}.key"}) };
-}
-
 sub tenant_id
 {
     my $self = shift;
@@ -158,12 +147,6 @@ sub tenant
     $self->user->tenant;
 }
 
-sub get_properties_key_value
-{
-    my $self = shift;
-
-    ( properties => { map {  $_->key => $_->value  } $self->properties->all });
-} 
 
 sub vm_mac
 {
