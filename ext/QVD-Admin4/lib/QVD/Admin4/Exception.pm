@@ -112,6 +112,7 @@ my $code2message_mapper =
     7360 => 'Incompatible expiration dates - Soft date must precede the hard one',
     7371 => 'Non core config items haven\'t default value',
     7372 => 'Unable to remove a core config item',
+    7373 => 'Unable to switch to monotenant mode - More than one tenant in the system',
 };
 
 # When an exception is thrown by DBIx::Class, it is catched and passed as a parameter 

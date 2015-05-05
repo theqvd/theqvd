@@ -5,6 +5,7 @@ use Moo;
 use QVD::Admin4::Exception;
 use QVD::Admin4::REST::Filter;
 use QVD::Admin4::ConfigsOverwriteList;
+use QVD::DB::Simple qw(db);
 
 # This class implements a request to the database. In fact, 
 # objects of this class are used by the methods in QVD::Admin4 
@@ -253,6 +254,21 @@ sub check_config_token_availability
 
     QVD::Admin4::Exception->throw(code => 6380, object => $token) 
 	unless $token =~ /$col_re/;
+
+# This code forbids the switch to monotenant mode if
+# in the system there are multiple tenants
+
+    my $token_value = $self->qvd_object_model->type_of_action eq 'delete' ?
+	'0' : $self->json_wrapper->get_argument_value('value');
+
+    my $false_in_postgres = '^(f(alse)?|no?|off|0)$';
+
+    QVD::Admin4::Exception->throw(code => 7373) if 
+	$token eq 'wat.multitenant' &&
+	$token_value =~ /$false_in_postgres/ &&
+        # There are more than 1 normal tenant 
+        # (in addition to tenant 0 for superadmins)
+	QVD::DB::Simple::db()->resultset('Tenant')->search()->count > 2;
 }
 
 

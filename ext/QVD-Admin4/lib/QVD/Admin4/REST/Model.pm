@@ -1402,7 +1402,7 @@ sub BUILD
 {
     my $self = shift;
 
-    $DB = db();
+    $DB = QVD::DB::Simple::db();
 
     $self->initialize_info_model; # Creates a new hash reference to allocate 'model_info'
 
