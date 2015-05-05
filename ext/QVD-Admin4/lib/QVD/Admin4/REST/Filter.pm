@@ -47,7 +47,7 @@ sub BUILD
 # logical operator (i.e. { filter1 => value } is normalized as { -and => [ filter1 => value ] })
 
     $self->normalize_simple_filter
-	unless $self->filter_with_logical_operator;
+	if $self->filter_without_logical_operator;
 
 # The key idea to manage complex structures of filters is 
 # to create a flattened version of the complex structure
@@ -133,18 +133,17 @@ sub is_obligatory_rec
 
 # It checks if the filters structure has logical operators
 
-sub filter_with_logical_operator
+sub filter_without_logical_operator
 {
     my $self = shift;
-    my $has_logical_operator;
-    for (keys %$LOGICAL_OPERATORS)
+    my $has_not_logical_operator = 0;
+    for (keys %{$self->hash})
     {
-	if ($has_logical_operator = $self->hash->{$_})
-	{ 
-	    last; 
-	} 
+	next if exists $LOGICAL_OPERATORS->{$_};
+	$has_not_logical_operator = 1;
     }
-    $has_logical_operator;
+
+    $has_not_logical_operator;
 }
 
 # It takes a simple filters structure
