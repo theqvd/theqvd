@@ -1299,7 +1299,8 @@ my $VALUES_NORMALIZATOR =
     User => { name => \&normalize_name, 
 	      password => \&password_to_token },
 
-    Administrator => { name => \&normalize_name },
+    Administrator => { name => \&normalize_name,
+		       password => \&password_to_token },
 
     Tenant => { name => \&normalize_name }
 };

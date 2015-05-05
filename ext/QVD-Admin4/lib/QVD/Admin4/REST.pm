@@ -64,6 +64,7 @@ sub validate_user
     return undef if (not defined $params{id}) && 
 	$multitenant && (not defined $params{tenant});
 
+    $params{password} = $self->password_to_token($params{password}) if defined $params{password};
     $params{name} = delete $params{login} if defined $params{login};
     $params{tenant_id} = eval { $QVD_ADMIN->_db->resultset('Tenant')->search(
 				    { name => delete $params{tenant} })->first->id } 
@@ -312,6 +313,16 @@ sub database_version
 	$QVD_ADMIN->_db->resultset('Version')->search(
 	    { component => 'schema' })->first->version
     } // undef;
+}
+
+# The same function is in QVD::Admin4::REST::Model !!! FIX ME
+# We wanna this in the sama place
+
+sub password_to_token 
+{
+    my ($self, $password) = @_;
+    require Digest::SHA;
+    Digest::SHA::sha256_base64(cfg('l7r.auth.plugin.default.salt') . $password);
 }
 
 1;

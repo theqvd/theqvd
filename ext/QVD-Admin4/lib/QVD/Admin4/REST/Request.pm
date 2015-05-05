@@ -562,25 +562,39 @@ sub forze_tenant_assignment_in_creation
 ############################################################
 ############################################################
 
+
+# This function creates an object QVD::Admin4::REST::Filter
+# that is a potentially complex set of filters.
+# These are the filters of the request
+
 sub set_filters_in_request
 {
     my $self = shift;
     my $filters = $self->json_wrapper->filters;
 
     $self->{filters} = QVD::Admin4::REST::Filter->new(
-	hash => $self->json_wrapper->filters_obj->hash,
-	unambiguous_filters => [$self->qvd_object_model->unambiguous_filters]);
+	# The hash of filters in the input query
+	hash => $self->json_wrapper->filters_obj->hash, 
+        # A list of filters that must be unambiguous for this kind of query (i.e. id for delete/update queries) 
+	unambiguous_filters => [$self->qvd_object_model->unambiguous_filters]); 
+                                                                                
+    my $found_properties = 0; # number of custom properties found
 
-    my $found_properties = 0;
+# For every filter. This is the list of filters that appear in the
+# potentially complex filters structure of the input query. In that
+# complex structure, one filter may appear many times, in different places
+# (i.e. OR [ filter1 = A, filter1 = B ]). In this list we have every filter
+# just once
 
-    for my $k ($self->filters->list_filters)
+    for my $k ($self->filters->list_filters) 
     {
 	my $is_property = $self->qvd_object_model->has_property($k);
 	my $key_dbix_format;
 
 	if ($is_property) 
 	{ 
-
+            # To filter by a property, the corresponding properties table must be joined.
+            # This code uses the aliases system for multiple joins of the same table in DBIC
 	    $self->add_to_join('properties');
 	    $found_properties++;
 	    $key_dbix_format = $found_properties > 1 ?
@@ -590,6 +604,10 @@ sub set_filters_in_request
 	{
 	    $key_dbix_format = $self->qvd_object_model->map_filter_to_dbix_format($k); 
 	}
+
+# For every value of the current filter in the input filters structure
+# For example, if the input filters structure is OR [ filter1 = A, filter1 = B ]
+# and $k = filter1, this list is (A, B) 
 
 	for my $ref_v ($self->filters->get_filter_ref_value($k))
 	{
