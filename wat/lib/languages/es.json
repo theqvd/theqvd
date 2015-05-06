@@ -318,6 +318,7 @@
     "There are not elements": "No hay elementos",
     "There are not tags": "No hay tags",
     "There are not VMS close to expire": "No hay MVs próximas a expirar",
+    "There are VMs affected by the latest action": "Hay MVs afectadas por la última acción",
     "This action cannot be undone": "Esta acción no puede deshacerse",
     "This disk image is already setted as default - To change this, another disk image of the same OSF must be setted as default": "Esta imagen de disco es la predeterminada - Para cambiar esto, otra imagen de disco del mismo OSF debe ser establecida como predeterminada",
     "This virtual machine will expire": "Esta máquina virtual expirará",

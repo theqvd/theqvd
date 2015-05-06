@@ -477,7 +477,7 @@ Wat.Views.MainView = Backbone.View.extend({
     openEditAffectedVMsDialog: function (affectedVMs) {
         var that = this;
         
-        this.dialogConf.title = 'Affected VMs';
+        this.dialogConf.title = $.i18n.t('There are VMs affected by the latest action');
 
         this.templateEditor = Wat.TPL.editorAffectedVM;
         

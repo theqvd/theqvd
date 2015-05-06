@@ -315,6 +315,7 @@
     "There are not elements": "There are not elements",
     "There are not tags": "There are not tags",
     "There are not VMS close to expire": "There are not VMS close to expire",
+    "There are VMs affected by the latest action": "There are VMs affected by the latest action",
     "This action cannot be undone": "This action cannot be undone",
     "This disk image is already setted as default - To change this, another disk image of the same OSF must be setted as default": "This disk image is already setted as default - To change this, another disk image of the same OSF must be setted as default",
     "This virtual machine will expire": "This virtual machine will expire",

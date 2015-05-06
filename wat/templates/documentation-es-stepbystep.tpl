@@ -2071,6 +2071,9 @@ Crear una Imagen en un OSF habiendo una máquina virtual asignada a ese mismo OS
 </li>
 </ul></div>
 <div class="paragraph"><p>Tras cualquiera de estas acciones, aparecerá una ventana modal avisándonos de la situación con la lista de Máquinas virtuales afectadas junto a casillas de verificación y un formulario para asignar una fecha de expiración a aquellas Máquinas de la lista que deseemos.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_di_edit_affected_vms.png" alt="screenshot_di_edit_affected_vms.png" width="960px" />
+</span></p></div>
 </div></div>
 </dd>
 </dl></div>
