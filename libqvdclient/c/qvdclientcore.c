@@ -52,7 +52,7 @@ int qvd_get_version(void) {
 }
 
 const char *qvd_get_version_text(void) {
-  snprintf(qvdversion, MAX_STRING_VERSION, "QVD Version: %s\nCurl Version: %s\nOpenssl version: %s\n", QVDABOUT, curl_version(), OPENSSL_VERSION_TEXT);
+  snprintf(qvdversion, MAX_STRING_VERSION, "QVD Version: %s\nCurl Version: %s\nOpenssl version: %s\nnxcomp version: %s\n", QVDABOUT, curl_version(), OPENSSL_VERSION_TEXT, NXVersion());
   return qvdversion;
 }
 

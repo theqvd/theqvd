@@ -12,9 +12,10 @@
 /* #define BUFFER_SIZE CURL_MAX_WRITE_SIZE * 2 */
 #define BUFFER_SIZE 65536
 #include "qvdbuffer.h"
-#define QVDVERSION 117
-#define QVDABOUT "Version: 1.1.7. $Id$"
-#define QVDCHANGELOG "1.1.7 03/05/2015 During debug show correct version text\n" \
+#define QVDVERSION 118
+#define QVDABOUT "Version: 1.1.8. $Id$"
+#define QVDCHANGELOG "1.1.8 06/05/2015 Include nxcomp version in the -v flag\n" \
+                     "1.1.7 03/05/2015 During debug show correct version text\n" \
                      "1.1.6 28/04/2015 More time to session takeover\n" \
                      "1.1.5  5/12/2014 Support for HTTP code 402\n" \
                      "1.1.4 23/11/2014 Extend pass length to 256\n" \
