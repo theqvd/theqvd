@@ -2021,6 +2021,56 @@ Edición
 <img src="images/doc_images/screenshot_di_edit.png" alt="screenshot_di_edit.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>Al editar una imagen podremos gestionar sus <strong>tags y crear, editar o añadir propiedades</strong>. Ademas podremos establecerla como imagen por defecto de su OSF, en el caso de no serlo ya. Si lo es, nos saldrá un aviso.</p></div>
+<div class="paragraph"><p><strong>Los tags de una Imagen de disco no se pueden repetir en las Imágenes asociadas a un mismo OSF</strong>. <strong>Si añadimos un tag a una Imagen de disco que ya existe</strong> en otra Imagen de su mismo OSF el sistema nos lo permitirá, pero lo que estaremos haciendo en realidad es <strong>mover el tag entre las dos Imágenes</strong>, desapareciendo de la que lo tenía en un inicio para establecerse en la Imagen que estemos editando.</p></div>
+</div></div>
+</dd>
+<dt class="hdlist1">
+Consecuencias de cambios en Imágenes
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>A veces, un cambio en una Imagen de disco puede tener <strong>consecuencias en las Máquinas virtuales</strong> de diversas maneras.</p></div>
+<div class="paragraph"><p>Esto sucederá en Máquinas virtuales <strong>corriendo</strong> y que tengan asociado el <strong>mismo OSF</strong> que la Imagen de disco modificada.</p></div>
+<div class="paragraph"><p>Una Máquina virtual tiene asignado un tag de entre los tags de sus Imágenes de disco asociadas, o lo que es lo mismo, las Imágenes de disco del OSF asociado a la Máquina. Esto incluye los tags especiales <em>head</em> y <em>default</em> que hacen referencia a la última Imagen de disco creada y a la Imagen de disco establecida como por defecto respectivamente.</p></div>
+<div class="paragraph"><p>Recordamos que cuando cambiamos el tag asociado a una Máquina virtual mientras está corriendo, podemos llegar a una situación en la que su Imagen de disco asociada es distinta a la que está utilizando en la ejecución.</p></div>
+<div class="paragraph"><p>Se puede llegar a la misma situación cuando el tag asociado a una Máquina virtual que está corriendo pase de una Imagen a otra. Esto puede pasar en distintas situaciones:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Cuando el tag sea asignado a otra Imagen de disco del mismo OSF y por lo tanto, eliminado de la Imagen usada en la ejecución de la Máquina virtual.
+</p>
+</li>
+<li>
+<p>
+Cuando el tag asociado sea <em>default</em> y se establezca como Imagen por defecto del OSF una nueva Imagen de disco.
+</p>
+</li>
+<li>
+<p>
+Cuando el tag asociado sea <em>head</em> y se cree una nueva Imagen de disco.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Al realizar la acción que desencadene cualquiera de estas situaciones se podrá asignar una fecha de expiración para la Máquina o Máquinas virtuales afectadas. Estas acciones son las siguientes:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Editar una Imagen añadiéndole un tag que está en otra, siendo este tag el asignado a una Máquina virtual corriendo
+</p>
+</li>
+<li>
+<p>
+Establecer una Imagen como imagen por defecto en su OSF habiendo una máquina virtual asignada a ese mismo OSF que tiene el tag <em>default</em> asignado
+</p>
+</li>
+<li>
+<p>
+Crear una Imagen en un OSF habiendo una máquina virtual asignada a ese mismo OSF que tiene el tag <em>head</em> asignado
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Tras cualquiera de estas acciones, aparecerá una ventana modal avisándonos de la situación con la lista de Máquinas virtuales afectadas junto a casillas de verificación y un formulario para asignar una fecha de expiración a aquellas Máquinas de la lista que deseemos.</p></div>
 </div></div>
 </dd>
 </dl></div>
