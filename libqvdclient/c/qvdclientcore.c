@@ -361,7 +361,8 @@ int qvd_connect_to_vm(qvdclient *qvd, int id)
   qvd_printf("before NXTransDestroy\n");
   NXTransDestroy(NX_FD_ANY);
   qvd_printf("after NXTransDestroy\n");
-
+  NXTransCleanupForReconnect();
+  qvd_printf("after NXTransCleanupForReconnect\n");
   if (result)
     return 6;
 
