@@ -1639,6 +1639,10 @@ select[name="role"] {
         border-spacing: 20px; } }
     .editor-container .editor-table td {
       padding-top: 4px; }
+    .editor-container .editor-table td.colspanned {
+      text-align: left !important;
+      white-space: normal;
+      font-weight: normal !important; }
     .editor-container .editor-table > tbody > tr > td:first-child {
       font-weight: bold;
       min-width: 50%;

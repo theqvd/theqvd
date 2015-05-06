@@ -32,8 +32,10 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         };
         
         var auxModel = new Wat.Models.DI();
+            
+        this.tagChanges = arguments['__tags_changes__'];
         
-        this.updateModel(arguments, filters, this.fetchList, auxModel);
+        this.updateModel(arguments, filters, this.checkMachinesChanges, auxModel);
     },
     
     openNewElementDialog: function (e) {

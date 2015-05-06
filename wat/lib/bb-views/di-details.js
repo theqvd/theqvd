@@ -74,7 +74,9 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
             }
         }
         
-        this.updateModel(arguments, {id: this.elementId}, this.fetchDetails);
+        this.tagChanges = arguments['__tags_changes__'];
+
+        this.updateModel(arguments, {id: this.elementId}, this.checkMachinesChanges);
     },
     
     updateElement: function (dialog) {
@@ -119,7 +121,9 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
             arguments["__properties_changes__"] = properties;
         }
         
-        this.updateModel(arguments, filters, this.fetchDetails);
+        this.tagChanges = arguments['__tags_changes__'];
+        
+        this.updateModel(arguments, filters, this.checkMachinesChanges);
     },
     
     render: function () {
@@ -130,7 +134,7 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
     
     openEditElementDialog: function(e) {
         this.dialogConf.title = $.i18n.t('Disk image') + ": " + this.model.get('disk_image');
-        
+
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
         
         // Configure tags inputs

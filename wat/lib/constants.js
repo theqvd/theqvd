@@ -76,7 +76,8 @@ ALL_STATUS = {
     7350: 'Forbidden role assignment: inherited role inherits from inheritor',
     7360: 'Incompatible expiration dates - Soft date must precede the hard one',
     7371: 'Non core config items haven\'t default value',
-    7372: 'Unable to remove a core config item'
+    7372: 'Unable to remove a core config item',
+    7373: 'Unable to switch to monotenant mode - More than one tenant in the system'
 };
 
 STATUS_SUCCESS = 0;
@@ -145,6 +146,7 @@ STATUS_ROLE_NOT_ASSIGNED_DUE_LOOP = 7350;
 STATUS_INCOMPATIBLE_EXPIRATION = 7360;
 STATUS_NOT_DEFAULT_CONFIG_TOKEN = 7371;
 STATUS_UNABLE_REMOVE_CONFIG_TOKEN = 7372;
+STATUS_UNABLE_SWITCH_MONOTENANT = 7373;
 
 STATUS_FORBIDDEN = 8;
 STATUS_FOREIGN_KEY = 23503;

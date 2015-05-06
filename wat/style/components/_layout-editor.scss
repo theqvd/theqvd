@@ -18,6 +18,12 @@
             padding-top: 4px;
         }
         
+        td.colspanned {
+            text-align: left !important;
+            white-space: normal;
+            font-weight: normal !important;
+        }
+        
         &>tbody>tr>td:first-child {
             font-weight: bold;
             min-width: 50%;

@@ -40,6 +40,12 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             },
             editor: {
                 name: 'editor-' + this.qvdObj
+            },
+            editorAffectedVM: {
+                name: 'editor-affected-vms'
+            },
+            editorAffectedVMList: {
+                name: 'editor-affected-vms-list'
             }
         }
         
