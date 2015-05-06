@@ -260,3 +260,141 @@ Otra peculiaridad de las _custom properties_ es que pueden ser eliminadas del si
 
 * `delete_views_for_removed_host_property`
 
+
+= El CLI
+
+== Nociones básicas para empezar a usar el CLI
+
+El CLI es una aplicación `CLI::Framework` definida en el archivo `qa`. De momento, solo funciona en modo interactivo. Para arrancar el CLI, se ejecuta el archivo `qa`, pasándole como parámetros el _host_ y el puerto donde escucha la API de administración de QVD contra la que se quiere trabajar.
+....
+qa --host=localhost --port=3000
+....
+
+Con ello, se abre una consola donde se pueden introducir comandos. Para aprender a utilizar la herramienta, ejecútese en esa consola el comando `usage`. 
+
+....
+> usage
+....
+
+Este comando devuelve la lista de comandos disponibles en el CLI. Además, al ejecutarse `usage` seguido del nombre de un comando (por ejemplo, `login`), se devuelve una explicación más detallada del uso del comando en cuestión.
+
+....
+
+> usage login
+
+....
+
+Para hacer consultas a la API es necesario, en primer lugar, loguearse con una cuenta de administrador. Para ello, se debe ejecutar el comando `login`.
+
+....
+> login
+....
+
+Al ejecutar este comando, se abre un diálogo en el que se deben introducir las credenciales de la cuenta de administrador con la que se quiere loguearse. Si la API gestiona un QVD en modo monotenant, estas credenciales serán el nombre del administrador y la contraseña; si la API gestiona un QVD en modo multitenant, además, se pedirá el nombre del tenant del administrador.
+
+....
+>login
+Name: superadmin
+Tenant: *
+Password:
+>
+....
+
+Una vez se ha hecho login con éxito, se puede comenzar a hacer consultas a la API. Los comandos que se usan para ello coinciden con los nombres de los objetos de QVD: por ejemplo, el comando `vm` es el encargado de llevar a cabo peticiones a la API relativas a máquinas virtuales, `host` es el encargado de las consultas relativas a los _hosts_, etc. Como se ha dicho arriba, para conocer la lista completa de comandos disponibles, se debe ejecutar el comando `usage`. 
+
+....
+> usage
+....
+
+Y para  conocer los detalles de uso de cada uno de estos comandos, se ejecuta `usage` seguido del nombre del comando
+
+....
+> usage vm
+....
+
+Cada comando podrá ir seguido de una secuencia de argumentos. En otras palabras, cualquier petición que se introduzca en la consola del CLI está compuesta por una serie de palabras. La primera de esas palabras es el comando y todas las demás forman la secuencia de argumentos. Por ejemplo, la siguiente es una orden válida en el CLI:  
+
+....
+> vm state=running get id, name
+....
+
+Esta orden pide que se muestren el `id` y el `name` de todas las máquinas virtuales que estén en estado `running`. Como puede verse, a ojos del usuario, la diferencia entre el comando y los argumentos no es obvia. A sus ojos, la petición es sencillamente una oración que debe ajustarse a una gramática determinada y tiene un significado. El hecho de que la primera palabra sea el comando y el resto los argumentos es más bien una cuestión de diseño interno (si bien el comando `usage` sí hace esta distinción transparente para los usuarios).
+
+== Diseño general del CLI
+
+El CLI se ha creado a partir del _framework_ `CLI::Framework`. El ejecutable que permite poner en marcha la herramienta es el archivo `qa`, pero la clase que define propiamente el CLI es `QVD::Admin4::CLI`, una subclase de `CLI::Framework`. A su vez, los comandos  del CLI son subtipos de  `CLI::Framework::Command`. En definitiva, a todos los efectos, el CLI es una aplicación de tipo `CLI::Framework`, sigue su lógica y utiliza sus recursos. Como en toda aplicación `CLI::Framework`, en la clase que define el CLI (`QVD::Admin4::CLI`) se registran los comandos disponibles. Y cada uno de estos comandos se ha definido, además, como una clase independiente: `QVD::Admin4::CLI::Command::VM` para el comando `vm`, `QVD::Admin4::CLI::Command::Host` para el comando `host`, etc.
+
+La mayoría de los comandos del CLI (aquellos que se corresponden con objetos de QVD) funcionan de forma prácticamente idéntica. De hecho, todos ellos se han definido como subclases de una clase común `QVD::Admin4::CLI::Command` (que a su vez es subclase de `CLI::Framework::Command`). Esta clase común es la que guarda la lógica común que determina cómo se procesa un comando del CLI. Esta lógica es, básicamente, la siguiente: el comando inroducido en el CLI junto a los argumentos que lo siguen forman una oración; un _parser_ analiza esta oración y devuelve como _output_ un JSON susceptible de ser enviado como petición a la API;  se envía dicha petición a la API; y cuando esta responde, se saca la respuesta por consola en forma de tabla. En resumen:
+
+* Un _parser_ analiza la petición escrita en la consola del CLI.
+
+* El resultado del análisis del _parser_ se manda como petición a la API.
+
+* La respuesta de la API se convierte en una tabla y se saca por consola.
+
+Por tanto, para explicar con más detalle el diseño del CLI, será necesario explicar el funcionamiento del _parser_ encargado de procesar las peticiones, y será necesario explicar también la clase `QVD::Admin4::CLI::Command`, encargada de articular los tres pasos necesarios para ejecutar cada petición. 
+
+== El _parser_ de las peticiones del CLI
+
+El proceso de _parsing_ recibe como _input_ una oración en forma de _string_. Esta _string_ tiene que convertirse en una lista de palabras (_tokens_). Al proceso que divide la _string_ original y la convierte en una lista de palabras o _tokens_ se le ha llamado tokenización. El objeto encargado de la tokenización está definido en la clase `QVD::Admin4::CLI::Tokenizer`. Es un objeto muy simple que efectúa la división de la _string_ conforme a una sencilla gramática de expresiones regulares; y devuelve la lista correspondiente de palabras (_tokens_).
+
+Una vez el tokenizador ha creado la lista de _tokens_, esta se le pasa como _input_ al objeto encargado del análisis sintáctico. Este es un objeto de tipo `QVD::Admin4::CLI::Parser` que toma una lista de _tokens_ y crea con ellos una estructura arbórea. El proceso de análisis sintáctico que lleva a cabo este objeto consiste, básicamente, en tomar constituyentes y unirlos para crear otros constituyentes mayores. En un primer momento, estos constituyentes son los _tokens_ que ha recibido el objeto como _input_. 
+
+Este proceso de análisis es un proceso iterativo. Cada iteración del proceso opera sobre un conjunto de constituyentes **C**, y efectúa los siguientes pasos:
+
+* Los  constituyentes de **C** se intentan combinar para crear nuevos constituyentes.
+* A continuación, estos constituyentes nuevos se añaden a **C**.
+* Con la nueva versión ampliada de **C**, se lanza la siguiente iteración del proceso de análisis. 
+
+Como ya se ha dicho, en la primera iteración del proceso, **C** está formado por los _tokens_ que forman el _input_ del análisis. Y la última iteración será aquella que no consiga crear ningún constituyente nuevo a partir de los constituyentes de **C**. 
+
+Pero este proceso de unión de constituyentes está regulado: no es posible unir dos sonstituyentes cualesquiera para crear un nuevo constituyente. Para que dos o más constituyentes se puedan unir, se tienen que dar dos condiciones:
+
+* Los constituyentes que se unen tienen que ser contiguos. 
+
+* Debe existir en la gramática que usa el _parser_ una regla que permita unir constituyentes del tipo en cuestión. 
+
+Efectivamente, el _parser_ analiza siempre de acuerdo con una gramática. Una versión muy simpista de este tipo de gramática  pudiera tener la lógica representada a continuación: 
+
+....
+X => get + name
+X' => vm + X
+....  
+
+Esta sencilla gramática establecería que se puede crear un constituyente `X` uniendo los constituyentes,`get` y `name`; y  que se puede crear un constituyente `X'` uniendo los constituyentes `vm` y `X`. Así pues, estas reglas permitirían analizar la oración `vm get name` (que pide el nombre de todas las máquinas virtuales). A esta oración, le  corresponde la lista  de _tokens_ `('vm', 'get', 'name')`. De acuerdo con las reglas de la gramática, esos _tokens_ podrían unirse secuencialmente en dos pasos:  `get` y `name` se unen y forman `X`; y a continuación, `vm` y `X` se unen para crear `X'`.
+
+Además, las reglas de la gramática obligan a que los constituyentes que se unen sean contiguos y aparezcan en la cadena original de _tokens_ en el orden que expresa la regla. 
+Los _tokens_ iniciales del análisis, y los constituyentes mayores que se hayan podido crear a partir de ellos, tienen siempre dos índices, llámense _from_ y _to_, que indican la posición que ocupan en la lista original de _tokens_. Por ejemplo, en `vm get name`, el _token_ `vm` abarca la posición 0 de la lista de _tokens_,  `get` la posición 1 y `name` la posición 2. Por tanto, sus índices _from_ y _to_ son, respectivamente, _from_ 0, _to_ 0; _from_ 1, _to_ 1; y _from_ 2, _to_ 2. De forma consecuente, el constituyente `X` tendría los índices  _from_ 1, _to_ 2; y el constituyente `X'` tendrá los índices _from_ 0, _to_ 2. En definitiva, para que dos constituyentes se puedan unir, el índice _from_ de cada constituyente de una regla tiene que ser igual al índice _to_  más 1 del siguiente constituyente de la regla.
+
+Este proceso de análisis puede tener éxito o no. Puede llegarse a encontrar un análisis adecuado para una oración, o no. En caso de que el _parser_ no consiga dar un análisis a la oración, se concluye que tal oración es agramatical; es decir, que, conforme a la gramática, la oración en cuestión no es correcta. Pero para determinar si una oración es o no gramatical, en la gramática se tiene que incluir el concepto de axioma. El axioma de la gramática es el tipo de constituyente que representa  a la oración completa. En el caso de la gramática anterior, el axioma debería ser `X'`. En definitiva, el objetivo de un proceso de análisis es crear constituyentes mediante la unión de otros constituyentes hasta crear uno o varios axiomas. Se considera que el _parsing_ ha encontrado un análisis satisfactorio, si se ha creado un constituyente catalogado como axioma que cubra toda la extensión de la lista original de _tokens_. En caso contrario, se concluye que la oración es agramatical.
+
+En resumen, un _parser_ (objeto de tipo `QVD::Admin4::CLI::Parser`) toma una lista ordenada de _tokens_. Estos _tokens_ los convierte en constituyentes atómicos del proceso de análisis. A partir de ahí, de forma iterativa, une constituyentes para crear nuevos constituyentes. Para que se puedan unir dos o más constituyentes, es necesario que estos sean contiguos y que la unión esté legitimada por alguna regla de la gramática. Una vez el proceso de _parsing_ ya no es capaz de efectuar nuevas uniones, el análisis termina. En ese momento, se buscan todos los constituyentes creados que cumplan dos condiciones: que sean de un tipo definido como axioma y  que cubran toda la lista original de _tokens_. La lista de constituyentes que cumple esos dos requisitos se devuelve como la lista de análisis posibles para la oración analizada. Si esa lista está vacía, la oración puede catalogarse como agramatical; y si contiene más de un análisis, la oración será ambigua. En el CLI, en estos casos, se devolverá un mensaje de error. El caso deseable en el CLI es que la lista cuente con un único elemento, de modo que sea gramatical no ambigua y se pueda usar para efectuar una petición concreta a la API. 
+
+Para llevar a cabo todo este proceso, el objeto `QVD::Admin4::CLI::Parser` hace uso de otra serie de objetos auxiliares:
+
+* La clase `QVD::Admin4::CLI::Grammar` define la gramática conforme a la cual se analiza.
+
+* La clase `QVD::Admin4::CLI::Parser::Edge` define, _grosso modo_, a los constituyentes que se van creando. 
+
+* La clase `QVD::Admin4::CLI::Parser::Chart` define el repositorio de constituyentes creados por el análisis. En adelante, se le identificará como el _chart_. 
+
+* La clase `QVD::Admin4::CLI::Parser::Agenda` define la lista de constituyentes que, en una iteración concreta, se van a intentar combinar con los constituyentes del _chart_. En adelante, se identificará a esta lista como _agenda_.
+
+La explicación del algoritmo de análisis hecha hasta ahora es una simplificación. El proceso de análisis es, como se ha dicho, iterativo. Pero cada iteración no consiste simplemente en combinar entre sí todos los constituyentes de un supuesto repositorio **C**. En realidad, el _parser_ cuenta con dos repositorios distintos de constituyentes: el _chart_ y la _agenda_. En cada iteración número _n_, el _chart_ contiene todos los constituyentes que se han ido creando durante las iteraciones anteriores a la iteración inmediatamente anterior (las número  _n_ - 2 y anteriores). Y la _agenda_ contiene los constituyentes que se han creado en la iteración inmediatamente anterior (la número _n_ - 1). Así pues, en cada iteración número _n_, se intenta combinar cada uno de los constituyentes de la _agenda_ con los constituyentes del _chart_. Los constituyentes resultantes de esas combinaciones serán los que formen la _agenda_ de la siguiente iteración (la número _n_ + 1). Y los constituyentes que en la actual iteración (la número _n_) estaban en la _agenda_ pasan al _chart_. El final del proceso se alcanza cuando en una iteración la _agenda_ que se crea para la siguiente iteración es una lista vacía. En cuanto al comienzo del proceso, en la primera iteración (_n_ = 1), la _agenda_ está formada por la lista de _tokens_ que se le pasan al _parser_ como _input_; y el _chart_ está vacío (no ha habido iteraciones anteriores que hayan creado constituyentes). 
+
+Pero, tal como se ha explicado el algoritmo, el resultado de esta primera iteración sería necesariamente una _agenda_ vacía, con lo cual acabaría todo el análisis de forma trivial. Como el _chart_ está vacío, la combinación de constituyentes de la _agenda_ con los del _chart_ dará lugar necesariamente a una agenda vacía para la siguiente iteración. En realidad, en cada iteración, no solo se combinan los constituyentes de la _agenda_ y el _chart_. También se efectúa una segunda operación crucial que crea constituyentes: la expansión de constituyentes.
+
+La expansión de constituyentes consiste en lo siguiente. Cada regla de la gramática legitima la creación de un constituyente de tipo *X*  mediante la unión de una serie de constituyentes *x1*, *x2*, etc. Pues bien, si un constituyente de la _agenda_ es del tipo *x1*, y existe en la gramática una regla que permite crear un *X* a partir de una serie de constituyentes tales que el primero es de tipo *x1*; en tal caso, el _parser_ crea el nuevo constituyente *X*. Pero téngase en cuenta que, habitualmente, la regla en cuestión establecerá que, para crear *X*, además de *x1*, hace falta al menos otro constituyente *x2*. Así pues, este nuevo constituyente creado, más que un constituyente real, es una hipótesis de constituyente. Para que el constituyente llegara a ser legítimo, sería necesario que, en fases posteriores del análisis, se encontrara un *x2* que permitiese completar el constituyente. Si esto no ocurriera, esta hipótesis de constituyente sería errónea. Por tanto, en el proceso de análisis se contemplan, no uno sino dos tipos de unidades de análisis:
+
+* Los _edges_ inactivos. Son _grosso modo_ los constituyentes reales, completos, que se han formado durante el análisis.  
+
+* Los _edges_ activos. Son hipótesis de constituyente a las que les falta alguno de los elementos necesarios para formar el constituyente real.
+
+Por tanto, a partir de ahora, se hablará de _edges_ (activos o inactivos) y no de constituyentes. Así pues, en cada iteración, se dan dos procesos:
+
+* Combinación de _edges_. Los _edges_ inactivos de la agenda se intentan combinar con los _edges_ activos del _chart_; y los _edges_ activos de la agenda se intentan combinar con los _edges_ inactivos del _chart_. En ambos casos, se intentan combinar un _edge_ activo con un _edge_ inactivo. El _edge_ activo se caracteriza por tener una lista ordenada de uno o más elementos (*x2*, *x3*...) pendientes de saturar. Si el _edge_ inactivo representa al primer elemento pendiente de saturar en el _edge_ activo (*x2*), en tal caso, se crea un nuevo _edge_. Este nuevo _edge_ será como el _edge_ inactivo original, pero con *x2* saturado. Su índice _from_ será el índice _from_ del _edge_ activo, y su índice _to_ será el _to_ del inactivo. Este nuevo _edge_ será activo o inactivo en función de que le quede aún o no algún elemento por saturar.
+
+* Expansión de _edges_. Los _edges_ inactivos de la _agenda_, además de combinarse, se pueden expandir. Para cada _edge_ inactivo *x1* de la agenda, se crea un nuevo _edge_ *X* por cada regla de la gramática que permita generar *X* a partir de una lista de constituyentes de la cual el primer elemento es *x1*. Este nuevo _edge_ tendrá los índices _from_ y _to_ del _edge_ inactivo a partir del que se forma. Y será activo o inactivo en función de que la lista de constituyentes de  la regla en cuestión tenga algún elemento más (*x2*...) detrás de *x1*.
+
+== La clase `QVD::Admin4::CLI::Command`
+

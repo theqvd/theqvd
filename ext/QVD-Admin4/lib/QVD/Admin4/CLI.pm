@@ -32,7 +32,7 @@ sub usage_text {
    
    password (Intended to change current QVD administrator password)
 
-   password (Intended to change current QVD administrator pagination block)
+   block (Intended to change current QVD administrator pagination block)
    
    version (Retrieves information about the QVD version the app is connected to)
       

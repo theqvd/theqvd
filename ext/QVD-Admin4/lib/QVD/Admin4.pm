@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 use Moo;
-use QVD::DB::Simple qw(db);
+use QVD::DB::Simple;
 use QVD::Config;
 use QVD::Config::Core;
 use File::Copy qw(copy move);
