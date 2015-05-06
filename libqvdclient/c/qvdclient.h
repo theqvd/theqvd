@@ -14,7 +14,7 @@
 #include "qvdbuffer.h"
 #define QVDVERSION 119
 #define QVDABOUT "Version: 1.1.9. $Id$"
-#define QVDCHANGELOG "1.1.9 06/05/2015 Use \n" \
+#define QVDCHANGELOG "1.1.9 06/05/2015 Use NXTransCleanupForReconnect for IOS\n" \
                      "1.1.8 06/05/2015 Include nxcomp version in the -v flag\n" \
                      "1.1.7 03/05/2015 During debug show correct version text\n" \
                      "1.1.6 28/04/2015 More time to session takeover\n" \
