@@ -591,8 +591,17 @@ int _qvd_client_loop(qvdclient *qvd, int connFd, int proxyFd)
       if (proxyFd > 0 && QvdBufferCanRead(&proxyRead))
 	  FD_SET(proxyFd, &rfds);
 
+      /*
+       * The X display writing is handled by NX. So this is not needed
+       *       if (proxyFd > 0 && QvdBufferCanWrite(&proxyWrite))
+       * 	  FD_SET(proxyFd, &wfds); 
+       */
+
       if (connFd > 0 && QvdBufferCanRead(&proxyWrite))
 	FD_SET(connFd, &rfds);
+
+      if (connFd > 0 && QvdBufferCanWrite(&proxyRead))
+	FD_SET(connFd, &wfds);
 
       if (NXTransPrepare(&maxfds, &rfds, &wfds, &timeout))
 	{
@@ -700,7 +709,7 @@ int _qvd_client_loop(qvdclient *qvd, int connFd, int proxyFd)
 	    proxyFd = -1;
 	  }
 	}
-      if (connFd > 0 && QvdBufferCanWrite(&proxyRead))
+      if (connFd > 0 && QvdBufferCanWrite(&proxyRead) && FD_ISSET(connFd, &wfds))
 	{
 	  /*QvdBufferWrite(&proxyRead, connFd);*/
 	  res = curl_easy_send(qvd->curl, proxyRead.data+proxyRead.offset,
