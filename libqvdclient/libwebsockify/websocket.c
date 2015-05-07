@@ -15,6 +15,7 @@
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <signal.h> // daemonizing
@@ -762,6 +763,12 @@ int start_server() {
         error("ERROR on binding listener socket");
 	return 1;
     }
+    int optval = 1;
+    if (setsockopt(lsock, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(int)) < 0) {
+      error("Cannot set TCP_NODELAY option on listen address");
+      return 1;
+    }
+
     listen(lsock,100);
 
     signal(SIGPIPE, signal_handler);  // catch pipe

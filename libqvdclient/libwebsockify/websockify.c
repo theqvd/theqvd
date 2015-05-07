@@ -11,8 +11,10 @@
 #include <errno.h>
 #include <limits.h>
 #include <getopt.h>
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <netdb.h>
 #include <sys/select.h>
 #include <fcntl.h>
@@ -250,6 +252,13 @@ void proxy_handler(ws_ctx_t *ws_ctx) {
     bzero((char *) &taddr, sizeof(taddr));
     taddr.sin_family = AF_INET;
     taddr.sin_port = htons(target_port);
+
+    int optval = 1;
+    if (setsockopt(tsock, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(int)) < 0) {
+      handler_emsg("Cannot set TCP_NODELAY option on target socket %s\n",
+		    strerror(errno));
+      return;
+    }
 
     /* Resolve target address */
     if (resolve_host(&taddr.sin_addr, target_host) < -1) {
