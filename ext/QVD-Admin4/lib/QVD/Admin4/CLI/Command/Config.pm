@@ -40,6 +40,13 @@ sub usage_text {
 }
 
 
+
+# Filters to identify config tokens are changed from
+# the commodins syntax (%) that accepts the CLI to the
+# REGEX syntax that supports the key_re filter in the API
+
+# The rest is like any other display action
+
 sub run 
 {
     my ($self, $opts, @args) = @_;

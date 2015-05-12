@@ -83,162 +83,478 @@ our $COMMON_USAGE_TEXT =
 ======================================================================================================
 ";
 
+
+###############
+## VARIABLES ##
+###############
+
+# Filters available in CLI and translation into API format
+# The typical translation is qvd-object => qvd-object_name
+# (i.e., for vms: osf => osf_name)
+
 my $FILTERS =
 {
-    vm => { storage => 'storage', id => 'id', name => 'name', user => 'user_name', osf => 'osf_name', tag => 'di_tag', blocked => 'blocked', 
-	    expiration_soft => 'expiration_soft', expiration_hard => 'expiration_hard', state => 'state', host =>  'host_name', di => 'di_name', 
-	    user_state => 'user_state', ip => 'ip', ssh_port => 'ssh_port', vnc_port => 'vnv_port', serial_port => 'serial_port',
-	    tenant =>  'tenant_name', ip_in_use => 'ip_in_use', di_in_use => 'di_name_in_use', creation_date => 'creation_date', 
-	    creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name' },
+    vm => { storage => 'storage', 
+	    id => 'id', 
+	    name => 'name', 
+	    user => 'user_name', 
+	    osf => 'osf_name', 
+	    tag => 'di_tag', 
+	    blocked => 'blocked', 
+	    expiration_soft => 'expiration_soft', 
+	    expiration_hard => 'expiration_hard', 
+	    state => 'state', 
+	    host =>  'host_name', 
+	    di => 'di_name', 
+	    user_state => 'user_state', 
+	    ip => 'ip', 
+	    ssh_port => 'ssh_port', 
+	    vnc_port => 'vnv_port', 
+	    serial_port => 'serial_port',
+	    tenant =>  'tenant_name', 
+	    ip_in_use => 'ip_in_use', 
+	    di_in_use => 'di_name_in_use', 
+	    creation_date => 'creation_date', 
+	    creation_admin_id => 'creation_admin_id', 
+	    creation_admin_name => 'creation_admin_name' },
 
-    user => { id => 'id', name => 'name', blocked => 'blocked', tenant => 'tenant_name', creation_date => 'creation_date',
-	      creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name'},
+    user => { id => 'id', 
+	      name => 'name', 
+	      blocked => 'blocked', 
+	      tenant => 'tenant_name', 
+	      creation_date => 'creation_date',
+	      creation_admin_id => 'creation_admin_id', 
+	      creation_admin_name => 'creation_admin_name'},
 
-    host => { id => 'id', name => 'name', address => 'address', blocked => 'blocked', frontend => 'frontend', backend => 'backend', state => 'state',
-	      creation_date => 'creation_date', creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name'},
+    host => { id => 'id', 
+	      name => 'name', 
+	      address => 'address', 
+	      blocked => 'blocked', 
+	      frontend => 'frontend', 
+	      backend => 'backend', 
+	      state => 'state',
+	      creation_date => 'creation_date', 
+	      creation_admin_id => 'creation_admin_id', 
+	      creation_admin_name => 'creation_admin_name'},
 
-    osf => { id => 'id', name => 'name', overlay => 'overlay', user_storage => 'user_storage', memory => 'memory', tenant =>  'tenant_name',
-	     creation_date => 'creation_date', creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name' },
+    osf => { id => 'id', 
+	     name => 'name', 
+	     overlay => 'overlay', 
+	     user_storage => 'user_storage', 
+	     memory => 'memory', 
+	     tenant =>  'tenant_name',
+	     creation_date => 'creation_date', 
+	     creation_admin_id => 'creation_admin_id', 
+	     creation_admin_name => 'creation_admin_name' },
 
-    di => { id => 'id', name => 'disk_image', version => 'version', osf => 'osf_name', tenant => 'tenant_name', blocked => 'blocked', tag => 'tag',
-	    creation_date => 'creation_date', creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name'},
+    di => { id => 'id', 
+	    name => 'disk_image', 
+	    version => 'version', 
+	    osf => 'osf_name', 
+	    tenant => 'tenant_name', 
+	    blocked => 'blocked', 
+	    tag => 'tag',
+	    creation_date => 'creation_date', 
+	    creation_admin_id => 'creation_admin_id', 
+	    creation_admin_name => 'creation_admin_name'},
 
-    tenant => { id => 'id', name => 'name', language => 'language', block => 'block',
-		creation_date => 'creation_date', creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name' },
+    tenant => { id => 'id', 
+		name => 'name', 
+		language => 'language', 
+		block => 'block',
+		creation_date => 'creation_date', 
+		creation_admin_id => 'creation_admin_id', 
+		creation_admin_name => 'creation_admin_name' },
 
     config => { key_re => 'key_re' },
 
-    admin => { id => 'id', name => 'name', tenant => 'tenant_name', language => 'language', block => 'block',
-	       creation_date => 'creation_date', last_update_date => 'last_update_date', creation_admin_id => 'creation_admin_id', 
+    admin => { id => 'id', 
+	       name => 'name', 
+	       tenant => 'tenant_name', 
+	       language => 'language', 
+	       block => 'block',
+	       creation_date => 'creation_date', 
+	       last_update_date => 'last_update_date', 
+	       creation_admin_id => 'creation_admin_id', 
 	       creation_admin_name => 'creation_admin_name' },
 
-    role => { id => 'id', name => 'name', fixed => 'fixed', internal => 'internal', creation_date => 'creation_date', 
-	      creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name' },
+    role => { id => 'id', 
+	      name => 'name', 
+	      fixed => 'fixed', 
+	      internal => 'internal', 
+	      creation_date => 'creation_date', 
+	      creation_admin_id => 'creation_admin_id', 
+	      creation_admin_name => 'creation_admin_name' },
 
-    acl => { id => 'id', name => 'name', role => 'role_id', admin => 'admin_id', operative => 'operative'},
+    acl => { id => 'id', 
+	     name => 'name', 
+	     role => 'role_id', 
+	     admin => 'admin_id', 
+	     operative => 'operative'},
 
-    log => { id => 'id', admin_id => 'admin_id', admin_name => 'admin_name', tenant_id => 'tenant_id', tenant_name => 'tenant_name', action => 'action',  arguments => 'arguments',  object_id => 'object_id', 
-	     object_name => 'object_name', time => 'time', status => 'status', source => 'source', ip => 'ip', type_of_action => 'type_of_action', qvd_object => 'qvd_object', superadmin => 'superadmin' },
+    log => { id => 'id', 
+	     admin_id => 'admin_id', 
+	     admin_name => 'admin_name', 
+	     tenant_id => 'tenant_id', 
+	     tenant_name => 'tenant_name', 
+	     action => 'action',  
+	     arguments => 'arguments',  
+	     object_id => 'object_id', 
+	     object_name => 'object_name', 
+	     time => 'time', 
+	     status => 'status', 
+	     source => 'source', 
+	     ip => 'ip', 
+	     type_of_action => 'type_of_action', 
+	     qvd_object => 'qvd_object', 
+	     superadmin => 'superadmin' },
 
 };
 
+# Available order criteria in CLI and translation into
+# API format
 
 my $ORDER =
 {
-    vm => { storage => 'storage', id => 'id', name => 'name', user => 'user_name', osf => 'osf_name', tag => 'di_tag', blocked => 'blocked', 
-	    expiration_soft => 'expiration_soft', expiration_hard => 'expiration_hard', state => 'state', host =>  'host_name', di => 'di_name', 
-	    user_state => 'user_state', ip => 'ip', ssh_port => 'ssh_port', vnc_port => 'vnv_port', serial_port => 'serial_port',
-	    tenant =>  'tenant_name', ip_in_use => 'ip_in_use', creation_date => 'creation_date', 
-            creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name'},
+    vm => { storage => 'storage', 
+	    id => 'id', 
+	    name => 'name', 
+	    user => 'user_name', 
+	    osf => 'osf_name', 
+	    tag => 'di_tag', 
+	    blocked => 'blocked', 
+	    expiration_soft => 'expiration_soft', 
+	    expiration_hard => 'expiration_hard', 
+	    state => 'state', 
+	    host =>  'host_name', 
+	    di => 'di_name', 
+	    user_state => 'user_state', 
+	    ip => 'ip', 
+	    ssh_port => 'ssh_port', 
+	    vnc_port => 'vnv_port', 
+	    serial_port => 'serial_port',
+	    tenant =>  'tenant_name', 
+	    ip_in_use => 'ip_in_use', 
+	    creation_date => 'creation_date', 
+            creation_admin_id => 'creation_admin_id', 
+	    creation_admin_name => 'creation_admin_name'},
 
-    user => { id => 'id', name => 'name', blocked => 'blocked', tenant => 'tenant_name', creation_date => 'creation_date', 
-	      creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name'},
+    user => { id => 'id', 
+	      name => 'name', 
+	      blocked => 'blocked', 
+	      tenant => 'tenant_name', 
+	      creation_date => 'creation_date', 
+	      creation_admin_id => 'creation_admin_id', 
+	      creation_admin_name => 'creation_admin_name'},
 
-    host => { id => 'id', name => 'name', address => 'address', blocked => 'blocked', frontend => 'frontend', backend => 'backend',state => 'state',
-	      creation_date => 'creation_date', creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name'},
+    host => { id => 'id', 
+	      name => 'name', 
+	      address => 'address', 
+	      blocked => 'blocked', 
+	      frontend => 'frontend', 
+	      backend => 'backend',
+	      state => 'state',
+	      creation_date => 'creation_date', 
+	      creation_admin_id => 'creation_admin_id', 
+	      creation_admin_name => 'creation_admin_name'},
 
-    osf => { id => 'id', name => 'name', overlay => 'overlay', user_storage => 'user_storage', memory => 'memory', tenant =>  'tenant_name',
-	     creation_date => 'creation_date', creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name' },
+    osf => { id => 'id', 
+	     name => 'name', 
+	     overlay => 'overlay', 
+	     user_storage => 'user_storage', 
+	     memory => 'memory', 
+	     tenant =>  'tenant_name',
+	     creation_date => 'creation_date', 
+	     creation_admin_id => 'creation_admin_id', 
+	     creation_admin_name => 'creation_admin_name' },
 
-    di => { id => 'id', name => 'disk_image', version => 'version', osf => 'osf_name', tenant => ' tenant_name', blocked => 'blocked', tag => 'tag',
-	    creation_date => 'creation_date', creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name' },
+    di => { id => 'id', 
+	    name => 'disk_image', 
+	    version => 'version', 
+	    osf => 'osf_name', 
+	    tenant => ' tenant_name', 
+	    blocked => 'blocked', 
+	    tag => 'tag',
+	    creation_date => 'creation_date', 
+	    creation_admin_id => 'creation_admin_id', 
+	    creation_admin_name => 'creation_admin_name' },
 
-    tenant => { id => 'id', name => 'name', language => 'language', block => 'block', creation_date => 'creation_date', 
-		creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name' },
+    tenant => { id => 'id', 
+		name => 'name', 
+		language => 'language', 
+		block => 'block', 
+		creation_date => 'creation_date', 
+		creation_admin_id => 'creation_admin_id', 
+		creation_admin_name => 'creation_admin_name' },
 
-    admin => { id => 'id', name => 'name', tenant => 'tenant_name', language => 'language', block => 'block',
-	       creation_date => 'creation_date', creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name' },
+    admin => { id => 'id', 
+	       name => 'name', 
+	       tenant => 'tenant_name', 
+	       language => 'language', 
+	       block => 'block',
+	       creation_date => 'creation_date', 
+	       creation_admin_id => 'creation_admin_id', 
+	       creation_admin_name => 'creation_admin_name' },
 
-    role => { id => 'id', name => 'name', fixed => 'fixed', internal => 'internal', creation_date => 'creation_date', 
-	      creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name' },
+    role => { id => 'id', 
+	      name => 'name', 
+	      fixed => 'fixed', 
+	      internal => 'internal', 
+	      creation_date => 'creation_date', 
+	      creation_admin_id => 'creation_admin_id', 
+	      creation_admin_name => 'creation_admin_name' },
 
     acl => { id => 'id', name => 'name' },
 
-    log => { id => 'id', admin_id => 'admin_id', admin_id => 'admin_name', tenant_id => 'tenant_id', tenant_name => 'tenant_name', action => 'action',  arguments => 'arguments',  object_id => 'object_id', 
-	     object_name => 'object_name', time => 'time', status => 'status', source => 'source', ip => 'ip', type_of_action => 'type_of_action', qvd_object => 'qvd_object', superadmin => 'superadmin' },
-
+    log => { id => 'id', 
+	     admin_id => 'admin_id', 
+	     admin_name => 'admin_name', 
+	     tenant_id => 'tenant_id', 
+	     tenant_name => 'tenant_name', 
+	     action => 'action',  
+	     arguments => 'arguments',  
+	     object_id => 'object_id', 
+	     object_name => 'object_name', 
+	     time => 'time', 
+	     status => 'status', 
+	     source => 'source', 
+	     ip => 'ip', 
+	     type_of_action => 'type_of_action', 
+	     qvd_object => 'qvd_object', 
+	     superadmin => 'superadmin' },
 };
+
+# Available fields to retrieve and translation into
+# API format
 
 my $FIELDS =
 {
-    vm => { storage => 'storage', id => 'id', name => 'name', user => 'user_name', osf => 'osf_name', tag => 'di_tag', blocked => 'blocked', 
-	    expiration_soft => 'expiration_soft', expiration_hard => 'expiration_hard', state => 'state', host =>  'host_name', di => 'di_name', 
-	    user_state => 'user_state', ip => 'ip', mac => 'mac', ssh_port => 'ssh_port', vnc_port => 'vnv_port', serial_port => 'serial_port', 
-	    tenant =>  'tenant_name', ip_in_use => 'ip_in_use', di_in_use => 'di_name_in_use',
-	    creation_date => 'creation_date', creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name' },
+    vm => { storage => 'storage', 
+	    id => 'id', 
+	    name => 'name', 
+	    user => 'user_name', 
+	    osf => 'osf_name', 
+	    tag => 'di_tag', 
+	    blocked => 'blocked', 
+	    expiration_soft => 'expiration_soft', 
+	    expiration_hard => 'expiration_hard', 
+	    state => 'state', 
+	    host =>  'host_name', 
+	    di => 'di_name', 
+	    user_state => 'user_state', 
+	    ip => 'ip', 
+	    mac => 'mac', 
+	    ssh_port => 'ssh_port', 
+	    vnc_port => 'vnv_port', 
+	    serial_port => 'serial_port', 
+	    tenant =>  'tenant_name', 
+	    ip_in_use => 'ip_in_use', 
+	    di_in_use => 'di_name_in_use',
+	    creation_date => 'creation_date', 
+	    creation_admin_id => 'creation_admin_id', 
+	    creation_admin_name => 'creation_admin_name' },
 
-    user => { id => 'id', name => 'name', tenant => 'tenant_name', blocked => 'blocked', number_of_vms => 'number_of_vms', 
-	      number_of_vms_connected => 'number_of_vms_connected', creation_date => 'creation_date', creation_admin_id => 'creation_admin_id', 
+    user => { id => 'id', 
+	      name => 'name', 
+	      tenant => 'tenant_name', 
+	      blocked => 'blocked', 
+	      number_of_vms => 'number_of_vms', 
+	      number_of_vms_connected => 'number_of_vms_connected', 
+	      creation_date => 'creation_date', 
+	      creation_admin_id => 'creation_admin_id', 
 	      creation_admin_name => 'creation_admin_name'},
 
-    host => { id => 'id', name => 'name', address => 'address', blocked => 'blocked', frontend => 'frontend', backend => 'backend', state => 'state', 
-	      number_of_vms_connected => 'number_of_vms_connected', creation_date => 'creation_date', 
-	      creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name'},
+    host => { id => 'id', 
+	      name => 'name', 
+	      address => 'address', 
+	      blocked => 'blocked', 
+	      frontend => 'frontend', 
+	      backend => 'backend', 
+	      state => 'state', 
+	      number_of_vms_connected => 'number_of_vms_connected', 
+	      creation_date => 'creation_date', 
+	      creation_admin_id => 'creation_admin_id', 
+	      creation_admin_name => 'creation_admin_name'},
 
-    osf => { id => 'id', name => 'name', overlay => 'overlay', user_storage => 'user_storage', memory => 'memory', tenant =>  'tenant_name', 
-	     number_of_vms => 'number_of_vms', number_of_dis => 'number_of_dis', creation_date => 'creation_date', 
-	     creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name'},
+    osf => { id => 'id', 
+	     name => 'name', 
+	     overlay => 'overlay', 
+	     user_storage => 'user_storage', 
+	     memory => 'memory', 
+	     tenant =>  'tenant_name', 
+	     number_of_vms => 'number_of_vms', 
+	     number_of_dis => 'number_of_dis', 
+	     creation_date => 'creation_date', 
+	     creation_admin_id => 'creation_admin_id', 
+	     creation_admin_name => 'creation_admin_name'},
 
-    di => { id => 'id', name => 'disk_image', tenant => 'tenant_name', version => 'version', osf => 'osf_name', blocked => 'blocked', tags => 'tags',
-	    creation_date => 'creation_date', creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name'},
+    di => { id => 'id', 
+	    name => 'disk_image', 
+	    tenant => 'tenant_name', 
+	    version => 'version', 
+	    osf => 'osf_name', 
+	    blocked => 'blocked', 
+	    tags => 'tags',
+	    creation_date => 'creation_date', 
+	    creation_admin_id => 'creation_admin_id', 
+	    creation_admin_name => 'creation_admin_name'},
 
-    tenant => { id => 'id', name => 'name', language => 'language', block => 'block', creation_date => 'creation_date', 
-		creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name' },
+    tenant => { id => 'id', 
+		name => 'name', 
+		language => 'language', 
+		block => 'block', 
+		creation_date => 'creation_date', 
+		creation_admin_id => 'creation_admin_id', 
+		creation_admin_name => 'creation_admin_name' },
 
-    config => { key => 'key', value => 'operative_value', default => 'default_value'  },
+    config => { key => 'key', 
+		value => 'operative_value', 
+		default => 'default_value'  },
 
-    admin => { id => 'id', name => 'name', roles => 'roles', tenant => 'tenant_name', language => 'language', block => 'block',
-	       creation_date => 'creation_date', creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name' },
+    admin => { id => 'id', 
+	       name => 'name', 
+	       roles => 'roles', 
+	       tenant => 'tenant_name', 
+	       language => 'language', 
+	       block => 'block',
+	       creation_date => 'creation_date', 
+	       creation_admin_id => 'creation_admin_id', 
+	       creation_admin_name => 'creation_admin_name' },
 
-    role => { id => 'id', name => 'name', fixed => 'fixed', internal => 'internal', roles => 'roles', acls => 'acls',
-	      creation_date => 'creation_date', creation_admin_id => 'creation_admin_id', creation_admin_name => 'creation_admin_name'},
+    role => { id => 'id', 
+	      name => 'name', 
+	      fixed => 'fixed', 
+	      internal => 'internal', 
+	      roles => 'roles', 
+	      acls => 'acls',
+	      creation_date => 'creation_date', 
+	      creation_admin_id => 'creation_admin_id', 
+	      creation_admin_name => 'creation_admin_name'},
 
     acl => { id => 'id', name => 'name' },
 
-    log => { id => 'id', admin_id => 'admin_id', admin_id => 'admin_name', tenant_id => 'tenant_id', tenant_name => 'tenant_name', action => 'action',  arguments => 'arguments',  object_id => 'object_id', 
-	     object_name => 'object_name', time => 'time', status => 'status', source => 'source', ip => 'ip', type_of_action => 'type_of_action', qvd_object => 'qvd_object', deleted_object => 'deleted_object', deleted_admin => 'deleted_admin', superadmin => 'superadmin' },
-
+    log => { id => 'id', 
+	     admin_id => 'admin_id', 
+	     admin_name => 'admin_name', 
+	     tenant_id => 'tenant_id', 
+	     tenant_name => 'tenant_name', 
+	     action => 'action',  
+	     arguments => 'arguments',  
+	     object_id => 'object_id', 
+	     object_name => 'object_name', 
+	     time => 'time', 
+	     status => 'status', 
+	     source => 'source', 
+	     ip => 'ip', 
+	     type_of_action => 'type_of_action', 
+	     qvd_object => 'qvd_object', 
+	     deleted_object => 'deleted_object', 
+	     deleted_admin => 'deleted_admin', 
+	     superadmin => 'superadmin' },
 };
+
+# For every field to retrieve, a callback can be specified.
+# When the CLI returns that field, it executes the corresponding
+# callback, that processes the original field retrieved by the API
+# before it is printed in console
 
 my $FIELDS_CBS =
 {
-    di => { tags => sub { my $tags = shift; my @tags = map { $_->{tag} } @$tags; return join ', ', @tags; }},
+    di => { tags => sub { my $tags = shift; 
+			  my @tags = map { $_->{tag} } @$tags; 
+			  return join ', ', @tags; }},
 
-    admin => { roles => sub { my $roles = shift; my @roles =  values %$roles; return join "\n", @roles }},
+    admin => { roles => sub { my $roles = shift; 
+			      my @roles =  values %$roles; 
+			      return join "\n", @roles }},
 
-    role => { roles => sub { my $roles = shift; my @roles = map { $_->{name} } values %$roles; return join "\n", @roles},
-	      acls =>  sub { my $acls = shift; my @acls = sort ( (map { "$_ (+)" } @{$acls->{positive}}), (map { "$_ (-)" } @{$acls->{negative}})); return join "\n", @acls}},
+    role => { roles => sub { my $roles = shift; 
+			     my @roles = map { $_->{name} } values %$roles; 
+			     return join "\n", @roles},
 
+	      acls =>  sub { my $acls = shift; 
+			     my @acls = sort ( (map { "$_ (+)" } @{$acls->{positive}}), 
+					       (map { "$_ (-)" } @{$acls->{negative}})); 
+			     return join "\n", @acls}},
 };
+
+# Available arguments in CLI and translation into
+# API format
 
 my $ARGUMENTS =
 {
-    vm => { name => 'name', ip => 'ip', tenant => 'tenant_id', blocked => 'blocked', expiration_soft => 'expiration_soft',
-	    expiration_hard => 'expiration_hard', storage => 'storage', tag => 'di_tag', user => 'user_id', osf => 'osf_id', 
-	    __properties_changes__ => '__properties_changes__' },
+    vm => { name => 'name', 
+	    ip => 'ip', 
+	    tenant => 'tenant_id', 
+	    blocked => 'blocked', 
+	    expiration_soft => 'expiration_soft',
+	    expiration_hard => 'expiration_hard', 
+	    storage => 'storage', 
+	    tag => 'di_tag', 
+	    user => 'user_id', 
+	    osf => 'osf_id', 
+	    __properties_changes__ => '__properties_changes__' }, # For nested queries in API
 
-    user => { name => 'name', password => 'password', blocked => 'blocked', tenant => 'tenant_id',
-	      __properties_changes__ => '__properties_changes__' },
+    user => { name => 'name', 
+	      password => 'password', 
+	      blocked => 'blocked', 
+	      tenant => 'tenant_id',
+	      __properties_changes__ => '__properties_changes__' }, # For nested queries in API
 
-    host => { name => 'name', address => 'address', frontend => 'frontend', backend => 'backend', blocked => 'blocked',
-	      __properties_changes__ => '__properties_changes__' },
+    host => { name => 'name', 
+	      address => 'address', 
+	      frontend => 'frontend', 
+	      backend => 'backend', 
+	      blocked => 'blocked',
+	      __properties_changes__ => '__properties_changes__' }, # For nested queries in API
 
-    osf => { name => 'name', memory => 'memory', user_storage => 'user_storage', overlay => 'overlay', tenant => 'tenant_id',
-	     __properties_changes__ => '__properties_changes__' },
+    osf => { name => 'name', 
+	     memory => 'memory', 
+	     user_storage => 'user_storage', 
+	     overlay => 'overlay', 
+	     tenant => 'tenant_id',
+	     __properties_changes__ => '__properties_changes__' }, # For nested queries in API
 
-    di => { blocked => 'blocked',  name => 'disk_image',  version => 'version', osf => 'osf_id',
-	    __properties_changes__ => '__properties_changes__', __tags_changes__ => '__tags_changes__'},
+    di => { blocked => 'blocked',  
+	    name => 'disk_image',  
+	    version => 'version', 
+	    osf => 'osf_id',
+	    __properties_changes__ => '__properties_changes__', # For nested queries in API
+	    __tags_changes__ => '__tags_changes__'}, # For nested queries in API
 
-    tenant => { name => 'name', language => 'language', block => 'block' },
+    tenant => { name => 'name', 
+		language => 'language', 
+		block => 'block' },
 
-    config => { key => 'key', value => 'value' },
+    config => { key => 'key', 
+		value => 'value' },
 
-    admin => { name => 'name', password => 'password', tenant => 'tenant_id', language => 'language', block => 'block',
-	       __roles_changes__ => '__roles_changes__' },
+    admin => { name => 'name', 
+	       password => 'password', 
+	       tenant => 'tenant_id', 
+	       language => 'language', 
+	       block => 'block',
+	       __roles_changes__ => '__roles_changes__' }, # For nested queries in API
 
-    role => { name => 'name', fixed => 'fixed', internal => 'internal',
-	      __roles_changes__ => '__roles_changes__', __acls_changes__ => '__acls_changes__' },
+    role => { name => 'name', 
+	      fixed => 'fixed', 
+	      internal => 'internal',
+	      __roles_changes__ => '__roles_changes__', # For nested queries in API
+	      __acls_changes__ => '__acls_changes__' }, # For nested queries in API
 };
+
+
+# These callbacks are intended to ask the API for
+# the list of ids corresponding a certain set of objects.
+# These cbs are intended to solve a problem regarding a general
+# difference between CLI syntax and API syntax:
+# A certain query to API about a QVD object can include
+# references to related objects (i.e. vms have a related
+# user and a related osf). These related objects are referenced
+# in the API by id, but in the CLI syntax they are referenced
+# by name. So these functions are intended to take a name, ask for the object
+# id corresponding to that name in API and retrieve the id: are intended
+# to switch from name to id.
 
 my $related_tenant_cb = sub { 
     my ($self,$name) = @_; 
@@ -290,34 +606,78 @@ my $related_role_cb = sub {
 		     filters =>  { name => $name }})->json('/rows');
 };
 
+# The previous callbacks are stored in this variable
+
 my $CBS_TO_GET_RELATED_OBJECTS_IDS =
 {
-    vm => { argument =>  { user => $related_user_cb,host => $related_host_cb,
-			   osf => $related_osf_cb, di => $related_di_cb }},
+    vm => { argument =>  { user => $related_user_cb,
+			   host => $related_host_cb,
+			   osf => $related_osf_cb, 
+			   di => $related_di_cb }},
 
     di => { argument => {osf => $related_osf_cb }}
 };
 
+# This variable stores the relation between CLI queries
+# and the corresponding actions in API
+
 my $CLI_CMD2API_ACTION =
-{
-    vm => { ids => 'vm_all_ids',  get => 'vm_get_list', update => 'vm_update', create => 'vm_create', delete => 'vm_delete', 
-	    start => 'vm_start', stop => 'vm_stop', disconnect => 'vm_user_disconnect' },
+{ # qvd_object => kind_of_action => API action
+    vm => { ids => 'vm_all_ids',  
+	    get => 'vm_get_list', 
+	    update => 'vm_update', 
+	    create => 'vm_create', 
+	    delete => 'vm_delete', 
+	    start => 'vm_start', 
+	    stop => 'vm_stop', 
+	    disconnect => 'vm_user_disconnect' },
 
-    user => { ids => 'user_all_ids', get => 'user_get_list', update => 'user_update', create => 'user_create', delete => 'user_delete' },
+    user => { ids => 'user_all_ids', 
+	      get => 'user_get_list', 
+	      update => 'user_update', 
+	      create => 'user_create', 
+	      delete => 'user_delete' },
 
-    host => { ids => 'host_all_ids', get => 'host_get_list', update => 'host_update', create => 'host_create', delete => 'host_delete'},
+    host => { ids => 'host_all_ids', 
+	      get => 'host_get_list', 
+	      update => 'host_update', 
+	      create => 'host_create', 
+	      delete => 'host_delete'},
 
-    osf => { ids => 'osf_all_ids', get => 'osf_get_list', update => 'osf_update', create => 'osf_create', delete => 'osf_delete'},
+    osf => { ids => 'osf_all_ids', 
+	     get => 'osf_get_list', 
+	     update => 'osf_update', 
+	     create => 'osf_create', 
+	     delete => 'osf_delete'},
 
-    di => { ids => 'di_all_ids', get => 'di_get_list', update => 'di_update', create => 'di_create', delete => 'di_delete'},
+    di => { ids => 'di_all_ids', 
+	    get => 'di_get_list', 
+	    update => 'di_update', 
+	    create => 'di_create', 
+	    delete => 'di_delete'},
 
-    tenant => { ids => 'tenant_all_ids', get => 'tenant_get_list', update => 'tenant_update', create => 'tenant_create', delete => 'tenant_delete' },
+    tenant => { ids => 'tenant_all_ids', 
+		get => 'tenant_get_list', 
+		update => 'tenant_update', 
+		create => 'tenant_create', 
+		delete => 'tenant_delete' },
 
-    config => { get => 'config_get', update => 'config_set', delete => 'config_delete', default => 'config_default' },
+    config => { get => 'config_get', 
+		update => 'config_set', 
+		delete => 'config_delete', 
+		default => 'config_default' },
 
-    admin => { ids => 'admin_all_ids', get => 'admin_get_list', update => 'admin_update', create => 'admin_create', delete => 'admin_delete' },
+    admin => { ids => 'admin_all_ids', 
+	       get => 'admin_get_list', 
+	       update => 'admin_update', 
+	       create => 'admin_create', 
+	       delete => 'admin_delete' },
 
-    role => { ids => 'role_all_ids', get => 'role_get_list', update => 'role_update', create => 'role_create', delete => 'role_delete' },
+    role => { ids => 'role_all_ids', 
+	      get => 'role_get_list', 
+	      update => 'role_update', 
+	      create => 'role_create', 
+	      delete => 'role_delete' },
 
     acl => { get => 'acl_get_list' }, 
 
@@ -325,6 +685,8 @@ my $CLI_CMD2API_ACTION =
 
 };
 
+# Default lists of fields that must be displayed
+# in console for every kind of qvd object
 
 my $DEFAULT_FIELDS = 
 { 
@@ -351,22 +713,51 @@ my $DEFAULT_FIELDS =
     log => [qw(time admin_name type_of_action qvd_object object_name status)]
 };
 
-###############
-## UTILITIES ##
-###############
+
+##############################################################
+## METHOD RUN (to be executed when a command is introduced) ##
+##############################################################
+
+sub run 
+{
+    my ($self, $opts, @args) = @_;
+
+    my $parsing = $self->parse_string(@args); # It parses the input CLI query
+
+    if ($parsing->command eq 'get')  # For display queries
+    {
+	$self->_get($parsing);
+    }
+    elsif ($parsing->command eq 'create') # For creation queries
+    {
+	$self->_create($parsing);
+    }
+    elsif ($parsing->command eq 'can') # For queries that check the acls of an admin or role
+    {
+	$self->_can($parsing);
+    }
+    else # For other queries (update/delete/...)
+    {
+	$self->_cmd($parsing);
+    }
+}
+
+# Function used to execute a displaying query
 
 sub _get 
 {
-    my ($self,$parsing) = @_;
-    my $query = $self->make_api_query($parsing);
-
-    $self->run_in_pagination_mode($query,$parsing);
+    my ($self,$parsing) = @_;                       # Takes a parsed query
+    my $query = $self->make_api_query($parsing);    # Creates a JSON query in API format 
+    $self->run_in_pagination_mode($query,$parsing); # Ask the API and prints a table in pagination mode
 }
+
+# Function to execute a creation table
 
 sub _create 
 {
-    my ($self,$parsing) = @_;
+    my ($self,$parsing) = @_; # Takes parsed query
 
+    # If needed, it switchs from tenant name to tenant id
     if (my $tenant_name = $parsing->arguments->{tenant})
     {
 	my $tenant_ids = $related_tenant_cb->($self,$tenant_name);
@@ -376,57 +767,72 @@ sub _create
 	$parsing->arguments->{tenant} = $self->tenant_scoop; 
     }
   
-    my $query = $self->make_api_query($parsing);
+    my $query = $self->make_api_query($parsing);# Creates a JSON query in API format 
     my $res = $self->ask_api($query);
     $self->print_table($res,$parsing);
 }
+
+# Function executed for queries that check the acls of an admin or role
 
 sub _can
 {
     my ($self,$parsing) = @_;
 
+    # It gets the id of the involved role or admin
     my $ids = $self->ask_api({ action => $self->get_all_ids_action($parsing),
 			       filters => $self->get_filters($parsing) })->json('/rows');
 
+    # It created an ad hoc JSON query
     my $acl_name = $parsing->parameters->{acl_name}; 
     my $id_key = $parsing->qvd_object eq 'admin' ? 'admin_id' : 'role_id';
     my $filters = { $id_key => $ids, operative => 1 }; 
     $filters->{acl_name} = { 'LIKE' => $acl_name } if defined $acl_name;
     my $action = $parsing->qvd_object eq 'admin' ? 'get_acls_in_admins' : 'get_acls_in_roles';
     my $query = { action => $action,filters => $filters,order_by => $self->get_order($parsing)};
+
+    # It creates an ad hoc displaying query  
     $parsing = QVD::Admin4::CLI::Grammar::Response->new(
 	response => { command => 'get', obj1 => { qvd_object => 'acl' }});
 
-    $self->run_in_pagination_mode($query,$parsing);
+    $self->run_in_pagination_mode($query,$parsing); # Ask the API and prints a table in pagination mode
 }
+
+# Function intended to execute a query in pagination mode.
+# It sets the console in pagination mode and asks the API and
+# prints a new table for every new page.
 
 sub run_in_pagination_mode
 {
     my ($self,$query,$parsing) = @_;
 
-    ReadMode("cbreak");
+    ReadMode("cbreak"); # This sets the pagination mode in console
 
+    # Current pagination parameters setted
     my ($pause_time, $char);
     my $offset = 1;
     $query->{offset} = $offset;
     my $app = $self->get_app;
     $query->{block} =  $app->cache->get('block');
 
-    my $res = $self->ask_api($query);
+    # It asks the API for the first page and prints that first page
+    my $res = $self->ask_api($query); 
+    $self->print_table($res,$parsing); 
 
-    $self->print_table($res,$parsing);
-
-    if ($res->json('/total') > $query->{block} )
+    if ($res->json('/total') > $query->{block} ) # If there are more than one page
     {
-	print STDOUT "--- page $offset ('n' for next, 'b' for back, 'q' for quit) ---\n";
+	print STDOUT "--- page $offset ('n' for next, 'b' for back, 'q' for quit) ---\n"; # Instrunctions to paginate
 
-	while ($char = ReadKey($pause_time)) {
+	while ($char = ReadKey($pause_time)) { # While a new page is asked
 	    last if $char eq 'q';
+            
+            # Pagination parameters updated
 
 	    $offset++ if $char eq 'n' &&
 		$res->json('/total') >= ($query->{block} * $query->{offset}) + 1;
 	    $offset-- if $char eq 'b' && $query->{offset} > 1;
 	    $query->{offset} = $offset;
+             
+            # New page asked and printed
 
 	    $res = $self->ask_api($query);
 	    $self->print_table($res,$parsing);
@@ -434,49 +840,40 @@ sub run_in_pagination_mode
 	}
     }
 
-    ReadMode(0);
+    ReadMode(0); # Return to normal mode in console 
 }
+
+
+# Function intended to execute update, delete and the rest of actions.
+# All these actions must include an id filter in API. So, firstly,
+# the corresponding ids are requested to API, and then the update/delete
+# request is performed
 
 sub _cmd
 {
     my ($self,$parsing) = @_;
 
+# It gets all the ids correspondig the objects that must
+# be deleted/updated
+
     my $ids = $self->ask_api(
 	{ action => $self->get_all_ids_action($parsing),
 	  filters => $self->get_filters($parsing) })->json('/rows');
     
+# It performs the update/delete over the objects with those ids
+
     my $res = $self->ask_api(
 	{ action => $self->get_action($parsing),
 	  filters => { id => { '=' => $ids }}, 
 	  order_by => $self->get_order($parsing), 
 	  arguments => $self->get_arguments($parsing)});
 
+# The API response is printed
+
     $self->print_table($res,$parsing);
 }
 
-sub run 
-{
-    my ($self, $opts, @args) = @_;
-
-    my $parsing = $self->parse_string(@args);
-
-    if ($parsing->command eq 'get')
-    {
-	$self->_get($parsing);
-    }
-    elsif ($parsing->command eq 'create')
-    {
-	$self->_create($parsing);
-    }
-    elsif ($parsing->command eq 'can')
-    {
-	$self->_can($parsing);
-    }
-    else
-    {
-	$self->_cmd($parsing);
-    }
-}
+# Regular function to create a JSON query in the API format
 
 sub make_api_query
 {
@@ -489,11 +886,23 @@ sub make_api_query
 	     arguments => $self->get_arguments($parsing)};
 }
 
+
+###############################################
+## METHODS TO PRINT RESPONSES IN CONSOLE RUN ##
+###############################################
+
+# It prints the total number of objects retrieved 
+# by the API
+
 sub print_count
 {
     my ($self,$res) = @_;
     print  "Total: ".$res->json('/total')."\n";
 }
+
+# It takes the response of the API and the original query
+# According to fields asked in the query, it prints in a 
+# table in console the info stored in the API response
 
 sub print_table
 {
@@ -509,37 +918,48 @@ sub print_table
 
     my $rows;
 
-    while (my $properties = $res->json("/rows/$n")) 
+    while (my $field = $res->json("/rows/$n")) 
     { 
-	$tb->add_row( map {  $self->get_field_value($parsing,$properties,$_) // '' } @fields );
+	$tb->add_row( map {  $self->get_field_value($parsing,$field,$_) // '' } @fields );
 	$n++;
     }
 
     print STDOUT "$tb" . "Total: ".$res->json('/total')."\n";
 }
 
+#######################################
+## METHODS TO PARSE THE INPUT STRING ##
+#######################################
+
 sub parse_string
 {
     my ($self,@args) = @_;
     my $req = join(' ',@args);
     my $app = $self->get_app;
+
+    # This code gets the parsers from the CLI settings
+
     my ($tokenizer,$parser) = 
 	($app->cache->get('tokenizer'), 
 	 $app->cache->get('parser'));
 
+    # First parsing stage, tokenization: 
+    # from string to list of words
     my $tokenization = $tokenizer->parse($req);
 
     $self->unrecognized($tokenization) &&
 	CLI::Framework::Exception->throw('Unable to tokenize request');
 
-    my $parsing = $parser->parse( shift @$tokenization );
+    # Second parsing stage, parsing:
+    # syntactic analysis
+    my $parsing = $parser->parse( shift @$tokenization ); # This is a list of analysis
 
     $self->unrecognized($parsing) &&
 	CLI::Framework::Exception->throw('Unable to parse request');
     $self->ambiguous($parsing) &&
 	CLI::Framework::Exception->throw('Ambiguos request');
 
-    shift @$parsing;
+    shift @$parsing; 
 }
 
 sub unrecognized
@@ -554,11 +974,29 @@ sub ambiguous
     scalar @$response > 1 ? return 1 : 0; 
 }
 
+##################################################
+## METHODS TO PERFORM A REQUEST AGAINST THE API ##
+##################################################
+
+# Main method
+
 sub ask_api
 {
     my ($self,$query) = @_;
 
-    return $self->ask_api_di_upload($query)
+# TODO: 
+# There is no way to select the kind of di creation system that
+# must be used. The API privides three different systems:
+# a) Copy an image from staging
+# b) Upload an inmage from local
+# c) Download an image from url
+
+# But here just one method can be used (di_upload):
+# This can be changed to 'ask_api_staging'.
+# One more method must be implemented: 'ask_api_di_download'
+
+    my $di_creation_method = 'ask_api_di_upload';                                                   
+    return $self->$di_creation_method($query)
 	if $query->{action} eq 'di_create';
 
     my $app = $self->get_app;
@@ -572,6 +1010,8 @@ sub ask_api
 
     my ($sid,$login,$password,$tenant,$url,$ua) = 
 	@args{qw(sid login password tenant url ua)};
+
+    # Added credentials to the JSON query
 
     my %credentials = defined $sid ? (sid => $sid) : 
 	( login => $login, password => $password);
@@ -588,39 +1028,8 @@ sub ask_api
     return $res;
 }
 
-sub check_api_result
-{
-    my ($self,$res) = @_;
-
-    return 1 unless $res->json('/status');
-
-    my $API_INTERNAL_PROBLEMS_MSG = 'Internal problems in API';
-    my %SERVER_INTERNAL_ERRORS = qw(1100 1 4100 1 4110 1 6100 1);
-
-    CLI::Framework::Exception->throw($API_INTERNAL_PROBLEMS_MSG) if 
-	$SERVER_INTERNAL_ERRORS{$res->json('/status')};
-
-    CLI::Framework::Exception->throw($res->json('/message')) unless 
-	$res->json('/status') eq 1200;
-
-    my ($message,$failures) = ($res->json('/message') . ":\n",$res->json('/failures'));
-
-    my %seen_msgs;
-
-    while (my ($id,$failure) = each %$failures)
-    {
-	my $msg = $SERVER_INTERNAL_ERRORS{$failure->{status}} ? 
-	    $API_INTERNAL_PROBLEMS_MSG : 
-	    $failure->{message};
-	next if exists $seen_msgs{$msg};
-	$seen_msgs{$msg} = 1;
-	$message .= "$msg\n"; 
-    } 
-
-    $message =~ s/\n$//;
-    CLI::Framework::Exception->throw($message);
-}
-
+# Method to create a DI copying the image from the
+# staging directory in API server
 
 sub ask_api_staging
 {
@@ -682,6 +1091,8 @@ sub ask_api_staging
     Mojo::Message::Response->new(json => $res);
 }
 
+# Method to create a DI uploading the image from local
+
 sub ask_api_di_upload
 {
     my ($self,$query) = @_;
@@ -719,34 +1130,57 @@ sub ask_api_di_upload
     return $res;
 }
 
-sub print_filters
+
+sub check_api_result
 {
-    my ($self,$parsing) = @_;
-    my @f = sort keys %{$FILTERS->{$parsing->qvd_object}};
-    print join "\n", @f;
+    my ($self,$res) = @_;
+
+    return 1 unless $res->json('/status'); # Successful response
+
+    # All API internal errors are translated to the same generic 
+    # message in CLI responde
+
+    my $API_INTERNAL_PROBLEMS_MSG = 'Internal problems in API';
+    my %SERVER_INTERNAL_ERRORS = qw(1100 1 4100 1 4110 1 6100 1);
+
+    CLI::Framework::Exception->throw($API_INTERNAL_PROBLEMS_MSG) if 
+	$SERVER_INTERNAL_ERRORS{$res->json('/status')};
+
+   # Well typified error messages in API are displayed via console
+   # in CLI 
+
+    CLI::Framework::Exception->throw($res->json('/message')) unless 
+	$res->json('/status') eq 1200; 
+
+  # For 1200 error in API (That means that one or more of the objects
+  # involved in a query couldn't be edited because of some problem):
+
+    my ($message,$failures) = ($res->json('/message') . ":\n",$res->json('/failures'));
+
+    my %seen_msgs;
+
+    while (my ($id,$failure) = each %$failures)
+    {
+	my $msg = $SERVER_INTERNAL_ERRORS{$failure->{status}} ? 
+	    $API_INTERNAL_PROBLEMS_MSG : 
+	    $failure->{message};
+	next if exists $seen_msgs{$msg};
+	$seen_msgs{$msg} = 1;
+	$message .= "$msg\n"; 
+    } 
+
+    $message =~ s/\n$//;
+    CLI::Framework::Exception->throw($message);
 }
 
-sub print_arguments
-{
-    my ($self,$parsing) = @_;
-    my @a = sort keys %{$ARGUMENTS->{$parsing->qvd_object}};
-    print join "\n", @a;
-}
 
-sub print_order
-{
-    my ($self,$parsing) = @_;
-    my @o = sort keys %{$ORDER->{$parsing->qvd_object}};
-    print join "\n", @o;
-}
+###################################################
+## AUXILIAR METHODS TO CREATE THE JSON API QUERY ##
+## FROM THE PARSING QUERY                        ##
+###################################################
 
-sub print_fields
-{
-    my ($self,$parsing) = @_;
-    my @f = sort @{$DEFAULT_FIELDS->{$parsing->qvd_object}};
-   print join "\n",@f; 
-}
-
+# Returns the corresponding action in API to the current
+# request in CLI
 sub get_action
 {
     my ($self,$parsing) = @_;
@@ -755,6 +1189,7 @@ sub get_action
     } // CLI::Framework::Exception->throw("No API action available for request"); 
 }
 
+# Returns a function that asks the API for the id of an object
 sub get_all_ids_action
 {
     my ($self,$parsing) = @_;
@@ -763,6 +1198,9 @@ sub get_all_ids_action
     } // CLI::Framework::Exception->throw("No API action available for getting related object"); 
 }
 
+# Normalizes the filters in a request according the
+# info in the class variables of this class. Returns the
+# hash of normalized  filters
 sub get_filters
 {
     my ($self,$parsing) = @_;
@@ -784,6 +1222,9 @@ sub get_filters
     $parsing->filters->hash;
 }
 
+# Normalizes the arguments in a request according the
+# info in the class variables of this class. Returns the
+# hash of normalized arguments
 sub get_arguments
 {
     my ($self,$parsing) = @_;
@@ -800,13 +1241,9 @@ sub get_arguments
     $out;
 }
 
-sub superadmin
-{
-    my $self = shift;
-    my $app = $self->get_app;
-    $app->cache->get('tenant_id') ? return 1 : return 0;
-}
-
+# Normalizes the ordering in a request according the
+# info in the class variables of this class. Returns the
+# hash of normalized ordering
 sub get_order
 {
     my ($self,$parsing) = @_;
@@ -824,6 +1261,8 @@ sub get_order
     { order => $direction, field => $out };
 }
 
+# It returns the list of fields that must be retrieved by 
+# an action
 sub get_fields
 {
     my ($self,$parsing,$api_res) = @_;
@@ -849,7 +1288,9 @@ sub get_fields
     @retrieved_fields;
 }
 
-
+# Normalizes the fields to retrieve in a request according the
+# info in the class variables of this class. Returns the
+# hash of normalized fields
 sub get_fields_for_api
 {
     my ($self,$parsing,$api_res) = @_;
@@ -864,6 +1305,11 @@ sub get_fields_for_api
     \@asked_fields;
 }
 
+# For a certain field retrieved by the API, it may need to be
+# normalized or processed before it is displayed. This function gets the
+# normalized value of the field, or the callback intended to process it 
+# (if any). And returns the normalized value, or the output of that callback 
+# for the current field 
 sub get_field_value
 {
     my ($self,$parsing,$api_res_obj,$cli_field) = @_;
@@ -880,6 +1326,12 @@ sub get_field_value
     return $v;
 }
 
+# This function gets a filter or argument and normalizes it 
+# according to a callback intended to normalize it (if any).
+# Typically, that normalizations means switch from the name
+# of an object provided by the CLI to the corresponding id that
+# the API ask for. And that's for related objects (i.e., the user
+# or osf of a vm)
 sub get_value
 {
     my ($self,$parsing,$key,$value,$filter_or_argument) = @_;
@@ -898,6 +1350,8 @@ sub get_value
     }
     $value;
 }
+
+# Other auxiliar functions
 
 sub tenant_scoop
 {
@@ -937,6 +1391,14 @@ sub _read
     chomp $read;
     print STDERR "\r";
     $read;
+}
+
+
+sub superadmin
+{
+    my $self = shift;
+    my $app = $self->get_app;
+    $app->cache->get('tenant_id') ? return 1 : return 0;
 }
 
 1;

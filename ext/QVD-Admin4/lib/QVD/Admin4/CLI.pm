@@ -2,8 +2,6 @@ package QVD::Admin4::CLI;
 use base qw( CLI::Framework );
 use strict;
 use warnings;
-use QVD::Admin4::CLI;
-use QVD::Admin4::CLI::Command;
 use QVD::Admin4::CLI::Grammar;
 use QVD::Admin4::CLI::Grammar::Unificator;
 use QVD::Admin4::CLI::Parser;
@@ -92,35 +90,66 @@ sub command_map {
     menu     => 'QVD::Admin4::CLI::Command::Menu',
     }
 
+# This is executen when the app is run.
+# It initalizes all objects and sets all parameters
+
 sub init {
     my ($self, $opts) = @_;
 
-    my ($host,$port) = (($opts->host || 'localhost'), ($opts->port || 3000)); 
+    my ($host,$port) =  # It gets the API address
+	(($opts->host || 'localhost'), 
+	 ($opts->port || 3000)); 
 
-    my $api_url = Mojo::URL->new(); $api_url->scheme('http'); $api_url->host($host); $api_url->port($port); 
-    my $api_info_url = Mojo::URL->new(); $api_info_url->scheme('http'); $api_info_url->host($host); $api_info_url->port($port); $api_info_url->path('/info');
-    my $api_staging_url = Mojo::URL->new(); $api_staging_url->scheme('ws'); $api_staging_url->host($host); $api_staging_url->port($port); 
+# Created as objects all addresses in API
+
+    my $api_url = Mojo::URL->new(); 
+    $api_url->scheme('http'); 
+    $api_url->host($host); 
+    $api_url->port($port); 
+    
+    my $api_info_url = Mojo::URL->new(); 
+    $api_info_url->scheme('http'); 
+    $api_info_url->host($host); 
+    $api_info_url->port($port); 
+    $api_info_url->path('/info');
+    
+    my $api_staging_url = Mojo::URL->new(); 
+    $api_staging_url->scheme('ws'); 
+    $api_staging_url->host($host); 
+    $api_staging_url->port($port); 
     $api_staging_url->path('/staging');
-    my $api_di_upload_url = Mojo::URL->new(); $api_di_upload_url->scheme('http'); $api_di_upload_url->host($host); $api_di_upload_url->port($port); 
+    
+    my $api_di_upload_url = Mojo::URL->new(); 
+    $api_di_upload_url->scheme('http'); 
+    $api_di_upload_url->host($host); 
+    $api_di_upload_url->port($port); 
     $api_di_upload_url->path('/di/upload');
+    
+# Created a web client
+
     my $user_agent = Mojo::UserAgent->new;
+
+# Created objects to parse the input string
 
     my $unificator = QVD::Admin4::CLI::Grammar::Unificator->new();
     my $grammar = QVD::Admin4::CLI::Grammar->new();
-    my $parser = QVD::Admin4::CLI::Parser->new( grammar => $grammar, unificator => $unificator);
+    my $parser = QVD::Admin4::CLI::Parser->new( 
+	grammar => $grammar, unificator => $unificator);
     my $tokenizer = QVD::Admin4::CLI::Tokenizer->new();
-    
+
+# Set parameters available from the whole app.
+
     $self->cache->set( user_agent => $user_agent ); 
     $self->cache->set( parser => $parser);
     $self->cache->set( tokenizer => $tokenizer );
-    $self->cache->set( api_url => $api_url ); 
-    $self->cache->set( api_info_url => $api_info_url ); 
-    $self->cache->set( api_di_upload_url => $api_di_upload_url ); 
-    $self->cache->set( api_staging_url => $api_staging_url ); 
-    $self->cache->set( login => undef ); 
+    $self->cache->set( api_url => $api_url ); # url '/' in API
+    $self->cache->set( api_info_url => $api_info_url ); # url '/info' in API
+    $self->cache->set( api_di_upload_url => $api_di_upload_url ); # url '/di/upload' in API
+    $self->cache->set( api_staging_url => $api_staging_url ); # ws url '/staging' in API
+    $self->cache->set( login => undef ); # No default credentials provided
     $self->cache->set( tenant_name => undef ); 
     $self->cache->set( password => undef ); 
-    $self->cache->set( block => 25 ); 
+    $self->cache->set( block => 25 ); # FIX ME. Default block value should be taken from a config file or sth.
 }
 
 
@@ -135,9 +164,19 @@ sub handle_exception
 {
     my ($self,$e) = @_;
 
-    ReadMode(0);
+    ReadMode(0); # This is important. It guarantees that,
+                 # after an exception is thrown, the CLI console is in the
+                 # right mode (i.e. this is needed when the CLI thrown an exception while it
+                 # is in pagination mode; it forces the return to the non-pagination mode)
     print $e->message, "\n";
 }
+
+# This method has been copy/pasted from CLI::Framework
+# It overwrites the original one. It has been added here
+# in order to escapa the quotes (',") introduced in the
+# CLI console. We don't want them to be parsed in a Unix
+# console regular way. Quotes have their own special meaning
+# in CLI syntax
 
 sub read_cmd {
 
@@ -161,8 +200,8 @@ sub read_cmd {
         print "\n"; 
     }
     else {
-	$command_request =~ s/'/\\'/g;
-	$command_request =~ s/"/\\"/g;
+	$command_request =~ s/'/\\'/g; # These are the
+	$command_request =~ s/"/\\"/g; # added lines
         @ARGV = Text::ParseWords::shellwords( $command_request );
         $term->addhistory($command_request)
             if $command_request =~ /\S/ and !$term->Features->{autohistory};

@@ -5,6 +5,8 @@ use warnings;
 use lib::glob '/home/benjamin/wat/*/lib/';
 use QVD::Admin4::CLI;
 
+# Script intended to create and run an instance of the CLI.
+
 my $app = QVD::Admin4::CLI->new();
 $app->run_interactive( initialize => 1 );
 
@@ -17,6 +19,6 @@ __END__
 
 =head1 PURPOSE
 
-Demonstration of a very simple CLIF application.
+Script intended to create and run an instance of the CLI.
 
 =cut
