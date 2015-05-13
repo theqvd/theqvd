@@ -9,16 +9,25 @@ use QVD::Admin4::CLI::Parser::Chart;
 use QVD::Admin4::CLI::Parser::Node;
 use QVD::Admin4::CLI::Grammar::Substitution;
 
+# Class intended to perform syntactic analysis
+
+# An object able to decide is two feature structures unify or not needed
 has 'unificator', is => 'ro', isa => sub { die "Invalid type for attribute unificator" 
 						  unless ref(+shift) eq 'QVD::Admin4::CLI::Grammar::Unificator'; };
+
+# The analysis is done acording to a grammar.
 has 'grammar', is => 'ro', isa => sub { die "Invalid type for attribute grammar" 
 						  unless ref(+shift) eq 'QVD::Admin4::CLI::Grammar'; };
 
+# Repositories of constituents needed for the parsing
 has 'agenda', is => 'ro', isa => sub { die "Invalid type for attribute agenda" 
 						  unless ref(+shift) eq 'QVD::Admin4::CLI::Parser::Agenda'; };
 
 has 'chart', is => 'ro', isa => sub { die "Invalid type for attribute chart" 
 						  unless ref(+shift) eq 'QVD::Admin4::CLI::Parser::Chart'; };
+
+# This is the last position in the input tokens list 
+# Needed to know if an analysis covers the whole sentence
 my $LAST;
 
 sub BUILD
@@ -42,9 +51,11 @@ sub parse
     my $response = [];
     for my $edge (@{$self->chart->inactive_edges})
     {
-	if ($self->is_root($edge)
-	    && $edge->from eq 0 && $edge->to eq $LAST)
-	{ push @$response, $self->grammar->response(clone $edge->node->meaning) ; }
+	if ($self->is_root($edge) # is an axiom
+	    && $edge->from eq 0 && $edge->to eq $LAST) # covers the whole sentence
+	{ push @$response, 
+	  $self->grammar->response(clone $edge->node->meaning) ; } # Creates an object QVD::Admin4::CLI::Grammar::Meaning
+                                                                   # (a wrapper for the HASH version of the analysis)
     } 
 
     $response;
@@ -87,6 +98,13 @@ sub get_edges_from_initial_tokens
     my ($self,$tokens) = @_;
     my @edges;
 
+# This code creates the initial constituents of the parsing
+# process from the input tokens 
+
+# The grammar has info about what kind of constituent 
+# (with a label and a meaning) should be created from 
+# a certain string
+
     for my $token (@$tokens)
     {
 	$LAST = $token->to if $token->to > $LAST; 
@@ -123,12 +141,17 @@ sub expand_edge
 
 	my $substitution = $self->unificator->unify(%args) || next; 
 
+        # Created a node that implements a new grammatical constituent. 
+        # It will be the kind of constituent defined by the rule $rule
 	my $node = QVD::Admin4::CLI::Parser::Node->new(rule => $rule, substitution => $substitution); 
 
+	# Created a new edge regarding the new constituent
 	my $new_edge = QVD::Admin4::CLI::Parser::Edge->new(
 	    node => $node, from => $edge->from, to => $edge->to, 
 	    to_find => [$rule->rest_of_daughters], found => [$edge->node] );
 
+        # Triggers the creation of the meaning of the constituent
+        # from the list of daughters
 	$new_edge->node->percolate_meaning_from_constituents($new_edge->found) 
 	    unless $new_edge->is_active;
 
@@ -189,13 +212,19 @@ sub combine_edge_aux
     
     my $substitution = $self->unificator->unify(%args) || return;
 
+    # Created a node that implements a new grammatical constituent. 
+    # It will be the kind of constituent defined by the rule $rule
     my $node = QVD::Admin4::CLI::Parser::Node->new(rule => $active_edge->node->rule, substitution => $substitution); 
+
+    # Created a new edge regarding the new constituent
     my $new_edge = QVD::Admin4::CLI::Parser::Edge->new(
 	node => $node, from => $active_edge->from, to => $inactive_edge->to, 
 	to_find => $active_edge->rest_to_find, found => [@{$active_edge->found}] );
 
     $new_edge->add_found($inactive_edge->node);
 
+    # Triggers the creation of the meaning of the constituent
+    # from the list of daughters
     $new_edge->node->percolate_meaning_from_constituents($new_edge->found)
 	    unless $new_edge->is_active;
 

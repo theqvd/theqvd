@@ -5,6 +5,7 @@ use Moo;
 use QVD::Admin4::CLI::Grammar::Substitution;
 use Data::Dumper;
 
+# Variables are strings that starts with #
 my $VAR = qr/^#[^#]+$/;
 
 sub unify
@@ -17,9 +18,9 @@ sub unify
     my $s_subst = $args{source_substitution};
     my $t_subst = $args{target_substitution};
 
-    $self->set_substitution($t_subst);
-
-    my $flag = 0;
+    $self->set_substitution($t_subst); # Creates the new substitution that 
+                                       # will be retrieved by the method in 
+    my $flag = 0;                      # case the unification is successful
 
     while (my ($key,$t_value) = each %$target)
     {

@@ -550,7 +550,7 @@ Intuitivamente, podría decirse que la regla permite tomar un constituyente de n
 
 ....
 
-Pero, como se ha dicho, este sistema de identidades entre rasgos de distintos constituyentes de una regla tiene ciertas limitaciones. La razón es que, debido al diseño  del _parser_, no es posible establecer identidades, directamente, entre los constituyentes de la margen derecha de una regla. Las identidades se establecen, en cambio, entre cada uno de los constituyentes de la margen derecha con el constituyente de la margen izquierda. Así pues, para la regla anterior,  el _parser_  controla que el primer constituyente de la derecha tenga el mismo `label` que el constituyente de la izquierda; y, después controla que el segundo constituyente de la derecha tenga también el mismo `label` que el de la izquierda. De este modo, indirectamente, se obliga a que los dos constituyentes de la derecha tengan el mismo valor. Pero esto obliga a incluir el rasgo  `label` con valor `#label` en la margen izquierda de la regla; con lo cual, las siguientes reglas serían imposibles en el CLI:
+Pero, como se ha dicho, este sistema de identidades entre rasgos de distintos constituyentes de una regla tiene ciertas limitaciones. La razón es que, debido al diseño  del _parser_, no es posible establecer identidades, directamente, entre los constituyentes de la margen derecha de una regla. Las identidades se establecen, en cambio, entre cada uno de los constituyentes de la margen derecha con el constituyente de la margen izquierda. Así pues, para la regla anterior,  el _parser_  controla que el primer constituyente de la derecha tenga el mismo `label` que el constituyente de la izquierda; y, después controla que el segundo constituyente de la derecha tenga también el mismo `label` que el de la izquierda. De este modo, indirectamente, se obliga a que los dos constituyentes de la derecha tengan el mismo valor. Pero esto hace necesario incluir el rasgo  `label` con valor `#label` en la margen izquierda de la regla; con lo cual, las siguientes reglas serían imposibles en el CLI:
 
 ....
 
@@ -568,7 +568,7 @@ En el CLI, la propiedad que determina si dos constituyentes son del mismo tipo e
 * El valor del rasgo de A es una variable.
 * El valor del rasgo de B es una variable.
 
-En concreto, el _parser_ del CLI establece tres situaciones en las que hay que determinar si dos constituyentes son del mismo tipo o no, si unifican o no.
+En concreto, el _parser_ del CLI establece tres situaciones en las que hay que comprobar si dos constituyentes son del mismo tipo o no, si unifican o no.
 
 * Para determinar si un constituyente puede expandirse o no mediante una regla de la gramática. En este caso el constituyente en cuestión debe unificar con el primer constituyente de la margen derecha de la regla.
 
@@ -580,7 +580,7 @@ Estas tres comprobaciones las hace el _parser_ en la clase `QVD::Admin4::CLI::Pa
 
 La clase `QVD::Admin4::CLI::Grammar::Unification` define al objeto encargado en el análisis de comprobar si dos constituyentes unifican o no. El método `unify` de esta clase  toma cuatro argumentos: dos constituyentes *C1* y *C2* con sus respectivas sustituciones *S1* y *S2*. El método aplica *S1* y *S2* respectivamente a *C1* y *C2* y crea los constituyentes virtuales *C1'* y *C2'*. Después compara estos constituyentes: si no unifican devuelve 0. Pero si sí unifican, el método devuelve un valor positivo.
 
-Hay varias cuestiones que precisar al respecto de este proceso de unificación. La  unificación, tal como se ha definido en el CLI, es en realidad una operación asimétrica. El método `unify` siempre se ejecuta sobre constituyentes que, en el proceso de análisis, cumplen funciones distintas. Uno de ellos siempre es un constituyente real, creado en el análisis; y otro es un constituyente hipotético, tomado de la margen derecha de una regla gramatical (expansión) o de una lista `to_find` de un _edge_ activo (combinación). Dicho en términos intuitivos, el constituyente hipotético es un elemento que se busca, es una posición pendiente de cubrir; y el constituyente real es el candidato que intenta cubrir esa posición. El constituyente hipotético es la variable y el constituyente real es su instancia. Así pues, la unificación se ha definido en el CLI como una operación asimétrica que comprueba si un constituyente real es un buen candidato para cubrir la posición de un constituyente hipotético.  
+La  unificación, tal como se ha definido en el CLI, es en realidad una operación asimétrica. El método `unify` siempre se ejecuta sobre constituyentes que, en el proceso de análisis, cumplen funciones distintas. Uno de ellos siempre es un constituyente real, creado en el análisis; y otro es un constituyente hipotético, tomado de la margen derecha de una regla gramatical (expansión) o de una lista `to_find` de un _edge_ activo (combinación). Dicho en términos intuitivos, el constituyente hipotético es un elemento que se busca, es una posición pendiente de cubrir; y el constituyente real es el candidato que intenta cubrir esa posición. El constituyente hipotético es la variable y el constituyente real es su instancia. Así pues, la unificación se ha definido en el CLI como una operación asimétrica que comprueba si un constituyente real es un buen candidato para cubrir la posición de un constituyente hipotético.  
 
 Se ha dicho que, cuando estos  dos tipos de constituyentes unifican, el método `unify` devuelve un valor positivo, y si no unifican, devuelve 0. Pues bien, ese valor positivo que devuelve `unify` tras una unificación exitosa es, en concreto, una nueva sustitución, un objeto `QVD::Admin4::CLI::Grammar::Substitution`. Esta es la sustitución que hay que aplicarle al constituyente hipotético para añadirle la especificidad que el constituyente real puede aportarle. En concreto, esta sustitución contendrá la información que ya existía en la sustitución del constituyente hipotético, más aquellas variables de dicho constituyente hipotético para las cuales el constituyente real sí tuviera un valor. Por ejemplo, el método `unify`, para los argumentos siguientes devolvería la sustitución que se presenta a continuación.
 
@@ -611,9 +611,9 @@ El análisis que hace el _parser_ del CLI es una estructura arbórea del estilo 
       get  name
 ....
 
-Sin embargo, lo que interesa en el CLI es, no tanto este tipo de análisis, como el significado que ese análisis puede llevar aparejado. Este significado es un HASH que, salvando las distancias, viene a ser un JSON válido como petición a la API de administración de QVD. En este apartado se explica cómo se construye este HASH a partir del análisis arbóreo que crea el _parser_.
+Sin embargo, lo que interesa en el CLI  no es este tipo de análisis, sino el significado que ese análisis lleva aparejado. Este significado es un HASH que, codificado en JSON y salvando las distancias, es válido como petición a la API de administración de QVD. 
 
-Cada constituyente del análisis tiene asociado un HASH, ARRAY o escalar que es su significado. El significado de un constituyente se crea composicionalmente a partir del significado de  sus constituyentes menores. Toda regla de la gramática define un constituyente creado a partir de la unión de sus constituyentes menores. Pues bien, toda regla de la gramática tiene asociada una función que calcula el significado del constituyente que define la regla a partir del significado de sus constituyentes menores. La función toma como argumento la lista de significados de sus constituyentes menores y, a partir de ellos, crea un nuevo HASH, ARRAY o escalar que se devuelve como significado del constituyente mayor.
+Cada constituyente del análisis tiene asociado un HASH, ARRAY o escalar que es su significado. El significado de un constituyente se crea composicionalmente a partir del significado de  sus constituyentes menores. Toda regla de la gramática define un constituyente creado a partir de la unión de sus constituyentes menores. Pues bien, toda regla de la gramática tiene asociada una función que calcula el significado del constituyente que define a partir del significado de sus constituyentes menores. La función toma como argumento la lista de significados de sus constituyentes menores y, a partir de ellos, crea un nuevo HASH, ARRAY o escalar que se devuelve como significado del constituyente mayor.
 
 El _parser_, para cada constituyente que crea, crea además su significado, ejecutando la función correspondiente. Para ello ejecuta el método `percolate_meaning_from_constituents` en la clase `QVD::Admin4::CLI::Parser`. Una vez todo el proceso de análisis ha concluido, por cada análisis satisfactorio existe un significado: el significado asociado al constituyente superior del análisis en cuestión. La lista de significados será el _output_ real del proceso de _parsing_. Más en concreto, cada uno de esos significados el _parser_ lo convierte en un objeto `QVD::Admin4::CLI::Meaning`. Este objeto no es más que un _wrapper_ que permite acceder de forma sencilla al HASH original. 
 
@@ -672,3 +672,203 @@ Por tanto, de nuevo será necesario que, antes de pedir las máquinas virtuales 
 
 En definitiva, el CLI admite unas acciones, cada una con sus filtros y/o argumentos. La cuestión es que ni la _key_ ni el valor de esos filtros y argumentos tiene por qué tener correspondencia con los filtros y argumentos que admite la API. Todo este, a veces complejo, paso de la petición del CLI a la de la API se gestiona en la clase `QVD::Admin4::CLI::Command` mediante variables de clase que establecen las correspondencias entre los elementos encontrados en la petición del CLI y los elementos correspondientes en la petición a la API. Estas variables son consultadas por las funciones encargadas de hacer el _mapping_ de una petición a otra. Todas ellas toman como argumento un objeto `QVD::Admin4::CLI::Grammar::Response` que representa, como se ha dicho, el análisis de la petición hecha al CLI. De acuerdo con ese análisis, se extrae de las variables de clase la información pertinente para la petición en cuestión. 
 
+== Otros
+
+=== Elementos creados directamente en la base de datos
+
+La base de datos de QVD4 no puede crearse solamente haciendo _deploy_ del esquema definido mediante DBIC. Es necesario, también añadir los siguientes elementos:
+
+* La vista `all_acl_role_relations`. Devuelve, para todos los pares acl/rol posibles en la base de datos, un _flag_ que determina si el acl está o no operativo en el rol.
+
+* La vista  `operative_views_in_tenants`. Devuelve todos los _tokens_ de configuración de vistas del WAT para cada tenant. Además de devolver los _tokens_ físicamente presentes en la base de datos, crea, si es necesario, otros virtuales para forzar el comportamiento por defecto de las _custom properties_.
+
+* La función `delete_views_for_removed_property` se ejecuta cuando una _custom property_ se borra en la base de datos. La función borra de la base de datos todos los _tokens_ de configuración de vistas del WAT relativos a la _custom property_ borrada.
+
+* Los _triggers_ que lanzan la función anterior:
+** `delete_views_for_removed_di_property`.
+** `delete_views_for_removed_host_property`.
+** `delete_views_for_removed_osf_property`.
+** `delete_views_for_removed_user_property`.
+** `delete_views_for_removed_vm_property`.
+
+* Los _triggers_ usados para lanzar notificaciones que se leen en el _websocket_ de la API: 
+** `di_blocked_or_unblocked_trigger`.
+** `di_created_or_removed_trigger`.
+** `host_blocked_or_unblocked_trigger`.
+** `host_created_or_removed_trigger`.
+** `host_state_changed_trigger`.
+** `osf_created_or_removed_trigger`.
+** `user_blocked_or_unblocked_trigger`.
+** `user_created_or_removed_trigger`.
+** `user_state_changed_trigger`.
+** `vm_blocked_or_unblocked_trigger`.
+** `vm_created_or_removed_trigger`.
+** `vm_expiration_date_changed_trigger`.
+** `vm_state_changed_trigger`.
+
+* Las siguientes son las funciones que notifican los eventos a petición de los _triggers_ anteriores:
+** `di_blocked_or_unblocked_notify`.
+** `di_created_or_removed_notify`.
+** `host_blocked_or_unblocked_notify`.
+** `host_created_or_removed_notify`.
+** `host_state_changed_notify`.
+** `osf_created_or_removed_notify`.
+** `user_blocked_or_unblocked_notify`.
+** `user_created_or_removed_notify`.
+** `user_state_changed_notify`.
+** `vm_blocked_or_unblocked_notify`.
+** `vm_created_or_removed_notify`.
+** `vm_expiration_date_changed_notify`.
+** `vm_state_changed_notify`.
+
+
+
+* La función `ip2mac`. Convierte una ip en su correspondiente mac. Necesaria para la ordenación por mac en la API.
+
+== Protocolos de _websockets_
+
+La API provee tres direcciones _websocket_: `/ws`, `/staging` y `/di/download`.
+
+`/ws` es el _websocket_ de monitorización del sistema. Manda avisos ante ciertas notificaciones de la base de datos. El cliente se conecta a este _websocket_ con una url en la que manda una petición normal a la API:  
+
+....
+ws://localhost:3000/ws/?sid=blablabla&action=vm_get_details&filters={"id":2}&fields=["state"]
+....
+
+Una vez registrada la petición, el servidor la ejecuta por primera vez y le manda al cliente la respuesta propia de la API para esa petición:
+
+....
+{"total" :1,
+ "status":0,
+ "message":"Successful completion",
+ "rows":[{"state":"stopped"}]}
+....
+
+A partir de entonces, el servidor se pone a escuchar notificaciones de la base de datos que puedan indicar que el resultado de esa petición pudiera haber cambiado. Cada dos segundos, se comprueba si ha habido nuevas notificaciones; y  si sí las ha habido, se vuelve a ejecutar la misma petición y se manda el nuevo resultado: 
+
+....
+
+{"total" :1,
+ "status":0,
+ "message":"Successful completion",
+ "rows":[{"state":"starting"}]}
+
+....
+
+El servidor espera que siempre que manda un mensaje, el cliente le responda con un mensaje cualquiera. Cuando el servidor recibe ese mensaje, crea un _timer_ que, tras 25 segundos de espera, manda a su vez un mensaje 'AKN' al cliente. Si antes de terminar esos 25 segundos, el servidor recibe un nuevo mensaje del cliente, pone el _timer_ a 0 y vuelve a esperar 25 segundos para mandar un 'AKN'. Con esto se consigue que, al menos cada 25 segundos, se dé un intercambio de mensajes entre cliente y servidor. De este modo se evitan posibles _timeouts_.
+
+`/staging` admite una petición de creación de `DI` a partir de una imagen presente en `storage/staging`. Es un _websocket_ capaz de monitorizar el progreso de la copia de la imagen desde `storage/staging` a `storage/images`.
+
+La url que abre el _websocket_ pudiera ser la siguiente:
+
+....
+ws://localhost:3000/ws/?sid=blablabla&action=di_create&arguments={"osf_id":1,"disk_image":"unaimagendedisco-3.0.tar.gz"}
+....
+
+El _websocket_, una vez abierto, crea el  `DI` pedido y cuando ha terminado el proceso, manda la respuesta normal de la API para tal petición:
+
+....
+{"total" :1,
+ "status":0,
+ "message":"Successful completion",
+ "rows":[{"id":"4"}]}
+....
+
+Pero ese proceso, debido a la copia de la imagen de disco, puede llegar a ser muy largo. Así pues, el _websocket_ tiene habilitado un sistema de monitorización del progreso de la copia. El servidor, cada vez que recibe un mensaje cualquiera del cliente, le manda un JSON del siguiente tipo, donde se informa del tamaño total de la imagen y del tamaño que se ha copiado hats el momento:
+
+....
+{"status":1000,
+ "total_size":1000000000,
+ "copy_size":100000}
+....
+   
+Así pues, en un uso normal de este _websocket_, el cliente abre la conexión. A continuación, le manda al servidor un mensaje cualquiera. El servidor le responde con el progreso de la copia de la imagen. Cuando el cliente recibe esa respuesta, vuelve a mandar un mensaje cualquiera al servidor. De nuevo, el servidor le responde con el progreso de la copia. Este bucle continúa hasta que el servidor termina la creación del `DI`. En ese momento, el servidor manda al cliente la respuesta normal de la API para esa petición. Cuando el cliente recibe este tipo de respuesta, debe dejar de mandar mensajes al servidor y cerrar la conexión.
+
+`/di/download` admite una petición de creación de `DI` a partir de una imagen que se debe descargar de una url. En este caso, el _websocket_ lo que monitoriza  es el progreso de descarga de la imagen. El protocolo de este _websocket_ es idéntico al de `/staging`. 
+
+== Sintaxis de la API
+
+=== Credenciales
+
+Toda llamada a la API (excepto en la url `/info`) necesita proporcionar las credenciales que permitan identificar a un administrador válido. Existen dos tipos de credenciales potencialmente válidas:
+
+* `login`, `password` y, si se está en modo multitenant, `tenant`. Son las credenciales que permiten identificar a un administrador para loguearse.
+* `sid`. Es el identificador de la sesión de un administrador previamente logueado.
+
+Así pues, las siguientes peticiones a la API son potencialmente válidas:
+
+....
+{ "login":"benja", "password":"benja", "tenant":"Madrid", ... }
+{ "sid":"aaaa", ... }
+....
+
+=== Acción
+
+También es necesario proporcionar en la petición el nombre de la acción que se pide ejecutar: `action`. 
+....
+{ "sid":"aaaa", "action":"vm_get_list" }
+....
+
+=== Filtros
+
+Ciertas acciones admiten filtros que permiten discriminar sobre qué objetos se debe aplicar una operación. Estos filtros se pueden añadir a la petición como valor de `filters`. 
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"name":"myVM","state":"running" }}
+....
+
+El valor de `filters` es un HASH con pares clave/valor. Un par del tipo de `"name":"myVM"` sencillamente establece que los objetos seleccionados deben tener un nombre igual a 'myVM'. Este es el par clave/valor más sencillo definido por la API. 
+
+Pero la API también permite establecer filtros con operadores distintos a "igual". Por ejemplo, en las siguientes peticiones se piden objetos cuyos ids sean igual a 2, distinto de 2, mayor que 2, menor que 2, etc.
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"id":{"=":"2"} }}
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"id":{"!=":"2"} }}
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"id":{">":"2"} }}
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"id":{"<":"2"} }}
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"id":{">=":"2"} }}
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"id":{"<=":"2"} }}
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"id":{"-between":["1","2"]} }}
+
+....
+
+Y en las siguientes peticiones se piden objetos cuyo nombre sea igual a "myV", o que sea distinto a "myVM", o que empiece por "my".
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"name":{"=":"myVM"} }}
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"name":{"!=":"myVM"} }}
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"name":{"~":"my%"} }}
+....
+
+En realidad, cualquier operador posible en DBIC está disponible a través de la API. La única excepción es el operador `~` que es exactamente equivalente al LIKE de SQL. La API convierte internamente `~` en LIKE.
+
+También es posible en la API que el valor de un filtro sea no un único elemento sino una ARRAY de elementos:
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"id":["1","2","3"] }}
+....
+
+En este ejemplo, la API devolverá, si existen, los objetos de id 1, 2 y 3.
+ 
+Además, la API admite filtros complejos con operadores lógicos. La sintaxis de este tipo de filtros es exactamente la misma que hay en DBIC. Los operadores disponibles son `-and`, `-or` y `-not`. Cada uno de estos operadores es una clave cuyo valor será una ARRAY. En esa ARRAY se han de listar pares claves/valor que obedezcan a la sintaxis de los filtros vista hasta el momento. Por ejemplo, la siguiente expresión filtra objetos de id 1, 2 o 3 que tengan o `name` "myVM" o un `name` que empiece por "your":
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"id":["1","2","3"], "-or":["name", "myVM", "name", { "~":"your%"}] }}
+....
+ 
+Los operadores lógicos pueden anidarse:
+
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"-and":["id", ["1","2","3"], "-or":["name", "myVM", "name", { "~":"your%"}] ]}}
+....
+
+=== Argumentos
+
+=== Campos a devolver
+
+=== Ordenación 
+
+=== Paginación
+
+=== Parmámetros

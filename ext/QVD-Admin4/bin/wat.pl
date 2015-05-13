@@ -184,7 +184,6 @@ websocket '/ws' => sub {
 
     my $res = $c->process_api_query($json);    $c->send(b(encode_json($res))->decode('UTF-8'));
 
-
 # For every action requested to the API we can get 0, 1 or more channels to listen in the
 # database. When the database notifies in those channels, this ws executes the action again 
 # and sends the updated info to the client 

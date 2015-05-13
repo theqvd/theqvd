@@ -5,12 +5,35 @@ use Moo;
 use QVD::Admin4::CLI::Grammar::Rule;
 use QVD::Admin4::CLI::Grammar::Response;
 
+# This is the definition of the axiom of the grammar
+
 my $ROOT_LABEL = { label => 'ROOT', saturated => 1 };
+
+# This is the tag by convention that will be used for
+# constituentes built from unknown strings 
 
 my $UNKNOWN_TAG = 'UNKNOWN';
 
+# This is the descriptive implementation of the grammar
+# The grammar is an array of rules
+# Every hash in the array is a rule
+# Every rule has:
+# a) left_side: the constituent that the rule defines.
+# b) right_side: the list of constituents that must be joined
+#    in order to create the left side constituent
+# c) meaning: The function intended to build the meaning of
+#    the left side constituent from the meanings of the right
+#    side constituents 
+
 my $RULES =
 [
+
+# All key words are defined as  ambiguous in the grammar.
+# They can be either the reserved word or a free value
+# (i.e. vm property=vm get name).
+
+# So these are the rules that create the free versions of the key
+# words
 
  { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'default', saturated => 1 } ],
@@ -72,7 +95,6 @@ my $RULES =
    right_side => [ { label => 'untag', saturated => 1 } ],
    meaning   => sub { 'untag' }  },
 
-
  { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'log', saturated => 1 } ],
    meaning   => sub { 'log'}},
@@ -121,13 +143,7 @@ my $RULES =
    right_side => [ { label => 'di', saturated => 1 } ],
    meaning   => sub {'di'}},
 
-# COMMANDS
-
-## COMMANDS
-
-# GET & SET COMMANDS have been implemented as bare words
-# at the beginning of ROOT rules (see the end of the grammar)
-
+# ACTIONS
 
  { left_side => { label => 'CMD', saturated => 0 }, 
    right_side => [ { label => 'get', saturated => 1, 
@@ -174,11 +190,6 @@ my $RULES =
 		   { label => 'CMD', saturated => 0, order => '#order', of => 1, to => 0, with => 0 },
                    { label => 'ITEM', saturated => 1, feature => 0 }],
    meaning   => sub { my ($c0,$c1,$c2) = @_; { command => $c1, fields => [ reverse fields($c2,'-and') ], obj1 => $c0}}},
-
-
-
-###################
-###################
 
 # ORDER BY
 
@@ -252,7 +263,6 @@ my $RULES =
  { left_side => { label => "QVD_OBJECT", saturated => 1 }, 
    right_side => [ { label => 'QVD_OBJECT', saturated => 0}],
    meaning => sub { my $c0 = shift; { qvd_object => $c0}}},
-
 
 # OPERATORS
 # There are operator intended to identify keys with their values '='
@@ -375,7 +385,6 @@ my $RULES =
 		   { label => 'CB', saturated => 1 } ],
    meaning => sub { my ($c0,$c1,$c2) = @_; return [ fields($c1,'-and')]; }},
 
-
  { left_side => { label => "ITEM", saturated => 1, coordinated => 0, brackets => 1 }, 
    right_side => [ { label => 'OB', saturated => 1}, 
 		   { label => "RANGE", saturated => 0 }, 
@@ -388,12 +397,10 @@ my $RULES =
 		   { label => 'ITEM', saturated => 1, feature => 0, coordinated => 0, brackets => 0 }],
    meaning => sub { my ($c0,$c1,$c2) = @_;  return { $c1 => [$c0,$c2] }}},
 
-
 # ORDER BY PHRASES
 # order by tenant_id,name
 # order asc by tenant_id,name
 # order desc by tenant_id,name
-
 
  { left_side => { label => 'DIR', saturated => 1 }, 
    right_side => [ { label => 'asc', saturated => 1} ],
@@ -458,8 +465,6 @@ my $RULES =
                    { label => "ITEM", saturated => 1, feature => 0 }],
    meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'update', obj1 => $c0, arguments => { __tags_changes__ => { delete => [ fields($c2,'-and') ] }}}}},
 
-################
-
  { left_side => { label => 'ROOT', saturated => 1 }, 
    right_side => [ { label => "QVD_OBJECT", saturated => 1 },
 		   { label => 'assign', saturated => 1 },
@@ -488,7 +493,6 @@ my $RULES =
                    { label => "ITEM", saturated => 1, feature => 0 }],
    meaning => sub { my ($c0,$c1,$c2,$c3) = @_; { command => 'update', obj1 => $c0, arguments => { __roles_changes__ => { unassign_roles => [ fields($c3,'-and') ] }}}}},
 
-
  { left_side => { label => 'ROOT', saturated => 1 }, 
    right_side => [ { label => "config", saturated => 1 },
 		   { label => "set", saturated => 1 },
@@ -514,7 +518,6 @@ my $RULES =
                    { label => "ITEM", saturated => 1, feature => 0, coordinated => 0 }],
    meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'default', obj1 => { qvd_object => 'config', filters => { key => ref($c2) ? shift @$c2 : $c2 }}}}},
 
-
  { left_side => { label => 'ROOT', saturated => 1 }, 
    right_side => [ { label => "config", saturated => 1 },
 		   { label => "get", saturated => 1 }],
@@ -533,12 +536,15 @@ my $RULES =
 
 ];
 
+# Store to easily know if a string is a tag defined in the grammar 
 my $KNOWN_TAGS = {};
 
 sub BUILD
 {
     my $self = shift;
     $self->{rules} = [];
+
+    # Rules are built as objects and stored in the object
 
     for my $rule_args (@$RULES)
     {
@@ -559,6 +565,34 @@ sub unknown_tag
     return $UNKNOWN_TAG;
 }
 
+sub root
+{
+    my $self = shift;
+    return $ROOT_LABEL;
+}
+
+sub is_known_tag
+{
+    my ($self,$tag) = @_;
+    exists $KNOWN_TAGS->{$tag} ? 
+	return 1 : return 0;
+}
+
+# Creates a wrapper for a HASH passed as argument that is supposed
+# to be the meaning of a root constituent according the grammar
+
+sub response
+{
+    my ($self,$hash) = @_;
+    QVD::Admin4::CLI::Grammar::Response->new(response => $hash);
+}
+
+############################
+
+# Functions intended to create constituents in an ad hoc way
+# without the use of a rule. They are user by the parser to create
+# the initial constituents of the parsing
+
 sub get_labels_for_string
 {
     my ($self,$string) = @_;
@@ -573,18 +607,11 @@ sub get_meaning_for_string
     return $string;
 }
 
-sub root
-{
-    my $self = shift;
-    return $ROOT_LABEL;
-}
+############################
 
-sub is_known_tag
-{
-    my ($self,$tag) = @_;
-    exists $KNOWN_TAGS->{$tag} ? 
-	return 1 : return 0;
-}
+# Functions used in several of the callbacks of the rules in the grammar
+# The give a certain format to complex nested parts of the meanings of the
+# constituents
 
 sub fields
 {
@@ -599,7 +626,6 @@ sub fields
     my @out = map { fields($_,$OPERATOR) } @$item;
     return  @out;
 }
-
 
 sub arguments
 {
@@ -624,10 +650,5 @@ sub arguments
     return ();
 }
 
-sub response
-{
-    my ($self,$hash) = @_;
-    QVD::Admin4::CLI::Grammar::Response->new(response => $hash);
-}
 1;
 

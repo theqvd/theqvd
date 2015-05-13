@@ -4,6 +4,13 @@ use warnings;
 use Moo;
 use QVD::Admin4::CLI::Tokenizer::Token;
 
+# Class intended to split a string according a simple grammar
+# of regular expressions.
+
+# GRAMMAR OF REGULAR EXPRESSIONS
+# Tokens and special tokens are found in the string
+# and isolated as words: 
+
 my $SPECIAL_TOKEN = qr/<=|>=|!=|[=,;)([\]!<>~:]|["'][^'"]*["']/;
 my $TOKEN = qr/[^\s<=>,;)(\][!~:'"]+/;
 
@@ -32,7 +39,8 @@ sub parse
 	$position = $token->to + 1;
     }
 
-    return [\@TOKENS]; # This is a list of analysis
+    return [\@TOKENS]; # This is a list of analysis, though, the current
+                       # version of the class always returns just one analysis
 }
 
 1;
