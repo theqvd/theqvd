@@ -26,7 +26,6 @@ La API recibe la _query_ en formato JSON. Lo primero que hace el sistema con est
 Un objeto `QVD::Admin4::Action` se crea con un parámetro obligatorio `name` (el nombre de la acción que se está pidiendo realizar, tomado de la _query_). Este objeto contiene la información básica, de arranque, de la acción que se ha solicitado. Concretamente, cuenta con los siguientes atributos:
 
 * El atributo `type_of_action` establece el tipo de  acción solicita (hay acciones de visualización, de creación, de actualización, de borrado...). 
-
 * El atributo `qvd_object` establece el tipo de objeto de QVD al que la acción afecta: `vm`, `user`, `osf`, `di`, `host`, etc. 
 
 * El atributo `restmethod` establece el método que debe ejecutarse en `QVD::Admin4::REST` para invocar la acción.
@@ -865,10 +864,166 @@ Los operadores lógicos pueden anidarse:
 
 === Argumentos
 
+Las acciones de creación y actualización de objetos necesitan especificar argumentos. Estos se colocan como valor de `arguments`. Este valor de   `arguments` es en HASH con pares clave/valor. Por ejemplo, la siguiente petición toma un objeto con nombre "myVM" y le cambia el nombre a "yourVM",
+
+....
+{ "sid":"aaaa", "action":"vm_update", "filters":{"name":"myVM"}, "arguments":{"name":"yourVM"}}
+....
+
+La API ha definido una serie de argumentos especiales que se han llamado _nested queries_. Estos argumentos permiten efectuar ciertas asignaciones de objetos de QVD a un objeto principal:  asignar `tags` a `DIs`; asignar _custom properties_ a máquinas virtuales, usuarios, OSFs, _hosts_ o `DIs`;  asignar acls o roles a un rol; o asignar roles a administradores.
+
+Así pues, en las acciones de creación, es posible incluir los siguientes argumentos, que añaden al objeto recién creado _properties_, _tags_, acls o roles: 
+
+....
+{ "action":"vm_create", "arguments":{ "__properties__":{"key1":"value1","key2":"value2"}}}
+
+{ "action":"di_create", "arguments":{ "__tags__":["tag1","tag2"]}}
+
+{ "action":"role_create", "arguments":{ "__tags__":["acl1","acl2"],"__roles__":["role1","role2"]}}
+
+{ "action":"admin_create", "arguments":{ "__roles__":["role1","role2"]}}
+....
+
+Las opciones de las acciones de actualización de elementos son más, pues en la actualización es posible tanto asignar como desasignar elementos. Por simplicidad, a continuación ni se incluyen otros argumentos obligatorios ni las debidas credenciales:
+
+....
+{ "action":"vm_update", "arguments":{"__properties_changes__":{"set":{"key1":"value1"},"delete":["key2"]}}}
+
+{ "action":"di_update", "arguments":{"__tags_changes__":{"create":["tag1","tag2"],"delete":["tag3"]}}}
+
+{ "action":"role_update", "arguments":{"__acls_changes__":{"assign_acls":["acl1"],"unassign_acls":["acl2"]},"__roles_changes__":{"assign_roles":["role1"],"unassign_roles":["role2"]}}}
+
+{ "action":"admin_update", "arguments":{"__roles_changes__":{"assign_roles":["role1"],"unassign_roles":["role2"]}}}
+....
+
 === Campos a devolver
+
+La API  permite especificar una lista de campos a devolver para cada objeto.  Esa lista se coloca en la petición como valor del campo `fields`. Así pues, en la siguiente petición, para cada una de las máquinas virtuales encontradas, se devuelve solo el id, el nombre y el estado.
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "fields":["id","name","state"] }
+....
+
+Si la petición no incluye `fields`, para cada objeto encontrado se devuelven todos los campos disponibles.
 
 === Ordenación 
 
+Para establecer criterios de ordenación de los objetos que devuelve la API se usa `order_by`. El valor de `order_by` es un HASH con dos claves: `field` y `order`. La clave `field` toma por valor el campo por el cual se debe establecer la ordenación; y la clave `order` toma por valor un indicador que determina si la ordenación debe ser ascendente (`-asc`) o descendente (`-desc`).
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "order_by":{"field":"id","order":"-desc" }}
+....
+
+Si no se especifica `order`, la API toma el valor por defecto, que es `-asc`. Además, también se permite establecer más de un criterio de ordenación:
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "order_by":{"field":["id","name"],"order":"-desc" }}
+....
+
 === Paginación
 
+La API también permite que se le especifiquen criterios de paginación. Para ello, es necesario incluir en la petición los campos `block` y `offset`. El valor de `block` debe ser un número que determine la cantidad de objetos que se deben mostrar por página; y el valor de  `offset` es el número de página que se está pidiendo. Así pues, la siguiente _query_ pide la página 3, dada una paginación en la que cada página contiene 20 elementos.
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "block":20, "offset":3}
+....
+
 === Parmámetros
+
+Por último, la API incluye un campo `parameters` que admite como valor un HASH. En este HASH se le puede pasar a la API información de forma libre. Por ejemplo, actualmente un cliente puede identificarse en la clave `source` de este HASH, y la API así puede saber desde dónde está recibiendo la petición. 
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "parameters":{"source":"WAT"}
+{ "sid":"aaaa", "action":"vm_get_list", "parameters":{"source":"CLI"}
+{ "sid":"aaaa", "action":"vm_get_list", "parameters":{"Hola":"Esto no sirve para nada"}
+....
+
+== Cómo añadir una acción a la API.
+
+Se registra la acción en `QVD::Admin4::Action`. Para ello, se debe añadir un par clave/valor a la variable `$ACTIONS` de esa clase. La clave es el nombre de la nueva acción y el valor es un HASH con la siguiente información:
+
+* El tipo de acción (si es de creación, de visualización, de actualización...).
+* El tipo de objeto de QVD al que hace referencia (si es de máquinas virtuales, de usuarios, de _hosts_...).
+* La lista de acls necesarios para ejecutar la acción.
+* El método de `QVD::Admin4` necesario para ejecutar la acción.
+
+Por ejemplo, para añadir la acción `vm_get_something`, se puede establecer lo siguiente en `$ACTIONS`:
+
+....
+
+$ACTIONS =
+{
+ ...
+
+ vm_get_something => { type_of_action => "list",
+                       qvd_object => "VM",
+                       acls       => [qr/^vm\.see-main\.$/],
+		       admin4method => 'select'},	
+
+ ...
+} 
+
+....
+
+Los valores habituales para `type_of_action` son `list`, `details`, `tiny`, `all_ids`, `update`, `create`, `create_or_update` y `delete`.  
+
+Los valores habituales para `qvd_object` son `VM`, `User`, `OSF`, `DI`, `Host`, `Tenant`, `Administrator`, `Role` y `ACL`.  
+
+El valor de `acls` es una lista de expresiones regulares. La idea es que la acción se puede ejecutar si el administrador tiene al menos un acl que unifique con cada expresión regular. 
+
+Los valores habituales para `admin4method` son `select`, `update`, `create`, `create_or_update` y `delete`. 
+
+Cada par `type_of_action`/`qvd_object` lleva especificado en `QVD::Admin4::REST::Model` todos los filtros, argumentos, criterios de ordenación que le son propios y los acls necesarios para usar esos elementos.
+
+Si se quiere crear una acción que funcione de forma diferente a las acciones regulares del CRUD, habrá que implementar una función a propósito en `QVD::Admin4`. Una práctica habitual es crear una función que en última instancia remita a la función regular pero que antes y/o después ejecute un código extra.
+
+Por ejemplo, imagínese que se quiere definir un compartiento no estándar para la acción `vm_get_something`. Para ello, se crea una función  `vm_get_something` en `QVD::Admin4` y, en `QVD::Admin4::Action`, en lugar de poner como valor de `qvdadmin4` el método estándar  `select` se coloca `vm_get_something`.
+ 
+....
+
+sub vm_get_something
+{
+    my ($self,$request) = @_;
+
+    # Here something more
+    
+    my $result = $self->select($request);
+
+    # Here something more
+   
+    return $result;
+}
+
+.... 
+
+== Cómo añadir un nuevo tipo de acción a la API.
+
+Quizá también se necesite, no solo añadir una nueva acción conforme a la tipología actual de acciones; sino añadir un nuevo tipo de acción que permita crear acciones que, de forma estándar, se comporten de un modo nuevo. Es decir, quizá se quiera añadir en `$Actions` en  `QVD::Admin4::Action` una entrada como la siguiente:
+
+....
+
+$ACTIONS =
+{
+ ...
+
+ vm_get_something => { type_of_action => "weird",
+                       qvd_object => "VM",
+                       acls       => [qr/^vm\.see-main\.$/],
+		       admin4method => 'select'},	
+
+ ...
+} 
+
+....
+
+Esta acción ejecuta el método regular `select`, pero es una acción de un tipo nuevo: `weird`. Para definir este nuevo tipo de acción hay que tocar las variables de clase de `QVD::Admin4::REST::Model`. En ellas se define qué filtros, argumentos, criterios de ordenación, etc. son apropiados para estas acciones. Y se define también qué acls se necesitan para usar esos elementos. Concretamente, habrá que incluir entradas para `weird` en las siguientes variables:
+
+* `AVAILABLE_FILTERS`. Por cada par `weird`/`qvd_object`, se listan los filtros disponibles.
+* `MANDATORY_FILTERS`. Por cada par `weird`/`qvd_object`, se listan los filtros obligatorios.
+* `UNAMBIGUOUS_FILTERS`. Hay algunas acciones que solo se aplican sobre objetos identificados unívocamente. Por ejemplo, las acciones de tipo `details`, `update` y `delete` solo se ejecutan sobre objetos unívocamente identificados por `id`. Y las acciones `get_acls_in_admins` y `get_acls_in_roles` se aplican, respectivamente, sobre un administrador unívocamente identificado en `admin_id` y un rol  unívocamente identificado en `role_id`. Si las acciones de tipo `weird` son de este tipo, es necesario que se especifique en esta variable, para cada par `weird`/`qvd_object`,  qué filtro es el que permite identificar unívocamente a los objetos afectados. 
+* `AVAILABLE_FIELDS`. Por cada par `weird`/`qvd_object`, se listan los campos que la API devuelve.
+* `DEFAULT_ORDER_CRITERIA`. Por cada par `weird`/`qvd_object`, se puede establecer una ordenación por defecto.
+* `AVAILABLE_NESTED_QUERY`. Si las acciones de tipo `weird` están pensadas para usar, de un modo u otro, las funciones `create` o `update` de `QVD::Admin4`, y se usan para objetos susceptibles de tener acls, roles, _tags_ o _properties_, se les puede asignar las _nested queries_ que soporta el sistema, también por cada par  `weird`/`qvd_object`. 
+* `DBIX_PREFETCH_VALUE`. Si las acciones `weird` van a devolver información presente en la base de datos en tablas relacionadas, es necesario incluir en esta variable una entrada para  `weird` en la que se listen, para cada `qvd_object` las tablas relacionadas de las que se va a sacar información. Esta lista debe seguir el formato de DBIC para el rasgo `weird`. 
+* `$RELATED_VIEWS_IN_DB`. No se puede incluir en `DBIX_PREFETCH_VALUE` información relacionada que esté en una relación de 1 a muchos con la tabla principal (por ejemplo, _properties_). Esa información debería sacarse con una vista de DBIC. Para ello, debería incluirse una entrada de `weird` en  `$RELATED_VIEWS_IN_DB`.  
+* `TYPES_OF_ACTION_TO_LOG_MAPPER`. En el log se establece, en cada registro, el tipo de acción que se ejecutó. Habrá que añadir en la base de datos `weird` como  tipo de acción posible, y en `TYPES_OF_ACTION_TO_LOG_MAPPER` una entrada que convierta el nombre del tipo de acción en `QVD::Admin4::REST::Model` al nombre en la base de datos.  
