@@ -57,6 +57,11 @@ var Wat = {
     },
     Router: {},
     
+    // Common functions used from two or more views
+    Common: {
+        DIViews: {},
+    },
+    
     // Current view store
     CurrentView: {},
     

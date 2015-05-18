@@ -6,6 +6,10 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
     
     initialize: function (params) {
         this.model = new Wat.Models.DI(params);
+        
+        // Add common functions
+        $.extend(this, Wat.Common.DIViews);
+        
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
     },
     
