@@ -526,7 +526,10 @@ Wat.I = {
             collision: 'fit',
             modal: true,
             buttons: dialogConf.buttons,
-            open: function(e) {                
+            open: function(e) {
+                // Empty dialog content
+                    $(e.target).html('');
+
                 // Close message if open
                     $('.message-close').trigger('click');
 

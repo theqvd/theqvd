@@ -62,6 +62,12 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             },
             sortingRow: {
                 name: 'list-sorting-row'
+            },
+            editorAffectedVM: {
+                name: 'editor-affected-vms'
+            },
+            editorAffectedVMList: {
+                name: 'editor-affected-vms-list'
             }
         }
         

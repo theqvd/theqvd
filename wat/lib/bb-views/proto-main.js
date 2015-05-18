@@ -414,7 +414,17 @@ Wat.Views.MainView = Backbone.View.extend({
             delete Wat.CurrentView.sideView2.tagChanges;
         }
         
-        if (that.retrievedData.status == STATUS_SUCCESS && tagChanges && Wat.C.checkACL('vm.update.expiration')) {
+        // The procedence point of this function can be a disk image update action or a direct call. 
+        // The second one occurs when create a disk image and this function is called after close websocket operations        
+        // For the first one, we will check the operation status, in second case, we won't check anything
+        if (that.retrievedData) {
+            var success = that.retrievedData.status == STATUS_SUCCESS;
+        }
+        else {
+            var success = true;
+        }
+        
+        if (success && tagChanges && Wat.C.checkACL('vm.update.expiration')) {
             var tagChanges = tagChanges["create"].concat(tagChanges["delete"]);
             
             if (tagChanges.length > 0) {

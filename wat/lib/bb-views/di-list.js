@@ -136,6 +136,14 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         
         var image_source = context.find('select[name="images_source"]').val();
         
+        // Store tags for affected VMs checking
+        tags.push('head');
+        
+        this.tagChanges = {
+            create: tags,
+            delete: []
+        };
+        
         switch (image_source) {
             case 'staging':
                 var disk_image = context.find('select[name="disk_image"]').val();
@@ -250,7 +258,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
     },
     
     creatingProcess: function (qvdObj, id, data, ws, mode) {
-        switch (data.status) {
+        switch (parseInt(data.status)) {
             case STATUS_IN_PROGRESS:
                 if (data.total_size == 0) {
                     var percent = 100;
@@ -290,6 +298,9 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
                 }
 
                 Wat.I.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
+                
+                // Check affected machine changes
+                Wat.CurrentView.checkMachinesChanges(this);
                 break;
             default:
                 if (ws.readyState == WS_OPEN) {
