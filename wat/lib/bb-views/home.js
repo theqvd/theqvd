@@ -110,6 +110,8 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         );
         
         $(".bb-vms-expire").html(this.template);
+                
+        Wat.T.translate();
     },
     
     loadData: function (stats) {
