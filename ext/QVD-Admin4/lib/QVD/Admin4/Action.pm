@@ -71,7 +71,7 @@ config_delete => { type_of_action =>  'delete',
 
 user_get_list => {type_of_action => 'list',
 		  admin4method => 'select',
-		  acls => [qr/^user\.see-main\./],
+		  acls => [qr/^(user\.see-main\.|[^.]+\.see\.user-list)$/],
 		  qvd_object => 'User'},
 
 user_tiny_list => {type_of_action => 'tiny',

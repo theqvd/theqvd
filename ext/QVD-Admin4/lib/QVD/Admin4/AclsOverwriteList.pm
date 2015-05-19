@@ -15,9 +15,12 @@ use QVD::Config;
 has 'admin_id', is => 'ro', isa => sub { my $name = shift; die "Invalid type for attribute admin_id" if ref($name) &&  (not ref($name) eq 'ARRAY'); }, required => 1;
 has 'admin', is => 'ro', isa => sub { my $name = shift; die "Invalid type for attribute admin" unless ref($name) eq 'QVD::DB::Result::Administrator'; };
 
-my $FOR_NON_SUPERADMINS_RE = 'tenant\..*';
+# Disable any Log acls temporary
+#my $FOR_NON_SUPERADMINS_RE = 'tenant\..*';
+my $FOR_NON_SUPERADMINS_RE = '^((tenant|log)\..+|.+\.log)$';
 my $FOR_RECOVERY_ADMINS_RE = '(administrator|config|tenant|role)\..*';
-my $NOTHING_RE = '^$';
+#my $NOTHING_RE = '^$';
+my $NOTHING_RE = '^(log\..+|.+\.log)$';
 
 sub BUILD
 {
