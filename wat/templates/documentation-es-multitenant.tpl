@@ -1199,6 +1199,21 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Datetime when a tenant was created</p></td>
 </tr>
 <tr>
+<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s disk images</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.see.di-list</p></td>
+<td align="left" valign="top"><p class="table">See the disk images of this tenant in his details view. This view will contain: name, block, tags, default and head</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s disk blocking state</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.see.di-list-block</p></td>
+<td align="left" valign="top"><p class="table">Blocking info of the disk images shown in tenant details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s disk images' tags</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.see.di-list-tags</p></td>
+<td align="left" valign="top"><p class="table">Tags of the disk images shown in tenant details view</p></td>
+</tr>
+<tr>
 <td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s ID</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see.id</p></td>
 <td align="left" valign="top"><p class="table">The database identiefier of the tenants. Useful to make calls from CLI.</p></td>
@@ -1207,6 +1222,41 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s language</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see.language</p></td>
 <td align="left" valign="top"><p class="table">The language setted by default for any administrar that belong to a tenant</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s users</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.see.user-list</p></td>
+<td align="left" valign="top"><p class="table">See the users of one tenant in his details view. This view will contain: name and blocking information of each user</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s user blocking state</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.see.user-list-block</p></td>
+<td align="left" valign="top"><p class="table">Blocking info of the users shown in tenant details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.see.vm-list</p></td>
+<td align="left" valign="top"><p class="table">See the virtual machines of one tenant in his details view. This view will contain: name, state, block and expire information of each vm</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s virtual machines blocking state</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.see.vm-list-block</p></td>
+<td align="left" valign="top"><p class="table">Blocking info of the virtual machines shown in tenant details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s virtual machines' expiration date</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.see.vm-list-expiration</p></td>
+<td align="left" valign="top"><p class="table">Expiration info of the virtual machines shown in tenant details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s virtual machines' running state</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.see.vm-list-state</p></td>
+<td align="left" valign="top"><p class="table">State (stopped/started) of the virtual machines shown in tenant details view</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s virtual machines' user state</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.see.vm-list-user-state</p></td>
+<td align="left" valign="top"><p class="table">User state (connected/disconnected)) of the virtual machines shown in tenant details view</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Update tenant&#8217;s block size</strong></p></td>
@@ -1310,7 +1360,7 @@ Contraseña: to the rescue</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-04-28 13:43:44 CEST
+Last updated 2015-05-19 10:31:11 CEST
 </div>
 </div>
 </body>

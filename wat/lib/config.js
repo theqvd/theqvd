@@ -353,16 +353,29 @@ Wat.C = {
     
     // Check all the ACLs of predifened groups. If any of them is available, return true
     // Params:
-    //      group: ACls group name associted to groups of ACLs defined on configuration file
+    //      group: ACls group or groups name associted to groups of ACLs defined on configuration file
     checkGroupACL: function (group) {
         var aclGranted = false;
         
+        // Convert to array if is not an array yet
+        if (typeof group == 'string') {
+            var groups = [group];
+        }
+        else {
+            var groups = group;
+        }
+        
         var that = this;
-        $.each(this.aclGroups[group], function (iAcl, acl) {
-            if (that.checkACL(acl)) {
-                aclGranted = true;
+        $.each(groups, function (iGroup, group) {
+            if (aclGranted) {
                 return false;
             }
+            $.each(that.aclGroups[group], function (iAcl, acl) {
+                if (that.checkACL(acl)) {
+                    aclGranted = true;
+                    return false;
+                }
+            });
         });
         
         return aclGranted;
@@ -390,8 +403,18 @@ Wat.C = {
         // Check acls on data items to remove forbidden ones
         $.each(data, function (item, itemConfig) {
             if (itemConfig.groupAcls != undefined) {
-                itemConfig.acls = that.aclGroups[itemConfig.groupAcls];
+                if (typeof itemConfig.groupAcls == 'string') {
+                    itemConfig.groupAcls = [itemConfig.groupAcls];
+                }
+                
+                itemConfig.acls = [];
+                
+                $.each (itemConfig.groupAcls, function (iGACLs, gACLs) {
+                    var acls = that.aclGroups[gACLs];
+                    itemConfig.acls = itemConfig.acls.concat(acls);
+                });
             }
+                        
             if (itemConfig.acls != undefined) {
                 if (!that.checkACL(itemConfig.acls, itemConfig.aclsLogic)) {
                     delete data[item];

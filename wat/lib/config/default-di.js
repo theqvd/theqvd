@@ -25,9 +25,10 @@ Wat.I.listFields[qvdObj] = {
             'blocked',
             'tags'
         ],
-        'acls': [
-            'di.see.block',
-            'di.see.tags'
+        'groupAcls': [
+            'diInfo', 
+            'osfDiEmbeddedInfo',
+            'tenantDiEmbeddedInfo',
         ],
         'aclsLogic': 'OR',
         'text': 'Info',

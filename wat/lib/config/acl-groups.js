@@ -45,6 +45,25 @@ Wat.C.aclGroups.tenantMassiveEdit = [];
 Wat.C.aclGroups.tenantMassiveActions = [
     'tenant.delete-massive.',
 ];
+
+Wat.C.aclGroups.tenantDiEmbeddedInfo = [
+    'tenant.see.di-list-default',
+    'tenant.see.di-list-head',
+    'tenant.see.di-list-tags',
+    'tenant.see.di-list-block'
+];
+
+Wat.C.aclGroups.tenantVmEmbeddedInfo = [
+    'tenant.see.vm-list-block',
+    'tenant.see.vm-list-state',
+    'tenant.see.vm-list-expiration',
+    'tenant.see.vm-list-user-state'
+];
+
+Wat.C.aclGroups.tenantUserEmbeddedInfo = [
+    'tenant.see.user-list-block'
+];
+
 // Massive actions include massive edit ACLs
 $.merge(Wat.C.aclGroups.tenantMassiveActions, Wat.C.aclGroups.tenantMassiveEdit);
 
@@ -56,6 +75,10 @@ Wat.C.aclGroups.userEdit = [
     'user.update.properties-create',
     'user.update.properties-update',
     'user.update.properties-delete'
+];
+
+Wat.C.aclGroups.userInfo = [
+    'user.see.block'
 ];
 
 Wat.C.aclGroups.userMassiveEdit = [
@@ -197,6 +220,7 @@ Wat.C.aclGroups.osfDiEmbeddedInfo = [
     'osf.see.di-list-tags',
     'osf.see.di-list-block'
 ];
+
 // Massive actions include massive edit ACLs
 $.merge(Wat.C.aclGroups.osfMassiveActions, Wat.C.aclGroups.osfMassiveEdit);
 
@@ -219,6 +243,11 @@ Wat.C.aclGroups.diEdit = [
     'di.update.properties-delete'
 ];
 
+Wat.C.aclGroups.diInfo = [
+    'di.see.block',
+    'di.see.tags'
+];
+
 Wat.C.aclGroups.diMassiveEdit = [
     'di.update-massive.tags-add',
     'di.update-massive.tags-delete',
@@ -238,7 +267,7 @@ Wat.C.aclGroups.diVmEmbeddedInfo = [
     'di.see.vm-list-block',
     'di.see.vm-list-state',
     'di.see.vm-list-expiration',
-    'di.see.vm-list-user-state'
+    'di.see.vm-list-user-state',
 ];
 
 

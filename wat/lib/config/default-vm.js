@@ -20,7 +20,13 @@ Wat.I.listFields[qvdObj] = {
             'expiration_hard',
             'user_state'
         ],
-        'groupAcls': 'vmInfo',
+        'groupAcls': [
+            'vmInfo', 
+            'tenantVmEmbeddedInfo',
+            'osfVmEmbeddedInfo',
+            'hostVmEmbeddedInfo',
+            'diVmEmbeddedInfo'
+        ],
         'aclsLogic': 'OR',
         'display': true,
         'sortable': false,

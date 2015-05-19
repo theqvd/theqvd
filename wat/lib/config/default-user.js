@@ -17,7 +17,11 @@ Wat.I.listFields[qvdObj] = {
         'fields': [
             'blocked'
         ],
-        'acls': 'user.see.block',
+        'groupAcls': [
+            'userInfo',
+            'tenantUserEmbeddedInfo'
+        ],
+        'aclsLogic': 'OR',
         'text': 'Info',
         'sortable': false,
     },

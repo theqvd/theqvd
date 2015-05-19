@@ -1012,7 +1012,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         
         // Show loading animation while loading
-        $('.list').html(HTML_MID_LOADING);
+        $('.' + this.cid).find('.list').html(HTML_MID_LOADING);
         
         var totalPages = Math.ceil(this.collection.elementsTotal/this.collection.block);
         var currentPage = this.collection.offset;
