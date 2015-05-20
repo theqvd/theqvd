@@ -46,7 +46,7 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
             params.block = 5;
             params.filters = {"user_id": this.elementId};
 
-            this.sideView = new Wat.Views.VMListView(params);
+            this.sideViews.push(new Wat.Views.VMListView(params));
         }
         
         if (sideCheck['user.see.log']) { 
@@ -55,7 +55,7 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
             // Render Related log list on side
             var params = this.getSideLogParams(sideContainer);
             
-            this.sideView = new Wat.Views.LogListView(params);
+            this.sideViews.push(new Wat.Views.LogListView(params));
             
             this.renderLogGraph(params);
         }

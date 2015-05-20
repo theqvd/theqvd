@@ -7,9 +7,6 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
     initialize: function (params) {
         this.model = new Wat.Models.DI(params);
         
-        // Add common functions
-        $.extend(this, Wat.Common.DIViews);
-        
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
     },
     
@@ -56,7 +53,7 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
             params.block = 5;
             params.filters = {"di_id": this.elementId};
 
-            this.sideView = new Wat.Views.VMListView(params);
+            this.sideViews.push(new Wat.Views.VMListView(params));
         }
         
         if (sideCheck['di.see.log']) { 
@@ -65,7 +62,7 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
             // Render Related log list on side
             var params = this.getSideLogParams(sideContainer);
 
-            this.sideView = new Wat.Views.LogListView(params);
+            this.sideViews.push(new Wat.Views.LogListView(params));
         
             this.renderLogGraph(params);
         }

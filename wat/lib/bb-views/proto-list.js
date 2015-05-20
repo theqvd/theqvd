@@ -30,7 +30,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     initialize: function (params) {        
         Wat.Views.MainView.prototype.initialize.apply(this);
-                
+        
         this.setFilters();
         this.setColumns();
         this.setSelectedActions();
@@ -57,9 +57,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             selectChecks: {
                 name: 'dialog-select-checks'
             },
-            editorNew: {
-                name: 'creator-' + this.qvdObj
-            },
             sortingRow: {
                 name: 'list-sorting-row'
             },
@@ -70,6 +67,10 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 name: 'editor-affected-vms-list'
             }
         }
+        
+        templates["editorNew_" + this.qvdObj] = {
+            name: 'creator-' + this.qvdObj
+        };        
         
         templates["list_" + this.qvdObj] = {
             name: 'list-' + this.qvdObj
@@ -1056,7 +1057,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     openNewElementDialog: function (e) {
         var that = this;
         
-        this.templateEditor = Wat.TPL.editorNew;
+        this.templateEditor = Wat.TPL['editorNew_' + that.qvdObj];
         
         this.dialogConf.buttons = {
             Cancel: function (e) {

@@ -12,10 +12,14 @@ Wat.Views.MainView = Backbone.View.extend({
     deleteRoles: [],
     addRoles: [],
     currentMenu: '', // platform-setup
+    sideViews: [],
     
     initialize: function () {
         _.bindAll(this, 'render');
-                        
+        
+        // Add common functions
+        Wat.C.addCommonFunctions (this);
+        
         // Add to the view events the parent class of this view to avoid collisions with other views events
         this.events = this.restrictEventsScope(this.events);
 
@@ -139,8 +143,8 @@ Wat.Views.MainView = Backbone.View.extend({
                         classifiedByTenant: classifiedByTenant,
                         isSuperadmin: isSuperadmin,
                         editorMode: editorMode,
-                        blocked: that.model.attributes.blocked,
-                        properties: that.model.attributes.properties,
+                        blocked: that.model ? that.model.attributes.blocked : 0,
+                        properties: that.model ? that.model.attributes.properties : {},
                         enabledProperties: enabledProperties,
                         enabledCreateProperties: enabledCreateProperties,
                         enabledUpdateProperties: enabledUpdateProperties,
@@ -172,7 +176,7 @@ Wat.Views.MainView = Backbone.View.extend({
                 }
             });
         }
-
+        
         // Add specific parts of editor to dialog
         that.template = _.template(
                     that.templateEditor, {

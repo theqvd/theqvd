@@ -92,7 +92,7 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
             params.block = 5;
             params.filters = {"tenant_id": this.elementId};
 
-            this.sideView = new Wat.Views.VMListView(params);
+            this.sideViews.push(new Wat.Views.VMListView(params));
         }    
         
         if (sideCheck['tenant.see.user-list']) { 
@@ -120,7 +120,7 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
             params.block = 5;
             params.filters = {"tenant_id": this.elementId};
 
-            this.sideView2 = new Wat.Views.UserListView(params);
+            this.sideViews.push(new Wat.Views.UserListView(params));
         }
         
         if (sideCheck['tenant.see.di-list']) { 
@@ -160,7 +160,7 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
             params.forceSelectedActions = {};
             params.block = 5;
             params.filters = {"tenant_id": this.elementId};
-            this.sideView3 = new Wat.Views.DIListView(params);  
+            this.sideViews.push(new Wat.Views.DIListView(params));  
         }
         
         if (sideCheck['tenant.see.log']) { 
@@ -169,7 +169,7 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
             // Render Related log list on side
             var params = this.getSideLogParams(sideContainer);
 
-            this.sideView4 = new Wat.Views.LogListView(params);
+            this.sideViews.push(new Wat.Views.LogListView(params));
 
             this.renderLogGraph(params);
         }

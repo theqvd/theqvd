@@ -53,7 +53,7 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
         // Render Related log list on side
         var params = this.getSideLogParams(sideContainer);
 
-        this.sideView = new Wat.Views.LogListView(params);
+        this.sideViews.push(new Wat.Views.LogListView(params));
         
         this.renderLogGraph(params);
     },

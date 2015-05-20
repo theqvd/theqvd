@@ -969,5 +969,40 @@ Wat.I = {
         $('html,body').animate({
             scrollTop: 0
         }, 'fast');
+    },
+    
+    getRealView: function (that) {
+        var realView = null;
+        
+        if (Wat.CurrentView.cid == that.cid) {
+            realView = Wat.CurrentView;
+        }
+        else {
+            $.each (Wat.CurrentView.sideViews, function (iV, view) {
+                if (view != undefined && view.cid == that.cid) {
+                    realView = view;
+                }
+            });
+        }
+        
+        return realView;
+    },
+    
+    // Get first view among current and side views with a determinate function
+    getUsefulView: function (qvdObj, functionName) {
+        var usefulView = null;
+        
+        if (typeof Wat.CurrentView[functionName] == 'function' && Wat.CurrentView.qvdObj == qvdObj) {
+            usefulView = Wat.CurrentView;
+        }
+        else {
+            $.each (Wat.CurrentView.sideViews, function (iV, view) {
+                if (view != undefined && typeof view[functionName] == 'function' && view.qvdObj == qvdObj) {
+                    usefulView = view;
+                }
+            });
+        }
+        
+        return usefulView;
     }
 }

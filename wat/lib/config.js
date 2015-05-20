@@ -572,5 +572,12 @@ Wat.C = {
                 that.requests.splice(index, 1);
             }
         });
+    },
+    
+    // Add common functions to the view
+    addCommonFunctions: function (that) {
+        if (Wat.Common.BySection[that.qvdObj] != undefined) {
+            $.extend(that, Wat.Common.BySection[that.qvdObj]);
+        }
     }
 }

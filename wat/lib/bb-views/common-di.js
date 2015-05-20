@@ -1,16 +1,12 @@
 // Common lib for DI views (list and details)
-Wat.Common.DIViews = {
+Wat.Common.BySection.di = {
     // Check if any running VM has suffered changes with a DI update
     checkMachinesChanges: function (that) {
+        var realView = Wat.I.getRealView(that);
+
         // Get stored tag changes depending on if the view is embeded or not
-        if (Wat.CurrentView.tagChanges != undefined) {
-            var tagChanges = Wat.CurrentView.tagChanges;
-            delete Wat.CurrentView.tagChanges;
-        }
-        else if (Wat.CurrentView.sideView2.tagChanges != undefined) {
-            var tagChanges = Wat.CurrentView.sideView2.tagChanges;
-            delete Wat.CurrentView.sideView2.tagChanges;
-        }
+        var tagChanges = realView.tagChanges;
+        delete realView.tagChanges;
         
         // The procedence point of this function can be a disk image update action or a direct call. 
         // The second one occurs when create a disk image and this function is called after close websocket operations        
@@ -38,16 +34,16 @@ Wat.Common.DIViews = {
                     "osf_id": Wat.CurrentView.model.get('osf_id')
                 };
                 
-                Wat.A.performAction('vm_get_list', {}, vmFilters, {}, Wat.CurrentView.warnMachinesChanges, this);
+                Wat.A.performAction('vm_get_list', {}, vmFilters, {}, that.warnMachinesChanges, that);
             }
         }
         else {
-            switch (Wat.CurrentView.viewKind) {
+            switch (realView.viewKind) {
                 case 'details':
-                    Wat.CurrentView.fetchDetails();
+                    realView.fetchDetails();
                     break;
                 case 'list':
-                    Wat.CurrentView.fetchList();
+                    realView.fetchList();
                     break;
             }
         }
@@ -68,16 +64,18 @@ Wat.Common.DIViews = {
             });
             
             if (affectedVMs.length > 0) {        
-                Wat.CurrentView.openEditAffectedVMsDialog(affectedVMs);
+                that.openEditAffectedVMsDialog(affectedVMs);
             }
         }
         
-        switch (Wat.CurrentView.viewKind) {
+        var realView = Wat.I.getRealView(that);
+        
+        switch (realView.viewKind) {
             case 'details':
-                Wat.CurrentView.fetchDetails();
+                realView.fetchDetails();
                 break;
             case 'list':
-                Wat.CurrentView.fetchList();
+                realView.fetchList();
                 break;
         }
     },

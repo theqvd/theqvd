@@ -7,9 +7,6 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
     initialize: function (params) {
         this.collection = new Wat.Collections.DIs(params);
         
-        // Add common functions
-        $.extend(this, Wat.Common.DIViews);
-        
         Wat.Views.ListView.prototype.initialize.apply(this, [params]);
     },
     
@@ -203,17 +200,11 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             that.dialog.dialog('close');
             Wat.I.loadingUnblock();
             
-            switch (Wat.CurrentView.qvdObj) {
-                case 'di':
-                    Wat.CurrentView.fetchList();
-                    break;
-                default:
-                    Wat.CurrentView.sideView2.fetchList();
-                    break;
-            }
-            
+            var realView = Wat.I.getRealView(that);
+            realView.fetchList();
+            realView.checkMachinesChanges(that);
+
             Wat.I.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
-            
         }).fail(function(data){
             that.dialog.dialog('close');
             Wat.I.loadingUnblock();
@@ -253,11 +244,13 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
     },
     
     creatingProcessStaging: function (qvdObj, id, data, ws) {
-        Wat.CurrentView.creatingProcess(qvdObj, id, data, ws, 'staging');
+        var usefulView = Wat.I.getUsefulView(qvdObj, 'creatingProcess');
+        usefulView.creatingProcess(qvdObj, id, data, ws, 'staging');
     },
     
     creatingProcessDownload: function (qvdObj, id, data, ws) {
-        Wat.CurrentView.creatingProcess(qvdObj, id, data, ws, 'download');
+        var usefulView = Wat.I.getUsefulView(qvdObj, 'creatingProcess');
+        usefulView.creatingProcess(qvdObj, id, data, ws, 'download');
     },
     
     creatingProcess: function (qvdObj, id, data, ws, mode) {
@@ -292,18 +285,15 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
                 }           
                 Wat.I.loadingUnblock();
                 $(".ui-dialog-buttonset button:first-child").trigger('click');
-
-                if (qvdObj == Wat.CurrentView.qvdObj) {
-                    Wat.CurrentView.fetchList();
-                }
-                else if (qvdObj == Wat.CurrentView.sideView2.qvdObj) {
-                    Wat.CurrentView.sideView2.fetchList();
-                }
+                
+                var realView = Wat.I.getRealView(this);
+                realView.fetchList();
 
                 Wat.I.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
                 
                 // Check affected machine changes
-                Wat.CurrentView.checkMachinesChanges(this);
+                var realView = Wat.I.getRealView(this);
+                realView.checkMachinesChanges(this);
                 break;
             default:
                 if (ws.readyState == WS_OPEN) {

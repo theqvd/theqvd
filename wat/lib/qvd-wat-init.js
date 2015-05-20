@@ -59,7 +59,16 @@ var Wat = {
     
     // Common functions used from two or more views
     Common: {
-        DIViews: {},
+        BySection: {
+            vm: {},
+            user: {},
+            host: {},
+            osf: {},
+            di: {},
+            role: {},
+            administrator: {},
+            log: {}
+        },
     },
     
     // Current view store

@@ -77,7 +77,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
             // Render Related log list on side
             var params = this.getSideLogParams(sideContainer);
             
-            this.sideView = new Wat.Views.LogListView(params);
+            this.sideViews[0] = new Wat.Views.LogListView(params);
             
             this.renderLogGraph(params);
         }

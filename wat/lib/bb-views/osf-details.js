@@ -53,7 +53,8 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
             params.forceSelectedActions = {};
             params.block = 5;
             params.filters = {"osf_id": this.elementId};
-            this.sideView2 = new Wat.Views.DIListView(params);  
+            
+            this.sideViews.push(new Wat.Views.DIListView(params));  
         }
         
         if (sideCheck['osf.see.vm-list']) { 
@@ -88,7 +89,7 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
             params.forceListActionButton = null;
             params.block = 5;
             params.filters = {"osf_id": this.elementId};
-            this.sideView3 = new Wat.Views.VMListView(params);
+            this.sideViews.push(new Wat.Views.VMListView(params));
         }
         
         
@@ -98,7 +99,7 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
             // Render Related log list on side
             var params = this.getSideLogParams(sideContainer);
 
-            this.sideView3 = new Wat.Views.LogListView(params);
+            this.sideViews.push(new Wat.Views.LogListView(params));
         
             this.renderLogGraph(params);
         }

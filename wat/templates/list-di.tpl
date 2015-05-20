@@ -199,7 +199,7 @@
                             case 'default':
                 %>
                                 <td class="desktop center">
-                                    <input type="radio" data-di_id="<%= model.get('id') %>" data-name="di_default" name="di_default-<%= model.get('id') %>" <%= model.get('default') ? 'checked': '' %> value="0">
+                                    <input type="radio" data-di_id="<%= model.get('id') %>" data-name="di_default" name="di_default" <%= model.get('default') ? 'checked': '' %> value="0">
                                 </td>
                 <%
                                 break;

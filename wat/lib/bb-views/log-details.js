@@ -37,7 +37,7 @@ Wat.Views.LogDetailsView = Wat.Views.DetailsView.extend({
             params.filters.status = this.model.get('status');
         }
 
-        this.sideView = new Wat.Views.LogListView(params);
+        this.sideViews.push(new Wat.Views.LogListView(params));
         
         this.renderLogGraph(params);
     },
