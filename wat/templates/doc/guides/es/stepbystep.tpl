@@ -942,6 +942,14 @@ Editar usuarios: La contraseña de los usuarios no aparecerá en el editor masiv
 </p>
 </li>
 </ul></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/tip.png" alt="Tip" />
+</td>
+<td class="content">Si se selecciona solamente un elemento, en el caso de la edición se podrán editar los mismos campos que con la edición normal del elemento desde su vista detalle.</td>
+</tr></table>
+</div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1017,6 +1025,14 @@ Edición
 <img src="images/doc_images/screenshot_user_edit.png" alt="screenshot_user_edit.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>Al editar un usuario podremos escoger si cambiarle la <strong>contraseña</strong> (si no marchamos la casilla de verificación,  permanecerá inalterada) y <strong>crear, editar o añadir propiedades</strong>.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/tip.png" alt="Tip" />
+</td>
+<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas que se sitúan bajo el listado si solo seleccionamos un elemento.</td>
+</tr></table>
+</div>
 </div></div>
 </dd>
 </dl></div>
@@ -1205,6 +1221,14 @@ Editar máquinas virtuales: El nombre de las máquinas virtuales no aparecerá e
 </p>
 </li>
 </ul></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/tip.png" alt="Tip" />
+</td>
+<td class="content">Si se selecciona solamente un elemento, en el caso de la edición se podrán editar los mismos campos que con la edición normal del elemento desde su vista detalle.</td>
+</tr></table>
+</div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1465,6 +1489,14 @@ Edición
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_vm_edit_expiration.png" alt="screenshot_vm_edit_expiration.png" width="960px" />
 </span></p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/tip.png" alt="Tip" />
+</td>
+<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas que se sitúan bajo el listado si solo seleccionamos un elemento.</td>
+</tr></table>
+</div>
 </div></div>
 </dd>
 </dl></div>
@@ -1589,6 +1621,14 @@ Editar nodos: Ni el nombre ni la dirección IP de los nodos aparecerá en el edi
 </p>
 </li>
 </ul></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/tip.png" alt="Tip" />
+</td>
+<td class="content">Si se selecciona solamente un elemento, en el caso de la edición se podrán editar los mismos campos que con la edición normal del elemento desde su vista detalle.</td>
+</tr></table>
+</div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1663,6 +1703,14 @@ Edición
 <img src="images/doc_images/screenshot_host_edit.png" alt="screenshot_host_edit.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>Al editar un nodo podremos editar su <strong>nombre, dirección IP y crear, editar o añadir propiedades</strong>.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/tip.png" alt="Tip" />
+</td>
+<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas que se sitúan bajo el listado si solo seleccionamos un elemento.</td>
+</tr></table>
+</div>
 </div></div>
 </dd>
 </dl></div>
@@ -1713,6 +1761,14 @@ Editar OSFs: El nombre no aparecerá en el editor masivo. Para cambiarlo se debe
 </p>
 </li>
 </ul></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/tip.png" alt="Tip" />
+</td>
+<td class="content">Si se selecciona solamente un elemento, en el caso de la edición se podrán editar los mismos campos que con la edición normal del elemento desde su vista detalle.</td>
+</tr></table>
+</div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1781,6 +1837,14 @@ Edición
 <img src="images/doc_images/screenshot_osf_edit.png" alt="screenshot_osf_edit.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>Al editar un OSF podremos editar su <strong>nombre, memoria, almacenamiento de usuario y crear, editar o añadir propiedades</strong>.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/tip.png" alt="Tip" />
+</td>
+<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas que se sitúan bajo el listado si solo seleccionamos un elemento.</td>
+</tr></table>
+</div>
 </div></div>
 </dd>
 </dl></div>
@@ -1903,6 +1967,14 @@ Editar imágenes: La edición de tags no aparecerán en el editor masivo. Para g
 </p>
 </li>
 </ul></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/tip.png" alt="Tip" />
+</td>
+<td class="content">Si se selecciona solamente un elemento, en el caso de la edición se podrán editar los mismos campos que con la edición normal del elemento desde su vista detalle.</td>
+</tr></table>
+</div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -2022,6 +2094,14 @@ Edición
 </span></p></div>
 <div class="paragraph"><p>Al editar una imagen podremos gestionar sus <strong>tags y crear, editar o añadir propiedades</strong>. Ademas podremos establecerla como imagen por defecto de su OSF, en el caso de no serlo ya. Si lo es, nos saldrá un aviso.</p></div>
 <div class="paragraph"><p><strong>Los tags de una Imagen de disco no se pueden repetir en las Imágenes asociadas a un mismo OSF</strong>. <strong>Si añadimos un tag a una Imagen de disco que ya existe</strong> en otra Imagen de su mismo OSF el sistema nos lo permitirá, pero lo que estaremos haciendo en realidad es <strong>mover el tag entre las dos Imágenes</strong>, desapareciendo de la que lo tenía en un inicio para establecerse en la Imagen que estemos editando.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/tip.png" alt="Tip" />
+</td>
+<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas que se sitúan bajo el listado si solo seleccionamos un elemento.</td>
+</tr></table>
+</div>
 </div></div>
 </dd>
 <dt class="hdlist1">
