@@ -46,46 +46,44 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         // Extend the common events with the list events and events of the specific view
         this.extendEvents(this.commonListEvents);
         this.extendEvents(this.listEvents);
+        this.addListTemplates();
         
+        Wat.A.getTemplates(this.templates, this.render); 
+    },
+    
+    addListTemplates: function () {
         var templates = {
             listCommonList: {
-                name: 'list-common'
+                name: 'list/common'
             },
             listCommonBlock: {
-                name: 'list-common-block'
+                name: 'list/common-block'
             },
             selectChecks: {
-                name: 'dialog-select-checks'
+                name: 'dialog/select-checks'
             },
             sortingRow: {
-                name: 'list-sorting-row'
-            },
-            editorAffectedVM: {
-                name: 'editor-affected-vms'
-            },
-            editorAffectedVMList: {
-                name: 'editor-affected-vms-list'
+                name: 'list/sorting-row'
             }
         }
         
         templates["editorNew_" + this.qvdObj] = {
-            name: 'creator-' + this.qvdObj
+            name: 'creator/' + this.qvdObj
         };        
         
         templates["list_" + this.qvdObj] = {
-            name: 'list-' + this.qvdObj
+            name: 'list/' + this.qvdObj
         };
         
         // If qvd object is massive-editable, get massive editor template
         if ($.inArray(this.qvdObj, QVD_OBJS_MASSIVE_EDITABLE) != -1) {
             templates.editorMassive = {
-                name: 'massive-editor-' + this.qvdObj
+                name: 'editor/' + this.qvdObj + '-massive'
             };
         }
         
-        Wat.A.getTemplates(templates, this.render); 
+        this.templates = $.extend({}, this.templates, templates);
     },
-
     
     readParams: function (params) {
         params = params || {};
@@ -1077,7 +1075,14 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.editorElement(e);
     },
     
-    openMassiveChangesDialog: function (that) {        
+    openMassiveChangesDialog: function (that) {   
+        // If the edition is performed over one single element, call single editor
+        if (that.selectedItems.length == 1) {
+            that.editingFromList = true;
+            this.openEditElementDialog(that);
+            return;
+        }
+        
         that.templateEditor = Wat.TPL.editorMassive;
         
         that.dialogConf.buttons = {

@@ -120,7 +120,7 @@
 
 
                 // ------- Configuration sections ------- //
-                Wat.Router.app_router.on('route:setupCustomize', function () {
+                Wat.Router.app_router.on('route:viewCustomize', function () {
                     Wat.Router.app_router.performRoute('views', Wat.Views.SetupCustomizeView);
                 });   
                 
@@ -257,19 +257,16 @@
                 name: 'menu'
             },
             editorCommon: {
-                name: 'editor-common'
+                name: 'editor/common'
             },
             relatedDoc: {
-                name: 'documentation-related-links'
+                name: 'doc/related-links'
             },
-            setupCommon: {
-                name: 'setup-common'
+            viewCustomize: {
+                name: 'view/customize'
             },
-            setupCustomize: {
-                name: 'setup-customize'
-            },
-            setupFormCustomize: {
-                name: 'setup-customize-form'
+            viewFormCustomize: {
+                name: 'view/customize-form'
             }
         }
 

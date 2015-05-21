@@ -26,17 +26,24 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         this.extendEvents(this.eventsDetails);
         
         Wat.I.chosenConfiguration();
+    
+        // Add specific templates for this view
+        this.addSpecificTemplates();
         
+        Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
+    },
+    
+    addSpecificTemplates: function () {
         var templates = {
             inheritanceTools: {
-                name: 'details-role-inheritance-tools'
+                name: 'details/role-inheritance-tools'
             },
             aclsRoles: {
-                name: 'details-role-acls-tree'
+                name: 'details/role-acls-tree'
             }
         }
         
-        Wat.A.getTemplates(templates, this.renderSetupCommon, this); 
+        this.templates = $.extend({}, this.templates, templates);
     },
     
     events: {
@@ -313,30 +320,6 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         }
     },
     
-    renderSetupCommon: function (that) {
-        var that = that || this;
-        
-        var cornerMenu = Wat.I.getCornerMenu();
-        
-        // Fill the html with the template and the model
-        that.template = _.template(
-            Wat.TPL.setupCommon, {
-                model: that.model,
-                cid: that.cid,
-                selectedOption: that.setupOption,
-                setupMenu: null,
-                //setupMenu: cornerMenu.wat.subMenu
-            }
-        );
-        
-        $(that.el).html(that.template);
-        
-        that.printBreadcrumbs(that.breadcrumbs, '');
-
-        // After render the side menu, embed the content of the view in secondary container
-        that.embedContent();
-    },
-    
     renderSide: function () {
         var sideCheck = this.checkSide({'role.see.acl-list': '.js-side-component1', 'role.see.log': '.js-side-component2'});
         if (sideCheck === false) {
@@ -464,13 +447,6 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         var selectedSubmenuOption = $('.js-submenu-option.menu-option--selected').attr('data-show-submenu');
         $('.acls-management').hide();
         $('.' + selectedSubmenuOption).show();
-    },
-    
-    embedContent: function () {
-        $(this.secondaryContainer).html('<div class="bb-content-secondary"></div>');
-
-        this.el = '.bb-content-secondary';
-        Wat.Views.DetailsView.prototype.initialize.apply(this, [this.params]);        
     },
     
     openEditElementDialog: function(e) {

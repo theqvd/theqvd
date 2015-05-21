@@ -13,6 +13,7 @@ Wat.Views.MainView = Backbone.View.extend({
     addRoles: [],
     currentMenu: '', // platform-setup
     sideViews: [],
+    templates: {},
     
     initialize: function () {
         _.bindAll(this, 'render');
@@ -22,6 +23,9 @@ Wat.Views.MainView = Backbone.View.extend({
         
         // Add to the view events the parent class of this view to avoid collisions with other views events
         this.events = this.restrictEventsScope(this.events);
+        
+        // Add the commonly used templates
+        this.addCommonTemplates();
 
         var that = this;
         this.render = _.wrap(this.render, function(render) { 
@@ -30,6 +34,16 @@ Wat.Views.MainView = Backbone.View.extend({
             that.afterRender(); 
             return that; 
         }); 
+    },
+    
+    addCommonTemplates: function () {
+        var templates = {};
+                
+        templates['editor_' + this.qvdObj] = {
+            name: 'editor/' + this.qvdObj
+        };
+        
+        this.templates = $.extend({}, this.templates, templates);
     },
     
     beforeRender: function () {
@@ -99,7 +113,15 @@ Wat.Views.MainView = Backbone.View.extend({
         var that = that || Wat.CurrentView;
         
         var isSuperadmin = Wat.C.isSuperadmin();
-        var editorMode = that.collection ? 'create' : 'edit';
+                
+        if (that.viewKind == 'details' || that.editingFromList) {
+            var editorMode = 'edit';
+            delete that.editingFromList;
+        }
+        else {
+            var editorMode = 'create';
+        }
+        
         var classifiedByTenant = $.inArray(that.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
         
         // Get enabled properties value from constant. Properties could be disabled by variable
@@ -140,7 +162,7 @@ Wat.Views.MainView = Backbone.View.extend({
         // Add common parts of editor to dialog
         that.template = _.template(
                     Wat.TPL.editorCommon, {
-                        classifiedByTenant: classifiedByTenant,
+                        classifiedByTenant: editorMode == 'create' ? classifiedByTenant : 0,
                         isSuperadmin: isSuperadmin,
                         editorMode: editorMode,
                         blocked: that.model ? that.model.attributes.blocked : 0,
@@ -152,7 +174,7 @@ Wat.Views.MainView = Backbone.View.extend({
                         cid: that.cid
                     }
                 );
-        
+
         target.html(that.template);
         
         if (editorMode == 'create' && isSuperadmin && classifiedByTenant) {
@@ -180,7 +202,7 @@ Wat.Views.MainView = Backbone.View.extend({
         // Add specific parts of editor to dialog
         that.template = _.template(
                     that.templateEditor, {
-                        model: that.model
+                        model: that.model || that.collection.where({id: that.selectedItems[0]})[0]
                     }
                 );
 
@@ -273,6 +295,11 @@ Wat.Views.MainView = Backbone.View.extend({
         // If not model is passed, use this.model
         var model = model || this.model;
         
+        // If we are updating an element from list view, reset selected items
+        if (this.viewKind == 'list') {
+            this.resetSelectedItems();
+        }
+        
         model.setOperation('update');
         
         var messages = {
@@ -344,7 +371,7 @@ Wat.Views.MainView = Backbone.View.extend({
     openEditElementDialog: function (e) {
         var that = this;
         
-        this.templateEditor = Wat.TPL.editor;
+        this.templateEditor = Wat.TPL['editor_' + that.qvdObj];
         
         this.dialogConf.buttons = {
             Cancel: function () {
@@ -404,4 +431,16 @@ Wat.Views.MainView = Backbone.View.extend({
             $('.bb-related-docs').html(that.template);
         }
     },
+    
+    // Fetch details or list depending on the current view kind
+    fetchAny: function (that) {
+        switch (that.viewKind) {
+            case 'list':
+                that.fetchList();
+                break;
+            case 'details':
+                that.fetchDetails();
+                break;
+        }
+    }
 });

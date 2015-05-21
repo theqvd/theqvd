@@ -14,7 +14,7 @@ Wat.Views.LoginView = Wat.Views.MainView.extend({
                 name: 'login'
             },
             errorRefresh: {
-                name: 'error-refresh'
+                name: 'error/refresh'
             }
         }
 

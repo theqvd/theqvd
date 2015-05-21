@@ -20,22 +20,27 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
         // Extend the common events
         this.extendEvents(this.eventsDetails);
         
-        this.params = params;
-                
+        this.printBreadcrumbs(this.breadcrumbs, '');
+        
+        // Add specific templates for this view
+        this.addSpecificTemplates();
+        
+        Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
+    },
+    
+    addSpecificTemplates: function () {
         var templates = {
             aclsAdmins: {
-                name: 'details-administrator-acls-tree'
+                name: 'details/administrator-acls-tree'
             },
             inheritedRoles: {
-                name: 'details-administrator-roles'
-            },
-            setupCommon: {
-                name: 'setup-common'
+                name: 'details/administrator-roles'
             }
         }
         
-        Wat.A.getTemplates(templates, this.renderSetupCommon, this); 
+        this.templates = $.extend({}, this.templates, templates);
     },
+    
     
     render: function () {
         Wat.Views.DetailsView.prototype.render.apply(this);
@@ -229,37 +234,6 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
             });
         });
     },    
-    
-    renderSetupCommon: function (that) {
-        var that = that || this;
-        
-        var cornerMenu = Wat.I.getCornerMenu();
-        
-        // Fill the html with the template and the model
-        that.template = _.template(
-            Wat.TPL.setupCommon, {
-                model: this.model,
-                cid: this.cid,
-                selectedOption: this.setupOption,
-                setupMenu: null,
-                //setupMenu: cornerMenu.wat.subMenu
-            }
-        );
-        
-        $(that.el).html(that.template);
-        
-        that.printBreadcrumbs(this.breadcrumbs, '');
-
-        // After render the side menu, embed the content of the view in secondary container
-        that.embedContent();
-    },
-    
-    embedContent: function () {
-        $(this.secondaryContainer).html('<div class="bb-content-secondary"></div>');
-
-        this.el = '.bb-content-secondary';
-        Wat.Views.DetailsView.prototype.initialize.apply(this, [this.params]);
-    },
     
     afterUpdateRoles: function () {
         this.render();

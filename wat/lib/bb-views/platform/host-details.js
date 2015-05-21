@@ -63,44 +63,6 @@ Wat.Views.HostDetailsView = Wat.Views.DetailsView.extend({
         }
     },
     
-    updateElement: function (dialog) {
-        var valid = Wat.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
-        
-        if (!valid) {
-            return;
-        }
-        
-        // Properties to create, update and delete obtained from parent view
-        var properties = this.properties;
-                
-        var context = $('.' + this.cid + '.editor-container');
-        
-        var name = context.find('input[name="name"]').val();
-        var address = context.find('input[name="address"]').val();
-        
-        var filters = {"id": this.id};
-        var arguments = {};
-        
-        if (Wat.C.checkACL('host.update.name')) {
-            arguments['name'] = name;
-        }        
-        if (Wat.C.checkACL('host.update.address')) {
-            arguments['address'] = address;
-        }
-
-        if (properties.delete.length > 0 || !$.isEmptyObject(properties.set)) {
-            arguments["__properties_changes__"] = properties;
-        }
-
-        this.updateModel(arguments, filters, this.fetchDetails);
-    },
-    
-    openEditElementDialog: function() {
-        this.dialogConf.title = $.i18n.t('Edit node') + ": " + this.model.get('name');
-        
-        Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this);
-    },
-    
     bindEditorEvents: function() {
         Wat.Views.DetailsView.prototype.bindEditorEvents.apply(this);
     }

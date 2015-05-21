@@ -577,7 +577,11 @@ Wat.C = {
     // Add common functions to the view
     addCommonFunctions: function (that) {
         if (Wat.Common.BySection[that.qvdObj] != undefined) {
-            $.extend(that, Wat.Common.BySection[that.qvdObj]);
+            if (!$.isEmptyObject(Wat.Common.BySection[that.qvdObj])) {
+                $.extend(that, Wat.Common.BySection[that.qvdObj]);
+                that.initializeCommon(that);
+                delete that.initializeCommon;
+            }
         }
     }
 }

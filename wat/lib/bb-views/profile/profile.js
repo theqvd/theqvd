@@ -35,10 +35,10 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         
         var templates = {
             editor: {
-                name: 'editor-' + this.qvdObj
+                name: 'editor/' + this.qvdObj
             },
             profile: {
-                name: 'profile'
+                name: 'profile/profile'
             }
         }
         
@@ -46,17 +46,6 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
     },
     
     render: function () {        
-        this.template = _.template(
-            Wat.TPL.setupCommon, {
-                model: this.model,
-                cid: this.cid,
-                selectedOption: this.setupOption,
-                setupMenu: this.sideMenu
-            }
-        );
-
-        $('.bb-content').html(this.template);
-                
         this.template = _.template(
             Wat.TPL.profile, {
                 login: Wat.C.login,
@@ -67,7 +56,7 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
             }
         );
 
-        $('.bb-setup').html(this.template);
+        $('.bb-content').html(this.template);
         
         this.printBreadcrumbs(this.breadcrumbs, '');
         this.renderRelatedDocs();

@@ -32,22 +32,33 @@ var Wat = {
         
         // List views
         ListView: {},
-        UserListView: {},
-        VMListView: {},
-        HostListView: {},
+            UserListView: {},
+            VMListView: {},
+            HostListView: {},
+            OSFListView: {},
+            DIListView: {},
+            TenantListView: {},
+            AdminListView: {},
+            RoleListView: {},
         
         // Details views
         DetailsView: {},
-        UserDetailsView: {},
-        VMDetailsView: {},
-        HostDetailsView: {},
+            UserDetailsView: {},
+            VMDetailsView: {},
+            HostDetailsView: {},
+            OSFDetailsView: {},
+            DIDetailsView: {},
+            TenantDetailsView: {},
+            AdminDetailsView: {},
+            RoleDetailsView: {},
+        
+        // Views
+        SetupCustomizeView: {},
+        MyViewsView: {},
         
         // Setup
-        SetupCustomizeView: {},
         ConfigQvdView: {},
-        TenantListView: {},
-        AdminListView: {},
-        RoleListView: {},
+        ConfigWatView: {},
         
         // Help
         AboutView: {},
@@ -69,6 +80,7 @@ var Wat = {
             administrator: {},
             log: {}
         },
+        ListDetails: {},
     },
     
     // Current view store

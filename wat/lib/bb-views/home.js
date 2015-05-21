@@ -50,10 +50,10 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
                 
         var templates = {
             home: {
-                name: 'home'
+                name: 'home/home'
             },
             homeVMsExpire: {
-                name: 'home-vms-expire'
+                name: 'home/vms-expire'
             }
         }
         

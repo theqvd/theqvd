@@ -128,7 +128,6 @@
 
 fieldset {
     @extend %clearfix;
-    margin-top: 35px;
     width: 100%;
     clear: both;
 
@@ -138,6 +137,10 @@ fieldset {
     
     &.action-select {
         margin-top: 60px;
+    }  
+    
+    &.action-selected {
+        margin-top: 35px;
     }
 
     .chosen-container {

@@ -44,13 +44,13 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
                     
         var templates = {
             editorNew: {
-                name: 'creator-conf-token'
+                name: 'creator/conf-token'
             },
             qvdConfig: {
-                name: 'qvd-config'
+                name: 'config/qvd'
             },
             qvdConfigTokens: {
-                name: 'qvd-config-tokens'
+                name: 'config/qvd-tokens'
             }
         };
         

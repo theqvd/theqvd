@@ -31,13 +31,13 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
         
         var templates = {
             docSection: {
-                name: 'help-documentation'
+                name: 'doc/doc'
             },
             docSearch: {
-                name: 'help-documentation-search'
+                name: 'doc/doc-search'
             },
             docSearchResult: {
-                name: 'help-documentation-search-result'
+                name: 'doc/doc-search-result'
             }
         }
         

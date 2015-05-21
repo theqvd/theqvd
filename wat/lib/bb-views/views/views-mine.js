@@ -22,7 +22,7 @@ Wat.Views.MyViewsView = Wat.Views.ViewsView.extend({
                 
         var templates = {
             resetViewsMine: {
-                name: 'editor-reset-views-mine'
+                name: 'editor/reset-views-mine'
             }
         }
         

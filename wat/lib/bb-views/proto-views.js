@@ -1,6 +1,5 @@
 Wat.Views.ViewsView = Wat.Views.MainView.extend({
     sideContainer: '.bb-setup-side',
-    setupContainer: '.bb-setup',
     setupFormContainer: '.bb-customize-form',
     setupOption: 'customize',
     selectedSection: 'user',
@@ -256,31 +255,18 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
     },
     
     render: function () {
-        // Fill the html with the template and the model
+        $(this.el).html(this.template);
+        
         this.template = _.template(
-            Wat.TPL.setupCommon, {
-                model: this.model,
+            Wat.TPL.viewCustomize, {
+                selectedSection: this.selectedSection,
+                limitByACLs: this.limitByACLs,
+                viewKind: this.viewKind,
                 cid: this.cid,
-                selectedOption: this.setupOption,
-                setupMenu: this.sideMenu
             }
         );
         
         $(this.el).html(this.template);
-        
-        this.renderBlock();
-    },
-    
-    renderBlock: function () {
-        this.template = _.template(
-            Wat.TPL.setupCustomize, {
-                selectedSection: this.selectedSection,
-                limitByACLs: this.limitByACLs,
-                viewKind: this.viewKind,
-            }
-        );
-        
-        $(this.setupContainer).html(this.template);
         
         // Store as selected the current selected section
         this.selectedSection = $('select[name="obj-qvd-select"]').val();
@@ -302,7 +288,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
     
     renderForm: function () {        
         this.template = _.template(
-            Wat.TPL.setupFormCustomize, {
+            Wat.TPL.viewFormCustomize, {
                 filters: this.currentFilters,
                 columns: this.currentColumns,
                 limitByACLs: this.limitByACLs

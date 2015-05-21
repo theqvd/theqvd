@@ -1,5 +1,81 @@
 // Common lib for DI views (list and details)
 Wat.Common.BySection.di = {
+    // This initialize function will be executed one time and deleted
+    initializeCommon: function (that) {
+        var templates = {
+            editorAffectedVM: {
+                name: 'editor/affected-vms'
+            },
+            editorAffectedVMList: {
+                name: 'editor/affected-vms-list'
+            }
+        };
+        
+        this.templates = $.extend({}, this.templates, templates);
+    },
+    
+    updateElement: function (dialog, that) {
+        var that = that || this;
+        that.id = that.id || that.selectedItems[0];
+        that.model = that.model || that.collection.where({id: that.selectedItems[0]})[0];
+        
+        var valid = Wat.Views.DetailsView.prototype.updateElement.apply(that, [dialog]);
+        
+        if (!valid) {
+            return;
+        }
+        
+        // Properties to create, update and delete obtained from parent view
+        var properties = that.properties;
+                
+        var context = $('.' + that.cid + '.editor-container');
+                        
+        var tags = context.find('input[name="tags"]').val();
+        var newTags = tags && Wat.C.checkACL('di.update.tags') ? tags.split(',') : [];
+
+        var def = context.find('input[name="default"][value=1]').is(':checked');
+        
+        // If we set default (only if the DI wasn't default), add this tag
+        if (def && !that.model.get('default') && Wat.C.checkACL('di.update.default')) {
+            newTags.push('default');
+        }
+                
+        var baseTags = that.model.attributes.tags ? that.model.attributes.tags.split(',') : [];
+        var keepedTags = _.intersection(baseTags, newTags);
+        
+        var createdTags = _.difference(newTags, keepedTags);
+        var deletedTags = _.difference(baseTags, keepedTags);
+        
+        var filters = {"id": that.id};
+        var arguments = {};
+        
+        if (Wat.C.checkACL('di.update.tags') || Wat.C.checkACL('di.update.default')) {
+            arguments['__tags_changes__'] = {
+                'create': createdTags,
+                'delete': deletedTags
+            };
+        }
+        
+        if (properties.delete.length > 0 || !$.isEmptyObject(properties.set)) {
+            arguments["__properties_changes__"] = properties;
+        }
+        
+        this.tagChanges = arguments['__tags_changes__'];
+        
+        that.updateModel(arguments, filters, that.checkMachinesChanges);
+    },
+    
+    openEditElementDialog: function(e) {
+        this.model = this.model || this.collection.where({id: this.selectedItems[0]})[0];
+        
+        this.dialogConf.title = $.i18n.t('Disk image') + ": " + this.model.get('disk_image');
+
+        Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
+        
+        // Configure tags inputs
+        Wat.I.tagsInputConfiguration();
+    },
+    
     // Check if any running VM has suffered changes with a DI update
     checkMachinesChanges: function (that) {
         var realView = Wat.I.getRealView(that);

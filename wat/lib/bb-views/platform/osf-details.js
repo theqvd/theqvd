@@ -105,51 +105,6 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
         }
     },
     
-    updateElement: function (dialog) {
-        var valid = Wat.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
-        
-        if (!valid) {
-            return;
-        }
-        
-        // Properties to create, update and delete obtained from parent view
-        var properties = this.properties;
-        
-        var context = $('.' + this.cid + '.editor-container');
-        
-        var name = context.find('input[name="name"]').val();        
-        var memory = context.find('input[name="memory"]').val();
-        var user_storage = context.find('input[name="user_storage"]').val();
-        
-        arguments = {};
-        
-        if (Wat.C.checkACL('osf.update.name')) {
-            arguments['name'] = name;
-        }        
-        
-        if (Wat.C.checkACL('osf.update.memory')) {
-            arguments['memory'] = memory;
-        }   
-        
-        if (Wat.C.checkACL('osf.update.user-storage')) {
-            arguments['user_storage'] = user_storage;
-        }
-        
-        if (properties.delete.length > 0 || !$.isEmptyObject(properties.set)) {
-            arguments["__properties_changes__"] = properties;
-        }
-        
-        var filters = {"id": this.id};
-
-        this.updateModel(arguments, filters, this.fetchDetails);
-    },
-    
-    openEditElementDialog: function(e) {
-        this.dialogConf.title = $.i18n.t('Edit OS Flavour') + ": " + this.model.get('name');
-        
-        Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
-    },
-    
     bindEditorEvents: function() {
         Wat.Views.DetailsView.prototype.bindEditorEvents.apply(this);
     }

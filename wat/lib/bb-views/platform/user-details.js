@@ -61,47 +61,6 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
         }
     },
     
-    updateElement: function (dialog) {        
-        var valid = Wat.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
-        
-        if (!valid) {
-            return;
-        }
-        
-        // Properties to create, update and delete obtained from parent view
-        var properties = this.properties;
-        
-        var arguments = {'properties' : properties};
-        
-        var context = $('.' + this.cid + '.editor-container');
-                        
-        var filters = {"id": this.id};
-        var arguments = {};
-        
-        if (properties.delete.length > 0 || !$.isEmptyObject(properties.set)) {
-            arguments["__properties_changes__"] = properties;
-        }
-        
-        if (Wat.C.checkACL('user.update.password')) {
-            // If change password is checked
-            if (context.find('input.js-change-password').is(':checked')) {
-                var password = context.find('input[name="password"]').val();
-                var password2 = context.find('input[name="password2"]').val();
-                if (password && password2 && password == password2) {
-                    arguments['password'] = password;
-                }
-            }
-        }
-        
-        this.updateModel(arguments, filters, this.fetchDetails);
-    },
-    
-    openEditElementDialog: function(e) {
-        this.dialogConf.title = $.i18n.t('Edit user') + ": " + this.model.get('name');
-        
-        Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
-    },
-    
     applyDisconnectAll: function () {
         var disconnectAllFilters = {
             'user_id': [this.id]

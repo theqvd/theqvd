@@ -22,7 +22,7 @@ Wat.Router = Backbone.Router.extend({
         "users/:searchHash": "listUser",
         "user/:id": "detailsUser",
         
-        "views": "setupCustomize",
+        "views": "viewCustomize",
         "myviews": "myviews",
 
         "tenants": "listTenant",

@@ -21,35 +21,32 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         
         // Extend the common events
         this.extendEvents(this.eventsDetails);
-                
+        
+        this.addDetailsTemplates();
+
+        Wat.A.getTemplates(this.templates, this.fetchDetails, this); 
+    },
+    
+    addDetailsTemplates: function () {
         var templates = {
             detailsCommon: {
-                name: 'details-common'
+                name: 'details/common'
             },
             detailsCommonProperties: {
-                name: 'details-common-properties'
+                name: 'details/common-properties'
             },
             details: {
-                name: 'details-' + this.qvdObj
+                name: 'details/' + this.qvdObj
             },
             detailsSide: {
-                name: 'details-' + this.qvdObj + '-side'
+                name: 'details/' + this.qvdObj + '-side'
             },
             warn404: {
-                name: '404'
-            },
-            editor: {
-                name: 'editor-' + this.qvdObj
-            },
-            editorAffectedVM: {
-                name: 'editor-affected-vms'
-            },
-            editorAffectedVMList: {
-                name: 'editor-affected-vms-list'
+                name: 'error/404'
             }
         }
         
-        Wat.A.getTemplates(templates, this.fetchDetails, this); 
+        this.templates = $.extend({}, this.templates, templates);
     },
     
     setBreadCrumbs: function () {

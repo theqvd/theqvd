@@ -16,7 +16,9 @@ Wat.A = {
                 cache = true;
             }
             
-            if ($('#template_' + templateName).html() == undefined || !cache) {
+            var templateNameHash = '#template_' + templateName.replace(/\//gi, '-');
+            
+            if ($(templateNameHash).html() == undefined || !cache) {
                 var tmplDir = APP_PATH + 'templates';
                 var tmplUrl = tmplDir + '/' + templateName + '.tpl';
                 var tmplString = '';
@@ -43,7 +45,7 @@ Wat.A = {
             }
             else {
                 if (cache) {
-                    Wat.TPL[storing] = $('#template_' + templateName).html();
+                    Wat.TPL[storing] = $(templateNameHash).html();
                 }
                 else {
                     Wat.TPL[storing] = tmplString;
@@ -413,7 +415,7 @@ Wat.A = {
         
         var templates = {
             docSection: {
-                name: 'documentation-' + lan + '-' + docParams.guide,
+                name: 'doc/guides/' + lan + '/' + docParams.guide,
                 cache: false
             }
         }

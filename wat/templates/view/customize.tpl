@@ -1,4 +1,4 @@
- <div class="js-custom-views-container" style="display: none;">
+ <div class="js-custom-views-container <%= cid %>" style="display: none;">
      <%
      if (viewKind == 'tenant') {
      %>
@@ -9,7 +9,7 @@
      <%
      }
      %>
-     <fieldset class="action-selected">
+     <fieldset>
         <div class="customize-section-selectors">
             <div class="customize-section-selector">
                 <label for="obj-qvd-select">Section</label>

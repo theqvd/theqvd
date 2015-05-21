@@ -32,7 +32,7 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
                 
         var templates = {
             resetViewsDefault: {
-                name: 'editor-reset-views-default'
+                name: 'editor/reset-views-default'
             }
         }
         

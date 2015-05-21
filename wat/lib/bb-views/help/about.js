@@ -17,7 +17,7 @@ Wat.Views.AboutView = Wat.Views.MainView.extend({
         
         var templates = {
             about: {
-                name: 'help-about'
+                name: 'doc/about'
             }
         }
         
