@@ -1,5 +1,20 @@
 <div class="editor-container <%= cid %>">
     <table class="editor-table alternate">
+         <%
+         if (editorMode == "massive_edit") {
+         %>
+            <tbody>
+                <tr>
+                    <td colspan=2></td>
+                        <div class="info-header nopadding">
+                            <span data-i18n class="fa fa-info-circle">Some fields are not available to be edited in massive edition</span><br> 
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+         <%
+         }
+         %>
         <%
             // If the user is superadmin, show tenants select in creation form
             if (classifiedByTenant && editorMode == 'create' && isSuperadmin) {

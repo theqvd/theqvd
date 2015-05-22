@@ -1298,11 +1298,6 @@ body {
       padding-left: 5px;
       padding-right: 5px;
       line-height: 1.2em; }
-    .wrapper .content .info-header {
-      height: auto;
-      padding: 10px; }
-      .wrapper .content .info-header .fa:before {
-        margin-right: 5px; }
     .wrapper .content .details-list .details-item, .wrapper .content .custom-props-container .details-item {
       margin-bottom: 5px; }
       .wrapper .content .details-list .details-item:before, .wrapper .content .details-list .details-item i:before, .wrapper .content .custom-props-container .details-item:before, .wrapper .content .custom-props-container .details-item i:before {
@@ -1723,6 +1718,12 @@ span.text {
 .search-matchs {
   margin-left: 20px;
   margin-bottom: 20px; }
+
+.info-header {
+  height: auto;
+  padding: 10px; }
+  .info-header .fa:before {
+    margin-right: 5px; }
 
 /********************************************************************
 *********************************************************************
@@ -2490,7 +2491,7 @@ table.role-template-matrix {
   height: 100vh; }
   @media screen and (min-width: 40em) {
     .dialog-container-template {
-      width: 600px;
+      width: 650px;
       height: 550px; } }
 
 .ui-dialog {
@@ -2508,7 +2509,7 @@ table.role-template-matrix {
       top: 0 !important; } }
   @media screen and (min-width: 40em) {
     .ui-dialog {
-      width: 600px !important;
+      width: 650px !important;
       height: 550px !important;
       height: auto !important; } }
   .ui-dialog td {
@@ -2821,6 +2822,9 @@ td {
 
 .bold {
   font-weight: bold; }
+
+.nopadding {
+  padding: 0px; }
 
 .doc-text {
   /* Shared CSS for AsciiDoc xhtml11 and html5 backends */

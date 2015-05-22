@@ -353,3 +353,12 @@ span.text {
     margin-left: 20px;
     margin-bottom: 20px;
 }
+
+.info-header {
+    height: auto;
+    padding: 10px;
+    .fa:before {
+        margin-right: 5px;    
+    }
+}
+
