@@ -51,7 +51,7 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
             params.forceSelectedActions = {};
             params.forceListActionButton = null;
             params.block = 5;
-            params.filters = {"di_id": this.elementId};
+            params.filters = {"-or": ["di_id", this.elementId, "di_id_in_use", this.elementId]};
 
             this.sideViews.push(new Wat.Views.VMListView(params));
         }

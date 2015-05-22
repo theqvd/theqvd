@@ -1178,11 +1178,11 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         var that = this;
         switch(action) {
             case 'delete':
-                Wat.I.confirm('dialog-confirm-undone', that.applyDelete, that, loadingBlock);
+                Wat.I.confirm('dialog/confirm-undone', that.applyDelete, that, loadingBlock);
                 break;
             case 'block':
                 if (elementsOutOfView) {
-                    Wat.I.confirm('dialog-confirm-out-of-view', that.applyBlock, that, loadingBlock);
+                    Wat.I.confirm('dialog/confirm-out-of-view', that.applyBlock, that, loadingBlock);
                 }
                 else {
                     that.applyBlock(that);
@@ -1190,7 +1190,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 break;
             case 'unblock':
                 if (elementsOutOfView) {
-                    Wat.I.confirm('dialog-confirm-out-of-view', that.applyUnblock, that, loadingBlock);
+                    Wat.I.confirm('dialog/confirm-out-of-view', that.applyUnblock, that, loadingBlock);
                 }
                 else {
                     that.applyUnblock(that);
@@ -1200,7 +1200,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 // The function that will open the Massive changes dialog is: openMassiveChangesDialog
                 // Each qvd object have the option of do things before with setupMassiveChangesDialog and after with configureMassiveEditor                
                 if (elementsOutOfView) {
-                    Wat.I.confirm('dialog-confirm-out-of-view', that.setupMassiveChangesDialog, that, loadingBlock);
+                    Wat.I.confirm('dialog/confirm-out-of-view', that.setupMassiveChangesDialog, that, loadingBlock);
                 }
                 else {
                     that.setupMassiveChangesDialog(that);
@@ -1209,7 +1209,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             // Used in VMs
             case 'start':
                 if (elementsOutOfView) {
-                    Wat.I.confirm('dialog-confirm-out-of-view', that.applyStart, that, loadingBlock);
+                    Wat.I.confirm('dialog/confirm-out-of-view', that.applyStart, that, loadingBlock);
                 }
                 else {
                     that.applyStart(that);
@@ -1217,7 +1217,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 break;
             case 'stop':
                 if (elementsOutOfView) {
-                    Wat.I.confirm('dialog-confirm-out-of-view', that.applyStop, that, loadingBlock);
+                    Wat.I.confirm('dialog/confirm-out-of-view', that.applyStop, that, loadingBlock);
                 }
                 else {
                     that.applyStop(that);
@@ -1225,7 +1225,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 break;
             case 'disconnect':
                 if (elementsOutOfView) {
-                    Wat.I.confirm('dialog-confirm-out-of-view', that.applyDisconnect, that, loadingBlock);
+                    Wat.I.confirm('dialog/confirm-out-of-view', that.applyDisconnect, that, loadingBlock);
                 }
                 else {
                     that.applyDisconnect(that);
@@ -1234,7 +1234,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             // Used in Hosts
             case 'stop_all':
                 if (elementsOutOfView) {
-                    Wat.I.confirm('dialog-confirm-out-of-view', that.applyStopAll, that, loadingBlock);
+                    Wat.I.confirm('dialog/confirm-out-of-view', that.applyStopAll, that, loadingBlock);
                 }
                 else {
                     that.applyStopAll(that);
@@ -1243,14 +1243,14 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             // Used in Users
             case 'disconnect_all':
                 if (elementsOutOfView) {
-                    Wat.I.confirm('dialog-confirm-out-of-view', that.applyDisconnectAll, that, loadingBlock);
+                    Wat.I.confirm('dialog/confirm-out-of-view', that.applyDisconnectAll, that, loadingBlock);
                 }
                 else {
                     that.applyDisconnectAll(that);
                 }
                 break;
             case 'delete_acl':
-                Wat.I.confirm('dialog-confirm-undone', that.applyDeleteACL, that, loadingBlock);
+                Wat.I.confirm('dialog/confirm-undone', that.applyDeleteACL, that, loadingBlock);
                 break;
         };
     },

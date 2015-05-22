@@ -201,7 +201,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     },  
     
     askDelete: function () {
-        Wat.I.confirm('dialog-confirm-undone', this.applyDelete, this);
+        Wat.I.confirm('dialog/confirm-undone', this.applyDelete, this);
     },
         
     applyDelete: function (that) {

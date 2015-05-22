@@ -248,7 +248,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
                     "value": value
                 };
                 
-                Wat.I.confirm('dialog-config-change', this.applySave, this);
+                Wat.I.confirm('dialog/config-change', this.applySave, this);
                 
                 break;
             case 'set_default':
@@ -256,14 +256,14 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
                     "key": token,
                 };
                 
-                Wat.I.confirm('dialog-config-change', this.applySetDefault, this);
+                Wat.I.confirm('dialog/config-change', this.applySetDefault, this);
                 break;
             case 'delete':
                 this.configActionFilters = {
                     "key": token,
                 };
                 
-                Wat.I.confirm('dialog-config-change', this.applyDelete, this);
+                Wat.I.confirm('dialog/config-change', this.applyDelete, this);
                 break;
         }
     },

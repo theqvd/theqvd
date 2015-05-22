@@ -310,6 +310,7 @@
     "Tenant": "Tenant",
     "Tenants": "Tenants",
     "Text input": "Caja de texto",
+    "The execution image is different than the assigned image": "La imagen en ejecución es diferente de la imagen asignada",
     "The operation will be performed over Virtual machines with different associated OSFs": "La operación se llevará a cabo en máquinas virtuales con diferentes OSFs asociados",
     "The virtual machine is running with different image - Restart it to update it to new image": "La máquina virtual está corriendo con una imagen diferente - Reiníciala para actualizarla a la nueva imagen",
     "The default block size of the system": "El tamaño de bloque predeterminado del sistema",
