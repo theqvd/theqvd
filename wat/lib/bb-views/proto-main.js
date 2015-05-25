@@ -174,7 +174,7 @@ Wat.Views.MainView = Backbone.View.extend({
                         cid: that.cid
                     }
                 );
-
+        
         target.html(that.template);
         
         if (editorMode == 'create' && isSuperadmin && classifiedByTenant) {

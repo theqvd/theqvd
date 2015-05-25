@@ -1,4 +1,4 @@
-<div class="details-header">
+<div class="details-header <%= cid %>">
     <span class="fa fa-user h1"><%= login %></span>
     <a class="button fright button-icon js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"></a>
 </div>

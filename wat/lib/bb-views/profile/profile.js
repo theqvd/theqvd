@@ -34,13 +34,14 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         this.extendEvents(this.eventsDetails);
         
         var templates = {
-            editor: {
-                name: 'editor/' + this.qvdObj
-            },
             profile: {
                 name: 'profile/profile'
             }
         }
+        
+        templates['editor_' + this.qvdObj] = {
+            name: 'editor/' + this.qvdObj
+        };
         
         Wat.A.getTemplates(templates, this.render, this); 
     },
@@ -48,6 +49,7 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
     render: function () {        
         this.template = _.template(
             Wat.TPL.profile, {
+                cid: this.cid,
                 login: Wat.C.login,
                 language: Wat.C.language,
                 block: Wat.C.block,
@@ -62,12 +64,9 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         this.renderRelatedDocs();
 
         Wat.T.translateAndShow();
-
-        // Extend the common events
-        this.extendEvents(this.eventsDetails);
     },
     
-    openEditElementDialog: function(e) {        
+    openEditElementDialog: function(e) {     
         this.dialogConf.title = $.i18n.t('Edit Profile');
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
 
