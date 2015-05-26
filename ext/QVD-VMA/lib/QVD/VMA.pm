@@ -371,7 +371,7 @@ sub _provisionate_user {
                 push @group_args, (-g => $gid) if defined $gid;
                 push @group_args, $group;
                 DEBUG "executing $groupadd => @group_args";
-                unless (system $groupadd => @group_args) {
+                unless (system($groupadd => @group_args) == 0) {
                     WARN "provisioning of group '$group' failed\n";
                 }
 
