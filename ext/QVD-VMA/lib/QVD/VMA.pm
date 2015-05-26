@@ -392,9 +392,9 @@ sub _provisionate_user {
             if ($@) {
                 # clean up, do not left the system in an inconsistent state
                 DEBUG "deleting user $user";
-                system $userdel => '-rf', $user;
+                system $userdel => '-rf', $user and WARN "'$userdel -rf $user' failed";
                 DEBUG "deleting group $user";
-                system $groupdel => $user;
+                system $groupdel => $user and WARN "'$groupdel $user' failed";
                 die $@;
             }
         }
