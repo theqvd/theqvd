@@ -1,0 +1,144 @@
+// Status codes returned by the API
+ALL_STATUS = {
+    0000: 'Successful completion',
+
+    1000: 'In progress',
+    1100: 'Internal server error',
+    1200: 'Action not accomplished for all elements',
+    1300: 'Zero items selected, no item has been changed',
+
+    2100: 'No connection to database',
+    2210: 'Unable to copy disk image from staging',
+    2211: 'Unable to copy whole disk image (lack of space?)',
+    2220: 'Unable to find images directory in filesystem',
+    2230: 'Unable to find staging directory in filesystem',
+    2240: 'Unable to find disk image in staging directory',
+    2250: 'Unable to upload disk image',
+    2251: 'Unable to move uploaded disk image',
+    2260: 'Unable to download disk image',
+    2261: 'Unable to move downloaded disk image',
+
+    3100: 'No credentials provided for authentication',
+    3200: 'Wrong login or password - Login again',
+    3300: 'Session expired - Login again',
+    3400: 'Problems to update expiration time in session',
+
+    4100: 'Unavailable action',
+    4210: 'Forbidden action for this administrator',
+    4220: 'Forbidden filter for this administrator',
+    4230: 'Forbidden argument for this administrator',
+    4240: 'Forbidden massive action for this administrator',
+    4250: 'Forbidden field for this administrator',
+
+    5110: 'Unable to disconnect user in current state',
+    5120: 'Unable to stop VM in current state',
+    5130: 'Unable to start VM in current state',
+    5140: 'Unable to assign host, no host available',
+
+    6100: 'Syntax errors in input json',
+    6210: 'Inappropiate filter for this action',
+    6220: 'No mandatory filter for this action',
+    6230: 'Inappropiate argument for this action',
+    6240: 'No mandatory argument for this action',
+    6250: 'Inappropiate field for this action',
+    6310: 'Invalid value',
+    6320: 'Invalid filter value',
+    6330: 'Invalid argument value',
+    6340: 'Invalid property value',
+    6350: 'Invalid tag value',
+    6360: 'Invalid acl value',
+    6370: 'Invalid role value',
+    6410: 'Lack of value for a not nullable field',
+    6420: 'No property value provided',
+    6430: 'No tag provided',
+    6440: 'No acl provided',
+    6450: 'No role provided',
+
+    7100: 'Refered related items don\'t exist',
+    7110: 'Unable to accomplish, refered related items don\'t exist',
+    7120: 'Unable to remove, other items depend on it',
+    7200: 'This element already exists',
+    7210: 'This property already exists',
+    7220: 'This acl has already been assigned',
+    7230: 'This role has already been assigned',
+    7310: 'Unable to remove VM - This VM is running',
+    7320: 'Unable to remove DI - There are VMs running with it',
+    7330: 'Unable to reassign a Tag fixed to another DI',
+    7340: 'Fixed, Head and Default Tags cannot be deleted',
+    7350: 'Forbidden role assignment: inherited role inherits from inheritor',
+    7360: 'Incompatible expiration dates - Soft date must precede the hard one',
+    7371: 'Non core config items haven\'t default value',
+    7372: 'Unable to remove a core config item',
+    7373: 'Unable to switch to monotenant mode - More than one tenant in the system'
+};
+
+STATUS_SUCCESS = 0;
+
+STATUS_IN_PROGRESS = 1000;
+STATUS_INTERNAL_ERROR = 1100;
+STATUS_NOT_ALL_DONE = 1200;
+STATUS_ZERO_SELECTED = 1300;
+
+STATUS_DB_CONNECTION = 2100;
+STATUS_NOT_COPY_STAGING_DI = 2210;
+STATUS_NOT_FIND_DI_PATH = 2220;
+STATUS_NOT_FIND_STAGING_PATH = 2230;
+STATUS_NOT_FIND_STAGING_IMAGE = 2240;
+STATUS_UNABLE_TO_DOWNLOAD_DI = 2260;
+
+STATUS_CREDENTIALS_FAIL = 3100;
+STATUS_NOT_LOGIN = 3200;
+STATUS_SESSION_EXPIRED = 3300;
+STATUS_ERROR_UPDATING_EXPIRATION = 3400;
+
+STATUS_UNAVAILABLE_ACTION = 4100;
+STATUS_FORBIDDEN_ACTION = 4210;
+STATUS_FORBIDDEN_FILTER = 4220;
+STATUS_FORBIDDEN_ARGUMENT = 4230;
+STATUS_FORBIDDEN_MASSIVE_ACTION = 4240;
+STATUS_FORBIDDEN_FIELD = 4250;
+
+STATUS_UNABLE_DISCONNECT_USER = 5110;
+STATUS_UNABLE_STOP_VM = 5120;
+STATUS_UNABLE_START_VM = 5130;
+STATUS_UNABLE_ASSIGN_HOST = 5140;
+
+STATUS_SYNTAX_ERROR = 6100;
+STATUS_INNAPPROPIATE_FLTER = 6210;
+STATUS_NO_MANDATORY_FILTER = 6220;
+STATUS_INNAPPROPIATE_ARGUMENT = 6230;
+STATUS_NO_MANDATORY_ARGUMENT = 6240;
+STATUS_INAPPROPIATE_FIELD = 6250;
+STATUS_INVALID_VALUE = 6310;
+STATUS_INVALID_FILTER = 6320;
+STATUS_INVALID_ARGUMENT = 6330;
+STATUS_INVALID_PROPERTY = 6340;
+STATUS_INVALID_TAG = 6350;
+STATUS_INVALID_ACL = 6360;
+STATUS_INVALID_ROLE = 6370;
+STATUS_NOT_NULLABLE_FIELD = 6410;
+STATUS_NO_PROPERTY_PROVIDED = 6420;
+STATUS_NO_TAG_PROVIDED = 6430;
+STATUS_NO_ACL_PROVIDED = 6440;
+STATUS_NO_ROLE_PROVIDED = 6450;
+
+STATUS_ITEMS_DONT_EXIST = 7100;
+STATUS_RELATED_ITEMS_DONT_EXIST = 7110;
+STATUS_NOT_REMOVED_DUE_DEPENDENCY = 7120;
+STATUS_ELEMENT_ALREADY_EXISTS = 7200;
+STATUS_PROPERTY_ALREADY_EXISTS = 7210;
+STATUS_ACL_ALREADY_ASSIGNED = 7220;
+STATUS_ROLE_ALREADY_ASSIGNED = 7230;
+STATUS_VM_NOT_DELETED_DUE_RUNNING = 7310;
+STATUS_DI_NOT_DELETED_DUE_RUNNING = 7320;
+STATUS_TAG_NOT_ASSIGNED_DUE_FIXED = 7330;
+STATUS_TAG_NOT_DELETED_DUE_FIXED = 7340;
+STATUS_ROLE_NOT_ASSIGNED_DUE_LOOP = 7350;
+
+STATUS_INCOMPATIBLE_EXPIRATION = 7360;
+STATUS_NOT_DEFAULT_CONFIG_TOKEN = 7371;
+STATUS_UNABLE_REMOVE_CONFIG_TOKEN = 7372;
+STATUS_UNABLE_SWITCH_MONOTENANT = 7373;
+
+STATUS_FORBIDDEN = 8;
+STATUS_FOREIGN_KEY = 23503;

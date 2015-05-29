@@ -1,0 +1,179 @@
+.admin-roles, .role-inherited-roles, role-acls {
+    clear:both;
+}
+
+.acls-management { 
+    table-layout: auto !important;
+    
+    select[multiple] {
+        width: 100%;
+    }
+
+    .roles-acls-calculated {
+        float: right;
+        font-weight: bold;
+    }
+
+    .inherited-role-wrapper {
+        width: auto;
+        margin: 5px;
+        float: left;
+    }
+    
+    .inherited-role-table {
+        width: auto;
+        min-width: 200px;
+        th {
+            .fa {
+                display: inline;
+                font-weight: normal;
+            }
+            
+            text-align: center;
+        }
+    }
+    
+    td.acls {
+        vertical-align: top;
+        padding: 8px 5px;
+     
+        .acls-list {
+            height:  157px;
+            overflow-x: auto;
+        }
+        
+        span {
+            font-weight: bold;
+        }
+    }
+    
+    .button {
+        text-align: center;
+        vertical-align: bottom;
+    }
+    
+    .side_to_side_select {
+        height: 250px;
+        margin-top: 5px;
+    }
+}
+
+.delete-property-button, .add-role-button, .delete-role-button, .add-acl-button, .delete-acl-button {
+    color: $col_brand;
+    cursor: pointer;
+}
+
+.role-acls-wrapper {
+    height: 275px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0px;
+    
+    table {
+        width: 90%;
+    }
+}
+
+td[data-disabled] {
+    color: #aaa;
+    text-decoration: line-through;
+    color: darken($col_red, 10);
+}
+
+td.vbutton {
+    width: 20px;
+    padding: 23px 0px !important;
+    vertical-align: top !important;
+    
+    .button {
+        height: 250px;
+        padding-top: 120px;
+    }
+}
+
+select[name="acl_negative_on_role"] option, .acls_negative {
+    color: darken($col_red, 10);
+}
+
+select[name="acl_positive_on_role"] option, .acls_positive {
+    color: darken($col_green, 10);
+}
+
+
+.subbranch {
+    margin-left: 30px;
+}
+
+.subbranch-piece {
+    margin-right: 5px;
+    line-height: 25px;
+    
+    padding-bottom: 4px;
+    
+    &:first-child {
+        vertical-align: middle;
+    }
+    
+    font-size: 12px;
+}
+
+.acl-tree-selector+div {
+    display: block;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+.acls-branch, .subbranch {
+    line-height: 27px;
+    display: table;
+    
+    .mini-loading {
+        margin-top: 0px;
+        margin-left: 30px;
+    }
+}
+
+.branch-button {
+    margin-right: 5px;
+    vertical-align: bottom;
+    
+    &:before {
+        font-size: 22px;
+    }
+}
+
+.branch-check, .acl-check {
+    width: 18px !important;
+    height: 18px !important;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+.branch-text, .subbranch-piece {
+    vertical-align: top;
+    margin-left: 2px;
+}
+
+.subbranch-piece {
+    font-size: 10px;
+}
+
+.branch-text {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.acl-inheritance {
+    margin-right: 5px;
+    &:before {
+        font-size: 15px;
+    }
+}
+
+.disabled-branch {
+    color: #666;
+}
+
+select[name="role"] { 
+    min-width: 200px;
+}

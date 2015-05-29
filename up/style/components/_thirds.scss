@@ -1,0 +1,204 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                @THIRDS: Third party libraries overrided styles
+                components/_thirds.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+// jQuery UI styles
+
+.ui-dialog {
+    z-index: 1002;
+    .ui-dialog-titlebar {
+        background: $col_brand;
+        text-align: center;
+        padding: 5px;
+
+        .ui-dialog-titlebar-close {
+            display: none;
+        }
+        
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    
+    .ui-state-hover, .ui-state-focus  {
+        @include button($col_whiter, $col_brand);
+    }
+    
+    .ui-dialog-buttonset {
+        padding: 10px;
+        text-align: right;
+        
+        .button {
+            margin-left: 30px;
+            .ui-button-text:before {
+                margin-right: 10px;
+            }
+        }
+    }
+    
+    .dialog-container {
+        overflow-y: auto;
+        padding-left: 30px;
+        padding-right: 30px;
+        min-height: 60vh !important;
+    }
+}
+
+.ui-widget-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1001;
+}
+
+.ui-widget-content {
+    background: $col_whiter;
+}
+
+
+.dialog-container, .dialog-container-template {
+    display: none;
+    padding: 0;
+    height: 50vh !important;
+}
+
+.dialog-container-template {
+    width: $dialog_mobile_width;
+    height: $dialog_mobile_height;
+    height: 100vh;
+    
+    @include in(desktop) {
+        width: $dialog_width;
+        height: $dialog_height;
+    }
+}
+
+.ui-dialog {
+    top: 20px !important;
+    overflow-y: auto;
+    padding: 1px;
+    margin-bottom: 50px;
+    position: fixed;
+    
+    @include in(mobile) {
+        position: absolute;
+        left: auto !important;
+        top: 0 !important;
+    }
+    
+    width: $dialog_mobile_width !important;
+    height: $dialog_mobile_height !important;
+
+    @include in(desktop) {
+        width: $dialog_width !important;
+        height: $dialog_height !important;
+        height: auto !important;
+        //height: 85vh !important;
+    }
+    
+    td {
+        display: block;
+        padding-bottom: 5px;
+
+        @include in(desktop) {
+            display: table-cell;
+            //padding-bottom: 0px;
+        }
+        
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            @include in(desktop) {
+                //width: auto;
+            }
+        }
+        
+
+        &:first-child {
+            @include in(desktop) {
+                width: 120px;
+                white-space: nowrap;
+            }
+        }       
+        
+        &:last-child {
+            input[type="text"], input[type="password"] {
+                @include in(desktop) {
+                   width: 100%;
+                }
+            }
+            
+            input.half100 {
+                width: 50%;
+                max-width: 100px;
+            }
+        
+        }
+    }
+    
+    @extend %no-outline;
+}
+
+// jQuery DateTimePicker styles
+
+.xdsoft_datetimepicker .xdsoft_calendar {
+    td>div {
+        padding: 6px;
+    }
+
+    th {
+        padding-top: 6px !important;
+    }
+}
+
+.xdsoft_datetimepicker .xdsoft_calendar td:hover, .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box >div >div:hover {
+    background: $col_brand !important;
+}
+
+.xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_default, .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_current, .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box >div >div.xdsoft_current,
+.xdsoft_datetimepicker .xdsoft_label > .xdsoft_select > div > .xdsoft_option.xdsoft_current {
+    background: darken($col_brand,20);
+    box-shadow: darken($col_brand,30) 0px 1px 3px 0px inset;
+}
+
+// jQuery Tag Input
+
+div.tagsinput input {
+    min-width: 80px;
+    border-color: darken($col_whiter, 20);
+}
+    
+div.tagsinput span.tag {
+    color: darken($col_whiter, 50);
+    background: darken($col_whiter, 5);
+    border: 1px solid darken($col_whiter, 10);
+    height: 32px;
+    padding-top: 7px;
+    
+    a {
+        color: $col_brand;
+    }
+}
+
+div.tagsinput span.tag a {
+    @include icon-size(14px);
+}
+
+.not_valid {
+    background: lighten($col_red, 10) !important;
+    color: $col_whiter !important;
+}
+
+
+// Chosen
+.chosen-container-multi input {
+    height: 25px !important;
+}
+
