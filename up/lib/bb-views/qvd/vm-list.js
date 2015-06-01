@@ -1,5 +1,6 @@
 Wat.Views.VMListView = Wat.Views.ListView.extend({  
     qvdObj: 'vm',
+    viewMode: 'grid',
     liveFields: ['state', 'user_state', 'ip', 'host_id', 'host_name', 'ssh_port', 'vnc_port', 'serial_port'],
     
     relatedDoc: {
@@ -14,7 +15,29 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
     },
     
     // This events will be added to view events
-    listEvents: {},
+    listEvents: {
+        'click .js-change-viewmode': 'changeViewMode',
+        'mouseover .js-vm-screenshot': 'overScreenshot',
+        'mouseover .js-vm-screenshot>*': 'overScreenshotContent',
+        'mouseout .js-vm-screenshot': 'outScreenshot',
+        'mouseout .js-vm-screenshot>*': 'outScreenshotContent',
+    },
+    
+    overScreenshot: function (e) {
+        $(e.target).find('.js-connect-btn').css('opacity', '1');
+    },    
+    
+    outScreenshot: function (e) {
+        $(e.target).find('.js-connect-btn').css('opacity', '0.5');
+    },
+    
+    overScreenshotContent: function (e) {
+        $(e.target).parent().find('.js-connect-btn').css('opacity', '1');
+    },    
+    
+    outScreenshotContent: function (e) {
+        $(e.target).parent().find('.js-connect-btn').css('opacity', '0.5');
+    },
     
     startVM: function (filters) {        
         var messages = {

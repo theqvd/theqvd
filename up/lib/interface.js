@@ -85,4 +85,14 @@ Wat.I = {
         // Set to the side box the same height of the content box
         $('.js-side').css('min-height', $('.list-block').height());
     },
+    
+    updateChosenControls: function (selector) {
+        var selector = selector || 'select.chosen-advanced, select.chosen-single';
+        $(selector).trigger('chosen:updated');
+                                
+        if ($(selector).find('option').length == 0) {
+            $(selector + '+.chosen-container span').html($.i18n.t('Empty'));
+        }
+
+    },
 }

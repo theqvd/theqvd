@@ -45,7 +45,7 @@ Wat.T = {
         Wat.T.translateXYears();
 
         // Other chains
-        $('.footer').html(i18n.t('QVD Web Administration Tool, by %s',  $('.footer').attr('data-link')));
+        $('.footer').html(i18n.t('QVD User Panel, by %s',  $('.footer').attr('data-link')));
 
         // Translatable buttons
         $.each($('.js-traductable_button'), function(index, button) {

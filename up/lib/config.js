@@ -30,7 +30,6 @@ Wat.C = {
 
     // Get the base URL for API calls using credentials or session ID
     getBaseUrl: function () {
-        console.info(this);
         if (this.login && this.password) {
             var baseUrl = this.getApiUrl() + "?login=" + this.login + "&password=" + this.password;
             

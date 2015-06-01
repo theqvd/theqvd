@@ -64,8 +64,12 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             }
         }     
         
-        templates["list_" + this.qvdObj] = {
-            name: 'list/' + this.qvdObj
+        templates["list-grid_" + this.qvdObj] = {
+            name: 'list/' + this.qvdObj + '-grid'
+        };  
+        
+        templates["list-list_" + this.qvdObj] = {
+            name: 'list/' + this.qvdObj + '-list'
         };
         
         this.templates = $.extend({}, this.templates, templates);
@@ -687,7 +691,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 }
                 
                 that.renderList(that.listContainer);
-                Wat.I.updateSortIcons(that);
                 Wat.I.updateChosenControls();
             }
         });
@@ -742,7 +745,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         // Fill the list
         var template = _.template(
             Wat.TPL.listCommonBlock, {
-                cid: this.cid
+                cid: this.cid,
+                viewMode: this.viewMode
             }
         );
         
@@ -770,7 +774,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     renderList: function () {
         // Fill the list
         var template = _.template(
-            Wat.TPL['list_' + this.qvdObj], {
+            Wat.TPL['list-' + this.viewMode + '_' + this.qvdObj], {
                 models: this.collection.models,
                 filters: this.collection.filters,
                 columns: this.columns,
@@ -1304,4 +1308,11 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         this.updateModel(arguments, filters, this.fetchList, auxModel);
     },
+    
+    changeViewMode: function (e) {
+        this.viewMode = $(e.target).attr('data-viewmode');
+        $('.js-change-viewmode').removeClass('disabled');
+        $(e.target).addClass('disabled');
+        this.renderList();
+    }
 });

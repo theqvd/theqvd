@@ -4,7 +4,7 @@
         if (models.length == 0) {
         %>  
             <tr>
-                <td colspan="<%= printedColumns %>">
+                <td colspan="3">
                     <span class="no-elements" data-i18n="There are not elements">
                         <%= i18n.t('There are not elements') %>
                     </span>
@@ -54,7 +54,7 @@
                     %>
                 </td>
                 <td class="js-name col-width-100">
-                    <span class="bigtext bold"><%= model.get('name') %></span>
+                    <span class="bigtext bold">GRID <%= model.get('name') %></span>
                     <div class="liltext">
                     <a href="#/vm/<%= model.get('id') %>" data-i18n="[title]Click for details">
                         <span class="text" data-i18n="Details"></span>
@@ -66,7 +66,7 @@
                     </div>
                 </td>
                 <td>
-                    <a class="fa fa-plug button2 js-login-button" data-i18n="Connect"></a>
+                    <a class="fa fa-plug button js-login-button" data-i18n="Connect"></a>
                 </td>
             </tr>
         <%

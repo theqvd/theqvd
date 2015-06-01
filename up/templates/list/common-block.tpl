@@ -2,8 +2,8 @@
 <h1 class="h1">Virtual Machines</h1>
 <div class="list-navigation">
         <div class="fleft col-width-40">
-            <a class="button button-icon fa fa-th-large" name="viewmode-grid" href="javascript:" data-i18n="[title]Grid view"></a>
-            <a class="button button-icon disabled fa fa-th-list" name="viewmode-list" href="javascript:" data-i18n="[title]List view"></a>
+            <a class="button button-icon <%= viewMode == 'grid' ? 'disabled' : '' %> fa fa-th-large js-change-viewmode" name="viewmode-grid" data-viewmode="grid" href="javascript:"></a>
+            <a class="button button-icon <%= viewMode == 'list' ? 'disabled' : '' %> fa fa-th-list js-change-viewmode" name="viewmode-list" data-viewmode="list" href="javascript:"></a>
         </div>
         <div class="pagination">
             <a class="fa fa-step-backward first button2"></a>

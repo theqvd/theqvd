@@ -162,3 +162,68 @@ fieldset {
         padding: 0px 10px;
     }
 }
+
+/* Grid styles */
+
+.grid-cell {
+    float: left;
+    width: 215px;
+    background: $col-whiter;
+    margin: 10px;
+    
+    padding: 10px;
+    border-radius: 4px;
+    
+    a {
+        &.button, &.button2 {
+            width: 100%;
+            text-align: center;
+        }
+    }
+    
+    .vm-screenshot {
+        background: url('../images/screenshot-test.png');
+        background-size: auto 100%;
+        background-position: center; 
+        background-repeat: no-repeat;
+        
+        width: 100%;
+        height: 150px;
+        position: relative;
+        
+        margin-top: 5px;
+        margin-bottom: 5px;
+        
+        .connect-btn, .state-icon, .warning-icon {
+            position: absolute;
+        }
+        
+        .connect-btn {
+            width: 90%;
+            top: 45%;
+            left: 5%;
+            opacity: 0.5;
+        }
+        
+        .state-icon, .warning-icon {
+            top: 3px;
+            background: $col-whiter;
+            border-radius: 100%;
+            padding: 3px;
+            width: 24px;
+            height: 24px;
+        }
+        
+        .state-icon {
+            left: 3px;
+        }
+        
+        .warning-icon {
+            left: 32px;
+        }
+    }
+    
+    .liltext {
+        margin-top: 5px;
+    }
+}
