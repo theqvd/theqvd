@@ -2488,7 +2488,7 @@ table.role-template-matrix {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0; }
     .ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-close {
-      display: none; }
+      display: inline; }
   .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus {
     z-index: 2;
     color: #fdfdfd;

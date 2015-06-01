@@ -72,6 +72,10 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             name: 'list/' + this.qvdObj + '-list'
         };
         
+        templates["details_" + this.qvdObj] = {
+            name: 'details/' + this.qvdObj
+        };
+        
         this.templates = $.extend({}, this.templates, templates);
     },
     

@@ -21,6 +21,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         'mouseover .js-vm-screenshot>*': 'overScreenshotContent',
         'mouseout .js-vm-screenshot': 'outScreenshot',
         'mouseout .js-vm-screenshot>*': 'outScreenshotContent',
+        'click .js-vm-details': 'openDetailsDialog',
     },
     
     overScreenshot: function (e) {
@@ -64,4 +65,56 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         that.resetSelectedItems ();
     },
     
+    openDetailsDialog: function (e) {
+        this.selectedModelId = $(e.target).attr('data-model-id');
+        
+        var dialogConf = {
+            title: 'Details',
+            buttons : {
+                "Force disconnection": function () {
+                    $(this).dialog('close');
+                },
+                "Reboot VM": function () {
+                    $(this).dialog('close');
+                }
+            },
+            button1Class : 'fa fa-sign-out',
+            button2Class : 'fa fa-refresh',
+            fillCallback : this.fillDetailsDialog
+        }
+                
+        Wat.I.dialog(dialogConf, this); 
+    },
+    
+    fillDetailsDialog: function (dialog, that) {
+        var model = that.collection.get(that.selectedModelId);
+        
+        // Fill the html with the template and the collection
+        var template = _.template(
+            Wat.TPL.details_vm, {
+                model: model,
+                userStateIcon: that.getUserStateIcon(model.get('user_state'), that.selectedModelId), 
+                warningIcon: that.getWarningIcon(model.get('expiration_hard'), that.selectedModelId), 
+            });
+        
+        $(dialog).html(template);
+    },
+    
+    getUserStateIcon: function (userState, modelId) {
+        if (userState == 'disconnected') {
+            return '<i class="fa fa-user not-notify state-icon js-state-icon" data-i18n="[title]User not connected" data-wsupdate="user_state" data-id="' + modelId + '"></i>';
+        }
+        else {
+            return '<i class="fa fa-user ok state-icon js-state-icon" data-i18n="[title]Running" data-wsupdate="state" data-id="' + modelId + '"></i>';
+        }
+    },    
+    
+    getWarningIcon: function (expiration, modelId) {
+        if (expiration) {
+            return '<i class="fa fa-warning error warning-icon js-warning-icon" data-i18n="[title]The VM will expire" data-wsupdate="warning_icon" data-id="' + modelId + '"></i>';
+        }
+        else {
+            return '<i class="fa fa-warning not-notify warning-icon js-warning-icon" data-i18n="[title]There are not warnings" data-wsupdate="warning_icon" data-id="' + modelId + '"></i>';
+        }
+    },      
 });

@@ -95,4 +95,66 @@ Wat.I = {
         }
 
     },
+    
+    dialog: function (dialogConf, that) {
+        $('.js-dialog-container').dialog({
+            dialogClass: "loadingScreenWindow",
+            resizable: false,
+            dialogClass: 'no-close',
+            collision: 'fit',
+            modal: true,
+            buttons: dialogConf.buttons,
+            open: function(e) {
+                // Empty dialog content
+                    $(e.target).html('');
+
+                // Close message if open
+                    $('.message-close').trigger('click');
+
+                // Set title content manually to support HTML
+                    $('.ui-dialog-titlebar .ui-dialog-title').html(dialogConf.title);
+                
+                // Buttons style
+                    var buttons = $(e.target).next().find('button');
+                    var buttonsText = $(".ui-dialog-buttonset .ui-button .ui-button-text");
+
+                    buttons.attr('class', '');
+                    buttons.addClass("button");
+
+                    var button1 = buttonsText[0];
+                    var button2 = buttonsText[1];
+
+                    Wat.T.translateElementContain($(button1));
+                    Wat.T.translateElementContain($(button2));
+
+                    // Delete jQuery UI default classes
+                    buttons.attr("class", "");
+                    // Add our button class
+                    buttons.addClass("button");
+
+                    $(button1).addClass(dialogConf.button1Class);
+                    $(button2).addClass(dialogConf.button2Class);
+                
+                // Call to the callback function that will fill the dialog
+                    dialogConf.fillCallback($(this), that);
+                
+                // Translate dialog strings
+                    Wat.T.translateElement($(this).find('[data-i18n]'));
+                
+                // Focus on first text input
+                    $(this).find('input[type="text"]').eq(0).trigger('focus');
+                
+                // Disable scrolling in window to improve dialog experience
+                    $('html, body').css({
+                        'overflow': 'hidden',
+                        'height': '100%'
+                    });
+            },
+            
+            close: function () {
+                // Enable scrolling in window when close
+                    $('html, body').attr('style', '');
+            }
+        });     
+    },
 }
