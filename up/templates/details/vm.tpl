@@ -1,3 +1,4 @@
+<div class="h2">Details of the Virtual Machine</div>
 <table class="details details-list">
     <tbody>
         <tr>
@@ -50,4 +51,3 @@
         %>
     </tbody>
 </table>
-<% console.log(model.get('properties')); %>

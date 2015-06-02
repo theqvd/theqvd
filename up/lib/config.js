@@ -373,56 +373,8 @@ Wat.C = {
     
     // Set different parameters to correct menu and sections visibility. 
     // These settings will be performed depending on ACL checks, mono/multi tenant configurations, or administrators tenants type
-    configureVisibility: function () {        
-        Wat.I.menu = $.extend(true, {}, Wat.I.menuOriginal);
-        Wat.I.userMenu = $.extend(true, {}, Wat.I.menuUserOriginal);
-        Wat.I.helpMenu = $.extend(true, {}, Wat.I.menuHelpOriginal);
-        Wat.I.configMenu = $.extend(true, {}, Wat.I.menuConfigOriginal);
-        Wat.I.setupMenu = $.extend(true, {}, Wat.I.menuSetupOriginal);
-        Wat.I.mobileMenu = $.extend(true, {}, Wat.I.mobileMenuOriginal);
-        Wat.I.cornerMenu = $.extend(true, {}, Wat.I.cornerMenuOriginal);
-
-        var that = this;
-
-        // Menu visibility
-        var aclMenu = {
-            'di.see-main.' : 'dis',
-            'host.see-main.' : 'hosts',
-            'osf.see-main.' : 'osfs',
-            'user.see-main.' : 'users',
-            'vm.see-main.' : 'vms',
-        };
+    configureVisibility: function () {  
         
-        // Menu visibility
-        var aclSetupMenu = {
-            'config.wat.' : 'watconfig',
-            'role.see-main.' : 'roles',
-            'administrator.see-main.' : 'administrators',
-            'tenant.see-main.' : 'tenants',
-            'views.see-main.' : 'views',
-            'log.see-main.' : 'logs',
-        };
-        
-        // For tenant admins (not superadmins) and recover admin in monotenant mode the acl section tenant will not exist
-        var tenantsExist = false;
-        
-        if (Wat.C.isSuperadmin() && Wat.C.isMultitenant()) {
-            tenantsExist = true;
-        }
-        
-        // For monotenant  enviroments, multitenant documentation will not be shown
-        if (!Wat.C.isMultitenant()) {
-            $.each(Wat.I.docSections, function (iSec, sec) {
-                if (sec.guide == 'multitenant') {
-                    delete Wat.I.docSections[iSec];
-                }
-            });
-        }
-        
-        if (!tenantsExist) {
-            delete ACL_SECTIONS['tenant'];
-            delete ACL_SECTIONS_PATTERNS['tenant'];
-        }
     },
     
     // Check if administrator session is expired

@@ -72,6 +72,10 @@ a.button, a.button2, button {
 // Forms
 label {
     @include font-size(1);
+    
+    &.select-label {
+        display: block;
+    }
 }
 
 .chosen-container {

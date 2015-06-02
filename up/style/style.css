@@ -130,6 +130,8 @@ fieldset {
   fieldset legend {
     color: #b2b2b2;
     text-align: right; }
+  fieldset.dialog-form {
+    margin-top: 15px; }
 
 .h1 {
   position: relative;
@@ -314,7 +316,7 @@ fieldset {
 .menu-corner {
   z-index: 1000;
   position: absolute;
-  top: 10px;
+  top: 5px;
   right: 80px;
   display: none; }
   @media screen and (min-width: 40em) {
@@ -327,8 +329,8 @@ fieldset {
     position: relative;
     cursor: default; }
     .menu-corner > ul > li.menu-option-current {
-      border-bottom: 2px dotted #e35e0c;
-      border-top: 2px dotted #e35e0c;
+      border-bottom: 2px dotted #fdfdfd;
+      border-top: 2px dotted #fdfdfd;
       padding-top: 2px;
       padding-bottom: 1px; }
     .menu-corner > ul > li > ul {
@@ -451,7 +453,6 @@ td i.fa-lock, td i.fa-unlock {
 *********************************************************************
 ********************************************************************/
 label {
-  display: block;
   margin-bottom: 8px; }
 
 select {
@@ -1355,8 +1356,9 @@ body {
       position: relative; }
       @media screen and (min-width: 40em) {
         .wrapper .content .details-block {
-          float: right;
-          width: 60%; } }
+          width: 50%;
+          min-width: 960px;
+          margin: 0 auto; } }
       @media screen and (min-width: 40em) {
         .wrapper .content .details-block .details-list {
           width: 100%;
@@ -1777,7 +1779,7 @@ span.text {
   .info-header .fa:before {
     margin-right: 5px; }
 
-.list-wrapper {
+.list-wrapper, .details-list-wrapper {
   margin-bottom: 65px;
   padding-top: 20px; }
 
@@ -2596,6 +2598,9 @@ table.role-template-matrix {
     .ui-dialog td:last-child input.half100 {
       width: 50%;
       max-width: 100px; }
+  .ui-dialog .form-table td {
+    padding-top: 10px;
+    padding-bottom: 10px; }
 
 .xdsoft_datetimepicker .xdsoft_calendar td > div {
   padding: 6px; }
@@ -2728,6 +2733,8 @@ label {
     label {
       font-size: 0.9em;
       line-height: 1.2em; } }
+  label.select-label {
+    display: block; }
 
 .chosen-container {
   font-size: 1.3em;

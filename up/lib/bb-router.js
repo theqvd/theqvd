@@ -4,9 +4,8 @@ Wat.Router = Backbone.Router.extend({
 
         "vms": "listVM",
         "vms/:searchHash": "listVM",
-        "vm/:id": "detailsVM",
         
-        "user/:id": "detailsUser",
+        "profile": "profile",
         
         "*actions": "defaultRoute" // Backbone will try match the route above first
     },
@@ -23,7 +22,7 @@ Wat.Router = Backbone.Router.extend({
         }
 
         Wat.I.showLoading();
-        //Wat.I.setMenuOpt(menuOpt);
+        Wat.I.setMenuOpt(menuOpt);
         
         if (!$.isEmptyObject(Wat.CurrentView)) {
             Wat.CurrentView.undelegateEvents();

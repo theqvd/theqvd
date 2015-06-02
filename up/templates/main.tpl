@@ -5,37 +5,13 @@
             <img src="images/logo.png" class="logo">
         </a>
         <a href="javascript:" class="fa fa-bars mobile-menu js-mobile-menu-hamburger" id="mobile-menu"></a>
-        <% 
-            var cornerMenuPrint = $.extend(true, {}, cornerMenu);
-
-            if (!loggedIn) {
-                delete cornerMenuPrint.wat;
-                delete cornerMenuPrint.user;
-                //delete cornerMenuPrint.help.subMenu.about;
-            } 
-            
-            cornerMenuPrint = {
-                profile: {
-                    link: "#logout",
-                    icon: "fa fa-cog",
-                    text: "Profile",
-                    subMenu: {}
-                },
-                logout: {
-                    link: "#logout",
-                    icon: "fa fa-power-off",
-                    text: "Log-out",
-                    subMenu: {}
-                }
-            };
-        %>
 
         <div class="js-menu-corner menu-corner">
-            <div class="right" style="margin-bottom: 8px; margin-right: 5px;">
+            <div class="right" style="margin-bottom: 13px; margin-right: 5px;">
                 Logged as: <span class="js-login"></span>
             </div>
             <ul class="nav-collapse-corner">
-                <% $.each(cornerMenuPrint, function (iMenu, menuOpt) { %>
+                <% $.each(cornerMenu, function (iMenu, menuOpt) { %>
                     <li class="menu-option js-menu-option-<%= iMenu %>">
                         <a href="<%= menuOpt.link %>">
                             <i class="<%= menuOpt.icon %>"></i>

@@ -115,7 +115,7 @@
     
     z-index: 1000;
     position: absolute;
-    top: 10px;
+    top: 5px;
     right: 80px;
     display: none;
     
@@ -133,8 +133,8 @@
             cursor: default;
         
             &.menu-option-current {
-                border-bottom: 2px dotted $col_brand;
-                border-top: 2px dotted $col_brand;
+                border-bottom: 2px dotted $col_whiter;
+                border-top: 2px dotted $col_whiter;
                 padding-top: 2px;
                 padding-bottom: 1px;
             }

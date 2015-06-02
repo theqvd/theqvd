@@ -37,7 +37,7 @@
                         <span class="text" data-model-id="<%= model.get('id') %>" data-i18n="Details"></span>
                     </a>
                     |
-                    <a href="javascript:" data-model-id="<%= model.get('id') %>" data-i18n="[title]Click to configure the connection parameters">
+                    <a href="javascript:" class="js-vm-settings" data-model-id="<%= model.get('id') %>" data-i18n="[title]Click to configure the connection parameters">
                         <span class="text" data-model-id="<%= model.get('id') %>" data-i18n="Connection settings"></span>
                     </a>
                     </div>

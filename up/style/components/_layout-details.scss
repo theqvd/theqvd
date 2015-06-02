@@ -86,8 +86,9 @@
 
 .details-block {
     @include in(desktop) {
-        float: right;
-        width: ($width_details_content) * 1%;
+        width: 50%;
+        min-width: 960px;
+        margin: 0 auto;
     }        
     
     .details-list {

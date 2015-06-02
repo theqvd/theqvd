@@ -22,6 +22,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         'mouseout .js-vm-screenshot': 'outScreenshot',
         'mouseout .js-vm-screenshot>*': 'outScreenshotContent',
         'click .js-vm-details': 'openDetailsDialog',
+        'click .js-vm-settings': 'openSettingsDialog',
     },
     
     overScreenshot: function (e) {
@@ -84,6 +85,23 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         }
                 
         Wat.I.dialog(dialogConf, this); 
+    },  
+    
+    openSettingsDialog: function (e) {
+        this.selectedModelId = $(e.target).attr('data-model-id');
+        
+        var dialogConf = {
+            title: 'Connection settings',
+            buttons : {
+                "Save": function () {
+                    $(this).dialog('close');
+                },
+            },
+            button1Class : 'fa fa-save',
+            fillCallback : this.fillSettingsDialog
+        }
+                
+        Wat.I.dialog(dialogConf, this); 
     },
     
     fillDetailsDialog: function (dialog, that) {
@@ -98,6 +116,20 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             });
         
         $(dialog).html(template);
+    },   
+    
+    fillSettingsDialog: function (dialog, that) {
+        var model = that.collection.get(that.selectedModelId);
+        
+        // Fill the html with the template and the collection
+        var template = _.template(
+            Wat.TPL.connectionSettings, {
+                model: model
+            });
+        
+        $(dialog).html(template);
+        
+        Wat.I.chosenElement('select[name="type"]', 'single100');
     },
     
     getUserStateIcon: function (userState, modelId) {

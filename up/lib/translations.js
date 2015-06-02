@@ -54,7 +54,7 @@ Wat.T = {
         });
         
         // Configure different chosen controls (advanced jquery select controls)
-        // Wat.I.chosenConfiguration();
+        Wat.I.chosenConfiguration();
         
         
         // Update all the chosen select controls

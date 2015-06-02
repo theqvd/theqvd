@@ -617,51 +617,7 @@ Wat.I = {
             },3000);
         }
     },
-    
-    closeMessage: function () {
-        this.clearMessageTimeout();
-        $('.js-message-container').slideUp(500);
-    },
-    
-    setMessageTimeout: function () {
-        this.clearMessageTimeout();
-        this.messageTimeout = setTimeout(function() { 
-            $('.message-close').trigger('click');
-        },3000);
-    },
-    
-    clearMessageTimeout: function () {
-        if (this.messageTimeout) {
-            clearInterval(this.messageTimeout);
-        }
-    },
-    
-    processMessage: function (msg, response) {
-        if (!response) {
-            return msg;
-        }
-        
-        if (!msg.message) {
-            msg.message = response.message;
-        }
-        
-        switch (msg.messageType) {
-            case 'error':
-                msg.expandedMessage = msg.expandedMessage || '';
-                
-                if (response.message != msg.message && response.message) {
-                    msg.expandedMessage += '<strong data-i18n="' + response.message + '">' + response.message + '</strong> <br/><br/>';
-                }
-            
-                if (response.failures && !$.isEmptyObject(response.failures)) {
-                    msg.expandedMessage += this.getTextFromFailures(response.failures) + '<br/>';
-                }
-                break;
-        }
-        
-        return msg;
-    },
-    
+
     getTextFromFailures: function (failures) {
         // Group failures by text
         var failuresByText = {};

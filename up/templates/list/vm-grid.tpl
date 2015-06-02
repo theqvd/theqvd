@@ -39,7 +39,7 @@
                             </a>
                             </div>
                             <div class="liltext">
-                            <a href="javascript:" data-model-id="<%= model.get('id') %>" data-i18n="[title]Click to configure the connection parameters">
+                            <a href="javascript:" data-model-id="<%= model.get('id') %>" class="js-vm-settings" data-i18n="[title]Click to configure the connection parameters">
                                 <i class="fa fa-wrench" data-model-id="<%= model.get('id') %>"></i>
                                 <span class="text" data-model-id="<%= model.get('id') %>" data-i18n="Connection settings"></span>
                             </a>

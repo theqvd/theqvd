@@ -56,36 +56,10 @@
 
 
                 // ------- Details sections ------- //
-                Wat.Router.app_router.on('route:detailsUser', function (id) {
-                    Wat.Router.app_router.performRoute('users', Wat.Views.UserDetailsView, {"id": id});
-                });
-
-                Wat.Router.app_router.on('route:detailsVM', function (id) {
-                    Wat.Router.app_router.performRoute('vms', Wat.Views.VMDetailsView, {"id": id});
+                Wat.Router.app_router.on('route:profile', function (id) {
+                    Wat.Router.app_router.performRoute('profile', Wat.Views.UserDetailsView, {"id": 167});
                 });
                 
-
-                // ------- Help sections ------- //
-                Wat.Router.app_router.on('route:about', function (actions) {
-                    Wat.Router.app_router.performRoute('about', Wat.Views.AboutView);
-                });
-                Wat.Router.app_router.on('route:documentation', function (actions) {
-                    Wat.Router.app_router.performRoute('documentation', Wat.Views.DocView);
-                });
-                Wat.Router.app_router.on('route:documentationGuide', function (guide, section) {
-                    Wat.Router.app_router.performRoute('documentation', Wat.Views.DocView, {
-                        "guide": guide,
-                        "section": section
-                    });
-                });
-                Wat.Router.app_router.on('route:documentationSearch', function (searchKey) {
-                    Wat.Router.app_router.performRoute('documentation', Wat.Views.DocView, {
-                        "searchKey": searchKey
-                    });
-                });
-
-
-
                  // ------- Current administrator ------- //
                 Wat.Router.app_router.on('route:logout', function (actions) {
                     Wat.C.logOut();
@@ -94,10 +68,7 @@
                     Wat.I.renderMain();
 
                     Wat.Router.app_router.performRoute();
-                });          
-                Wat.Router.app_router.on('route:profile', function (actions) {
-                    Wat.Router.app_router.performRoute('profile', Wat.Views.ProfileView);
-                });             
+                });   
                 Wat.Router.app_router.on('route:myviews', function (actions) {
                     Wat.Router.app_router.performRoute('myviews', Wat.Views.MyViewsView);
                 });       

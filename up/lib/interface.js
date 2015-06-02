@@ -1,5 +1,33 @@
 // Pure interface utilities
 Wat.I = {
+    cornerMenu : {
+        vms: {
+            link: "#/vms",
+            icon: "fa fa-cloud",
+            text: "Virtual machines",
+            objVisible: "vm",
+            subMenu: {}
+        },
+        profile: {
+            link: "#/profile",
+            icon: "fa fa-cog",
+            text: "Profile",
+            objVisible: "vm",
+            subMenu: {}
+        },
+        logout: {
+            link: "#logout",
+            icon: "fa fa-power-off",
+            text: "Log-out",
+            objVisible: "all",
+            subMenu: {}
+        }
+    },
+    
+    getCornerMenu: function () {
+        return this.cornerMenu;
+    },
+    
     renderMain: function () { 
         var that = this;
         
@@ -7,7 +35,7 @@ Wat.I = {
         var template = _.template(
             Wat.TPL.main, {
                 loggedIn: Wat.C.loggedIn,
-                cornerMenu: this.cornerMenu
+                cornerMenu: this.getCornerMenu()
             });
         
         $('.bb-super-wrapper').html(template);
@@ -156,5 +184,54 @@ Wat.I = {
                     $('html, body').attr('style', '');
             }
         });     
+    },
+    
+    chosenConfiguration: function () {
+        // Convert the filter selects to library chosen style
+            var chosenOptions = {};
+            chosenOptions.no_results_text = i18n.t('No results match');
+            chosenOptions.placeholder_text_single = i18n.t('Loading');
+            chosenOptions.placeholder_text_multiple = i18n.t('Select some options');
+            chosenOptions.search_contains = true;
+
+            var chosenOptionsSingle = jQuery.extend({}, chosenOptions);
+            chosenOptionsSingle.disable_search = true;
+            chosenOptionsSingle.width = "150px";
+
+            var chosenOptionsSingle100 = jQuery.extend({}, chosenOptionsSingle);
+            chosenOptionsSingle100.width = "100%"; 
+
+            var chosenOptionsAdvanced = jQuery.extend({}, chosenOptions);
+        
+            var chosenOptionsAdvanced100 = jQuery.extend({}, chosenOptions);
+            chosenOptionsAdvanced100.width = "100%";
+        
+            // Store options to be retrieved in dinamic loads
+            this.chosenOptions = {
+                'single': chosenOptionsSingle,
+                'single100': chosenOptionsSingle100,
+                'advanced': chosenOptionsAdvanced,
+                'advanced100': chosenOptionsAdvanced100
+            };
+
+            $('.filter-control select.chosen-advanced').chosen(chosenOptionsAdvanced100);
+            $('.filter-control select.chosen-single').chosen(chosenOptionsSingle100);
+            $('select.chosen-single').chosen(chosenOptionsSingle100);
+    },
+    
+    chosenElement: function (selector, type) {
+        $(selector).chosen(this.chosenOptions[type]);
+    },
+    
+    // Set specific menu section as selected
+    setMenuOpt: function (opt) {
+        $('.js-menu-corner .menu-option').removeClass('menu-option-current');
+        $('.js-menu-corner .js-menu-option-' + opt).addClass('menu-option-current');
+        
+        if (opt == 'home' || !opt) {
+            var menu = 'platform';
+        }
+        $('.menu').hide();
+        $('.js-' + menu + '-menu').show();
     },
 }

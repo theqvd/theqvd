@@ -61,6 +61,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             },
             sortingRow: {
                 name: 'list/sorting-row'
+            },
+            connectionSettings: {
+                name: 'editor/connection-settings'
             }
         }     
         
