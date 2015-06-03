@@ -23,6 +23,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         'mouseout .js-vm-screenshot>*': 'outScreenshotContent',
         'click .js-vm-details': 'openDetailsDialog',
         'click .js-vm-settings': 'openSettingsDialog',
+        'click .js-vm-warnings': 'openVMWarningsDialog',
     },
     
     overScreenshot: function (e) {
@@ -66,7 +67,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         that.resetSelectedItems ();
     },
     
-    openDetailsDialog: function (e) {
+    openDetailsDialog: function (e) {  
         this.selectedModelId = $(e.target).attr('data-model-id');
         
         var dialogConf = {
@@ -87,7 +88,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         Wat.I.dialog(dialogConf, this); 
     },  
     
-    openSettingsDialog: function (e) {
+    openSettingsDialog: function (e) {    
         this.selectedModelId = $(e.target).attr('data-model-id');
         
         var dialogConf = {
@@ -99,6 +100,17 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             },
             button1Class : 'fa fa-save',
             fillCallback : this.fillSettingsDialog
+        }
+                
+        Wat.I.dialog(dialogConf, this); 
+    },    
+    
+    openVMWarningsDialog: function (e) {
+        this.selectedModelId = $(e.target).attr('data-model-id');
+        
+        var dialogConf = {
+            title: 'Warnings',
+            fillCallback : this.fillVMWarningsDialog
         }
                 
         Wat.I.dialog(dialogConf, this); 
@@ -130,23 +142,46 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         $(dialog).html(template);
         
         Wat.I.chosenElement('select[name="type"]', 'single100');
+    },    
+    
+    fillVMWarningsDialog: function (dialog, that) {
+        var model = that.collection.get(that.selectedModelId);
+        
+        // Fill the html with the template and the collection
+        var template = _.template(
+            Wat.TPL.VMwarnings, {
+                model: model
+            });
+        
+        $(dialog).html(template);        
     },
     
     getUserStateIcon: function (userState, modelId) {
-        if (userState == 'disconnected') {
-            return '<i class="fa fa-user not-notify state-icon js-state-icon" data-i18n="[title]User not connected" data-wsupdate="user_state" data-id="' + modelId + '"></i>';
+        switch (userState) {
+            case 'disconnected':
+                var icon = '<i class="fa fa-user not-notify state-icon js-state-icon" data-i18n="[title]User not connected" data-wsupdate="user_state" data-id="' + modelId + '"></i>';
+                break;
+            case 'connected':
+                var icon = '<i class="fa fa-user ok state-icon js-state-icon" data-i18n="[title]Running" data-wsupdate="state" data-id="' + modelId + '"></i>';
+                break;
+            case 'hanged':
+                var icon = '<i class="fa fa-user error state-icon js-state-icon" data-i18n="[title]Hanged" data-wsupdate="state" data-id="' + modelId + '"></i>';
+                break;
         }
-        else {
-            return '<i class="fa fa-user ok state-icon js-state-icon" data-i18n="[title]Running" data-wsupdate="state" data-id="' + modelId + '"></i>';
-        }
+        
+        return icon;
     },    
     
     getWarningIcon: function (expiration, modelId) {
         if (expiration) {
-            return '<i class="fa fa-warning error warning-icon js-warning-icon" data-i18n="[title]The VM will expire" data-wsupdate="warning_icon" data-id="' + modelId + '"></i>';
+            var icon = '<a href="javascript:" class="js-vm-warnings" data-model-id="' + modelId + '">';
+            icon += '<i class="fa fa-warning error warning-icon js-warning-icon" data-i18n="[title]The VM will expire" data-wsupdate="warning_icon" data-model-id="' + modelId + '"></i>';
+            icon += '</a>';
         }
         else {
-            return '<i class="fa fa-warning not-notify warning-icon js-warning-icon" data-i18n="[title]There are not warnings" data-wsupdate="warning_icon" data-id="' + modelId + '"></i>';
+            var icon = '<i class="fa fa-warning not-notify warning-icon js-warning-icon" data-i18n="[title]There are not warnings" data-wsupdate="warning_icon" data-model-id="' + modelId + '"></i>';
         }
+        
+        return icon;
     },      
 });

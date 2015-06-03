@@ -48,6 +48,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             },
             connectionSettings: {
                 name: 'editor/connection-settings'
+            },
+            VMwarnings: {
+                name: 'editor/vm-warnings'
             }
         }     
         
@@ -175,6 +178,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         Wat.T.translateAndShow();
     },
     
+    // Update the label of shown elements at the bottom of the list table
     shownElementsLabelUpdate: function () {
         var context = $('.' + this.cid);
 
@@ -184,6 +188,18 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         context.find(' .shown-elements .elements-shown').html(elementsShown);
         context.find(' .shown-elements .elements-total').html(elementsTotal);
     },
+       
+    // Change view mode when click on the view mode button and render list
+    changeViewMode: function (e) {
+        this.viewMode = $(e.target).attr('data-viewmode');
+        $('.js-change-viewmode').removeClass('disabled');
+        $(e.target).addClass('disabled');
+        this.renderList();
+    },
+    
+    //////////////////////////
+    // Pagination functions //
+    //////////////////////////
     
     paginationUpdate: function () {  
         this.elementsShown = this.collection.length;
@@ -273,12 +289,4 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         this.fetchList();        
     },
-    
-    // Change view mode when click on the view mode button and render list
-    changeViewMode: function (e) {
-        this.viewMode = $(e.target).attr('data-viewmode');
-        $('.js-change-viewmode').removeClass('disabled');
-        $(e.target).addClass('disabled');
-        this.renderList();
-    }
 });

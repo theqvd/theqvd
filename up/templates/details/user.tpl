@@ -1,4 +1,4 @@
-<div class="details-list-wrapper details-block">
+<div class="details-list-wrapper details-block <%= cid %>">
     <div class="h1" data-i18n="Profile"></div>
     <table class="details details-list">
         <tbody>
@@ -44,7 +44,7 @@
             %>
             <tr>
                 <td colspan="2">
-                        <a class="js-traductable_button actions_button button fa fa-pencil fright" name="selected_actions_button" data-i18n="Change password"></a>
+                    <a class="js-traductable_button actions_button button fa fa-pencil fright js-change-password" name="selected_actions_button" data-i18n="Change password"></a>
                 </td>
             </tr>
         </tbody>
