@@ -33,6 +33,7 @@
     .ui-dialog-buttonset {
         padding: 10px;
         text-align: right;
+        width: 100%;
         
         .button {
             width: 100%;
@@ -50,7 +51,12 @@
         overflow-y: auto;
         padding-left: 30px;
         padding-right: 30px;
-        min-height: 60vh !important;
+            
+        min-height: 75vh !important;
+
+        @include in(desktop) {
+            min-height: 60vh !important;
+        }
     }
 }
 
