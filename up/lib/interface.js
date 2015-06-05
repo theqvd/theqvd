@@ -40,11 +40,24 @@ Wat.I = {
         
         $('.bb-super-wrapper').html(template);
         
-        if (!Wat.C.loggedIn) {
+        if (Wat.C.loggedIn) {
+            this.renderMenu();
+        }
+        else {
             $('.menu-corner').hide();
         }
         
         this.updateLoginOnMenu();
+    },
+    
+    renderMenu: function () {
+        // Fill the html with the template and the collection
+        var template = _.template(
+            Wat.TPL.menu, {
+                mobileMenu: this.getCornerMenu()
+            });
+
+        $('.bb-menu').html(template);
     },
     
     updateLoginOnMenu: function () {

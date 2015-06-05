@@ -16,6 +16,7 @@ Wat.Views.MainView = Backbone.View.extend({
         
         // Add common functions
         Wat.C.addCommonFunctions (this);
+        Wat.B.bindCommonEvents();
         
         // Add to the view events the parent class of this view to avoid collisions with other views events
         this.events = this.restrictEventsScope(this.events);
@@ -45,6 +46,11 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     events:  {
+        'click .js-mobile-menu-hamburger': 'clickMenuMobile'
+    },
+    
+    clickMenuMobile: function () {
+        console.log(2);
     },
     
     extendEvents: function (ev) {
