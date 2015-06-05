@@ -25,23 +25,33 @@
                         }
                         %>
                         <span class="js-name col-width-100">
-                            <span class="bigtext bold"><%= model.get('name') %></span>
+                            <div class="bigtext bold vm-name"><%= model.get('name') %></div>
                             <div class="vm-screenshot js-vm-screenshot"> 
+                                <div class="vm-warn-buttons js-vm-warn-buttons"></div>
                                 <%= Wat.CurrentView.getUserStateIcon(model.get('user_state'), model.get('id')) %>
                                 <%= Wat.CurrentView.getWarningIcon(model.get('expiration_hard'), model.get('id')) %>
-
-                                <a class="fa fa-plug button js-login-button connect-btn js-connect-btn" data-i18n="Connect"></a>
                             </div>
-                            <div class="liltext">
-                            <a href="javascript:" data-model-id="<%= model.get('id') %>" class="js-vm-details" data-i18n="[title]Click for details">
+                                
+                            <a class="fa fa-plug button js-login-button connect-btn js-connect-btn" data-i18n="Connect"></a>
+                            
+                            <div class="liltext vm-link">
+                            <a href="javascript:" data-model-id="<%= model.get('id') %>" class="js-vm-details desktop" data-i18n="[title]Click for details">
+                                <i class="fa fa-search"></i>
+                                <span class="text" data-model-id="<%= model.get('id') %>" data-i18n="Details"></span>
+                            </a>
+                            <a href="javascript:" data-model-id="<%= model.get('id') %>" class="js-vm-details vm-link-button mobile button2" data-i18n="[title]Click for details">
                                 <i class="fa fa-search"></i>
                                 <span class="text" data-model-id="<%= model.get('id') %>" data-i18n="Details"></span>
                             </a>
                             </div>
-                            <div class="liltext">
-                            <a href="javascript:" data-model-id="<%= model.get('id') %>" class="js-vm-settings" data-i18n="[title]Click to configure the connection parameters">
+                            <div class="liltext vm-link">
+                            <a href="javascript:" data-model-id="<%= model.get('id') %>" class="js-vm-settings desktop" data-i18n="[title]Click to configure the connection parameters">
                                 <i class="fa fa-wrench" data-model-id="<%= model.get('id') %>"></i>
                                 <span class="text" data-model-id="<%= model.get('id') %>" data-i18n="Connection settings"></span>
+                            </a>
+                            <a href="javascript:" data-model-id="<%= model.get('id') %>" class="js-vm-settings vm-link-button mobile button2" data-i18n="[title]Click to configure the connection parameters">
+                                <i class="fa fa-wrench" data-model-id="<%= model.get('id') %>"></i>
+                                <span class="text" data-model-id="<%= model.get('id') %>" data-i18n="Settings"></span>
                             </a>
                             </div>
                         </span>

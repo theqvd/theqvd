@@ -170,7 +170,7 @@ Wat.I = {
                     Wat.T.translateElement($(this).find('[data-i18n]'));
                 
                 // Focus on first text input
-                    $(this).find('input[type="text"]').eq(0).trigger('focus');
+                    $(this).find('input').eq(0).trigger('focus');
                 
                 // Disable scrolling in window to improve dialog experience
                     $('html, body').css({

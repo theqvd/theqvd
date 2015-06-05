@@ -153,7 +153,9 @@ fieldset {
     } 
 
     .action-selected-button a {
-        float: right;
+        @include in(desktop) {
+            float: right;
+        }
     }       
 
     legend {
@@ -167,17 +169,50 @@ fieldset {
 
 .grid-cell {
     float: left;
-    width: 215px;
+    
+    width: 100%;
+    
+    @include in(desktop) {
+        width: 215px;
+    }
+        
     background: $col-whiter;
     margin: 10px;
     
     padding: 10px;
     border-radius: 4px;
+    border: #ddd solid 4px;
     
     a {
         &.button, &.button2 {
             width: 100%;
             text-align: center;
+            
+            &.connect-btn {
+                width: 60%;
+                float: right;
+                @include in(desktop) {
+                    width: 100%;
+                    float: none;
+                }
+            }
+        }
+    }
+    
+    .vm-link {
+        float: left;
+        margin-left: 10px;
+        @include in(desktop) {
+            float: none;
+            margin: inherit;
+        }
+    }
+    
+    .vm-name {
+        width: 100%;
+        
+        @include in(desktop) {
+            width: 100%;
         }
     }
     
@@ -187,43 +222,93 @@ fieldset {
         background-position: center; 
         background-repeat: no-repeat;
         
-        width: 100%;
-        height: 150px;
+        width: 35%;
+        height: 75px;
+        float: left;
+        
+        @include in(desktop) {
+            width: 100%;
+            height: 150px;
+            float: none;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+        
         position: relative;
         
-        margin-top: 5px;
-        margin-bottom: 5px;
         
-        .connect-btn, .state-icon, .warning-icon {
+        .state-icon, .warning-icon, .vm-warn-buttons {
             position: absolute;
         }
         
-        .connect-btn {
-            width: 90%;
-            top: 45%;
-            left: 5%;
-            opacity: 0.5;
+        .vm-warn-buttons {
+            background: $col-blacker;
+            opacity: 0.8;
+            position: absolute;
+            left: 0;
+            
+            width: 100%;
+            height: 38px;
+            bottom: -40px;
+            border-radius: 6px;
+            
+            @include in(desktop) {
+                width: 60px;
+                top: 0;
+                border-radius: 0px;
+                border-bottom-right-radius: 10px;
+                height: 30px;
+                bottom: -35px;
+                border-radius: 10px;
+            }
         }
         
         .state-icon, .warning-icon {
-            top: 3px;
+            bottom: -36px;
+            width: 30px;
+            height: 30px;
+            padding: 6px;
+            
+            @include in(desktop) {
+                top: 3px;
+                width: 24px;
+                height: 24px;
+                padding: 3px;
+            }
+            
             background: $col-whiter;
             border-radius: 100%;
-            padding: 3px;
-            width: 24px;
-            height: 24px;
         }
         
         .state-icon {
-            left: 3px;
+            left: 14px;
+            @include in(desktop) {
+                left: 3px;
+            }
         }
         
         .warning-icon {
-            left: 32px;
+            right: 10px;
+            @include in(desktop) {
+                left: 32px;
+            }
         }
     }
     
     .liltext {
         margin-top: 5px;
+    }
+    
+    .vm-link {
+        @include in(mobile) {
+            width: 60%;
+            float: right;
+            position: relative;
+            height: 37px;
+        }
+    }
+    
+    .vm-link-button {
+        position: absolute;
     }
 }

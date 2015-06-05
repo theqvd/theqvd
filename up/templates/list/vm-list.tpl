@@ -31,7 +31,7 @@
                     <%= Wat.CurrentView.getWarningIcon(model.get('expiration_hard'), model.get('id')) %>
                 </td>
                 <td class="js-name col-width-100">
-                    <span class="bigtext bold">GRID <%= model.get('name') %></span>
+                    <span class="bigtext bold vm-name">GRID <%= model.get('name') %></span>
                     <div class="liltext">
                     <a href="javascript:" class="js-vm-details" data-model-id="<%= model.get('id') %>" data-i18n="[title]Click for details">
                         <span class="text" data-model-id="<%= model.get('id') %>" data-i18n="Details"></span>

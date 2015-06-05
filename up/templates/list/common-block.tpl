@@ -1,7 +1,7 @@
 <div class="<%= cid %> list-wrapper">
 <h1 class="h1">Virtual Machines</h1>
 <div class="list-navigation">
-        <div class="fleft col-width-40">
+        <div class="fleft col-width-40 desktop">
             <a class="button button-icon <%= viewMode == 'grid' ? 'disabled' : '' %> fa fa-th-large js-change-viewmode" name="viewmode-grid" data-viewmode="grid" href="javascript:"></a>
             <a class="button button-icon <%= viewMode == 'list' ? 'disabled' : '' %> fa fa-th-list js-change-viewmode" name="viewmode-list" data-viewmode="list" href="javascript:"></a>
         </div>

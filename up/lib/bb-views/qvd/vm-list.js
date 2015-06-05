@@ -17,29 +17,9 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
     // This events will be added to view events
     listEvents: {
         'click .js-change-viewmode': 'changeViewMode',
-        'mouseover .js-vm-screenshot': 'overScreenshot',
-        'mouseover .js-vm-screenshot>*': 'overScreenshotContent',
-        'mouseout .js-vm-screenshot': 'outScreenshot',
-        'mouseout .js-vm-screenshot>*': 'outScreenshotContent',
         'click .js-vm-details': 'openDetailsDialog',
         'click .js-vm-settings': 'openSettingsDialog',
         'click .js-vm-warnings': 'openVMWarningsDialog',
-    },
-    
-    overScreenshot: function (e) {
-        $(e.target).find('.js-connect-btn').css('opacity', '1');
-    },    
-    
-    outScreenshot: function (e) {
-        $(e.target).find('.js-connect-btn').css('opacity', '0.5');
-    },
-    
-    overScreenshotContent: function (e) {
-        $(e.target).parent().find('.js-connect-btn').css('opacity', '1');
-    },    
-    
-    outScreenshotContent: function (e) {
-        $(e.target).parent().find('.js-connect-btn').css('opacity', '0.5');
     },
     
     startVM: function (filters) {        

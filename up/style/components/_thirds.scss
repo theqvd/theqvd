@@ -35,7 +35,11 @@
         text-align: right;
         
         .button {
-            margin-left: 30px;
+            width: 100%;
+            @include in(desktop) {
+                width: auto;
+                margin-left: 30px;
+            }
             .ui-button-text:before {
                 margin-right: 10px;
             }
