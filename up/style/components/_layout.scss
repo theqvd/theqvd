@@ -216,7 +216,11 @@ body {
     @extend %invisible;
 
     @extend %center-wrapper;
-            
+        
+    @include in(desktop) {
+        @extend %center-wrapper-mobile;
+    }
+    
     @include width-wrapper;
 
     background-color: $col_whiter;
