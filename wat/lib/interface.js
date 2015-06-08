@@ -507,7 +507,8 @@ Wat.I = {
                 $(ui.tooltip).parent().mouseleave(function() {
                     $(ui.tooltip).hide();
                 });
-            }
+            },
+            hide: false
         }
                              );
     },
