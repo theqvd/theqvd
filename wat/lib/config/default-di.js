@@ -215,7 +215,7 @@ Wat.I.formFilters[qvdObj] = {
         'name': 'name',
         'filterField': 'disk_image',
         'type': 'text',
-        'text': 'Search by disk image',
+        'text': 'Disk image',
         'displayMobile': true,
         'displayDesktop': true,
         'acls': 'di.filter.disk-image'

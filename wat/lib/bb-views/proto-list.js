@@ -151,7 +151,10 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     // Render list sorted by a column
-    sort: function (e) {         
+    sort: function (e) { 
+        // Show loading animation while loading
+        this.loadingList();
+        
         // Find the TH cell, because sometimes you can click on the icon
         if ($(e.target).get(0).tagName == 'TH') {
             var sortCell = $(e.target).get(0);    
@@ -215,13 +218,24 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         theader.find('th').removeClass('sortable');
     },
     
+    // Hide elements related with a list. Used while list data is loading
+    loadingList: function () {
+        $('div.js-shown-elements, div.js-selected-elements, fieldset.js-action-selected').hide();
+    },
+    
+    // Show elements related with a list. Used after load list data
+    loadedList: function () {
+        $('div.js-shown-elements, div.js-selected-elements, fieldset.js-action-selected').show();
+    },
+    
     // Get filter parameters of the form, set in collection, fetch list and render it
     filter: function (e) {
         var that = this;
         
         // Show loading animation while loading
+        that.loadingList();
         $('.list').html(HTML_MID_LOADING);
-        
+
         if (e && $(e.target).hasClass('mobile-filter')) {
             var filtersContainer = '.' + this.cid + ' .filter-mobile';
         }
@@ -781,9 +795,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
 
         that.renderList();
-        
-        this.renderRelatedDocs(this.qvdObj);
-        
+                
         // Translate the strings rendered. 
         // This translation is only done here, in the first charge. 
         // When the list were rendered in actions such as sorting, filtering or pagination, 
@@ -824,6 +836,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.updateFilterNotes();
         
         Wat.I.addSortIcons(this.cid);
+        
+        // Show hidded controls again after list loading
+        this.loadedList();
         
         Wat.I.adaptSideSize();
         

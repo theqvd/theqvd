@@ -181,8 +181,6 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
                 $('.bb-properties').html(this.template);
             }
         }
-
-        this.renderRelatedDocs();
         
         Wat.T.translateAndShow();
         

@@ -61,7 +61,6 @@ Wat.Router = Backbone.Router.extend({
     performRoute: function (menuOpt, view, params) {
         // Hide filter notes when route anywhere            
         $('.js-filter-notes').hide();
-        $('.bb-related-docs').html('');
         
         params = params || {};
         if (!Wat.C.isLogged()) {

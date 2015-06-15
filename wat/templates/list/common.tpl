@@ -17,6 +17,8 @@
 %>
 <div class="wrapper-content <%= cid %>">
     <div class="filter js-side <%= filtersClass %>">
+        <div class="h2"><i class="fa fa-filter"></i><span data-i18n="Search by"></span></div>
+        
         <!-- ADVANCED FILTERS
         <span class="filter-control">
             <label for="filter_mode" data-i18n="Filter mode"></label>

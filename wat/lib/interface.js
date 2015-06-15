@@ -520,9 +520,15 @@ Wat.I = {
     },
     
     dialog: function (dialogConf, that) {
-        $('.js-dialog-container').dialog({
+        var div = document.createElement("DIV");
+        $(div).addClass('dialog-container');
+        $(div).addClass('js-dialog-container');
+        document.body.appendChild(div);
+        
+        $(div).dialog({
             dialogClass: "loadingScreenWindow",
             resizable: false,
+            resize: true,
             dialogClass: 'no-close',
             collision: 'fit',
             modal: true,

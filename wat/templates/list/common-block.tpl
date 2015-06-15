@@ -68,7 +68,7 @@
     <div class="list bb-list">
 
     </div>
-    <div class="shown-elements second_row">
+    <div class="shown-elements js-shown-elements second_row">
         <span data=i18n="Shown"><%= $.i18n.t('Shown') %></span>:
         <span class="elements-shown"></span>
         /
@@ -80,12 +80,12 @@
     if (Object.keys(selectedActions).length > 0)
     {
     %>
-        <div class="selected-elements second_row">
+        <div class="selected-elements js-selected-elements second_row">
             <span data=i18n="Selected"><%= $.i18n.t('Selected') %></span>:
             <span class="elements-selected">0</span>
         </div>
         
-        <fieldset class="action-selected">
+        <fieldset class="action-selected js-action-selected">
             <legend data-i18n="Actions over selected items"></legend>
             <div class="action-selected-select">
                 <select name="selected_actions_select" class="chosen-single">

@@ -58,7 +58,7 @@ Wat.I.formFilters[qvdObj] = {
     'name': {
         'filterField': 'name',
         'type': 'text',
-        'text': 'Search by name',
+        'text': 'Name',
         'displayMobile': true,
         'displayDesktop': true
     },

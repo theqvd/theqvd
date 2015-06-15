@@ -99,7 +99,7 @@ Wat.Views.MainView = Backbone.View.extend({
             this.printBreadcrumbs (bc.next, bcHTML);
         }
         else {
-            bcHTML += '<a href="javascript:" class="fa fa-book js-screen-help screen-help" data-i18n="[title]This section step by step" data-docsection="' + this.qvdObj + '"></a>'
+            bcHTML += '<a href="javascript:" class="fa fa-book js-screen-help screen-help" data-i18n="[title]Related documentation" data-docsection="' + this.qvdObj + '"></a>'
             $('#breadcrumbs').html(bcHTML);
         }
     },
@@ -430,6 +430,52 @@ Wat.Views.MainView = Backbone.View.extend({
 
             $('.bb-related-docs').html(that.template);
         }
+    },
+    
+    openRelatedDocsDialog: function () {
+        var that = this;
+        
+        var dialogConf = {};
+
+        dialogConf.title = $.i18n.t("Related documentation");
+
+        dialogConf.buttons = {
+            "Read full documentation": function (e) {
+                $(this).dialog('close');
+                window.location = '#documentation';
+            },
+            Close: function (e) {
+                $(this).dialog('close');
+            }
+        };
+
+        dialogConf.button1Class = 'fa fa-book';
+        dialogConf.button2Class = 'fa fa-check';
+
+        dialogConf.fillCallback = function (target, that) {
+            // Back scroll of the div to top position
+            target.html('');
+            $('.js-dialog-container').animate({scrollTop:0});
+
+            var sectionDoc = [];
+            sectionDoc[this.qvdObj] = "This section step by step";
+            this.relatedDoc = $.extend({}, sectionDoc, that.relatedDoc);
+            
+            if (this.relatedDoc) {
+                var that = this;
+
+                that.template = _.template(
+                        Wat.TPL.relatedDoc, {
+                            relatedDoc: that.relatedDoc,
+                        }
+                    );
+
+                target.html(that.template);
+            }
+        };
+
+
+        Wat.I.dialog(dialogConf, this);          
     },
     
     // Fetch details or list depending on the current view kind

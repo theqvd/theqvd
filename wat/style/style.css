@@ -880,6 +880,7 @@ body {
   min-width: 0px;
   max-width: 40em;
   background-color: #fdfdfd;
+  margin-bottom: 50px;
   position: relative; }
   @media screen and (min-width: 40em) {
     .wrapper {
@@ -1171,13 +1172,18 @@ body {
       margin-bottom: 15px;
       width: 13%;
       height: auto;
-      float: right;
-      padding-left: 2%;
-      margin-left: 2%;
-      border-left: 1px dotted #d7d7d7; }
+      background: #f5f5f5;
+      border: 2px solid #ebebeb;
+      padding: 9px;
+      border-radius: 6px;
+      float: left;
+      padding-right: 1%;
+      margin-right: 1%; }
       @media screen and (min-width: 40em) {
         .wrapper .content .filter {
           display: block; } }
+      .wrapper .content .filter i.fa {
+        margin-right: 8px; }
       .wrapper .content .filter .filter-control {
         margin-bottom: 10px;
         display: block; }
@@ -1705,14 +1711,12 @@ span.text {
 
 .related-doc {
   display: inline-table;
+  margin-top: 20px;
   margin-bottom: 80px;
-  padding-left: 20px; }
-  .related-doc .related-doc-title {
-    font-weight: bold;
-    margin-bottom: 10px;
-    margin-top: 10px; }
+  padding-left: 20px;
+  width: 100%; }
   .related-doc a.button2 {
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     display: block; }
 
 .search-matchs {
@@ -2467,7 +2471,8 @@ table.role-template-matrix {
     overflow-y: auto;
     padding-left: 30px;
     padding-right: 30px;
-    min-height: 60vh !important; }
+    max-height: 70vh !important;
+    height: auto; }
 
 .ui-widget-overlay {
   position: fixed;
@@ -2482,8 +2487,7 @@ table.role-template-matrix {
 
 .dialog-container, .dialog-container-template {
   display: none;
-  padding: 0;
-  height: 50vh !important; }
+  padding: 0; }
 
 .dialog-container-template {
   width: 100%;

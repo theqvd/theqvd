@@ -88,9 +88,7 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         this.renderVmsExpire ();
                 
         this.loadData(this.stats);
-        
-        this.renderRelatedDocs();
-        
+                
         Wat.T.translateAndShow();
         
         // Open websockets for live fields

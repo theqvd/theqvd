@@ -301,7 +301,14 @@ Wat.B = {
                 });
             }
             
-            Wat.I.loadDialogDoc(guideSection);
+            // If doc dialog is opened from breadcrumbs link and there are not relate docs, open directly doc about current section step by step
+            if ($(e.target).hasClass('screen-help') && Wat.CurrentView.relatedDoc != undefined) {
+                Wat.CurrentView.openRelatedDocsDialog();
+            }
+            // Otherwise, open related doc options
+            else {
+                Wat.I.loadDialogDoc(guideSection);
+            }
             
             $('html,body').animate({
                 scrollTop: 0

@@ -298,7 +298,6 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         $(this.setupFormContainer).html(this.template);
                 
         this.printBreadcrumbs(this.breadcrumbs, '');
-        this.renderRelatedDocs();
         
         $('.js-custom-views-container').show();
         
