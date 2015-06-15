@@ -389,6 +389,9 @@ fieldset {
     .mobile-menu {
       display: none; } }
 
+.mobile-menu--mini {
+  font-size: 30px; }
+
 .submenu ul {
   margin-bottom: 20px;
   float: right; }
@@ -780,6 +783,10 @@ body {
       display: none; }
     .header-wrapper.header-wrapper--mini .corner-menu {
       margin-top: 5px; }
+  .header-wrapper .corner-menu {
+    float: right; }
+    .header-wrapper .corner-menu > li > ul > li {
+      background: #e35e0c; }
   .header-wrapper .header {
     position: relative;
     min-width: 0px;
@@ -811,13 +818,17 @@ body {
         left: 20px;
         width: 40%; } }
     .header-wrapper .message-container.success {
-      background: #00b300; }
+      color: #00b300;
+      background: #fdfdfd; }
     .header-wrapper .message-container.error {
-      background: #e60000; }
+      color: #e60000;
+      background: #fdfdfd; }
     .header-wrapper .message-container.info {
-      background: #5577ff; }
+      color: #5577ff;
+      background: #fdfdfd; }
     .header-wrapper .message-container.warning {
-      background: #e6bf00; }
+      color: #e6bf00;
+      background: #fdfdfd; }
     .header-wrapper .message-container .message-close {
       float: right;
       top: 6px;
@@ -1289,13 +1300,16 @@ body {
           width: 215px;
           margin: 10px; } }
       .wrapper .content .grid-cell a.button, .wrapper .content .grid-cell a.button2 {
-        width: 100%;
-        text-align: center; }
+        text-align: center;
+        margin-bottom: 3px;
+        margin-top: 3px; }
         .wrapper .content .grid-cell a.button.connect-btn, .wrapper .content .grid-cell a.button2.connect-btn {
           width: 60%;
-          float: right; }
+          float: right;
+          margin-top: 0px; }
           @media screen and (min-width: 40em) {
             .wrapper .content .grid-cell a.button.connect-btn, .wrapper .content .grid-cell a.button2.connect-btn {
+              margin-bottom: 0px;
               width: 100%;
               float: none; } }
       .wrapper .content .grid-cell .vm-link {
@@ -1334,8 +1348,8 @@ body {
           position: absolute;
           left: 0;
           width: 100%;
-          height: 38px;
-          bottom: -40px;
+          height: 33px;
+          bottom: -38px;
           border-radius: 6px; }
           @media screen and (min-width: 40em) {
             .wrapper .content .grid-cell .vm-screenshot .vm-warn-buttons {
@@ -1348,9 +1362,9 @@ body {
               border-radius: 10px; } }
         .wrapper .content .grid-cell .vm-screenshot .state-icon, .wrapper .content .grid-cell .vm-screenshot .warning-icon {
           bottom: -36px;
-          width: 30px;
-          height: 30px;
-          padding: 6px;
+          width: 28px;
+          height: 28px;
+          padding: 5px;
           background: #fdfdfd;
           border-radius: 100%; }
           @media screen and (min-width: 40em) {
@@ -1369,16 +1383,29 @@ body {
           @media screen and (min-width: 40em) {
             .wrapper .content .grid-cell .vm-screenshot .warning-icon {
               left: 32px; } }
-      .wrapper .content .grid-cell .liltext {
-        margin-top: 5px; }
-      @media only screen and (max-width: 40em) {
-        .wrapper .content .grid-cell .vm-link {
-          width: 60%;
-          float: right;
-          position: relative;
-          height: 37px; } }
+      .wrapper .content .grid-cell .vm-link {
+        width: 60%;
+        float: right;
+        position: relative;
+        height: 37px; }
+        @media screen and (min-width: 40em) {
+          .wrapper .content .grid-cell .vm-link {
+            height: 25px;
+            float: none;
+            width: 100%;
+            position: relative; }
+            .wrapper .content .grid-cell .vm-link a {
+              width: 100%; } }
       .wrapper .content .grid-cell .vm-link-button {
-        position: absolute; }
+        width: 60%;
+        float: right; }
+        @media screen and (min-width: 40em) {
+          .wrapper .content .grid-cell .vm-link-button {
+            width: 100%;
+            float: none; } }
+        @media screen and (min-width: 40em) {
+          .wrapper .content .grid-cell .vm-link-button.desktop {
+            display: block; } }
     .wrapper .content .details-side {
       display: none;
       margin-bottom: 15px;
@@ -1814,17 +1841,20 @@ select[name="role"] {
 
 /* Responsive generic layout */
 .desktop {
-  display: none; }
+  display: none;
+  visibility: hidden; }
 
 @media screen and (min-width: 40em) {
   .desktop {
-    display: block; }
+    display: block;
+    visibility: visible; }
   td.desktop, th.desktop {
     display: table-cell; }
   span.desktop, a.desktop {
     display: inline; }
   .mobile {
-    display: none; } }
+    display: none;
+    visibility: hidden; } }
 
 .inline {
   display: inline; }

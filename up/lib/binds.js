@@ -1,7 +1,6 @@
 Wat.B = {
     bindCommonEvents: function () {
         this.bindMessageEvents();  
-        this.bindEditorEvents();  
         this.bindNavigationEvents();  
         this.bindFormEvents(); 
     },
@@ -26,65 +25,6 @@ Wat.B = {
         
         // Chosen controls hack
         this.bindEvent('click', '.not_valid', this.formBinds.pressValidatedField);
-    },
-    
-    bindEditorEvents: function () {
-        // Common Editor
-        
-            // Delete custom property
-            this.bindEvent('click', '.delete-property-button', this.editorBinds.deleteProperty);
-
-            // Add custom property
-            this.bindEvent('click', '.add-property-button', this.editorBinds.addProperty);        
-
-            // Hide property help when write on text input
-            this.bindEvent('focus', '.custom-properties>tr>td input', this.editorBinds.hidePropertyHelp);
-
-            // Active focus on property input when click on help message becaus it is over it
-            this.bindEvent('click', '.property-help', this.editorBinds.focusPropertyField);
-
-            // Toggle controls for expire fields (it's only needed for vm form, but it can be accesible from two views: list and details)
-            this.bindEvent('change', 'input[name="expire"]', this.editorBinds.toggleExpire);
-        
-        // Virtual Machines Editor
-        
-            // Toggle controls for disk images tags retrieving when select osf (it's only needed for vm form, but it can be accesible from two views: list and details)
-            this.bindEvent('change', 'select[name="osf_id"]', this.editorBinds.fillDITags, this);
-        
-        // User editor
-                
-            // Toggle controls for new password
-            this.bindEvent('change', 'input[name="change_password"]', this.userEditorBinds.toggleNewPassword);
-        
-        // Roles editor
-        
-            // Delete positive ACL
-            this.bindEvent('click', '.js-delete-positive-acl-button', this.roleEditorBinds.deleteAcl, 'positive');
-
-            // Add positive ACL
-            this.bindEvent('click', '.js-add-positive-acl-button', this.roleEditorBinds.addAcl, 'positive'); 
-        
-            // Delete negative ACL
-            this.bindEvent('click', '.js-delete-negative-acl-button', this.roleEditorBinds.deleteAcl, 'negative');
-
-            // Add negative ACL
-            this.bindEvent('click', '.js-add-negative-acl-button', this.roleEditorBinds.addAcl, 'negative');
-
-            // Add inherited Role
-            this.bindEvent('click', '.js-add-role-button', this.roleEditorBinds.addRole);
-            this.bindEvent('click', '.js-add-template-button', this.roleEditorBinds.addTemplate);
-
-            // Delete inherited Role
-            this.bindEvent('click', '.js-delete-role-button', this.roleEditorBinds.deleteRole);
-    },
-    
-    bindHomeEvents: function () {
-        // Pie charts events
-        this.bindEvent('mouseenter', '.js-pie-chart', this.homeBinds.pieHoverIn);
-        
-        this.bindEvent('mouseleave', '.js-pie-chart', this.homeBinds.pieHoverOut);
-        
-        this.bindEvent('click', '.js-pie-chart', this.homeBinds.pieClick);
     },
     
     bindNavigationEvents: function () {
@@ -116,8 +56,9 @@ Wat.B = {
         $(window).off('scroll');
         $(window).on('scroll', this.navigationBinds.onScroll);
         
-        // Kind of image source in DI creation
-        this.bindEvent('change', 'select[name="images_source"]', this.navigationBinds.toggleImagesource);
+        // Dialogs
+        this.bindEvent('click' ,'.js-change-password', this.navigationBinds.openChangePasswordDialog);
+
     },
     
     bindLoginEvents: function () {
@@ -238,28 +179,6 @@ Wat.B = {
             }
         },
         
-        toggleImagesource: function (e) {
-            var selectedSource = $(e.target).val();
-            
-            switch (selectedSource) {
-                case 'computer':
-                    $('.image_computer_row').show();
-                    $('.image_staging_row').hide();
-                    $('.image_url_row').hide();
-                    break;
-                case 'staging':
-                    $('.image_computer_row').hide();
-                    $('.image_staging_row').show();
-                    $('.image_url_row').hide();
-                    break;
-                case 'url':
-                    $('.image_computer_row').hide();
-                    $('.image_staging_row').hide();
-                    $('.image_url_row').show();
-                    break;
-            }
-        },
-        
         onScroll: function () {
             if ($('.js-back-top-button').length) {
                 if ($(window).scrollTop() > $(window).height()) {
@@ -273,9 +192,11 @@ Wat.B = {
             // When move scroll, minify header
             if ($(window).scrollTop() > 0) {
                 $('.js-header-wrapper').addClass('header-wrapper--mini');
+                $('.js-mobile-menu-hamburger').addClass('mobile-menu--mini');
             }
             else {
                 $('.js-header-wrapper').removeClass('header-wrapper--mini');
+                $('.js-mobile-menu-hamburger').removeClass('mobile-menu--mini');
             }
 
         },
@@ -340,26 +261,22 @@ Wat.B = {
             
             Wat.CurrentView.updateFilterNotes();
             Wat.CurrentView.filter();
-        }
-    },
-    
-    homeBinds: {
-        pieHoverIn: function (e) {
-            var percentLabel = $(e.target).parent().parent().find('.home-percent');
-            percentLabel.css('opacity', '1');
-            percentLabel.css('font-weight', 'bold');
-        },
-            
-        pieHoverOut: function (e) {
-            var percentLabel = $(e.target).parent().parent().find('.home-percent');
-            percentLabel.css('opacity', '0.5');
-            percentLabel.css('font-weight', 'normal');
         },
         
-        pieClick: function (e) {
-            var target = $(e.target).parent().attr('data-target');
-            window.location = '#/' + target;
-        }
+        openChangePasswordDialog: function (e) {        
+            var dialogConf = {
+                title: 'Change password',
+                buttons : {
+                    "Save": function () {
+                        $(this).dialog('close');
+                    }
+                },
+                button1Class : 'fa fa-save',
+                fillCallback : Wat.CurrentView.fillChangePasswordDialog
+            }
+
+            Wat.I.dialog(dialogConf, this); 
+        },
     },
     
     // Generic function to bind events receiving the event, the selector and the callback function to be called when event is triggered
@@ -406,249 +323,4 @@ Wat.B = {
             }
         }
     },
-    
-    // Callbacks of the events binded on editor
-    editorBinds: {
-        addProperty: function () {
-            var newRow = $('.template-property').clone();
-            newRow.attr('class', 'new-property');
-            newRow.insertBefore('.template-property');
-        },
-
-        deleteProperty: function () {
-            // Store the name of the deleted property in a hidden field of serialized names by commas
-            var deletedProp = $(this).parent().find('input.custom-prop-name');
-            var deletedPropName = deletedProp.val();
-            var deletedPropType = deletedProp.attr('type');
-
-            // The current porperties are stored in hidden fields and the new properties in text fields
-            // We will only store the current properties in a serialized list to remove them
-            if (deletedPropType === 'hidden') {   
-                Wat.CurrentView.deleteProps.push(deletedPropName);
-            }
-            
-            // Remove two levels above the button (tr)
-            $(this).parent().parent().remove();
-        },
-
-        hidePropertyHelp: function () {
-            $(this).parent().find('.property-help').hide();
-        },
-
-        focusPropertyField: function () {
-            $(this).parent().find('input').focus();
-        },
-        
-        toggleExpire: function () {
-            $('.expiration_row').toggle();
-        },
-        
-        // Fill the select combo with the available tags in the disk images of an OSF
-        fillDITags: function (event) {
-            var that = event.data;
-            
-            $('[name="di_tag"]').find('option').remove();
-            
-            // Fill DI Tags select on virtual machines creation form
-            var params = {
-                'action': 'tag_tiny_list',
-                'selectedId': '',
-                'controlName': 'di_tag',
-                'filters': {
-                    'osf_id': $('[name="osf_id"]').val()
-                },
-                'nameAsId': true,
-                'chosenType': 'advanced100'
-            };
-
-            Wat.A.fillSelect(params);
-        },
-        
-        filterTenantOSFs: function () {
-            var params = {
-                'action': 'osf_tiny_list',
-                'selectedId': '',
-                'controlName': 'osf_id',
-                
-            };
-            
-            if ($(this).val() > 0) {
-                params.filters =  {
-                    'tenant_id': $(this).val()
-                };
-            }
-
-            // Remove all osf options and fill filtering with new selected tenant
-            $('[name="osf_id"] option').remove();
-            
-            Wat.A.fillSelect(params, function () {
-                // Update chosen control for osf
-                Wat.I.updateChosenControls('[name="osf_id"]');
-
-                // Trigger change event to update tags
-                $('[name="osf_id"]').trigger('change');
-            }); 
-        },
-        
-        filterTenantUsers: function () {
-            var params = {
-                'action': 'user_tiny_list',
-                'selectedId': '',
-                'controlName': 'user_id'
-            };
-
-            if ($(this).val() > 0) {
-                params.filters =  {
-                    'tenant_id': $(this).val()
-                };
-            }
-            
-            // Remove all osf options and fill filtering with new selected tenant
-            $('[name="user_id"] option').remove();
-            
-            Wat.A.fillSelect(params, function () {
-                // Update chosen control for user
-                Wat.I.updateChosenControls('[name="user_id"]');
-            }); 
-        }
-    },
-    
-    userEditorBinds: {
-        toggleNewPassword: function () {
-            $('.new_password_row').toggle();
-        }
-    },
-    
-    roleEditorBinds: {
-        deleteAcl: function (e) {
-            // Disabled buttons have no effect
-            if ($(this).hasClass('disabled')) {
-                return;
-            }
-            
-            // type can be 'positive' or 'negative'
-            var type = e.data;
-            
-            var acls = $('select[name="acl_' + type + '_on_role"]').val();
-            
-            if (!acls) {
-                Wat.I.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
-                return;
-            }
-            
-            var filters = {
-                id: Wat.CurrentView.id
-            };
-            
-            var changes = {};
-            changes["unassign_acls"] = acls;
-            
-            var arguments = {
-                "__acls_changes__": changes
-            };
-            
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.model.fetch({      
-                    complete: function () {
-                        Wat.CurrentView.afterUpdateAcls();
-                    }
-                });
-            });
-        },
-        addAcl: function (e) {
-            // type can be 'positive' or 'negative'
-            var type = e.data;
-            
-            var acls = $('select[name="acl_available"]').val();
-            
-            if (!acls) {
-                Wat.I.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
-                return;
-            }
-            
-            var filters = {
-                id: Wat.CurrentView.id
-            };
-            
-            var changes = {};
-            changes["assign_acls"] = acls;
-            
-            var arguments = {
-                "__acls_changes__": changes
-            };
-            
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.model.fetch({      
-                    complete: function () {
-                        Wat.CurrentView.afterUpdateAcls();
-                    }
-                });
-            });
-        },
-        deleteRole: function () {
-            var roleId = $(this).attr('data-id');
-            
-            var filters = {
-                id: Wat.CurrentView.id
-            };
-            var arguments = {
-                "__roles_changes__": {
-                    unassign_roles: [roleId]
-                }
-            };
-
-            
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.model.fetch({      
-                    complete: function () {
-                        Wat.CurrentView.afterUpdateRoles();
-                    }
-                });
-            });
-        },
-        addRole: function () {
-            var roleId = $('select[name="role"]').val();
-            
-            var filters = {
-                id: Wat.CurrentView.id
-            };
-            var arguments = {
-                "__roles_changes__": {
-                    assign_roles: [roleId]
-                }
-            };
-            
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.model.fetch({      
-                    complete: function () {
-                        Wat.CurrentView.afterUpdateRoles();
-                    }
-                });
-            });
-        },
-        addTemplate: function (e) {
-            if ($(e.target).hasClass('disabled')) {
-                return;
-            }
-            
-            var roleId = $(e.target).attr('data-role-template-id');
-            
-            var filters = {
-                id: Wat.CurrentView.id
-            };
-            var arguments = {
-                "__roles_changes__": {
-                    assign_roles: [roleId]
-                }
-            };
-            
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.model.fetch({      
-                    complete: function () {
-                        Wat.CurrentView.afterUpdateRoles();
-                    }
-                });
-            });
-        },
-    }
 }

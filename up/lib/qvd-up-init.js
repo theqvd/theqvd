@@ -33,7 +33,6 @@ var Wat = {
         
         // Details views
         DetailsView: {},
-            UserDetailsView: {},
             VMDetailsView: {},
     },
     Router: {},

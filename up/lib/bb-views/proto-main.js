@@ -46,11 +46,10 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     events:  {
-        'click .js-mobile-menu-hamburger': 'clickMenuMobile'
+        'click .js-mobile-menu-hamburger': 'clickMenuMobile',
     },
     
     clickMenuMobile: function () {
-        console.log(2);
     },
     
     extendEvents: function (ev) {

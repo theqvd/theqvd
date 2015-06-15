@@ -1,5 +1,5 @@
 <div class="<%= cid %> list-wrapper">
-<h1 class="h1">Virtual Machines</h1>
+<h1 class="h1"><i class="fa fa-cloud"></i>My virtual machines</h1>
 <div class="list-navigation">
         <div class="fleft col-width-40 desktop">
             <a class="button button-icon <%= viewMode == 'grid' ? 'disabled' : '' %> fa fa-th-large js-change-viewmode" name="viewmode-grid" data-viewmode="grid" href="javascript:"></a>

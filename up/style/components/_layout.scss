@@ -61,6 +61,14 @@ body {
         opacity: 0.90;
     }
     
+    .corner-menu {
+        float: right;
+        
+        &>li>ul>li {
+            background: $col_brand;
+        }
+    }
+    
     .header {
         position: relative;    
                 
@@ -100,19 +108,23 @@ body {
         display: none;
                 
         &.success {
-            background: darken($col_green, 5);
+            color: darken($col_green, 5);
+            background: $col_whiter;
         }
         
         &.error {
-            background: darken($col_red, 5);
+            color: darken($col_red, 5);
+            background: $col_whiter;
         }
         
         &.info {
-            background: darken($col_blue, 5);
+            color: darken($col_blue, 5);
+            background: $col_whiter;
         }
         
         &.warning {
-            background: darken($col_yellow, 5);
+            color: darken($col_yellow, 5);
+            background: $col_whiter;
         }
 
         .message-close {
@@ -319,11 +331,13 @@ body {
 /* Responsive generic layout */
 .desktop {
     display: none;
+    visibility: hidden;
 }
 
 @include in(desktop) {
     .desktop {
         display: block;
+        visibility: visible;
     }
     
     td.desktop, th.desktop {
@@ -335,6 +349,7 @@ body {
     
     .mobile {
         display: none;
+        visibility: hidden;
     }
 }
 

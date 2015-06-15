@@ -51,6 +51,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             },
             VMwarnings: {
                 name: 'editor/vm-warnings'
+            },
+            changePassword: {
+                name: 'editor/change-password'
             }
         }     
         
@@ -205,6 +208,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.elementsShown = this.collection.length;
         var totalPages = Math.ceil(this.collection.elementsTotal/this.collection.block);
         var currentPage = this.collection.offset;
+        
+        var hideWhenOne = true;
 
         var context = $('.' + this.cid);
 
@@ -213,8 +218,13 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         context.find('.pagination a').removeClass('disabled');
         
-        if (totalPages <= 1) {
-            context.find('.pagination a').addClass('disabled');
+        if (totalPages <= 1)  {
+            if (hideWhenOne) {
+                context.find('.pagination').hide();
+            }
+            else {
+                context.find('.pagination a').addClass('disabled');
+            }
         }
         else if (currentPage == 1){
             context.find('.pagination a.first').addClass('disabled');

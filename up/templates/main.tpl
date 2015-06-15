@@ -20,7 +20,7 @@
                         <ul>
                             <% $.each(menuOpt.subMenu, function (iSubMenu, subMenuOpt) { %>
                                 <li>
-                                    <a href="<%= subMenuOpt.link %>">
+                                    <a href="<%= subMenuOpt.link %>" class="<%= subMenuOpt.linkClass %>">
                                         <span class="<%= subMenuOpt.icon %>" data-i18n="<%= subMenuOpt.text %>"></span>
                                     </a>
                                 </li>

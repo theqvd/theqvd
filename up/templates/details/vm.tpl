@@ -3,6 +3,14 @@
     <tbody>
         <tr>
             <td>
+                <span data-i18n="Id"></span>
+            </td>
+            <td>
+                <%= model.get('id') %>
+            </td>
+        </tr>
+        <tr>
+            <td>
                 <span data-i18n="Name"></span>
             </td>
             <td>

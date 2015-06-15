@@ -34,8 +34,7 @@
                                 
                             <a class="fa fa-plug button js-login-button connect-btn js-connect-btn" data-i18n="Connect"></a>
                             
-                            <div class="liltext vm-link">
-                            <a href="javascript:" data-model-id="<%= model.get('id') %>" class="js-vm-details desktop" data-i18n="[title]Click for details">
+                            <a href="javascript:" data-model-id="<%= model.get('id') %>" class="js-vm-details vm-link-button desktop button2" data-i18n="[title]Click for details">
                                 <i class="fa fa-search"></i>
                                 <span class="text" data-model-id="<%= model.get('id') %>" data-i18n="Details"></span>
                             </a>
@@ -43,17 +42,14 @@
                                 <i class="fa fa-search"></i>
                                 <span class="text" data-model-id="<%= model.get('id') %>" data-i18n="Details"></span>
                             </a>
-                            </div>
-                            <div class="liltext vm-link">
-                            <a href="javascript:" data-model-id="<%= model.get('id') %>" class="js-vm-settings desktop" data-i18n="[title]Click to configure the connection parameters">
+                            <a href="javascript:" data-model-id="<%= model.get('id') %>" class="js-vm-settings vm-link-button desktop button2" data-i18n="[title]Click to configure the connection parameters">
                                 <i class="fa fa-wrench" data-model-id="<%= model.get('id') %>"></i>
-                                <span class="text" data-model-id="<%= model.get('id') %>" data-i18n="Connection settings"></span>
+                                <span class="text" data-model-id="<%= model.get('id') %>" data-i18n="Settings"></span>
                             </a>
                             <a href="javascript:" data-model-id="<%= model.get('id') %>" class="js-vm-settings vm-link-button mobile button2" data-i18n="[title]Click to configure the connection parameters">
                                 <i class="fa fa-wrench" data-model-id="<%= model.get('id') %>"></i>
                                 <span class="text" data-model-id="<%= model.get('id') %>" data-i18n="Settings"></span>
                             </a>
-                            </div>
                         </span>
                     </div>
                 <%

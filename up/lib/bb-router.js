@@ -4,9 +4,7 @@ Wat.Router = Backbone.Router.extend({
 
         "vms": "listVM",
         "vms/:searchHash": "listVM",
-        
-        "profile": "profile",
-        
+                
         "*actions": "defaultRoute" // Backbone will try match the route above first
     },
     

@@ -53,12 +53,6 @@
                     }
                     Wat.Router.app_router.performRoute('vms', Wat.Views.VMListView, params);
                 });
-
-
-                // ------- Details sections ------- //
-                Wat.Router.app_router.on('route:profile', function (id) {
-                    Wat.Router.app_router.performRoute('profile', Wat.Views.UserDetailsView, {"id": 167});
-                });
                 
                  // ------- Current administrator ------- //
                 Wat.Router.app_router.on('route:logout', function (actions) {

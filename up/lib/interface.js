@@ -1,31 +1,35 @@
 // Pure interface utilities
 Wat.I = {
     cornerMenu : {
-        vms: {
-            link: "#/vms",
-            icon: "fa fa-cloud",
-            text: "Virtual machines",
-            objVisible: "vm",
-            subMenu: {}
-        },
         profile: {
-            link: "#/profile",
-            icon: "fa fa-cog",
+            link: "javascript:",
+            icon: "fa fa-user",
             text: "Profile",
             objVisible: "vm",
-            subMenu: {}
-        },
-        logout: {
-            link: "#logout",
-            icon: "fa fa-power-off",
-            text: "Log-out",
-            objVisible: "all",
-            subMenu: {}
+            subMenu: {
+                change_password: {
+                    link: "javascript:",
+                    linkClass: "js-change-password",
+                    icon: "fa fa-edit",
+                    text: "Change password",
+                    subMenu: {}
+                },
+                logout: {
+                    link: "#/logout",
+                    icon: "fa fa-power-off",
+                    text: "Log-out",
+                    subMenu: {}
+                },
+            }
         }
     },
     
     getCornerMenu: function () {
         return this.cornerMenu;
+    },    
+    
+    getMobileMenu: function () {
+        return this.cornerMenu.profile.subMenu;
     },
     
     renderMain: function () { 
@@ -54,7 +58,7 @@ Wat.I = {
         // Fill the html with the template and the collection
         var template = _.template(
             Wat.TPL.menu, {
-                mobileMenu: this.getCornerMenu()
+                mobileMenu: this.getMobileMenu()
             });
 
         $('.bb-menu').html(template);

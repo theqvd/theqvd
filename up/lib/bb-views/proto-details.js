@@ -30,9 +30,6 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             warn404: {
                 name: 'error/404'
             },
-            changePassword: {
-                name: 'editor/change-password'
-            }
         }
         
         this.templates = $.extend({}, this.templates, templates);

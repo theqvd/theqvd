@@ -19,7 +19,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         'click .js-change-viewmode': 'changeViewMode',
         'click .js-vm-details': 'openDetailsDialog',
         'click .js-vm-settings': 'openSettingsDialog',
-        'click .js-vm-warnings': 'openVMWarningsDialog',
+        'click .js-vm-warnings': 'openVMWarningsDialog'
     },
     
     startVM: function (filters) {        
@@ -52,6 +52,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         
         var dialogConf = {
             title: 'Details',
+            /*
             buttons : {
                 "Force disconnection": function () {
                     $(this).dialog('close');
@@ -62,6 +63,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             },
             button1Class : 'fa fa-sign-out',
             button2Class : 'fa fa-refresh',
+            */
             fillCallback : this.fillDetailsDialog
         }
                 
@@ -163,5 +165,14 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         }
         
         return icon;
-    },      
+    },
+    
+    fillChangePasswordDialog: function (dialog, that) {   
+        // Fill the html with the template and the collection
+        var template = _.template(
+            Wat.TPL.changePassword, {
+            });
+
+        $(dialog).html(template);
+    },
 });

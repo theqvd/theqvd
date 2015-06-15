@@ -251,7 +251,7 @@ Wat.C = {
                 
             Wat.I.renderMain();
 
-            Wat.Router.app_router.performRoute('', Wat.Views.HomeView);
+            Wat.Router.app_router.performRoute('vms', Wat.Views.VMListView);
         }
                 
         Wat.C.afterLogin ();
