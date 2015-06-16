@@ -5,9 +5,14 @@ Wat.WS.changeWebsocketVm = function (id, field, data, viewType) {
             if (viewType == 'details') {
                 // Add this effect when data will be received only when change
                 $('.js-body-state').hide();
-                $('[data-wsupdate="state-' + data + '"][data-id="' + id + '"]').show();   
+                $('[data-wsupdate="state-' + data + '"][data-id="' + id + '"]').show();
+                
+                // Update model
+                Wat.CurrentView.model.set({"state": data});
             }
-            
+           
+            $('[data-wsupdate="ip"][data-id="' + id + '"]').addClass('invisible');   
+
             switch (data) {
                 case 'running':
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('class', 'fa fa-play');
@@ -93,6 +98,9 @@ Wat.WS.changeWebsocketVm = function (id, field, data, viewType) {
                 var diNameContainer = $('[data-wsupdate="di"][data-id="' + id + '"]');
             }
             diNameContainer.html(data); 
+            break;
+        case 'ip_in_use':
+            $('[data-wsupdate="ip"][data-id="' + id + '"]').html(data); 
             break;
     }
 }

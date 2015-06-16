@@ -117,7 +117,12 @@ Wat.B = {
         $(window).on('scroll', this.navigationBinds.onScroll);
         
         // Kind of image source in DI creation
-        this.bindEvent('change', 'select[name="images_source"]', this.navigationBinds.toggleImagesource);
+        this.bindEvent('change', 'select[name="images_source"]', this.navigationBinds.toggleImagesource);   
+        
+        // Hack to fix jQuery UI tooltip plugin
+        this.bindEvent('mouseleave', '[title]', function () { 
+            $('.ui-tooltip').hide();
+        });
     },
     
     bindLoginEvents: function () {
@@ -273,9 +278,11 @@ Wat.B = {
             // When move scroll, minify header
             if ($(window).scrollTop() > 0) {
                 $('.js-header-wrapper').addClass('header-wrapper--mini');
+                $('.js-mobile-menu-hamburger').addClass('mobile-menu--mini');
             }
             else {
                 $('.js-header-wrapper').removeClass('header-wrapper--mini');
+                $('.js-mobile-menu-hamburger').removeClass('mobile-menu--mini');
             }
 
         },

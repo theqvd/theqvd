@@ -219,6 +219,10 @@
     }
 }
 
+.mobile-menu--mini {
+    @include icon-size(30px);
+}
+
 
 .submenu ul {
     margin-bottom: 20px;

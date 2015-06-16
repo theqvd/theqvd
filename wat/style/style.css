@@ -12,6 +12,12 @@
   padding-left: 20px;
   padding-right: 20px; }
 
+.wrapper {
+  width: 100%;
+  margin: 0 auto;
+  padding-left: 5px;
+  padding-right: 5px; }
+
 .menu > ul .menu-option, .menu > ul .lateral-menu-option, .menu > ul .lateral-menu-option-discrete, a.button, button.button, a.button2, button.button2, a.button--green, button.button--green, a.button--red, button.button--red, a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.disabled, .wrapper .content .home-wrapper th, .wrapper .content .home-wrapper .home-row .home-cell .summary-table th, .wrapper .content .home-wrapper .log-table th, table.list th, table.customize-fields th, table.custom-props th, table.details th, table.role-template-matrix th, .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus, .not-selectable {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -377,6 +383,9 @@ fieldset {
   @media screen and (min-width: 40em) {
     .mobile-menu {
       display: none; } }
+
+.mobile-menu--mini {
+  font-size: 30px; }
 
 .submenu ul {
   margin-bottom: 20px;
@@ -882,6 +891,7 @@ body {
   background-color: #fdfdfd;
   margin-bottom: 50px;
   position: relative; }
+  @media screen and (min-width: 40em) { }
   @media screen and (min-width: 40em) {
     .wrapper {
       min-width: 1024px;
@@ -2348,6 +2358,18 @@ table.role-template-matrix {
       table.role-template-matrix td a.no-text-button:before {
         margin: 0px;
         text-align: center; }
+
+table.vmst i.vmst-vm, table.vmst i.vmst-host, table.vmst i.vmst-dot {
+  width: 100%; }
+  table.vmst i.vmst-vm.vmst-dot, table.vmst i.vmst-host.vmst-dot, table.vmst i.vmst-dot.vmst-dot {
+    font-size: 9px;
+    margin-top: 10px; }
+  table.vmst i.vmst-vm.vmst-dot-branch, table.vmst i.vmst-host.vmst-dot-branch, table.vmst i.vmst-dot.vmst-dot-branch {
+    margin-top: 0px;
+    line-height: 1px; }
+table.vmst .vmst-vm-cell, table.vmst .vmst-host-cell {
+  width: 50%;
+  vertical-align: bottom; }
 
 /********************************************************************
 *********************************************************************

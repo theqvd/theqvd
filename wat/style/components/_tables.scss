@@ -207,3 +207,24 @@ table.role-template-matrix {
         }
     }
 }
+
+table.vmst {
+    i.vmst-vm, i.vmst-host, i.vmst-dot {
+        width: 100%;
+        
+        &.vmst-dot {
+            font-size: 9px;
+            margin-top: 10px;
+        }        
+        
+        &.vmst-dot-branch {
+            margin-top: 0px;
+            line-height: 1px;
+        }
+    }
+    
+    .vmst-vm-cell, .vmst-host-cell {
+        width: 50%; 
+        vertical-align: bottom;
+    }
+}

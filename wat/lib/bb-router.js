@@ -79,6 +79,7 @@ Wat.Router = Backbone.Router.extend({
 		// Abort pending requests
         if (Wat.C.abortOldRequests) {
             Wat.C.abortRequests();
+            clearInterval(Wat.CurrentView.executionAnimationInterval);
         }
         
         Wat.CurrentView = new view(params);

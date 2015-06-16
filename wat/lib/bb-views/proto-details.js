@@ -58,6 +58,8 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     },
     
     afterRender: function () {
+        var that = this;
+        
         // If this view have Side component, render it after render
         if (this.renderSide) {
             this.renderSide();

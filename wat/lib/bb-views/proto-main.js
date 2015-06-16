@@ -409,29 +409,6 @@ Wat.Views.MainView = Backbone.View.extend({
         Wat.A.performAction ('vm_user_disconnect', {}, filters, messages, this.fetchList, this);
     },
     
-    renderRelatedDocs: function () {
-        // The related doc links only will be render for not embeded views
-        if (Wat.CurrentView.qvdObj != this.qvdObj) {
-            return;
-        }
-        
-        var sectionDoc = [];
-        sectionDoc[this.qvdObj] = "This section step by step";
-        this.relatedDoc = $.extend({}, sectionDoc, this.relatedDoc);
-        
-        if (this.relatedDoc) {
-            var that = this;
-            
-            that.template = _.template(
-                    Wat.TPL.relatedDoc, {
-                        relatedDoc: that.relatedDoc,
-                    }
-                );
-
-            $('.bb-related-docs').html(that.template);
-        }
-    },
-    
     openRelatedDocsDialog: function () {
         var that = this;
         

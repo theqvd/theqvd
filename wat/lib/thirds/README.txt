@@ -9,6 +9,7 @@ Used libraries on QVD Wat and their version, licenses and source sites:
 - jQuery Cookie v1.4.1 (MIT License) http://plugins.jquery.com/cookie/
 - Chosen v1.1.0 (MIT License) http://harvesthq.github.io/chosen/
 - Font Awesome v4.2.0 (Font: SIL OFL 1.1, CSS: MIT License) http://fortawesome.github.io/Font-Awesome/
+- Font Awesome Animation v0.0.7 (MIT License) http://l-lin.github.io/font-awesome-animation/
 - i18next v1.7.3 (MIT License) http://i18next.com/
 - Flot charts v0.8.3 (Unrestricted license explained at README.txt) http://www.flotcharts.org/
 - Flot axislabels v2.0.1 (GPLv3) http://people.mozilla.org/~mcote/flot-axislabels/
