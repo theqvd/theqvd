@@ -1,9 +1,9 @@
 /* INCLUDED: variables */
 /* INCLUDED: place_holders */
-.wrapper .content::after, .wrapper .content .list-block .list-navigation::after, .wrapper .content .details-side .list-navigation::after, .wrapper .content .list-block .list-navigation .action-new-item::after, .wrapper .content .details-side .list-navigation .action-new-item::after, .wrapper .content fieldset::after, .footer::after, .clear::after, .wrapper .content::before, .wrapper .content .list-block .list-navigation::before, .wrapper .content .details-side .list-navigation::before, .wrapper .content .list-block .list-navigation .action-new-item::before, .wrapper .content .details-side .list-navigation .action-new-item::before, .wrapper .content fieldset::before, .footer::before, .clear::before {
+.wrapper .content::after, .wrapper .content .home-wrapper .summary-container::after, .wrapper .content .list-block .list-navigation::after, .wrapper .content .details-side .list-navigation::after, .wrapper .content .list-block .list-navigation .action-new-item::after, .wrapper .content .details-side .list-navigation .action-new-item::after, .wrapper .content fieldset::after, .footer::after, .clear::after, .wrapper .content::before, .wrapper .content .home-wrapper .summary-container::before, .wrapper .content .list-block .list-navigation::before, .wrapper .content .details-side .list-navigation::before, .wrapper .content .list-block .list-navigation .action-new-item::before, .wrapper .content .details-side .list-navigation .action-new-item::before, .wrapper .content fieldset::before, .footer::before, .clear::before {
   content: "";
   clear: both; }
-.wrapper .content::after, .wrapper .content .list-block .list-navigation::after, .wrapper .content .details-side .list-navigation::after, .wrapper .content .list-block .list-navigation .action-new-item::after, .wrapper .content .details-side .list-navigation .action-new-item::after, .wrapper .content fieldset::after, .footer::after, .clear::after {
+.wrapper .content::after, .wrapper .content .home-wrapper .summary-container::after, .wrapper .content .list-block .list-navigation::after, .wrapper .content .details-side .list-navigation::after, .wrapper .content .list-block .list-navigation .action-new-item::after, .wrapper .content .details-side .list-navigation .action-new-item::after, .wrapper .content fieldset::after, .footer::after, .clear::after {
   display: table; }
 
 .header-wrapper .header, .wrapper {
@@ -65,7 +65,8 @@ article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, 
   display: block; }
 
 body {
-  line-height: 1; }
+  line-height: 1;
+  color: #444; }
 
 ol, ul {
   list-style: none; }
@@ -962,10 +963,13 @@ body {
       border: 1px solid #ddd;
       border-radius: 4px;
       border-collapse: separate;
+      border: 0px;
       table-layout: fixed;
-      margin-top: 30px;
+      margin-top: 20px;
       width: 100%;
-      padding-bottom: 20px; }
+      padding-bottom: 20px;
+      border-spacing: 10px;
+      border-collapse: separate; }
       .wrapper .content .home-wrapper th {
         font-weight: bold;
         text-align: left;
@@ -1021,9 +1025,14 @@ body {
           display: block;
           padding: 0px;
           padding-bottom: 10px;
+          vertical-align: top;
+          border: 1px solid #fcd6bf;
+          border-radius: 6px;
+          margin-top: 10px;
           text-align: center; }
           @media screen and (min-width: 40em) {
             .wrapper .content .home-wrapper .home-row .home-cell {
+              margin-top: 0px;
               display: table-cell;
               padding: 15px; } }
           .wrapper .content .home-wrapper .home-row .home-cell > div {
@@ -1031,7 +1040,7 @@ body {
             display: block; }
           .wrapper .content .home-wrapper .home-row .home-cell .home-title {
             text-align: center;
-            margin: 20px; }
+            margin: 10px 20px 30px 10px; }
           .wrapper .content .home-wrapper .home-row .home-cell .summary-table {
             width: 100%;
             background-color: #fdfdfd;
@@ -1040,7 +1049,7 @@ body {
             border-collapse: separate;
             text-align: left;
             width: 95%;
-            margin: 20px auto; }
+            margin: 0px auto; }
             .wrapper .content .home-wrapper .home-row .home-cell .summary-table th {
               font-weight: bold;
               text-align: left;
@@ -1113,6 +1122,35 @@ body {
               padding: 0px;
               color: #979797;
               opacity: 0.5; }
+          .wrapper .content .home-wrapper .home-row .home-cell .summary-element .summary-element-title {
+            font-size: 1.5em;
+            line-height: 1.5em;
+            height: 2.5em;
+            padding: 6px 2px; }
+            @media screen and (min-width: 40em) {
+              .wrapper .content .home-wrapper .home-row .home-cell .summary-element .summary-element-title {
+                font-size: 1.1em;
+                line-height: 1.4em; } }
+          .wrapper .content .home-wrapper .home-row .home-cell .summary-element .summary-element-icon {
+            width: 60px;
+            height: 60px;
+            margin: 3px auto;
+            background: #f0f0f0;
+            border: #e4e4e4 1px solid;
+            border-radius: 100%;
+            padding-top: 11px; }
+            .wrapper .content .home-wrapper .home-row .home-cell .summary-element .summary-element-icon i {
+              font-size: 35px;
+              width: 60px; }
+          .wrapper .content .home-wrapper .home-row .home-cell .summary-element .summary-element-count {
+            font-size: 1.8em;
+            line-height: 1.8em; }
+            @media screen and (min-width: 40em) {
+              .wrapper .content .home-wrapper .home-row .home-cell .summary-element .summary-element-count {
+                font-size: 1.4em;
+                line-height: 1.7em; } }
+            .wrapper .content .home-wrapper .home-row .home-cell .summary-element .summary-element-count .summary-data {
+              font-weight: bold; }
       .wrapper .content .home-wrapper .log-table {
         width: 100%;
         background-color: #fdfdfd;
@@ -1177,6 +1215,10 @@ body {
           @media screen and (min-width: 40em) {
             .wrapper .content .home-wrapper .log-table td:last-child a {
               padding-left: 50px; } }
+      .wrapper .content .home-wrapper .summary-container {
+        margin: 0 auto;
+        width: 100%;
+        table-layout: fixed; }
     .wrapper .content .filter {
       display: none;
       margin-bottom: 15px;
@@ -2777,7 +2819,7 @@ td {
       font-size: 1.4em;
       line-height: 1.7em; } }
   .welcome-message .welcome-help a {
-    font-size: 0.8em; }
+    font-size: 0.7em; }
 
 .home-wrapper .home-cell .home-title {
   font-size: 20px;

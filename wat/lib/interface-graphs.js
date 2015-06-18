@@ -158,6 +158,17 @@ Wat.I.G = {
     drawBarChartRunningVMs: function (name, data, loadTime) {
         var plotSelector = '#' + name;
         
+        // Complete data with a minimum of 5 nodes
+        if (data.length < 5){
+            for(i=data.length;i<5;i++) {
+                data.push({
+                    id: 0,
+                    name: "",
+                    number_of_vms: 0
+                });
+            }
+        }
+        
         var barData = [];
         var ticks = [];
         var ids = [];
@@ -316,6 +327,18 @@ Wat.I.G = {
     drawBarChartRunningVMsSimple: function (name, data, loadTime) {
         var plotSelector = '#' + name;
         
+        // Complete data with a minimum of 5 nodes
+        if (data.length < 5){
+            for(i=data.length;i<5;i++) {
+                data.push({
+                    id: 0,
+                    name: "",
+                    number_of_vms: 0
+                });
+            }
+        }
+        
+        
         var barData = [];
         var ticks = [];
         var ids = [];
@@ -383,7 +406,7 @@ Wat.I.G = {
         };
  
         var plot = $.plot($(plotSelector), dataSet, options);
-
+        
         if (barData.length > 0 ) {
             dataSet = [{ label: "", data: barData, color: COL_BRAND }];
             $.plot($(plotSelector), dataSet, options);

@@ -15,9 +15,8 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         'blocked_vms_count', 
         'blocked_hosts_count', 
         'blocked_dis_count',
+        'connected_users_count',
         'running_hosts_count',
-        'running_hosts_count',
-        'running_vms_count',
         'running_vms_count',
         'vms_with_expiration_date',
         'top_populated_hosts'
@@ -28,6 +27,7 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         blocked_hosts_count: 0,
         blocked_users_count: 0,
         blocked_vms_count: 0,
+        connected_users_count: 0,
         dis_count: 0,
         hosts_count: 0,
         osfs_count: 0,
@@ -118,7 +118,10 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         }
         
         var runningHostsData = [stats.running_hosts_count, stats.hosts_count - stats.running_hosts_count];
-        Wat.I.G.drawPieChart('running-hosts', runningHostsData);
+        Wat.I.G.drawPieChart('running-hosts', runningHostsData);      
+        
+        var connectedUsersData = [stats.connected_users_count, stats.users_count - stats.connected_users_count];
+        Wat.I.G.drawPieChart('connected-users', connectedUsersData);
         
         var runningVMSData = [stats.running_vms_count, stats.vms_count - stats.running_vms_count];
         Wat.I.G.drawPieChart('running-vms', runningVMSData);
