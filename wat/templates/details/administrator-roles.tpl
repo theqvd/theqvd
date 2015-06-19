@@ -16,7 +16,7 @@
                     </tr>
                     <tr>
                         <td class="col-width-1">
-                            <a class="button add-role-button js-add-role-button fa fa-graduation-cap fright" href="javascript:" data-i18n="Assign selected role"></a>
+                            <a class="button add-role-button js-add-role-button <%= CLASS_ICON_ROLES %> fright" href="javascript:" data-i18n="Assign selected role"></a>
                         </td>
                     </tr>
                 <% 

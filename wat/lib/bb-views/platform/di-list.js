@@ -197,7 +197,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             contentType: false, // Setting contentType as false 'multipart/form-data' and boundary will be sent
 
         }).success(function(){            
-            that.dialog.dialog('close');
+            Wat.I.closeDialog(that.dialog);
             Wat.I.loadingUnblock();
             
             var realView = Wat.I.getRealView(that);
@@ -206,7 +206,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
 
             Wat.I.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
         }).fail(function(data){
-            that.dialog.dialog('close');
+            Wat.I.closeDialog(that.dialog);
             Wat.I.loadingUnblock();
             Wat.I.showMessage({message: i18n.t('Error creating'), messageType: 'error'});
         });

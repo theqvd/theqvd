@@ -555,7 +555,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                             $.each($('.js-check-it'), function (iCheckbox, checkbox) {
                                 that.selectedItems.push(parseInt($(checkbox).attr('data-id')));
                             });
-                            $(this).dialog('close');
+                            Wat.I.closeDialog($(this));
                             Wat.I.updateSelectedItems(that.selectedItems.length);
                         },
                         "Select all": function () {
@@ -597,7 +597,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             that.selectedItems = that.retrievedData.rows;
         }
         
-        that.dialog.dialog('close');
+        Wat.I.closeDialog(that.dialog);
         Wat.I.updateSelectedItems(that.selectedItems.length);
         that.selectedAll = true;
     },
@@ -1074,7 +1074,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         this.dialogConf.buttons = {
             Cancel: function (e) {
-                $(this).dialog('close');
+                Wat.I.closeDialog($(this));
             },
             Create: function (e) {
                 that.dialog = $(this);
@@ -1102,7 +1102,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         that.dialogConf.buttons = {
             Cancel: function () {
-                $(this).dialog('close');
+                Wat.I.closeDialog($(this));
             },
             Update: function () {
                 that.dialog = $(this);

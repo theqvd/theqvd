@@ -81,6 +81,7 @@
                                 </div>
                             <%
                                 }); 
+                                
                             %>  
                             <%
                                 if (Object.keys(model.get('roles')).length == 0) {

@@ -165,9 +165,6 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
                     subbranch += '</span>';
                 }
             
-                // Name of the ACL
-                subbranch += '<span class="subbranch-piece" data-i18n="' + acl.description + '"></span>';
-            
                 // Inheritence procendence indicator
                 if (Wat.C.checkACL('role.see.acl-list-roles') && inheritedRoles) {
                     var roles = [];
@@ -179,6 +176,9 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
                         subbranch += '<i class="' + CLASS_ICON_ROLES + ' acl-inheritance" data-acl-id="' + acl.id + '" title="' + titleRole + '"></i>';
                     subbranch += '</span>';
                 }
+            
+                // Name of the ACL
+                subbranch += '<span class="subbranch-piece" data-i18n="' + acl.description + '"></span>';
             
             subbranch += '</div>';
             that.currentBranchDiv.append(subbranch);

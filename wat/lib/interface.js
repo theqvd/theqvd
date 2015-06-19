@@ -819,10 +819,10 @@ Wat.I = {
             title: '<i class="fa fa-question"></i>',
             buttons : {
                 "Cancel": function () {
-                    $(this).dialog('close');
+                    Wat.I.closeDialog($(this));
                 },
                 "Accept": function () {
-                    $(this).dialog('close');
+                    Wat.I.closeDialog($(this));
                     if (loadingBlock) {
                         Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
                     }
@@ -871,11 +871,11 @@ Wat.I = {
 
         dialogConf.buttons = {
             "Read full documentation": function (e) {
-                $(this).dialog('close');
+                Wat.I.closeDialog($(this));
                 window.location = '#documentation/' + guideSection[0].guide;
             },
             Close: function (e) {
-                $(this).dialog('close');
+                Wat.I.closeDialog($(this));
             }
         };
 
@@ -967,5 +967,10 @@ Wat.I = {
         }
         
         return usefulView;
+    },
+    
+    closeDialog: function (dialog) {
+        dialog.dialog('close').remove();
+        delete Wat.CurrentView.dialog;
     }
 }

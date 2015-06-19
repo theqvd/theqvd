@@ -32,11 +32,11 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
 
         dialogConf.buttons = {
             Cancel: function (e) {
-                $(this).dialog('close');
+                Wat.I.closeDialog($(this));
             },
             "Reset": function (e) {
                 that.performResetViews ();
-                $(this).dialog('close');
+                Wat.I.closeDialog($(this));
             }
         };
         

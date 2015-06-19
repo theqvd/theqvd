@@ -165,7 +165,7 @@ Wat.Common.BySection.di = {
         
         this.dialogConf.buttons = {
             Cancel: function () {
-                $(this).dialog('close');
+                Wat.I.closeDialog($(this));
             },
             Update: function () {
                 that.dialog = $(this);
@@ -175,7 +175,7 @@ Wat.Common.BySection.di = {
                 });
                 
                 if (affectedVMsIds.length == 0) {
-                    that.dialog.dialog('close');
+                    Wat.I.closeDialog(that.dialog);
                     Wat.I.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
                     return;
                 }
@@ -204,7 +204,7 @@ Wat.Common.BySection.di = {
                 };
                 
                 Wat.A.performAction ('vm_update', args, filters, messages, function (that) {
-                    that.dialog.dialog('close');
+                    Wat.I.closeDialog(that.dialog);
                 }, that);
             }
         };

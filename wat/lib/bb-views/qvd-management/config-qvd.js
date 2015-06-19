@@ -313,7 +313,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     },
     
     afterCreateToken: function (that) {
-        that.dialog.dialog('close');
+        Wat.I.closeDialog(that.dialog);
         
         var keySplitted = that.createdKey.split('.');
         

@@ -356,7 +356,7 @@ Wat.Views.MainView = Backbone.View.extend({
             }
 
             if (that.dialog) {
-                that.dialog.dialog('close');
+                Wat.I.closeDialog(that.dialog);
             }
                         
             var messageParams = {
@@ -375,7 +375,7 @@ Wat.Views.MainView = Backbone.View.extend({
         
         this.dialogConf.buttons = {
             Cancel: function () {
-                $(this).dialog('close');
+                Wat.I.closeDialog($(this));
             },
             Update: function () {
                 that.dialog = $(this);
@@ -418,11 +418,11 @@ Wat.Views.MainView = Backbone.View.extend({
 
         dialogConf.buttons = {
             "Read full documentation": function (e) {
-                $(this).dialog('close');
+                Wat.I.closeDialog($(this));
                 window.location = '#documentation';
             },
             Close: function (e) {
-                $(this).dialog('close');
+                Wat.I.closeDialog($(this));
             }
         };
 

@@ -126,10 +126,15 @@ select[name="acl_positive_on_role"] option, .acls_positive {
 .acls-branch, .subbranch {
     line-height: 27px;
     display: table;
+    font-weight: bold;
     
     .mini-loading {
         margin-top: 0px;
         margin-left: 30px;
+    }
+    
+    .count-wrapper--disabled {
+        color: lighten($col_blacker, 20);
     }
 }
 
@@ -160,18 +165,18 @@ select[name="acl_positive_on_role"] option, .acls_positive {
 
 .branch-text {
     font-size: 12px;
-    font-weight: bold;
 }
 
 .acl-inheritance {
-    margin-right: 5px;
+    margin-right: 0px;
     &:before {
         font-size: 15px;
     }
 }
 
 .disabled-branch {
-    color: #666;
+    color: lighten($col_blacker, 20);
+    font-weight: normal;
 }
 
 select[name="role"] { 

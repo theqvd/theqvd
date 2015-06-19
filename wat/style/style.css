@@ -66,7 +66,7 @@ article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, 
 
 body {
   line-height: 1;
-  color: #444; }
+  color: #333; }
 
 ol, ul {
   list-style: none; }
@@ -116,10 +116,10 @@ a {
   text-decoration: none;
   font-weight: bold; }
   a i.hover {
-    color: #444; }
+    color: #333; }
 
 a:hover i:before {
-  color: #444; }
+  color: #333; }
 
 .invisible {
   visibility: hidden; }
@@ -135,14 +135,14 @@ fieldset {
   border: 1px solid #fcd6bf;
   border-radius: 6px; }
   fieldset legend {
-    color: #b2b2b2;
+    color: #a1a1a1;
     text-align: right; }
 
 .h1 {
   position: relative;
   margin-bottom: 15px; }
   .h1 .subtitle {
-    color: #c4c4c4; }
+    color: #b3b3b3; }
   .h1 .fa:before {
     margin-right: 5px; }
 
@@ -162,10 +162,10 @@ fieldset {
   text-align: center; }
   .error-404 i.fa, .error-refresh i.fa {
     font-size: 90px;
-    color: #c4c4c4; }
+    color: #b3b3b3; }
   .error-404 div, .error-refresh div {
     font-size: 50px;
-    color: #c4c4c4; }
+    color: #b3b3b3; }
 
 .error-refresh {
   margin-top: 30px; }
@@ -175,7 +175,7 @@ fieldset {
 .no-elements {
   font-style: italic;
   font-weight: normal;
-  color: #777777;
+  color: #666666;
   margin-top: 6px; }
 
 .dialog-advice {
@@ -266,7 +266,7 @@ fieldset {
     min-width: 100px;
     padding: 8px 12px 8px 12px;
     background: #fdfdfd;
-    color: #444;
+    color: #333;
     border: 1px solid #f7985e;
     cursor: pointer; }
     @media screen and (min-width: 40em) {
@@ -828,7 +828,7 @@ body {
         padding: 14px 30px;
         margin-top: 10px;
         background: #e9e9e9;
-        color: #444;
+        color: #333;
         margin-top: 10px;
         margin-bottom: 10px;
         border-radius: 4px;
@@ -915,7 +915,6 @@ body {
         display: block; } }
   .wrapper .content {
     display: table;
-    width: 100%;
     margin: 0 auto;
     /********************************************************************
 *********************************************************************
@@ -1312,7 +1311,7 @@ body {
         float: right; }
       .wrapper .content fieldset legend {
         text-align: left;
-        color: #444;
+        color: #333;
         padding: 0px 10px; }
     .wrapper .content .details-side {
       display: none;
@@ -1641,10 +1640,13 @@ select[name="acl_positive_on_role"] option, .acls_positive {
 
 .acls-branch, .subbranch {
   line-height: 27px;
-  display: table; }
+  display: table;
+  font-weight: bold; }
   .acls-branch .mini-loading, .subbranch .mini-loading {
     margin-top: 0px;
     margin-left: 30px; }
+  .acls-branch .count-wrapper--disabled, .subbranch .count-wrapper--disabled {
+    color: #666666; }
 
 .branch-button {
   margin-right: 5px;
@@ -1666,16 +1668,16 @@ select[name="acl_positive_on_role"] option, .acls_positive {
   font-size: 10px; }
 
 .branch-text {
-  font-size: 12px;
-  font-weight: bold; }
+  font-size: 12px; }
 
 .acl-inheritance {
-  margin-right: 5px; }
+  margin-right: 0px; }
   .acl-inheritance:before {
     font-size: 15px; }
 
 .disabled-branch {
-  color: #666; }
+  color: #666666;
+  font-weight: normal; }
 
 select[name="role"] {
   min-width: 200px; }
@@ -1712,7 +1714,7 @@ select[name="role"] {
         position: absolute;
         left: 12px;
         top: 11px;
-        color: #c4c4c4;
+        color: #b3b3b3;
         font-weight: normal; }
 
 .footer {
@@ -1720,7 +1722,7 @@ select[name="role"] {
   height: 30px;
   margin-top: 50px;
   text-align: center;
-  color: #919191;
+  color: #808080;
   border-top: 2px solid #cacaca;
   background: #d7d7d7;
   width: 100%;
@@ -1948,13 +1950,13 @@ table.roles-inherit-tools-table {
 
 .second_row {
   margin-top: 4px;
-  color: #777777; }
+  color: #666666; }
 
 .second_row--error {
   color: #cc0000; }
 
 th .second_row {
-  color: #444; }
+  color: #333; }
 
 td.inner-table {
   padding: 0 !important; }
@@ -2931,7 +2933,7 @@ td {
     font-weight: bold;
     color: black; }
   .doc-text h1, .doc-text h2, .doc-text h3, .doc-text h4, .doc-text h5, .doc-text h6 {
-    color: #444;
+    color: #333;
     margin-top: 1.2em;
     margin-bottom: 0.5em;
     line-height: 1.3;
@@ -3160,7 +3162,7 @@ td {
   .doc-text #toc {
     margin-bottom: 2.5em; }
   .doc-text #toctitle {
-    color: #444;
+    color: #333;
     font-size: 1.1em;
     font-weight: bold;
     margin-top: 1em;

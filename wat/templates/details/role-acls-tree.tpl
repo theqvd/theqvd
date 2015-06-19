@@ -30,7 +30,7 @@
                 <input type="checkbox" class="js-branch-check branch-check" data-branch="<%= branch %>" data-tree-kind="sections" <%= checked %>/>
             <% } %>
                 <span class="branch-text" data-i18n="<%= branchName %>"><%= $.i18n.t(branchName) %></span>
-                <span class="second_row">
+                <span class="js-count-wrapper count-wrapper <%= branchStats[pattern].effective != branchStats[pattern].total ? 'count-wrapper--disabled' : '' %>">
                     (<span class="js-effective-count" data-branch="<%= branch %>"><%= branchStats[pattern].effective %></span>/<span class="js-total-count" data-branch="<%= branch %>"><%= branchStats[pattern].total %></span>)
                 </span>
         </div>
@@ -64,7 +64,7 @@
                 <input type="checkbox" class="js-branch-check branch-check" data-branch="<%= branch %>" data-tree-kind="actions" <%= checked %>/>
             <% } %>
                 <span class="branch-text" data-i18n="<%= branchName %>"><%= $.i18n.t(branchName) %></span>
-                <span class="second_row">
+                <span class="js-count-wrapper count-wrapper <%= branchStats[pattern].effective != branchStats[pattern].total ? 'count-wrapper--disabled' : '' %>">
                     (<span class="js-effective-count"><%= branchStats[pattern].effective %></span>/<span class="js-effective-count"><%= branchStats[pattern].total %></span>)
                 </span>
         </div>

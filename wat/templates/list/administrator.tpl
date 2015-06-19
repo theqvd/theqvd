@@ -107,7 +107,7 @@
                                             roles.push(role);
                                         });
                                     %>
-                                        <i class="fa fa-graduation-cap" title="&raquo; <%= roles.join(',').replace(/,/g,'<br /><br />&raquo; ') %>"></i>
+                                        <i class="<%= CLASS_ICON_ROLES %>" title="&raquo; <%= roles.join(',').replace(/,/g,'<br /><br />&raquo; ') %>"></i>
                                     <%
                                     }
                                     %>
