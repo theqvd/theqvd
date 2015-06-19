@@ -225,11 +225,9 @@ my $ACLS_FOR_FIELDS =
 	    di_id => [qr/^vm\.see\.di$/],
 	    properties => [qr/^vm\.see\.properties$/] },
  
-   Administrator => { roles => [qr/^administrator\.see\.roles$/],
-		       id => [qr/^administrator\.see\.id$/] },
+   Administrator => { roles => [qr/^administrator\.see\.roles$/] },
 
-    User => { id => [qr/^user\.see\.id$/],
-	      blocked => [qr/^user\.see\.block$/],
+    User => { blocked => [qr/^user\.see\.block$/],
 	      creation_admin_id => [qr/^user\.see\.created-by$/],
 	      creation_admin_name => [qr/^user\.see\.created-by$/],
 	      creation_date => [qr/^user\.see\.creation-date$/],
@@ -237,8 +235,7 @@ my $ACLS_FOR_FIELDS =
 	      number_of_vms_connected => [qr/^user\.see\.vm-list-state$/],
 	      properties => [qr/^user\.see\.properties$/] },
 
-    Host => { id => [qr/^host\.see\.id$/],
-	      address => [qr/^host\.see\.address$/],
+    Host => { address => [qr/^host\.see\.address$/],
 	      blocked => [qr/^host\.see\.block$/],
 	      state => [qr/^host\.see\.state$/],
 	      creation_admin_id => [qr/^host\.see\.created-by$/],
