@@ -154,6 +154,11 @@ sub OnInit {
     my $frame = QVD::Client::Frame->new();
     $self->SetTopWindow($frame);
     $frame->Show();
+    if ($self->should_autoconnect()) {
+	INFO("Launching autoconnect");
+	$frame->OnClickConnect;
+    }
+
     return 1;
 };
 
@@ -171,10 +176,13 @@ SCRIPT
 
     close(OSA);
 }
+
+sub should_autoconnect {
+    core_cfg('client.auto_connect', 0);
+}
 package main;
+
 use QVD::Log;
-
-
 
 Wx::InitAllImageHandlers();
 my $app = QVD::Client::App->new();

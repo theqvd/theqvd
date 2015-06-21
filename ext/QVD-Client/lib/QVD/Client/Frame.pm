@@ -185,7 +185,7 @@ sub new {
     $grid_sizer->Add($self->{username}, 1, wxALL|wxEXPAND, 5);
 
     $grid_sizer->Add(Wx::StaticText->new($panel, -1, $self->_t("Password")), 0, wxALL, 5);
-    $self->{password} = Wx::TextCtrl->new($panel, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+    $self->{password} = Wx::TextCtrl->new($panel, -1, core_cfg('client.user.password') ?  core_cfg('client.user.password') : '', wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
     $grid_sizer->Add($self->{password}, 0, wxALL|wxEXPAND, 5);
 
     if (core_cfg('client.show.remember_password')) {
