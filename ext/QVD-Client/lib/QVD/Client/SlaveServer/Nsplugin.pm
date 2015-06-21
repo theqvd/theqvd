@@ -71,8 +71,6 @@ sub execute {
 
     $ENV{NPW_INIT_TIMEOUT}="300";
     $ENV{NPW_MESSAGE_TIMEOUT}="300";
-    $ENV{NPW_DEBUG}="1";
-    $ENV{NPW_LOG}="/tmp/npw-viewer.out";
 
     my $npviewer = $self->_npviewer_path($plugin);
 
