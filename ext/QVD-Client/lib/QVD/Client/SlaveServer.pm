@@ -19,18 +19,18 @@ BEGIN {
 }
 
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use QVD::Log;
 use QVD::HTTP::Headers qw(header_eq_check header_lookup);
 use QVD::HTTP::StatusCodes qw(:all);
 use QVD::HTTPD;
 use File::Spec;
-
+use URI::Split qw(uri_split);
+use URI;
+use QVD::Client::SlaveServer::Nsplugin;
 use base 'QVD::HTTPD::INET';
 
-
 my $socat = "/usr/bin/socat";
-
 
 sub new {
     my ($class) = @_;
@@ -39,6 +39,7 @@ sub new {
     $self->set_http_request_processor(\&handle_version   , GET  => '/version');
     $self->set_http_request_processor(\&handle_connect   , POST => '/tcp/connect/*');
     $self->set_http_request_processor(\&handle_port_check, GET  => '/tcp/portcheck/*');
+    $self->set_http_request_processor(\&handle_get_nsplugin, GET => '/nsplugin');
 
 
     bless $self, $class;
@@ -113,6 +114,21 @@ sub handle_port_check {
     }
 }
 
+sub handle_get_nsplugin {
+    my ($httpd, $method, $url, $headers) = @_;
+
+    $httpd->send_http_error(HTTP_BAD_REQUEST)
+        unless header_eq_check($headers, Connection => 'Upgrade')
+           and header_eq_check($headers, Upgrade => 'qvd:slave/1.0');
+
+    my $uri = URI->new($url);
+    my %query = $uri->query_form();
+    my $plugin = QVD::Client::SlaveServer::Nsplugin->new(%query);
+
+    $httpd->send_http_response(HTTP_SWITCHING_PROTOCOLS);
+
+    $plugin->execute();
+}
 
 
 'QVD-Client'
@@ -166,4 +182,3 @@ L<http://search.cpan.org/dist/QVD-SlaveServer/>
 Copyright 2012 QVD Team.
 
 This program is released under the GNU Public License, version 3.
-
