@@ -169,6 +169,10 @@ client.host.port = 8443
 client.host.name =
 ## user name for client authentication
 client.user.name =
+## user password for client authentication
+client.user.password =
+## Auto connect when the client is invoked
+client.auto_connect = 0
 ## whether to use SSL in the client↔server communication or not
 client.use_ssl = 1
 client.ssl.use_cert = 0
