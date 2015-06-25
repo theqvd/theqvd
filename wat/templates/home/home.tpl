@@ -22,7 +22,7 @@
                             <div class="summary-element-count">
                                 <span class="summary-data js-summary-users" data-wsupdate="users_count"><%= stats.users_count %></span>
 
-                                <table class="col-width-100 second_row">
+                                <table class="summary-element-subtable second_row">
                                     <tr>
                                         <% if (Wat.C.checkACL('user.stats.blocked')) { %>
                                         <td>
@@ -59,7 +59,7 @@
                             <div class="summary-element-count">
                                 <span class="summary-data js-summary-vms" data-wsupdate="vms_count"><%= stats.vms_count %></span>
 
-                                <table class="col-width-100 second_row">
+                                <table class="summary-element-subtable second_row">
                                     <tr>
                                         <% if (Wat.C.checkACL('vm.stats.blocked')) { %>
                                         <td>
@@ -96,7 +96,7 @@
                             <div class="summary-element-count">
                                 <span class="summary-data js-summary-hosts" data-wsupdate="hosts_count"><%= stats.hosts_count %></span>
 
-                                <table class="col-width-100 second_row">
+                                <table class="summary-element-subtable second_row">
                                     <tr>
                                         <% if (Wat.C.checkACL('host.stats.blocked')) { %>
                                         <td>
@@ -149,7 +149,7 @@
                             <div class="summary-element-count">
                                 <span class="summary-data js-summary-dis" data-wsupdate="dis_count"><%= stats.dis_count %></span>
 
-                                <table class="col-width-100 second_row">
+                                <table class="summary-element-subtable second_row">
                                     <tr>
                                         <% if (Wat.C.checkACL('di.stats.blocked')) { %>
                                         <td>

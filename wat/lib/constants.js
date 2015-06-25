@@ -1,7 +1,7 @@
 // Debugging purposes
 
 // If true, the internal or fixed roles cannot be edited from WAT
-RESTRICT_INTERNAL_ROLES = true;
+RESTRICT_TEMPLATES = true;
 
 // Debug constants
 DEBUG_ACL_FAILS = false;
@@ -169,6 +169,7 @@ CLASS_ICON_DIS = 'fa fa-dot-circle-o';
 CLASS_ICON_LOGOUT = 'fa fa-power-off';
 CLASS_ICON_ADMINS = 'fa fa-suitcase';
 CLASS_ICON_ROLES = 'fa fa-graduation-cap';
+CLASS_ICON_TEMPLATES = 'fa fa-cube';
 CLASS_ICON_TENANTS = 'fa fa-building'; 
 CLASS_ICON_QVDMANAGE = 'fa fa-sliders'; 
 CLASS_ICON_QVDCONFIG = 'fa fa-dashboard'; 

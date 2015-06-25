@@ -73,6 +73,10 @@ Wat.B = {
             // Add inherited Role
             this.bindEvent('click', '.js-add-role-button', this.roleEditorBinds.addRole);
             this.bindEvent('click', '.js-add-template-button', this.roleEditorBinds.addTemplate);
+        
+            // Toggle role and templates tools
+            this.bindEvent('click', '.js-toggle-tools-roles-btn', this.roleEditorBinds.toggleRoleTools);
+            this.bindEvent('click', '.js-toggle-tools-templates-btn', this.roleEditorBinds.toggleTemplateTools);
 
             // Delete inherited Role
             this.bindEvent('click', '.js-delete-role-button', this.roleEditorBinds.deleteRole);
@@ -562,11 +566,7 @@ Wat.B = {
             };
             
             Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.model.fetch({      
-                    complete: function () {
-                        Wat.CurrentView.afterUpdateAcls();
-                    }
-                });
+                Wat.CurrentView.afterUpdateAcls();
             });
         },
         addAcl: function (e) {
@@ -601,6 +601,7 @@ Wat.B = {
         },
         deleteRole: function () {
             var roleId = $(this).attr('data-id');
+            var inheritType = $(this).attr('data-inherit-type');
             
             var filters = {
                 id: Wat.CurrentView.id
@@ -615,7 +616,14 @@ Wat.B = {
             Wat.CurrentView.updateModel(arguments, filters, function() {
                 Wat.CurrentView.model.fetch({      
                     complete: function () {
-                        Wat.CurrentView.afterUpdateRoles();
+                        switch (inheritType) {
+                            case "roles":
+                                Wat.CurrentView.afterUpdateRoles('delete_role');
+                                break;
+                            case "templates":
+                                Wat.CurrentView.afterUpdateRoles('delete_template');
+                                break;
+                        }
                     }
                 });
             });
@@ -635,16 +643,12 @@ Wat.B = {
             Wat.CurrentView.updateModel(arguments, filters, function() {
                 Wat.CurrentView.model.fetch({      
                     complete: function () {
-                        Wat.CurrentView.afterUpdateRoles();
+                        Wat.CurrentView.afterUpdateRoles('add_role');
                     }
                 });
             });
         },
         addTemplate: function (e) {
-            if ($(e.target).hasClass('disabled')) {
-                return;
-            }
-            
             var roleId = $(e.target).attr('data-role-template-id');
             
             var filters = {
@@ -652,17 +656,47 @@ Wat.B = {
             };
             var arguments = {
                 "__roles_changes__": {
-                    assign_roles: [roleId]
                 }
-            };
+            }
+            
+            if ($(e.target).is(':checked')) {
+                arguments["__roles_changes__"].assign_roles = [roleId];
+            }
+            else {
+                arguments["__roles_changes__"].unassign_roles = [roleId];
+            }
             
             Wat.CurrentView.updateModel(arguments, filters, function() {
                 Wat.CurrentView.model.fetch({      
                     complete: function () {
-                        Wat.CurrentView.afterUpdateRoles();
+                        Wat.CurrentView.afterUpdateRoles('add_template');
                     }
                 });
             });
         },
+        toggleRoleTools: function (e) {
+            if ($(e.target).hasClass('fa-eye')) {
+                $(e.target).addClass('fa-eye-slash');
+                $(e.target).removeClass('fa-eye');
+            }
+            else {
+                $(e.target).addClass('fa-eye');
+                $(e.target).removeClass('fa-eye-slash');
+            }
+
+            $('.js-tools-roles').slideToggle();
+        },
+        toggleTemplateTools: function (e) {
+            if ($(e.target).hasClass('fa-eye')) {
+                $(e.target).addClass('fa-eye-slash');
+                $(e.target).removeClass('fa-eye');
+            }
+            else {
+                $(e.target).addClass('fa-eye');
+                $(e.target).removeClass('fa-eye-slash');
+            }
+            
+            $('.js-tools-templates').slideToggle();
+        }
     }
 }

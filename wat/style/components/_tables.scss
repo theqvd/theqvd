@@ -197,7 +197,14 @@ table.role-template-matrix {
     width: 100%;
     @include table-base (alternate-rows);
     td {
-        padding: 8px !important;
+        text-align: center;
+        padding: 5px !important;
+        
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+        }
+        
         a.no-text-button {
             text-align: center;
             &:before {
@@ -206,6 +213,11 @@ table.role-template-matrix {
             }
         }
     }
+}
+
+.tools-roles, .tools-templates {
+    background: $col_whiter !important; 
+    display: none;
 }
 
 table.vmst {

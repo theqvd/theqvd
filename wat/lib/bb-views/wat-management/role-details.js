@@ -2,7 +2,6 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     setupOption: 'roles',
     secondaryContainer: '.bb-setup',
     qvdObj: 'role',
-    inheritanceSelectedMode: 'role',
     
     filterSection: '-1',
     filterAction: '-1',
@@ -35,8 +34,14 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     
     addSpecificTemplates: function () {
         var templates = {
-            inheritanceTools: {
-                name: 'details/role-inheritance-tools'
+            inheritanceToolsRoles: {
+                name: 'details/role-inheritance-tools-roles'
+            },
+            inheritanceToolsTemplates: {
+                name: 'details/role-inheritance-tools-templates'
+            },
+            inheritanceList: {
+                name: 'details/role-inheritance-list'
             },
             aclsRoles: {
                 name: 'details/role-acls-tree'
@@ -56,9 +61,6 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     },
     
     toggleInheritModes: function (e) {
-        // Store new selected value
-        Wat.CurrentView.inheritanceSelectedMode = $(e.target).val();
-        
         switch ($(e.target).val()) {
             case 'role':
                 $('.inherit-role').show();
@@ -159,7 +161,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             subbranch += '<div class="subbranch ' + disabledClass + '" data-acl="' + acl.name + '" data-acl-id="' + acl.id + '">';
             
                 // Assignation checkbox
-                if (Wat.C.checkACL('role.update.assign-acl') && (!that.model.get('fixed') || !RESTRICT_INTERNAL_ROLES)) {
+                if (Wat.C.checkACL('role.update.assign-acl') && (!that.model.get('fixed') || !RESTRICT_TEMPLATES)) {
                     subbranch += '<span class="subbranch-piece">';
                         subbranch += '<input type="checkbox" class="js-acl-check acl-check" data-acl="' + acl.name + '" data-acl-id="' + acl.id + '" ' + checkedAttr + '/>';
                     subbranch += '</span>';
@@ -349,6 +351,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         Wat.Views.DetailsView.prototype.render.apply(this);
         
         if (Wat.C.checkACL('role.see.inherited-roles')) {
+            this.renderManagerInheritedList();   
             this.renderManagerInheritedRoles();   
         }
         else {
@@ -358,22 +361,52 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         Wat.T.translate();
     },
     
+    renderManagerInheritedList: function () {
+        // Fill the html with the template and the model
+        this.template = _.template(
+            Wat.TPL.inheritanceList, {
+                model: this.model,
+                inheritFilter: 'roles'
+            }
+        );
+        $('.bb-role-inherited-list').html(this.template);
+        
+        // Fill the html with the template and the model
+        this.template = _.template(
+            Wat.TPL.inheritanceList, {
+                model: this.model,
+                inheritFilter: 'templates'
+            }
+        );
+        $('.bb-template-inherited-list').html(this.template);
+    },
+    
     renderManagerInheritedRoles: function () {
         // Fill the html with the template and the model
         this.template = _.template(
-            Wat.TPL.inheritanceTools, {
-                model: this.model,
-                inheritanceSelectedMode: this.inheritanceSelectedMode
+            Wat.TPL.inheritanceToolsRoles, {
+                model: this.model
             }
         );
-        $('.bb-role-inherited-roles').html(this.template);
-            
-        if (this.inheritanceSelectedMode != 'role') {
-            $('.js-role-inherit-mode[value="template"]').trigger('change');
-        }
+        $('.bb-role-inherited-tools-roles').html(this.template);
+        
+        // Fill the html with the template and the model
+        this.template = _.template(
+            Wat.TPL.inheritanceToolsTemplates, {
+                model: this.model
+            }
+        );
+        $('.bb-role-inherited-tools-templates').html(this.template);
         
         Wat.I.chosenElement('select[name="role-inherit-mode"]', 'single100');
         
+        this.fillInheritedRolesSelect();
+        this.fillInheritedTemplatesMatrix();
+        
+    },
+    
+    fillInheritedRolesSelect: function () {
+        // Fill roles select
         var params = {
             'action': 'role_tiny_list',
             'selectedId': '',
@@ -389,6 +422,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         };
         
         var that = this;
+        $('select[name="role"] option').remove();
         Wat.A.fillSelect(params, function () {
             // Remove from inherited roles selector, current role and already inherited ones (for standard roles)
             $('select[name="role"] option[value="' + that.elementId + '"]').remove();
@@ -400,16 +434,25 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             Wat.T.translate();
         });
         
+    },
+    
+    fillInheritedTemplatesMatrix: function () {
+        // Fill templates matrix
         Wat.A.performAction('role_tiny_list', {}, {internal: "1"}, {}, function (that) {
             var currentRoles = that.model.get('roles');
             
             $.each(that.retrievedData.rows, function (iTemplate, template) {
-                var button = $('td[data-role-template-cell="' + template.name + '"]>a');
-                button.removeClass('invisible');
-                button.attr('data-role-template-id', template.id);
+                var checkbox = $('td[data-role-template-cell="' + template.name + '"]>input');
+                
+                checkbox.removeClass('invisible');
+
+                checkbox.attr('data-role-template-id', template.id);
                 
                 if (currentRoles[template.id] != undefined) {
-                    button.addClass('disabled');
+                    checkbox.attr('checked', 'checked');
+                }
+                else {
+                    checkbox.removeAttr('checked');
                 }
             });
         }, this);
@@ -436,8 +479,20 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         Wat.T.translate();
     },
     
-    afterUpdateRoles: function () {
-        this.render();
+    afterUpdateRoles: function (performedAction) {
+        this.renderSide();
+        this.renderManagerInheritedList(); 
+        
+        switch (performedAction) {
+            case 'add_role':
+            case 'delete_role':
+                this.fillInheritedRolesSelect();
+                break;
+            case 'delete_template':
+                this.fillInheritedTemplatesMatrix();
+                break;
+        }
+        
     },
     
     afterUpdateAcls: function () {

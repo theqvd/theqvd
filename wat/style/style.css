@@ -1150,6 +1150,9 @@ body {
                 line-height: 1.7em; } }
             .wrapper .content .home-wrapper .home-row .home-cell .summary-element .summary-element-count .summary-data {
               font-weight: bold; }
+          .wrapper .content .home-wrapper .home-row .home-cell .summary-element .summary-element-subtable {
+            width: auto;
+            margin: 0 auto; }
       .wrapper .content .home-wrapper .log-table {
         width: 100%;
         background-color: #fdfdfd;
@@ -2396,12 +2399,20 @@ table.role-template-matrix {
     margin-top: 8px;
     float: right; }
   table.role-template-matrix td {
-    padding: 8px !important; }
+    text-align: center;
+    padding: 5px !important; }
+    table.role-template-matrix td input[type="checkbox"] {
+      width: 20px;
+      height: 20px; }
     table.role-template-matrix td a.no-text-button {
       text-align: center; }
       table.role-template-matrix td a.no-text-button:before {
         margin: 0px;
         text-align: center; }
+
+.tools-roles, .tools-templates {
+  background: #fdfdfd !important;
+  display: none; }
 
 table.vmst i.vmst-vm, table.vmst i.vmst-host, table.vmst i.vmst-dot {
   width: 100%; }
@@ -2827,10 +2838,10 @@ td {
   font-size: 20px;
   font-weight: bold; }
 .home-wrapper .home-cell .summary-table, .home-wrapper .home-cell .summary-table a {
-  font-size: 15px; }
+  font-size: 13px; }
   @media screen and (min-width: 40em) {
     .home-wrapper .home-cell .summary-table, .home-wrapper .home-cell .summary-table a {
-      font-size: 17px; } }
+      font-size: 15px; } }
 .home-wrapper .home-cell .home-percent-wrapper .home-percent {
   font-weight: normal;
   font-size: 35px; }

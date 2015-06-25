@@ -1,9 +1,9 @@
 <div class="details-header">
     <span class="<%= CLASS_ICON_ROLES %> h1"><%= model.get('name') %></span>
-    <% if(Wat.C.checkACL('role.delete.') && (!model.get('fixed') || !RESTRICT_INTERNAL_ROLES)) { %>
+    <% if(Wat.C.checkACL('role.delete.') && (!model.get('fixed') || !RESTRICT_TEMPLATES)) { %>
     <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
     <% } %>
-    <% if(Wat.C.checkGroupACL('roleEdit') && (!model.get('fixed') || !RESTRICT_INTERNAL_ROLES)) { %>
+    <% if(Wat.C.checkGroupACL('roleEdit') && (!model.get('fixed') || !RESTRICT_TEMPLATES)) { %>
     <a class="button fright button-icon js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"></a>
     <% } %>
 </div>
@@ -28,52 +28,25 @@ if (Wat.C.checkACL('role.see.id')) {
             <tr>
                 <td><i class="<%= CLASS_ICON_ROLES %>"></i><span data-i18n="Inherited roles"></span></td>
                 <td>
-                    <table class="roles-inherit-table">
-                        <tr>
-                            <td>
-                                <%
-                                    var classFixed = '';
-                                    if (model.get('fixed') && RESTRICT_INTERNAL_ROLES) {
-                                        classFixed = 'hidden';
-                                    }
-
-                                    $.each(model.get('roles'), function (iRole, role) {
-                                %>
-                                    <div>
-                                        <%
-                                            if (Wat.C.checkACL('role.update.assign-role')) {
-                                        %>
-                                                <i class="delete-role-button js-delete-role-button fa fa-trash-o <%= classFixed %>" data-id="<%= iRole %>" data-name="<%= role.name %>"></i>
-                                        <%
-                                            }
-
-                                        if (role.internal && RESTRICT_INTERNAL_ROLES) {
-                                        %>
-                                            <span class="text"><%= role.name + ' (' + $.i18n.t('Template') + ')' %></span>
-                                        <%
-                                        }
-                                        else {
-                                        %>
-                                            <%= Wat.C.ifACL('<a href="#/role/' + iRole + '">', 'role.see-details.') %>
-                                            <span class="text"><%= role.name %></span>
-                                            <%= Wat.C.ifACL('</a>', 'role.see-details.') %>
-                                        <%
-                                        }
-                                        %>
-                                    </div>
-                                <%
-                                    }); 
-                                %>  
-                                <%
-                                    if (Object.keys(model.get('roles')).length == 0) {
-                                %>
-                                        <span data-i18n="No elements found"></span>
-                                <%
-                                    }
-                                %>
-                            </td>
-                        </tr>
-                    </table>
+                    <div class="bb-role-inherited-list"></div>
+                    <a class="fa fa-eye button js-toggle-tools-roles-btn" style="width: 100%" data-i18n="Inherit roles"></a>
+                </td>
+            </tr>
+            <tr>
+                <td colspan=2  class="tools-roles js-tools-roles">
+                    <div class="bb-role-inherited-tools-roles"></div>
+                </td>
+            </tr>
+            <tr>
+                <td><i class="<%= CLASS_ICON_TEMPLATES %>"></i><span data-i18n="Inherited templates"></span></td>
+                <td>
+                    <div class="bb-template-inherited-list"></div>
+                    <a class="fa fa-eye button js-toggle-tools-templates-btn" style="width: 100%" data-i18n="Inherit templates"></a>
+                </td>
+            </tr>
+            <tr>
+                <td colspan=2 class="tools-templates js-tools-templates">
+                    <div class="bb-role-inherited-tools-templates"></div>
                 </td>
             </tr>
         <% 

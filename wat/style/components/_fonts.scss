@@ -164,9 +164,9 @@ td {
         }
         
         .summary-table, .summary-table a {
-            font-size: 15px;
+            font-size: 13px;
             @include in(desktop) {
-                font-size: 17px;
+                font-size: 15px;
             }
         }
         
