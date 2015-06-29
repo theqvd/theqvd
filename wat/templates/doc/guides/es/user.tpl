@@ -1794,7 +1794,44 @@ En la vista detalle encontraremos un bloque con los roles asignados. Aparecerá 
 </li>
 </ul></div>
 <div class="paragraph"><p>Para nuestros primeros administradores podemos utilizar los roles disponibles por defecto en el sistema.</p></div>
-<div class="paragraph"><p><span class="yellow-background">TODO: Cuando estén definidos los roles predefinidos del sistema, explicar con ejemplos la creación de algunos administradores útiles.</span></p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Root
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Rol con todos los ACLs posibles del sistema. O lo que es lo mismo, control total de lectura, actualización, operación, creación y borrado en cada uno de los elementos.</p></div>
+</div></div>
+</dd>
+<dt class="hdlist1">
+Operator L1
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Rol con todos los <strong>ACLs de lectura</strong> de Imágenes de disco, OSFs, Usuarios y Máquinas virtuales.</p></div>
+</div></div>
+</dd>
+<dt class="hdlist1">
+Operator L2
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Rol con los ACLs del Operator L1 y además los ACLs de operación: Bloquear/Desbloquear elementos, Arrancar/Parar máquinas virtuales, Desconectar usuarios&#8230;</p></div>
+</div></div>
+</dd>
+<dt class="hdlist1">
+Operator L3
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Rol con los ACLs del Operator L2 y además los ACLs de creación, actualización y borrado sobre los elementos de QVD, y los ACLs de administración de Nodos.</p></div>
+</div></div>
+</dd>
+</dl></div>
 <div class="paragraph"><p>Cuando nos surja la necesidad de crear administradores con permisos más específicos, será cuando necesitemos abordar la gestión de roles.</p></div>
 </div>
 <div class="sect2">
@@ -2058,6 +2095,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table"><strong>See statistics of number of users</strong></p></td>
 <td align="left" valign="top"><p class="table">user.stats.blocked</p></td>
 <td align="left" valign="top"><p class="table">Total of blocked users in current tenant or all system for superadministrators.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See statistics of number of connected users</strong></p></td>
+<td align="left" valign="top"><p class="table">user.stats.connected-users</p></td>
+<td align="left" valign="top"><p class="table">Total of users connected in at least one virtual machine.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>See statistics of number of blocked users</strong></p></td>
@@ -4795,7 +4837,7 @@ Seleccionar todos los elementos del listado, incluyendo los de otras páginas
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-04-28 11:47:21 CEST
+Last updated 2015-06-29 15:43:21 CEST
 </div>
 </div>
 </body>

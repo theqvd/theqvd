@@ -6,10 +6,10 @@
     <% if(Wat.C.checkGroupACL('roleEdit') && (!model.get('fixed') || !RESTRICT_TEMPLATES)) { %>
     <a class="button fright button-icon js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"></a>
     <% } %>
-    <% if(Wat.C.checkACL('role.update.assign-role')) { %>
+    <% if(Wat.C.checkACL('role.update.assign-role') && (!model.get('fixed') || !RESTRICT_TEMPLATES)) { %>
     <a class="button fright button-icon js-tools-templates-btn <%= CLASS_ICON_TEMPLATES %>" href="javascript:" data-i18n="[title]Inherit templates"></a>
     <% } %>
-    <% if(Wat.C.checkACL('role.update.assign-role')) { %>
+    <% if(Wat.C.checkACL('role.update.assign-role') && (!model.get('fixed') || !RESTRICT_TEMPLATES)) { %>
     <a class="button fright button-icon js-tools-roles-btn <%= CLASS_ICON_ROLES %>" href="javascript:" data-i18n="[title]Inherit roles"></a>
     <% } %>
 </div>
