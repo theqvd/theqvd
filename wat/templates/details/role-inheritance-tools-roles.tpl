@@ -1,10 +1,20 @@
-<table class="roles-inherit-tools-table" style="border: 0">
-    <tr class="inherit-role">
-        <td colspan=2 style="width: 100%">
-            <select name="role"></select>
-        </td>
-        <td>
-            <a class="button add-role-button js-add-role-button fa fa-sitemap fright" href="javascript:" data-i18n="Inherit selected role"></a>
-        </td>
+<table class="role-template-tools">
+    <tr>
+        <th><span data-i18n="Inherited"></span></th>
+        <th><span data-i18n="Role"></span></th>
     </tr>
+<%
+    $.each(roles, function (iRole, role) {
+        %>
+            <tr>
+                <td class="center">
+                    <input type="checkbox" class="js-add-role-button" <%= role.inherited ? 'checked="checked"' : '' %> data-role-template-id="<%= role.id %>"/>
+                </td>
+                <td class="col-width-100 left">
+                    <%= role.name %>
+                </td>
+            </tr>
+        <%
+    });
+%>
 </table>

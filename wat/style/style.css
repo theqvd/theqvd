@@ -18,7 +18,7 @@
   padding-left: 5px;
   padding-right: 5px; }
 
-.menu > ul .menu-option, .menu > ul .lateral-menu-option, .menu > ul .lateral-menu-option-discrete, a.button, button.button, a.button2, button.button2, a.button--green, button.button--green, a.button--red, button.button--red, a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.disabled, .wrapper .content .home-wrapper th, .wrapper .content .home-wrapper .home-row .home-cell .summary-table th, .wrapper .content .home-wrapper .log-table th, table.list th, table.customize-fields th, table.custom-props th, table.details th, table.role-template-matrix th, .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus, .not-selectable {
+.menu > ul .menu-option, .menu > ul .lateral-menu-option, .menu > ul .lateral-menu-option-discrete, a.button, button.button, a.button2, button.button2, a.button--green, button.button--green, a.button--red, button.button--red, a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.disabled, .wrapper .content .home-wrapper th, .wrapper .content .home-wrapper .home-row .home-cell .summary-table th, .wrapper .content .home-wrapper .log-table th, table.list th, table.customize-fields th, table.custom-props th, table.details th, table.role-template-tools th, .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus, .not-selectable {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -2344,69 +2344,71 @@ div.list-block div:first-child {
 table.list td, table.list th {
   white-space: nowrap; }
 
-table.role-template-matrix {
-  width: 100%;
+table.role-template-tools {
   width: 100%;
   background-color: #fdfdfd;
   border: 1px solid #ddd;
   border-radius: 4px;
-  border-collapse: separate; }
-  table.role-template-matrix th {
+  border-collapse: separate;
+  width: 100%;
+  font-size: 15px;
+  margin: 0 auto; }
+  table.role-template-tools th {
     font-weight: bold;
     text-align: left;
     border-bottom: #ccc solid 1px;
     background: #d7d7d7; }
-    table.role-template-matrix th .sort-icon {
+    table.role-template-tools th .sort-icon {
       float: right;
       width: auto; }
-    table.role-template-matrix th.sortable {
+    table.role-template-tools th.sortable {
       cursor: pointer; }
-    table.role-template-matrix th.sorted {
+    table.role-template-tools th.sorted {
       background-color: #e35e0c;
       color: #fdfdfd; }
-    table.role-template-matrix th i {
+    table.role-template-tools th i {
       width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       font-weight: bold; }
-      table.role-template-matrix th i.sort-icon:before {
+      table.role-template-tools th i.sort-icon:before {
         float: right;
         margin-left: 5px;
         font-weight: normal; }
-  table.role-template-matrix tr td, table.role-template-matrix tr th {
+  table.role-template-tools tr td, table.role-template-tools tr th {
     padding: 12px 8px 8px 8px;
     vertical-align: top;
     border-right: dotted 1px #e4e4e4;
     border-bottom: dotted 1px #e4e4e4; }
-    table.role-template-matrix tr td:last-child, table.role-template-matrix tr th:last-child {
+    table.role-template-tools tr td:last-child, table.role-template-tools tr th:last-child {
       border-right: 0px; }
-  table.role-template-matrix tr:last-child td {
+  table.role-template-tools tr:last-child td {
     border-bottom: 0; }
-  table.role-template-matrix > tbody:nth-child(2) tr:first-child td:first-child {
+  table.role-template-tools > tbody:nth-child(2) tr:first-child td:first-child {
     border-right: dotted 1px #e4e4e4; }
-  table.role-template-matrix > tbody:nth-child(2) tr:first-child td {
+  table.role-template-tools > tbody:nth-child(2) tr:first-child td {
     border-top: dotted 1px #e4e4e4; }
-  table.role-template-matrix > tbody > tr:nth-child(even) {
+  table.role-template-tools > tbody > tr:nth-child(even) {
     background-color: #fdfdfd; }
-  table.role-template-matrix > tbody > tr:nth-child(odd) {
+  table.role-template-tools > tbody > tr:nth-child(odd) {
     background-color: #f3f3f3; }
-  table.role-template-matrix tr:last-child td:first-child {
+  table.role-template-tools tr:last-child td:first-child {
     border-bottom-left-radius: 4px; }
-  table.role-template-matrix tr:last-child td:last-child {
+  table.role-template-tools tr:last-child td:last-child {
     border-bottom-right-radius: 4px; }
-  table.role-template-matrix .info-in-name-cell {
+  table.role-template-tools .info-in-name-cell {
     margin-top: 8px;
     float: right; }
-  table.role-template-matrix td {
+  table.role-template-tools td {
     text-align: center;
     padding: 5px !important; }
-    table.role-template-matrix td input[type="checkbox"] {
+    table.role-template-tools td input[type="checkbox"] {
       width: 20px;
       height: 20px; }
-    table.role-template-matrix td a.no-text-button {
+    table.role-template-tools td a.no-text-button {
       text-align: center; }
-      table.role-template-matrix td a.no-text-button:before {
+      table.role-template-tools td a.no-text-button:before {
         margin: 0px;
         text-align: center; }
 

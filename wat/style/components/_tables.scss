@@ -193,9 +193,13 @@ table.list {
     }     
 }
 
-table.role-template-matrix {
-    width: 100%;
+table.role-template-tools {
     @include table-base (alternate-rows);
+    
+    width: 100%;
+    font-size: 15px;
+    margin: 0 auto;
+
     td {
         text-align: center;
         padding: 5px !important;

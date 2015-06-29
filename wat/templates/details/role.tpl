@@ -6,6 +6,12 @@
     <% if(Wat.C.checkGroupACL('roleEdit') && (!model.get('fixed') || !RESTRICT_TEMPLATES)) { %>
     <a class="button fright button-icon js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"></a>
     <% } %>
+    <% if(Wat.C.checkACL('role.update.assign-role')) { %>
+    <a class="button fright button-icon js-tools-templates-btn <%= CLASS_ICON_TEMPLATES %>" href="javascript:" data-i18n="[title]Inherit templates"></a>
+    <% } %>
+    <% if(Wat.C.checkACL('role.update.assign-role')) { %>
+    <a class="button fright button-icon js-tools-roles-btn <%= CLASS_ICON_ROLES %>" href="javascript:" data-i18n="[title]Inherit roles"></a>
+    <% } %>
 </div>
 
 <% 
@@ -29,7 +35,6 @@ if (Wat.C.checkACL('role.see.id')) {
                 <td><i class="<%= CLASS_ICON_ROLES %>"></i><span data-i18n="Inherited roles"></span></td>
                 <td>
                     <div class="bb-role-inherited-list"></div>
-                    <a class="fa fa-eye button js-toggle-tools-roles-btn" style="width: 100%" data-i18n="Inherit roles"></a>
                 </td>
             </tr>
             <tr>
@@ -41,7 +46,6 @@ if (Wat.C.checkACL('role.see.id')) {
                 <td><i class="<%= CLASS_ICON_TEMPLATES %>"></i><span data-i18n="Inherited templates"></span></td>
                 <td>
                     <div class="bb-template-inherited-list"></div>
-                    <a class="fa fa-eye button js-toggle-tools-templates-btn" style="width: 100%" data-i18n="Inherit templates"></a>
                 </td>
             </tr>
             <tr>

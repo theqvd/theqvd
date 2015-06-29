@@ -206,7 +206,7 @@ Wat.C = {
     // - Storing useful parameters, perform configuration and rendering main if success.
     // Params:
     //      that: Current context where will be stored API call return
-    checkLogin: function (that) {   
+    checkLogin: function (that) {
         that.password = '';
         
         if (!that.retrievedData.acls || $.isEmptyObject(that.retrievedData.acls)) {

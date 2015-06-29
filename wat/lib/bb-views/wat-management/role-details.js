@@ -57,7 +57,109 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         'change .js-acl-check': 'checkACL',
         'change .js-acl-tree-selector': 'toggleTree',
         'change .js-role-inherit-mode': 'toggleInheritModes',
-        'click .js-role-inherit-mode': 'inheritTemplate'
+        'click .js-role-inherit-mode': 'inheritTemplate',
+        'click .js-tools-roles-btn': 'openRoleToolsDialog',
+        'click .js-tools-templates-btn': 'openTemplateToolsDialog'
+    },
+    
+    openRoleToolsDialog: function () {
+        var that = this;
+        
+        var dialogConf = {
+            title: 'Inherit roles',
+            buttons : {
+                "Close": function () {
+                    Wat.I.closeDialog($(this));
+                }
+            },
+            button1Class : 'fa fa-check',
+            fillCallback : function(target) {
+                $(target).html(HTML_MID_LOADING);
+                
+                Wat.A.performAction('role_tiny_list', {}, {internal: "0"}, {}, function (that) {
+                    var currentRoles = that.model.get('roles');
+                    var roles = that.retrievedData.rows;
+
+                    // Add inherted flag to roles object 
+                    $.each (roles, function (i, role) {
+                        if (currentRoles[role.id]) {
+                            roles[i].inherited = 1;   
+                        }
+                        else {
+                            roles[i].inherited = 0;   
+                        }
+                    });                
+
+                    // Render template and fill dialog
+                    var template = _.template(
+                        Wat.TPL.inheritanceToolsRoles, {
+                            model: this.model,
+                            roles: roles
+                        }
+                    );
+                    
+                    $(target).html(template);
+                    
+                    Wat.T.translate();
+
+                }, that);
+            }
+        }
+        
+        $("html, body").animate({ scrollTop: 0 }, 200);
+        Wat.I.dialog(dialogConf);
+    },
+    
+    openTemplateToolsDialog: function () {
+        var that = this;
+        
+        var dialogConf = {
+            title: 'Inherit templates',
+            buttons : {
+                "Close": function () {
+                    Wat.I.closeDialog($(this));
+                }
+            },
+            button1Class : 'fa fa-check',
+            fillCallback : function(target) { 
+                $(target).html(HTML_MID_LOADING);
+                $(target).css('padding', '0px');
+                
+                // Render templates matrix
+                Wat.A.performAction('role_tiny_list', {}, {internal: "1"}, {}, function (that) {
+                    var currentRoles = that.model.get('roles');
+                    var templates = that.retrievedData.rows;
+                    
+                    var templatesByName = {};
+                    // Create an object with templates including inherited flag
+                    $.each (templates, function (i, template) {
+                        templatesByName[template.name] = template;
+                        
+                        if (currentRoles[template.id]) {
+                            templatesByName[template.name].inherited = 1;   
+                        }
+                        else {
+                            templatesByName[template.name].inherited = 0;   
+                        }
+                    });
+                    
+                    var template = _.template(
+                        Wat.TPL.inheritanceToolsTemplates, {
+                            templates: templatesByName
+                        }
+                    );
+                    
+                    $(target).html(template);
+                    
+                    Wat.T.translate();
+                    
+                }, that);
+                
+            }
+        }
+        
+        $("html, body").animate({ scrollTop: 0 }, 200);
+        Wat.I.dialog(dialogConf);
     },
     
     toggleInheritModes: function (e) {
@@ -352,7 +454,6 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         
         if (Wat.C.checkACL('role.see.inherited-roles')) {
             this.renderManagerInheritedList();   
-            this.renderManagerInheritedRoles();   
         }
         else {
             $('.js-menu-roles').hide();
@@ -379,61 +480,6 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             }
         );
         $('.bb-template-inherited-list').html(this.template);
-    },
-    
-    renderManagerInheritedRoles: function () {
-        // Fill the html with the template and the model
-        this.template = _.template(
-            Wat.TPL.inheritanceToolsRoles, {
-                model: this.model
-            }
-        );
-        $('.bb-role-inherited-tools-roles').html(this.template);
-        
-        // Fill the html with the template and the model
-        this.template = _.template(
-            Wat.TPL.inheritanceToolsTemplates, {
-                model: this.model
-            }
-        );
-        $('.bb-role-inherited-tools-templates').html(this.template);
-        
-        Wat.I.chosenElement('select[name="role-inherit-mode"]', 'single100');
-        
-        this.fillInheritedRolesSelect();
-        this.fillInheritedTemplatesMatrix();
-        
-    },
-    
-    fillInheritedRolesSelect: function () {
-        // Fill roles select
-        var params = {
-            'action': 'role_tiny_list',
-            'selectedId': '',
-            'controlName': 'role',
-            'filters': {
-                "internal": false
-            },
-            'order_by': {
-                "field": ["internal","name"],
-                "order": "-asc"
-            },
-            'chosenType': 'advanced100'
-        };
-        
-        var that = this;
-        $('select[name="role"] option').remove();
-        Wat.A.fillSelect(params, function () {
-            // Remove from inherited roles selector, current role and already inherited ones (for standard roles)
-            $('select[name="role"] option[value="' + that.elementId + '"]').remove();
-
-            $.each(that.model.get('roles'), function (iRole, role) {
-                $('select[name="role"] option[value="' + iRole + '"]').remove();
-            });
-            
-            Wat.T.translate();
-        });
-        
     },
     
     fillInheritedTemplatesMatrix: function () {
@@ -482,21 +528,9 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     afterUpdateRoles: function (performedAction) {
         this.renderSide();
         this.renderManagerInheritedList(); 
-        
-        switch (performedAction) {
-            case 'add_role':
-            case 'delete_role':
-                this.fillInheritedRolesSelect();
-                break;
-            case 'delete_template':
-                this.fillInheritedTemplatesMatrix();
-                break;
-        }
-        
     },
     
     afterUpdateAcls: function () {
-        this.renderManagerInheritedRoles();
         $('.bb-details-side1').html(HTML_MINI_LOADING);
         this.renderSide();
         var selectedSubmenuOption = $('.js-submenu-option.menu-option--selected').attr('data-show-submenu');

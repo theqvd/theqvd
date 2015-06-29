@@ -71,12 +71,8 @@ Wat.B = {
             this.bindEvent('click', '.js-add-negative-acl-button', this.roleEditorBinds.addAcl, 'negative');
 
             // Add inherited Role
-            this.bindEvent('click', '.js-add-role-button', this.roleEditorBinds.addRole);
+            this.bindEvent('change', '.js-add-role-button', this.roleEditorBinds.addRole);
             this.bindEvent('click', '.js-add-template-button', this.roleEditorBinds.addTemplate);
-        
-            // Toggle role and templates tools
-            this.bindEvent('click', '.js-toggle-tools-roles-btn', this.roleEditorBinds.toggleRoleTools);
-            this.bindEvent('click', '.js-toggle-tools-templates-btn', this.roleEditorBinds.toggleTemplateTools);
 
             // Delete inherited Role
             this.bindEvent('click', '.js-delete-role-button', this.roleEditorBinds.deleteRole);
@@ -628,21 +624,36 @@ Wat.B = {
                 });
             });
         },
-        addRole: function () {
-            var roleId = $('select[name="role"]').val();
+        addRole: function (e) {
+            var roleId = $(e.target).attr('data-role-template-id');
+            
+            // Disable checks to avoid current petitions and add animation to current checked
+            $('.js-add-role-button').attr('disabled', 'disabled');
+            $(e.target).addClass('animated');
+            $(e.target).addClass('faa-flash');
             
             var filters = {
                 id: Wat.CurrentView.id
             };
             var arguments = {
                 "__roles_changes__": {
-                    assign_roles: [roleId]
                 }
             };
+            
+            if ($(e.target).is(':checked')) {
+                arguments["__roles_changes__"].assign_roles = [roleId];
+            }
+            else {
+                arguments["__roles_changes__"].unassign_roles = [roleId];
+            }
             
             Wat.CurrentView.updateModel(arguments, filters, function() {
                 Wat.CurrentView.model.fetch({      
                     complete: function () {
+                        $('.js-add-role-button').removeAttr('disabled');
+                        $(e.target).removeClass('animated');
+                        $(e.target).removeClass('faa-flash');
+                        
                         Wat.CurrentView.afterUpdateRoles('add_role');
                     }
                 });
@@ -650,6 +661,12 @@ Wat.B = {
         },
         addTemplate: function (e) {
             var roleId = $(e.target).attr('data-role-template-id');
+
+            // Disable checks to avoid current petitions and add animation to current checked
+            $('.js-add-template-button').attr('disabled', 'disabled');
+            $(e.target).addClass('animated');
+            $(e.target).addClass('faa-flash')
+            
             
             var filters = {
                 id: Wat.CurrentView.id
@@ -669,34 +686,14 @@ Wat.B = {
             Wat.CurrentView.updateModel(arguments, filters, function() {
                 Wat.CurrentView.model.fetch({      
                     complete: function () {
+                        $('.js-add-template-button').removeAttr('disabled');
+                        $(e.target).removeClass('animated');
+                        $(e.target).removeClass('faa-flash');
+                        
                         Wat.CurrentView.afterUpdateRoles('add_template');
                     }
                 });
             });
         },
-        toggleRoleTools: function (e) {
-            if ($(e.target).hasClass('fa-eye')) {
-                $(e.target).addClass('fa-eye-slash');
-                $(e.target).removeClass('fa-eye');
-            }
-            else {
-                $(e.target).addClass('fa-eye');
-                $(e.target).removeClass('fa-eye-slash');
-            }
-
-            $('.js-tools-roles').slideToggle();
-        },
-        toggleTemplateTools: function (e) {
-            if ($(e.target).hasClass('fa-eye')) {
-                $(e.target).addClass('fa-eye-slash');
-                $(e.target).removeClass('fa-eye');
-            }
-            else {
-                $(e.target).addClass('fa-eye');
-                $(e.target).removeClass('fa-eye-slash');
-            }
-            
-            $('.js-tools-templates').slideToggle();
-        }
     }
 }

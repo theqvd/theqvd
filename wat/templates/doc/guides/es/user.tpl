@@ -3354,7 +3354,7 @@ cellspacing="0" cellpadding="4">
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Assign-Unassign role&#8217;s inherited roles</strong></p></td>
 <td align="left" valign="top"><p class="table">role.update.assign-role</p></td>
-<td align="left" valign="top"><p class="table">Manage the inheritance of roles adding rolles in others.</p></td>
+<td align="left" valign="top"><p class="table">Manage the inheritance of roles adding roles in others.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Update role&#8217;s name</strong></p></td>
