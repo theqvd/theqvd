@@ -75,7 +75,8 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             button1Class : 'fa fa-check',
             fillCallback : function(target) {
                 $(target).html(HTML_MID_LOADING);
-                
+                $(target).css('padding', '0px');
+
                 Wat.A.performAction('role_tiny_list', {}, {internal: "0"}, {}, function (that) {
                     var currentRoles = that.model.get('roles');
                     var roles = that.retrievedData.rows;
@@ -100,6 +101,12 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
                     
                     $(target).html(template);
                     
+                    $('.role-template-tools').tableScroll({
+                        height: 400
+                    });
+                    
+                    that.fixTableScrollStyles();
+                    
                     Wat.T.translate();
 
                 }, that);
@@ -118,7 +125,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             buttons : {
                 "Close": function () {
                     Wat.I.closeDialog($(this));
-                }
+                },
             },
             button1Class : 'fa fa-check',
             fillCallback : function(target) { 
@@ -150,6 +157,12 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
                     );
                     
                     $(target).html(template);
+                    
+                    $('.role-template-tools').tableScroll({
+                        height: 400
+                    });
+                    
+                    that.fixTableScrollStyles();
                     
                     Wat.T.translate();
                     
@@ -576,5 +589,46 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         toggleNewPassword: function () {
             $('.new_password_row').toggle();
         }
+    },
+    
+    fixTableScrollStyles: function () {
+        // Add table styles to header
+        $('.tablescroll .tablescroll_head').addClass('role-template-tools');
+
+        // Reduce the wrapper layer because header will be increased due class application
+        var currentHeight = $('.tablescroll .tablescroll_wrapper').height();
+        $('.tablescroll .tablescroll_wrapper').css('height', (currentHeight - 50) + 'px');
+
+        // Remove horizontal scroll to wrapper layer
+        $('.tablescroll .tablescroll_wrapper').css('overflow-x', 'hidden');
+
+        // Get max width of each column and apply it on header cells
+        var maxWidths = [];
+        $.each($('.tablescroll .tablescroll_body tr').eq(0).children(), function (i, cell) {
+            var cellWidth = $(cell).css('width');
+            var head = $('.tablescroll .tablescroll_head tr').eq(0).children().eq(i);
+            var headWidth = $(head).css('width');
+
+            if (cellWidth > headWidth) {
+                maxWidths[i] = cellWidth;
+            }
+            else {
+                maxWidths[i] = headWidth;
+            }
+
+            $(head).css('width', maxWidths[i]);
+            $(head).css('min-width', maxWidths[i]);
+            $(head).css('max-width', maxWidths[i]);
+        });
+
+        // Apply max widths on each row within body
+        $.each($('.tablescroll .tablescroll_body tr'), function (i, row) {
+            $.each(maxWidths, function (imw, mw) {
+                var cell = $(row).children().eq(imw);
+                $(cell).css('width', mw);
+                $(cell).css('min-width', mw);
+                $(cell).css('max-width', mw);
+            });
+        });
     }
 });

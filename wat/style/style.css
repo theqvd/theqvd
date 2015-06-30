@@ -2351,8 +2351,8 @@ table.role-template-tools {
   border-radius: 4px;
   border-collapse: separate;
   width: 100%;
-  font-size: 15px;
-  margin: 0 auto; }
+  font-size: 14px;
+  margin: 0 0; }
   table.role-template-tools th {
     font-weight: bold;
     text-align: left;
@@ -2411,6 +2411,8 @@ table.role-template-tools {
       table.role-template-tools td a.no-text-button:before {
         margin: 0px;
         text-align: center; }
+  table.role-template-tools td:first-child {
+    text-align: left; }
 
 .tools-roles, .tools-templates {
   background: #fdfdfd !important;
