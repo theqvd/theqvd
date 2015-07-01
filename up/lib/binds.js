@@ -58,6 +58,8 @@ Wat.B = {
         
         // Dialogs
         this.bindEvent('click' ,'.js-change-password', this.navigationBinds.openChangePasswordDialog);
+        this.bindEvent('click' ,'.js-profiles', this.navigationBinds.openProfilesDialog);
+        this.bindEvent('change' ,'.js-profile-select', this.navigationBinds.openProfileChangeDialog);
 
     },
     
@@ -276,6 +278,14 @@ Wat.B = {
             }
 
             Wat.I.dialog(dialogConf, this); 
+        },
+        
+        openProfilesDialog: function (e) {  
+            Wat.CurrentView.openProfilesDialog(e);
+        }, 
+        
+        openProfileChangeDialog: function (e) {  
+            Wat.CurrentView.openProfileChangeDialog(e);
         },
     },
     

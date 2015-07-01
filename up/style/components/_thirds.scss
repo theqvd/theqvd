@@ -51,12 +51,8 @@
         overflow-y: auto;
         padding-left: 30px;
         padding-right: 30px;
-            
-        min-height: 75vh !important;
-
-        @include in(desktop) {
-            min-height: 60vh !important;
-        }
+        max-height: 70vh !important;
+        height: auto;
     }
 }
 
@@ -77,7 +73,7 @@
 .dialog-container, .dialog-container-template {
     display: none;
     padding: 0;
-    height: 50vh !important;
+    padding-bottom: 30px !important;
 }
 
 .dialog-container-template {

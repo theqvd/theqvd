@@ -7,9 +7,6 @@
         <a href="javascript:" class="fa fa-bars mobile-menu js-mobile-menu-hamburger" id="mobile-menu"></a>
 
         <div class="js-menu-corner menu-corner">
-            <div class="logged-info right" style="margin-bottom: 13px; margin-right: 5px;">
-                Logged as: <span class="js-login"></span>
-            </div>
             <ul class="corner-menu nav-collapse-corner">
                 <% $.each(cornerMenu, function (iMenu, menuOpt) { %>
                     <li class="menu-option js-menu-option-<%= iMenu %>">

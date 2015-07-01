@@ -49,6 +49,12 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             connectionSettings: {
                 name: 'editor/connection-settings'
             },
+            profileChange: {
+                name: 'editor/profile-change'
+            },
+            profiles: {
+                name: 'editor/profiles'
+            },
             VMwarnings: {
                 name: 'editor/vm-warnings'
             },
@@ -148,7 +154,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         );
         
         $(that.listBlockContainer).html(template);
-
+        
+        Wat.I.chosenElement('select[name="connection_profile"]', 'single100');
+        
         that.renderList();
                 
         // Translate the strings rendered. 

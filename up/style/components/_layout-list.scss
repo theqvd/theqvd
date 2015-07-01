@@ -334,3 +334,12 @@ fieldset {
         }
     }
 }
+
+.profile-select {
+    clear: none;
+    padding: 4px;
+    width: 100%;
+    @include in(desktop) {
+        width: 35%;
+    }
+}

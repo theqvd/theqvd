@@ -4,7 +4,7 @@ Wat.I = {
         profile: {
             link: "javascript:",
             icon: "fa fa-user",
-            text: "Profile",
+            textClass: "js-login",
             objVisible: "vm",
             subMenu: {
                 change_password: {
@@ -12,6 +12,13 @@ Wat.I = {
                     linkClass: "js-change-password",
                     icon: "fa fa-edit",
                     text: "Change password",
+                    subMenu: {}
+                },
+                settings: {
+                    link: "javascript:",
+                    linkClass: "js-profiles",
+                    icon: "fa fa-sliders",
+                    text: "Profiles",
                     subMenu: {}
                 },
                 logout: {

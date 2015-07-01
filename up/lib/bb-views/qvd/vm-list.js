@@ -70,6 +70,38 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         Wat.I.dialog(dialogConf, this); 
     },  
     
+    openProfilesDialog: function (e) {    
+        this.selectedModelId = $(e.target).attr('data-model-id');
+        
+        var dialogConf = {
+            title: 'Profiles',
+            fillCallback : this.fillProfilesDialog,
+            buttons : {
+                "OK": function () {
+                    $(this).dialog('close');
+                },
+            },
+            button1Class : 'fa fa-check',
+        }
+                
+        Wat.I.dialog(dialogConf, this); 
+    },  
+    
+    openProfileChangeDialog: function (e) {            
+        var dialogConf = {
+            title: 'Profile change',
+            fillCallback : this.fillProfileChangeDialog,
+            buttons : {
+                "OK": function () {
+                    $(this).dialog('close');
+                },
+            },
+            button1Class : 'fa fa-check',
+        }
+                
+        Wat.I.dialog(dialogConf, this); 
+    },     
+    
     openSettingsDialog: function (e) {    
         this.selectedModelId = $(e.target).attr('data-model-id');
         
@@ -111,6 +143,30 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         
         $(dialog).html(template);
     },   
+    
+    fillProfileChangeDialog: function (dialog, that) {        
+        // Fill the html with the template and the collection
+        var template = _.template(
+            Wat.TPL.profileChange, {
+            });
+        
+        $(dialog).html(template);
+    },    
+    
+    fillProfilesDialog: function (dialog, that) {
+        var model = that.collection.get(that.selectedModelId);
+        
+        // Fill the html with the template and the collection
+        var template = _.template(
+            Wat.TPL.profiles, {
+                model: model
+            });
+        
+        $(dialog).html(template);
+        
+        Wat.I.chosenElement('select[name="connection_profile"]', 'single100');
+        Wat.I.chosenElement('select[name="connection_profile_remember"]', 'single100');
+    },       
     
     fillSettingsDialog: function (dialog, that) {
         var model = that.collection.get(that.selectedModelId);
