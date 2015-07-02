@@ -14,11 +14,18 @@ Wat.I = {
                     text: "Change password",
                     subMenu: {}
                 },
-                settings: {
+                profiles_select: {
                     link: "javascript:",
-                    linkClass: "js-profiles",
+                    linkClass: "js-profiles-select",
                     icon: "fa fa-sliders",
-                    text: "Profiles",
+                    text: "Profile selection",
+                    subMenu: {}
+                },
+                profiles_manage: {
+                    link: "javascript:",
+                    linkClass: "js-profiles-manage",
+                    icon: "fa fa-cogs",
+                    text: "Profiles management",
                     subMenu: {}
                 },
                 logout: {
@@ -150,7 +157,13 @@ Wat.I = {
     },
     
     dialog: function (dialogConf, that) {
-        $('.js-dialog-container').dialog({
+        
+        var div = document.createElement("DIV");
+        $(div).addClass('dialog-container');
+        $(div).addClass('js-dialog-container');
+        document.body.appendChild(div);
+
+        $(div).dialog({
             dialogClass: "loadingScreenWindow",
             resizable: false,
             dialogClass: 'no-close',
@@ -259,4 +272,9 @@ Wat.I = {
         $('.menu').hide();
         $('.js-' + menu + '-menu').show();
     },
+    
+    closeDialog: function (dialog) {
+        dialog.dialog('close').remove();
+        delete Wat.CurrentView.dialog;
+    }
 }

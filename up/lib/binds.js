@@ -58,8 +58,14 @@ Wat.B = {
         
         // Dialogs
         this.bindEvent('click' ,'.js-change-password', this.navigationBinds.openChangePasswordDialog);
-        this.bindEvent('click' ,'.js-profiles', this.navigationBinds.openProfilesDialog);
+        this.bindEvent('click' ,'.js-profiles-select', this.navigationBinds.openProfilesDialog);
+        this.bindEvent('click' ,'.js-profiles-manage', this.navigationBinds.openProfilesManageDialog);
         this.bindEvent('change' ,'.js-profile-select', this.navigationBinds.openProfileChangeDialog);
+        this.bindEvent('click' ,'.js-edit-profile', this.navigationBinds.openEditProfileDialog);
+        this.bindEvent('click' ,'.js-new-profile', this.navigationBinds.openNewProfileDialog);
+        this.bindEvent('click' ,'.js-delete-profile', this.navigationBinds.deleteProfile);
+        this.bindEvent('click' ,'.js-custom-settings-switch', this.navigationBinds.switchCustomSettings);
+        this.bindEvent('click' ,'.js-vm-warnings', this.navigationBinds.openVMWarningsDialog);
 
     },
     
@@ -270,7 +276,7 @@ Wat.B = {
                 title: 'Change password',
                 buttons : {
                     "Save": function () {
-                        $(this).dialog('close');
+                        Wat.I.closeDialog($(this));
                     }
                 },
                 button1Class : 'fa fa-save',
@@ -282,10 +288,41 @@ Wat.B = {
         
         openProfilesDialog: function (e) {  
             Wat.CurrentView.openProfilesDialog(e);
+        },     
+        
+        openProfilesManageDialog: function (e) {  
+            Wat.CurrentView.openProfilesManageDialog(e);
         }, 
         
         openProfileChangeDialog: function (e) {  
             Wat.CurrentView.openProfileChangeDialog(e);
+        },      
+        
+        openEditProfileDialog: function (e) {  
+            Wat.CurrentView.openEditProfileDialog(e);
+        },     
+        
+        openNewProfileDialog: function (e) {  
+            Wat.CurrentView.openNewProfileDialog(e);
+        },
+        
+        deleteProfile: function (e) {  
+            Wat.CurrentView.deleteProfile(e);
+        },
+        
+        switchCustomSettings: function (e) {
+            if ($(e.target).val() == "1") {
+                $('.js-vm-settings-custom').show();
+                $('.js-vm-settings-global').hide();
+            }
+            else {
+                $('.js-vm-settings-custom').hide();
+                $('.js-vm-settings-global').show();
+            }
+        },
+        
+        openVMWarningsDialog: function (e) {  
+            Wat.CurrentView.openVMWarningsDialog(e);
         },
     },
     

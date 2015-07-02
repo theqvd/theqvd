@@ -18,8 +18,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
     listEvents: {
         'click .js-change-viewmode': 'changeViewMode',
         'click .js-vm-details': 'openDetailsDialog',
-        'click .js-vm-settings': 'openSettingsDialog',
-        'click .js-vm-warnings': 'openVMWarningsDialog'
+        'click .js-vm-settings': 'openVmSettingsDialog',
     },
     
     startVM: function (filters) {        
@@ -49,21 +48,15 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
     
     openDetailsDialog: function (e) {  
         this.selectedModelId = $(e.target).attr('data-model-id');
-        
+        console.log(this.selectedModelId);
         var dialogConf = {
             title: 'Details',
-            /*
             buttons : {
-                "Force disconnection": function () {
-                    $(this).dialog('close');
+                "Close": function () {
+                    Wat.I.closeDialog($(this));
                 },
-                "Reboot VM": function () {
-                    $(this).dialog('close');
-                }
             },
-            button1Class : 'fa fa-sign-out',
-            button2Class : 'fa fa-refresh',
-            */
+            button1Class : 'fa fa-check',
             fillCallback : this.fillDetailsDialog
         }
                 
@@ -74,14 +67,35 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         this.selectedModelId = $(e.target).attr('data-model-id');
         
         var dialogConf = {
-            title: 'Profiles',
-            fillCallback : this.fillProfilesDialog,
+            title: 'Profile selection',
+            fillCallback : this.fillProfilesSelectDialog,
             buttons : {
-                "OK": function () {
-                    $(this).dialog('close');
+                "Save": function () {
+                    Wat.I.closeDialog($(this));
                 },
             },
-            button1Class : 'fa fa-check',
+            button1Class : 'fa fa-save',
+        }
+                
+        Wat.I.dialog(dialogConf, this); 
+    },      
+    
+    openProfilesManageDialog: function (e) {    
+        this.selectedModelId = $(e.target).attr('data-model-id');
+        
+        var dialogConf = {
+            title: 'Profiles management',
+            fillCallback : this.fillProfilesManageDialog,
+            buttons : {
+                "New profile": function () {
+
+                },
+                "Close": function () {
+                    Wat.I.closeDialog($(this));
+                },
+            },
+            button1Class : 'fa fa-plus-circle js-new-profile',
+            button2Class : 'fa fa-check',
         }
                 
         Wat.I.dialog(dialogConf, this); 
@@ -92,15 +106,36 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             title: 'Profile change',
             fillCallback : this.fillProfileChangeDialog,
             buttons : {
+                "Cancel": function () {
+                    Wat.I.closeDialog($(this));
+                },
                 "OK": function () {
-                    $(this).dialog('close');
+                    Wat.I.closeDialog($(this));
                 },
             },
-            button1Class : 'fa fa-check',
+            button1Class : 'fa fa-ban',
+            button2Class : 'fa fa-check',
         }
                 
         Wat.I.dialog(dialogConf, this); 
     },     
+    
+    openVmSettingsDialog: function (e) {    
+        this.selectedModelId = $(e.target).attr('data-model-id');
+        
+        var dialogConf = {
+            title: 'Connection settings',
+            buttons : {
+                "Save": function () {
+                    Wat.I.closeDialog($(this));
+                },
+            },
+            button1Class : 'fa fa-save',
+            fillCallback : this.fillVmSettingsDialog
+        }
+                
+        Wat.I.dialog(dialogConf, this); 
+    },      
     
     openSettingsDialog: function (e) {    
         this.selectedModelId = $(e.target).attr('data-model-id');
@@ -109,7 +144,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             title: 'Connection settings',
             buttons : {
                 "Save": function () {
-                    $(this).dialog('close');
+                    Wat.I.closeDialog($(this));
                 },
             },
             button1Class : 'fa fa-save',
@@ -117,7 +152,48 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         }
                 
         Wat.I.dialog(dialogConf, this); 
-    },    
+    },     
+    
+    openEditProfileDialog: function (e) {  
+        this.selectedModelId = $(e.target).attr('data-profile-id');
+        
+        var dialogConf = {
+            title: 'Connection settings',
+            buttons : {
+                "Save": function () {
+                    Wat.I.closeDialog($(this));
+                },
+            },
+            button1Class : 'fa fa-save',
+            fillCallback : this.fillSettingsDialog
+        }
+                
+        Wat.I.dialog(dialogConf, this); 
+    },      
+    
+    openNewProfileDialog: function (e) {          
+        var dialogConf = {
+            title: 'Connection settings',
+            buttons : {
+                "Save": function () {
+                    Wat.I.closeDialog($(this));
+                },
+            },
+            button1Class : 'fa fa-save',
+            fillCallback : this.fillSettingsDialog
+        }
+                
+        Wat.I.dialog(dialogConf, this); 
+    },
+    
+    deleteProfile: function (e) {
+        this.dialog = $('.js-dialog-container');
+        if (confirm($.i18n.t("Are you sure?"))) {        
+            $(this.dialog).html('');
+            this.fillProfilesManageDialog(this.dialog, this);
+            Wat.T.translate();
+        }
+    },
     
     openVMWarningsDialog: function (e) {
         this.selectedModelId = $(e.target).attr('data-model-id');
@@ -153,12 +229,12 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         $(dialog).html(template);
     },    
     
-    fillProfilesDialog: function (dialog, that) {
+    fillProfilesSelectDialog: function (dialog, that) {
         var model = that.collection.get(that.selectedModelId);
         
         // Fill the html with the template and the collection
         var template = _.template(
-            Wat.TPL.profiles, {
+            Wat.TPL.profilesSelect, {
                 model: model
             });
         
@@ -166,7 +242,51 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         
         Wat.I.chosenElement('select[name="connection_profile"]', 'single100');
         Wat.I.chosenElement('select[name="connection_profile_remember"]', 'single100');
+    },    
+    
+    fillProfilesManageDialog: function (dialog, that) {
+        var model = that.collection.get(that.selectedModelId);
+        
+        // Fill the html with the template and the collection
+        var template = _.template(
+            Wat.TPL.profilesManage, {
+                model: model
+            });
+        
+        $(dialog).html(template);
     },       
+    
+    fillVmSettingsDialog: function (dialog, that) {
+        var model = that.collection.get(that.selectedModelId);
+        
+        // Fill the html with the template and the collection
+        var template = _.template(
+            Wat.TPL.vmConnectionSettings, {
+                model: model
+            });
+        
+        $(dialog).html(template);
+        
+        // Fill the html with the template and the collection
+        var template = _.template(
+            Wat.TPL.connectionSettings, {
+                model: model,
+                onlyread: true,
+            });
+        
+        $(dialog).find('.bb-vm-settings-global').html(template); 
+        
+        // Fill the html with the template and the collection
+        var template = _.template(
+            Wat.TPL.connectionSettings, {
+                model: model,
+                onlyread: false,
+            });
+        
+        $(dialog).find('.bb-vm-settings-custom').html(template);
+        
+        Wat.I.chosenElement('select[name="type"]', 'single100');
+    },    
     
     fillSettingsDialog: function (dialog, that) {
         var model = that.collection.get(that.selectedModelId);
@@ -174,7 +294,8 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         // Fill the html with the template and the collection
         var template = _.template(
             Wat.TPL.connectionSettings, {
-                model: model
+                model: model,
+                onlyread: false,
             });
         
         $(dialog).html(template);

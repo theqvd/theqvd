@@ -127,7 +127,7 @@ Wat.Views.MainView = Backbone.View.extend({
             }
 
             if (that.dialog) {
-                that.dialog.dialog('close');
+                Wat.I.closeDialog(that.dialog);
             }
                         
             var messageParams = {

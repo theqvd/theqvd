@@ -47,13 +47,19 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 name: 'list/sorting-row'
             },
             connectionSettings: {
-                name: 'editor/connection-settings'
+                name: 'editor/connection-settings-table'
+            },
+            vmConnectionSettings: {
+                name: 'editor/vm-connection-settings'
             },
             profileChange: {
                 name: 'editor/profile-change'
             },
-            profiles: {
-                name: 'editor/profiles'
+            profilesSelect: {
+                name: 'editor/profiles-select'
+            },
+            profilesManage: {
+                name: 'editor/profiles-manage'
             },
             VMwarnings: {
                 name: 'editor/vm-warnings'

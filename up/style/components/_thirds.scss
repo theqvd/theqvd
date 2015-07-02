@@ -93,7 +93,8 @@
     padding: 1px;
     margin-bottom: 50px;
     position: fixed;
-    
+    border: 2px solid $col_brand;
+
     @include in(mobile) {
         position: absolute;
         left: auto !important;

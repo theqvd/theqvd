@@ -229,15 +229,21 @@ table.profile-options {
 }
 
 
-table.profile-change-table {
+table.profile-change-table, table.profile-settings-table, table.settings-table {
     td { 
         padding: 3px;
         font-size: 20px;
         vertical-align: top;
         
-        input[type="radio"] {
+        input[type="radio"], input[type="checkbox"] {
             width: 20px;
             height: 20px;
         }
+    }
+}
+
+table.settings-table {
+    td:last-child {
+        text-align: center;
     }
 }

@@ -2538,13 +2538,16 @@ table.profile-options {
   border-spacing: 4px;
   border-collapse: separate; }
 
-table.profile-change-table td {
+table.profile-change-table td, table.profile-settings-table td, table.settings-table td {
   padding: 3px;
   font-size: 20px;
   vertical-align: top; }
-  table.profile-change-table td input[type="radio"] {
+  table.profile-change-table td input[type="radio"], table.profile-change-table td input[type="checkbox"], table.profile-settings-table td input[type="radio"], table.profile-settings-table td input[type="checkbox"], table.settings-table td input[type="radio"], table.settings-table td input[type="checkbox"] {
     width: 20px;
     height: 20px; }
+
+table.settings-table td:last-child {
+  text-align: center; }
 
 /********************************************************************
 *********************************************************************
@@ -2707,6 +2710,7 @@ table.profile-change-table td {
   padding: 1px;
   margin-bottom: 50px;
   position: fixed;
+  border: 2px solid #e35e0c;
   width: 100% !important;
   height: 100vh !important; }
   @media only screen and (max-width: 40em) {
