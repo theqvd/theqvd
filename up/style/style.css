@@ -1332,7 +1332,10 @@ body {
           .wrapper .content .grid-cell .vm-name {
             width: 100%; } }
       .wrapper .content .grid-cell .vm-screenshot {
-        background: url('../images/screenshot-test.png');
+        background: url('../images/screenshot-test.png'); }
+      .wrapper .content .grid-cell .vm-screenshot-off {
+        background: url('../images/screenshot-off.png'); }
+      .wrapper .content .grid-cell .vm-screenshot, .wrapper .content .grid-cell .vm-screenshot-off {
         background-size: auto 100%;
         background-position: center;
         background-repeat: no-repeat;
@@ -1341,15 +1344,15 @@ body {
         float: left;
         position: relative; }
         @media screen and (min-width: 40em) {
-          .wrapper .content .grid-cell .vm-screenshot {
+          .wrapper .content .grid-cell .vm-screenshot, .wrapper .content .grid-cell .vm-screenshot-off {
             width: 100%;
             height: 150px;
             float: none;
             margin-top: 5px;
             margin-bottom: 5px; } }
-        .wrapper .content .grid-cell .vm-screenshot .state-icon, .wrapper .content .grid-cell .vm-screenshot .warning-icon, .wrapper .content .grid-cell .vm-screenshot .vm-warn-buttons {
+        .wrapper .content .grid-cell .vm-screenshot .state-icon, .wrapper .content .grid-cell .vm-screenshot .warning-icon, .wrapper .content .grid-cell .vm-screenshot .vm-warn-buttons, .wrapper .content .grid-cell .vm-screenshot-off .state-icon, .wrapper .content .grid-cell .vm-screenshot-off .warning-icon, .wrapper .content .grid-cell .vm-screenshot-off .vm-warn-buttons {
           position: absolute; }
-        .wrapper .content .grid-cell .vm-screenshot .vm-warn-buttons {
+        .wrapper .content .grid-cell .vm-screenshot .vm-warn-buttons, .wrapper .content .grid-cell .vm-screenshot-off .vm-warn-buttons {
           background: #333;
           opacity: 0.8;
           position: absolute;
@@ -1359,7 +1362,7 @@ body {
           bottom: -38px;
           border-radius: 6px; }
           @media screen and (min-width: 40em) {
-            .wrapper .content .grid-cell .vm-screenshot .vm-warn-buttons {
+            .wrapper .content .grid-cell .vm-screenshot .vm-warn-buttons, .wrapper .content .grid-cell .vm-screenshot-off .vm-warn-buttons {
               width: 60px;
               top: 0;
               border-radius: 0px;
@@ -1367,7 +1370,7 @@ body {
               height: 30px;
               bottom: -35px;
               border-radius: 10px; } }
-        .wrapper .content .grid-cell .vm-screenshot .state-icon, .wrapper .content .grid-cell .vm-screenshot .warning-icon {
+        .wrapper .content .grid-cell .vm-screenshot .state-icon, .wrapper .content .grid-cell .vm-screenshot .warning-icon, .wrapper .content .grid-cell .vm-screenshot-off .state-icon, .wrapper .content .grid-cell .vm-screenshot-off .warning-icon {
           bottom: -36px;
           width: 28px;
           height: 28px;
@@ -1375,20 +1378,20 @@ body {
           background: #fdfdfd;
           border-radius: 100%; }
           @media screen and (min-width: 40em) {
-            .wrapper .content .grid-cell .vm-screenshot .state-icon, .wrapper .content .grid-cell .vm-screenshot .warning-icon {
+            .wrapper .content .grid-cell .vm-screenshot .state-icon, .wrapper .content .grid-cell .vm-screenshot .warning-icon, .wrapper .content .grid-cell .vm-screenshot-off .state-icon, .wrapper .content .grid-cell .vm-screenshot-off .warning-icon {
               top: 3px;
               width: 24px;
               height: 24px;
               padding: 3px; } }
-        .wrapper .content .grid-cell .vm-screenshot .state-icon {
+        .wrapper .content .grid-cell .vm-screenshot .state-icon, .wrapper .content .grid-cell .vm-screenshot-off .state-icon {
           left: 14px; }
           @media screen and (min-width: 40em) {
-            .wrapper .content .grid-cell .vm-screenshot .state-icon {
+            .wrapper .content .grid-cell .vm-screenshot .state-icon, .wrapper .content .grid-cell .vm-screenshot-off .state-icon {
               left: 3px; } }
-        .wrapper .content .grid-cell .vm-screenshot .warning-icon {
+        .wrapper .content .grid-cell .vm-screenshot .warning-icon, .wrapper .content .grid-cell .vm-screenshot-off .warning-icon {
           right: 10px; }
           @media screen and (min-width: 40em) {
-            .wrapper .content .grid-cell .vm-screenshot .warning-icon {
+            .wrapper .content .grid-cell .vm-screenshot .warning-icon, .wrapper .content .grid-cell .vm-screenshot-off .warning-icon {
               left: 32px; } }
       .wrapper .content .grid-cell .vm-link {
         width: 60%;

@@ -223,6 +223,14 @@ fieldset {
     
     .vm-screenshot {
         background: url('../images/screenshot-test.png');
+    }  
+    
+    .vm-screenshot-off {
+        background: url('../images/screenshot-off.png');
+    }
+    
+
+    .vm-screenshot, .vm-screenshot-off {
         background-size: auto 100%;
         background-position: center; 
         background-repeat: no-repeat;

@@ -26,7 +26,7 @@
                         %>
                         <span class="js-name col-width-100">
                             <div class="bigtext bold vm-name"><%= model.get('name') %></div>
-                            <div class="vm-screenshot js-vm-screenshot"> 
+                            <div class="<%= Math.floor( Math.random() * 2 ) ? "vm-screenshot" : "vm-screenshot-off" %> js-vm-screenshot"> 
                                 <div class="vm-warn-buttons js-vm-warn-buttons"></div>
                                 <%= Wat.CurrentView.getUserStateIcon(model.get('user_state'), model.get('id')) %>
                                 <%= Wat.CurrentView.getWarningIcon(model.get('expiration_hard'), model.get('id')) %>
