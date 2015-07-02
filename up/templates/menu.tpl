@@ -3,7 +3,7 @@
         <%
             $.each(mobileMenu, function (target, option) {
         %>
-            <li class="menu-option" data-target="<%= target %>">
+            <li class="menu-option <%= option.linkClass %>" data-target="<%= target %>">
                 <i class="<%= option.icon %>"></i>
                 <span data-i18n="<%= option.text %>"></span>
             </li>

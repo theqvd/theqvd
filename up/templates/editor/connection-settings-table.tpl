@@ -6,7 +6,7 @@
         <td>
             <label for="close_session" data-i18n="Close current session"></label>
         </td>
-        <td class="col-width-15">
+        <td>
             <%
             if (onlyread) {
             %>

@@ -2540,7 +2540,7 @@ table.profile-options {
 
 table.profile-change-table td, table.profile-settings-table td, table.settings-table td {
   padding: 3px;
-  font-size: 20px;
+  font-size: 18px;
   vertical-align: top; }
   table.profile-change-table td input[type="radio"], table.profile-change-table td input[type="checkbox"], table.profile-settings-table td input[type="radio"], table.profile-settings-table td input[type="checkbox"], table.settings-table td input[type="radio"], table.settings-table td input[type="checkbox"] {
     width: 20px;
@@ -2548,6 +2548,9 @@ table.profile-change-table td, table.profile-settings-table td, table.settings-t
 
 table.settings-table td:last-child {
   text-align: center; }
+  @media screen and (min-width: 40em) {
+    table.settings-table td:last-child {
+      width: 100px; } }
 
 /********************************************************************
 *********************************************************************

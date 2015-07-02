@@ -232,7 +232,7 @@ table.profile-options {
 table.profile-change-table, table.profile-settings-table, table.settings-table {
     td { 
         padding: 3px;
-        font-size: 20px;
+        font-size: 18px;
         vertical-align: top;
         
         input[type="radio"], input[type="checkbox"] {
@@ -245,5 +245,8 @@ table.profile-change-table, table.profile-settings-table, table.settings-table {
 table.settings-table {
     td:last-child {
         text-align: center;
+        @include in(desktop) {
+            width: 100px;
+        }
     }
 }
