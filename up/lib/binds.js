@@ -64,7 +64,7 @@ Wat.B = {
         this.bindEvent('click' ,'.js-edit-profile', this.navigationBinds.openEditProfileDialog);
         this.bindEvent('click' ,'.js-new-profile', this.navigationBinds.openNewProfileDialog);
         this.bindEvent('click' ,'.js-delete-profile', this.navigationBinds.deleteProfile);
-        this.bindEvent('click' ,'.js-custom-settings-switch', this.navigationBinds.switchCustomSettings);
+        this.bindEvent('change' ,'.js-custom-settings-switch', this.navigationBinds.switchCustomSettings);
         this.bindEvent('click' ,'.js-vm-warnings', this.navigationBinds.openVMWarningsDialog);
 
     },
@@ -311,7 +311,7 @@ Wat.B = {
         },
         
         switchCustomSettings: function (e) {
-            if ($(e.target).val() == "1") {
+            if ($(e.target).val() == "custom") {
                 $('.js-vm-settings-custom').show();
                 $('.js-vm-settings-global').hide();
             }

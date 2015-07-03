@@ -52,6 +52,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             vmConnectionSettings: {
                 name: 'editor/vm-connection-settings'
             },
+            editConnectionSettings: {
+                name: 'editor/edit-connection-settings'
+            },
             profileChange: {
                 name: 'editor/profile-change'
             },

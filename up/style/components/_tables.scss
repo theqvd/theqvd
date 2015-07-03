@@ -246,7 +246,12 @@ table.settings-table {
     td:last-child {
         text-align: center;
         @include in(desktop) {
-            width: 100px;
+            width: 150px;
+        }
+        
+        .chosen-container {
+            text-align: left;
+            font-size: 14px;
         }
     }
 }

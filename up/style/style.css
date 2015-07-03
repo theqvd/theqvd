@@ -2553,7 +2553,10 @@ table.settings-table td:last-child {
   text-align: center; }
   @media screen and (min-width: 40em) {
     table.settings-table td:last-child {
-      width: 100px; } }
+      width: 150px; } }
+  table.settings-table td:last-child .chosen-container {
+    text-align: left;
+    font-size: 14px; }
 
 /********************************************************************
 *********************************************************************

@@ -1,4 +1,4 @@
-<div class="h2">Details of the Virtual Machine</div>
+<div class="h2" data-i18n="Details of the Virtual Machine"></div>
 <table class="details details-list">
     <tbody>
         <tr>
