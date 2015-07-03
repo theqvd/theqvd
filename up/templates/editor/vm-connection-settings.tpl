@@ -1,4 +1,4 @@
-<table class="list settings-table">
+<table class="list settings-table shrinkable">
     <tbody>
         <tr>
             <td>

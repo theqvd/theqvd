@@ -155,6 +155,14 @@ $security_margin: 5;
     }
 }
 
+@for $i from 1 through 100 {
+    @include in(mobile) {
+        .mob-col-width-#{$i} {
+            width: $i * 1% !important;
+        }
+    }
+}
+
 /* Table scroll */
 
 div.list-block {
@@ -201,7 +209,9 @@ div.list-block>div:first-child {
 
 table.list {
     td, th {
-        white-space: nowrap;
+        @include in(desktop) {
+            white-space: nowrap;
+        }
     }     
 }
 
@@ -251,7 +261,11 @@ table.settings-table {
         
         .chosen-container {
             text-align: left;
-            font-size: 14px;
+            
+            font-size: 12px;
+            @include in(desktop) {
+                font-size: 14px;
+            }
         }
     }
 }

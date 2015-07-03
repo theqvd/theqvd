@@ -111,8 +111,11 @@
         //height: 85vh !important;
     }
     
-    td {
+    table.shrinkable td {
         display: block;
+    }
+    
+    td {
         padding-bottom: 5px;
 
         @include in(desktop) {

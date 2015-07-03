@@ -16,7 +16,7 @@
 <table class="profile-options">
     <tr>
         <td>
-                <a class="fa fa-trash button js-new-profile" data-i18n="New profile"></a>
+                <a class="fa fa-trash button js-new-profile mob-col-width-100" data-i18n="New profile"></a>
         </td>
     </tr>
     <tr>
