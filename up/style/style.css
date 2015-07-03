@@ -3136,8 +3136,9 @@ table.settings-table td:last-child {
       width: 650px !important;
       height: 550px !important;
       height: auto !important; } }
-  .ui-dialog table.shrinkable td {
-    display: block; }
+  @media only screen and (max-width: 40em) {
+    .ui-dialog table.shrinkable td {
+      display: block; } }
   .ui-dialog td {
     padding-bottom: 5px; }
     @media screen and (min-width: 40em) {

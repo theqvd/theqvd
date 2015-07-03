@@ -112,7 +112,9 @@
     }
     
     table.shrinkable td {
-        display: block;
+        @include in(mobile) {
+            display: block;
+        }
     }
     
     td {
