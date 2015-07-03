@@ -155,6 +155,14 @@ $security_margin: 5;
     }
 }
 
+@for $i from 1 through 100 {
+    @include in(mobile) {
+        .mob-col-width-#{$i} {
+            width: $i * 1% !important;
+        }
+    }
+}
+
 /* Table scroll */
 
 div.list-block div:first-child {

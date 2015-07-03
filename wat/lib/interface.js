@@ -424,6 +424,10 @@ Wat.I = {
     },
     
     chosenElement: function (selector, type) {
+        if (type == 'single100' || type == 'advanced100' ) {
+            $(selector).addClass('mob-col-width-100');
+        }
+        
         $(selector).chosen(this.chosenOptions[type]);
     },
     
