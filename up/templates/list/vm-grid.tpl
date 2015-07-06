@@ -32,7 +32,7 @@
                                 <%= Wat.CurrentView.getWarningIcon(model.get('expiration_hard'), model.get('id')) %>
                             </div>
                                 
-                            <a class="fa fa-plug button js-login-button connect-btn js-connect-btn" data-i18n="Connect"></a>
+                            <a class="fa fa-plug button connect-btn js-connect-btn" data-i18n="Connect"></a>
                             
                             <a href="javascript:" data-model-id="<%= model.get('id') %>" class="js-vm-details vm-link-button desktop button2" data-i18n="[title]Click for details">
                                 <i class="fa fa-search"></i>

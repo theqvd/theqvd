@@ -43,7 +43,7 @@
                     </div>
                 </td>
                 <td>
-                    <a class="fa fa-plug button js-login-button" data-i18n="Connect"></a>
+                    <a class="fa fa-plug button connect-btn js-connect-btn" data-i18n="Connect"></a>
                 </td>
             </tr>
         <%
