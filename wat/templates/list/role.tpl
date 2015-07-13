@@ -136,6 +136,13 @@
                                 </td>
                 <%
                                 break;
+                            case 'tenant':
+                %>
+                                <td class="desktop">
+                                    <%= model.get('tenant_name') %>
+                                </td>
+                <%
+                                break;
                         }
                     });
                 %>
