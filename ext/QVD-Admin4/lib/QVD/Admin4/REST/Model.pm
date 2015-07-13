@@ -448,7 +448,7 @@ my $AVAILABLE_FILTERS =
 
 	      Tenant => [qw(id name language block creation_date creation_admin_id creation_admin_name)],
 
-	      Role => [qw(name id fixed internal admin_id inheritor_id creation_date creation_admin_id creation_admin_name)],
+	      Role => [qw(name id fixed internal admin_id inheritor_id tenant_id tenant_name creation_date creation_admin_id creation_admin_name)],
 
 	      Administrator => [qw(name  tenant_id tenant_name id language block creation_date creation_admin_id creation_admin_name)],
 
@@ -483,7 +483,7 @@ my $AVAILABLE_FILTERS =
 
 		 ACL => [qw(id name role_id admin_id description )],
 
-		 Role => [qw(name id fixed internal admin_id inheritor_id creation_date creation_admin_id creation_admin_name)],
+		 Role => [qw(name id fixed internal admin_id inheritor_id tenant_id tenant_name creation_date creation_admin_id creation_admin_name)],
 
 		 Tenant => [qw(id name language block creation_date creation_admin_id creation_admin_name)],
 
@@ -730,7 +730,7 @@ my $MANDATORY_ARGUMENTS = { Config => [qw(key value)],
 			    OSF => [qw(tenant_id name memory overlay user_storage )],
                             DI => [qw(version disk_image osf_id blocked)],
 			    Tenant => [qw(name language block)],
-			    Role => [qw(name fixed internal)],
+			    Role => [qw(tenant_id name fixed internal)],
                             Administrator => [qw(tenant_id name password language block)],
 			    Tenant_Views_Setup => [qw(tenant_id field visible view_type device_type qvd_object property)],
 			    Administrator_Views_Setup => [qw(field visible view_type device_type qvd_object property)]}; # Every admin is able to set just its own views, 
@@ -936,6 +936,8 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'fixed' => 'me.fixed',
 	'internal' => 'me.internal',
 	'id' => 'me.id',
+	'tenant_id' => 'me.tenant_id',
+	'tenant_name' => 'tenant.name',
 	'admin_id' => 'admin_rels.administrator_id',
 	'inheritor_id' => 'parent_role_rels.inheritor_id',
 	'creation_date' => 'creation_log_entry.time',
@@ -1094,6 +1096,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'fixed' => 'me.fixed',
 	'internal' => 'me.internal',
 	'id' => 'me.id',
+	'tenant_id' => 'me.tenant_id',
+	'tenant_name' => 'tenant.name',
 	'acls' => 'view.acls',
 	'roles' => 'view.roles',
 	'creation_date' => 'creation_log_entry.time',
@@ -1321,7 +1325,7 @@ my $DBIX_JOIN_VALUE =
 
     DI_Tag => [{di => {osf => 'tenant'}}],
 
-    Role => [ 'admin_rels', {role_rels => 'inherited'}, {parent_role_rels => 'inheritor'}, { acl_rels => 'acl'}, qw(creation_log_entry)],
+    Role => [ 'admin_rels', {role_rels => 'inherited'}, {parent_role_rels => 'inheritor'}, { acl_rels => 'acl'}, qw(tenant creation_log_entry)],
 		
     Administrator => [qw(tenant wat_setups), { role_rels => { role => { acl_rels => 'acl' }}}, qw(creation_log_entry)],
 
@@ -1345,7 +1349,7 @@ my $DBIX_JOIN_VALUE =
 my $DBIX_PREFETCH_VALUE = 
 { 
     list => { Log => [qw(deletion_log_entry administrator)],
-	      Role => [qw(creation_log_entry)],
+	      Role => [qw(tenant creation_log_entry)],
 	      User => [qw(tenant creation_log_entry)],
 	      VM => ['di', 'osf', { vm_runtime => qw(host) }, { user => 'tenant' }, qw(creation_log_entry)],
 	      Host => ['runtime', qw(creation_log_entry)],
@@ -1358,7 +1362,7 @@ my $DBIX_PREFETCH_VALUE =
 	      Administrator_Views_Setup => [ { administrator => 'tenant' }] },
 
     details => {Log => [qw(deletion_log_entry administrator)],
-		Role => [qw(creation_log_entry)],
+		Role => [qw(tenant creation_log_entry)],
 		User => [qw(tenant creation_log_entry)],
 		VM => ['di', 'osf', { vm_runtime => qw(host) }, { user => 'tenant' }, qw(creation_log_entry)],
 		Host => ['runtime', qw(creation_log_entry)],
