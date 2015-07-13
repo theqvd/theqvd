@@ -5,7 +5,8 @@ var roleShort = {"1": "Root"};
 var roleLong = {"1": {
         "fixed": true,
         "internal": false,
-        "name": "Root"
+        "name": "Root",
+        "tenant_id": -1
     }
 };
 

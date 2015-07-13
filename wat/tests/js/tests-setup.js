@@ -120,7 +120,8 @@ WatTests.values = {
             "tenant_id": null,
         },
         role: {
-            "name": getRandomStr()
+            "name": getRandomStr(),
+            "tenant_id": 1
         }
     };
 WatTests.updateValues = {
