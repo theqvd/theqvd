@@ -1177,6 +1177,17 @@ sub blocked_users_count
 	  'me.tenant_id' => $admin->tenants_scoop})->count;
 }
 
+sub connected_users_count
+{
+    my ($self,$admin) = @_;
+    $DB->resultset('VM')->search(
+	{ 'vm_runtime.user_state' => 'connected',
+	  'user.tenant_id' => $admin->tenants_scoop }, 
+	{ columns => [ qw/user.id/ ],
+	distinct => 1, 
+	join => [qw(vm_runtime user)] })->count;
+}
+
 sub vms_count
 {
     my ($self,$admin) = @_;
