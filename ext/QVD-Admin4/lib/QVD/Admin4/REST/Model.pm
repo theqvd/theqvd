@@ -501,7 +501,7 @@ my $AVAILABLE_FILTERS =
 
     details => { Config => [qw(key value)], default => [qw(id tenant_id)], Host => [qw(id)], Role => [qw(id)], ACL => [qw(id)], Tenant => [qw(id)] },
 		
-    tiny => { default => [qw(tenant_id)], Host => [qw()], Role => [qw(internal fixed)], ACL => [qw(name)], Tenant => [qw(id)], DI_Tag => [qw(tenant_id osf_id)]},
+    tiny => { default => [qw(tenant_id)], Host => [qw()], Role => [qw(internal fixed tenant_id)], ACL => [qw(name)], Tenant => [qw(id)], DI_Tag => [qw(tenant_id osf_id)]},
 
     delete => { default => [qw(id tenant_id)], Config => [qw(key value)], Host => [qw(id)], Role => [qw(id)],Tenant => [qw(id)],
                 Tenant_Views_Setup => [qw(tenant_id qvd_object)],
