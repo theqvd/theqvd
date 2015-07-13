@@ -149,6 +149,7 @@ sub set_tenants_scoop
 {
     my $self = shift;
     my $tenants_ids = shift;
+    
     $self->{tenants_scoop} = $tenants_ids;
 }
 
@@ -156,7 +157,10 @@ sub tenants_scoop
 {
     my $self = shift;
     my $tenants_ids = shift;
-    return [$self->tenant_id]
+    use constant COMMON_TENANT_ID => -1;
+
+    # Common tenant is always included in the admin scoop
+    return [$self->tenant_id, COMMON_TENANT_ID]
 	unless $self->is_superadmin;
 
     die "No tenants scoop assigned to superadmin"
