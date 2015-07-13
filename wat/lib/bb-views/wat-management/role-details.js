@@ -77,25 +77,41 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
                 $(target).html(HTML_MID_LOADING);
                 $(target).css('padding', '0px');
 
-                Wat.A.performAction('role_tiny_list', {}, {internal: "0"}, {}, function (that) {
+                Wat.A.performAction('role_tiny_list', {}, {
+                        internal: "0",
+                        "-or": [
+                            "tenant_id",
+                            that.model.get('tenant_id'), 
+                            "tenant_id",
+                            COMMON_TENANT_ID,    
+                        ]
+                    }, {}, function (that) {
                     var currentRoles = that.model.get('roles');
                     var roles = that.retrievedData.rows;
-
+                    var filteredRoles = [];
+                    
                     // Add inherted flag to roles object 
                     $.each (roles, function (i, role) {
+                        // Exclude current role
+                        if (role.id == that.model.get('id')) {
+                            return;
+                        }
+                        
                         if (currentRoles[role.id]) {
                             roles[i].inherited = 1;   
                         }
                         else {
                             roles[i].inherited = 0;   
                         }
+                        
+                        filteredRoles.push(role);
                     });                
 
                     // Render template and fill dialog
                     var template = _.template(
                         Wat.TPL.inheritanceToolsRoles, {
                             model: this.model,
-                            roles: roles
+                            roles: filteredRoles
                         }
                     );
                     

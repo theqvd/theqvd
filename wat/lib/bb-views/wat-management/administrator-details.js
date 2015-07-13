@@ -108,7 +108,16 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
                 $(target).html(HTML_MID_LOADING);
                 $(target).css('padding', '0px');
 
-                Wat.A.performAction('role_tiny_list', {}, {internal: "0"}, {}, function (that) {
+                Wat.A.performAction('role_tiny_list', {}, {
+                        internal: "0",
+                        "-or": [
+                            "tenant_id",
+                            that.model.get('tenant_id'), 
+                            "tenant_id",
+                            COMMON_TENANT_ID,    
+                        ]
+                    }, {}, function (that) {
+                    
                     var currentRoles = that.model.get('roles');
                     var roles = that.retrievedData.rows;
 
