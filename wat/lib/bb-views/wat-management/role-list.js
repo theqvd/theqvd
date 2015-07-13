@@ -48,12 +48,15 @@ Wat.Views.RoleListView = Wat.Views.ListView.extend({
         var context = $('.' + this.cid + '.editor-container');
 
         var name = context.find('input[name="name"]').val();
-        var tenant = context.find('select[name="tenant"]').val();
         
         var arguments = {
-            "name": name,
-            "tenant": tenant
+            "name": name
         };
+        
+        if (Wat.C.isSuperadmin) {
+            var tenant_id = context.find('select[name="tenant_id"]').val();
+            arguments['tenant_id'] = tenant_id;
+        }
         
         // Go to first page and order by ID desc to got the last created element in first place
         this.collection.sort = {"field": "id", "order": "-desc"};

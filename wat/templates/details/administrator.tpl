@@ -7,6 +7,10 @@
     <% if(Wat.C.checkGroupACL('administratorEdit')) { %>
     <a class="button fright button-icon js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"></a>
     <% } %>
+    
+    <% if(Wat.C.checkACL('administrator.update.assign-role')) { %>
+    <a class="button fright button-icon js-tools-roles-btn <%= CLASS_ICON_ROLES %>" href="javascript:" data-i18n="[title]Assign roles"></a>
+    <% } %>
 </div>
 
 <table class="details details-list col-width-100">

@@ -52,6 +52,14 @@
                             </th>
             <%
                             break;
+                        case 'tenant':
+            %>
+                            <th class="<%= sortAttr %> desktop" data-sortby="tenant_name">
+                                <span data-i18n="Tenant"><%= i18n.t('Tenant') %></span>
+                            </th>
+            <%
+                            break;
+                        
                     }
                 });
             %>

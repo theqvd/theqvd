@@ -29,13 +29,11 @@ Wat.Views.AdminListView = Wat.Views.ListView.extend({
         var context = $('.' + this.cid + '.editor-container');
 
         var name = context.find('input[name="name"]').val();
-        var tenant = context.find('select[name="tenant"]').val();
         var password = context.find('input[name="password"]').val();
 
         var arguments = {
             "name": name,
             "password": password,
-            "tenant": tenant
         };
         
         if (Wat.C.checkACL('administrator.create.language')) { 

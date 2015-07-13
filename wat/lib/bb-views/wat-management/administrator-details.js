@@ -30,24 +30,15 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     
     addSpecificTemplates: function () {
         var templates = {
+            inheritanceToolsRoles: {
+                name: 'details/role-inheritance-tools-roles'
+            },
             aclsAdmins: {
                 name: 'details/administrator-acls-tree'
             },
-            inheritedRoles: {
-                name: 'details/administrator-roles'
-            }
         }
         
         this.templates = $.extend({}, this.templates, templates);
-    },
-    
-    
-    render: function () {
-        Wat.Views.DetailsView.prototype.render.apply(this);
-
-        this.renderManagerRoles();
-        
-        Wat.T.translate();
     },
     
     renderACLsTree: function (that) {
@@ -99,6 +90,62 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     events: {
         'click .js-branch-button': 'toggleBranch',
         'change .js-acl-tree-selector': 'toggleTree',
+        'click .js-tools-roles-btn': 'openRoleToolsDialog',
+    },
+    
+    openRoleToolsDialog: function () {
+        var that = this;
+        
+        var dialogConf = {
+            title: 'Assign roles',
+            buttons : {
+                "Close": function () {
+                    Wat.I.closeDialog($(this));
+                }
+            },
+            button1Class : 'fa fa-check',
+            fillCallback : function(target) {
+                $(target).html(HTML_MID_LOADING);
+                $(target).css('padding', '0px');
+
+                Wat.A.performAction('role_tiny_list', {}, {internal: "0"}, {}, function (that) {
+                    var currentRoles = that.model.get('roles');
+                    var roles = that.retrievedData.rows;
+
+                    // Add inherted flag to roles object 
+                    $.each (roles, function (i, role) {
+                        if (currentRoles[role.id]) {
+                            roles[i].inherited = 1;   
+                        }
+                        else {
+                            roles[i].inherited = 0;   
+                        }
+                    });                
+
+                    // Render template and fill dialog
+                    var template = _.template(
+                        Wat.TPL.inheritanceToolsRoles, {
+                            model: this.model,
+                            roles: roles
+                        }
+                    );
+                    
+                    $(target).html(template);
+                    
+                    $('.role-template-tools').tableScroll({
+                        height: 400
+                    });
+                    
+                    Wat.I.fixTableScrollStyles();
+                    
+                    Wat.T.translate();
+
+                }, that);
+            }
+        }
+        
+        $("html, body").animate({ scrollTop: 0 }, 200);
+        Wat.I.dialog(dialogConf);
     },
     
     toggleTree: function (e) {
@@ -202,38 +249,6 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
 
         Wat.T.translate();
     },
-    
-    renderManagerRoles: function () {
-        if (!Wat.C.checkACL('administrator.see.roles')) { 
-            return;
-        }
-        
-        // Fill the html with the template and the model
-        this.template = _.template(
-            Wat.TPL.inheritedRoles, {
-                model: this.model
-            }
-        );
-        $('.bb-admin-roles').html(this.template);
-        
-        var params = {
-            'action': 'role_tiny_list',
-            'selectedId': '',
-            'controlName': 'role',
-            'filters': {
-                'internal': false
-            },
-            'chosenType': 'advanced100'
-        };
-        
-        var that = this;
-        
-        Wat.A.fillSelect(params, function () {
-            $.each(that.model.get('roles'), function (iRole, role) {
-                $('select[name="role"] option[value="' + iRole + '"]').remove();
-            });
-        });
-    },    
     
     afterUpdateRoles: function () {
         this.render();
