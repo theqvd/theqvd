@@ -1277,7 +1277,8 @@ sub top_populated_hosts
 {
     my ($self,$admin) = @_;
 
-    my $rs = $DB->resultset('Host')->search({ 'vms.vm_state' => 'running'}, 
+    #my $rs = $DB->resultset('Host')->search({ 'vms.vm_state' => 'running'}, 
+    my $rs = $DB->resultset('Host')->search({}, 
 					    { distinct => 1, 
                                               join => [qw(vms)] });
     return [] unless $rs->count;

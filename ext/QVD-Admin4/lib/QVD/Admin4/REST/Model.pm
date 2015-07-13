@@ -511,7 +511,7 @@ my $AVAILABLE_FILTERS =
 
     create_or_update => { Tenant_Views_Setup => [qw(tenant_id)]},
 
-    exec => { default => [qw(id tenant_id)]},
+    exec => { default => [qw(id tenant_id user_id host_id)]},
 
     state => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]},
 };
@@ -640,7 +640,7 @@ my $MANDATORY_FILTERS =
 
     update=> { default => [qw(id)], Config => [qw(key)]}, 
 
-    exec => { default => [qw(id)]}, 
+    exec => { default => [qw()]}, 
 
     state => { default => [qw(id)]}, 
 
