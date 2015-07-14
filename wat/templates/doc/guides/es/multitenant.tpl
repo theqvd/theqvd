@@ -1079,17 +1079,13 @@ Poderes de <em>superadmin</em>
 <div class="paragraph"><p>Las diferencias en la interfaz y en su gestión que comentaremos a continuación solamente aparecerán para los superadministradores.</p></div>
 <div class="paragraph"><p>Aunque un entorno sea multitenant, para los administradores de un tenant, esta condición es transparente. Para ellos, no habrá diferencia con un entorno monotenant.</p></div>
 <div class="sect2">
-<h3 id="_independencia_de_roles">7.1. Independencia de roles</h3>
-<div class="paragraph"><p>Los roles son independientes a los tenants. Lo que es lo mismo, son comunes a todos ellos. Por ello, en la vista listado de roles no se observarán cambios respecto al modo monotenant.</p></div>
-</div>
-<div class="sect2">
-<h3 id="_distribución_de_administradores_por_tenants">7.2. Distribución de administradores por tenants</h3>
+<h3 id="_distribución_de_administradores_por_tenants">7.1. Distribución de administradores por tenants</h3>
 <div class="paragraph"><p>En un entorno multitenant, <strong>los administradores estarán alojados inequívocamente en un tenant</strong>, bien sea un tenant normal o el supertenant en el caso de los superadministradores.</p></div>
 <div class="paragraph"><p>Atendiendo a la creación de un administrador, distinguimos <strong>dos casos en función del ámbito</strong>:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>Un administrador de tenant</strong> podrá ser creado por un administrador de su mismo tenant y por un superadministrador.
+<strong>Un administrador de tenant</strong> podrá ser creado por un administrador de su mismo tenant o por un superadministrador.
 </p>
 </li>
 <li>
@@ -1102,7 +1098,26 @@ Poderes de <em>superadmin</em>
 <div class="paragraph"><p>En la vista listado de administradores figurará en una <strong>columna extra</strong> el tenant al que pertenece cada administrador, y además un <strong>nuevo control de filtrado</strong> nos ayudará a ver solamente los administradores del tenant que elijamos.</p></div>
 </div>
 <div class="sect2">
-<h3 id="_gestión_de_tenants">7.3. Gestión de tenants</h3>
+<h3 id="_independencia_de_plantillas_de_acls">7.2. Independencia de plantillas de ACLs</h3>
+<div class="paragraph"><p>Las plantilals son independientes a los tenants. Lo que es lo mismo, son comunes a todos ellos. Como no hay una vista de plantillas más allá de la pantalla de edición de roles donde heredamos de las plantillas, no habrá cambios significativos a nivel de interfaz.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_distribución_de_roles_por_tenants">7.3. Distribución de roles por tenants</h3>
+<div class="sect3">
+<h4 id="_roles_de_sistema">7.3.1. Roles de sistema</h4>
+<div class="paragraph"><p>Los roles que el sistema trae por defecto son fijos y comunes a todos los tenants, osea que no se pueden editar ni eliminar y están a disposición de cualquier administrador del sistema, independientemente del tenant o supertenant al que pertenezca, al igual que pasa con las plantillas.</p></div>
+</div>
+<div class="sect3">
+<h4 id="_roles_personalizados">7.3.2. Roles personalizados</h4>
+<div class="paragraph"><p>Los roles creados por un administrador estarán alojados inequívocamente en un tenant, bien sea un tenant normal o el supertenant.</p></div>
+<div class="paragraph"><p>Los superadministradores podrán crearlos en cualquier tenant y los administradores de tenant lo harán en el suyo propio.</p></div>
+<div class="paragraph"><p>Un rol solo podrá heredar de roles de sistema o de otros roles de su mismo tenant.</p></div>
+<div class="paragraph"><p>Al crear un rol, si estamos en un entorno multitenant y somos superadministradores, aparecerá un campo para escoger en qué tenant queremos crearlo. <strong>El rol no podrá ser movido de tenant una vez creado</strong>.</p></div>
+<div class="paragraph"><p>En la vista listado de roles figurará en una <strong>columna extra</strong> el tenant al que pertenece cada rol, y además un <strong>nuevo control de filtrado</strong> nos ayudará a ver solamente los roles del tenant que elijamos.</p></div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_gestión_de_tenants">7.4. Gestión de tenants</h3>
 <div class="paragraph"><p>En los entornos multitenant se introduce la gestión de tenants.</p></div>
 <div class="paragraph"><p>Podemos crear tantos tenants como queramos, sin límite de administradores por tenant.</p></div>
 <div class="paragraph"><p>Al crear un tenant definiremos su nombre, el idioma y el tamaño de bloque del WAT por defecto para sus administradores.</p></div>
@@ -1121,12 +1136,12 @@ La gestión de un tenant no va más allá de modificar dichos parámetros o elim
 </ul></div>
 </div>
 <div class="sect2">
-<h3 id="_referencia_de_acls_multitenant">7.4. Referencia de ACLs (Multitenant)</h3>
+<h3 id="_referencia_de_acls_multitenant">7.5. Referencia de ACLs (Multitenant)</h3>
 <div class="paragraph"><p>Algunos ACLs son exclusivos de entornos multitenant.</p></div>
 <div class="paragraph"><p>De esta manera, en la gestión de roles así como cuando gestionemos administradores en un entorno multitenant, los árboles de ACLs tendrán ciertos ACLs extras además de los mismos que habrá en el caso de monotenant.</p></div>
 <div class="paragraph"><p>Este es el caso de los ACLs responsables de la gestión de Tenants.</p></div>
 <div class="sect3">
-<h4 id="_acls_de_tenants">7.4.1. ACLs de Tenants</h4>
+<h4 id="_acls_de_tenants">7.5.1. ACLs de Tenants</h4>
 <div class="tableblock">
 <table rules="all"
 width="100%"
@@ -1197,6 +1212,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s creation date</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see.creation-date</p></td>
 <td align="left" valign="top"><p class="table">Datetime when a tenant was created</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.see.description</p></td>
+<td align="left" valign="top"><p class="table">The description of the tenants.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s disk images</strong></p></td>
@@ -1279,7 +1299,7 @@ cellspacing="0" cellpadding="4">
 </div>
 </div>
 <div class="sect2">
-<h3 id="_referencia_de_plantillas_multitenant">7.5. Referencia de Plantillas (Multitenant)</h3>
+<h3 id="_referencia_de_plantillas_multitenant">7.6. Referencia de Plantillas (Multitenant)</h3>
 <div class="paragraph"><p>También hay Plantillas de ACLs adicionales exclusivas del modo multitenant:</p></div>
 <div class="ulist"><ul>
 <li>
@@ -1325,7 +1345,7 @@ Tenants Eraser
 </li>
 </ul></div>
 <div class="sect3">
-<h4 id="_jerarquía_de_plantillas_multitenant">7.5.1. Jerarquía de Plantillas (Multitenant)</h4>
+<h4 id="_jerarquía_de_plantillas_multitenant">7.6.1. Jerarquía de Plantillas (Multitenant)</h4>
 <div class="paragraph"><p>Cuando el sistema está en modo multitenant, la jerarquía de Plantillas tiene Plantillas adicionales. Se pueden ver de un vistazo en el siguiente esquema:</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/Templates_Hierarchy_Monotenant.png" alt="Templates_Hierarchy_Monotenant.png" width="960px" />
@@ -1360,7 +1380,7 @@ Contraseña: to the rescue</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-05-19 10:31:11 CEST
+Last updated 2015-07-14 15:39:18 CEST
 </div>
 </div>
 </body>

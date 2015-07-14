@@ -1765,7 +1765,6 @@ Crear un administrador que hayamos podido eliminar
 </li>
 </ul></div>
 <div class="paragraph"><p>QVD cuenta por defecto con algunos <strong>roles predefinidos</strong> que nos pueden ser útiles si no necesitamos permisos muy específicos.</p></div>
-<div class="paragraph"><p>Es el caso del <strong>rol “Root”</strong>, que contiene todos los ACLs del sistema. Es el rol asociado al usuario “admin” creado por defecto en WAT.</p></div>
 <div class="sect2">
 <h3 id="_gestión_de_administradores">6.1. Gestión de administradores</h3>
 <div class="paragraph"><p>La acción de crear un administrador solamente nos permitirá asignarle un nombre de usuario y una contraseña. Para que pueda acceder al WAT será necesario asignarle al menos un rol.</p></div>
@@ -1801,7 +1800,7 @@ Root
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>Rol con todos los ACLs posibles del sistema. O lo que es lo mismo, control total de lectura, actualización, operación, creación y borrado en cada uno de los elementos.</p></div>
+<div class="paragraph"><p>Rol con todos los ACLs posibles del sistema. O lo que es lo mismo, control total de lectura, actualización, operación, creación y borrado en cada uno de los elementos. Es el rol asociado al usuario “admin” creado por defecto en WAT.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1894,7 +1893,7 @@ En la vista detalle tenemos <strong>dos herramientas</strong> disponibles:
 <div class="content">
 <pre><code>Por ejemplo: Users Creator, Images Operator, VMs Manager, Roles Eraser...</code></pre>
 </div></div>
-<div class="paragraph"><p>En las <strong>futuras actualizaciones</strong> del WAT puedan aparecer <strong>nuevos ACLs</strong>. Para evitar tener que re-configurar los ACLs de nuestros administradores tras una actualización, <strong>se recomienda utilizar la herencia de Plantillas</strong> para configurar nuestros roles. Estos roles, serán actualizados con el WAT, conteniendo los nuevos ACLs de una forma coherente con su uso.</p></div>
+<div class="paragraph"><p>En las <strong>futuras actualizaciones</strong> del WAT puedan aparecer <strong>nuevos ACLs</strong>. Para evitar tener que re-configurar los ACLs de nuestros administradores tras una actualización, <strong>se recomienda utilizar la herencia de Plantillas</strong> para configurar nuestros roles. Estos roles serán actualizados con el WAT conteniendo los nuevos ACLs de una forma coherente con su uso.</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>Por ejemplo: Si se añadie un nuevo campo en la vista de usuarios, el ACL que permita su visualización será añadido el rol interno Users Reader. Los roles que hereden de este rol interno, se actualizarán y tendrán automáticamente dicho nuevo acceso.</code></pre>
@@ -2050,6 +2049,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table"><strong>See user&#8217;s creation date</strong></p></td>
 <td align="left" valign="top"><p class="table">user.see.creation-date</p></td>
 <td align="left" valign="top"><p class="table">Datetime when a user was created</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See user&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table">user.see.description</p></td>
+<td align="left" valign="top"><p class="table">The description of the users.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>See user&#8217;s ID</strong></p></td>
@@ -2267,6 +2271,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s creation date</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.creation-date</p></td>
 <td align="left" valign="top"><p class="table">Datetime when a virtual machine was created</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.see.description</p></td>
+<td align="left" valign="top"><p class="table">The description of virtual machines.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s disk image</strong></p></td>
@@ -2566,6 +2575,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Datetime when a host was created</p></td>
 </tr>
 <tr>
+<td align="left" valign="top"><p class="table"><strong>See node&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table">host.see.description</p></td>
+<td align="left" valign="top"><p class="table">The description of the hosts.</p></td>
+</tr>
+<tr>
 <td align="left" valign="top"><p class="table"><strong>See node&#8217;s ID</strong></p></td>
 <td align="left" valign="top"><p class="table">host.see.id</p></td>
 <td align="left" valign="top"><p class="table">The database identiefier of the hosts. Useful to make calls from CLI.</p></td>
@@ -2791,6 +2805,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s creation date</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.see.creation-date</p></td>
 <td align="left" valign="top"><p class="table">Datetime when an OS flavour image was created</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.description</p></td>
+<td align="left" valign="top"><p class="table">The description of the OSFs.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s disk images</strong></p></td>
@@ -3060,6 +3079,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">If a disk image is setted as default image within the OSF where it belongs</p></td>
 </tr>
 <tr>
+<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table">di.see.description</p></td>
+<td align="left" valign="top"><p class="table">The description of disk images.</p></td>
+</tr>
+<tr>
 <td align="left" valign="top"><p class="table"><strong>See OSF&#8217;s last created disk image</strong></p></td>
 <td align="left" valign="top"><p class="table">di.see.head</p></td>
 <td align="left" valign="top"><p class="table">If a disk image is the last created image within the OSF where it belongs</p></td>
@@ -3267,6 +3291,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Datetime when an administrator was created</p></td>
 </tr>
 <tr>
+<td align="left" valign="top"><p class="table"><strong>See administrator&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.see.description</p></td>
+<td align="left" valign="top"><p class="table">The description of the WAT administrators.</p></td>
+</tr>
+<tr>
 <td align="left" valign="top"><p class="table"><strong>See administrator&#8217;s ID</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.see.id</p></td>
 <td align="left" valign="top"><p class="table">The database identiefier of the WAT administrators. Useful to make calls from CLI.</p></td>
@@ -3377,6 +3406,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table"><strong>See role&#8217;s creation date</strong></p></td>
 <td align="left" valign="top"><p class="table">role.see.creation-date</p></td>
 <td align="left" valign="top"><p class="table">Datetime when a role was created</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See role&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table">role.see.description</p></td>
+<td align="left" valign="top"><p class="table">The description of a role.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>See role&#8217;s ID</strong></p></td>
@@ -4837,7 +4871,7 @@ Seleccionar todos los elementos del listado, incluyendo los de otras páginas
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-06-29 15:43:21 CEST
+Last updated 2015-07-14 11:25:04 CEST
 </div>
 </div>
 </body>
