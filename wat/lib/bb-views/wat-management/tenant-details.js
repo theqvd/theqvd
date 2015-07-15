@@ -33,7 +33,7 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
             arguments['name'] = name;
         }     
         
-        if (Wat.C.checkACL('tenant.update.block')) {
+        if (Wat.C.checkACL('tenant.update.blocksize')) {
             arguments['block'] = block;
         }    
         

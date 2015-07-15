@@ -27,7 +27,7 @@
         </td>
     </tr>
     <% } %>
-    <% if (Wat.C.checkACL('tenant.update.block')) { %>
+    <% if (Wat.C.checkACL('tenant.update.blocksize')) { %>
     <tr>
         <td data-i18n="Block size"></td>
         <td>

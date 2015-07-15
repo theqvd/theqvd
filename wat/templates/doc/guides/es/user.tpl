@@ -2116,6 +2116,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of users massively.</p></td>
 </tr>
 <tr>
+<td align="left" valign="top"><p class="table"><strong>Update user&#8217;s description (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">user.update-massive.description</p></td>
+<td align="left" valign="top"><p class="table">Update the description of users massively.</p></td>
+</tr>
+<tr>
 <td align="left" valign="top"><p class="table"><strong>Create properties when update users (massive)</strong></p></td>
 <td align="left" valign="top"><p class="table">user.update-massive.properties-create</p></td>
 <td align="left" valign="top"><p class="table">Create properties in user&#8217;s massive update process.</p></td>
@@ -2134,6 +2139,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table"><strong>Block-Unblock users</strong></p></td>
 <td align="left" valign="top"><p class="table">user.update.block</p></td>
 <td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of users one by one.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update user&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table">user.update.description</p></td>
+<td align="left" valign="top"><p class="table">Update the description of users one by one.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Update user&#8217;s password</strong></p></td>
@@ -2388,6 +2398,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of virtual machines massively.</p></td>
 </tr>
 <tr>
+<td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s description (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.update-massive.description</p></td>
+<td align="left" valign="top"><p class="table">Update the description of virtual machines massively.</p></td>
+</tr>
+<tr>
 <td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s tag (massive)</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.update-massive.di-tag</p></td>
 <td align="left" valign="top"><p class="table">Update the disk image&#8217;s tag setted on virtual machines massively.</p></td>
@@ -2426,6 +2441,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table"><strong>Block-Unblock virtual machines</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.update.block</p></td>
 <td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of virtual machines one by one.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.update.description</p></td>
+<td align="left" valign="top"><p class="table">Update the description of virtual machines one by one.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s tag</strong></p></td>
@@ -2650,6 +2670,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of hosts massively.</p></td>
 </tr>
 <tr>
+<td align="left" valign="top"><p class="table"><strong>Update node&#8217;s description (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">host.update-massive.description</p></td>
+<td align="left" valign="top"><p class="table">Update the description of the hosts massively.</p></td>
+</tr>
+<tr>
 <td align="left" valign="top"><p class="table"><strong>Create properties when update nodes (massive)</strong></p></td>
 <td align="left" valign="top"><p class="table">host.update-massive.properties-create</p></td>
 <td align="left" valign="top"><p class="table">Create properties in host&#8217;s massive update process.</p></td>
@@ -2678,6 +2703,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table"><strong>Block-Unblock nodes</strong></p></td>
 <td align="left" valign="top"><p class="table">host.update.block</p></td>
 <td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of hosts one by one.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update node&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table">host.update.description</p></td>
+<td align="left" valign="top"><p class="table">Update the description of the hosts one by one.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Update node&#8217;s name</strong></p></td>
@@ -2907,6 +2937,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Total of OS flavours in current tenant or all system for superadministrators.</p></td>
 </tr>
 <tr>
+<td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s description (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.update-massive.description</p></td>
+<td align="left" valign="top"><p class="table">Update the description of OSF flavours massively.</p></td>
+</tr>
+<tr>
 <td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s memory (massive)</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.update-massive.memory</p></td>
 <td align="left" valign="top"><p class="table">Update the memory of OSF flavours massively.</p></td>
@@ -2930,6 +2965,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s user storage (massive)</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.update-massive.user-storage</p></td>
 <td align="left" valign="top"><p class="table">Update the memory of OSF flavours massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.update.description</p></td>
+<td align="left" valign="top"><p class="table">Update the description of OSF flavours one by one.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s memory</strong></p></td>
@@ -3154,6 +3194,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of disk images massively.</p></td>
 </tr>
 <tr>
+<td align="left" valign="top"><p class="table"><strong>Update disk image&#8217;s description (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">di.update-massive.description</p></td>
+<td align="left" valign="top"><p class="table">Update the description of disk images massively.</p></td>
+</tr>
+<tr>
 <td align="left" valign="top"><p class="table"><strong>Create properties when update disk images (massive)</strong></p></td>
 <td align="left" valign="top"><p class="table">di.update-massive.properties-create</p></td>
 <td align="left" valign="top"><p class="table">Create properties in disk image&#8217;s massive update process.</p></td>
@@ -3182,6 +3227,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table"><strong>Set disk images as default</strong></p></td>
 <td align="left" valign="top"><p class="table">di.update.default</p></td>
 <td align="left" valign="top"><p class="table">Set as default a disk image in the OS flavour where it belongs.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update disk image&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table">di.update.description</p></td>
+<td align="left" valign="top"><p class="table">Update the description of disk images one by one.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Create properties when update disk images</strong></p></td>
@@ -3311,9 +3361,24 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Assigned roles to the WAT administrator</p></td>
 </tr>
 <tr>
+<td align="left" valign="top"><p class="table"><strong>Update administrator&#8217;s description (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.update-massive.description</p></td>
+<td align="left" valign="top"><p class="table">Update the description of administrators massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update administrator&#8217;s language (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.update-massive.language</p></td>
+<td align="left" valign="top"><p class="table">Update the language of administrators massively.</p></td>
+</tr>
+<tr>
 <td align="left" valign="top"><p class="table"><strong>Assign-Unassign administrator&#8217;s roles</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.update.assign-role</p></td>
 <td align="left" valign="top"><p class="table">Assign roles to WAT administrators to give to them their ACLs.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update administrator&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table">administrator.update.description</p></td>
+<td align="left" valign="top"><p class="table">Update the description of administrators one by one.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Update administrator&#8217;s language</strong></p></td>
@@ -3423,6 +3488,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Inherited roles of a role.</p></td>
 </tr>
 <tr>
+<td align="left" valign="top"><p class="table"><strong>Update role&#8217;s description (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">role.update-massive.description</p></td>
+<td align="left" valign="top"><p class="table">Update the description of roles massively.</p></td>
+</tr>
+<tr>
 <td align="left" valign="top"><p class="table"><strong>Assign-Unassign role&#8217;s ACLs</strong></p></td>
 <td align="left" valign="top"><p class="table">role.update.assign-acl</p></td>
 <td align="left" valign="top"><p class="table">Add/Remove acl on role.</p></td>
@@ -3431,6 +3501,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table"><strong>Assign-Unassign role&#8217;s inherited roles</strong></p></td>
 <td align="left" valign="top"><p class="table">role.update.assign-role</p></td>
 <td align="left" valign="top"><p class="table">Manage the inheritance of roles adding roles in others.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update role&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table">role.update.description</p></td>
+<td align="left" valign="top"><p class="table">Update the description of roles one by one.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Update role&#8217;s name</strong></p></td>

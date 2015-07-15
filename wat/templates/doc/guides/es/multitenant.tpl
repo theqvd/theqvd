@@ -1200,7 +1200,7 @@ cellspacing="0" cellpadding="4">
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s block size</strong></p></td>
-<td align="left" valign="top"><p class="table">tenant.see.block</p></td>
+<td align="left" valign="top"><p class="table">tenant.see.blocksize</p></td>
 <td align="left" valign="top"><p class="table">The block size in lists pagination of the tenants.</p></td>
 </tr>
 <tr>
@@ -1279,14 +1279,34 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">User state (connected/disconnected)) of the virtual machines shown in tenant details view</p></td>
 </tr>
 <tr>
+<td align="left" valign="top"><p class="table"><strong>Update tenant&#8217;s block size (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.update-massive.blocksize</p></td>
+<td align="left" valign="top"><p class="table">Update the block size in lists pagination of tenants massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update tenant&#8217;s description (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.update-massive.description</p></td>
+<td align="left" valign="top"><p class="table">Update the description of tenants massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update tenant&#8217;s language (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.update-massive.language</p></td>
+<td align="left" valign="top"><p class="table">Update the language of tenants massively.</p></td>
+</tr>
+<tr>
 <td align="left" valign="top"><p class="table"><strong>Update tenant&#8217;s block size</strong></p></td>
-<td align="left" valign="top"><p class="table">tenant.update.block</p></td>
-<td align="left" valign="top"><p class="table">Update the block size in lists pagination of tenants.</p></td>
+<td align="left" valign="top"><p class="table">tenant.update.blocksize</p></td>
+<td align="left" valign="top"><p class="table">Update the block size in lists pagination of tenants one by one.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Update tenant&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.update.description</p></td>
+<td align="left" valign="top"><p class="table">Update the description of tenants one by one.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Update tenant&#8217;s language</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.update.language</p></td>
-<td align="left" valign="top"><p class="table">Update the language of tenants.</p></td>
+<td align="left" valign="top"><p class="table">Update the language of tenants one by one.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Update tenant&#8217;s name</strong></p></td>
@@ -1380,7 +1400,7 @@ Contraseña: to the rescue</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-07-14 15:39:18 CEST
+Last updated 2015-07-15 13:08:37 CEST
 </div>
 </div>
 </body>

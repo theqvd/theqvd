@@ -30,7 +30,7 @@
         </tr>
     <% 
     } 
-    if (Wat.C.checkACL('tenant.see.block')) { 
+    if (Wat.C.checkACL('tenant.see.blocksize')) { 
     %>
         <tr>
             <td><i class="fa fa-list"></i><span data-i18n="Block size"></span></td>
