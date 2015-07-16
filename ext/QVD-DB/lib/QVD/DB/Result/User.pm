@@ -6,6 +6,7 @@ __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('users');
 __PACKAGE__->add_columns( id         => { data_type         => 'integer',
 					  is_auto_increment => 1 },
+                          description => { data_type => 'varchar(32768)' },
 			  tenant_id  => { data_type         => 'integer' },
 			  login      => { data_type         => 'varchar(64)' },
                           blocked    => { data_type         => 'boolean',

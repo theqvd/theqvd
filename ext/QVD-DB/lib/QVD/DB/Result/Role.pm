@@ -10,6 +10,7 @@ __PACKAGE__->add_columns( tenant_id => { data_type => 'integer' },
 			  id => { data_type => 'integer',
                           is_auto_increment => 1 },
                           name => { data_type => 'varchar(64)' },
+                          description => { data_type => 'varchar(32768)' },
                           internal => { data_type => 'boolean' },
                           fixed => { data_type => 'boolean' },
 );

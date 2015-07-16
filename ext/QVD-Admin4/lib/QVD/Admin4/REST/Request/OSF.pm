@@ -38,6 +38,7 @@ __DATA__
 
 id = me.id
 name = me.name
+description = me.description
 overlay = me.use_overlay
 user_storage = me.user_storage_size
 memory = me.memory

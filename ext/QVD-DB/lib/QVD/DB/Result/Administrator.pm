@@ -9,10 +9,11 @@ __PACKAGE__->add_columns( tenant_id  => { data_type         => 'integer' },
                           id         => { data_type         => 'integer',
 					  is_auto_increment => 1 },
 			  name      => { data_type         => 'varchar(64)' },
+                          description => { data_type => 'varchar(32768)' },
 			  # FIXME: get passwords out of this table!
                           # FIXME: omg encrypt passwords!!
 			  password   => { data_type         => 'varchar(64)',
-					  is_nullable       => 1 } );
+					  is_nullable       => 1 });
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint([qw(name tenant_id)]);

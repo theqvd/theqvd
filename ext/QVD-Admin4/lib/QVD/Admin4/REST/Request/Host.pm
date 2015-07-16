@@ -31,6 +31,7 @@ __DATA__
 
 id = me.id
 name = me.name
+description = me.description
 address = me.address
 blocked =  runtime.blocked
 frontend = me.frontend

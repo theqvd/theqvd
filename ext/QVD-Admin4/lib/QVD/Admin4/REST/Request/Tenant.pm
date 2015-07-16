@@ -24,4 +24,5 @@ __DATA__
 
 id = me.id
 name = me.name
+description = me.description
 tenant = me.id

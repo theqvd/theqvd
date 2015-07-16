@@ -13,6 +13,7 @@ __PACKAGE__->add_columns(
 			  id      => { data_type         => 'integer',
 				       is_auto_increment => 1 },
 			  name    => { data_type         => 'varchar(64)' },
+                          description => { data_type => 'varchar(32768)' },
 			  user_id => { data_type         => 'integer' },
 			  osf_id  => { data_type         => 'integer' },
                           di_tag  => { data_type         => 'varchar(128)' },

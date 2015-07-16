@@ -8,6 +8,7 @@ __PACKAGE__->add_columns( id     => { data_type => 'integer',
                           osf_id => { data_type => 'integer' },
                           blocked => { data_type         => 'boolean',
                                        default_value => 0 },
+                          description => { data_type => 'varchar(32768)' },
 
                           # Valor tomado de la variable PATH_MAX de
                           # /usr/src/linux-headers-2.6.28-15/include/linux/limits.h:

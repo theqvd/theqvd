@@ -62,6 +62,7 @@ __DATA__
 storage         = me.storage
 id              = me.id
 name            = me.name
+description     = me.description
 user_id         = me.user_id
 user_name       = user.login
 osf_id          = me.osf_id

@@ -182,11 +182,13 @@ my $ACLS_FOR_FIELDS =
 	     memory => [qr/^osf\.see\.memory$/],
 	     number_of_vms => [qr/^osf\.see\.vms-info$/],
 	     number_of_dis => [qr/^osf\.see\.dis-info$/],
-	     properties => [qr/^osf\.see\.properties$/] },
+	     properties => [qr/^osf\.see\.properties$/],
+	     description => [qr/^osf\.see\.description$/] },
 
     Role => { roles => [qr/^role\.see\.(acl-list|(acl-list|inherited)-roles)$/],
 	      acls => [qr/^role\.see\.acl-list$/],
-	      number_of_acls => [qr/^role\.see\.acl-list$/] },
+	      number_of_acls => [qr/^role\.see\.acl-list$/],
+	      description => [qr/^role\.see\.description$/] },
 
     DI => { creation_admin_id => [qr/^di\.see\.created-by$/],
 	    creation_admin_name => [qr/^di\.see\.created-by$/],
@@ -196,7 +198,8 @@ my $ACLS_FOR_FIELDS =
 	    osf_name => [qr/^di\.see\.osf$/],
 	    blocked => [qr/^di\.see\.block$/],
 	    tags => [qr/^(di\.see\.|[^.]+\.see\.di-list-)(tags|default|head)$/],
-	    properties => [qr/^di\.see\.properties$/]  },
+	    properties => [qr/^di\.see\.properties$/],
+	    description => [qr/^di\.see\.description$/] },
 
     VM => { user_id => [qr/^vm\.see\.user$/],
 	    user_name => [qr/^vm\.see\.user$/],
@@ -223,9 +226,11 @@ my $ACLS_FOR_FIELDS =
 	    di_version => [qr/^vm\.see\.di-version$/],
 	    di_name => [qr/^vm\.see\.di$/],
 	    di_id => [qr/^vm\.see\.di$/],
-	    properties => [qr/^vm\.see\.properties$/] },
+	    properties => [qr/^vm\.see\.properties$/],
+	    description => [qr/^vm\.see\.description$/] },
  
-   Administrator => { roles => [qr/^administrator\.see\.roles$/] },
+    Administrator => { roles => [qr/^administrator\.see\.roles$/],
+	              description => [qr/^administrator\.see\.description$/] },
 
     User => { blocked => [qr/^user\.see\.block$/],
 	      creation_admin_id => [qr/^user\.see\.created-by$/],
@@ -233,7 +238,8 @@ my $ACLS_FOR_FIELDS =
 	      creation_date => [qr/^user\.see\.creation-date$/],
 	      number_of_vms => [qr/^user\.see\.vms-info$/],
 	      number_of_vms_connected => [qr/^user\.see\.vm-list-state$/],
-	      properties => [qr/^user\.see\.properties$/] },
+	      properties => [qr/^user\.see\.properties$/],
+	      description => [qr/^user\.see\.description$/] },
 
     Host => { address => [qr/^host\.see\.address$/],
 	      blocked => [qr/^host\.see\.block$/],
@@ -242,7 +248,12 @@ my $ACLS_FOR_FIELDS =
 	      creation_admin_name => [qr/^host\.see\.created-by$/],
 	      creation_date => [qr/^host\.see\.creation-date$/],
 	      number_of_vms_connected => [qr/^host\.see\.vms-info$/],
-	      properties => [qr/^host\.see\.properties$/] },
+	      properties => [qr/^host\.see\.properties$/],
+	      description => [qr/^host\.see\.description$/] },
+
+    Tenant => { description => [qr/^tenant\.see\.description$/] ,
+	      block => [qr/^tenant\.see\.blocksize$/],
+	      language => [qr/^tenant\.see\.language$/] }
 };
 
 # Acls needed to update every field in actions regarding
@@ -252,6 +263,7 @@ my $ACLS_FOR_ARGUMENTS_IN_UPDATE =
 { 
     User => { password => [qr/^user\.update\.password$/],
 	      blocked => [qr/^user\.update\.block$/],
+	      description => [qr/^user\.update\.description$/],
 	      __properties_changes_set => [qr/^user\.update\.properties-(cre|upd)ate$/],
 	      __properties_changes_delete => [qr/^user\.update\.properties-delete$/]},
 
@@ -263,36 +275,46 @@ my $ACLS_FOR_ARGUMENTS_IN_UPDATE =
 	    expiration_soft => [qr/^vm\.update\.expiration$/],
 	    expiration_hard => [qr/^vm\.update\.expiration$/],
 	    di_tag => [qr/^vm\.update\.di-tag$/],
+	    description => [qr/^vm\.update\.description$/],
 	    __properties_changes__set => [qr/^vm\.update\.properties-(cre|upd)ate$/],
 	    __properties_changes__delete => [qr/^vm\.update\.properties-delete$/] },
 
     Host => { name => [qr/^host\.update\.name$/],
 	      address => [qr/^host\.update\.address$/],
 	      blocked => [qr/^host\.update\.block$/],
+	      description => [qr/^host\.update\.description$/],
 	      __properties_changes__set => [qr/^host\.update\.properties-(cre|upd)ate$/],
 	      __properties_changes__delete => [qr/^host\.update\.properties-delete$/] },
 
     OSF => { name => [qr/^osf\.update\.name$/],
 	     memory => [qr/^osf\.update\.memory$/],
 	     user_storage => [qr/^osf\.update\.user-storage$/],
+	     description => [qr/^osf\.update\.description$/],
 	     __properties_changes__set => [qr/^osf\.update\.properties-(cre|upd)ate$/],
 	     __properties_changes__delete => [qr/^osf\.update\.properties-delete$/] },
 
     DI => { blocked => [qr/^di\.update\.block$/],
+	    description => [qr/^di\.update\.description$/],
 	    __properties_changes__set => [qr/^di\.update\.properties-(cre|upd)ate$/],
 	    __properties_changes__delete => [qr/^di\.update\.properties-delete$/],
 	    __tags_changes__create => [qr/^(di\.update\.(tags|defaults)|osf\.see\.di-list-default-update)$/],
 	    __tags_changes__delete => [qr/^(di\.update\.(tags|defaults)|osf\.see\.di-list-default-update)$/]},
 
     Role => { name => [qr/^role\.update\.name$/],
+	      description => [qr/^role\.update\.description$/],
 	      __acls_changes__assign_acls => [qr/^role\.update\.assign-acl$/],
 	      __acls_changes__unassign_acls => [qr/^role\.update\.assign-acl$/],
 	      __roles_changes__assign_roles => [qr/^role\.update\.assign-role$/],
 	      __roles_changes__unassign_roles => [qr/^role\.update\.assign-role$/] },
 
     Administrator => { password => [qr/^administrator\.update\.password$/],
+	               description => [qr/^administrator\.update\.description$/],
 		       __roles_changes__assign_roles => [qr/^administrator\.update\.assign-role$/],
 		       __roles_changes__unassign_roles => [qr/^administrator\.update\.assign-role$/] },
+
+    Tenant => { description => [qr/^tenant\.update\.description$/],
+	        block => [qr/^tenant\.update\.blocksize$/],
+	        language => [qr/^tenant\.update\.language$/] },
 
     Tenant_Views_Setup => { visible => [qr/^views\.update\.columns$/] },  
     Operative_Views_In_Tenant => { visible => [qr/^views\.update\.columns$/] },  
@@ -308,6 +330,7 @@ my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE =
 { 
     User => { '***delete***' => [qr/^user\.delete-massive\.$/], # MAYBE A NEW VARIABLE?
 	      blocked => [qr/^user\.update-massive\.block$/],
+	      description => [qr/^user\.update-massive\.description$/],
 	      __properties_changes__set => [qr/^user\.update-massive\.properties-(cre|upd)ate$/],
 	      __properties_changes__delete => [qr/^user\.update-massive\.properties-delete$/]},
 
@@ -319,32 +342,41 @@ my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE =
 	    expiration_soft => [qr/^vm\.update-massive\.expiration$/],
 	    expiration_hard => [qr/^vm\.update-massive\.expiration$/],
 	    di_tag => [qr/^vm\.update-massive\.di-tag$/],
+	    description => [qr/^vm\.update-massive\.description$/],
 	    __properties_changes__set => [qr/^vm\.update-massive\.properties-(cre|upd)ate$/],
 	    __properties_changes__delete => [qr/^vm\.update-massive\.properties-delete$/] },
 
     Host => { '***delete***' => [qr/^host\.delete-massive\.$/],
 	      blocked => [qr/^host\.update-massive\.block$/],
+	      description => [qr/^host\.update-massive\.description$/],
 	      __properties_changes__set => [qr/^host\.update-massive\.properties-(cre|upd)ate$/],
 	      __properties_changes__delete => [qr/^host\.update-massive\.properties-delete$/] },
 	
     OSF => { '***delete***' => [qr/^osf\.delete-massive\.$/],
 	     memory => [qr/^osf\.update-massive\.memory$/],
 	     user_storage => [qr/^osf\.update-massive\.user-storage$/],
+	     description => [qr/^osf\.update-massive\.description$/],
 	     __properties_changes__set => [qr/^osf\.update-massive\.properties-(cre|upd)ate$/],
 	     __properties_changes__delete => [qr/^osf\.update-massive\.properties-delete$/] },
 	
     DI => { '***delete***' => [qr/^di\.delete-massive\.$/],
 	    blocked => [qr/^di\.update-massive\.block$/],
+	    description => [qr/^di\.update-massive\.description$/],
 	    __properties_changes__set => [qr/^di\.update-massive\.properties-(cre|upd)ate$/],
 	    __properties_changes__delete => [qr/^di\.update-massive\.properties-delete$/],
 	    __tags_changes__create => [qr/^di\.update-massive\.tags$/],
 	    __tags_changes__delete => [qr/^di\.update-massive\.tags-delete$/]},
 	
-    Tenant => { '***delete***' => [qr/^tenant\.delete-massive\.$/]},
+    Tenant => { '***delete***' => [qr/^tenant\.delete-massive\.$/],
+	        block => [qr/^tenant\.update-massive\.blocksize$/],
+	        description => [qr/^tenant\.update-massive\.description$/],
+	        language => [qr/^tenant\.update-massive\.language$/] },
 
-    Role => { '***delete***' => [qr/^role\.delete-massive\.$/] },
+    Role => { '***delete***' => [qr/^role\.delete-massive\.$/],
+	      description => [qr/^role\.update-massive\.description$/] },
 
-    Administrator => { '***delete***' => [qr/^administrator\.delete-massive\.$/]}
+    Administrator => { '***delete***' => [qr/^administrator\.delete-massive\.$/],
+	               description => [qr/^administrator\.update-massive\.description$/] }
 
 };
 
@@ -429,28 +461,28 @@ my $AVAILABLE_FILTERS =
 	      
 	      Config => [qw(key value)],
 	      
-	      VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked 
+	      VM => [qw(storage id name description user_id user_name osf_id osf_name di_tag blocked 
                         expiration_soft expiration_hard state host host_id host_name di_name di_id 
                         user_state ip next_boot_ip ssh_port vnc_port serial_port tenant tenant_id tenant_name 
                         creation_date creation_admin_id creation_admin_name   ip_in_use di_id_in_use  )],
 
 	      DI_Tag => [qw(osf_id di_id name id tenant_id tenant_name)],
 
-	      User => [qw(id name blocked creation_date creation_admin_id creation_admin_name tenant_id tenant_name )],
+	      User => [qw(id name description blocked creation_date creation_admin_id creation_admin_name tenant_id tenant_name )],
 
-	      Host => [qw(id name address blocked frontend backend state vm_id creation_date creation_admin_id creation_admin_name)],
+	      Host => [qw(id name description address blocked frontend backend state vm_id creation_date creation_admin_id creation_admin_name)],
 
-	      DI => [qw(id disk_image version  osf_id osf_name  tenant_id blocked tenant_name tag creation_date creation_admin_id creation_admin_name)],
+	      DI => [qw(id disk_image description version  osf_id osf_name  tenant_id blocked tenant_name tag creation_date creation_admin_id creation_admin_name)],
 
-	      OSF => [qw(id name overlay user_storage memory vm_id di_id  tenant_id tenant_name creation_date creation_admin_id creation_admin_name)],
+	      OSF => [qw(id name description overlay user_storage memory vm_id di_id  tenant_id tenant_name creation_date creation_admin_id creation_admin_name)],
 
 	      ACL => [qw(id name role_id admin_id description)],
 
-	      Tenant => [qw(id name language block creation_date creation_admin_id creation_admin_name)],
+	      Tenant => [qw(id name description language block creation_date creation_admin_id creation_admin_name)],
 
-	      Role => [qw(name id fixed internal admin_id inheritor_id tenant_id tenant_name creation_date creation_admin_id creation_admin_name)],
+	      Role => [qw(name id description fixed internal admin_id inheritor_id tenant_id tenant_name creation_date creation_admin_id creation_admin_name)],
 
-	      Administrator => [qw(name  tenant_id tenant_name id language block creation_date creation_admin_id creation_admin_name)],
+	      Administrator => [qw(name description tenant_id tenant_name id language block creation_date creation_admin_id creation_admin_name)],
 
 	      Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
@@ -467,27 +499,27 @@ my $AVAILABLE_FILTERS =
 
 		 Config => [qw(key value)],
 
-		 VM => [qw(storage id name  user_id user_name  osf_id osf_name di_tag blocked expiration_soft 
+		 VM => [qw(storage id name description user_id user_name  osf_id osf_name di_tag blocked expiration_soft 
                            expiration_hard state host_id host_name di_name di_id user_state ip next_boot_ip ssh_port 
                            vnc_port serial_port tenant_id tenant_name  creation_date creation_admin_id creation_admin_name ip_in_use di_id_in_use )],
 
 		 DI_Tag => [qw(osf_id di_id name id tenant_id tenant_name)],
 
-		 User => [qw(id name blocked creation_date creation_admin_id creation_admin_name tenant_id tenant_name )],
+		 User => [qw(id name description blocked creation_date creation_admin_id creation_admin_name tenant_id tenant_name )],
 
-		 Host => [qw(id name address blocked frontend backend state vm_id creation_date creation_admin_id creation_admin_name)],
+		 Host => [qw(id name description address blocked frontend backend state vm_id creation_date creation_admin_id creation_admin_name)],
 
-		 DI => [qw(id disk_image version osf osf_id osf_name tenant_id blocked tenant_name tag creation_date creation_admin_id creation_admin_name)],
+		 DI => [qw(id disk_image description version osf osf_id osf_name tenant_id blocked tenant_name tag creation_date creation_admin_id creation_admin_name)],
 
-		 OSF => [qw(id name overlay user_storage memory vm_id di_id  tenant_id tenant_name creation_date creation_admin_id creation_admin_name)],
+		 OSF => [qw(id name description overlay user_storage memory vm_id di_id  tenant_id tenant_name creation_date creation_admin_id creation_admin_name)],
 
-		 ACL => [qw(id name role_id admin_id description )],
+		 ACL => [qw(id name description role_id admin_id description )],
 
-		 Role => [qw(name id fixed internal admin_id inheritor_id tenant_id tenant_name creation_date creation_admin_id creation_admin_name)],
+		 Role => [qw(name id description fixed internal admin_id inheritor_id tenant_id tenant_name creation_date creation_admin_id creation_admin_name)],
 
-		 Tenant => [qw(id name language block creation_date creation_admin_id creation_admin_name)],
+		 Tenant => [qw(id name description language block creation_date creation_admin_id creation_admin_name)],
 
-		 Administrator => [qw(name  tenant_id tenant_name role_id acl_id id role_name acl_name language block creation_date creation_admin_id creation_admin_name)],
+		 Administrator => [qw(name description tenant_id tenant_name role_id acl_id id role_name acl_name language block creation_date creation_admin_id creation_admin_name)],
 
 		 Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
 
@@ -526,25 +558,25 @@ my $AVAILABLE_FIELDS =
 
 	      Config => [qw(key value)],
 
-	      OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties creation_date creation_admin_id creation_admin_name)],
+	      OSF => [qw(id name description overlay user_storage memory  number_of_vms number_of_dis properties creation_date creation_admin_id creation_admin_name)],
 
-	      Role => [qw(name id fixed internal acls roles creation_date creation_admin_id creation_admin_name)],
+	      Role => [qw(name id description fixed internal acls roles creation_date creation_admin_id creation_admin_name)],
 
-	      DI => [qw(id disk_image version osf_id osf_name blocked tags  properties creation_date creation_admin_id creation_admin_name)],
+	      DI => [qw(id disk_image description version osf_id osf_name blocked tags  properties creation_date creation_admin_id creation_admin_name)],
 
-	      VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
+	      VM => [qw(storage id name description user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
                         state host_id host_name  di_id user_state ip mac next_boot_ip ssh_port vnc_port serial_port 
                         creation_date creation_admin_id creation_admin_name di_version di_name di_id properties ip_in_use di_id_in_use di_name_in_use di_version_in_use )],
 
 	      ACL => [qw(id name description)],
 
-	      Administrator => [qw(name roles id language block creation_date creation_admin_id creation_admin_name)],
+	      Administrator => [qw(name description roles id language block creation_date creation_admin_id creation_admin_name)],
 
-	      Tenant => [qw(id name language block creation_date creation_admin_id creation_admin_name)],
+	      Tenant => [qw(id name description language block creation_date creation_admin_id creation_admin_name)],
 				   
-	      User => [qw(id name  blocked creation_date creation_admin_id creation_admin_name number_of_vms number_of_vms_connected  properties )],
+	      User => [qw(id name description blocked creation_date creation_admin_id creation_admin_name number_of_vms number_of_vms_connected  properties )],
 
-	      Host => [qw(id name address blocked frontend backend state  load creation_date creation_admin_id creation_admin_name number_of_vms_connected properties )],
+	      Host => [qw(id name description address blocked frontend backend state  load creation_date creation_admin_id creation_admin_name number_of_vms_connected properties )],
 
 	      DI_Tag => [qw(osf_id di_id name id )],
 
@@ -565,25 +597,25 @@ my $AVAILABLE_FIELDS =
 		 Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time antiquity status source ip type_of_action qvd_object object_deleted admin_deleted superadmin)],
 		 Config => [qw(key value)],
 
-		 OSF => [qw(id name overlay user_storage memory  number_of_vms number_of_dis properties creation_date creation_admin_id creation_admin_name)],
+		 OSF => [qw(id name description overlay user_storage memory  number_of_vms number_of_dis properties creation_date creation_admin_id creation_admin_name)],
 		 
-		 Role => [qw(name id fixed internal acls roles creation_date creation_admin_id creation_admin_name)],
+		 Role => [qw(name description id fixed internal acls roles creation_date creation_admin_id creation_admin_name)],
 		
-		 DI => [qw(id disk_image version osf_id osf_name  blocked tags  properties creation_date creation_admin_id creation_admin_name)],
+		 DI => [qw(id disk_image description version osf_id osf_name  blocked tags  properties creation_date creation_admin_id creation_admin_name)],
 		
-		 VM => [qw(storage id name user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
+		 VM => [qw(storage id name description user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
                            time_until_expiration_soft time_until_expiration_hard state host_id host_name  di_id user_state ip mac next_boot_ip ssh_port vnc_port serial_port 
                            creation_date creation_admin_id creation_admin_name di_version di_name di_id properties ip_in_use di_id_in_use di_name_in_use di_version_in_use )],
 
 		 ACL => [qw(id name description)],
 
-		 Administrator => [qw(name roles id language block creation_date creation_admin_id creation_admin_name)],
+		 Administrator => [qw(name description roles id language block creation_date creation_admin_id creation_admin_name)],
 
-		 Tenant => [qw(id name language block creation_date creation_admin_id creation_admin_name)],
+		 Tenant => [qw(id name description language block creation_date creation_admin_id creation_admin_name)],
 
-		 User => [qw(id name  blocked  creation_date creation_admin_id creation_admin_name number_of_vms number_of_vms_connected  properties )],
+		 User => [qw(id name description blocked  creation_date creation_admin_id creation_admin_name number_of_vms number_of_vms_connected  properties )],
 
-		 Host => [qw(id name address blocked frontend backend state  load creation_admin_id creation_admin_name creation_date 
+		 Host => [qw(id name description address blocked frontend backend state  load creation_admin_id creation_admin_name creation_date 
                              number_of_vms_connected properties )],
 
 		 DI_Tag => [qw(di_id osf_id name id )],
@@ -710,28 +742,28 @@ my $AVAILABLE_NESTED_QUERIES =
 # Available arguments for update actions
 
 my $AVAILABLE_ARGUMENTS = { Config => [qw(value)],
-			    User => [qw(name password blocked)],
-                            VM => [qw(name ip blocked expiration_soft expiration_hard storage di_tag ***start*** ***stop*** ***disconnect***)],
-                            Host => [qw(name address blocked)],
-                            OSF => [qw(name memory user_storage overlay)],
-                            DI => [qw(blocked disk_image)],
-			    Tenant => [qw(name language block)],
-			    Role => [qw(name)],
-			    Administrator => [qw(name password language block)],
+			    User => [qw(name password blocked description)],
+                            VM => [qw(name ip blocked expiration_soft expiration_hard storage di_tag description ***start*** ***stop*** ***disconnect***)],
+                            Host => [qw(name address blocked description)],
+                            OSF => [qw(name memory user_storage overlay description)],
+                            DI => [qw(blocked disk_image description)],
+			    Tenant => [qw(name language block description)],
+			    Role => [qw(name description)],
+			    Administrator => [qw(name password language block description)],
 			    Tenant_Views_Setup => [qw(visible)],
 			    Administrator_Views_Setup => [qw(visible)]};
 
 # Available arguments for creation actions
 
 my $MANDATORY_ARGUMENTS = { Config => [qw(key value)],
-			    User => [qw(tenant_id name password  blocked)],
-			    VM => [qw(name user_id ip osf_id di_tag state user_state blocked)],
-			    Host => [qw(name address frontend backend blocked state)],
-			    OSF => [qw(tenant_id name memory overlay user_storage )],
-                            DI => [qw(version disk_image osf_id blocked)],
-			    Tenant => [qw(name language block)],
-			    Role => [qw(tenant_id name fixed internal)],
-                            Administrator => [qw(tenant_id name password language block)],
+			    User => [qw(tenant_id name password blocked description)],
+			    VM => [qw(name user_id ip osf_id di_tag state user_state blocked description)],
+			    Host => [qw(name address frontend backend blocked state description)],
+			    OSF => [qw(tenant_id name memory overlay user_storage description)],
+                            DI => [qw(version disk_image osf_id blocked description)],
+			    Tenant => [qw(name language block description)],
+			    Role => [qw(tenant_id name fixed internal description)],
+                            Administrator => [qw(tenant_id name password language block description)],
 			    Tenant_Views_Setup => [qw(tenant_id field visible view_type device_type qvd_object property)],
 			    Administrator_Views_Setup => [qw(field visible view_type device_type qvd_object property)]}; # Every admin is able to set just its own views, 
                                                                                                                          # Suitable admin_id forzed in Request.pm
@@ -837,6 +869,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'role_name' => 'role.name',
 	'acl_name' => 'acl.name',
 	'id' => 'me.id',
+	'description' => 'me.description',
 	'creation_date' => 'creation_log_entry.time',
 	'creation_admin_id' => 'creation_log_entry.administrator_id',
 	'creation_admin_name' => 'creation_log_entry.administrator_name',
@@ -850,6 +883,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'memory' => 'me.memory',
 	'vm_id' => 'vms.id',
 	'di_id' => 'dis.id',
+	'description' => 'me.description',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'tenant.name',
 	'creation_date' => 'creation_log_entry.time',
@@ -864,6 +898,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'blocked' => 'runtime.blocked',
 	'frontend' => 'me.frontend',
 	'backend' => 'me.backend',
+	'description' => 'me.description',
 	'state' => 'runtime.state',
 	'vm_id' => 'vms.vm_id',
 	'creation_date' => 'creation_log_entry.time',
@@ -880,6 +915,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'tag' => 'tags.tag',
 	'tenant_id' => 'osf.tenant_id',
 	'blocked' => 'me.blocked',
+	'description' => 'me.description',
 	'tenant_name' => 'tenant.name',
 	'creation_date' => 'creation_log_entry.time',
 	'creation_admin_id' => 'creation_log_entry.administrator_id',
@@ -888,8 +924,10 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     User => {
 	'id' => 'me.id',
 	'name' => 'me.login',
+	'description' => 'me.description',
 	'password' => 'me.password',
 	'blocked' => 'me.blocked',
+	'description' => 'me.description',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'tenant.name',
 	'creation_date' => 'creation_log_entry.time',
@@ -906,6 +944,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'osf_id' => 'me.osf_id',
 	'osf_name' => 'osf.name',
 	'di_tag' => 'me.di_tag',
+	'description' => 'me.description',
 	'blocked' => 'vm_runtime.blocked',
 	'expiration_soft' => 'vm_runtime.vm_expiration_soft',
 	'expiration_hard' => 'vm_runtime.vm_expiration_hard',
@@ -936,6 +975,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'fixed' => 'me.fixed',
 	'internal' => 'me.internal',
 	'id' => 'me.id',
+	'description' => 'me.description',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'tenant.name',
 	'admin_id' => 'admin_rels.administrator_id',
@@ -948,6 +988,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     Tenant => {
 	'name' => 'me.name',
 	'id' => 'me.id',
+	'description' => 'me.description',
 	'language' => 'wat_setups.language',
 	'block' => 'wat_setups.block',
 	'creation_date' => 'creation_log_entry.time',
@@ -1078,6 +1119,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     Host => {
 	'id' => 'me.id',
 	'name' => 'me.name',
+	'description' => 'me.description',
 	'address' => 'me.address',
 	'blocked' => 'runtime.blocked',
 	'frontend' => 'me.frontend',
@@ -1093,6 +1135,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 
     Role => {
 	'name' => 'me.name',
+	'description' => 'me.description',
 	'fixed' => 'me.fixed',
 	'internal' => 'me.internal',
 	'id' => 'me.id',
@@ -1108,6 +1151,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     User => {
 	'id' => 'me.id',
 	'name' => 'me.login',
+	'description' => 'me.description',
 	'password' => 'me.password',
 	'blocked' => 'me.blocked',
 	'number_of_vms' => 'view.number_of_vms',
@@ -1132,6 +1176,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     OSF => {
 	'id' => 'me.id',
 	'name' => 'me.name',
+	'description' => 'me.description',
 	'overlay' => 'me.use_overlay',
 	'user_storage' => 'me.user_storage_size',
 	'memory' => 'me.memory',
@@ -1149,6 +1194,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'storage' => 'me.storage',
 	'id' => 'me.id',
 	'name' => 'me.name',
+	'description' => 'me.description',
 	'user_id' => 'me.user_id',
 	'user_name' => 'user.login',
 	'osf_id' => 'me.osf_id',
@@ -1188,6 +1234,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     DI => {
 	'id' => 'me.id',
 	'disk_image' => 'me.path',
+	'description' => 'me.description',
 	'version' => 'me.version',
 	'osf_id' => 'me.osf_id',
 	'osf_name' => 'osf.name',
@@ -1203,6 +1250,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 
     Administrator => {
 	'name' => 'me.name',
+	'description' => 'me.description',
 	'language' => 'wat_setups.language',
 	'block' => 'wat_setups.block',
 	'password' => 'me.password',
@@ -1216,6 +1264,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     },
     Tenant => {
 	'name' => 'me.name',
+	'description' => 'me.description',
 	'id' => 'me.id',
 	'language' => 'wat_setups.language',
 	'block' => 'wat_setups.block',

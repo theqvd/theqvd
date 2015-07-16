@@ -6,6 +6,7 @@ __PACKAGE__->table('hosts');
 __PACKAGE__->add_columns( id       => { data_type => 'integer',
                                        is_auto_increment => 1 },
                           name     => { data_type => 'varchar(127)' },
+                          description => { data_type => 'varchar(32768)' },
                           address  => { data_type => 'varchar(127)' },
 			  frontend => { data_type => 'boolean' },
 			  backend  => { data_type => 'boolean' },

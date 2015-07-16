@@ -61,6 +61,7 @@ __DATA__
 
 id             = me.id
 name           = me.login
+description    = me.description
 password       = me.password
 blocked        = me.blocked
 creation_admin = me.creation_admin

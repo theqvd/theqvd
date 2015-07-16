@@ -59,6 +59,7 @@ __DATA__
 
 id = me.id
 name = me.name
+description = me.description
 password = me.password
 tenant = me.tenant_id
 tenant_name = tenant.name

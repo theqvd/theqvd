@@ -1089,6 +1089,23 @@ sub get_number_of_acls_in_admin
     my $acl_patterns = $json_wrapper->get_filter_value('acl_pattern') // '%';
     $acl_patterns = ref($acl_patterns) ? $acl_patterns : [$acl_patterns];
     my $admin_id = $json_wrapper->get_filter_value('admin_id') //
+	QVD::Admin4::Exception->throw(code=>'6220', object => 'admin_id');
+    my $aol = QVD::Admin4::AclsOverwriteList->new(admin_id => $admin_id);
+    my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
+
+    my $rs = $DB->resultset('Operative_Acls_In_Administrator')->search(
+	{},{bind => $bind})->search({admin_id => $admin_id});
+
+    $self->get_number_of_acls($rs,$acl_patterns);
+}
+
+sub get_number_of_acls_in_admin_old
+{
+    my ($self,$administrator,$json_wrapper) = @_;
+
+    my $acl_patterns = $json_wrapper->get_filter_value('acl_pattern') // '%';
+    $acl_patterns = ref($acl_patterns) ? $acl_patterns : [$acl_patterns];
+    my $admin_id = $json_wrapper->get_filter_value('admin_id') //
         QVD::Admin4::Exception->throw(code=>'6220', object => 'admin_id');
 
 # This view needs to bind three placeholders. The values of the 
@@ -1156,6 +1173,9 @@ sub get_number_of_acls
             $output->{$acl_pattern}->{effective}++ if $acl->operative;
         }
     }
+
+#    $output->{$_}->{total} || delete $output->{$_} 
+#    for keys %$output;
 
     $output;
 }

@@ -27,6 +27,7 @@ __DATA__
 
 id = me.id
 name = me.name
+description = me.description
 own_acls = me.get_own_acls
 inherited_acls = me.get_inherited_acls_kk
 own_roles = me.get_own_roles

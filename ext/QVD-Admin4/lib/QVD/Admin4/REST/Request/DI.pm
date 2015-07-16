@@ -57,6 +57,7 @@ __DATA__
 
 id = me.id
 disk_image = me.path
+description = me.description
 version = me.version
 osf_id = me.osf_id
 osf_name = osf.name
