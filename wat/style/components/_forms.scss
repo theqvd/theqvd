@@ -44,7 +44,7 @@ select {
 }
     
 
-input, .button, .button2 {
+input, textarea, .button, .button2 {
     padding: 4px 8px;
     line-height: 30px;
     border-color: #ccc;
@@ -57,7 +57,7 @@ input {
     line-height: $height_input;
 }
 
-select, input, .button, .button2 {
+select, input, textarea, .button, .button2 {
     border-radius: $form_elements_radius;
     border-style: solid;
     border-color: darken($col_whiter, 20%);

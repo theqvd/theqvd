@@ -18,7 +18,28 @@
 if (Wat.C.checkACL('role.see.id')) { 
 %>
     <table class="details details-list col-width-100">
+        <%   
+        if (Wat.C.checkACL('role.see.description')) { 
+        %>
+            <tr>
+                <td><i class="fa fa-align-justify"></i><span data-i18n="Description"></span></td>
+                <td>
+                    <% 
+                    if (model.get('description')) { 
+                    %>
+                        <%= model.get('description').replace(/\n/g, '<br>') %>
+                    <%
+                    }
+                    else {
+                    %>
+                        <span class="second_row">-</span>
+                    <%
+                    }
+                    %>
+                </td>
+            </tr>
         <% 
+        }
         if (Wat.C.checkACL('role.see.id')) { 
         %>
         <tr>

@@ -50,6 +50,15 @@ Wat.I.listFields[qvdObj] = {
         'fixed': true,
         'sortable': true,
     },
+    'description': {
+        'display': false,
+        'fields': [
+            'description'
+        ],
+        'acls': 'vm.see.description',
+        'text': 'Description',
+        'sortable': true,
+    },
     'host': {
         'text': 'Node',
         'fields': [

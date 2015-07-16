@@ -23,7 +23,8 @@ Wat.Common.BySection.osf = {
         var name = context.find('input[name="name"]').val();        
         var memory = context.find('input[name="memory"]').val();
         var user_storage = context.find('input[name="user_storage"]').val();
-        
+        var description = context.find('textarea[name="description"]').val();
+
         arguments = {};
         
         if (Wat.C.checkACL('osf.update.name')) {
@@ -40,6 +41,10 @@ Wat.Common.BySection.osf = {
         
         if (properties.delete.length > 0 || !$.isEmptyObject(properties.set)) {
             arguments["__properties_changes__"] = properties;
+        }
+            
+        if (Wat.C.checkACL('osf.update.description')) {
+            arguments["description"] = description;
         }
         
         var filters = {"id": that.id};

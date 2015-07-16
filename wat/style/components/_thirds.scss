@@ -113,7 +113,7 @@
             //padding-bottom: 0px;
         }
         
-        input[type="text"], input[type="password"] {
+        input[type="text"], input[type="password"], textarea {
             width: 100%;
             @include in(desktop) {
                 //width: auto;

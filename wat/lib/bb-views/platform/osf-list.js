@@ -55,6 +55,11 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
         if (name) {
             arguments["name"] = name;
         }
+        
+        var description = context.find('textarea[name="description"]').val();
+        if (description) {
+            arguments["description"] = description;
+        }
                  
         if (Wat.C.isSuperadmin) {
             var tenant_id = context.find('select[name="tenant_id"]').val();
@@ -82,10 +87,16 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
         
         var context = $('.' + this.cid + '.editor-container');
         
+        var description = context.find('textarea[name="description"]').val();
         var memory = context.find('input[name="memory"]').val();
         var user_storage = context.find('input[name="user_storage"]').val();
         
         var filters = {"id": id};
+        
+        
+        if (description != '' && Wat.C.checkACL(this.qvdObj + '.update-massive.description')) {
+            arguments["description"] = description;
+        }
         
         if (memory != '' && Wat.C.checkACL('osf.update-massive.memory')) {
             arguments["memory"] = memory;

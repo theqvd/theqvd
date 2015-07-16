@@ -42,6 +42,11 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
         var name = context.find('input[name="name"]').val();
         if (name) {
             arguments["name"] = name;
+        }  
+        
+        var description = context.find('textarea[name="description"]').val();
+        if (description) {
+            arguments["description"] = description;
         }
         
         var password = context.find('input[name="password"]').val();

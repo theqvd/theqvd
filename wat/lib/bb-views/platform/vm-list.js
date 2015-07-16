@@ -147,6 +147,11 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             arguments["name"] = name;
         }
         
+        var description = context.find('textarea[name="description"]').val();
+        if (description) {
+            arguments["description"] = description;
+        }
+        
         this.createModel(arguments, this.fetchList);
     },
     
@@ -238,9 +243,14 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         
         var context = $('.' + this.cid + '.editor-container');
         
+        var description = context.find('textarea[name="description"]').val();
         var di_tag = context.find('select[name="di_tag"]').val(); 
         
         var filters = {"id": id};
+        
+        if (description != '' && Wat.C.checkACL(this.qvdObj + '.update-massive.description')) {
+            arguments["description"] = description;
+        }
         
         if (di_tag != '' && Wat.C.checkACL('vm.update-massive.di-tag')) {
             arguments["di_tag"] = di_tag;

@@ -29,6 +29,15 @@ Wat.I.listFields[qvdObj] = {
         'fixed': true,
         'sortable': true,
     },
+    'description': {
+        'display': false,
+        'fields': [
+            'description'
+        ],
+        'acls': 'role.see.description',
+        'text': 'Description',
+        'sortable': true,
+    },
     'acls': {
         'display': false,
         'fields': [

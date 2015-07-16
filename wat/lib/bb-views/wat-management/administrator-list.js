@@ -36,6 +36,11 @@ Wat.Views.AdminListView = Wat.Views.ListView.extend({
             "password": password,
         };
         
+        var description = context.find('textarea[name="description"]').val();
+        if (description) {
+            arguments["description"] = description;
+        }
+        
         if (Wat.C.checkACL('administrator.create.language')) { 
             var language = context.find('select[name="language"]').val();
             arguments["language"] = language;

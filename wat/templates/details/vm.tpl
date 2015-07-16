@@ -265,7 +265,28 @@ switch (model.get('state')) {
 -->
 
 <table class="details details-list <%= mainTableClass %>">
+    <%  
+    if (Wat.C.checkACL('vm.see.description')) { 
+    %>
+        <tr>
+            <td><i class="fa fa-align-justify"></i><span data-i18n="Description"></span></td>
+            <td>
+                <% 
+                if (model.get('description')) { 
+                %>
+                    <%= model.get('description').replace(/\n/g, '<br>') %>
+                <%
+                }
+                else {
+                %>
+                    <span class="second_row">-</span>
+                <%
+                }
+                %>
+            </td>
+        </tr>
     <% 
+    } 
     if (Wat.C.checkACL('vm.see.id')) {
     %>
         <tr>

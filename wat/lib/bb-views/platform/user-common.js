@@ -21,7 +21,9 @@ Wat.Common.BySection.user = {
         var arguments = {'properties' : properties};
         
         var context = $('.' + that.cid + '.editor-container');
-                        
+        
+        var description = context.find('textarea[name="description"]').val();
+
         var filters = {"id": that.id};
         var arguments = {};
         
@@ -38,6 +40,10 @@ Wat.Common.BySection.user = {
                     arguments['password'] = password;
                 }
             }
+        }
+        
+        if (Wat.C.checkACL('user.update.description')) {
+            arguments["description"] = description;
         }
         
         //that.updateModel(arguments, filters, that.fetchDetails);

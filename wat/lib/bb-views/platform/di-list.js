@@ -134,6 +134,11 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         
         arguments['__tags__'] = tags;
         
+        var description = context.find('textarea[name="description"]').val();
+        if (description) {
+            arguments["description"] = description;
+        }
+        
         var image_source = context.find('select[name="images_source"]').val();
         
         // Store tags for affected VMs checking

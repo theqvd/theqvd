@@ -52,6 +52,15 @@ Wat.I.listFields[qvdObj] = {
         'text': 'Disk image',
         'sortable': true,
     },
+    'description': {
+        'display': false,
+        'fields': [
+            'description'
+        ],
+        'acls': 'di.see.description',
+        'text': 'Description',
+        'sortable': true,
+    },
     'osf': {
         'display': true,
         'fields': [

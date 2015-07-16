@@ -28,6 +28,7 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
         var name = context.find('input[name="name"]').val();
         var language = context.find('select[name="language"]').val(); 
         var block = context.find('select[name="block"]').val();
+        var description = context.find('textarea[name="description"]').val();
         
         if (Wat.C.checkACL('tenant.update.name')) {
             arguments['name'] = name;
@@ -43,6 +44,10 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
         if (Wat.C.checkACL('tenant.update.language')) {
             arguments['language'] = language;
         }     
+        
+        if (Wat.C.checkACL('role.update.description')) {
+            arguments["description"] = description;
+        }
         
         // Store new language to make things after update
         this.newLanguage = language;

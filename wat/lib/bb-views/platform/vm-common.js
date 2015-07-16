@@ -22,7 +22,8 @@ Wat.Common.BySection.vm = {
         
         var name = context.find('input[name="name"]').val();
         var di_tag = context.find('select[name="di_tag"]').val(); 
-        
+        var description = context.find('textarea[name="description"]').val();
+
         var filters = {"id": that.id};
         var arguments = {};
         
@@ -57,6 +58,10 @@ Wat.Common.BySection.vm = {
                 arguments['expiration_soft'] = '';
                 arguments['expiration_hard'] = '';
             }
+        }
+        
+        if (Wat.C.checkACL('vm.update.description')) {
+            arguments["description"] = description;
         }
                 
         that.updateModel(arguments, filters, that.fetchAny);

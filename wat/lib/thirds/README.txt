@@ -8,6 +8,7 @@ Used libraries on QVD Wat and their version, licenses and source sites:
 - jQuery UI v1.11.0 (MIT License) http://jqueryui.com
 - jQuery Cookie v1.4.1 (MIT License) http://plugins.jquery.com/cookie/
 - jQuery TableScroll (MIT License) https://github.com/farinspace/jquery.tableScroll
+- ExpandingTextareas v0.2.0 (MIT License) https://github.com/bgrins/ExpandingTextareas
 - Chosen v1.1.0 (MIT License) http://harvesthq.github.io/chosen/
 - Font Awesome v4.2.0 (Font: SIL OFL 1.1, CSS: MIT License) http://fortawesome.github.io/Font-Awesome/
 - Font Awesome Animation v0.0.7 (MIT License) http://l-lin.github.io/font-awesome-animation/

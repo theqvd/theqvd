@@ -40,6 +40,11 @@ Wat.Views.TenantListView = Wat.Views.ListView.extend({
             "block": block,
             "language": language
         };
+        
+        var description = context.find('textarea[name="description"]').val();
+        if (description) {
+            arguments["description"] = description;
+        }
                                 
         this.createModel(arguments, this.fetchList);
     },

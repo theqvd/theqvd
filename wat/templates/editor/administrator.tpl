@@ -1,4 +1,12 @@
 <table>
+    <% if (Wat.C.checkACL('vm.update.description')) { %>
+    <tr>
+        <td data-i18n="Description"></td>
+        <td>
+            <textarea id="name" type="text" name="description"><%= model.get('description') %></textarea>
+        </td>
+    </tr>
+    <% } %>
     <% 
     if (Wat.C.checkACL('administrator.update.password')) { 
     %>

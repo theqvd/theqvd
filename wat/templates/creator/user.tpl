@@ -6,6 +6,12 @@
         </td>
     </tr>
     <tr>
+        <td data-i18n="Description"></td>
+        <td>
+            <textarea id="name" type="text" name="description"></textarea>
+        </td>
+    </tr>
+    <tr>
         <td data-i18n="New password" class="mandatory-label"></td>
         <td>
             <input type="password" name="password" value="" data-required data-equal="password">

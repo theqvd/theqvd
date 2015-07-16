@@ -36,6 +36,15 @@ Wat.I.listFields[qvdObj] = {
         'fixed': true,
         'sortable': true,
     },
+    'description': {
+        'display': false,
+        'fields': [
+            'description'
+        ],
+        'acls': 'osf.see.description',
+        'text': 'Description',
+        'sortable': true,
+    },
     'overlay': {
         'display': true,
         'fields': [

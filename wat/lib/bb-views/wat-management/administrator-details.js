@@ -299,6 +299,11 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
             arguments['language'] = language;
         }
         
+        if (Wat.C.checkACL('administrator.update.description')) {
+            var description = context.find('textarea[name="description"]').val();
+            arguments["description"] = description;
+        }
+        
         this.updateModel(arguments, filters, this.fetchDetails);
     },
     

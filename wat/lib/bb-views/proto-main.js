@@ -207,6 +207,9 @@ Wat.Views.MainView = Backbone.View.extend({
                 );
 
         $(that.editorContainer).html(that.template);
+        
+        // Apply expanding plugin to make textareas expandable
+        $("textarea").expanding();
     },
     
     updateElement: function () {

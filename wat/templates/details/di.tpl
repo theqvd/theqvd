@@ -29,7 +29,28 @@
 </div>
 
 <table class="details details-list <% if (!enabledProperties) { %> col-width-100 <% } %>">
+    <%   
+    if (Wat.C.checkACL('di.see.description')) { 
+    %>
+        <tr>
+            <td><i class="fa fa-align-justify"></i><span data-i18n="Description"></span></td>
+            <td>
+                <% 
+                if (model.get('description')) { 
+                %>
+                    <%= model.get('description').replace(/\n/g, '<br>') %>
+                <%
+                }
+                else {
+                %>
+                    <span class="second_row">-</span>
+                <%
+                }
+                %>
+            </td>
+        </tr>
     <% 
+    }
     if (detailsFields['id'] != undefined) { 
     %>
         <tr>

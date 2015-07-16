@@ -22,7 +22,8 @@ Wat.Common.BySection.host = {
         
         var name = context.find('input[name="name"]').val();
         var address = context.find('input[name="address"]').val();
-        
+        var description = context.find('textarea[name="description"]').val();
+
         var filters = {"id": that.id};
         var arguments = {};
         
@@ -35,6 +36,10 @@ Wat.Common.BySection.host = {
 
         if (properties.delete.length > 0 || !$.isEmptyObject(properties.set)) {
             arguments["__properties_changes__"] = properties;
+        }
+        
+        if (Wat.C.checkACL('host.update.description')) {
+            arguments["description"] = description;
         }
 
         that.updateModel(arguments, filters, that.fetchAny);

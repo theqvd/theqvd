@@ -7,6 +7,14 @@
         </td>
     </tr>
     <% } %>
+    <% if (Wat.C.checkACL('tenant.update.description')) { %>
+    <tr>
+        <td data-i18n="Description"></td>
+        <td>
+            <textarea id="name" type="text" name="description"><%= model.get('description') %></textarea>
+        </td>
+    </tr>
+    <% } %>
     <% if (Wat.C.checkACL('tenant.update.language')) { %>
     <tr>
         <td data-i18n="Language"></td>

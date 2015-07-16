@@ -583,12 +583,17 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         var context = $('.' + this.cid + '.editor-container');
         
         var name = context.find('input[name="name"]').val();
-        
+        var description = context.find('textarea[name="description"]').val();
+
         var filters = {"id": this.id};
         var arguments = {};
         
         if (Wat.C.checkACL('role.update.name')) {
             arguments['name'] = name;
+        }
+        
+        if (Wat.C.checkACL('role.update.description')) {
+            arguments["description"] = description;
         }
         
         this.updateModel(arguments, filters, this.fetchDetails);

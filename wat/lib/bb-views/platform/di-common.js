@@ -32,6 +32,7 @@ Wat.Common.BySection.di = {
                         
         var tags = context.find('input[name="tags"]').val();
         var newTags = tags && Wat.C.checkACL('di.update.tags') ? tags.split(',') : [];
+        var description = context.find('textarea[name="description"]').val();
 
         var def = context.find('input[name="default"][value=1]').is(':checked');
         
@@ -58,6 +59,10 @@ Wat.Common.BySection.di = {
         
         if (properties.delete.length > 0 || !$.isEmptyObject(properties.set)) {
             arguments["__properties_changes__"] = properties;
+        }
+        
+        if (Wat.C.checkACL('di.update.description')) {
+            arguments["description"] = description;
         }
         
         this.tagChanges = arguments['__tags_changes__'];
@@ -111,6 +116,16 @@ Wat.Common.BySection.di = {
                 };
                 
                 Wat.A.performAction('vm_get_list', {}, vmFilters, {}, that.warnMachinesChanges, that);
+            }
+            else {
+                switch (realView.viewKind) {
+                    case 'details':
+                        realView.fetchDetails();
+                        break;
+                    case 'list':
+                        realView.fetchList();
+                        break;
+                }
             }
         }
         else {

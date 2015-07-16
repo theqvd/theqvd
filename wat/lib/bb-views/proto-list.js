@@ -1320,6 +1320,14 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             arguments['__properties_changes__'] = properties;
         }
         
+        var context = $('.' + this.cid + '.editor-container');
+
+        var description = context.find('textarea[name="description"]').val();
+        
+        if (description != '' && Wat.C.checkACL(this.qvdObj + '.update-massive.description')) {
+            arguments["description"] = description;
+        }
+        
         var filters = {"id": id};
 
         this.resetSelectedItems();

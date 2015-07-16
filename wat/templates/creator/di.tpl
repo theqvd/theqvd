@@ -1,5 +1,11 @@
 <table>
     <tr>
+        <td data-i18n="Description"></td>
+        <td>
+            <textarea id="name" type="text" name="description"></textarea>
+        </td>
+    </tr>
+    <tr>
         <td data-i18n="Image's source"></td>
         <td>
             <select class="" name="images_source" data-any-selected>

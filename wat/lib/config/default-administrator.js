@@ -39,6 +39,15 @@ Wat.I.listFields[qvdObj] = {
         'fixed': true,
         'sortable': true,
     },
+    'description': {
+        'display': false,
+        'fields': [
+            'description'
+        ],
+        'acls': 'administrator.see.description',
+        'text': 'Description',
+        'sortable': true,
+    },
     'creation_date': {
         'text': 'Creation date',
         'fields': [
