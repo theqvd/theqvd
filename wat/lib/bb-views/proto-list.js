@@ -1350,6 +1350,15 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             case 'di':
                 auxModel = new Wat.Models.DI();
                 break;
+            case 'administrator':
+                auxModel = new Wat.Models.Admin();
+                break;
+            case 'role':
+                auxModel = new Wat.Models.Role();
+                break;
+            case 'tenant':
+                auxModel = new Wat.Models.Tenant();
+                break;
         }
         
         this.updateModel(arguments, filters, this.fetchList, auxModel);

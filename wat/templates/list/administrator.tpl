@@ -45,15 +45,31 @@
                             </th>
             <%
                             break;
+                        case 'tenant':
+            %>
+                            <th class="<%= sortAttr %> desktop" data-sortby="tenant_name">
+                                <span data-i18n="Tenant"><%= i18n.t('Tenant') %></span>
+                            </th>
+            <%
+                            break;
+                        default:
+                            var translationAttr = '';
+                            var colText = col.text;
+
+                            if (col.noTranslatable !== true) {
+                                translationAttr = 'data-i18n="' + col.text + '"';
+                                colText = $.i18n.t(col.text);
+                            }
+
+            %>
+                            <th class="<%= sortAttr %> desktop" data-sortby="<%= name %>">
+                                <span <%= translationAttr %>><%= colText %></span>
+                            </th>
+            <%
+                            break;
                     }
                 });
             %>
-            
-            <% if (Wat.C.isSuperadmin()) { %>
-                <th data-sortby="tenant_name">
-                    <span data-i18n="Tenant"><%= i18n.t('Tenant') %></span>
-                </th>
-            <% } %>
         </tr>
     </thead>
     <tbody>
@@ -134,15 +150,31 @@
                                 </td>
                 <%
                                 break;
+                            case 'tenant':
+                %>
+                                <td class="desktop">
+                                    <%= model.get('tenant_name') %>
+                                </td>
+                <%
+                                break;
+                            default:
+                %>
+                                <td class="desktop" data-wsupdate="<%= name %>" data-id="<%= model.get('id') %>">
+                                    <% 
+                                        if (model.get(name) !== undefined) {
+                                            print(model.get(name));
+                                        }
+                                        else if (model.get('properties') !== undefined && model.get('properties')[name] !== undefined) {
+                                            print(model.get('properties')[name]);
+                                        }
+                                    
+                                    %>
+                                </td>
+                <%
+                                break;
                         }
                     });
                 %>
-                
-                <% if (Wat.C.isSuperadmin ()) { %>
-                    <td class="js-tenant">
-                        <span class="text"><%= model.get('tenant_name') %></span>
-                    </td>
-                <% } %>
             </tr>
         <% }); %>
     </tbody>

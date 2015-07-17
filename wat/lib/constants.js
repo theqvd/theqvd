@@ -190,7 +190,7 @@ COL_BRAND_DARK = '#9a4008';
 // Classification of Qvd Objects
 QVD_OBJS_WITH_PROPERTIES = ['user', 'vm', 'host', 'osf', 'di'];
 QVD_OBJS_CLASSIFIED_BY_TENANT = ['user', 'vm', 'osf', 'di', 'administrator', 'log', 'role'];
-QVD_OBJS_MASSIVE_EDITABLE = ['user', 'vm', 'host', 'osf', 'di'];
+QVD_OBJS_MASSIVE_EDITABLE = ['user', 'vm', 'host', 'osf', 'di', 'administrator', 'role', 'tenant'];
 QVD_OBJS_EXIST_IN_SUPERTENANT = ['role', 'administrator'];
 QVD_OBJS_PLATFORM = ['home', 'user', 'vm', 'host', 'osf', 'di'];
 QVD_OBJS_SETUP = ['role', 'administrator', 'tenant', 'views', 'watconfig'];

@@ -5,10 +5,13 @@ Wat.C.aclGroups = {};
 ///////////////////////////////
 Wat.C.aclGroups.administratorEdit = [
     'administrator.update.password',
-    'administrator.update.language'
+    'administrator.update.language',
+    'administrator.update.description'
 ];
 
-Wat.C.aclGroups.administratorMassiveEdit = [];
+Wat.C.aclGroups.administratorMassiveEdit = [
+    'administrator.update-massive.description'
+];
 
 Wat.C.aclGroups.administratorMassiveActions = [
     'administrator.delete-massive.',
@@ -21,10 +24,13 @@ $.merge(Wat.C.aclGroups.administratorMassiveActions, Wat.C.aclGroups.administrat
 // Roles ACL groups
 ///////////////////////////////
 Wat.C.aclGroups.roleEdit = [
-    'role.update.name'
+    'role.update.name',
+    'role.update.description'
 ];
 
-Wat.C.aclGroups.roleMassiveEdit = [];
+Wat.C.aclGroups.roleMassiveEdit = [
+    'role.update-massive.description'
+];
 
 Wat.C.aclGroups.roleMassiveActions = [
     'role.delete-massive.',
@@ -37,10 +43,13 @@ $.merge(Wat.C.aclGroups.roleMassiveActions, Wat.C.aclGroups.roleMassiveEdit);
 ///////////////////////////////
 Wat.C.aclGroups.tenantEdit = [
     'tenant.update.name',
-    'tenant.update.language'
+    'tenant.update.language',
+    'tenant.update.description'
 ];
 
-Wat.C.aclGroups.tenantMassiveEdit = [];
+Wat.C.aclGroups.tenantMassiveEdit = [
+    'tenant.update.description'
+];
 
 Wat.C.aclGroups.tenantMassiveActions = [
     'tenant.delete-massive.',
@@ -74,7 +83,8 @@ Wat.C.aclGroups.userEdit = [
     'user.update.password',
     'user.update.properties-create',
     'user.update.properties-update',
-    'user.update.properties-delete'
+    'user.update.properties-delete',
+    'user.update.description'
 ];
 
 Wat.C.aclGroups.userInfo = [
@@ -84,7 +94,8 @@ Wat.C.aclGroups.userInfo = [
 Wat.C.aclGroups.userMassiveEdit = [
     'user.update-massive.properties-create',
     'user.update-massive.properties-update',
-    'user.update-massive.properties-delete'
+    'user.update-massive.properties-delete',
+    'role.update-massive.description'
 ];
 
 Wat.C.aclGroups.userMassiveActions = [
@@ -118,7 +129,8 @@ Wat.C.aclGroups.vmEdit = [
     'vm.update.expiration',
     'vm.update.properties-create',
     'vm.update.properties-update',
-    'vm.update.properties-delete'
+    'vm.update.properties-delete',
+    'vm.update.description'
 ];
 
 Wat.C.aclGroups.vmMassiveEdit = [
@@ -126,7 +138,8 @@ Wat.C.aclGroups.vmMassiveEdit = [
     'vm.update-massive.expiration',
     'vm.update-massive.properties-create',
     'vm.update-massive.properties-update',
-    'vm.update-massive.properties-delete'
+    'vm.update-massive.properties-delete',
+    'vm.update-massive.description'
 ];
 
 Wat.C.aclGroups.vmMassiveActions = [
@@ -166,13 +179,15 @@ Wat.C.aclGroups.hostEdit = [
     'host.update.address',
     'host.update.properties-create',
     'host.update.properties-update',
-    'host.update.properties-delete'
+    'host.update.properties-delete',
+    'host.update.description'
 ];
 
 Wat.C.aclGroups.hostMassiveEdit = [
     'host.update-massive.properties-create',
     'host.update-massive.properties-update',
-    'host.update-massive.properties-delete'
+    'host.update-massive.properties-delete',
+    'host.update-massive.description'
 ];
 
 Wat.C.aclGroups.hostMassiveActions = [
@@ -199,7 +214,8 @@ Wat.C.aclGroups.osfEdit = [
     'osf.update.user-storage',
     'osf.update.properties-create',
     'osf.update.properties-update',
-    'osf.update.properties-delete'
+    'osf.update.properties-delete',
+    'osf.update.description'
 ];
 
 Wat.C.aclGroups.osfMassiveEdit = [
@@ -207,7 +223,8 @@ Wat.C.aclGroups.osfMassiveEdit = [
     'osf.update-massive.user-storage',
     'osf.update-massive.properties-create',
     'osf.update-massive.properties-update',
-    'osf.update-massive.properties-delete'
+    'osf.update-massive.properties-delete',
+    'osf.update-massive.description'
 ];
 
 Wat.C.aclGroups.osfMassiveActions = [
@@ -240,7 +257,8 @@ Wat.C.aclGroups.diEdit = [
     'di.update.tags-delete',
     'di.update.properties-create',
     'di.update.properties-update',
-    'di.update.properties-delete'
+    'di.update.properties-delete',
+    'di.update.description'
 ];
 
 Wat.C.aclGroups.diInfo = [
@@ -253,7 +271,8 @@ Wat.C.aclGroups.diMassiveEdit = [
     'di.update-massive.tags-delete',
     'di.update-massive.properties-create',
     'di.update-massive.properties-update',
-    'di.update-massive.properties-delete'
+    'di.update-massive.properties-delete',
+    'di.update-massive.description'
 ];
 
 Wat.C.aclGroups.diMassiveActions = [

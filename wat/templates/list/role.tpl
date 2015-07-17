@@ -59,6 +59,21 @@
                             </th>
             <%
                             break;
+                        default:
+                            var translationAttr = '';
+                            var colText = col.text;
+
+                            if (col.noTranslatable !== true) {
+                                translationAttr = 'data-i18n="' + col.text + '"';
+                                colText = $.i18n.t(col.text);
+                            }
+
+            %>
+                            <th class="<%= sortAttr %> desktop" data-sortby="<%= name %>">
+                                <span <%= translationAttr %>><%= colText %></span>
+                            </th>
+            <%
+                            break;
                         
                     }
                 });
@@ -140,6 +155,21 @@
                 %>
                                 <td class="desktop">
                                     <%= model.get('tenant_name') %>
+                                </td>
+                <%
+                                break;
+                            default:
+                %>
+                                <td class="desktop" data-wsupdate="<%= name %>" data-id="<%= model.get('id') %>">
+                                    <% 
+                                        if (model.get(name) !== undefined) {
+                                            print(model.get(name));
+                                        }
+                                        else if (model.get('properties') !== undefined && model.get('properties')[name] !== undefined) {
+                                            print(model.get('properties')[name]);
+                                        }
+                                    
+                                    %>
                                 </td>
                 <%
                                 break;

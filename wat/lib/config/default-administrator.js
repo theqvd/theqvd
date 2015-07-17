@@ -138,6 +138,11 @@ Wat.I.selectedActions[qvdObj] = {
     'delete': {
         'text': 'Delete',
         'acls': 'administrator.delete-massive.'
+    },
+    'massive_changes': {
+        'text': 'Edit',
+        'groupAcls': 'administratorMassiveEdit',
+        'aclsLogic': 'OR'
     }
 };
 
