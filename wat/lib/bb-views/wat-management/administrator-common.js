@@ -7,7 +7,10 @@ Wat.Common.BySection.administrator = {
     
     updateElement: function (dialog) {
         var that = that || this;
-        that.id = that.id || that.selectedItems[0];
+        
+        if (that.viewKind == 'list') {
+            that.id = that.selectedItems[0];
+        }
         
         var valid = Wat.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
         
@@ -45,8 +48,10 @@ Wat.Common.BySection.administrator = {
     },
     
     openEditElementDialog: function(e) {
-        this.model = this.model || this.collection.where({id: this.selectedItems[0]})[0];
-
+        if (this.viewKind == 'list') {
+            this.model = this.collection.where({id: this.selectedItems[0]})[0];
+        }
+        
         this.dialogConf.title = $.i18n.t('Edit Administrator') + ": " + this.model.get('name');
         
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);

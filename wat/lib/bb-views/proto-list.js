@@ -1093,6 +1093,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     openMassiveChangesDialog: function (that) {   
         // If the edition is performed over one single element, call single editor
         if (that.selectedItems.length == 1) {
+            console.log(that.selectedItems);
             that.editingFromList = true;
             this.openEditElementDialog(that);
             return;

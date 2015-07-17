@@ -7,8 +7,12 @@ Wat.Common.BySection.tenant = {
     
     updateElement: function (dialog) {  
         var that = that || this;
-        that.id = that.id || that.selectedItems[0];
-              
+        
+        // If current view is list, use selected ID as update element ID
+        if (that.viewKind == 'list') {
+            that.id = that.selectedItems[0];
+        }
+                   
         var valid = Wat.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
         
         if (!valid) {
@@ -53,7 +57,9 @@ Wat.Common.BySection.tenant = {
     },
     
     openEditElementDialog: function(e) {
-        this.model = this.model || this.collection.where({id: this.selectedItems[0]})[0];
+        if (this.viewKind == 'list') {
+            this.model = this.collection.where({id: this.selectedItems[0]})[0];
+        }   
         
         this.dialogConf.title = $.i18n.t('Edit tenant') + ": " + this.model.get('name');
         
