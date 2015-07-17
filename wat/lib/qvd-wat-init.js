@@ -78,6 +78,7 @@ var Wat = {
             di: {},
             role: {},
             administrator: {},
+            tenant: {},
             log: {}
         },
         ListDetails: {},

@@ -566,39 +566,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         $('.acls-management').hide();
         $('.' + selectedSubmenuOption).show();
     },
-    
-    openEditElementDialog: function(e) {
-        this.dialogConf.title = $.i18n.t('Edit Role') + ": " + this.model.get('name');
-        
-        Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
-    },
-    
-    updateElement: function (dialog) {
-        var valid = Wat.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
-        
-        if (!valid) {
-            return;
-        }
-        
-        var context = $('.' + this.cid + '.editor-container');
-        
-        var name = context.find('input[name="name"]').val();
-        var description = context.find('textarea[name="description"]').val();
 
-        var filters = {"id": this.id};
-        var arguments = {};
-        
-        if (Wat.C.checkACL('role.update.name')) {
-            arguments['name'] = name;
-        }
-        
-        if (Wat.C.checkACL('role.update.description')) {
-            arguments["description"] = description;
-        }
-        
-        this.updateModel(arguments, filters, this.fetchDetails);
-    },
-    
     bindEditorEvents: function() {
         Wat.Views.DetailsView.prototype.bindEditorEvents.apply(this);
         
