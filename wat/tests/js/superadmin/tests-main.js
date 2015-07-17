@@ -3,6 +3,7 @@ var password = 'superadmin';
 var tenant = '*';
 var roleShort = {"1": "Root"};
 var roleLong = {"1": {
+        "description": null,
         "fixed": true,
         "internal": false,
         "name": "Root",

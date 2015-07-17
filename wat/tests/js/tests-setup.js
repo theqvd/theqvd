@@ -48,6 +48,7 @@ WatTests.detailViews = {
     };
 WatTests.values = {
         user: {
+            "description": getRandomStr(),
             "__properties__" : {
                 "prop1": getRandomStr(),
                 "prop2": getRandomStr(),
@@ -59,6 +60,7 @@ WatTests.values = {
             "tenant_id": 1
         },
         vm: {
+            "description": getRandomStr(),
             "__properties__" : {
                 "prop1": getRandomStr(),
                 "prop2": getRandomStr(),
@@ -71,6 +73,7 @@ WatTests.values = {
             "di_tag": 'default'
         },
         host: {
+            "description": getRandomStr(),
             "__properties__" : {
                 "prop1": getRandomStr(),
                 "prop2": getRandomStr(),
@@ -81,6 +84,7 @@ WatTests.values = {
             "address": getRandomStr()
         },
         osf: {
+            "description": getRandomStr(),
             "__properties__" : {
                 "prop1": getRandomStr(),
                 "prop2": getRandomStr(),
@@ -92,6 +96,7 @@ WatTests.values = {
             "tenant_id": 1
         },
         di: {
+            "description": getRandomStr(),
             "__properties__" : {
                 "prop1": getRandomStr(),
                 "prop2": getRandomStr(),
@@ -108,11 +113,13 @@ WatTests.values = {
             "osf_id": 0
         },
         tenant: {
+            "description": getRandomStr(),
             "name": getRandomStr(),
             "language": "auto",
             "block": getRandomInt()
         },
         admin: {
+            "description": getRandomStr(),
             "name": getRandomStr(),
             "language": "default",
             "block": getRandomInt(),
@@ -120,6 +127,7 @@ WatTests.values = {
             "tenant_id": null,
         },
         role: {
+            "description": getRandomStr(),
             "name": getRandomStr(),
             "tenant_id": 1
         }
@@ -136,6 +144,7 @@ WatTests.updateValues = {
                 ]
             },
             "blocked": WatTests.values.user.blocked ? 0 : 1, // Change blocked status
+            "description": getRandomStr(),
             "password": getRandomStr()
         },
         vm: {
@@ -150,6 +159,7 @@ WatTests.updateValues = {
             },
             "name": getRandomStr(),
             "blocked": WatTests.values.user.blocked ? 0 : 1, // Change blocked status
+            "description": getRandomStr(),
             "di_tag": 'default',
         },
         host: {},
@@ -164,6 +174,7 @@ WatTests.updateValues = {
                 ]
             },
             "name": getRandomStr(),
+            "description": getRandomStr(),
             "memory": getRandomInt(),
             "user_storage": getRandomInt()
         },
@@ -185,15 +196,18 @@ WatTests.updateValues = {
                     WatTests.values.di.__tags__[0] // Delete property
                 ]
             },
+            "description": getRandomStr(),
             "blocked": WatTests.values.di.blocked ? 0 : 1 // Change blocked status
         },
         tenant: {
             "name": getRandomStr(),
+            "description": getRandomStr(),
             "language": "en",
             "block": getRandomInt()
         },
         admin: {
             "name": getRandomStr(),
+            "description": getRandomStr(),
             "language": "en",
             "password": getRandomStr(),
             "block": getRandomInt(),
@@ -203,6 +217,7 @@ WatTests.updateValues = {
         },
         role: {
             "name": getRandomStr(),
+            "description": getRandomStr(),
             "__acls_changes__": {
                 "unassign_acls": ["user.delete.", "vm.delete"]
             },
