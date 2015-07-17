@@ -8,6 +8,7 @@ Wat.Common.BySection.administrator = {
     updateElement: function (dialog) {
         var that = that || this;
         
+        // If current view is list, use selected ID as update element ID
         if (that.viewKind == 'list') {
             that.id = that.selectedItems[0];
         }
