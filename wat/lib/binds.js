@@ -122,6 +122,27 @@ Wat.B = {
         // Hack to fix jQuery UI tooltip plugin
         this.bindEvent('mouseleave', '[title]', function () { 
             $('.ui-tooltip').hide();
+        });        
+        
+        // Propagate click in cells with links
+        this.bindEvent('mouseenter', 'td.cell-link', function (e) { 
+            var firstLink = $(e.target).find('a')[0];
+            if (firstLink) {
+                $(firstLink).trigger('mouseenter');
+            }
+        });
+        this.bindEvent('mouseleave', 'td.cell-link', function (e) { 
+            var firstLink = $(e.target).find('a')[0];
+            if (firstLink) {
+                $(firstLink).trigger('mouseleave');
+            }
+        });
+        this.bindEvent('click', 'td.cell-link', function (e) { 
+            var firstLink = $(e.target).find('a')[0];
+            if (firstLink) {
+                location = $(firstLink).attr('href');
+                $(firstLink).trigger('click');
+            }
         });
     },
     

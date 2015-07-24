@@ -1021,5 +1021,20 @@ Wat.I = {
                 $(cell).css('max-width', mw);
             });
         });
+    },
+    
+    addOddEvenRowClass: function (listContainer) {
+        $.each($(listContainer).find('table.list tr'), function (i, row) {
+            if ($(row).children().eq(0).prop("tagName") != 'TD') {
+                return;
+            }
+            
+            var type = 'odd';
+            if (i % 2 == 0) {
+                type = 'even';
+            }
+            
+            $(row).find('td.cell-link').addClass(type);
+        });
     }
 }

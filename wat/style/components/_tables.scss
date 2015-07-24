@@ -199,6 +199,16 @@ table.list {
     td, th {
         white-space: nowrap;
     }     
+    
+    td.cell-link:hover {
+        cursor: pointer;
+    }     
+    td.cell-link.odd:hover {
+        background: darken($col_whiter, 12);
+    }    
+    td.cell-link.even:hover {
+        background: darken($col_whiter, 8);
+    }
 }
 
 table.role-template-tools {

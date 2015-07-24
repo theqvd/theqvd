@@ -2746,6 +2746,12 @@ div.list-block div:first-child {
 
 table.list td, table.list th {
   white-space: nowrap; }
+table.list td.cell-link:hover {
+  cursor: pointer; }
+table.list td.cell-link.odd:hover {
+  background: #dedede; }
+table.list td.cell-link.even:hover {
+  background: #e9e9e9; }
 
 table.role-template-tools {
   width: 100%;

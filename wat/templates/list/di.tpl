@@ -172,7 +172,7 @@
                                 break;
                             case 'disk_image':
                 %>
-                                <td class="not-break js-name">
+                                <td class="not-break js-name <%= Wat.C.checkACL('di.see-details.') ? 'cell-link' : '' %>">
                                     <%= Wat.C.ifACL('<a href="#/di/' + model.get('id') + '" data-i18n="[title]Click for details">', 'di.see-details.') %>
                                     <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'di.see-details.') %>
                                         <span class="text"><%= model.get('disk_image') %></span>

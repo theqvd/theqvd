@@ -842,6 +842,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         Wat.I.adaptSideSize();
         
+        Wat.I.addOddEvenRowClass(this.listContainer);
+        
         this.fillAdminSelect();
     },
     

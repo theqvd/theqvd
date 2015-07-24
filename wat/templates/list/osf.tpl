@@ -140,7 +140,7 @@
                                 break;
                             case 'name':
                 %>
-                                <td class="js-name">
+                                <td class="js-name <%= Wat.C.checkACL('osf.see-details.') ? 'cell-link' : '' %>">
                                     <%= Wat.C.ifACL('<a href="#/osf/' + model.get('id') + '" data-i18n="[title]Click for details">', 'osf.see-details.') %>
                                     <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'osf.see-details.') %>
                                         <span class="text"><%= model.get('name') %></span>
