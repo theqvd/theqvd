@@ -1,18 +1,33 @@
 -- Modifications in old table
 ALTER TABLE host_properties ADD COLUMN key character varying(1024);
 UPDATE host_properties as hp SET key = (SELECT key FROM properties_list as pl WHERE pl.id=hp.property_id);
+ALTER TABLE host_properties DROP CONSTRAINT host_properties_pkey;
+ALTER TABLE ONLY host_properties
+    ADD CONSTRAINT host_properties_pkey PRIMARY KEY (host_id, key);
 
 ALTER TABLE vm_properties ADD COLUMN key character varying(1024);
-UPDATE user_properties as vp SET key = (SELECT key FROM properties_list as pl WHERE pl.id=vp.property_id);
+UPDATE vm_properties as vp SET key = (SELECT key FROM properties_list as pl WHERE pl.id=vp.property_id);
+ALTER TABLE vm_properties DROP CONSTRAINT vm_properties_pkey;
+ALTER TABLE ONLY vm_properties
+    ADD CONSTRAINT vm_properties_pkey PRIMARY KEY (vm_id, key);
 
 ALTER TABLE user_properties ADD COLUMN key character varying(1024);
 UPDATE user_properties as up SET key = (SELECT key FROM properties_list as pl WHERE pl.id=up.property_id);
+ALTER TABLE user_properties DROP CONSTRAINT user_properties_pkey;
+ALTER TABLE ONLY user_properties
+    ADD CONSTRAINT user_properties_pkey PRIMARY KEY (user_id, key);
 
 ALTER TABLE osf_properties ADD COLUMN key character varying(1024);
 UPDATE osf_properties as op SET key = (SELECT key FROM properties_list as pl WHERE pl.id=op.property_id);
+ALTER TABLE osf_properties DROP CONSTRAINT osf_properties_pkey;
+ALTER TABLE ONLY osf_properties
+    ADD CONSTRAINT osf_properties_pkey PRIMARY KEY (osf_id, key);
 
 ALTER TABLE di_properties ADD COLUMN key character varying(1024);
 UPDATE di_properties as dp SET key = (SELECT key FROM properties_list as pl WHERE pl.id=dp.property_id);
+ALTER TABLE di_properties DROP CONSTRAINT di_properties_pkey;
+ALTER TABLE ONLY di_properties
+    ADD CONSTRAINT di_properties_pkey PRIMARY KEY (di_id, key);
 
 
 

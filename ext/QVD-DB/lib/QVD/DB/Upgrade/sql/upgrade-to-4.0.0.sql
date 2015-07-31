@@ -316,8 +316,27 @@ UNION
   WHERE tenant_views_setups.property = false;
 
 -- Drop old key column in properties table
+ALTER TABLE user_properties DROP CONSTRAINT user_properties_pkey;
+ALTER TABLE ONLY user_properties
+    ADD CONSTRAINT user_properties_pkey PRIMARY KEY (user_id, key);
 ALTER TABLE user_properties DROP COLUMN key;
+
+ALTER TABLE vm_properties DROP CONSTRAINT vm_properties_pkey;
+ALTER TABLE ONLY vm_properties
+    ADD CONSTRAINT vm_properties_pkey PRIMARY KEY (vm_id, key);
 ALTER TABLE vm_properties DROP COLUMN key;
+
+ALTER TABLE host_properties DROP CONSTRAINT host_properties_pkey;
+ALTER TABLE ONLY host_properties
+    ADD CONSTRAINT host_properties_pkey PRIMARY KEY (host_id, key);
 ALTER TABLE host_properties DROP COLUMN key;
+
+ALTER TABLE di_properties DROP CONSTRAINT di_properties_pkey;
+ALTER TABLE ONLY di_properties
+    ADD CONSTRAINT di_properties_pkey PRIMARY KEY (di_id, key);
 ALTER TABLE di_properties DROP COLUMN key;
+
+ALTER TABLE osf_properties DROP CONSTRAINT osf_properties_pkey;
+ALTER TABLE ONLY osf_properties
+    ADD CONSTRAINT osf_properties_pkey PRIMARY KEY (osf_id, key);
 ALTER TABLE osf_properties DROP COLUMN key;
