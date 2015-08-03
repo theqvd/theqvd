@@ -207,6 +207,16 @@ vmlist *qvd_list_of_vm(qvdclient *qvd) {
     return NULL;
   }
 
+  struct curl_slist *chunk = NULL;
+  chunk = curl_slist_append(chunk, "Accept:");
+  qvd->res = curl_easy_setopt(qvd->curl, CURLOPT_HTTPHEADER, chunk);
+  if (qvd->res)
+    {
+      qvd_printf("Error deleting Accept headers. Error code: %ul\n", qvd->res);
+      qvd_error(qvd, "Error deleting Accept headers. Error code: %s\n", curl_easy_strerror(qvd->res));
+      return NULL;
+    }
+
   _qvd_use_client_cert(qvd);
   curl_easy_setopt(qvd->curl, CURLOPT_URL, url);
   qvd->res = curl_easy_perform(qvd->curl);
