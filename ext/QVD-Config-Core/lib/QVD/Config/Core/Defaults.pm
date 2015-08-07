@@ -74,7 +74,7 @@ path.qvd.bin = /usr/lib/qvd/bin
 
 ## paths to external executables
 command.kvm = kvm
-command.kvm-img = kvm-img
+command.kvm-img = qemu-img
 command.sshfs = ${path.qvd.bin}/sshfs
 command.open_file = /usr/bin/xdg-open
 command.sftp-server = /usr/lib/openssh/sftp-server
