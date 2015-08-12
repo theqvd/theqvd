@@ -46,7 +46,7 @@ ALTER TABLE ONLY user_properties_list
 
 -- Change old trigger by new one in new table
 DROP TRIGGER IF EXISTS delete_views_for_removed_user_property ON user_properties;
-CREATE TRIGGER delete_elements_for_removed_user_property_list AFTER DELETE ON user_properties_list FOR EACH ROW EXECUTE PROCEDURE delete_elements_for_removed_property('user');
+CREATE TRIGGER delete_elements_for_removed_user_property_list AFTER DELETE ON user_properties_list FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property('user');
  
 -- Modifications in old table
 
@@ -82,7 +82,7 @@ ALTER TABLE ONLY vm_properties_list
 
 -- Change old trigger by new one in new table
 DROP TRIGGER IF EXISTS delete_views_for_removed_vm_property ON vm_properties;
-CREATE TRIGGER delete_elements_for_removed_vm_property_list AFTER DELETE ON vm_properties_list FOR EACH ROW EXECUTE PROCEDURE delete_elements_for_removed_property('vm');
+CREATE TRIGGER delete_elements_for_removed_vm_property_list AFTER DELETE ON vm_properties_list FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property('vm');
  
 -- Modifications in old table
 ALTER TABLE vm_properties ADD COLUMN property_id integer;
@@ -115,7 +115,7 @@ ALTER TABLE ONLY host_properties_list
 
 -- Change old trigger by new one in new table
 DROP TRIGGER IF EXISTS delete_views_for_removed_host_property ON host_properties;
-CREATE TRIGGER delete_elements_for_removed_host_property_list AFTER DELETE ON host_properties_list FOR EACH ROW EXECUTE PROCEDURE delete_elements_for_removed_property('host');
+CREATE TRIGGER delete_elements_for_removed_host_property_list AFTER DELETE ON host_properties_list FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property('host');
  
 -- Modifications in old table
 
@@ -150,7 +150,7 @@ ALTER TABLE ONLY osf_properties_list
 
 -- Change old trigger by new one in new table
 DROP TRIGGER IF EXISTS delete_views_for_removed_osf_property ON osf_properties;
-CREATE TRIGGER delete_elements_for_removed_osf_property_list AFTER DELETE ON osf_properties_list FOR EACH ROW EXECUTE PROCEDURE delete_elements_for_removed_property('osf');
+CREATE TRIGGER delete_elements_for_removed_osf_property_list AFTER DELETE ON osf_properties_list FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property('osf');
  
 -- Modifications in old table
 
@@ -185,7 +185,7 @@ ALTER TABLE ONLY di_properties_list
 
 -- Change old trigger by new one in new table
 DROP TRIGGER IF EXISTS delete_views_for_removed_di_property ON di_properties;
-CREATE TRIGGER delete_elements_for_removed_di_property_list AFTER DELETE ON di_properties_list FOR EACH ROW EXECUTE PROCEDURE delete_elements_for_removed_property('di');
+CREATE TRIGGER delete_elements_for_removed_di_property_list AFTER DELETE ON di_properties_list FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property('di');
  
 -- Modifications in old table
 ALTER TABLE di_properties ADD COLUMN property_id integer;
@@ -318,25 +318,182 @@ UNION
 -- Drop old key column in properties table
 ALTER TABLE user_properties DROP CONSTRAINT user_properties_pkey;
 ALTER TABLE ONLY user_properties
-    ADD CONSTRAINT user_properties_pkey PRIMARY KEY (user_id, key);
+    ADD CONSTRAINT user_properties_pkey PRIMARY KEY (user_id, property_id);
 ALTER TABLE user_properties DROP COLUMN key;
 
 ALTER TABLE vm_properties DROP CONSTRAINT vm_properties_pkey;
 ALTER TABLE ONLY vm_properties
-    ADD CONSTRAINT vm_properties_pkey PRIMARY KEY (vm_id, key);
+    ADD CONSTRAINT vm_properties_pkey PRIMARY KEY (vm_id, property_id);
 ALTER TABLE vm_properties DROP COLUMN key;
 
 ALTER TABLE host_properties DROP CONSTRAINT host_properties_pkey;
 ALTER TABLE ONLY host_properties
-    ADD CONSTRAINT host_properties_pkey PRIMARY KEY (host_id, key);
+    ADD CONSTRAINT host_properties_pkey PRIMARY KEY (host_id, property_id);
 ALTER TABLE host_properties DROP COLUMN key;
 
 ALTER TABLE di_properties DROP CONSTRAINT di_properties_pkey;
 ALTER TABLE ONLY di_properties
-    ADD CONSTRAINT di_properties_pkey PRIMARY KEY (di_id, key);
+    ADD CONSTRAINT di_properties_pkey PRIMARY KEY (di_id, property_id);
 ALTER TABLE di_properties DROP COLUMN key;
 
 ALTER TABLE osf_properties DROP CONSTRAINT osf_properties_pkey;
 ALTER TABLE ONLY osf_properties
-    ADD CONSTRAINT osf_properties_pkey PRIMARY KEY (osf_id, key);
+    ADD CONSTRAINT osf_properties_pkey PRIMARY KEY (osf_id, property_id);
 ALTER TABLE osf_properties DROP COLUMN key;
+
+
+
+
+
+
+-------------------------------------------------------------------------------------------------------
+------ PROCEDURE TO DELETE ROWS IN tenant_views_setups WHEN DELETING A PROPERTY FROM PROPS LIST -------
+-------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION delete_views_for_removed_property() RETURNS trigger AS $$
+
+-- Flags for deleting views in involved tenant and tenant 0
+
+DECLARE delete_in_tenant_n boolean;
+DECLARE delete_in_tenant_zero boolean;
+
+-- Variable for rows retrieved by queries
+
+DECLARE i record;
+
+-- Variable for tenant_id involved
+
+DECLARE tid int;
+
+-- Variable for qvd_object involved 
+
+DECLARE qo qvd_objects_enum;
+BEGIN
+qo := TG_ARGV[0];
+
+
+IF qo = 'host' THEN                                                                                                                                                            
+
+    IF EXISTS (SELECT 1 FROM host_properties_list pl WHERE pl.key=OLD.key AND pl.tenant_id=OLD.tenant_id) THEN
+      delete_in_tenant_n := FALSE;
+    ELSE
+      delete_in_tenant_n := TRUE;
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM host_properties_list pl WHERE pl.key=OLD.key) THEN
+      delete_in_tenant_zero := FALSE;
+    ELSE
+      delete_in_tenant_zero := TRUE;
+    END IF;
+
+ELSIF qo = 'vm' THEN                                                                                                                                                            
+
+    IF EXISTS (SELECT 1 FROM vm_properties_list pl WHERE pl.key=OLD.key AND pl.tenant_id=OLD.tenant_id) THEN
+      delete_in_tenant_n := FALSE;
+    ELSE
+      delete_in_tenant_n := TRUE;
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM vm_properties_list pl WHERE pl.key=OLD.key) THEN
+      delete_in_tenant_zero := FALSE;
+    ELSE
+      delete_in_tenant_zero := TRUE;
+    END IF;
+
+ELSIF qo = 'user' THEN
+
+    IF EXISTS (SELECT 1 FROM user_properties_list pl WHERE pl.key=OLD.key AND pl.tenant_id=OLD.tenant_id) THEN
+      delete_in_tenant_n := FALSE;
+    ELSE
+      delete_in_tenant_n := TRUE;
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM user_properties_list pl WHERE pl.key=OLD.key) THEN
+      delete_in_tenant_zero := FALSE;
+    ELSE
+      delete_in_tenant_zero := TRUE;
+    END IF;
+
+ELSIF qo = 'osf' THEN
+
+    IF EXISTS (SELECT 1 FROM osf_properties_list pl WHERE pl.key=OLD.key AND pl.tenant_id=OLD.tenant_id) THEN
+      delete_in_tenant_n := FALSE;
+    ELSE
+      delete_in_tenant_n := TRUE;
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM osf_properties_list pl WHERE pl.key=OLD.key) THEN
+      delete_in_tenant_zero := FALSE;
+    ELSE
+      delete_in_tenant_zero := TRUE;
+    END IF;
+
+ELSIF qo = 'di' THEN
+
+    IF EXISTS (SELECT 1 FROM di_properties_list pl WHERE pl.key=OLD.key AND pl.tenant_id=OLD.tenant_id) THEN
+      delete_in_tenant_n := FALSE;
+    ELSE
+      delete_in_tenant_n := TRUE;
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM di_properties_list pl WHERE pl.key=OLD.key) THEN
+      delete_in_tenant_zero := FALSE;
+    ELSE
+      delete_in_tenant_zero := TRUE;
+    END IF;
+
+ELSE                
+
+    RAISE EXCEPTION 'Invalid qvd_object provided to delete_views_for_removed_property()';	
+
+END IF;
+
+IF delete_in_tenant_n  THEN
+
+    EXECUTE 'DELETE FROM tenant_views_setups WHERE field=$1 AND qvd_object=$2 AND property=$3 AND tenant_id=$4' USING OLD.key, qo, TRUE, tid;
+    RAISE NOTICE 'Deleted rows in tenant_views_setups by procedure delete_views_for_removed_property'; 
+
+    FOR i IN SELECT a.id as administrator_id FROM administrators a WHERE a.tenant_id=tid LOOP
+      EXECUTE 'DELETE FROM administrator_views_setups WHERE field=$1 AND qvd_object=$2 AND property=$3 AND administrator_id=$4' USING OLD.key, qo, TRUE, i.administrator_id;
+      RAISE NOTICE 'Deleted rows in tenant_views_setups by procedure delete_views_for_removed_property'; 
+    END LOOP;
+
+ELSE
+
+END IF;
+
+-- If there are not properties with same key as deleted in any tenant, delete it from tenant 0 too vecause tenant 0 have available all tenant properties in views
+
+IF  delete_in_tenant_zero THEN
+
+    EXECUTE 'DELETE FROM tenant_views_setups WHERE field=$1 AND qvd_object=$2 AND property=$3 AND tenant_id=$4' USING OLD.key, qo, TRUE, 0;
+    RAISE NOTICE 'Deleted rows in tenant_views_setups by procedure delete_views_for_removed_property'; 
+
+    FOR i IN SELECT a.id as administrator_id FROM administrators a WHERE a.tenant_id='0' LOOP
+      EXECUTE 'DELETE FROM administrator_views_setups WHERE field=$1 AND qvd_object=$2 AND property=$3 AND administrator_id=$4' USING OLD.key, qo, TRUE, i.administrator_id;
+      RAISE NOTICE 'Deleted rows in administrator_views_setups by procedure delete_views_for_removed_property'; 
+    END LOOP;
+
+ELSE
+
+END IF;
+
+RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+--------------------------------------------------------------------------------------------------------
+----- TRIGGERS TO TRIGGER THE CREATION/DELETION OF RELATED VIEWS WHEN CREATING/DELETING PROPERTIES -----
+--------------------------------------------------------------------------------------------------------
+
+DROP TRIGGER delete_views_for_removed_vm_property;
+DROP TRIGGER delete_views_for_removed_user_property;
+DROP TRIGGER delete_views_for_removed_host_property;
+DROP TRIGGER delete_views_for_removed_osf_property;
+DROP TRIGGER delete_views_for_removed_di_property;
+
+CREATE TRIGGER delete_views_for_removed_vm_property AFTER DELETE ON vm_properties_list FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property(vm);
+CREATE TRIGGER delete_views_for_removed_user_property AFTER DELETE ON user_properties_list FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property(user);
+CREATE TRIGGER delete_views_for_removed_host_property AFTER DELETE ON host_properties_list FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property(host);
+CREATE TRIGGER delete_views_for_removed_osf_property AFTER DELETE ON osf_properties_list FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property(osf);
+CREATE TRIGGER delete_views_for_removed_di_property AFTER DELETE ON di_properties_list FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property(di);

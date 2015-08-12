@@ -9,11 +9,11 @@ __PACKAGE__->result_source_instance->is_virtual(1);
 __PACKAGE__->result_source_instance->view_definition(
 
 "SELECT me.id            as id, 
-        json_agg(properties)   as properties_json,
+        json_agg(DISTINCT properties)   as properties_json,
         COUNT(DISTINCT vms) as number_of_vms,
         COUNT(DISTINCT dis) as number_of_dis
  FROM      osfs me 
- LEFT JOIN osf_properties properties ON(properties.osf_id=me.id) 
+ LEFT JOIN (osf_properties p LEFT JOIN properties_list pl ON(p.property_id=pl.id)) properties ON(properties.osf_id=me.id) 
  LEFT JOIN vms vms ON(vms.osf_id=me.id)
  LEFT JOIN dis dis ON(dis.osf_id=me.id)  
  GROUP BY me.id"

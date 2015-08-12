@@ -10,11 +10,11 @@ __PACKAGE__->result_source_instance->is_virtual(1);
 __PACKAGE__->result_source_instance->view_definition(
 
 "SELECT me.id            as id, 
-        json_agg(properties)   as properties_json,
+        json_agg(DISTINCT properties)   as properties_json,
         json_agg(DISTINCT tags) as tags_json 
 
  FROM      dis me 
- LEFT JOIN di_properties properties ON(properties.di_id=me.id) 
+ LEFT JOIN (di_properties p LEFT JOIN properties_list pl ON(p.property_id=pl.id)) properties ON(properties.di_id=me.id) 
  LEFT JOIN di_tags tags ON(tags.di_id=me.id) 
  GROUP BY me.id"
 

@@ -492,7 +492,17 @@ my $AVAILABLE_FILTERS =
 
 	      Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
-	      Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)]},
+	      Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)],
+
+	      User_Property_List => [qw(tenant_id)],
+
+	      VM_Property_List => [qw(tenant_id)],
+
+	      Host_Property_List => [qw(tenant_id)],
+
+	      OSF_Property_List => [qw(tenant_id)],
+
+	      DI_Property_List => [qw(tenant_id)]},
 
 
     all_ids => { default => [],
@@ -590,7 +600,17 @@ my $AVAILABLE_FIELDS =
 
 	      Administrator_Views_Setup => [qw(id tenant_id tenant_name admin_id admin_name field visible view_type 
                                                device_type qvd_object property)],
-	      Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)] },
+	      Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)],
+
+	      User_Property_List => [qw(property_id key)],
+
+	      VM_Property_List => [qw(property_id key)],
+
+	      Host_Property_List => [qw(property_id key)],
+
+	      OSF_Property_List => [qw(property_id key)],
+
+	      DI_Property_List => [qw(property_id key)] },
 
     details => { default => [],
 
@@ -1060,6 +1080,40 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'property' => 'me.property'
     },
 
+    User_Property_List => {
+    	'property_id' => 'me.property_id',
+	'tenant_id' => 'properties_list.tenant_id',
+	'tenant_name' => 'me.tenant_name',
+	'key' => 'properties_list.key'
+    },
+
+    VM_Property_List => {
+    	'property_id' => 'me.property_id',
+	'tenant_id' => 'properties_list.tenant_id',
+	'tenant_name' => 'me.tenant_name',
+	'key' => 'properties_list.key'
+    },
+
+    Host_Property_List => {
+    	'property_id' => 'me.property_id',
+	'tenant_id' => 'properties_list.tenant_id',
+	'tenant_name' => 'me.tenant_name',
+	'key' => 'properties_list.key'
+    },
+
+    OSF_Property_List => {
+    	'property_id' => 'me.property_id',
+	'tenant_id' => 'properties_list.tenant_id',
+	'tenant_name' => 'me.tenant_name',
+	'key' => 'properties_list.key'
+    },
+
+    DI_Property_List => {
+    	'property_id' => 'me.property_id',
+	'tenant_id' => 'properties_list.tenant_id',
+	'tenant_name' => 'me.tenant_name',
+	'key' => 'properties_list.key'
+    },
 };
 
 # Nowadays the mapper for arguments and order criteria
@@ -1335,6 +1389,40 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'description' => 'me.acl_description',
     },
 
+    User_Property_List => {
+    	'property_id' => 'me.property_id',
+	'tenant_id' => 'properties_list.tenant_id',
+	'tenant_name' => 'me.tenant_name',
+	'key' => 'properties_list.key'
+    },
+
+    VM_Property_List => {
+    	'property_id' => 'me.property_id',
+	'tenant_id' => 'properties_list.tenant_id',
+	'tenant_name' => 'me.tenant_name',
+	'key' => 'properties_list.key'
+    },
+
+    Host_Property_List => {
+    	'property_id' => 'me.property_id',
+	'tenant_id' => 'properties_list.tenant_id',
+	'tenant_name' => 'me.tenant_name',
+	'key' => 'properties_list.key'
+    },
+
+    OSF_Property_List => {
+    	'property_id' => 'me.property_id',
+	'tenant_id' => 'properties_list.tenant_id',
+	'tenant_name' => 'me.tenant_name',
+	'key' => 'properties_list.key'
+    },
+
+    DI_Property_List => {
+    	'property_id' => 'me.property_id',
+	'tenant_id' => 'properties_list.tenant_id',
+	'tenant_name' => 'me.tenant_name',
+	'key' => 'properties_list.key'
+    },
 };
 
 # This var stores functions intended to 
@@ -1384,7 +1472,17 @@ my $DBIX_JOIN_VALUE =
     
     Tenant_Views_Setup => [ qw(tenant)],
 
-    Administrator_Views_Setup => [ { administrator => 'tenant' }] 
+    Administrator_Views_Setup => [ { administrator => 'tenant' }],
+
+    User_Property_List => [ {properties_list => 'tenant'}],
+
+    VM_Property_List => [ {properties_list => 'tenant'}],
+
+    Host_Property_List => [ {properties_list => 'tenant'}],
+
+    OSF_Property_List => [ {properties_list => 'tenant'}],
+
+    DI_Property_List => [ {properties_list => 'tenant'}],
 };
 
 
@@ -1622,7 +1720,7 @@ sub set_tenant_fields
 {
     my $self = shift;
 
-    return unless $self->type_of_action =~ /^list|details$/;
+    return unless $self->type_of_action =~ /^list|details|properties$/;
 
     return unless $self->current_qvd_administrator->is_superadmin;
 

@@ -10,12 +10,12 @@ __PACKAGE__->result_source_instance->is_virtual(1);
 __PACKAGE__->result_source_instance->view_definition(
 
 "SELECT me.id                                as id, 
-        json_agg(properties)   as properties_json,
+        json_agg(DISTINCT properties)   as properties_json,
         COUNT(DISTINCT vm_runtimes) as number_of_vms_connected, 
         COUNT(DISTINCT vms)         as number_of_vms
 
  FROM      users me 
- LEFT JOIN user_properties properties ON(properties.user_id=me.id) 
+ LEFT JOIN (user_properties p LEFT JOIN properties_list pl ON(p.property_id=pl.id)) properties ON(properties.user_id=me.id) 
  LEFT JOIN vms vms         ON(vms.user_id=me.id) 
  LEFT JOIN vm_runtimes vm_runtimes ON(vm_runtimes.vm_id=vms.id and vm_runtimes.user_state='connected') 
 

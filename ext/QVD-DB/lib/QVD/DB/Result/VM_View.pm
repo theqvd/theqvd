@@ -10,10 +10,10 @@ __PACKAGE__->result_source_instance->is_virtual(1);
 __PACKAGE__->result_source_instance->view_definition(
 
 "SELECT me.id            as id, 
-        json_agg(properties)   as properties_json
+        json_agg(DISTINCT properties)   as properties_json
 
  FROM      vms me 
- LEFT JOIN vm_properties properties ON(properties.vm_id=me.id) 
+ LEFT JOIN (vm_properties p LEFT JOIN properties_list pl ON(p.property_id=pl.id)) properties ON(properties.vm_id=me.id) 
  GROUP BY me.id"
 
 );
