@@ -604,15 +604,15 @@ my $AVAILABLE_FIELDS =
                                                device_type qvd_object property)],
 	      Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
-	      User_Property_List => [qw(property_id key)],
+	      User_Property_List => [qw(property_id key description)],
 
-	      VM_Property_List => [qw(property_id key)],
+	      VM_Property_List => [qw(property_id key description)],
 
-	      Host_Property_List => [qw(property_id key)],
+	      Host_Property_List => [qw(property_id key description)],
 
-	      OSF_Property_List => [qw(property_id key)],
+	      OSF_Property_List => [qw(property_id key description)],
 
-	      DI_Property_List => [qw(property_id key)],
+	      DI_Property_List => [qw(property_id key description)],
 
 	      Property_List => [qw(property_id key description in_user in_vm in_host in_osf in_di)] },
 
