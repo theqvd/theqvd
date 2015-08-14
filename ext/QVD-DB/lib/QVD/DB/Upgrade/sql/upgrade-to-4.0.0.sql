@@ -202,6 +202,18 @@ INSERT INTO di_properties_list (property_id) (SELECT DISTINCT property_id FROM d
 ALTER TABLE ONLY di_properties
     ADD CONSTRAINT di_properties_property_id_fkey FOREIGN KEY (property_id) REFERENCES di_properties_list(property_id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
 
+-- -----------------------------------------------------
+-- CLEAN UNUSED PROPERTIES
+-- -----------------------------------------------------
+
+-- Delete not used properties migrated to general table
+
+DELETE FROM properties_list WHERE id NOT IN (SELECT property_id from user_properties_list) and id NOT IN (SELECT property_id from vm_properties_list) and id NOT IN (SELECT property_id from host_properties_list) and id NOT IN (SELECT property_id from osf_properties_list) and id NOT IN (SELECT property_id from di_properties_list);
+
+-- -----------------------------------------------------
+-- VIEW
+-- -----------------------------------------------------
+
 -- Change view with envolved properties
 CREATE OR REPLACE VIEW operative_views_in_tenants AS 
 SELECT DISTINCT dt.dt AS device_type,
@@ -340,10 +352,6 @@ ALTER TABLE osf_properties DROP CONSTRAINT osf_properties_pkey;
 ALTER TABLE ONLY osf_properties
     ADD CONSTRAINT osf_properties_pkey PRIMARY KEY (osf_id, property_id);
 ALTER TABLE osf_properties DROP COLUMN key;
-
-
-
-
 
 
 -------------------------------------------------------------------------------------------------------

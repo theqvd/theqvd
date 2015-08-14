@@ -127,7 +127,7 @@ my $exception2code_mapper =
     'DBIx::Error::DataException' => { default => 6310, select => 6320, update => 6330, create => 6330, set => 6330,
 				      properties => 6340, tags => 6350, acls => 6360, roles => 6370 },
 
-    'DBIx::Error::NotNullViolation' => { default => 6410, properties => 6420, tags => 6430, acls => 6440, roles => 6450 },
+    'DBIx::Error::NotNullViolation' => { default => 6410, tags => 6430, acls => 6440, roles => 6450 },
 
     'DBIx::Error::ForeignKeyViolation' => { default => 7100, update => 7110, create => 7110, set => 7110, delete => 7120},
 

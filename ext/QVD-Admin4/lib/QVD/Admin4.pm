@@ -601,10 +601,10 @@ sub custom_properties_set
     while (my ($key,$value) = each %$props)
     { 
 	$key = undef if defined $key && $key eq ''; 
-	$value = undef if defined $value && $value eq '';
+    
 	my $t = $class . "_Property";
 	my $k = lc($class) . "_id";
-	my $a = {key => $key, value => $value, $k => $obj->id};
+	my $a = {property_id => $key, value => $value, $k => $obj->id};
 
 	eval { $DB->resultset($t)->update_or_create($a) };
 	QVD::Admin4::Exception->throw(exception => $@, 

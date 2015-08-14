@@ -502,7 +502,9 @@ my $AVAILABLE_FILTERS =
 
 	      OSF_Property_List => [qw(tenant_id)],
 
-	      DI_Property_List => [qw(tenant_id)]},
+	      DI_Property_List => [qw(tenant_id)],
+
+	      Property_List => [qw(tenant_id)]},
 
 
     all_ids => { default => [],
@@ -610,7 +612,9 @@ my $AVAILABLE_FIELDS =
 
 	      OSF_Property_List => [qw(property_id key)],
 
-	      DI_Property_List => [qw(property_id key)] },
+	      DI_Property_List => [qw(property_id key)],
+
+	      Property_List => [qw(property_id key description in_user in_vm in_host in_osf in_di)] },
 
     details => { default => [],
 
@@ -1114,6 +1118,19 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'tenant_name' => 'me.tenant_name',
 	'key' => 'properties_list.key'
     },
+
+    Property_List => {
+    	'property_id' => 'me.id',
+	'tenant_id' => 'me.tenant_id',
+	'tenant_name' => 'me.tenant_name',
+	'key' => 'me.key',
+	'description' => 'me.description',
+	'in_user' => 'me.in_user',
+	'in_vm' => 'me.in_vm',
+	'in_host' => 'me.in_host',
+	'in_osf' => 'me.in_osf',
+	'in_di' => 'me.in_di'
+    },
 };
 
 # Nowadays the mapper for arguments and order criteria
@@ -1423,6 +1440,19 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'tenant_name' => 'me.tenant_name',
 	'key' => 'properties_list.key'
     },
+
+    Property_List => {
+    	'property_id' => 'me.id',
+	'tenant_id' => 'me.tenant_id',
+	'tenant_name' => 'me.tenant_name',
+	'key' => 'me.key',
+	'description' => 'me.description',
+	'in_user' => 'me.in_user',
+	'in_vm' => 'me.in_vm',
+	'in_host' => 'me.in_host',
+	'in_osf' => 'me.in_osf',
+	'in_di' => 'me.in_di'
+    },
 };
 
 # This var stores functions intended to 
@@ -1483,6 +1513,8 @@ my $DBIX_JOIN_VALUE =
     OSF_Property_List => [ {properties_list => 'tenant'}],
 
     DI_Property_List => [ {properties_list => 'tenant'}],
+
+    Property_List => [ 'tenant'],
 };
 
 

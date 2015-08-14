@@ -504,6 +504,11 @@ qvd_objects_statistics => { type_of_action =>  'multiple',
 					       vms_with_expiration_date => { acls => [qr/^vm\.stats\.close-to-expire$/] },
 					       top_populated_hosts => { acls => [qr/^host\.stats\.top-hosts-most-vms$/] } },
 			    acls => [qr/^[^.]+\.stats\./]},
+
+property_get_list => {type_of_action => 'list',
+		  admin4method => 'select',
+		  acls => [qr/^(host\.see\.properties)$/],
+		  qvd_object => 'Property_List'},
 };
 
 sub BUILD

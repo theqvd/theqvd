@@ -15,5 +15,52 @@ __PACKAGE__->might_have(properties => 'QVD::DB::Result::DI_Property_List', 'prop
 __PACKAGE__->might_have(properties => 'QVD::DB::Result::User_Property_List', 'property_id', { cascade_delete => 0 });
 __PACKAGE__->might_have(properties => 'QVD::DB::Result::VM_Property_List', 'property_id', { cascade_delete => 0 });
 __PACKAGE__->belongs_to(tenant => 'QVD::DB::Result::Tenant',  'tenant_id', { cascade_delete => 0 });
+__PACKAGE__->has_many(properties => 'QVD::DB::Result::OSF_Property', 'property_id', { cascade_delete => 0 });
+
+sub tenant_name
+{
+    my $self = shift;
+    $self->tenant->name;
+}
+
+sub in_user 
+{ 
+    my $args = shift; 
+    my $DB = QVD::DB::Simple::db();
+
+    $DB->resultset('User_Property_List')->search({property_id=>$args->id})->all;
+}
+
+sub in_vm 
+{ 
+    my $args = shift; 
+    my $DB = QVD::DB::Simple::db();
+
+    $DB->resultset('VM_Property_List')->search({property_id=>$args->id})->all;
+}
+
+sub in_host 
+{ 
+    my $args = shift; 
+    my $DB = QVD::DB::Simple::db();
+
+    $DB->resultset('Host_Property_List')->search({property_id=>$args->id})->all;
+}
+
+sub in_osf 
+{ 
+    my $args = shift; 
+    my $DB = QVD::DB::Simple::db();
+
+    $DB->resultset('OSF_Property_List')->search({property_id=>$args->id})->all;
+}
+
+sub in_di
+{ 
+    my $args = shift; 
+    my $DB = QVD::DB::Simple::db();
+
+    $DB->resultset('DI_Property_List')->search({property_id=>$args->id})->all;
+}
 
 1;
