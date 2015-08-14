@@ -1088,6 +1088,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     	'property_id' => 'me.property_id',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
+	'description' => 'me.description',
 	'key' => 'properties_list.key'
     },
 
@@ -1095,6 +1096,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     	'property_id' => 'me.property_id',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
+	'description' => 'me.description',
 	'key' => 'properties_list.key'
     },
 
@@ -1102,6 +1104,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     	'property_id' => 'me.property_id',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
+	'description' => 'me.description',
 	'key' => 'properties_list.key'
     },
 
@@ -1109,6 +1112,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     	'property_id' => 'me.property_id',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
+	'description' => 'me.description',
 	'key' => 'properties_list.key'
     },
 
@@ -1116,6 +1120,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     	'property_id' => 'me.property_id',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
+	'description' => 'me.description',
 	'key' => 'properties_list.key'
     },
 
@@ -1410,6 +1415,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     	'property_id' => 'me.property_id',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
+	'description' => 'me.description',
 	'key' => 'properties_list.key'
     },
 
@@ -1417,6 +1423,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     	'property_id' => 'me.property_id',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
+	'description' => 'me.description',
 	'key' => 'properties_list.key'
     },
 
@@ -1424,6 +1431,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     	'property_id' => 'me.property_id',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
+	'description' => 'me.description',
 	'key' => 'properties_list.key'
     },
 
@@ -1431,6 +1439,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     	'property_id' => 'me.property_id',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
+	'description' => 'me.description',
 	'key' => 'properties_list.key'
     },
 
@@ -1438,6 +1447,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     	'property_id' => 'me.property_id',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
+	'description' => 'me.description',
 	'key' => 'properties_list.key'
     },
 
