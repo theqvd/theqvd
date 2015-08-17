@@ -327,11 +327,11 @@ $$ LANGUAGE plpgsql;
 
 
 
-DROP TRIGGER delete_views_for_removed_vm_property;
-DROP TRIGGER delete_views_for_removed_user_property;
-DROP TRIGGER delete_views_for_removed_host_property;
-DROP TRIGGER delete_views_for_removed_osf_property;
-DROP TRIGGER delete_views_for_removed_di_property;
+DROP TRIGGER delete_views_for_removed_vm_property ON vm_properties_list;
+DROP TRIGGER delete_views_for_removed_user_property ON user_properties_list;
+DROP TRIGGER delete_views_for_removed_host_property ON host_properties_list;
+DROP TRIGGER delete_views_for_removed_osf_property ON osf_properties_list;
+DROP TRIGGER delete_views_for_removed_di_property ON di_properties_list;
 
 CREATE TRIGGER delete_views_for_removed_vm_property AFTER DELETE ON vm_properties FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property(vm);
 CREATE TRIGGER delete_views_for_removed_user_property AFTER DELETE ON user_properties FOR EACH ROW EXECUTE PROCEDURE delete_views_for_removed_property(user);
