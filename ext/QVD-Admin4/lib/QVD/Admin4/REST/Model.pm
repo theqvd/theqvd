@@ -44,7 +44,8 @@ my $QVD_OBJECTS_TO_LOG_MAPPER =
     Log => 'log', User => 'user', VM => 'vm', DI => 'di', OSF => 'osf', Host => 'host', 
     Administrator => 'administrator', Tenant => 'tenant', 
     Role => 'role', Config => 'config', Tenant_Views_Setup => 'tenant_view', 
-    Administrator_Views_Setup => 'admin_view',  
+    Administrator_Views_Setup => 'admin_view', User_Property_List => 'user', VM_Property_List => 'vm',
+    Host_Property_List => 'host', OSF_Property_List => 'osf', DI_Property_List => 'di', Property_List => 'property',  
 };
 
 # Mapper from kinds of actions in this class to available values for 
@@ -468,7 +469,7 @@ my $AVAILABLE_FILTERS =
 
 	      DI_Tag => [qw(osf_id di_id name id tenant_id tenant_name)],
 
-	      User => [qw(id name description blocked creation_date creation_admin_id creation_admin_name tenant_id tenant_name )],
+	      User => [qw(id name description blocked creation_date creation_admin_id creation_admin_name tenant_id tenant_name)],
 
 	      Host => [qw(id name description address blocked frontend backend state vm_id creation_date creation_admin_id creation_admin_name)],
 
@@ -614,7 +615,7 @@ my $AVAILABLE_FIELDS =
 
 	      DI_Property_List => [qw(property_id key description)],
 
-	      Property_List => [qw(property_id key description in_user in_vm in_host in_osf in_di)] },
+	      Property_List => [qw(id property_id key description in_user in_vm in_host in_osf in_di)] },
 
     details => { default => [],
 
@@ -775,7 +776,8 @@ my $AVAILABLE_ARGUMENTS = { Config => [qw(value)],
 			    Role => [qw(name description)],
 			    Administrator => [qw(name password language block description)],
 			    Tenant_Views_Setup => [qw(visible)],
-			    Administrator_Views_Setup => [qw(visible)]};
+			    Administrator_Views_Setup => [qw(visible)],
+	      		    Property_List => [qw(key description)] };
 
 # Available arguments for creation actions
 
@@ -789,8 +791,14 @@ my $MANDATORY_ARGUMENTS = { Config => [qw(key value)],
 			    Role => [qw(tenant_id name fixed internal description)],
                             Administrator => [qw(tenant_id name password language block description)],
 			    Tenant_Views_Setup => [qw(tenant_id field visible view_type device_type qvd_object property)],
-			    Administrator_Views_Setup => [qw(field visible view_type device_type qvd_object property)]}; # Every admin is able to set just its own views, 
+			    Administrator_Views_Setup => [qw(field visible view_type device_type qvd_object property)], # Every admin is able to set just its own views, 
                                                                                                                          # Suitable admin_id forzed in Request.pm
+	      		    User_Property_List => [qw(property_id)],
+	      		    VM_Property_List => [qw(property_id)],
+	      		    Host_Property_List => [qw(property_id)],
+	      		    OSF_Property_List => [qw(property_id)],
+	      		    DI_Property_List => [qw(property_id)],
+	      		    Property_List => [qw(tenant_id key)] };
 
 # Default values for some mandatory arguments in creation
 
@@ -1085,6 +1093,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     },
 
     User_Property_List => {
+    	'id' => 'me.property_id',
     	'property_id' => 'me.property_id',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
@@ -1093,6 +1102,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     },
 
     VM_Property_List => {
+    	'id' => 'me.property_id',
     	'property_id' => 'me.property_id',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
@@ -1101,6 +1111,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     },
 
     Host_Property_List => {
+    	'id' => 'me.property_id',
     	'property_id' => 'me.property_id',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
@@ -1109,6 +1120,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     },
 
     OSF_Property_List => {
+    	'id' => 'me.property_id',
     	'property_id' => 'me.property_id',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
@@ -1117,6 +1129,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     },
 
     DI_Property_List => {
+    	'id' => 'me.property_id',
     	'property_id' => 'me.property_id',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
@@ -1125,6 +1138,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
     },
 
     Property_List => {
+    	'id' => 'me.id',
     	'property_id' => 'me.id',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'me.tenant_name',
@@ -1412,6 +1426,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     },
 
     User_Property_List => {
+    	'id' => 'me.property_id',
     	'property_id' => 'me.property_id',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
@@ -1420,6 +1435,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     },
 
     VM_Property_List => {
+    	'id' => 'me.property_id',
     	'property_id' => 'me.property_id',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
@@ -1428,6 +1444,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     },
 
     Host_Property_List => {
+    	'id' => 'me.property_id',
     	'property_id' => 'me.property_id',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
@@ -1436,6 +1453,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     },
 
     OSF_Property_List => {
+    	'id' => 'me.property_id',
+    	'id' => 'me.property_id',
     	'property_id' => 'me.property_id',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
@@ -1444,6 +1463,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     },
 
     DI_Property_List => {
+    	'id' => 'me.property_id',
     	'property_id' => 'me.property_id',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
@@ -1452,6 +1472,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
     },
 
     Property_List => {
+    	'id' => 'me.property_id',
     	'property_id' => 'me.id',
 	'tenant_id' => 'me.tenant_id',
 	'tenant_name' => 'me.tenant_name',
@@ -1762,7 +1783,7 @@ sub set_tenant_fields
 {
     my $self = shift;
 
-    return unless $self->type_of_action =~ /^list|details|properties$/;
+    return unless $self->type_of_action =~ /^list|details$/;
 
     return unless $self->current_qvd_administrator->is_superadmin;
 
@@ -2209,6 +2230,7 @@ sub get_acls
 sub qvd_object_log_style
 {
     my $self = shift;
+
     $QVD_OBJECTS_TO_LOG_MAPPER->{$self->qvd_object};    
 }
 

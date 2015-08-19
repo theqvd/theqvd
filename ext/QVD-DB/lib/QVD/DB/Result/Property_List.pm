@@ -23,6 +23,12 @@ sub tenant_name
     $self->tenant->name;
 }
 
+sub property_id 
+{
+    my $self = shift;
+    $self->id;
+}
+
 sub in_user 
 { 
     my $args = shift; 
