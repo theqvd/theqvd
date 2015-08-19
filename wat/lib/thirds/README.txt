@@ -10,7 +10,7 @@ Used libraries on QVD Wat and their version, licenses and source sites:
 - jQuery TableScroll (MIT License) https://github.com/farinspace/jquery.tableScroll
 - ExpandingTextareas v0.2.0 (MIT License) https://github.com/bgrins/ExpandingTextareas
 - Chosen v1.1.0 (MIT License) http://harvesthq.github.io/chosen/
-- Font Awesome v4.2.0 (Font: SIL OFL 1.1, CSS: MIT License) http://fortawesome.github.io/Font-Awesome/
+- Font Awesome v4.4.0 (Font: SIL OFL 1.1, CSS: MIT License) http://fortawesome.github.io/Font-Awesome/
 - Font Awesome Animation v0.0.7 (MIT License) http://l-lin.github.io/font-awesome-animation/
 - i18next v1.7.3 (MIT License) http://i18next.com/
 - Flot charts v0.8.3 (Unrestricted license explained at README.txt) http://www.flotcharts.org/

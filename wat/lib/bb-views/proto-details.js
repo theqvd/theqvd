@@ -70,9 +70,32 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         var that = that || this;
         that.model.fetch({      
             success: function () {
-                that.render();
+                var filters = {};
+                
+                if (Wat.C.isMultitenant() && Wat.C.isSuperadmin()) {
+                    filters['tenant_id'] = that.model.get('tenant_id');
+                }
+                
+                Wat.A.performAction(that.qvdObj + '_get_property_list', {}, filters, {}, that.completePropertiesAndRender, that, undefined, {"field":"key","order":"-asc"});
             }
         });
+    },
+    
+    completePropertiesAndRender: function (that) {
+        if (that.retrievedData.total > 0) {
+            var properties = {};
+            $.each(that.retrievedData.rows, function (iProp, prop) {
+                properties[prop.property_id] = {
+                    value: that.model.get('properties')[prop.key],
+                    key: prop.key
+                };
+            });
+
+            // Override properties including not setted on element
+            that.model.set({properties: properties});
+        }
+
+        that.render();
     },
     
     eventsDetails: {
@@ -173,14 +196,13 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             $(this.sideContainer).html(this.template);
             
             if (enabledProperties) {
-                // Fill the html with the template and the model
-                this.template = _.template(
-                    Wat.TPL.detailsCommonProperties, {
-                        properties: this.model.get('properties'),
-                    }
-                );
-
-                $('.bb-properties').html(this.template);
+                var filters = {};
+                
+                if (Wat.C.isMultitenant() && Wat.C.isSuperadmin()) {
+                    filters['tenant_id'] = this.model.get('tenant_id');
+                }
+                
+                this.renderProperties();
             }
         }
         
@@ -190,6 +212,17 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         if (this.liveFields) {
             Wat.WS.openDetailsWebsockets(this.qvdObj, this.model, this.liveFields, this.cid);
         }
+    },
+    
+    renderProperties: function () {
+        // Fill the html with the template and the model
+        this.template = _.template(
+            Wat.TPL.detailsCommonProperties, {
+                properties: this.model.get('properties')
+            }
+        );
+
+        $('.bb-properties').html(this.template);
     },
     
     applyBlock: function () {

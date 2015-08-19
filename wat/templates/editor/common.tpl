@@ -40,26 +40,23 @@
                 <input type="hidden" class="deleted-properties" value=""/>
 
                 <% 
-                    _.each(properties, function(propValue, propName) { 
+                    $.each(properties, function(propertyId, property) { 
                 %>
                         <tr>
                             <td>
-                                <% if (enabledDeleteProperties) { %>
-                                    <i class="delete-property-button fa fa-trash-o"></i>
-                                <% } %>
-                                <input type="hidden" class="custom-prop-name" value="<%= propName %>">
-                                <span class="custom-prop-name"><%= propName %></span>
+                                <input type="hidden" class="custom-prop-name" value="<%= propertyId %>">
+                                <span class="custom-prop-name"><%= property.key %></span>
                             </td>
                             <td>
                                 <% 
                                 if (enabledUpdateProperties) { 
                                 %>
-                                    <input type="text" class="custom-prop-value" data-current="<%= propValue %>" value="<%= propValue %>">
+                                    <input type="text" class="custom-prop-value" data-current="<%= property.value %>" value="<%= property.value %>">
                                 <% 
                                 }
                                 else { 
                                 %>
-                                    <%= propValue %>
+                                    <%= property.value %>
                                 <% 
                                 } 
                                 %>
@@ -68,25 +65,6 @@
                 <%
                     });
                 %>
-                <tr class="template-property hidden">
-                    <td>
-                            <i class="delete-property-button fa fa-trash-o"></i>
-                            <span class="property-help" data-i18n="Property name"></span>
-                            <input type="text" class="custom-prop-name">
-                    </td>
-                    <td>
-                            <span class="property-help" data-i18n="Property value">ss</span>
-                            <input type="text" class="custom-prop-value">
-                    </td>
-                </tr>
-                <% if (enabledCreateProperties) { %>
-                    <tr>
-                        <td>
-                            <a class="button2 add-property-button fa fa-plus-circle" data-i18n="Add property"></a>
-                        </td>
-                        <td></td>
-                    </tr>
-                <% } %>
             </tbody>
         <%
             }

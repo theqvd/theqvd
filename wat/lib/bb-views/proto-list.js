@@ -1069,33 +1069,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.fetchList();        
     },
     
-    openNewElementDialog: function (e) {
-        var that = this;
-        
-        this.templateEditor = Wat.TPL['editorNew_' + that.qvdObj];
-        
-        this.dialogConf.buttons = {
-            Cancel: function (e) {
-                Wat.I.closeDialog($(this));
-            },
-            Create: function (e) {
-                that.dialog = $(this);
-                that.createElement($(this));
-            }
-        };
-
-        this.dialogConf.button1Class = 'fa fa-ban';
-        this.dialogConf.button2Class = 'fa fa-plus-circle';
-        
-        this.dialogConf.fillCallback = this.fillEditor;
-
-        this.editorElement(e);
-    },
-    
     openMassiveChangesDialog: function (that) {   
         // If the edition is performed over one single element, call single editor
         if (that.selectedItems.length == 1) {
-            console.log(that.selectedItems);
             that.editingFromList = true;
             this.openEditElementDialog(that);
             return;

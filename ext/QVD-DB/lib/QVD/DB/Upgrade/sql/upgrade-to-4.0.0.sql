@@ -2,7 +2,7 @@
 CREATE TABLE properties_list (
     id integer NOT NULL,
     key character varying(1024) NOT NULL,
-    description character varying(1024) NOT NULL,
+    description character varying(1024),
     tenant_id integer NOT NULL
 );
 

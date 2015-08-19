@@ -63,6 +63,11 @@ Wat.I.menuSetupOriginal = {
         link: '#/views',
         icon: CLASS_ICON_VIEWS
     },
+    properties: {
+        text: 'Custom properties',
+        link: '#/properties',
+        icon: CLASS_ICON_PROPERTIES
+    },
     logs: {
         text: 'Log',
         link: '#/logs',

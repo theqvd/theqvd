@@ -29,14 +29,7 @@ Wat.B = {
     },
     
     bindEditorEvents: function () {
-        // Common Editor
-        
-            // Delete custom property
-            this.bindEvent('click', '.delete-property-button', this.editorBinds.deleteProperty);
-
-            // Add custom property
-            this.bindEvent('click', '.add-property-button', this.editorBinds.addProperty);        
-
+        // Common Editor  
             // Hide property help when write on text input
             this.bindEvent('focus', '.custom-properties>tr>td input', this.editorBinds.hidePropertyHelp);
 
@@ -444,28 +437,6 @@ Wat.B = {
     
     // Callbacks of the events binded on editor
     editorBinds: {
-        addProperty: function () {
-            var newRow = $('.template-property').clone();
-            newRow.attr('class', 'new-property');
-            newRow.insertBefore('.template-property');
-        },
-
-        deleteProperty: function () {
-            // Store the name of the deleted property in a hidden field of serialized names by commas
-            var deletedProp = $(this).parent().find('input.custom-prop-name');
-            var deletedPropName = deletedProp.val();
-            var deletedPropType = deletedProp.attr('type');
-
-            // The current porperties are stored in hidden fields and the new properties in text fields
-            // We will only store the current properties in a serialized list to remove them
-            if (deletedPropType === 'hidden') {   
-                Wat.CurrentView.deleteProps.push(deletedPropName);
-            }
-            
-            // Remove two levels above the button (tr)
-            $(this).parent().parent().remove();
-        },
-
         hidePropertyHelp: function () {
             $(this).parent().find('.property-help').hide();
         },

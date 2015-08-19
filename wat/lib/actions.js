@@ -108,7 +108,7 @@ Wat.A = {
                 
                 // Aborted
                 if (that.retrievedData.readyState == 0) {
-                    return;
+                    //return;
                 }
                 
                 successCallback(that);

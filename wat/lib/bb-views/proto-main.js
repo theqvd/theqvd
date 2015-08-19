@@ -106,7 +106,7 @@ Wat.Views.MainView = Backbone.View.extend({
     
     // Editor
     editorElement: function (e) {
-        Wat.I.dialog(this.dialogConf, this);           
+        Wat.I.dialog(this.dialogConf, this);    
     },
     
     fillEditor: function (target, that) {
@@ -177,11 +177,10 @@ Wat.Views.MainView = Backbone.View.extend({
         
         target.html(that.template);
         
-        if (editorMode == 'create' && isSuperadmin && classifiedByTenant) {
-            
+        if (editorMode == 'create' && isSuperadmin && classifiedByTenant) { 
             var params = {
                 'action': 'tenant_tiny_list',
-                'selectedId': 0,
+                'selectedId': that.selectedTenant || 0,
                 'controlId': 'tenant_editor',
                 'chosenType': 'single100'
             };
@@ -369,6 +368,54 @@ Wat.Views.MainView = Backbone.View.extend({
             
             Wat.I.showMessage(messageParams, response);
         });
+    },
+    
+    openNewElementDialog: function (e) {
+        Wat.A.performAction(this.qvdObj + '_get_property_list', {}, {}, {}, this.completePropertiesAndOpenDialog, this, undefined, {"field":"key","order":"-asc"});
+    },
+    
+    completePropertiesAndOpenDialog: function (that) {
+        if (that.retrievedData.total > 0) {
+            var properties = {};
+            $.each(that.retrievedData.rows, function (iProp, prop) {
+                var value = '';
+                if (that.model.get('properties')) {
+                    value = that.model.get('properties')[prop.key];
+                }
+                properties[prop.property_id] = {
+                    value: value,
+                    key: prop.key
+                };
+            });
+
+            // Override properties including not setted on element
+            that.model.set({properties: properties});
+        }
+
+        that.openNewElementDialogCompleted();
+    },
+    
+    openNewElementDialogCompleted: function (e) {
+        var that = this;
+        
+        this.templateEditor = Wat.TPL['editorNew_' + that.qvdObj];
+        
+        this.dialogConf.buttons = {
+            Cancel: function (e) {
+                Wat.I.closeDialog($(this));
+            },
+            Create: function (e) {
+                that.dialog = $(this);
+                that.createElement($(this));
+            }
+        };
+
+        this.dialogConf.button1Class = 'fa fa-ban';
+        this.dialogConf.button2Class = 'fa fa-plus-circle';
+        
+        this.dialogConf.fillCallback = this.fillEditor;
+
+        this.editorElement(e);
     },
     
     openEditElementDialog: function (e) {

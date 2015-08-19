@@ -1,8 +1,8 @@
-<% _.each(properties, function(val, key) { %>
+<% $.each(properties, function(propertyId, property) { %>
     <tr>
-        <td><i class="fa fa-asterisk"></i><%= key %></td>
+        <td><i class="<%= CLASS_ICON_PROPERTIES %>"></i><%= property.key %></td>
         <td>
-            <%= val %>
+            <%= property.value %>
         </td>
     </tr>
 <% }); %>

@@ -29,6 +29,8 @@ Wat.Router = Backbone.Router.extend({
         "tenants/:searchHash": "listTenant",
         "tenant/:id": "detailsTenant",
         
+        "properties": "property",
+        
         "administrators": "listAdmin",
         "administrators/:searchHash": "listAdmin",
         "administrator/:id": "detailsAdmin",

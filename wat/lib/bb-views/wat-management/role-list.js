@@ -58,7 +58,7 @@ Wat.Views.RoleListView = Wat.Views.ListView.extend({
             arguments["description"] = description;
         }
         
-        if (Wat.C.isSuperadmin) {
+        if (Wat.C.isSuperadmin()) {
             var tenant_id = context.find('select[name="tenant_id"]').val();
             arguments['tenant_id'] = tenant_id;
         }

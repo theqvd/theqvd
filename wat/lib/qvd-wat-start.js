@@ -150,6 +150,14 @@
                     Wat.Router.app_router.performRoute('tenants', Wat.Views.TenantDetailsView, {"id": id});
                 });
                 
+                Wat.Router.app_router.on('route:property', function (searchHash) {   
+                    var params = {};
+                    if (searchHash !== null) {
+                        params = Wat.U.base64.decodeObj(searchHash);
+                    }
+                    
+                    Wat.Router.app_router.performRoute('properties', Wat.Views.PropertyView, params);
+                });
                 
                 Wat.Router.app_router.on('route:listAdmin', function (searchHash) {   
                     var params = {};

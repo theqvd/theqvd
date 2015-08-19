@@ -1476,9 +1476,7 @@ body {
         .wrapper .content .customize-section-selectors .customize-section-selector:first-child {
           padding-right: 20px; }
         .wrapper .content .customize-section-selectors .customize-section-selector:last-child {
-          padding-left: 20px;
-          text-align: right;
-          vertical-align: bottom; }
+          padding-left: 20px; }
     .wrapper .content .customize-options .customize-block {
       width: 49%;
       display: inline-block;
@@ -1595,7 +1593,7 @@ body {
     height: 250px;
     margin-top: 5px; }
 
-.delete-property-button, .add-role-button, .delete-role-button, .add-acl-button, .delete-acl-button {
+.add-role-button, .delete-role-button, .add-acl-button, .delete-acl-button {
   color: #e35e0c;
   cursor: pointer; }
 
@@ -1713,9 +1711,6 @@ select[name="role"] {
       margin-right: 10px; }
     .editor-container .editor-table .custom-properties td {
       position: relative; }
-      .editor-container .editor-table .custom-properties td .delete-property-button {
-        position: absolute;
-        left: -20px; }
       .editor-container .editor-table .custom-properties td .property-help {
         position: absolute;
         left: 12px;
