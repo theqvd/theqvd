@@ -33,7 +33,7 @@ __PACKAGE__->belongs_to(osf  => 'QVD::DB::Result::OSF',  'osf_id',  { cascade_de
 
 __PACKAGE__->has_one (vm_runtime => 'QVD::DB::Result::VM_Runtime',  'vm_id');
 __PACKAGE__->has_one (counters   => 'QVD::DB::Result::VM_Counter',  'vm_id');
-__PACKAGE__->has_many(properties => 'QVD::DB::Result::VM_Property', 'vm_id',{join_type => 'LEFT', order_by => {'-asc' => 'key'}});
+__PACKAGE__->has_many(properties => 'QVD::DB::Result::VM_Property', 'vm_id',{join_type => 'LEFT', order_by => {'-asc' => 'property_id'}});
 __PACKAGE__->belongs_to(di => 'QVD::DB::Result::DI',
 			sub {
   			  my $args = shift;
@@ -97,7 +97,7 @@ sub combined_properties {
 sub host_name 
 {
     my $self = shift;
-    $self->vm_runtime->host->name;
+    defined $self->vm_runtime->host ? $self->vm_runtime->host->name : '';
 }
 
 sub di_id

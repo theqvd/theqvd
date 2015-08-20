@@ -207,12 +207,12 @@ sub is_ephemeral {
 
 sub current_di_name {
     my $self = shift;
-    $self->current_di->path;
+    defined $self->current_di ? $self->current_di->path : '';
 }
 
 sub current_di_version {
     my $self = shift;
-    $self->current_di->version;
+    defined $self->current_di ? $self->current_di->version : '';
 }
 
 1;

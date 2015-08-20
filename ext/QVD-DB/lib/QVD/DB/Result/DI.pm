@@ -18,7 +18,7 @@ __PACKAGE__->add_columns( id     => { data_type => 'integer',
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->belongs_to(osf => 'QVD::DB::Result::OSF', 'osf_id', { cascade_delete => 0 } );
-__PACKAGE__->has_many(properties => 'QVD::DB::Result::DI_Property', 'di_id', {join_type => 'LEFT', order_by => {'-asc' => 'key'}});
+__PACKAGE__->has_many(properties => 'QVD::DB::Result::DI_Property', 'di_id', {join_type => 'LEFT', order_by => {'-asc' => 'property_id'}});
 __PACKAGE__->has_many(vm_runtimes => 'QVD::DB::Result::VM_Runtime', 'current_di_id', { cascade_delete => 0 });
 __PACKAGE__->has_many(tags => 'QVD::DB::Result::DI_Tag', 'di_id', { order_by => { '-desc' => 'tag' }});
 
