@@ -516,7 +516,13 @@ Wat.B = {
                 // Update chosen control for user
                 Wat.I.updateChosenControls('[name="user_id"]');
             }); 
-        }
+        },
+        
+        updatePropertyRows: function () {
+            $('.js-editor-property-row').hide();
+            $('.js-editor-property-row[data-tenant-id="' + $('[name="tenant_id"]').val() + '"]').show();
+            $('.js-editor-property-row[data-tenant-id="' + SUPERTENANT_ID + '"]').show();
+        },
     },
     
     userEditorBinds: {

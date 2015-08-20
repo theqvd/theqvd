@@ -1100,22 +1100,13 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     fillMassiveEditor: function (target) {
         var that = Wat.CurrentView;
-
-        var enabledProperties = $.inArray(that.qvdObj, QVD_OBJS_WITH_PROPERTIES) != -1;
-        var enabledCreateProperties = true;
-        var enabledUpdateProperties = false;
-        var enabledDeleteProperties = false;
         
         // Add common parts of editor to dialog
         that.template = _.template(
                     Wat.TPL.editorCommon, {
                         classifiedByTenant: 0,
                         editorMode: 'massive_edit',
-                        isSuperadmin: Wat.C.isSuperadmin(), 
-                        enabledProperties: enabledProperties, 
-                        enabledCreateProperties: enabledCreateProperties,
-                        enabledUpdateProperties: enabledUpdateProperties,
-                        enabledDeleteProperties: enabledDeleteProperties,
+                        isSuperadmin: Wat.C.isSuperadmin(),
                         blocked: undefined,
                         properties: [],
                         cid: that.cid
@@ -1132,6 +1123,22 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 );
 
         $(that.editorContainer).html(that.template);
+        
+        var enabledProperties = $.inArray(that.qvdObj, QVD_OBJS_WITH_PROPERTIES) != -1;
+
+        if (enabledProperties) {
+            var filters = {};
+            
+            that.model = new that.collection.model(); 
+            
+            if (that.selectedItems.length > 1) {
+                that.model = that.collection.where({id: that.selectedItems[0]})[0];
+            }
+
+            that.editorMode = 'massive-edit';
+                
+            Wat.A.performAction(that.qvdObj + '_get_property_list', {}, filters, {}, that.fillEditorProperties, that, undefined, {"field":"key","order":"-asc"});
+        }
         
         that.configureMassiveEditor (that);
     },

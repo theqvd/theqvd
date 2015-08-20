@@ -267,6 +267,9 @@
             editorCommon: {
                 name: 'editor/common'
             },
+            editorCommonProperties: {
+                name: 'editor/common-properties'
+            },
             relatedDoc: {
                 name: 'doc/related-links'
             },

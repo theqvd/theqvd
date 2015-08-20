@@ -32,42 +32,6 @@
         %>
         
         <tbody class="bb-editor"></tbody>
-        
-        <%
-            if (enabledProperties) {
-        %>
-            <tbody class="custom-properties">
-                <input type="hidden" class="deleted-properties" value=""/>
-
-                <% 
-                    $.each(properties, function(propertyId, property) { 
-                %>
-                        <tr>
-                            <td>
-                                <input type="hidden" class="custom-prop-name" value="<%= propertyId %>">
-                                <span class="custom-prop-name"><%= property.key %></span>
-                            </td>
-                            <td>
-                                <% 
-                                if (enabledUpdateProperties) { 
-                                %>
-                                    <input type="text" class="custom-prop-value" data-current="<%= property.value %>" value="<%= property.value %>">
-                                <% 
-                                }
-                                else { 
-                                %>
-                                    <%= property.value %>
-                                <% 
-                                } 
-                                %>
-                            </td>
-                        </tr>
-                <%
-                    });
-                %>
-            </tbody>
-        <%
-            }
-        %>
+        <tbody class="bb-custom-properties custom-properties"></tbody>
     </table>
 </div>

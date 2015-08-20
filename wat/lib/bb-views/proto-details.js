@@ -73,7 +73,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
                 var filters = {};
                 
                 if (Wat.C.isMultitenant() && Wat.C.isSuperadmin()) {
-                    filters['tenant_id'] = that.model.get('tenant_id');
+                    filters['-or'] = ['tenant_id', that.model.get('tenant_id'), 'tenant_id', SUPERTENANT_ID];
                 }
                 
                 Wat.A.performAction(that.qvdObj + '_get_property_list', {}, filters, {}, that.completePropertiesAndRender, that, undefined, {"field":"key","order":"-asc"});
@@ -86,8 +86,9 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             var properties = {};
             $.each(that.retrievedData.rows, function (iProp, prop) {
                 properties[prop.property_id] = {
-                    value: that.model.get('properties')[prop.key],
-                    key: prop.key
+                    value: that.model.get('properties')[prop.property_id] ? that.model.get('properties')[prop.property_id].value : '',
+                    key: prop.key,
+                    tenant_id: prop.tenant_id
                 };
             });
 

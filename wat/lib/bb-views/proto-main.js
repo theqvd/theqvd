@@ -1,6 +1,7 @@
 Wat.Views.MainView = Backbone.View.extend({
     el: '.bb-content',
     editorContainer: '.bb-editor',
+    editorPropertiesContainer: '.bb-custom-properties',
     breadcrumbs: {},
     message: 'Unknown problem',
     // error/success/info
@@ -124,41 +125,6 @@ Wat.Views.MainView = Backbone.View.extend({
         
         var classifiedByTenant = $.inArray(that.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
         
-        // Get enabled properties value from constant. Properties could be disabled by variable
-        if (that.enabledProperties != undefined) {
-            var enabledProperties =  that.enabledProperties;
-            // Clean enabledProperties variable
-            delete that.enabledProperties;
-        }
-        else {
-            var enabledProperties =  $.inArray(that.qvdObj, QVD_OBJS_WITH_PROPERTIES) != -1;
-        }
-        
-        var enabledCreateProperties = true;
-        var enabledUpdateProperties = true;
-        var enabledDeleteProperties = true;
-
-        if (enabledProperties) {
-            switch (editorMode) {
-                case 'edit':
-                        if (!Wat.C.checkACL(Wat.CurrentView.qvdObj + '.update.properties-create')) {
-                            var enabledCreateProperties = false;
-                        }
-                        if (!Wat.C.checkACL(Wat.CurrentView.qvdObj + '.update.properties-update')) {
-                            var enabledUpdateProperties = false;
-                        }
-                        if (!Wat.C.checkACL(Wat.CurrentView.qvdObj + '.update.properties-delete')) {
-                            var enabledDeleteProperties = false;
-                        }
-                    break;
-                case 'create':
-                        if (!Wat.C.checkACL(Wat.CurrentView.qvdObj + '.create.properties')) {
-                            enabledProperties = false;
-                        }
-                    break;
-            }
-        }
-        
         // Add common parts of editor to dialog
         that.template = _.template(
                     Wat.TPL.editorCommon, {
@@ -166,11 +132,6 @@ Wat.Views.MainView = Backbone.View.extend({
                         isSuperadmin: isSuperadmin,
                         editorMode: editorMode,
                         blocked: that.model ? that.model.attributes.blocked : 0,
-                        properties: that.model ? that.model.attributes.properties : {},
-                        enabledProperties: enabledProperties,
-                        enabledCreateProperties: enabledCreateProperties,
-                        enabledUpdateProperties: enabledUpdateProperties,
-                        enabledDeleteProperties: enabledDeleteProperties,
                         cid: that.cid
                     }
                 );
@@ -193,8 +154,10 @@ Wat.Views.MainView = Backbone.View.extend({
                     $('select[name="tenant_id"] option[value="0"]').remove();
                     
                     Wat.I.updateChosenControls('[name="tenant_id"]');
-                    $('[name="tenant_id"]').trigger('change');
                 }
+                                
+                Wat.B.bindEvent('change', '.tenant-selector select[name="tenant_id"]', Wat.B.editorBinds.updatePropertyRows);
+                $('[name="tenant_id"]').trigger('change');
             });
         }
         
@@ -209,6 +172,85 @@ Wat.Views.MainView = Backbone.View.extend({
         
         // Apply expanding plugin to make textareas expandable
         $("textarea").expanding();
+        
+        // Custom Properties
+        
+        if (!Wat.C.checkACL(Wat.CurrentView.qvdObj + '.update.properties-update')) {
+            var enabledProperties = false;
+        }
+        // Get enabled properties value from constant. Properties could be disabled by variable
+        else if (that.enabledProperties != undefined) {
+            var enabledProperties =  that.enabledProperties;
+            // Clean enabledProperties variable
+            delete that.enabledProperties;
+        }
+        else {
+            var enabledProperties =  $.inArray(that.qvdObj, QVD_OBJS_WITH_PROPERTIES) != -1;
+        }
+        
+        if (enabledProperties) {
+            var filters = {};
+
+            if (editorMode == 'edit') {
+                if (Wat.C.isMultitenant() && Wat.C.isSuperadmin()) {
+                    filters['-or'] = ['tenant_id', that.model.get('tenant_id'), 'tenant_id', SUPERTENANT_ID];
+                }
+                else {
+                    filters['tenant_id'] = that.model.get('tenant_id');
+                }
+            }
+            
+            that.editorMode = editorMode;
+                
+            Wat.A.performAction(that.qvdObj + '_get_property_list', {}, filters, {}, that.fillEditorProperties, that, undefined, {"field":"key","order":"-asc"});
+        }
+    },
+    
+    fillEditorProperties: function (that) {
+        if (that.retrievedData.total > 0) {
+            var properties = {};
+            $.each(that.retrievedData.rows, function (iProp, prop) {
+                var value = '';
+                
+                if (that.model && that.model.get('properties') && that.model.get('properties')[prop.property_id]) {
+                    value = that.model.get('properties')[prop.property_id].value;
+                }
+                
+                properties[prop.property_id] = {
+                    value: value,
+                    key: prop.key,
+                    tenant_id: prop.tenant_id
+                };
+            });
+
+            // Override properties including not setted on element
+            that.model.set({properties: properties});
+        }
+        
+        that.template = _.template(
+                    Wat.TPL.editorCommonProperties, {
+                        properties: that.model ? that.model.attributes.properties : {}
+                    }
+                );
+        
+        $(that.editorPropertiesContainer).html(that.template);
+
+        if (that.editorMode != 'create' || !Wat.C.isSuperadmin()) {
+            $('.js-editor-property-row').show();
+        }
+        else if (Wat.C.isMultitenant() && Wat.C.isSuperadmin() && $('[name="tenant_id"]').val() != undefined) {
+            $('.js-editor-property-row[data-tenant-id="' + $('[name="tenant_id"]').val() + '"]').show();
+            $('.js-editor-property-row[data-tenant-id="' + SUPERTENANT_ID + '"]').show();
+        }
+        else {
+            var existsInSupertenant = $.inArray(that.qvdObj, QVD_OBJS_EXIST_IN_SUPERTENANT) != -1;
+            if (!existsInSupertenant) {
+                $('.js-editor-property-row[data-tenant-id="' + Wat.C.tenantID + '"]').show();
+            }
+        }
+
+        
+        delete that.editorMode;
     },
     
     updateElement: function () {
@@ -371,31 +413,6 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     openNewElementDialog: function (e) {
-        Wat.A.performAction(this.qvdObj + '_get_property_list', {}, {}, {}, this.completePropertiesAndOpenDialog, this, undefined, {"field":"key","order":"-asc"});
-    },
-    
-    completePropertiesAndOpenDialog: function (that) {
-        if (that.retrievedData.total > 0) {
-            var properties = {};
-            $.each(that.retrievedData.rows, function (iProp, prop) {
-                var value = '';
-                if (that.model.get('properties')) {
-                    value = that.model.get('properties')[prop.key];
-                }
-                properties[prop.property_id] = {
-                    value: value,
-                    key: prop.key
-                };
-            });
-
-            // Override properties including not setted on element
-            that.model.set({properties: properties});
-        }
-
-        that.openNewElementDialogCompleted();
-    },
-    
-    openNewElementDialogCompleted: function (e) {
         var that = this;
         
         this.templateEditor = Wat.TPL['editorNew_' + that.qvdObj];
