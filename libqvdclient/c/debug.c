@@ -60,7 +60,7 @@ void _qvd_vprintf(const char *format, va_list args)
 #ifdef ANDROID
   __android_log_vprint(get_debug_level(), "qvd", format, args);
 #elif __APPLE__
-  asl_log(NULL, NULL, ASL_LEVEL_DEBUG, format, args);
+  asl_log(NULL, NULL, ASL_LEVEL_WARNING, format, args);
 #else
   vfprintf(global_debug_file, format, args);
   fflush(global_debug_file);
