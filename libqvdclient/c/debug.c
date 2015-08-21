@@ -7,8 +7,9 @@
 #include <string.h>
 #ifdef ANDROID
 #include <android/log.h>
+#elif __APPLE__
+#include <asl.h>
 #endif
-
 static int qvd_global_debug_level = -1;
 static FILE *global_debug_file = NULL; /* By default it becomes stderr see unistd.h */
 
@@ -58,6 +59,8 @@ void _qvd_vprintf(const char *format, va_list args)
 
 #ifdef ANDROID
   __android_log_vprint(get_debug_level(), "qvd", format, args);
+#elif __APPLE__
+  asl_log(NULL, NULL, ASL_LEVEL_DEBUG, format, args);
 #else
   vfprintf(global_debug_file, format, args);
   fflush(global_debug_file);
