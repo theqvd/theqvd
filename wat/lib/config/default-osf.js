@@ -9,9 +9,7 @@ Wat.I.listFields[qvdObj] = {
             'osf.delete-massive.',
             'osf.update-massive.memory',
             'osf.update-massive.user-storage',
-            'osf.update-massive.properties-create',
-            'osf.update-massive.properties-update',
-            'osf.update-massive.properties-delete'
+            'osf.update-massive.properties'
         ],
         'aclsLogic': 'OR',
         'fixed': true,

@@ -43,7 +43,7 @@ Wat.Common.BySection.osf = {
             arguments['user_storage'] = user_storage;
         }
         
-        if (properties.delete.length > 0 || !$.isEmptyObject(properties.set)) {
+        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('osf.update.properties')) {
             arguments["__properties_changes__"] = properties;
         }
             

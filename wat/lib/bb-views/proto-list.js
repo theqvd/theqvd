@@ -1069,7 +1069,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.fetchList();        
     },
     
-    openMassiveChangesDialog: function (that) {   
+    openMassiveChangesDialog: function (that) {  
         // If the edition is performed over one single element, call single editor
         if (that.selectedItems.length == 1) {
             that.editingFromList = true;
@@ -1125,10 +1125,16 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         $(that.editorContainer).html(that.template);
         
         var enabledProperties = $.inArray(that.qvdObj, QVD_OBJS_WITH_PROPERTIES) != -1;
-
-        if (enabledProperties) {
+        var enabledEditProperties = Wat.C.checkACL(that.qvdObj + '.update-massive.properties');
+        
+        if (enabledProperties && enabledEditProperties) {
             var filters = {};
             
+            // In massive edition for superadmins, only is available the specific properties for superadmins
+            if (Wat.C.isSuperadmin()) {
+                filters['tenant_id'] = SUPERTENANT_ID;
+            }
+
             that.model = new that.collection.model(); 
             
             if (that.selectedItems.length > 1) {
@@ -1302,7 +1308,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         var arguments = {};
         
-        if (properties.delete.length > 0 || !$.isEmptyObject(properties.set)) {
+        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL(this.qvdObj + '.update-massive.properties')) {
             arguments['__properties_changes__'] = properties;
         }
         

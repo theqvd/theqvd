@@ -175,7 +175,7 @@ Wat.Views.MainView = Backbone.View.extend({
         
         // Custom Properties
         
-        if (!Wat.C.checkACL(Wat.CurrentView.qvdObj + '.update.properties-update')) {
+        if (!Wat.C.checkACL(Wat.CurrentView.qvdObj + '.update.properties')) {
             var enabledProperties = false;
         }
         // Get enabled properties value from constant. Properties could be disabled by variable
@@ -188,7 +188,16 @@ Wat.Views.MainView = Backbone.View.extend({
             var enabledProperties =  $.inArray(that.qvdObj, QVD_OBJS_WITH_PROPERTIES) != -1;
         }
         
-        if (enabledProperties) {
+        switch (editorMode) {
+            case 'create':
+                var enabledEditProperties = Wat.C.checkACL(that.qvdObj + '.create.properties');
+                break;
+            case 'edit':
+                var enabledEditProperties = Wat.C.checkACL(that.qvdObj + '.update.properties');
+                break;
+        }
+        
+        if (enabledProperties && enabledEditProperties) {
             var filters = {};
 
             if (editorMode == 'edit') {
@@ -209,10 +218,12 @@ Wat.Views.MainView = Backbone.View.extend({
     fillEditorProperties: function (that) {
         if (that.retrievedData.total > 0) {
             var properties = {};
+            
             $.each(that.retrievedData.rows, function (iProp, prop) {
                 var value = '';
                 
-                if (that.model && that.model.get('properties') && that.model.get('properties')[prop.property_id]) {
+                // Massive editor will not shot any value
+                if (that.editorMode != 'massive-edit' && that.model && that.model.get('properties') && that.model.get('properties')[prop.property_id]) {
                     value = that.model.get('properties')[prop.property_id].value;
                 }
                 
@@ -254,7 +265,7 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     updateElement: function () {
-        this.parseProperties();
+        this.parseProperties('update');
         
         var context = '.editor-container.' + this.cid;
         
@@ -262,7 +273,7 @@ Wat.Views.MainView = Backbone.View.extend({
     },  
     
     createElement: function () {
-        this.parseProperties();
+        this.parseProperties('create');
         
         var context = '.editor-container.' + this.cid;
         
@@ -270,58 +281,46 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     // Parse properties from create/edit forms
-    parseProperties: function () {
+    parseProperties: function (mode) {
         var propNames = $('.' + this.cid + '.editor-container input.custom-prop-name');
         var propValues = $('.' + this.cid + '.editor-container input.custom-prop-value');
         
-        var deletedProps = [];
-        var setProps = {};
-        
-        switch(this.viewKind) {
-            case 'list':
-                var createPropertiesACL = this.qvdObj + '.update-massive.properties-create';
-                var updatePropertiesACL = this.qvdObj + '.update-massive.properties-update';
-                var deletePropertiesACL = this.qvdObj + '.update-massive.properties-delete';
+        switch (mode) {
+            case 'create':
+                var createPropertiesACL = this.qvdObj + '.create.properties';
+                
+                if (!createPropertiesACL) {
+                    return;
+                }
                 break;
-            case 'details':
-                var createPropertiesACL = this.qvdObj + '.update.properties-create';
-                var updatePropertiesACL = this.qvdObj + '.update.properties-update';
-                var deletePropertiesACL = this.qvdObj + '.update.properties-delete';
-                break;    
+            case 'update':
+                switch(this.viewKind) {
+                    case 'list':
+                        var updatePropertiesACL = this.qvdObj + '.update-massive.properties';
+                        break;
+                    case 'details':
+                        var updatePropertiesACL = this.qvdObj + '.update.properties';
+                        break;    
+                }
+                
+                if (!updatePropertiesACL) {
+                    return;
+                }
+                break;
         }
         
+        var setProps = {};
+
         for(i=0;i<propNames.length;i++) {
             var name = propNames.eq(i);
             var value = propValues.eq(i);
-            
-            if (!name.val()) {
-                continue;
-            }
-                        
-            // If the element has not data-current attribute means that it's new
-            // New properties with empty name will be ignored
-            if (name.val() !== '' && value.attr('data-current') === undefined && Wat.C.checkACL(createPropertiesACL)) {
-                setProps[name.val()] = value.val();
-            }
-            else {
-                // If the value is different of the data-current attribute means that it's different
-                if (value.attr('data-current') != value.val() && Wat.C.checkACL(updatePropertiesACL)) {
-                    setProps[name.val()] = value.val();
-                }
-            }
+                 
+            setProps[name.val()] = value.val();
         }
-        
-        if (!Wat.C.checkACL(deletePropertiesACL)) {
-            this.deleteProps = [];
-        }
-        
+
         this.properties = {
-            'set' : setProps, 
-            'delete': this.deleteProps
+            'set' : setProps
         };
-        
-        // Restore deleteProps array
-        this.deleteProps = [];
     },
     
     createModel: function (arguments, successCallback) {

@@ -10,9 +10,7 @@ Wat.I.listFields[qvdObj] = {
             'di.update-massive.block',
             'di.update-massive.tags-add',
             'di.update-massive.tags-delete',
-            'di.update-massive.properties-create',
-            'di.update-massive.properties-update',
-            'di.update-massive.properties-delete'
+            'di.update-massive.properties'
         ],
         'aclsLogic': 'OR',
         'fixed': true,

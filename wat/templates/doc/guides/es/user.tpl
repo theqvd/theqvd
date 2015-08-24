@@ -2121,19 +2121,9 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Update the description of users massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create properties when update users (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">user.update-massive.properties-create</p></td>
-<td align="left" valign="top"><p class="table">Create properties in user&#8217;s massive update process.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Delete properties when update users (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">user.update-massive.properties-delete</p></td>
+<td align="left" valign="top"><p class="table"><strong>Update properties when update users (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">user.update-massive.properties</p></td>
 <td align="left" valign="top"><p class="table">Update properties in user&#8217;s massive update process.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Change properties when update users (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">user.update-massive.properties-update</p></td>
-<td align="left" valign="top"><p class="table">Delete properties in user&#8217;s massive update process.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Block-Unblock users</strong></p></td>
@@ -2151,19 +2141,9 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Update the password of users.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create properties when update users</strong></p></td>
-<td align="left" valign="top"><p class="table">user.update.properties-create</p></td>
-<td align="left" valign="top"><p class="table">Create properties in user&#8217;s one by one update process.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Delete properties when update users</strong></p></td>
-<td align="left" valign="top"><p class="table">user.update.properties-delete</p></td>
+<td align="left" valign="top"><p class="table"><strong>Update properties when update users</strong></p></td>
+<td align="left" valign="top"><p class="table">user.update.properties</p></td>
 <td align="left" valign="top"><p class="table">Update properties in user&#8217;s one by one update process.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Change properties when update users</strong></p></td>
-<td align="left" valign="top"><p class="table">user.update.properties-update</p></td>
-<td align="left" valign="top"><p class="table">Delete properties in user&#8217;s one by one update process.</p></td>
 </tr>
 </tbody>
 </table>
@@ -2418,19 +2398,9 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Update the expiration date times of virtual machines massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create properties when update virtual machines (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.update-massive.properties-create</p></td>
-<td align="left" valign="top"><p class="table">Create properties in virtual machine&#8217;s massive update process.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Delete properties when update virtual machines (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.update-massive.properties-delete</p></td>
-<td align="left" valign="top"><p class="table">Update properties in virtual machine&#8217;s massive update process.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Change properties when update virtual machines (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.update-massive.properties-update</p></td>
-<td align="left" valign="top"><p class="table">Delete properties in virtual machine&#8217;s massive update process.</p></td>
+<td align="left" valign="top"><p class="table"><strong>Update properties when update virtual machines (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.update-massive.properties</p></td>
+<td align="left" valign="top"><p class="table">Update properties in virtual machines&#8217;s massive update process.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Start-Stop virtual machines (massive)</strong></p></td>
@@ -2468,19 +2438,9 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Update the name of virtual machines.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create properties when update virtual machines</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.update.properties-create</p></td>
-<td align="left" valign="top"><p class="table">Create properties in virtual machine&#8217;s one by one update process.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Delete properties when update virtual machines</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.update.properties-delete</p></td>
-<td align="left" valign="top"><p class="table">Update properties in virtual machine&#8217;s one by one update process.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Change properties when update virtual machines</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.update.properties-update</p></td>
-<td align="left" valign="top"><p class="table">Delete properties in virtual machine&#8217;s one by one update process.</p></td>
+<td align="left" valign="top"><p class="table"><strong>Update properties when update virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table">vm.update.properties</p></td>
+<td align="left" valign="top"><p class="table">Update properties in virtual machines&#8217;s one by one update process.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Start-Stop virtual machines</strong></p></td>
@@ -2675,19 +2635,9 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Update the description of the hosts massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create properties when update nodes (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">host.update-massive.properties-create</p></td>
-<td align="left" valign="top"><p class="table">Create properties in host&#8217;s massive update process.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Delete properties when update nodes (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">host.update-massive.properties-delete</p></td>
-<td align="left" valign="top"><p class="table">Delete properties in host&#8217;s massive update process.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Change properties when update nodes (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">host.update-massive.properties-update</p></td>
-<td align="left" valign="top"><p class="table">Update properties in host&#8217;s massive update process.</p></td>
+<td align="left" valign="top"><p class="table"><strong>Update properties when update nodes (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">host.update-massive.properties</p></td>
+<td align="left" valign="top"><p class="table">Update properties in node&#8217;s massive update process.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Stop all virtual machines of a node (massive)</strong></p></td>
@@ -2715,19 +2665,9 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Update the name of the hosts.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create properties when update nodes</strong></p></td>
-<td align="left" valign="top"><p class="table">host.update.properties-create</p></td>
-<td align="left" valign="top"><p class="table">Create properties in host&#8217;s one by one update process.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Delete properties when update nodes</strong></p></td>
-<td align="left" valign="top"><p class="table">host.update.properties-delete</p></td>
-<td align="left" valign="top"><p class="table">Delete properties in host&#8217;s one by one update process.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Change properties when update nodes</strong></p></td>
-<td align="left" valign="top"><p class="table">host.update.properties-update</p></td>
-<td align="left" valign="top"><p class="table">Update properties in host&#8217;s one by one update process.</p></td>
+<td align="left" valign="top"><p class="table"><strong>Update properties when update nodes</strong></p></td>
+<td align="left" valign="top"><p class="table">host.update.properties</p></td>
+<td align="left" valign="top"><p class="table">Update properties in node&#8217;s one by one update process.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Stop all virtual machines of a node</strong></p></td>
@@ -2947,19 +2887,9 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Update the memory of OSF flavours massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create properties when update OS Flavours (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update-massive.properties-create</p></td>
-<td align="left" valign="top"><p class="table">Create properties in OS flavour&#8217;s massive update process.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Delete properties when update OS Flavours (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update-massive.properties-delete</p></td>
-<td align="left" valign="top"><p class="table">Update properties in OS flavour&#8217;s massive update process.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Change properties when update OS Flavours (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update-massive.properties-update</p></td>
-<td align="left" valign="top"><p class="table">Delete properties in OS flavour&#8217;s massive update process.</p></td>
+<td align="left" valign="top"><p class="table"><strong>Update properties when update OSFs (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.update-massive.properties</p></td>
+<td align="left" valign="top"><p class="table">Update properties in OSF&#8217;s massive update process.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s user storage (massive)</strong></p></td>
@@ -2982,19 +2912,9 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Update the name of OSF flavour&#8217;s.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create properties when update OS Flavours</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update.properties-create</p></td>
-<td align="left" valign="top"><p class="table">Create properties in OS flavour&#8217;s one by one update process.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Delete properties when update OS Flavours</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update.properties-delete</p></td>
-<td align="left" valign="top"><p class="table">Update properties in OS flavour&#8217;s one by one update process.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Change properties when update OS Flavours</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update.properties-update</p></td>
-<td align="left" valign="top"><p class="table">Delete properties in OS flavour&#8217;s one by one update process.</p></td>
+<td align="left" valign="top"><p class="table"><strong>Update properties when update OSFs</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.update.properties</p></td>
+<td align="left" valign="top"><p class="table">Update properties in OSF&#8217;s one by one update process.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s user storage</strong></p></td>
@@ -3199,19 +3119,9 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Update the description of disk images massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create properties when update disk images (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">di.update-massive.properties-create</p></td>
-<td align="left" valign="top"><p class="table">Create properties in disk image&#8217;s massive update process.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Delete properties when update disk images (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">di.update-massive.properties-delete</p></td>
+<td align="left" valign="top"><p class="table"><strong>Update properties when update disk images (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">di.update-massive.properties</p></td>
 <td align="left" valign="top"><p class="table">Update properties in disk image&#8217;s massive update process.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Change properties when update disk images (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">di.update-massive.properties-update</p></td>
-<td align="left" valign="top"><p class="table">Delete properties in disk image&#8217;s massive update process.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Update disk image&#8217;s tags (massive)</strong></p></td>
@@ -3234,19 +3144,9 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Update the description of disk images one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create properties when update disk images</strong></p></td>
-<td align="left" valign="top"><p class="table">di.update.properties-create</p></td>
-<td align="left" valign="top"><p class="table">Create properties in disk image&#8217;s one by one update process.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Delete properties when update disk images</strong></p></td>
-<td align="left" valign="top"><p class="table">di.update.properties-delete</p></td>
+<td align="left" valign="top"><p class="table"><strong>Update properties when update disk images</strong></p></td>
+<td align="left" valign="top"><p class="table">di.update.properties</p></td>
 <td align="left" valign="top"><p class="table">Update properties in disk image&#8217;s one by one update process.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Change properties when update disk images</strong></p></td>
-<td align="left" valign="top"><p class="table">di.update.properties-update</p></td>
-<td align="left" valign="top"><p class="table">Delete properties in disk image&#8217;s one by one update process.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Update disk image&#8217;s tags</strong></p></td>
@@ -3517,7 +3417,59 @@ cellspacing="0" cellpadding="4">
 </div>
 </div>
 <div class="sect3">
-<h4 id="_acls_de_vistas">7.1.8. ACLs de Vistas</h4>
+<h4 id="_acls_de_propiedades_personalizadas">7.1.8. ACLs de Propiedades personalizadas</h4>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+<thead>
+<tr>
+<th align="left" valign="top">ACL    </th>
+<th align="left" valign="top">ACL code       </th>
+<th align="left" valign="top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Access to properties&#8217;s main section</strong></p></td>
+<td align="left" valign="top"><p class="table">property.see-main.</p></td>
+<td align="left" valign="top"><p class="table">Access to custom properties managment section</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Manage user&#8217;s custom properties</strong></p></td>
+<td align="left" valign="top"><p class="table">property.manage.user</p></td>
+<td align="left" valign="top"><p class="table">Create, update and delete custom properties of users.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Manage virtual machines&#8217;s custom properties</strong></p></td>
+<td align="left" valign="top"><p class="table">property.manage.vm</p></td>
+<td align="left" valign="top"><p class="table">Create, update and delete custom properties of virtual machines.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Manage node&#8217;s custom properties</strong></p></td>
+<td align="left" valign="top"><p class="table">property.manage.host</p></td>
+<td align="left" valign="top"><p class="table">Create, update and delete custom properties of nodes.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Manage OSF&#8217;s custom properties</strong></p></td>
+<td align="left" valign="top"><p class="table">property.manage.osf</p></td>
+<td align="left" valign="top"><p class="table">Create, update and delete custom properties of OS Flavours.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Manage disk image&#8217;s custom properties</strong></p></td>
+<td align="left" valign="top"><p class="table">property.manage.di</p></td>
+<td align="left" valign="top"><p class="table">Create, update and delete custom properties of disk images.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_acls_de_vistas">7.1.9. ACLs de Vistas</h4>
 <div class="tableblock">
 <table rules="all"
 width="100%"
@@ -3559,7 +3511,7 @@ cellspacing="0" cellpadding="4">
 </div>
 </div>
 <div class="sect3">
-<h4 id="_acls_de_configuración">7.1.9. ACLs de Configuración</h4>
+<h4 id="_acls_de_configuración">7.1.10. ACLs de Configuración</h4>
 <div class="tableblock">
 <table rules="all"
 width="100%"

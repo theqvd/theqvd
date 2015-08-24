@@ -462,6 +462,7 @@ Wat.C = {
             'administrator.see-main.' : 'administrators',
             'tenant.see-main.' : 'tenants',
             'views.see-main.' : 'views',
+            'property.see-main.' : 'properties',
             'log.see-main.' : 'logs',
         };
         

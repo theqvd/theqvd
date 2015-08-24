@@ -81,9 +81,7 @@ $.merge(Wat.C.aclGroups.tenantMassiveActions, Wat.C.aclGroups.tenantMassiveEdit)
 ///////////////////////////////
 Wat.C.aclGroups.userEdit = [
     'user.update.password',
-    'user.update.properties-create',
-    'user.update.properties-update',
-    'user.update.properties-delete',
+    'user.update.properties',
     'user.update.description'
 ];
 
@@ -92,9 +90,7 @@ Wat.C.aclGroups.userInfo = [
 ];
 
 Wat.C.aclGroups.userMassiveEdit = [
-    'user.update-massive.properties-create',
-    'user.update-massive.properties-update',
-    'user.update-massive.properties-delete',
+    'user.update-massive.properties',
     'role.update-massive.description'
 ];
 
@@ -127,18 +123,14 @@ Wat.C.aclGroups.vmEdit = [
     'vm.update.name',
     'vm.update.di-tag',
     'vm.update.expiration',
-    'vm.update.properties-create',
-    'vm.update.properties-update',
-    'vm.update.properties-delete',
+    'vm.update.properties',
     'vm.update.description'
 ];
 
 Wat.C.aclGroups.vmMassiveEdit = [
     'vm.update-massive.di-tag',
     'vm.update-massive.expiration',
-    'vm.update-massive.properties-create',
-    'vm.update-massive.properties-update',
-    'vm.update-massive.properties-delete',
+    'vm.update-massive.properties',
     'vm.update-massive.description'
 ];
 
@@ -177,16 +169,12 @@ $.merge(Wat.C.aclGroups.vmMassiveActions, Wat.C.aclGroups.vmMassiveEdit);
 Wat.C.aclGroups.hostEdit = [
     'host.update.name',
     'host.update.address',
-    'host.update.properties-create',
-    'host.update.properties-update',
-    'host.update.properties-delete',
+    'host.update.properties',
     'host.update.description'
 ];
 
 Wat.C.aclGroups.hostMassiveEdit = [
-    'host.update-massive.properties-create',
-    'host.update-massive.properties-update',
-    'host.update-massive.properties-delete',
+    'host.update-massive.properties',
     'host.update-massive.description'
 ];
 
@@ -212,18 +200,14 @@ Wat.C.aclGroups.osfEdit = [
     'osf.update.name',
     'osf.update.memory',
     'osf.update.user-storage',
-    'osf.update.properties-create',
-    'osf.update.properties-update',
-    'osf.update.properties-delete',
+    'osf.update.properties',
     'osf.update.description'
 ];
 
 Wat.C.aclGroups.osfMassiveEdit = [
     'osf.update-massive.memory',
     'osf.update-massive.user-storage',
-    'osf.update-massive.properties-create',
-    'osf.update-massive.properties-update',
-    'osf.update-massive.properties-delete',
+    'osf.update-massive.properties',
     'osf.update-massive.description'
 ];
 
@@ -255,9 +239,7 @@ Wat.C.aclGroups.osfVmEmbeddedInfo = [
 Wat.C.aclGroups.diEdit = [
     'di.update.tags-create',
     'di.update.tags-delete',
-    'di.update.properties-create',
-    'di.update.properties-update',
-    'di.update.properties-delete',
+    'di.update.properties',
     'di.update.description'
 ];
 
@@ -269,9 +251,7 @@ Wat.C.aclGroups.diInfo = [
 Wat.C.aclGroups.diMassiveEdit = [
     'di.update-massive.tags-add',
     'di.update-massive.tags-delete',
-    'di.update-massive.properties-create',
-    'di.update-massive.properties-update',
-    'di.update-massive.properties-delete',
+    'di.update-massive.properties',
     'di.update-massive.description'
 ];
 
@@ -307,4 +287,15 @@ Wat.C.aclGroups.statisticsBlockedObjects = [
     'vm.stats.blocked',
     'host.stats.blocked',
     'di.stats.blocked'
+];
+
+///////////////////////////////
+// Properties
+///////////////////////////////
+Wat.C.aclGroups.propertiesManagement = [
+    'property.manage.user',
+    'property.manage.vm',
+    'property.manage.host',
+    'property.manage.osf',
+    'property.manage.di'
 ];

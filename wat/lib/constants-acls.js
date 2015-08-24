@@ -11,7 +11,8 @@ ACL_SECTIONS = {
     "tenant": "Tenants",
     "user": "Users",
     "views": "Views",
-    "vm": "Virtual machines"
+    "vm": "Virtual machines",
+    "property": "Custom properties"
 };
 
 ACL_SECTIONS_PATTERNS = {
@@ -25,7 +26,8 @@ ACL_SECTIONS_PATTERNS = {
     "user": "user.%",
     "views": "views.%",
     "vm": "vm.%",
-    "log": "log.%"
+    "log": "log.%",
+    "property": "property.%"
 };
 
 ACL_ACTIONS = {
@@ -38,7 +40,8 @@ ACL_ACTIONS = {
     "update": "Update one by one",
     "update-massive": "Update massively",
     "filter": "Filters",
-    "stats": "Statistics"
+    "stats": "Statistics",
+    "manage": "Manage"
 }
 
 ACL_ACTIONS_PATTERNS = {
@@ -51,5 +54,6 @@ ACL_ACTIONS_PATTERNS = {
     "update": "%.update.%",
     "update-massive": "%.update-massive.%",
     "filter": "%.filter.%",
-    "stats": "%.stats.%"
+    "stats": "%.stats.%",
+    "manage": "%.manage.%"
 }

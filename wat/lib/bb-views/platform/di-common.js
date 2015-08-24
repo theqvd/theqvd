@@ -61,7 +61,7 @@ Wat.Common.BySection.di = {
             };
         }
         
-        if (properties.delete.length > 0 || !$.isEmptyObject(properties.set)) {
+        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('di.update.properties')) {
             arguments["__properties_changes__"] = properties;
         }
         

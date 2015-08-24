@@ -113,7 +113,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             "osf_id": osf_id
         };
         
-        if (!$.isEmptyObject(properties.set)) {
+        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('di.create.properties')) {
             arguments["__properties__"] = properties.set;
         }
         

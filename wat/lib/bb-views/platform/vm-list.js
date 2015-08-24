@@ -132,7 +132,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             "osf_id": osf_id
         };
         
-        if (!$.isEmptyObject(properties.set)) {
+        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('vm.create.properties')) {
             arguments["__properties__"] = properties.set;
         }
         
@@ -205,7 +205,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         else {
             $('.js-advice-various-osfs').show();
         }
-
+        
         var params = {
             'action': 'tag_tiny_list',
             'startingOptions': {
@@ -237,7 +237,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         
         var arguments = {};
         
-        if (properties.delete.length > 0 || !$.isEmptyObject(properties.set)) {
+        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('vm.update-massive.properties')) {
             arguments["__properties_changes__"] = properties;
         }
         
@@ -248,7 +248,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         
         var filters = {"id": id};
         
-        if (description != '' && Wat.C.checkACL(this.qvdObj + '.update-massive.description')) {
+        if (description != '' && Wat.C.checkACL('vm.update-massive.description')) {
             arguments["description"] = description;
         }
         

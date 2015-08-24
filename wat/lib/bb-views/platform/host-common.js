@@ -38,7 +38,7 @@ Wat.Common.BySection.host = {
             arguments['address'] = address;
         }
 
-        if (properties.delete.length > 0 || !$.isEmptyObject(properties.set)) {
+        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('host.update.properties')) {
             arguments["__properties_changes__"] = properties;
         }
         

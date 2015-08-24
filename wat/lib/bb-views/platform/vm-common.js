@@ -39,7 +39,7 @@ Wat.Common.BySection.vm = {
             arguments['di_tag'] = di_tag;
         }
         
-        if (properties.delete.length > 0 || !$.isEmptyObject(properties.set)) {
+        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL(this.qvdObj + 'vm.update.properties')) {
             arguments["__properties_changes__"] = properties;
         }
         

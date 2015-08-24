@@ -35,7 +35,7 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
             "blocked": blocked ? 1 : 0
         };
         
-        if (!$.isEmptyObject(properties.set)) {
+        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('user.create.properties')) {
             arguments["__properties__"] = properties.set;
         }
         

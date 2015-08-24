@@ -9,9 +9,7 @@ Wat.I.listFields[qvdObj] = {
             'host.delete-massive.',
             'host.update-massive.block',
             'host.update-massive.stop-vms',
-            'host.update-massive.properties-create',
-            'host.update-massive.properties-update',
-            'host.update-massive.properties-delete'
+            'host.update-massive.properties'
         ],
         'aclsLogic': 'OR',
         'fixed': true,

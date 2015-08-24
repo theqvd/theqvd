@@ -36,7 +36,7 @@ Wat.Views.HostListView = Wat.Views.ListView.extend({
             "blocked": blocked ? 1 : 0
         };
         
-        if (!$.isEmptyObject(properties.set)) {
+        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('host.create.properties')) {
             arguments["__properties__"] = properties.set;
         }
         

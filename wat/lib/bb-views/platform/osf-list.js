@@ -47,7 +47,7 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
             arguments['user_storage'] = user_storage;
         }
         
-        if (!$.isEmptyObject(properties.set)) {
+        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('osf.create.properties')) {
             arguments["__properties__"] = properties.set;
         }
         
@@ -81,7 +81,7 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
         
         var arguments = {};
         
-        if (properties.delete.length > 0 || !$.isEmptyObject(properties.set)) {
+        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('osf.update-massive.properties')) {
             arguments["__properties_changes__"] = properties;
         }
         
