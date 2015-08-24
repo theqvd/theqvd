@@ -117,12 +117,12 @@ user_get_property_list => {type_of_action => 'list',
 
 user_create_property_list => { type_of_action => 'create',
 		 admin4method => 'create',
-		 acls => [qr/^user\.update\.properties-create$/],
+		 acls => [qr/^property\.manage\.user$/],
 		 qvd_object => 'User_Property_List'},
 
 user_delete_property_list => { type_of_action => 'delete',
 		 admin4method => 'delete',
-		 acls => [qr/^user\.update\.properties-delete$/],
+		 acls => [qr/^property\.manage\.user$/],
 		 qvd_object => 'User_Property_List'},
 
 vm_get_list => { type_of_action => 'list',
@@ -188,12 +188,12 @@ vm_get_property_list => {type_of_action => 'list',
 
 vm_create_property_list => { type_of_action => 'create',
 		 admin4method => 'create',
-		 acls => [qr/^vm\.update\.properties-create$/],
+		 acls => [qr/^property\.manage\.vm$/],
 		 qvd_object => 'VM_Property_List'},
 
 vm_delete_property_list => { type_of_action => 'delete',
 		 admin4method => 'delete',
-		 acls => [qr/^vm\.update\.properties-delete$/],
+		 acls => [qr/^property\.manage\.vm$/],
 		 qvd_object => 'VM_Property_List'},
 
 host_get_list => { type_of_action => 'list',
@@ -244,12 +244,12 @@ host_get_property_list => {type_of_action => 'list',
 
 host_create_property_list => { type_of_action => 'create',
 		 admin4method => 'create',
-		 acls => [qr/^host\.update\.properties-create$/],
+		 acls => [qr/^property\.manage\.host$/],
 		 qvd_object => 'Host_Property_List'},
 
 host_delete_property_list => { type_of_action => 'delete',
 		 admin4method => 'delete',
-		 acls => [qr/^host\.update\.properties-delete$/],
+		 acls => [qr/^property\.manage\.host$/],
 		 qvd_object => 'Host_Property_List'},
 
 osf_get_list => { type_of_action => 'list',
@@ -295,12 +295,12 @@ osf_get_property_list => {type_of_action => 'list',
 
 osf_create_property_list => { type_of_action => 'create',
 		 admin4method => 'create',
-		 acls => [qr/^osf\.update\.properties-create$/],
+		 acls => [qr/^property\.manage\.osf$/],
 		 qvd_object => 'OSF_Property_List'},
 
 osf_delete_property_list => { type_of_action => 'delete',
 		 admin4method => 'delete',
-		 acls => [qr/^osf\.update\.properties-delete$/],
+		 acls => [qr/^property\.manage\.osf$/],
 		 qvd_object => 'OSF_Property_List'},
 
 di_get_list => { type_of_action => 'list',
@@ -346,12 +346,12 @@ di_get_property_list => {type_of_action => 'list',
 
 di_create_property_list => { type_of_action => 'create',
 		 admin4method => 'create',
-		 acls => [qr/^di\.update\.properties-create$/],
+		 acls => [qr/^property\.manage\.di$/],
 		 qvd_object => 'DI_Property_List'},
 
 di_delete_property_list => { type_of_action => 'delete',
 		 admin4method => 'delete',
-		 acls => [qr/^di\.update\.properties-delete$/],
+		 acls => [qr/^property\.manage\.di$/],
 		 qvd_object => 'DI_Property_List'},
 
 tag_tiny_list => { type_of_action => 'tiny',

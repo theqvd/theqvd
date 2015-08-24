@@ -29,6 +29,12 @@ sub property_id
     $self->id;
 }
 
+sub description 
+{
+    my $self = shift;
+    $self->description;
+}
+
 sub in_user 
 { 
     my $args = shift; 

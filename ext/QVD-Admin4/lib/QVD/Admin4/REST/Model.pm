@@ -265,8 +265,7 @@ my $ACLS_FOR_ARGUMENTS_IN_UPDATE =
     User => { password => [qr/^user\.update\.password$/],
 	      blocked => [qr/^user\.update\.block$/],
 	      description => [qr/^user\.update\.description$/],
-	      __properties_changes_set => [qr/^user\.update\.properties-(cre|upd)ate$/],
-	      __properties_changes_delete => [qr/^user\.update\.properties-delete$/]},
+	      __properties_changes_set => [qr/^user\.update\.properties$/]},
 
     VM => { '***start***' => [qr/^vm\.update\.state$/], 
 	    '***stop***' => [qr/^(vm\.update\.state|host\.update\.stop-vms)$/],
@@ -277,27 +276,23 @@ my $ACLS_FOR_ARGUMENTS_IN_UPDATE =
 	    expiration_hard => [qr/^vm\.update\.expiration$/],
 	    di_tag => [qr/^vm\.update\.di-tag$/],
 	    description => [qr/^vm\.update\.description$/],
-	    __properties_changes__set => [qr/^vm\.update\.properties-(cre|upd)ate$/],
-	    __properties_changes__delete => [qr/^vm\.update\.properties-delete$/] },
+	    __properties_changes__set => [qr/^vm\.update\.properties$/] },
 
     Host => { name => [qr/^host\.update\.name$/],
 	      address => [qr/^host\.update\.address$/],
 	      blocked => [qr/^host\.update\.block$/],
 	      description => [qr/^host\.update\.description$/],
-	      __properties_changes__set => [qr/^host\.update\.properties-(cre|upd)ate$/],
-	      __properties_changes__delete => [qr/^host\.update\.properties-delete$/] },
+	      __properties_changes__set => [qr/^host\.update\.properties$/] },
 
     OSF => { name => [qr/^osf\.update\.name$/],
 	     memory => [qr/^osf\.update\.memory$/],
 	     user_storage => [qr/^osf\.update\.user-storage$/],
 	     description => [qr/^osf\.update\.description$/],
-	     __properties_changes__set => [qr/^osf\.update\.properties-(cre|upd)ate$/],
-	     __properties_changes__delete => [qr/^osf\.update\.properties-delete$/] },
+	     __properties_changes__set => [qr/^osf\.update\.properties$/] },
 
     DI => { blocked => [qr/^di\.update\.block$/],
 	    description => [qr/^di\.update\.description$/],
-	    __properties_changes__set => [qr/^di\.update\.properties-(cre|upd)ate$/],
-	    __properties_changes__delete => [qr/^di\.update\.properties-delete$/],
+	    __properties_changes__set => [qr/^di\.update\.properties$/],
 	    __tags_changes__create => [qr/^(di\.update\.(tags|defaults)|osf\.see\.di-list-default-update)$/],
 	    __tags_changes__delete => [qr/^(di\.update\.(tags|defaults)|osf\.see\.di-list-default-update)$/]},
 
@@ -332,8 +327,7 @@ my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE =
     User => { '***delete***' => [qr/^user\.delete-massive\.$/], # MAYBE A NEW VARIABLE?
 	      blocked => [qr/^user\.update-massive\.block$/],
 	      description => [qr/^user\.update-massive\.description$/],
-	      __properties_changes__set => [qr/^user\.update-massive\.properties-(cre|upd)ate$/],
-	      __properties_changes__delete => [qr/^user\.update-massive\.properties-delete$/]},
+	      __properties_changes__set => [qr/^user\.update-massive\.properties$/]},
 
     VM => { '***delete***' => [qr/^vm\.delete-massive\.$/],
 	    '***start***' => [qr/^vm\.update-massive\.state$/], 
@@ -782,7 +776,7 @@ my $AVAILABLE_ARGUMENTS = { Config => [qw(value)],
 # Available arguments for creation actions
 
 my $MANDATORY_ARGUMENTS = { Config => [qw(key value)],
-			    User => [qw(tenant_id name password blocked description)],
+			    User => [qw(tenant_id name password blocked)],
 			    VM => [qw(name user_id ip osf_id di_tag state user_state blocked)],
 			    Host => [qw(name address frontend backend blocked state)],
 			    OSF => [qw(tenant_id name memory overlay user_storage)],
@@ -1251,7 +1245,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'properties' => 'view.properties',
 	'creation_date' => 'creation_log_entry.time',
 	'creation_admin_id' => 'creation_log_entry.administrator_id',
-	'creation_admin_name' => 'creation_log_entry.administrator_name',
+	'creation_admin_name' => 'creation_log_entry.administrator_name'
     },
 
     DI_Tag => {
