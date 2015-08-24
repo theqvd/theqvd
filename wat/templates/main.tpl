@@ -44,6 +44,16 @@
         </div>
 </div>
 <div class="wrapper">
+    <div class="server-datetime-wrapper">
+        <div style="display: none;">
+            <i class="fa fa-calendar"></i>
+            <span class="js-server-date second_row"><%= HTML_MINI_LOADING %></span>
+        </div>
+        <div data-i18n="[title]Server's time">
+            <i class="fa fa-clock-o"></i>
+            <span class="js-server-time second_row"><%= HTML_MINI_LOADING %></span>
+        </div>
+    </div>
     <div class="bb-menu"></div>
     <div class="content bb-content js-content"></div>
     <div class="loading"><i class="fa fa-gear fa-spin"></i></div>

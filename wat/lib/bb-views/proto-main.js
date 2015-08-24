@@ -48,6 +48,24 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     beforeRender: function () {
+        // Get timestamp from configuration and print on interface
+        var d = new Date (Wat.C.serverDatetime);
+        var date = d.toString().slice(0, 15);
+        var time = d.toString().slice(16, 24);
+        $('.js-server-date').html(date);
+        $('.js-server-time').html(time);
+        
+        // Create a loop to update timestamp every second
+        setInterval(function(){
+            var currentDatetime = $('.js-server-date').html() + ' ' + $('.js-server-time').html();
+            var currentUnixTimestamp = Math.round(new Date(currentDatetime).getTime()/1000);
+            currentUnixTimestamp++;
+            var d = new Date (currentUnixTimestamp*1000);
+            var date = d.toString().slice(0, 15);
+            var time = d.toString().slice(16, 24);
+            $('.js-server-date').html(date);
+            $('.js-server-time').html(time);
+        }, 1000);
     },
     
     afterRender: function () {

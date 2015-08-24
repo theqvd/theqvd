@@ -364,3 +364,14 @@ span.text {
     }
 }
 
+.server-datetime-wrapper {
+    position: fixed;
+    right: 0;
+    top: 70px;
+    font-size: 12px;
+    padding: 7px 15px 4px 5px;
+    background: #eee;
+    border-bottom-left-radius: 8px;
+    border-top-left-radius: 8px;
+    z-index: 2;
+}

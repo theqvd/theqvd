@@ -229,6 +229,9 @@ Wat.C = {
         Wat.C.block = that.retrievedData.admin_block;
         Wat.C.tenantBlock = that.retrievedData.tenant_block;
         
+        // Store server datetime
+        Wat.C.serverDatetime = that.retrievedData.server_datetime;
+        
         // Restore possible residous views configuration to default values
         Wat.I.restoreListColumns();
         Wat.I.restoreFormFilters();
