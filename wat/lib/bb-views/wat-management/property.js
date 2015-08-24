@@ -130,8 +130,12 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
     },
     
     changeTenantSelect: function () {
+        var newSelectedTenant = $('select[name="tenant-select"]').val();
+        
+        this.selectedTenant = newSelectedTenant;
+        
         filters = {
-            "tenant_id": $('select[name="tenant-select"]').val(),
+            "tenant_id":  newSelectedTenant,
         };
         
         $('.bb-property-list').html(HTML_LOADING);
@@ -202,7 +206,6 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
     
     openNewElementDialog: function (e) {
         this.model = new Wat.Models.Property();
-        
         this.dialogConf.title = $.i18n.t('New property');
         Wat.Views.MainView.prototype.openNewElementDialog.apply(this, [e]);
     },
@@ -299,7 +302,6 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
         $.each(this.collection.models, function (iMod, mod) {
             if (mod.get('property_id') == propertyId) {
                 that.model = mod;
-                console.log(that.model);
             }
         });
         
@@ -311,6 +313,10 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
     },
     
     getLastId: function (that) {
+        if (that.retrievedData.status = STATUS_ELEMENT_ALREADY_EXISTS) {
+            return;
+        }
+        
         var lastId = that.retrievedData.rows[0].id;
         
         // Get all the properties orderer by id desc to get the last property created

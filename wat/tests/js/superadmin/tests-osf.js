@@ -113,7 +113,7 @@ function osfTestReal () {
                             var valRetrieved = WatTests.models.osf.attributes[fieldName];
 
                             if (fieldName == 'properties' && WatTests.values.osf['__properties__'] != undefined) {
-                                deepEqual(valRetrieved, WatTests.values.osf['__properties__'], "OSF field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
+                                deepEqual(valRetrieved, WatTests.valuesExpected.osf['__properties__'], "OSF field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
                             }
                             else if (WatTests.values.osf[fieldName] != undefined) {
                                 equal(valRetrieved, WatTests.values.osf[fieldName], "OSF field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");
@@ -125,6 +125,7 @@ function osfTestReal () {
 
                         // Perform changes in testing osf values
                         performUpdation(WatTests.values.osf, WatTests.updateValues.osf);
+                        WatTests.valuesExpected.osf['__properties__'] = convertPropsToExpected(WatTests.values.osf['__properties__']);
 
                         //////////////////////////////////////////////////////////////////
                         // After get list of osfs, update it
@@ -142,7 +143,7 @@ function osfTestReal () {
                                         var valRetrieved = WatTests.models.osf.attributes[fieldName];
 
                                         if (fieldName == 'properties' && WatTests.values.osf['__properties__'] != undefined) {
-                                            deepEqual(valRetrieved, WatTests.values.osf['__properties__'], "OSF field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
+                                            deepEqual(valRetrieved, WatTests.valuesExpected.osf['__properties__'], "OSF field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
                                         }
                                         else if (WatTests.values.osf[fieldName] != undefined) {
                                             equal(valRetrieved, WatTests.values.osf[fieldName], "OSF field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");

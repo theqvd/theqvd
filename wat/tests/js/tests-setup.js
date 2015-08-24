@@ -4,6 +4,21 @@
 // Override configuration constants
 APP_PATH = '../';
 
+// Id of prop1, prop2 and propN properties. This id is in test machine DB. If changes, test will fail
+var propertyIDs = {
+    prop1: 185,
+    prop2: 197,
+    prop3: 201,
+    propN: 198
+};
+
+var propertyNames = {
+    185: "prop1",
+    197: "prop2",
+    201: "prop3",
+    198: "propN"
+};
+
 WatTests = {};
 
 WatTests.models = {
@@ -132,16 +147,37 @@ WatTests.values = {
             "tenant_id": 1
         }
     };
+
+WatTests.valuesExpected = {};
+
+// Replace properties by IDs
+$.each(WatTests.values, function (iVal, val) {
+    if (val['__properties__']) {
+        WatTests.valuesExpected[iVal] = { 
+            '__properties__': {}
+        };
+        
+        $.each(val['__properties__'], function (pName, pValue) {
+            WatTests.values[iVal]['__properties__'][propertyIDs[pName]] = pValue;
+        
+            WatTests.valuesExpected[iVal]['__properties__'][propertyIDs[pName]] = {
+                key: pName,
+                tenant_id: 1,
+                value: pValue
+            }
+                        
+            delete WatTests.values[iVal]['__properties__'][pName];
+        });
+    }
+});
+
 WatTests.updateValues = {
         user: {
             "__properties_changes__" : {
                 "set": {
                     "prop3": getRandomStr(), // Add new property
                     "propN": getRandomStr()  // Update property
-                },
-                "delete": [
-                    "prop2" // Delete property
-                ]
+                }
             },
             "blocked": WatTests.values.user.blocked ? 0 : 1, // Change blocked status
             "description": getRandomStr(),
@@ -152,10 +188,7 @@ WatTests.updateValues = {
                 "set": {
                     "prop3": getRandomStr(), // Add new property
                     "propN": getRandomStr()  // Update property
-                },
-                "delete": [
-                    "prop2" // Delete property
-                ]
+                }
             },
             "name": getRandomStr(),
             "blocked": WatTests.values.user.blocked ? 0 : 1, // Change blocked status
@@ -168,10 +201,7 @@ WatTests.updateValues = {
                 "set": {
                     "prop3": getRandomStr(), // Add new property
                     "propN": getRandomStr()  // Update property
-                },
-                "delete": [
-                    "prop2" // Delete property
-                ]
+                }
             },
             "name": getRandomStr(),
             "description": getRandomStr(),
@@ -183,10 +213,7 @@ WatTests.updateValues = {
                 "set": {
                     "prop3": getRandomStr(), // Add new property
                     "propN": getRandomStr()  // Update property
-                },
-                "delete": [
-                    "prop2" // Delete property
-                ]
+                }
             },
             "__tags_changes__" : {
                 "create": [
@@ -226,6 +253,16 @@ WatTests.updateValues = {
             }
         }
     };
+
+// Replace properties by IDs
+$.each(WatTests.updateValues, function (iVal, val) {
+    if (val['__properties_changes__']) {
+        $.each(val['__properties_changes__']['set'], function (pName, pValue) {
+            WatTests.updateValues[iVal]['__properties_changes__']['set'][propertyIDs[pName]] = pValue;
+            delete WatTests.updateValues[iVal]['__properties_changes__']['set'][pName];
+        });
+    }
+});
 
 // Calculate random string for DI version here because will be assigned to two fields
 var di_version = getRandomStr();

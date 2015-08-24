@@ -110,7 +110,7 @@ function userTestReal () {
                             var valRetrieved = WatTests.models.user.attributes[fieldName];
 
                             if (fieldName == 'properties' && WatTests.values.user['__properties__'] != undefined) {
-                                deepEqual(valRetrieved, WatTests.values.user['__properties__'], "User field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
+                                deepEqual(valRetrieved, WatTests.valuesExpected.user['__properties__'], "User field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
                             }
                             else if (WatTests.values.user[fieldName] != undefined) {
                                 equal(valRetrieved, WatTests.values.user[fieldName], "User field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");
@@ -122,6 +122,7 @@ function userTestReal () {
 
                         // Perform changes in testing user values
                         performUpdation(WatTests.values.user, WatTests.updateValues.user);
+                        WatTests.valuesExpected.user['__properties__'] = convertPropsToExpected(WatTests.values.user['__properties__']);
 
                         //////////////////////////////////////////////////////////////////
                         // After get list of users, update it
@@ -137,9 +138,8 @@ function userTestReal () {
                                     WatTests.values.user.id = WatTests.models.user.attributes['id'];
                                     $.each (WatTests.fakeValues.user, function (fieldName) {
                                         var valRetrieved = WatTests.models.user.attributes[fieldName];
-
                                         if (fieldName == 'properties' && WatTests.values.user['__properties__'] != undefined) {
-                                            deepEqual(valRetrieved, WatTests.values.user['__properties__'], "User field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
+                                            deepEqual(valRetrieved, WatTests.valuesExpected.user['__properties__'], "User field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
                                         }
                                         else if (WatTests.values.user[fieldName] != undefined) {
                                             equal(valRetrieved, WatTests.values.user[fieldName], "User field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");

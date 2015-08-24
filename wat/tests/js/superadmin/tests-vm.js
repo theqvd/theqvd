@@ -181,7 +181,7 @@ function vmTestReal () {
                                         var valRetrieved = WatTests.models.vm.attributes[fieldName];
 
                                         if (fieldName == 'properties' && WatTests.values.vm['__properties__'] != undefined) {
-                                            deepEqual(valRetrieved, WatTests.values.vm['__properties__'], "Virtual machine field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
+                                            deepEqual(valRetrieved, WatTests.valuesExpected.vm['__properties__'], "Virtual machine field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
                                         }
                                         else if (WatTests.values.vm[fieldName] != undefined) {
                                             equal(valRetrieved, WatTests.values.vm[fieldName], "Virtual machine field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");
@@ -193,6 +193,7 @@ function vmTestReal () {
 
                                     // Perform changes in testing virtual machine values
                                     performUpdation(WatTests.values.vm, WatTests.updateValues.vm);
+                                    WatTests.valuesExpected.vm['__properties__'] = convertPropsToExpected(WatTests.values.vm['__properties__']);
 
                                     //////////////////////////////////////////////////////////////////
                                     // After get list of virtual machines, update it
@@ -210,7 +211,7 @@ function vmTestReal () {
                                                     var valRetrieved = WatTests.models.vm.attributes[fieldName];
 
                                                     if (fieldName == 'properties' && WatTests.values.vm['__properties__'] != undefined) {
-                                                        deepEqual(valRetrieved, WatTests.values.vm['__properties__'], "Virtual machine field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
+                                                        deepEqual(valRetrieved, WatTests.valuesExpected.vm['__properties__'], "Virtual machine field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
                                                     }
                                                     else if (WatTests.values.vm[fieldName] != undefined) {
                                                         equal(valRetrieved, WatTests.values.vm[fieldName], "Virtual machine '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");

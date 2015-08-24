@@ -146,7 +146,7 @@ function diTestReal () {
                                 var valRetrieved = WatTests.models.di.attributes[fieldName];
 
                                 if (fieldName == 'properties' && WatTests.values.di['__properties__'] != undefined) {
-                                    deepEqual(valRetrieved, WatTests.values.di['__properties__'], "DI field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
+                                    deepEqual(valRetrieved, WatTests.valuesExpected.di['__properties__'], "DI field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
                                 }
                                 else if (WatTests.values.di[fieldName] != undefined) {
                                     
@@ -165,6 +165,7 @@ function diTestReal () {
 
                             // Perform changes in testing osf values
                             performUpdation(WatTests.values.di, WatTests.updateValues.di);
+                            WatTests.valuesExpected.di['__properties__'] = convertPropsToExpected(WatTests.values.di['__properties__']);
 
                             //////////////////////////////////////////////////////////////////
                             // After get list of DIs, update it
@@ -182,7 +183,7 @@ function diTestReal () {
                                             var valRetrieved = WatTests.models.di.attributes[fieldName];
 
                                             if (fieldName == 'properties' && WatTests.values.di['__properties__'] != undefined) {
-                                                deepEqual(valRetrieved, WatTests.values.di['__properties__'], "DI field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
+                                                deepEqual(valRetrieved, WatTests.valuesExpected.di['__properties__'], "DI field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
                                             }
                                             else if (WatTests.values.di[fieldName] != undefined) {
                                                 if (fieldName == 'disk_image') {

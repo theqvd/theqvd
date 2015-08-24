@@ -108,7 +108,7 @@ function hostTestReal () {
                             var valRetrieved = WatTests.models.host.attributes[fieldName];
 
                             if (fieldName == 'properties' && WatTests.values.host['__properties__'] != undefined) {
-                                deepEqual(valRetrieved, WatTests.values.host['__properties__'], "Host field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
+                                deepEqual(valRetrieved, WatTests.valuesExpected.host['__properties__'], "Host field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
                             }
                             else if (WatTests.values.host[fieldName] != undefined) {
                                 equal(valRetrieved, WatTests.values.host[fieldName], "Host field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");
@@ -120,6 +120,7 @@ function hostTestReal () {
 
                         // Perform changes in testing host values
                         performUpdation(WatTests.values.host, WatTests.updateValues.host);
+                        WatTests.valuesExpected.host['__properties__'] = convertPropsToExpected(WatTests.values.host['__properties__']);
 
                         //////////////////////////////////////////////////////////////////
                         // After get list of hosts, update it
@@ -137,7 +138,7 @@ function hostTestReal () {
                                         var valRetrieved = WatTests.models.host.attributes[fieldName];
 
                                         if (fieldName == 'properties' && WatTests.values.host['__properties__'] != undefined) {
-                                            deepEqual(valRetrieved, WatTests.values.host['__properties__'], "Host field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
+                                            deepEqual(valRetrieved, WatTests.valuesExpected.host['__properties__'], "Host field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
                                         }
                                         else if (WatTests.values.host[fieldName] != undefined) {
                                             equal(valRetrieved, WatTests.values.host[fieldName], "Host field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");
