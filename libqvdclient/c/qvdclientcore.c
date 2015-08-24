@@ -185,7 +185,7 @@ void qvd_free(qvdclient *qvd) {
 
 vmlist *qvd_list_of_vm(qvdclient *qvd) {
   char url[MAX_BASEURL];
-  int i;
+  size_t i;
   long http_code = 0;
   json_error_t error;
   char *command = "/qvd/list_of_vm";
@@ -249,9 +249,9 @@ vmlist *qvd_list_of_vm(qvdclient *qvd) {
   qvd_printf("No error and no auth error after curl_easy_perform\n");
 
   json_t *vmList = json_loads(qvd->buffer.data, 0, &error);
-  int arrayLength = json_array_size(vmList);
+  size_t arrayLength = json_array_size(vmList);
   qvd->numvms = arrayLength;
-  qvd_printf("VMs available: %d\n", qvd->numvms);
+  qvd_printf("VMs available: %lld\n", qvd->numvms);
 
   QvdVmListFree(qvd->vmlist);
   if (!(qvd->vmlist = malloc(sizeof(vmlist)))) {
@@ -262,7 +262,7 @@ vmlist *qvd_list_of_vm(qvdclient *qvd) {
 
   for (i = 0; i < arrayLength; i++) {
     json_t *obj = json_array_get(vmList, i);
-    int id, blocked;
+    json_int_t id, blocked;
     char *name, *state;
     json_unpack(obj, "{s:i,s:s,s:i,s:s}",
 		"id", &id,

@@ -212,12 +212,12 @@ void print_vmids(vmlist *vm)
   vmlist *ptr;
   printf("List of vms:\n");
   for (ptr=vm; ptr != NULL; ptr = ptr->next)
-    printf("VM ID:%d NAME:%s STATE:%s BLOCKED:%d\n",
+    printf("VM ID:%" PRIi64 " NAME:%s STATE:%s BLOCKED:%" PRIi64 "\n",
 	   ptr->data->id, ptr->data->name, ptr->data->state, ptr->data->blocked);
 }
 int choose_vmid(vmlist *vm)
 {
-  int vm_id = -1;
+  int64_t vm_id = -1;
   vmlist *ptr;
 
   while (vm_id == -1)
@@ -225,11 +225,11 @@ int choose_vmid(vmlist *vm)
       print_vmids(vm);
 
       printf("Choose vmid: ");
-      scanf("%d", &vm_id);
+      scanf("%" SCNi64 "", &vm_id);
       for (ptr=vm; ptr != NULL; ptr = ptr->next)
 	if (ptr->data->id == vm_id)
 	  {
-	    printf("You have chosen VM ID:%d NAME:%s STATE:%s BLOCKED:%d\n",
+	    printf("You have chosen VM ID:%" PRIi64 " NAME:%s STATE:%s BLOCKED:%" PRIi64 "\n",
 		   ptr->data->id, ptr->data->name, ptr->data->state, ptr->data->blocked);
 	    return vm_id;
 	  }
@@ -253,7 +253,7 @@ int _set_display_if_not_set(qvdclient *qvd) {
 }
 
 int qvd_connection(const char *host, int port, const char *user, const char *pass, const char *geometry, int fullscreen, int only_list_of_vm, int one_vm, int no_cert_check, int restart_session, const char *nx_options, const char *client_cert, const char *client_key) {
-  int vm_id;
+  int64_t vm_id;
   qvdclient *qvd;
 
   qvd = qvd_init(host, port, user, pass);
@@ -297,7 +297,7 @@ int qvd_connection(const char *host, int port, const char *user, const char *pas
   if (one_vm || qvd->numvms == 1)
     {
       vm_id = qvd->vmlist->data->id;
-      printf("Connecting to the first vm: vm_id %d\n", vm_id);
+      printf("Connecting to the first vm: vm_id %" PRIi64 "\n", vm_id);
     }
   else
     {
@@ -305,7 +305,7 @@ int qvd_connection(const char *host, int port, const char *user, const char *pas
     }
   if (vm_id < 0)
     {
-      printf("Error choosing vm_id: %d\n", vm_id);
+      printf("Error choosing vm_id: %" PRIi64 "\n", vm_id);
       return 6;
     }
 
