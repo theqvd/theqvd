@@ -1043,8 +1043,6 @@ Wat.I = {
     },
     
     startServerClock: function () {
-        console.log(Wat.C.serverTimeUpdater);
-        console.log(Wat.C.serverDatetime);
         if (Wat.C.serverTimeUpdater == undefined && Wat.C.serverDatetime) {
             // Get timestamp from configuration and print on interface
             var d = new Date (Wat.C.serverDatetime);
