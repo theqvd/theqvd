@@ -102,7 +102,7 @@ struct qvdclientstruct {
   char userpwd[MAX_USERPWD];
   char authdigest[MAX_AUTHDIGEST];
   char baseurl[MAX_BASEURL];
-  size_t numvms;
+  int64_t numvms;
   vmlist *vmlist;
   QvdBuffer buffer;
   char link[MAX_LINK];
