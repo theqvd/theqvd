@@ -16,7 +16,7 @@
 #include "qvdbuffer.h"
 #define QVDVERSION 121
 #define QVDABOUT "Version: 1.2.1. $Id$"
-#define QVDCHANGELOG "1.2.1 25/08/2015 Improve Janson code for 64 bit arm\n" \
+#define QVDCHANGELOG "1.2.1 25/08/2015 Improve Janson code for 64 bit arm, update openssl to 1.0.2d\n" \
                      "1.2.0 07/05/2015 Improve Select on write file descriptors\n" \
                      "1.1.9 06/05/2015 Use NXTransCleanupForReconnect for IOS\n" \
                      "1.1.8 06/05/2015 Include nxcomp version in the -v flag\n" \
