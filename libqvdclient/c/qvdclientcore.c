@@ -248,10 +248,16 @@ vmlist *qvd_list_of_vm(qvdclient *qvd) {
     }
   qvd_printf("No error and no auth error after curl_easy_perform\n");
 
-  json_t *vmList = json_loads(qvd->buffer.data, 0, &error);
-  int64_t arrayLength = json_array_size(vmList);
+  json_t *vmList = json_loads(qvd->buffer.data+qvd->buffer.offset, 0, &error);
+  if (vmList == NULL)
+    {
+      qvd_error(qvd, "Error parsing JSON string: %s", qvd->buffer.data+qvd->buffer.offset);
+      return NULL;
+    }
+  size_t arrayLength = json_array_size(vmList);
   qvd->numvms = arrayLength;
   qvd_printf("VMs available: %" PRIi64 "\n", qvd->numvms);
+  qvd_printf("VMs availabble JSON detail: %s\n", qvd->buffer.data+qvd->buffer.offset);
 
   QvdVmListFree(qvd->vmlist);
   if (!(qvd->vmlist = malloc(sizeof(vmlist)))) {
