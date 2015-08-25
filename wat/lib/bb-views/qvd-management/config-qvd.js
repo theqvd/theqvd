@@ -43,7 +43,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         this.model = new Wat.Models.Admin(params);
                     
         var templates = {
-            editorNew: {
+            editorNew_config: {
                 name: 'creator/conf-token'
             },
             qvdConfig: {

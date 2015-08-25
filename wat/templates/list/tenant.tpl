@@ -19,7 +19,7 @@
                         case 'checks':
                             var checkedAttr = selectedAll ? 'checked' : '';
             %>
-                            <th class="<%= sortAttr %> max-1-icons">
+                            <th class="<%= sortAttr %> max-1-icons cell-check">
                                 <input type="checkbox" class="check_all" <%= checkedAttr %>>
                             </th>
             <%
@@ -90,7 +90,7 @@
                                 var checkedAttr = $.inArray(parseInt(model.get('id')), selectedItems) > -1 ? 'checked' : '';
 
                 %>
-                                <td>
+                                <td class="cell-check">
                                     <input type="checkbox" class="check-it js-check-it" data-id="<%= model.get('id') %>" <%= checkedAttr %>>
                                 </td>
                 <%

@@ -137,6 +137,12 @@ Wat.B = {
                 $(firstLink).trigger('click');
             }
         });
+        this.bindEvent('click', 'td.cell-check, th.cell-check', function (e) { 
+            var firstCheckbox = $(e.target).find('input[type="checkbox"]')[0];
+            if (firstCheckbox) {
+                $(firstCheckbox).trigger('click');
+            }
+        });
     },
     
     bindLoginEvents: function () {

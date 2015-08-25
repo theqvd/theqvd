@@ -50,31 +50,31 @@ switch (selectedObj) {
     </tr>
     <tr>
         <td data-i18n="Users"></td>
-        <td>
+        <td class="cell-check">
             <input type="checkbox" name="in_user" value="1" <%= checkedUser %>>
         </td>
     </tr>
     <tr>
         <td data-i18n="Virtual machines"></td>
-        <td>
+        <td class="cell-check">
             <input type="checkbox" name="in_vm" value="1" <%= checkedVM %>>
         </td>
     </tr>
     <tr>
         <td data-i18n="Nodes"></td>
-        <td>
+        <td class="cell-check">
             <input type="checkbox" name="in_host" value="1" <%= checkedHost %>>
         </td>
     </tr>
     <tr>
         <td data-i18n="OS Flavours"></td>
-        <td>
+        <td class="cell-check">
             <input type="checkbox" name="in_osf" value="1" <%= checkedOSF %>>
         </td>
     </tr>
     <tr>
         <td data-i18n="Disk images"></td>
-        <td>
+        <td class="cell-check">
             <input type="checkbox" name="in_di" value="1" <%= checkedDI %>>
         </td>
     </tr>

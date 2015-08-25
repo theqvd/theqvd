@@ -29,7 +29,7 @@
                     return;
                 }
             %>
-                <td data-role-template-cell="<%= rTS %> <%= rTA %>">
+                <td data-role-template-cell="<%= rTS %> <%= rTA %>" class="cell-check">
                     <input type="checkbox" class="add-template-button js-add-template-button" <%= template.inherited ? 'checked="checked"' : '' %> data-i18n="[title]<%= rTS %> <%= rTA %>" data-role-template-id="<%= template.id %>">
                 </td>
             <%
@@ -41,13 +41,13 @@
     %>
         <tr>
             <th>Master</th>
-            <td colspan=7 data-role-template-cell="Master">
+            <td colspan=7 data-role-template-cell="Master" class="cell-check">
             <input type="checkbox" class="add-template-button js-add-template-button" <%= templates["Master"].inherited ? 'checked="checked"' : '' %> title="Master" data-role-template-id="<%= templates["Master"].id %>">
             </td>
         </tr>
         <tr>
             <th>Total Master</th>
-            <td colspan=7 data-role-template-cell="Total Master">
+            <td colspan=7 data-role-template-cell="Total Master" class="cell-check">
                 <input type="checkbox" class="add-template-button js-add-template-button" <%= templates["Total Master"].inherited ? 'checked="checked"' : '' %> title="Total Master" data-role-template-id="<%= templates["Total Master"].id %>">
             </td>
         </tr>

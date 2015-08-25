@@ -61,7 +61,7 @@
     %>
     <tr>
         <td data-i18n="Default"></td>
-        <td>
+        <td class="cell-check">
              <input type="checkbox" name="default" value="1">
         </td>
     </tr>

@@ -59,12 +59,12 @@ Wat.I.menuSetupOriginal = {
         icon: CLASS_ICON_TENANTS 
     },
     views: {
-        text: 'Default views',
+        text: 'Views',
         link: '#/views',
         icon: CLASS_ICON_VIEWS
     },
     properties: {
-        text: 'Custom properties',
+        text: 'Properties',
         link: '#/properties',
         icon: CLASS_ICON_PROPERTIES
     },

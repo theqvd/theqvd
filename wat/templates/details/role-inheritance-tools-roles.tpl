@@ -10,7 +10,7 @@
     $.each(roles, function (iRole, role) {
         %>
             <tr>
-                <td class="center">
+                <td class="center cell-check">
                     <input type="checkbox" class="js-add-role-button" <%= role.inherited ? 'checked="checked"' : '' %> data-role-template-id="<%= role.id %>"/>
                 </td>
                 <td class="left">
