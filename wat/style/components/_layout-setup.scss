@@ -1,24 +1,32 @@
 .setup-side {
-    width: ($width_setup_side - 2) * 1%;
-    height: auto;
+    width: 100%;
+    @include in(desktop) {
+        width: ($width_setup_side - 2) * 1%;
+        height: auto;
 
-    @if $setup_side == left {
-        float: left;
-        padding-right: 2%;
-        margin-right: 2%;
-        border-right: 1px dotted darken($col_whiter, 15);
-    }
-    @else if $setup_side == right {
-        float: right;
-        padding-left: 2%;
-        margin-left: 2%;
-        border-left: 1px dotted darken($col_whiter, 15);
+        @if $setup_side == left {
+            float: left;
+            padding-right: 2%;
+            margin-right: 2%;
+            border-right: 1px dotted darken($col_whiter, 15);
+        }
+        @else if $setup_side == right {
+            float: right;
+            padding-left: 2%;
+            margin-left: 2%;
+            border-left: 1px dotted darken($col_whiter, 15);
+        }
     }
 }
 
 
 .setup-block {
-    width: ($width_setup_content - 2) * 1%;
+    width: 90%;
+    
+    @include in(desktop) {
+        width: ($width_setup_content - 2) * 1%;
+    }
+    
     height: auto;
 
     @if $setup_side == left {
@@ -33,6 +41,12 @@
     }
     
     margin-bottom: 60px;
+    
+    .sect2, .sect3 {
+        @include in(mobile) {
+            overflow: scroll;
+        }
+    }
 }
 
 .customize-section-selectors {

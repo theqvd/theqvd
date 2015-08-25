@@ -123,6 +123,8 @@ Wat.C = {
         this.sid = '';
         this.login = '';
         this.acls = [];
+        
+        Wat.I.stopServerClock();
     },
     
     // Process login including cookies creation

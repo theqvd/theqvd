@@ -34,6 +34,9 @@
 
             // Interface onfiguration
             Wat.I.renderMain();
+            
+            // Start server clock
+            Wat.I.startServerClock();
 
             //Wat.I.bindCornerMenuEvents();
             Wat.I.tooltipConfiguration();

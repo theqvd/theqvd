@@ -293,7 +293,9 @@ Wat.I = {
             $('.header-wrapper').css('visibility','visible').hide().fadeIn('fast');
             $('.js-content').css('visibility','visible').hide().fadeIn('fast');
             $('.breadcrumbs').css('visibility','visible').hide().fadeIn('fast');
-            $('.menu-corner').css('visibility','visible');
+            $('.js-menu-corner').css('visibility','visible');
+            $('.js-mobile-menu-hamburger').css('visibility','visible');
+            $('.js-server-datetime-wrapper').css('visibility','visible');
             $('.related-doc').css('visibility','visible');                
             $('.loading').show();
         }
@@ -476,7 +478,9 @@ Wat.I = {
             this.renderMenu();
         }
         else {
-            $('.menu-corner').hide();
+            $('.js-menu-corner').hide();
+            $('.js-mobile-menu-hamburger').hide();
+            $('.js-server-datetime-wrapper').hide();
         }
         
         this.updateLoginOnMenu();
@@ -1036,5 +1040,37 @@ Wat.I = {
             
             $(row).find('td.cell-link').addClass(type);
         });
+    },
+    
+    startServerClock: function () {
+        console.log(Wat.C.serverTimeUpdater);
+        console.log(Wat.C.serverDatetime);
+        if (Wat.C.serverTimeUpdater == undefined && Wat.C.serverDatetime) {
+            // Get timestamp from configuration and print on interface
+            var d = new Date (Wat.C.serverDatetime);
+            var date = d.toString().slice(0, 15);
+            var time = d.toString().slice(16, 24);
+            $('.js-server-date').html(date);
+            $('.js-server-time').html(time);
+        
+            // Create a loop to update timestamp every second
+            Wat.C.serverTimeUpdater = setInterval(function(){
+                var currentDatetime = $('.js-server-date').html() + ' ' + $('.js-server-time').html();
+                var currentUnixTimestamp = Math.round(new Date(currentDatetime).getTime()/1000);
+                currentUnixTimestamp++;
+                var d = new Date (currentUnixTimestamp*1000);
+                var date = d.toString().slice(0, 15);
+                var time = d.toString().slice(16, 24);
+                $('.js-server-date').html(date);
+                $('.js-server-time').html(time);
+            }, 1000);
+        }
+    },
+    
+    stopServerClock: function () {
+        $('.js-server-datetime-wrapper').hide();
+        clearInterval(Wat.C.serverTimeUpdater);
+        delete Wat.C.serverTimeUpdater;
+        delete Wat.C.serverDatetime;
     }
 }

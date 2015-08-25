@@ -1451,19 +1451,28 @@ body {
     .wrapper .content .execution-params {
       display: none; }
     .wrapper .content .setup-side {
-      width: 16%;
-      height: auto;
-      float: left;
-      padding-right: 2%;
-      margin-right: 2%;
-      border-right: 1px dotted #d7d7d7; }
+      width: 100%; }
+      @media screen and (min-width: 40em) {
+        .wrapper .content .setup-side {
+          width: 16%;
+          height: auto;
+          float: left;
+          padding-right: 2%;
+          margin-right: 2%;
+          border-right: 1px dotted #d7d7d7; } }
     .wrapper .content .setup-block {
-      width: 80%;
+      width: 90%;
       height: auto;
       float: right;
       padding-right: 2%;
       margin-right: 2%;
       margin-bottom: 60px; }
+      @media screen and (min-width: 40em) {
+        .wrapper .content .setup-block {
+          width: 80%; } }
+      @media only screen and (max-width: 40em) {
+        .wrapper .content .setup-block .sect2, .wrapper .content .setup-block .sect3 {
+          overflow: scroll; } }
     .wrapper .content .customize-section-selectors {
       display: table;
       table-layout: fixed;
