@@ -108,7 +108,8 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         'click .js-button-start-vm': 'startVM',
         'click .js-button-stop-vm': 'stopVM',
         'click .js-button-restart-vm': 'restartVM',
-        'click .js-button-disconnect-all-vms': 'applyDisconnectAll'
+        'click .js-button-disconnect-all-vms': 'applyDisconnectAll',
+        'click .js-show-details-actions': 'toggleActions'
     },
 
     render: function () {
@@ -207,6 +208,11 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             }
         }
         
+        // If there isnt action buttons, hide action show/hide button
+        if ($('.details-header').find('a.button').length == 0) {
+            $('.js-show-details-actions').hide();
+        }
+        
         Wat.T.translateAndShow();
         
         // Open websockets for live fields
@@ -236,6 +242,23 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     
     askDelete: function () {
         Wat.I.confirm('dialog/confirm-undone', this.applyDelete, this);
+    },
+    
+    toggleActions: function (e) {
+        $(e.target).parent().find('a.button').toggle();
+        
+        switch ($(e.target).attr('data-options-state')) {
+            case 'hidden':
+                $(e.target).attr('data-options-state', 'shown');
+                $(e.target).removeClass('fa-eye');
+                $(e.target).addClass('fa-eye-slash');
+                break;
+            case 'shown':
+                $(e.target).attr('data-options-state', 'hidden');
+                $(e.target).removeClass('fa-eye-slash');
+                $(e.target).addClass('fa-eye');
+                break;
+        }
     },
         
     applyDelete: function (that) {

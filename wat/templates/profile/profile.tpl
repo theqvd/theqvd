@@ -1,6 +1,11 @@
 <div class="details-header <%= cid %>">
     <span class="fa fa-user h1"><%= login %></span>
+    <div class="clear"></div>
+    <a class="button2 fright fa fa-eye js-show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>
+    
     <a class="button fright button-icon js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"></a>
+    
+    <div class="clear"></div>
 </div>
 
 <table class="details details-list col-width-100">

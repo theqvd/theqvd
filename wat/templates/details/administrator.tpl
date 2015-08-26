@@ -1,5 +1,8 @@
 <div class="details-header">
     <span class="fa fa-suitcase h1"><%= model.get('name') %></span>
+    <div class="clear mobile"></div>
+    <a class="button2 fright fa fa-eye js-show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>
+    
     <% if(Wat.C.checkACL('administrator.delete.')) { %>
     <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
     <% } %>
@@ -11,6 +14,8 @@
     <% if(Wat.C.checkACL('administrator.update.assign-role')) { %>
     <a class="button fright button-icon js-tools-roles-btn <%= CLASS_ICON_ROLES %>" href="javascript:" data-i18n="[title]Assign roles"></a>
     <% } %>
+    
+    <div class="clear"></div>
 </div>
 
 <table class="details details-list col-width-100">

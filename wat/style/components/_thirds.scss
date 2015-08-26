@@ -202,3 +202,12 @@ div.tagsinput span.tag a {
     height: 25px !important;
 }
 
+// Tooltip
+
+.ui-tooltip {
+    @include in(mobile) {
+        display: none;
+        visibility: hidden;
+    }
+}
+

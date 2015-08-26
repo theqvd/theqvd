@@ -10,6 +10,9 @@ if (Wat.C.checkACL('vm.see.state')) {
 
 <div class="details-header">
     <span class="fa fa-cloud h1"><%= model.get('name') %></span>
+    <div class="clear"></div>
+    <a class="button2 fright fa fa-eye js-show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>
+    
     <% if(Wat.C.checkACL('vm.delete.')) { %>
     <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
     <% } %>
@@ -23,12 +26,12 @@ if (Wat.C.checkACL('vm.see.state')) {
     if (Wat.C.checkACL('vm.update.state') && stateTableClass == 'hidden') {
         if (model.get('state') != 'stopped') { 
     %>
-            <a class="button fright button-icon js-button-stop-vm fa fa-stop fright" href="javascript:" data-i18n="[title]Stop" data-wsupdate="state-button" data-id="<%= model.get('id') %>"></a>
+        <a class="button fright button-icon js-button-stop-vm fa fa-stop fright" href="javascript:" data-i18n="[title]Stop" data-wsupdate="state-button" data-id="<%= model.get('id') %>"></a>
     <% 
         }
         else { 
     %>
-            <a class="button fright button-icon js-button-start-vm fa fa-play fright" href="javascript:" data-i18n="[title]Start" data-wsupdate="state-button" data-id="<%= model.get('id') %>"></a>
+        <a class="button fright button-icon js-button-start-vm fa fa-play fright" href="javascript:" data-i18n="[title]Start" data-wsupdate="state-button" data-id="<%= model.get('id') %>"></a>
     <% 
         }
     } 
@@ -57,6 +60,7 @@ if (Wat.C.checkACL('vm.see.state')) {
     }
     %>  
     
+    <div class="clear"></div>
 </div>
 
 <% 

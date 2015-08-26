@@ -1,5 +1,8 @@
 <div class="details-header">
     <span class="fa fa-dot-circle-o h1"><%= model.get('disk_image') %></span>
+    <div class="clear mobile"></div>
+    <a class="button2 fright fa fa-eye js-show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>
+        
     <% if(Wat.C.checkACL('di.delete.')) { %>
     <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
     <% } %>
@@ -26,6 +29,7 @@
     <a class="button fright button-icon js-button-default fa fa-home" href="javascript:" data-i18n="[title]Set by default"></a>
     <% } %>
     
+    <div class="clear mobile"></div>
 </div>
 
 <table class="details details-list <% if (!enabledProperties) { %> col-width-100 <% } %>">

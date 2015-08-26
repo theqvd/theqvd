@@ -1,5 +1,7 @@
 <div class="details-header">
     <span class="<%= CLASS_ICON_LOG %> h1"><%= model.get('time').replace('T', ' ') + ' - ' + i18n.t(LOG_TYPE_ACTIONS[model.get('type_of_action')]) + ' - ' + i18n.t(LOG_TYPE_OBJECTS[model.get('qvd_object')]) %></span>
+    
+    <div class="clear"></div>
 </div>
 
 

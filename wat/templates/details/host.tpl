@@ -1,5 +1,8 @@
 <div class="details-header">
     <span class="fa fa-hdd-o h1"><%= model.get('name') %></span>
+    <div class="clear"></div>
+    <a class="button2 fright fa fa-eye js-show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>
+    
     <% if(Wat.C.checkACL('host.delete.')) { %>
     <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
     <% } %>
@@ -22,6 +25,7 @@
     }
     %>
     
+    <div class="clear"></div>
 </div>
 
 <table class="details details-list <% if (!enabledProperties) { %> col-width-100 <% } %>">

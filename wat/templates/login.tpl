@@ -10,7 +10,7 @@
                 <div class="login-control">
                     <div data-i18n="Tenant"></div>
                     <div>
-                        <input type="text" name="admin_tenant" />
+                        <input type="text" name="admin_tenant"  autocomplete="on"/>
                     </div>
                 </div>
             <%
@@ -19,7 +19,7 @@
             <div class="login-control">
                 <div data-i18n="User"></div>
                 <div>
-                    <input type="text" name="admin_user" />
+                    <input type="text" name="admin_user" autocomplete="on"/>
                 </div>
             </div>
             <div class="login-control">

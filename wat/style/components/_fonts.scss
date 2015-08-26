@@ -47,8 +47,13 @@ table.expiration-table td, table.state-table td {
 
 .h1 {
     font-weight: normal;
+
+
+    @include font-size(2);
     
-    @include font-size(4);
+    @include in(desktop) {
+        @include font-size(4);
+    }
     
     .subtitle {
         font-weight: normal;   
@@ -62,7 +67,7 @@ table.expiration-table td, table.state-table td {
 
 // Buttons
 a, button.actions_button:before {
-    @include font-size(2);
+    @include font-size(1);
 }
 
 a.button, a.button2, button {

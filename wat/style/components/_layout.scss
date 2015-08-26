@@ -247,7 +247,12 @@ body {
         
         display: table;
         margin: 0 auto;
-        width: 100%;
+        
+        width: 96%;
+
+        @include in(desktop) {
+            width: 100%;
+        }
         
         // Different view layouts
         @import "layout-home";
@@ -367,11 +372,15 @@ span.text {
 .server-datetime-wrapper {
     position: fixed;
     right: 0;
-    top: 70px;
+    top: 60px;
     font-size: 12px;
     padding: 7px 15px 4px 5px;
     background: #eee;
     border-bottom-left-radius: 8px;
-    border-top-left-radius: 8px;
     z-index: 2;
+    opacity: 0.8;
+    
+    &.server-datetime-wrapper--mini {
+        top: 40px;
+    }
 }

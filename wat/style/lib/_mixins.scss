@@ -31,11 +31,11 @@
 // Layout
 @mixin width-wrapper {
     min-width: $min_width_mobile;
-    max-width: $max_width_mobile;
+    //max-width: $max_width_mobile;
 
     @include in(desktop) {
         min-width: $min_width_wrapper;
-        max-width: $max_width_wrapper;
+        //max-width: $max_width_wrapper;
     }
 }
 
@@ -237,12 +237,12 @@
     }
     
     >tbody:nth-child(2) tr:first-child {
-        td:first-child {
-            border-right: dotted 1px darken($col_whiter, 10);
+        td: first-child {
+            //border-right: dotted 1px darken($col_whiter, 10);
         }
         
         td {
-            border-top: dotted 1px darken($col_whiter, 10);
+            //border-top: dotted 1px darken($col_whiter, 10);
         }
     }
 

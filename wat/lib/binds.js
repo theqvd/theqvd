@@ -299,10 +299,12 @@ Wat.B = {
             if ($(window).scrollTop() > 0) {
                 $('.js-header-wrapper').addClass('header-wrapper--mini');
                 $('.js-mobile-menu-hamburger').addClass('mobile-menu--mini');
+                $('.js-server-datetime-wrapper').addClass('server-datetime-wrapper--mini');
             }
             else {
                 $('.js-header-wrapper').removeClass('header-wrapper--mini');
                 $('.js-mobile-menu-hamburger').removeClass('mobile-menu--mini');
+                $('.js-server-datetime-wrapper').removeClass('server-datetime-wrapper--mini');
             }
 
         },

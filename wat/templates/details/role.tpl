@@ -1,5 +1,8 @@
 <div class="details-header">
     <span class="<%= CLASS_ICON_ROLES %> h1"><%= model.get('name') %></span>
+    <div class="clear"></div>
+    <a class="button2 fright fa fa-eye js-show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>
+    
     <% if(Wat.C.checkACL('role.delete.') && (!model.get('fixed') || !RESTRICT_TEMPLATES)) { %>
     <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
     <% } %>
@@ -12,6 +15,8 @@
     <% if(Wat.C.checkACL('role.update.assign-role') && (!model.get('fixed') || !RESTRICT_TEMPLATES)) { %>
     <a class="button fright button-icon js-tools-roles-btn <%= CLASS_ICON_ROLES %>" href="javascript:" data-i18n="[title]Inherit roles"></a>
     <% } %>
+    
+    <div class="clear"></div>
 </div>
 
 <% 
