@@ -58,7 +58,22 @@ if (Wat.C.checkACL('vm.see.state')) {
         <a class="button button-icon js-button-disconnect-user fa fa-plug fright" href="javascript:" data-i18n="[title]Disconnect user"></a>
     <%
     }
-    %>  
+    %>
+    
+    <% 
+    if (Wat.C.checkACL('vm.update.state')) {
+        if (model.get('state') != 'stopped') { 
+    %>
+            <a class="button fright button-icon--desktop js-button-stop-vm fa fa-stop fright mobile" href="javascript:" data-i18n="[title]Stop" data-wsupdate="state-button" data-id="<%= model.get('id') %>"><span data-i18n="Stop" class="mobile"></span></a>
+    <% 
+        }
+        else { 
+    %>
+            <a class="button fright button-icon--desktop js-button-start-vm fa fa-play fright mobile" href="javascript:" data-i18n="[title]Start" data-wsupdate="state-button" data-id="<%= model.get('id') %>"><span data-i18n="Start" class="mobile"></span></a>
+    <% 
+        }
+    } 
+    %>
     
     <div class="clear mobile"></div>
 </div>
@@ -327,6 +342,16 @@ switch (model.get('state')) {
                 </td>
         </tr>  
     <% 
+    } 
+    if (Wat.C.checkACL('vm.see.state')) {
+    %>
+        <tr class="mobile">
+            <td><i class="fa fa-heart"></i><span data-i18n="State"></span></td>
+            <td data-wsupdate="state-text" data-id="<%= model.get('id') %>">
+                <%= DICTIONARY_STATES[model.get('state')] %>
+            </td>
+        </tr>  
+    <% 
     }
     if (!Wat.C.checkACL('vm.see.user') && Wat.C.checkACL('vm.see.user-state')) {
     %>
@@ -560,8 +585,5 @@ switch (model.get('state')) {
     }
     %>
     <tbody class="bb-properties">
-        <tr>
-            <td colspan=2 class="center"><i class="fa fa-heart"></i><span data-i18n="State"></span></td>
-        </tr>
     </tbody>
 </table>

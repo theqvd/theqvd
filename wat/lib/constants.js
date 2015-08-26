@@ -340,7 +340,7 @@ ANTIQUITY_OPTIONS = [
 ];
 
 // Filters that will be fussioned in one filter note
-var FUSSION_NOTES = {
+FUSSION_NOTES = {
     object__object_id: {
         label: 'object',
         value: 'object_id',
@@ -352,3 +352,13 @@ var FUSSION_NOTES = {
 // Role templates
 ROLE_TEMPLATE_SCOPE = ['Users', 'VMs', 'Nodes', 'OSFs', 'Images', 'Administrators', 'Roles', 'Tenants', /*'Logs',*/ 'Views', 'QVD Config', 'WAT Config', 'QVD', 'WAT'];
 ROLE_TEMPLATE_ACTIONS = ['Reader', 'Operator', 'Creator', 'Updater', 'Eraser', 'Manager'];
+
+// Dictionaries
+
+
+DICTIONARY_STATES = {
+    running: 'Running',
+    stopped: 'Stopped',
+    starting: 'Starting',
+    stopping: 'Stopping'
+};

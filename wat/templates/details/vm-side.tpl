@@ -15,22 +15,22 @@
         
         var stateComponents = {
             running: {
-                stateText: 'Running',
+                stateText: DICTIONARY_STATES['running'],
                 stateIcon: '<i class="fa fa-play"></i>',
                 style: 'display: none;'
             },
             stopped: {
-                stateText: 'Stopped',
+                stateText: DICTIONARY_STATES['stopped'],
                 stateIcon: '<i class="fa fa-stop"></i>',
                 style: 'display: none;'
             },
             starting: {
-                stateText: 'Starting',
+                stateText: DICTIONARY_STATES['starting'],
                 stateIcon: '<i class="fa fa-play faa-flash animated"></i>',
                 style: 'display: none;'
             },
             stopping: {
-                stateText: 'Stopping',
+                stateText: DICTIONARY_STATES['stopping'],
                 stateIcon: '<i class="fa fa-stop faa-flash animated"></i>',
                 style: 'display: none;'
             },

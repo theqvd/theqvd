@@ -17,16 +17,16 @@ Wat.WS.changeWebsocketVm = function (id, field, data, viewType) {
                 case 'running':
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('class', 'fa fa-play');
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('title', i18n.t('Running'));                                
-                    $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(i18n.t('Running'));                                
-                    $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-start-vm fa-play').addClass('js-button-stop-vm fa-stop').attr('title', i18n.t('Stop'));                                   
+                    $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(i18n.t('Running')).removeClass('faa-flash animated');                                
+                    $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-start-vm fa-play').addClass('js-button-stop-vm fa-stop').attr('title', i18n.t('Stop')).find('span').html(i18n.t('Stop'));                                   
                     $('[data-wsupdate="ip"][data-id="' + id + '"]').removeClass('invisible');   
                     $('.remote-administration-buttons a').removeClass('disabled');   
                     break;
                 case 'stopped':
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('class', 'fa fa-stop');
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('title', i18n.t('Stopped'));
-                    $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(i18n.t('Stopped'));
-                    $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-stop-vm fa-stop').addClass('js-button-start-vm fa-play').attr('title', i18n.t('Start'));
+                    $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(i18n.t('Stopped')).removeClass('faa-flash animated');
+                    $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-stop-vm fa-stop').addClass('js-button-start-vm fa-play').attr('title', i18n.t('Start')).find('span').html(i18n.t('Start')); 
                     if (Wat.CurrentView.restarting) {
                         Wat.CurrentView.restarting = false;
                         Wat.CurrentView.startVM();
@@ -35,14 +35,14 @@ Wat.WS.changeWebsocketVm = function (id, field, data, viewType) {
                 case 'starting':
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('class', 'fa fa-spinner fa-spin');
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('title', i18n.t('Starting'));
-                    $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(i18n.t('Starting'));  
-                    $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-start-vm fa-play').addClass('js-button-stop-vm fa-stop').attr('title', i18n.t('Stop'));
+                    $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(i18n.t('Starting')).addClass('faa-flash animated');  
+                    $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-start-vm fa-play').addClass('js-button-stop-vm fa-stop').attr('title', i18n.t('Stop')).find('span').html(i18n.t('Stop')); 
                     break;
                 case 'stopping':
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('class', 'fa fa-spinner fa-spin');
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('title', i18n.t('Stopping'));
-                    $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(i18n.t('Stopping'));  
-                    $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-start-vm fa-play').addClass('js-button-stop-vm fa-stop').attr('title', i18n.t('Stop'));    
+                    $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(i18n.t('Stopping')).addClass('faa-flash animated');  
+                    $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-start-vm fa-play').addClass('js-button-stop-vm fa-stop').attr('title', i18n.t('Stop')).find('span').html(i18n.t('Stop'));    
                     
                     $('.remote-administration-buttons a').addClass('disabled');
                     
