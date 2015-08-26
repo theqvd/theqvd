@@ -185,7 +185,7 @@ void qvd_free(qvdclient *qvd) {
 
 vmlist *qvd_list_of_vm(qvdclient *qvd) {
   char url[MAX_BASEURL];
-  int64_t i;
+  int i;
   long http_code = 0;
   json_error_t error;
   char *command = "/qvd/list_of_vm";
@@ -254,10 +254,10 @@ vmlist *qvd_list_of_vm(qvdclient *qvd) {
       qvd_error(qvd, "Error parsing JSON string: %s", qvd->buffer.data+qvd->buffer.offset);
       return NULL;
     }
-  size_t arrayLength = json_array_size(vmList);
+  int arrayLength = json_array_size(vmList);
   qvd->numvms = arrayLength;
-  qvd_printf("VMs available: %" PRIi64 "\n", qvd->numvms);
-  qvd_printf("VMs availabble JSON detail: %s\n", qvd->buffer.data+qvd->buffer.offset);
+  qvd_printf("VMs available: %d\n", qvd->numvms);
+  qvd_printf("VM json output: %s\n", qvd->buffer.data+qvd->buffer.offset);
 
   QvdVmListFree(qvd->vmlist);
   if (!(qvd->vmlist = malloc(sizeof(vmlist)))) {

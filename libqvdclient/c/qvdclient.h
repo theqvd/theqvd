@@ -8,15 +8,13 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <curl/curl.h>
-#define __STDC_FORMAT_MACROS
-#include <inttypes.h>
 /* Also used for vm list  normally 16KB*2 */
 /* #define BUFFER_SIZE CURL_MAX_WRITE_SIZE * 2 */
 #define BUFFER_SIZE 65536
 #include "qvdbuffer.h"
 #define QVDVERSION 121
 #define QVDABOUT "Version: 1.2.1. $Id$"
-#define QVDCHANGELOG "1.2.1 25/08/2015 Improve Janson code for 64 bit arm, update openssl to 1.0.2d\n" \
+#define QVDCHANGELOG "1.2.1 26/08/2015 Use ASL logging for Apple, openssl: 1.0.2d, jansson: 2.7\n" \
                      "1.2.0 07/05/2015 Improve Select on write file descriptors\n" \
                      "1.1.9 06/05/2015 Use NXTransCleanupForReconnect for IOS\n" \
                      "1.1.8 06/05/2015 Include nxcomp version in the -v flag\n" \
@@ -102,7 +100,7 @@ struct qvdclientstruct {
   char userpwd[MAX_USERPWD];
   char authdigest[MAX_AUTHDIGEST];
   char baseurl[MAX_BASEURL];
-  int64_t numvms;
+  int numvms;
   vmlist *vmlist;
   QvdBuffer buffer;
   char link[MAX_LINK];
