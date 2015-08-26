@@ -10,15 +10,15 @@ if (Wat.C.checkACL('vm.see.state')) {
 
 <div class="details-header">
     <span class="fa fa-cloud h1"><%= model.get('name') %></span>
-    <div class="clear"></div>
+    <div class="clear mobile"></div>
     <a class="button2 fright fa fa-eye js-show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>
     
     <% if(Wat.C.checkACL('vm.delete.')) { %>
-    <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
+    <a class="button fleft button-icon--desktop js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"><span data-i18n="Delete" class="mobile"></span></a>
     <% } %>
     
     <% if(Wat.C.checkGroupACL('vmEdit')) { %>
-    <a class="button fright button-icon js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"></a>
+    <a class="button fright button-icon--desktop js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"><span data-i18n="Edit" class="mobile"></span></a>
     <% } %>
     
     <% 
@@ -26,12 +26,12 @@ if (Wat.C.checkACL('vm.see.state')) {
     if (Wat.C.checkACL('vm.update.state') && stateTableClass == 'hidden') {
         if (model.get('state') != 'stopped') { 
     %>
-        <a class="button fright button-icon js-button-stop-vm fa fa-stop fright" href="javascript:" data-i18n="[title]Stop" data-wsupdate="state-button" data-id="<%= model.get('id') %>"></a>
+        <a class="button fright button-icon--desktop js-button-stop-vm fa fa-stop fright" href="javascript:" data-i18n="[title]Stop" data-wsupdate="state-button" data-id="<%= model.get('id') %>"><span data-i18n="Stop" class="mobile"></span></a>
     <% 
         }
         else { 
     %>
-        <a class="button fright button-icon js-button-start-vm fa fa-play fright" href="javascript:" data-i18n="[title]Start" data-wsupdate="state-button" data-id="<%= model.get('id') %>"></a>
+        <a class="button fright button-icon--desktop js-button-start-vm fa fa-play fright" href="javascript:" data-i18n="[title]Start" data-wsupdate="state-button" data-id="<%= model.get('id') %>"><span data-i18n="Start" class="mobile"></span></a>
     <% 
         }
     } 
@@ -41,12 +41,12 @@ if (Wat.C.checkACL('vm.see.state')) {
     if (Wat.C.checkACL('vm.update.block')) {
         if(model.get('blocked')) {
     %>
-            <a class="button button-icon js-button-unblock fa fa-unlock fright" href="javascript:" data-i18n="[title]Unblock"></a>
+            <a class="button button-icon--desktop js-button-unblock fa fa-unlock fright" href="javascript:" data-i18n="[title]Unblock"><span data-i18n="Unblock" class="mobile"></span></a>
     <%
         } 
         else { 
     %>
-            <a class="button button-icon js-button-block fa fa-lock fright" href="javascript:" data-i18n="[title]Block"></a>
+            <a class="button button-icon--desktop js-button-block fa fa-lock fright" href="javascript:" data-i18n="[title]Block"><span data-i18n="Block" class="mobile"></span></a>
     <%
         }
     }
@@ -60,7 +60,7 @@ if (Wat.C.checkACL('vm.see.state')) {
     }
     %>  
     
-    <div class="clear"></div>
+    <div class="clear mobile"></div>
 </div>
 
 <% 

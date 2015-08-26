@@ -97,10 +97,10 @@
             <div class="action-selected-button">
                 <a class="js-traductable_button actions_button button fa fa-check-square-o" name="selected_actions_button" data-i18n="Apply"></a>
             </div>
-            <div class="clear"></div>
+            <div class="clear mobile"></div>
         </fieldset>
     <%
     }
     %>
-    <div class="clear"></div>
+    <div class="clear mobile"></div>
 </div>

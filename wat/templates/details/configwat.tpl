@@ -1,13 +1,13 @@
 <div class="details-header">
     <span class="<%= CLASS_ICON_WATCONFIG %> h1" data-i18n="WAT Config"></span>
-    <div class="clear"></div>
+    <div class="clear mobile"></div>
     <a class="button2 fright fa fa-eye js-show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>
     
     <% if(Wat.C.checkACL('config.wat.')) { %>
-    <a class="button fright button-icon js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"></a>
+    <a class="button fright button-icon--desktop js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"><span data-i18n="Edit" class="mobile"></span></a>
     <% } %>
     
-    <div class="clear"></div>
+    <div class="clear mobile"></div>
 </div>
 
 <% 

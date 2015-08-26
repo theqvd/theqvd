@@ -501,14 +501,14 @@ select, input, textarea, .button, .button2 {
   box-shadow: inset 1px 1px 1px 0px #dddddd; }
 
 input[type="checkbox"], input[type="radio"] {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   box-shadow: none;
   border-width: 0; }
   @media screen and (min-width: 41em) {
     input[type="checkbox"], input[type="radio"] {
-      width: 14px;
-      height: 14px; } }
+      width: 20px;
+      height: 20px; } }
 
 .mandatory-label:after {
   content: "(*)"; }
@@ -739,6 +739,14 @@ a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.di
 .button-icon:before {
   margin: 0px !important; }
 
+@media screen and (min-width: 41em) {
+  .button-icon--desktop:before {
+    margin: 0px !important; } }
+
+@media only screen and (max-width: 41em) {
+  .button-icon--mobile:before {
+    margin: 0px !important; } }
+
 /********************************************************************
 *********************************************************************
 *********************************************************************
@@ -776,9 +784,7 @@ body {
   .header-wrapper .header {
     position: relative;
     min-width: 0px; }
-    @media screen and (min-width: 41em) {
-      .header-wrapper .header {
-        min-width: 1024px; } }
+    @media screen and (min-width: 41em) { }
     .header-wrapper .header .logo {
       height: 55px;
       margin: 5px 0px; }
@@ -890,9 +896,7 @@ body {
   margin-bottom: 50px;
   position: relative; }
   @media screen and (min-width: 41em) { }
-  @media screen and (min-width: 41em) {
-    .wrapper {
-      min-width: 1024px; } }
+  @media screen and (min-width: 41em) { }
   .wrapper .menu {
     margin-bottom: 10px;
     margin-top: 5px; }
@@ -1719,9 +1723,11 @@ select[name="role"] {
     .editor-container .editor-table > tbody > tr > td:first-child {
       font-weight: bold;
       min-width: 50%;
-      text-align: right;
       vertical-align: top;
       padding-top: 5px; }
+      @media screen and (min-width: 41em) {
+        .editor-container .editor-table > tbody > tr > td:first-child {
+          text-align: right; } }
     .editor-container .editor-table td.fa:before {
       margin-right: 10px; }
     .editor-container .editor-table .custom-properties td {

@@ -34,7 +34,7 @@
     //max-width: $max_width_mobile;
 
     @include in(desktop) {
-        min-width: $min_width_wrapper;
+        //min-width: $min_width_wrapper;
         //max-width: $max_width_wrapper;
     }
 }

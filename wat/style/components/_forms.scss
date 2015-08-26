@@ -68,14 +68,14 @@ select, input, textarea, .button, .button2 {
 }
 
 input[type="checkbox"], input[type="radio"] {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     box-shadow: none;
     border-width: 0;
     
     @include in(desktop) {
-        width: 14px;
-        height: 14px;
+        width: 20px;
+        height: 20px;
     }
 }
 

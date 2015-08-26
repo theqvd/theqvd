@@ -245,18 +245,20 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     },
     
     toggleActions: function (e) {
-        $(e.target).parent().find('a.button').toggle();
         
         switch ($(e.target).attr('data-options-state')) {
             case 'hidden':
                 $(e.target).attr('data-options-state', 'shown');
                 $(e.target).removeClass('fa-eye');
                 $(e.target).addClass('fa-eye-slash');
+                $(e.target).parent().find('a.button').show();
+                $(e.target).parent().find('a.button[data-enabled="false"]').hide();
                 break;
             case 'shown':
                 $(e.target).attr('data-options-state', 'hidden');
                 $(e.target).removeClass('fa-eye-slash');
                 $(e.target).addClass('fa-eye');
+                $(e.target).parent().find('a.button').hide();
                 break;
         }
     },

@@ -4,29 +4,29 @@
     <a class="button2 fright fa fa-eye js-show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>
         
     <% if(Wat.C.checkACL('di.delete.')) { %>
-    <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
+    <a class="button fleft button-icon--desktop js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"><span data-i18n="Delete" class="mobile"></span></a>
     <% } %>
     <% if(Wat.C.checkGroupACL('diEdit')) { %>
-    <a class="button fright button-icon js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"></a>
+    <a class="button fright button-icon--desktop js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"><span data-i18n="Edit" class="mobile"></span></a>
     <% } %>
     
     <% 
     if (Wat.C.checkACL('di.update.block')) {
         if(model.get('blocked')) {
     %>
-            <a class="button button-icon js-button-unblock fa fa-unlock fright" href="javascript:" data-i18n="[title]Unblock"></a>
+            <a class="button button-icon--desktop js-button-unblock fa fa-unlock fright" href="javascript:" data-i18n="[title]Unblock"><span data-i18n="Unblock" class="mobile"></span></a>
     <%
         } 
         else { 
     %>
-            <a class="button button-icon js-button-block fa fa-lock fright" href="javascript:" data-i18n="[title]Block"></a>
+            <a class="button button-icon--desktop js-button-block fa fa-lock fright" href="javascript:" data-i18n="[title]Block"><span data-i18n="Block" class="mobile"></span></a>
     <%
         }
     }
     %>
     
     <% if(Wat.C.checkACL('di.update.default') && !model.get('default')) { %>
-    <a class="button fright button-icon js-button-default fa fa-home" href="javascript:" data-i18n="[title]Set by default"></a>
+    <a class="button fright button-icon--desktop js-button-default fa fa-home" href="javascript:" data-i18n="[title]Set by default"><span data-i18n="Set by default" class="mobile"></span></a>
     <% } %>
     
     <div class="clear mobile"></div>

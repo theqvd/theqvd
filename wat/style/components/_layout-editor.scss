@@ -27,9 +27,9 @@
         &>tbody>tr>td:first-child {
             font-weight: bold;
             min-width: 50%;
-            text-align: right;
-            // border-right: #ddd dotted 1px;
-            // padding-right: 10px;
+            @include in(desktop) {
+                text-align: right;
+            }
             vertical-align: top;
             padding-top: 5px;
         }

@@ -1,25 +1,25 @@
 <div class="details-header">
     <span class="fa fa-user h1"><%= model.get('name') %></span>
-    <div class="clear"></div>
+    <div class="clear mobile"></div>
     <a class="button2 fright fa fa-eye js-show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>
     
     <% if(Wat.C.checkACL('user.delete.')) { %>
-    <a class="button fleft button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"></a>
+    <a class="button fleft button-icon--desktop js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"><span data-i18n="Delete" class="mobile"></span></a>
     <% } %>
     <% if(Wat.C.checkGroupACL('userEdit')) { %>
-    <a class="button fright button-icon js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"</a>
+    <a class="button fright button-icon--desktop js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"><span data-i18n="Edit" class="mobile"></span></a>
     <% } %>
     
     <% 
     if (Wat.C.checkACL('user.update.block')) {
         if(model.get('blocked')) {
     %>
-            <a class="button button-icon js-button-unblock fa fa-unlock fright" href="javascript:" data-i18n="[title]Unblock"></a>
+            <a class="button button-icon--desktop js-button-unblock fa fa-unlock fright" href="javascript:" data-i18n="[title]Unblock"><span data-i18n="Unblock" class="mobile"></span></a>
     <%
         } 
         else { 
     %>
-            <a class="button button-icon js-button-block fa fa-lock fright" href="javascript:" data-i18n="[title]Block"></a>
+            <a class="button button-icon--desktop js-button-block fa fa-lock fright" href="javascript:" data-i18n="[title]Block"><span data-i18n="Block" class="mobile"></span></a>
     <%
         }
     }
@@ -28,17 +28,17 @@
     
     <% 
     if(Wat.C.checkACL('vm.update.disconnect-user')) { 
-        var hiddenClass = 'hidden';
+        var enabled = false;
         if (model.get('number_of_vms_connected') > 0) {
-            hiddenClass = '';
+            enabled = true;
         }
     %>
-        <a class="button button-icon js-button-disconnect-all-vms fa fa-plug fright <%= hiddenClass %>" href="javascript:" data-i18n="[title]Disconnect from all VMS"></a>
+        <a class="button button-icon--desktop js-button-disconnect-all-vms fa fa-plug fright <%= enabled ? '' : 'hidden' %>" data-enabled="<%= enabled %>" href="javascript:" data-i18n="[title]Disconnect from all VMs"><span data-i18n="Disconnect from all VMs" class="mobile"></span></a>
     <% 
     } 
     %>
     
-    <div class="clear"></div>
+    <div class="clear mobile"></div>
 </div>
 
 <table class="details details-list <% if (!enabledProperties) { %> col-width-100 <% } %>">

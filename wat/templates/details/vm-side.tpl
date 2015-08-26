@@ -66,7 +66,7 @@
             <tr>
                 <td>
                     <%
-                        var nDots = 25;
+                        var nDots = 15;
                         
                         var hostHtml = '';
                         if (Wat.C.checkACL('vm.see.host')) {
