@@ -78,10 +78,10 @@ extern "C" {
 #endif
 
 typedef struct {
-  int64_t id;
+  int id;
   char *name;
   char *state;
-  int64_t blocked;
+  int blocked;
 } vm;
 
 struct vmliststruct {

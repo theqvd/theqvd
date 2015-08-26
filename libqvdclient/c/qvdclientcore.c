@@ -268,9 +268,9 @@ vmlist *qvd_list_of_vm(qvdclient *qvd) {
 
   for (i = 0; i < arrayLength; i++) {
     json_t *obj = json_array_get(vmList, i);
-    json_int_t id, blocked;
+    int id, blocked;
     char *name, *state;
-    json_unpack(obj, "{s:I,s:s,s:I,s:s}",
+    json_unpack(obj, "{s:i,s:s,s:i,s:s}",
 		"id", &id,
 		"state", &state,
 		"blocked", &blocked,

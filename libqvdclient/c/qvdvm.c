@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "qvdclient.h"
-vm *QvdVmNew(int64_t id, const char *name, const char *state, int64_t blocked) {
+vm *QvdVmNew(int id, const char *name, const char *state, int blocked) {
   vm *ptr;
   if (!(ptr = malloc(sizeof(vm)))) {
     return NULL;
