@@ -77,9 +77,10 @@
 
 .details-header {
     a.button2 {
-        float: right;
         margin-bottom: 10px;
-        
+        width: 100%;
+        text-align: center;
+
         @include in(desktop) {
             display: none;
         }

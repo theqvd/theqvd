@@ -1353,8 +1353,9 @@ body {
       padding-right: 5px;
       line-height: 1.2em; }
     .wrapper .content .details-header a.button2 {
-      float: right;
-      margin-bottom: 10px; }
+      margin-bottom: 10px;
+      width: 100%;
+      text-align: center; }
       @media screen and (min-width: 41em) {
         .wrapper .content .details-header a.button2 {
           display: none; } }
