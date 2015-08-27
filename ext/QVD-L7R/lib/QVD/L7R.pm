@@ -234,12 +234,6 @@ sub stop_vm_processor {
         $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Server is blocked");
     }
 
-    header_eq_check($headers, Connection => 'Upgrade') &&
-    header_eq_check($headers, Upgrade => 'QVD/1.0') or do {
-        INFO 'Upgrade HTTP header required';
-        $l7r->throw_http_error(HTTP_UPGRADE_REQUIRED);
-    };
-
     my $query = (uri_split $url)[3];
     my %params = uri_query_split  $query;
     my $vm_id = delete $params{id};
@@ -290,7 +284,16 @@ sub stop_vm_processor {
                           "$saved_err, retry later");
     }
     DEBUG "VM shut down". " VM_ID: $vm_id";
-    $l7r->send_http_response(HTTP_OK);
+
+    my %vm = (
+	id      => $vm->vm_id,
+	state   => $vm->vm_state,
+	name    => $vm->vm->name,
+	blocked => $vm->blocked 
+	);
+
+    $l7r->send_http_response_with_body( HTTP_OK, 'application/json', [],
+                                        $l7r->json->encode(\%vm) );
 
 }
 
