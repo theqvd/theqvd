@@ -318,7 +318,7 @@ fieldset {
 .menu-corner {
   z-index: 1000;
   position: absolute;
-  top: 10px;
+  top: 20px;
   right: 80px;
   display: none; }
   @media screen and (min-width: 41em) {
@@ -329,20 +329,20 @@ fieldset {
     display: inline;
     margin: 5px;
     position: relative;
-    cursor: default; }
+    cursor: default;
+    padding-bottom: 5px;
+    padding-top: 5px; }
     .menu-corner > ul > li.menu-option-current {
       border-bottom: 2px dotted #e35e0c;
-      border-top: 2px dotted #e35e0c;
-      padding-top: 2px;
-      padding-bottom: 1px; }
+      border-top: 2px dotted #e35e0c; }
     .menu-corner > ul > li > ul {
       border: solid 1px #f9b78e;
       background: #fdfdfd;
       opacity: 0.9;
       display: none;
       position: absolute;
-      left: -9px;
-      top: 18px;
+      left: 0px;
+      top: 28px;
       border-bottom-left-radius: 7px;
       border-bottom-right-radius: 7px;
       z-index: 3; }
@@ -575,7 +575,8 @@ a.button, button.button {
   border: solid 1px #9a4008;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
-  box-shadow: none; }
+  box-shadow: none;
+  white-space: nowrap; }
   a.button:hover, button.button:hover {
     cursor: pointer;
     border-color: #b24a09; }
@@ -607,7 +608,8 @@ a.button2, button.button2 {
   border: solid 1px #d7d7d7;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
-  box-shadow: none; }
+  box-shadow: none;
+  white-space: nowrap; }
   a.button2:hover, button.button2:hover {
     cursor: pointer;
     border-color: #e4e4e4; }
@@ -639,7 +641,8 @@ a.button--green, button.button--green {
   border: solid 1px #001a00;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
-  box-shadow: none; }
+  box-shadow: none;
+  white-space: nowrap; }
   a.button--green:hover, button.button--green:hover {
     cursor: pointer;
     border-color: #003300; }
@@ -671,7 +674,8 @@ a.button--red, button.button--red {
   border: solid 1px #4d0000;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
-  box-shadow: none; }
+  box-shadow: none;
+  white-space: nowrap; }
   a.button--red:hover, button.button--red:hover {
     cursor: pointer;
     border-color: #660000; }
@@ -1495,7 +1499,8 @@ body {
         .wrapper .content .customize-section-selectors .customize-section-selector:first-child {
           padding-right: 20px; }
         .wrapper .content .customize-section-selectors .customize-section-selector:last-child {
-          padding-left: 20px; }
+          padding-left: 20px;
+          vertical-align: bottom; }
     .wrapper .content .customize-options .customize-block {
       width: 49%;
       display: inline-block;
@@ -2954,7 +2959,8 @@ table.vmst .vmst-vm-cell, table.vmst .vmst-host-cell {
     border: solid 1px #9a4008;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
-    box-shadow: none; }
+    box-shadow: none;
+    white-space: nowrap; }
     .ui-dialog .ui-state-hover:hover, .ui-dialog .ui-state-focus:hover {
       cursor: pointer;
       border-color: #b24a09; }

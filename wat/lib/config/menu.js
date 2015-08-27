@@ -5,7 +5,7 @@ Wat.I.menuUserOriginal = {
         icon: CLASS_ICON_PERSONALAREA 
     },
     myviews: {
-        text: 'Customize views',
+        text: 'My views',
         link: '#/myviews',
         icon: CLASS_ICON_VIEWS 
     },

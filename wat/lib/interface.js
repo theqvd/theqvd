@@ -1070,5 +1070,10 @@ Wat.I = {
         clearInterval(Wat.C.serverTimeUpdater);
         delete Wat.C.serverTimeUpdater;
         delete Wat.C.serverDatetime;
+    },
+    
+    attachFastClick: function () {
+        // Items with class "needsclick" will be ignored
+        FastClick.attach(document.body);
     }
 }

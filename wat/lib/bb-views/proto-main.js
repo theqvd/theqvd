@@ -48,6 +48,8 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     beforeRender: function () {
+            // Close submenus for touch devices compatibility
+            $('.js-menu-corner li ul').hide();
     },
     
     afterRender: function () {

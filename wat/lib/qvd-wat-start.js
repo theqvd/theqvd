@@ -15,6 +15,9 @@
         // Init API address variables
         Wat.C.initApiAddress();
         
+        // Attach fast click events to separate tap from click
+        Wat.I.attachFastClick();
+        
         // Setup jQuery ajax to store all requests in a requests queue
         $.ajaxSetup({
             beforeSend: function(jqXHR) {

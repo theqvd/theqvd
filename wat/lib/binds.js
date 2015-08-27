@@ -83,7 +83,17 @@ Wat.B = {
     bindNavigationEvents: function () {
         this.bindEvent('click', '.menu-option[data-target]', this.navigationBinds.clickMenu);
         
+        this.bindEvent('click', '.js-menu-corner .menu-option', this.navigationBinds.clickCornerMenu);
+        
         this.bindEvent('click', '.js-submenu-option', this.navigationBinds.clickSubMenu);
+        
+        this.bindEvent('touchstart', '.needsclick', this.navigationBinds.tapNeedsClick);
+        
+        this.bindEvent('touchstart', 'body', this.navigationBinds.tapAny);
+        
+        this.bindEvent('touchstart', '.chosen-container', function (e) {
+            $(e.target).parent().find('select').trigger('click');
+        });
         
         this.bindEvent('click', '.js-mobile-menu-hamburger', this.navigationBinds.clickMenuMobile);
         
@@ -190,6 +200,10 @@ Wat.B = {
             var id = $(this).attr('data-target');
             window.location = '#/' + id;
             Wat.I.closeMessage();
+        }, 
+        
+        // When click on a corner menu option
+        clickCornerMenu: function(e) {
         },        
         
         // When click on a submenu option, show properly subsection
@@ -200,6 +214,44 @@ Wat.B = {
             $('table.acls-management').hide();
             $(this).addClass('menu-option--selected');
             $('table.' + submenu).show();
+        },
+        
+        // When click on elements that FastClick library ignore, trigger hover but prevent click
+        tapNeedsClick: function (e) {
+            if ($(e.target).hasClass('needsclick')) {
+                // Walk along the DOM tree until find UL of submenu to know if is visible or not
+                // This swich have not "beak;" willfully
+                var element = $(e.target);
+                switch ($(e.target).prop('tagName')) {
+                    case "I":
+                    case "SPAN":
+                        element = element.parent();
+                    case "LI":
+                        element = element.parent();
+                    default:
+                        var isAlreadyShown = element.find('ul').css('display') != 'none';
+                }
+                
+                // Close submenus for touch devices compatibility
+                $('.js-menu-corner li ul').hide();
+                
+                if (!isAlreadyShown) {
+                    // Trigger hover event
+                    $(e.target).trigger('mouseover');
+                }
+                
+                // Prevent click event triggering
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        },
+        
+        // When tap in any part of the screen but the "needsClick" elements because this behavior is prevent
+        tapAny: function (e) {
+            // Close submenus for touch devices compatibility
+            setTimeout( function() { 
+                $('.js-menu-corner li ul').hide();
+            }, 100);
         },
         
         clickMenuMobile: function () {
@@ -300,11 +352,13 @@ Wat.B = {
                 $('.js-header-wrapper').addClass('header-wrapper--mini');
                 $('.js-mobile-menu-hamburger').addClass('mobile-menu--mini');
                 $('.js-server-datetime-wrapper').addClass('server-datetime-wrapper--mini');
+                $('.js-menu-corner').css('top', '10px');
             }
             else {
                 $('.js-header-wrapper').removeClass('header-wrapper--mini');
                 $('.js-mobile-menu-hamburger').removeClass('mobile-menu--mini');
                 $('.js-server-datetime-wrapper').removeClass('server-datetime-wrapper--mini');
+                $('.js-menu-corner').css('top', '20px');
             }
 
         },

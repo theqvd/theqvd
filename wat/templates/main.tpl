@@ -16,17 +16,17 @@
         %>
 
         <div class="js-menu-corner menu-corner">
-            <ul class="nav-collapse-corner">
+            <ul class="nav-collapse-corner needsclick">
                 <% $.each(cornerMenuPrint, function (iMenu, menuOpt) { %>
-                    <li class="menu-option js-menu-option-<%= iMenu %>">
-                        <a href="<%= menuOpt.link %>">
-                            <i class="<%= menuOpt.icon %>"></i>
-                            <span class="<%= menuOpt.textClass %>" data-i18n="<%= menuOpt.text %>"></span>
+                    <li class="menu-option needsclick js-menu-option-<%= iMenu %>">
+                        <a href="<%= menuOpt.link %>" class="needsclick">
+                            <i class="<%= menuOpt.icon %> needsclick"></i>
+                            <span class="<%= menuOpt.textClass %> needsclick" data-i18n="<%= menuOpt.text %>"></span>
                         </a>
                         <ul>
                             <% $.each(menuOpt.subMenu, function (iSubMenu, subMenuOpt) { %>
                                 <li>
-                                    <a href="<%= subMenuOpt.link %>">
+                                    <a href="<%= subMenuOpt.link %>" class="js-submenu-option">
                                         <span class="<%= subMenuOpt.icon %>" data-i18n="<%= subMenuOpt.text %>"></span>
                                     </a>
                                 </li>

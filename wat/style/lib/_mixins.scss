@@ -112,6 +112,8 @@
         margin-right: 10px;
         color: $col;
     }
+    
+    white-space: nowrap;
 }
 
 @mixin button--disabled () {

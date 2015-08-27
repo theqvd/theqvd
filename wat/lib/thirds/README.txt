@@ -19,3 +19,4 @@ Used libraries on QVD Wat and their version, licenses and source sites:
 - Lato font v11 (SIL Open Font License, 1.1) https://www.google.com/fonts/attribution
 - Droid Sans font v6 (Apache License, version 2.0) https://www.google.com/fonts/attribution
 - Open Sans font v10 (Apache License, version 2.0) https://www.google.com/fonts/attribution
+- FastClick v1.0.6 (MIT License) https://github.com/ftlabs/fastclick
