@@ -91,10 +91,6 @@ Wat.B = {
         
         this.bindEvent('touchstart', 'body', this.navigationBinds.tapAny);
         
-        this.bindEvent('touchstart', '.chosen-container', function (e) {
-            $(e.target).parent().find('select').trigger('click');
-        });
-        
         this.bindEvent('click', '.js-mobile-menu-hamburger', this.navigationBinds.clickMenuMobile);
         
         this.bindEvent('click', '.js-delete-filter-note', this.navigationBinds.clickDeleteFilterNote);
