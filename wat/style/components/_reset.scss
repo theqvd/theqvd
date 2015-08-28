@@ -68,7 +68,7 @@ table {
 }
 
 *:focus {
-    @extend %no-outline;
+    @extend %focus-outline;
 }
 
 :focus {

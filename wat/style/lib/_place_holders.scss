@@ -62,3 +62,10 @@
     border: 0;
 }
 
+%focus-outline {
+    outline-color: $col_brand;
+    box-shadow: 0;
+    border: 2px;
+    border-color: $col_brand;
+}
+

@@ -169,16 +169,17 @@ fieldset {
 }
 
 .filter-notes {
-    border: 1px rgb(182, 182, 0) solid;
+    border: 1px #DDDDBB solid;
     padding: 8px;
     border-radius: 4px;
-    background: rgb(246, 247, 175);
+    background: #FBFBC9;
     margin-top: -20px;
     margin-bottom: 15px;
     min-height: 40px;
     
     .fa:before {
         margin-right: 4px;
+        font-size: 20px;
     }
     
     .filter-notes-list {
@@ -192,6 +193,18 @@ fieldset {
             padding: 5px;
             background: #FFF;
             border-radius: 3px;
+        }
+        
+        .fa.delete-filter-note:before {
+            font-size: 22px;
+            color: $col_whiter;
+            background: $col_red;
+            border-right: 1px solid grey;
+            margin-left: -5px;
+            padding-right: 7px;
+            padding-left: 9px;
+            vertical-align: middle;
+            padding-top: 1px;
         }
     }
 }

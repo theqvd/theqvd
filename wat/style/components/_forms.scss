@@ -67,6 +67,10 @@ select, input, textarea, .button, .button2 {
             box-shadow: inset 1px 1px 1px 0px #dddddd;
 }
 
+select {
+    width: 100%;
+}
+
 input[type="checkbox"], input[type="radio"] {
     width: 24px;
     height: 24px;

@@ -94,11 +94,14 @@ a.button-update-customize {
 
 .config-table {
     margin-bottom: 3px;
-    table-layout: fixed;
     
     td {
         text-align: left; 
         vertical-align: middle;
+        
+        &:last-child {
+            text-align: center;
+        }
     }
     
     th {
@@ -126,4 +129,8 @@ a.button-update-customize {
     input {
         width: 100%;
     }
+}
+
+.token-action-select {
+    width: auto;
 }

@@ -29,13 +29,19 @@
 .menu-corner, .header-wrapper, .wrapper, .wrapper .menu, .wrapper .breadcrumbs, .wrapper .content, .footer {
   visibility: hidden; }
 
-*:focus, .ui-dialog {
+.ui-dialog {
   outline-width: 0;
   outline: none;
   -moz-outline: none;
   -moz-user-focus: ignore;
   box-shadow: 0;
   border: 0; }
+
+*:focus {
+  outline-color: #e35e0c;
+  box-shadow: 0;
+  border: 2px;
+  border-color: #e35e0c; }
 
 /* INCLUDED: mixins */
 /********************************************************************
@@ -218,15 +224,16 @@ fieldset {
     padding: 50px; }
 
 .filter-notes {
-  border: 1px #b6b600 solid;
+  border: 1px #DDDDBB solid;
   padding: 8px;
   border-radius: 4px;
-  background: #f6f7af;
+  background: #FBFBC9;
   margin-top: -20px;
   margin-bottom: 15px;
   min-height: 40px; }
   .filter-notes .fa:before {
-    margin-right: 4px; }
+    margin-right: 4px;
+    font-size: 20px; }
   .filter-notes .filter-notes-list {
     display: block;
     margin-top: 15px;
@@ -238,6 +245,16 @@ fieldset {
       padding: 5px;
       background: #FFF;
       border-radius: 3px; }
+    .filter-notes .filter-notes-list .fa.delete-filter-note:before {
+      font-size: 22px;
+      color: #fdfdfd;
+      background: #FF0000;
+      border-right: 1px solid grey;
+      margin-left: -5px;
+      padding-right: 7px;
+      padding-left: 9px;
+      vertical-align: middle;
+      padding-top: 1px; }
 
 .screen-help {
   margin-left: 5px;
@@ -499,6 +516,9 @@ select, input, textarea, .button, .button2 {
   -webkit-box-shadow: inset 1px 1px 1px 0px #dddddd;
   -moz-box-shadow: inset 1px 1px 1px 0px #dddddd;
   box-shadow: inset 1px 1px 1px 0px #dddddd; }
+
+select {
+  width: 100%; }
 
 input[type="checkbox"], input[type="radio"] {
   width: 24px;
@@ -1514,11 +1534,12 @@ body {
       float: right;
       margin-top: 20px; }
     .wrapper .content .config-table {
-      margin-bottom: 3px;
-      table-layout: fixed; }
+      margin-bottom: 3px; }
       .wrapper .content .config-table td {
         text-align: left;
         vertical-align: middle; }
+        .wrapper .content .config-table td:last-child {
+          text-align: center; }
       .wrapper .content .config-table th {
         cursor: pointer; }
       .wrapper .content .config-table .fa:before {
@@ -1533,6 +1554,8 @@ body {
       border-bottom: 1px dotted #d7d7d7; }
       .wrapper .content .config-search-box input, .wrapper .content .doc-search-box input {
         width: 100%; }
+    .wrapper .content .token-action-select {
+      width: auto; }
     .wrapper .content .login-box {
       width: 90%;
       height: 250px;

@@ -504,7 +504,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                         fNote.value = Wat.CurrentView.collection.models[0].get(fNote.replaceValue);
                     }
                 }
-                var note = '<li><a href="javascript:" class="js-delete-filter-note fa fa-times" data-filter-name="' + fNoteName + '" data-filter-type="' + fNote.type + '"></a>';
+                var note = '<li><a href="javascript:" class="js-delete-filter-note delete-filter-note fa fa-times" data-filter-name="' + fNoteName + '" data-filter-type="' + fNote.type + '"></a>';
                 note += '<span class="note-label">' + fNote.label + '</span>';
                 if (fNote.value != undefined) {
                     note += ': <span class="note-value">' + fNote.value + '</span>';
