@@ -63,9 +63,9 @@
 }
 
 %focus-outline {
+    -webkit-appearance: none;
     outline-color: $col_brand;
     box-shadow: 0;
-    border: 2px;
-    border-color: $col_brand;
+    border: 0;
 }
 

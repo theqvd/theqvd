@@ -9,17 +9,19 @@
         <% if (Wat.C.checkGroupACL('statisticsSummaryObjects')) { %>
             <div class="home-row">
                 <% if (Wat.C.checkACL('user.stats.summary')) { %>
-                    <div class="home-cell">
+                    <div class="home-cell js-home-cell">
                         <div class="summary-element home-widget">
-                            <div class="summary-element-title">
+                            <div class="summary-element-title js-summary-element-title">
                                 <%= Wat.C.ifACL('<a href="#/users" data-i18n="Users">', 'user.see-main.') %>
                                     <%= i18n.t('Users') %>
                                 <%= Wat.C.ifACL('</a>', 'user.see-main.') %>
                             </div>
-                            <div class="summary-element-icon">
-                                <i class="<%= CLASS_ICON_USERS %>"></i>
+                            <div class="summary-element-icon js-summary-element-icon">
+                                <%= Wat.C.ifACL('<a href="#/users">', 'user.see-main.') %>
+                                    <i class="<%= CLASS_ICON_USERS %>"></i>                                
+                                <%= Wat.C.ifACL('</a>', 'user.see-main.') %>
                             </div>
-                            <div class="summary-element-count">
+                            <div class="summary-element-count js-summary-element-count">
                                 <span class="summary-data js-summary-users" data-wsupdate="users_count"><%= stats.users_count %></span>
 
                                 <table class="summary-element-subtable second_row">
@@ -46,17 +48,19 @@
                         </div>
                     </div>
                 <% } if (Wat.C.checkACL('vm.stats.summary')) { %>
-                    <div class="home-cell">
+                    <div class="home-cell js-home-cell">
                         <div class="summary-element home-widget">
-                            <div class="summary-element-title">
+                            <div class="summary-element-title js-summary-element-title">
                                 <%= Wat.C.ifACL('<a href="#/vms" data-i18n="Virtual machines">', 'vm.see-main.') %>
                                     <%= i18n.t('Virtual machines') %>
                                 <%= Wat.C.ifACL('</a>', 'vm.see-main.') %>
                             </div>
-                            <div class="summary-element-icon">
-                                <i class="<%= CLASS_ICON_VMS %>"></i>
+                            <div class="summary-element-icon js-summary-element-icon">
+                                <%= Wat.C.ifACL('<a href="#/vms">', 'vm.see-main.') %>
+                                    <i class="<%= CLASS_ICON_VMS %>"></i>
+                                <%= Wat.C.ifACL('</a>', 'vm.see-main.') %>
                             </div>
-                            <div class="summary-element-count">
+                            <div class="summary-element-count js-summary-element-count">
                                 <span class="summary-data js-summary-vms" data-wsupdate="vms_count"><%= stats.vms_count %></span>
 
                                 <table class="summary-element-subtable second_row">
@@ -83,17 +87,19 @@
                         </div>
                     </div>
                 <% } if (Wat.C.checkACL('host.stats.summary')) { %>
-                    <div class="home-cell">
+                    <div class="home-cell js-home-cell js-home-cell">
                         <div class="summary-element home-widget">
-                            <div class="summary-element-title">
+                            <div class="summary-element-title js-summary-element-title">
                                 <%= Wat.C.ifACL('<a href="#/hosts" data-i18n="Nodes">', 'host.see-main.') %>
                                     <%= i18n.t('Nodes') %>
                                 <%= Wat.C.ifACL('</a>', 'host.see-main.') %>
                             </div>
-                            <div class="summary-element-icon">
-                                <i class="<%= CLASS_ICON_HOSTS %>"></i>
+                            <div class="summary-element-icon js-summary-element-icon">
+                                <%= Wat.C.ifACL('<a href="#/hosts">', 'host.see-main.') %>
+                                    <i class="<%= CLASS_ICON_HOSTS %>"></i>
+                                <%= Wat.C.ifACL('</a>', 'host.see-main.') %>
                             </div>
-                            <div class="summary-element-count">
+                            <div class="summary-element-count js-summary-element-count">
                                 <span class="summary-data js-summary-hosts" data-wsupdate="hosts_count"><%= stats.hosts_count %></span>
 
                                 <table class="summary-element-subtable second_row">
@@ -120,33 +126,37 @@
                         </div>
                     </div>
                 <% } if (Wat.C.checkACL('osf.stats.summary')) { %>
-                    <div class="home-cell">
+                    <div class="home-cell js-home-cell">
                         <div class="summary-element home-widget">
-                            <div class="summary-element-title">
+                            <div class="summary-element-title js-summary-element-title">
                                 <%= Wat.C.ifACL('<a href="#/osfs" data-i18n="OS Flavours">', 'osf.see-main.') %>
                                     <%= i18n.t('OS Flavours') %>
                                 <%= Wat.C.ifACL('</a>', 'osf.see-main.') %>
                             </div>
-                            <div class="summary-element-icon">
-                                <i class="<%= CLASS_ICON_OSFS %>"></i>
+                            <div class="summary-element-icon js-summary-element-icon">
+                                <%= Wat.C.ifACL('<a href="#/osfs">', 'osf.see-main.') %>
+                                    <i class="<%= CLASS_ICON_OSFS %>"></i>
+                                <%= Wat.C.ifACL('</a>', 'osf.see-main.') %>
                             </div>
-                            <div class="summary-element-count">
+                            <div class="summary-element-count js-summary-element-count">
                                 <span class="summary-data js-summary-osfs" data-wsupdate="osfs_count"><%= stats.osfs_count %></span>
                             </div>
                         </div>
                     </div>
                 <% } if (Wat.C.checkACL('di.stats.summary')) { %>
-                    <div class="home-cell">
+                    <div class="home-cell js-home-cell">
                         <div class="summary-element home-widget">
-                            <div class="summary-element-title">
+                            <div class="summary-element-title js-summary-element-title">
                                 <%= Wat.C.ifACL('<a href="#/dis" data-i18n="Disk images">', 'di.see-main.') %>
                                     <%= i18n.t('Disk images') %>
                                 <%= Wat.C.ifACL('</a>', 'di.see-main.') %>
                             </div>
-                            <div class="summary-element-icon">
-                                <i class="<%= CLASS_ICON_DIS %>"></i>
+                            <div class="summary-element-icon js-summary-element-icon">
+                                <%= Wat.C.ifACL('<a href="#/dis">', 'di.see-main.') %>
+                                    <i class="<%= CLASS_ICON_DIS %>"></i>
+                                <%= Wat.C.ifACL('</a>', 'di.see-main.') %>
                             </div>
-                            <div class="summary-element-count">
+                            <div class="summary-element-count js-summary-element-count">
                                 <span class="summary-data js-summary-dis" data-wsupdate="dis_count"><%= stats.dis_count %></span>
 
                                 <table class="summary-element-subtable second_row">
@@ -169,7 +179,7 @@
         <% } %>
         <div class="home-row">
             <% if (Wat.C.checkACL('vm.stats.running-vms')) { %>
-            <div class="home-cell">
+            <div class="home-cell js-home-cell">
                 <div class="home-title" data-i18n="Running virtual machines"></div>
                 <div class="home-percent-wrapper">
                     <div class="js-running-vms-percent home-title home-percent js-home-percent"></div>
@@ -182,7 +192,7 @@
             <% } %>
 
             <% if (Wat.C.checkACL('user.stats.connected-users')) { %>
-            <div class="home-cell">
+            <div class="home-cell js-home-cell">
                 <div class="home-title" data-i18n="Connected users"></div>
                 <div class="home-percent-wrapper">
                     <div class="js-connected-users-percent home-title home-percent js-home-percent"></div>
@@ -195,7 +205,7 @@
             <% } %>
 
             <% if (Wat.C.checkACL('host.stats.running-hosts')) { %>
-            <div class="home-cell">
+            <div class="home-cell js-home-cell">
                 <div class="home-title" data-i18n="Running nodes"></div>
                 <div class="home-percent-wrapper">
                     <div class="js-running-hosts-percent home-title home-percent js-home-percent"></div>
@@ -212,18 +222,18 @@
 <% if (Wat.C.checkGroupACL('statisticsBlockedObjects') || Wat.C.checkACL('vm.stats.close-to-expire') || Wat.C.checkACL('host.stats.top-hosts-most-vms')) { %>
         <div class="home-row">
             <% if (Wat.C.checkACL('vm.stats.close-to-expire')) { %>
-                <div class="home-cell bb-vms-expire"></div>
+                <div class="home-cell js-home-cell bb-vms-expire"></div>
             <% } %>
 
             <% if (Wat.C.checkACL('host.stats.top-hosts-most-vms')) { %>
-            <div class="home-cell">
+            <div class="home-cell js-home-cell">
                 <div class="home-title" data-i18n="Nodes with most running VMs"></div>
                 <div id="hosts-more-vms" class="bar-chart js-bar-chart" style="width:95%;height:200px;"></div>
             </div>
             <% } %>
 
             <% if (Wat.C.checkGroupACL('statisticsBlockedObjects')) { %>
-                <div class="home-cell">
+                <div class="home-cell js-home-cell">
                     <div class="home-title" data-i18n="Blocked elements"></div>
                     <table class="summary-table">
                         <% if (Wat.C.checkACL('user.stats.blocked')) { %>
