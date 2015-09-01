@@ -10,52 +10,62 @@ Wat.WS = {
             
             var urlParams = Wat.U.objToUrl(params);
 
-            // Let us open a web socket
-            var ws = new WebSocket('ws://' + Wat.C.apiAddress + '/' + stream + '?sid=' + Wat.C.sid + '&action=' + action + urlParams + '&parameters=' + JSON.stringify({source: Wat.C.source}));
-            
-            ws.onopen = function() {
-                // Web Socket is connected, send data using send()
-                if (Wat.WS.debug) {
-                    console.info("Websocket opened");
-                }
-                ws.send("HI");
-            };
-            ws.onmessage = function (evt) { 
-                var received_msg = evt.data;
-                
-                if (received_msg != 'AKN') {
-                    var data = JSON.parse(received_msg);
-                    
-                    if (params.filters) {
-                        var id = params.filters.id
-                    }
-                    
+            try {
+                // Let us open a web socket
+                var wsURI = 'ws://' + Wat.C.apiAddress + '/' + stream + '?sid=' + Wat.C.sid + '&action=' + action + urlParams + '&parameters=' + JSON.stringify({source: Wat.C.source});
+                var ws = new WebSocket(encodeURI(wsURI));
+
+                ws.onopen = function() {
+                    // Web Socket is connected, send data using send()
                     if (Wat.WS.debug) {
-                        console.info("Message is received: ");
-                        console.info(action + ' : ' + id + ' : ' + JSON.stringify(data));
+                        console.info("Websocket opened");
                     }
-                    
-                    callback(qvdObj, id, data, ws, viewType);
-                }
-                setTimeout(function () {
-                    if (ws.readyState == WS_OPEN) {
-                        ws.send("AKN");
+                    ws.send("HI");
+                };
+                ws.onmessage = function (evt) { 
+                    var received_msg = evt.data;
+
+                    if (received_msg != 'AKN') {
+                        var data = JSON.parse(received_msg);
+
+                        if (params.filters) {
+                            var id = params.filters.id
+                        }
+
+                        if (Wat.WS.debug) {
+                            console.info("Message is received: ");
+                            console.info(action + ' : ' + id + ' : ' + JSON.stringify(data));
+                        }
+
+                        callback(qvdObj, id, data, ws, viewType);
                     }
-                }, 500);
-            };
-            
-            ws.onclose = function() { 
-                // websocket is closed.
-                if (Wat.WS.debug) {
-                    console.info("Connection is closed...");
+                    setTimeout(function () {
+                        if (ws.readyState == WS_OPEN) {
+                            ws.send("AKN");
+                        }
+                    }, 500);
+                };
+
+                ws.onclose = function() { 
+                    // websocket is closed.
+                    if (Wat.WS.debug) {
+                        console.info("Connection is closed...");
+                    }
+                };
+
+                if (this.websockets[this.cid] == undefined) {
+                    this.websockets[this.cid] = [];
                 }
-            };
-            
-            if (this.websockets[this.cid] == undefined) {
-                this.websockets[this.cid] = [];
-            }
-            
-            this.websockets[this.cid].push(ws);
+
+                this.websockets[this.cid].push(ws);
+                }
+                catch (exception) { 
+                    if (Wat.WS.debug) {
+                        if (window.console) {
+                            console.log(exception);
+                        }
+                    }
+                }
         }
         else {
             // The browser doesn't support WebSocket
