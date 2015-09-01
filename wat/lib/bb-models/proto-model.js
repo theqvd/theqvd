@@ -81,7 +81,7 @@ Wat.Models.Model = Backbone.Model.extend({
         var params = _.extend({
             type: 'POST',
             dataType: 'json',
-            url: that.url(),
+            url: encodeURI(that.url()),
             processData: false
         }, options);
         
@@ -90,11 +90,11 @@ Wat.Models.Model = Backbone.Model.extend({
     
     save: function(attributes, options) { 
         options = {
-            url: Wat.C.getBaseUrl() + 
+            url: encodeURI(Wat.C.getBaseUrl() + 
                 "&action=" + this.operation +
                 "&filters=" + JSON.stringify(options.filters) + 
                 "&arguments=" + JSON.stringify(attributes) +
-                "&parameters=" + JSON.stringify({source: Wat.C.source})
+                "&parameters=" + JSON.stringify({source: Wat.C.source}))
         };
         
         return Backbone.Model.prototype.save.call(this, attributes, options);

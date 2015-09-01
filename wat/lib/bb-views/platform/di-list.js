@@ -90,6 +90,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             Wat.A.fillSelect(params);  
         }
         
+        $('select[name="images_source"]').trigger('change');
         Wat.I.chosenElement('select[name="images_source"]', 'single100');
     },
     
@@ -187,7 +188,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
 
         $.ajax({
-            url: url, 
+            url: encodeURI(url), 
             data: data,
             type: 'POST',
             xhr: function() {  // Custom XMLHttpRequest
@@ -236,7 +237,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
         Wat.WS.openWebsocket (this.qvdObj, 'di_create', {
                 arguments: args,
-                url: diskImageUrl
+                url: encodeURI(diskImageUrl)
         }, this.creatingProcessDownload, 'di/download/');
     },   
     

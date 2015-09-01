@@ -24,7 +24,7 @@ Wat.A = {
                 var tmplString = '';
 
                 $.ajax({
-                    url: tmplUrl,
+                    url: encodeURI(tmplUrl),
                     method: 'GET',
                     async: true,
                     contentType: 'text',
@@ -96,7 +96,7 @@ Wat.A = {
 
         successCallback = successCallback || function () {};   
         var params = {
-            url: url,
+            url: encodeURI(url),
             type: 'POST',
             dataType: 'json',
             processData: false,
@@ -184,7 +184,7 @@ Wat.A = {
 
         successCallback = successCallback || function () {};   
         var params = {
-            url: url,
+            url: encodeURI(url),
             type: 'POST',
             dataType: 'json',
             processData: false,
@@ -313,7 +313,7 @@ Wat.A = {
             }
             
             var request = $.ajax({
-                url: jsonUrl,
+                url: encodeURI(jsonUrl),
                 type: 'POST',
                 async: true,
                 dataType: 'json',

@@ -57,7 +57,7 @@ Wat.Collections.Collection = Backbone.Collection.extend({
         var params = _.extend({
             type: 'POST',
             dataType: 'json',
-            url: that.getListUrl(),
+            url: encodeURI(that.getListUrl()),
             processData: false
         }, options);
         
