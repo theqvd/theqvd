@@ -17,18 +17,10 @@ body {
     font-family: 'Droid Sans', Lato, 'Open Sans', FontAwesome !important; 
     
     @include font-size(1);
-
-    @include in(desktop) {
-        @include font-size(3);
-    }
 }
 
 th, td * {
-    font-size: 14px;
-
-    @include in(desktop) {
-        @include font-size(2);
-    }
+    @include font-size(2);
 }
 
 .doc-text {
@@ -185,11 +177,6 @@ td {
 }
 
 // Messages
-
 .message-container .message {
-    font-size: 1.1em;
-
-    @include in(desktop) {
-        @include font-size(3);
-    }
+    @include font-size-static(3);
 }

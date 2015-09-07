@@ -3146,25 +3146,14 @@ body {
     * {
       font-size: 0.9em;
       line-height: 1.2em; } }
-  @media screen and (min-width: 41em) {
-    * {
-      font-size: 1.5em;
-      line-height: 1.5em; }
-      @media screen and (min-width: 41em) {
-        * {
-          font-size: 1.1em;
-          line-height: 1.4em; } } }
 
 th, td * {
-  font-size: 14px; }
+  font-size: 1.3em;
+  line-height: 1.3em; }
   @media screen and (min-width: 41em) {
     th, td * {
-      font-size: 1.3em;
-      line-height: 1.3em; }
-      @media screen and (min-width: 41em) {
-        th, td * {
-          font-size: 1em;
-          line-height: 1.3em; } } }
+      font-size: 1em;
+      line-height: 1.3em; } }
 
 .doc-text {
   font-size: 0.9em;
@@ -3332,15 +3321,8 @@ td {
   font-size: 35px; }
 
 .message-container .message {
-  font-size: 1.1em; }
-  @media screen and (min-width: 41em) {
-    .message-container .message {
-      font-size: 1.5em;
-      line-height: 1.5em; }
-      @media screen and (min-width: 41em) {
-        .message-container .message {
-          font-size: 1.1em;
-          line-height: 1.4em; } } }
+  font-size: 1.1em;
+  line-height: 1.4em; }
 
 /********************************************************************
 *********************************************************************

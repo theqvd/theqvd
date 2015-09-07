@@ -58,14 +58,14 @@ Wat.WS = {
                 }
 
                 this.websockets[this.cid].push(ws);
-                }
-                catch (exception) { 
-                    if (Wat.WS.debug) {
-                        if (window.console) {
-                            console.log(exception);
-                        }
+            }
+            catch (exception) { 
+                if (Wat.WS.debug) {
+                    if (window.console) {
+                        console.warn(exception);
                     }
                 }
+            }
         }
         else {
             // The browser doesn't support WebSocket
