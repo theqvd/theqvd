@@ -750,7 +750,81 @@ asciidoc.install(2);
 </div>
 </div>
 <div class="sect1">
-<h2 id="_estructura_general_de_la_interfaz">2. Estructura general de la interfaz</h2>
+<h2 id="_compatibilidad_de_navegadores">2. Compatibilidad de navegadores</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>A continuación se especifican los navegadores soportados para utilizar el WAT con todas sus funcionalidad. La utilización de versiones inferiores y/o otros navegadores no garantiza su correcto funcionamiento.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Escritorio
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<thead>
+<tr>
+<th align="left" valign="top">Chrome </th>
+<th align="left" valign="top">Firefox        </th>
+<th align="left" valign="top">Internet Explorer </th>
+<th align="left" valign="top">Opera</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table">40+</p></td>
+<td align="left" valign="top"><p class="table">31+</p></td>
+<td align="left" valign="top"><p class="table">11+</p></td>
+<td align="left" valign="top"><p class="table">31+</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Dispositivos móviles
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<thead>
+<tr>
+<th align="left" valign="top">iOS Safari     </th>
+<th align="left" valign="top">iOS Chrome     </th>
+<th align="left" valign="top">Android Browser    </th>
+<th align="left" valign="top">Android Chrome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table">8.4+</p></td>
+<td align="left" valign="top"><p class="table">40+</p></td>
+<td align="left" valign="top"><p class="table">4.3+</p></td>
+<td align="left" valign="top"><p class="table">44+</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_estructura_general_de_la_interfaz">3. Estructura general de la interfaz</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>La estructura de la interfaz del WAT tiene 6 componentes básicos:</p></div>
 <div class="ulist"><ul>
@@ -916,11 +990,11 @@ Captura
 </div>
 </div>
 <div class="sect1">
-<h2 id="_estructura_listado_detalle">3. Estructura listado-detalle</h2>
+<h2 id="_estructura_listado_detalle">4. Estructura listado-detalle</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>La gestión de elementos en el WAT tiene componentes en común a lo largo de muchas de sus secciones. Estos componentes conforman la estructura listado-detalle.</p></div>
 <div class="sect2">
-<h3 id="_vista_listado">3.1. Vista listado</h3>
+<h3 id="_vista_listado">4.1. Vista listado</h3>
 <div class="paragraph"><p>Vista donde se muestra una lista de elementos paginados con controles de filtrado y acciones.</p></div>
 <div class="ulist"><ul>
 <li>
@@ -1021,7 +1095,7 @@ También es posible <strong>seleccionar todos los elementos de un solo click</st
 </ul></div>
 </div>
 <div class="sect2">
-<h3 id="_vista_detalle">3.2. Vista detalle</h3>
+<h3 id="_vista_detalle">4.2. Vista detalle</h3>
 <div class="paragraph"><p>Vista donde se muestran detallados los datos de un elemento junto a información relacionada y controles de acción, editado y borrado.</p></div>
 <div class="ulist"><ul>
 <li>
@@ -1082,7 +1156,7 @@ Componentes detallados
 </ul></div>
 </div>
 <div class="sect2">
-<h3 id="_formularios_de_creación_edición">3.3. Formularios de creación-edición</h3>
+<h3 id="_formularios_de_creación_edición">4.3. Formularios de creación-edición</h3>
 <div class="paragraph"><p>Tanto en una vista como en otra, al crear o editar un elemento, se mostrarán los diferentes formularios en ventanas modales, sin salir del contexto de la vista.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_user_create.png" alt="screenshot_user_create.png" width="960px" />
@@ -1094,16 +1168,16 @@ Componentes detallados
 </div>
 </div>
 <div class="sect1">
-<h2 id="_permisos_administrador_rol_acl">4. Permisos: Administrador-Rol-ACL</h2>
+<h2 id="_permisos_administrador_rol_acl">5. Permisos: Administrador-Rol-ACL</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Un <strong>administrador</strong> es un usuario dotado de credenciales y permisos para administrar una solución QVD a través de la herramienta de administración web (WAT).</p></div>
 <div class="sect2">
-<h3 id="_administradores">4.1. Administradores</h3>
+<h3 id="_administradores">5.1. Administradores</h3>
 <div class="paragraph"><p>Un administrador será creado por <strong>otro administrador</strong> del WAT siempre que tenga permisos para ello.</p></div>
 <div class="paragraph"><p>No basta con crear un administrador para que pueda acceder al sistema. Hará falta asignarle permisos.</p></div>
 </div>
 <div class="sect2">
-<h3 id="_permisos">4.2. Permisos</h3>
+<h3 id="_permisos">5.2. Permisos</h3>
 <div class="paragraph"><p>Los administradores del WAT pueden ser configurados para tener <strong>diferentes permisos para ver determinada información o realizar diferentes acciones</strong>. A estos permisos los denominamos <strong>ACLs</strong>.</p></div>
 <div class="paragraph"><p>Dicha asignación no se realiza directamente, sino que se configuran una serie de <strong>roles con los ACLs deseados</strong> y dichos roles se asignan a los administradores.</p></div>
 <div class="paragraph"><p><span class="image">
@@ -1111,13 +1185,13 @@ Componentes detallados
 </span></p></div>
 <div class="paragraph"><p>Si no tenemos el rol o conjunto de roles deseados para ese administrador deberemos crearlo.</p></div>
 <div class="sect3">
-<h4 id="_roles">4.2.1. Roles</h4>
+<h4 id="_roles">5.2.1. Roles</h4>
 <div class="paragraph"><p>A un rol se le pueden asignar ACLs y/o heredarlos de otros roles.</p></div>
 <div class="paragraph"><p>En la herencia de roles es posible escoger qué ACLs heredar y cuales no.</p></div>
 <div class="paragraph"><p>Un rol puedo heredar de uno o varios roles, así como un administrador puede tener uno o más roles asignados, adquiriendo sus ACLs.</p></div>
 </div>
 <div class="sect3">
-<h4 id="_acls">4.2.2. ACLs</h4>
+<h4 id="_acls">5.2.2. ACLs</h4>
 <div class="paragraph"><p>Las características y cosas a tener en cuenta de los ACLs se pueden resumir en los siguientes puntos:</p></div>
 <div class="ulist"><ul>
 <li>
@@ -1198,7 +1272,7 @@ Gestionar sus propios ACLs, pudiendo llegar a tener permisos totales o incluso p
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-03-03 10:30:52 CET
+Last updated 2015-09-08 10:58:55 CEST
 </div>
 </div>
 </body>
