@@ -74,7 +74,7 @@
         /
         <span class="elements-total"></span>
     </div>
-    <div class="mobile clear"></div>
+    <div class="clear"></div>
 
     <% 
     if (Object.keys(selectedActions).length > 0)
