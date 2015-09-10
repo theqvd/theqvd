@@ -58,6 +58,13 @@ Wat.WS = {
                 }
 
                 this.websockets[this.cid].push(ws);
+                
+                if (Wat.WS.debug) {
+                    if (window.console) {
+                        console.info('#WS currently opened: ' + this.websockets[this.cid].length);
+                    }
+                }
+                
             }
             catch (exception) { 
                 if (Wat.WS.debug) {
@@ -107,27 +114,49 @@ Wat.WS = {
     openStatsWebsockets: function (qvdObj, fields, cid) {
         this.cid = cid;
         var that = this;
-
-        var filters = {
-            id: null
-        };
         
-        $.each(fields, function (iField, field) {
-            that.openWebsocket(qvdObj, 'qvd_objects_statistics', {
-                filters: filters, 
-                fields: field
-            }, that.changeWebsocket, 'ws', 'stats');
-        });
+        that.openWebsocket(qvdObj, 'qvd_objects_statistics', { 
+            fields: fields
+        }, that.changeWebsocket, 'ws', 'stats');
     },
     
-    openListWebsockets: function (qvdObj, models, fields, cid) {
+    openListWebsockets: function (qvdObj, collection, fields, cid) {
         this.closeViewWebsockets(cid);
 
         var that = this;
                 
-        $.each(models, function (iModel, model) {
+        // NON-EFFICIENT VERSION: Monitoring elements one per socket
+        $.each(collection.models, function (iModel, model) {
             that.openDetailsWebsockets (qvdObj, model, fields, cid, 'list');
         });
+        
+        // IMPROVED VERSION 1: Monitoring just the shown elements
+        /*
+        // Build an OR filter with the IDs of all visible elements
+        var filters = {
+            '-or': []
+        };
+        $.each(collection.pluck('id'), function (iId, id) {
+            filters['-or'].push('id');
+            filters['-or'].push(id);
+        });
+          
+        that.openWebsocket(qvdObj, qvdObj + '_get_list', {
+            filters: filters, 
+            fields: fields
+        }, that.changeWebsocket, 'ws', 'list');
+        */
+        
+        // IMPROVED VERSION 2: Live monitoring where some elements can dissapear from list and appear another ones
+        /*
+        that.openWebsocket(qvdObj, qvdObj + '_get_list', {
+            offset: collection.offset, 
+            block: collection.block, 
+            filters: collection.filters, 
+            order_by: collection.sort, 
+            fields: fields
+        }, that.changeWebsocket, 'ws', 'list');
+        */
     },    
     
     openDetailsWebsockets: function (qvdObj, model, fields, cid, viewType) {

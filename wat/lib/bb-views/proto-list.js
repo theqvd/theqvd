@@ -828,7 +828,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         // Open websockets for live fields
         if (this.liveFields) {
-            Wat.WS.openListWebsockets(this.qvdObj, this.collection.models, this.liveFields, this.cid);
+            Wat.WS.openListWebsockets(this.qvdObj, this.collection, this.liveFields, this.cid);
         }
         
         Wat.T.translateAndShow();
