@@ -15,4 +15,10 @@ sub tenant_name
     $self->properties_list->tenant->name;
 }
 
+sub description 
+{
+    my $self = shift;
+    $self->properties_list->description;
+}
+
 1;

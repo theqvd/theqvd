@@ -97,7 +97,7 @@ sub combined_properties {
 sub host_name 
 {
     my $self = shift;
-    defined $self->vm_runtime->host ? $self->vm_runtime->host->name : '';
+    defined $self->vm_runtime->host ? $self->vm_runtime->host->name : undef;
 }
 
 sub di_id
