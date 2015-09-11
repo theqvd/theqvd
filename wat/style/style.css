@@ -800,6 +800,10 @@ body {
   top: 0px;
   width: 100%;
   z-index: 100; }
+  @media screen and (min-width: 41em) {
+    .header-wrapper {
+      width: auto;
+      min-width: 100%; } }
   .header-wrapper.header-wrapper--mini {
     height: 40px;
     opacity: 0.9; }
@@ -808,7 +812,9 @@ body {
   .header-wrapper .header {
     position: relative;
     min-width: 0px; }
-    @media screen and (min-width: 41em) { }
+    @media screen and (min-width: 41em) {
+      .header-wrapper .header {
+        min-width: 1024px; } }
     .header-wrapper .header .logo {
       height: 55px;
       margin: 5px 0px; }
@@ -920,7 +926,9 @@ body {
   margin-bottom: 50px;
   position: relative; }
   @media screen and (min-width: 41em) { }
-  @media screen and (min-width: 41em) { }
+  @media screen and (min-width: 41em) {
+    .wrapper {
+      min-width: 1024px; } }
   .wrapper .menu {
     margin-bottom: 10px;
     margin-top: 5px; }
@@ -1773,6 +1781,21 @@ select[name="role"] {
         top: 11px;
         color: #b3b3b3;
         font-weight: normal; }
+
+.responsive-switch {
+  margin-bottom: 45px;
+  width: 100%; }
+  @media screen and (min-width: 41em) {
+    .responsive-switch {
+      position: absolute;
+      margin-left: auto;
+      margin-right: auto;
+      left: 0;
+      right: 0;
+      bottom: 0px; } }
+  .responsive-switch a {
+    display: table;
+    margin: 0 auto; }
 
 .footer {
   z-index: 1000;

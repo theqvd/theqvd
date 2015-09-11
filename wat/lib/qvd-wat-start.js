@@ -12,6 +12,11 @@
     })(jQuery);
     
 	$(doc).ready(function() {
+        // If desktop mode is forced, change viewport's meta tag
+        if ($.cookie('forceDesktop')) {
+            $('meta[name="viewport"]').prop('content', 'width=1024, initial-scale=1, maximum-scale=1');
+        }
+        
         // Init API address variables
         Wat.C.initApiAddress();
         

@@ -111,6 +111,10 @@ Wat.B = {
         this.bindEvent('click', '.js-back-top-doc-button', this.navigationBinds.goDocTop);
         this.bindEvent('click', '.js-back-top-generic-button', this.navigationBinds.goSimpleTop);
         
+        // Switch desktop-mobile modes
+        this.bindEvent('click', '.js-force-desktop', this.navigationBinds.forceDesktopMode);
+        this.bindEvent('click', '.js-unforce-desktop', this.navigationBinds.unforceDesktopMode);
+
         // On any scroll
         $(window).off('scroll');
         $(window).on('scroll', this.navigationBinds.onScroll);
@@ -312,6 +316,16 @@ Wat.B = {
             }
         },
         
+        forceDesktopMode: function () {
+            $.cookie('forceDesktop', "1", { expires: 7, path: '/' });
+            window.location.reload();
+        },   
+        
+        unforceDesktopMode: function () {
+            $.removeCookie('forceDesktop', { path: '/' });
+            window.location.reload();
+        },
+        
         toggleImagesource: function (e) {
             var selectedSource = $(e.target).val();
             
@@ -357,7 +371,8 @@ Wat.B = {
                 $('.js-server-datetime-wrapper').removeClass('server-datetime-wrapper--mini');
                 $('.js-menu-corner').css('top', '20px');
             }
-
+            
+            $('.js-header-wrapper').css('left', -$(window).scrollLeft());
         },
         
         clickScreenHelp: function (e) {

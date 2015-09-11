@@ -2,7 +2,7 @@
     <iframe id="remember" name="remember" class="hidden" src="index.html"></iframe>
 
     <div class="login-side">
-        <img src="images/qvd-logo-header-trans-tiny_big.png" />
+        <img src="images/logo-login.png" />
     </div>
     <div class="login-main">
         <form class="login-form js-login-form" target="remember" method="post" action="index.html">

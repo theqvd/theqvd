@@ -2,7 +2,7 @@
 <div class="header-wrapper js-header-wrapper">
     <div class="header">
         <a href="#">
-            <img src="images/qvd-logo-header-trans.png" class="logo">
+            <img src="images/logo-header.png" class="logo">
         </a>
         <a href="javascript:" class="fa fa-bars mobile-menu js-mobile-menu-hamburger" id="mobile-menu"></a>
         <% 
@@ -57,6 +57,13 @@
     <div class="bb-menu"></div>
     <div class="content bb-content js-content"></div>
     <div class="loading"><i class="fa fa-gear fa-spin"></i></div>
-</div>                        
+</div>                       
 </div>
+    <div class="js-responsive-switch responsive-switch <%= !forceDesktop ? 'mobile' : '' %>">
+        <% if (forceDesktop) { %>
+            <a class="fa fa-mobile button2 js-unforce-desktop" data-i18n="Mobile version"></a>
+        <% } else { %>
+            <a class="fa fa-desktop button2 js-force-desktop" data-i18n="Desktop version"></a>
+        <% } %>
+    </div>
 <div class="footer" data-link="<a href='http://qindel.com'>Qindel Group</a>"></div>

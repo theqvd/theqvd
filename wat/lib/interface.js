@@ -302,13 +302,13 @@ Wat.I = {
     },
     
     showContent: function () {
-        this.adaptSideSize();
-
         $('.breadcrumbs').css('visibility','visible').hide().show();
         $('.js-content').css('visibility','visible').hide().show();
         $('.footer').css('visibility','visible').hide().show();
         $('.loading').hide();
         $('.related-doc').css('visibility','visible').hide().show();
+        
+        this.adaptSideSize();
     },
 
     showLoading: function () {
@@ -469,7 +469,8 @@ Wat.I = {
         var template = _.template(
             Wat.TPL.main, {
                 loggedIn: Wat.C.loggedIn,
-                cornerMenu: this.cornerMenu
+                cornerMenu: this.cornerMenu,
+                forceDesktop: $.cookie('forceDesktop')
             });
         
         $('.bb-super-wrapper').html(template);
