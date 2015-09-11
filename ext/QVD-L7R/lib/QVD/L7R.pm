@@ -28,6 +28,7 @@ my $vm_poll_time     = cfg('internal.l7r.poll_time.vm');
 my $x_poll_time      = cfg('internal.l7r.poll_time.x');
 my $takeover_timeout = cfg('internal.l7r.timeout.takeover');
 my $vm_start_timeout = cfg('internal.l7r.timeout.vm_start');
+my $vm_stop_timeout  = cfg('internal.l7r.timeout.vm_stop');
 my $x_start_retry    = cfg('internal.l7r.retry.x_start');
 my $x_start_timeout  = cfg('internal.l7r.timeout.x_start');
 my $vma_timeout      = cfg('internal.l7r.timeout.vma');
@@ -180,6 +181,8 @@ sub connect_to_vm_processor {
             $l7r->throw_http_error(HTTP_FORBIDDEN,
                                        "The requested virtual machine is offline for maintenance");
         };
+        # FIXME: at this point we have not checked yet if the user can
+        # access this machine!!!
         $vm->update({real_user_id => $user_id});
         return $vm,
     };
@@ -237,67 +240,25 @@ sub stop_vm_processor {
     my $query = (uri_split $url)[3];
     my %params = uri_query_split  $query;
     my $vm_id = delete $params{id};
-    my $file_name = delete $params{file_name};
-    unless (defined $vm_id or defined $file_name)  {
+    unless (defined $vm_id) {
         INFO 'Parameter id required';
         $l7r->throw_http_error(HTTP_UNPROCESSABLE_ENTITY, "parameter id is missing");
     }
 
-    my $vm = txn_eval {
-        my $vm;
-        $vm = rs(VM_Runtime)->search({vm_id => $vm_id})->first // do {
-            INFO 'The requested virtual machine does not exist,)'. " VM_ID: $vm_id";
-            $l7r->throw_http_error(HTTP_NOT_FOUND, "The requested virtual machine does not exist");
-        };
-        $vm->blocked and do {
-            INFO 'The requested virtual machine is offline for maintenance'. " VM_ID: $vm_id";
-            $l7r->throw_http_error(HTTP_FORBIDDEN,
-                                       "The requested virtual machine is offline for maintenance");
-        };
-        $vm->update({real_user_id => $user_id});
-        return $vm,
+    my $vm = rs(VM_Runtime)->search({vm_id => $vm_id})->first // do {
+        INFO 'The requested virtual machine does not exist,)'. " VM_ID: $vm_id";
+        $l7r->throw_http_error(HTTP_NOT_FOUND, "The requested virtual machine does not exist");
     };
 
-    if (!$vm) {
-        $l7r->throw_http_error(HTTP_NOT_FOUND, $@);
+    if (!$auth->allow_access_to_vm($vm->vm)) {
+        INFO "User $user_id has tried to access VM $vm_id but (s)he isn't allowed to";
+        $l7r->throw_http_error(HTTP_FORBIDDEN,
+                               "You are not allowed to access requested virtual machine");
     }
 
-    eval {
-        if (!$auth->allow_access_to_vm($vm->vm)) {
-            INFO "User $user_id has tried to access VM $vm_id but (s)he isn't allowed to";
-            $l7r->throw_http_error(HTTP_FORBIDDEN,
-                die                   "You are not allowed to access requested virtual machine");
-        }
-    #    $l7r->_takeover_vm($vm);
-    #    $l7r->_assign_vm($vm);
-    #    $auth->before_connect_to_vm;
-        $l7r->_stop_and_wait_for_vm($vm);
-    };
-    my $saved_err = $@;
-    DEBUG 'Releasing VM'. " VM_ID: $vm_id";
-    $l7r->_release_vm($vm);
-    if ($saved_err) {
-        chomp $saved_err;
-        INFO "The requested virtual machine is not available: '$saved_err'. Retry later". " VM_ID: $vm_id";
-        $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE,
-                          "The requested virtual machine is not available: ",
-                          "$saved_err, retry later");
-    }
-    DEBUG "VM shut down". " VM_ID: $vm_id";
-
-    my %vm = (
-	id      => $vm->vm_id,
-	state   => $vm->vm_state,
-	name    => $vm->vm->name,
-	blocked => $vm->blocked 
-	);
-
-    $l7r->send_http_response_with_body( HTTP_OK, 'application/json', [],
-                                        $l7r->json->encode(\%vm) );
-
+    $l7r->_stop_and_wait_for_vm($vm);
+    $l7r->send_http_response_with_body(HTTP_OK, 'text/plain', [], "Machine stopped\r\n");
 }
-
-
 
 sub _authenticate_user {
     my ($l7r, $headers) = @_;
@@ -427,91 +388,72 @@ sub _assign_vm {
     }
 }
 
+sub _wait_for_vm {
+    my ($l7r, $vm, $target_state, $timeout) = @_;
+    my $end = $timeout + time;
+    my $vm_id = $vm->id;
+    while (1) {
+        $vm->discard_changes;
+        my $current_state = $vm->vm_state;
+        DEBUG "waiting for VM $vm_id to reach state $target_state from state $current_state";
+
+        return 1 if $current_state eq $target_state;
+
+        if ($current_state eq 'stopped' and
+            not defined $vm->vm_cmd) {
+            DEBUG "VM went to state 'stopped' unexpectedly";
+            return;
+        }
+
+        if (time > $end) {
+            DEBUG "timeout waiting for VM $vm_id to reach state '$target_state'";
+            $l7r->throw_http_error(HTTP_REQUEST_TIMEOUT,
+                                   "VM didn't reach state '$target_state'. Timeout");
+        }
+        $l7r->_tell_client("Waiting for VM to reach state '$target_state'");
+        sleep($vm_poll_time);
+    }
+}
+
 sub _start_and_wait_for_vm {
     my ($l7r, $vm) = @_;
 
-    my $vm_id = $vm->id;
-    my $timeout = time + $vm_start_timeout;
-    my $vm_state = $vm->vm_state;
-
-    if ($vm_state eq 'stopped') {
+    if ($vm->can_send_vm_cmd('start')) {
         $l7r->_tell_client("Starting virtual machine");
         $vm->send_vm_start;
         my $host_id = $vm->host_id;
         notify("qvd_cmd_for_vm_on_host$host_id");
     }
 
-    return if $vm_state eq 'running';
-
-    $l7r->_tell_client("Waiting for VM $vm_id to start");
-    while (1) {
-        DEBUG "waiting for VM $vm_id to come up";
-        sleep($vm_poll_time);
-        $vm->discard_changes;
-        $l7r->_check_abort($vm);
-        my $vm_state = $vm->vm_state;
-        if ($vm_state eq 'running') {
-            DEBUG 'VM is running VM_ID: '. $vm->id;
-            return;
-        }
-        # FIXME: timeout in state starting_1 should be relaxed a bit
-        if (( $vm_state eq 'stopped' and
-              defined $vm->vm_cmd ) or
-            $vm_state =~ /^starting/) {
-            LOGDIE "Unable to start VM $vm_id, operation timed out!\n"
-                if time > $timeout;
-        }
-        else {
-            LOGDIE "Unable to start VM $vm_id in state $vm_state";
-        }
-    }
+    $l7r->_wait_for_vm($vm, 'running', $vm_start_timeout)
+        or LOGDIE "Unable to start VM " . $vm->id;
 }
 
 sub _stop_and_wait_for_vm {
     my ($l7r, $vm) = @_;
 
+    # we don't use transactions in this method as it is a non-critical cmd.
     my $vm_id = $vm->id;
-    my $timeout = time + $vm_start_timeout;
     my $vm_state = $vm->vm_state;
+    my $host_id = $vm->host_id;
 
-    DEBUG "stop_and_wait: VM $vm_id, timeout $timeout, state $vm_state";
+    DEBUG "stop_and_wait: VM $vm_id, timeout $vm_stop_timeout, state $vm_state, host $host_id";
 
-    if ($vm_state eq 'running') {
-        $l7r->_tell_client("Stopping virtual machine");
-        DEBUG "VM $vm_id running, stopping";
+    return 1 if $vm_state eq 'stopped';
+
+    $l7r->_tell_client("Stopping virtual machine");
+    if ($vm->can_send_vm_cmd('stop')) {
         $vm->send_vm_stop;
-        my $host_id = $vm->host_id;
         notify("qvd_cmd_for_vm_on_host$host_id");
     }
-
-    return if $vm_state eq 'stopped';
-
-    $l7r->_tell_client("Waiting for VM $vm_id to stop");
-    while (1) {
-        DEBUG "waiting for VM $vm_id to shut down";
-        sleep($vm_poll_time);
-        $vm->discard_changes;
-        $l7r->_check_abort($vm);
-        my $vm_state = $vm->vm_state;
-        if ($vm_state eq 'stopped') {
-            DEBUG 'VM is running VM_ID: '. $vm->id;
-            return;
-        }
-        # FIXME: timeout in state starting_1 should be relaxed a bit
-        if (( $vm_state eq 'running' and
-              defined $vm->vm_cmd ) or
-            $vm_state =~ /^stopping/) {
-            LOGDIE "Unable to stop VM $vm_id, operation timed out!\n"
-                if time > $timeout;
-        }
-        else {
-            LOGDIE "Unable to stop VM $vm_id in state $vm_state";
-        }
+    elsif ($vm_state ne 'stopping') {
+        $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE,
+                               "The requested virtual machine is in an unstoppable state ($vm_state)");
     }
+
+    $l7r->_wait_for_vm($vm, 'stopped', $vm_stop_timeout)
+        or LOGDIE "Unable to stop VM $vm_id";
 }
-
-
-
 
 sub _start_x {
     my ($l7r, $vm, @params) = @_;
