@@ -387,10 +387,7 @@ Wat.Views.MainView = Backbone.View.extend({
                     //console.log (e.responseText);
                 }
             }
-            
-            that.retrievedData = response;
-            successCallback(that);
-            
+
             if (callResponse == 200 && response.status == STATUS_SUCCESS) {
                 that.message = messages.success;
                 that.messageType = 'success';
@@ -408,6 +405,9 @@ Wat.Views.MainView = Backbone.View.extend({
                 message: that.message,
                 messageType: that.messageType
             };
+            
+            that.retrievedData = response;
+            successCallback(that);
             
             Wat.I.showMessage(messageParams, response);
         });
