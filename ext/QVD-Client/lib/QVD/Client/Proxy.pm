@@ -253,23 +253,8 @@ sub connect_to_vm {
             
             DEBUG("Body: $body") if (defined $body);
             
-            
             if ( $code != HTTP_PROCESSING ) {
-                if ( $code == HTTP_OK ) {
-                    DEBUG "VM shut down";
-                } elsif ( $code == HTTP_SERVICE_UNAVAILABLE ) {
-                    # VM blocked, this should fail again when start is attempted
-                    DEBUG "VM on blocked server, ignoring";
-                } elsif ( $code == HTTP_NOT_FOUND ) {
-                    # No VM, no problem
-                    DEBUG "VM does not exist, ignoring";
-                } elsif ( $code == HTTP_FORBIDDEN ) {
-                    DEBUG "VM offline for maintenance";
-                } else {
-                    DEBUG "Unrecognized status code $code";
-                }
-            
-                # Leave error reporting to the next step
+                # just ignore the return status from stop_vm and let's connect_to_vm run...
                 last;
             }
         }
