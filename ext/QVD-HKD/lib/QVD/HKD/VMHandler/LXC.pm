@@ -157,7 +157,7 @@ use Class::StateMachine::Declarative
                                             substates => [ saving_state           => { enter => '_save_state',
                                                                                        on => { _on_error => '_on_done' } },
                                                            dirty                  => { enter => '_check_dirty_flag',
-                                                                                       transitions => { _on_error => 'dirty' } },
+                                                                                       transitions => { _on_error => '/dirty' } },
                                                            heavy                  => { enter => '_heavy_down' },
                                                            checking_lxc           => { enter => '_check_lxc',
                                                                                       transitions => { _on_error => 'killing_lxc' } },
