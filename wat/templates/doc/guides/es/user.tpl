@@ -4754,11 +4754,11 @@ Total Master
 </div>
 </div>
 <div class="sect1">
-<h2 id="_propiedades_libres">8. Propiedades libres</h2>
+<h2 id="_propiedades_personalizadas">8. Propiedades personalizadas</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><strong>Los elementos de QVD tienen atributos</strong> como por ejemplo el nombre, su estado de bloqueo, su dirección IP asociada (en el caso de las máquinas virtuales o nodos) o la referencia a otros objetos de QVD a los que están asociados. Por ejemplo las imágenes de disco tienen asignado un OSF o las máquinas virtuales están unívocamente relacionadas con un usuario.</p></div>
 <div class="paragraph"><p>Todos estos atributos nos describen cómo son los objetos de QVD, nos permiten diferenciarlos del resto, nos dan información de qué dependencias tienen y nos enseñan a cerca de su comportamiento. Esta información será fija, aunque puede configurarse su visibilidad a través de los ACLs, pudiendo crearse roles de administradores que solo permitan ver parte de ellos.</p></div>
-<div class="paragraph"><p>Debido a las diversas necesidades que puedan tenerse en diferentes entornos QVD, existe una manera de <strong>personalizar la información</strong> que se almacena de cada objeto QVD. Esta personalización es posible gracias a las <strong>propiedades libres</strong>, que son unos <strong>atributos especiales de los objetos de QVD</strong> creados por los administradores para cubrir sus necesidades.</p></div>
+<div class="paragraph"><p>Debido a las diversas necesidades que puedan tenerse en diferentes entornos QVD, existe una manera de <strong>personalizar la información</strong> que se almacena de cada objeto QVD. Esta personalización es posible gracias a las <strong>propiedades personalizadas</strong>, que son unos <strong>atributos especiales de los objetos de QVD</strong> creados por los administradores para cubrir sus necesidades.</p></div>
 <div class="paragraph"><p>Estas propiedades serán atributos extra que podrán configurarse como una columna más así como habilitarlos como filtro en la vista listado.</p></div>
 <div class="admonitionblock">
 <table><tr>
@@ -4774,9 +4774,21 @@ Total Master
 <td class="icon">
 <img src="images/doc_images/icons/important.png" alt="Important" />
 </td>
-<td class="content">Los elementos con propiedades libres son: Usuarios, Máquinas virtuales, Nodos, OSFs e Imágenes de disco.</td>
+<td class="content">Los elementos con propiedades personalizadas son: Usuarios, Máquinas virtuales, Nodos, OSFs e Imágenes de disco.</td>
 </tr></table>
 </div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Gestión de propiedades personalizadas
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Para crear, editar o eliminar las propiedades personalizadas iremos a la sección <em>'Gestión del WAT</em>', descrita en la guía <em>'Paso a paso</em>'.</p></div>
+<div class="paragraph"><p>En esta sección podremos gestionar las propiedades de cada elemento de QVD. Pudiendo fácilmente asignar la misma propiedad a uno o más de ellos, renombrarla o agregarle una descripción que aparecerá junto a ella en la interfaz para guiar al usuario.</p></div>
+</div></div>
+</dd>
+</dl></div>
 </div>
 </div>
 <div class="sect1">
@@ -4898,7 +4910,7 @@ Seleccionar todos los elementos del listado, incluyendo los de otras páginas
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-07-14 11:25:04 CEST
+Last updated 2015-09-11 13:50:08 CEST
 </div>
 </div>
 </body>

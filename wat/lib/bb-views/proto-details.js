@@ -88,6 +88,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
                 properties[prop.property_id] = {
                     value: that.model.get('properties')[prop.property_id] ? that.model.get('properties')[prop.property_id].value : '',
                     key: prop.key,
+                    description: prop.description,
                     tenant_id: prop.tenant_id
                 };
             });

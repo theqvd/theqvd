@@ -232,6 +232,7 @@ Wat.Views.MainView = Backbone.View.extend({
                 properties[prop.property_id] = {
                     value: value,
                     key: prop.key,
+                    description: prop.description,
                     tenant_id: prop.tenant_id
                 };
             });
@@ -247,6 +248,8 @@ Wat.Views.MainView = Backbone.View.extend({
                 );
         
         $(that.editorPropertiesContainer).html(that.template);
+        
+        Wat.T.translate();
 
         if (that.editorMode != 'create' || !Wat.C.isSuperadmin()) {
             $('.js-editor-property-row').show();
