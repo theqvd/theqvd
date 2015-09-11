@@ -391,6 +391,7 @@ hkd.vm.starting.max = 6
 
 # internal parameters, do not change!!!
 internal.l7r.timeout.vm_start = 270
+internal.l7r.timeout.vm_stop = 270
 internal.l7r.timeout.x_start = 10
 internal.l7r.timeout.vma = 4
 internal.l7r.timeout.takeover = 30
