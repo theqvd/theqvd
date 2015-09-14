@@ -179,6 +179,9 @@ client.ssl.use_cert = 0
 ## slave shell
 client.slave.command =
 client.slave.client = bin/qvd-slaveclient
+# enable commands used for benchmarking and testing the functionality
+# of the slave channel
+client.slave.debug_commands = 0
 ## enable making slave connections to VM
 client.slave.enable = 1
 ## force locale, ignoring system LC_* and LANG environment variables
@@ -197,6 +200,7 @@ client.darwin.screen_resolution.low_res_geometry=800x600
 
 # Enable USB sharing
 client.usb.enable = 0
+client.usbip.enable = 0
 
 # Share all USB devices automatically (most of the time not a good idea)
 client.usb.share_all = 0

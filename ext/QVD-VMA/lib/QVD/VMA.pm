@@ -493,6 +493,7 @@ sub _fork_monitor {
                     when (/Listening to slave connections on port '(\d+)'/) {
                         DEBUG "Slave channel opened";
                         _start_usb($1) if ( $props{'qvd.client.usb.enabled' } );
+                        _start_usbip($1) if ( $props{'qvd.client.usbip.enabled' } );
                     }
                 }
                 print $line;
@@ -701,6 +702,18 @@ sub _start_usb {
     my @cmd = ($slaveclient, "--forward-usb");
 
     system(@cmd) == 0 or ERROR "Failed to execute " . join(' ', @cmd) . ": $?";
+}
+
+sub _start_usbip {
+   my ($port) = @_;
+   DEBUG "Starting USB";
+   my @cmd;
+   
+   @cmd = ($slaveclient, "--forward-usbip");
+   system(@cmd) == 0 or ERROR "Failed to execute " . join(' ', @cmd) . ": $?";
+   
+   @cmd = ($slaveclient, "forward-usbip-devices");
+   system(@cmd) == 0 or ERROR "Failed to execute " . join(' ', @cmd) . ": $?";
 }
 
 ################################ RPC methods ######################################
