@@ -764,6 +764,7 @@ asciidoc.install(2);
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/login.png" alt="login.png" width="960px" />
 </span></p></div>
+<div class="paragraph"><p>La primera vez que inicies sesión te preguntará si deseas guardar el usuario y contraseña para el futuro (siempre que el navegador lo permita).</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -961,7 +962,9 @@ Editor masivo
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_user_massiveeditor.png" alt="screenshot_user_massiveeditor.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>El editor masivo de usuarios solamente permite crear/modificar propiedades. Al hacer click en “Añadir propiedad” aparecerán unas cajas de texto para poner el nombre y el valor de la propiedad. Si alguno de los usuarios editados ya tienene una propiedad con ese nombre (coincidiendo mayúsculas y minúsculas) se sobreescribirá su valor; por el contrario, si no existe, se creará.</p></div>
+<div class="paragraph"><p>El editor masivo de usuarios solamente permite modificar propiedades porsonalizadas.</p></div>
+<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados.</p></div>
+<div class="paragraph"><p>Si no existen propiedades personalizadas en los usuarios, la edición masiva no estará habilitada.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1240,8 +1243,8 @@ Editor masivo
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_vm_massiveeditor_properties.png" alt="screenshot_vm_massiveeditor_properties.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>El editor masivo de máquinas virtuales permite cambiar el tag de imagen utilizado, asignar una fecha de expiración y crear/modificar propiedades.</p></div>
-<div class="paragraph"><p>Al hacer click en “Añadir propiedad” aparecerán unas cajas de texto para poner el nombre y el valor de la propiedad. Si alguna de las máquinas virtuales editadas ya tienene una propiedad con ese nombre (coincidiendo mayúsculas y minúsculas) se sobreescribirá su valor; por el contrario, si no existe, se creará.</p></div>
+<div class="paragraph"><p>El editor masivo de máquinas virtuales permite cambiar el tag de imagen utilizado, asignar una fecha de expiración y modificar propiedades personalizadas.</p></div>
+<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados.</p></div>
 <div class="paragraph"><p>El control de expiración se verá en el apartado de Edición de máquinas virtuales.</p></div>
 <div class="paragraph"><p>Respecto al tag de imagen, cuando editamos masivamente máquinas virtuales existen dos posibilidades:</p></div>
 </div></div>
@@ -1640,7 +1643,9 @@ Editor masivo
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_host_massiveeditor.png" alt="screenshot_host_massiveeditor.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>El editor masivo de nodos solamente permite crear/modificar propiedades. Al hacer click en “Añadir propiedad” aparecerán unas cajas de texto para poner el nombre y el valor de la propiedad. Si alguno de los nodos editados ya tienene una propiedad con ese nombre (coincidiendo mayúsculas y minúsculas) se sobreescribirá su valor; por el contrario, si no existe, se creará.</p></div>
+<div class="paragraph"><p>El editor masivo de nodos solamente permite modificar propiedades porsonalizadas.</p></div>
+<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados.</p></div>
+<div class="paragraph"><p>Si no existen propiedades personalizadas en los nodos, la edición masiva no estará habilitada.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1780,7 +1785,9 @@ Editor masivo
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_osf_massiveeditor.png" alt="screenshot_osf_massiveeditor.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>El editor masivo de OSFs permite modificar la memoria, el almacenamiento de usuario y crear/modificar propiedades. <strong>Si dejamos la caja de memoria y almacenamiento de usuario en blanco no se modificarán</strong>. Al hacer click en “Añadir propiedad” aparecerán unas cajas de texto para poner el nombre y el valor de la propiedad. Si alguno de los OSFs editados ya tienene una propiedad con ese nombre (coincidiendo mayúsculas y minúsculas) se sobreescribirá su valor; por el contrario, si no existe, se creará.</p></div>
+<div class="paragraph"><p>El editor masivo de OSFs permite modificar la memoria, el almacenamiento de usuario y las propiedades personalizadas.</p></div>
+<div class="paragraph"><p><strong>Si dejamos la caja de memoria y almacenamiento de usuario en blanco no se modificarán</strong>.</p></div>
+<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1986,7 +1993,9 @@ Editor masivo
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_di_massiveeditor.png" alt="screenshot_di_massiveeditor.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>El editor masivo de imágenes solamente permite crear/modificar propiedades. Al hacer click en “Añadir propiedad” aparecerán unas cajas de texto para poner el nombre y el valor de la propiedad. Si alguna de las imáges editadas ya tienene una propiedad con ese nombre (coincidiendo mayúsculas y minúsculas) se sobreescribirá su valor; por el contrario, si no existe, se creará.</p></div>
+<div class="paragraph"><p>El editor masivo de imágenes de disco solamente permite modificar propiedades porsonalizadas.</p></div>
+<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados.</p></div>
+<div class="paragraph"><p>Si no existen propiedades personalizadas en las imágenes de disco, la edición masiva no estará habilitada.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -2744,7 +2753,7 @@ Ambos parámetros se pueden definir como <em>por defecto</em> adoptando así la 
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-04-28 12:40:58 CEST
+Last updated 2015-09-14 09:04:46 CEST
 </div>
 </div>
 </body>
