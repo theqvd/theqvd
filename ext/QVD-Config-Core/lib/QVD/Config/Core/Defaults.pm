@@ -71,6 +71,7 @@ path.client.pixmaps = pixmaps
 path.client.pixmaps.alt = /usr/share/pixmaps
 
 path.qvd.bin = /usr/lib/qvd/bin
+path.usb.database = /usr/share/hwdata/usb.ids
 
 ## paths to external executables
 command.kvm = kvm
@@ -128,6 +129,7 @@ command.darwin.sftp-server = /usr/libexec/sftp-server
 
 command.usbsrv = /usr/local/bin/usbsrv
 command.usbclnt = /usr/local/bin/usbclnt
+command.usbip = /usr/sbin/usbip
 command.slaveclient = ${path.qvd.bin}/qvd-slaveclient
 
 ## whether to remember password after successful connection
@@ -200,7 +202,8 @@ client.darwin.screen_resolution.low_res_geometry=800x600
 
 # Enable USB sharing
 client.usb.enable = 0
-client.usbip.enable = 0
+client.usb.implementation = USBIP
+client.usb.sudo = 1
 
 # Share all USB devices automatically (most of the time not a good idea)
 client.usb.share_all = 0

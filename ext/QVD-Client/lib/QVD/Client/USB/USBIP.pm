@@ -3,14 +3,16 @@ package QVD::Client::USB::USBIP;
 use base 'QVD::Client::USB';
 use strict;
 use QVD::Log;
+use QVD::Config::Core;
 use Carp;
 
 
 sub new {
 	my ($class) = @_;
 	my $self = $class->SUPER::new(@_);
-	$self->{usbip} = "/usr/sbin/usbip";
-	$self->{database} = "/usr/share/hwdata/usb.ids";
+	$self->{usbip} = core_cfg('command.usbip'); # "/usr/sbin/usbip";
+	$self->{database} = core_cfg('path.usb.database'); #"/usr/share/hwdata/usb.ids";
+	$self->{sudo} = core_cfg('client.usb.sudo');
 	
 	bless $self, $class;
 	$self->refresh();
@@ -32,9 +34,9 @@ sub _cat {
 }
 
 sub get_busid {
-	my ($self, $vid, $pid) = @_;
+	my ($self, $vid, $pid, $serial) = @_;
 	
-	my $dev = $self->get_device($vid, $pid);
+	my $dev = $self->get_device($vid, $pid, $serial);
 	if ( defined $dev ) {
 		return $dev->{busid};
 	}
@@ -56,6 +58,8 @@ sub int_get_devices {
 
 	DEBUG "Getting USB devices";
 
+	my $usbroot = "/sys/bus/usb/devices";
+	
 	my ($vid, $pid, $busid);
 	
 	foreach my $line ( @usblist ) {
@@ -78,16 +82,21 @@ sub int_get_devices {
 			$line =~ s/\($vid:$pid\)//;
 			my ($vend_name, $prod_name) = split(/:/, $line);
 			my $shared = 0;
+			my $serial;
 			
-			if ( $prod_name =~ /unknown/ && -f "/sys/bus/usb/devices/$busid/product" ) {
-				$prod_name = $self->_cat( "/sys/bus/usb/devices/$busid/product" );
+			if ( $prod_name =~ /unknown/ && -f "$usbroot/$busid/product" ) {
+				$prod_name = $self->_cat( "$usbroot/$busid/product" );
 			}
 		
-			if ( $vend_name =~ /unknown/ && -f "/sys/bus/usb/devices/$busid/manufacturer" ) {
-				$vend_name = $self->_cat( "/sys/bus/usb/devices/$busid/manufacturer" );
+			if ( $vend_name =~ /unknown/ && -f "$usbroot/$busid/manufacturer" ) {
+				$vend_name = $self->_cat( "$usbroot/$busid/manufacturer" );
 			}
 			
-			if ( readlink("/sys/bus/usb/devices/$busid/driver") =~ /usbip-host/ ) {
+			if ( -f "$usbroot/$busid/serial" ) {
+				$serial = $self->_cat( "$usbroot/$busid/serial" );
+			}
+			
+			if ( readlink("$usbroot/$busid/driver") =~ /usbip-host/ ) {
 				$shared = 1;
 			}
 			
@@ -102,7 +111,8 @@ sub int_get_devices {
 				pid       => $pid,
 				vendor    => $vend_name,
 				product   => $prod_name,
-				shared    => $shared 
+				shared    => $shared,
+				serial    => $serial,
 			};
 			
 			undef $pid;
@@ -116,11 +126,11 @@ sub int_get_devices {
 }
 
 sub share {
-	my ($self, $vid, $pid) = @_;
+	my ($self, $vid, $pid, $serial) = @_;
 	my @cmd;
 
 	
-	my $busid = $self->get_busid( $vid, $pid );
+	my $busid = $self->get_busid( $vid, $pid, $serial );
 	die "Can't share $vid:$pid: Device not found" unless ($busid);
 	$self->share_busid($busid);
 }
@@ -138,9 +148,9 @@ sub share_busid {
 }
 
 sub unshare {
-	my ($self, $vid, $pid) = @_;
+	my ($self, $vid, $pid, $serial) = @_;
 	
-	my $busid = $self->get_busid( $vid, $pid );
+	my $busid = $self->get_busid( $vid, $pid, $serial );
 	die "Can't unshare $vid:$pid: Device not found" unless ($busid);
 	$self->unshare_busid($busid);
 }

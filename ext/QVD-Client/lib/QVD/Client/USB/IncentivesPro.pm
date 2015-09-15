@@ -54,4 +54,14 @@ sub unshare {
 	return system($self->{usbsrv}, "-unshare", "-vid", $vid, "-pid", $pid) == 0
 }
 
+sub can_autoshare {
+	return 1;
+}
+
+sub set_autoshare {
+	my ($self, $value) = @_;
+	
+	system($self->{usbsrv}, '-autoshare', $value ? 'on' : 'off');
+}
+
 1;

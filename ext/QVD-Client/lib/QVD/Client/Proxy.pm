@@ -16,6 +16,10 @@ use QVD::HTTP::Headers qw(header_lookup);
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use URI::Escape qw(uri_escape);
 use QVD::Log;
+use QVD::Client::USB;
+use QVD::Client::USB::USBIP;
+use QVD::Client::USB::IncentivesPro;
+
 
 my $LINUX = ($^O eq 'linux');
 my $WINDOWS = ($^O eq 'MSWin32');
@@ -40,8 +44,10 @@ sub new {
         extra           => delete $opts{extra},
         printing        => delete $opts{printing},
         usb             => delete $opts{usb},
+        usb_impl        => delete $opts{usb_impl},
         opts            => \%opts,
     };
+    
     bless $self, $class;
 }
 
@@ -274,6 +280,7 @@ sub connect_to_vm {
         'qvd.client.fullscreen'         => $opts->{fullscreen},
         'qvd.client.printing.enabled'   => $self->{printing},
         'qvd.client.usb.enabled'        => $self->{usb},
+        'qvd.client.usb.implementation' => $self->{usb_impl},
     );
 	
 	if ( $WINDOWS ) {
@@ -390,54 +397,20 @@ sub _run {
 
      if ( core_cfg('client.slave.enable') && core_cfg('client.usb.enable') ) {
         DEBUG "USB sharing enabled";
-        my $usbsrv = core_cfg('command.usbsrv');
+        
+        my $usb = QVD::Client::USB::instantiate( core_cfg('client.usb.implementation' ) );
+        
+        
+        if ( core_cfg('client.usb.share_all') && $usb->can_autoshare ) {
+		$usb->set_autoshare(1);
+	} else {
+		$usb->set_autoshare(0) if ( $usb->can_autoshare );
+		
+		my @devs = map { [ $_ ] } split(/,/, core_cfg('client.usb.share_list'));
+		$usb->share_list_only(@devs);
+		
+	}
 
-        if ( core_cfg('client.usb.share_all') ) {
-            DEBUG "USB autoshare enabled";
-            system($usbsrv, '-autoshare', 'on');
-        } else {
-            DEBUG "USB autoshare disabled";
-            system($usbsrv, '-autoshare', 'off');
-
-            my @usblist = `$usbsrv -list`;
-            chomp @usblist;
-            my (@unshare, $pid, $vid);
-
-            DEBUG "Getting shared USB devices";
-            foreach my $line ( @usblist ) {
-                if ( $line =~ /^\s*\d+:/ ) {
-                    undef $pid;
-                    undef $vid;
-                }
-
-                if ( $line =~ /Vid: ([a-f0-9]{4})\s+Pid: ([a-f0-9]{4})/i  ) {
-                    ($vid, $pid) = ($1, $2);
-                }
-
-                if ( $line =~ /^\s+Status:.*?shared/ && $pid && $vid ) {
-                    push @unshare, [$vid, $pid];
-                }
-            }
-            
-            DEBUG "Unsharing devices";
-            foreach my $dev (@unshare) {
-                my ($vid, $pid) = @$dev;
-                DEBUG "Unsharing VID $vid, PID $pid";
-                system($usbsrv, "-unshare", "-vid", $vid, "-pid", $pid) == 0
-                    or ERROR "Failed to unshare device with VID $vid, PID $pid";
-            }
-
-            my $tmp = core_cfg('client.usb.share_list', 0) // "";
-            $tmp =~ s/\s+//g;
-
-            DEBUG "Sharing devices: $tmp";
-            foreach my $dev ( split(/,/, $tmp) ) {
-                my ($vid, $pid) = split(/:/, $dev);
-
-                DEBUG "Sharing VID $vid PID $pid";
-                system($usbsrv, "-share", "-vid", $vid, "-pid", $pid) == 0 or ERROR "Failed to share device with VID $vid, PID $pid";
-            }
-        }
     }
 
     if ($self->{audio}) {

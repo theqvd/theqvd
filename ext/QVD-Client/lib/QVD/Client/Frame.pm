@@ -12,6 +12,8 @@ use Locale::gettext;
 use FindBin;
 use Encode;
 use POSIX qw(setlocale);
+use QVD::Client::USB::USBIP;
+use QVD::Client::USB::IncentivesPro;
 
 use constant EVT_LIST_OF_VM_LOADED => Wx::NewEventType;
 use constant EVT_CONNECTION_ERROR  => Wx::NewEventType;
@@ -157,7 +159,28 @@ sub new {
 
         $self->{forwarding} = Wx::CheckBox->new($settings_panel, -1, $self->_t("Enable port forwarding"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
         $self->{forwarding}->SetValue( core_cfg("client.slave.enable" ) );
-        $settings_sizer->Add($self->{forwarding});        
+        $settings_sizer->Add($self->{forwarding});
+
+        if ( !$WINDOWS && !$DARWIN ) {
+            $self->{usb_redirection} = Wx::CheckBox->new($settings_panel, -1, $self->_t("Enable USB redirection"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
+            $self->{usb_redirection}->SetValue( core_cfg("client.usb.enable" ) );
+            $settings_sizer->Add($self->{usb_redirection});
+        
+            $self->{usbip_devices} = Wx::TextCtrl->new($settings_panel, -1, core_cfg('client.usb.share_list') ?  core_cfg('client.usb.share_list') : "");
+            $settings_sizer->Add($self->{usbip_devices}, 0, wxEXPAND);
+        
+            $self->{usbip_list_button} = Wx::Button->new($settings_panel, -1, $self->_t("Select devices"));
+            $settings_sizer->Add($self->{usbip_list_button});            
+            Wx::Event::EVT_BUTTON($settings_panel, $self->{usbip_list_button}->GetId, sub { select_usb_devices($self); });
+            
+            
+
+    
+            
+            
+        }
+        
+        
         $settings_sizer->AddSpacer(5);
 
         ###############################
@@ -404,6 +427,7 @@ sub OnClickConnect {
         audio         => core_cfg('client.audio.enable'),
         printing      => core_cfg('client.printing.enable'),
         usb           => core_cfg('client.usb.enable'),
+        usb_impl      => core_cfg('client.usb.implementation'),
         geometry      => core_cfg('client.geometry'),
         fullscreen    => core_cfg('client.fullscreen'),
         extra_args    => core_cfg('client.nxagent.extra_args'),
@@ -622,6 +646,64 @@ sub OnSetEnvironment {
     cond_signal $set_env;
 }
 
+sub select_usb_devices {
+	my ($self) = @_;
+
+	my $usb = QVD::Client::USB::instantiate( core_cfg('client.usb.implementation') );
+	my @devices = @{ $usb->list_devices };
+	my @selected;
+	my $cursel = $self->{usbip_devices}->GetValue();
+	my @parts = split(/,/, $cursel);
+
+	# Build selection list from the contents of the textbox
+	foreach my $part (@parts) {
+		my ($v, $p, $id);
+		$part =~ s/^\s+//;
+		$part =~ s/\s+$//;
+
+		($v, $p) = split(/:/, $part);
+		($p, $id) = split(/@/, $p) if ( $p =~ /@/ );
+
+		for(my $i=0;$i<=scalar @devices;$i++) {
+			my $d = $devices[$i];
+			if ( $d->{vid} eq $v && $d->{pid} eq $p && (!defined $id || $d->{serial} eq $id)) {
+				push @selected, $i;
+			}
+		}
+	}
+    
+	my $dialog = new Wx::MultiChoiceDialog(
+		$self, 
+		$self->_t("Select the USB devices to share:"), 
+		$self->_t("USB sharing"), 
+		[
+		map {
+			$_->{vendor} . " " . $_->{product} . 
+			" (" . $_->{vid} . ":" . $_->{pid} . ( $_->{serial} ? '@' . $_->{serial} : "") . ")";
+		} @devices
+		],
+	);
+
+	$dialog->SetSelections(@selected);
+
+        if ( $dialog->ShowModal() == wxID_OK ) {
+		my @selected = $dialog->GetSelections();
+		
+		my $devs = "";
+		foreach my $sel (@selected) {
+			my $d = $devices[$sel];
+			
+			$devs .= ", " if ( $devs ne "" );
+			$devs .= $d->{vid} . ":" . $d->{pid};
+			$devs .= '@' . $d->{serial} if ( $d->{serial} );
+		}
+		
+		$self->{usbip_devices}->SetValue( $devs );
+	}
+
+}
+
+
 ################################################################################
 #
 # Helpers
@@ -696,6 +778,9 @@ sub SaveConfiguration {
         set_core_cfg('client.remember_password', ($self->{remember_pass}->IsChecked() ? 1 : 0));
     }
 
+    if ($self->{usbip_devices}) {
+        set_core_cfg('client.usb.share_list', $self->{usbip_devices}->GetValue());
+    }
     
     # The widgets only exist if the settings tab is enabled.
     set_core_cfg('client.audio.enable', $self->{audio}->GetValue())       if ( $self->{audio} );

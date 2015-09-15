@@ -492,8 +492,16 @@ sub _fork_monitor {
                     }
                     when (/Listening to slave connections on port '(\d+)'/) {
                         DEBUG "Slave channel opened";
-                        _start_usb($1) if ( $props{'qvd.client.usb.enabled' } );
-                        _start_usbip($1) if ( $props{'qvd.client.usbip.enabled' } );
+                        
+                        if ( $props{'qvd.client.usb.enabled' } ) {
+                            DEBUG "USB forwarding is enabled, implementation is " . $props{'qvd.client.usb.implementation'};
+                            
+                            if ( $props{'qvd.client.usb.implementation'} =~ /USBIP/ ) {
+                                _start_usbip($1);
+                            } else {
+                                _start_usb($1);
+                            }
+                        }
                     }
                 }
                 print $line;
@@ -706,7 +714,7 @@ sub _start_usb {
 
 sub _start_usbip {
    my ($port) = @_;
-   DEBUG "Starting USB";
+   DEBUG "Starting USBIP";
    my @cmd;
    
    @cmd = ($slaveclient, "--forward-usbip");
