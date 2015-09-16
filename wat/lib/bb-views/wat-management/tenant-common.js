@@ -70,7 +70,7 @@ Wat.Common.BySection.tenant = {
     },
     
     afterUpdateElement: function (that) {
-        that.fetchAny();
+        that.fetchAny(that);
 
         // If change is made succesfully check new language to ender again and translate
         if (that.retrievedData.status == STATUS_SUCCESS && Wat.C.tenantID == that.model.get('id')) {

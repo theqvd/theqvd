@@ -437,7 +437,22 @@ Wat.B = {
                     var width = canvas.width / shrinkFactor;
                     
                     doc.addImage(imgData, 'JPEG', 5, 30, width, height, undefined, compress);
-                    doc.save('sample-file.pdf');
+                    
+                    var d = new Date();
+                    var date = d.toISOString().substring(0, 10);
+                    var time = d.toTimeString().substring(0, 8);
+                    time = time.replace(/:/g, '');
+                    var dateTime = date + '_' + time;
+                    
+                    var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                    
+                    if (iOS) {
+                        doc.output('dataurlnewwindow');
+                    }
+                    else {
+                        doc.save('QVD-Summary-' + dateTime + '.pdf');
+                    }
+                    
                     Wat.CurrentView.render();
                 },
                   allowTaint: true,

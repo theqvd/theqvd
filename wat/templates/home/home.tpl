@@ -3,7 +3,7 @@
     <div class="welcome-help">
         <a class="button2 <%= CLASS_ICON_HELP %>" href="#documentation/introduction" data-i18n="Do you need help?"></a>
         
-        <a class="button2 fa fa-file-pdf-o js-exportPDF" data-i18n="Export to PDF"></a>
+        <a class="button2 fa fa-file-pdf-o js-exportPDF desktop" data-i18n="Export to PDF"></a>
     </div>
 </div>
     <div class="home-wrapper">
