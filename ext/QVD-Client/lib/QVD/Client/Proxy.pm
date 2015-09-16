@@ -63,8 +63,7 @@ sub _ssl_verify_callback {
     return 1 if $ssl_thinks;
 
     DEBUG("_ssl_verify_callback called: " . join(' ', @_));
-  
-
+    
     my $cert_pem_str = Net::SSLeay::PEM_get_string_X509 (Net::SSLeay::X509_STORE_CTX_get_current_cert ($mem_addr));
     my $x509 = Crypt::OpenSSL::X509->new_from_string ($cert_pem_str);
     my $err_no    = Net::SSLeay::X509_STORE_CTX_get_error($mem_addr);
@@ -110,17 +109,36 @@ EOF
     make_path $dir;
     -d $dir or die "Unable to create directory $dir";
 
-    my $file;
-    foreach my $idx (0..99) {
+    # Save the accepted certificate to disk.
+    # Certificates may be accepted even if they're already in storage, for instance because the cert
+    # has expired.
+    #
+    # We do a simple check to see if we saved this cert already.
+    my $idx = 0;
+    while(1) {
+        my $file;
         my $basename = sprintf '%s.%d', $cert_hash, $idx;
         $file = File::Spec->join($dir, $basename);
-        last unless -e $file;
-    }
-    ## TODO: -e $file and what?
+        
+        if ( -e $file ) {
+             open(my $fd, '<', $file) or die "Can't open '$file' for reading: $!";
+             local $/;
+             my $cert_str = <$fd>;
+             close $fd;
 
-    open my $fd, '>', $file or die "Unable to open '$file': $!";
-    print $fd $cert_pem_str;
-    close $fd;
+             if ( $cert_str eq $cert_pem_str ) {
+                 DEBUG "Certificate already saved in $file";
+                 last;
+             }
+        } else {
+             DEBUG "Saving certificate in $file";
+             open my $fd, '>', $file or die "Unable to open '$file': $!";
+             print $fd $cert_pem_str;
+             close $fd;
+             last;
+        }
+        $idx++;
+    }
 
     return $accept;
 }
