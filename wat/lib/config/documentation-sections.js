@@ -37,15 +37,23 @@ Wat.I.docSections = {
         guide: 'stepbystep'
     },
     views: { 
-        es: '_vistas_por_defecto',
+        es: '_vistas',
         guide: 'stepbystep'
     },
     log: { 
         es: '_log',
         guide: 'stepbystep'
     },
+    property: { 
+        es: '_propiedades',
+        guide: 'stepbystep'
+    },
     views_multitenant: { 
-        es: '_vistas_por_defecto_multitenant',
+        es: '_vistas_multitenant',
+        guide: 'multitenant'
+    },
+    property_multitenant: { 
+        es: '_propiedades_multitenant',
         guide: 'multitenant'
     },
     config: { 

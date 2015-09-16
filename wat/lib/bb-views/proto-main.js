@@ -53,6 +53,13 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     afterRender: function () {
+        var htmlString ="<html><body ><label>INPUT TYPE</label></body></html>";
+        var doc = new jsPDF('landscape','pt');
+        var specialElementHandlers = {
+          '#editor': function( element, renderer ) {
+              return true;
+            }
+        };
     },
     
     events:  {

@@ -106,6 +106,9 @@ Wat.B = {
         
         // Screen help button
         this.bindEvent('click', 'a[data-docsection]', this.navigationBinds.clickScreenHelp);
+                
+        // Screen help button
+        this.bindEvent('click', '.js-exportPDF', this.navigationBinds.exportPDF);
         
         // Back to top button
         this.bindEvent('click', '.js-back-top-doc-button', this.navigationBinds.goDocTop);
@@ -389,6 +392,7 @@ Wat.B = {
             ];
             
             var docSectionMultitenant = docSection + '_multitenant';
+            
             if (Wat.I.docSections[docSectionMultitenant] != undefined) {
                 guideSection.push({
                     section: Wat.I.docSections[docSectionMultitenant].es,
@@ -408,6 +412,38 @@ Wat.B = {
             $('html,body').animate({
                 scrollTop: 0
             }, 'fast');
+        },
+        
+        exportPDF: function () {
+            var doc = new jsPDF('p', 'mm');
+            
+            html2canvas($('.home-wrapper'), {
+                background:'#fff',
+                onrendered: function(canvas) {   
+                    $('canvas').hide();
+                    
+                    var imgData = canvas.toDataURL(
+                        'image/jpeg');  
+
+                    var doc = new jsPDF('p', 'mm');
+                              
+                    doc.setFontSize(26);          
+                    doc.text(5, 20, 'QVD summary');
+
+                    
+                    compress = 0;
+                    var shrinkFactor = canvas.width / 200;
+                    var height = canvas.height / shrinkFactor;
+                    var width = canvas.width / shrinkFactor;
+                    
+                    doc.addImage(imgData, 'JPEG', 5, 30, width, height, undefined, compress);
+                    doc.save('sample-file.pdf');
+                    Wat.CurrentView.render();
+                },
+                  allowTaint: true,
+                  logging: false,
+                  useCORS: true
+            });
         },
         
         clickDeleteFilterNote: function (e) {

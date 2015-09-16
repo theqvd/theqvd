@@ -895,7 +895,7 @@ Cuando creamos un elemento en QVD así como un administrador del WAT, habrá un 
 </li>
 <li>
 <p>
-En la sección <em>Vistas por defecto</em> que se encuentra en el apartado <em>Gestión del WAT</em> aparece un nuevo control de Tenant. Se pueden configurar las vistas del mismo modo que en Monotenant pero por cada Tenant.
+En la sección <em>Vistas</em> que se encuentra en el apartado <em>Gestión del WAT</em> aparece un nuevo control de Tenant. Se pueden configurar las vistas del mismo modo que en Monotenant pero por cada Tenant.
 </p>
 </li>
 <li>
@@ -1001,8 +1001,8 @@ Edición
 </dl></div>
 </div>
 <div class="sect2">
-<h3 id="_vistas_por_defecto_multitenant">5.3. Vistas por defecto (multitenant)</h3>
-<div class="paragraph"><p>Si estamos en modo multitenant y somos superadministrador, en <em>Vistas por defecto</em> podremos no solo configurar estos elementos en el supertenant, sino que también podremos hacerlo para cada uno de los tenants del sistema.</p></div>
+<h3 id="_vistas_multitenant">5.3. Vistas (multitenant)</h3>
+<div class="paragraph"><p>Si estamos en modo multitenant y somos superadministrador, en <em>Vistas</em> podremos no solo configurar estos elementos en el supertenant, sino que también podremos hacerlo para cada uno de los tenants del sistema.</p></div>
 <div class="paragraph"><p>Para ello, además de un combo selector con la sección que queremos personalizar, aparecerá otro combo de selección con el tenant al que afectará esta configuración.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/default_views_multitenant.png" alt="default_views_multitenant.png" width="960px" />
@@ -1046,6 +1046,12 @@ La <strong>guía multitenant</strong> donde encontraremos, por una parte una des
 </li>
 </ul></div>
 <div class="paragraph"><p>Además, en los enlaces de documentación relacionada situados bajo las diferentes secciones, podremos encontrar enlaces adicionales con acceso a la parte correspondiente de dicha sección desde el punto de vista multitenant.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_propiedades_multitenant">5.5. Propiedades (multitenant)</h3>
+<div class="paragraph"><p>Si estamos en modo multitenant y somos superadministrador, en <em>Propiedades</em> tendremos acceso a la gestión de todas las propiedades de todos los tenants. Por lo tanto, para clasificarlas está disponible un filtro más con el tenant al que pertenecen las propiedades en pantalla. Estos tenants incluyen el supertenant <em>*</em>, que también puede tener sus propias propiedades.</p></div>
+<div class="paragraph"><p>Al poder haber propiedades específicas del supertenant <em>*</em>, en las vistas de listado y detalle de los elementos, si somos superadministradores, puede que veamos las propiedades del tenant y además las del supertenant. Conviene tener en cuenta que estas últimas no serán visibles para los administradores de ese tenant, sino que solo las podrán ver los superadministradores.</p></div>
+<div class="paragraph"><p><strong>En el caso de los Nodos</strong>, al no pertenecer a ningún tenant pero sí poder tener propiedades diferentes en cada uno de los tenants incluído el supertenant <em>*</em>, <strong>la vista será simplificada</strong>. Cada administrador verá las propiedades de Nodos del tenant al que pertenece. Esto se extiende tambien al superadministrador, que sólamente verá las propiedades de Nodos del supertenant <em>*</em>.</p></div>
 </div>
 </div>
 </div>
@@ -1400,7 +1406,7 @@ Contraseña: to the rescue</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-07-15 13:08:37 CEST
+Last updated 2015-09-14 13:43:35 CEST
 </div>
 </div>
 </body>

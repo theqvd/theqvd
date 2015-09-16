@@ -2613,7 +2613,7 @@ Edición
 </dl></div>
 </div>
 <div class="sect2">
-<h3 id="_vistas_por_defecto">5.4. Vistas por defecto</h3>
+<h3 id="_vistas">5.4. Vistas</h3>
 <div class="paragraph"><p>Como hemos visto en el análisis de cada sección, las vistas listado muestran varias columnas con diferentes datos de los elementos existentes y además disponen de algunos controles de filtrado.</p></div>
 <div class="paragraph"><p>Estas columnas y filtros se puede configurar globalmente en el sistema, y luego cada administrador podrá personalizar estos valores sólamente para él.</p></div>
 <div class="paragraph"><p><span class="image">
@@ -2630,6 +2630,41 @@ Edición
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_watconfig_defaultviews_reset.png" alt="screenshot_watconfig_defaultviews_reset.png" width="960px" />
 </span></p></div>
+</div>
+<div class="sect2">
+<h3 id="_propiedades">5.5. Propiedades</h3>
+<div class="paragraph"><p>En este apartado gestionaremos las propiedades personalizadas por cada elemento de QVD. Así, podremos crear propiedades extras para los elementos que soportan esta funcionalidad: Usuarios, Máquinas virtuales, Nodos, OSFs e Imágenes de disco.</p></div>
+<div class="paragraph"><p>Una propiedad personalizada en los Usuarios, por ejemplo, aparecerá en todos los usuarios del sistema como un campo más. Tanto en su vista detalle, como en sus formularios de creación y edición. También podría aparecer en la vista de listado como una columna y/o filtro específicos si se configurase desde la sección de <em>Vistas</em>.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Control de ACLs en bloque
+</dt>
+<dd>
+<p>
+Tanto la gestión como la visualización por parte de otros administradores de las propiedades personalizadas se pueden regular por ACLs, pero se realizará <em>en bloque</em>. Esto significa que se pueden mostrar o no mostrar las propiedades de un determinado tipo de elemento (por ejemplo de las imágenes de disco) pero no se pueden mostrar unas y ocultar otras.
+</p>
+</dd>
+<dt class="hdlist1">
+Ayuda contextual
+</dt>
+<dd>
+<p>
+Cada propiedadad tiene una descripción asignada que se utilizará como ayuda contextual en los lugares donde aparezca la propiedad, pudiendo aclarar posibles dudas sobre su propósito o posibles valores.
+</p>
+</dd>
+<dt class="hdlist1">
+Interfaz
+</dt>
+<dd>
+<p>
+Puede ser común establecer la misma propiedad en diferentes tipos de elementos de QVD, por lo que el editor tiene forma de matriz, en la que, en una sola vista se pueden ver las diferentes propiedades del sistema y ponerlas o quitarlas de ciertos elementos de QVD.
+</p>
+</dd>
+</dl></div>
+<div class="paragraph"><p>Para facilitar la edición en entornos con muchas propiedades personalizadas hay disponible un filtro para mostrar solamente las propiedades de un determinado tipo de elemento (Por ejemplo OSFs). Este filtro por defecto tiene la opción "Todos" seleccionada para dar una visión global de las propiedades.</p></div>
+<div class="paragraph"><p>Para crear una nueva propiedad daremos al botón "Nueva propiedad" y le estableceremos el nombre, la descripción (opcional) y los tipos de elementos donde aparecerá.</p></div>
+<div class="paragraph"><p>Para editar el nombre o la descripción de las propiedades haremos click en el botón de edición junto al nombre de la propiedad. Sin embargo para gestionar en qué tipo de elementos aparecerá una propiedad ya creada, lo haremos con las casillas de verificación de la matriz conformada en la interfaz principal.</p></div>
+<div class="paragraph"><p>Hay que tener en cuenta que si tenemos filtradas las propiedades por un tipo de elemento (Por ejemplo nodos), y desactivamos la casilla de verificación que habilita dicha propiedad en los nodos, desaparecerá de la vista, pero cambiando el filtro de nuevo a <em>Todos</em> podremos volver a gestionarla.</p></div>
 </div>
 </div>
 </div>
@@ -2753,7 +2788,7 @@ Ambos parámetros se pueden definir como <em>por defecto</em> adoptando así la 
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-14 09:04:46 CEST
+Last updated 2015-09-14 09:57:50 CEST
 </div>
 </div>
 </body>

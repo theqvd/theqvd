@@ -5,7 +5,17 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
     qvdObj: 'property',
     selectedObj: 'all',
     selectedTenant: '0',
-
+    
+    breadcrumbs: {
+        'screen': 'Home',
+        'link': '#',
+        'next': {
+            'screen': 'WAT Management',
+            'next': {
+                'screen': 'Properties'
+            }
+        }
+    },
     
     initialize: function (params) {     
         this.collection = new Wat.Collections.Properties(params);
@@ -87,6 +97,8 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
                 that.renderPropertyList(that);
             }
         });
+        
+        this.printBreadcrumbs(this.breadcrumbs, '');
     },
     
     renderPropertyList: function (that) { 

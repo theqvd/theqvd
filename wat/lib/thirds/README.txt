@@ -20,3 +20,6 @@ Used libraries on QVD Wat and their version, licenses and source sites:
 - Droid Sans font v6 (Apache License, version 2.0) https://www.google.com/fonts/attribution
 - Open Sans font v10 (Apache License, version 2.0) https://www.google.com/fonts/attribution
 - FastClick v1.0.6 (MIT License) https://github.com/ftlabs/fastclick
+- html2canvas v0.4.1 (MIT License) http://html2canvas.hertzen.com
+- jsPDF v0.9.0rc2 (MIT License) https://github.com/MrRio/jsPDF
+- FileSaver v1.1.20150716 (X11/MIT License) https://github.com/eligrey/FileSaver.js
