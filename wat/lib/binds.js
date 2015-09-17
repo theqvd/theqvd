@@ -428,7 +428,7 @@ Wat.B = {
                     var doc = new jsPDF('p', 'mm');
                               
                     doc.setFontSize(26);          
-                    doc.text(5, 20, 'QVD summary');
+                    doc.text(5, 20, $.i18n.t('QVD summary'));
 
                     
                     compress = 0;
