@@ -43,7 +43,7 @@
         <td>
             <input type="text" name="version" value="">
             <div class="second_row">
-                (<span data-i18n="Leave it blank for set automatic version based on creation date"></span>)
+                (<span data-i18n="Leave it blank to set an automatic version based on creation date"></span>)
             </div>
         </td>
     </tr>

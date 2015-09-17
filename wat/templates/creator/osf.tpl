@@ -20,7 +20,7 @@
             <input type="text" class="half100" name="memory" value=""> MB
             <div class="second_row" data-i18n>
                 <%=
-                    '(' + i18n.t('Leave it blank for default: __default_megabytes__ MB', {'default_megabytes': '256'}) + ')'
+                    '(' + i18n.t('Leave it blank to use the default value: __default_megabytes__ MB', {'default_megabytes': '256'}) + ')'
                 %>
             </div>
         </td>
@@ -34,7 +34,7 @@
         <td>
             <input type="text" class="half100" name="user_storage" value="0" data-required> MB
             <div class="second_row">
-                (<span data-i18n="Set 0 for not use User storage"></span>)
+                (<span data-i18n="Set to 0 for not using User storage"></span>)
             </div>
         </td>
     </tr>

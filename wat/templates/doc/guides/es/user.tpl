@@ -1952,6 +1952,16 @@ En la vista detalle tenemos <strong>dos herramientas</strong> disponibles:
 </li>
 </ul></div>
 <div class="paragraph"><p>Hay que tener cuidado con la gestión de administradores y permisos ya que si realizamos una acción equivocada, podríamos perder funcionalidades e incluso el acceso al WAT. Ver la sección <em>Situaciones de bloqueo</em> en el manual.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Actualización del administrador actual
+</dt>
+<dd>
+<p>
+Los ACLs se obtienen en el momento del login, por lo que si se deciden cambiar ACLs en el administrador actual, especialmente los de visualización de secciones, será necesario <strong>refrescar el navegador o iniciar sesión</strong> de nuevo para que se hagan efectivos.
+</p>
+</dd>
+</dl></div>
 </div>
 </div>
 </div>
@@ -4910,7 +4920,7 @@ Seleccionar todos los elementos del listado, incluyendo los de otras páginas
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-11 13:50:08 CEST
+Last updated 2015-09-17 10:35:10 CEST
 </div>
 </div>
 </body>

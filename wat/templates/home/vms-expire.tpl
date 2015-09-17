@@ -3,7 +3,7 @@
     <%
     if (vms_with_expiration_date.length == 0) {
     %>
-        <div class="no-elements" data-i18n="There are not VMS close to expire"></div>
+        <div class="no-elements" data-i18n="There are no VMS close to expire"></div>
     <%
     }
     else {

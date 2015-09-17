@@ -92,8 +92,8 @@
         %>  
             <tr>
                 <td colspan="<%= printedColumns %>">
-                    <span class="no-elements" data-i18n="There are not elements">
-                        <%= i18n.t('There are not elements') %>
+                    <span class="no-elements" data-i18n="There are no elements">
+                        <%= i18n.t('There are no elements') %>
                     </span>
                 </td>
             </tr>

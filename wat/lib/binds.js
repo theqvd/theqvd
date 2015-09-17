@@ -68,7 +68,21 @@ Wat.B = {
             this.bindEvent('click', '.js-add-template-button', this.roleEditorBinds.addTemplate);
 
             // Delete inherited Role
-            this.bindEvent('click', '.js-delete-role-button', this.roleEditorBinds.deleteRole);
+            this.bindEvent('click', '.js-delete-role-button', function () {
+                switch (Wat.CurrentView.qvdObj) {
+                    case 'administrator':
+                        if (Wat.C.adminID == Wat.CurrentView.model.get('id')) {
+                            Wat.I.confirm('dialog/confirm-admin-lost-acls', Wat.B.roleEditorBinds.deleteRole, this);
+                        }
+                        else {
+                            Wat.B.roleEditorBinds.deleteRole(this);
+                        }
+                        break;
+                    case 'role':
+                            Wat.I.confirm('dialog/confirm-role-lost-acls', Wat.B.roleEditorBinds.deleteRole, this);
+                        break;
+                }
+            });
     },
     
     bindHomeEvents: function () {
@@ -718,9 +732,9 @@ Wat.B = {
                 });
             });
         },
-        deleteRole: function () {
-            var roleId = $(this).attr('data-id');
-            var inheritType = $(this).attr('data-inherit-type');
+        deleteRole: function (that) {
+            var roleId = $(that).attr('data-id');
+            var inheritType = $(that).attr('data-inherit-type');
             
             var filters = {
                 id: Wat.CurrentView.id

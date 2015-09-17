@@ -136,7 +136,7 @@
             <%
                 if (!model.get('tags')) {
             %>
-                    <span class="no-elements" data-i18n="There are not tags"></span>
+                    <span class="no-elements" data-i18n="There are no tags"></span>
             <%
                 }
             %>
