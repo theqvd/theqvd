@@ -864,7 +864,6 @@ Wat.I = {
     },
     
     loadingBlock: function (message) {
-        console.log('loadingBlock!');
         $('.loading-big-message').html(message);
         $('.loading-big').show();
         $('html, body').css({

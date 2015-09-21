@@ -2,7 +2,8 @@
 <div class="header-wrapper js-header-wrapper">
     <div class="header">
         <a href="#">
-            <img src="images/logo-header.png" class="logo">
+            <!--<img src="images/logo-header.png" class="logo">-->
+            <div class="logo"></div>
         </a>
         <a href="javascript:" class="fa fa-bars mobile-menu js-mobile-menu-hamburger" id="mobile-menu"></a>
         <% 

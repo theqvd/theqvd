@@ -19,8 +19,8 @@ body {
     height: 100vh !important;
 }
 
-a {
-    color: $col_links;
+a, a:active, a:hover {
+    color: $col_links_text;
     text-decoration: none;
     font-weight: bold;
     
@@ -217,4 +217,11 @@ fieldset {
         margin: 0 !important;
         font-size: 1.2em;
     }
+}
+
+.fake-graph-a {
+    color: $graph_color_a
+}
+.fake-graph-b {
+    color: $graph_color_b
 }

@@ -17,9 +17,10 @@
         height: 300px;
     }
     margin: 50px auto;
+    color: $login_text;
     border-radius: 20px;
-    border: 3px solid darken($col_whiter, 15);
-    background: darken($col_whiter, 10);
+    border: 3px solid darken($login_bg, 5);
+    background: $login_bg;
     display: table;
     table-layout: fixed;
     padding: 30px 20px;
@@ -31,7 +32,16 @@
         }
         width: 240px;
         text-align: center;
-        border-right: 2px dotted darken($col_whiter, 20);
+        border-right: 2px dotted darken($login_bg, 10);
+        
+        div.logo-login {
+            width: 150px;
+            height: 227px;
+            display: inline-block;
+            background-image: url($login_logo);
+            background-repeat: no-repeat;
+            background-size: 100%;
+        }
     }
     
     .login-main {

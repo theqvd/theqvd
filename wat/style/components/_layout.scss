@@ -31,8 +31,8 @@ body {
     @extend %invisible;
 
     height: 60px;
-    border-bottom: 2px solid darken($col_whiter, 20);
-    background: darken($col_whiter, 15);
+    border-bottom: 2px solid darken($header_bg, 5);
+    background: $header_bg;
     position: fixed;
     top: 0px;
     
@@ -48,8 +48,9 @@ body {
     &.header-wrapper--mini {
         height: 40px;
         
-        img.logo {
+        div.logo {
             height: 35px;
+            width: 80px;
         }
         
         opacity: 0.90;
@@ -64,7 +65,11 @@ body {
         
         .logo {
             height: 55px;
+            width: 125px;
             margin: 5px 0px;
+            background-image: url($header_logo);
+            background-repeat: no-repeat;
+            background-size: 100%;
         }
         
         .superadmin-select {
@@ -304,11 +309,11 @@ body {
     height: 30px;
     margin-top: 50px;
     text-align: center;
-    color: lighten($col_blacker, 30%);
+    color: $footer_text;
     @extend %clearfix;
     
-    border-top: 2px solid darken($col_whiter, 20);
-    background: darken($col_whiter, 15);
+    border-top: 2px solid darken($footer_bg, 5);
+    background: $footer_bg;
     width: 100%;
     
     position: fixed;

@@ -6,6 +6,9 @@ RESTRICT_TEMPLATES = false;
 // Debug constants
 DEBUG_ACL_FAILS = false;
 
+// Customizer enabled/disabled
+ENABLE_CUSTOMIZER = false;
+
 // Status codes returned by the API
 ALL_STATUS = {
     0000: 'Successful completion',
@@ -183,10 +186,6 @@ CLASS_ICON_PERSONALAREA = 'fa fa-archive';
 CLASS_ICON_USER = 'fa fa-user';
 CLASS_ICON_LOG = 'fa fa-file-text-o';
 CLASS_ICON_PROPERTIES = 'fa fa-sticky-note-o';
-
-// Colours
-COL_BRAND = '#cb540a';
-COL_BRAND_DARK = '#9a4008';
 
 // Classification of Qvd Objects
 QVD_OBJS_WITH_PROPERTIES = ['user', 'vm', 'host', 'osf', 'di'];

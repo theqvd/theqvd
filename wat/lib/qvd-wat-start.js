@@ -17,6 +17,11 @@
             $('meta[name="viewport"]').prop('content', 'width=1024, initial-scale=1, maximum-scale=1');
         }
         
+        // If customizer is enabled, show it
+        if (ENABLE_CUSTOMIZER) {
+            Wat.I.C.initCustomizer();
+        }
+        
         // Init API address variables
         Wat.C.initApiAddress();
         

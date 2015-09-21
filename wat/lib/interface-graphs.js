@@ -35,8 +35,8 @@ Wat.I.G = {
             };
         
         var pieData = [
-            { label: "",  data: 0, color: COL_BRAND},
-            { label: "",  data: 0, color: '#DDD'}
+            { label: "",  data: 0, color: Wat.I.G.getGraphColorA()},
+            { label: "",  data: 0, color: Wat.I.G.getGraphColorB()}
         ];
 
         // First data start from 0 and second one from total to make grow effect
@@ -130,8 +130,8 @@ Wat.I.G = {
         }
         
         var pieData = [
-            { label: "",  data: data1, color: COL_BRAND},
-            { label: "",  data: data2, color: '#DDD'}
+            { label: "",  data: data1, color: Wat.I.G.getGraphColorA()},
+            { label: "",  data: data2, color: Wat.I.G.getGraphColorB()}
         ];
 
         $(dataStatSelector).html(data1 + '/' + dataTotal);
@@ -181,7 +181,7 @@ Wat.I.G = {
         });
 
         var maxValue = data.length > 0 ? data[0].number_of_vms : 10;
-        var dataSet = [{ label: "", data: barData, color: COL_BRAND }];
+        var dataSet = [{ label: "", data: barData, color: Wat.I.G.getGraphColorA() }];
 
         var options = {
             series: {
@@ -259,7 +259,7 @@ Wat.I.G = {
                     }
                 });
 
-                dataSet = [{ label: "", data: barData, color: COL_BRAND }];
+                dataSet = [{ label: "", data: barData, color: Wat.I.G.getGraphColorA() }];
                 $.plot($(plotSelector), dataSet, options);
 
                 // After last load, clear interval
@@ -351,7 +351,7 @@ Wat.I.G = {
         });
 
         var maxValue = data.length > 0 ? data[0].number_of_vms : 10;
-        var dataSet = [{ label: "", data: barData, color: COL_BRAND }];
+        var dataSet = [{ label: "", data: barData, color: Wat.I.G.getGraphColorA() }];
 
         var options = {
             series: {
@@ -408,7 +408,7 @@ Wat.I.G = {
         var plot = $.plot($(plotSelector), dataSet, options);
         
         if (barData.length > 0 ) {
-            dataSet = [{ label: "", data: barData, color: COL_BRAND }];
+            dataSet = [{ label: "", data: barData, color: Wat.I.G.getGraphColorA() }];
             $.plot($(plotSelector), dataSet, options);
             
             window.plot = plot;
@@ -511,7 +511,7 @@ Wat.I.G = {
             });
         });
 
-        var dataSet = [{ label: "", data: barData, color: COL_BRAND }];
+        var dataSet = [{ label: "", data: barData, color: Wat.I.G.getGraphColorA() }];
 
         var options = {
             series: {
@@ -579,7 +579,7 @@ Wat.I.G = {
         var plot = $.plot($(plotSelector), dataSet, options);
         
         if (barData.length > 0 ) {
-            dataSet = [{ label: "", data: barData, color: COL_BRAND }];
+            dataSet = [{ label: "", data: barData, color: Wat.I.G.getGraphColorA() }];
             $.plot($(plotSelector), dataSet, options);
             
             window.plot = plot;
@@ -609,7 +609,7 @@ Wat.I.G = {
                     }
                 });
 
-                dataSet = [{ label: "", data: barData, color: COL_BRAND }];
+                dataSet = [{ label: "", data: barData, color: Wat.I.G.getGraphColorA() }];
                 $.plot($(plotSelector), dataSet, options);
 
                 // After last load, clear interval
@@ -702,5 +702,13 @@ Wat.I.G = {
             }).appendTo("body").fadeIn(200);
         }
     },
+    
+    getGraphColorA: function () {
+        return $('.js-fake-graph-a').css('color');
+    },
+    
+    getGraphColorB: function () {
+        return $('.js-fake-graph-b').css('color');
+    }
     
 }

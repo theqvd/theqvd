@@ -2,7 +2,7 @@
     <iframe id="remember" name="remember" class="hidden" src="index.html"></iframe>
 
     <div class="login-side">
-        <img src="images/logo-login.png" />
+        <div class="logo-login"></div>
     </div>
     <div class="login-main">
         <form class="login-form js-login-form" target="remember" method="post" action="index.html">

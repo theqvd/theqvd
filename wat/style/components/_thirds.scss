@@ -211,3 +211,126 @@ div.tagsinput span.tag a {
     }
 }
 
+// jQuery Extruder
+
+.extruder {
+    &.left {
+        .flap {
+            font-size:18px;
+            color:white;
+            top:0;
+            padding:10px 0 10px 10px;
+            background:#000;
+            width: 40px;
+            position:absolute;
+            right:0;
+            -moz-border-radius:0 10px 10px 0;
+            -webkit-border-top-right-radius:10px;
+            -webkit-border-bottom-right-radius:10px;
+            -moz-box-shadow:#666 2px 0px 3px;
+            -webkit-box-shadow:#666 2px 0px 3px;
+            cursor: pointer;
+
+
+            .flapLabel {
+                background: #000;
+                cursor: pointer;
+            }
+        }
+
+        .content {
+            /*border-right:3px solid #772B14;*/
+        }
+    }
+}
+
+.extruder-content, .ext-wrapper, .extruder-content .text {
+    background: #333 !important;
+}
+
+
+// Colorpicker
+
+.evo-pop {
+    * {
+        text-shadow: none !important;
+    }
+    
+    width: 210px !important;
+}
+
+.customizer {  
+    * {
+        text-shadow: none !important;
+    }
+    .customizer-title {
+        color: $col_whiter;
+        text-align: center;
+        font-weight: bold;
+    }
+    
+    .extruder-content {
+        &>.text {
+            width: auto !important;
+            padding-right: 0px;
+        }
+    }
+    
+    .customize-panel {
+        color: $col_whiter;
+        overflow-y: auto;
+        padding-right: 10px;
+        margin-top: 10px;
+        height: 55vh;
+        
+        input.colorpicker {
+            width: 90px;
+        }
+
+        .evo-colorind {
+            width: 30px !important;
+            height: 30px !important;
+        }
+
+        &>div {
+            //width: 170px !important;
+
+        }
+        
+        .evo-cp-wrap {
+            width: 135px !important;
+        }
+
+        .custom-field-text {
+            width: 100%;
+        }
+        
+        .customize-section {
+            display: none;
+        }
+    }
+        
+    .custom-btn {
+        width: 200px !important;
+        text-shadow: none;
+        margin-top: 10px;
+        margin-left: 15px;
+        text-align: center;
+    }
+    
+    .customize-section {        
+        font-size: 12px;
+        margin-bottom: 15px;
+
+        legend {
+            text-align: left;
+        }
+        
+        .color-title {
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+        
+        margin-top: 20px;
+    }
+}
