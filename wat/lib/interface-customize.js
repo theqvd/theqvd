@@ -95,28 +95,40 @@ Wat.I.C = {
         Sass.setWorkerUrl('lib/thirds/sass.js/sass.worker.js');
         this.sass = new Sass();
         
-        $.each(this.sassFiles, function (iFile, filename) {
+        var sassFiles = this.sassFiles;
+        var prefix = this.prefixSassFiles;
+        var i = 0;
+        
+        var writeSassFile = function (filename) {
             $.ajax({
-                url: encodeURI(that.prefixSassFiles + filename),
+                url: encodeURI(prefix + filename),
                 method: 'GET',
                 async: true,
                 contentType: 'text',
                 cache: false,
                 success: function (content) {
                     that.sass.writeFile(filename, content, function callback(success) {
-                        //console.warn(success);
-                    });
-
-                    that.sass.listFiles(function callback(list) {
-                        if (list.length == that.sassFiles.length) {
-                            that.status = 'running';
+                        i++;
+                        if (sassFiles[i]) {
+                            writeSassFile (sassFiles[i])
                         }
                     });
+                },
+                error: function (e) {
+                    console.error(e);
+                    i++;
+                    
+                    if (sassFiles[i]) {
+                        writeSassFile (sassFiles[i])
+                    }
                 }
             });
-
-        });
-    
+        }
+        
+        // Wait one second for security
+        setTimeout(function () {
+            writeSassFile(sassFiles[i]);
+        }, 1000);
     },
     
     events: function () {
@@ -133,9 +145,7 @@ Wat.I.C = {
         $('.js-customize-section[name="' + selectedSectionName + '"]').show();
     },
     
-    preview: function () {  
-        var content = "";
-        
+    preview: function () {          
         $('.js-customizer-wrapper').closeMbExtruder();
         Wat.I.loadingBlock($.i18n.t('Generating preview') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
         
@@ -152,12 +162,18 @@ Wat.I.C = {
                         Wat.I.loadingUnblock();
                         $('.js-customizer-wrapper').openMbExtruder();
                     }
+                    else {
+                        Wat.I.loadingUnblock();
+                        $('.js-customizer-wrapper').openMbExtruder();
+                        Wat.I.showMessage({messageType: 'error', message: result.message});
+                    }
                 });
             }
         });
     },
     
     export: function () {
+        $('.js-customizer-wrapper').closeMbExtruder();
         Wat.I.loadingBlock($.i18n.t('Generating CSS file. When downloading were finished, replace custom_style.css on server to make changes permanent.') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
         
         var content = Wat.I.C.getCustomVarContent();
@@ -165,13 +181,25 @@ Wat.I.C = {
         var filename = Wat.I.C.customVarFilename;
         
         Wat.I.C.sass.writeFile(filename, content, function callback(success) {
+            console.log(success);
             if (success) {
-                Wat.I.C.sass.compileFile('style.scss', function (result) {
+                Wat.I.C.sass.compileFile('/style.scss', function (result) {
+                    console.log(result);
                     if (result.status == 0) {
                         var blob = new Blob([result.text], {type: "text/plain;charset=utf-8"});
                         Wat.I.loadingUnblock();
-
+                        $('.js-customizer-wrapper').openMbExtruder();
+                        
                         saveAs(blob, "custom_style.css");
+                    }
+                    else {
+                        Wat.I.loadingUnblock();
+                        $('.js-customizer-wrapper').openMbExtruder();
+                        Wat.I.showMessage({messageType: 'error', message: result.message});
+                        Wat.I.C.sass.listFiles(function callback(list) {
+                          console.info(list);
+                        });
+                        
                     }
                 });
             }

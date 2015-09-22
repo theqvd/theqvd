@@ -8,6 +8,10 @@ Used libraries on QVD Wat and their version, licenses and source sites:
 - jQuery UI v1.11.0 (MIT License) http://jqueryui.com
 - jQuery Cookie v1.4.1 (MIT License) http://plugins.jquery.com/cookie/
 - jQuery TableScroll (MIT License) https://github.com/farinspace/jquery.tableScroll
+- jQuery SideBar v1.0.2 (MIT License) https://github.com/sideroad/jquery.sidebar
+- jQuery mbExtruder (MIT/GPL License) https://github.com/pupunzi/jquery.mb.extruder
+- jQuery mbFlipText (MIT/GPL License) https://github.com/pupunzi/jquery.mb.fliptext
+- jQuery hoverIntent (MIT/GPL License) http://pupunzi.com
 - ExpandingTextareas v0.2.0 (MIT License) https://github.com/bgrins/ExpandingTextareas
 - Chosen v1.4.2 (MIT License) http://harvesthq.github.io/chosen/
 - Font Awesome v4.4.0 (Font: SIL OFL 1.1, CSS: MIT License) http://fortawesome.github.io/Font-Awesome/
@@ -23,3 +27,5 @@ Used libraries on QVD Wat and their version, licenses and source sites:
 - html2canvas v0.4.1 (MIT License) http://html2canvas.hertzen.com
 - jsPDF v0.9.0rc2 (MIT License) https://github.com/MrRio/jsPDF
 - FileSaver v1.1.20150716 (X11/MIT License) https://github.com/eligrey/FileSaver.js
+- Colorpicker v3.2.1 (MIT License) https://github.com/evoluteur/colorpicker
+- sass.js v0.9.2 (MIT License) https://github.com/medialize/sass.js/
