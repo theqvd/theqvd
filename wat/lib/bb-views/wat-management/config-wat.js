@@ -53,6 +53,18 @@ Wat.Views.ConfigWatView = Wat.Views.DetailsView.extend({
             arguments['block'] = block;
         }     
         
+        // Check style customizer if is possible and modify cookie
+        if (Wat.C.isSuperadmin() || !Wat.C.isMultitenant()) { 
+            if ($('input[name="style-customizer"]').is(':checked')) {
+                $.cookie('styleCustomizer', true, { expires: 7, path: '/' });
+                Wat.I.C.initCustomizer();
+            }
+            else {
+                $.removeCookie('styleCustomizer', { path: '/' });
+                Wat.I.C.hideCustomizer();
+            }
+        }
+        
         // Store new language to make things after update
         this.newLanguage = language;
         this.newBlock = block;

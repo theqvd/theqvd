@@ -70,13 +70,20 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         var that = that || this;
         that.model.fetch({      
             success: function () {
-                var filters = {};
+                var enabledProperties = $.inArray(that.qvdObj, QVD_OBJS_WITH_PROPERTIES) != -1;
                 
-                if (Wat.C.isMultitenant() && Wat.C.isSuperadmin()) {
-                    filters['-or'] = ['tenant_id', that.model.get('tenant_id'), 'tenant_id', SUPERTENANT_ID];
+                if (enabledProperties) {
+                    var filters = {};
+
+                    if (Wat.C.isMultitenant() && Wat.C.isSuperadmin()) {
+                        filters['-or'] = ['tenant_id', that.model.get('tenant_id'), 'tenant_id', SUPERTENANT_ID];
+                    }
+
+                    Wat.A.performAction(that.qvdObj + '_get_property_list', {}, filters, {}, that.completePropertiesAndRender, that, undefined, {"field":"key","order":"-asc"});
                 }
-                
-                Wat.A.performAction(that.qvdObj + '_get_property_list', {}, filters, {}, that.completePropertiesAndRender, that, undefined, {"field":"key","order":"-asc"});
+                else {
+                    that.render();
+                }
             }
         });
     },

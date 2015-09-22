@@ -17,11 +17,8 @@
             $('meta[name="viewport"]').prop('content', 'width=1024, initial-scale=1, maximum-scale=1');
         }
         
-        // If customizer is enabled, show it
-        if (ENABLE_CUSTOMIZER) {
-            Wat.I.C.initCustomizer();
-        }
-        
+        Wat.I.C.hideCustomizer();
+
         // Init API address variables
         Wat.C.initApiAddress();
         
@@ -47,6 +44,14 @@
 
             // Interface onfiguration
             Wat.I.renderMain();
+            
+            // If customizer is enabled, show it
+            if ((Wat.C.isSuperadmin() || Wat.C.isMultitenant() === 0) && $.cookie('styleCustomizer')) {
+                Wat.I.C.initCustomizer();
+            }
+            else {
+                Wat.I.C.hideCustomizer();
+            }
             
             // Start server clock
             Wat.I.startServerClock();
@@ -262,10 +267,9 @@
 
                 // Start Backbone history
                 Backbone.history.start();   
-                
+
                 Wat.C.routerHistoryStarted = true;
             }
-        
         };
                 
         var continueStart = function () {
@@ -291,6 +295,9 @@
             },
             viewCustomize: {
                 name: 'view/customize'
+            },
+            viewCustomizerTool: {
+                name: 'config/customizer-tool'
             },
             viewFormCustomize: {
                 name: 'view/customize-form'

@@ -381,14 +381,14 @@ Wat.B = {
                 $('.js-mobile-menu-hamburger').addClass('mobile-menu--mini');
                 $('.js-server-datetime-wrapper').addClass('server-datetime-wrapper--mini');
                 $('.js-menu-corner').css('top', '5px');
-                $('.js-customizer').css('top', '40px');
+                $('.js-customizer-wrapper').css('top', '40px');
             }
             else {
                 $('.js-header-wrapper').removeClass('header-wrapper--mini');
                 $('.js-mobile-menu-hamburger').removeClass('mobile-menu--mini');
                 $('.js-server-datetime-wrapper').removeClass('server-datetime-wrapper--mini');
                 $('.js-menu-corner').css('top', '20px');
-                $('.js-customizer').css('top', '60px');
+                $('.js-customizer-wrapper').css('top', '60px');
             }
             
             $('.js-header-wrapper').css('left', -$(window).scrollLeft());

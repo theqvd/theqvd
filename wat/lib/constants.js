@@ -6,9 +6,6 @@ RESTRICT_TEMPLATES = false;
 // Debug constants
 DEBUG_ACL_FAILS = false;
 
-// Customizer enabled/disabled
-ENABLE_CUSTOMIZER = false;
-
 // Status codes returned by the API
 ALL_STATUS = {
     0000: 'Successful completion',

@@ -35,6 +35,14 @@ if (Wat.C.checkACL('config.wat.')) {
                 <span><%= model.get('block') %></span>
             </td>
         </tr>
+        <% if (Wat.C.isSuperadmin() || !Wat.C.isMultitenant()) { %>
+        <tr>
+            <td><i class="fa fa-paint-brush"></i><span data-i18n="Style customizer tool"></span></td>
+            <td>
+                <span data-i18n="<%= $.cookie('styleCustomizer') ? 'Enabled' : 'Disabled' %>"></span>
+            </td>
+        </tr>
+        <% } %>
     </table>
 <% 
 } 

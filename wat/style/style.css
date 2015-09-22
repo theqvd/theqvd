@@ -1080,12 +1080,12 @@ body {
           padding: 0px;
           padding-bottom: 10px;
           vertical-align: top;
-          border: 1px solid #fcd6bf;
+          border: 1px solid #f9b78e;
           border-radius: 6px;
           margin-top: 10px;
           text-align: center; }
           .wrapper .content .home-wrapper .home-row .home-cell:hover {
-            border: 1px solid #f9b78e;
+            border: 1px solid #f7985e;
             background: #f8f8f8; }
           @media screen and (min-width: 41em) {
             .wrapper .content .home-wrapper .home-row .home-cell {

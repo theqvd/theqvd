@@ -123,6 +123,7 @@ Wat.C = {
         this.sid = '';
         this.login = '';
         this.acls = [];
+        Wat.I.C.hideCustomizer();
         
         Wat.I.stopServerClock();
     },
