@@ -1030,6 +1030,7 @@ body {
         font-weight: bold;
         text-align: left;
         border-bottom: #ccc solid 1px;
+        color: #333;
         background: #d7d7d7; }
         .wrapper .content .home-wrapper th .sort-icon {
           float: right;
@@ -1111,6 +1112,7 @@ body {
               font-weight: bold;
               text-align: left;
               border-bottom: #ccc solid 1px;
+              color: #333;
               background: #d7d7d7; }
               .wrapper .content .home-wrapper .home-row .home-cell .summary-table th .sort-icon {
                 float: right;
@@ -1226,6 +1228,7 @@ body {
           font-weight: bold;
           text-align: left;
           border-bottom: #ccc solid 1px;
+          color: #333;
           background: #d7d7d7; }
           .wrapper .content .home-wrapper .log-table th .sort-icon {
             float: right;
@@ -1926,6 +1929,7 @@ table.list, table.customize-fields {
     font-weight: bold;
     text-align: left;
     border-bottom: #ccc solid 1px;
+    color: #333;
     background: #d7d7d7; }
     table.list th .sort-icon, table.customize-fields th .sort-icon {
       float: right;
@@ -1978,6 +1982,7 @@ table.custom-props, table.details {
     font-weight: bold;
     text-align: left;
     border-bottom: #ccc solid 1px;
+    color: #333;
     background: #d7d7d7; }
     table.custom-props th .sort-icon, table.details th .sort-icon {
       float: right;
@@ -2878,6 +2883,7 @@ table.role-template-tools {
     font-weight: bold;
     text-align: left;
     border-bottom: #ccc solid 1px;
+    color: #333;
     background: #d7d7d7; }
     table.role-template-tools th .sort-icon {
       float: right;

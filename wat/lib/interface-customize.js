@@ -253,6 +253,11 @@ Wat.I.C = {
             'submenu_border': 'cpSubmenuBorder',
             'submenu_hover_bg': 'cpSubmenuHoverBg',
             'submenu_hover_text': 'cpSubmenuHoverText',
+            
+            'table_header_bg': 'cpTableThBg',
+            'table_header_text': 'cpTableThText',
+            'table_sorted_header_bg': 'cpTableSortedThBg',
+            'table_sorted_header_text': 'cpTableSortedThText',
         };  
         
         var customVarImgMapping = {

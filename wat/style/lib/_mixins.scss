@@ -193,7 +193,8 @@
         font-weight: bold;
         text-align: left;
         border-bottom: #ccc solid 1px;
-        background: darken($col_whiter, 15); 
+        color: $table_header_text;
+        background: $table_header_bg; 
         
         .sort-icon {
             float: right;
@@ -207,8 +208,8 @@
         @extend %not-selectable;
     
         &.sorted {
-            background-color: $col_brand;
-            color: $col_whiter;
+            background-color: $table_sorted_header_bg;
+            color: $table_sorted_header_text;
         }
         
         i {

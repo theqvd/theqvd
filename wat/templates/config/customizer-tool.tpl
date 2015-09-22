@@ -3,8 +3,9 @@
     <option value="header_and_footer">Header & Footer</option>         
     <option value="menu">Menu</option>
     <option value="buttons_and_links">Buttons & Links</option>
-    <option value="login_screen">Login screen</option>
+    <option value="tables">Tables</option>
     <option value="graphs">Graphs</option>
+    <option value="login_screen">Login screen</option>
 </select>
 <div class="customize-panel">
     <div name="header_and_footer" class="customize-section js-customize-section">
@@ -76,6 +77,17 @@
         <input name="cpSubmenuHoverBg" class="js-custom-field colorpicker" value="#e35e0c" data-original-value="#e35e0c"/>
         <div class="color-title">Header submenu text (hover)</div>
         <input name="cpSubmenuHoverText" class="js-custom-field colorpicker" value="#fdfdfd" data-original-value="#fdfdfd"/>
+    </div>
+    
+    <div name="tables" class="customize-section js-customize-section">
+        <div class="color-title">Tables header background</div>
+        <input name="cpTableThBg" class="js-custom-field colorpicker" value="#d7d7d7" data-original-value="#d7d7d7"/>
+        <div class="color-title">Tables header text</div>
+        <input name="cpTableThText" class="js-custom-field colorpicker" value="#333" data-original-value="#333"/>
+        <div class="color-title">Tables header background (currently sorted)</div>
+        <input name="cpTableSortedThBg" class="js-custom-field colorpicker" value="#cb540a" data-original-value="#cb540a"/>
+        <div class="color-title">Tables header text (currently sorted)</div>
+        <input name="cpTableSortedThText" class="js-custom-field colorpicker" value="#fdfdfd" data-original-value="#fdfdfd"/>
     </div>
 </div>
 <div style="clear:both;"></div>

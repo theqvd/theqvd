@@ -37,3 +37,8 @@ $submenu_text: darken($col_brand, 5);
 $submenu_border: lighten($col_brand, 20%);
 $submenu_hover_bg: $col_brand;
 $submenu_hover_text: $col_whiter;
+
+$table_header_bg: darken($col_whiter, 15); 
+$table_header_text: $col_blacker;
+$table_sorted_header_bg: $col_brand;
+$table_sorted_header_text: $col_whiter;
