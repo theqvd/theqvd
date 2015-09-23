@@ -717,11 +717,10 @@ sub _start_usbip {
    DEBUG "Starting USBIP";
    my @cmd;
    
-   @cmd = ($slaveclient, "--forward-usbip");
-   system(@cmd) == 0 or ERROR "Failed to execute " . join(' ', @cmd) . ": $?";
-   
-   @cmd = ($slaveclient, "forward-usbip-devices");
-   system(@cmd) == 0 or ERROR "Failed to execute " . join(' ', @cmd) . ": $?";
+
+   _run($slaveclient, "--forward-usbip");
+   _run($slaveclient, "--forward-usbip-devices");
+
 }
 
 ################################ RPC methods ######################################
@@ -767,6 +766,30 @@ sub HTTP_vnc_connect {
     _vnc_connect($httpd, $headers);
 }
 
+sub _run {
+	my @cmd = @_;
+	my $cmdstr = join(' ', @cmd);
+	
+	DEBUG "Going to run command '$cmdstr'";
+	
+	my $ret = system(@cmd);
+	if ( $ret == -1 ) {
+		ERROR "Failed to execute '$cmdstr': $!\n";
+		return 1;
+	} elsif ( $ret & 127 ) {
+		my $msg = sprintf("died with signal %d, %s coredump\n", ( $?&127), ($?&128) ? 'with' : 'without');
+		ERROR "Command '$cmdstr' $msg";
+		return 1;
+	} else {
+		if ( ($? >> 8) > 0 ) {
+			ERROR "Command '$cmdstr' exited with value " . ( $? >> 8 );
+			return $? >> 8;
+		} else {
+			DEBUG "Command '$cmdstr' exited successfully";
+			return 0;
+		}
+	}
+}
 
 1;
 
