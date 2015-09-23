@@ -129,7 +129,7 @@ command.darwin.sftp-server = /usr/libexec/sftp-server
 
 command.usbsrv = /usr/local/bin/usbsrv
 command.usbclnt = /usr/local/bin/usbclnt
-command.usbip = /usr/sbin/usbip
+command.usbip = /usr/bin/usbip
 command.slaveclient = ${path.qvd.bin}/qvd-slaveclient
 
 ## whether to remember password after successful connection
@@ -179,7 +179,7 @@ client.auto_connect = 0
 client.use_ssl = 1
 client.ssl.use_cert = 0
 ## slave shell
-client.slave.command =
+client.slave.command = bin/qvd-client-slaveserver
 client.slave.client = bin/qvd-slaveclient
 # enable commands used for benchmarking and testing the functionality
 # of the slave channel
