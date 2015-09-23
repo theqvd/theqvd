@@ -37,7 +37,7 @@ function hostTestFake () {
                 ]
            );
 
-            Wat.Router.app_router.trigger('route:detailsHost', [fakeValues.id]);        
+            Wat.Router.watRouter.trigger('route:detailsHost', [fakeValues.id]);        
 
             // Bind to the change event on the model
             Wat.CurrentView.model.bind('change', callback);
@@ -77,7 +77,7 @@ function hostTestReal () {
 
             expect(assertions);
 
-            Wat.Router.app_router.trigger('route:listHost');
+            Wat.Router.watRouter.trigger('route:listHost');
 
             Wat.CurrentView.model = new Wat.Models.Host();
 

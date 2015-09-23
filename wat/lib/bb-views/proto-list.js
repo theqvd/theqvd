@@ -729,7 +729,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         // If user have not access to main section, redirect to home
         if (!embeddedView && that.whatRender && !Wat.C.checkACL(that.qvdObj + '.see-main.')) {
-            Wat.Router.app_router.trigger('route:defaultRoute');
+            Wat.Router.watRouter.trigger('route:defaultRoute');
             return;
         }
         

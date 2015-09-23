@@ -18,13 +18,13 @@ function loginTest (login, password, tenant, callback) {
             
             // Sometimes router is not ready at this point. Wait for it
             var waitingRouter = setInterval(function(){ 
-                if (Wat.Router.app_router != undefined) {
+                if (Wat.Router.watRouter != undefined) {
                     Wat.C.afterLogin = function () {
-                        if (Wat.Router.app_router == undefined) {
+                        if (Wat.Router.watRouter == undefined) {
                             callback();
                             return;
                         }
-                        Wat.Router.app_router.trigger('route:defaultRoute');        
+                        Wat.Router.watRouter.trigger('route:defaultRoute');        
 
                         equal(Wat.CurrentView.qvdObj, "home", "Home access granted after auth");
 
@@ -44,7 +44,7 @@ function loginTest (login, password, tenant, callback) {
                     };
                         
 
-                    Wat.Router.app_router.trigger('route:defaultRoute');    
+                    Wat.Router.watRouter.trigger('route:defaultRoute');    
             
                     equal(Wat.CurrentView.qvdObj, "login", "Login screen is loaded before auth");
                     

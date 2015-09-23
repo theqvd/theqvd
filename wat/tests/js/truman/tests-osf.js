@@ -23,7 +23,7 @@ function osfTestReal () {
 
             expect(assertions);
 
-            Wat.Router.app_router.trigger('route:listOSF');
+            Wat.Router.watRouter.trigger('route:listOSF');
 
             Wat.CurrentView.model = new Wat.Models.OSF();
 

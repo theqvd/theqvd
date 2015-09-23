@@ -37,7 +37,7 @@ function osfTestFake () {
                 ]
            );
 
-            Wat.Router.app_router.trigger('route:detailsOSF', [fakeValues.id]);        
+            Wat.Router.watRouter.trigger('route:detailsOSF', [fakeValues.id]);        
 
             // Bind to the change event on the model
             Wat.CurrentView.model.bind('change', callback);
@@ -79,7 +79,7 @@ function osfTestReal () {
 
             expect(assertions);
 
-            Wat.Router.app_router.trigger('route:listOSF');
+            Wat.Router.watRouter.trigger('route:listOSF');
 
             Wat.CurrentView.model = new Wat.Models.OSF();
             

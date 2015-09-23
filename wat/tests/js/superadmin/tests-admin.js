@@ -17,7 +17,7 @@ function adminTestReal () {
 
             expect(assertions);
 
-            Wat.Router.app_router.trigger('route:listAdmin');
+            Wat.Router.watRouter.trigger('route:listAdmin');
 
             Wat.CurrentView.model = new Wat.Models.Admin();
             delete WatTests.values.admin.id;

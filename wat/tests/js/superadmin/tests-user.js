@@ -37,7 +37,7 @@ function userTestFake () {
                 ]
            );
             
-            Wat.Router.app_router.trigger('route:detailsUser', [fakeValues.id]);
+            Wat.Router.watRouter.trigger('route:detailsUser', [fakeValues.id]);
 
             // Bind to the change event on the model
             Wat.CurrentView.model.bind('change', callback);
@@ -77,7 +77,7 @@ function userTestReal () {
 
             expect(assertions);
 
-            Wat.Router.app_router.trigger('route:listUser');
+            Wat.Router.watRouter.trigger('route:listUser');
 
             Wat.CurrentView.model = new Wat.Models.User();
 

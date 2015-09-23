@@ -16,7 +16,7 @@ function roleTestReal () {
 
             expect(assertions);
 
-            Wat.Router.app_router.trigger('route:listRole');
+            Wat.Router.watRouter.trigger('route:listRole');
 
             Wat.CurrentView.model = new Wat.Models.Role();
 

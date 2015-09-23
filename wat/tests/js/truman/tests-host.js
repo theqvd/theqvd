@@ -15,7 +15,7 @@ function hostTestReal () {
 
             expect(assertions);
 
-            Wat.Router.app_router.trigger('route:listHost');
+            Wat.Router.watRouter.trigger('route:listHost');
 
             Wat.CurrentView.model = new Wat.Models.Host();
 

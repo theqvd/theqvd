@@ -15,7 +15,7 @@ function qvdConfigTestReal () {
 
             expect(assertions);
 
-            Wat.Router.app_router.trigger('route:setupConfig');
+            Wat.Router.watRouter.trigger('route:setupConfig');
             
             // Define different parameters for get, set and default actions
             var searchedKey = 'model.user.login.case-sensitive';
@@ -125,7 +125,7 @@ function qvdConfigTestReal () {
 
             expect(assertions);
 
-            Wat.Router.app_router.trigger('route:setupConfig');
+            Wat.Router.watRouter.trigger('route:setupConfig');
             
             // Define different parameters for get, set and default actions
             var customBranch = getRandomStr();

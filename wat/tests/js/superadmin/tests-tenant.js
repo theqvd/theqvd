@@ -16,7 +16,7 @@ function tenantTestReal () {
 
             expect(assertions);
 
-            Wat.Router.app_router.trigger('route:listTenant');
+            Wat.Router.watRouter.trigger('route:listTenant');
 
             Wat.CurrentView.model = new Wat.Models.Tenant();
 

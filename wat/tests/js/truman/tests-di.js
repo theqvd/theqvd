@@ -20,7 +20,7 @@ function diTestReal () {
 
             expect(assertions);
 
-            Wat.Router.app_router.trigger('route:listDI');
+            Wat.Router.watRouter.trigger('route:listDI');
 
             Wat.CurrentView.model = new Wat.Models.DI();
 

@@ -4,7 +4,7 @@ Wat.Views.ConfigWatView = Wat.Views.DetailsView.extend({
     initialize: function () {
         // If user have not access to main section, redirect to home
         if (!Wat.C.checkACL('config.wat.')) {
-            Wat.Router.app_router.trigger('route:defaultRoute');
+            Wat.Router.watRouter.trigger('route:defaultRoute');
             return;
         }
         

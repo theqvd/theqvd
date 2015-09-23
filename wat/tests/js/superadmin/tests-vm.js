@@ -37,7 +37,7 @@ function vmTestFake () {
                 ]
            );
 
-            Wat.Router.app_router.trigger('route:detailsVM', [fakeValues.id]);        
+            Wat.Router.watRouter.trigger('route:detailsVM', [fakeValues.id]);        
 
             // Bind to the change event on the model
             Wat.CurrentView.model.bind('change', callback);
@@ -81,7 +81,7 @@ function vmTestReal () {
             expect(assertions);
 
             // Move to OSFs section
-            Wat.Router.app_router.trigger('route:listOSF');
+            Wat.Router.watRouter.trigger('route:listOSF');
 
             Wat.CurrentView.model = new Wat.Models.OSF();
             delete WatTests.values.osf.id;
@@ -101,7 +101,7 @@ function vmTestReal () {
                 }
 
                 // Move to Disk images section
-                Wat.Router.app_router.trigger('route:listDI');
+                Wat.Router.watRouter.trigger('route:listDI');
 
                 Wat.CurrentView.model = new Wat.Models.DI();
 
@@ -124,7 +124,7 @@ function vmTestReal () {
                     }
 
                     // Move to Users section
-                    Wat.Router.app_router.trigger('route:listUser');
+                    Wat.Router.watRouter.trigger('route:listUser');
 
                     Wat.CurrentView.model = new Wat.Models.User();
                     delete WatTests.values.user.id;
@@ -144,7 +144,7 @@ function vmTestReal () {
                         }
 
                         // Move to Virtual machines section
-                        Wat.Router.app_router.trigger('route:listVM');
+                        Wat.Router.watRouter.trigger('route:listVM');
 
                         Wat.CurrentView.model = new Wat.Models.VM();
 
@@ -232,7 +232,7 @@ function vmTestReal () {
                                                     // After delete virtual machine, delete the dependency user
                                                     //////////////////////////////////////////////////////////////////
 
-                                                    Wat.Router.app_router.trigger('route:listUser');
+                                                    Wat.Router.watRouter.trigger('route:listUser');
 
                                                     Wat.CurrentView.model = new Wat.Models.User();
 
@@ -243,7 +243,7 @@ function vmTestReal () {
                                                         // After delete user, delete the dependency disk image
                                                         //////////////////////////////////////////////////////////////////
 
-                                                        Wat.Router.app_router.trigger('route:listDI');
+                                                        Wat.Router.watRouter.trigger('route:listDI');
 
                                                         Wat.CurrentView.model = new Wat.Models.DI();
 
@@ -254,7 +254,7 @@ function vmTestReal () {
                                                             // After delete di, delete the dependency osf
                                                             //////////////////////////////////////////////////////////////////
 
-                                                            Wat.Router.app_router.trigger('route:listOSF');
+                                                            Wat.Router.watRouter.trigger('route:listOSF');
 
                                                             Wat.CurrentView.model = new Wat.Models.OSF();
 

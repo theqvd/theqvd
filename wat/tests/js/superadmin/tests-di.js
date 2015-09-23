@@ -50,7 +50,7 @@ function diTestFake () {
                 ]
            );
 
-            Wat.Router.app_router.trigger('route:detailsDI', [fakeValues.id]);        
+            Wat.Router.watRouter.trigger('route:detailsDI', [fakeValues.id]);        
 
             // Bind to the change event on the model
             Wat.CurrentView.model.bind('change', callback);
@@ -91,7 +91,7 @@ function diTestReal () {
 
             expect(assertions);
 
-            Wat.Router.app_router.trigger('route:listOSF');
+            Wat.Router.watRouter.trigger('route:listOSF');
 
             Wat.CurrentView.model = new Wat.Models.OSF();
                         
@@ -111,7 +111,7 @@ function diTestReal () {
                     return;
                 }
 
-                Wat.Router.app_router.trigger('route:listDI');
+                Wat.Router.watRouter.trigger('route:listDI');
 
                 Wat.CurrentView.model = new Wat.Models.DI();
 
@@ -210,7 +210,7 @@ function diTestReal () {
                                             // After delete di, delete the dependency osf
                                             //////////////////////////////////////////////////////////////////
 
-                                            Wat.Router.app_router.trigger('route:listOSF');
+                                            Wat.Router.watRouter.trigger('route:listOSF');
 
                                             Wat.CurrentView.model = new Wat.Models.OSF();
 

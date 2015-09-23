@@ -21,7 +21,7 @@ function viewTest () {
                 // Number of Assertions we Expect     
                 expect( 1 );
 
-                Wat.Router.app_router.trigger('route:list' + view);        
+                Wat.Router.watRouter.trigger('route:list' + view);        
 
                 equal(Wat.CurrentView.qvdObj, view.toLowerCase(), view + " view rendered");
 
