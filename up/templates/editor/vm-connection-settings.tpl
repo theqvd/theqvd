@@ -12,6 +12,9 @@
             <td colspan=2>
                 <select name="custom_settings" class="js-custom-settings-switch">
                     <option value="global"><%= $.i18n.t("Inherit global profile (__profile__)", {profile: "Office"}) %></option>
+                    <option>Office</option>
+                    <option>Home</option>
+                    <option>Outdoor (Public network)</option>
                     <option data-i18n="Customize settings for this machine" value="custom"></option>
                 </select>
             </td>

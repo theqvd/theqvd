@@ -96,6 +96,9 @@ Wat.I = {
                 $(ui.tooltip).parent().mouseleave(function() {
                     $(ui.tooltip).hide();
                 });
+                $(ui.tooltip).mouseleave(function() {
+                    $(ui.tooltip).hide();
+                });
             },
             hide: false
         });

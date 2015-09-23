@@ -44,14 +44,14 @@
             </td>
         </tr>
         <%
-            $.each(model.get('properties'), function (propName, propValue) {
+            $.each(model.get('properties'), function (propId, prop) {
         %>
             <tr>
                 <td>
-                    <%= propName %>
+                    <%= prop.key %>
                 </td>
                 <td>
-                    <%= propValue %>
+                    <%= prop.value %>
                 </td>
             </tr>
         <%
