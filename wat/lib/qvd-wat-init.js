@@ -121,5 +121,3 @@ var Wat = {
     TPL: {},
 };
 
-//Wat.C.initApiAddress();
-

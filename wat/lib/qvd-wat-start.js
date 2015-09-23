@@ -20,7 +20,7 @@
         Wat.I.C.hideCustomizer();
 
         // Init API address variables
-        Wat.C.initApiAddress();
+        //Wat.C.initApiAddress();
         
         // Attach fast click events to separate tap from click
         Wat.I.attachFastClick();
@@ -271,8 +271,17 @@
                 Wat.C.routerHistoryStarted = true;
             }
         };
-                
+            
+        // Read config file "/config.json"
+        var readConfigFile = function () {
+            //After readl configuration file, continue start
+            Wat.C.readConfigFile(continueStart);
+        };        
+        
         var continueStart = function () {
+            // After read configuration file, we will set API address
+            Wat.C.initApiAddress();
+            
             // Remember login from cookies
             Wat.C.rememberLogin();
         };
@@ -304,6 +313,7 @@
             }
         }
 
-        Wat.A.getTemplates(templates, continueStart);
+        // Get templates and after that read config file
+        Wat.A.getTemplates(templates, readConfigFile);
 	});
 })(window, document, jQuery)

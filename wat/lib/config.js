@@ -1,10 +1,11 @@
 // Config
 Wat.C = {
-    version: '1.7',
+    version: '4.0',
     login: '',
     password: '',
     loggedIn: false,
-    apiAddress: '172.20.126.16:3000',   
+    apiAddress: '', //Will be loaded from external file config.json
+    apiPort: '', // Will be loaded from external file config.json
 
     // Source to be stored by API log
     source: 'WAT',
@@ -24,8 +25,8 @@ Wat.C = {
     
     // Init Api address configuration
     initApiAddress: function () {
-        this.apiUrl = 'http://' + this.apiAddress + '/';
-        this.apiWSUrl = 'ws://' + this.apiAddress + '/ws';
+        this.apiUrl = 'http://' + Wat.C.apiAddress + ':' + Wat.C.apiPort + '/';
+        this.apiWSUrl = 'ws://' + Wat.C.apiAddress + ':' + Wat.C.apiPort + '/ws';
     },
 
     // Get the base URL for API calls using credentials or session ID
@@ -590,5 +591,34 @@ Wat.C = {
                 delete that.initializeCommon;
             }
         }
+    },
+    
+    
+    readConfigFile: function (callback) {
+        $.ajax({
+            url: 'config.json',
+            method: 'GET',
+            async: true,
+            contentType: 'json',
+            cache: false,
+            complete: function (response) {
+                var configTokens = JSON.parse(response.responseText);
+                
+                $.each(configTokens, function (token, value) {
+                    Wat.C.setConfigToken(token, value);
+                });
+                                
+                callback();
+            }
+        });
+    },
+    
+    setConfigToken: function (token, value) {
+        if ($.inArray(token, ['apiAddress', 'apiPort']) == -1) {
+            console.error('A not allowed token was intented to load from config file (' + token + ')');
+            return;
+        }
+        
+        this[token] = value;
     }
 }
