@@ -266,14 +266,23 @@ Wat.I.C = {
         };
         
         var content = "";
+        
+        var configStyle = {};
 
         $.each(customVarColMapping, function (variableName, inputName) {
             content += "$" + variableName + ": " + $('input[name="' + inputName + '"]').val() + ";";
+            
+            configStyle[variableName] = $('input[name="' + inputName + '"]').val();
         });
         
         $.each(customVarImgMapping, function (variableName, inputName) {
             content += "$" + variableName + ": '" + $('input[name="' + inputName + '"]').val() + "';";
+
+            configStyle[variableName] = $('input[name="' + inputName + '"]').val();
         });
+        
+        // JSON format is for future feature
+        var configStyleJSON = JSON.stringify(configStyle);
         
         return content;
     }
