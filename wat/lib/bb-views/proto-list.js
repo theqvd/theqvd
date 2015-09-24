@@ -336,7 +336,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     else {
                         // Substring search syntax
                         filters[filterControl.attr('data-filter-field')] = {
-                            "~" : '%25' + filterControl.val() + '%25'
+                            "~" : '%' + filterControl.val() + '%'
                         };
                     }
                     break;
