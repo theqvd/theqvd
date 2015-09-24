@@ -9,14 +9,7 @@ Wat.Views.LoginView = Wat.Views.MainView.extend({
         Wat.C.language = 'auto';
         Wat.T.initTranslate();
         
-        var templates = {
-            login: {
-                name: 'login'
-            },
-            errorRefresh: {
-                name: 'error/refresh'
-            }
-        }
+        var templates = Wat.I.T.getTemplateList('login');
 
         Wat.A.getTemplates(templates,  this.getApiInfo, this);
     },

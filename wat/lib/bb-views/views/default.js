@@ -25,12 +25,8 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
         // Get side menu
         var cornerMenu = Wat.I.getCornerMenu();
         this.sideMenu = null;
-                
-        var templates = {
-            resetViewsDefault: {
-                name: 'editor/reset-views-default'
-            }
-        }
+        
+        var templates = Wat.I.T.getTemplateList('viewsDefault');
         
         Wat.A.getTemplates(templates, this.render); 
     },

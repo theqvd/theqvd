@@ -1858,12 +1858,14 @@ select[name="role"] {
   border-bottom: dotted 1px #d7d7d7; }
 
 /* Responsive generic layout */
-.desktop {
+.desktop, .desktop-row {
   display: none; }
 
 @media screen and (min-width: 41em) {
   .desktop {
     display: block; }
+  .desktop-row {
+    display: table-row; }
   td.desktop, th.desktop {
     display: table-cell; }
   span.desktop, a.desktop {

@@ -36,7 +36,7 @@ if (Wat.C.checkACL('config.wat.')) {
             </td>
         </tr>
         <% if (Wat.C.isSuperadmin() || !Wat.C.isMultitenant()) { %>
-        <tr class="desktop">
+        <tr class="desktop-row">
             <td><i class="fa fa-paint-brush"></i><span data-i18n="Style customizer tool"></span></td>
             <td>
                 <span data-i18n="<%= $.cookie('styleCustomizer') ? 'Enabled' : 'Disabled' %>"></span>

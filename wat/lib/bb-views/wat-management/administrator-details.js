@@ -29,14 +29,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     },
     
     addSpecificTemplates: function () {
-        var templates = {
-            inheritanceToolsRoles: {
-                name: 'details/role-inheritance-tools-roles'
-            },
-            aclsAdmins: {
-                name: 'details/administrator-acls-tree'
-            },
-        }
+        var templates = Wat.I.T.getTemplateList('detailsAdministrator');
         
         this.templates = $.extend({}, this.templates, templates);
     },

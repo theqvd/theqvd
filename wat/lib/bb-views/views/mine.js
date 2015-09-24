@@ -20,11 +20,7 @@ Wat.Views.MyViewsView = Wat.Views.ViewsView.extend({
     initialize: function (params) {
         Wat.Views.ViewsView.prototype.initialize.apply(this, [params]);
                 
-        var templates = {
-            resetViewsMine: {
-                name: 'editor/reset-views-mine'
-            }
-        }
+        var templates = Wat.I.T.getTemplateList('viewsMine');
         
         Wat.A.getTemplates(templates, this.render); 
     },

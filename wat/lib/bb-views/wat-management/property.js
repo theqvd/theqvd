@@ -25,20 +25,7 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
                 
         Wat.Views.MainView.prototype.initialize.apply(this, [params]);
         
-        var templates = {
-            property: {
-                name: 'list/property'
-            },
-            listProperty: {
-                name: 'list/property-list'
-            },
-            editorNew_property: {
-                name: 'creator/property'
-            },
-            editor_property: {
-                name: 'editor/property'
-            }
-        }
+        var templates = Wat.I.T.getTemplateList('properties');
         
         Wat.A.getTemplates(templates, this.render); 
     },

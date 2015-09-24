@@ -2,7 +2,7 @@ Wat.WS.changeWebsocketVm = function (id, field, data, viewType) {
    switch (field) {
         case 'state':
            
-            if (viewType == 'details') {
+            if (viewType == 'details' && Wat.CurrentView.model) {
                 // Add this effect when data will be received only when change
                 $('.js-body-state').hide();
                 $('[data-wsupdate="state-' + data + '"][data-id="' + id + '"]').show();

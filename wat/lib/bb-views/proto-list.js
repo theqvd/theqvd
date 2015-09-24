@@ -52,35 +52,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     addListTemplates: function () {
-        var templates = {
-            listCommonList: {
-                name: 'list/common'
-            },
-            listCommonBlock: {
-                name: 'list/common-block'
-            },
-            selectChecks: {
-                name: 'dialog/select-checks'
-            },
-            sortingRow: {
-                name: 'list/sorting-row'
-            }
-        }
-        
-        templates["editorNew_" + this.qvdObj] = {
-            name: 'creator/' + this.qvdObj
-        };        
-        
-        templates["list_" + this.qvdObj] = {
-            name: 'list/' + this.qvdObj
-        };
-        
-        // If qvd object is massive-editable, get massive editor template
-        if ($.inArray(this.qvdObj, QVD_OBJS_MASSIVE_EDITABLE) != -1) {
-            templates.editorMassive = {
-                name: 'editor/' + this.qvdObj + '-massive'
-            };
-        }
+        var templates = Wat.I.T.getTemplateList('list', {qvdObj: this.qvdObj});
         
         this.templates = $.extend({}, this.templates, templates);
     },

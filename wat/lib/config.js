@@ -625,7 +625,19 @@ Wat.C = {
         this[token] = value;
     },
     
-    setupAjaxQueue: function () {
+    // Add extensions or another setup parameters to jQuery
+    setupJQuery: function () {
+        // Extend jQuery with pseudo selector :blank
+        (function($) {
+            $.extend($.expr[":"], {
+                // http://docs.jquery.com/Plugins/Validation/blank
+                blank: function(a) {
+                    return !$.trim(a.value);
+                },
+            });
+        })(jQuery);
+        
+
         // Setup jQuery ajax to store all requests in a requests queue
         $.ajaxSetup({
             beforeSend: function(jqXHR) {

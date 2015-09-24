@@ -1,7 +1,11 @@
 // Pure interface utilities
 Wat.I = {
-    // Graphs
+    // Customize Tool (interface-customize.js)
+    C: {},
+    // Graphs (interface-graphs.js)
     G: {},
+    // Templates (interface-templates.js)
+    T: {},
     
     menu : {},
     mobileMenu : {},
@@ -844,13 +848,8 @@ Wat.I = {
             },
             button1Class : 'fa fa-ban',
             button2Class : 'fa fa-check',
-            fillCallback : function(target) {                
-                var templates = {
-                    confirmTemplate: {
-                        name: templateName,
-                        cache: false
-                    }
-                }
+            fillCallback : function(target) { 
+                var templates = Wat.I.T.getTemplateList('confirm', {templateName: templateName});
 
                 Wat.A.getTemplates(templates, Wat.A.fillTemplate, {
                     target: target,

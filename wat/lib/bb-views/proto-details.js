@@ -28,23 +28,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     },
     
     addDetailsTemplates: function () {
-        var templates = {
-            detailsCommon: {
-                name: 'details/common'
-            },
-            detailsCommonProperties: {
-                name: 'details/common-properties'
-            },
-            details: {
-                name: 'details/' + this.qvdObj
-            },
-            detailsSide: {
-                name: 'details/' + this.qvdObj + '-side'
-            },
-            warn404: {
-                name: 'error/404'
-            }
-        }
+        var templates = Wat.I.T.getTemplateList('details', {qvdObj: this.qvdObj});
         
         this.templates = $.extend({}, this.templates, templates);
     },

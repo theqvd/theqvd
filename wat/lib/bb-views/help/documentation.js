@@ -29,17 +29,7 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
             this.setSelectedGuide('');
         }
         
-        var templates = {
-            docSection: {
-                name: 'doc/doc'
-            },
-            docSearch: {
-                name: 'doc/doc-search'
-            },
-            docSearchResult: {
-                name: 'doc/doc-search-result'
-            }
-        }
+        var templates = Wat.I.T.getTemplateList('doc');
         
         Wat.A.getTemplates(templates, this.render); 
     },

@@ -342,13 +342,16 @@ body {
 }
 
 /* Responsive generic layout */
-.desktop {
+.desktop, .desktop-row {
     display: none;
 }
 
 @include in(desktop) {
     .desktop {
         display: block;
+    }
+    .desktop-row {
+        display: table-row;
     }
     
     td.desktop, th.desktop {

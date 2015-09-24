@@ -42,17 +42,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         
         this.model = new Wat.Models.Admin(params);
                     
-        var templates = {
-            editorNew_config: {
-                name: 'creator/conf-token'
-            },
-            qvdConfig: {
-                name: 'config/qvd'
-            },
-            qvdConfigTokens: {
-                name: 'config/qvd-tokens'
-            }
-        };
+        var templates = Wat.I.T.getTemplateList('qvdConfig');
         
         // The templates will be charged asynchronously. 
         Wat.A.getTemplates(templates, this.getPrefixes, this); 

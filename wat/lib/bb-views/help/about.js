@@ -15,11 +15,7 @@ Wat.Views.AboutView = Wat.Views.MainView.extend({
     initialize: function (params) {
         Wat.Views.MainView.prototype.initialize.apply(this, [params]);
         
-        var templates = {
-            about: {
-                name: 'doc/about'
-            }
-        }
+        var templates = Wat.I.T.getTemplateList('about');
         
         Wat.A.getTemplates(templates, this.render); 
     },

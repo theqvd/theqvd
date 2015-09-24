@@ -413,12 +413,7 @@ Wat.A = {
             lan = DOC_DEFAULT_LANGUAGE;
         }
         
-        var templates = {
-            docSection: {
-                name: 'doc/guides/' + lan + '/' + docParams.guide,
-                cache: false
-            }
-        }
+        var templates = Wat.I.T.getTemplateList('docSection', {lan: lan, guide: docParams.guide});
         
         Wat.A.getTemplates(templates, callBack, docParams);
     },

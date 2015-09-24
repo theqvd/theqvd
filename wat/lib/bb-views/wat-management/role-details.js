@@ -33,20 +33,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     },
     
     addSpecificTemplates: function () {
-        var templates = {
-            inheritanceToolsRoles: {
-                name: 'details/role-inheritance-tools-roles'
-            },
-            inheritanceToolsTemplates: {
-                name: 'details/role-inheritance-tools-templates'
-            },
-            inheritanceList: {
-                name: 'details/role-inheritance-list'
-            },
-            aclsRoles: {
-                name: 'details/role-acls-tree'
-            }
-        }
+        var templates = Wat.I.T.getTemplateList('detailsRole');
         
         this.templates = $.extend({}, this.templates, templates);
     },

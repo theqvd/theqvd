@@ -2,14 +2,7 @@
 Wat.Common.BySection.di = {
     // This initialize function will be executed one time and deleted
     initializeCommon: function (that) {
-        var templates = {
-            editorAffectedVM: {
-                name: 'editor/affected-vms'
-            },
-            editorAffectedVMList: {
-                name: 'editor/affected-vms-list'
-            }
-        };
+        var templates = Wat.I.T.getTemplateList('commonDI');
         
         this.templates = $.extend({}, this.templates, templates);
     },

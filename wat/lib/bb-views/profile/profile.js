@@ -33,15 +33,7 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         // Extend the common events
         this.extendEvents(this.eventsDetails);
         
-        var templates = {
-            profile: {
-                name: 'profile/profile'
-            }
-        }
-        
-        templates['editor_' + this.qvdObj] = {
-            name: 'editor/' + this.qvdObj
-        };
+        var templates = Wat.I.T.getTemplateList('profile', {qvdObj: this.qvdObj});
         
         Wat.A.getTemplates(templates, this.render, this); 
     },

@@ -1,16 +1,6 @@
 "use strict";
 
 (function (win, doc, $) {
-    // Extend jQuery with pseudo selector :blank
-    (function($) {
-        $.extend($.expr[":"], {
-            // http://docs.jquery.com/Plugins/Validation/blank
-            blank: function(a) {
-                return !$.trim(a.value);
-            },
-        });
-    })(jQuery);
-    
 	$(doc).ready(function() {
         // If desktop mode is forced, change viewport's meta tag
         if ($.cookie('forceDesktop')) {
@@ -21,10 +11,10 @@
         Wat.I.C.hideCustomizer();
         
         // Attach fast click events to separate tap from click
-        Wat.I.attachFastClick();
+        Wat.I.attachFastClick();      
         
-        // Setup ajax calls queue
-        Wat.C.setupAjaxQueue();
+        // Setup jquery addons
+        Wat.C.setupJQuery();
         
         Wat.C.afterLogin = function () {
             // Load translation file
@@ -75,32 +65,7 @@
             Wat.C.rememberLogin();
         };
         
-        var templates = {
-            main: {
-                name: 'main'
-            },
-            menu: {
-                name: 'menu'
-            },
-            editorCommon: {
-                name: 'editor/common'
-            },
-            editorCommonProperties: {
-                name: 'editor/common-properties'
-            },
-            relatedDoc: {
-                name: 'doc/related-links'
-            },
-            viewCustomize: {
-                name: 'view/customize'
-            },
-            viewCustomizerTool: {
-                name: 'config/customizer-tool'
-            },
-            viewFormCustomize: {
-                name: 'view/customize-form'
-            }
-        }
+        var templates = Wat.I.T.getTemplateList('starting');
 
         // Get templates and after that read config file
         Wat.A.getTemplates(templates, readConfigFile);

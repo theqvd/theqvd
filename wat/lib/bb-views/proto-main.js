@@ -38,11 +38,7 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     addCommonTemplates: function () {
-        var templates = {};
-                
-        templates['editor_' + this.qvdObj] = {
-            name: 'editor/' + this.qvdObj
-        };
+        var templates = Wat.I.T.getTemplateList('commonEditors', {qvdObj: this.qvdObj});
         
         this.templates = $.extend({}, this.templates, templates);
     },

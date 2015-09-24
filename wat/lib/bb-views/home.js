@@ -53,14 +53,7 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         Wat.Views.MainView.prototype.initialize.apply(this, [params]);
         Wat.B.bindHomeEvents();
                 
-        var templates = {
-            home: {
-                name: 'home/home'
-            },
-            homeVMsExpire: {
-                name: 'home/vms-expire'
-            }
-        }
+        var templates = Wat.I.T.getTemplateList('home');
         
         Wat.A.getTemplates(templates, this.getStatistics, this); 
     },
