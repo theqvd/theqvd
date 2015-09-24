@@ -25,7 +25,9 @@
         <tr>
             <td><i class="<%= CLASS_ICON_TENANTS %>"></i><span data-i18n="Tenant"></span></td>
             <td>
+                <%= Wat.C.ifACL('<a href="#/tenant/' + model.get('tenant_id') + '">', 'tenant.see-details.') %>
                 <%= model.get('tenant_name') %>
+                <%= Wat.C.ifACL('</a>', 'tenant.see-details.') %>
             </td>
         </tr>
     <%   
