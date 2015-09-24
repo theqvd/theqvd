@@ -198,7 +198,7 @@
                                 break;
                             case 'default':
                 %>
-                                <td class="desktop center">
+                                <td class="desktop center cell-check">
                                     <input type="radio" data-di_id="<%= model.get('id') %>" data-name="di_default" name="di_default" <%= model.get('default') ? 'checked': '' %> value="0">
                                 </td>
                 <%

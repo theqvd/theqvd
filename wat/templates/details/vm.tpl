@@ -110,7 +110,27 @@ switch (model.get('state')) {
 %>
 
 <table class="details details-list <%= mainTableClass %>">
-    <%  
+    <%   
+    if (Wat.C.isSuperadmin()) { 
+    %>
+        <tr>
+            <td><i class="<%= CLASS_ICON_TENANTS %>"></i><span data-i18n="Tenant"></span></td>
+            <td>
+                <%= model.get('tenant_name') %>
+            </td>
+        </tr>
+    <%   
+    }
+    if (Wat.C.checkACL('vm.see.id')) { 
+    %>
+        <tr>
+            <td><i class="fa fa-asterisk"></i><span data-i18n="Id"></span></td>
+            <td>
+                <%= model.get('id') %>
+            </td>
+        </tr>
+    <% 
+    }  
     if (Wat.C.checkACL('vm.see.description')) { 
     %>
         <tr>
@@ -130,16 +150,6 @@ switch (model.get('state')) {
                 %>
             </td>
         </tr>
-    <% 
-    } 
-    if (Wat.C.checkACL('vm.see.id')) {
-    %>
-        <tr>
-            <td><i class="fa fa-male"></i><span data-i18n="Id"></span></td>
-            <td>
-                <%= model.get('id') %>
-            </td>
-        </tr>  
     <% 
     }
     if (Wat.C.checkACL('vm.see.user')) {

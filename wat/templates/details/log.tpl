@@ -10,7 +10,7 @@
     if (Wat.C.checkACL('log.see-details.')) { 
     %>
         <tr>
-            <td><i class="fa fa-male"></i><span data-i18n="Id"></span></td>
+            <td><i class="fa fa-asterisk"></i><span data-i18n="Id"></span></td>
             <td>
                 <%= model.get('id') %>
             </td>

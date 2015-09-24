@@ -183,7 +183,8 @@ fieldset {
     }
     
     .filter-notes-list {
-        display: block;
+        display: inline;
+        margin-left: 20px;
         margin-top: 15px;
         margin-bottom: 10px;
         li {

@@ -29,7 +29,17 @@
 </div>
 
 <table class="details details-list <% if (!enabledProperties) { %> col-width-100 <% } %>">
-    <%   
+    <%
+    if (Wat.C.checkACL('host.see.id')) { 
+    %>
+        <tr>
+            <td><i class="fa fa-asterisk"></i><span data-i18n="Id"></span></td>
+            <td>
+                <%= model.get('id') %>
+            </td>
+        </tr>
+    <% 
+    }
     if (Wat.C.checkACL('host.see.description')) { 
     %>
         <tr>
@@ -49,16 +59,6 @@
                 %>
             </td>
         </tr>
-    <% 
-    }
-    if (detailsFields['id'] != undefined) { 
-    %>
-        <tr>
-            <td><i class="fa fa-male"></i><span data-i18n="Id"></span></td>
-            <td>
-                <%= model.get('id') %>
-            </td>
-        </tr>  
     <% 
     }
     if (detailsFields['address'] != undefined) { 

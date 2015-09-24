@@ -38,7 +38,7 @@
             </td>
         </tr>
         <% if (Wat.C.isSuperadmin() || !Wat.C.isMultitenant()) { %>
-            <tr>
+            <tr class="desktop">
             <td data-i18n="Style customizer tool"></td>
             <td>
                 <input type="checkbox" name="style-customizer" <%= $.cookie('styleCustomizer') ? 'checked' : '' %>/>

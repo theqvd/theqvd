@@ -169,6 +169,10 @@ Wat.B = {
             if (firstCheckbox) {
                 $(firstCheckbox).trigger('click');
             }
+            var firstRadiobutton = $(e.target).find('input[type="radio"]')[0];
+            if (firstRadiobutton) {
+                $(firstRadiobutton).trigger('click');
+            }
         });
     },
     

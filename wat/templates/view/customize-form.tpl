@@ -26,7 +26,7 @@
                 }
         %>  
                 <tr class="<%= field.property ? 'js-is-property' : '' %>" data-name="<%= fName %>">
-                    <td class="center">
+                    <td class="center cell-check">
                         <div class="js-field-check" data-name="<%= fName %>" data-fields="<%= field.fields.join(',') %>">
                             <%= Wat.I.controls.CheckBox({checked: field.display}) %>
                         </div>
@@ -55,7 +55,7 @@
         });
         %>
             <tr class="js-is-property js-column-property-template hidden" data-name="">
-                <td class="center">
+                <td class="center cell-check">
                     <div class="js-field-check" data-name="" data-fields="">
                         <%= Wat.I.controls.CheckBox({checked: false}) %>
                     </div>
@@ -95,12 +95,12 @@
                 }
         %>  
                 <tr class="<%= filter.property ? 'js-is-property' : '' %>" data-name="<%= fName %>">
-                    <td class="center">
+                    <td class="center cell-check">
                         <div  data-name="<%= fName %>" data-field="<%= filter.filterField %>" class="js-desktop-fields">
                             <%= Wat.I.controls.CheckBox({checked: filter.displayDesktop}) %>
                         </div>
                     </td>                    
-                    <td class="center">
+                    <td class="center cell-check">
                         <div data-name="<%= fName %>" data-field="<%= filter.filterField %>" class="js-mobile-fields">
                             <%= Wat.I.controls.CheckBox({checked: filter.displayMobile}) %>
                         </div>
@@ -132,12 +132,12 @@
         });
         %>
             <tr class="js-is-property js-filter-property-template hidden" data-name="">
-                <td class="center">
+                <td class="center cell-check">
                     <div class="js-desktop-fields" data-name="" data-fields="">
                         <%= Wat.I.controls.CheckBox({checked: false}) %>
                     </div>
                 </td>
-                <td class="center">
+                <td class="center cell-check">
                     <div class="js-mobile-fields" data-name="" data-field="">
                         <%= Wat.I.controls.CheckBox({checked: false}) %>
                     </div>

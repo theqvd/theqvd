@@ -15,6 +15,26 @@
 
 <table class="details details-list <% if (!enabledProperties) { %> col-width-100 <% } %>">
     <%   
+    if (Wat.C.isSuperadmin()) { 
+    %>
+        <tr>
+            <td><i class="<%= CLASS_ICON_TENANTS %>"></i><span data-i18n="Tenant"></span></td>
+            <td>
+                <%= model.get('tenant_name') %>
+            </td>
+        </tr>
+    <%   
+    }
+    if (Wat.C.checkACL('osf.see.id')) { 
+    %>
+        <tr>
+            <td><i class="fa fa-asterisk"></i><span data-i18n="Id"></span></td>
+            <td>
+                <%= model.get('id') %>
+            </td>
+        </tr>  
+    <% 
+    }
     if (Wat.C.checkACL('osf.see.description')) { 
     %>
         <tr>
@@ -34,16 +54,6 @@
                 %>
             </td>
         </tr>
-    <% 
-    }
-    if (detailsFields['id'] != undefined) { 
-    %>
-        <tr>
-            <td><i class="fa fa-male"></i><span data-i18n="Id"></span></td>
-            <td>
-                <%= model.get('id') %>
-            </td>
-        </tr>  
     <% 
     }
     if (detailsFields['overlay'] != undefined) { 
