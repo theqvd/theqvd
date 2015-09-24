@@ -534,6 +534,11 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     },    
     
     renderACLsTree: function (that) {
+        // If data gathering is aborted due view switch or any other reason, abort rendering
+        if (that.retrievedData.statusText == 'abort') {
+            return;
+        }
+        
         var branchStats = that.retrievedData;
         
         // Fill the html with the template and the model
