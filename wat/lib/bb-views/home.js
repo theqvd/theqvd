@@ -40,6 +40,11 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         vms_with_expiration_date: []
     },
     
+    events: {
+        'click .js-exportPDF': 'exportPDF',
+        'click .js-exportCSV': 'exportCSV'
+    },
+    
     breadcrumbs: {
         'screen': 'Home'
     },
@@ -77,7 +82,8 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         // Fill the html with the template and the model
         this.template = _.template(
             Wat.TPL.home, {
-                stats: this.stats
+                stats: this.stats,
+                cid: this.cid
             }
         );
         
@@ -141,5 +147,100 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
                 }
             }, 50);
         }
-    }
+    },
+    
+    exportPDF: function () {
+        var doc = new jsPDF('p', 'mm');
+
+        html2canvas($('.home-wrapper'), {
+            background:'#fff',
+            onrendered: function(canvas) {   
+                $('canvas').hide();
+
+                var imgData = canvas.toDataURL(
+                    'image/jpeg');  
+
+                var doc = new jsPDF('p', 'mm');
+
+                doc.setFontSize(26);          
+                doc.text(5, 20, $.i18n.t('QVD summary'));
+
+
+                compress = 0;
+                var shrinkFactor = canvas.width / 200;
+                var height = canvas.height / shrinkFactor;
+                var width = canvas.width / shrinkFactor;
+
+                doc.addImage(imgData, 'JPEG', 5, 30, width, height, undefined, compress);
+
+                var d = new Date();
+                var date = d.toISOString().substring(0, 10);
+                var time = d.toTimeString().substring(0, 8);
+                time = time.replace(/:/g, '');
+                var dateTime = date + '_' + time;
+
+                var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+                if (iOS) {
+                    doc.output('dataurlnewwindow');
+                }
+                else {
+                    doc.save('QVD-Summary-' + dateTime + '.pdf');
+                }
+
+                Wat.CurrentView.render();
+            },
+              allowTaint: true,
+              logging: false,
+              useCORS: true
+        });
+    },   
+    
+    exportCSV: function () {
+        // Make a copy of the home stats
+        var homeStats = $.extend(true, {}, this.retrievedData);
+        
+        // Delete data of API communication
+        delete homeStats.sid;
+        delete homeStats.status;
+        
+        // Convert top populated hosts structure to a simple string
+        var topPopulatedHosts = [];
+        $.each(homeStats.top_populated_hosts, function (i, host) {
+            topPopulatedHosts.push(host.id + ',' + host.name + ',' + host.number_of_vms);
+        });
+        
+        homeStats.top_populated_hosts = '"' + topPopulatedHosts.join('|') + '"';  
+        
+        // Convert vms with expiration date structure to a simple string
+        var vmsWithExpirationDate = [];
+        $.each(homeStats.vms_with_expiration_date, function (i, exp) {
+            vmsWithExpirationDate.push(exp.id + ',' + exp.name + ',' + exp.expiration.replace('T',''));
+        });
+        
+        homeStats.vms_with_expiration_date = '"' + vmsWithExpirationDate.join('|') + '"';
+        
+        var keys = Object.keys(homeStats);
+        keys.sort();
+        
+        var values = keys.map(function(v) { 
+            return homeStats[v]; 
+        });
+        
+        // Build CSV
+        var csv = '';
+        csv += keys.join(',') + "\n";
+        csv += values.join(',') + "\n";
+        
+        // Get Current date time to build file name
+        var d = new Date();
+        var date = d.toISOString().substring(0, 10);
+        var time = d.toTimeString().substring(0, 8);
+        time = time.replace(/:/g, '');
+        var dateTime = date + '_' + time;
+        
+        // Export CSV file
+        var blob = new Blob([csv], {type: "text/plain;charset=utf-8"});                       
+        saveAs(blob, 'QVD-Summary-' + dateTime + '.csv');
+    },
 });
