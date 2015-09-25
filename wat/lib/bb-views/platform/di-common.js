@@ -190,7 +190,7 @@ Wat.Common.BySection.di = {
                 
                 if (affectedVMsIds.length == 0) {
                     Wat.I.closeDialog(that.dialog);
-                    Wat.I.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
+                    Wat.I.M.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
                     return;
                 }
                 

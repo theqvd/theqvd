@@ -393,7 +393,7 @@ Wat.C = {
         }
         else if (response.status == STATUS_NOT_LOGIN || response.status == STATUS_SESSION_EXPIRED) {
             Wat.Router.watRouter.trigger('route:logout');
-            Wat.I.showMessage({'message': ALL_STATUS[response.status], 'messageType': 'error'});
+            Wat.I.M.showMessage({'message': ALL_STATUS[response.status], 'messageType': 'error'});
             return true;
         }
         

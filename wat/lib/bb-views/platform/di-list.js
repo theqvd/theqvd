@@ -210,11 +210,11 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             realView.fetchList();
             realView.checkMachinesChanges(that);
 
-            Wat.I.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
+            Wat.I.M.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
         }).fail(function(data){
             Wat.I.closeDialog(that.dialog);
             Wat.I.loadingUnblock();
-            Wat.I.showMessage({message: i18n.t('Error creating'), messageType: 'error'});
+            Wat.I.M.showMessage({message: i18n.t('Error creating'), messageType: 'error'});
         });
     },
     
@@ -295,7 +295,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
                 var realView = Wat.I.getRealView(this);
                 realView.fetchList();
 
-                Wat.I.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
+                Wat.I.M.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
                 
                 // Check affected machine changes
                 var realView = Wat.I.getRealView(this);
@@ -308,7 +308,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
 
                 Wat.I.loadingUnblock();
                 $(".ui-dialog-buttonset button:first-child").trigger('click');
-                Wat.I.showMessage({message: i18n.t(ALL_STATUS[data.status]), messageType: 'error'});
+                Wat.I.M.showMessage({message: i18n.t(ALL_STATUS[data.status]), messageType: 'error'});
         }
     }
 });

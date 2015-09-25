@@ -175,11 +175,11 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
             if (that.retrievedData.status == STATUS_SUCCESS) {
                 var row = $(e.target).parent().parent();
                 if (checked) {
-                    Wat.I.showMessage({message: i18n.t('Successfully created'), messageType: 'success'}, that.retrievedData);
+                    Wat.I.M.showMessage({message: i18n.t('Successfully created'), messageType: 'success'}, that.retrievedData);
                     $(row).addClass('js-row-property-' + qvdObj);
                 }
                 else {
-                    Wat.I.showMessage({message: i18n.t('Successfully deleted'), messageType: 'success'}, that.retrievedData);
+                    Wat.I.M.showMessage({message: i18n.t('Successfully deleted'), messageType: 'success'}, that.retrievedData);
                     $(row).removeClass('js-row-property-' + qvdObj);
                     var selectedObj = $('select[name="obj-qvd-select"]').val();
                     
@@ -194,10 +194,10 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
             }
             else {
                 if (checked) {
-                    Wat.I.showMessage({message: i18n.t('Error creating'), messageType: 'error'}, that.retrievedData);
+                    Wat.I.M.showMessage({message: i18n.t('Error creating'), messageType: 'error'}, that.retrievedData);
                 }
                 else {
-                    Wat.I.showMessage({message: i18n.t('Error deleting'), messageType: 'error'}, that.retrievedData);
+                    Wat.I.M.showMessage({message: i18n.t('Error deleting'), messageType: 'error'}, that.retrievedData);
                 }
             }                            
         }, this);
@@ -340,10 +340,10 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
 
                 Wat.A.performAction(action, args, filters, {}, function (that) {
                     if (that.retrievedData.status == STATUS_SUCCESS) {
-                        //Wat.I.showMessage({message: i18n.t('Successfully created'), messageType: 'success'}, that.retrievedData);
+                        //Wat.I.M.showMessage({message: i18n.t('Successfully created'), messageType: 'success'}, that.retrievedData);
                     }
                     else {
-                        //Wat.I.showMessage({message: i18n.t('Error creating'), messageType: 'error'}, that.retrievedData);
+                        //Wat.I.M.showMessage({message: i18n.t('Error creating'), messageType: 'error'}, that.retrievedData);
                     }
 
                     countChecks++;

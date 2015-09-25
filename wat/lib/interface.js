@@ -1,11 +1,13 @@
 // Pure interface utilities
 Wat.I = {
-    // Customize Tool (interface-customize.js)
+        // Styles Customizer Tool (interface-customize.js)
     C: {},
     // Graphs (interface-graphs.js)
     G: {},
     // Templates (interface-templates.js)
     T: {},
+    // Messages (interface-messages.js)
+    M: {},
     
     menu : {},
     mobileMenu : {},
@@ -606,40 +608,6 @@ Wat.I = {
     
     updateLoginOnMenu: function () {
         $('.js-menu-corner').find('.js-login').html(Wat.C.login);
-    },
-    
-    // Messages
-    showMessage: function (msg, response) {
-        // Process message to set expanded message if proceeds
-        msg = this.processMessage (msg, response);
-        
-        this.clearMessageTimeout();
-        
-        if (msg.expandedMessage) {
-            var expandIcon = '<i class="fa fa-plus-square-o expand-message js-expand-message"></i>';
-            var expandedMessage = '<article class="expandedMessage">' + msg.expandedMessage + '</article>';
-        }
-        else {
-            var expandIcon = '';
-            var expandedMessage = '';
-        }
-        
-        var summaryMessage = '<summary>' + $.i18n.t(msg.message) + '</summary>';
-        
-        $('.message').html(expandIcon + summaryMessage + expandedMessage);
-        
-        Wat.T.translate();
-
-        $('.message-container').hide().slideDown(500);
-        $('.message-container').removeClass('success error info warning');
-        $('.message-container').addClass(msg.messageType);
-        
-        // Success and info messages will be hidden automatically
-        if (msg.messageType != 'error' && msg.messageType != 'warning') {
-            this.messageTimeout = setTimeout(function() { 
-                Wat.I.closeMessage();
-            },3000);
-        }
     },
 
     getTextFromFailures: function (failures) {

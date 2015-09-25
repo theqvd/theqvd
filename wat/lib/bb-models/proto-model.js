@@ -23,7 +23,7 @@ Wat.Models.Model = Backbone.Model.extend({
                 return this.processResponse(response);
                 break;
             case 'error':
-                Wat.I.showMessage({messageType: 'error'}, response);
+                Wat.I.M.showMessage({messageType: 'error'}, response);
                 break;
         }
     },

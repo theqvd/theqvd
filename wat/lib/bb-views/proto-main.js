@@ -415,7 +415,7 @@ Wat.Views.MainView = Backbone.View.extend({
             that.retrievedData = response;
             successCallback(that);
             
-            Wat.I.showMessage(messageParams, response);
+            Wat.I.M.showMessage(messageParams, response);
         });
     },
     

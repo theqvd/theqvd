@@ -67,7 +67,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
                 break;
         }
 
-        Wat.I.showMessage(messageParams, response);
+        Wat.I.M.showMessage(messageParams, response);
     },
     
     checkDesktopFilter: function (e) {

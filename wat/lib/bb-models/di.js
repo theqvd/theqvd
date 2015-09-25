@@ -8,7 +8,7 @@ Wat.Models.DI = Wat.Models.Model.extend({
         // If parse is done in details view, we get head and default tags 
         // to independent attributes
         if (this.detailsView && response.status != 0) {
-            Wat.I.showMessage({message: "ERROR #" + response.status + ": " + response.message, messageType: "error"});
+            Wat.I.M.showMessage({message: "ERROR #" + response.status + ": " + response.message, messageType: "error"});
             return {};
         }
         

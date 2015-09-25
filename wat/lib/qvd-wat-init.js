@@ -9,7 +9,14 @@ var Wat = {
         // Models
         User: {},
         VM: {},
-        Host: {}
+        Host: {},
+        OSF: {},
+        DI: {},
+        Admin: {},
+        Log: {},
+        Property: {},
+        Role: {},
+        Tenant: {},
     },
     Collections: {
         // Common collection with connection method
@@ -18,7 +25,14 @@ var Wat = {
         // Collections
         Users: {},
         VMs: {},
-        Hosts: {}
+        Hosts: {},
+        OSFs: {},
+        DIs: {},
+        Admins: {},
+        Logs: {},
+        Properties: {},
+        Roles: {},
+        Tenants: {},
     },
     Views: {
         // Common view with menu and breadcrumbs
@@ -66,6 +80,7 @@ var Wat = {
         // Current administrator
         Profile: {}
     },
+    // Backbone router (lib/bb-router.js)
     Router: {},
     
     // Common functions used from two or more views
@@ -87,28 +102,37 @@ var Wat = {
     // Current view store
     CurrentView: {},
     
-    // Actions
+    // Actions (lib/actions.js)
     A: {},
     
-    // Translation utilities
+    // Translation utilities (lib/translations.js)
     T: {}, 
     
-    // Interface utilities
-    I: {},
+    // Interface utilities (lib/interface.js)
+    I: {
+        // Styles Customizer Tool (lib/interface-customize.js)
+        C: {},
+        // Graphs (lib/interface-graphs.js)
+        G: {},
+        // Templates (lib/interface-templates.js)
+        T: {},
+        // Messages (lib/interface-messages.js)
+        M: {},
+    },
     
-    // Configuration
+    // Configuration (lib/config.js)
     C: {}, 
     
-    // Login utilities
+    // Login utilities (lib/login.js)
     L: {}, 
     
-    // Binds
+    // Events binds that cant be done in backbone views (lib/binds.js)
     B: {},
     
-    // Utilities
+    // Utilities (lib/utilities.js)
     U: {},
     
-    // Web Sockets
+    // Web Sockets (lib/websockets/websockets.js)
     WS: {
         websockets: [],
         debug: false,
@@ -117,10 +141,20 @@ var Wat = {
         openStatsWebsockets: function () {},
         openListWebsockets: function () {},    
         openDetailsWebsockets: function () {},
-        changeWebsocket: function () {}
+        changeWebsocket: function () {},
+        // Web Sockets for Hosts (lib/websockets/websockets.host.js)
+        changeWebsocketHost: function () {},
+        // Web Sockets for OSFs (lib/websockets/websockets.osf.js)
+        changeWebsocketOsf: function () {},
+        // Web Sockets for Home page s  tats (lib/websockets/websockets.stats.js)
+        changeWebsocketStats: function () {},
+        // Web Sockets for Users (lib/websockets/websockets.user.js)
+        changeWebsocketUser: function () {},
+        // Web Sockets for VMs (lib/websockets/websockets.vm.js)
+        changeWebsocketVm: function () {},
     },
     
-    // Templates
+    // Templates storage
     TPL: {},
 };
 

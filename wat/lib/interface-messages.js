@@ -1,4 +1,4 @@
-var iMessages = {
+Wat.I.M = {
     // Messages
     showMessage: function (msg, response) {
         // Process message to set expanded message if proceeds
@@ -28,7 +28,7 @@ var iMessages = {
         // Success and info messages will be hidden automatically
         if (msg.messageType != 'error' && msg.messageType != 'warning') {
             this.messageTimeout = setTimeout(function() { 
-                Wat.I.closeMessage();
+                Wat.I.M.closeMessage();
             },3000);
         }
     },
@@ -78,5 +78,3 @@ var iMessages = {
         return msg;
     },
 }
-
-Wat.I = $.extend({}, Wat.I, iMessages);

@@ -82,7 +82,7 @@ Wat.L = {
         var tenant = $('input[name="admin_tenant"]').val() || tenant;
         
         if (!user) {
-            Wat.I.showMessage({message: "Empty user", messageType: "error"});
+            Wat.I.M.showMessage({message: "Empty user", messageType: "error"});
             return;
         }
 
@@ -103,10 +103,10 @@ Wat.L = {
         
         if (!that.retrievedData.acls || $.isEmptyObject(that.retrievedData.acls)) {
             Wat.L.logOut();
-            Wat.I.showMessage({message: "Wrong user or password", messageType: "error"});
+            Wat.I.M.showMessage({message: "Wrong user or password", messageType: "error"});
             that.login = '';
             that.sid = '';
-            window.location.reload();
+            //window.location.reload();
             return;
         }
         

@@ -165,7 +165,7 @@ Wat.I.C = {
                     else {
                         Wat.I.loadingUnblock();
                         $('.js-customizer-wrapper').openMbExtruder();
-                        Wat.I.showMessage({messageType: 'error', message: result.message});
+                        Wat.I.M.showMessage({messageType: 'error', message: result.message});
                     }
                 });
             }
@@ -195,7 +195,7 @@ Wat.I.C = {
                     else {
                         Wat.I.loadingUnblock();
                         $('.js-customizer-wrapper').openMbExtruder();
-                        Wat.I.showMessage({messageType: 'error', message: result.message});
+                        Wat.I.M.showMessage({messageType: 'error', message: result.message});
                         Wat.I.C.sass.listFiles(function callback(list) {
                           console.info(list);
                         });

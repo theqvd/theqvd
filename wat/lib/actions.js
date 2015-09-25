@@ -122,7 +122,7 @@ Wat.A = {
                         messageType: that.messageType
                     };
 
-                    Wat.I.showMessage(messageParams, response);
+                    Wat.I.M.showMessage(messageParams, response);
                 }                   
             },
             success: function (response, result, raw) {
@@ -163,7 +163,7 @@ Wat.A = {
                         messageType: that.messageType
                     };
 
-                    Wat.I.showMessage(messageParams, response);
+                    Wat.I.M.showMessage(messageParams, response);
                 }                
             }
         };
@@ -205,7 +205,7 @@ Wat.A = {
                         messageType: that.messageType
                     };
 
-                    Wat.I.showMessage(messageParams, response);
+                    Wat.I.M.showMessage(messageParams, response);
                 }                   
             },
             success: function (response, result, raw) {
@@ -230,7 +230,7 @@ Wat.A = {
                         messageType: that.messageType
                     };
 
-                    Wat.I.showMessage(messageParams, response);
+                    Wat.I.M.showMessage(messageParams, response);
                 }                
             }
         };

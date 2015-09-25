@@ -218,7 +218,7 @@ Wat.B = {
                         
             var id = $(this).attr('data-target');
             window.location = '#/' + id;
-            Wat.I.closeMessage();
+            Wat.I.M.closeMessage();
         }, 
         
         // When click on a corner menu option
@@ -495,12 +495,12 @@ Wat.B = {
     // Callbacks of the events binded for messages system
     messageBinds: {
         closeMessage: function () {
-            Wat.I.closeMessage();
+            Wat.I.M.closeMessage();
         },
         
         toggleExtendedMessage: function () { 
             var extendedMessage = $(this).parent().find('article');
-            Wat.I.clearMessageTimeout();
+            Wat.I.M.clearMessageTimeout();
             
             if (extendedMessage.css('display') == 'none') {
                 $(this).removeClass('fa-plus-square-o');
@@ -515,7 +515,7 @@ Wat.B = {
         },
         
         hoverInMessage: function (e) {
-            Wat.I.clearMessageTimeout();
+            Wat.I.M.clearMessageTimeout();
         },
         
         hoverOutMessage: function (e) {
@@ -525,7 +525,7 @@ Wat.B = {
                         
             // Error messages need to be closed manually
             if (!$(e.target).hasClass('error')) {
-                Wat.I.setMessageTimeout();
+                Wat.I.M.setMessageTimeout();
             }
         }
     },
@@ -639,7 +639,7 @@ Wat.B = {
             var acls = $('select[name="acl_' + type + '_on_role"]').val();
             
             if (!acls) {
-                Wat.I.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
+                Wat.I.M.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
                 return;
             }
             
@@ -665,7 +665,7 @@ Wat.B = {
             var acls = $('select[name="acl_available"]').val();
             
             if (!acls) {
-                Wat.I.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
+                Wat.I.M.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
                 return;
             }
             
