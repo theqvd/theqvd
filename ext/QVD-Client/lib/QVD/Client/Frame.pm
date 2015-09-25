@@ -780,6 +780,7 @@ sub SaveConfiguration {
 
     if ($self->{usbip_devices}) {
         set_core_cfg('client.usb.share_list', $self->{usbip_devices}->GetValue());
+        set_core_cfg('client.usb.enable', $self->{usb_redirection}->GetValue()); 
     }
     
     # The widgets only exist if the settings tab is enabled.
