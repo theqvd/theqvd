@@ -267,8 +267,6 @@ sub handle_usbip_devices {
 	my @ids;
 	
 	foreach my $dev ( @{$usb->list_shared_devices} ) {
-		use Data::Dumper;
-		#die Dumper([\$dev], []);
 		push @ids, $dev->{busid};
 	}
 	
