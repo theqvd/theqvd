@@ -717,9 +717,25 @@ sub _start_usbip {
    DEBUG "Starting USBIP";
    my @cmd;
    
+   eval {
+       DEBUG "Creating SlaveClient object";
+       require QVD::SlaveClient;
+       my $slave = QVD::SlaveClient->new('localhost:11100');
 
-   _run($slaveclient, "--forward-usbip");
-   _run($slaveclient, "--forward-usbip-devices");
+       DEBUG "Setting up USBIP forwarding";
+       $slave->forward_usbip();
+
+       DEBUG "Forwarding devices";
+       $slave->forward_usbip_devices();
+
+   };
+   if ( $@ ) {
+       if ( $@ =~ /SlaveClient.pm in \@INC/ ) {
+           ERROR "The qvd-slaveclient package is required for USBIP functionality";
+       } else {
+           ERROR "Error while setting up USBIP: $@";
+       }
+   }
 
 }
 
