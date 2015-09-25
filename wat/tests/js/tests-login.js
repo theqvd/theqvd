@@ -1,7 +1,7 @@
 function loginTest (login, password, tenant, callback) {
     module( "Login tests", {
         setup: function() {
-            Wat.C.logOut();
+            Wat.L.logOut();
             // prepare something for all following tests
         },
         teardown: function() {
@@ -19,7 +19,7 @@ function loginTest (login, password, tenant, callback) {
             // Sometimes router is not ready at this point. Wait for it
             var waitingRouter = setInterval(function(){ 
                 if (Wat.Router.watRouter != undefined) {
-                    Wat.C.afterLogin = function () {
+                    Wat.L.afterLogin = function () {
                         if (Wat.Router.watRouter == undefined) {
                             callback();
                             return;
@@ -40,7 +40,7 @@ function loginTest (login, password, tenant, callback) {
                             Wat.C.multitenant = ret.retrievedData.multitenant;
                         }
 
-                        Wat.C.tryLogin(login, password, tenant);
+                        Wat.L.tryLogin(login, password, tenant);
                     };
                         
 

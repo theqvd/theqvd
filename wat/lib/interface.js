@@ -1075,5 +1075,12 @@ Wat.I = {
     attachFastClick: function () {
         // Items with class "needsclick" will be ignored
         FastClick.attach(document.body);
+    },
+    
+    // If desktop mode is forced, change viewport's meta tag
+    forceDesktop: function () {
+        if ($.cookie('forceDesktop')) {
+            $('meta[name="viewport"]').prop('content', 'width=1024, initial-scale=1, maximum-scale=1');
+        }
     }
 }

@@ -61,7 +61,13 @@ body {
                 
         @include width-wrapper;
 
-        @extend %center-wrapper; 
+        padding-left: 5px;
+        padding-right: 5px;
+
+        @include in(desktop) {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
         
         .logo {
             height: 55px;
@@ -213,18 +219,24 @@ body {
 
 .wrapper {
     @extend %invisible;
+    
 
-    @extend %center-wrapper;
+    width: 99%;
+    margin: 0 auto;
+    
+    padding-left: 5px;
+    padding-right: 5px;
     
     @include in(desktop) {
-        @extend %center-wrapper-mobile;
+        padding-left: 20px;
+        padding-right: 20px;
     }
     
     @include width-wrapper;
 
     background-color: $col_whiter;
     margin-bottom: 50px;
-    margin-left: 20px;
+    margin-left: 5px;
     
     position: relative;
     

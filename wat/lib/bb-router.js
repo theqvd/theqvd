@@ -238,7 +238,7 @@ Wat.Router = Backbone.Router.extend({
 
          // ------- Current administrator ------- //
         that.on('route:logout', function (actions) {
-            Wat.C.logOut();
+            Wat.L.logOut();
 
             Wat.C.configureVisibility();
             Wat.I.renderMain();
@@ -269,7 +269,7 @@ Wat.Router = Backbone.Router.extend({
         $('.js-filter-notes').hide();
         
         params = params || {};
-        if (!Wat.C.isLogged()) {
+        if (!Wat.L.isLogged()) {
             Wat.I.renderMain();
             view = Wat.Views.LoginView;
         }

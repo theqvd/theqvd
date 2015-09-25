@@ -182,7 +182,7 @@ Wat.B = {
     loginBinds: {
         tryLogIn: function() {
             $('.js-login-form').submit();
-            Wat.C.tryLogin();
+            Wat.L.tryLogin();
         },
         
         pushKeyOnLoginInput: function (e) {

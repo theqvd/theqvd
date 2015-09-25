@@ -119,161 +119,6 @@ Wat.C = {
         return $.inArray(guide, Object.keys(guides)) != -1;
     },
     
-    // Process log out including cookies removement
-    logOut: function () {
-        $.removeCookie('qvdWatSid', { path: '/' });
-        $.removeCookie('qvdWatLogin', { path: '/' });
-        this.loggedIn = false;
-        this.sid = '';
-        this.login = '';
-        this.acls = [];
-        Wat.I.C.hideCustomizer();
-        
-        Wat.I.stopServerClock();
-    },
-    
-    // Process login including cookies creation
-    // Params:
-    //      sid: session ID
-    //      login: administrator username
-    logIn: function (sid, login) {
-        this.loggedIn = true;
-        $.cookie('qvdWatSid', sid, { expires: this.loginExpirationDays, path: '/' });
-        $.cookie('qvdWatLogin', login, { expires: this.loginExpirationDays, path: '/' });
-        Wat.T.initTranslate();
-        
-        // Reload screen after login
-        var locationHash = window.location.hash;
-        
-        if (locationHash == '#/login' || locationHash == '#/logout' || typeof WatTests != 'undefined') {
-            window.location = '#';
-        }
-        else {
-            window.location.reload();
-        }
-
-    },
-    
-    // Check if current admin is properly logged in
-    isLogged: function () {
-        if (this.loggedIn && this.sid != '' && $.cookie('qvdWatSid') && $.cookie('qvdWatSid') == this.sid && this.login != '' && $.cookie('qvdWatLogin') && $.cookie('qvdWatLogin') == this.login) {
-            return true;
-        }
-        else {
-            this.logOut();
-            return false;
-        }
-    },
-    
-    // Recover login cookies if exist and call to API to check if credentials are correct
-    rememberLogin: function () {
-        if ($.cookie('qvdWatSid') && $.cookie('qvdWatLogin')) {
-            this.loggedIn = true;
-            this.sid = $.cookie('qvdWatSid');
-            this.login = $.cookie('qvdWatLogin');
-        }
-        else {
-            this.loggedIn = false;
-            this.sid = '';
-            this.login = '';
-        }
-        
-        if (this.sid) {
-            Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, this.checkLogin, this);
-        }
-        else {
-            Wat.C.afterLogin ();
-        }
-    },
-    
-    // Call to API with user and password retrieved to check if credentials are correct.
-    // Params:
-    //      user: administrator username
-    //      password: administrator password
-    // If credentials not retrieved, get it from login form
-    tryLogin: function (user, password, tenant) {
-        var user = $('input[name="admin_user"]').val() || user;
-        var password = $('input[name="admin_password"]').val() || password;
-        var tenant = $('input[name="admin_tenant"]').val() || tenant;
-        
-        if (!user) {
-            Wat.I.showMessage({message: "Empty user", messageType: "error"});
-            return;
-        }
-
-        this.login = user;
-        this.password = password;
-        this.tenant = tenant;
-        
-        Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, this.checkLogin, this);
-    },
-    
-    // After call to API to get admin setup, check response
-    // - Showing message if error. 
-    // - Storing useful parameters, perform configuration and rendering main if success.
-    // Params:
-    //      that: Current context where will be stored API call return
-    checkLogin: function (that) {
-        that.password = '';
-        
-        if (!that.retrievedData.acls || $.isEmptyObject(that.retrievedData.acls)) {
-            Wat.C.logOut();
-            Wat.I.showMessage({message: "Wrong user or password", messageType: "error"});
-            that.login = '';
-            that.sid = '';
-            window.location.reload();
-            return;
-        }
-        
-        // Store retrieved acls
-        Wat.C.acls = that.retrievedData.acls;
-        
-        // Store language
-        Wat.C.language = that.retrievedData.admin_language;
-        Wat.C.tenantLanguage = that.retrievedData.tenant_language;
-        
-        // Store block
-        Wat.C.block = that.retrievedData.admin_block;
-        Wat.C.tenantBlock = that.retrievedData.tenant_block;
-        
-        // Store server datetime
-        Wat.C.serverDatetime = that.retrievedData.server_datetime;
-        
-        // Restore possible residous views configuration to default values
-        Wat.I.restoreListColumns();
-        Wat.I.restoreFormFilters();
-        
-        // Store views configuration
-        Wat.C.storeViewsConfiguration(that.retrievedData.views);
-        
-        // Store tenant ID
-        Wat.C.tenantID = that.retrievedData.tenant_id;
-        
-        // Store admin ID
-        Wat.C.adminID = that.retrievedData.admin_id;   
-        
-        // Store tenant mode
-        Wat.C.multitenant = parseInt(that.retrievedData.multitenant);
-        
-        // Store time lag between server and client
-        var currentDate = new Date();
-        var serverDate = new Date(that.retrievedData.server_datetime);
-        Wat.C.serverClientTimeLag = parseInt((serverDate - currentDate) / 1000);
-        
-        // Configure visability
-        Wat.C.configureVisibility();
-        
-        if (Wat.CurrentView.qvdObj == 'login') {
-            Wat.C.logIn(that.sid, that.login);
-                
-            Wat.I.renderMain();
-
-            Wat.Router.watRouter.performRoute('', Wat.Views.HomeView);
-        }
-                
-        Wat.C.afterLogin ();
-    },
-    
     // Stored views configuration retrieved from database to the inner data structure
     // Params:
     //      viewsConfiguration: Hash with each view configured on DB for current admin.
@@ -596,26 +441,6 @@ Wat.C = {
         }
     },
     
-    
-    readConfigFile: function (callback) {
-        $.ajax({
-            url: 'config.json',
-            method: 'GET',
-            async: true,
-            contentType: 'json',
-            cache: false,
-            complete: function (response) {
-                var configTokens = JSON.parse(response.responseText);
-                
-                $.each(configTokens, function (token, value) {
-                    Wat.C.setConfigToken(token, value);
-                });
-                                
-                callback();
-            }
-        });
-    },
-    
     setConfigToken: function (token, value) {
         if ($.inArray(token, ['apiAddress', 'apiPort']) == -1) {
             console.error('A not allowed token was intented to load from config file (' + token + ')');
@@ -650,5 +475,34 @@ Wat.C = {
                 }
             }
         });
+    },
+    
+    // Read config file "/config.json"
+    readConfigFile: function (callback) {
+        $.ajax({
+            url: 'config.json',
+            method: 'GET',
+            async: true,
+            contentType: 'json',
+            cache: false,
+            complete: function (response) {
+                var configTokens = JSON.parse(response.responseText);
+                
+                $.each(configTokens, function (token, value) {
+                    Wat.C.setConfigToken(token, value);
+                });
+                                
+                // After read configuration file, we will set API address
+                Wat.C.initApiAddress();
+                
+                // Remember login from cookies to recover session if was setted previously
+                Wat.L.rememberLogin();
+            }
+        });
+    },
+    
+    setupLibraries: function () {
+        // Attach fast click events to separate tap from click
+        Wat.I.attachFastClick(); 
     }
 }

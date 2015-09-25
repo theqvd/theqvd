@@ -99,6 +99,9 @@ var Wat = {
     // Configuration
     C: {}, 
     
+    // Login utilities
+    L: {}, 
+    
     // Binds
     B: {},
     
