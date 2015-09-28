@@ -11,6 +11,7 @@
         // Setup jquery addons
         Wat.C.setupJQuery();       
 
+        // Get list of the necessary templates on starting
         var templates = Wat.I.T.getTemplateList('starting');
 
         // Get templates and after that read config file

@@ -19,12 +19,12 @@ function languageDocTest() {
             
             $.each(DOC_AVAILABLE_LANGUAGES, function (iLan, lan) {
                 $.each (Wat.I.docSections, function (iSection, section) {
-                    Wat.A.fillTemplateString = function (string, target, toc, docParams) {
+                    Wat.D.fillTemplateString = function (string, target, toc, docParams) {
                         notEqual(string, null, 'Documentation section "' + docParams.sectionId + '" was found in guide "' + docParams.guide + '"');
                         start();
                     };
                     
-                    Wat.A.fillDocSection(section.guide, section[lan] + '', false, '../');
+                    Wat.D.fillDocSection(section.guide, section[lan] + '', false, '../');
                 });
             });
         });

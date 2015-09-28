@@ -20,7 +20,7 @@ function languageDocTest() {
             
             $.each(DOC_AVAILABLE_LANGUAGES, function (iLan, lan) {
                 $.each (Wat.I.docSections, function (iSection, section) {
-                    Wat.A.fillTemplateString = function (string, target, toc, docParams) {
+                    Wat.D.fillTemplateString = function (string, target, toc, docParams) {
                         if (docParams.guide == 'multitenant') {
                             equal(string, null, 'Documentation section "' + docParams.sectionId + '" was not found in guide "' + docParams.guide + '" due the administrator has not permissions');
                         }
@@ -30,7 +30,7 @@ function languageDocTest() {
                         start();
                     };
                     
-                    Wat.A.fillDocSection(section.guide, section[lan] + '', false, '../');
+                    Wat.D.fillDocSection(section.guide, section[lan] + '', false, '../');
                 });
             });
         });

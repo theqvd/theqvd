@@ -831,7 +831,7 @@ Wat.I = {
 
             // Fill div with section documentation
             $.each (guideSection, function (iGS, gS) {
-                Wat.A.fillDocSection(gS.guide, gS.section, undefined, undefined, target);
+                Wat.D.fillDocSection(gS.guide, gS.section, undefined, undefined, target);
             });
         };
 

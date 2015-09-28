@@ -92,11 +92,11 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
     
     // Fill guide doc content
     fillDocumentation: function () {    
-        Wat.A.getDocBody({
+        Wat.D.getDocBody({
             guide: this.selectedGuide,
             target: $('.bb-doc-text'),
             callback: this.goSelectedSection
-        }, Wat.A.fillDocBody);
+        }, Wat.D.fillDocBody);
     },
     
     // Simulate click on guide that is stored as selected
@@ -148,7 +148,7 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
         // Go over each guide to get it and perform searching
         $.each(guides, function (guideKey, guideName) {
             // Get guide file content
-            Wat.A.getDocBody({
+            Wat.D.getDocBody({
                 guide: guideKey,
                 guideName: guideName,
                 target: $('.bb-doc-text'),
