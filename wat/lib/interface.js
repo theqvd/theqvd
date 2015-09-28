@@ -609,44 +609,6 @@ Wat.I = {
     updateLoginOnMenu: function () {
         $('.js-menu-corner').find('.js-login').html(Wat.C.login);
     },
-
-    getTextFromFailures: function (failures) {
-        // Group failures by text
-        var failuresByText = {};
-        $.each(failures, function(id, text) {
-            failuresByText[text.message] = failuresByText[text.message] || [];
-            failuresByText[text.message].push(id);
-        });
-        
-        // Get class from the icon of the selected item from menu to use it in list
-        var elementClass = $('.menu-option--selected').find('i').attr('class');
-        
-        var failuresList = '<ul>';
-        $.each(failuresByText, function(text, ids) {
-            failuresList += '<li>';
-            failuresList += '<i class="fa fa-angle-double-right strong" data-i18n="' + text + '"></i>';
-            failuresList += '<ul>';
-            $.each(ids, function(iId, id) {
-                if ($('.list')) {
-                    var elementName = $('.list').find('tr.row-' + id).find('.js-name .text').html();
-                    if (!elementName) {
-                        elementName = '(ID: ' + id + ')';
-                    }
-                    
-                    failuresList += '<li class="' + elementClass + '">' + elementName + '</li>';
-                }
-                else {
-                    failuresList += '<li class="' + elementClass + '">' + id + '</li>';
-                }
-            });
-            failuresList += '</ul>';
-            failuresList += '</li>';
-        });
-        
-        failuresList += '</ul>';
-        
-        return failuresList;
-    },
     
     
     fillCustomizeOptions: function (qvdObj) { 
