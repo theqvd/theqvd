@@ -73,6 +73,7 @@ use Class::StateMachine::Declarative
                                                                 loading_host_row      => { enter => '_load_host_row' },
                                                                 checking_net_ports    => { enter => '_check_net_ports' },
                                                                 checking_address      => { enter => '_check_address' },
+                                                                checking_bridge_fw    => { enter => '_check_bridge_fw' },
                                                                 checking_cgroups      => { enter => '_check_cgroups' } ] },
 
                                        setup => { transitions => { _on_error => 'stopping',
@@ -347,6 +348,7 @@ sub _load_host_row {
 
 sub _check_address {
     my $self = shift;
+    DEBUG "checking the node has configured IP $self->{address}";
     my $address_q = quotemeta $self->{address};
     my $ifaces = `ip -f inet addr show`;
     unless ($ifaces =~ /inet $address_q\b/) {
@@ -363,6 +365,26 @@ sub _check_address {
                       $self->{address}, net_ntoa($net_n), net_ntoa($start_n));
         return $self->_on_error;
     }
+    $self->_on_done;
+}
+
+sub _check_bridge_fw {
+    my $self = shift;
+    if ($self->_cfg('internal.vm.network.firewall.enable')) {
+        DEBUG "checking kernel module br_netfilter is loaded and working";
+        for my $i (0, 1) {
+            my $out = `sysctl net.bridge.bridge-nf-call-iptables 2>&1`;
+            $out =~ /\s*=\s*\d+$/ and last;
+
+            if ($i) {
+                ERROR "br_netfilter module is not loaded";
+                return $self->_on_error;
+            }
+
+            system modprobe => 'br_netfilter';
+        }
+    }
+
     $self->_on_done;
 }
 
