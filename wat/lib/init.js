@@ -102,37 +102,37 @@ var Wat = {
     // Current view store
     CurrentView: {},
     
-    // Actions with ajax calls including independent API calls (lib/actions.js)
+    // Actions with ajax calls including independent API calls (lib/actions/actions.js)
     A: {},
     
-    // Events binds that cant be done in backbone views (lib/binds.js)
+    // Events binds that cant be done in backbone views (lib/binds/binds.js)
     B: {},
     
-    // Configuration functions (lib/config.js)
+    // Configuration functions (lib/session/config.js)
     C: {}, 
     
-    // Documentation utilities (lib/documentation.js)
+    // Documentation utilities (lib/doc/doc.js)
     D: {},
     
-    // Interface utilities (lib/interface.js)
+    // Interface utilities (lib/interface/interface.js)
     I: {
-        // Styles Customizer Tool (lib/interface-customize.js)
+        // Styles Customizer Tool (lib/interface/interface-customize.js)
         C: {},
-        // Graphs (lib/interface-graphs.js)
+        // Graphs (lib/interface/interface-graphs.js)
         G: {},
-        // Messages (lib/interface-messages.js)
+        // Messages (lib/interface/interface-messages.js)
         M: {},
-        // Templates (lib/interface-templates.js)
+        // Templates (lib/interface/interface-templates.js)
         T: {},
     },
     
-    // Login utilities (lib/login.js)
+    // Login utilities (lib/session/login.js)
     L: {}, 
     
-    // Translation utilities (lib/translations.js)
+    // Translation utilities (lib/translations/translations.js)
     T: {}, 
     
-    // Miscelanious utilities (lib/utilities.js)
+    // Miscelanious utilities (lib/util/util.js)
     U: {},    
 
     

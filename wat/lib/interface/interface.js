@@ -781,7 +781,7 @@ Wat.I = {
             fillCallback : function(target) { 
                 var templates = Wat.I.T.getTemplateList('confirm', {templateName: templateName});
 
-                Wat.A.getTemplates(templates, Wat.A.fillTemplate, {
+                Wat.A.getTemplates(templates, Wat.I.fillTemplate, {
                     target: target,
                     templateName: 'confirmTemplate'
                 });
@@ -1012,5 +1012,57 @@ Wat.I = {
         if ($.cookie('forceDesktop')) {
             $('meta[name="viewport"]').prop('content', 'width=1024, initial-scale=1, maximum-scale=1');
         }
-    }
+    },
+    
+    
+    // Fill template given target and templateName
+    fillTemplate: function (element) {
+        element.target.html(Wat.TPL[element.templateName]);
+        
+        Wat.T.translate();
+    },
+
+    // When change a filter, check fussion notes to delete the associated filter if is necessary
+    solveFilterDependences: function (name, field) {        
+        $.each(FUSSION_NOTES, function (fNKey, fNote) {
+            var fName = '';
+            
+            if (fNote.qvdObj != Wat.CurrentView.qvdObj) {
+                return;
+            }
+            
+            if (fNote.label == name) {
+                fName = fNote.value;
+            }
+            
+            if (fNote.value == name) {
+                fName = fNote.label;
+            }
+            
+            if (fName != '') {
+                Wat.I.cleanFussionFilter(fName);
+            }
+        });
+    },
+    
+    // Clean list filter checking if is used in control or not
+    cleanFussionFilter: function (fName) {
+        // If not exist in filters use name directly
+        if (!$('[name="' + fName + '"]').length) {
+            Wat.CurrentView.cleanFilter(fName);
+        }
+        else {
+            Wat.CurrentView.cleanFilter($('[name="' + fName + '"]').attr('data-filter-field'));
+
+            switch($('[name="' + fName + '"]').prop('tagName')) {
+                case 'INPUT':
+                    $('[name="' + fName + '"]').val('');
+                    break;
+                case 'SELECT':
+                    $('[name="' + fName + '"]').val(-1);
+                    $('[name="' + fName + '"]').trigger('chosen:updated');
+                    break;
+            }
+        }
+    },  
 }

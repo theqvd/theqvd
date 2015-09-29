@@ -217,7 +217,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         // Solve dependences in case of fussioned filters
         if (e) {
-            Wat.A.solveFilterDependences($(e.target).attr('name'), $(e.target).attr('data-filter-field'));
+            Wat.I.solveFilterDependences($(e.target).attr('name'), $(e.target).attr('data-filter-field'));
         }
         
         var filters = {};

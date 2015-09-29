@@ -452,7 +452,7 @@ Wat.B = {
                     if (name.indexOf('__') > -1) {
                         var fussionNames = name.split('__');
                         $.each(fussionNames, function (iFN, fName) {
-                            Wat.A.cleanFussionFilter(fName);
+                            Wat.I.cleanFussionFilter(fName);
                         });
                     }
                     else {

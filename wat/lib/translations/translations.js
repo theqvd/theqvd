@@ -18,7 +18,7 @@ Wat.T = {
         }
 
         $.i18n.init({
-            resGetPath: APP_PATH + 'lib/languages/' + lan + '.json',
+            resGetPath: APP_PATH + 'lib/translations/dictionaries/' + lan + '.json',
             useLocalStorage: false,
             debug: false,
             fallbackLng: 'en',
