@@ -4916,11 +4916,302 @@ Seleccionar todos los elementos del listado, incluyendo los de otras páginas
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_herramienta_de_personalización_de_estilos">10. Herramienta de personalización de estilos</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Con esta herramienta se podrá personalizar el estilo del WAT, incluyendo logotipos y colores.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/important.png" alt="Important" />
+</td>
+<td class="content">Para hacer permanentes los cambios llevados a cabo con esta herramienta será necesario tener acceso al servidor donde esté colgado el WAT.</td>
+</tr></table>
+</div>
+<div class="paragraph"><p>La herramienta estará disponible para aquellos administradores con permisos de configuración del WAT junto a la capacidad de editar otros parámetros como el idioma o el tamaño de bloque de paginación.</p></div>
+<div class="paragraph"><p>Ésta herramienta no es una sección, sino una característica presente en cualquier sección del WAT.</p></div>
+<div class="paragraph"><p>Cuando la herramienta de personalizacíón de estilos esté activada, aparecerá una pestaña en la parte izquierda de la pantalla con el texto "Customizer".</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_customizer_enabled.png" alt="screenshot_customizer_enabled.png" width="960px" />
+</span></p></div>
+<div class="paragraph"><p>Al hacer click en la pestaña aparecerá un menú con un selector de categorías.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_customizer_open_select.png" alt="screenshot_customizer_open_select.png" width="960px" />
+</span></p></div>
+<div class="paragraph"><p>Cada categoría tendrá ciertos parámetros configurables, la mayoría colores.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_customizer_open.png" alt="screenshot_customizer_open.png" width="960px" />
+</span></p></div>
+<div class="paragraph"><p>Parámetros de personalización de estilos divididos por categorías:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Cabecera y pie
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Logo de Cabecera (125px x 55px)
+</p>
+</li>
+<li>
+<p>
+Color de fondo de la cabecera
+</p>
+</li>
+<li>
+<p>
+Color de fondo del pie
+</p>
+</li>
+<li>
+<p>
+Color de texto del pie
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Menu
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Color de fondo de Menú principal
+</p>
+</li>
+<li>
+<p>
+Color de texto de Menú principal
+</p>
+</li>
+<li>
+<p>
+Color de borde de Menú principal
+</p>
+</li>
+<li>
+<p>
+Color de fondo de Menú principal (al pasar por encima)
+</p>
+</li>
+<li>
+<p>
+Color de texto de Menú principal (al pasar por encima)
+</p>
+</li>
+<li>
+<p>
+Color de fondo de Menú principal (seleccionado)
+</p>
+</li>
+<li>
+<p>
+Color de texto de Menú principal (seleccionado)
+</p>
+</li>
+<li>
+<p>
+Color de texto de Menú de Cabecera
+</p>
+</li>
+<li>
+<p>
+Color de texto de Menú de Cabecera (seleccionado)
+</p>
+</li>
+<li>
+<p>
+Color de fondo de submenú de Cabecera
+</p>
+</li>
+<li>
+<p>
+Color de texto de submenú de Cabecera
+</p>
+</li>
+<li>
+<p>
+Color de border de submenú de Cabecera
+</p>
+</li>
+<li>
+<p>
+Color de fondo de submenú de Cabecera (al pasar por encima)
+</p>
+</li>
+<li>
+<p>
+Color de texto de submenú de Cabecera (al pasar por encima
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Botones y enlaces
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Color de fondo de Botón1
+</p>
+</li>
+<li>
+<p>
+Color de texto de Botón1
+</p>
+</li>
+<li>
+<p>
+Color de fondo de Botón2
+</p>
+</li>
+<li>
+<p>
+Color de texto de Botón2
+</p>
+</li>
+<li>
+<p>
+Enlaces de texto
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Tablas
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Color de fondo de cabecera de tablas
+</p>
+</li>
+<li>
+<p>
+Color de texto de cabecera de tablas
+</p>
+</li>
+<li>
+<p>
+Color de fondo de cabecera de tablas (columna ordenada)
+</p>
+</li>
+<li>
+<p>
+Color de texto de cabecera de tablas (columna ordenada)
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Gráficas
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Color A de Gráficas
+</p>
+</li>
+<li>
+<p>
+Color B de Gráficas
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Pantalla de login
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Logo del login (150px x 227px)
+</p>
+</li>
+<li>
+<p>
+Color de fondo de la caja de login
+</p>
+</li>
+<li>
+<p>
+Color de texto de la caja de login
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
+<div class="paragraph"><p>Los cambios de color se realizarán mediante una paleta que se mostrará haciendo click en el recuadro del color que queramos cambiar.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_customizer_change.png" alt="screenshot_customizer_change.png" width="960px" />
+</span></p></div>
+<div class="paragraph"><p>Aunque también se puede establecer un código RGB en la caja de texto del parámetro. Por ejemplo.: #ff0494</p></div>
+<div class="sect2">
+<h3 id="_vista_previa">10.1. Vista previa</h3>
+<div class="paragraph"><p>Al hacer click en el botón de vista previa el sistema calculará los cambios y se generará una vista previa de cómo quedarían los nuevos estilos.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_customizer_preview_loading.png" alt="screenshot_customizer_preview_loading.png" width="960px" />
+</span></p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/important.png" alt="Important" />
+</td>
+<td class="content">Estos cambios serán temporales y solo visibles en el navegador en el que se haga la vista previa</td>
+</tr></table>
+</div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_customizer_preview.png" alt="screenshot_customizer_preview.png" width="960px" />
+</span></p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/warning.png" alt="Warning" />
+</td>
+<td class="content">Escoger el amarillo como color de fondo es una dramatización. No intentar en casa.</td>
+</tr></table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_restaurar">10.2. Restaurar</h3>
+<div class="paragraph"><p>Con el botón restaurar se volverá a la configuración inicial de los estilos del WAT. También se puede volver a la configuración inicial refrescando la pantalla.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_exportar_fichero_css">10.3. Exportar fichero CSS</h3>
+<div class="paragraph"><p>Con este botón se descargará la hoja de estilos <em>custom_style.css</em> con los cambios actuales. Se deberá acceder al servidor donde esté alojado el WAT y sobrescribir el fichero <em>/styles/custom_style.css</em>. Esta hoja de estilos sobreescribirá la que viene por defecto.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_cambiar_logos">10.4. Cambiar logos</h3>
+<div class="paragraph"><p>Desde la herramienta de personalización solamente se cambia el nombre del fichero de los logos, no el fichero en sí. Por ello, tanto para que se vea en la vista previa como para hacerlo permanente, deberán estar los logos nuevos subidos en el directorio <em>/images/</em> del servidor.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_ejemplo_de_cambios">10.5. Ejemplo de cambios</h3>
+<div class="paragraph"><p>Imaginemos que queremos cambiar el estilo del WAT a colores azulados más acordes con nuestra organización. Cambiando los colores iniciales a diferentes tonalidades de azul nos quedaría un resultado como el siguiente:</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_customizer_blue.png" alt="screenshot_customizer_blue.png" width="960px" />
+</span></p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/warning.png" alt="Warning" />
+</td>
+<td class="content">Qindel Group no se hace responsable de las catástrofes estéticas producidas al utilizar esta herramienta por administradores daltónicos o con cualquier otra disfunción visual.</td>
+</tr></table>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-17 10:35:10 CEST
+Last updated 2015-09-29 08:54:58 CEST
 </div>
 </div>
 </body>

@@ -1,19 +1,34 @@
 // Config
 Wat.C = {
+    // Version of WAT
     version: '4.0',
+    
+    // Login parameters
     login: '',
     password: '',
     loggedIn: false,
+    
+    // API parameters
     apiAddress: '', //Will be loaded from external file config.json
     apiPort: '', // Will be loaded from external file config.json
 
     // Source to be stored by API log
     source: 'WAT',
     
+    // Configuration file name
+    configFileName: 'config.json',
+    
+    // Days to login expiration
     loginExpirationDays: 1,
+    
+    // ACL variables
     acls: [],
     aclGroups: {},
+    
+    // Session ID
     sid: '',
+    
+    // Current admin IDs
     tenantID: -1,
     adminID: -1,
     
@@ -480,7 +495,7 @@ Wat.C = {
     // Read config file "/config.json"
     readConfigFile: function (callback) {
         $.ajax({
-            url: 'config.json',
+            url: Wat.C.configFileName,
             method: 'GET',
             async: true,
             contentType: 'json',

@@ -1168,16 +1168,120 @@ Componentes detallados
 </div>
 </div>
 <div class="sect1">
-<h2 id="_permisos_administrador_rol_acl">5. Permisos: Administrador-Rol-ACL</h2>
+<h2 id="_versión_móvil">5. Versión móvil</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>La interfaz del WAT está diseñada para ser visualizada tanto en dispositivos con resoluciones grandes (Escritorio, Tablets&#8230;) como en dipositivos móviles. Para las pantallas pequeñas automáticamente se cargará una versión simplificada.</p></div>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<col width="100%" />
+<tbody>
+<tr>
+<td align="center" valign="top"><p class="table"><span class="image">
+<img src="images/doc_images/mobile_version_home.png" alt="mobile_version_home.png" width="300px" />
+</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="paragraph"><p>En esta versión el menú será un desplegable al que se accede haciendo click en el tipico icono de menú formado por barras horizontales.</p></div>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<col width="100%" />
+<tbody>
+<tr>
+<td align="center" valign="top"><p class="table"><span class="image">
+<img src="images/doc_images/mobile_version_menu.png" alt="mobile_version_menu.png" width="300px" />
+</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Características
+</dt>
+<dd>
+<p>
+La versión móvil tendrá todas las funcionalidades relativas a la administración de QVD. Esto incluye la lectura, creación, actualizado, eliminación y operación en los elementos de QVD: Usuarios, Máquinas virtuales, Nodos, OSFs e Imágenes de disco.
+</p>
+</dd>
+</dl></div>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<col width="100%" />
+<tbody>
+<tr>
+<td align="center" valign="top"><p class="table"><span class="image">
+<img src="images/doc_images/mobile_version_list_view.png" alt="mobile_version_list_view.png" width="300px" />
+</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="paragraph"><p>De este modo acciones como arrancar o parar una máquina virtual estarán disponibles del mismo modo que en la versión de escritorio.</p></div>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<col width="100%" />
+<tbody>
+<tr>
+<td align="center" valign="top"><p class="table"><span class="image">
+<img src="images/doc_images/mobile_version_actions.png" alt="mobile_version_actions.png" width="300px" />
+</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="paragraph"><p>Las características relativas a la administración del WAT, tales como gestión de permisos y administradores, serán solo accesibles desde la versión escritorio del WAT.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Forzado de versión escritorio
+</dt>
+<dd>
+<p>
+Es posible forzar la versión de escritorio en los dispositivos móviles y con ello acceder a todas las funcionalidades.
+</p>
+</dd>
+</dl></div>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<col width="100%" />
+<tbody>
+<tr>
+<td align="center" valign="top"><p class="table"><span class="image">
+<img src="images/doc_images/mobile_version_desktop_button.png" alt="mobile_version_desktop_button.png" width="300px" />
+</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_permisos_administrador_rol_acl">6. Permisos: Administrador-Rol-ACL</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Un <strong>administrador</strong> es un usuario dotado de credenciales y permisos para administrar una solución QVD a través de la herramienta de administración web (WAT).</p></div>
 <div class="sect2">
-<h3 id="_administradores">5.1. Administradores</h3>
+<h3 id="_administradores">6.1. Administradores</h3>
 <div class="paragraph"><p>Un administrador será creado por <strong>otro administrador</strong> del WAT siempre que tenga permisos para ello.</p></div>
 <div class="paragraph"><p>No basta con crear un administrador para que pueda acceder al sistema. Hará falta asignarle permisos.</p></div>
 </div>
 <div class="sect2">
-<h3 id="_permisos">5.2. Permisos</h3>
+<h3 id="_permisos">6.2. Permisos</h3>
 <div class="paragraph"><p>Los administradores del WAT pueden ser configurados para tener <strong>diferentes permisos para ver determinada información o realizar diferentes acciones</strong>. A estos permisos los denominamos <strong>ACLs</strong>.</p></div>
 <div class="paragraph"><p>Dicha asignación no se realiza directamente, sino que se configuran una serie de <strong>roles con los ACLs deseados</strong> y dichos roles se asignan a los administradores.</p></div>
 <div class="paragraph"><p><span class="image">
@@ -1185,13 +1289,13 @@ Componentes detallados
 </span></p></div>
 <div class="paragraph"><p>Si no tenemos el rol o conjunto de roles deseados para ese administrador deberemos crearlo.</p></div>
 <div class="sect3">
-<h4 id="_roles">5.2.1. Roles</h4>
+<h4 id="_roles">6.2.1. Roles</h4>
 <div class="paragraph"><p>A un rol se le pueden asignar ACLs y/o heredarlos de otros roles.</p></div>
 <div class="paragraph"><p>En la herencia de roles es posible escoger qué ACLs heredar y cuales no.</p></div>
 <div class="paragraph"><p>Un rol puedo heredar de uno o varios roles, así como un administrador puede tener uno o más roles asignados, adquiriendo sus ACLs.</p></div>
 </div>
 <div class="sect3">
-<h4 id="_acls">5.2.2. ACLs</h4>
+<h4 id="_acls">6.2.2. ACLs</h4>
 <div class="paragraph"><p>Las características y cosas a tener en cuenta de los ACLs se pueden resumir en los siguientes puntos:</p></div>
 <div class="ulist"><ul>
 <li>
@@ -1272,7 +1376,7 @@ Gestionar sus propios ACLs, pudiendo llegar a tener permisos totales o incluso p
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-08 10:58:55 CEST
+Last updated 2015-09-28 15:20:15 CEST
 </div>
 </div>
 </body>

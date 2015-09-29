@@ -771,9 +771,59 @@ asciidoc.install(2);
 <h2 id="_página_principal">2. Página principal</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>La primera pantalla que se muestra al iniciar sesión es una vista táctica compuesta por gráficas y tablas resumen del sistema.</p></div>
+<div class="paragraph"><p>Además, bajo el título, están disponibles algunos botones con utilidades.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/home.png" alt="home.png" width="960px" />
 </span></p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Utilidades
+</dt>
+<dd>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Ayuda</strong>: Un enlace a la documentación del WAT.
+</p>
+</li>
+<li>
+<p>
+<strong>Exportar a PDF</strong>: Con este botón se construirá y descargará un documento PDF con los Widgets de estadísticas.
+</p>
+</li>
+<li>
+<p>
+<strong>Exportar a CSV</strong>: Con este botón se descargará un documento de texto plano con el formato CSV que contendrá los diferentes datos estadísticos en los que se apoyan las gráficas.
+</p>
+</li>
+</ul></div>
+</dd>
+<dt class="hdlist1">
+Widgets de estadísticas
+</dt>
+<dd>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Fila 1: Resumen de elementos.</strong> Por cada uno de los elementos básicos de QVD (Usuarios, Máquinas virtuales, Nodos, OSFs e Imágenes de disco) se muestran sus estadísticas principales.
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Usuarios</strong>: Número de usuarios, cuantos de ellos están bloqueados y cuantos de ellos están conectados al menos a una máquina virtual.
+</p>
+</li>
+<li>
+<p>
+<strong>Máquinas virtuales</strong>: Número de usuarios, cuantos de ellos están bloqueados y cuantos de ellos están conectados al menos a una máquina virtual.
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+<strong>Fila 2: Gráficas circulares</strong> con información de interés.
+</p>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -782,7 +832,7 @@ asciidoc.install(2);
 </li>
 <li>
 <p>
-<strong>Resumen</strong>: En una tabla resumen se muestra el recuento de elementos de QVD. Número de usuarios, máquinas virtuales, nodos, OSFs e imágenes de disco.
+<strong>Usuarios conectados</strong>: Se muestra en una gráfica circular la relación entre los usuarios conectados al menos a una máquina virtual respecto al total de usuarios existentes.
 </p>
 </li>
 <li>
@@ -790,13 +840,20 @@ asciidoc.install(2);
 <strong>Nodos corriendo</strong>: Se muestra en una gráfica circular la relación entre los nodos corriendo respecto al total de nodos existentes.
 </p>
 </li>
+</ul></div>
+</li>
+<li>
+<p>
+<strong>Fila 3: Otros resúmenes.</strong>
+</p>
+<div class="ulist"><ul>
 <li>
 <p>
 <strong>Máquinas virtuales próximas a expirar</strong>: Se muestran las máquinas virtuales cuya fecha de expiración está próxima.
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>En esta lista se tendrá en cuenta la <strong>fecha de expiración dura</strong>, mostrándose la fecha y hora en que sucederá y el tiempo que resta hasta ese momento.</p></div>
+<div class="paragraph"><p>En esta lista se tendrá en cuenta la <strong>fecha de expiración dura</strong>, mostrándose el tiempo que resta hasta ese momento. Según la proximidad de la expiración aparecerán las fechas en diferentes colores: rojo (muy próximo), amarillo (próximo) o verde (poco próximo).</p></div>
 <div class="paragraph"><p>Las máquinas virtuales aparecen ordenadas de la más próxima a expirar a la más lejana, adoptando un color más crítico cuanto más cerca esté el momento.</p></div>
 </div></div>
 </li>
@@ -811,6 +868,10 @@ asciidoc.install(2);
 </p>
 </li>
 </ul></div>
+</li>
+</ul></div>
+</dd>
+</dl></div>
 </div>
 </div>
 <div class="sect1">
@@ -2226,6 +2287,15 @@ Edición
 <div class="paragraph"><p>Una excepción al tamaño de bloque son las <strong>listas embebidas</strong> en las vistas detalle, que tendrán un <strong>tamaño de bloque fijo</strong> de 5.</p></div>
 </div></div>
 </li>
+<li>
+<p>
+<strong>Herramienta de personalización de estilos</strong>: Activar o desactivar la herramienta de personalización de estilos del WAT.
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Con esta herramienta activada aparecerá una pasetaña en el lado izquierdo de la pantalla. Al hacer click en ella saldrá un menú lateral con las opciones de personalización de estilos. Para conocer a fondo esta herramienta, revisar la sección <em>Herramienta de personalización de estilos</em> en la guía de usuario.</p></div>
+</div></div>
+</li>
 </ul></div>
 </div></div>
 </dd>
@@ -2788,7 +2858,7 @@ Ambos parámetros se pueden definir como <em>por defecto</em> adoptando así la 
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-14 09:57:50 CEST
+Last updated 2015-09-28 12:46:48 CEST
 </div>
 </div>
 </body>

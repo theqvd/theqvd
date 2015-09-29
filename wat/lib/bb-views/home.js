@@ -3,6 +3,7 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
     
     relatedDoc: {
         first_steps: "First steps",
+        home: "Main page"
     },
     
     liveFields: [
