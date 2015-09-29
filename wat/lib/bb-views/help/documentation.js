@@ -74,7 +74,7 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
         $(this.el).html(this.template);
         
         this.printBreadcrumbs(this.breadcrumbs, '');
-        
+
         if (this.currentSearchKey) {
             var that = this;
             
@@ -104,8 +104,10 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
         var currentHash = '#documentation/' + Wat.CurrentView.selectedGuide;
         
         if (Wat.CurrentView.selectedSection) {
-            $('#toc [href="#_' + Wat.CurrentView.selectedSection + '"]').trigger('click');
-            currentHash += '/' + Wat.CurrentView.selectedSection;
+            $('body').waitForImages(function() {
+                $('#toc [href="#_' + Wat.CurrentView.selectedSection + '"]').trigger('click');
+                currentHash += '/' + Wat.CurrentView.selectedSection;
+            });
         }
         
         // If pushState is available in browser, modify hash with current section

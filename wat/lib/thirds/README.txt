@@ -12,6 +12,7 @@ Used libraries on QVD Wat and their version, licenses and source sites:
 - jQuery mbExtruder (MIT/GPL License) https://github.com/pupunzi/jquery.mb.extruder
 - jQuery mbFlipText (MIT/GPL License) https://github.com/pupunzi/jquery.mb.fliptext
 - jQuery hoverIntent (MIT/GPL License) http://pupunzi.com
+- jQuery waitForImages (MIT License) https://github.com/alexanderdickson/waitForImages
 - ExpandingTextareas v0.2.0 (MIT License) https://github.com/bgrins/ExpandingTextareas
 - Chosen v1.4.2 (MIT License) http://harvesthq.github.io/chosen/
 - Font Awesome v4.4.0 (Font: SIL OFL 1.1, CSS: MIT License) http://fortawesome.github.io/Font-Awesome/

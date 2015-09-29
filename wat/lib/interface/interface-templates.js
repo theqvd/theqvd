@@ -7,10 +7,10 @@ Wat.I.T = {
             case 'starting':        
                 templates = {
                     main: {
-                        name: 'main'
+                        name: 'common/main'
                     },
                     menu: {
-                        name: 'menu'
+                        name: 'common/menu'
                     },
                     editorCommon: {
                         name: 'editor/common'
@@ -45,7 +45,7 @@ Wat.I.T = {
             case 'login':
                 templates = {
                     login: {
-                        name: 'login'
+                        name: 'login/login'
                     },
                     errorRefresh: {
                         name: 'error/refresh'
