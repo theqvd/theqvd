@@ -2,7 +2,7 @@
 // QUnit.config.testTimeout = 60000;
 
 // Override configuration constants
-APP_PATH = '../';
+APP_PATH = '../../';
 
 // Id of prop1, prop2 and propN properties. This id is in test machine DB. If changes, test will fail
 var propertyIDs = {
