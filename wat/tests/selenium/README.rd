@@ -25,6 +25,12 @@ And if we need to install it in a server, we will install a virtual buffer envir
 
     apt-get install xvfb
     
+To launch selenium server standalone just execute:
+
+    java -jar selenium-server-standalone.jar
+    
+Additionaly you can add launching line to /etc/rc.local to start selenium server any time you start your machine.
+    
 
 Building tests
 --------------
@@ -40,6 +46,8 @@ We use PERL to build the tests but it's not available by default in Selenium IDE
 If it's not available, we need to install another firefox addon: 
 
     Selenium IDE: Perl Formatter
+    
+We will need to configure our Perl Formatter (Options->Options->Formats->Perl) to set our Selenium server URL (localhost:4444 is setted by default)
 
 When we build a test in Selenium IDE, we export it in two formats.
 
