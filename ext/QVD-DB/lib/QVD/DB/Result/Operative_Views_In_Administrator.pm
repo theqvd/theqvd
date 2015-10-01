@@ -10,17 +10,18 @@ __PACKAGE__->result_source_instance->deploy_depends_on(
 );
 __PACKAGE__->result_source_instance->is_virtual(0);
 __PACKAGE__->result_source_instance->view_definition(
-
 "
-SELECT * FROM (SELECT (CASE WHEN (TV.device_type IS NOT NULL) THEN TV.device_type ELSE AV.device_type END) as device_type, 
-       (CASE WHEN (TV.view_type IS NOT NULL) THEN TV.view_type ELSE AV.view_type END) as view_type, 
-       (CASE WHEN (TV.qvd_object IS NOT NULL) THEN TV.qvd_object ELSE AV.qvd_object END) as qvd_object, 
+SELECT * FROM (
+    SELECT
        (CASE WHEN (TV.field IS NOT NULL) THEN TV.field ELSE AV.field END) as field, 
-       (CASE WHEN (TV.property IS NOT NULL) THEN TV.property ELSE AV.property END) as property, 
        (CASE WHEN (TV.tenant_id IS NOT NULL) THEN TV.tenant_id ELSE AV.tenant_id END) as tenant_id, 
        (CASE WHEN (TV.administrator_id IS NOT NULL) THEN TV.administrator_id ELSE AV.administrator_id END) as administrator_id, 
-       (CASE WHEN (AV.visible IS NOT NULL) THEN AV.visible ELSE TV.visible END) as visible
-FROM (administrator_views_setups JOIN administrators ON administrators.id=administrator_views_setups.administrator_id) AV
+       (CASE WHEN (AV.visible IS NOT NULL) THEN AV.visible ELSE TV.visible END) as visible,
+       (CASE WHEN (TV.view_type IS NOT NULL) THEN TV.view_type ELSE AV.view_type END) as view_type,
+       (CASE WHEN (TV.device_type IS NOT NULL) THEN TV.device_type ELSE AV.device_type END) as device_type,
+       (CASE WHEN (TV.qvd_object IS NOT NULL) THEN TV.qvd_object ELSE AV.qvd_object END) as qvd_object,
+       (CASE WHEN (TV.property IS NOT NULL) THEN TV.property ELSE AV.property END) as property
+    FROM (administrator_views_setups JOIN administrators ON administrators.id=administrator_views_setups.administrator_id) AV
      FULL OUTER JOIN
      (select T.*, A.id as administrator_id from operative_views_in_tenants T LEFT JOIN administrators A ON T.tenant_id=A.tenant_id) TV
      ON TV.device_type=AV.device_type AND 
@@ -28,9 +29,9 @@ FROM (administrator_views_setups JOIN administrators ON administrators.id=admini
      TV.qvd_object=AV.qvd_object AND
      TV.field=AV.field AND
      TV.property=AV.property AND 
-     TV.administrator_id=AV.administrator_id) M
+       TV.administrator_id=AV.administrator_id
+    ) M;
 "
-
 );
 
 __PACKAGE__->add_columns(

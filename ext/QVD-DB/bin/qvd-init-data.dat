@@ -762,8 +762,8 @@ id	acl_id	role_id	positive
 ### Role_Administrator_Relation ###
 id	role_id	administrator_id
 
-1	1	1
-2	1	2
+1	66	1
+2	66	2
 
 
 ### Wat_Setups_By_Administrator ###
