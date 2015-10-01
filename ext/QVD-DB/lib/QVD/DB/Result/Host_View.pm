@@ -19,17 +19,10 @@ __PACKAGE__->result_source_instance->view_definition(
 );
 
 __PACKAGE__->add_columns(
-    'id' => {
-	data_type => 'integer'
-    },
-    'properties_json' => {
-	data_type => 'JSON',
-    },
-
-    'number_of_vms_connected' => {
-	data_type => 'integer',
-    },
-    );
+	'id'                      => { data_type => 'integer' },
+	'properties_json'         => { data_type => 'JSON', },
+	'number_of_vms_connected' => { data_type => 'integer', },
+);
 
 sub properties
 {

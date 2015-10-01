@@ -12,64 +12,38 @@ use QVD::Log;
 
 __PACKAGE__->load_components(qw/Core InflateColumn::DateTime/);
 __PACKAGE__->table('vm_runtimes');
-__PACKAGE__->add_columns( vm_id          => { data_type   => 'integer' },
-			  host_id        => { data_type   => 'integer',
-					      is_nullable => 1 },
-                          current_osf_id => { data_type   => 'integer',
-                                              is_nullable => 1 },
-                          current_di_id  => { data_type   => 'integer',
-                                              is_nullable => 1 },
-			  user_ip        => { data_type   => 'varchar(15)',
-					      is_nullable => 1 },
-			  real_user_id   => { data_type   => 'integer',
-					      is_nullable => 1 },
-			  vm_state       => { data_type   => 'varchar(12)',
-					      is_enum     => 1,
-					      extra       => { list => [qw(stopped starting running
-									   stopping zombie debugging)] } },
-			  vm_state_ts    => { data_type   => 'integer',
-					      is_nullable => 1 },
-			  vm_cmd         => { data_type   => 'varchar(12)',
-					      is_nullable => 1,
-					      is_enum     => 1,
+__PACKAGE__->add_columns(
+	vm_id          => { data_type   => 'integer' },
+	host_id        => { data_type   => 'integer', is_nullable => 1 },
+	current_osf_id => { data_type   => 'integer', is_nullable => 1 },
+	current_di_id  => { data_type   => 'integer', is_nullable => 1 },
+	user_ip        => { data_type   => 'varchar(15)', is_nullable => 1 },
+	real_user_id   => { data_type   => 'integer', is_nullable => 1 },
+	vm_state       => { data_type   => 'varchar(12)', is_enum => 1,
+	                    extra       => { list => [qw(stopped starting running stopping zombie debugging)] } },
+	vm_state_ts    => { data_type   => 'integer', is_nullable => 1 },
+	vm_cmd         => { data_type   => 'varchar(12)', is_nullable => 1, is_enum     => 1,
 					      extra       => { list => [qw/start stop busy/] } },
-			  vm_pid         => { data_type   => 'integer',
-					      is_nullable => 1	},
+	vm_pid         => { data_type   => 'integer', is_nullable => 1	},
 			  user_state     => { data_type   => 'varchar(12)',
 					      extra       => { list => [qw/disconnected connecting connected/] } },
-			  user_state_ts  => { data_type   => 'integer',
-					      is_nullable => 1 },
-			  user_cmd       => { data_type   => 'varchar(12)',
-					      is_nullable => 1,
-					      is_enum     => 1,
+	user_state_ts  => { data_type   => 'integer', is_nullable => 1 },
+	user_cmd       => { data_type   => 'varchar(12)', is_nullable => 1, is_enum     => 1,
 					      extra       => { list => [qw/abort/] } },
-			  vma_ok_ts      => { data_type   => 'integer',
-					      is_nullable => 1 },
-			  l7r_host_id    => { data_type   => 'integer',    
-					      is_nullable => 1 },
-			  l7r_pid        => { data_type   => 'integer',
-					      is_nullable => 1 },
-			  vm_address     => { data_type   => 'varchar(127)',
-					      is_nullable => 1 },
-			  vm_vma_port    => { data_type   => 'integer',
-					      is_nullable => 1 },
-			  vm_x_port      => { data_type   => 'integer',
-					      is_nullable => 1 },
-			  vm_ssh_port    => { data_type   => 'integer',
-					      is_nullable => 1 },
-			  vm_vnc_port    => { data_type   => 'integer',
-					      is_nullable => 1 },
-			  vm_mon_port    => { data_type   => 'integer',
-					      is_nullable => 1 },
-			  vm_serial_port => { data_type   => 'integer',
-					      is_nullable => 1 },
-			  blocked        => { data_type   => 'boolean',
-					      is_nullable => 1 },
-                          vm_expiration_soft => { data_type   => 'timestamp',
-                                                  is_nullable => 1 },
-                          vm_expiration_hard => { data_type   => 'timestamp',
-                                                  is_nullable => 1 },
-                        );
+	vma_ok_ts      => { data_type   => 'integer', is_nullable => 1 },
+	l7r_host_id    => { data_type   => 'integer', is_nullable => 1 },
+	l7r_pid        => { data_type   => 'integer', is_nullable => 1 },
+	vm_address     => { data_type   => 'varchar(127)', is_nullable => 1 },
+	vm_vma_port    => { data_type   => 'integer', is_nullable => 1 },
+	vm_x_port      => { data_type   => 'integer', is_nullable => 1 },
+	vm_ssh_port    => { data_type   => 'integer', is_nullable => 1 },
+	vm_vnc_port    => { data_type   => 'integer', is_nullable => 1 },
+	vm_mon_port    => { data_type   => 'integer', is_nullable => 1 },
+	vm_serial_port => { data_type   => 'integer', is_nullable => 1 },
+	blocked        => { data_type   => 'boolean', is_nullable => 1 },
+	vm_expiration_soft => { data_type   => 'timestamp', is_nullable => 1 },
+	vm_expiration_hard => { data_type   => 'timestamp', is_nullable => 1 },
+);
 
 __PACKAGE__->set_primary_key('vm_id');
 
@@ -109,10 +83,10 @@ sub _clear_cmd {
 sub clear_vm_cmd { shift->_clear_cmd('vm') }
 sub clear_user_cmd { shift->_clear_cmd('user') }
 
-my %valid_vm_cmd = ( start => { stopped    => 1 },
-		     stop  => { starting   => 1,
-				running    => 1,
-                                debugging  => 1 } );
+my %valid_vm_cmd = (
+	start => { stopped    => 1 },
+	stop  => { starting   => 1, running    => 1, debugging  => 1 }
+);
 
 sub can_send_vm_cmd {
     my ($vm, $cmd) = @_;

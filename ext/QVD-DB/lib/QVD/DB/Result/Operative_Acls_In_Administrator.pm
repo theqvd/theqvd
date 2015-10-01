@@ -20,7 +20,6 @@ __PACKAGE__->result_source_instance->is_virtual(1);
 __PACKAGE__->result_source_instance->view_definition(
 
 "
-
 SELECT ad.id as admin_id, 
        CASE WHEN a.name ~ ? THEN FALSE ELSE CASE WHEN a.name ~ ? THEN TRUE ELSE CASE WHEN j.acl_id IS NULL THEN FALSE ELSE TRUE END END END as operative,
        j.inheritor_id as role_id, 
@@ -34,18 +33,16 @@ CROSS JOIN administrators ad
 LEFT JOIN (all_acl_role_relations j JOIN roles r ON r.id=j.inheritor_id JOIN role_administrator_relations i ON i.role_id=r.id) ON i.administrator_id= ad.id AND a.id=j.acl_id  
 WHERE a.name !~ ? 
 GROUP BY j.acl_id, a.name, j.inheritor_id, ad.id, a.id
-
 "
 );
 
 
 __PACKAGE__->add_columns(
-
     operative  => { data_type => 'boolean' },
     admin_id  => { data_type => 'integer' },
     acl_id  => { data_type => 'integer' },
     acl_name  => { data_type => 'varchar(64)' },
-    acl_description  => { data_type => 'varchar(80)' },
+	acl_description  => { data_type => 'varchar(80)', is_nullable => 1 },
     roles_json  => { data_type => 'varchar' },
 );
 

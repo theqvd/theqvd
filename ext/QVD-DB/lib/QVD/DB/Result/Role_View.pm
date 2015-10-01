@@ -25,7 +25,6 @@ GROUP BY mr.id
 );
 
 __PACKAGE__->add_columns(
-
     id  => { data_type => 'integer' },
     roles_json  => { data_type => 'JSON' },
     positive_acls_json  => { data_type => 'JSON' },

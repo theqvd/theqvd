@@ -6,11 +6,12 @@ use warnings;
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('acl_role_relations');
-__PACKAGE__->add_columns(id          => { data_type => 'integer',
-                                           is_auto_increment => 1 },
+__PACKAGE__->add_columns(
+	id       => { data_type => 'integer', is_auto_increment => 1 },
                          acl_id  => { data_type => 'integer' },
 			 role_id  => { data_type => 'integer' },
-                         positive  => { data_type => 'boolean' });
+	positive => { data_type => 'boolean' },
+);
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint([qw(role_id acl_id)]);

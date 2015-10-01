@@ -6,15 +6,14 @@ use warnings;
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('osfs');
-__PACKAGE__->add_columns( tenant_id      => { data_type         => 'integer' },
-			  id          => { data_type => 'integer',
-                                           is_auto_increment => 1 },
+__PACKAGE__->add_columns(
+	tenant_id   => { data_type => 'integer' },
+	id          => { data_type => 'integer', is_auto_increment => 1 },
                           name        => { data_type => 'varchar(64)' },
-                          description => { data_type => 'varchar(32768)' },
-                          memory      => { data_type => 'integer' },
-                          use_overlay => { data_type => 'boolean' },
-                          user_storage_size => { data_type => 'integer',
-                                                 is_nullable => 1 } );
+	description => { data_type => 'varchar(32768)', is_nullable => 1 },
+	memory      => { data_type => 'integer' }, use_overlay => { data_type => 'boolean' },
+	user_storage_size => { data_type => 'integer', is_nullable => 1 },
+);
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint(['name']);

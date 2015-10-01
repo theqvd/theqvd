@@ -3,25 +3,20 @@ use base qw/DBIx::Class/;
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('host_runtimes');
-__PACKAGE__->add_columns( host_id    => { data_type   => 'integer' },
-			  pid        => { data_type   => 'integer',
-				          is_nullable => 1 },
-			  ok_ts      => { data_type   => 'timestamp',
-				          is_nullable => 1 },
+__PACKAGE__->add_columns(
+	host_id    => { data_type => 'integer' },
+	pid        => { data_type => 'integer', is_nullable => 1 },
+	ok_ts      => { data_type => 'timestamp', is_nullable => 1 },
 			  # Memory available for VMs, in MBs
-			  usable_ram => { data_type   => 'real',
-					  is_nullable => 1 },
+	usable_ram => { data_type   => 'real', is_nullable => 1 },
 			  # CPU available for VMs, in bogomips
-			  usable_cpu => { data_type   => 'real',
-					  is_nullable => 1 },
+	usable_cpu => { data_type => 'real', is_nullable => 1 },
 			  state      => { data_type   => 'varchar(12)',
-				          is_enum     => 1,
-				          extra       => { list => [qw(stopped starting running stopping lost)] } },
+	                is_enum => 1, extra => { list => [qw(stopped starting running stopping lost)] } },
 			  blocked    => { data_type   => 'boolean' },
-			  cmd        => { data_type   => 'varchar(12)',
-				          is_nullable => 1,
-				          is_enum     => 1,
-				          extra       => { list => [qw(stop)] } } );
+	cmd        => { data_type => 'varchar(12)', is_nullable => 1,
+	                is_enum => 1, extra => { list => [qw(stop)] } },
+);
 
 __PACKAGE__->set_primary_key('host_id');
 __PACKAGE__->belongs_to('host'      => 'QVD::DB::Result::Host',       'host_id', { cascade_delete => 0 } );

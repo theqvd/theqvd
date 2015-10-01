@@ -3,14 +3,14 @@ use base qw/DBIx::Class/;
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('hosts');
-__PACKAGE__->add_columns( id       => { data_type => 'integer',
-                                       is_auto_increment => 1 },
+__PACKAGE__->add_columns(
+	id       => { data_type => 'integer', is_auto_increment => 1 },
                           name     => { data_type => 'varchar(127)' },
-                          description => { data_type => 'varchar(32768)' },
+	description => { data_type => 'varchar(32768)', is_nullable => 1 },
                           address  => { data_type => 'varchar(127)' },
 			  frontend => { data_type => 'boolean' },
 			  backend  => { data_type => 'boolean' },
- );
+);
 
 __PACKAGE__->set_primary_key('id');
 
@@ -57,8 +57,7 @@ sub vms_connected
     my $count = 0;
     for my $vm ($self->vms->all)
     {
-	$count++ if ($vm->user_state &&
-		     $vm->user_state eq 'connected');
+		$count++ if ($vm->user_state && $vm->user_state eq 'connected');
     }
     $count;
 }

@@ -6,10 +6,11 @@ use warnings;
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('role_administrator_relations');
-__PACKAGE__->add_columns(id          => { data_type => 'integer',
-                                           is_auto_increment => 1 },
+__PACKAGE__->add_columns(
+	id               => { data_type => 'integer', is_auto_increment => 1 },
                          role_id  => { data_type => 'integer' },
-			 administrator_id  => { data_type => 'integer' });
+	administrator_id => { data_type => 'integer' },
+);
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint([qw(administrator_id role_id)]);

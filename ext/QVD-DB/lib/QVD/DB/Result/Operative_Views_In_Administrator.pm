@@ -5,12 +5,13 @@ use base qw/DBIx::Class::Core/;
 __PACKAGE__->table_class('DBIx::Class::ResultSource::View');
 
 __PACKAGE__->table('operative_views_in_administrators');
-__PACKAGE__->result_source_instance->is_virtual(1);
+__PACKAGE__->result_source_instance->deploy_depends_on(
+    ["QVD::DB::Result::Operative_Views_In_Tenant"]
+);
+__PACKAGE__->result_source_instance->is_virtual(0);
 __PACKAGE__->result_source_instance->view_definition(
 
 "
-
-
 SELECT * FROM (SELECT (CASE WHEN (TV.device_type IS NOT NULL) THEN TV.device_type ELSE AV.device_type END) as device_type, 
        (CASE WHEN (TV.view_type IS NOT NULL) THEN TV.view_type ELSE AV.view_type END) as view_type, 
        (CASE WHEN (TV.qvd_object IS NOT NULL) THEN TV.qvd_object ELSE AV.qvd_object END) as qvd_object, 
@@ -28,23 +29,22 @@ FROM (administrator_views_setups JOIN administrators ON administrators.id=admini
      TV.field=AV.field AND
      TV.property=AV.property AND 
      TV.administrator_id=AV.administrator_id) M
-
 "
 
 );
 
 __PACKAGE__->add_columns(
-
     field  => { data_type => 'varchar(64)' },
     tenant_id  => { data_type => 'integer' },
-    administrator_id => { data_type => 'integer',
-			  is_nullable => 1},
+	administrator_id => { data_type => 'integer', is_nullable => 1},
     visible  => { data_type => 'boolean' },
-    view_type  => { data_type => 'varchar(64)' },
-    device_type  => { data_type => 'varchar(64)' },
-    qvd_object => { data_type => 'varchar(64)'},
-    property => { data_type => 'boolean'});
+	view_type   => { data_type => 'administrator_and_tenant_views_setups_view_type_enum' },
+	device_type => { data_type => 'administrator_and_tenant_views_setups_device_type_enum' },
+	qvd_object  => { data_type => 'administrator_and_tenant_views_setups_qvd_object_enum'},
+	property    => { data_type => 'boolean'}
+);
 
 __PACKAGE__->set_primary_key( qw/ field tenant_id view_type device_type qvd_object property / );
+
 1;
 

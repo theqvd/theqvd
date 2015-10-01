@@ -21,16 +21,10 @@ __PACKAGE__->result_source_instance->view_definition(
 );
 
 __PACKAGE__->add_columns(
-    'id' => {
-	data_type => 'integer'
-    },
-    'properties_json' => {
-	data_type => 'JSON',
-    },
-    'tags_json' => {
-	data_type => 'JSON',
-    },
-    );
+	'id'              => { data_type => 'integer' },
+	'properties_json' => { data_type => 'JSON', },
+	'tags_json'       => { data_type => 'JSON', },
+);
 
 sub properties
 {

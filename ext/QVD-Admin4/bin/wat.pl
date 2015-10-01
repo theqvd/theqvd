@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 use Mojolicious::Lite;
-use lib::glob '/home/benjamin/wat/*/lib/';
 use Mojo::JSON qw(encode_json decode_json j);
 use QVD::Admin4::Exception;
 use MojoX::Session;
@@ -434,7 +433,7 @@ sub get_input_json
     
     unless ($json)
     {
-	$json =  { map { $_ => b($c->param($_))->encode('UTF-8')->to_string } $c->param };
+		$json =  { map { $_ => b($c->param($_))->encode('UTF-8')->to_string } keys($c->req->params->to_hash) };
  
 	eval
 	{

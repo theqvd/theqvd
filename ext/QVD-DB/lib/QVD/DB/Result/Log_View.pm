@@ -22,11 +22,11 @@ SELECT DISTINCT A.id,
 
     );
 
-__PACKAGE__->add_columns( id                      => { data_type => 'integer', 
-						       is_auto_increment => 1 },
+__PACKAGE__->add_columns(
+	id                    => { data_type => 'integer', is_auto_increment => 1 },
                           object_deleted          => { data_type => 'boolean' },
                           administrator_deleted   => { data_type => 'boolean' },
-    );
+);
 
 __PACKAGE__->set_primary_key('id');
 

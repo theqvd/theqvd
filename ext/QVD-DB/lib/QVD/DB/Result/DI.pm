@@ -3,14 +3,12 @@ use base qw/DBIx::Class/;
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('dis');
-__PACKAGE__->add_columns( id     => { data_type => 'integer',
-                                      is_auto_increment => 1 },
+__PACKAGE__->add_columns(
+	id          => { data_type => 'integer', is_auto_increment => 1 },
                           osf_id => { data_type => 'integer' },
-                          blocked => { data_type         => 'boolean',
-                                       default_value => 0 },
-                          description => { data_type => 'varchar(32768)' },
-
-                          # Valor tomado de la variable PATH_MAX de
+	blocked     => { data_type => 'boolean', default_value => 0 },
+	description => { data_type => 'varchar(32768)', is_nullable => 1},
+	# Value taken from PATH_MAX variable defined in
                           # /usr/src/linux-headers-2.6.28-15/include/linux/limits.h:
                           path  => { data_type => 'varchar(4096)' },
                           version => { data_type => 'varchar(64)' },

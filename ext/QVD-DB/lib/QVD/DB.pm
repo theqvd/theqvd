@@ -58,26 +58,31 @@ sub _make_pg_socket_keepalive {
     }
 }
 
-my %initial_values = ( VM_State   => [qw(stopped
-                                         starting
-                                         running
-					 stopping
-					 zombie
-                                         debugging )],
-		       VM_Cmd     => [qw(start stop busy)],
-		       User_State => [qw(disconnected connecting connected)],
-		       User_Cmd   => [qw(abort)],
-		       Host_State => [qw(stopped starting running stopping lost)],
-		       Host_Cmd   => [qw(stop)] );
-
 sub deploy {
     my $db = shift;
     # Ensure the default transaction isolation is "serializable" (see #1210)
     my $dbh = $db->storage->dbh;
     $dbh->do("ALTER DATABASE $db_name SET default_transaction_isolation TO serializable");
+
+	# Get arguments
+	my %args_as_hash = %{$_[0]};
+
+	# Generate enumerates
+	if($args_as_hash{add_enums}){
+		while (my ($name, $values) = each %{$args_as_hash{add_enums}}) {
+			$dbh->do("DROP TYPE IF EXISTS $name CASCADE");
+			$dbh->do("CREATE TYPE $name AS ENUM (" . join(",", map {qq/'$_'/} @$values) . ")");
+		}
+	}
+
+	# Generate tables
     $db->SUPER::deploy(@_);
-    while (my ($rs, $names) = each %initial_values) {
-	$db->resultset($rs)->create({name => $_}) for @$names;
+
+	# Generate initial values
+	if($args_as_hash{add_init_vars}){
+		while (my ($name, $values) = each %{$args_as_hash{add_init_vars}}) {
+			$db->resultset($name)->create({name => $_}) for @$values;
+		}
     }
 
     $db->resultset('Version')->create({ component => 'schema',

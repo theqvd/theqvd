@@ -6,11 +6,11 @@ use QVD::DB::Simple qw(db);
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('roles');
-__PACKAGE__->add_columns( tenant_id => { data_type => 'integer' },
-			  id => { data_type => 'integer',
-                          is_auto_increment => 1 },
+__PACKAGE__->add_columns(
+	id          => { data_type => 'integer', is_auto_increment => 1 },
+	tenant_id   => { data_type => 'integer' },
                           name => { data_type => 'varchar(64)' },
-                          description => { data_type => 'varchar(32768)' },
+	description => { data_type => 'varchar(32768)', is_nullable => 1 },
                           internal => { data_type => 'boolean' },
                           fixed => { data_type => 'boolean' },
 );

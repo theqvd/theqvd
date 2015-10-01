@@ -6,10 +6,11 @@ use warnings;
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('acls');
-__PACKAGE__->add_columns(id          => { data_type => 'integer',
-                                           is_auto_increment => 1 },
+__PACKAGE__->add_columns(
+	id          => { data_type => 'integer', is_auto_increment => 1 },
                          name        => { data_type => 'varchar(64)' },
-                         description => { data_type => 'varchar(80)' });
+	description => { data_type => 'varchar(80)', is_nullable => 1 },
+);
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint([qw(name)]);

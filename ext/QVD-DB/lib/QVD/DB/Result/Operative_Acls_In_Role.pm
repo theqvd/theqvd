@@ -19,7 +19,6 @@ __PACKAGE__->result_source_instance->view_definition(
 # no deben devolverse como sí operativos para al administrador en cuestión (se le esconden)
 
 "
-
 SELECT CASE WHEN a.name ~ ? OR (j.acl_id IS NULL AND jj.acl_id IS NULL) OR jj.positive=FALSE THEN FALSE ELSE TRUE END as operative, 
        rr.id as role_id, 
        a.id as acl_id, 
@@ -33,13 +32,11 @@ LEFT JOIN (all_acl_role_relations j JOIN roles r ON r.id=j.inheritor_id JOIN rol
 LEFT JOIN acl_role_relations jj ON a.id=jj.acl_id AND rr.id=jj.role_id
 WHERE a.name !~ ? 
 GROUP BY j.acl_id, a.name, a.id, rr.id, jj.acl_id, jj.positive
-
 "
 
 );
 
 __PACKAGE__->add_columns(
-
     operative  => { data_type => 'boolean' },
     role_id  => { data_type => 'integer' },
     acl_id  => { data_type => 'integer' },

@@ -10,17 +10,14 @@ use List::Util qw(sum);
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('vms');
 __PACKAGE__->add_columns( 
-			  id      => { data_type         => 'integer',
-				       is_auto_increment => 1 },
+	id          => { data_type => 'integer', is_auto_increment => 1 },
 			  name    => { data_type         => 'varchar(64)' },
-                          description => { data_type => 'varchar(32768)' },
+	description => { data_type => 'varchar(32768)', is_nullable => 1 },
 			  user_id => { data_type         => 'integer' },
 			  osf_id  => { data_type         => 'integer' },
                           di_tag  => { data_type         => 'varchar(128)' },
-			  ip      => { data_type         => 'varchar(15)',
-				       is_nullable       => 1 },
-			  storage => { data_type         => 'varchar(4096)',
-				       is_nullable       => 1 },
+	ip          => { data_type => 'varchar(15)', is_nullable => 1 },
+	storage     => { data_type => 'varchar(4096)', is_nullable => 1 },
 );
 
 __PACKAGE__->set_primary_key('id');
