@@ -30,7 +30,7 @@ function languageDocTest() {
                         start();
                     };
                     
-                    Wat.D.fillDocSection(section.guide, section[lan] + '', false, '../');
+                    Wat.D.fillDocSection(section.guide, section[lan] + '', false, APP_PATH);
                 });
             });
         });

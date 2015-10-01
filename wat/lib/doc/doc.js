@@ -94,7 +94,7 @@ Wat.D = {
         
         // When doc sections are retrieved from different path than standard (i.e. tests), we can add a prefix to the images path
         if (docParams.imagesPrefix) {
-            array_matches2[1] = array_matches2[1].replace(/src="images/g, 'src="../images');
+            array_matches2[1] = array_matches2[1].replace(/src="images/g, 'src="' + docParams.imagesPrefix + 'images');
         }
         
         var secBody = $.parseHTML('<div>' + array_matches2[1])[0].innerHTML;
