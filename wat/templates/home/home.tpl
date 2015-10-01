@@ -1,4 +1,4 @@
-<div class="<%= cid %>">
+<div class="<%= cid %> sec-home">
     <div class="welcome-message">
         <span class="welcome" data-i18n="Welcome to QVD's Web Administration Tool"></span>
         <div class="welcome-help">
