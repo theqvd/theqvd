@@ -55,7 +55,7 @@ sub new {
     $self->set_http_request_processor(\&handle_get_nsplugin  , GET  => '/nsplugin');
     $self->set_http_request_processor(\&handle_usbip         , POST => '/usbip/connect');
     $self->set_http_request_processor(\&handle_usbip_devices , GET  => '/usbip/shared_devices');
-    
+    $self->set_http_request_processor(\&handle_usbip_check   , GET  => '/usbip/portcheck');    
     
     if ( core_cfg('client.slave.debug_commands' ) ) {
         $self->set_http_request_processor(\&handle_echo   , POST => '/echo');
@@ -249,13 +249,20 @@ sub handle_get_nsplugin {
     $plugin->execute();
 }
 
+sub handle_usbip_check {
+	my ($httpd, $method, $url, $headers) = @_;
+
+	my $port = core_cfg('client.usb.usbip.port');
+	handle_port_check($httpd, $method, "/tcp/portcheck/$port", $headers);
+}
+
 sub handle_usbip {
 	my ($httpd, $method, $url, $headers) = @_;
 	
 	# Connecting to usbipd is just port redirection.
 	# We use a dedicated command here so that VMA doesn't need to know
 	# the port.
-	my $port = core_cfg("client.usbip.server_port");
+	my $port = core_cfg('client.usb.usbip.port');
 	handle_connect($httpd, $method, "/tcp/connect/$port", $headers);
 }
 

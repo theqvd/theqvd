@@ -204,13 +204,16 @@ client.darwin.screen_resolution.low_res_geometry=800x600
 client.usb.enable = 0
 client.usb.implementation = USBIP
 client.usb.sudo = 1
+client.usb.usbip.port = 3240
+client.usb.usbip.debug = 0
+client.usb.usbip.log = 0
 
 # Share all USB devices automatically (most of the time not a good idea)
 client.usb.share_all = 0
 
 # List of USB devices to share with the VM. 
-# Syntax: VID:PID, comma separated. Spaces are allowed. For example:
-# 0441:0012, 1234:5678
+# Syntax: VID:PID@serial, comma separated. Spaces are allowed. For example:
+# 0441:0012, 1234:5678@12345678
 client.usb.share_list =
 
 
@@ -354,6 +357,8 @@ vma.user.home.path = /home
 vma.user.default.name = qvd
 vma.user.default.groups =
 vma.default.lang = en_US.UTF-8
+vma.usb.usbip.debug = 0
+vma.usb.usbip.log = 0
 
 # When using LXC if this flag is set, QVD will assume that the home
 # directories are not per virtual machine but per user and that they

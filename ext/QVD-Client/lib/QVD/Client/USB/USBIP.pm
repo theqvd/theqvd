@@ -10,10 +10,13 @@ use Carp;
 sub new {
 	my ($class) = @_;
 	my $self = $class->SUPER::new(@_);
-	$self->{usbip} = core_cfg('command.usbip'); # "/usr/sbin/usbip";
+	$self->{usbip}    = core_cfg('command.usbip'); # "/usr/sbin/usbip";
 	$self->{database} = core_cfg('path.usb.database'); #"/usr/share/hwdata/usb.ids";
-	$self->{sudo} = core_cfg('client.usb.sudo');
-	
+	$self->{sudo}     = core_cfg('client.usb.sudo');
+	$self->{port}     = core_cfg('client.usb.usbip.port');
+	$self->{log}      = core_cfg('client.usb.usbip.log');
+	$self->{debug}    = core_cfg('client.usb.usbip.debug');
+
 	bless $self, $class;
 	$self->refresh();
 	return $self;
@@ -53,7 +56,11 @@ sub int_get_devices {
 	
 	
 	my $usbip = $self->{usbip};
-	my @usblist = `$usbip list -l -p`;
+	my $port  = $self->{port};
+	my $debug = $self->{debug} ? "--debug" : "";
+	my $log   = $self->{log} ? "--log" : "";
+
+	my @usblist = `$usbip $debug $log --tcp-port $port list -l -p`;
 	chomp @usblist;
 
 	DEBUG "Getting USB devices";
@@ -137,14 +144,9 @@ sub share {
 
 sub share_busid {
 	my ($self, $busid) = @_;
-	my @cmd;
-	
-	push @cmd, 'sudo' if ( $self->{sudo} );
-	push @cmd, ($self->{usbip}, "bind", "-b", $busid);
 	
 	$self->{needs_refresh} = 1;
-	
-	return system(@cmd) == 0;
+	return $self->_run_usbip("bind", "-b", $busid) == 0;
 }
 
 sub unshare {
@@ -158,15 +160,26 @@ sub unshare {
 
 sub unshare_busid {
 	my ($self, $busid) = @_;
-	my @cmd;
-	
-	
-	push @cmd, 'sudo' if ( $self->{sudo} );
-	push @cmd, ($self->{usbip}, "unbind", "-b", $busid);
-	
+
 	$self->{needs_refresh} = 1;
-	
-	return system(@cmd) == 0;
+	return $self->_run_usbip("bind", "-b", $busid) == 0;
+}
+
+sub _run_usbip {
+	my ($self, @args) = @_;
+	my @cmd;
+
+	push @cmd, 'sudo'            if ( $self->{sudo} );
+	push @cmd, $self->{usbip};
+	push @cmd, '--log'           if ( $self->{log} );
+	push @cmd, '--debug'         if ( $self->{debug} );
+	push @cmd, ('--tcp-port', $self->{port});
+	push @cmd, @args;
+
+	my $cmdstr = join(' ', @cmd);
+	DEBUG "running usbip command: '$cmdstr'";
+
+	return system(@cmd);
 }
 
 1;
