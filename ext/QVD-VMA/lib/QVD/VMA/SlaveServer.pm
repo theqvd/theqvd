@@ -128,10 +128,14 @@ sub handle_put_share {
         wait;
         rmdir $mount_point;
     } else {
-	my @cmd = ($command_sshfs => "qvd-client:", $mount_point, -o => 'slave', -o => 'idmap=user', -o => 'atomic_o_trunc');
+	my @cmd = ($command_sshfs => "qvd-client:", $mount_point, -o => 'slave');
+	push @cmd, split(/\s+/, core_cfg('vma.sshfs.extra_args'));
 	push @cmd, -o => "modules=iconv,from_code=$charset" if ($charset);
+	my $cmdstr = join(' ', @cmd);
+	
+	DEBUG "Going to run sshfs: $cmdstr";
 	exec @cmd;
-        die "Unable to exec $command_sshfs: $^E";
+        die "Unable to exec $cmdstr: $^E";
     }
 }
 

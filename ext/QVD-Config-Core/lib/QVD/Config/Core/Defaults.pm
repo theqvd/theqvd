@@ -359,6 +359,7 @@ vma.user.default.groups =
 vma.default.lang = en_US.UTF-8
 vma.usb.usbip.debug = 0
 vma.usb.usbip.log = 0
+vma.sshfs.extra_args = -o idmap=user -o atomic_o_trunc
 
 # When using LXC if this flag is set, QVD will assume that the home
 # directories are not per virtual machine but per user and that they
