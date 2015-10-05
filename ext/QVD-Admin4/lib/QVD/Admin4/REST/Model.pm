@@ -60,7 +60,7 @@ my $TYPES_OF_ACTION_TO_LOG_MAPPER =
 
 # List of QVD objects directly assigned to a tenant.
 
-my $DIRECTLY_TENANT_RELATED = [qw(User Administrator OSF Tenant_Views_Setup)];
+my $DIRECTLY_TENANT_RELATED = [qw(User Administrator Role OSF Tenant_Views_Setup)];
 
 # Mappers for identity operators between API and DBIx::Class
 # The majority of operators are just the same
@@ -1769,7 +1769,7 @@ sub set_info_by_qvd_object
 }
 
 # For some actions, the fields tenant_id and tenant_name
-# are available only in case the current admin in superadmin
+# are available only in case the current admin is superadmin
 # For that cases, these fields are added to the available_fields list
 # in here 
 
