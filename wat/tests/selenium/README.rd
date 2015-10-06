@@ -5,7 +5,7 @@ QVD WAT application is tested using Selenium components. In this document we wil
 
 
 Server
-------
+======
 
 Selenium server standalone has been used in server side.
 
@@ -33,7 +33,7 @@ Additionaly you can add launching line to /etc/rc.local to start selenium server
     
 
 Building tests
---------------
+==============
 
 To build the tests we use a firefox addon named "Selenium IDE".
 
@@ -47,23 +47,80 @@ If it's not available, we need to install another firefox addon:
 
     Selenium IDE: Perl Formatter
     
-We will need to configure our Perl Formatter (Options->Options->Formats->Perl) to set our Selenium server URL (localhost:4444 is setted by default)
+Configuring Perl Formatter
+--------------------------
 
-When we build a test in Selenium IDE, we export it in two formats.
+Perl formatter is developed to export test cases (not test suites). Due this, each exported case adds perl libraries inclusion and server connection at the beginning of the perl script. We will talk about the perl scripts dependencies in Running tests section.
 
-* Addon format: When Save a test (File->Save Test Case) in the addon of firefox, it can be opened later to be modified, runned or exported again in other format.
+We have isolated this header part to a independent script:
 
-    We store these files at /tests/selenium/firefox-IDE 
+	/tests/selenium/lib/connection.pl
     
-* Perl format: When Export a test to Perl format (File->Export Test Case as->Perl), it export executable perl script.  
+And we will export the test cases without this part of code. Just the perl code referred to the test.
     
-    We store these files at /tests/selenium/
+To do that, we will need to configure our Perl Formatter (Options->Options->Formats->Perl) to remove the header information to export just test code. 
     
-    We will talk about the perl scripts dependencies in Running tests section.
+Is recomendable make a copy of the Perl format before modify it. To do that Add a new format (I.E. Perl Simple) and fill the source with the Perl formatter source. Then delete the header content and save it.
 
+This copy of the Perl formatter will be wich we will use to export test cases to perl format.
+
+Exporting Test cases
+--------------------
+
+When we build a test case in Selenium IDE, we export it in two formats.
+
+	* Addon format: Save a test case (File->Save Test Case) with .case extension. It can be opened later to be runned, modified, exported in other format or re-used in new test suites.
+
+	* Perl format (using our modified version): Export a test case to Perl format (File->Export Test Case as->Perl Simple). It exports an executable perl script. We will store the script with .pl extension and the same name of test case.  
+    
+    We store these files at /tests/selenium/cases. For example: 
+
+	- /tests/selenium/cases/test1.case
+	- /tests/selenium/cases/test1.pl
+
+Exporting Test suites
+---------------------
+
+Using the exported test cases we can build a test suite with Selenium IDE. After compose desired sequence of test cases, we save it (File->Sabe Test Suite) with .suite extension.
+
+    We store these files at /tests/selenium/suites. For example:
+
+	- /tests/selenium/suites/suite1.suite
+
+Generating Test suites executable
+---------------------------------
+
+We have a perl script that open a test suite file, read the referred test cases and open all of them in the specific order to compose the whole suite script.
+
+This script is /tests/lib/buildtestsuite.pl.
+
+The beginninig of this script will be the connection headers (/tests/lib/connection.pl content).
+
+Example:
+
+We have 3 test cases:
+
+	- /tests/cases/case1.case
+	- /tests/cases/case2.case
+	- /tests/cases/case2.case
+	
+We create a suite in the Firefox addon "Selenium IDE" with these cases one after one and save as a suite:
+
+	- /tests/suites/suite1.suite
+
+If we execute the builder script with the suite as a parameter like:
+
+	perl lib/buildtestsuite.pl suites/suite1.suite
+
+We obtain the full code (including headers and connection to Selenium server) of the needy script perl to execute test suite.
+
+This script will be used by tests runner scripts. We will talk about it in Test suites execution.
 
 Running tests in command line
------------------------------
+=============================
+
+Perl dependences
+----------------
 
 To run exported tests we need to have installed some packages:
 
@@ -76,11 +133,18 @@ To run exported tests we need to have installed some packages:
     apt-get install cpanminus
     cpanm WWW::Selenium
     
-After solve these dependencies and any other (if were necessary), we can execute a test like any other perl script:
+After solve these dependencies and any other (if were necessary), we are ready to execute any test suite.
 
-    perl test.pl
+Test suites execution
+---------------------
     
-And we will obtain an output similar to the following:
+To execute a test suite, we execute the shell script 'runtest.sh' passing the test suite path:
+
+    ./runtest.sh suites/suite1.suite 
+
+This executable call the script lib/buildtestsuite.pl passing the suite file as parameter. The result is stored in a temp file and executed. 
+    
+With the execution, we will obtain an output similar to the following:
 
     ok 1 - open, /wat/
     ok 2
