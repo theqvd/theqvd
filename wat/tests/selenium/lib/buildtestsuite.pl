@@ -17,7 +17,7 @@ while (my $row = <$fh>) {
     chomp $row;
     $row =~ /<a.*href=".*\/([\s\S]+?)\.case".*>/;
     if (defined $1) {
-        my $caseplfile = 'cases/' . $1 . '.pl';
+        my $caseplfile = 'cases-pl/' . $1 . '.pl';
         push @caseplfiles, $caseplfile;
     }
 }
