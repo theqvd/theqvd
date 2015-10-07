@@ -8,12 +8,13 @@
 <body>
 <table id="suiteTable" cellpadding="1" cellspacing="1" border="1" class="selenium"><tbody>
 <tr><td><b>Test Suite</b></td></tr>
-<tr><td><a href="../cases/login-truman.case">login-truman</a></td></tr>
-<tr><td><a href="../cases/not-present-user-sec.case">not-present-user-sec</a></td></tr>
-<tr><td><a href="../cases/not-present-host-sec.case">not-present-host-sec</a></td></tr>
-<tr><td><a href="../cases/load-vm-sec.case">load-vm-sec</a></td></tr>
-<tr><td><a href="../cases/load-osf-sec.case">load-osf-sec</a></td></tr>
-<tr><td><a href="../cases/load-di-sec.case">load-di-sec</a></td></tr>
+<tr><td><a href="../cases/load_wat_home">load_wat_home</a></td></tr>
+<tr><td><a href="../cases/login_truman">login_truman</a></td></tr>
+<tr><td><a href="../cases/not_present_user_sec">not_present_user_sec</a></td></tr>
+<tr><td><a href="../cases/not_present_host_sec">not_present_host_sec</a></td></tr>
+<tr><td><a href="../cases/load_sec_vms">load_sec_vms</a></td></tr>
+<tr><td><a href="../cases/load_sec_osfs">load_sec_osfs</a></td></tr>
+<tr><td><a href="../cases/load_sec_dis">load_sec_dis</a></td></tr>
 </tbody></table>
 </body>
 </html>

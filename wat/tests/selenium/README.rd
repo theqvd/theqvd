@@ -69,14 +69,14 @@ Exporting Test cases
 
 When we build a test case in Selenium IDE, we export it in two formats.
 
-	* Addon format: Save a test case (File->Save Test Case) with .case extension. It can be opened later to be runned, modified, exported in other format or re-used in new test suites. We store these files at /tests/selenium/cases. 
+	* Addon format: Save a test case (File->Save Test Case). It can be opened later to be runned, modified, exported in other format or re-used in new test suites. We store these files at /tests/selenium/cases. 
 
-	* Perl format (using our modified version): Export a test case to Perl format (File->Export Test Case as->Perl Simple). It exports an executable perl script. We will store the script with .pl extension and the same name of test case. We store these files at /tests/selenium/cases-pl. 
+	* Perl format (using our modified version): Export a test case to Perl format (File->Export Test Case as->Perl Simple). It exports an executable perl script. We will store the script with .pl extension and the same name of test case. We store these files at /tests/selenium/pl-cases. 
     
     For example: 
 
-	- /tests/selenium/cases/test1.case
-	- /tests/selenium/cases-pl/test1.pl
+	- /tests/selenium/cases/test1
+	- /tests/selenium/pl-cases/test1.pl
 
 Exporting Test suites
 ---------------------
@@ -100,15 +100,15 @@ Example:
 
 We have 3 test cases:
 
-	- /tests/cases/case1.case
-	- /tests/cases/case2.case
-	- /tests/cases/case2.case
+	- /tests/cases/case1
+	- /tests/cases/case2
+	- /tests/cases/case2
 	
 These tests have the correspondent perl files:
 
-	- /tests/cases-pl/case1.pl
-	- /tests/cases-pl/case2.pl
-	- /tests/cases-pl/case2.pl
+	- /tests/pl-cases/case1.pl
+	- /tests/pl-cases/case2.pl
+	- /tests/pl-cases/case2.pl
 	
 We create a suite in the Firefox addon "Selenium IDE" with these cases one after one and save as a suite:
 
