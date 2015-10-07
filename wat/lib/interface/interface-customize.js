@@ -197,7 +197,7 @@ Wat.I.C = {
                         $('.js-customizer-wrapper').openMbExtruder();
                         Wat.I.M.showMessage({messageType: 'error', message: result.message});
                         Wat.I.C.sass.listFiles(function callback(list) {
-                          console.info(list);
+                          //console.info(list);
                         });
                         
                     }

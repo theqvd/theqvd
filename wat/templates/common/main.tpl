@@ -24,10 +24,10 @@
                             <i class="<%= menuOpt.icon %> needsclick"></i>
                             <span class="<%= menuOpt.textClass %> needsclick" data-i18n="<%= menuOpt.text %>"></span>
                         </a>
-                        <ul>
+                        <ul class="js-menu-submenu-<%= iMenu %>">
                             <% $.each(menuOpt.subMenu, function (iSubMenu, subMenuOpt) { %>
                                 <li>
-                                    <a href="<%= subMenuOpt.link %>" class="js-submenu-option">
+                                    <a href="<%= subMenuOpt.link %>" class="js-submenu-option js-submenu-option-<%= iSubMenu %>">
                                         <span class="<%= subMenuOpt.icon %>" data-i18n="<%= subMenuOpt.text %>"></span>
                                     </a>
                                 </li>

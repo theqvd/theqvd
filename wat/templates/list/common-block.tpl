@@ -1,4 +1,4 @@
-<div class="<%= cid %>">
+<div class="<%= cid %> sec-list-<%= qvdObj %>">
     <div class="list-navigation">
         <div class="filter-mobile mobile">
             <%

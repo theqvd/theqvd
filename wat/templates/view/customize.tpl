@@ -1,4 +1,4 @@
- <div class="js-custom-views-container <%= cid %>" style="display: none;">
+ <div class="js-custom-views-container <%= cid %> sec-custom-views-<%= viewKind %>" style="display: none;">
      <%
      if (viewKind == 'tenant') {
      %>

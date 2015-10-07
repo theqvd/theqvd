@@ -46,7 +46,8 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
                 selectedObj: this.selectedObj,
                 selectedTenant: this.selectedTenant,
                 limitByACLs: false,
-                cid: this.cid
+                cid: this.cid,
+                qvdObj: this.qvdObj
             }
         );
 

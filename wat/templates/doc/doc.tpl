@@ -1,4 +1,4 @@
-<div class="wrapper-content <%= cid %>"> 
+<div class="wrapper-content <%= cid %> sec-documentation"> 
     <div class="menu secondary-menu setup-side">
         <div class="doc-search-box">
             <label for="doc_search" data-i18n="Search"></label>
@@ -30,7 +30,7 @@
     </div>
     
     <div class="setup-block">
-        <div class="bb-doc-text doc-text"></div>
+        <div class="bb-doc-text doc-text js-doc-text"></div>
     </div>
 
 </div>

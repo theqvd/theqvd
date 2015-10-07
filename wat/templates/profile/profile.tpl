@@ -1,4 +1,4 @@
-<div class="details-header <%= cid %>">
+<div class="details-header <%= cid %> sec-profile">
     <span class="fa fa-user h1"><%= login %></span>
     <div class="clear mobile"></div>
     <a class="button2 fright fa fa-eye js-show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>

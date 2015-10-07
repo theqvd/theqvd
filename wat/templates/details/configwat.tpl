@@ -1,4 +1,5 @@
-<div class="details-header">
+<div class="sec-wat-config">
+    <div class="details-header">
     <span class="<%= CLASS_ICON_WATCONFIG %> h1" data-i18n="WAT Config"></span>
     <div class="clear mobile"></div>
     <a class="button2 fright fa fa-eye js-show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>
@@ -8,11 +9,11 @@
     <% } %>
     
     <div class="clear mobile"></div>
-</div>
+    </div>
 
-<% 
-if (Wat.C.checkACL('config.wat.')) { 
-%>
+    <% 
+    if (Wat.C.checkACL('config.wat.')) { 
+    %>
     <table class="details details-list col-width-100">
         <tr>
             <td><i class="fa fa-globe"></i><span data-i18n="Language"></span></td>
@@ -44,6 +45,7 @@ if (Wat.C.checkACL('config.wat.')) {
         </tr>
         <% } %>
     </table>
-<% 
-} 
-%>
+    <% 
+    } 
+    %>
+</div>

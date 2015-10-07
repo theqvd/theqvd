@@ -1,4 +1,4 @@
-<div class="wrapper-content <%= cid %>"> 
+<div class="wrapper-content <%= cid %> sec-qvd-config"> 
     <div class="menu secondary-menu setup-side">
     <div class="config-search-box">
         <label for="config_search" data-i18n="Search"></label>

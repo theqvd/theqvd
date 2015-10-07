@@ -106,7 +106,9 @@ Wat.L = {
             Wat.I.M.showMessage({message: "Wrong user or password", messageType: "error"});
             that.login = '';
             that.sid = '';
-            //window.location.reload();
+            if (that.retrievedData.status == STATUS_CREDENTIALS_FAIL) {
+                window.location.reload();
+            }
             return;
         }
         

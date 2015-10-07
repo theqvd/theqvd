@@ -406,7 +406,7 @@ Wat.C = {
         if (!Wat.Router.watRouter) {
             return false;
         }
-        else if (response.status == STATUS_NOT_LOGIN || response.status == STATUS_SESSION_EXPIRED) {
+        else if (response.status == STATUS_NOT_LOGIN || response.status == STATUS_SESSION_EXPIRED || response.status == STATUS_CREDENTIALS_FAIL) {
             Wat.Router.watRouter.trigger('route:logout');
             Wat.I.M.showMessage({'message': ALL_STATUS[response.status], 'messageType': 'error'});
             return true;

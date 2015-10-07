@@ -73,7 +73,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     },
     
     completePropertiesAndRender: function (that) {
-        if (that.retrievedData.total > 0) {
+        if (that.retrievedData.total > 0 && that.model.get('properties')) {
             var properties = {};
             $.each(that.retrievedData.rows, function (iProp, prop) {
                 properties[prop.property_id] = {

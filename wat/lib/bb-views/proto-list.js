@@ -755,7 +755,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 formFilters: that.formFilters,
                 selectedActions: that.selectedActions,
                 listActionButton: that.listActionButton,
-                cid: this.cid
+                cid: this.cid,
+                qvdObj: this.qvdObj
             }
         );
         

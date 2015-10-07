@@ -1,4 +1,4 @@
-<div class="login-box">
+<div class="login-box sec-login">
     <iframe id="remember" name="remember" class="hidden" src="remember.html"></iframe>
 
     <div class="login-side">

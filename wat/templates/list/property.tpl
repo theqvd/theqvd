@@ -6,7 +6,7 @@
  }
  else {
  %>
-     <div class="js-custom-views-container <%= cid %>">
+     <div class="js-custom-views-container <%= cid %> sec-properties">
          <fieldset>
             <div class="customize-section-selectors">
                 <div class="customize-section-selector">
