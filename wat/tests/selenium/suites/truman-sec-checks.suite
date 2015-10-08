@@ -9,12 +9,20 @@
 <table id="suiteTable" cellpadding="1" cellspacing="1" border="1" class="selenium"><tbody>
 <tr><td><b>Test Suite</b></td></tr>
 <tr><td><a href="../cases/load_wat_home">load_wat_home</a></td></tr>
+<tr><td><a href="../cases/time_start_measure">time_start_measure</a></td></tr>
 <tr><td><a href="../cases/login_truman">login_truman</a></td></tr>
+<tr><td><a href="../cases/time_end_measure">time_end_measure</a></td></tr>
 <tr><td><a href="../cases/not_present_user_sec">not_present_user_sec</a></td></tr>
 <tr><td><a href="../cases/not_present_host_sec">not_present_host_sec</a></td></tr>
+<tr><td><a href="../cases/time_start_measure">time_start_measure</a></td></tr>
 <tr><td><a href="../cases/load_sec_vms">load_sec_vms</a></td></tr>
+<tr><td><a href="../cases/time_end_measure">time_end_measure</a></td></tr>
+<tr><td><a href="../cases/time_start_measure">time_start_measure</a></td></tr>
 <tr><td><a href="../cases/load_sec_osfs">load_sec_osfs</a></td></tr>
+<tr><td><a href="../cases/time_end_measure">time_end_measure</a></td></tr>
+<tr><td><a href="../cases/time_start_measure">time_start_measure</a></td></tr>
 <tr><td><a href="../cases/load_sec_dis">load_sec_dis</a></td></tr>
+<tr><td><a href="../cases/time_end_measure">time_end_measure</a></td></tr>
 </tbody></table>
 </body>
 </html>

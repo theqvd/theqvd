@@ -12,11 +12,6 @@
 <tr><td rowspan="1" colspan="3">wat-test-selenium-firefox1</td></tr>
 </thead><tbody>
 <tr>
-	<td>waitForElementPresent</td>
-	<td>name=admin_tenant</td>
-	<td></td>
-</tr>
-<tr>
 	<td>type</td>
 	<td>name=admin_tenant</td>
 	<td>*</td>

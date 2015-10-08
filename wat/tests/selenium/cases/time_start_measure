@@ -4,21 +4,21 @@
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="selenium.base" href="http://localhost/" />
-<title>load-wat-home</title>
+<title>time_start_measure</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">load-wat-home</td></tr>
+<tr><td rowspan="1" colspan="3">time_start_measure</td></tr>
 </thead><tbody>
 <tr>
-	<td>open</td>
-	<td>/wat</td>
-	<td></td>
+	<td>storeEval</td>
+	<td>new Date().getTime()</td>
+	<td>startTime</td>
 </tr>
 <tr>
-	<td>waitForElementPresent</td>
-	<td>name=admin_tenant</td>
+	<td>echo</td>
+	<td>[time_start] Starting time measure</td>
 	<td></td>
 </tr>
 </tbody></table>
