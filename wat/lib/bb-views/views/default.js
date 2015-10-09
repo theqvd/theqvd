@@ -151,7 +151,7 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
     },
     
     storeColumns: function (that) {
-        if (that.retrievedData.status != STATUS_SUCCESS) {
+        if (that.retrievedData.status != STATUS_SUCCESS || that.retrievedData.statusText == 'abort') {
             return {};
         }
         

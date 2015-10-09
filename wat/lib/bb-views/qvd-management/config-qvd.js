@@ -53,6 +53,10 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     },
     
     processPrefixes: function (that) {
+        if (that.retrievedData.statusText == 'abort') {
+            return;
+        }
+        
         that.prefixes = that.retrievedData.rows;
                 
         // If current Token is not among the recovered fixes, set first one

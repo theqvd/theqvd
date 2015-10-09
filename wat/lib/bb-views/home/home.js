@@ -113,7 +113,7 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
     },
     
     loadData: function (stats) {
-        if (!stats) {
+        if (!stats || stats.statusText == 'abort') {
             return;
         }
         

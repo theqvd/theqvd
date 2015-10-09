@@ -9,7 +9,7 @@ function qvdViewsAdminReal () {
     });
 
         $.each(Wat.I.listFields, function (qvdObj, fields) {
-            if (qvdObj == 'acl') {
+            if ($.inArray(qvdObj, visibleViews) == -1) {
                 return;
             }
             QUnit.asyncTest("Column views (" + qvdObj + ")", function() {
@@ -61,6 +61,9 @@ function qvdViewsAdminReal () {
         });
     
         $.each(Wat.I.formFilters, function (qvdObj, fields) {
+            if ($.inArray(qvdObj, visibleViews) == -1) {
+                return;
+            }
             QUnit.asyncTest("Filter views (" + qvdObj + ")", function() {
                 // Number of Assertions we Expect
                 var assertions = 0;

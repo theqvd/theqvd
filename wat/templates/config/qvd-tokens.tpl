@@ -4,7 +4,7 @@ var prefixes = [];
 var prefix = '';
 var miscTokens = [];
 
-if (configTokens.length == 0) {
+if (!configTokens || configTokens.length == 0) {
 %>
     <tr>
         <td data-i18n="No elements found"></td>

@@ -7,6 +7,8 @@ var tenantOSFId = 14;
 var tenantDIId = 14;
 var tenantHostId = 1;
 
+var visibleViews = ['vm', 'osf', 'di'];
+
 Wat.C.setSource('TESTING truman');
 Wat.C.setAbortOldRequests(false);
 
