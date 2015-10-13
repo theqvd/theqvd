@@ -16,9 +16,10 @@ Wat.A = {
                 cache = true;
             }
             
-            var templateNameHash = '#template_' + templateName.replace(/\//gi, '-');
+            var templateNameHash = 'template_' + templateName.replace(/\//gi, '-');
+            var templateNameHashSelector = '#' + templateNameHash;
             
-            if ($(templateNameHash).html() == undefined || !cache) {
+            if ($(templateNameHashSelector).html() == undefined || !cache) {
                 var tmplDir = APP_PATH + 'templates';
                 var tmplUrl = tmplDir + '/' + templateName + '.tpl';
                 var tmplString = '';
@@ -31,7 +32,7 @@ Wat.A = {
                     cache: false,
                     success: function (tmplString) {
                         if (cache) {
-                            $('head').append('<script id="template_' + templateName + '" type="text/template">' + tmplString + '<\/script>');
+                            $('head').append('<script id="' + templateNameHash + '" type="text/template">' + tmplString + '<\/script>');
                         }
                         
                         Wat.TPL[storing] = tmplString;
@@ -45,7 +46,7 @@ Wat.A = {
             }
             else {
                 if (cache) {
-                    Wat.TPL[storing] = $(templateNameHash).html();
+                    Wat.TPL[storing] = $(templateNameHashSelector).html();
                 }
                 else {
                     Wat.TPL[storing] = tmplString;

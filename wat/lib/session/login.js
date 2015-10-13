@@ -25,7 +25,6 @@ Wat.L = {
         Wat.C.loggedIn = true;
         $.cookie('qvdWatSid', sid, { expires: Wat.C.loginExpirationDays, path: '/' });
         $.cookie('qvdWatLogin', login, { expires: Wat.C.loginExpirationDays, path: '/' });
-        Wat.T.initTranslate();
         
         // Reload screen after login
         var locationHash = window.location.hash;

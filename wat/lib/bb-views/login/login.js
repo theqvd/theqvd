@@ -7,7 +7,6 @@ Wat.Views.LoginView = Wat.Views.MainView.extend({
         Wat.B.bindLoginEvents();
                 
         Wat.C.language = 'auto';
-        Wat.T.initTranslate();
         
         var templates = Wat.I.T.getTemplateList('login');
 
