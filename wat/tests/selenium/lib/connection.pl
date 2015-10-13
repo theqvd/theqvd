@@ -8,8 +8,10 @@ use Test::WWW::Selenium;
 use Test::More "no_plan";
 use Test::Exception;
 
+my $selenium_server = $ARGV[0];
+my $wat_url = $ARGV[1];
 
-my $sel = Test::WWW::Selenium->new( host => "172.20.126.53", 
+my $sel = Test::WWW::Selenium->new( host => $selenium_server, 
                                     port => 4444, 
                                     browser => "*firefox", 
-                                    browser_url => "http://172.20.126.16/" );
+                                    browser_url => $wat_url );

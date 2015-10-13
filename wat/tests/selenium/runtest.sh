@@ -1,12 +1,12 @@
 #!/bin/bash
 
-if [ -z "$1" ]
+if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]
     then
         echo ""
-        echo "[ERROR] Missing parameter for: ./runtest.sh [suite_file]"
+        echo "[ERROR] Missing parameter for: ./runtest.sh [suite_file] [selenium_server_address] [wat_url]"
         echo ""
         echo "Example:"
-        echo "           ./runtest.sh suites/test1.suite"
+        echo "           ./runtest.sh suites/test1.suite 172.20.126.53 http://myurl.com/wat"
         echo ""
         exit
 fi
@@ -30,7 +30,7 @@ touch .temp-test.pl
 perl lib/buildtestsuite.pl $1 > .temp-test.pl
 
 # Execute suite
-perl .temp-test.pl
+perl .temp-test.pl $2 $3
 
 # Remove temporary file
 rm .temp-test.pl

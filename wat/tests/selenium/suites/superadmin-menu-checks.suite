@@ -9,9 +9,11 @@
 <table id="suiteTable" cellpadding="1" cellspacing="1" border="1" class="selenium"><tbody>
 <tr><td><b>Test Suite</b></td></tr>
 <tr><td><a href="../cases/load_wat_home">load_wat_home</a></td></tr>
+<tr><td><a href="../cases/login_fill_superadmin">login_fill_superadmin</a></td></tr>
 <tr><td><a href="../cases/time_start_measure">time_start_measure</a></td></tr>
-<tr><td><a href="../cases/login_superadmin">login_superadmin</a></td></tr>
+<tr><td><a href="../cases/login_click">login_click</a></td></tr>
 <tr><td><a href="../cases/time_end_measure">time_end_measure</a></td></tr>
+<tr><td><a href="../cases/time_check_8seconds">time_check_8seconds</a></td></tr>
 <tr><td><a href="../cases/test_hover_menu_help">test_hover_menu_help</a></td></tr>
 <tr><td><a href="../cases/test_hover_menu_platform">test_hover_menu_platform</a></td></tr>
 <tr><td><a href="../cases/test_hover_menu_wat">test_hover_menu_wat</a></td></tr>
