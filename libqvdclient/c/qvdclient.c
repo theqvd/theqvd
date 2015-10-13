@@ -37,6 +37,8 @@ void help(const char *program)
 	 "  %s : Specifies the password, if not specified with -w\n"
 	 "  %s : Enables debugging, can also be enabled with -d\n"
 	 "  %s : Enables the file were debugging should go to\n"
+	 "  http_proxy/https_proxy: Optional variables to use for proxy settings\n"
+         "       See http://curl.haxx.se/docs/manpage.html for more information\n"
 	 "  DISPLAY : Needed to be correctly setup. In some environments you might need to run one of the following:\n"
 	 "            export DISPLAY=localhost:0; xhost + localhost\n"
 	 "            xhost +si:localuser:$LOGNAME\n"
