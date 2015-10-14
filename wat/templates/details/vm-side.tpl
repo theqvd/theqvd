@@ -82,7 +82,7 @@
                                 <% 
                                 $.each(stateComponents, function (state, components) {
                                 %>
-                                    <td colspan=<%= nDots %> class="js-vmst-status vmst-status js-body-state" data-wsupdate="state-<%= state %>" data-id="<%= model.get('id') %>" style="<%= components['style'] %>">
+                                    <td colspan=<%= nDots %> class="js-vmst-status vmst-status js-body-state" data-wsupdate="state-<%= state %>" data-state-<%= state %> data-id="<%= model.get('id') %>" style="<%= components['style'] %>">
                                         <%= components['stateIcon'] %><span data-i18n="<%= components['stateText'] %>"></span>
                                     </td>
                                 <%

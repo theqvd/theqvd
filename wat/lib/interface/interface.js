@@ -289,7 +289,7 @@ Wat.I = {
     },
     
     showAll: function () {
-        var firstLoad = $('.wrapper').css('visibility') == 'hidden';
+        var firstLoad = $('.content').html() == '';
 
         this.showContent();
 

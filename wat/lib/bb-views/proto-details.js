@@ -162,7 +162,8 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
                 Wat.TPL.detailsCommon, {
                     model: this.model,
                     enabledProperties: enabledProperties,
-                    cid: this.cid
+                    cid: this.cid,
+                    qvdObj: this.qvdObj
                 }
             );
 

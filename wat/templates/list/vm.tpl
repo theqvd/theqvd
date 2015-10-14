@@ -135,19 +135,19 @@
                                 break;
                             case 'info':
                 %>
-                                <td>
+                                <td class="js-cell-info">
                                     <%
                                     if (!infoRestrictions || infoRestrictions.state) {
                                     %>
                                         <%
                                         if (model.get('state') == 'stopped') {
                                         %>
-                                            <i class="fa fa-stop" title="<%= i18n.t('Stopped') %>" data-i18n="[title]Stopped" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
+                                            <i class="fa fa-stop" title="<%= i18n.t('Stopped') %>" data-i18n="[title]Stopped" data-wsupdate="state" data-state-stopped data-id="<%= model.get('id') %>"></i>
                                         <%
                                         }
                                         else if (model.get('state') == 'running'){
                                         %>
-                                            <i class="fa fa-play" data-i18n="[title]Running" title="<%= i18n.t('Running') %>" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
+                                            <i class="fa fa-play" data-i18n="[title]Running" title="<%= i18n.t('Running') %>" data-wsupdate="state" data-state-running data-id="<%= model.get('id') %>"></i>
                                             
                                             <%
                                             if (model.get('di_id') != model.get('di_id_in_use')) {
@@ -160,7 +160,7 @@
                                         }
                                         else {
                                         %>
-                                            <i class="fa fa-spinner fa-spin" title="<%= model.get('state') %>" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
+                                            <i class="fa fa-spinner fa-spin" title="<%= model.get('state') %>" data-wsupdate="state" data-state-<%= model.get('state') %> data-id="<%= model.get('id') %>"></i>
                                         <%
                                         }
                                         %>
