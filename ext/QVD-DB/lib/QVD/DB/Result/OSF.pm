@@ -46,6 +46,88 @@ sub update_log_entry_join_condition
     { "$args->{foreign_alias}.id"     => \$sql , };
 }
 
+####### TRIGGERS ############################################################################
+
+sub get_procedures
+{
+	my @procedures_array = ();
+
+	# Define procedures to listen and notify
+	my @notify_procs_array = (
+		{
+			name => 'osf_changed_notify',
+			sql  => '$function$ BEGIN listen osf_changed; PERFORM pg_notify(\'osf_changed\', \'tenant_id=\' || NEW.tenant_id::text); RETURN NULL; END; $function$',
+			parameters => [],
+		},
+		{
+			name => 'osf_created_notify',
+			sql  => '$function$ BEGIN listen osf_created; PERFORM pg_notify(\'osf_created\', \'tenant_id=\' || NEW.tenant_id::text); RETURN NULL; END; $function$',
+			parameters => [],
+		},
+		{
+			name => 'osf_deleted_notify',
+			sql  => '$function$ BEGIN listen osf_deleted; PERFORM pg_notify(\'osf_deleted\', \'tenant_id=\' || OLD.tenant_id::text); RETURN NULL; END; $function$',
+			parameters => [],
+		},
+	);
+
+	for my $proc (@notify_procs_array){
+		$proc->{replace} = 1;
+		$proc->{language} = 'plpgsql';
+		$proc->{returns} = 'trigger';
+	}
+
+	push @procedures_array, @notify_procs_array;
+
+	# Return all procedures
+	return @procedures_array;
+}
+
+sub get_triggers
+{
+	my @triggers_array = ();
+
+	my @notify_triggers_array = (
+		{
+			name => 'osf_changed_trigger',
+			when => 'AFTER',
+			events => [qw/UPDATE/],
+			fields    => [],
+			on_table  => 'osfs',
+			condition => undef,
+			procedure => 'osf_changed_notify',
+			parameters => [],
+			scope  => 'ROW',
+		},
+		{
+			name => 'osf_created_trigger',
+			when => 'AFTER',
+			events => [qw/INSERT/],
+			fields    => [],
+			on_table  => 'osfs',
+			condition => undef,
+			procedure => 'osf_created_notify',
+			parameters => [],
+			scope  => 'ROW',
+		},
+		{
+			name => 'osf_deleted_trigger',
+			when => 'AFTER',
+			events => [qw/DELETE/],
+			fields    => [],
+			on_table  => 'osfs',
+			condition => undef,
+			procedure => 'osf_deleted_notify',
+			parameters => [],
+			scope  => 'ROW',
+		},
+	);
+
+	push @triggers_array, @notify_triggers_array;
+
+	return @triggers_array;
+}
+
 ##############################################################################################
 
 sub _dis_by_tag {

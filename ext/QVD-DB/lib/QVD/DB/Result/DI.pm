@@ -45,6 +45,104 @@ sub update_log_entry_join_condition
     { "$args->{foreign_alias}.id"     => \$sql , };
 }
 
+####### TRIGGERS ############################################################################
+
+sub get_procedures
+{
+	my @procedures_array = ();
+
+	# Define procedures to listen and notify
+	my @notify_procs_array = (
+		{
+			name => 'di_blocked_or_unblocked_notify',
+			sql  => '$function$ BEGIN listen di_blocked_or_unblocked; notify di_blocked_or_unblocked; RETURN NULL; END; $function$',
+			parameters => [],
+		},
+		{
+			name => 'di_changed_notify',
+			sql  => '$function$ BEGIN listen di_changed; notify di_changed; RETURN NULL; END; $function$',
+			parameters => [],
+		},
+		{
+			name => 'di_created_notify',
+			sql  => '$function$ BEGIN listen di_created; notify di_created; RETURN NULL; END; $function$',
+			parameters => [],
+		},
+		{
+			name => 'di_deleted_notify',
+			sql  => '$function$ BEGIN listen di_deleted; notify di_deleted; RETURN NULL; END; $function$',
+			parameters => [],
+		},
+	);
+
+	for my $proc (@notify_procs_array){
+		$proc->{replace} = 1;
+		$proc->{language} = 'plpgsql';
+		$proc->{returns} = 'trigger';
+	}
+
+	push @procedures_array, @notify_procs_array;
+
+	# Return all procedures
+	return @procedures_array;
+}
+
+sub get_triggers
+{
+	my @triggers_array = ();
+
+	my @notify_triggers_array = (
+		{
+			name => 'di_blocked_or_unblocked_trigger',
+			when => 'AFTER',
+			events => [qw/UPDATE/],
+			fields    => [qw/blocked/],
+			on_table  => 'dis',
+			condition => undef,
+			procedure => 'di_blocked_or_unblocked_notify',
+			parameters => [],
+			scope  => 'ROW',
+		},
+		{
+			name => 'di_changed_trigger',
+			when => 'AFTER',
+			events => [qw/UPDATE/],
+			fields    => [],
+			on_table  => 'dis',
+			condition => undef,
+			procedure => 'di_changed_notify',
+			parameters => [],
+			scope  => 'ROW',
+		},
+		{
+			name => 'di_created_trigger',
+			when => 'AFTER',
+			events => [qw/INSERT/],
+			fields    => [],
+			on_table  => 'dis',
+			condition => undef,
+			procedure => 'di_created_notify',
+			parameters => [],
+			scope  => 'ROW',
+		},
+		{
+			name => 'di_deleted_trigger',
+			when => 'AFTER',
+			events => [qw/DELETE/],
+			fields    => [],
+			on_table  => 'dis',
+			condition => undef,
+			procedure => 'di_deleted_notify',
+			parameters => [],
+			scope  => 'ROW',
+		},
+	);
+
+	push @triggers_array, @notify_triggers_array;
+
+	return @triggers_array;
+}
+
 ############################################################################################
 
 sub tag_list {

@@ -14,6 +14,8 @@ use Socket::Linux qw(TCP_KEEPIDLE TCP_KEEPINTVL TCP_KEEPCNT);
 use QVD::Config::Core;
 use parent qw(DBIx::Class::Schema);
 
+require QVD::DB::Translator;
+
 __PACKAGE__->load_namespaces(result_namespace => 'Result');
 __PACKAGE__->exception_action(sub { croak @_ ; DBIx::Class::Exception::throw(@_);});
 
@@ -60,6 +62,7 @@ sub _make_pg_socket_keepalive {
 
 sub deploy {
     my $db = shift;
+
     # Ensure the default transaction isolation is "serializable" (see #1210)
     my $dbh = $db->storage->dbh;
     $dbh->do("ALTER DATABASE $db_name SET default_transaction_isolation TO serializable");
@@ -85,8 +88,49 @@ sub deploy {
 		}
     }
 
-    $db->resultset('Version')->create({ component => 'schema',
-                                        version => '3.3.0' });
+	# Get list of sources
+	my $source_list = $db->{source_registrations};
+
+	# Create procedures
+	for my $class (keys (%$source_list)) {
+		my $package = $source_list->{$class}->{result_class};
+		my $table_name = $source_list->{$class}->{name};
+
+		my $function = $package->can('get_procedures');
+		if ($function) {
+			my @elem_array = $function->();
+			for my $elem (@elem_array) {
+				my $drop_query = QVD::DB::Translator::translate_drop_procedure($elem);
+				my $create_query = QVD::DB::Translator::translate_create_procedure($elem);
+				if($drop_query and $create_query) {
+					$dbh->do($drop_query);
+					$dbh->do($create_query);
+				}
+			}
+		}
+	}
+
+	# Create triggers
+	for my $class (keys (%$source_list)) {
+		my $package = $source_list->{$class}->{result_class};
+		my $table_name = $source_list->{$class}->{name};
+
+		my $function = $package->can('get_triggers');
+		if ($function) {
+			my @elem_array = $function->();
+			for my $elem (@elem_array) {
+				my $drop_query = QVD::DB::Translator::translate_drop_trigger($elem);
+				my $create_query = QVD::DB::Translator::translate_create_trigger($elem);
+				if($drop_query and $create_query) {
+					$dbh->do($drop_query);
+					$dbh->do($create_query);
+				}
+			}
+		}
+	}
+
+	# Create DB version
+	$db->resultset('Version')->create({ component => 'schema', version => '3.3.0' });
 }
 
 sub erase {

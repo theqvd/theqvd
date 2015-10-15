@@ -49,7 +49,6 @@ EOIN
 __PACKAGE__->has_one(creation_log_entry => 'QVD::DB::Result::Log', 
 		     \&creation_log_entry_join_condition, {join_type => 'LEFT'});
 
-
 sub creation_log_entry_join_condition
 { 
     my $args = shift; 
@@ -77,8 +76,105 @@ sub start_log_entry_join_condition
     { "$args->{foreign_alias}.id"     => \$sql , };
 }
 
-################################################################################################
+####### TRIGGERS ############################################################################
 
+sub get_procedures
+{
+	my @procedures_array = ();
+
+	# Define procedures to listen and notify
+	my @notify_procs_array = (
+		{
+			name => 'vm_blocked_or_unblocked_notify',
+			sql  => '$function$ BEGIN listen vm_blocked_or_unblocked; PERFORM pg_notify(\'vm_blocked_or_unblocked\', \'tenant_id=\' || (SELECT tenant_id FROM users WHERE id = (SELECT user_id FROM vms WHERE id = NEW.vm_id))::text); RETURN NULL; END; $function$',
+			parameters => [],
+		},
+		{
+			name => 'vm_changed_notify',
+			sql  => '$function$ BEGIN listen vm_changed; PERFORM pg_notify(\'vm_changed\', \'tenant_id=\' || (SELECT tenant_id FROM users WHERE id = NEW.user_id)::text); RETURN NULL; END; $function$',
+			parameters => [],
+		},
+		{
+			name => 'vm_created_notify',
+			sql  => '$function$ BEGIN listen vm_created; PERFORM pg_notify(\'vm_created\', \'tenant_id=\' || (SELECT tenant_id FROM users WHERE id = NEW.user_id)::text); RETURN NULL; END; $function$',
+			parameters => [],
+		},
+		{
+			name => 'vm_deleted_notify',
+			sql  => '$function$ BEGIN listen vm_deleted; PERFORM pg_notify(\'vm_deleted\', \'tenant_id=\' || (SELECT tenant_id FROM users WHERE id = OLD.user_id)::text); RETURN NULL; END; $function$',
+			parameters => [],
+		},
+	);
+
+	for my $proc (@notify_procs_array){
+		$proc->{replace} = 1;
+		$proc->{language} = 'plpgsql';
+		$proc->{returns} = 'trigger';
+	}
+
+	push @procedures_array, @notify_procs_array;
+
+	# Return all procedures
+	return @procedures_array;
+}
+
+sub get_triggers
+{
+	my @triggers_array = ();
+
+	my @notify_triggers_array = (
+		{
+			name => 'vm_blocked_or_unblocked_trigger',
+			when => 'AFTER',
+			events => [qw/UPDATE/],
+			fields    => [qw/blocked/],
+			on_table  => 'vm_runtimes',
+			condition => undef,
+			procedure => 'vm_blocked_or_unblocked_notify',
+			parameters => [],
+			scope  => 'ROW',
+		},
+		{
+			name => 'vm_changed_trigger',
+			when => 'AFTER',
+			events => [qw/UPDATE/],
+			fields    => [],
+			on_table  => 'vms',
+			condition => undef,
+			procedure => 'vm_changed_notify',
+			parameters => [],
+			scope  => 'ROW',
+		},
+		{
+			name => 'vm_created_trigger',
+			when => 'AFTER',
+			events => [qw/INSERT/],
+			fields    => [],
+			on_table  => 'vms',
+			condition => undef,
+			procedure => 'vm_created_notify',
+			parameters => [],
+			scope  => 'ROW',
+		},
+		{
+			name => 'vm_deleted_trigger',
+			when => 'AFTER',
+			events => [qw/DELETE/],
+			fields    => [],
+			on_table  => 'vms',
+			condition => undef,
+			procedure => 'vm_deleted_notify',
+			parameters => [],
+			scope  => 'ROW',
+		},
+	);
+
+	push @triggers_array, @notify_triggers_array;
+
+	return @triggers_array;
+}
+
+################################################################################################
 
 sub combined_properties {
     my $vm = shift;

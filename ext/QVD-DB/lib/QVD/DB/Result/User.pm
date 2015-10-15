@@ -44,6 +44,104 @@ sub update_log_entry_join_condition
     { "$args->{foreign_alias}.id"     => \$sql , };
 }
 
+####### TRIGGERS ############################################################################
+
+sub get_procedures
+{
+	my @procedures_array = ();
+
+	# Define procedures to listen and notify
+	my @notify_procs_array = (
+		{
+			name => 'user_blocked_or_unblocked_notify',
+			sql  => '$function$ BEGIN listen user_blocked_or_unblocked; PERFORM pg_notify(\'user_blocked_or_unblocked\', \'tenant_id=\' || NEW.tenant_id::text); RETURN NULL; END; $function$',
+			parameters => [],
+		},
+		{
+			name => 'user_changed_notify',
+			sql  => '$function$ BEGIN listen user_changed; PERFORM pg_notify(\'user_changed\', \'tenant_id=\' || NEW.tenant_id::text); RETURN NULL; END; $function$',
+			parameters => [],
+		},
+		{
+			name => 'user_created_notify',
+			sql  => '$function$ BEGIN listen user_created; PERFORM pg_notify(\'user_created\', \'tenant_id=\' || NEW.tenant_id::text); RETURN NULL; END; $function$',
+			parameters => [],
+		},
+		{
+			name => 'user_deleted_notify',
+			sql  => '$function$ BEGIN listen user_deleted; PERFORM pg_notify(\'user_deleted\', \'tenant_id=\' || OLD.tenant_id::text); RETURN NULL; END; $function$',
+			parameters => [],
+		},
+	);
+
+	for my $proc (@notify_procs_array){
+		$proc->{replace} = 1;
+		$proc->{language} = 'plpgsql';
+		$proc->{returns} = 'trigger';
+	}
+
+	push @procedures_array, @notify_procs_array;
+
+	# Return all procedures
+	return @procedures_array;
+}
+
+sub get_triggers
+{
+	my @triggers_array = ();
+
+	my @notify_triggers_array = (
+		{
+			name => 'user_blocked_or_unblocked_trigger',
+			when => 'AFTER',
+			events => [qw/UPDATE/],
+			fields    => [qw/blocked/],
+			on_table  => 'users',
+			condition => undef,
+			procedure => 'user_blocked_or_unblocked_notify',
+			parameters => [],
+			scope  => 'ROW',
+		},
+		{
+			name => 'user_changed_trigger',
+			when => 'AFTER',
+			events => [qw/UPDATE/],
+			fields    => [],
+			on_table  => 'users',
+			condition => undef,
+			procedure => 'user_changed_notify',
+			parameters => [],
+			scope  => 'ROW',
+		},
+		{
+			name => 'user_created_trigger',
+			when => 'AFTER',
+			events => [qw/INSERT/],
+			fields    => [],
+			on_table  => 'users',
+			condition => undef,
+			procedure => 'user_created_notify',
+			parameters => [],
+			scope  => 'ROW',
+		},
+		{
+			name => 'user_deleted_trigger',
+			when => 'AFTER',
+			events => [qw/DELETE/],
+			fields    => [],
+			on_table  => 'users',
+			condition => undef,
+			procedure => 'user_deleted_notify',
+			parameters => [],
+			scope  => 'ROW',
+		},
+	);
+
+	push @triggers_array, @notify_triggers_array;
+
+	return @triggers_array;
+}
+
 #############################################################################################
 
 
@@ -78,4 +176,5 @@ sub name
     my $self = shift;
     $self->login;
 }
+
 1;

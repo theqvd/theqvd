@@ -46,6 +46,104 @@ sub update_log_entry_join_condition
     { "$args->{foreign_alias}.id"     => \$sql , };
 }
 
+####### TRIGGERS ############################################################################
+
+sub get_procedures
+{
+	my @procedures_array = ();
+
+	# Define procedures to listen and notify
+	my @notify_procs_array = (
+		{
+			name => 'host_blocked_or_unblocked_notify',
+			sql  => '$function$ BEGIN listen host_blocked_or_unblocked; notify host_blocked_or_unblocked; RETURN NULL; END; $function$',
+			parameters => [],
+		},
+		{
+			name => 'host_changed_notify',
+			sql  => '$function$ BEGIN listen host_changed; notify host_changed; RETURN NULL; END; $function$',
+			parameters => [],
+		},
+		{
+			name => 'host_created_notify',
+			sql  => '$function$ BEGIN listen host_created; notify host_created; RETURN NULL; END; $function$',
+			parameters => [],
+		},
+		{
+			name => 'host_deleted_notify',
+			sql  => '$function$ BEGIN listen host_deleted; notify host_deleted; RETURN NULL; END; $function$',
+			parameters => [],
+		},
+	);
+
+	for my $proc (@notify_procs_array){
+		$proc->{replace} = 1;
+		$proc->{language} = 'plpgsql';
+		$proc->{returns} = 'trigger';
+	}
+
+	push @procedures_array, @notify_procs_array;
+
+	# Return all procedures
+	return @procedures_array;
+}
+
+sub get_triggers
+{
+	my @triggers_array = ();
+
+	my @notify_triggers_array = (
+		{
+			name => 'host_blocked_or_unblocked_trigger',
+			when => 'AFTER',
+			events => [qw/UPDATE/],
+			fields    => [qw/blocked/],
+			on_table  => 'host_runtimes',
+			condition => undef,
+			procedure => 'host_blocked_or_unblocked_notify',
+			parameters => [],
+			scope  => 'ROW',
+		},
+		{
+			name => 'host_changed_trigger',
+			when => 'AFTER',
+			events => [qw/UPDATE/],
+			fields    => [],
+			on_table  => 'hosts',
+			condition => undef,
+			procedure => 'host_changed_notify',
+			parameters => [],
+			scope  => 'ROW',
+		},
+		{
+			name => 'host_created_trigger',
+			when => 'AFTER',
+			events => [qw/INSERT/],
+			fields    => [],
+			on_table  => 'hosts',
+			condition => undef,
+			procedure => 'host_created_notify',
+			parameters => [],
+			scope  => 'ROW',
+		},
+		{
+			name => 'host_deleted_trigger',
+			when => 'AFTER',
+			events => [qw/DELETE/],
+			fields    => [],
+			on_table  => 'hosts',
+			condition => undef,
+			procedure => 'host_deleted_notify',
+			parameters => [],
+			scope  => 'ROW',
+		},
+	);
+
+	push @triggers_array, @notify_triggers_array;
+
+	return @triggers_array;
+}
+
 #####################################################################################################
 
 
