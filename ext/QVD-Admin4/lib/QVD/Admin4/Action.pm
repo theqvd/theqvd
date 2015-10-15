@@ -69,8 +69,9 @@ config_delete => { type_of_action =>  'delete',
 		   acls => [qr/^config\.qvd\./],
 		   admin4method => 'config_delete'},
 
-user_get_list => {type_of_action => 'list',
+user_get_list => { type_of_action => 'list',
 		  admin4method => 'select',
+		  channels => [qw(user_created user_deleted user_changed vm_created vm_deleted)],
 		  acls => [qr/^(user\.see-main\.|[^.]+\.see\.user-list)$/],
 		  qvd_object => 'User'},
 
@@ -84,9 +85,15 @@ user_all_ids => { type_of_action => 'all_ids',
 		  acls => [qr/^user\.[^.]+-massive\.|user\.see-main\./],
 		  qvd_object => 'User'},
 
-user_get_details => { type_of_action => 'details',
+user_list_details => { type_of_action => 'details',
 		      admin4method => 'select',
-		      channels => [qw(user_state_changed vm_state_changed user_state_changed)],
+		      acls => [qr/^user\.see-details\./],
+		      qvd_object => 'User' },
+
+user_get_details => {
+	type_of_action => 'details',
+	admin4method => 'select',
+	channels => [qw(user_created user_deleted user_changed vm_created vm_deleted)],
 		      acls => [qr/^user\.see-details\./],
 		      qvd_object => 'User' },
 
@@ -127,6 +134,7 @@ user_delete_property_list => { type_of_action => 'delete',
 
 vm_get_list => { type_of_action => 'list',
 		 admin4method => 'select',
+		 channels => [qw(vm_created vm_removed vm_changed user_created user_deleted)],
 		 acls => [qr/^(vm\.see-main\.|[^.]+\.see\.vm-list)$/],
 		 qvd_object => 'VM'},
 
@@ -142,7 +150,7 @@ vm_tiny_list => { type_of_action => 'tiny',
 
 vm_get_details => { type_of_action => 'details',
 		    admin4method => 'select',
-		    channels => [qw(vm_state_changed user_state_changed)],
+		    channels => [qw(vm_created vm_removed vm_changed user_created user_deleted)],
 		    acls => [qr/^vm\.see-details\./],
 		    qvd_object => 'VM'},
 
@@ -198,6 +206,7 @@ vm_delete_property_list => { type_of_action => 'delete',
 
 host_get_list => { type_of_action => 'list',
 		   admin4method => 'select',
+		   channels => [qw(host_created host_deleted host_changed vm_created vm_deleted)],
 		   acls => [qr/^host\.see-main\./],
 		   qvd_object => 'Host'},
 
@@ -213,7 +222,7 @@ host_tiny_list => { type_of_action => 'tiny',
 
 host_get_details => { type_of_action => 'details',
 		      admin4method => 'select',
-		      channels => [qw(host_state_changed vm_state_changed)],
+		      channels => [qw(host_created host_deleted host_changed vm_created vm_deleted)],
 		      acls => [qr/^host\.see-details\./],
 		      qvd_object => 'Host'},
 
@@ -254,6 +263,7 @@ host_delete_property_list => { type_of_action => 'delete',
 
 osf_get_list => { type_of_action => 'list',
 		  admin4method => 'select',
+		  channels => [qw(vm_created vm_deleted di_created di_deleted)],
 		  acls => [qr/^osf\.see-main\./],
 		  qvd_object => 'OSF'},
 
@@ -269,7 +279,7 @@ osf_tiny_list => { type_of_action => 'tiny',
 
 osf_get_details => { type_of_action => 'details',
 		     admin4method => 'select',
-		     channels => [qw(vm_created_or_deleted di_created_or_delated)],
+		     channels => [qw(vm_created vm_deleted vm_changed di_created di_deleted)],
 		     acls => [qr/^osf\.see-details\./],
 		     qvd_object => 'OSF'},
 
@@ -320,7 +330,6 @@ di_tiny_list => { type_of_action => 'tiny',
 
 di_get_details => { type_of_action => 'details',
 		    admin4method => 'select',
-		     channels => [qw(vm_created_or_deleted)],
 		    acls => [qr/^di\.see-details\./],
 		    qvd_object => 'DI'},
 
@@ -534,11 +543,11 @@ current_admin_setup => {type_of_action => 'ad_hoc',
 		       admin4method => 'current_admin_setup'},
 
 qvd_objects_statistics => { type_of_action =>  'multiple',
-			    channels => [qw(vm_created_or_removed vm_blocked_or_unblocked vm_state_changed vm_expiration_date_changed
-                                            host_created_or_removed host_blocked_or_unblocked host_state_changed
-                                            user_created_or_removed user_blocked_or_unblocked user_state_changed
-                                            osf_created_or_removed osf_blocked_or_unblocked
-                                            di_created_or_removed di_blocked_or_unblocked)],
+			    channels => [qw(vm_created vm_removed vm_blocked_or_unblocked vm_changed vm_expiration_date_changed
+                                            host_created host_deleted host_blocked_or_unblocked host_changed
+                                            user_created user_deleted user_blocked_or_unblocked user_changed
+                                            osf_created  osf_deleted osf_changed
+                                            di_created di_removed di_blocked_or_unblocked)],
 			    admin4methods => { users_count => { acls => [qr/^user\.stats/] },
 					       blocked_users_count => { acls => [qr/^user\.stats\.blocked$/]},
 					       connected_users_count => { acls => [qr/^user\.stats\.connected-users$/]},
