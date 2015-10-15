@@ -180,37 +180,60 @@ websocket '/ws' => sub {
     $c->inactivity_timeout(30000);     
     my $json = $c->get_input_json;
     my $notification = 0;
+	my %payload_hash;
 
-    my $res = $c->process_api_query($json);    $c->send(b(encode_json($res))->decode('UTF-8'));
+	my $res = $c->process_api_query($json);
+	$c->send(b(encode_json($res))->decode('UTF-8'));
 
-# For every action requested to the API we can get 0, 1 or more channels to listen in the
-# database. When the database notifies in those channels, this ws executes the action again 
-# and sends the updated info to the client 
+	# For every action requested to the API we can get 0, 1 or more channels to listen in the
+	# database. When the database notifies in those channels, this ws executes the action again
+	# and sends the updated info to the client
 
     for my $channel ($c->get_action_channels($json))
     {
-	$c->qvd_admin4_api->_pool->listen($channel,on_notify => sub { $notification = 1; });
+		$c->qvd_admin4_api->_pool->listen($channel,on_notify => sub {
+			my ($pg_pool, $channel, $pid, $payload) = @_;
+			%payload_hash = split(/[=;]/, $payload);
+			$payload_hash{channel} = $channel;
+			$notification = 1;
+		});
     }
 
+	my $currentTenant = $c->qvd_admin4_api->{administrator}->tenant->id;
     my $recurring = Mojo::IOLoop->recurring(
-	2 => sub { return 1 unless $notification;
+		2 => sub {
+			my $received_tenant_id = $payload_hash{tenant_id} // -1;
+			printf("%d -> Curr %s, Recv %s, channel %s\n", $notification, $currentTenant, $received_tenant_id, $payload_hash{channel} // "None");
+			if ($notification and (($currentTenant == 0) or
+				($received_tenant_id == -1) or
+				($received_tenant_id == $currentTenant))) {
+
 		   $c->app->log->debug("WebSocket refreshing information");
 		   my $res = $c->process_api_query($json);
 		   $c->send(b(encode_json($res))->decode('UTF-8'));
-		   $notification = 0;});
+			}
+
+			$notification = 0;
+			%payload_hash = ();
+
+			return 1;
+		}
+	);
 
     my $timer;
     $c->on(message => sub {
         my ($c, $msg) = @_;
         $c->app->log->debug("WebSocket $msg signal received");
 	Mojo::IOLoop->remove($timer) if $timer;
-	$timer = Mojo::IOLoop->timer(25 => sub { $c->send('AKN');});});
+		$timer = Mojo::IOLoop->timer(25 => sub { $c->send('AKN'); } );
+	});
 
     $c->on(finish => sub {
         my ($c, $code) = @_;
         Mojo::IOLoop->remove($timer) if $timer;
         Mojo::IOLoop->remove($recurring) if $recurring;
-        $c->app->log->debug("WebSocket closed with status $code");});
+		$c->app->log->debug("WebSocket closed with status $code");
+	});
 };
 
 
