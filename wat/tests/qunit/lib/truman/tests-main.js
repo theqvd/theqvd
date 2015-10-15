@@ -4,7 +4,7 @@ var tenant = 'qvd';
 var tenantUserId = 17;
 var tenantVMId = 3;
 var tenantOSFId = 14;
-var tenantDIId = 14;
+var tenantDIId = 4;
 var tenantHostId = 1;
 
 var visibleViews = ['vm', 'osf', 'di'];
