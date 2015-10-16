@@ -4,16 +4,16 @@
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="selenium.base" href="http://172.20.126.16/" />
-<title>vm_wait_stopped_517</title>
+<title>vm_select_517</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">vm_wait_stopped_517</td></tr>
+<tr><td rowspan="1" colspan="3">vm_select_517</td></tr>
 </thead><tbody>
 <tr>
-	<td>waitForElementPresent</td>
-	<td>css=input.vm-state-517[value=&quot;stopped&quot;]</td>
+	<td>click</td>
+	<td>css=table.list tr.row-${vmId}&gt;td.cell-check&gt;input</td>
 	<td></td>
 </tr>
 </tbody></table>
