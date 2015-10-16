@@ -3,32 +3,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://localhost/" />
-<title>time_end_measure</title>
+<link rel="selenium.base" href="http://172.20.126.16/" />
+<title>vm_wait_running_517</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">time_end_measure</td></tr>
+<tr><td rowspan="1" colspan="3">vm_wait_running_517</td></tr>
 </thead><tbody>
 <tr>
-	<td>storeEval</td>
-	<td>${startTime}</td>
-	<td>startTime</td>
-</tr>
-<tr>
-	<td>storeEval</td>
-	<td>new Date().getTime()</td>
-	<td>endTime</td>
-</tr>
-<tr>
-	<td>storeEval</td>
-	<td>(${endTime} - ${startTime}) / 1000</td>
-	<td>scriptExecutionTime</td>
-</tr>
-<tr>
-	<td>echo</td>
-	<td>[time_end] Execution time: ${scriptExecutionTime} seconds</td>
+	<td>waitForElementPresent</td>
+	<td>css=input.vm-state-517[value=&quot;running&quot;]</td>
 	<td></td>
 </tr>
 </tbody></table>
