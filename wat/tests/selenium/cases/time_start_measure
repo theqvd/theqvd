@@ -18,7 +18,7 @@
 </tr>
 <tr>
 	<td>echo</td>
-	<td>[time_start] Starting time measure</td>
+	<td>#[time_start] Starting time measure</td>
 	<td></td>
 </tr>
 </tbody></table>

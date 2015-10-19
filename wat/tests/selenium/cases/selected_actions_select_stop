@@ -22,16 +22,10 @@
 	<td>actionIndex</td>
 </tr>
 <tr>
-	<td>echo</td>
-	<td>${actionIndex}</td>
-	<td></td>
-</tr>
-<tr>
 	<td>clickAt</td>
 	<td>css=div.action-selected-select&gt;div.chosen-container .chosen-results [data-option-array-index=${actionIndex}]</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>
