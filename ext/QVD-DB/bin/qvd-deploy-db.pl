@@ -7,6 +7,10 @@ use QVD::DB::Simple;
 
 ### FUNCTIONS ###
 
+my %functions  = (
+	FILE_CONTENT => \&get_file_content,
+);
+
 sub initData {
 
 	# Check flags
@@ -44,7 +48,8 @@ sub initData {
 					@currAttribNames = split('\t+', $line);
 					print "\n### $currTableName ###\n". join(', ', @currAttribNames) . "\n" if $verbose;
 				} else {
-					@currAttribValues = split('\t+', $line);
+					my @auxAttribValues = split('\t+', $line);
+					@currAttribValues = map {applyFunction($_)} @auxAttribValues;
 					# Check number of attributes of each row
 					if (@currAttribValues != @currAttribNames) {
 						print "[ERROR] Number of attributes is different to number of values in line:\n$line\n";
@@ -76,6 +81,34 @@ sub updateSeqs() {
 			}
 		}
 	}
+}
+
+sub applyFunction {
+	my $value = shift;
+
+	if($value =~ /^\&(\w+)\((.*)\)$/){
+		my $function = $1;
+		my @args = split(/\s*,\s*/, $2);
+		if (exists $functions{$function}) {
+			$value = $functions{$function}->(@args);
+		}
+	}
+
+	return $value;
+}
+
+sub get_file_content {
+	my $filepath = shift;
+	my $content = "";
+
+	if (open FILE, $filepath){
+		$content = join("",<FILE>);
+		close(FILE);
+	} else {
+		print "[ERROR] Could not open file $filepath\n";
+	}
+
+	return $content;
 }
 
 ### Check IF DB IS DEPLOYED ###

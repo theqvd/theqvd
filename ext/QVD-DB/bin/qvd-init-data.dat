@@ -869,3 +869,9 @@ id	inheritor_id	inherited_id
 83	65	29
 84	65	28
 85	65	33
+
+### SSL_Config ###
+key	value
+
+path.l7r.ssl.cert	&FILE_CONTENT(/etc/qvd/certs/server-certificate.pem)
+path.l7r.ssl.key	&FILE_CONTENT(/etc/qvd/certs/server-private-key.pem)
