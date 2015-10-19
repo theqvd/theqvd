@@ -203,7 +203,6 @@ websocket '/ws' => sub {
     my $recurring = Mojo::IOLoop->recurring(
 		2 => sub {
 			my $received_tenant_id = $payload_hash{tenant_id} // -1;
-			printf("%d -> Curr %s, Recv %s, channel %s\n", $notification, $currentTenant, $received_tenant_id, $payload_hash{channel} // "None");
 			if ($notification and (($currentTenant == 0) or
 				($received_tenant_id == -1) or
 				($received_tenant_id == $currentTenant))) {
