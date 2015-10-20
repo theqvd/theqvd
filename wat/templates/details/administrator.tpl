@@ -108,7 +108,7 @@
                             <%
                                 $.each(model.get('roles'), function (iRole, role) {
                             %>
-                                <div>
+                                <div data-role-id="<%= iRole %>">
                                     <%
                                         if (Wat.C.checkACL('administrator.update.assign-role')) {
                                     %>

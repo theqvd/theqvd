@@ -86,7 +86,7 @@
         <%
         }
         _.each(models, function(model) { %>
-            <tr class="row-<%= model.get('id') %>">
+            <tr class="row-<%= model.get('id') %>" data-id="<%= model.get('id') %>" data-name="<%= model.get('name') %>">
                 <% 
                     var info = '';
                     

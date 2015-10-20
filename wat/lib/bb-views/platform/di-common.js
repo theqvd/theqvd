@@ -223,8 +223,8 @@ Wat.Common.BySection.di = {
             }
         };
         
-        this.dialogConf.button1Class = 'fa fa-ban';
-        this.dialogConf.button2Class = 'fa fa-save';
+        this.dialogConf.button1Class = 'fa fa-ban js-button-cancel';
+        this.dialogConf.button2Class = 'fa fa-save js-button-update';
         
         this.enabledProperties = false;
         this.dialogConf.fillCallback = this.fillEditor;

@@ -1062,8 +1062,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             }
         };
         
-        that.dialogConf.button1Class = 'fa fa-ban';
-        that.dialogConf.button2Class = 'fa fa-save';
+        that.dialogConf.button1Class = 'fa fa-ban js-button-cancel';
+        that.dialogConf.button2Class = 'fa fa-save js-button-update';
         
         that.dialogConf.fillCallback = that.fillMassiveEditor;
         that.dialogConf.title = i18n.t('Massive changes over __counter__ elements', {counter: that.selectedItems.length}) + '<i class="fa fa-warning" title="' + i18n.t('Some fields could not be able in the massive editor') + '"></i>';

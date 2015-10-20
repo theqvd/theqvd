@@ -1,4 +1,4 @@
-<div class="editor-container <%= cid %>">
+<div class="editor-container <%= cid %> js-editor-container-<%= editorMode %>">
     <table class="editor-table alternate">
          <%
          if (editorMode == "massive_edit") {

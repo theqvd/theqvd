@@ -39,7 +39,7 @@
         stateComponents[model.get('state')].style = '';
         
     %>
-    <table class="details-list col-width-100">
+    <table class="details-list col-width-100 js-vm-execution-table" data-state="<%= model.get('state') %>">
         <tbody data-id="<%= model.get('id') %>">
             <tr>
                 <td colspan=2>
@@ -82,7 +82,7 @@
                                 <% 
                                 $.each(stateComponents, function (state, components) {
                                 %>
-                                    <td colspan=<%= nDots %> class="js-vmst-status vmst-status js-body-state" data-wsupdate="state-<%= state %>" data-state-<%= state %> data-id="<%= model.get('id') %>" style="<%= components['style'] %>">
+                                    <td colspan=<%= nDots %> class="js-vmst-status vmst-status js-body-state" data-wsupdate="state-<%= state %>" data-id="<%= model.get('id') %>" style="<%= components['style'] %>">
                                         <%= components['stateIcon'] %><span data-i18n="<%= components['stateText'] %>"></span>
                                     </td>
                                 <%

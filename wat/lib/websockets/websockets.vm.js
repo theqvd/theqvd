@@ -13,12 +13,21 @@ Wat.WS.changeWebsocketVm = function (id, field, data, viewType) {
            
             $('[data-wsupdate="ip"][data-id="' + id + '"]').addClass('invisible');   
 
-            // Update state attribute
-            $('[data-wsupdate="state"][data-id="' + id + '"]').removeAttr('data-state-running');
-            $('[data-wsupdate="state"][data-id="' + id + '"]').removeAttr('data-state-starting');
-            $('[data-wsupdate="state"][data-id="' + id + '"]').removeAttr('data-state-stopping');
-            $('[data-wsupdate="state"][data-id="' + id + '"]').removeAttr('data-state-stopped');
-            $('[data-wsupdate="state"][data-id="' + id + '"]').attr('data-state-' + data, '');
+            switch (viewType) {
+                case 'list':
+                    $('.js-name .vm-state-' + id).remove();
+                    
+                    var hiddenState = document.createElement("INPUT");
+                    $(hiddenState).attr('type', 'hidden');
+                    $(hiddenState).attr('class', 'vm-state-' + id);
+                    $(hiddenState).val(data);
+                    $('tr.row-' + id + '>td.js-name').append(hiddenState);
+
+                    break;
+                case 'details':
+                    $('.js-vm-execution-table').attr('data-state', data);
+                    break;
+            }
 
             switch (data) {
                 case 'running':

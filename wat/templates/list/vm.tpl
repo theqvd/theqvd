@@ -142,12 +142,12 @@
                                         <%
                                         if (model.get('state') == 'stopped') {
                                         %>
-                                            <i class="fa fa-stop" title="<%= i18n.t('Stopped') %>" data-i18n="[title]Stopped" data-wsupdate="state" data-state-stopped data-id="<%= model.get('id') %>"></i>
+                                            <i class="fa fa-stop" title="<%= i18n.t('Stopped') %>" data-i18n="[title]Stopped" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
                                         <%
                                         }
                                         else if (model.get('state') == 'running'){
                                         %>
-                                            <i class="fa fa-play" data-i18n="[title]Running" title="<%= i18n.t('Running') %>" data-wsupdate="state" data-state-running data-id="<%= model.get('id') %>"></i>
+                                            <i class="fa fa-play" data-i18n="[title]Running" title="<%= i18n.t('Running') %>" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
                                             
                                             <%
                                             if (model.get('di_id') != model.get('di_id_in_use')) {
@@ -160,7 +160,7 @@
                                         }
                                         else {
                                         %>
-                                            <i class="fa fa-spinner fa-spin" title="<%= model.get('state') %>" data-wsupdate="state" data-state-<%= model.get('state') %> data-id="<%= model.get('id') %>"></i>
+                                            <i class="fa fa-spinner fa-spin" title="<%= model.get('state') %>" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
                                         <%
                                         }
                                         %>
@@ -202,6 +202,7 @@
                             case 'name':
                 %>
                                 <td class="js-name  <%= Wat.C.checkACL('vm.see-details.') ? 'cell-link' : '' %>">
+                                    <input type="hidden" class="selenium-field vm-state-<%= model.get('id') %>" value="<%= model.get('state') %>">
                                     <%= Wat.C.ifACL('<a href="#/vm/' + model.get('id') + '" data-i18n="[title]Click for details">', 'vm.see-details.') %>
                                     <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'vm.see-details.') %>
                                         <span class="text"><%= model.get('name') %></span>

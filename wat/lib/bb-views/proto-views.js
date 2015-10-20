@@ -40,8 +40,8 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             }
         };
         
-        dialogConf.button1Class = 'fa fa-ban';
-        dialogConf.button2Class = 'fa fa-eraser';
+        dialogConf.button1Class = 'fa fa-ban js-button-cancel';
+        dialogConf.button2Class = 'fa fa-eraser js-button-reset';
 
         dialogConf.fillCallback = that.fillResetViewsEditor;
 

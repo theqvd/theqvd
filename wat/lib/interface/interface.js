@@ -776,8 +776,8 @@ Wat.I = {
                     successCallback(that);
                 }
             },
-            button1Class : 'fa fa-ban',
-            button2Class : 'fa fa-check',
+            button1Class : 'fa fa-ban js-button-cancel',
+            button2Class : 'fa fa-check js-button-accept',
             fillCallback : function(target) { 
                 var templates = Wat.I.T.getTemplateList('confirm', {templateName: templateName});
 
@@ -821,8 +821,8 @@ Wat.I = {
             }
         };
 
-        dialogConf.button1Class = 'fa fa-book';
-        dialogConf.button2Class = 'fa fa-check';
+        dialogConf.button1Class = 'fa fa-book js-button-read-full-doc';
+        dialogConf.button2Class = 'fa fa-check js-button-close';
 
         dialogConf.fillCallback = function (target, that) {
             // Back scroll of the div to top position

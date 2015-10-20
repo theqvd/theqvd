@@ -2934,6 +2934,10 @@ table.role-template-tools {
     text-align: center;
     padding: 5px !important; }
     table.role-template-tools td input[type="checkbox"] {
+      /* All browsers except webkit*/
+      transform: scale(2);
+      /* Webkit browsers*/
+      -webkit-transform: scale(2);
       width: 20px;
       height: 20px; }
     table.role-template-tools td a.no-text-button {
