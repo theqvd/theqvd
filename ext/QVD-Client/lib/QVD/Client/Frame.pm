@@ -804,7 +804,7 @@ sub SaveConfiguration {
 
 sub start_file_sharing {
     my $slave_client_proc;
-    if (core_cfg('client.slave.enable', 1)) {
+    if (core_cfg('client.slave.enable', 1) && core_cfg('client.file_sharing.enable', 1)) {
         #my $slave_client_cmd = $QVD::Client::App::app_dir . '/bin/qvd-slaveclient';
         my @shares;
         if ($WINDOWS) {

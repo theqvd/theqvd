@@ -188,6 +188,8 @@ client.slave.debug_commands = 0
 client.slave.enable = 1
 ## force locale, ignoring system LC_* and LANG environment variables
 client.locale =
+## enable exporting $HOME, /media and /Volumes to the VM.
+client.file_sharing.enable = 1
 
 ## On OSX the window is hard to resize if it's too large, so
 ## we check whether we should default to a lower window size
