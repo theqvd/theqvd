@@ -761,9 +761,11 @@ Wat.I = {
         $('.elements-selected').html(selectedItems);
         
         if (selectedItems == 0) {
+            $('.js-pagination').css('margin-right', 'auto');
             $('.js-action-selected').hide( "slide" );
         }
         else {
+            $('.js-pagination').css('margin-right', $('.js-action-selected').css('width'));
             $('.js-action-selected').show( "slide" );
             
             if (selectedItems == 1) {

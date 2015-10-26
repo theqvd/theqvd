@@ -1370,9 +1370,15 @@ body {
         position: fixed;
         top: 50px;
         right: -5px;
-        width: 250px;
+        width: 100px;
         min-height: 100px;
         background: #4d4d4d; }
+        @media screen and (min-width: 41em) {
+          .wrapper .content fieldset.action-selected {
+            width: 250px; } }
+        @media only screen and (max-width: 41em) {
+          .wrapper .content fieldset.action-selected a.button, .wrapper .content fieldset.action-selected a.button2 {
+            text-align: center; } }
         .wrapper .content fieldset.action-selected .title {
           color: #fdfdfd;
           margin-bottom: 20px;

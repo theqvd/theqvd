@@ -57,7 +57,7 @@
                 <a class="js-traductable_button js-button-new actions_button button fa fa-plus-circle" name="<%= listActionButton.name %>" href="<%= listActionButton.link %>" data-i18n="<%= listActionButton.value %>"></a>
             </div>
         <% } %>
-        <div class="pagination">
+        <div class="pagination js-pagination">
             <a class="fa fa-step-backward first button2"></a>
             <a class="fa fa-caret-left prev button2"></a>
             <span class="pagination_current_page">1</span>/<span class="pagination_total_pages">1</span>
@@ -81,13 +81,14 @@
     {
     %>
         <fieldset class="action-selected js-action-selected">
-            <a class="fright fa fa-times button button-icon js-unckeck-all" style="font-size: 0.8em;"></a>
-            <div data-i18n="Actions over selected items" class="title"></div>
+            <a class="fright fa fa-times button button-icon js-unckeck-all desktop" style="font-size: 0.8em;"></a>
+            <div data-i18n="Actions over selected items" class="title desktop"></div>
                     <% $.each(selectedActions, function(action, actionConfig) { %>
-                <a class="js-traductable_button js-selected-actions-button actions_button <%= actionConfig.darkButton ? 'button' : 'button2' %> <%= actionConfig.iconClass %> <%= actionConfig.otherClass %>" data-action="<%= action %>" style="width: 100%; margin-bottom: 15px;" name="selected_actions_button_<%= action %>" data-i18n="<%= actionConfig.text %>"></a>
+                                        <a class="js-traductable_button js-selected-actions-button actions_button <%= actionConfig.darkButton ? 'button' : 'button2' %> button-icon--mobile <%= actionConfig.iconClass %> <%= actionConfig.otherClass %>" data-action="<%= action %>" style="width: 100%; margin-bottom: 15px;" name="selected_actions_button_<%= action %>"><span class="desktop" data-i18n="<%= actionConfig.text %>"></span></a>
                     <% }); %>
             <div class="selected-elements js-selected-elements">
-                <span data=i18n="Selected"><%= $.i18n.t('Selected') %></span>:
+                <i class="fa fa-check-square-o mobile"></i>
+                <span class="fa fa-check-square-o desktop" data=i18n="Selected"><%= $.i18n.t('Selected') %></span>:
                 <span class="elements-selected">0</span>
             </div>
             <div class="clear mobile"></div>

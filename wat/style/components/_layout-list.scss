@@ -152,7 +152,18 @@ fieldset {
         position: fixed;
         top: 50px;
         right: -5px;
+
+        width: 100px;
+
+        @include in(desktop) {
         width: 250px;
+        }        
+        
+        a.button, a.button2 {
+            @include in(mobile) {
+                text-align: center;
+            }
+        }
         min-height: 100px;
         background: lighten($col_blacker, 10);
 

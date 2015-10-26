@@ -193,6 +193,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     // Hide elements related with a list. Used while list data is loading
     loadingList: function () {
+        $('.js-pagination').css('margin-right', $('.js-action-selected').css('width'));
         $('div.js-shown-elements, div.js-selected-elements, fieldset.js-action-selected').show( "slide" );
     },
     
@@ -1247,6 +1248,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         $('.js-check-it').prop('checked', false);
         $('.check_all').prop('checked', false);
         $('.js-action-selected').hide( "slide" );
+        $('.js-pagination').css('margin-right', 'auto');
     },
     
     setupMassiveChangesDialog: function (that) {
