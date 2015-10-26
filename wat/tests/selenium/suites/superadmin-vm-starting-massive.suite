@@ -18,8 +18,7 @@
 <tr><td><a href="../cases/store_vm_id_434">store_vm_id_434</a></td></tr>
 <tr><td><a href="../cases/vm_wait_stopped">vm_wait_stopped</a></td></tr>
 <tr><td><a href="../cases/vm_check_box">vm_check_box</a></td></tr>
-<tr><td><a href="../cases/selected_actions_select_start">selected_actions_select_start</a></td></tr>
-<tr><td><a href="../cases/selected_actions_click_apply">selected_actions_click_apply</a></td></tr>
+<tr><td><a href="../cases/selected_actions_click_start">selected_actions_click_start</a></td></tr>
 <tr><td><a href="../cases/time_start_measure">time_start_measure</a></td></tr>
 <tr><td><a href="../cases/store_vm_id_517">store_vm_id_517</a></td></tr>
 <tr><td><a href="../cases/vm_wait_starting">vm_wait_starting</a></td></tr>
@@ -34,8 +33,7 @@
 <tr><td><a href="../cases/vm_check_box">vm_check_box</a></td></tr>
 <tr><td><a href="../cases/store_vm_id_434">store_vm_id_434</a></td></tr>
 <tr><td><a href="../cases/vm_check_box">vm_check_box</a></td></tr>
-<tr><td><a href="../cases/selected_actions_select_stop">selected_actions_select_stop</a></td></tr>
-<tr><td><a href="../cases/selected_actions_click_apply">selected_actions_click_apply</a></td></tr>
+<tr><td><a href="../cases/selected_actions_click_stop">selected_actions_click_stop</a></td></tr>
 <tr><td><a href="../cases/time_start_measure">time_start_measure</a></td></tr>
 <tr><td><a href="../cases/store_vm_id_517">store_vm_id_517</a></td></tr>
 <tr><td><a href="../cases/vm_wait_stopped">vm_wait_stopped</a></td></tr>

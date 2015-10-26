@@ -4,26 +4,16 @@
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="selenium.base" href="http://172.20.126.16/" />
-<title>selected_actions_select_stop</title>
+<title>selected_actions_click_apply</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">selected_actions_select_stop</td></tr>
+<tr><td rowspan="1" colspan="3">selected_actions_click_apply</td></tr>
 </thead><tbody>
 <tr>
-	<td>clickAt</td>
-	<td>css=div.action-selected-select&gt;div.chosen-container</td>
-	<td></td>
-</tr>
-<tr>
-	<td>storeElementIndex</td>
-	<td>css=select[name=&quot;selected_actions_select&quot;] option[value=&quot;stop&quot;]</td>
-	<td>actionIndex</td>
-</tr>
-<tr>
-	<td>clickAt</td>
-	<td>css=div.action-selected-select&gt;div.chosen-container .chosen-results [data-option-array-index=${actionIndex}]</td>
+	<td>click</td>
+	<td>css=a[name=&quot;selected_actions_button_start&quot;]</td>
 	<td></td>
 </tr>
 </tbody></table>
