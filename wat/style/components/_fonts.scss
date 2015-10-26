@@ -75,7 +75,7 @@ label {
     @include font-size(2);
 }
 
-.actions_button, select[name="selected_actions_select"] {
+.actions_button {
     @include font-size(2);
     line-height: 1.6em;
 }

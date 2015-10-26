@@ -617,6 +617,7 @@
     "See role's description": "Ver la descripción de un rol",
     "See role's ID": "Ver ID de rol", 
     "See role's inherited roles": "Ver roles heredados por un rol", 
+    "Update role's description (massive)": "Actualizar descripción de rol (masivo)", 
     "See role's Log": "Ver log de rol", 
     "Assign-Unassign role's ACLs": "Asignar-Desasignar ACLs a un rol", 
     "Assign-Unassign role's inherited roles": "Asignar-Desasignar roles heredados a un rol", 

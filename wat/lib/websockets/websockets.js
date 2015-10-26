@@ -126,12 +126,12 @@ Wat.WS = {
         var that = this;
                 
         // NON-EFFICIENT VERSION: Monitoring elements one per socket
-        /*
+        
         $.each(collection.models, function (iModel, model) {
             that.openDetailsWebsockets (qvdObj, model, fields, cid, 'list');
         });
-        */
         
+        /*
         // IMPROVED VERSION 1: Monitoring just the shown elements
         that.cid = cid;
         
@@ -151,7 +151,7 @@ Wat.WS = {
             filters: filters, 
             fields: fields
         }, that.changeWebsocket, 'ws', 'list');
-        
+        */
         // IMPROVED VERSION 2: Live monitoring where some elements can dissapear from list and appear another ones
         /*
         that.openWebsocket(qvdObj, qvdObj + '_get_list', {
@@ -193,8 +193,8 @@ Wat.WS = {
         $.each(data, function (iRow, row) {
             // If view type is a list. Id is taken from retrieved data
             if (viewType == 'list') {
-                id = row.id;
-                delete row.id;
+                //id = row.id;
+                //delete row.id;
         }
         
             $.each(row, function (field, value) {

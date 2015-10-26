@@ -119,7 +119,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         'change .filter-control select': 'filter',
         'input .filter-control input.date-filter': 'filter',
         'click .js-button-new': 'openNewElementDialog',
-        'click [name="selected_actions_button"]': 'applySelectedAction'
+        'click .js-selected-actions-button': 'applySelectedAction',
+        'click .js-unckeck-all': 'resetSelectedItems'
     },
     
     // Render list sorted by a column
@@ -192,12 +193,12 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     // Hide elements related with a list. Used while list data is loading
     loadingList: function () {
-        $('div.js-shown-elements, div.js-selected-elements, fieldset.js-action-selected').hide();
+        $('div.js-shown-elements, div.js-selected-elements, fieldset.js-action-selected').show( "slide" );
     },
     
     // Show elements related with a list. Used after load list data
     loadedList: function () {
-        $('div.js-shown-elements, div.js-selected-elements, fieldset.js-action-selected').show();
+        //$('div.js-shown-elements, div.js-selected-elements, fieldset.js-action-selected').show();
     },
     
     // Get filter parameters of the form, set in collection, fetch list and render it
@@ -795,7 +796,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         $(this.listContainer).html(template);
         this.paginationUpdate();
         this.shownElementsLabelUpdate();
-        this.selectedActionControlsUpdate();
         
         Wat.I.updateSelectedItems(this.selectedItems.length);
         
@@ -937,20 +937,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
 
         context.find(' .shown-elements .elements-shown').html(elementsShown);
         context.find(' .shown-elements .elements-total').html(elementsTotal);
-    },
-    
-    selectedActionControlsUpdate: function () {
-        // Depend on the number of elements shown, we enabled/disabled selected elements controls
-        if (this.elementsShown > 0) {
-            $('a[name="selected_actions_button"]').removeClass('disabled chosen-disabled');
-            $('select[name="selected_actions_select"]').removeAttr('disabled');
-            $('select[name="selected_actions_select"]').next().removeClass('chosen-disabled');
-        }
-        else {
-            $('a[name="selected_actions_button"]').addClass('disabled');
-            $('select[name="selected_actions_select"]').attr('disabled', 'disabled');
-            $('select[name="selected_actions_select"]').next().addClass('chosen-disabled');
-        }
     },
     
     paginationUpdate: function () {  
@@ -1122,8 +1108,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         that.configureMassiveEditor (that);
     },
     
-    applySelectedAction: function () { 
-        var action = $('select[name="selected_actions_select"]').val();
+    applySelectedAction: function (e) { 
+        var action = $(e.target).attr('data-action');
+        console.log(action);
 
         if (!this.selectedItems.length) {
             Wat.I.M.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
@@ -1177,6 +1164,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 }
                 break;
             case 'massive_changes':
+            case 'changes':
                 // The function that will open the Massive changes dialog is: openMassiveChangesDialog
                 // Each qvd object have the option of do things before with setupMassiveChangesDialog and after with configureMassiveEditor                
                 if (elementsOutOfView) {
@@ -1258,6 +1246,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.selectedItems = [];
         $('.js-check-it').prop('checked', false);
         $('.check_all').prop('checked', false);
+        $('.js-action-selected').hide( "slide" );
     },
     
     setupMassiveChangesDialog: function (that) {

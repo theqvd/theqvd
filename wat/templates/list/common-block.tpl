@@ -80,22 +80,15 @@
     if (Object.keys(selectedActions).length > 0)
     {
     %>
-        <div class="selected-elements js-selected-elements second_row">
-            <span data=i18n="Selected"><%= $.i18n.t('Selected') %></span>:
-            <span class="elements-selected">0</span>
-        </div>
-        
         <fieldset class="action-selected js-action-selected">
-            <legend data-i18n="Actions over selected items"></legend>
-            <div class="action-selected-select">
-                <select name="selected_actions_select" class="chosen-single">
+            <a class="fright fa fa-times button button-icon js-unckeck-all" style="font-size: 0.8em;"></a>
+            <div data-i18n="Actions over selected items" class="title"></div>
                     <% $.each(selectedActions, function(action, actionConfig) { %>
-                        <option value="<%= action %>" data-i18n="<%= actionConfig.text %>"></option>
+                <a class="js-traductable_button js-selected-actions-button actions_button <%= actionConfig.darkButton ? 'button' : 'button2' %> <%= actionConfig.iconClass %> <%= actionConfig.otherClass %>" data-action="<%= action %>" style="width: 100%; margin-bottom: 15px;" name="selected_actions_button_<%= action %>" data-i18n="<%= actionConfig.text %>"></a>
                     <% }); %>
-                </select>
-            </div>
-            <div class="action-selected-button">
-                <a class="js-traductable_button actions_button button fa fa-check-square-o" name="selected_actions_button" data-i18n="Apply"></a>
+            <div class="selected-elements js-selected-elements">
+                <span data=i18n="Selected"><%= $.i18n.t('Selected') %></span>:
+                <span class="elements-selected">0</span>
             </div>
             <div class="clear mobile"></div>
         </fieldset>

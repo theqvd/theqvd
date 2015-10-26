@@ -759,6 +759,22 @@ Wat.I = {
     // Update the indicator of selected intems situated under the list table
     updateSelectedItems: function (selectedItems) { 
         $('.elements-selected').html(selectedItems);
+        
+        if (selectedItems == 0) {
+            $('.js-action-selected').hide( "slide" );
+        }
+        else {
+            $('.js-action-selected').show( "slide" );
+            
+            if (selectedItems == 1) {
+                $('.js-only-one').show();
+                $('.js-only-massive').hide();
+            }
+            else {
+                $('.js-only-massive').show();
+                $('.js-only-one').hide();
+            }
+        }
     },
     
     confirm: function (templateName, successCallback, that, loadingBlock) {        

@@ -226,10 +226,25 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             var percent = parseInt((e.loaded / e.total) * 100);
         }
 
+        if (percent == 100) {
+            var progressHiddenInput = '<input type="hidden" data-di-uploading="completed">';
+        }
+        else {
+            var progressHiddenInput = '<input type="hidden" data-di-uploading="inprogress-' + percent + '">';
+        }
+
         var progressData = [e.loaded, e.total - e.loaded];
         Wat.I.G.drawPieChartSimple('loading-block', progressData);
 
-        $('.loading-little-message').html($.i18n.t('Uploading image to server') + '<br><br>' + parseInt(e.loaded/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB / ' + parseInt(e.total/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB');
+        var progressMessage = '';
+        progressMessage += parseInt(e.loaded/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB';
+        progressMessage += ' / ';
+        progressMessage += parseInt(e.total/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB';
+        progressMessage += progressHiddenInput;
+        
+        var creatingMessage = $.i18n.t('Uploading image to server');
+        
+        $('.loading-little-message').html(creatingMessage + '<br><br>' + progressMessage);
     },
     
     heavyCreateDownload: function (args, diskImageUrl) {
@@ -272,8 +287,20 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
                 var progressData = [data.copy_size, data.total_size - data.copy_size];
                 Wat.I.G.drawPieChartSimple('loading-block', progressData);
 
+                if (percent == 100) {
+                    var progressHiddenInput = '<input type="hidden" data-di-uploading="completed">';
+                }
+                else {
+                    var progressHiddenInput = '<input type="hidden" data-di-uploading="inprogress-' + percent + '">';
+                }
+                
+                var progressMessage = '';
+                progressMessage += parseInt(data.copy_size/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB';
+                progressMessage += ' / ';
+                progressMessage += parseInt(data.total_size/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB';
+                progressMessage += progressHiddenInput;
+                
                 var creatingMessage = '';
-                var progressMessage = parseInt(data.copy_size/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB / ' + parseInt(data.total_size/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB';
                 switch (mode) {
                     case 'staging':
                         creatingMessage = $.i18n.t('Copying image from staging to images folder in server');

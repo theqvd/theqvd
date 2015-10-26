@@ -126,14 +126,17 @@ Wat.I.formDefaultFilters[qvdObj] = $.extend({}, Wat.I.formFilters[qvdObj]);
 
 // Actions of the bottom of the list (those that will be done with selected items) configuration on list view
 Wat.I.selectedActions[qvdObj] = {
-    'delete': {
-        'text': 'Delete',
-        'acls': 'tenant.delete-massive.'
-    },
     'massive_changes': {
         'text': 'Edit',
         'groupAcls': 'tenantMassiveEdit',
-        'aclsLogic': 'OR'
+        'aclsLogic': 'OR',
+        'iconClass': 'fa fa-pencil'
+    },
+    'delete': {
+        'text': 'Delete',
+        'acls': 'tenant.delete-massive.',
+        'iconClass': 'fa fa-trash',
+        'darkButton': true
     }
 };
 

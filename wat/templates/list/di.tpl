@@ -113,8 +113,10 @@
             </tr>
         <%
         }                
-        _.each(models, function(model) { %>
-            <tr class="row-<%= model.get('id') %>">
+        _.each(models, function(model) {
+            var cleanName = model.get('disk_image').substr(model.get('disk_image').indexOf('-')+1);
+        %>
+            <tr class="row-<%= model.get('id') %>" data-name="<%= cleanName %>">
                 <% 
                     $.each(columns, function(name, col) {
                         if (col.display == false) {

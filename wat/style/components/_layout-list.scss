@@ -125,6 +125,7 @@
     .selected-elements {
         margin-top: 9px;
         float: left;
+        color: $col_whiter;
     }
 }
 
@@ -147,19 +148,24 @@ fieldset {
     
     &.action-selected {
         margin-top: 35px;
+        display: none;
+        position: fixed;
+        top: 50px;
+        right: -5px;
+        width: 250px;
+        min-height: 100px;
+        background: lighten($col_blacker, 10);
+
+        .title {
+            color: $col_whiter;
+            margin-bottom: 20px;
+            font-weight: bold;
+            line-height: 20px;
     }
+    } 
 
     .chosen-container {
         margin-top: -6px;
-    }
-
-    .action-selected-select {
-        margin-bottom: 10px;
-        width: 100%;
-    } 
-
-    .action-selected-button a {
-        float: right;
     }       
 
     legend {

@@ -561,35 +561,43 @@ Wat.I.formDefaultFilters[qvdObj] = $.extend({}, Wat.I.formFilters[qvdObj]);
 
 // Actions of the bottom of the list (those that will be done with selected items) configuration on list view
 Wat.I.selectedActions[qvdObj] = {
-    'start': {
-        'text': 'Start',
-        'acls': 'vm.update-massive.state'
-    },
-    'stop': {
-        'text': 'Stop',
-        'acls': 'vm.update-massive.state'
-    },
-    'block': {
-        'text': 'Block',
-        'acls': 'vm.update-massive.block'
-    },
-    'unblock': {
-        'text': 'Unblock',
-        'acls': 'vm.update-massive.block'
-    },
-    'disconnect': {
-        'text': 'Disconnect user',
-        'acls': 'vm.update-massive.disconnect-user'
-    },
-    'delete': {
-        'text': 'Delete',
-        'acls': 'vm.delete-massive.'
-    },
     'massive_changes': {
         'text': 'Edit',
         'groupAcls': 'vmMassiveEdit',
-        'aclsLogic': 'OR'
-    }
+        'aclsLogic': 'OR',
+        'iconClass': 'fa fa-pencil'
+    },
+    'start': {
+        'text': 'Start',
+        'acls': 'vm.update-massive.state',
+        'iconClass': 'fa fa-play'
+    },
+    'stop': {
+        'text': 'Stop',
+        'acls': 'vm.update-massive.state',
+        'iconClass': 'fa fa-stop'
+    },
+    'block': {
+        'text': 'Block',
+        'acls': 'vm.update-massive.block',
+        'iconClass': 'fa fa-lock'
+    },
+    'unblock': {
+        'text': 'Unblock',
+        'acls': 'vm.update-massive.block',
+        'iconClass': 'fa fa-unlock-alt'
+    },
+    'disconnect': {
+        'text': 'Disconnect user',
+        'acls': 'vm.update-massive.disconnect-user',
+        'iconClass': 'fa fa-plug'
+    },
+    'delete': {
+        'text': 'Delete',
+        'acls': 'vm.delete-massive.',
+        'iconClass': 'fa fa-trash',
+        'darkButton': true
+    },
 };
 
 // Action button (tipically New button) configuration on list view

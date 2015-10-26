@@ -454,12 +454,12 @@ td i.fa {
   @media screen and (min-width: 41em) {
     td i.fa {
       font-size: 16px; } }
-td i.fa-lock, td i.fa-unlock {
+td i.fa-lock, td i.fa-unlock-alt {
   font-size: 23px;
   vertical-align: bottom;
   height: 18px; }
   @media screen and (min-width: 41em) {
-    td i.fa-lock, td i.fa-unlock {
+    td i.fa-lock, td i.fa-unlock-alt {
       font-size: 19px; } }
 
 .fa-centered {
@@ -488,17 +488,13 @@ select {
   min-height: 22px;
   padding: 4px;
   -webkit-appearance: normal; }
-  select[name="selected_actions_select"] {
-    width: auto;
-    float: left;
-    margin-bottom: 10px; }
 
-.actions_button, select[name="selected_actions_select"] {
+.actions_button {
   width: 100%;
   height: 35px;
   border: 1px solid #cacaca; }
   @media screen and (min-width: 41em) {
-    .actions_button, select[name="selected_actions_select"] {
+    .actions_button {
       width: auto;
       height: 28px; } }
 
@@ -1356,7 +1352,8 @@ body {
       float: right; }
     .wrapper .content .list-block .selected-elements, .wrapper .content .details-side .selected-elements {
       margin-top: 9px;
-      float: left; }
+      float: left;
+      color: #fdfdfd; }
     .wrapper .content .more-tags {
       margin-top: 8px; }
     .wrapper .content fieldset {
@@ -1368,14 +1365,21 @@ body {
       .wrapper .content fieldset.action-select {
         margin-top: 60px; }
       .wrapper .content fieldset.action-selected {
-        margin-top: 35px; }
+        margin-top: 35px;
+        display: none;
+        position: fixed;
+        top: 50px;
+        right: -5px;
+        width: 250px;
+        min-height: 100px;
+        background: #4d4d4d; }
+        .wrapper .content fieldset.action-selected .title {
+          color: #fdfdfd;
+          margin-bottom: 20px;
+          font-weight: bold;
+          line-height: 20px; }
       .wrapper .content fieldset .chosen-container {
         margin-top: -6px; }
-      .wrapper .content fieldset .action-selected-select {
-        margin-bottom: 10px;
-        width: 100%; }
-      .wrapper .content fieldset .action-selected-button a {
-        float: right; }
       .wrapper .content fieldset legend {
         text-align: left;
         color: #333;
@@ -3363,12 +3367,12 @@ label {
       font-size: 1em;
       line-height: 1.3em; } }
 
-.actions_button, select[name="selected_actions_select"] {
+.actions_button {
   font-size: 1.3em;
   line-height: 1.3em;
   line-height: 1.6em; }
   @media screen and (min-width: 41em) {
-    .actions_button, select[name="selected_actions_select"] {
+    .actions_button {
       font-size: 1em;
       line-height: 1.3em; } }
 

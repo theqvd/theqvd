@@ -14,7 +14,7 @@
     if (Wat.C.checkACL('host.update.block')) {
         if(model.get('blocked')) {
     %>
-            <a class="button button-icon--desktop js-button-unblock fa fa-unlock fright" href="javascript:" data-i18n="[title]Unblock"><span data-i18n="Unblock" class="mobile"></span></a>
+            <a class="button button-icon--desktop js-button-unblock fa fa-unlock-alt fright" href="javascript:" data-i18n="[title]Unblock"><span data-i18n="Unblock" class="mobile"></span></a>
     <%
         } 
         else { 

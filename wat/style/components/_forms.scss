@@ -24,16 +24,10 @@ select {
     min-height: 22px;
     padding: 4px;
     
-    &[name="selected_actions_select"] {
-        width: auto;
-        float: left;
-        margin-bottom: 10px;
-    }
-    
     -webkit-appearance: normal;
 }
 
-.actions_button, select[name="selected_actions_select"] {
+.actions_button {
     width: 100%;
     height: $input_height_mobile;
     border: 1px solid darken($col_whiter, 20);

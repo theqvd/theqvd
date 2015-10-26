@@ -128,6 +128,7 @@ Wat.A = {
             },
             success: function (response, result, raw) {
                 if (Wat.C.sessionExpired(response)) {
+                    window.location.reload();
                     return;
                 }
                 

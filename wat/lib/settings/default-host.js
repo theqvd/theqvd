@@ -312,26 +312,40 @@ Wat.I.formDefaultFilters[qvdObj] = $.extend({}, Wat.I.formFilters[qvdObj]);
 
 // Actions of the bottom of the list (those that will be done with selected items) configuration on list view
 Wat.I.selectedActions[qvdObj] = {
-    'block': {
-        'text': 'Block',
-        'acls': 'host.update-massive.block'
-    },
-    'unblock': {
-        'text': 'Unblock',
-        'acls': 'host.update-massive.block'
-    },
-    'stop_all': {
-        'text': 'Stop all VMs',
-        'acls': 'vm.update-massive.state'
-    },
-    'delete': {
-        'text': 'Delete',
-        'acls': 'host.delete-massive.'
-    },
     'massive_changes': {
         'text': 'Edit',
         'groupAcls': 'hostMassiveEdit',
-        'aclsLogic': 'OR'
+        'aclsLogic': 'OR',
+        'iconClass': 'fa fa-pencil',
+        'otherClass': 'js-only-massive'
+    },
+    'changes': {
+        'text': 'Edit',
+        'groupAcls': 'hostEdit',
+        'aclsLogic': 'OR',
+        'iconClass': 'fa fa-pencil',
+        'otherClass': 'js-only-one'
+    },
+    'block': {
+        'text': 'Block',
+        'acls': 'host.update-massive.block',
+        'iconClass': 'fa fa-lock'
+    },
+    'unblock': {
+        'text': 'Unblock',
+        'acls': 'host.update-massive.block',
+        'iconClass': 'fa fa-unlock-alt'
+    },
+    'stop_all': {
+        'text': 'Stop all VMs',
+        'acls': 'vm.update-massive.state',
+        'iconClass': 'fa fa-stop'
+    },
+    'delete': {
+        'text': 'Delete',
+        'acls': 'host.delete-massive.',
+        'iconClass': 'fa fa-trash',
+        'darkButton': true
     }
 };
 

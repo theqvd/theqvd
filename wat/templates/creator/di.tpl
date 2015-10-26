@@ -8,7 +8,7 @@
     <tr>
         <td data-i18n="Image's source"></td>
         <td>
-            <select class="" name="images_source" data-any-selected>
+            <select class="" id="images_source" name="images_source" data-any-selected>
                 <option value="computer" data-i18n="Your computer"></option>
                 <option value="staging" data-i18n="Staging directory"></option>
                 <option value="url" data-i18n="URL"></option>
@@ -18,7 +18,7 @@
     <tr class="image_staging_row" style="display: none;">
         <td data-i18n="Disk image"></td>
         <td>
-            <select class="" name="disk_image"></select>
+            <select class="" name="disk_image" id="disk_image"></select>
         </td>
     </tr>
     <tr class="image_computer_row">
