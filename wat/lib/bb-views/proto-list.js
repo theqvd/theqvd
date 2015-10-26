@@ -1110,8 +1110,12 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     applySelectedAction: function (e) { 
+        if ($(e.target).attr('data-action')) {
         var action = $(e.target).attr('data-action');
-        console.log(action);
+        }
+        else {
+            var action = $(e.target).parent().attr('data-action');
+        }
 
         if (!this.selectedItems.length) {
             Wat.I.M.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
