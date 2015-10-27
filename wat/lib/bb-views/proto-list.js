@@ -191,23 +191,10 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         theader.find('th').removeClass('sortable');
     },
     
-    // Hide elements related with a list. Used while list data is loading
-    loadingList: function () {
-        $('.js-pagination').css('margin-right', $('.js-action-selected').css('width'));
-        $('div.js-shown-elements, div.js-selected-elements, fieldset.js-action-selected').show( "slide" );
-    },
-    
-    // Show elements related with a list. Used after load list data
-    loadedList: function () {
-        //$('div.js-shown-elements, div.js-selected-elements, fieldset.js-action-selected').show();
-    },
-    
     // Get filter parameters of the form, set in collection, fetch list and render it
     filter: function (e) {
         var that = this;
         
-        // Show loading animation while loading
-        that.loadingList();
         $('.list').html(HTML_MID_LOADING);
 
         if (e && $(e.target).hasClass('mobile-filter')) {
@@ -811,9 +798,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         Wat.I.addSortIcons(this.cid);
         
-        // Show hidded controls again after list loading
-        this.loadedList();
-        
         Wat.I.adaptSideSize();
         
         Wat.I.addOddEvenRowClass(this.listContainer);
@@ -1247,12 +1231,14 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     resetSelectedItems: function () {
+        if (this.selectedItems.length > 0) {
+            $('.js-action-selected').hide( "slide" );
+            $('.js-pagination').css('margin-right', 'auto');
+        }
         this.selectedAll = false;
         this.selectedItems = [];
         $('.js-check-it').prop('checked', false);
         $('.check_all').prop('checked', false);
-        $('.js-action-selected').hide( "slide" );
-        $('.js-pagination').css('margin-right', 'auto');
     },
     
     setupMassiveChangesDialog: function (that) {
