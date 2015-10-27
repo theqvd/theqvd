@@ -1,11 +1,11 @@
 var login = 'truman';
 var password = 'truman';
-var tenant = 'qvd';
-var tenantUserId = 17;
-var tenantVMId = 3;
-var tenantOSFId = 14;
-var tenantDIId = 4;
-var tenantHostId = 1;
+var tenant = 'default';
+var tenantUserId = 10000;
+var tenantVMId = 10014;
+var tenantOSFId = 10000;
+var tenantDIId = 10000;
+var tenantHostId = 10001;
 
 var visibleViews = ['vm', 'osf', 'di'];
 

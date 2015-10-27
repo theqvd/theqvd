@@ -522,6 +522,8 @@ select {
   width: 100%; }
 
 input[type="checkbox"], input[type="radio"] {
+  /* Trick for make checkboxes resizable on firefox */
+  -moz-appearance: none;
   width: 24px;
   height: 24px;
   box-shadow: none;
@@ -1369,7 +1371,7 @@ body {
         display: none;
         position: fixed;
         top: 50px;
-        right: -5px;
+        right: 10px;
         width: 100px;
         min-height: 100px;
         background: #4d4d4d; }
@@ -2944,10 +2946,8 @@ table.role-template-tools {
     text-align: center;
     padding: 5px !important; }
     table.role-template-tools td input[type="checkbox"] {
-      /* All browsers except webkit*/
-      transform: scale(2);
-      /* Webkit browsers*/
-      -webkit-transform: scale(2);
+      /* Trick for make checkboxes resizable on firefox */
+      -moz-appearance: none;
       width: 20px;
       height: 20px; }
     table.role-template-tools td a.no-text-button {

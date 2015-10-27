@@ -6,17 +6,17 @@ APP_PATH = '../../';
 
 // Id of prop1, prop2 and propN properties. This id is in test machine DB. If changes, test will fail
 var propertyIDs = {
-    prop1: 185,
-    prop2: 197,
-    prop3: 201,
-    propN: 198
+    prop1: 10000,
+    prop2: 10001,
+    prop3: 10002,
+    propN: 10003
 };
 
 var propertyNames = {
-    185: "prop1",
-    197: "prop2",
-    201: "prop3",
-    198: "propN"
+    10000: "prop1",
+    10001: "prop2",
+    10002: "prop3",
+    10003: "propN"
 };
 
 WatTests = {};
@@ -133,7 +133,7 @@ WatTests.values = {
             "language": "auto",
             "block": getRandomInt()
         },
-        admin: {
+        administrator: {
             "description": getRandomStr(),
             "name": getRandomStr(),
             "language": "default",
@@ -232,14 +232,14 @@ WatTests.updateValues = {
             "language": "en",
             "block": getRandomInt()
         },
-        admin: {
+        administrator: {
             "name": getRandomStr(),
             "description": getRandomStr(),
             "language": "en",
             "password": getRandomStr(),
             "block": getRandomInt(),
             "__roles_changes__": {
-                "assign_roles": ["1"]
+                "assign_roles": ["66"]
             }
         },
         role: {
@@ -249,7 +249,12 @@ WatTests.updateValues = {
                 "unassign_acls": ["user.delete.", "vm.delete"]
             },
             "__roles_changes__": {
-                "assign_roles": ["1"]
+                "assign_roles": ["66"]
+            }
+        },
+        role2: {
+            "__roles_changes__": {
+                "unassign_roles": ["66"]
             }
         }
     };
@@ -390,7 +395,7 @@ WatTests.fakeValues = {
             "language": "es",
             "block": getRandomInt()
         },
-        admin: {
+        administrator: {
             "id": getRandomInt(),
             "name": getRandomStr(),
             "language": "en",

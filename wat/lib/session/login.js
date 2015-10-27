@@ -100,7 +100,11 @@ Wat.L = {
     checkLogin: function (that) {
         that.password = '';
         
-        if (!that.retrievedData.acls || $.isEmptyObject(that.retrievedData.acls)) {
+        if (that.retrievedData.status == ERROR_INTERNAL) {
+            Wat.I.M.showMessage({message: that.retrievedData.statusText, messageType: "error"});
+            return;
+        }
+        else if (!that.retrievedData.acls || $.isEmptyObject(that.retrievedData.acls)) {
             Wat.L.logOut();
             Wat.I.M.showMessage({message: "Wrong user or password", messageType: "error"});
             that.login = '';

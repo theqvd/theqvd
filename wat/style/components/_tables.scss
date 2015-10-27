@@ -223,11 +223,8 @@ table.role-template-tools {
         padding: 5px !important;
         
         input[type="checkbox"] {
-            /* All browsers except webkit*/
-            transform: scale(2);
-
-            /* Webkit browsers*/
-            -webkit-transform: scale(2);
+            /* Trick for make checkboxes resizable on firefox */
+            -moz-appearance: none;
 
             width: 20px;
             height: 20px;

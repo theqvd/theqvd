@@ -313,7 +313,7 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
     },
     
     getLastId: function (that) {
-        if (that.retrievedData.status == STATUS_ELEMENT_ALREADY_EXISTS) {
+        if (that.retrievedData.status != STATUS_SUCCESS) {
             return;
         }
         

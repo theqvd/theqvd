@@ -10,7 +10,7 @@ function backboneTest () {
         test("Models instantiation", function() {
             // Instantiate Local Contact Backbone Model Object
             WatTests.models = {
-                admin: new Wat.Models.Admin(),
+                administrator: new Wat.Models.Admin(),
                 di: new Wat.Models.DI(),
                 host: new Wat.Models.Host(),
                 osf: new Wat.Models.OSF(),
@@ -33,7 +33,7 @@ function backboneTest () {
         test("Collections instantiation", function() {
             // Instantiate Local Contact Backbone Collection Object
             WatTests.collections = {
-                admin: new Wat.Collections.Admins(),
+                administrator: new Wat.Collections.Admins(),
                 di: new Wat.Collections.DIs(),
                 host: new Wat.Collections.Hosts(),
                 osf: new Wat.Collections.OSFs(),

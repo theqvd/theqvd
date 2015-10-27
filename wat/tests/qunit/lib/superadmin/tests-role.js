@@ -12,7 +12,7 @@ function roleTestReal () {
             // Number of Assertions we Expect
             var assertions = 0;
             assertions += Object.keys(WatTests.fakeValues.role).length * 3; // Create & Update verifications.
-            assertions +=4; // Create, Update and Delete verifications
+            assertions +=8; // Create, Update and Delete verifications
 
             expect(assertions);
 
@@ -108,6 +108,32 @@ function roleTestReal () {
                                         equal(e.retrievedData.status, 0, "Role updated succesfully (" + JSON.stringify(WatTests.updateValues.role) + ")");
 
                                         //////////////////////////////////////////////////////////////////
+                                        // After update, get role details matching by name
+                                        //////////////////////////////////////////////////////////////////
+                                        WatTests.models.role.fetch({   
+                                            complete: function (e) {
+                                                WatTests.values.role.id = WatTests.models.role.attributes['id'];
+                                                $.each (WatTests.fakeValues.role, function (fieldName) {
+                                                    var valRetrieved = WatTests.models.role.attributes[fieldName];
+                                                    
+                                                    if (fieldName == 'acls' && WatTests.values.role[fieldName] != undefined) {
+                                                        deepEqual(valRetrieved, WatTests.values.role[fieldName], "Role field '" + fieldName + "' retrieved successfully and match with created value (" + JSON.stringify(valRetrieved) + ")");
+                                                    }
+                                                    else if (WatTests.values.role[fieldName] != undefined) {
+                                                        equal(valRetrieved, WatTests.values.role[fieldName], "Role field '" + fieldName + "' retrieved successfully and match with created value (" + valRetrieved + ")");
+                                                    }
+                                                    else {
+                                                        notEqual(WatTests.models.role.attributes[fieldName], undefined, "Role field '" + fieldName + "' retrieved successfully (" + JSON.stringify(valRetrieved) + ")");
+                                                    }
+                                                });
+
+                                                //////////////////////////////////////////////////////////////////
+                                                // After get role details, update it again
+                                                //////////////////////////////////////////////////////////////////
+                                                Wat.CurrentView.updateModel(WatTests.updateValues.role2, {'id': WatTests.values.role.id}, function (e) { 
+                                                    equal(e.retrievedData.status, 0, "Role updated succesfully (" + JSON.stringify(WatTests.updateValues.role) + ")");
+
+                                                    //////////////////////////////////////////////////////////////////
                                         // After update, get list of roles matching by name
                                         //////////////////////////////////////////////////////////////////
                                         WatTests.models.role.fetch({   
@@ -129,7 +155,7 @@ function roleTestReal () {
 
 
                                                 //////////////////////////////////////////////////////////////////
-                                                // After match the updated user, delete it
+                                                            // After match the updated role, delete it
                                                 //////////////////////////////////////////////////////////////////
                                                 Wat.CurrentView.deleteModel({'id': WatTests.values.role.id}, function (e) { 
                                                     equal(e.retrievedData.status, 0, "Role deleted succesfully (ID: " + JSON.stringify(WatTests.values.role.id) + ")");
@@ -137,6 +163,10 @@ function roleTestReal () {
                                                     // Unblock task runner
                                                     start();
                                                 }, Wat.CurrentView.model);
+                                            }
+                                        });
+                                    }, Wat.CurrentView.model);
+                                                
                                             }
                                         });
                                     }, Wat.CurrentView.model);
