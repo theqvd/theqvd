@@ -596,7 +596,7 @@ my $related_admin_cb = sub {
     my ($self,$name,$tenant_id) = @_; 
     my $filters = { name => $name };
     $filters->{tenant_id} = $tenant_id if $tenant_id;
-    $self->ask_api( { action => 'admin_all_ids', 
+    $self->ask_api( { action => 'administrator_all_ids', 
 		      filters =>  $filters })->json('/rows');
 };
 
@@ -667,11 +667,11 @@ my $CLI_CMD2API_ACTION =
 		delete => 'config_delete', 
 		default => 'config_default' },
 
-    admin => { ids => 'admin_all_ids', 
-	       get => 'admin_get_list', 
-	       update => 'admin_update', 
-	       create => 'admin_create', 
-	       delete => 'admin_delete' },
+    admin => { ids => 'administrator_all_ids', 
+	       get => 'administrator_get_list', 
+	       update => 'administrator_update', 
+	       create => 'administrator_create', 
+	       delete => 'administrator_delete' },
 
     role => { ids => 'role_all_ids', 
 	      get => 'role_get_list', 

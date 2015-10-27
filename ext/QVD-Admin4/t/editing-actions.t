@@ -297,41 +297,41 @@ $t->post_ok('/' => json => { login    => 'superadmin',
 
 
 #################
-### admin_update
+### administrator_update
 #################
 
 $t->post_ok('/' => json => { login    => 'superadmin',              
 		             password => 'superadmin',              
-		             action   => 'admin_update',
+		             action   => 'administrator_update',
 			     filters => {id => 5},
 			     arguments    => { name => 'youradmin',
 			                       password => 'youradmin',
 					       __roles_changes__ => { assign_roles => ['4'], 
 								      unassign_roles => ['1']}}}) 
-    ->status_is(200, 'admin_update HTTP STATUS')
-    ->json_is('/status' => '0', 'admin_update API STATUS');
+    ->status_is(200, 'administrator_update HTTP STATUS')
+    ->json_is('/status' => '0', 'administrator_update API STATUS');
 
 
 $t->post_ok('/' => json => { login    => 'superadmin',              
 		             password => 'superadmin',              
-		             action   => 'admin_get_details',
+		             action   => 'administrator_get_details',
 			     filters => {id => 5}}) 
-    ->status_is(200, 'admin_get_details HTTP STATUS')
-    ->json_is('/result/rows/0/name' => 'youradmin', 'admin_get_details HAS CHANGED')
-    ->json_is('/result/rows/0/roles/4','superpringao', 'admin_get_details HAS CHANGED')
-    ->json_hasnt('/result/rows/roles/1/','admin_get_details HAS CHANGED')
-    ->json_is('/status' => '0', 'admin_get_details API STATUS');
+    ->status_is(200, 'administrator_get_details HTTP STATUS')
+    ->json_is('/result/rows/0/name' => 'youradmin', 'administrator_get_details HAS CHANGED')
+    ->json_is('/result/rows/0/roles/4','superpringao', 'administrator_get_details HAS CHANGED')
+    ->json_hasnt('/result/rows/roles/1/','administrator_get_details HAS CHANGED')
+    ->json_is('/status' => '0', 'administrator_get_details API STATUS');
 
 $t->post_ok('/' => json => { login    => 'superadmin',              
 		             password => 'superadmin',              
-		             action   => 'admin_update',
+		             action   => 'administrator_update',
 			     filters => {id => 5},
 			     arguments    => { name => 'myadmin',
 			                       password => 'myadmin',
 					       __roles_changes__ => { assign_roles => ['1'], 
 								      unassign_roles => ['4']}}}) 
-    ->status_is(200, 'admin_update HTTP STATUS')
-    ->json_is('/status' => '0', 'admin_update API STATUS');
+    ->status_is(200, 'administrator_update HTTP STATUS')
+    ->json_is('/status' => '0', 'administrator_update API STATUS');
 
 #################
 ### tenant_update

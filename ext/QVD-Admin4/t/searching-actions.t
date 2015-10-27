@@ -452,63 +452,63 @@ $t->post_ok('/' => json => { login    => 'superadmin',
 
 
 #################
-### admin_get_list
+### administrator_get_list
 #################
 
 $t->post_ok('/' => json => { login    => 'superadmin',              
 		             password => 'superadmin',              
-		             action   => 'admin_get_list',
+		             action   => 'administrator_get_list',
 			     filters    => { name => 'myadmin',
 					     tenant_id => 1,
 					     tenant_name => 'Madrid',
 					     id => 5 }}) 
-    ->status_is(200, 'admin_get_list HTTP STATUS')
-    ->json_is('/status' => '0', 'admin_get_list API STATUS')
-    ->json_has('/result/rows/0/', 'admin_get_list NO UNDERGENERATE')
-    ->json_hasnt('/result/rows/1/' => 'admin_get_list NO OVERGENERATE');
+    ->status_is(200, 'administrator_get_list HTTP STATUS')
+    ->json_is('/status' => '0', 'administrator_get_list API STATUS')
+    ->json_has('/result/rows/0/', 'administrator_get_list NO UNDERGENERATE')
+    ->json_hasnt('/result/rows/1/' => 'administrator_get_list NO OVERGENERATE');
 
 #####################
-### admin_get_details
+### administrator_get_details
 #####################
 
 $t->post_ok('/' => json => { login    => 'superadmin',              
 		             password => 'superadmin',              
-		             action   => 'admin_get_details',
+		             action   => 'administrator_get_details',
 			     filters    => { id => 5 }}) 
-    ->status_is(200, 'admin_get_list HTTP STATUS')
-    ->json_is('/status' => '0', 'admin_get_details API STATUS')
-    ->json_has('/result/rows/0/', 'admin_get_details NO UNDERGENERATE')
-    ->json_hasnt('/result/rows/1/' => 'admin_get_details NO OVERGENERATE');
+    ->status_is(200, 'administrator_get_list HTTP STATUS')
+    ->json_is('/status' => '0', 'administrator_get_details API STATUS')
+    ->json_has('/result/rows/0/', 'administrator_get_details NO UNDERGENERATE')
+    ->json_hasnt('/result/rows/1/' => 'administrator_get_details NO OVERGENERATE');
 
 #################
-### admin_all_ids
+### administrator_all_ids
 #################
 
 $t->post_ok('/' => json => { login    => 'superadmin',              
 		             password => 'superadmin',              
-		             action   => 'admin_all_ids',
+		             action   => 'administrator_all_ids',
 			     filters    => { name => 'myadmin',
 					     tenant_id => 1,
 					     tenant_name => 'Madrid',
 					     id => 5 }}) 
-    ->status_is(200, 'admin_get_list HTTP STATUS')
-    ->json_is('/status' => '0', 'admin_all_ids API STATUS')
-    ->json_is('/result/rows/0/', 5, 'admin_all_ids NO UNDERGENERATE')
-    ->json_hasnt('/result/rows/1/' => 'admin_all_ids NO OVERGENERATE');
+    ->status_is(200, 'administrator_get_list HTTP STATUS')
+    ->json_is('/status' => '0', 'administrator_all_ids API STATUS')
+    ->json_is('/result/rows/0/', 5, 'administrator_all_ids NO UNDERGENERATE')
+    ->json_hasnt('/result/rows/1/' => 'administrator_all_ids NO OVERGENERATE');
 
 
 ####################
-### admin_tiny_list
+### administrator_tiny_list
 ####################
 
 $t->post_ok('/' => json => { login    => 'superadmin',              
 		             password => 'superadmin',              
-		             action   => 'admin_tiny_list',
+		             action   => 'administrator_tiny_list',
 			     filters    => { tenant_id => 1 }}) 
-    ->status_is(200, 'admin_tiny_list HTTP STATUS')
-    ->json_is('/status' => '0', 'admin_tiny_list API STATUS')
-    ->json_has('/result/rows/0/', 'admin_tiny_list NO UNDERGENERATE')
-    ->json_hasnt('/result/rows/4/' => 'admin_tiny_list NO OVERGENERATE');
+    ->status_is(200, 'administrator_tiny_list HTTP STATUS')
+    ->json_is('/status' => '0', 'administrator_tiny_list API STATUS')
+    ->json_has('/result/rows/0/', 'administrator_tiny_list NO UNDERGENERATE')
+    ->json_hasnt('/result/rows/4/' => 'administrator_tiny_list NO OVERGENERATE');
 
 ###################
 ### tenant_get_list
