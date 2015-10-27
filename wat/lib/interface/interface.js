@@ -778,12 +778,12 @@ Wat.I = {
     },
     
     hideSelectedItemsMenu: function () {
-        $('.js-pagination').animate({ 'marginRight': '0px' }, 200);
+        $('.js-pagination,.js-list,.js-shown-elements').animate({ 'marginRight': '0px' }, 200);
         $('.js-action-selected').hide( "slide" );
     },
     
     showSelectedItemsMenu: function () {
-        $('.js-pagination').animate({ 'marginRight': $('.js-action-selected').css('width') }, 200);
+        $('.js-pagination,.js-list,.js-shown-elements').animate({ 'marginRight': $('.js-action-selected').css('width') }, 200);
         $('.js-action-selected').show( "slide" );
     },
     

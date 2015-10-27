@@ -65,7 +65,7 @@
             <a class="fa fa-step-forward last button2"></a>
         </div>
     </div>
-    <div class="list bb-list">
+    <div class="list bb-list js-list">
 
     </div>
     <div class="shown-elements js-shown-elements second_row">
