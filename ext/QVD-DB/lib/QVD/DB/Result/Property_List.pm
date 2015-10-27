@@ -4,7 +4,7 @@ use base qw/DBIx::Class/;
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('properties_list');
 __PACKAGE__->add_columns(
-	id          => { data_type => 'integer' },
+	id          => { data_type => 'integer', is_auto_increment => 1 },
 			  key   => { data_type => 'varchar(1024)' },
 			  tenant_id  => { data_type         => 'integer' },
 	description => { data_type => 'varchar(1024)', is_nullable => 1 },
