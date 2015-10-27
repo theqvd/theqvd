@@ -21,7 +21,7 @@ plugin 'QVD::Admin4::REST';
 
 helper (get_input_json => \&get_input_json); 
 
-# Intended to get the JSON query that the API receives, process it and return a response 
+# Intended to get the JSON query that the API receives, process it and return a response
 
 helper (process_api_query => \&process_api_query); 
 
@@ -175,11 +175,11 @@ any [qw(POST GET)] => '/' => sub {
 # number of vms running, number vms in a host and so on.
 
 websocket '/ws' => sub {
-    my $c = shift;
-    $c->app->log->debug("WebSocket opened");
-    $c->inactivity_timeout(30000);     
-    my $json = $c->get_input_json;
-    my $notification = 0;
+	my $c = shift;
+	$c->app->log->debug("WebSocket opened");
+	$c->inactivity_timeout(30000);
+	my $json = $c->get_input_json;
+	my $notification = 0;
 	my %payload_hash;
 
 	my $res = $c->process_api_query($json);
@@ -189,27 +189,27 @@ websocket '/ws' => sub {
 	# database. When the database notifies in those channels, this ws executes the action again
 	# and sends the updated info to the client
 
-    for my $channel ($c->get_action_channels($json))
-    {
+	for my $channel ($c->get_action_channels($json))
+	{
 		$c->qvd_admin4_api->_pool->listen($channel,on_notify => sub {
 			my ($pg_pool, $channel, $pid, $payload) = @_;
 			%payload_hash = split(/[=;]/, $payload);
 			$payload_hash{channel} = $channel;
 			$notification = 1;
 		});
-    }
+	}
 
 	my $currentTenant = $c->qvd_admin4_api->{administrator}->tenant->id;
-    my $recurring = Mojo::IOLoop->recurring(
+	my $recurring = Mojo::IOLoop->recurring(
 		2 => sub {
 			my $received_tenant_id = $payload_hash{tenant_id} // -1;
 			if ($notification and (($currentTenant == 0) or
 				($received_tenant_id == -1) or
 				($received_tenant_id == $currentTenant))) {
 
-		   $c->app->log->debug("WebSocket refreshing information");
-		   my $res = $c->process_api_query($json);
-		   $c->send(b(encode_json($res))->decode('UTF-8'));
+				$c->app->log->debug("WebSocket refreshing information");
+				my $res = $c->process_api_query($json);
+				$c->send(b(encode_json($res))->decode('UTF-8'));
 			}
 
 			$notification = 0;
@@ -219,18 +219,18 @@ websocket '/ws' => sub {
 		}
 	);
 
-    my $timer;
-    $c->on(message => sub {
-        my ($c, $msg) = @_;
-        $c->app->log->debug("WebSocket $msg signal received");
-	Mojo::IOLoop->remove($timer) if $timer;
+	my $timer;
+	$c->on(message => sub {
+		my ($c, $msg) = @_;
+		$c->app->log->debug("WebSocket $msg signal received");
+		Mojo::IOLoop->remove($timer) if $timer;
 		$timer = Mojo::IOLoop->timer(25 => sub { $c->send('AKN'); } );
 	});
 
-    $c->on(finish => sub {
-        my ($c, $code) = @_;
-        Mojo::IOLoop->remove($timer) if $timer;
-        Mojo::IOLoop->remove($recurring) if $recurring;
+	$c->on(finish => sub {
+		my ($c, $code) = @_;
+		Mojo::IOLoop->remove($timer) if $timer;
+		Mojo::IOLoop->remove($recurring) if $recurring;
 		$c->app->log->debug("WebSocket closed with status $code");
 	});
 };
@@ -449,27 +449,27 @@ app->start;
 
 sub get_input_json
 {
-    my $c = shift;
-    my $json = $c->req->json;
-    deep_utf8_decode($json) if $json;
-    
-    unless ($json)
-    {
-		$json =  { map { $_ => b($c->param($_))->encode('UTF-8')->to_string } keys($c->req->params->to_hash) };
- 
-	eval
-	{
-	    $json->{filters} =  decode_json($json->{filters}) if exists $json->{filters};
-	    $json->{arguments} = decode_json($json->{arguments}) if exists $json->{arguments};
-	    $json->{order_by} = decode_json($json->{order_by}) if exists $json->{order_by};
-	    $json->{fields} = decode_json($json->{fields}) if exists $json->{fields};
-	    $json->{parameters} = decode_json($json->{parameters}) if exists $json->{parameters}
-	};
+	my $c = shift;
+	my $json = $c->req->json;
+	deep_utf8_decode($json) if $json;
 
-	$c->render(json => QVD::Admin4::Exception->new(code => 6100)->json) if $@;
-    }
-    $json->{parameters}->{remote_address} = $c->tx->remote_address; # For Log purposes
-    $json;
+	unless ($json)
+	{
+		$json =  { map { $_ => b($c->param($_))->encode('UTF-8')->to_string } keys($c->req->params->to_hash) };
+
+		eval
+		{
+			$json->{filters} =  decode_json($json->{filters}) if exists $json->{filters};
+			$json->{arguments} = decode_json($json->{arguments}) if exists $json->{arguments};
+			$json->{order_by} = decode_json($json->{order_by}) if exists $json->{order_by};
+			$json->{fields} = decode_json($json->{fields}) if exists $json->{fields};
+			$json->{parameters} = decode_json($json->{parameters}) if exists $json->{parameters}
+		};
+
+		$c->render(json => QVD::Admin4::Exception->new(code => 6100)->json) if $@;
+	}
+	$json->{parameters}->{remote_address} = $c->tx->remote_address; # For Log purposes
+	$json;
 }
 
 sub process_api_query
