@@ -551,6 +551,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     storeAllSelectedIds: function (that) {
         var maxSelectableItems = 2000;
+        console.log(that.retrievedData);
         if (that.retrievedData.rows.length > maxSelectableItems) {
             that.selectedItems = that.retrievedData.rows.slice(0, maxSelectableItems);
         }
@@ -1232,8 +1233,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     resetSelectedItems: function () {
         if (this.selectedItems.length > 0) {
-            $('.js-action-selected').hide( "slide" );
-            $('.js-pagination').css('margin-right', 'auto');
+            Wat.I.hideSelectedItemsMenu();
         }
         this.selectedAll = false;
         this.selectedItems = [];

@@ -761,12 +761,10 @@ Wat.I = {
         $('.elements-selected').html(selectedItems);
         
         if (selectedItems == 0) {
-            $('.js-pagination').css('margin-right', 'auto');
-            $('.js-action-selected').hide( "slide" );
+            this.hideSelectedItemsMenu();
         }
         else {
-            $('.js-pagination').css('margin-right', $('.js-action-selected').css('width'));
-            $('.js-action-selected').show( "slide" );
+            this.showSelectedItemsMenu();
             
             if (selectedItems == 1) {
                 $('.js-only-one').show();
@@ -777,6 +775,16 @@ Wat.I = {
                 $('.js-only-one').hide();
             }
         }
+    },
+    
+    hideSelectedItemsMenu: function () {
+        $('.js-pagination').animate({ 'marginRight': '0px' }, 200);
+        $('.js-action-selected').hide( "slide" );
+    },
+    
+    showSelectedItemsMenu: function () {
+        $('.js-pagination').animate({ 'marginRight': $('.js-action-selected').css('width') }, 200);
+        $('.js-action-selected').show( "slide" );
     },
     
     confirm: function (templateName, successCallback, that, loadingBlock) {        
