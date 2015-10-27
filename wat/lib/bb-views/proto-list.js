@@ -551,7 +551,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     storeAllSelectedIds: function (that) {
         var maxSelectableItems = 2000;
-        console.log(that.retrievedData);
+        
         if (that.retrievedData.rows.length > maxSelectableItems) {
             that.selectedItems = that.retrievedData.rows.slice(0, maxSelectableItems);
         }

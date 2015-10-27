@@ -115,7 +115,6 @@ Wat.I.C = {
                     });
                 },
                 error: function (e) {
-                    console.error(e);
                     i++;
                     
                     if (sassFiles[i]) {
@@ -181,10 +180,8 @@ Wat.I.C = {
         var filename = Wat.I.C.customVarFilename;
         
         Wat.I.C.sass.writeFile(filename, content, function callback(success) {
-            console.log(success);
             if (success) {
                 Wat.I.C.sass.compileFile('/style.scss', function (result) {
-                    console.log(result);
                     if (result.status == 0) {
                         var blob = new Blob([result.text], {type: "text/plain;charset=utf-8"});
                         Wat.I.loadingUnblock();
