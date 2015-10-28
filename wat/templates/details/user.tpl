@@ -33,7 +33,7 @@
             enabled = true;
         }
     %>
-        <a class="button button-icon--desktop js-button-disconnect-all-vms fa fa-plug fright <%= enabled ? '' : 'hidden' %>" data-enabled="<%= enabled %>" href="javascript:" data-i18n="[title]Disconnect from all VMs"><span data-i18n="Disconnect from all VMs" class="mobile"></span></a>
+        <a class="button button-icon--desktop js-button-disconnect-all-vms fa fa-plug fright <%= enabled ? '' : 'hidden' %>" data-enabled="<%= enabled %>" href="javascript:" data-i18n="[title]Disconnect"><span data-i18n="Disconnect" class="mobile"></span></a>
     <% 
     } 
     %>

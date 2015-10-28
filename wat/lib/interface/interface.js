@@ -107,42 +107,6 @@ Wat.I = {
         this.formFilters = $.extend(true, {}, this.formDefaultFilters);
     },
     
-    getCurrentCustomization: function (qvdObj) {
-        var currentCustomization = {};
-
-        var listFields = this.getListColumns(qvdObj);
-        
-        // Get default values for custom columns
-        var listFieldsByField = {};
-        $.each(listFields, function (fieldName, column) {
-            $.each(column.fields, function (iField, field) {
-                currentCustomization[field] = currentCustomization[field] || {};
-                currentCustomization[field]['listFields'] = currentCustomization[field]['listFields'] || {};
-                currentCustomization[field]['listFields'][fieldName] = column.display;
-            });
-        });
-        
-        //return listFieldsByField;
-        var formFilters = this.getFormFilters(qvdObj);
-
-        // Get default values for custom filters
-        var formFiltersByField = {desktop: {}, mobile: {}};
-        $.each(formFilters, function (fieldName, filter) {
-            var field = filter.filterField;
-            // For desktop
-            currentCustomization[field] = currentCustomization[field] || {};
-            currentCustomization[field]['desktopFilters'] = currentCustomization[field]['desktopFilters'] || {};
-            currentCustomization[field]['desktopFilters'][fieldName] = filter.displayDesktop; 
-            
-            // For mobile
-            currentCustomization[field] = currentCustomization[field] || {};
-            currentCustomization[field]['mobileFilters'] = currentCustomization[field]['mobileFilters'] || {};
-            currentCustomization[field]['mobileFilters'][fieldName] = filter.displayMobile;
-        });
-        
-        return currentCustomization;
-    },
-    
     setCustomizationFields: function (qvdObj) {
         return;
         var filters = {};
@@ -608,77 +572,6 @@ Wat.I = {
     
     updateLoginOnMenu: function () {
         $('.js-menu-corner').find('.js-login').html(Wat.C.login);
-    },
-    
-    
-    fillCustomizeOptions: function (qvdObj) { 
-        var listFields = this.listFields[qvdObj]
-        var head = '<tr><th data-i18n="Column">' + i18n.t('Column') + '</th><th data-i18n="Show">' + i18n.t('Show') + '</th></tr>';
-        var selector = '.js-customize-columns table';
-        $(selector + ' tr').remove();
-        $(selector).append(head);
-
-        $.each(listFields, function (fName, field) {
-            if (field.fixed) {
-                return;
-            }
-
-            var cellContent = Wat.I.controls.CheckBox({checked: field.display});
-            
-            var fieldText = field.text;
-            
-            if (field.noTranslatable) {
-                var fieldTextTranslated = field.text;
-            }
-            else {
-                var fieldTextTranslated = i18n.t(field.text);
-            }
-            
-            var row = '<tr><td data-i18n="' + fieldText + '">' + fieldTextTranslated + '</td><td class="center">' + cellContent + '</td></tr>';
-            
-            $(selector).append(row);
-        });
-        
-        var formFilters = this.formFilters[qvdObj]
-        var head = '<tr><th data-i18n="Filter control">' + i18n.t('Filter control') + '</th><th data-i18n="Desktop version">' + i18n.t('Desktop version') + '</th><th data-i18n="Mobile version">' + i18n.t('Mobile version') + '</th></tr>';
-        var selector = '.js-customize-filters table';
-        $(selector + ' tr').remove();
-        $(selector).append(head);
-
-        $.each(formFilters, function (fName, field) {
-            if (field.fixed) {
-                return;
-            }
-
-            var cellContentDesktop = Wat.I.controls.CheckBox({checked: field.display && field.device != 'mobile'});
-            var cellContentMobile = Wat.I.controls.CheckBox({checked: field.display && field.device != 'desktop'});
-            
-            var fieldType = '';
-            switch(field.type) {
-                case 'text':
-                    fieldType = 'Text input';
-                    break;
-                case 'select':
-                    fieldType = 'Combo box';
-                    break;
-            }
-            
-            var fieldText = field.text;
-            
-            if (field.noTranslatable) {
-                var fieldTextTranslated = field.text;
-            }
-            else {
-                var fieldTextTranslated = i18n.t(field.text);
-            }
-            
-            var rowField = '<td><div data-i18n="' + fieldText + '">' + fieldTextTranslated + '</div><div class="second_row" data-i18n="' + fieldType + '">' + i18n.t(fieldType) + '</div></td>';
-            var rowMobile = '<td class="center">' + cellContentDesktop + '</td>';
-            var rowDesktop = '<td class="center">' + cellContentMobile + '</td></tr>';
-            var row = '<tr>' + rowField + rowMobile + rowDesktop + '</tr>';
-            
-            $(selector).append(row);
-        });
     },
     
     controls: {

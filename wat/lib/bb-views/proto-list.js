@@ -545,8 +545,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             this.resetSelectedItems ();
             Wat.I.updateSelectedItems(this.selectedItems.length);
         }
-        
-        Wat.I.updateSelectedItems(this.selectedItems.length);
     },
     
     storeAllSelectedIds: function (that) {

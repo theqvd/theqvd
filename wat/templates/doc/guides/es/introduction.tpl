@@ -1003,9 +1003,38 @@ Captura
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_user_list.png" alt="screenshot_user_list.png" width="960px" />
-</span></p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Vista listado básica
+</dt>
+<dd>
+<p>
+<span class="image">
+<img src="images/doc_images/interface_list.png" alt="interface_list.png" width="960px" />
+</span>
+</p>
+</dd>
+<dt class="hdlist1">
+Vista listado tras aplicar un filtro
+</dt>
+<dd>
+<p>
+<span class="image">
+<img src="images/doc_images/interface_list_filtered.png" alt="interface_list_filtered.png" width="960px" />
+</span>
+</p>
+</dd>
+<dt class="hdlist1">
+Vista listado tras aplicar un filtro y seleccionar un elemento
+</dt>
+<dd>
+<p>
+<span class="image">
+<img src="images/doc_images/interface_list_checked.png" alt="interface_list_checked.png" width="960px" />
+</span>
+</p>
+</dd>
+</dl></div>
 </div></div>
 </li>
 <li>
@@ -1015,7 +1044,7 @@ Captura por componentes
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/interface_list.png" alt="interface_list.png" width="960px" />
+<img src="images/doc_images/interface_list_components.png" alt="interface_list_components.png" width="960px" />
 </span></p></div>
 </div></div>
 </li>
@@ -1072,7 +1101,7 @@ También es posible <strong>seleccionar todos los elementos de un solo click</st
 </li>
 <li>
 <p>
-<strong>Control de acciones masivas</strong> sobre elementos seleccionados. Se seleccionará una opción del menú desplegable y se hará click en “Aplicar”. Entre estas acciones se encuentran eliminar, bloquear, desbloquear y otras más concretas de cada vista como por ejemplo arrancar y parar máquinas virtuales.
+<strong>Control de acciones masivas</strong> sobre elementos seleccionados. Cuando seleccionamos una o varios elementos de la lista mediante la columna de casillas de verificación, aparecerá a la derecha un menú con las acciones disponibles sobre los elementos seleccionados. Entre estas acciones se encuentran editar, eliminar, bloquear, desbloquear y otras más concretas de cada vista como por ejemplo arrancar y parar máquinas virtuales.
 </p>
 </li>
 <li>
@@ -1376,7 +1405,7 @@ Gestionar sus propios ACLs, pudiendo llegar a tener permisos totales o incluso p
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-28 15:20:15 CEST
+Last updated 2015-10-28 10:59:59 CET
 </div>
 </div>
 </body>

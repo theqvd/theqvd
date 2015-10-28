@@ -242,7 +242,7 @@ Wat.I.selectedActions[qvdObj] = {
         'iconClass': 'fa fa-unlock-alt'
     },
     'disconnect_all': {
-        'text': 'Disconnect from all VMs',
+        'text': 'Disconnect',
         'acls': 'vm.update-massive.disconnect-user',
         'iconClass': 'fa fa-plug'
     },
