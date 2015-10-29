@@ -1179,6 +1179,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     that.applyStop(that);
                 }
                 break;
+            case 'default':
+                that.applyDefault(that);
+                break;
             case 'disconnect':
                 if (elementsOutOfView) {
                     Wat.I.confirm('dialog/confirm-out-of-view', that.applyDisconnect, that, loadingBlock);

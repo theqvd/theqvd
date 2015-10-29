@@ -331,10 +331,15 @@ Wat.I.selectedActions[qvdObj] = {
         'aclsLogic': 'OR',
         'iconClass': 'fa fa-pencil'
     },
+    'default': {
+        'text': 'Default image',
+        'acls': 'di.update.default',
+        'iconClass': 'fa fa-home',
+        'otherClass': 'js-only-one'
+    }, 
     'block': {
         'text': 'Block',
         'acls': 'di.update-massive.block',
-        'iconClass': 'fa fa-trash',
         'iconClass': 'fa fa-lock'
     },           
     'unblock': {

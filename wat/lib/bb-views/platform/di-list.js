@@ -38,6 +38,23 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         this.updateModel(arguments, filters, this.checkMachinesChanges, auxModel);
     },
     
+    applyDefault: function (that) {
+        // Came from list view
+        var id = that.applyFilters.id[0];
+        var checkMachinesChanges = that.checkMachinesChanges;
+        that.model = that.collection.where({id: id})[0];
+        
+        var arguments = {
+            "__tags_changes__": {
+                'create': ['default'],
+            }
+        }
+        
+        that.tagChanges = arguments['__tags_changes__'];
+
+        that.updateModel(arguments, {id: id}, checkMachinesChanges);
+    },
+    
     openNewElementDialog: function (e) {
         this.model = new Wat.Models.DI();
         this.dialogConf.title = $.i18n.t('New Disk image');
