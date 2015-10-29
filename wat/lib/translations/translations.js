@@ -5,6 +5,19 @@ Wat.T = {
     initTranslate: function(lan) {        
         lan = lan || Wat.C.language;
         
+        lan = this.getLanguage(lan);
+        
+        $.i18n.init({
+            resGetPath: APP_PATH + 'lib/translations/dictionaries/' + lan + '.json',
+            useLocalStorage: false,
+            debug: false,
+            fallbackLng: 'en',
+        }, this.translateAndShow);
+        
+        this.lan = lan;
+    },
+    
+    getLanguage: function (lan) {
         // If language is not among the WAT supported languages, check the tenant language
         if ($.inArray(lan, Object.keys(WAT_LANGUAGES)) == -1) {
             // If language is default, check if tenant language is among the WAT supported languages
@@ -17,14 +30,7 @@ Wat.T = {
             }
         }
 
-        $.i18n.init({
-            resGetPath: APP_PATH + 'lib/translations/dictionaries/' + lan + '.json',
-            useLocalStorage: false,
-            debug: false,
-            fallbackLng: 'en',
-        }, this.translateAndShow);
-        
-        this.lan = lan;
+        return lan;
     },
     
     // After all the translations do custom actions that need to have the content translated

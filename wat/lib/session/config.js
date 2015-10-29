@@ -481,6 +481,11 @@ Wat.C = {
         // Setup jQuery ajax to store all requests in a requests queue
         $.ajaxSetup({
             beforeSend: function(jqXHR) {
+                // Dictionary calls will not be stored
+                if (jqXHR.requestURL.indexOf('dictionaries') != -1) {
+                    return;
+                }
+                
                 Wat.C.requests.push(jqXHR);
             },
             complete: function(jqXHR) {
@@ -489,6 +494,11 @@ Wat.C = {
                     Wat.C.requests.splice(index, 1);
                 }
             }
+        });
+        
+		// Attach request url to ajax data
+        $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
+            jqXHR.requestURL = options.url;   
         });
     },
     

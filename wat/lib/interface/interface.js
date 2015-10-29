@@ -342,14 +342,13 @@ Wat.I = {
     },
     
     enableDataPickers: function () {
-        $('.datetimepicker').datetimepicker({
+        var options = {
             dayOfWeekStart: 1,
-            lang: Wat.C.language,
             format:'Y-m-d H:i',
             minDate: 0
-        });
+        };
         
-        $('.datepicker-past').datetimepicker({
+        var optionsPast = {
             dayOfWeekStart: 1,
             lang: Wat.C.language,
             format:'Y-m-d',
@@ -359,7 +358,17 @@ Wat.I = {
                 $(target).trigger('input');
             },
             closeOnDateSelect: true
-        });
+        };
+        
+        if (Wat.C.language != 'auto') {
+            var lan = Wat.T.getLanguage(Wat.C.language);
+            options['lang'] = lan;
+            optionsPast['lang'] = lan;
+        }
+        
+        $('.datetimepicker').datetimepicker(options);
+        
+        $('.datepicker-past').datetimepicker(optionsPast);
     },
     
     chosenConfiguration: function () {
