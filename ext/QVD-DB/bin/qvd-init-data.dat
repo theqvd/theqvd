@@ -1,10 +1,3 @@
-### Config ###
-
-key	value	tenant_id
-
-wat.multitenant	1	0
-
-
 ### Tenant ###
 
 id	name	description
@@ -12,6 +5,13 @@ id	name	description
 -1	-	invalid tenant
 0	*	supertenant
 1	default	tenant1
+
+
+### Config ###
+
+key	value	tenant_id
+
+wat.multitenant	1	-1
 
 
 ### Administrator ###

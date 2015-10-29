@@ -306,6 +306,9 @@ sub config_delete
 {
     my ($self,$request) = @_;
 
+	# Raise an exception if admin cannot delete config
+	$self->is_admin_allowed_to_config($request);
+
     my $result = $self->delete($request, conditions => [qw(is_not_custom_config)]);
 
     QVD::Config::reload(); # To refresh config tokens in QVD::Config 
@@ -318,6 +321,9 @@ sub config_delete
 sub config_default
 {
     my ($self,$request) = @_;
+
+	# Raise an exception if admin cannot modify config
+	$self->is_admin_allowed_to_config($request);
 
     my $result = $self->delete($request, conditions => [qw(is_custom_config)]);
 
@@ -336,13 +342,17 @@ sub create
     my $obj;
     eval 
     {
-	$DB->txn_do( sub { $self->$_($request) for @$conditions;
+		$DB->txn_do(
+			sub {
+				$self->$_($request) for @$conditions;
 			   $obj = $DB->resultset($request->table)->create($request->arguments); 
                            # Create tables related to the main object (i.e. vm_runtimes for vms)
 			   $self->create_related_objects($request,$obj);
                            # Assign and unassign other objects to the main objects (i.e. tags for dis, acls for roles, properties for vms...)
 			   $self->exec_nested_queries($request,$obj);
-			   $result->{rows} = [ $obj ] } )
+				$result->{rows} = [ $obj ]
+			}
+		)
     };
     
     print $@ if $@;
@@ -427,10 +437,15 @@ sub create_or_update
 sub config_set
 {
     my ($self,$request) = @_;
+
+	# Raise an exception if admin cannot modify config
+	$self->is_admin_allowed_to_config($request);
+
+	# Modify parameter if no exception is raised
     my $result = $self->create_or_update($request);
 
     QVD::Config::reload(); # To refresh config tokens in QVD::Config 
-    $result;
+	return $result;
 }
 
 # FOR EXECUTION OF VMs
@@ -1017,6 +1032,41 @@ sub is_custom_config
     return 1;
 }
 
+# Check if the current admin is allowed to change the specified configuration
+
+sub is_admin_allowed_to_config
+{
+	my ($self,$request) = @_;
+
+	# Get current administrator
+	my $admin = $request->qvd_object_model->current_qvd_administrator;
+
+	# Check if configuration parameter to be changed is a global parameter
+	my $col = QVD::Admin4::ConfigsOverwriteList->new(admin_id => $admin->id);
+	my $col_re = $col->configs_global_re;
+	my $general_config = ($request->get_adequate_value('key') =~ /$col_re/);
+
+	# Get the tenant_id the change will take place
+	my $tenant_id = $request->get_adequate_value('tenant_id') // $admin->tenant_id;
+
+	# Common administrators can only modify configuration in his tenant
+	if(!$admin->is_superadmin && ($admin->tenant_id != $tenant_id)){
+		QVD::Admin4::Exception->throw(code => 4230);
+	}
+
+	# Local tokens cannot be defined as global
+	if($tenant_id == -1 && !$general_config){
+		QVD::Admin4::Exception->throw(code => 7380);
+	}
+
+	# Global tokens cannot be defined locally for a tenant
+	if($tenant_id != -1 && $general_config){
+		QVD::Admin4::Exception->throw(code => 7381);
+	}
+
+	return 1;
+}
+
 ######################################
 ## AD HOC FUNCTIONS WITHOUT REQUEST
 ######################################
@@ -1330,15 +1380,19 @@ sub top_populated_hosts
 sub config_preffix_get
 {
     my ($self,$admin,$json_wrapper) = @_;
-    my @keys = cfg_keys; 
+
+	# Tenant is sent as an argument if superadmin
+	my $tenant = $admin->is_superadmin ? $json_wrapper->get_filter_value("tenant_id") : $admin->tenant_id;
+
+	my @keys = cfg_keys($tenant);
     my %preffix;
 
-# Several configuration tokens of the sistem are not allowed to be used from the API
-# The class QVD::Admin4::ConfigsOverwriteList provides the regex that defines the
-# tokens available from the API.
+	# Several configuration tokens of the sistem are not allowed to be used from the API
+	# The class QVD::Admin4::ConfigsOverwriteList provides the regex that defines the
+	# tokens available from the API.
 
     my $col = QVD::Admin4::ConfigsOverwriteList->new(admin_id => $admin->id);
-    my $col_re = $col->configs_to_show_re;
+	my $col_re = $col->configs_to_show_re($tenant);
     my $unclassified;
 
     for (@keys)
@@ -1363,15 +1417,18 @@ sub config_get
 {
     my ($self,$admin,$json_wrapper) = @_;
 
-# Several configuration tokens of the sistem are not allowed to be used from the API
-# The class QVD::Admin4::ConfigsOverwriteList provides the regex that defines the
-# tokens available from the API.
+	# Tenant is sent as an argument if superadmin
+	my $tenant = $admin->is_superadmin ? $json_wrapper->get_filter_value("tenant_id") : $admin->tenant_id;
+
+	# Several configuration tokens of the sistem are not allowed to be used from the API
+	# The class QVD::Admin4::ConfigsOverwriteList provides the regex that defines the
+	# tokens available from the API.
 
     my $col = QVD::Admin4::ConfigsOverwriteList->new(admin_id => $admin->id);
-    my $col_re = $col->configs_to_show_re;
+	my $col_re = $col->configs_to_show_re($tenant);
     my $cp = $json_wrapper->get_filter_value('key');
     my $cp_re = $json_wrapper->get_filter_value('key_re');
-    my @keys = cfg_keys;
+	my @keys = cfg_keys($tenant);
     @keys = grep { $_ =~ /\Q$cp\E/ } @keys if $cp;
     @keys = grep { $_ =~ /$cp_re/ } @keys if $cp_re;
     @keys = grep { $_ =~ /$col_re/ } @keys;
@@ -1390,7 +1447,7 @@ sub config_get
 
    { total => $total,
      rows => [ map {{ key => $_, 
-		      operative_value => cfg($_), 
+	operative_value => cfg($_, $tenant),
 		      default_value => (defined eval{ core_cfg($_)} ? core_cfg($_) : undef) }} @keys ] };
 }
 

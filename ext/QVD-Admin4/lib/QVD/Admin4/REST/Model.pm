@@ -60,7 +60,7 @@ my $TYPES_OF_ACTION_TO_LOG_MAPPER =
 
 # List of QVD objects directly assigned to a tenant.
 
-my $DIRECTLY_TENANT_RELATED = [qw(User Administrator Role OSF Tenant_Views_Setup)];
+my $DIRECTLY_TENANT_RELATED = [qw(User Administrator Role OSF Tenant_Views_Setup Config)];
 
 # Mappers for identity operators between API and DBIx::Class
 # The majority of operators are just the same
@@ -542,7 +542,7 @@ my $AVAILABLE_FILTERS =
 		
     tiny => { default => [qw(tenant_id)], Host => [qw()], Role => [qw(internal fixed tenant_id)], ACL => [qw(name)], Tenant => [qw(id)], DI_Tag => [qw(tenant_id osf_id)]},
 
-    delete => { default => [qw(id tenant_id)], Config => [qw(key value)], Host => [qw(id)], Role => [qw(id)],Tenant => [qw(id)],
+    delete => { default => [qw(id tenant_id)], Config => [qw(tenant_id key value)], Host => [qw(id)], Role => [qw(id)],Tenant => [qw(id)],
                 Tenant_Views_Setup => [qw(tenant_id qvd_object)],
                 Administrator_Views_Setup => [qw(qvd_object)]}, # Every admin is able to delete just its own views, so you cannot filter by admin or id. Suitable admin_id forzed in Request.pm
 
@@ -563,7 +563,7 @@ my $AVAILABLE_FIELDS =
 
 	      Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time antiquity status source ip type_of_action qvd_object object_deleted admin_deleted superadmin)],
 
-	      Config => [qw(key value)],
+	      Config => [qw(key value tenant_id)],
 
 	      OSF => [qw(id name description overlay user_storage memory  number_of_vms number_of_dis properties creation_date creation_admin_id creation_admin_name)],
 
@@ -614,7 +614,7 @@ my $AVAILABLE_FIELDS =
     details => { default => [],
 
 		 Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time antiquity status source ip type_of_action qvd_object object_deleted admin_deleted superadmin)],
-		 Config => [qw(key value)],
+		 Config => [qw(tenant_id key value)],
 
 		 OSF => [qw(id name description overlay user_storage memory  number_of_vms number_of_dis properties creation_date creation_admin_id creation_admin_name)],
 		 
@@ -667,9 +667,9 @@ my $AVAILABLE_FIELDS =
 	       
 	       Host => [qw(number_of_vms_connected)]},
     
-    create => { 'default' => [qw(id)], Config => [qw(key)]},
+    create => { 'default' => [qw(id)], Config => [qw(key tenant_id)]},
 
-    create_or_update => { 'default' => [qw(id)], 'Config' => [qw(key)] }
+    create_or_update => { 'default' => [qw(id)], 'Config' => [qw(key tenant_id)] }
 
 };
 
@@ -689,7 +689,7 @@ my $MANDATORY_FILTERS =
 
     delete => { default => [qw(id)], Config => [qw(key)], Administrator_Views_Setup => [qw()], Tenant_Views_Setup => [qw()]},
 
-    update=> { default => [qw(id)], Config => [qw(key)]}, 
+    update=> { default => [qw(id)], Config => [qw(key tenant_id)]},
 
     exec => { default => [qw()]}, 
 
@@ -775,7 +775,7 @@ my $AVAILABLE_ARGUMENTS = { Config => [qw(value)],
 
 # Available arguments for creation actions
 
-my $MANDATORY_ARGUMENTS = { Config => [qw(key value)],
+my $MANDATORY_ARGUMENTS = { Config => [qw(tenant_id key value)],
 			    User => [qw(tenant_id name password blocked)],
 			    VM => [qw(name user_id ip osf_id di_tag state user_state blocked)],
 			    Host => [qw(name address frontend backend blocked state)],
@@ -863,7 +863,8 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 
     Config => {
 	'key' => 'me.key',
-	'value' => 'me.value'
+	'value' => 'me.value',
+	'tenant_id' => 'me.tenant_id',
     },
 
     ACL => {
@@ -1191,7 +1192,8 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 
     Config => {
 	'key' => 'me.key',
-	'value' => 'me.value'
+	'value' => 'me.value',
+	'tenant_id' => 'me.tenant_id'
     },
 
     ACL => {
@@ -1519,6 +1521,8 @@ my $DBIX_JOIN_VALUE =
 
     Role => [ 'admin_rels', {role_rels => 'inherited'}, {parent_role_rels => 'inheritor'}, { acl_rels => 'acl'}, qw(tenant creation_log_entry)],
 		
+	Config => [ qw(tenant) ],
+
     Administrator => [qw(tenant wat_setups), { role_rels => { role => { acl_rels => 'acl' }}}, qw(creation_log_entry)],
 
     Tenant => [qw(wat_setups creation_log_entry)],

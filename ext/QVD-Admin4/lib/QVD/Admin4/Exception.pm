@@ -113,6 +113,9 @@ my $code2message_mapper =
     7371 => 'Non core config items haven\'t default value',
     7372 => 'Unable to remove a core config item',
     7373 => 'Unable to switch to monotenant mode - More than one tenant in the system',
+	7380 => 'Local configuration tokens cannot be set as global tokens',
+	7381 => 'Global configuration tokens cannot be set locally for a tenant',
+
 };
 
 # When an exception is thrown by DBIx::Class, it is catched and passed as a parameter 

@@ -241,30 +241,29 @@ sub check_config_token_availability
 {
     my $self = shift;
 
-# This code gives a regex that denotes the set of acls that can be 
-# accessed via API. If the config token requested doesn't match this regex
-# it is an unavailable one
+	# This code gives a regex that denotes the set of acls that can be
+	# accessed via API. If the config token requested doesn't match this regex
+	# it is an unavailable one
+	my $token = $self->get_adequate_value('key');
 
-    my $col = QVD::Admin4::ConfigsOverwriteList->new(admin_id => $ADMIN->id);
-    my $col_re = $col->configs_to_show_re;
+	my $tenant = $ADMIN->is_superadmin ? $self->get_adequate_value('tenant_id') : $ADMIN->tenant_id;
 
-    my $token = $self->qvd_object_model->type_of_action eq 'delete' ?
-	$self->json_wrapper->get_filter_value('key') : 
-	$self->json_wrapper->get_argument_value('key');
+	my $col = QVD::Admin4::ConfigsOverwriteList->new(admin_id => $ADMIN->id);
+	my $col_re = $col->configs_to_show_re($tenant);
 
     QVD::Admin4::Exception->throw(code => 6380, object => $token) 
 	unless $token =~ /$col_re/;
 
-# This code forbids the switch to monotenant mode if
-# in the system there are multiple tenants
+	# This code forbids the switch to monotenant mode if
+	# in the system there are multiple tenants
 
     my $token_value = $self->qvd_object_model->type_of_action eq 'delete' ?
 	'0' : $self->json_wrapper->get_argument_value('value');
 
     my $false_in_postgres = '^(f(alse)?|no?|off|0)$';
 
-    QVD::Admin4::Exception->throw(code => 7373) if 
-	$token eq 'wat.multitenant' &&
+	QVD::Admin4::Exception->throw(code => 7373)
+		if $token eq 'wat.multitenant' &&
 	$token_value =~ /$false_in_postgres/ &&
         # There are more than 1 normal tenant 
         # (in addition to tenant 0 for superadmins)
@@ -826,6 +825,15 @@ sub set_parameter
 {
     my ($self,$k,$v) = @_;
     $self->parameters->{$k} = $v;
+}
+
+# Returns the value of the key passed as argument from the filter list
+# or the argument list depending of the type of the action
+sub get_adequate_value{
+	my ($self, $key) = @_;
+	return $self->qvd_object_model->type_of_action eq 'delete' ?
+		$self->json_wrapper->get_filter_value($key) :
+		$self->json_wrapper->get_argument_value($key);
 }
 
 sub action 
