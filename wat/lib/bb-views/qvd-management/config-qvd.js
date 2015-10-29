@@ -295,6 +295,10 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
                     "value": value
                 };
                 
+                if (Wat.C.isSuperadmin) {
+                    this.configActionArguments['tenant_id'] = this.selectedTenant;
+                }
+                
                 Wat.I.confirm('dialog/config-change', this.applySave, this);
                 
                 break;
@@ -303,12 +307,20 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
                     "key": token,
                 };
                 
+                if (Wat.C.isSuperadmin) {
+                    this.configActionFilters['tenant_id'] = this.selectedTenant;
+                }
+                
                 Wat.I.confirm('dialog/config-change', this.applySetDefault, this);
                 break;
             case 'delete':
                 this.configActionFilters = {
                     "key": token,
                 };
+                
+                if (Wat.C.isSuperadmin) {
+                    this.configActionFilters['tenant_id'] = this.selectedTenant;
+                }
                 
                 Wat.I.confirm('dialog/config-change', this.applyDelete, this);
                 break;
@@ -356,6 +368,10 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         };
         
         this.createdKey = key;
+        
+        if (Wat.C.isSuperadmin) {
+            arguments['tenant_id'] = this.selectedTenant;
+        }
         
         Wat.A.performAction('config_set', arguments, {}, {'error': i18n.t('Error creating'), 'success': i18n.t('Successfully created')}, this.afterCreateToken, this);
     },
