@@ -67,7 +67,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
                 
 
         var filter = {};
-        if (Wat.C.isSuperadmin) {
+        if (Wat.C.isSuperadmin()) {
             filter['tenant_id'] = that.selectedTenant;
         }
                 
@@ -201,7 +201,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
             }
             
             var filter = {};
-            if (Wat.C.isSuperadmin) {
+            if (Wat.C.isSuperadmin()) {
                 filter['tenant_id'] = this.selectedTenant;
             }
             
@@ -233,7 +233,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         $('.bb-config-tokens').html(HTML_MINI_LOADING);
         
         var filter = {};
-        if (Wat.C.isSuperadmin) {
+        if (Wat.C.isSuperadmin()) {
             filter['tenant_id'] = this.selectedTenant;
         }
         
@@ -295,7 +295,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
                     "value": value
                 };
                 
-                if (Wat.C.isSuperadmin) {
+                if (Wat.C.isSuperadmin()) {
                     this.configActionArguments['tenant_id'] = this.selectedTenant;
                 }
                 
@@ -307,7 +307,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
                     "key": token,
                 };
                 
-                if (Wat.C.isSuperadmin) {
+                if (Wat.C.isSuperadmin()) {
                     this.configActionFilters['tenant_id'] = this.selectedTenant;
                 }
                 
@@ -318,7 +318,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
                     "key": token,
                 };
                 
-                if (Wat.C.isSuperadmin) {
+                if (Wat.C.isSuperadmin()) {
                     this.configActionFilters['tenant_id'] = this.selectedTenant;
                 }
                 
@@ -369,7 +369,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         
         this.createdKey = key;
         
-        if (Wat.C.isSuperadmin) {
+        if (Wat.C.isSuperadmin()) {
             arguments['tenant_id'] = this.selectedTenant;
         }
         
@@ -395,7 +395,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     
     afterChangeToken: function (that) {
         var filter = {};
-        if (Wat.C.isSuperadmin) {
+        if (Wat.C.isSuperadmin()) {
             filter['tenant_id'] = that.selectedTenant;
         }
         
