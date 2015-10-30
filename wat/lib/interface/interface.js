@@ -257,10 +257,14 @@ Wat.I = {
 
         this.showContent();
 
+		// Header will be shown in logout ever
+        if (firstLoad || window.location.hash == '#/logout') {
+            $('.header-wrapper').css('visibility','visible').hide().fadeIn('fast');
+        }
+
         if (firstLoad) {
             $('.wrapper').css('visibility','visible').hide().fadeIn('fast');
             $('.menu').css('visibility','visible');
-            $('.header-wrapper').css('visibility','visible').hide().fadeIn('fast');
             $('.js-content').css('visibility','visible').hide().fadeIn('fast');
             $('.breadcrumbs').css('visibility','visible').hide().fadeIn('fast');
             $('.js-menu-corner').css('visibility','visible');

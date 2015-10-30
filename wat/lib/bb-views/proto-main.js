@@ -35,6 +35,12 @@ Wat.Views.MainView = Backbone.View.extend({
             that.afterRender(); 
             return that; 
         }); 
+
+		// If any message os sent from last refresh, show it and delete cookie
+        if ($.cookie('messageToShow')) {
+            Wat.I.M.showMessage(JSON.parse($.cookie('messageToShow')));
+            $.removeCookie('messageToShow', {path: '/'});
+        }
     },
     
     addCommonTemplates: function () {
