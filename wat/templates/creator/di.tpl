@@ -25,14 +25,14 @@
         <td data-i18n="Disk image"></td>
         <td>
             <form id="form_file_update">
-            <input type="file" name="disk_image_file" class="col-width-100"></select>
+            <input type="file" name="disk_image_file" class="col-width-100" data-required></select>
             </form>
         </td>
     </tr>
     <tr class="image_url_row">
         <td data-i18n="Disk image's URL"></td>
         <td>
-            <input type="text" name="disk_image_url" class="col-width-100"></select>
+            <input type="text" name="disk_image_url" class="col-width-100" data-required></select>
         </td>
     </tr>
     <% 

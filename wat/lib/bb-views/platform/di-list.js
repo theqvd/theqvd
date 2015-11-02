@@ -102,9 +102,11 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             if ($('[name="tenant_id"]').length > 0) {
                 // Add an event to the tenant select change
                 Wat.B.bindEvent('change', '[name="tenant_id"]', Wat.B.editorBinds.filterTenantOSFs);
+                Wat.I.chosenElement('select[name="osf_id"]', 'advanced100');
             }
-
+            else {
             Wat.A.fillSelect(params);  
+        }
         }
         
         $('select[name="images_source"]').trigger('change');

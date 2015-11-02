@@ -252,7 +252,7 @@ Wat.Views.MainView = Backbone.View.extend({
         
         that.template = _.template(
                     Wat.TPL.editorCommonProperties, {
-                        properties: that.model ? that.model.attributes.properties : {}
+                        properties: that.model && that.model.attributes.properties ? that.model.attributes.properties : {}
                     }
                 );
         

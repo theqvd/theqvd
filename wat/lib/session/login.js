@@ -104,19 +104,11 @@ Wat.L = {
             Wat.I.M.showMessage({message: that.retrievedData.statusText, messageType: "error"});
             return;
         }
-        else if (that.retrievedData.status == STATUS_CREDENTIALS_FAIL) {
-            Wat.I.M.showMessage({message: that.retrievedData.statusText, messageType: "error"});
-            return;
-        }
         else if (!that.retrievedData.acls || $.isEmptyObject(that.retrievedData.acls)) {
             Wat.L.logOut();
             Wat.I.M.showMessage({message: "Wrong user or password", messageType: "error"});
             that.login = '';
             that.sid = '';
-            if (that.retrievedData.status == STATUS_SESSION_EXPIRED) {
-                window.location.reload();
-                Wat.I.M.showMessage({message: that.retrievedData.statusText, messageType: "error"});
-            }
             return;
         }
         
