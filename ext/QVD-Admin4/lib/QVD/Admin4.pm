@@ -1491,4 +1491,57 @@ sub config_ssl {
      rows => [ ] };
 }
 
+sub config_wat_get
+{
+	my ($self,$request) = @_;
+
+	# Get current administrator
+	my $admin = $request->qvd_object_model->current_qvd_administrator;
+
+	# Tenant is sent as an argument if superadmin
+	my $tenant = $admin->tenant_id;
+
+	my $row;
+	eval {
+		my $rs = $DB->resultset($request->table)->search({tenant_id => $tenant});
+		$row = $rs->first;
+	};
+
+	QVD::Admin4::Exception->throw(exception => $@, query => 'select') if $@;
+
+	{
+		total => 1,
+		rows => [ $row ],
+	};
+}
+
+sub config_wat_update
+{
+	my ($self,$request) = @_;
+
+	# Get current administrator
+	my $admin = $request->qvd_object_model->current_qvd_administrator;
+
+	# Tenant is sent as an argument if superadmin
+	my $tenant = $admin->tenant_id;
+
+	my @rows;
+	eval {
+		for my $obj ($DB->resultset($request->table)->search({tenant_id => $tenant})->all){
+			$DB->txn_do( sub {
+				# Update the main object
+				$obj->update($request->arguments);
+				# Update tables related to the main object (i.e. vm_runtimes for vms)
+				$self->update_related_objects($request,$obj);
+			} );
+		}
+	};
+
+	QVD::Admin4::Exception->throw(exception => $@, query => 'update') if $@;
+
+	{
+		rows => [],
+	};
+}
+
 1;

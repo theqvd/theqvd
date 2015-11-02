@@ -46,6 +46,7 @@ my $QVD_OBJECTS_TO_LOG_MAPPER =
     Role => 'role', Config => 'config', Tenant_Views_Setup => 'tenant_view', 
     Administrator_Views_Setup => 'admin_view', User_Property_List => 'user', VM_Property_List => 'vm',
     Host_Property_List => 'host', OSF_Property_List => 'osf', DI_Property_List => 'di', Property_List => 'property',  
+	Wat_Setups_By_Tenant => 'wat_setup_by_tenant',
 };
 
 # Mapper from kinds of actions in this class to available values for 
@@ -428,6 +429,7 @@ my $NESTED_QUERIES_TO_ADMIN4_MAPPER =
 	    __properties_changes__delete => 'custom_properties_del', 
 	    __tags_changes__create => 'tags_create',
 	    __tags_changes__delete => 'tags_delete'},
+
     Tenant => {},
 
     Role => { __acls__ => 'add_acls_to_role',
@@ -538,7 +540,7 @@ my $AVAILABLE_FILTERS =
 
 		 Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)],},
 
-    details => { Config => [qw(key value)], default => [qw(id tenant_id)], Host => [qw(id)], Role => [qw(id)], ACL => [qw(id)], Tenant => [qw(id)] },
+    details => { default => [qw(id tenant_id)], Config => [qw(key value)], Host => [qw(id)], Role => [qw(id)], ACL => [qw(id)], Tenant => [qw(id)], Wat_Setups_By_Tenant => [qw()] },
 		
     tiny => { default => [qw(tenant_id)], Host => [qw()], Role => [qw(internal fixed tenant_id)], ACL => [qw(name)], Tenant => [qw(id)], DI_Tag => [qw(tenant_id osf_id)]},
 
@@ -546,7 +548,7 @@ my $AVAILABLE_FILTERS =
                 Tenant_Views_Setup => [qw(tenant_id qvd_object)],
                 Administrator_Views_Setup => [qw(qvd_object)]}, # Every admin is able to delete just its own views, so you cannot filter by admin or id. Suitable admin_id forzed in Request.pm
 
-    update => { default => [qw(id tenant_id)],Config => [qw(key value)],Host => [qw(id)],Role => [qw(id)],Tenant => [qw(id)]},
+    update => { default => [qw(id tenant_id)],Config => [qw(key value)],Host => [qw(id)],Role => [qw(id)],Tenant => [qw(id)], Wat_Setups_By_Tenant => [qw()]},
 
     create_or_update => { Tenant_Views_Setup => [qw(tenant_id)]},
 
@@ -649,7 +651,9 @@ my $AVAILABLE_FIELDS =
 
 		 Administrator_Views_Setup => [qw(id admin_id admin_name tenant_id tenant_name field visible view_type 
                                                   device_type qvd_object property)],
-		 Operative_Views_In_Administrators => [qw(tenant_id field visible view_type device_type qvd_object property)], },
+		 Operative_Views_In_Administrators => [qw(tenant_id field visible view_type device_type qvd_object property)],
+
+		Wat_Setups_By_Tenant => [qw( block language )], },
 
     tiny => { default => [qw(id name)],
 
@@ -682,6 +686,7 @@ my $MANDATORY_FILTERS =
 	      Operative_Acls_In_Administrator => [qw()]}, # FIX ME. HAS DEFAULT VALUE IN Request.pm. DEFAULT SYSTEM FOR FILTERS NEEDED
 
     details => { default => [qw(id)], 
+		Wat_Setups_By_Tenant => [ qw() ],
 		 Operative_Acls_In_Role => [qw(role_id)], 
 		 Operative_Acls_In_Administrator => [qw()]}, # FIX ME. HAS DEFAULT VALUE IN Request.pm. DEFAULT SYSTEM FOR FILTERS NEEDED
 
@@ -689,7 +694,7 @@ my $MANDATORY_FILTERS =
 
     delete => { default => [qw(id)], Config => [qw(key)], Administrator_Views_Setup => [qw()], Tenant_Views_Setup => [qw()]},
 
-    update=> { default => [qw(id)], Config => [qw(key tenant_id)]},
+    update=> { default => [qw(id)], Config => [qw(key tenant_id)], Wat_Setups_By_Tenant => [qw()]},
 
     exec => { default => [qw()]}, 
 
@@ -755,12 +760,14 @@ my $AVAILABLE_NESTED_QUERIES =
 		Tenant_Views_Setup => [qw()],
 		Operative_Views_In_Tenant => [qw()],
 		Administrator_Views_Setup => [qw()],
-		Operative_Views_In_Administrator => [qw()]}
+		Operative_Views_In_Administrator => [qw()],
+		Wat_Setups_By_Tenant => [qw()]}
 };
 
 # Available arguments for update actions
 
-my $AVAILABLE_ARGUMENTS = { Config => [qw(value)],
+my $AVAILABLE_ARGUMENTS = {
+	Config => [qw(value)],
 			    User => [qw(name password blocked description)],
                             VM => [qw(name ip blocked expiration_soft expiration_hard storage di_tag description ***start*** ***stop*** ***disconnect***)],
                             Host => [qw(name address blocked description)],
@@ -771,7 +778,9 @@ my $AVAILABLE_ARGUMENTS = { Config => [qw(value)],
 			    Administrator => [qw(name password language block description)],
 			    Tenant_Views_Setup => [qw(visible)],
 			    Administrator_Views_Setup => [qw(visible)],
-	      		    Property_List => [qw(key description)] };
+	Property_List => [qw(key description)],
+	Wat_Setups_By_Tenant => [qw(language block)]
+};
 
 # Available arguments for creation actions
 
@@ -1145,6 +1154,13 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'in_osf' => 'me.in_osf',
 	'in_di' => 'me.in_di'
     },
+
+	Wat_Setups_By_Tenant => {
+		'id' => 'me.id',
+		'block' => 'me.block',
+		'language' => 'me.language',
+		'tenant_id' => 'me.tenant_id',
+	},
 };
 
 # Nowadays the mapper for arguments and order criteria
@@ -1480,6 +1496,13 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'in_osf' => 'me.in_osf',
 	'in_di' => 'me.in_di'
     },
+
+	Wat_Setups_By_Tenant => {
+		'id' => 'me.id',
+		'block' => 'me.block',
+		'language' => 'me.language',
+		'tenant_id' => 'me.tenant_id',
+	},
 };
 
 # This var stores functions intended to 

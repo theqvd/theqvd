@@ -69,6 +69,16 @@ config_delete => { type_of_action =>  'delete',
 		   acls => [qr/^config\.qvd\./],
 		   admin4method => 'config_delete'},
 
+config_wat_get => { type_of_action =>  'details',
+	qvd_object => 'Wat_Setups_By_Tenant',
+	acls => [qr/^(config\.wat)/],
+	admin4method => 'config_wat_get'},
+
+config_wat_update => { type_of_action =>  'update',
+	qvd_object => 'Wat_Setups_By_Tenant',
+	acls => [qr/^(config\.wat)/],
+	admin4method => 'config_wat_update'},
+
 user_get_list => { type_of_action => 'list',
 		  admin4method => 'select',
 		  channels => [qw(user_created user_deleted user_changed vm_created vm_deleted)],
@@ -421,7 +431,7 @@ tenant_get_list => { type_of_action => 'list',
 
 tenant_get_details => { type_of_action => 'details',
 			admin4method => 'select',
-			acls => [qr/^(config\.wat|tenant\.see-details)\./],
+			acls => [qr/^(tenant\.see-details)\./],
 			qvd_object => 'Tenant'},
 
 tenant_all_ids => { type_of_action => 'all_ids',
@@ -431,7 +441,7 @@ tenant_all_ids => { type_of_action => 'all_ids',
 
 tenant_update => { type_of_action => 'update',
 		   admin4method => 'update',
-		   acls => [qr/^(config\.wat|tenant\.update)\./],
+		   acls => [qr/^(tenant\.update)\./],
 		   qvd_object => 'Tenant'},
 
 mytenant_update => { type_of_action => 'update',
