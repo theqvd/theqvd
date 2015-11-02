@@ -5,7 +5,7 @@
         // Force desktop Mode if is necessary
         Wat.I.forceDesktop();     
         
-        if (Wat.C) {
+        if (Wat.C.setupLibraries) {
         // Setup JS libraries
         Wat.C.setupLibraries(); 
         

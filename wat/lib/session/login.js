@@ -104,6 +104,12 @@ Wat.L = {
             Wat.I.M.showMessage({message: that.retrievedData.statusText, messageType: "error"});
             return;
         }
+        else if (that.retrievedData.status == STATUS_SESSION_EXPIRED || that.retrievedData.status == STATUS_CREDENTIALS_FAIL) {
+            Wat.L.logOut();
+            $.cookie('messageToShow', JSON.stringify({message: that.retrievedData.message, messageType: "error"}), {expires: 1, path: '/'});
+            window.location.reload();
+            return;
+        }
         else if (!that.retrievedData.acls || $.isEmptyObject(that.retrievedData.acls)) {
             Wat.L.logOut();
             Wat.I.M.showMessage({message: "Wrong user or password", messageType: "error"});

@@ -1,18 +1,25 @@
 // Translation setup and utilities
 Wat.T = {
     lan: '',
+    loaded: false,
+    
     // Translation configuration and actions to be done when language file is loaded
     initTranslate: function(lan) {        
         lan = lan || Wat.C.language;
         
         lan = this.getLanguage(lan);
         
+        var that = this;
+        
         $.i18n.init({
             resGetPath: APP_PATH + 'lib/translations/dictionaries/' + lan + '.json',
             useLocalStorage: false,
             debug: false,
             fallbackLng: 'en',
-        }, this.translateAndShow);
+        }, function () {
+            that.loaded = true;
+            that.translateAndShow();
+        });
         
         this.lan = lan;
     },
