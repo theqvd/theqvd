@@ -1491,7 +1491,7 @@ sub config_ssl {
      rows => [ ] };
 }
 
-sub config_wat_get
+sub config_wat_get_details
 {
 	my ($self,$request) = @_;
 
