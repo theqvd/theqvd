@@ -8,8 +8,8 @@ Wat.Views.ConfigWatView = Wat.Views.DetailsView.extend({
             return;
         }
         
-        var params = {id: Wat.C.tenantID};
-        this.model = new Wat.Models.Tenant(params);
+        var params = {};
+        this.model = new Wat.Models.ConfigWat(params);
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
     },
     
@@ -39,7 +39,7 @@ Wat.Views.ConfigWatView = Wat.Views.DetailsView.extend({
         
         var context = $('.' + this.cid + '.editor-container');
                         
-        var filters = {"id": Wat.C.tenantID};
+        var filters = {};
         var arguments = {};
         
         var language = context.find('select[name="language"]').val(); 

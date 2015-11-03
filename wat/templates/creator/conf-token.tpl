@@ -1,4 +1,12 @@
 <table>
+    <% if (Wat.C.isSuperadmin()) { %>
+        <tr>
+            <td data-i18n="Tenant"></td>
+            <td>
+                <span><%= $('select[name="tenant_id"] option:selected').html() %></span>
+            </td>
+        </tr>
+    <% } %>
     <tr>
         <td data-i18n="Key"></td>
         <td>
