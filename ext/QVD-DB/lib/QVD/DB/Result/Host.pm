@@ -105,6 +105,17 @@ sub get_triggers
 			scope  => 'ROW',
 		},
 		{
+			name => 'host_runtime_changed_trigger',
+			when => 'AFTER',
+			events => [qw/UPDATE/],
+			fields    => [qw/state/],
+			on_table  => 'host_runtimes',
+			condition => undef,
+			procedure => 'host_changed_notify',
+			parameters => [],
+			scope  => 'ROW',
+		},
+		{
 			name => 'host_changed_trigger',
 			when => 'AFTER',
 			events => [qw/UPDATE/],
