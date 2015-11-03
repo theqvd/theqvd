@@ -1760,7 +1760,8 @@ select[name="acl_positive_on_role"] option, .acls_positive {
     color: #666666; }
 
 .branch-button {
-  margin-right: 5px;
+  margin-left: 2px;
+  margin-right: 3px;
   vertical-align: bottom; }
   .branch-button:before {
     font-size: 22px; }

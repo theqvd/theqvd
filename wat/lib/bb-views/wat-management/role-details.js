@@ -40,8 +40,10 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     
     events: {
         'click .js-branch-button': 'toggleBranch',
+        'click .js-branch-text': 'triggerToggleBranch',
         'change .js-branch-check': 'checkBranch',
         'change .js-acl-check': 'checkACL',
+        'click .js-subbranch-text': 'triggerCheckACL',
         'change .js-acl-tree-selector': 'toggleTree',
         'change .js-role-inherit-mode': 'toggleInheritModes',
         'click .js-role-inherit-mode': 'inheritTemplate',
@@ -211,6 +213,11 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         }
     },
     
+    // Show-Hide ACL branch when click on branch name too
+    triggerToggleBranch: function (e) {
+        $(e.target).parent().find('.js-branch-button').trigger('click');
+    },
+    
     // Show-Hide ACL branch
     toggleBranch: function (e) {
         var branch = $(e.target).attr('data-branch');
@@ -279,7 +286,14 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
             subbranch += '<div class="subbranch ' + disabledClass + '" data-acl="' + acl.name + '" data-acl-id="' + acl.id + '">';
             
                 // Assignation checkbox
+                var isEditable = false;
+                var nameBranchExtraClass = '';
                 if (Wat.C.checkACL('role.update.assign-acl') && (!that.model.get('fixed') || !RESTRICT_TEMPLATES)) {
+                    isEditable = true;
+                    nameBranchExtraClass = 'js-subbranch-text event';
+                }
+            
+                if (isEditable) {
                     subbranch += '<span class="subbranch-piece">';
                         subbranch += '<input type="checkbox" class="js-acl-check acl-check" data-acl="' + acl.name + '" data-acl-id="' + acl.id + '" ' + checkedAttr + '/>';
                     subbranch += '</span>';
@@ -298,7 +312,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
                 }
             
                 // Name of the ACL
-                subbranch += '<span class="subbranch-piece" data-i18n="' + acl.description + '"></span>';
+                subbranch += '<span class="subbranch-piece subbranch-text ' + nameBranchExtraClass + '" data-i18n="' + acl.description + '"></span>';
             
             subbranch += '</div>';
             that.currentBranchDiv.append(subbranch);
@@ -354,6 +368,11 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
                 unassign_acls: acls
             });
         }
+    },
+    
+    // Assign-unassign ACL triggered when click on subbranch
+    triggerCheckACL: function (e) {  
+        $(e.target).parent().find('.js-acl-check').trigger('click');
     },
     
     // Assign-unassign ACL triggered when check an ACL

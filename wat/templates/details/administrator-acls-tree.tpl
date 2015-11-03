@@ -24,7 +24,7 @@
     %>
         <div class="acls-branch js-acls-branch <%= hiddenClass %>" data-branch="<%= branch %>">
             <a class="js-branch-button branch-button fa fa-plus-square-o <%= invisibleClass %>" href="javascript:" data-branch="<%= branch %>" data-tree-kind="sections" data-open="0"></a>
-                <span class="branch-text" data-i18n="<%= branchName %>"><%= $.i18n.t(branchName) %></span>
+            <span class="branch-text js-branch-text event" data-i18n="<%= branchName %>"><%= $.i18n.t(branchName) %></span>
         </div>
     <%
     });
@@ -58,7 +58,7 @@
     %>
         <div class="acls-branch js-acls-branch <%= hiddenClass %>" data-branch="<%= branch %>">
             <a class="js-branch-button branch-button fa fa-plus-square-o <%= invisibleClass %>" href="javascript:" data-branch="<%= branch %>" data-tree-kind="actions" data-open="0"></a>
-                <span class="branch-text" data-i18n="<%= branchName %>"><%= $.i18n.t(branchName) %></span>
+            <span class="branch-text js-branch-text event" data-i18n="<%= branchName %>"><%= $.i18n.t(branchName) %></span>
         </div>
     <%
     });

@@ -87,6 +87,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     
     events: {
         'click .js-branch-button': 'toggleBranch',
+        'click .js-branch-text': 'triggerToggleBranch',
         'change .js-acl-tree-selector': 'toggleTree',
         'click .js-tools-roles-btn': 'openRoleToolsDialog',
     },
@@ -172,6 +173,11 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
                 $('.js-actions-tree').show();
                 break;
         }
+    },
+    
+    // Show-Hide ACL branch when click on branch name too
+    triggerToggleBranch: function (e) {
+        $(e.target).parent().find('.js-branch-button').trigger('click');
     },
     
     // Show-Hide ACL branch
