@@ -1,6 +1,7 @@
 var login = 'superadmin';
 var password = 'superadmin';
 var tenant = '*';
+var tenantId = 0;
 var roleShort = {"66": "Root"};
 var roleLong = {"66": {
         "description": null,

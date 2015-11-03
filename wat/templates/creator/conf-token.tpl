@@ -16,7 +16,7 @@
     <tr>
         <td data-i18n="Value"></td>
         <td>
-            <input type="text" name="value" value="">
+            <input type="text" name="value" value="" data-required>
         </td>
     </tr>
 </table>

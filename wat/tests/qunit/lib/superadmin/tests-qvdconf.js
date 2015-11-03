@@ -22,16 +22,19 @@ function qvdConfigTestReal () {
             
             var getAction = 'config_get';
             var getBranchFilters = {
-                'key_re': '^model\\.'
+                'key_re': '^model\\.',
+                'tenant_id': tenantId
             };
             var getTokenFilters = {
-                'key': searchedKey
+                'key': searchedKey,
+                'tenant_id': tenantId
             };
             
             var updateAction = 'config_set';
             var updateArguments = {
                 'key': searchedKey,
-                'value': 1
+                'value': 1,
+                'tenant_id': tenantId
             };
             var updateFilters = {};
             var updateMessage = 'QVD config key update to new value correctly';
@@ -139,27 +142,33 @@ function qvdConfigTestReal () {
             
             var getAction = 'config_get';
             var getBranchFilters = {
-                'key_re': '^' + customBranch + '\\.'
+                'key_re': '^' + customBranch + '\\.',
+                'tenant_id': tenantId
             };
             var getTokenFilters = {
-                'key': customFullKey
+                'key': customFullKey,
+                'tenant_id': tenantId
             };
             var getTokenFilters2 = {
-                'key': customFullKey2
+                'key': customFullKey2,
+                'tenant_id': tenantId
             };
             
             var updateAction = 'config_set';
             var updateArguments = {
                 'key': customFullKey,
-                'value': customValue
+                'value': customValue,
+                'tenant_id': tenantId
             };
             var updateArguments2 = {
                 'key': customFullKey2,
-                'value': customValue2
+                'value': customValue2,
+                'tenant_id': tenantId
             };
             var updateNewArguments = {
                 'key': customFullKey,
-                'value': customNewValue
+                'value': customNewValue,
+                'tenant_id': tenantId
             };
             var updateFilters = {};
             var updateFilters2 = {};
@@ -167,10 +176,12 @@ function qvdConfigTestReal () {
             
             var deleteAction = 'config_delete';
             var deleteFilters = {
-                'key': customFullKey
+                'key': customFullKey,
+                'tenant_id': tenantId
             };
             var deleteFilters2 = {
-                'key': customFullKey2
+                'key': customFullKey2,
+                'tenant_id': tenantId
             };
             
             // Check if custom branch doesnt exist yet
