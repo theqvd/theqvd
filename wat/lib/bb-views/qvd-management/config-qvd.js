@@ -404,11 +404,12 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
             Wat.A.performAction('config_get', {}, filter, {}, that.processTokensRenderTokens, that);
         }
         else if ($.inArray(that.currentTokensPrefix, that.prefixes) != -1) {
-            // If there is a current search, filter by it. Otherwise filter by current selected prefix    
-            filter['key_re'] = '^' + that.currentTokensPrefix + '\\.';
-            
             if (!$.isEmptyObject(Wat.C.currentSearch)) {
                 filter['key'] = Wat.C.currentSearch;
+            }
+            else {
+                // If there is a current search, filter by it. Otherwise filter by current selected prefix    
+                filter['key_re'] = '^' + that.currentTokensPrefix + '\\.';
             }
             
 			// If the prefix of the changed token exist, render it after change
