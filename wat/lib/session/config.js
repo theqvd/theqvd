@@ -511,14 +511,24 @@ Wat.C = {
             contentType: 'json',
             cache: false,
             complete: function (response) {
-                var configTokens = JSON.parse(response.responseText);
+                var isJSON = true;
+                var configTokens = '';
                 
+                try {
+                    configTokens = JSON.parse(response.responseText);
+                }
+                catch(err) {
+                    isJSON = false;
+                } 
+                
+                if (isJSON) {
                 $.each(configTokens, function (token, value) {
                     Wat.C.setConfigToken(token, value);
                 });
                                 
                 // After read configuration file, we will set API address
                 Wat.C.initApiAddress();
+                }
                 
                 // Remember login from cookies to recover session if was setted previously
                 Wat.L.rememberLogin();

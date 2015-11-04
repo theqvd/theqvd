@@ -27,7 +27,7 @@ Wat.Views.LoginView = Wat.Views.MainView.extend({
         
         var template = Wat.TPL.login;
         
-        if (this.retrievedData.readyState == 0) {
+        if (this.retrievedData.readyState == 0 || this.retrievedData.status == STATUS_NOT_FOUND) {
             template = Wat.TPL.errorRefresh;
         }
         
