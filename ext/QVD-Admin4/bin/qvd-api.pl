@@ -504,14 +504,14 @@ sub get_auth_method
 
 sub create_session
 {
-    my ($c,$session,$json) = @_;
+	my ($c, $session, $json) = @_;
     my %args = (login => $json->{login}, 
 		password => $json->{password});
     $args{tenant} = $json->{tenant} if defined $json->{tenant};
     my $admin = $c->qvd_admin4_api->validate_user(%args);
+	my $exception_code = 3200;
 
    QVD::Admin4::LogReport->new(
-
        action => { action => 'login', type_of_action => 'login' },
        qvd_object => 'administrator',
        tenant => eval { $admin->tenant } // undef,
@@ -520,12 +520,13 @@ sub create_session
        ip => $c->tx->remote_address,
        source => eval { $json->{parameters}->{source} } // undef,
        arguments => \%args,
-       status => ($admin ? 0 : 3200)
-
+		status => ($admin ? 0 : $exception_code),
        )->report;
 
-    return (0,QVD::Admin4::Exception->new(code =>3200)) 
-	unless $admin;
+	# Login credentials not found
+	if (not $admin) {
+		return (0, QVD::Admin4::Exception->new(code => $exception_code));
+	}
 
     $c->qvd_admin4_api->load_user($admin);
     $session->create;

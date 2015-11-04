@@ -36,8 +36,7 @@ has 'object', is => 'ro', isa => sub { die "Invalid type for attribute object" i
 # This is the mapper that relates numeric codes of exceptions
 # with its corresponding messages. Supported codes must be listed in here
 
-my $code2message_mapper = 
-{
+my $code2message_mapper = {
     0000 => 'Successful completion',
 
     1000 => 'In progress', 
@@ -57,7 +56,7 @@ my $code2message_mapper =
     2261 => 'Unable to move downloaded disk image', 
 
     3100 => 'No credentials provided for authentication',
-    3200 => 'Wrong login or password - Login again',
+	3200 => 'Wrong credentials - Login again',
     3300 => 'Session expired - Login again',
     3400 => 'Problems to update expiration time in session',
 
