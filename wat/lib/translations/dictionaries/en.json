@@ -382,7 +382,7 @@
     "WAT Management": "WAT Management",
     "WAT Step by step": "WAT Step by step",
     "Welcome to QVD's Web Administration Tool": "Welcome to QVD's Web Administration Tool",
-    "Wrong user or password": "Welcome to QVD's Web Administration Tool",
+    "Wrong credentials": "Wrong credentials",
     "Yes": "Yes",
     "You are trying to remove a role from your own administrator": "You are trying to remove a role from your own administrator",
     "You are trying to remove ACLs from a role": "You are trying to remove ACLs from a role",
@@ -773,7 +773,7 @@
     "Unable to download disk image": "Unable to download disk image", 
     "Unable to move downloaded disk image": "Unable to move downloaded disk image",
     "No credentials provided for authentication": "No credentials provided for authentication", 
-    "Wrong login or password - Login again": "Wrong login or password - Login again", 
+    "Wrong credentials - Login again": "Wrong credentials - Login again", 
     "Session expired - Login again": "Session expired - Login again", 
     "Problems to update expiration time in session": "Problems to update expiration time in session", 
     "Unavailable action": "Unavailable action", 
@@ -820,5 +820,7 @@
     "Incompatible expiration dates - Soft date must precede the hard one": "Incompatible expiration dates - Soft date must precede the hard one",
     "Non core config items haven't default value": "Non core config items haven't default value",
     "Unable to remove a core config item": "Unable to remove a core config item",
-    "Unable to switch to monotenant mode - More than one tenant in the system": "Unable to switch to monotenant mode - More than one tenant in the system"
+    "Unable to switch to monotenant mode - More than one tenant in the system": "Unable to switch to monotenant mode - More than one tenant in the system",
+    "Local configuration tokens cannot be set as global tokens": "Local configuration tokens cannot be set as global tokens",
+    "Global configuration tokens cannot be set locally for a tenant": "Global configuration tokens cannot be set locally for a tenant"
 }

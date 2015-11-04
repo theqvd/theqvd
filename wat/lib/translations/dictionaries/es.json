@@ -385,7 +385,7 @@
     "WAT Management": "Gestión del WAT",
     "WAT Step by step": "WAT Paso a paso",
     "Welcome to QVD's Web Administration Tool": "Bienvenido a la herramienta de administración web de QVD",
-    "Wrong user or password": "Usuario o contraseña incorrectos",
+    "Wrong credentials": "Credenciales incorrectas",
     "Yes": "Si",
     "You are trying to remove a role from your own administrator": "Estás intentando eliminar un rol de tu propia cuenta de administrador",
     "You are trying to remove ACLs from a role": "Estás intentando eliminar ACLs de un rol",
@@ -776,7 +776,7 @@
     "Unable to download disk image": "Imposible descargar imagen de disco", 
     "Unable to move downloaded disk image": "Imposible mover imagen de disco descargada",
     "No credentials provided for authentication": "Credenciales para la autenticación no proporcionadas", 
-    "Wrong login or password - Login again": "Usuario o contraseña incorrectos - Inicia sesión de nuevo", 
+    "Wrong credentials - Login again": "Credenciales incorrectas - Inicia sesión de nuevo", 
     "Session expired - Login again": "Sesión expirada - Inicia sesión de nuevo", 
     "Problems to update expiration time in session": "Problemas para actualizar el tiempo de expiración de la sesión", 
     "Unavailable action": "Acción no disponible", 
@@ -823,5 +823,7 @@
     "Incompatible expiration dates - Soft date must precede the hard one": "Fechas de expiración incompatibles - La fecha suave debe preceder a la fuerte",
     "Non core config items haven't default value": "Los elementos de configuración que no son nativos, no tienen valor por defecto",
     "Unable to remove a core config item": "Imposible eliminar un elemento de configuración nativo",
-    "Unable to switch to monotenant mode - More than one tenant in the system": "Imposible cambiar a modo monotenant - Hay más de un tenant en el sistema"
+    "Unable to switch to monotenant mode - More than one tenant in the system": "Imposible cambiar a modo monotenant - Hay más de un tenant en el sistema",
+    "Local configuration tokens cannot be set as global tokens": "Los tokens de configuración locales no pueden establecerse como globales",
+    "Global configuration tokens cannot be set locally for a tenant": "Los tokens de configuración globales no pueden establecerse como locales en un tenant"
 }

@@ -112,7 +112,7 @@ Wat.L = {
         }
         else if (!that.retrievedData.acls || $.isEmptyObject(that.retrievedData.acls)) {
             Wat.L.logOut();
-            Wat.I.M.showMessage({message: "Wrong user or password", messageType: "error"});
+            Wat.I.M.showMessage({message: "Wrong credentials", messageType: "error"});
             that.login = '';
             that.sid = '';
             return;

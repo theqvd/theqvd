@@ -27,7 +27,7 @@ ALL_STATUS = {
     2261: 'Unable to move downloaded disk image',
 
     3100: 'No credentials provided for authentication',
-    3200: 'Wrong login or password - Login again',
+    3200: 'Wrong credentials - Login again',
     3300: 'Session expired - Login again',
     3400: 'Problems to update expiration time in session',
 
@@ -77,7 +77,8 @@ ALL_STATUS = {
     7360: 'Incompatible expiration dates - Soft date must precede the hard one',
     7371: 'Non core config items haven\'t default value',
     7372: 'Unable to remove a core config item',
-    7373: 'Unable to switch to monotenant mode - More than one tenant in the system'
+    7380: 'Local configuration tokens cannot be set as global tokens',
+    7381: 'Global configuration tokens cannot be set locally for a tenant'
 };
 
 STATUS_SUCCESS = 0;
