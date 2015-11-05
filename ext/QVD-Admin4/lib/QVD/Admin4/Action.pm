@@ -388,7 +388,7 @@ administrator_get_list => { type_of_action => 'list',
 
 administrator_tiny_list => { type_of_action => 'tiny',
 		    admin4method => 'select',
-		    acls => [qr/^log\.filter\.administrator/],
+		    acls => [qr/^log\.filter\.administrator|[^.]+\.filter\.created-by/],
 		    qvd_object => 'Administrator' },
 
 administrator_get_details => { type_of_action => 'details',
