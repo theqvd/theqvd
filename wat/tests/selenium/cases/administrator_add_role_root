@@ -23,7 +23,7 @@
 </tr>
 <tr>
 	<td>clickAt</td>
-	<td>css=input.js-add-role-button[data-role-template-id=&quot;1&quot;]</td>
+	<td>css=input.js-add-role-button[data-role-template-id=&quot;66&quot;]</td>
 	<td></td>
 </tr>
 <tr>
@@ -33,10 +33,9 @@
 </tr>
 <tr>
 	<td>waitForElementPresent</td>
-	<td>css=div[data-role-id=&quot;1&quot;]</td>
+	<td>css=div[data-role-id=&quot;66&quot;]</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

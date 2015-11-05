@@ -1,4 +1,4 @@
-$sel->type_ok("name=admin_tenant", "qvd");
+$sel->type_ok("name=admin_tenant", "default");
 $sel->type_ok("name=admin_user", "truman");
 $sel->type_ok("name=admin_password", "truman");
 $sel->click_ok("link=Log-in");

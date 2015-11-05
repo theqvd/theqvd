@@ -89,7 +89,7 @@ Wat.I.formFilters[qvdObj] = {
         'displayMobile': true,
         'displayDesktop': true
     },
-    'admin': {
+    'administrator': {
         'filterField': 'creation_admin_id',
         'type': 'select',
         'text': 'Created by',

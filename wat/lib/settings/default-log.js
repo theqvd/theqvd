@@ -141,7 +141,7 @@ Wat.I.formFilters[qvdObj] = {
         'displayDesktop': true,
         'acls': 'log.filter.source'
     },
-    'admin': {
+    'administrator': {
         'filterField': 'admin_id',
         'type': 'select',
         'text': 'Administrator',

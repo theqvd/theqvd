@@ -5,7 +5,7 @@ WAIT: {
     }
     fail("timeout");
 }
-my $actionIndex = $sel->get_element_index("css=select[name=\"tenant_id\"] option[value=\"158\"]");
+my $actionIndex = $sel->get_element_index("css=select[name=\"tenant_id\"] option[value=\"1\"]");
 $sel->click_at_ok("css=#tenant_editor_chosen", "");
 $sel->click_at_ok("css=div#tenant_editor_chosen .chosen-results [data-option-array-index=" . $actionIndex . "]", "");
 $sel->type_ok("css=div.js-editor-container-create input[name=\"name\"]", "selenita");

@@ -240,7 +240,7 @@ Wat.I.formFilters[qvdObj] = {
         'displayDesktop': true,
         'acls': 'osf.filter.di'
     },
-    'admin': {
+    'administrator': {
         'filterField': 'creation_admin_id',
         'type': 'select',
         'text': 'Created by',

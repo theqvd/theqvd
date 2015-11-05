@@ -245,11 +245,13 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             var percent = parseInt((e.loaded / e.total) * 100);
         }
 
+        var step = 5;
+        
         if (percent == 100) {
             var progressHiddenInput = '<input type="hidden" data-di-uploading="completed">';
         }
         else {
-            var progressHiddenInput = '<input type="hidden" data-di-uploading="inprogress-' + percent + '">';
+            var progressHiddenInput = '<input type="hidden" data-di-uploading="inprogress-' + Math.floor(percent/step)*step + '">';
         }
 
         var progressData = [e.loaded, e.total - e.loaded];

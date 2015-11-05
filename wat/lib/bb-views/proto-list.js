@@ -806,7 +806,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     fillAdminSelect: function () {
         // If exist admin select and is not filled yet, fill it
-        if ($('select[name="admin"]').length > 0 && $('select[name="admin"] option').length < 2) {
+        if ($('select[name="administrator"]').length > 0 && $('select[name="administrator"] option').length < 2) {
             if (Wat.C.isSuperadmin()) {
                 // If tenant select is defined, we wait to be loaded to load administrators select
                 Wat.A.performAction ('tenant_tiny_list', {}, {}, {}, function(e) {
@@ -816,9 +816,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                             var tenant = tenants.shift();
 
                             var params = {
-                                'action': 'admin_tiny_list',
+                                'action': 'administrator_tiny_list',
                                 'selectedId': '',
-                                'controlName': 'admin',
+                                'controlName': 'administrator',
                                 'filters': {
                                     "tenant_id": tenant.id
                                 },

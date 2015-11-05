@@ -18,7 +18,7 @@
 </tr>
 <tr>
 	<td>storeElementIndex</td>
-	<td>css=select[name=&quot;tenant_id&quot;] option[value=&quot;158&quot;]</td>
+	<td>css=select[name=&quot;tenant_id&quot;] option[value=&quot;1&quot;]</td>
 	<td>actionIndex</td>
 </tr>
 <tr>
@@ -32,22 +32,22 @@
 	<td></td>
 </tr>
 <tr>
-	<td>sendKeys</td>
+	<td>type</td>
 	<td>css=div.js-editor-container-create input[name=&quot;name&quot;]</td>
 	<td>selenita</td>
 </tr>
 <tr>
-	<td>sendKeys</td>
+	<td>type</td>
 	<td>css=div.js-editor-container-create textarea[name=&quot;description&quot;]</td>
 	<td>My description</td>
 </tr>
 <tr>
-	<td>sendKeys</td>
+	<td>type</td>
 	<td>css=div.js-editor-container-create input[name=&quot;password&quot;]</td>
 	<td>selenita</td>
 </tr>
 <tr>
-	<td>sendKeys</td>
+	<td>type</td>
 	<td>css=div.js-editor-container-create input[name=&quot;password2&quot;]</td>
 	<td>selenita</td>
 </tr>

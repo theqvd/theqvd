@@ -14,7 +14,7 @@
 <tr>
 	<td>type</td>
 	<td>name=admin_tenant</td>
-	<td>testing</td>
+	<td>default</td>
 </tr>
 <tr>
 	<td>type</td>

@@ -3,23 +3,18 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://localhost/" />
-<title>vm_click_details_10000</title>
+<link rel="selenium.base" href="http://172.20.126.16/" />
+<title>store_vm_id_10000</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">vm_click_details_10000</td></tr>
+<tr><td rowspan="1" colspan="3">store_vm_id_10000</td></tr>
 </thead><tbody>
 <tr>
-	<td>click</td>
-	<td>css=table.list tr.row-${vmId}&gt;td.js-name</td>
-	<td></td>
-</tr>
-<tr>
-	<td>waitForElementPresent</td>
-	<td>css=div.sec-details-vm</td>
-	<td></td>
+	<td>storeEval</td>
+	<td>10000</td>
+	<td>vmId</td>
 </tr>
 </tbody></table>
 </body>
