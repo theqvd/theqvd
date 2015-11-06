@@ -440,7 +440,7 @@ Wat.B = {
                     Wat.CurrentView.cleanFilter($('[name="' + name + '"]').attr('data-filter-field'));
                     
                     $('[name="' + name + '"]').val(-1);
-                    $('[name="' + name + '"]').trigger('chosen:updated');
+                    $('[name="' + name + '"]').trigger('change');
                     break;
                 case 'text':
                     Wat.CurrentView.cleanFilter($('[name="' + name + '"]').attr('data-filter-field'));

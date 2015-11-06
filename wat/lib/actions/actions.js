@@ -71,6 +71,8 @@ Wat.A = {
     //      fields: fields to be returned by the API
     //      orderBy: Order factor
     performAction: function (action, arguments, filters, messages, successCallback, that, fields, orderBy) {
+        var that = that || {};
+        
         var url = Wat.C.getBaseUrl() + 
             '&action=' + action;
         

@@ -110,7 +110,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
                 'controlId': 'tenant_search',
                 'chosenType': 'single100',
                 'startingOptions': {
-                    '-1' : 'None (Global tokens)',
+                    '-1' : 'None (Globals)',
                 },
             };
             

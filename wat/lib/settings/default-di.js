@@ -275,7 +275,7 @@ Wat.I.formFilters[qvdObj] = {
         'type': 'select',
         'text': 'Created by',
         'class': 'chosen-advanced',
-        'fillable': false,
+        'fillable': true,
         'options': [
             {
                 'value': -1,

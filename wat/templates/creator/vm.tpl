@@ -1,6 +1,6 @@
 <table>
     <tr>
-        <td data-i18n="Name"></td>
+        <td data-i18n="Name" class="mandatory-label"></td>
         <td>
             <input type="text" class="" name="name" data-required>
         </td>
