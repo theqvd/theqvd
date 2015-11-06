@@ -38,7 +38,7 @@ sub find_tenant {
     my $separators = cfg('l7r.auth.plugin.default.separators');
     if (length $separators) {
         my $re = $re_cache{$separators} // do {
-            my $str = '(?:' . join('|', map quotemeta split //, $separators) . ')';
+            my $str = '(?:' . join('|', map {quotemeta} (split //, $separators)) . ')';
             qr/$str/i;
         };
         ($login1, $tenant) = split $re, $login, 1;
