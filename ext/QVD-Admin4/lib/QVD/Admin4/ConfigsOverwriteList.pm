@@ -80,4 +80,14 @@ sub configs_global_re{
 	return $regex;
 }
 
+# Returns 1 if the configuration key is a global token or
+# 0 otherwise
+sub is_global_config {
+	my ($self, $key) = @_;
+
+	my $regex = $self->configs_global_re;
+
+	return  ($key =~ /$regex/);
+}
+
 1;

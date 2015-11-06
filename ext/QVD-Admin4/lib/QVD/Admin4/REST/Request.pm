@@ -2,6 +2,7 @@ package QVD::Admin4::REST::Request;
 use strict;
 use warnings;
 use Moo;
+use QVD::Config;
 use QVD::Admin4::Exception;
 use QVD::Admin4::REST::Filter;
 use QVD::Admin4::ConfigsOverwriteList;
@@ -244,9 +245,9 @@ sub check_config_token_availability
 	# This code gives a regex that denotes the set of acls that can be
 	# accessed via API. If the config token requested doesn't match this regex
 	# it is an unavailable one
-	my $token = $self->get_adequate_value('key');
+	my $token = $self->get_json_adequate_value('key');
 
-	my $tenant = $ADMIN->is_superadmin ? $self->get_adequate_value('tenant_id') : $ADMIN->tenant_id;
+	my $tenant = $ADMIN->is_superadmin ? $self->get_json_adequate_value('tenant_id') : $ADMIN->tenant_id;
 
 	my $col = QVD::Admin4::ConfigsOverwriteList->new(admin_id => $ADMIN->id);
 	my $col_re = $col->configs_to_show_re($tenant);
@@ -262,12 +263,14 @@ sub check_config_token_availability
 
     my $false_in_postgres = '^(f(alse)?|no?|off|0)$';
 
+	# Raise exception if cannot change to monotenant
 	QVD::Admin4::Exception->throw(code => 7373)
 		if $token eq 'wat.multitenant' &&
 	$token_value =~ /$false_in_postgres/ &&
         # There are more than 1 normal tenant 
-        # (in addition to tenant 0 for superadmins)
-	QVD::DB::Simple::db()->resultset('Tenant')->search()->count > 2;
+			# (in addition to tenant 0 for
+			# superadmins and invalid tenant -1)
+			QVD::DB::Simple::db()->resultset('Tenant')->search()->count != 3;
 }
 
 
@@ -572,8 +575,17 @@ sub forze_tenant_assignment_in_creation
     }
     else
     { # For non-superadmins a tenant_id assignation is forced according to the tenant_id of the admin
-	my $tenant_id = $self->qvd_object_model->map_argument_to_dbix_format('tenant_id');
-	$self->instantiate_argument($tenant_id,$ADMIN->tenant_id);
+		my $tenant_id_key = $self->qvd_object_model->map_argument_to_dbix_format('tenant_id');
+		my $tenant_id_value = $ADMIN->tenant_id;
+
+		# Set tenant_id to -1 if global configuration is changed in monotenant
+		my $col = QVD::Admin4::ConfigsOverwriteList->new(admin_id => $ADMIN->id);
+		if( (!cfg('wat.multitenant')) and ($self->qvd_object_model->qvd_object eq 'Config') and
+			($col->is_global_config($self->get_json_adequate_value('key'))) ){
+			$tenant_id_value = -1;
+		}
+
+		$self->instantiate_argument($tenant_id_key,$tenant_id_value);
     }
 }
 
@@ -611,6 +623,7 @@ sub set_filters_in_request
 
     for my $k ($self->filters->list_filters) 
     {
+
 	my $is_property = $self->qvd_object_model->has_property($k);
 	my $key_dbix_format;
 
@@ -827,13 +840,22 @@ sub set_parameter
     $self->parameters->{$k} = $v;
 }
 
+# Returns the value of the key included in JSON from the filter list
+# or the argument list depending of the type of the action
+sub get_json_adequate_value{
+	my ($self, $key) = @_;
+	return $self->qvd_object_model->type_of_action eq 'delete' ?
+		$self->json_wrapper->get_filter_value($key) :
+		$self->json_wrapper->get_argument_value($key);
+}
+
 # Returns the value of the key passed as argument from the filter list
 # or the argument list depending of the type of the action
 sub get_adequate_value{
 	my ($self, $key) = @_;
 	return $self->qvd_object_model->type_of_action eq 'delete' ?
 		$self->json_wrapper->get_filter_value($key) :
-		$self->json_wrapper->get_argument_value($key);
+		$self->arguments->{$key} ;
 }
 
 sub action 

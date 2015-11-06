@@ -1043,25 +1043,28 @@ sub is_admin_allowed_to_config
 
 	# Check if configuration parameter to be changed is a global parameter
 	my $col = QVD::Admin4::ConfigsOverwriteList->new(admin_id => $admin->id);
-	my $col_re = $col->configs_global_re;
-	my $general_config = ($request->get_adequate_value('key') =~ /$col_re/);
+	my $global_config = $col->is_global_config($request->get_adequate_value('key'));
 
 	# Get the tenant_id the change will take place
 	my $tenant_id = $request->get_adequate_value('tenant_id') // $admin->tenant_id;
 
+	# if multitenant is enabled
+	if(cfg('wat.multitenant')) {
 	# Common administrators can only modify configuration in his tenant
-	if(!$admin->is_superadmin && ($admin->tenant_id != $tenant_id)){
+
+		if (!$admin->is_superadmin && ($admin->tenant_id != $tenant_id)) {
 		QVD::Admin4::Exception->throw(code => 4230);
 	}
 
 	# Local tokens cannot be defined as global
-	if($tenant_id == -1 && !$general_config){
+		if ($tenant_id == - 1 && !$global_config) {
 		QVD::Admin4::Exception->throw(code => 7380);
 	}
 
 	# Global tokens cannot be defined locally for a tenant
-	if($tenant_id != -1 && $general_config){
+		if ($tenant_id != - 1 && $global_config) {
 		QVD::Admin4::Exception->throw(code => 7381);
+	}
 	}
 
 	return 1;
