@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
-prefix = /usr/lib/qvd/wat
 
+prefix = /usr/lib/qvd
 install: 
 	mkdir -p $(DESTDIR)$(prefix)/wat
 	cp README.rd config.json index.html remember.html $(DESTDIR)$(prefix)/wat
