@@ -44,7 +44,7 @@
 #define CplusplusCmd /Applications/Xcode.app/Contents/Developer/usr/bin/g++ -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk -miphoneos-version-min=8.1
 /*#define CplusplusCmd arm-linux-androideabi-g++ */
 #define DoRanlibCmd YES
-#define RanlibCmd /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/ranlib
+#define RanlibCmd /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib
 /*#define RanlibCmd arm-linux-androideabi-ranlib*/
 #undef ExtraLoadFlags 
 /* #define ExtraLoadFlags -static -static-libgcc */
