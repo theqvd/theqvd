@@ -67,6 +67,7 @@
 #define ServerXdmcpDefines	/**/
 
 /* Use gcc instead of clang to build imake */
-#define HostCcCmd /usr/local/bin/gcc-4.7
+/* #define HostCcCmd /usr/local/bin/gcc-4.7 */
+#define HostCcCmd /opt/local/bin/gcc-mp-4.7
 #endif
 #include <cross.rules>
