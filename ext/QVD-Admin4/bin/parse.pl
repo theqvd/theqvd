@@ -2,7 +2,6 @@
 use strict;
 use 5.010;
 use warnings;
-use lib::glob '/home/benjamin/wat/*/lib/';
 use QVD::Admin4::CLI::Grammar;
 use QVD::Admin4::CLI::Parser;
 use QVD::Admin4::CLI::Grammar::Unificator;
