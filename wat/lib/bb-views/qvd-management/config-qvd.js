@@ -114,7 +114,13 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
                 },
             };
             
-            Wat.A.fillSelect(params);
+            Wat.A.fillSelect(params, function () {
+                // There are not tokens in supertenat context by the moment, so we delete the supertenant from tenant selector
+                $('select#tenant_search option[value="0"]').remove();
+
+                Wat.I.updateChosenControls('select#tenant_search');
+
+            });
         }
         
         this.renderConfigurationTokens();
