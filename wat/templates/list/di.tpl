@@ -209,7 +209,7 @@
                 %>
                                 <td class="desktop center">
                                     <% if (model.get('head')) { %>
-                                        <i class="fa fa-flag-o" data-i18n="[title]Head" title="Head"></i>
+                                        <i class="fa fa-flag-o" title="Head"></i>
                                     <% } %>
                                 </td>
                 <%

@@ -855,6 +855,7 @@ Wat.I = {
         // Reduce the wrapper layer because header will be increased due class application
         var currentHeight = $('.tablescroll .tablescroll_wrapper').height();
         $('.tablescroll .tablescroll_wrapper').css('height', (currentHeight - 50) + 'px');
+        $('.tablescroll .tablescroll_wrapper').css('min-height', '200px');
 
         // Remove horizontal scroll to wrapper layer
         $('.tablescroll .tablescroll_wrapper').css('overflow-x', 'hidden');

@@ -406,10 +406,15 @@ Wat.C = {
         if (!Wat.Router.watRouter) {
             return false;
         }
-        else if (response.status == STATUS_SESSION_EXPIRED || response.status == STATUS_CREDENTIALS_FAIL) {
+        else {
+            switch  (response.status) { 
+                case STATUS_SESSION_EXPIRED:
+                case STATUS_CREDENTIALS_FAIL:
+                case STATUS_NOT_LOGIN:
             $.cookie('messageToShow', JSON.stringify({'message': ALL_STATUS[response.status], 'messageType': 'error'}), {expires: 1, path: '/'});
             window.location = '#/logout';
             return true;
+        }
         }
         
         return false;
