@@ -3547,10 +3547,10 @@ td {
   .doc-text body {
     margin: 1em 5% 1em 5%; }
   .doc-text a {
-    color: #e35e0c;
+    color: #cb540a;
     text-decoration: underline; }
   .doc-text a:visited {
-    color: #e35e0c; }
+    color: #cb540a; }
   .doc-text em {
     font-style: italic;
     color: #823607; }

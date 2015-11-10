@@ -116,7 +116,6 @@ Wat.I.C = {
                 },
                 error: function (e) {
                     i++;
-                    
                     if (sassFiles[i]) {
                         writeSassFile (sassFiles[i])
                     }
@@ -157,7 +156,6 @@ Wat.I.C = {
                 Wat.I.C.sass.compileFile('/style.scss', function (result) {
                     if (result.status == 0) {
                         $('style[name="custom-preview-css"]').html(result.text);
-                        Wat.CurrentView.render();
                         Wat.I.loadingUnblock();
                         $('.js-customizer-wrapper').openMbExtruder();
                     }
