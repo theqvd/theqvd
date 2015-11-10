@@ -1,7 +1,6 @@
 #!/usr/lib/qvd/bin/perl
 use strict;
 use warnings;
-use lib::glob '/home/benjamin/wat/*/lib/';
 use QVD::Admin4::CLI;
 use QVD::Admin4::CLI::Grammar;
 use QVD::Admin4::CLI::Parser;
