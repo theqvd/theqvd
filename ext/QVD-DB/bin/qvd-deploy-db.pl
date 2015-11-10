@@ -58,6 +58,9 @@ sub initData {
 					} else { # Add values to the db
 						print(join(" | ", @currAttribValues) . "\n") if $verbose;
 						@currAttribHash{@currAttribNames} = @currAttribValues;
+						while ( my ( $key, $val ) = each %currAttribHash ) {
+							delete $currAttribHash{$key} if $val eq '\N';
+						}
 						rs($currTableName)->create(\%currAttribHash) unless $checkData;
 					}
 				}
@@ -114,8 +117,10 @@ sub get_file_content {
 ### Check IF DB IS DEPLOYED ###
 
 my $force;
+my $verbose = 0;
 my $datafile = "qvd-init-data.dat";
-GetOptions("force|f" => \$force, "file=s" => \$datafile) or exit (1);
+GetOptions("force|f" => \$force, "file=s" => \$datafile, "verbose|v" => \$verbose) or exit (1);
+
 unless ($force) {
 	eval { db->storage->dbh->do("select count(*) from configs;"); };
 	$@ or die "Database already contains QVD tables, use '--force' to redeploy the database\n";
@@ -153,7 +158,8 @@ my %initial_values = (
 db->deploy({add_drop_table => 1, add_enums => \%enumerates, add_init_vars => \%initial_values});
 
 # Populate database if DATA is valid
-initData({filepath => $datafile}) if initData({filepath => $datafile, check => 1});
+initData({filepath => $datafile})
+	if initData({filepath => $datafile, check => 1, verbose => $verbose});
 
 updateSeqs();
 
