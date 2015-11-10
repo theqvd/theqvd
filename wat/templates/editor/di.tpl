@@ -8,7 +8,7 @@
     </tr>
     <% } %>
     <tr>
-        <td data-i18n="Default"></td>
+        <td>Default</td>
         <td>
             <%
             if (model.get('default')) {

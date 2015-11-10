@@ -77,15 +77,27 @@
             <td><i class="fa fa-heart"></i><span data-i18n="State"></span></td>
             <td>
                 <% 
-            if (model.get('state') == 'running') {
+            switch (model.get('state')) {
+                case 'running':
                 %>
                 <span data-i18n data-wsupdate="state-text" data-id="<%= model.get('id') %>">Running</span>
                 <%
-                }
-                else {
+                    break;
+                case 'stopped':
                 %>
                 <span data-i18n data-wsupdate="state-text" data-id="<%= model.get('id') %>">Stopped</span>
                 <%
+                    break;
+                case 'starting':
+                %>
+                    <span data-i18n data-wsupdate="state-text" data-id="<%= model.get('id') %>">Starting</span>
+                <%
+                    break;
+                case 'stopping':
+                %>
+                    <span data-i18n data-wsupdate="state-text" data-id="<%= model.get('id') %>">Stopping</span>
+                <%
+                    break;
                 }
                 %>
             </td>

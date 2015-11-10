@@ -60,7 +60,7 @@
     if (Wat.C.checkACL('di.create.default')) { 
     %>
     <tr>
-        <td data-i18n="Default"></td>
+        <td>Default</td>
         <td class="cell-check">
              <input type="checkbox" name="default" value="1">
         </td>

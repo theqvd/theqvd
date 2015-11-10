@@ -146,13 +146,13 @@
                                     
                                     if (model.get('head') && (!infoRestrictions || infoRestrictions.head)) {
                                     %>
-                                        <i class="fa fa-flag-o" data-i18n="[title]Head" title="<%= i18n.t('Head') %>"></i>
+                                        <i class="fa fa-flag-o" title="head"></i>
                                     <%
                                     }
                                     
                                     if (model.get('default') && (!infoRestrictions || infoRestrictions.default)) {
                                     %>
-                                        <i class="fa fa-home" data-i18n="[title]Default" title="<%= i18n.t('Default') %>"></i>
+                                        <i class="fa fa-home" title="default"></i>
                                     <%
                                     }
                                     

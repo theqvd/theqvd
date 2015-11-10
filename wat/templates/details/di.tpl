@@ -123,7 +123,7 @@
     if (detailsFields['default'] != undefined && model.get('default')) { 
     %>
         <tr>
-            <td><i class="fa fa-home"></i><span data-i18n="Default"></span></td>
+            <td><i class="fa fa-home"></i><span>Default</span></td>
             <td>
                 <div class="second_row" data-i18n="Default image for this OSF"></div>
             </td>
@@ -133,7 +133,7 @@
     if (detailsFields['head'] != undefined && model.get('head')) { 
     %>
         <tr> 
-            <td><i class="fa fa-flag-o"></i><span data-i18n="Head"></span></td>
+            <td><i class="fa fa-flag-o"></i><span>Head</span></td>
             <td>
                 <div class="second_row" data-i18n="Last image created on this OSF"></div>
             </td>
