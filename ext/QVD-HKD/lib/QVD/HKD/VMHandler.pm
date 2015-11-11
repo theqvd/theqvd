@@ -18,7 +18,7 @@ use QVD::HKD::Config::Network qw(netmask_len);
 
 use parent qw(QVD::HKD::Agent);
 
-my %hypervisor_class = map { $_ => __PACKAGE__ . '::' . uc $_ } qw(kvm lxc);
+my %hypervisor_class = map { $_ => __PACKAGE__ . '::' . uc $_ } qw(kvm lxc nothing);
 
 my $off = 0;
 sub _allocate_tcp_port {

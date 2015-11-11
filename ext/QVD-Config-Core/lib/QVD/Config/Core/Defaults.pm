@@ -524,3 +524,8 @@ internal.hkd.agent.l7rmonitor.delay = 60
 internal.hkd.agent.l7rkiller.delay = 61
 
 internal.hkd.agent.config.delay = 10
+
+internal.hkd.nothing.timeout.on_state.starting = 5
+internal.hkd.nothing.timeout.on_state.running = 5
+internal.hkd.nothing.timeout.on_state.stopping = 5
+internal.hkd.nothing.timeout.on_state.zombie = 100
