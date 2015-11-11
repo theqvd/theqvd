@@ -99,7 +99,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             });  
         }
                     
-        if ($('[name="tenant_id"]').length == 0) {
+        if ($('[name="tenant_id"]').val() == null) {
             fillFields();
         }
         else {
