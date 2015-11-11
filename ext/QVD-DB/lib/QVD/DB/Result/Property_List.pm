@@ -11,13 +11,13 @@ __PACKAGE__->add_columns(
 );
 
 __PACKAGE__->set_primary_key('id');
-__PACKAGE__->might_have(properties => 'QVD::DB::Result::Host_Property_List', 'property_id', { cascade_delete => 0 });
-__PACKAGE__->might_have(properties => 'QVD::DB::Result::OSF_Property_List', 'property_id', { cascade_delete => 0 });
-__PACKAGE__->might_have(properties => 'QVD::DB::Result::DI_Property_List', 'property_id', { cascade_delete => 0 });
-__PACKAGE__->might_have(properties => 'QVD::DB::Result::User_Property_List', 'property_id', { cascade_delete => 0 });
-__PACKAGE__->might_have(properties => 'QVD::DB::Result::VM_Property_List', 'property_id', { cascade_delete => 0 });
 __PACKAGE__->belongs_to(tenant => 'QVD::DB::Result::Tenant',  'tenant_id', { cascade_delete => 0 });
-__PACKAGE__->has_many(properties => 'QVD::DB::Result::OSF_Property', 'property_id', { cascade_delete => 0 });
+__PACKAGE__->might_have(properties => 'QVD::DB::Result::Host_Property_List', 'property_id', { cascade_delete => 1 });
+__PACKAGE__->might_have(properties => 'QVD::DB::Result::OSF_Property_List', 'property_id', { cascade_delete => 1 });
+__PACKAGE__->might_have(properties => 'QVD::DB::Result::DI_Property_List', 'property_id', { cascade_delete => 1 });
+__PACKAGE__->might_have(properties => 'QVD::DB::Result::User_Property_List', 'property_id', { cascade_delete => 1 });
+__PACKAGE__->might_have(properties => 'QVD::DB::Result::VM_Property_List', 'property_id', { cascade_delete => 1 });
+__PACKAGE__->has_many(properties => 'QVD::DB::Result::OSF_Property', 'property_id', { cascade_delete => 1 });
 
 sub tenant_name
 {
