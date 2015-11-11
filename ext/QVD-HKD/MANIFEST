@@ -31,6 +31,7 @@ QVD-HKD/lib/QVD/HKD/VMHandler/LXC/FS/aufs.pm
 QVD-HKD/lib/QVD/HKD/VMHandler/LXC/FS/bind.pm
 QVD-HKD/lib/QVD/HKD/VMHandler/LXC.pm
 QVD-HKD/lib/QVD/HKD/VMHandler/KVM.pm
+QVD-HKD/lib/QVD/HKD/VMHandler/NOTHING.pm
 Makefile.PL
 MANIFEST
 README
