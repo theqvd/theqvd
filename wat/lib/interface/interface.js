@@ -790,7 +790,7 @@ Wat.I = {
             return undefined;
         }
         
-        var selectedId = -1;
+        var selectedId = FILTER_ALL;
         
         $.each (options, function (iOption, option) {
             if (option.selected) {
@@ -992,7 +992,7 @@ Wat.I = {
                     $('[name="' + fName + '"]').val('');
                     break;
                 case 'SELECT':
-                    $('[name="' + fName + '"]').val(-1);
+                    $('[name="' + fName + '"]').val(FILTER_ALL);
                     $('[name="' + fName + '"]').trigger('chosen:updated');
                     break;
             }

@@ -88,7 +88,7 @@ Wat.I.formFilters[qvdObj] = {
         'fillable': false,
         'options': [
             {
-                'value': -1,
+                'value': FILTER_ALL,
                 'text': 'All',
                 'selected': true
             }

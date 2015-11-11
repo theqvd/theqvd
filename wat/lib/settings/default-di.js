@@ -238,7 +238,7 @@ Wat.I.formFilters[qvdObj] = {
         'displayDesktop': true,
         'options': [
             {
-                'value': -1,
+                'value': FILTER_ALL,
                 'text': 'All',
                 'selected': true
             }
@@ -253,7 +253,7 @@ Wat.I.formFilters[qvdObj] = {
         'fillable': false,
         'options': [
             {
-                'value': -1,
+                'value': FILTER_ALL,
                 'text': 'All',
                 'selected': true
             },
@@ -278,7 +278,7 @@ Wat.I.formFilters[qvdObj] = {
         'fillable': true,
         'options': [
             {
-                'value': -1,
+                'value': FILTER_ALL,
                 'text': 'All',
                 'selected': true
             }

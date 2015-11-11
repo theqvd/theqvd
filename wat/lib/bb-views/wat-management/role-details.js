@@ -3,8 +3,8 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     secondaryContainer: '.bb-setup',
     qvdObj: 'role',
     
-    filterSection: '-1',
-    filterAction: '-1',
+    filterSection: FILTER_ALL,
+    filterAction: FILTER_ALL,
     
     relatedDoc: {
         permissions_introduction: "Permissions introduction",

@@ -196,7 +196,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         // Virtual machine form include a date time picker control, so we need enable it
         Wat.I.enableDataPickers();
         
-        var osfId = -1;
+        var osfId = FILTER_ALL;
         // If there are returned more than 1 OSFs, it will restrict tag selection to head and default
         if($.unique(that.retrievedData.rows).length == 1) {
             osfId = that.retrievedData.rows[0];

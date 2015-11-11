@@ -219,10 +219,10 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 delete that.initFilters[filterControl.attr('data-filter-field')];
             }
             
-            // If input text box is empty or selected option in a select is All (-1) skip filter control
+            // If input text box is empty or selected option in a select is All skip filter control
             switch(filter.type) {
                 case 'select':
-                    if (filterControl.val() == '-1' || filterControl.val() == undefined) {
+                    if (filterControl.val() == FILTER_ALL || filterControl.val() == undefined) {
                         return true;
                     }
                     
@@ -409,10 +409,10 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
 
             $.each(this.formFilters, function(name, filter) {
                 var filterControl = $(filtersContainer + ' [name="' + name + '"]');
-                // If input text box is empty or selected option in a select is All (-1) skip filter control
+                // If input text box is empty or selected option in a select is All skip filter control
                 switch(filter.type) {
                     case 'select':
-                        if (filterControl.val() == '-1' || filterControl.val() == undefined) {
+                        if (filterControl.val() == FILTER_ALL || filterControl.val() == undefined) {
                             return true;
                         }
                         filterNotes[filterControl.attr('name')] = {
@@ -598,7 +598,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                                         'fillable': true,
                                         'options': [
                                             {
-                                                'value': -1,
+                                                'value': FILTER_ALL,
                                                 'text': 'All',
                                                 'selected': true
                                             }
@@ -850,6 +850,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         var that = this;
                 
         var currentExistsInSupertenant = $.inArray(that.qvdObj, QVD_OBJS_EXIST_IN_SUPERTENANT) != -1;
+        var currentExistsOutTenant = $.inArray(that.qvdObj, QVD_OBJS_EXIST_OUT_TENANT) != -1;
         var currentClassifiedByTenant = $.inArray(that.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
         
         $.each(this.formFilters, function(name, filter) {
@@ -877,7 +878,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                                     };
 
                                     Wat.A.fillSelect(params, function () {
-                                        var filteredByTenant = $('select[name="tenant"]').val() != -1;
+                                        var filteredByTenant = $('select[name="tenant"]').val() >= SUPERTENANT_ID;
 
                                         var tenants = [];
                                         $.each($('select[name="tenant"] option'), function (iT, tenantOption) {
@@ -892,7 +893,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                                                 'showTenant': true
                     }
                     
-                                            if ($(tenantOption).val() == -1 || filteredByTenant) {
+                                            if ($(tenantOption).val() < SUPERTENANT_ID || filteredByTenant) {
                                                 tenant.showTenant = false;
                                             }
 
@@ -942,6 +943,13 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                         'startingOptions': Wat.I.getFilterStartingOptions(filter.options),
                             'nameAsId': filter.nameAsId
                     };
+
+                        if (currentExistsOutTenant) {
+                            var paramGlobal = {};
+                            paramGlobal[COMMON_TENANT_ID] = 'None (Common)';
+                            
+                            params['startingOptions'] = $.extend({}, params['startingOptions'], paramGlobal);
+                        }
 
                     Wat.A.fillSelect(params, function () {
                         // In tenant case (except in admins list) has not sense show supertenant in filters

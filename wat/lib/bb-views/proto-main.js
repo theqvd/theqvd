@@ -165,6 +165,13 @@ Wat.Views.MainView = Backbone.View.extend({
                 'chosenType': 'single100'
             };
             
+            var existsOutTenant = $.inArray(that.qvdObj, QVD_OBJS_EXIST_OUT_TENANT) != -1;
+
+            if (existsOutTenant) {
+                    params['startingOptions'] = {};
+                    params['startingOptions'][COMMON_TENANT_ID] = 'None (Common)';   
+            }
+            
             Wat.A.fillSelect(params, function () {
                 // Remove supertenant from tenant selector
                 var existsInSupertenant = $.inArray(that.qvdObj, QVD_OBJS_EXIST_IN_SUPERTENANT) != -1;

@@ -439,7 +439,7 @@ Wat.B = {
                 case 'select':
                     Wat.CurrentView.cleanFilter($('[name="' + name + '"]').attr('data-filter-field'));
                     
-                    $('[name="' + name + '"]').val(-1);
+                    $('[name="' + name + '"]').val(FILTER_ALL);
                     $('[name="' + name + '"]').trigger('change');
                     break;
                 case 'text':

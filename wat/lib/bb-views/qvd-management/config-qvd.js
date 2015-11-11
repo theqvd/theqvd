@@ -2,7 +2,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     setupOption: 'administrators',
     secondaryContainer: '.bb-setup',
     qvdObj: 'config',
-    selectedTenant: -1,
+    selectedTenant: COMMON_TENANT_ID,
     
     setupOption: 'profile',
     
@@ -110,9 +110,10 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
                 'controlId': 'tenant_search',
                 'chosenType': 'single100',
                 'startingOptions': {
-                    '-1' : 'None (Globals)',
                 },
             };
+            
+            params['startingOptions'][COMMON_TENANT_ID] = 'None (Common)';
             
             Wat.A.fillSelect(params, function () {
                 // There are not tokens in supertenat context by the moment, so we delete the supertenant from tenant selector

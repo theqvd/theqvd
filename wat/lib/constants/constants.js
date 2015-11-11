@@ -193,11 +193,15 @@ QVD_OBJS_WITH_PROPERTIES = ['user', 'vm', 'host', 'osf', 'di'];
 QVD_OBJS_CLASSIFIED_BY_TENANT = ['user', 'vm', 'osf', 'di', 'administrator', 'log', 'role', 'property'];
 QVD_OBJS_MASSIVE_EDITABLE = ['user', 'vm', 'host', 'osf', 'di', 'administrator', 'role', 'tenant'];
 QVD_OBJS_EXIST_IN_SUPERTENANT = ['role', 'administrator', 'property'];
+QVD_OBJS_EXIST_OUT_TENANT = ['role'];
 QVD_OBJS_PLATFORM = ['home', 'user', 'vm', 'host', 'osf', 'di'];
 QVD_OBJS_SETUP = ['role', 'administrator', 'tenant', 'views', 'watconfig'];
 QVD_OBJS_USERAREA = ['profile', 'myviews'];
 QVD_OBJS_HELP = ['about', 'documentation'];
 QVD_OBJS_QVDCONFIG = ['config'];
+
+// Filters
+FILTER_ALL = -10;
 
 // Recover user
 RECOVER_USER_ID = 0;
@@ -305,7 +309,7 @@ LOG_TYPE_OBJECTS_ICONS = {
 // Antiquity standard options for selects
 ANTIQUITY_OPTIONS = [
     {
-        'value': -1,
+        'value': FILTER_ALL,
         'text': 'All',
         'selected': true
     },
