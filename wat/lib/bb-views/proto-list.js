@@ -126,9 +126,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     // Render list sorted by a column
     sort: function (e) { 
-        // Show loading animation while loading
-        this.loadingList();
-        
         // Find the TH cell, because sometimes you can click on the icon
         if ($(e.target).get(0).tagName == 'TH') {
             var sortCell = $(e.target).get(0);    
