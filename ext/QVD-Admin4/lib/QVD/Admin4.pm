@@ -413,17 +413,13 @@ sub create_or_update
     my ($self,$request) = @_;
     my $result;
     my $obj;
-    for (1 .. 20) # FIX ME!!! This is to avoid problems with concurrent updates
-    {             # For some reason, it happens sometimes in the test with this function 
-	eval
-	{
-	    $DB->txn_do( sub { $obj = $DB->resultset($request->table)->update_or_create($request->arguments);
+
+	eval {
+		$DB->txn_do( sub {
+			$obj = $DB->resultset($request->table)->update_or_create($request->arguments);
 			       $result->{rows} = [ $obj ] } )
 	};
     
-	last unless $@;
-    }
-
     my $e = $@ ? QVD::Admin4::Exception->new(exception => $@, query => 'set') : undef;
 
     $self->report_in_log($request,$obj, $e ? $e->code : 0);
@@ -481,16 +477,15 @@ sub vm_start
 
     for my $vm (@{$result->{rows}})
     {
-	for (1 .. 5) { eval { $DB->txn_do( sub {
-
+		eval {
+			$DB->txn_do( sub {
 		  $vm->vm_runtime->can_send_vm_cmd('start')  ||
 		  QVD::Admin4::Exception->throw(code => 5130, 
 					      object => $vm->vm_runtime->vm_state);
 		  $self->vm_assign_host($vm->vm_runtime);
 		  $vm->vm_runtime->send_vm_start;
 		  $host{$vm->vm_runtime->host_id}++;}
-
-				  ) }; $@ or last; } 
+			) };
 
 	$failures->{$vm->id} = QVD::Admin4::Exception->new(exception => $@)->json if $@; 
 	$self->report_in_log($request,$vm,$failures && exists $failures->{$vm->id} ? $failures->{$vm->id}->{status} : 0);
@@ -514,12 +509,11 @@ sub vm_stop
 
     for my $vm (@{$result->{rows}})
     {
-	for (1 .. 5) { eval { $DB->txn_do( sub {
-
+		eval {
+			$DB->txn_do( sub {
 		  $vm->vm_runtime->send_vm_stop;
 		  $host{$vm->vm_runtime->host_id}++; }
-
-				  ) }; $@ or last; } 
+			) };
        
 	$failures->{$vm->id} = QVD::Admin4::Exception->new(
 	    code => 5120, object => $vm->vm_runtime->vm_state)->json if $@; 
