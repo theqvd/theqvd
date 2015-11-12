@@ -11,4 +11,10 @@ __PACKAGE__->set_primary_key('host_id', 'property_id');
 __PACKAGE__->belongs_to(host => 'QVD::DB::Result::Host', 'host_id');
 __PACKAGE__->belongs_to(host_properties_list => 'QVD::DB::Result::Host_Property_List', 'property_id');
 
+sub key
+{
+	my $self = shift;
+	return $self->host_properties_list->properties_list->key;
+}
+
 1;

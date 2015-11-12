@@ -11,5 +11,10 @@ __PACKAGE__->set_primary_key('osf_id', 'property_id');
 __PACKAGE__->belongs_to(osf => 'QVD::DB::Result::OSF', 'osf_id');
 __PACKAGE__->belongs_to(osf_properties_list => 'QVD::DB::Result::OSF_Property_List', 'property_id');
 
+sub key
+{
+	my $self = shift;
+	return $self->osf_properties_list->properties_list->key;
+}
 
 1;

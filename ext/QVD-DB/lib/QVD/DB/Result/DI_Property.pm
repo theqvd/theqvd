@@ -11,4 +11,10 @@ __PACKAGE__->set_primary_key('di_id', 'property_id');
 __PACKAGE__->belongs_to(di => 'QVD::DB::Result::DI', 'di_id');
 __PACKAGE__->belongs_to(di_properties_list => 'QVD::DB::Result::DI_Property_List', 'property_id');
 
+sub key
+{
+	my $self = shift;
+	return $self->di_properties_list->properties_list->key;
+}
+
 1;
