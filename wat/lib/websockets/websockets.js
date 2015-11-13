@@ -198,6 +198,22 @@ Wat.WS = {
         }
         
             $.each(row, function (field, value) {
+                var paramsChange = {};
+                paramsChange[field] = value;
+                
+                if (viewType == 'details' && Wat.CurrentView.model) {
+                    var model = Wat.CurrentView.model;
+                }
+                else if (viewType == 'list') {
+                    var model = Wat.CurrentView.collection.where({id: id})[0];
+                }
+
+                // Update model
+                model.set(paramsChange);
+
+                // Check visibility conditions of the selected items dialog. Usefull when this dialog is opened during websockets changes
+                Wat.I.checkVisibilityConditions();
+                
             switch (qvdObj) {
                 case 'vm':
                     Wat.WS.changeWebsocketVm(id, field, value, viewType);

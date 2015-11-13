@@ -234,17 +234,32 @@ Wat.I.selectedActions[qvdObj] = {
     'block': {
         'text': 'Block',
         'acls': 'user.update-massive.block',
-        'iconClass': 'fa fa-lock'
+        'iconClass': 'fa fa-lock',
+        'visibilityCondition': {
+            'type': 'eq',
+            'field': 'blocked',
+            'value': '0'
+        }
     },
     'unblock': {
         'text': 'Unblock',
         'acls': 'user.update-massive.block',
-        'iconClass': 'fa fa-unlock-alt'
+        'iconClass': 'fa fa-unlock-alt',
+        'visibilityCondition': {
+            'type': 'eq',
+            'field': 'blocked',
+            'value': '1'
+        }
     },
     'disconnect_all': {
         'text': 'Disconnect',
         'acls': 'vm.update-massive.disconnect-user',
-        'iconClass': 'fa fa-plug'
+        'iconClass': 'fa fa-plug',
+        'visibilityCondition': {
+            'type': 'ne',
+            'field': 'number_of_vms_connected',
+            'value': '0'
+        }
     },
     'delete': {
         'text': 'Delete',

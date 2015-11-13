@@ -570,27 +570,52 @@ Wat.I.selectedActions[qvdObj] = {
     'start': {
         'text': 'Start',
         'acls': 'vm.update-massive.state',
-        'iconClass': 'fa fa-play'
+        'iconClass': 'fa fa-play',
+        'visibilityCondition': {
+            'type': 'eq',
+            'field': 'state',
+            'value': 'stopped'
+        }
     },
     'stop': {
         'text': 'Stop',
         'acls': 'vm.update-massive.state',
-        'iconClass': 'fa fa-stop'
+        'iconClass': 'fa fa-stop',
+        'visibilityCondition': {
+            'type': 'ne',
+            'field': 'state',
+            'value': 'stopped'
+        }
     },
     'block': {
         'text': 'Block',
         'acls': 'vm.update-massive.block',
-        'iconClass': 'fa fa-lock'
+        'iconClass': 'fa fa-lock',
+        'visibilityCondition': {
+            'type': 'eq',
+            'field': 'blocked',
+            'value': '0'
+        }
     },
     'unblock': {
         'text': 'Unblock',
         'acls': 'vm.update-massive.block',
-        'iconClass': 'fa fa-unlock-alt'
+        'iconClass': 'fa fa-unlock-alt',
+        'visibilityCondition': {
+            'type': 'eq',
+            'field': 'blocked',
+            'value': '1'
+        }
     },
     'disconnect': {
         'text': 'Disconnect user',
         'acls': 'vm.update-massive.disconnect-user',
-        'iconClass': 'fa fa-plug'
+        'iconClass': 'fa fa-plug',
+        'visibilityCondition': {
+            'type': 'eq',
+            'field': 'user_state',
+            'value': 'connected'
+        }
     },
     'delete': {
         'text': 'Delete',

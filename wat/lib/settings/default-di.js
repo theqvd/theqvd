@@ -340,12 +340,22 @@ Wat.I.selectedActions[qvdObj] = {
     'block': {
         'text': 'Block',
         'acls': 'di.update-massive.block',
-        'iconClass': 'fa fa-lock'
+        'iconClass': 'fa fa-lock',
+        'visibilityCondition': {
+            'type': 'eq',
+            'field': 'blocked',
+            'value': '0'
+        }
     },           
     'unblock': {
         'text': 'Unblock',
         'acls': 'di.update-massive.block',
-        'iconClass': 'fa fa-unlock-alt'
+        'iconClass': 'fa fa-unlock-alt',
+        'visibilityCondition': {
+            'type': 'eq',
+            'field': 'blocked',
+            'value': '1'
+        }
     },
     'delete': {
         'text': 'Delete',

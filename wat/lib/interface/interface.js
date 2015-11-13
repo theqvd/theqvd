@@ -679,16 +679,51 @@ Wat.I = {
             this.showSelectedItemsMenu();
             
             if (selectedItems == 1) {
+                this.checkVisibilityConditions();
+                
                 $('.js-only-one').show();
                 $('.js-only-massive').hide();
             }
             else {
+                $('[data-visibility-conditioned]').show();
                 $('.js-only-massive').show();
                 $('.js-only-one').hide();
             }
         }
     },
     
+    checkVisibilityConditions: function () {
+        if ($('[data-visibility-conditioned]').length > 0) {
+            var selectedId = Wat.CurrentView.selectedItems[0];
+            var selectedModel = Wat.CurrentView.collection.where({id: selectedId})[0];
+            
+            if (!selectedId) {
+                return;
+            }
+            
+            $.each($('[data-visibility-conditioned]'), function (i, element) {
+                var conditionType = $(element).attr('data-visibility-cond-type');
+                var conditionField = $(element).attr('data-visibility-cond-field');
+                var conditionValue = $(element).attr('data-visibility-cond-value');
+                                
+                $(element).hide();    
+                
+                switch(conditionType) {
+                    case 'eq':
+                            if (selectedModel.get(conditionField) == conditionValue) {
+                                $(element).show();   
+                            }
+                        break;
+                    case 'ne':
+                            if (selectedModel.get(conditionField) != conditionValue) {
+                                $(element).show();     
+                            }
+                        break;
+                }
+            });
+        }
+    },
+
     hideSelectedItemsMenu: function () {
         $('.js-pagination,.js-list,.js-shown-elements').animate({ 'marginRight': '0px' }, 200);
         $('.js-action-selected').hide( "slide" );
