@@ -308,11 +308,13 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
                 var progressData = [data.copy_size, data.total_size - data.copy_size];
                 Wat.I.G.drawPieChartSimple('loading-block', progressData);
 
+                var step = 5;
+
                 if (percent == 100) {
                     var progressHiddenInput = '<input type="hidden" data-di-uploading="completed">';
                 }
                 else {
-                    var progressHiddenInput = '<input type="hidden" data-di-uploading="inprogress-' + percent + '">';
+                    var progressHiddenInput = '<input type="hidden" data-di-uploading="inprogress-' + Math.floor(percent/step)*step + '">';
                 }
                 
                 var progressMessage = '';

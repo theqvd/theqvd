@@ -14,8 +14,16 @@
 <tr><td><a href="../cases/load_topmenu_sec_dis">load_topmenu_sec_dis</a></td></tr>
 <tr><td><a href="../cases/new_button_click">new_button_click</a></td></tr>
 <tr><td><a href="../cases/fill_form_di_creation_staging">fill_form_di_creation_staging</a></td></tr>
+<tr><td><a href="../cases/store_di_id_ubuntu">store_di_id_ubuntu</a></td></tr>
+<tr><td><a href="../cases/di_check_box">di_check_box</a></td></tr>
+<tr><td><a href="../cases/selected_actions_click_delete">selected_actions_click_delete</a></td></tr>
+<tr><td><a href="../cases/di_wait_not_present_ubuntu">di_wait_not_present_ubuntu</a></td></tr>
 <tr><td><a href="../cases/new_button_click">new_button_click</a></td></tr>
 <tr><td><a href="../cases/fill_form_di_creation_url">fill_form_di_creation_url</a></td></tr>
+<tr><td><a href="../cases/store_di_id_suse">store_di_id_suse</a></td></tr>
+<tr><td><a href="../cases/di_check_box">di_check_box</a></td></tr>
+<tr><td><a href="../cases/selected_actions_click_delete">selected_actions_click_delete</a></td></tr>
+<tr><td><a href="../cases/di_wait_not_present_suse">di_wait_not_present_suse</a></td></tr>
 </tbody></table>
 </body>
 </html>

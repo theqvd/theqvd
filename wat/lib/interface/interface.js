@@ -366,6 +366,12 @@ Wat.I = {
         
         if (Wat.C.language != 'auto') {
             var lan = Wat.T.getLanguage(Wat.C.language);
+            
+            // If lan is auto, change i18next macro by navigator language
+            if (lan == '__lng__') {
+                lan = navigator.language;
+            }
+            
             options['lang'] = lan;
             optionsPast['lang'] = lan;
         }
