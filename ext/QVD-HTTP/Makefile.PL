@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME                => 'QVD::HTTP',
-    AUTHOR              => 'Salvador Fandiño <sfandino@yahoo.com>',
+    AUTHOR              => 'Salvador Fandino <sfandino@yahoo.com>',
     VERSION	        => '3.1'.$ENV{BUILD_NUMBER},
     ABSTRACT            => 'lib/QVD/HTTP.pm',
     PL_FILES            => {},

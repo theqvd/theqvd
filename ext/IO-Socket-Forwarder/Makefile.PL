@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME                => 'IO::Socket::Forwarder',
-    AUTHOR              => 'Salvador Fandiño <sfandino@yahoo.com>',
+    AUTHOR              => 'Salvador Fandino <sfandino@yahoo.com>',
     VERSION_FROM        => 'lib/IO/Socket/Forwarder.pm',
     ABSTRACT_FROM       => 'lib/IO/Socket/Forwarder.pm',
     PL_FILES            => {},

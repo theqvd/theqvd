@@ -588,7 +588,7 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head1 AUTHOR
 
-Salvador Fandiño, C<< <sfandino at yahoo.com> >>
+Salvador Fandino, C<< <sfandino at yahoo.com> >>
 
 =head1 COPYRIGHT
 
