@@ -209,7 +209,9 @@ Wat.WS = {
                 }
 
                 // Update model
+                if (model) {
                 model.set(paramsChange);
+                }
 
                 // Check visibility conditions of the selected items dialog. Usefull when this dialog is opened during websockets changes
                 Wat.I.checkVisibilityConditions();

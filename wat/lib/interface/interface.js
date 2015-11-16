@@ -677,15 +677,13 @@ Wat.I = {
         }
         else {
             this.showSelectedItemsMenu();
-            
-            if (selectedItems == 1) {
                 this.checkVisibilityConditions();
                 
+            if (selectedItems == 1) {
                 $('.js-only-one').show();
                 $('.js-only-massive').hide();
             }
             else {
-                $('[data-visibility-conditioned]').show();
                 $('.js-only-massive').show();
                 $('.js-only-one').hide();
             }
@@ -694,13 +692,6 @@ Wat.I = {
     
     checkVisibilityConditions: function () {
         if ($('[data-visibility-conditioned]').length > 0) {
-            var selectedId = Wat.CurrentView.selectedItems[0];
-            var selectedModel = Wat.CurrentView.collection.where({id: selectedId})[0];
-            
-            if (!selectedId) {
-                return;
-            }
-            
             $.each($('[data-visibility-conditioned]'), function (i, element) {
                 var conditionType = $(element).attr('data-visibility-cond-type');
                 var conditionField = $(element).attr('data-visibility-cond-field');
@@ -708,17 +699,33 @@ Wat.I = {
                                 
                 $(element).hide();    
                 
+                var positiveItems = 0;
+                $.each(Wat.CurrentView.selectedItems, function (i, selectedId) {
+                    var selectedModel = Wat.CurrentView.collection.where({id: selectedId})[0];      
+                    
+                    // If any item is out of view (other page), all options will be shown
+                    if (selectedModel == undefined) {
+                        $(element).show();
+                        return false;
+                    }
+                    
                 switch(conditionType) {
                     case 'eq':
                             if (selectedModel.get(conditionField) == conditionValue) {
-                                $(element).show();   
+                                    positiveItems++;   
                             }
                         break;
                     case 'ne':
                             if (selectedModel.get(conditionField) != conditionValue) {
-                                $(element).show();     
+                                    positiveItems++;     
                             }
                         break;
+                }
+            });
+                
+                // If any item was positive in check, show the conditioned option
+                if (positiveItems > 0) {
+                    $(element).show();
                 }
             });
         }
