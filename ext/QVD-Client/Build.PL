@@ -15,7 +15,7 @@ my $mod = Module::Build->subclass(
 			my @po_files = glob("po/*.po");
 			foreach my $po_file (@po_files) {
 				my ($lang) = ( $po_file =~ /po\/(.*?)\.po$/ );
-				my $d = "blib/locale/$lang/LC_MESSAGES";
+				my $d = "share/locale/$lang/LC_MESSAGES";
 				mkpath($d) unless (-d $d);
 				Locale::Msgfmt::msgfmt({ in => $po_file, out => "$d/qvd-gui-client.mo" });
 
@@ -79,7 +79,7 @@ my $build = $mod->new (
 		                },
 		desktop_files => {
 				  'desktop/qvd.desktop' => 'desktop/qvd.desktop'
-		}
+		}, 
 );
 
 $build->install_path('pixmaps' => $build->config()->{installprefix} . "/pixmaps");
