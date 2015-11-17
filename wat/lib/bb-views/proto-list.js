@@ -656,15 +656,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
 
         that.collection.fetch({      
             complete: function () {
-                // If typed search is defined, check if typedSearch matchs with currentSearch. If not, do nothing
-                if (that.typedSearch) {
-                    var currentSearch = $(that.filtersContainer).find('.filter-control>input[type="text"]').val();
-                    
-                    if (that.typedSearch != currentSearch) {
-                        return;
-                    }
-                }
-
                 // If loaded page is not the first one and is empty, go to previous page
                 if (that.collection.offset > 1 && that.collection.length == 0) {
                     that.collection.offset--;

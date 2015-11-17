@@ -1058,8 +1058,6 @@ body {
         border-bottom: dotted 1px #e4e4e4; }
         .wrapper .content .home-wrapper tr td:last-child, .wrapper .content .home-wrapper tr th:last-child {
           border-right: 0px; }
-      .wrapper .content .home-wrapper tr:last-child td {
-        border-bottom: 0; }
       .wrapper .content .home-wrapper > tbody:nth-child(2) tr:first-child {
         td: first-child; }
       .wrapper .content .home-wrapper > tbody > tr:nth-child(even) {
@@ -1140,8 +1138,6 @@ body {
               border-bottom: dotted 1px #e4e4e4; }
               .wrapper .content .home-wrapper .home-row .home-cell .summary-table tr td:last-child, .wrapper .content .home-wrapper .home-row .home-cell .summary-table tr th:last-child {
                 border-right: 0px; }
-            .wrapper .content .home-wrapper .home-row .home-cell .summary-table tr:last-child td {
-              border-bottom: 0; }
             .wrapper .content .home-wrapper .home-row .home-cell .summary-table > tbody:nth-child(2) tr:first-child {
               td: first-child; }
             .wrapper .content .home-wrapper .home-row .home-cell .summary-table > tbody > tr:nth-child(even) {
@@ -1256,8 +1252,6 @@ body {
           border-bottom: dotted 1px #e4e4e4; }
           .wrapper .content .home-wrapper .log-table tr td:last-child, .wrapper .content .home-wrapper .log-table tr th:last-child {
             border-right: 0px; }
-        .wrapper .content .home-wrapper .log-table tr:last-child td {
-          border-bottom: 0; }
         .wrapper .content .home-wrapper .log-table > tbody:nth-child(2) tr:first-child {
           td: first-child; }
         .wrapper .content .home-wrapper .log-table > tbody > tr:nth-child(even) {
@@ -1974,8 +1968,6 @@ table.list, table.customize-fields {
     border-bottom: dotted 1px #e4e4e4; }
     table.list tr td:last-child, table.list tr th:last-child, table.customize-fields tr td:last-child, table.customize-fields tr th:last-child {
       border-right: 0px; }
-  table.list tr:last-child td, table.customize-fields tr:last-child td {
-    border-bottom: 0; }
   table.list > tbody:nth-child(2) tr:first-child, table.customize-fields > tbody:nth-child(2) tr:first-child {
     td: first-child; }
   table.list > tbody > tr:nth-child(even), table.customize-fields > tbody > tr:nth-child(even) {
@@ -2027,8 +2019,6 @@ table.custom-props, table.details {
     border-bottom: dotted 1px #e4e4e4; }
     table.custom-props tr td:last-child, table.custom-props tr th:last-child, table.details tr td:last-child, table.details tr th:last-child {
       border-right: 0px; }
-  table.custom-props tr:last-child td, table.details tr:last-child td {
-    border-bottom: 0; }
   table.custom-props > tbody:nth-child(2) tr:first-child, table.details > tbody:nth-child(2) tr:first-child {
     td: first-child; }
   table.custom-props > tbody > tr > td, table.details > tbody > tr > td {
@@ -2928,8 +2918,6 @@ table.role-template-tools {
     border-bottom: dotted 1px #e4e4e4; }
     table.role-template-tools tr td:last-child, table.role-template-tools tr th:last-child {
       border-right: 0px; }
-  table.role-template-tools tr:last-child td {
-    border-bottom: 0; }
   table.role-template-tools > tbody:nth-child(2) tr:first-child {
     td: first-child; }
   table.role-template-tools > tbody > tr:nth-child(even) {

@@ -204,7 +204,7 @@ Wat.WS = {
                 if (viewType == 'details' && Wat.CurrentView.model) {
                     var model = Wat.CurrentView.model;
                 }
-                else if (viewType == 'list') {
+                else if (viewType == 'list' && Wat.CurrentView.collection) {
                     var model = Wat.CurrentView.collection.where({id: id})[0];
                 }
 
