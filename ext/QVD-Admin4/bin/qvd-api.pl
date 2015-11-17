@@ -161,10 +161,10 @@ any [qw(POST GET)] => '/' => sub {
     my $json = $c->get_input_json;
     my $response = $c->process_api_query($json);
 
-# Retrieving the right encode is tricky. 
-# With this system accents and so on are supported. 
-# WARNING: we're rendering in json text mode. The json mode break the accents
-# Maybe a problem in Mojo?
+	# Retrieving the right encode is tricky.
+	# With this system accents and so on are supported.
+	# WARNING: we're rendering in json text mode. The json mode break the accents
+	# Maybe a problem in Mojo?
  
     deep_utf8_decode($response);
     $c->render(text => b(encode_json($response))->decode('UTF-8'));
