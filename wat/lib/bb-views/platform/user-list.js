@@ -13,7 +13,7 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
     
     openNewElementDialog: function (e) {
         this.model = new Wat.Models.User();
-        this.dialogConf.title = $.i18n.t('New user');
+        this.dialogConf.title = $.i18n.t('New User');
         Wat.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
     },
     
