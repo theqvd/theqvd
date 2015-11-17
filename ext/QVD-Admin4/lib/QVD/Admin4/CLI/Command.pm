@@ -473,7 +473,7 @@ my $FIELDS_CBS =
 			     return join "\n", @roles},
 
 	      acls =>  sub { my $acls = shift; 
-			     my @acls = sort ( (map { "$_ (+)" } @{$acls->{positive}}), 
+			     my @acls = sort( (map { "$_ (+)" } @{$acls->{positive}}),
 					       (map { "$_ (-)" } @{$acls->{negative}})); 
 			     return join "\n", @acls}},
 };

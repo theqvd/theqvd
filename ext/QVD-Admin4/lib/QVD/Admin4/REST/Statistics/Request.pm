@@ -34,10 +34,10 @@ my $ACTIONS =
 sub nested_actions
 {
     my $self = shift;
-    my $matrix_action = $self->json_wrapper->action //;
+    my $matrix_action = $self->json_wrapper->action;
     my @nested_actions = 
-	grep { $self->administrator->re_is_allowed_to(@{$ACTION->{$matrix_action}->{$_}->{acls}}) }
-	keys %{$ACTION->{$matrix_action}};
+	grep { $self->administrator->re_is_allowed_to(@{$ACTIONS->{$matrix_action}->{$_}->{acls}}) }
+	keys %{$ACTIONS->{$matrix_action}};
     \@nested_actions;
 }
 

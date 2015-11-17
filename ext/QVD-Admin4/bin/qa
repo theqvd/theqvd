@@ -2,16 +2,16 @@
 use strict;
 use 5.010;
 use warnings;
-use lib::glob '/home/benjamin/wat/*/lib/';
 use QVD::Admin4::CLI;
 
 # Script intended to create and run an instance of the CLI.
 
 my $app = QVD::Admin4::CLI->new();
-$app->run_interactive( initialize => 1 );
-
-
-
+if(@ARGV > 0) {
+	$app->run( initialize => 1 );
+} else {
+	$app->run_interactive( initialize => 1 );
+}
 
 __END__
 

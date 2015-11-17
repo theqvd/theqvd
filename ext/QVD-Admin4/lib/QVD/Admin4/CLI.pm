@@ -10,6 +10,12 @@ use Mojo::UserAgent;
 use Mojo::URL;
 use Term::ReadKey;
 
+our %environment_config = (
+	login => 'QVD_ADMIN_LOGIN',
+	password => 'QVD_ADMIN_PASSWORD',
+	tenant_name => 'QVD_ADMIN_TENANT',
+);
+
 sub usage_text { 
 "
 ==============================================================================
@@ -100,7 +106,7 @@ sub init {
 	(($opts->host || 'localhost'), 
 	 ($opts->port || 3000)); 
 
-# Created as objects all addresses in API
+	# Created as objects all addresses in API
 
     my $api_url = Mojo::URL->new(); 
     $api_url->scheme('http'); 
@@ -125,19 +131,18 @@ sub init {
     $api_di_upload_url->port($port); 
     $api_di_upload_url->path('/di/upload');
     
-# Created a web client
+	# Created a web client
 
     my $user_agent = Mojo::UserAgent->new;
 
-# Created objects to parse the input string
+	# Created objects to parse the input string
 
     my $unificator = QVD::Admin4::CLI::Grammar::Unificator->new();
     my $grammar = QVD::Admin4::CLI::Grammar->new();
-    my $parser = QVD::Admin4::CLI::Parser->new( 
-	grammar => $grammar, unificator => $unificator);
+	my $parser = QVD::Admin4::CLI::Parser->new(grammar => $grammar, unificator => $unificator);
     my $tokenizer = QVD::Admin4::CLI::Tokenizer->new();
 
-# Set parameters available from the whole app.
+	# Set parameters available from the whole app.
 
     $self->cache->set( user_agent => $user_agent ); 
     $self->cache->set( parser => $parser);
@@ -149,7 +154,19 @@ sub init {
     $self->cache->set( login => undef ); # No default credentials provided
     $self->cache->set( tenant_name => undef ); 
     $self->cache->set( password => undef ); 
-    $self->cache->set( block => 25 ); # FIX ME. Default block value should be taken from a config file or sth.
+	$self->cache->set( block => 25 ); # FIXME. Default block value should be taken from a config file or sth.
+
+	if (not $self->is_interactive_mode_enabled()){
+		for my $cache_key (keys %environment_config){
+			my $env_key = $environment_config{$cache_key};
+			if (not defined $ENV{$env_key}) {
+				printf("Environment variable %s is not defined\n", $env_key);
+			} else {
+				$self->cache->set( $cache_key => $ENV{$env_key} );
+			}
+		}
+	}
+
 }
 
 
@@ -207,6 +224,11 @@ sub read_cmd {
             if $command_request =~ /\S/ and !$term->Features->{autohistory};
     }
     return 1;
+}
+
+sub is_interactive_mode_enabled {
+	my $self = shift;
+	return $self->get_interactivity_mode();
 }
 
 1;
