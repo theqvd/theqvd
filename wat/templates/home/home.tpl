@@ -20,24 +20,17 @@
                                         <%= i18n.t('Users') %>
                                     <%= Wat.C.ifACL('</a>', 'user.see-main.') %>
                                 </div>
+                                <div class="summary-element-count js-summary-element-count">
+                                    <span class="summary-data js-summary-users" data-wsupdate="users_count"><%= stats.users_count %></span>
+                                </div>
                                 <div class="summary-element-icon js-summary-element-icon">
                                     <%= Wat.C.ifACL('<a href="#/users">', 'user.see-main.') %>
                                         <i class="<%= CLASS_ICON_USERS %>"></i>                                
                                     <%= Wat.C.ifACL('</a>', 'user.see-main.') %>
                                 </div>
                                 <div class="summary-element-count js-summary-element-count">
-                                    <span class="summary-data js-summary-users" data-wsupdate="users_count"><%= stats.users_count %></span>
-
                                     <table class="summary-element-subtable second_row">
                                         <tr>
-                                            <% if (Wat.C.checkACL('user.stats.blocked')) { %>
-                                            <td>
-                                                <%= Wat.C.ifACL('<a href="#/users/' + Wat.U.transformFiltersToSearchHash({blocked: 1}) + '">', 'user.see-main.') %>
-                                                    <span data-wsupdate="blocked_users_count"><%= stats.blocked_users_count %></span>/<span class="summary-data js-summary-users" data-wsupdate="users_count"><%= stats.users_count %></span>
-                                                    <span class="fa fa-lock" data-i18n="[title]Blocked"></span>
-                                                <%= Wat.C.ifACL('</a>', 'user.see-main.') %>
-                                            </td>
-                                            <% } %>
                                             <% if (Wat.C.checkACL('user.stats.connected-users')) { %>
                                             <td>
                                                 <%= Wat.C.ifACL('<a href="#/users">', 'user.see-main.') %>
@@ -59,24 +52,17 @@
                                         <%= i18n.t('Virtual machines') %>
                                     <%= Wat.C.ifACL('</a>', 'vm.see-main.') %>
                                 </div>
+                                <div class="summary-element-count js-summary-element-count">
+                                    <span class="summary-data js-summary-vms" data-wsupdate="vms_count"><%= stats.vms_count %></span>
+                                </div>
                                 <div class="summary-element-icon js-summary-element-icon">
                                     <%= Wat.C.ifACL('<a href="#/vms">', 'vm.see-main.') %>
                                         <i class="<%= CLASS_ICON_VMS %>"></i>
                                     <%= Wat.C.ifACL('</a>', 'vm.see-main.') %>
                                 </div>
                                 <div class="summary-element-count js-summary-element-count">
-                                    <span class="summary-data js-summary-vms" data-wsupdate="vms_count"><%= stats.vms_count %></span>
-
                                     <table class="summary-element-subtable second_row">
                                         <tr>
-                                            <% if (Wat.C.checkACL('vm.stats.blocked')) { %>
-                                            <td>
-                                                <%= Wat.C.ifACL('<a href="#/vms/' + Wat.U.transformFiltersToSearchHash({blocked: 1}) + '">', 'vm.see-main.') %>
-                                                    <span data-wsupdate="blocked_vms_count"><%= stats.blocked_vms_count %></span>/<span class="summary-data js-summary-vms" data-wsupdate="vms_count"><%= stats.vms_count %></span> 
-                                                    <span class="fa fa-lock" data-i18n="[title]Blocked"></span>
-                                                <%= Wat.C.ifACL('</a>', 'vm.see-main.') %>
-                                            </td>
-                                            <% } %>
                                             <% if (Wat.C.checkACL('vm.stats.running-vms')) { %>
                                             <td>
                                                 <%= Wat.C.ifACL('<a href="#/vms/' + Wat.U.transformFiltersToSearchHash({'state': 'running'}) + '">', 'vm.see-main.') %>
@@ -98,24 +84,17 @@
                                         <%= i18n.t('Nodes') %>
                                     <%= Wat.C.ifACL('</a>', 'host.see-main.') %>
                                 </div>
+                                <div class="summary-element-count js-summary-element-count">
+                                    <span class="summary-data js-summary-hosts" data-wsupdate="hosts_count"><%= stats.hosts_count %></span>
+                                </div>
                                 <div class="summary-element-icon js-summary-element-icon">
                                     <%= Wat.C.ifACL('<a href="#/hosts">', 'host.see-main.') %>
                                         <i class="<%= CLASS_ICON_HOSTS %>"></i>
                                     <%= Wat.C.ifACL('</a>', 'host.see-main.') %>
                                 </div>
                                 <div class="summary-element-count js-summary-element-count">
-                                    <span class="summary-data js-summary-hosts" data-wsupdate="hosts_count"><%= stats.hosts_count %></span>
-
                                     <table class="summary-element-subtable second_row">
                                         <tr>
-                                            <% if (Wat.C.checkACL('host.stats.blocked')) { %>
-                                            <td>
-                                                <%= Wat.C.ifACL('<a href="#/hosts/' + Wat.U.transformFiltersToSearchHash({blocked: 1}) + '">', 'host.see-main.') %>
-                                                    <span data-wsupdate="blocked_hosts_count"><%= stats.blocked_hosts_count %></span>/<span class="summary-data js-summary-hosts" data-wsupdate="hosts_count"><%= stats.hosts_count %></span> 
-                                                    <span class="fa fa-lock" data-i18n="[title]Blocked"></span>
-                                                <%= Wat.C.ifACL('</a>', 'host.see-main.') %>
-                                            </td>
-                                            <% } %>
                                             <% if (Wat.C.checkACL('host.stats.running-hosts')) { %>
                                             <td>
                                                 <%= Wat.C.ifACL('<a href="#/hosts/' + Wat.U.transformFiltersToSearchHash({state: 'running'}) + '">', 'host.see-main.') %>
@@ -137,13 +116,13 @@
                                         <%= i18n.t('OS Flavours') %>
                                     <%= Wat.C.ifACL('</a>', 'osf.see-main.') %>
                                 </div>
+                                <div class="summary-element-count js-summary-element-count">
+                                    <span class="summary-data js-summary-osfs" data-wsupdate="osfs_count"><%= stats.osfs_count %></span>
+                                </div>
                                 <div class="summary-element-icon js-summary-element-icon">
                                     <%= Wat.C.ifACL('<a href="#/osfs">', 'osf.see-main.') %>
                                         <i class="<%= CLASS_ICON_OSFS %>"></i>
                                     <%= Wat.C.ifACL('</a>', 'osf.see-main.') %>
-                                </div>
-                                <div class="summary-element-count js-summary-element-count">
-                                    <span class="summary-data js-summary-osfs" data-wsupdate="osfs_count"><%= stats.osfs_count %></span>
                                 </div>
                             </div>
                         </div>
@@ -155,26 +134,13 @@
                                         <%= i18n.t('Disk images') %>
                                     <%= Wat.C.ifACL('</a>', 'di.see-main.') %>
                                 </div>
+                                <div class="summary-element-count js-summary-element-count">
+                                    <span class="summary-data js-summary-dis" data-wsupdate="dis_count"><%= stats.dis_count %></span>
+                                </div>
                                 <div class="summary-element-icon js-summary-element-icon">
                                     <%= Wat.C.ifACL('<a href="#/dis">', 'di.see-main.') %>
                                         <i class="<%= CLASS_ICON_DIS %>"></i>
                                     <%= Wat.C.ifACL('</a>', 'di.see-main.') %>
-                                </div>
-                                <div class="summary-element-count js-summary-element-count">
-                                    <span class="summary-data js-summary-dis" data-wsupdate="dis_count"><%= stats.dis_count %></span>
-
-                                    <table class="summary-element-subtable second_row">
-                                        <tr>
-                                            <% if (Wat.C.checkACL('di.stats.blocked')) { %>
-                                            <td>
-                                                <%= Wat.C.ifACL('<a href="#/dis/' + Wat.U.transformFiltersToSearchHash({blocked: 1}) + '">', 'di.see-main.') %>
-                                                    <span class="summary-data js-summary-blocked-dis" data-wsupdate="blocked_dis_count"><%= stats.blocked_dis_count %></span>/<span class="summary-data js-summary-dis" data-wsupdate="dis_count"><%= stats.dis_count %></span> 
-                                                    <span class="fa fa-lock" data-i18n="[title]Blocked"></span>
-                                                <%= Wat.C.ifACL('</a>', 'di.see-main.') %>
-                                            </td>
-                                            <% } %>
-                                        </tr>
-                                    </table>
                                 </div>
                             </div>
                         </div>
