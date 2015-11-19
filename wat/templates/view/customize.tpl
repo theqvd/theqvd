@@ -12,7 +12,7 @@
      <fieldset>
         <div class="customize-section-selectors">
             <div class="customize-section-selector">
-                <label for="obj-qvd-select">Section</label>
+                <label for="obj-qvd-select" data-i18n="Section"></label>
                 <select name="obj-qvd-select" class="chosen-single">
                     <%
                     if (!limitByACLs || Wat.C.checkACL('user.see-main.')) {

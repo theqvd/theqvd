@@ -10,7 +10,7 @@
          <fieldset>
             <div class="customize-section-selectors">
                 <div class="customize-section-selector">
-                    <label for="obj-qvd-select" data-i18n>Section</label>
+                    <label for="obj-qvd-select" data-i18n="Section"></label>
                     <select name="obj-qvd-select" class="chosen-single">
                             <option data-i18n="All" value="all" <%= selectedObj == "all" ? 'selected' : '' %>></option>
 

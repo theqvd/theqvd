@@ -58,7 +58,7 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
     },
     
     openEditElementDialog: function(e) {     
-        this.dialogConf.title = $.i18n.t('Edit Profile');
+        this.dialogConf.title = $.i18n.t('Edit profile');
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
 
         Wat.I.chosenConfiguration();
