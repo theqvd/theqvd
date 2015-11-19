@@ -47,9 +47,9 @@ use Class::StateMachine::Declarative
                                   nothing2 => { enter => '_do_nothing' } ] },
 
     running   => { on => { on_hkd_kill => '_on_error',
-                           on_expired => '_on_error' },
-                   transitions => { _on_error => 'stopping/shutdown',
-                                    _on_done => 'stopping' },
+                           on_expired => '_on_error',
+                           _on_cmd_stop => '_on_error' },
+                   transitions => { _on_error => 'stopping' },
                    advance => '_on_done',
                    substates => [ saving_state   => { enter => '_save_state' },
                                   updating_stats => { enter => '_incr_run_ok' },
