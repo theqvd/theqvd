@@ -26,6 +26,9 @@ Wat.B = {
         
         // Chosen controls hack
         this.bindEvent('click', '.not_valid', this.formBinds.pressValidatedField);
+        
+        // When open a chosen selector into a dialog, check if dialog size changes to make auto-scroll to bottom
+        this.bindEvent('click', '.js-dialog-container .chosen-container', this.formBinds.checkDialogSizeChange);
     },
     
     bindEditorEvents: function () {
@@ -194,7 +197,7 @@ Wat.B = {
     },
     
     formBinds: {
-        pressValidatedField : function (e) {
+        pressValidatedField: function (e) {
             if ($(e.target).hasClass('not_valid')) {
                 $(e.target).removeClass('not_valid');
                 $(e.target).parent().find('.validation-message').remove();
@@ -204,6 +207,16 @@ Wat.B = {
             if ($(e.target).parent().hasClass('not_valid')) {
                 $(e.target).parent().removeClass('not_valid');
                 $(e.target).parent().parent().parent().find('.validation-message').remove();
+            }
+        },
+        
+        checkDialogSizeChange: function (e) {
+            var container = $(e.target).closest('.chosen-container');
+            var containerOpen = $(container).hasClass('chosen-width-drop');
+            
+            if (Wat.I.dialogScrollHeight < $('.ui-dialog .js-dialog-container')[0].scrollHeight && !containerOpen) {
+                Wat.I.dialogScrollHeight = $('.ui-dialog .js-dialog-container')[0].scrollHeight;
+                $('.ui-dialog .js-dialog-container')[0].scrollTop = $('.ui-dialog .js-dialog-container')[0].scrollHeight;
             }
         }
     },

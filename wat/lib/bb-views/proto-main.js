@@ -239,6 +239,9 @@ Wat.Views.MainView = Backbone.View.extend({
                 
             Wat.A.performAction(that.qvdObj + '_get_property_list', {}, filters, {}, that.fillEditorProperties, that, undefined, {"field":"key","order":"-asc"});
         }
+        
+        // Store scrollHeight of the dialog container
+        Wat.I.dialogScrollHeight = $('.ui-dialog .js-dialog-container')[0].scrollHeight;
     },
     
     fillEditorProperties: function (that) {
@@ -289,6 +292,8 @@ Wat.Views.MainView = Backbone.View.extend({
             }
         }
 
+        // Store scrollHeight of the dialog container
+        Wat.I.dialogScrollHeight = $('.ui-dialog .js-dialog-container')[0].scrollHeight;
         
         delete that.editorMode;
     },
