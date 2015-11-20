@@ -875,3 +875,14 @@ key	value
 
 path.l7r.ssl.cert	&FILE_CONTENT(/etc/qvd/certs/server-certificate.pem)
 path.l7r.ssl.key	&FILE_CONTENT(/etc/qvd/certs/server-private-key.pem)
+
+
+### Log ###
+id	administrator_id	administrator_name	tenant_id	tenant_name	action	type_of_action	arguments	qvd_object	object_id	object_name	time	status	source	ip	superadmin
+0	1	superadmin	-1	Invalid	tenant_create	create	\N	tenant	1	default	&CURRENT_TIME()	0	\N	\N	\N
+1	1	superadmin	-1	Invalid	administrator_create	create	\N	administrator	1	superadmin	&CURRENT_TIME()	0	\N	\N	\N
+2	1	superadmin	-1	Invalid	administrator_create	create	\N	administrator	2	admin	&CURRENT_TIME()	0	\N	\N	\N
+3	1	superadmin	-1	Invalid	role_create	create	\N	role	63	Operator L1	&CURRENT_TIME()	0	\N	\N	\N
+4	1	superadmin	-1	Invalid	role_create	create	\N	role	64	Operator L2	&CURRENT_TIME()	0	\N	\N	\N
+5	1	superadmin	-1	Invalid	role_create	create	\N	role	65	Operator L3	&CURRENT_TIME()	0	\N	\N	\N
+6	1	superadmin	-1	Invalid	role_create	create	\N	role	66	Root	&CURRENT_TIME()	0	\N	\N	\N

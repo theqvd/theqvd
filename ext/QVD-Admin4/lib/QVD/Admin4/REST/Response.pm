@@ -109,7 +109,9 @@ sub get_info_provider_and_method
                           # whose result was saved in the 'extra' key of the QVD::Admin4 result
 
 	if (my ($method,$argument) = $column =~ /^([^#]+)#([^#]+)$/) 
-	{ return ($self->result->{extra}->{$dbix_object->id},$method,$argument) };
+		{
+			return ($self->result->{extra}->{$dbix_object->id},$method,$argument)
+		};
 	return ($self->result->{extra}->{$dbix_object->id},$column);
     }
     return ($dbix_object->$table,$column);
