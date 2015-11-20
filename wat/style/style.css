@@ -245,6 +245,19 @@ fieldset {
       padding-left: 9px;
       vertical-align: middle;
       padding-top: 1px; }
+    .filter-notes .filter-notes-list .fa.fix-filter-note:before {
+      font-size: 22px;
+      color: #fdfdfd;
+      background: #d7d7d7;
+      border-left: 1px solid grey;
+      margin-right: -5px;
+      margin-left: 5px;
+      padding-right: 9px;
+      padding-left: 7px;
+      vertical-align: middle;
+      padding-top: 1px; }
+    .filter-notes .filter-notes-list .fa.fix-filter-note.fix-filter-note--enabled:before {
+      background: #404040; }
 
 .screen-help {
   margin-left: 5px;
@@ -3007,7 +3020,7 @@ table.vmst .vmst-vm-cell, table.vmst .vmst-host-cell {
     height: 25px; }
     .pagination a.prev:before, .pagination a.next:before {
       font-size: 43px;
-      vertical-align: bottom;
+      vertical-align: text-top;
       padding-top: 0px; }
       @media screen and (min-width: 41em) {
         .pagination a.prev:before, .pagination a.next:before {

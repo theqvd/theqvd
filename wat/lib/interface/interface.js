@@ -13,6 +13,8 @@ Wat.I = {
     mobileMenu : {},
     cornerMenu : {},
     
+    fixedFilters: {},
+    
     getCornerMenu: function () {
         return $.extend(true, [], this.cornerMenu);
     },

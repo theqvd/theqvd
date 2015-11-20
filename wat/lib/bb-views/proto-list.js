@@ -29,6 +29,17 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     */
     
     initialize: function (params) {        
+		// If there are fixed filters, add them to collection
+        if (!$.isEmptyObject(Wat.I.fixedFilters)) {
+            params.filters = $.extend({}, params.filters, Wat.I.fixedFilters);
+            this.collection.filters = $.extend({}, this.collection.filters, Wat.I.fixedFilters);
+            
+            var classifiedByTenant = $.inArray(this.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
+            if (!classifiedByTenant && this.collection.filters['tenant_id']) {
+                delete this.collection.filters['tenant_id'];
+            }
+        }
+        
         Wat.Views.MainView.prototype.initialize.apply(this);
         
         this.setFilters();
@@ -354,7 +365,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             var filtersContainer = '.' + this.cid + ' .filter';
             
             var filterNotes = {};
-            if ($.isEmptyObject(filterNotes) && !$.isEmptyObject(this.initFilters)) {
+            if (!$.isEmptyObject(this.initFilters)) {
                 $.each(this.initFilters, function (filterField, filterValue) {                    
                     switch (filterField) {
                         case 'di_id':
@@ -415,7 +426,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                         filterNotes[filterControl.attr('name')] = {
                             'label': $('label[for="' + filterControl.attr('name') + '"]').html(),
                             'value': filterControl.find('option:selected').html(),
-                            'type': filter.type
+                            'type': filter.type,
+                            'fixable': filter.fixable
                         };
                         break;
                     case 'text':
@@ -425,7 +437,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                         filterNotes[filterControl.attr('name')] = {
                             'label': $('label[for="' + filterControl.attr('name') + '"]').html(),
                             'value': filterControl.val(),
-                            'type': filter.type
+                            'type': filter.type,
+                            'fixable': filter.fixable
                         };
                         break;
                 }
@@ -467,6 +480,15 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 note += '<span class="note-label">' + fNote.label + '</span>';
                 if (fNote.value != undefined) {
                     note += ': <span class="note-value">' + fNote.value + '</span>';
+                }
+                
+                if (fNote.fixable != undefined) {
+                    var field = $('[name="' + fNoteName + '"]').attr('data-filter-field');                  
+                    var extraClass = '';
+                    if (Wat.I.fixedFilters[field]) {
+                        extraClass = 'fix-filter-note--enabled';
+                    }
+                    note += '<a href="javascript:" class="js-fix-filter-note fix-filter-note ' + extraClass + ' fa fa-thumb-tack" data-filter-name="' + fNoteName + '" data-filter-type="' + fNote.type + '" data-i18n="[title]Fix filter"></a>';
                 }
                 
                 note += '</li>';
@@ -593,6 +615,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                                         'displayMobile': false,
                                         'class': 'chosen-single',
                                         'fillable': true,
+                                        'fixable': true,
                                         'options': [
                                             {
                                                 'value': FILTER_ALL,

@@ -112,6 +112,8 @@ Wat.B = {
         
         this.bindEvent('click', '.js-delete-filter-note', this.navigationBinds.clickDeleteFilterNote);
         
+        this.bindEvent('click', '.js-fix-filter-note', this.navigationBinds.clickFixFilterNote);
+        
         // Show/hide the corner menu
         this.bindEvent('mouseenter', '.js-menu-corner li:has(ul)', this.navigationBinds.cornerMenuHoverIn);
         
@@ -476,6 +478,22 @@ Wat.B = {
             
             Wat.CurrentView.updateFilterNotes();
             Wat.CurrentView.filter();
+        },
+        
+        clickFixFilterNote: function (e) {
+            var name = $(e.target).attr('data-filter-name');
+            var value = $('[name="' + name + '"]').val();                    
+            var field = $('[name="' + name + '"]').attr('data-filter-field');                  
+            var enabled = $(e.target).hasClass('fix-filter-note--enabled');
+            
+            if (enabled) {
+                $(e.target).removeClass('fix-filter-note--enabled');
+                delete Wat.I.fixedFilters[field];
+            }
+            else {
+                $(e.target).addClass('fix-filter-note--enabled');
+                Wat.I.fixedFilters[field] = value;
+            }
         }
     },
     

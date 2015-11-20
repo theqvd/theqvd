@@ -207,6 +207,25 @@ fieldset {
             vertical-align: middle;
             padding-top: 1px;
         }
+        
+        .fa.fix-filter-note {
+            &:before {
+                font-size: 22px;
+                color: $col_whiter;
+                background: darken($col_whiter, 15);
+                border-left: 1px solid grey;
+                margin-right: -5px;
+                margin-left: 5px;
+                padding-right: 9px;
+                padding-left: 7px;
+                vertical-align: middle;
+                padding-top: 1px;
+            }
+            
+            &.fix-filter-note--enabled:before {
+                background: lighten($col_blacker, 5);
+            }
+        }
     }
 }
 
