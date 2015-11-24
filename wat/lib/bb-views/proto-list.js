@@ -1065,6 +1065,10 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             delete Wat.I.fixedFilters[$(e.target).attr('data-filter-field')];
         }
         
+        // When tenant changes reset all filters with tenant dependence
+        $('[data-tenant-depent]').val(FILTER_ALL);
+        $('[data-tenant-depent]').trigger('change');
+        
         Wat.I.disableChosenControls('[data-waiting-loading]');
 
         this.resetSelectFiltersByTenant();
