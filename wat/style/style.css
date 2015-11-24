@@ -573,7 +573,9 @@ input[type="checkbox"], input[type="radio"] {
       .chosen-container-single .chosen-single span {
         line-height: 25px; } }
 
-.chosen-container .chosen-results li.highlighted {
+.chosen-container .chosen-results {
+  max-height: 150px; }
+  .chosen-container .chosen-results li.highlighted {
   background-color: #e35e0c;
   background-image: none; }
 

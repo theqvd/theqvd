@@ -434,6 +434,16 @@ Wat.I = {
 
     },
     
+    disableChosenControls: function (selector) {
+        var selector = selector || 'select.chosen-advanced, select.chosen-single';
+        $(selector).prop('disabled', true).trigger('chosen:updated');
+    },    
+    
+    enableChosenControls: function (selector) {
+        var selector = selector || 'select.chosen-advanced, select.chosen-single';
+        $(selector).prop('disabled', false).trigger('chosen:updated');
+    },
+    
     // Set specific menu section as selected
     setMenuOpt: function (opt) {
         // Set as selected the menu option
@@ -1048,4 +1058,8 @@ Wat.I = {
             }
         }
     },  
+    
+    isMobile: function () {
+        return $('.js-mobile-menu-hamburger').css('display') != 'none';
+    }
 }

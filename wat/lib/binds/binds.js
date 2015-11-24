@@ -227,7 +227,7 @@ Wat.B = {
         // When click on a menu option, redirect to this section
         clickMenu: function() {
             // If in mobule mode, hide menu when click
-            if ($('.js-mobile-menu-hamburger').css('display') != 'none') {
+            if (Wat.I.isMobile()) {
                 $('.menu').slideUp();
             }
                         

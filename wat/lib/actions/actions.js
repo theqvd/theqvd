@@ -282,6 +282,9 @@ Wat.A = {
             $.each($(controlSelector), function () {
                 var combo = $(this);
                 
+                // Reset select options
+                combo.find('option').remove();
+                
                 $.each(params.startingOptions, function (id, name) {
                     var selected = '';
                     if (params.selectedId !== undefined && params.selectedId == id) {

@@ -62,7 +62,7 @@
                                     }
                                 %>
                                 <label for="<%= name %>" <%= translationAttr %>><%= filter.text %></label>
-                                <input type="text" class="<%= filter.class %>" name="<%= name %>" data-filter-field="<%= filter.filterField %>" value="<%= textValue %>"/>
+                                <input type="text" class="desktop-filter <%= filter.class %>" name="<%= name %>" data-filter-field="<%= filter.filterField %>" value="<%= textValue %>"/>
                             </span>
                         <%
                         break;            
@@ -70,7 +70,7 @@
                         %>
                             <span class="filter-control desktop">
                                 <label for="<%= name %>" <%= translationAttr %>><%= filter.text %></label>
-                                <select name="<%= name %>" class="<%= filter.class %>" data-filter-field="<%= filter.filterField %>">
+                                <select name="<%= name %>" class="desktop-filter <%= filter.class %>" data-filter-field="<%= filter.filterField %>" <%= filter.tenantDepent ? 'data-tenant-depent="1"' : '' %> <%= filter.waitLoading ? 'disabled="disabled" data-waiting-loading="1"' : '' %>>
                                     <% 
                                     /*
                                     var forceSelected = undefined;

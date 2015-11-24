@@ -433,7 +433,8 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'vm.filter.user'
+        'acls': 'vm.filter.user',
+        'tenantDepent': true
     },
     'osf': {
         'filterField': 'osf_id',
@@ -450,7 +451,8 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'vm.filter.osf'
+        'acls': 'vm.filter.osf',
+        'tenantDepent': true
     },
     'host': {
         'filterField': 'host_id',
@@ -499,7 +501,7 @@ Wat.I.formFilters[qvdObj] = {
         'type': 'select',
         'text': 'Created by',
         'class': 'chosen-advanced',
-        'fillable': false,
+        'fillable': true,
         'options': [
             {
                 'value': FILTER_ALL,

@@ -234,6 +234,7 @@ Wat.I.formFilters[qvdObj] = {
         'text': 'OS Flavour',
         'class': 'chosen-advanced',
         'fillable': true,
+        'tenantDepent': true,
         'displayMobile': true,
         'displayDesktop': true,
         'options': [

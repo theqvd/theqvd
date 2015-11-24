@@ -357,7 +357,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         Wat.CurrentView.collection.deleteFilter(fKey);
     },
     
-    updateFilterNotes: function () {     
+    updateFilterNotes: function (firstLoad) {     
         var that = this;
         
         // Show-Hide filter notes only when view is not embeded
@@ -417,12 +417,23 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
 
             $.each(this.formFilters, function(name, filter) {
                 var filterControl = $(filtersContainer + ' [name="' + name + '"]');
+                
                 // If input text box is empty or selected option in a select is All skip filter control
                 switch(filter.type) {
                     case 'select':
                         if (filterControl.val() == FILTER_ALL || filterControl.val() == undefined) {
+                            if (!firstLoad) {
+                                // If fixable filter changes to ALL value, unfixed it
+                                delete Wat.I.fixedFilters[filterControl.attr('data-filter-field')];
+                            }
                             return true;
                         }
+
+                        // If fixable filter changes, change stored data
+                        if (Wat.I.fixedFilters[filterControl.attr('data-filter-field')]) {
+                            Wat.I.fixedFilters[filterControl.attr('data-filter-field')] = filterControl.val();
+                        }
+                        
                         filterNotes[filterControl.attr('name')] = {
                             'label': $('label[for="' + filterControl.attr('name') + '"]').html(),
                             'value': filterControl.find('option:selected').html(),
@@ -612,10 +623,11 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                                         'type': 'select',
                                         'text': 'Tenant',
                                         'displayDesktop': true,
-                                        'displayMobile': false,
+                                        'displayMobile': true,
                                         'class': 'chosen-single',
                                         'fillable': true,
                                         'fixable': true,
+                                        'waitLoading': true,
                                         'options': [
                                             {
                                                 'value': FILTER_ALL,
@@ -805,7 +817,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         Wat.T.translateAndShow();
         
-        this.updateFilterNotes();
+        this.updateFilterNotes(true);
         
         Wat.I.addSortIcons(this.cid);
         
@@ -817,6 +829,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     // Recursive function to fill a select making a query per tenant and grouping it
     fillSelectGrouped: function (tenants, name, filter) {
         var nameField = name == 'di' ? 'disk_image' : 'name';
+
+        $('[name="' + name + '"]').attr('data-loading', 1);
 
                         if (tenants.length > 0) {
                             var tenant = tenants.shift();
@@ -850,6 +864,13 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 });
             }
         else {
+            $('[name="' + name + '"]').removeAttr('data-loading');
+            
+            // If there are any control waiting loading and there arent any loading element more, enable it
+            if ($('[data-waiting-loading]').length > 0 && $('[data-loading]').length == 0) {
+                Wat.I.enableChosenControls('[data-waiting-loading]');
+            }
+            
             // Finish filling
             Wat.T.translate();
             Wat.I.updateChosenControls('[name="' + name + '"]');
@@ -863,8 +884,25 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         var currentExistsInSupertenant = $.inArray(that.qvdObj, QVD_OBJS_EXIST_IN_SUPERTENANT) != -1;
         var currentExistsOutTenant = $.inArray(that.qvdObj, QVD_OBJS_EXIST_OUT_TENANT) != -1;
         var currentClassifiedByTenant = $.inArray(that.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
+        var anyTenantDepent = false;
+        var tenantFilterSelector = 'select[name="tenant"]';
+        
+        if (Wat.I.isMobile()) {
+            tenantFilterSelector += '.mobile-filter';
+        }
+        else {
+            tenantFilterSelector += '.desktop-filter';
+        }
         
         $.each(this.formFilters, function(name, filter) {
+            if ((Wat.I.isMobile() && !filter.displayMobile) || (!Wat.I.isMobile() && !filter.displayDesktop)) {
+                return;
+            }
+            
+            if (filter.tenantDepent) {
+                anyTenantDepent = true;
+            }
+            
             var classifiedByTenant = $.inArray(name, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
 
             if (!classifiedByTenant && type == 'classifiedByTenant') {
@@ -877,11 +915,11 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     filter.nameAsId = filter.nameAsId || false;
                     
                     if (Wat.C.isSuperadmin() && classifiedByTenant) {
-                        existTenantControl = $('select[name="tenant"]').length > 0;
+                        existTenantControl = $($(tenantFilterSelector + ' option')).length > 0;
                         
                         if (existTenantControl) {
                             var waitingTenants = setInterval (function () {
-                                if ($('select[name="tenant"] option').length > 1) {
+                                if ($(tenantFilterSelector + ' option').length > 1) {
                                     var params = {
                                         'controlName': name,
                                         'startingOptions': Wat.I.getFilterStartingOptions(filter.options),
@@ -889,10 +927,10 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                                     };
 
                                     Wat.A.fillSelect(params, function () {
-                                        var filteredByTenant = $('select[name="tenant"]').val() >= SUPERTENANT_ID;
+                                        var filteredByTenant = $(tenantFilterSelector).val() >= SUPERTENANT_ID;
 
                                         var tenants = [];
-                                        $.each($('select[name="tenant"] option'), function (iT, tenantOption) {
+                                        $.each($(tenantFilterSelector + ' option'), function (iT, tenantOption) {
                                             // If is selected by tenant only store the selected tenant
                                             if (filteredByTenant && !$(tenantOption).is(':selected')) {
                                                 return;
@@ -936,6 +974,10 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                                 Wat.A.performAction ('tenant_tiny_list', {}, {}, {}, function(e) {
                                     var tenants = e.retrievedData.rows;
                                     
+                                    if (!tenants) {
+                                        return;
+                                    }
+                                    
                                     $.each(tenants, function (iTenant, tentant) {
                                         tenants[iTenant].showTenant = true;
                                     });
@@ -966,7 +1008,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                         // In tenant case (except in admins list) has not sense show supertenant in filters
                             if (!currentExistsInSupertenant && name == 'tenant') {
                             // Remove supertenant from tenant selector
-                            $('select[name="tenant"] option[value="0"]').remove();
+                                $(tenantFilterSelector + ' option[value="0"]').remove();
                         }
                                                 
                         Wat.I.updateChosenControls('[name="' + name + '"]');
@@ -988,6 +1030,10 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 }
             }
         });
+        
+        if (Wat.C.isSuperadmin() && !anyTenantDepent) {
+            Wat.I.enableChosenControls('[data-waiting-loading]');
+        }
     },
     
     // Reset filter selects of classified by tenant elements
@@ -1011,7 +1057,16 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     // When change tenant reset fillable selects that can be affected by tenant classification
-    changeTenant: function () {
+    changeTenant: function (e) {
+        $(e.target).attr('data-waiting-loading', 1);
+        
+        // If filter changes to "ALL", remove it from fixed filters
+        if ($(e.target).val() == FILTER_ALL) {
+            delete Wat.I.fixedFilters[$(e.target).attr('data-filter-field')];
+        }
+        
+        Wat.I.disableChosenControls('[data-waiting-loading]');
+
         this.resetSelectFiltersByTenant();
         this.fetchFilters('classifiedByTenant');
     },

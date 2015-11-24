@@ -212,6 +212,7 @@ Wat.I.formFilters[qvdObj] = {
         'text': 'Virtual machine',
         'class': 'chosen-advanced',
         'fillable': true,
+        'tenantDepent': true,
         'options': [
             {
                 'value': FILTER_ALL,
@@ -229,6 +230,7 @@ Wat.I.formFilters[qvdObj] = {
         'text': 'Disk image',
         'class': 'chosen-advanced',
         'fillable': true,
+        'tenantDepent': true,
         'options': [
             {
                 'value': FILTER_ALL,
@@ -245,7 +247,7 @@ Wat.I.formFilters[qvdObj] = {
         'type': 'select',
         'text': 'Created by',
         'class': 'chosen-advanced',
-        'fillable': false,
+        'fillable': true,
         'options': [
             {
                 'value': FILTER_ALL,

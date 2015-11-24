@@ -112,9 +112,13 @@ input[type="checkbox"], input[type="radio"] {
     @include linear-gradient($col_whiter);
 }
 
-.chosen-container .chosen-results li.highlighted {
+.chosen-container .chosen-results { 
+    max-height: 150px;
+    
+    li.highlighted {
     background-color: $col_brand;
     background-image: none;
+    }
 }
 
 .chosen-container * {
