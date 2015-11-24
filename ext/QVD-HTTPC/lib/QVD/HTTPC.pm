@@ -20,6 +20,25 @@ use QVD::Config;
 
 my $CRLF = "\r\n";
 
+# List of all the IO::Socket::SSL options, except the ones that only make sense on the server,
+# and ones we don't wish to allow.
+#
+# Excluded:
+#     SSL_server (this is a client)
+#     SSL_startHandshake (we always want to be using SSL)
+#     SSL_verify_mode (we always use SSL_VERIFY_PEER)
+#
+# Added:
+#     SSL_ca_path_alt (not a real OpenSSL option, we handle it)
+#
+my @SSL_OPTIONS = qw( SSL_hostname SSL_ca SSL_ca_file SSL_ca_path SSL_client_ca SSL_client_ca_file SSL_fingerprint
+                      SSL_passwd_cb SSL_use_cert SSL_version SSL_cipher_list SSL_honor_cipher_order SSL_dh_file SSL_dh SSL_ecdh_curve
+                      SSL_verify_callback SSL_verifycn_scheme SSL_verifycn_publicsuffix SSL_verifycn_name 
+                      SSL_check_crl SSL_crl_file SSL_ocsp_mode SSL_ocsp_staple_callback SSL_ocsp_cache SSL_reuse_ctx
+                      SSL_create_ctx_callback SSL_session_cache_size SSL_session_cache SSL_session_key SSL_session_id_context
+                      SSL_error_trap SSL_npn_protocols SSL_alpn_protocols SSL_ca_path_alt SSL_ocsp_no_resolve
+                    );
+
 sub _create_socket {
     my $self = shift;
     my $target = $self->{target};
@@ -30,20 +49,58 @@ sub _create_socket {
         require Net::SSLeay;
         Net::SSLeay::load_error_strings();
 
-	# IO::Socket::SSL->import('debug3');
+        die "IO::Socket::SSL >= 2.020 required" unless ( $IO::Socket::SSL::VERSION >= 2.020 );
 
-        my %args = ( SSL_verify_mode => 3 );
-        $args{$_} = $self->{$_} for qw(SSL_ca_path SSL_use_cert SSL_cert_file SSL_key_file);
-	#open my $err, ">>/tmp/qvd-httpc.err";
-	#$args{SSL_passwd_cb} = sub { print $err "user certificate requires password\n"; "foo" };
-	#print STDERR "ssl args:\n", Dumper \%args;
-        $s = eval { return IO::Socket::SSL->new(PeerAddr => $target, Blocking => 0, %args); };
-        unless ($s) {
-            # try again with the user customized CA certificates
-            $args{SSL_ca_path}         = $self->{SSL_ca_path_alt};
-            $args{SSL_verify_callback} = $self->{SSL_verify_callback};
-	    #print STDERR "ssl args (second try):\n", Dumper \%args;
-            $s = IO::Socket::SSL->new(PeerAddr => $target, Blocking => 0, %args);
+        IO::Socket::SSL->import('debug3');
+
+        my %args = ( SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_PEER() );
+        $args{$_} = $self->{$_} for grep { exists $self->{$_} } @SSL_OPTIONS;
+
+        # This is not a real IO::Socket::SSL argument
+        delete $args{SSL_ca_path_alt};
+        delete $args{SSL_ocsp_no_resolve};
+
+        if (defined $args{SSL_ca_path} && defined $self->{SSL_ca_path_alt}) {
+            # SSL_ca_path_alt is deprecated since as of IO::Socket::SSL 2.020 the CA path is
+            # an array. Support the old way of doing things here.
+
+            if ( ref($args{SSL_ca_path}) eq "ARRAY" ) {
+                push $args{SSL_ca_path}, $self->{SSL_ca_path_alt};
+            } else {
+                $args{SSL_ca_path} = [ $args{SSL_ca_path}, $self->{SSL_ca_path_alt} ];
+            }
+        }
+
+        # Some sensible defaults
+        my $sslhost = $target;
+        $sslhost =~ s/:.*$//;
+
+        $args{SSL_version}         //= "!SSLv3:!SSLv2:!TLSv1";
+        $args{SSL_verifycn_scheme}   = "none";
+        $args{SSL_verifycn_name}   //= $sslhost;
+        $args{SSL_hostname}        //= $sslhost;
+        $args{SSL_ocsp_mode}       //= IO::Socket::SSL::SSL_OCSP_FULL_CHAIN() | IO::Socket::SSL::SSL_OCSP_FAIL_HARD();
+
+        use Data::Dumper;
+        print STDERR "ssl args:\n" . Dumper( \%args );
+
+        $s = IO::Socket::SSL->new(PeerAddr => $target, Blocking => 0, %args);
+
+        if ( $s && ! $s->verify_hostname( $args{SSL_verifycn_name}, $self->{SSL_verifycn_scheme} // "http" ) ) {
+            $self->{failed_socket} = $s;
+            print STDERR "ERRSTR : ". $s->errstr() . "\n";
+            print STDERR "SSL ERR: $IO::Socket::SSL::SSL_ERROR\n";
+            die "hostname verification failed: " . $s->errstr();
+        }
+
+        if ( !$self->{SSL_ocsp_no_resolve} ) {
+            $IO::Socket::SSL::DEBUG=3;
+            my $ocsp = $s->ocsp_resolver();
+            my $ocsp_errors = $ocsp->resolve_blocking();
+            if ( $ocsp_errors ) {
+                $self->{failed_socket} = $s;
+                die "OCSP validation error: $ocsp_errors";
+            }
         }
     }
     else {
@@ -55,20 +112,27 @@ sub _create_socket {
 
 sub new {
     my ($class, $target, %opts) = @_;
-    my $self = { target => $target,
+    my $self = {
                  bin => '',
 		 bout => ''
                };
 
-    $self->{$_} = delete $opts{$_} for qw(timeout SSL SSL_verify_callback
-                                          SSL_ca_path SSL_ca_path_alt
-					  SSL_use_cert SSL_cert_file SSL_key_file);
+    bless $self, $class;
+
+    $self->connect($target, %opts) if ($target);
+    $self;
+}
+
+sub connect {
+    my ($self, $target, %opts) = @_;
+
+    $self->{target} = $target;
+    $self->{$_} = delete $opts{$_} for ("timeout", "SSL", grep { exists $opts{$_} } @SSL_OPTIONS);
     keys %opts and croak "unknown constructor option(s) " . join(', ', keys %opts);
 
-    bless $self, $class;
     $self->_create_socket();
     setsockopt $self->{socket}, IPPROTO_TCP, TCP_NODELAY, 1;
-    $self;
+ 
 }
 
 sub read_buffered {
@@ -79,6 +143,10 @@ sub read_buffered {
 }
 
 sub get_socket { shift->{socket} }
+
+# Used to access IO::Socket::SSL information when the connection failed to
+# complete due to an error.
+sub get_failed_socket { shift->{failed_socket} }
 
 sub _print {
     my $self = shift;
@@ -271,6 +339,11 @@ sub make_http_request {
     my $self = shift;
     $self->send_http_request(@_);
     $self->read_http_response;
+}
+
+sub is_ssl {
+    my $self = shift;
+    return $self->{SSL};
 }
 
 1;
