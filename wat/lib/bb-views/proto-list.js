@@ -827,7 +827,12 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     // Recursive function to fill a select making a query per tenant and grouping it
-    fillSelectGrouped: function (tenants, name, filter) {
+    fillSelectGrouped: function (tenants, name, filter, recursive) {
+        // If this select is in loading process, do not load again
+        if (!recursive && $('[name="' + name + '"]').attr('data-loading')) {
+            return; 
+        }
+        
         var nameField = name == 'di' ? 'disk_image' : 'name';
 
         $('[name="' + name + '"]').attr('data-loading', 1);
@@ -860,7 +865,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 if (that.filters[filter.filterField] != undefined) {      
                     that.updateFilterNotes();
                 }
-                Wat.CurrentView.fillSelectGrouped(tenants, name, filter);
+                Wat.CurrentView.fillSelectGrouped(tenants, name, filter, true);
                 });
             }
         else {
@@ -1070,6 +1075,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         $('[data-tenant-depent]').trigger('change');
         
         Wat.I.disableChosenControls('[data-waiting-loading]');
+        $('.js-delete-filter-note[data-filter-name="tenant"]').hide();
 
         this.resetSelectFiltersByTenant();
         this.fetchFilters('classifiedByTenant');
