@@ -141,11 +141,6 @@ Wat.B = {
         // Kind of image source in DI creation
         this.bindEvent('change', 'select[name="images_source"]', this.navigationBinds.toggleImagesource);   
         
-        // Hack to fix jQuery UI tooltip plugin
-        this.bindEvent('mouseleave', '[title]', function () { 
-            $('.ui-tooltip').hide();
-        });        
-        
         // Propagate click in cells with links
         this.bindEvent('mouseenter', 'td.cell-link', function (e) { 
             var firstLink = $(e.target).find('a')[0];

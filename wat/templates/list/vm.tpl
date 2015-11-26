@@ -200,10 +200,19 @@
                 <%
                                 break;
                             case 'name':
+                                var cellClass = 'js-name';
+                                var cellAttrs = '';
+                                if (Wat.C.checkACL('vm.see-details.')) {
+                                    cellClass += ' cell-link';
+                                    cellAttrs += 'data-i18n="[title]Click for details"';
+                                }
+                                
+                                cellAttrs += ' class="' + cellClass + '"';
+                                
                 %>
-                                <td class="js-name  <%= Wat.C.checkACL('vm.see-details.') ? 'cell-link' : '' %>">
+                                <td <%= cellAttrs %>>
                                     <input type="hidden" class="selenium-field vm-state-<%= model.get('id') %>" value="<%= model.get('state') %>">
-                                    <%= Wat.C.ifACL('<a href="#/vm/' + model.get('id') + '" data-i18n="[title]Click for details">', 'vm.see-details.') %>
+                                    <%= Wat.C.ifACL('<a href="#/vm/' + model.get('id') + '"">', 'vm.see-details.') %>
                                     <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'vm.see-details.') %>
                                         <span class="text"><%= model.get('name') %></span>
                                     <%= Wat.C.ifACL('</a>', 'vm.see-details.') %>

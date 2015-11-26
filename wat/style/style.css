@@ -397,6 +397,11 @@ fieldset {
       .menu-corner > ul > li > ul > li:last-child span {
         border-bottom-left-radius: 7px;
         border-bottom-right-radius: 7px; }
+  .menu-corner li.menu-option.needsclick.menu-option:last-child {
+    margin-left: 33px;
+    background-color: white;
+    padding-left: 5px;
+    padding-right: 5px; }
 
 .side-menu li {
   margin-bottom: 15px;
@@ -3274,6 +3279,11 @@ div.tagsinput span.tag a {
   .customizer .customize-section .color-title {
     margin-top: 10px;
     margin-bottom: 5px; }
+
+.qtip-default {
+  border: 1px solid #222;
+  background-color: #444;
+  color: #FEFEFE; }
 
 /********************************************************************
 *********************************************************************

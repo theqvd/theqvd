@@ -190,9 +190,6 @@ Wat.L = {
         // Start server clock
         Wat.I.startServerClock();
 
-        //Wat.I.bindCornerMenuEvents();
-        Wat.I.tooltipConfiguration();
-
         // Binding events manually because backbone doesnt allow bind events to dialogs loaded dinamically
         Wat.B.bindCommonEvents();
 

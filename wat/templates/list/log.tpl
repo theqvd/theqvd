@@ -120,9 +120,18 @@
                     
                         switch(name) {
                             case 'see_details':
+                                var cellClass = 'js-name';
+                                var cellAttrs = '';
+                                if (Wat.C.checkACL('log.see-details.')) {
+                                    cellClass += ' cell-link';
+                                    cellAttrs += 'data-i18n="[title]Click for details"';
+                                }
+                                
+                                cellAttrs += ' class="' + cellClass + '"';
+                                
                 %>
-                                <td class="center">
-                                    <%= Wat.C.ifACL('<a href="#/log/' + model.get('id') + '" data-i18n="[title]Click for details">', 'log.see-details.') %>
+                                <td <%= cellAttrs %>>
+                                    <%= Wat.C.ifACL('<a href="#/log/' + model.get('id') + '">', 'log.see-details.') %>
                                     <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'log.see-details.') %>
                                     <%= Wat.C.ifACL('</a>', 'log.see-details.') %>
                                 </td>

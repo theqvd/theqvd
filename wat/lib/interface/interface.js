@@ -503,28 +503,17 @@ Wat.I = {
         $('.bb-menu').html(template);
     },
     
-    tooltipConfiguration: function () {
-        $( document ).tooltip({
+    tooltipBind: function () {
+        $('[title]').qtip({
             position: { 
-                my: "left+15 center", 
-                at: "right center" 
+                target: 'mouse', // Track the mouse as the positioning target
+                adjust: { x: 5, y: 5 }, // Offset it slightly from under the mouse
+                viewport: $(window)
             },
-            content: function(callback) {
-                // Carriage return support
-                callback($(this).prop('title').replace('\n', '<br />')); 
-            },
-            open: function (event, ui) {
-                $(ui.tooltip).parent().mouseleave(function() {
-                    $(ui.tooltip).hide();
-                });
-
-                $(ui.tooltip).mouseleave(function() {
-                    $(ui.tooltip).hide();
-                });
-            },
-            hide: false
+            adjust: {
+                method: 'flip'
         }
-                             );
+        });
     },
     
     tagsInputConfiguration: function () {

@@ -130,9 +130,18 @@
                 <%
                                 break;
                             case 'name':
+                                var cellClass = 'js-name';
+                                var cellAttrs = '';
+                                if (Wat.C.checkACL('user.see-details.')) {
+                                    cellClass += ' cell-link';
+                                    cellAttrs += 'data-i18n="[title]Click for details"';
+                                }
+                                
+                                cellAttrs += ' class="' + cellClass + '"';
+                                
                 %>
-                                <td class="js-name  <%= Wat.C.checkACL('user.see-details.') ? 'cell-link' : '' %>">
-                                    <%= Wat.C.ifACL('<a href="#/user/' + model.get('id') + '" data-i18n="[title]Click for details">', 'user.see-details.') %>
+                                <td <%= cellAttrs %>>
+                                    <%= Wat.C.ifACL('<a href="#/user/' + model.get('id') + '">', 'user.see-details.') %>
                                     <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'user.see-details.') %>
                                         <span class="text"><%= model.get('name') %></span>
                                     <%= Wat.C.ifACL('</a>', 'user.see-details.') %>
@@ -170,10 +179,10 @@
                 %>
                                 <td class="desktop" data-wsupdate="<%= name %>" data-id="<%= model.get('id') %>">
                                     <% 
-                                        if (model.get(name) !== undefined) {
+                                        if (!col.property) {
                                             print(model.get(name));
                                         }
-                                        else if (model.get('properties') !== undefined && model.get('properties')[name] !== undefined) {
+                                        else {
                                             print(model.get('properties')[name]);
                                         }
                                     

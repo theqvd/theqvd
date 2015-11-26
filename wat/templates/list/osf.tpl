@@ -139,8 +139,17 @@
                 <%
                                 break;
                             case 'name':
+                                var cellClass = 'js-name';
+                                var cellAttrs = '';
+                                if (Wat.C.checkACL('osf.see-details.')) {
+                                    cellClass += ' cell-link';
+                                    cellAttrs += 'data-i18n="[title]Click for details"';
+                                }
+                                
+                                cellAttrs += ' class="' + cellClass + '"';
+                                
                 %>
-                                <td class="js-name <%= Wat.C.checkACL('osf.see-details.') ? 'cell-link' : '' %>">
+                                <td <%= cellAttrs %>>
                                     <%= Wat.C.ifACL('<a href="#/osf/' + model.get('id') + '" data-i18n="[title]Click for details">', 'osf.see-details.') %>
                                     <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'osf.see-details.') %>
                                         <span class="text"><%= model.get('name') %></span>

@@ -195,6 +195,13 @@
             }
         }
     }
+    
+    li.menu-option.needsclick.menu-option:last-child {
+        margin-left: 33px;
+        background-color: white;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
 }
 
 .side-menu {

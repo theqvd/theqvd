@@ -161,9 +161,18 @@
                 <%
                                 break;
                             case 'name':
+                                var cellClass = 'js-name';
+                                var cellAttrs = '';
+                                if (Wat.C.checkACL('host.see-details.')) {
+                                    cellClass += ' cell-link';
+                                    cellAttrs += 'data-i18n="[title]Click for details"';
+                                }
+                                
+                                cellAttrs += ' class="' + cellClass + '"';
+                                
                 %>
-                                <td class="js-name <%= Wat.C.checkACL('host.see-details.') ? 'cell-link' : '' %>">
-                                    <%= Wat.C.ifACL('<a href="#/host/' + model.get('id') + '" data-i18n="[title]Click for details">', 'host.see-details.') %>
+                                <td <%= cellAttrs %>>
+                                    <%= Wat.C.ifACL('<a href="#/host/' + model.get('id') + '">', 'host.see-details.') %>
                                     <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'host.see-details.') %>
                                         <span class="text"><%= model.get('name') %></span>
                                     <%= Wat.C.ifACL('</a>', 'host.see-details.') %>

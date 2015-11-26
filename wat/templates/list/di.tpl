@@ -173,9 +173,18 @@
                 <%
                                 break;
                             case 'disk_image':
+                                var cellClass = 'not-break js-name';
+                                var cellAttrs = '';
+                                if (Wat.C.checkACL('di.see-details.')) {
+                                    cellClass += ' cell-link';
+                                    cellAttrs += 'data-i18n="[title]Click for details"';
+                                }
+                                
+                                cellAttrs += ' class="' + cellClass + '"';
+                                
                 %>
-                                <td class="not-break js-name <%= Wat.C.checkACL('di.see-details.') ? 'cell-link' : '' %>">
-                                    <%= Wat.C.ifACL('<a href="#/di/' + model.get('id') + '" data-i18n="[title]Click for details">', 'di.see-details.') %>
+                                <td <%= cellAttrs %>>
+                                    <%= Wat.C.ifACL('<a href="#/di/' + model.get('id') + '">', 'di.see-details.') %>
                                     <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'di.see-details.') %>
                                         <span class="text"><%= model.get('disk_image') %></span>
                                     <%= Wat.C.ifACL('</a>', 'di.see-details.') %>

@@ -72,6 +72,9 @@ Wat.T = {
         // Add sort icons to header
         Wat.I.updateSortIcons();
         
+        // Process tooltips
+        Wat.I.tooltipBind();
+        
         // Update all the chosen select controls
         $('select').trigger('chosen:updated');  
     },
