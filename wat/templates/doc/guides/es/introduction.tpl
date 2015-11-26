@@ -497,6 +497,10 @@ Vista listado tras aplicar un filtro
 </span>
 </p>
 </dd>
+</dl></div>
+<div class="paragraph"><p>Cuando una vista está filtrada por algún campo, para indicar que puede que no se estén mostrando el total de los elementos existentes, aparecerá sobre la lista una franja amarilla con los diferentes filtros activados.</p></div>
+<div class="paragraph"><p>Desde este panel se pueden desactivar los filtros con el icono de un aspa que acompaña a cada uno, poniéndose automáticamente con el valor "Todos" en el selector correspondiente.</p></div>
+<div class="dlist"><dl>
 <dt class="hdlist1">
 Vista listado tras aplicar un filtro y seleccionar un elemento
 </dt>
@@ -508,6 +512,8 @@ Vista listado tras aplicar un filtro y seleccionar un elemento
 </p>
 </dd>
 </dl></div>
+<div class="paragraph"><p>Si seleccionamos uno o varios elementos, aparecerá un menú lateral con las opciones a realizar sobre los elementos seleccionados. Este menú se puede cerrar con un botón en la parte superior del propio menú, o deseleccionando todos los elementos del listado.</p></div>
+<div class="paragraph"><p>Si se edita un solo elemento será una edición estándar. Sin embargo, si se editan dos o más a la vez, se considera una edición masiva, por lo que algunos campos no estarán disponibles para la edición al no tener sentido.</p></div>
 </div></div>
 </li>
 <li>
@@ -878,7 +884,7 @@ Gestionar sus propios ACLs, pudiendo llegar a tener permisos totales o incluso p
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-10-28 10:59:59 CET
+Last updated 2015-11-26 15:51:04 CET
 </div>
 </div>
 </body>
