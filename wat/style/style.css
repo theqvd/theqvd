@@ -398,10 +398,10 @@ fieldset {
         border-bottom-left-radius: 7px;
         border-bottom-right-radius: 7px; }
   .menu-corner li.menu-option.needsclick.menu-option:last-child {
-    margin-left: 33px;
-    background-color: white;
-    padding-left: 5px;
-    padding-right: 5px; }
+    margin-left: 20px;
+    background-color: #fdfdfd;
+    padding: 8px;
+    border: 1px solid #e9e9e9; }
 
 .side-menu li {
   margin-bottom: 15px;
