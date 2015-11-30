@@ -140,7 +140,10 @@ fieldset {
     }
     
     .loading-big-message {
+        font-size: 18px;
+        @include in(desktop) {
         font-size: 24px;
+        }
         color: $col_whiter;
         margin-bottom: 20px;
     }
@@ -158,13 +161,21 @@ fieldset {
     
     .loading-big-box {
         background: black;
+        
+        width: 100vw;
+        height: 100vh;
+        margin-top: 0px;
+        border-radius: 0;
+        min-height: 400px;
+        text-align: center;
+        padding: 50px;
+        
+        @include in(desktop) {
         border-radius: 15px;
         width: 70vw;
         height: 70vh;
-        min-height: 400px;
         margin: 70px auto;
-        text-align: center;
-        padding: 50px;
+        }
     }
 }
 

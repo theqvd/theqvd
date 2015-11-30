@@ -192,9 +192,12 @@ fieldset {
     font-size: 150px;
     color: #fdfdfd; }
   .loading-big .loading-big-message {
-    font-size: 24px;
+    font-size: 18px;
     color: #fdfdfd;
     margin-bottom: 20px; }
+    @media screen and (min-width: 41em) {
+      .loading-big .loading-big-message {
+        font-size: 24px; } }
   .loading-big .loading-little-message {
     color: #fdfdfd;
     margin-top: 20px; }
@@ -204,13 +207,19 @@ fieldset {
     margin: 0 auto; }
   .loading-big .loading-big-box {
     background: black;
-    border-radius: 15px;
-    width: 70vw;
-    height: 70vh;
+    width: 100vw;
+    height: 100vh;
+    margin-top: 0px;
+    border-radius: 0;
     min-height: 400px;
-    margin: 70px auto;
     text-align: center;
     padding: 50px; }
+    @media screen and (min-width: 41em) {
+      .loading-big .loading-big-box {
+        border-radius: 15px;
+        width: 70vw;
+        height: 70vh;
+        margin: 70px auto; } }
 
 .filter-notes {
   border: 1px #DDDDBB solid;
