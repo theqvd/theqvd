@@ -225,13 +225,17 @@ sub update
     my $failures;
     for my $obj (@{$result->{rows}})
     {
-	eval { $DB->txn_do( sub { $self->$_($obj) for @$conditions;
+		eval {
+			$DB->txn_do( sub {
+				$self->$_($obj) for @$conditions;
 				  # Update the main object
 				  $obj->update($request->arguments);                 
                                   # Update tables related to the main object (i.e. vm_runtimes for vms)
 				  $self->update_related_objects($request,$obj);      
                                   # Assign and unassign other objects to the main objects (i.e. tags for dis, acls for roles, properties for vms...)
-				  $self->exec_nested_queries($request,$obj); } ) };  
+				$self->exec_nested_queries($request,$obj);
+			} )
+		};
 	$failures->{$obj->id} = QVD::Admin4::Exception->new(exception => $@, query => 'update')->json if $@; 
 
 	$self->report_in_log($request,$obj,$failures && exists $failures->{$obj->id} ? $failures->{$obj->id}->{status} : 0);
@@ -593,7 +597,7 @@ sub exec_nested_queries
     my %nq = %{$request->nested_queries}; 
     for (keys %nq) #This is supposed to be a list of functions in this class
     {
-	$self->$_($nq{$_},$obj); 
+		$self->$_($nq{$_},$obj,$request);
     }    
 }
 
@@ -602,7 +606,7 @@ sub exec_nested_queries
 
 sub custom_properties_set
 {
-    my ($self,$props,$obj) = @_;
+    my ($self,$props,$obj,$request) = @_;
 
     my $class = ref($obj);     # FIX ME.  Can be improved the identification of the class?
     $class =~ s/^QVD::DB::Result::(.+)$/$1/;
@@ -623,7 +627,7 @@ sub custom_properties_set
 
 sub custom_properties_del
 {
-    my ($self,$props,$obj) = @_;
+    my ($self,$props,$obj,$request) = @_;
 
     for my $key (@$props)
     {
@@ -639,7 +643,7 @@ sub custom_properties_del
 
 sub tags_create
 {
-    my ($self,$tags,$di) = @_;
+    my ($self,$tags,$di,$request) = @_;
 
     for my $tag (@$tags)
     { 	
@@ -685,7 +689,7 @@ sub tags_delete
 
 sub add_acls_to_role
 {
-    my ($self,$acls,$role) = @_;
+    my ($self,$acls,$role,$request) = @_;
 
 # The API supports identification of acls both by name and by id
 # But the function must operate with names. Here the switch is done if needed
@@ -708,7 +712,7 @@ sub add_acls_to_role
 
 sub del_acls_to_role
 {
-    my ($self,$acls,$role) = @_;
+    my ($self,$acls,$role,$request) = @_;
 
 # The API supports identification of acls both by name and by id
 # But the function must operate with names. Here the switch is done if needed
@@ -739,7 +743,7 @@ sub del_acls_to_role
 
 sub add_roles_to_role
 {
-    my ($self,$roles_to_assign,$this_role) = @_;
+    my ($self,$roles_to_assign,$this_role,$request) = @_;
 
 # The API supports identification of roles both by name and by id
 # But the function must operate with names. Here the switch is done if needed
@@ -767,7 +771,7 @@ sub add_roles_to_role
 
 sub del_roles_to_role
 {
-    my ($self,$roles_to_unassign,$this_role) = @_;
+    my ($self,$roles_to_unassign,$this_role,$request) = @_;
 
 # The API supports identification of roles both by name and by id
 # But the function must operate with names. Here the switch is done if needed
@@ -887,7 +891,7 @@ sub unassign_role_to_role
 
 sub del_roles_to_admin
 {
-    my ($self,$role_ids,$admin) = @_;
+    my ($self,$role_ids,$admin,$request) = @_;
 
     my $ids = $self->as_ids($role_ids,'roles') ? 
 	$role_ids : $self->switch_names_to_ids('Role',$role_ids);
@@ -901,7 +905,7 @@ sub del_roles_to_admin
 
 sub add_roles_to_admin
 {
-    my ($self,$role_ids,$admin) = @_;
+    my ($self,$role_ids,$admin,$request) = @_;
 
     my $ids = $self->as_ids($role_ids,'roles') ? 
 	$role_ids : $self->switch_names_to_ids('Role',$role_ids);
@@ -1539,6 +1543,25 @@ sub config_wat_update
 	{
 		rows => [],
 	};
+}
+
+sub assign_property_to_objects {
+
+	my ($self, $obj_names, $property, $request) = @_;
+
+	for my $obj_name (@$obj_names) {
+		my $property_list_name = $request->qvd_object_model->get_property_list_name($obj_name);
+		if (defined $property_list_name) {
+			try {
+				$DB->resultset($property_list_name)->create({property_id => $property->id});
+			} catch {
+				QVD::Admin4::Exception->throw(exception => $@, query => 'create') if $@;
+			}
+		} else {
+			QVD::Admin4::Exception->throw(code => 6231, object => $obj_name);
+		}
+	}
+
 }
 
 1;

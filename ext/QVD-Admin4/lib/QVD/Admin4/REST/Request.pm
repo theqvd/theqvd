@@ -402,13 +402,18 @@ sub check_nested_queries_validity_in_json
 	    ('get_acls_for_nested_query_in_update',4230) ;
     }
 
-    $self->qvd_object_model->available_nested_query($_) || 
-	QVD::Admin4::Exception->throw(code => 6230, object => $_)
-	for $self->json_wrapper->nested_queries_list;
+	for my $nested_query ($self->json_wrapper->nested_queries_list) {
+		$self->qvd_object_model->available_nested_query($nested_query) ||
+			QVD::Admin4::Exception->throw(code => 6230, object => $nested_query);
 
-    $admin->re_is_allowed_to($self->qvd_object_model->$method($_)) || 
-	QVD::Admin4::Exception->throw(code => $code, object => $_) 
-	for $self->json_wrapper->nested_queries_list
+		$admin->re_is_allowed_to($self->qvd_object_model->$method($nested_query)) ||
+			QVD::Admin4::Exception->throw(code => $code, object => $nested_query);
+
+		for my $nested_query_arg (@{$self->json_wrapper->get_nested_query_value($nested_query)}){
+			$self->qvd_object_model->is_nested_query_arg_available($nested_query, $nested_query_arg) ||
+				QVD::Admin4::Exception->throw(code => 6231, object => $nested_query_arg);
+		}
+	}
 }
 
 sub check_order_by_validity_in_json

@@ -78,6 +78,7 @@ my $code2message_mapper = {
     6210 => 'Inappropiate filter for this action',
     6220 => 'No mandatory filter for this action',
     6230 => 'Inappropiate argument for this action',
+	6231 => 'Inappropiate argument for the nested query action',
     6240 => 'No mandatory argument for this action',
     6250 => 'Inappropiate field for this action',
     6310 => 'Invalid value',

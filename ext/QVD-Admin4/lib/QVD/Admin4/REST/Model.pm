@@ -22,7 +22,7 @@ use Clone qw(clone);
 # Many accessor methods let you get that info of the action.
 
 has 'current_qvd_administrator', is => 'ro', isa => 
-    sub { die "Invalid type for attribute current_qvd_administrator" 
+sub { die "Invalid type for attribute current_qvd_administrator"
 	      unless ref(+shift) eq 'QVD::DB::Result::Administrator'; }, required => 1;
 has 'qvd_object', is => 'ro', isa => sub {die "Invalid type for attribute qvd_object" 
 					      if ref(+shift);}, required => 1;
@@ -31,7 +31,7 @@ has 'type_of_action', is => 'ro', isa => sub {die "Invalid type for attribute ty
 
 has 'model_info', is => 'ro', isa => sub {die "Invalid type for attribute model_info" 
 					      unless ref(+shift) eq 'HASH';}, 
-    default => sub {{};};
+default => sub {{};};
 
 
 my $DB;
@@ -39,8 +39,7 @@ my $DB;
 # Mapper from kinds of QVD objects in this class to available values for 
 # the 'qvd_object' column in the log table of DB
 
-my $QVD_OBJECTS_TO_LOG_MAPPER = 
-{ 
+my $QVD_OBJECTS_TO_LOG_MAPPER = {
     Log => 'log', User => 'user', VM => 'vm', DI => 'di', OSF => 'osf', Host => 'host', 
     Administrator => 'administrator', Tenant => 'tenant', 
     Role => 'role', Config => 'config', Tenant_Views_Setup => 'tenant_view', 
@@ -52,8 +51,7 @@ my $QVD_OBJECTS_TO_LOG_MAPPER =
 # Mapper from kinds of actions in this class to available values for 
 # the 'type_of_action' column in the log table of DB
 
-my $TYPES_OF_ACTION_TO_LOG_MAPPER = 
-{ 
+my $TYPES_OF_ACTION_TO_LOG_MAPPER = {
     list => 'see', details => 'see', tiny => 'see', delete => 'delete', update => 'update', 
     create_or_update => 'create_or_update', exec => 'exec', 
     state => 'see', create => 'create' 
@@ -66,18 +64,18 @@ my $DIRECTLY_TENANT_RELATED = [qw(User Administrator Role OSF Tenant_Views_Setup
 # Mappers for identity operators between API and DBIx::Class
 # The majority of operators are just the same
 
-my $OPERATORS_MAPPER = 
-{
+my $OPERATORS_MAPPER = {
     '~' => 'LIKE'
 };
 
 # For every kind of QVD object there must be one filter that 
 # identifies the objects unambiguously (typically, the id)
 
-my $UNAMBIGUOUS_FILTERS = 
-{   
-    list => { Operative_Acls_In_Role => [qw(role_id)],
-	      Operative_Acls_In_Administrator => [qw(admin_id)] },
+my $UNAMBIGUOUS_FILTERS = {
+	list => {
+		Operative_Acls_In_Role => [qw(role_id)],
+		Operative_Acls_In_Administrator => [qw(admin_id)]
+	},
 
     details => { default => [qw(id)] },
 
@@ -91,29 +89,42 @@ my $UNAMBIGUOUS_FILTERS =
 # via a secondary request to DB. That secondary request
 # uses a view. This var says the views related to the QVD objects
 
-my $RELATED_VIEWS_IN_DB = 
-{   
-    list => { User => [qw(User_View)],
+my $RELATED_VIEWS_IN_DB = {
+	list => {
+		User => [qw(User_View)],
 	      VM => [qw(VM_View)],
 	      Host => [qw(Host_View)],
 	      OSF => [qw(OSF_View)],
 	      DI => [qw(DI_View)],
-	      Role => [qw(Role_View)],},
+		Role => [qw(Role_View)],
+	},
 
-    details => { User => [qw(User_View)],
+	details => {
+		User => [qw(User_View)],
 		 VM => [qw(VM_View)],
 		 Host => [qw(Host_View)],
 		 OSF => [qw(OSF_View)],
 		 DI => [qw(DI_View)],
-		 Role => [qw(Role_View)],},		 
+		Role => [qw(Role_View)],
+	},
+};
+
+# Arguments names related to the DBIx module
+my $ARGUMENT_NAME_TO_QVD_OBJECT = {
+	vm => 'VM',
+	osf => 'OSF',
+	user => 'User',
+	host => 'Host',
+	role => 'Role',
+	di => 'DI',
 };
 
 # Acls needed for using every filter in actions regarding
 # a certain QVD object
 
-my $ACLS_FOR_FILTERS = 
-{
-    VM => { properties => [qr/^vm\.filter\.properties$/], 
+my $ACLS_FOR_FILTERS = {
+	VM => {
+		properties => [qr/^vm\.filter\.properties$/],
 	    name => [qr/^vm\.filter\.name$/],
 	    user_id => [qr/^vm\.filter\.user|user\.see\.vm-list$/],
 	    user_name => [qr/^vm\.filter\.user$/],
@@ -125,39 +136,56 @@ my $ACLS_FOR_FILTERS =
 	    state => [qr/^vm\.filter\.state$/],
 	    host_id => [qr/^vm\.filter\.host|host\.see\.vm-list$/],
 	    host_name => [qr/^vm\.filter\.host$/],
-	    host => [qr/^vm\.filter\.host$/]},
+		host => [qr/^vm\.filter\.host$/]
+	},
 
-    User => { properties => [qr/^user\.filter\.properties$/], 
-	      name => [qr/^user\.filter\.name$/]},
+	User => {
+		properties => [qr/^user\.filter\.properties$/],
+		name => [qr/^user\.filter\.name$/]
+	},
 
-    Host => { properties => [qr/^host\.filter\.properties$/],
+	Host => {
+		properties => [qr/^host\.filter\.properties$/],
 	      name => [qr/^host\.filter\.name$/],
-	      vm_id => [qr/^host\.filter\.vm$/]},
+		vm_id => [qr/^host\.filter\.vm$/]
+	},
 
-    DI => { properties => [qr/^di\.filter\.properties$/],
+	DI => {
+		properties => [qr/^di\.filter\.properties$/],
 	    disk_image => [qr/^di\.filter\.disk-image$/],
 	    osf_id => [qr/^di\.filter\.osf|osf\.see\.di-list$/],
 	    osf_name => [qr/^di\.filter\.osf$/],
-	    osf => [qr/^di\.filter\.osf$/]},
+		osf => [qr/^di\.filter\.osf$/]
+	},
 
-    OSF => { properties => [qr/^osf\.filter\.properties$/],
+	OSF => {
+		properties => [qr/^osf\.filter\.properties$/],
 	     name => [qr/^osf\.filter\.name$/],
 	     vm_id => [qr/^osf\.filter\.vm$/],
-	     di_id => [qr/^osf\.filter\.di$/]},
+		di_id => [qr/^osf\.filter\.di$/]
+	},
 
-    Administrator => { name => [qr/^administrator\.filter\.name$/] },	    
+	Administrator => {
+		name => [qr/^administrator\.filter\.name$/]
+	},
 
-    Role => { name => [qr/^role\.filter\.name$/] },	    
+	Role => {
+		name => [qr/^role\.filter\.name$/]
+	},
 
-    Tenant => { name => [qr/^tenant\.filter\.name$/] }
+	Tenant => {
+		name => [qr/^tenant\.filter\.name$/]
+	}
 };
 
 # Acls needed for using a certain value of filters in actions regarding
 # a certain QVD object
 
-my $ACLS_FOR_FILTER_VALUES = 
-{
-    list => { Log => { qvd_object => { vm => [qr/^vm\.see-main\.$/],
+my $ACLS_FOR_FILTER_VALUES = {
+	list => {
+		Log => {
+			qvd_object => {
+				vm => [qr/^vm\.see-main\.$/],
 					   user => [qr/^user\.see-main\.$/],
 					   osf => [qr/^osf\.see-main\.$/],
 					   di => [qr/^di\.see-main\.$/],
@@ -168,15 +196,18 @@ my $ACLS_FOR_FILTER_VALUES =
 					   acl => [qr/^administrator\.see\.acl-list$/],
 					   config => [qr/^config\.qvd\.$/],
 					   tenant_view => [qr/^views\.see-main\.$/],
-					   admin_view => [qr/^views\.see-main\.$/],}}},
+				admin_view => [qr/^views\.see-main\.$/],
+			}
+		}
+	},
 };
 
 # Acls needed for retrieving every field in actions regarding
 # a certain QVD object
 
-my $ACLS_FOR_FIELDS = 
-{
-    OSF => { creation_admin_id => [qr/^osf\.see\.created-by$/],
+my $ACLS_FOR_FIELDS = {
+	OSF => {
+		creation_admin_id => [qr/^osf\.see\.created-by$/],
 	     creation_admin_name => [qr/^osf\.see\.created-by$/],
 	     creation_date => [qr/^osf\.see\.creation-date$/],
 	     overlay => [qr/^osf\.see\.overlay$/],
@@ -185,14 +216,18 @@ my $ACLS_FOR_FIELDS =
 	     number_of_vms => [qr/^osf\.see\.vms-info$/],
 	     number_of_dis => [qr/^osf\.see\.dis-info$/],
 	     properties => [qr/^osf\.see\.properties$/],
-	     description => [qr/^osf\.see\.description$/] },
+		description => [qr/^osf\.see\.description$/]
+	},
 
-    Role => { roles => [qr/^role\.see\.(acl-list|(acl-list|inherited)-roles)$/],
+	Role => {
+		roles => [qr/^role\.see\.(acl-list|(acl-list|inherited)-roles)$/],
 	      acls => [qr/^role\.see\.acl-list$/],
 	      number_of_acls => [qr/^role\.see\.acl-list$/],
-	      description => [qr/^role\.see\.description$/] },
+		description => [qr/^role\.see\.description$/]
+	},
 
-    DI => { creation_admin_id => [qr/^di\.see\.created-by$/],
+	DI => {
+		creation_admin_id => [qr/^di\.see\.created-by$/],
 	    creation_admin_name => [qr/^di\.see\.created-by$/],
 	    creation_date => [qr/^di\.see\.creation-date$/],
 	    version => [qr/^di\.see\.version$/],
@@ -201,9 +236,11 @@ my $ACLS_FOR_FIELDS =
 	    blocked => [qr/^di\.see\.block$/],
 	    tags => [qr/^(di\.see\.|[^.]+\.see\.di-list-)(tags|default|head)$/],
 	    properties => [qr/^di\.see\.properties$/],
-	    description => [qr/^di\.see\.description$/] },
+		description => [qr/^di\.see\.description$/]
+	},
 
-    VM => { user_id => [qr/^vm\.see\.user$/],
+	VM => {
+		user_id => [qr/^vm\.see\.user$/],
 	    user_name => [qr/^vm\.see\.user$/],
 	    osf_id => [qr/^vm\.see\.osf$/],
 	    osf_name => [qr/^vm\.see\.osf$/],
@@ -229,21 +266,27 @@ my $ACLS_FOR_FIELDS =
 	    di_name => [qr/^vm\.see\.di$/],
 	    di_id => [qr/^vm\.see\.di$/],
 	    properties => [qr/^vm\.see\.properties$/],
-	    description => [qr/^vm\.see\.description$/] },
+		description => [qr/^vm\.see\.description$/]
+	},
  
-    Administrator => { roles => [qr/^administrator\.see\.roles$/],
-	              description => [qr/^administrator\.see\.description$/] },
+	Administrator => {
+		roles => [qr/^administrator\.see\.roles$/],
+		description => [qr/^administrator\.see\.description$/]
+	},
 
-    User => { blocked => [qr/^user\.see\.block$/],
+	User => {
+		blocked => [qr/^user\.see\.block$/],
 	      creation_admin_id => [qr/^user\.see\.created-by$/],
 	      creation_admin_name => [qr/^user\.see\.created-by$/],
 	      creation_date => [qr/^user\.see\.creation-date$/],
 	      number_of_vms => [qr/^user\.see\.vms-info$/],
 	      number_of_vms_connected => [qr/^user\.see\.vm-list-state$/],
 	      properties => [qr/^user\.see\.properties$/],
-	      description => [qr/^user\.see\.description$/] },
+		description => [qr/^user\.see\.description$/]
+	},
 
-    Host => { address => [qr/^host\.see\.address$/],
+	Host => {
+		address => [qr/^host\.see\.address$/],
 	      blocked => [qr/^host\.see\.block$/],
 	      state => [qr/^host\.see\.state$/],
 	      creation_admin_id => [qr/^host\.see\.created-by$/],
@@ -251,24 +294,29 @@ my $ACLS_FOR_FIELDS =
 	      creation_date => [qr/^host\.see\.creation-date$/],
 	      number_of_vms_connected => [qr/^host\.see\.vms-info$/],
 	      properties => [qr/^host\.see\.properties$/],
-	      description => [qr/^host\.see\.description$/] },
+		description => [qr/^host\.see\.description$/]
+	},
 
-    Tenant => { description => [qr/^tenant\.see\.description$/] ,
+	Tenant => {
+		description => [qr/^tenant\.see\.description$/] ,
 	      block => [qr/^tenant\.see\.blocksize$/],
-	      language => [qr/^tenant\.see\.language$/] }
+		language => [qr/^tenant\.see\.language$/]
+	}
 };
 
 # Acls needed to update every field in actions regarding
 # a certain QVD object
 
-my $ACLS_FOR_ARGUMENTS_IN_UPDATE = 
-{ 
-    User => { password => [qr/^user\.update\.password$/],
+my $ACLS_FOR_ARGUMENTS_IN_UPDATE = {
+	User => {
+		password => [qr/^user\.update\.password$/],
 	      blocked => [qr/^user\.update\.block$/],
 	      description => [qr/^user\.update\.description$/],
-	      __properties_changes_set => [qr/^user\.update\.properties$/]},
+		__properties_changes_set => [qr/^user\.update\.properties$/]
+	},
 
-    VM => { '***start***' => [qr/^vm\.update\.state$/], 
+	VM => {
+		'***start***' => [qr/^vm\.update\.state$/],
 	    '***stop***' => [qr/^(vm\.update\.state|host\.update\.stop-vms)$/],
 	    '***disconnect***' => [qr/^vm\.update\.disconnect-user$/], 
 	    name => [qr/^vm\.update\.name$/],
@@ -277,60 +325,86 @@ my $ACLS_FOR_ARGUMENTS_IN_UPDATE =
 	    expiration_hard => [qr/^vm\.update\.expiration$/],
 	    di_tag => [qr/^vm\.update\.di-tag$/],
 	    description => [qr/^vm\.update\.description$/],
-	    __properties_changes__set => [qr/^vm\.update\.properties$/] },
+		__properties_changes__set => [qr/^vm\.update\.properties$/]
+	},
 
-    Host => { name => [qr/^host\.update\.name$/],
+	Host => {
+		name => [qr/^host\.update\.name$/],
 	      address => [qr/^host\.update\.address$/],
 	      blocked => [qr/^host\.update\.block$/],
 	      description => [qr/^host\.update\.description$/],
-	      __properties_changes__set => [qr/^host\.update\.properties$/] },
+		__properties_changes__set => [qr/^host\.update\.properties$/]
+	},
 
-    OSF => { name => [qr/^osf\.update\.name$/],
+	OSF => {
+		name => [qr/^osf\.update\.name$/],
 	     memory => [qr/^osf\.update\.memory$/],
 	     user_storage => [qr/^osf\.update\.user-storage$/],
 	     description => [qr/^osf\.update\.description$/],
-	     __properties_changes__set => [qr/^osf\.update\.properties$/] },
+		__properties_changes__set => [qr/^osf\.update\.properties$/]
+	},
 
-    DI => { blocked => [qr/^di\.update\.block$/],
+	DI => {
+		blocked => [qr/^di\.update\.block$/],
 	    description => [qr/^di\.update\.description$/],
 	    __properties_changes__set => [qr/^di\.update\.properties$/],
 	    __tags_changes__create => [qr/^(di\.update\.(tags|defaults)|osf\.see\.di-list-default-update)$/],
-	    __tags_changes__delete => [qr/^(di\.update\.(tags|defaults)|osf\.see\.di-list-default-update)$/]},
+		__tags_changes__delete => [qr/^(di\.update\.(tags|defaults)|osf\.see\.di-list-default-update)$/]
+	},
 
-    Role => { name => [qr/^role\.update\.name$/],
+	Role => {
+		name => [qr/^role\.update\.name$/],
 	      description => [qr/^role\.update\.description$/],
 	      __acls_changes__assign_acls => [qr/^role\.update\.assign-acl$/],
 	      __acls_changes__unassign_acls => [qr/^role\.update\.assign-acl$/],
 	      __roles_changes__assign_roles => [qr/^role\.update\.assign-role$/],
-	      __roles_changes__unassign_roles => [qr/^role\.update\.assign-role$/] },
+		__roles_changes__unassign_roles => [qr/^role\.update\.assign-role$/]
+	},
 
-    Administrator => { password => [qr/^administrator\.update\.password$/],
+	Administrator => {
+		password => [qr/^administrator\.update\.password$/],
 	               description => [qr/^administrator\.update\.description$/],
 		       __roles_changes__assign_roles => [qr/^administrator\.update\.assign-role$/],
-		       __roles_changes__unassign_roles => [qr/^administrator\.update\.assign-role$/] },
+		__roles_changes__unassign_roles => [qr/^administrator\.update\.assign-role$/]
+	},
 
-    Tenant => { description => [qr/^tenant\.update\.description$/],
+	Tenant => {
+		description => [qr/^tenant\.update\.description$/],
 	        block => [qr/^tenant\.update\.blocksize$/],
-	        language => [qr/^tenant\.update\.language$/] },
+		language => [qr/^tenant\.update\.language$/]
+	},
 
-    Tenant_Views_Setup => { visible => [qr/^views\.update\.columns$/] },  
-    Operative_Views_In_Tenant => { visible => [qr/^views\.update\.columns$/] },  
-    Administrator_Views_Setup => { visible => [qr/^views\.update\.columns$/] },
-    Operative_Views_In_Administrator => { visible => [qr/^views\.update\.columns$/] }
+	Tenant_Views_Setup => {
+		visible => [qr/^views\.update\.columns$/]
+	},
+
+	Operative_Views_In_Tenant => {
+		visible => [qr/^views\.update\.columns$/]
+	},
+
+	Administrator_Views_Setup => {
+		visible => [qr/^views\.update\.columns$/]
+	},
+
+	Operative_Views_In_Administrator => {
+		visible => [qr/^views\.update\.columns$/]
+	}
 
 };
 
 # Acls needed to perform massive updates for every field in actions regarding
 # a certain QVD object
 
-my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE = 
-{ 
-    User => { '***delete***' => [qr/^user\.delete-massive\.$/], # MAYBE A NEW VARIABLE?
+my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE = {
+	User => {
+		'***delete***' => [qr/^user\.delete-massive\.$/], # MAYBE A NEW VARIABLE?
 	      blocked => [qr/^user\.update-massive\.block$/],
 	      description => [qr/^user\.update-massive\.description$/],
-	      __properties_changes__set => [qr/^user\.update-massive\.properties$/]},
+		__properties_changes__set => [qr/^user\.update-massive\.properties$/]
+	},
 
-    VM => { '***delete***' => [qr/^vm\.delete-massive\.$/],
+	VM => {
+		'***delete***' => [qr/^vm\.delete-massive\.$/],
 	    '***start***' => [qr/^vm\.update-massive\.state$/], 
 	    '***stop***' => [qr/^(vm\.update-massive\.state|host\.update-massive\.stop-vms)$/],
 	    '***disconnect***' => [qr/^vm\.update-massive\.disconnect-user$/], 
@@ -340,61 +414,87 @@ my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE =
 	    di_tag => [qr/^vm\.update-massive\.di-tag$/],
 	    description => [qr/^vm\.update-massive\.description$/],
 	    __properties_changes__set => [qr/^vm\.update-massive\.properties-(cre|upd)ate$/],
-	    __properties_changes__delete => [qr/^vm\.update-massive\.properties-delete$/] },
+		__properties_changes__delete => [qr/^vm\.update-massive\.properties-delete$/]
+	},
 
-    Host => { '***delete***' => [qr/^host\.delete-massive\.$/],
+	Host => {
+		'***delete***' => [qr/^host\.delete-massive\.$/],
 	      blocked => [qr/^host\.update-massive\.block$/],
 	      description => [qr/^host\.update-massive\.description$/],
 	      __properties_changes__set => [qr/^host\.update-massive\.properties-(cre|upd)ate$/],
-	      __properties_changes__delete => [qr/^host\.update-massive\.properties-delete$/] },
+		__properties_changes__delete => [qr/^host\.update-massive\.properties-delete$/]
+	},
 	
-    OSF => { '***delete***' => [qr/^osf\.delete-massive\.$/],
+	OSF => {
+		'***delete***' => [qr/^osf\.delete-massive\.$/],
 	     memory => [qr/^osf\.update-massive\.memory$/],
 	     user_storage => [qr/^osf\.update-massive\.user-storage$/],
 	     description => [qr/^osf\.update-massive\.description$/],
 	     __properties_changes__set => [qr/^osf\.update-massive\.properties-(cre|upd)ate$/],
-	     __properties_changes__delete => [qr/^osf\.update-massive\.properties-delete$/] },
+		__properties_changes__delete => [qr/^osf\.update-massive\.properties-delete$/]
+	},
 	
-    DI => { '***delete***' => [qr/^di\.delete-massive\.$/],
+	DI => {
+		'***delete***' => [qr/^di\.delete-massive\.$/],
 	    blocked => [qr/^di\.update-massive\.block$/],
 	    description => [qr/^di\.update-massive\.description$/],
 	    __properties_changes__set => [qr/^di\.update-massive\.properties-(cre|upd)ate$/],
 	    __properties_changes__delete => [qr/^di\.update-massive\.properties-delete$/],
 	    __tags_changes__create => [qr/^di\.update-massive\.tags$/],
-	    __tags_changes__delete => [qr/^di\.update-massive\.tags-delete$/]},
+		__tags_changes__delete => [qr/^di\.update-massive\.tags-delete$/]
+	},
 	
-    Tenant => { '***delete***' => [qr/^tenant\.delete-massive\.$/],
+	Tenant => {
+		'***delete***' => [qr/^tenant\.delete-massive\.$/],
 	        block => [qr/^tenant\.update-massive\.blocksize$/],
 	        description => [qr/^tenant\.update-massive\.description$/],
-	        language => [qr/^tenant\.update-massive\.language$/] },
+		language => [qr/^tenant\.update-massive\.language$/]
+	},
 
-    Role => { '***delete***' => [qr/^role\.delete-massive\.$/],
-	      description => [qr/^role\.update-massive\.description$/] },
+	Role => {
+		'***delete***' => [qr/^role\.delete-massive\.$/],
+		description => [qr/^role\.update-massive\.description$/]
+	},
 
-    Administrator => { '***delete***' => [qr/^administrator\.delete-massive\.$/],
-	               description => [qr/^administrator\.update-massive\.description$/] }
+	Administrator => {
+		'***delete***' => [qr/^administrator\.delete-massive\.$/],
+		description => [qr/^administrator\.update-massive\.description$/]
+	}
 
 };
 
 # Acls needed to set every field in creation for actions regarding
 # a certain QVD object
 
-my $ACLS_FOR_ARGUMENTS_IN_CREATION = 
-{ 
-    User => { __properties__ => [qr/^user\.create\.properties$/]},
+my $ACLS_FOR_ARGUMENTS_IN_CREATION = {
+	User => {
+		__properties__ => [qr/^user\.create\.properties$/]
+	},
     
-    VM => { di_tag => [qr/^vm\.create\.di-tag$/],
-	    __properties__ => [qr/^vm\.create\.properties$/] },
+	VM => {
+		di_tag => [qr/^vm\.create\.di-tag$/],
+		__properties__ => [qr/^vm\.create\.properties$/]
+	},
     
-    Host => {__properties__ => [qr/^host\.create\.properties$/] },
+	Host => {
+		__properties__ => [qr/^host\.create\.properties$/]
+	},
 
-    OSF => { memory => [qr/^osf\.create\.memory$/],
+	OSF => {
+		memory => [qr/^osf\.create\.memory$/],
 	     user_storage => [qr/^osf\.create\.user-storage$/],
-	     __properties__ => [qr/^osf\.create\.properties$/]},
+		__properties__ => [qr/^osf\.create\.properties$/]
+	},
 
-    DI => { version => [qr/^di\.create\.version$/],
+	DI => {
+		version => [qr/^di\.create\.version$/],
 	    __properties__ => [qr/^di\.create\.properties$/],
-	    __tags__ => [qr/^di\.create\.(tags|default)$/]}
+		__tags__ => [qr/^di\.create\.(tags|default)$/]
+	},
+
+	Property_List => {
+		__properties_assign__ => [qr/^property\.manage\./],
+	}
 
 };
 
@@ -405,54 +505,79 @@ my $ACLS_FOR_ARGUMENTS_IN_CREATION =
 #       can be requested inside of create and update actions
 #       for that object.
 
-my $NESTED_QUERIES_TO_ADMIN4_MAPPER = 
-{ 
-    User => { __properties__ => 'custom_properties_set',
+my $NESTED_QUERIES_TO_ADMIN4_MAPPER = {
+	User => {
+		__properties__ => 'custom_properties_set',
 	      __properties_changes__set => 'custom_properties_set',
-	      __properties_changes__delete => 'custom_properties_del'},
+		__properties_changes__delete => 'custom_properties_del'
+	},
   
-    VM => { __properties__ => 'custom_properties_set',
+	VM => {
+		__properties__ => 'custom_properties_set',
 	    __properties_changes__set => 'custom_properties_set',
-	    __properties_changes__delete => 'custom_properties_del'},
+		__properties_changes__delete => 'custom_properties_del'
+	},
     
-    Host => { __properties__ => 'custom_properties_set',
+	Host => {
+		__properties__ => 'custom_properties_set',
 	      __properties_changes__set => 'custom_properties_set',
-	      __properties_changes__delete => 'custom_properties_del' },
+		__properties_changes__delete => 'custom_properties_del'
+	},
   
-    OSF => { __properties__ => 'custom_properties_set',
+	OSF => {
+		__properties__ => 'custom_properties_set',
 	     __properties_changes__set => 'custom_properties_set',
-	     __properties_changes__delete => 'custom_properties_del'},
+		__properties_changes__delete => 'custom_properties_del'
+	},
   
-    DI => { __properties__ => 'custom_properties_set',
+	DI => {
+		__properties__ => 'custom_properties_set',
 	    __tags__ => 'tags_create',
 	    __properties_changes__set => 'custom_properties_set',
 	    __properties_changes__delete => 'custom_properties_del', 
 	    __tags_changes__create => 'tags_create',
-	    __tags_changes__delete => 'tags_delete'},
+		__tags_changes__delete => 'tags_delete'
+	},
 
     Tenant => {},
 
-    Role => { __acls__ => 'add_acls_to_role',
+	Role => {
+		__acls__ => 'add_acls_to_role',
 	      __roles__ => 'add_roles_to_role',
 	      __acls_changes__assign_acls  => 'add_acls_to_role',
 	      __acls_changes__unassign_acls => 'del_acls_to_role',
 	      __roles_changes__assign_roles => 'add_roles_to_role', 
-	      __roles_changes__unassign_roles => 'del_roles_to_role'},
+		__roles_changes__unassign_roles => 'del_roles_to_role'
+	},
 
-    Administrator => { __roles__ => 'add_roles_to_admin',
+	Administrator => {
+		__roles__ => 'add_roles_to_admin',
 		       __roles_changes__assign_roles => 'add_roles_to_admin',
-		       __roles_changes__unassign_roles => 'del_roles_to_admin' },
+		__roles_changes__unassign_roles => 'del_roles_to_admin'
+	},
+
     Tenant_Views_Setup => {},
+
     Operative_Views_In_Tenant => {},
+
     Administrator_Views_Setup => {},
+
     Operative_Views_In_Administrator => {},
+
+	Property_List => {
+		__property_assign__ => 'assign_property_to_objects',
+	},
+};
+
+my $NESTED_QUERIES_AVAILABLE_ARGS = {
+	__property_assign__ => [qw(vm user osf host di)],
 };
 
 # Available filters for every kind of action
 
-my $AVAILABLE_FILTERS = 
-{ 
-    list => { default => [],
+my $AVAILABLE_FILTERS = {
+	list => {
+		default => [],
 
 	      Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time status source ip type_of_action qvd_object superadmin)],
 	      
@@ -501,10 +626,11 @@ my $AVAILABLE_FILTERS =
 
 	      DI_Property_List => [qw(tenant_id)],
 
-	      Property_List => [qw(tenant_id)]},
+		Property_List => [qw(tenant_id)]
+	},
 
-
-    all_ids => { default => [],
+	all_ids => {
+		default => [],
 
 		 Config => [qw(key value)],
 
@@ -538,30 +664,66 @@ my $AVAILABLE_FILTERS =
 
 		 Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
-		 Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)],},
+		Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)],
+	},
 
-    details => { default => [qw(id tenant_id)], Config => [qw(key value)], Host => [qw(id)], Role => [qw(id)], ACL => [qw(id)], Tenant => [qw(id)], Wat_Setups_By_Tenant => [qw()] },
+	details => {
+		default => [qw(id tenant_id)],
+		Config => [qw(key value)],
+		Host => [qw(id)],
+		Role => [qw(id)],
+		ACL => [qw(id)],
+		Tenant => [qw(id)],
+		Wat_Setups_By_Tenant => [qw()]
+	},
 		
-    tiny => { default => [qw(tenant_id)], Host => [qw()], Role => [qw(internal fixed tenant_id)], ACL => [qw(name)], Tenant => [qw(id)], DI_Tag => [qw(tenant_id osf_id)]},
+	tiny => {
+		default => [qw(tenant_id)],
+		Host => [qw()],
+		Role => [qw(internal fixed tenant_id)],
+		ACL => [qw(name)],
+		Tenant => [qw(id)],
+		DI_Tag => [qw(tenant_id osf_id)]
+	},
 
-    delete => { default => [qw(id tenant_id)], Config => [qw(tenant_id key value)], Host => [qw(id)], Role => [qw(id)],Tenant => [qw(id)],
+	delete => {
+		default => [qw(id tenant_id)],
+		Config => [qw(tenant_id key value)],
+		Host => [qw(id)],
+		Role => [qw(id)],
+		Tenant => [qw(id)],
                 Tenant_Views_Setup => [qw(tenant_id qvd_object)],
-                Administrator_Views_Setup => [qw(qvd_object)]}, # Every admin is able to delete just its own views, so you cannot filter by admin or id. Suitable admin_id forzed in Request.pm
+		Administrator_Views_Setup => [qw(qvd_object)]
+	}, # Every admin is able to delete just its own views, so you cannot filter by admin or id. Suitable admin_id forzed in Request.pm
 
-    update => { default => [qw(id tenant_id)],Config => [qw(key value)],Host => [qw(id)],Role => [qw(id)],Tenant => [qw(id)], Wat_Setups_By_Tenant => [qw()]},
+	update => {
+		default => [qw(id tenant_id)],
+		Config => [qw(key value)],
+		Host => [qw(id)],
+		Role => [qw(id)],
+		Tenant => [qw(id)],
+		Wat_Setups_By_Tenant => [qw()]
+	},
 
-    create_or_update => { Tenant_Views_Setup => [qw(tenant_id)]},
+	create_or_update => { Tenant_Views_Setup => [qw(tenant_id)] },
 
-    exec => { default => [qw(id tenant_id user_id host_id)]},
+	exec => { default => [qw(id tenant_id user_id host_id)] },
 
-    state => { default => [qw(id tenant_id)], Host => [qw(id)], ACL => [qw(id)], Role => [qw(id)], Tenant => [qw(id)]},
+	state => {
+		default => [qw(id tenant_id)],
+		Host => [qw(id)],
+		ACL => [qw(id)],
+		Role => [qw(id)],
+		Tenant => [qw(id)]
+	},
 };
 
 # Available fields to retrieve for every kind of action
 
-my $AVAILABLE_FIELDS = 
-{ 
-    list => { default => [],
+my $AVAILABLE_FIELDS = {
+	list => {
+
+		default => [],
 
 	      Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time antiquity status source ip type_of_action qvd_object object_deleted admin_deleted superadmin)],
 
@@ -599,6 +761,7 @@ my $AVAILABLE_FIELDS =
 
 	      Administrator_Views_Setup => [qw(id tenant_id tenant_name admin_id admin_name field visible view_type 
                                                device_type qvd_object property)],
+
 	      Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
 	      User_Property_List => [qw(property_id key description)],
@@ -611,11 +774,14 @@ my $AVAILABLE_FIELDS =
 
 	      DI_Property_List => [qw(property_id key description)],
 
-	      Property_List => [qw(id property_id key description in_user in_vm in_host in_osf in_di)] },
+		Property_List => [qw(id property_id tenant_id key description in_user in_vm in_host in_osf in_di)]
+	},
 
-    details => { default => [],
+	details => {
+		default => [],
 
 		 Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time antiquity status source ip type_of_action qvd_object object_deleted admin_deleted superadmin)],
+
 		 Config => [qw(tenant_id key value)],
 
 		 OSF => [qw(id name description overlay user_storage memory  number_of_vms number_of_dis properties creation_date creation_admin_id creation_admin_name)],
@@ -651,64 +817,89 @@ my $AVAILABLE_FIELDS =
 
 		 Administrator_Views_Setup => [qw(id admin_id admin_name tenant_id tenant_name field visible view_type 
                                                   device_type qvd_object property)],
+
 		 Operative_Views_In_Administrators => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
-		Wat_Setups_By_Tenant => [qw( block language )], },
+		Wat_Setups_By_Tenant => [qw( block language )],
+	},
 
-    tiny => { default => [qw(id name)],
+	tiny => {
+		default => [qw(id name)],
 
 	      DI => [qw(id disk_image)],
 
 	      Tenant_Views_Setup => [qw(id)],
 
-	      Administrator_Views_Setup => [qw(id)]},
+		Administrator_Views_Setup => [qw(id)]
+	},
 
     all_ids => { default => [qw(id)]},
 
-    state => { User => [qw(number_of_vms_connected)],
+	state => {
+		User => [qw(number_of_vms_connected)],
 	       
 	       VM => [qw(state user_state)],
 	       
-	       Host => [qw(number_of_vms_connected)]},
+		Host => [qw(number_of_vms_connected)]
+	},
     
-    create => { 'default' => [qw(id)], Config => [qw(key tenant_id)]},
+	create => {
+		'default' => [qw(id)], Config => [qw(key tenant_id)]
+	},
 
-    create_or_update => { 'default' => [qw(id)], 'Config' => [qw(key tenant_id)] }
+	create_or_update => {
+		'default' => [qw(id)], 'Config' => [qw(key tenant_id)]
+	}
 
 };
 
 # Mandatory filters to execute every kind of action
 
 my $MANDATORY_FILTERS = 
-{ 
-    list => { default => [qw()],  
+	{
+		list => {
+			default => [qw()],
               Operative_Acls_In_Role => [qw(role_id)], 
-	      Operative_Acls_In_Administrator => [qw()]}, # FIX ME. HAS DEFAULT VALUE IN Request.pm. DEFAULT SYSTEM FOR FILTERS NEEDED
+			Operative_Acls_In_Administrator => [qw()]
+		}, # FIX ME. HAS DEFAULT VALUE IN Request.pm. DEFAULT SYSTEM FOR FILTERS NEEDED
 
-    details => { default => [qw(id)], 
+		details => {
+			default => [qw(id)],
 		Wat_Setups_By_Tenant => [ qw() ],
 		 Operative_Acls_In_Role => [qw(role_id)], 
-		 Operative_Acls_In_Administrator => [qw()]}, # FIX ME. HAS DEFAULT VALUE IN Request.pm. DEFAULT SYSTEM FOR FILTERS NEEDED
+			Operative_Acls_In_Administrator => [qw()]
+		}, # FIX ME. HAS DEFAULT VALUE IN Request.pm. DEFAULT SYSTEM FOR FILTERS NEEDED
 
-    tiny => { default => [qw()]},
+		tiny => { default => [qw()] },
 
-    delete => { default => [qw(id)], Config => [qw(key)], Administrator_Views_Setup => [qw()], Tenant_Views_Setup => [qw()]},
+		delete => {
+			default => [qw(id)],
+			Config => [qw(key)],
+			Administrator_Views_Setup => [qw()],
+			Tenant_Views_Setup => [qw()]
+		},
 
-    update=> { default => [qw(id)], Config => [qw(key tenant_id)], Wat_Setups_By_Tenant => [qw()]},
+		update=> {
+			default => [qw(id)],
+			Config => [qw(key tenant_id)],
+			Wat_Setups_By_Tenant => [qw()]
+		},
 
-    exec => { default => [qw()]}, 
+		exec => { default => [qw()] },
 
-    state => { default => [qw(id)]}, 
+		state => { default => [qw(id)] },
 
-    all_ids => { default => [qw()],
+		all_ids => {
+			default => [qw()],
 		 Operative_Acls_In_Role => [qw(role_id)], 
-		 Operative_Acls_In_Administrator => [qw()]}, # FIX ME. HAS DEFAULT VALUE IN Request.pm. DEFAULT SYSTEM FOR FILTERS NEEDED
-};
+			Operative_Acls_In_Administrator => [qw()]
+		}, # FIX ME. HAS DEFAULT VALUE IN Request.pm. DEFAULT SYSTEM FOR FILTERS NEEDED
+	};
 
 # Default order criteria for every kind of action
 
 my $DEFAULT_ORDER_CRITERIA = 
-{ 
+	{
     tiny => { default =>  [qw(name)],
 	      DI => [qw(disk_image)],
 	      Tenant_Views_Setup => [qw(field)],
@@ -722,7 +913,7 @@ my $DEFAULT_ORDER_CRITERIA =
 	      Operative_Views_In_Administrator => [qw(field)],
               Config => [qw(key)] }
 
-};
+	};
 
 
 # Available nested queries for every type of action
@@ -730,9 +921,10 @@ my $DEFAULT_ORDER_CRITERIA =
 #       can be requested inside of create and update actions
 #       for that object.
 
-my $AVAILABLE_NESTED_QUERIES = 
-{ 
-    create => { User => [qw(__properties__)],
+my $AVAILABLE_NESTED_QUERIES = {
+
+	create => {
+		User => [qw(__properties__)],
 		VM => [qw(__properties__)],
 		Host => [qw(__properties__)],
 		OSF => [qw(__properties__)],
@@ -743,9 +935,12 @@ my $AVAILABLE_NESTED_QUERIES =
 		Tenant_Views_Setup => [qw()],
 		Operative_Views_In_Tenant => [qw()],
 		Administrator_Views_Setup => [qw()],
-		Operative_Views_In_Administrator => [qw()]},
+		Operative_Views_In_Administrator => [qw()],
+		Property_List => [qw(__property_assign__)]
+	},
 
-    update => { User => [qw(__properties_changes__set __properties_changes__delete)],
+	update => {
+		User => [qw(__properties_changes__set __properties_changes__delete)],
 		VM => [qw(__properties_changes__set __properties_changes__delete)],
 		Host => [qw(__properties_changes__set __properties_changes__delete)],
 		OSF => [qw(__properties_changes__set __properties_changes__delete)],
@@ -761,7 +956,8 @@ my $AVAILABLE_NESTED_QUERIES =
 		Operative_Views_In_Tenant => [qw()],
 		Administrator_Views_Setup => [qw()],
 		Operative_Views_In_Administrator => [qw()],
-		Wat_Setups_By_Tenant => [qw()]}
+		Wat_Setups_By_Tenant => [qw()]
+	}
 };
 
 # Available arguments for update actions
@@ -784,7 +980,8 @@ my $AVAILABLE_ARGUMENTS = {
 
 # Available arguments for creation actions
 
-my $MANDATORY_ARGUMENTS = { Config => [qw(tenant_id key value)],
+my $MANDATORY_ARGUMENTS = {
+	Config => [qw(tenant_id key value)],
 			    User => [qw(tenant_id name password blocked)],
 			    VM => [qw(name user_id ip osf_id di_tag state user_state blocked)],
 			    Host => [qw(name address frontend backend blocked state)],
@@ -801,40 +998,66 @@ my $MANDATORY_ARGUMENTS = { Config => [qw(tenant_id key value)],
 	      		    Host_Property_List => [qw(property_id)],
 	      		    OSF_Property_List => [qw(property_id)],
 	      		    DI_Property_List => [qw(property_id)],
-	      		    Property_List => [qw(tenant_id key)] };
+	Property_List => [qw(tenant_id key)]
+};
 
 # Default values for some mandatory arguments in creation
 
-my $DEFAULT_ARGUMENT_VALUES = 
-{
-    User => { blocked => 'false' },
+my $DEFAULT_ARGUMENT_VALUES = {
+	User => {
+		blocked => 'false'
+	},
 
-    VM => { di_tag => 'default',
+	VM => {
+		di_tag => 'default',
 	    blocked => 'false',
 	    user_state => 'disconnected',
 	    state => 'stopped',
-	    ip => \&get_free_ip},
+		ip => \&get_free_ip
+	},
 
-    Host => { backend => 'true',
+	Host => {
+		backend => 'true',
 	      frontend => 'true',
 	      blocked => 'false',
-	      state => 'stopped'},
+		state => 'stopped'
+	},
 
-    OSF => { memory => \&get_default_memory,
+	OSF => {
+		memory => \&get_default_memory,
 	     overlay => \&get_default_overlay,
-	     user_storage => 0 },
+		user_storage => 0
+	},
 
-    DI => { blocked => 'false', version => \&get_default_di_version },
+	DI => {
+		blocked => 'false',
+		version => \&get_default_di_version
+	},
 
-    Role => { fixed => 'false', internal => 'false' },
+	Role => {
+		fixed => 'false',
+		internal => 'false'
+	},
 
-    Tenant => { language => 'auto',block => '10'},
+	Tenant => {
+		language => 'auto',
+		block => '10'
+	},
 
-    Administrator => { language => 'auto',block => '10'},
+	Administrator => {
+		language => 'auto',
+		block => '10'
+	},
 
-    Tenant_Views_Setup => { visible => 0, property => 0 },
+	Tenant_Views_Setup => {
+		visible => 0,
+		property => 0
+	},
 
-    Administrator_Views_Setup =>  { visible => 0, property => 0 }
+	Administrator_Views_Setup =>  {
+		visible => 0,
+		property => 0
+	}
 };
 
 
@@ -850,7 +1073,7 @@ my $ip2mac = "ip2mac(me.ip,'".cfg('vm.network.mac.prefix')."')";
 # depicts the column of the table.
 
 my $FILTERS_TO_DBIX_FORMAT_MAPPER = 
-{
+	{
     Log => { 
 	id => 'me.id',
 	admin_id => 'me.administrator_id',
@@ -1161,7 +1384,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 		'language' => 'me.language',
 		'tenant_id' => 'me.tenant_id',
 	},
-};
+	};
 
 # Nowadays the mapper for arguments and order criteria
 # is equal to the mapper for filters. That's for
@@ -1183,7 +1406,7 @@ my $ORDER_CRITERIA_TO_DBIX_FORMAT_MAPPER =
 # from a related view (See $RELATED_VIEWS_IN_DB).
 
 my $FIELDS_TO_DBIX_FORMAT_MAPPER = 
-{
+	{
     Log => { 
 	id => 'me.id',
 	admin_id => 'me.administrator_id',
@@ -1503,7 +1726,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 		'language' => 'me.language',
 		'tenant_id' => 'me.tenant_id',
 	},
-};
+	};
 
 # This var stores functions intended to 
 # normalize tha value provided to API 
@@ -1511,7 +1734,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 # that need it.  
 
 my $VALUES_NORMALIZATOR = 
-{ 
+	{
     DI => { disk_image => \&basename_disk_image},
 
     User => { name => \&normalize_name, 
@@ -1521,13 +1744,12 @@ my $VALUES_NORMALIZATOR =
 		       password => \&password_to_token },
 
     Tenant => { name => \&normalize_name }
-};
+	};
 
 # Joins of related tables needed in
 # actions regarding every QVD object
 
-my $DBIX_JOIN_VALUE = 
-{ 
+my $DBIX_JOIN_VALUE = {
     Log => [qw(deletion_log_entry administrator)],
 
     User => [qw(tenant creation_log_entry)],
@@ -1577,9 +1799,9 @@ my $DBIX_JOIN_VALUE =
 # That's all for performance.
 
 
-my $DBIX_PREFETCH_VALUE = 
-{ 
-    list => { Log => [qw(deletion_log_entry administrator)],
+my $DBIX_PREFETCH_VALUE = {
+	list => {
+		Log => [qw(deletion_log_entry administrator)],
 	      Role => [qw(tenant creation_log_entry)],
 	      User => [qw(tenant creation_log_entry)],
 	      VM => ['di', 'osf', { vm_runtime => qw(host) }, { user => 'tenant' }, qw(creation_log_entry)],
@@ -1590,9 +1812,11 @@ my $DBIX_PREFETCH_VALUE =
 	      Administrator => [qw(tenant wat_setups), qw(creation_log_entry)],
 	      Tenant => [qw(wat_setups creation_log_entry)],
 	      Tenant_Views_Setup => [ qw(tenant)],
-	      Administrator_Views_Setup => [ { administrator => 'tenant' }] },
+		Administrator_Views_Setup => [ { administrator => 'tenant' }]
+	},
 
-    details => {Log => [qw(deletion_log_entry administrator)],
+	details => {
+		Log => [qw(deletion_log_entry administrator)],
 		Role => [qw(tenant creation_log_entry)],
 		User => [qw(tenant creation_log_entry)],
 		VM => ['di', 'osf', { vm_runtime => qw(host) }, { user => 'tenant' }, qw(creation_log_entry)],
@@ -1603,15 +1827,15 @@ my $DBIX_PREFETCH_VALUE =
 		Administrator => [qw(tenant wat_setups creation_log_entry)],
 		Tenant => [qw(wat_setups creation_log_entry)],
 		Tenant_Views_Setup => [ qw(tenant)],
-		Administrator_Views_Setup => [ { administrator => 'tenant' }]}
+		Administrator_Views_Setup => [ { administrator => 'tenant' }]
+	}
 };
 
 # This is for creation actions. When creating
 # an object in DVB, you may have to create related objects as well.
 # These related objects are listed in here.
 
-my $DBIX_HAS_ONE_RELATIONSHIPS = 
-{ 
+my $DBIX_HAS_ONE_RELATIONSHIPS = {
     VM => [qw(vm_runtime counters)],
     Host => [qw(runtime counters)],
     Tenant => [qw(wat_setups)],
@@ -1698,10 +1922,10 @@ sub BUILD
 	'dbix_has_one_relationships',$DBIX_HAS_ONE_RELATIONSHIPS);
 
 
-# For some actions, the fields tenant_id and tenant_name
-# are available only in case the current admin in superadmin
-# For that cases, these fields are added to the available_fields list
-# in here 
+	# For some actions, the fields tenant_id and tenant_name
+	# are available only in case the current admin in superadmin
+	# For that cases, these fields are added to the available_fields list
+	# in here
 
     $self->set_tenant_fields;  # The last one. It depends on others
 }
@@ -1711,8 +1935,7 @@ sub BUILD
 sub initialize_info_model 
 {
     my $self = shift;
-    $self->{model_info} =
-{ 
+	$self->{model_info} = {
     unambiguous_filters => [],                                                                 
     related_views_in_db => [],
     available_filters => [],                                                                 
@@ -1732,7 +1955,7 @@ sub initialize_info_model
     dbix_join_value => [],                                                                   
     dbix_prefetch_value => [],                                                                   
     dbix_has_one_relationships => []
-};
+	};
 }
 
 # It sets custom properties
@@ -1847,6 +2070,13 @@ sub available_nested_queries
     my $self = shift;
     my $nq =  $self->{model_info}->{available_nested_queries} // [];
     @$nq;
+}
+
+sub available_nested_query_args
+{
+	my $self = shift;
+	my $nested_query = shift;
+	return $NESTED_QUERIES_AVAILABLE_ARGS->{$nested_query};
 }
 
 sub available_filters
@@ -1985,6 +2215,21 @@ sub available_nested_query
 
     return 0;
 }
+
+sub is_nested_query_arg_available {
+	my $self = shift;
+	my $nested_query = shift;
+	my $nested_query_arg = shift;
+	my $available_nested_query_args = $self->available_nested_query_args($nested_query);
+
+	if (defined $available_nested_query_args) {
+		$_ eq $nested_query_arg && return 1
+			for @$available_nested_query_args;
+	}
+
+	return 0;
+}
+
 
 sub available_filter
 {
@@ -2260,6 +2505,23 @@ sub type_of_action_log_style
 {
     my $self = shift;
     $TYPES_OF_ACTION_TO_LOG_MAPPER->{$self->type_of_action};    
+}
+
+sub get_property_list_name {
+	my $self = shift;
+	my $object_name = shift;
+
+	my $property_list_object_name = undef;
+	my $qvd_object_name = $ARGUMENT_NAME_TO_QVD_OBJECT->{$object_name};
+
+	if (defined $qvd_object_name) {
+		$property_list_object_name = "${qvd_object_name}_Property_List";
+		if (not defined $DB->resultset($property_list_object_name)->all) {
+			$property_list_object_name = undef;
+		}
+	}
+
+	return $property_list_object_name;
 }
 
 #########################################
