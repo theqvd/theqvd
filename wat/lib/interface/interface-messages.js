@@ -92,7 +92,7 @@ Wat.I.M = {
         var failuresList = '<ul>';
         $.each(failuresByText, function(text, ids) {
             failuresList += '<li>';
-            failuresList += '<i class="fa fa-angle-double-right strong" data-i18n="' + text + '"></i>';
+            failuresList += '<i class="fa fa-angle-double-right strong" data-i18n="' + text + '">' + text + '</i>';
             failuresList += '<ul>';
             $.each(ids, function(iId, id) {
                 if ($('.list')) {
