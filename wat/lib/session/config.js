@@ -412,6 +412,7 @@ Wat.C = {
                 case STATUS_CREDENTIALS_FAIL:
                     // Close dialog (if opened)
                     $('.js-dialog-container').remove();
+                    $('html, body').attr('style', '');
                     
                     // Store message on cookies to print it after reloading
             $.cookie('messageToShow', JSON.stringify({'message': ALL_STATUS[response.status], 'messageType': 'error'}), {expires: 1, path: '/'});
