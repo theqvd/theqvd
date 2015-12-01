@@ -22,10 +22,12 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
     
     renderSide: function () {
         // No side rendered
-        if (this.checkSide({'vm.see.state': '.js-side-component1', 'vm.see.log': '.js-side-component2'}) === false) {
+        var sideCheck = this.checkSide({'vm.see.state': '.js-side-component1', 'vm.see.log': '.js-side-component2'});
+        if (sideCheck === false) {
             return;
         }
         
+        if (sideCheck['vm.see.log']) { 
         var sideContainer = '.' + this.cid + ' .bb-details-side2';
 
         // Render Related log list on side
@@ -34,7 +36,10 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
         this.sideViews.push(new Wat.Views.LogListView(params));
         
         this.renderLogGraph(params);
+        }
         
+        
+        if (sideCheck['vm.see.state']) { 
         // Execution state animation
         var that = this;
         var oldState = '';
@@ -97,6 +102,7 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
                     break;
             }
         }, 100);
+        }
     },
     
     bindEditorEvents: function() {

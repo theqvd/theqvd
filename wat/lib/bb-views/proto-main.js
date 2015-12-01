@@ -251,7 +251,7 @@ Wat.Views.MainView = Backbone.View.extend({
             $.each(that.retrievedData.rows, function (iProp, prop) {
                 var value = '';
                 
-                // Massive editor will not shot any value
+                // Massive editor will not show any value
                 if (that.editorMode != 'massive-edit' && that.model && that.model.get('properties') && that.model.get('properties')[prop.property_id]) {
                     value = that.model.get('properties')[prop.property_id].value;
                 }
