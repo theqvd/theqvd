@@ -112,6 +112,7 @@ command.ip = /sbin/ip
 command.x11vnc = /usr/bin/x11vnc
 command.qvd-l7r-slave = ${path.qvd.bin}/qvd-l7r-slave
 command.windows.xming = Xming\\Xming.exe
+command.windows.vcxsrv = VcxSrv\\vcxsrv.exe
 command.windows.pulseaudio = pulseaudio\\pulseaudio.exe
 command.windows.nxproxy = nx\\nxproxy.exe
 command.windows.sftp-server = bin/sftp-server.exe

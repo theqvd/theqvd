@@ -97,15 +97,32 @@ sub OnInit {
     DEBUG("OnInit called");
 
     if ($WINDOWS or $DARWIN) {
-        unless( $ENV{DISPLAY} ) {
+        unless( $ENV{DISPLAY} || $ENV{QVD_PP_BUILD} ) {
             my @cmd;
             my $proc;
 
             if ($WINDOWS) {
+			    DEBUG "Running on Windows, detecting X server";
+				
                 $ENV{DISPLAY} = '127.0.0.1:0';
-                @cmd = ( File::Spec->rel2abs(core_cfg('command.windows.xming'), $app_dir),
-                         '-multiwindow', '-notrayicon', '-nowinkill', '-clipboard', '+bs', '-wm',
-                         '-logfile' => File::Spec->join($user_dir, "xserver.log") );
+				my $xming_bin = File::Spec->rel2abs(core_cfg('command.windows.xming'), $app_dir);
+				my $vcxsrv_bin = File::Spec->rel2abs(core_cfg('command.windows.vcxsrv'), $app_dir);
+				
+				if ( -f $xming_bin ) {
+				    DEBUG "Xming found at $xming_bin";
+					
+					@cmd = ( $xming_bin,
+							'-multiwindow', '-notrayicon', '-nowinkill', '-clipboard', '+bs', '-wm',
+							'-logfile' => File::Spec->join($user_dir, "xserver.log") );
+				} elsif ( -f $vcxsrv_bin ) {
+				    DEBUG "VcxSrv found at $vcxsrv_bin";
+					
+				    @cmd = ( $vcxsrv_bin,
+							'-multiwindow', '-notrayicon', '-nowinkill', '-clipboard', '+bs', '-wm',
+							'-listen', 'tcp', '-logfile' => File::Spec->join($user_dir, "xserver.log") );
+				} else {
+				    die "X server not found! Tried '$xming_bin' and '$vcxsrv_bin'";
+				}
             }
             else { # DARWIN!
                 $ENV{DISPLAY} = ':0';
@@ -146,7 +163,11 @@ sub OnInit {
                 }
             }
         } else {
-                DEBUG("X11 server already running on display $ENV{DISPLAY}, using that.");
+			if (  $ENV{QVD_PP_BUILD} ) {
+				DEBUG("Running under a PP build, not starting X");
+			} else {
+				DEBUG("X11 server already running on display $ENV{DISPLAY}, using that.");
+			}
         }
     }
 
