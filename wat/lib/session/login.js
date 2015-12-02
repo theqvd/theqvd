@@ -187,8 +187,10 @@ Wat.L = {
             Wat.I.C.initCustomizer();
         }
 
+        if (Wat.C.showServerClock) {
         // Start server clock
         Wat.I.startServerClock();
+        }
 
         // Binding events manually because backbone doesnt allow bind events to dialogs loaded dinamically
         Wat.B.bindCommonEvents();

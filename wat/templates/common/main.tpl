@@ -45,6 +45,7 @@
         </div>
 </div>
 <div class="wrapper">
+    <% if (Wat.C.showServerClock) { %>
     <div class="server-datetime-wrapper js-server-datetime-wrapper">
         <div style="display: none;">
             <i class="fa fa-calendar"></i>
@@ -55,6 +56,7 @@
             <span class="js-server-time second_row"></span>
         </div>
     </div>
+    <% } %>
     <div class="bb-menu"></div>
     <div class="content bb-content js-content"></div>
     <div class="loading"><i class="fa fa-gear fa-spin"></i></div>

@@ -172,5 +172,23 @@ Wat.U = {
     // Get url basename
     basename: function (path) {
         return path.split(/[\\/]/).pop();
+    },
+    
+    // Get local datetime from GMT+0 datetime
+    getLocalDatetime: function (datetime) {
+        var d = new Date (datetime);
+        
+        var minutesOffset = new Date().getTimezoneOffset();
+        dLocal = new Date (d.getTime()-(minutesOffset*60*1000));
+        
+        return dLocal;
+    }, 
+    
+    // Get local datetime formatted
+    getLocalDatetimeFormatted: function (datetime) {
+        var d = this.getLocalDatetime(datetime);
+        var dFormatted = Wat.U.getDate(d.getTime());
+        
+        return dFormatted;
     }
 }

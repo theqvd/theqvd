@@ -31,8 +31,10 @@ Wat.Models.Model = Backbone.Model.extend({
     processResponse: function (response) {
         // If found creation_date field, replace ugly T by blank space
         if (response) {
+            // Creation date must be converted to local timezone and proper format
             if (response.creation_date) {
                 response.creation_date = response.creation_date.replace("T", " ");
+                response.creation_date = Wat.U.getLocalDatetimeFormatted(response.creation_date);
             }
         
             // Escape strings to avoid injections

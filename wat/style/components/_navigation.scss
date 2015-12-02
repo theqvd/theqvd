@@ -197,10 +197,23 @@
     }
     
     li.menu-option.needsclick.menu-option:last-child {
-        margin-left: 20px;
+        margin-left: 10px;
         background-color: $col_whiter;
         padding: 8px;
         border: 1px solid darken($col_whiter, 8);
+        
+        i {
+            padding-right: 25px;
+            &:before {
+                font-size: 25px;
+                position: absolute;
+                top: 4px;
+            }
+        }
+        
+        .js-menu-submenu-user {
+            top: 32px;
+        }
     }
 }
 

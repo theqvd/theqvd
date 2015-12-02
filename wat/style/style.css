@@ -407,10 +407,18 @@ fieldset {
         border-bottom-left-radius: 7px;
         border-bottom-right-radius: 7px; }
   .menu-corner li.menu-option.needsclick.menu-option:last-child {
-    margin-left: 20px;
+    margin-left: 10px;
     background-color: #fdfdfd;
     padding: 8px;
     border: 1px solid #e9e9e9; }
+    .menu-corner li.menu-option.needsclick.menu-option:last-child i {
+      padding-right: 25px; }
+      .menu-corner li.menu-option.needsclick.menu-option:last-child i:before {
+        font-size: 25px;
+        position: absolute;
+        top: 4px; }
+    .menu-corner li.menu-option.needsclick.menu-option:last-child .js-menu-submenu-user {
+      top: 32px; }
 
 .side-menu li {
   margin-bottom: 15px;

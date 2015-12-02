@@ -41,6 +41,9 @@ Wat.C = {
     // Flag to know if router history is started
     routerHistoryStarted: false,
     
+    // Show a clock with server's time
+    showServerClock: false,
+    
     // Init Api address configuration
     initApiAddress: function () {
         this.apiUrl = 'http://' + Wat.C.apiAddress + ':' + Wat.C.apiPort + '/';
