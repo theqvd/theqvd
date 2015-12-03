@@ -60,7 +60,13 @@ void _qvd_vprintf(const char *format, va_list args)
 #ifdef ANDROID
   __android_log_vprint(get_debug_level(), "qvd", format, args);
 #elif __APPLE__
-  asl_vlog(NULL, NULL, ASL_LEVEL_DEBUG, format, args);
+  #include "TargetConditionals.h"
+  #if TARGET_OS_IPHONE
+    vfprintf(global_debug_file, format, args);
+    fflush(global_debug_file);
+  #elif TARGET_OS_MAC
+    asl_vlog(NULL, NULL, ASL_LEVEL_DEBUG, format, args);
+  #endif
 #else
   vfprintf(global_debug_file, format, args);
   fflush(global_debug_file);

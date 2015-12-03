@@ -558,6 +558,33 @@ int _qvd_proxy_connect(qvdclient *qvd)
       return -1;
     }
 
+
+/* This piece of code was needed as a workaround for the bug in which the buffer was writing at the reading pointer.
+  int buff = BUFFER_SIZE;
+  int res=0;
+  socklen_t optlen;
+  optlen = sizeof(buff);
+
+#ifdef TRACE
+  qvd_printf("Setting proxyPair sockets' send and receive buffers to BUFFER_SIZE\n");
+#endif
+
+  res = setsockopt(proxyPair[0], SOL_SOCKET, SO_SNDBUF, &buff, sizeof(buff));
+  if(res == -1)
+    qvd_printf("Error in setsockopt for proxyPair[0] send buffer\n");
+
+  res = setsockopt(proxyPair[0], SOL_SOCKET, SO_RCVBUF, &buff, sizeof(buff));
+  if(res == -1)
+    qvd_printf("Error in setsockopt for proxyPair[0] receive buffer\n");
+
+  res = setsockopt(proxyPair[1], SOL_SOCKET, SO_SNDBUF, &buff, sizeof(buff));
+  if(res == -1)
+    qvd_printf("Error in setsockopt for proxyPair[1] send buffer\n");
+
+  res = setsockopt(proxyPair[1], SOL_SOCKET, SO_RCVBUF, &buff, sizeof(buff));
+  if(res == -1)
+    qvd_printf("Error in setsockopt for proxyPair[1] receive buffer\n");
+*/
   if (NXTransCreate(proxyPair[0], NX_MODE_SERVER, qvd->nx_options) < 0)
     {
       qvd_error(qvd, "Error creating proxy transport <%s>\n", strerror(errno));
@@ -658,7 +685,7 @@ int _qvd_client_loop(qvdclient *qvd, int connFd, int proxyFd)
       if (connFd > 0 && QvdBufferCanRead(&proxyWrite) && FD_ISSET(connFd, &rfds))
 	{
 	  read = 0; /* handle case of CURLE_UNSUPPORTED_PROTOCOL where read does not gets modified */
-	  res = curl_easy_recv(qvd->curl, proxyWrite.data+proxyWrite.offset,
+	  res = curl_easy_recv(qvd->curl, proxyWrite.data+proxyWrite.size,
 			       BUFFER_SIZE-proxyWrite.size, &read);
 
 	  switch (res)

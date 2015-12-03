@@ -8,14 +8,14 @@ void QvdBufferInit(QvdBuffer *self)
   self->offset = 0;
   self->size = 0;
 #ifdef TRACE
-  qvd_printf("QvdBufferInit offset=0, size=0\n");
+  qvd_printf("QvdBufferInit data=%p offset=0, size=0\n",self->data);
 #endif
 }
 
 int QvdBufferCanRead(QvdBuffer *self)
 {
 #ifdef TRACE
-  qvd_printf("QvdBufferCanRead offset=%d, size=%d: %d\n", self->offset, self->size, self->size < BUFFER_SIZE);
+  qvd_printf("QvdBufferCanRead offset=%d, size=%d: %d data:%p \n", self->offset, self->size, self->size < BUFFER_SIZE, self->data);
 #endif
   return self->size < BUFFER_SIZE;
 }
@@ -23,7 +23,7 @@ int QvdBufferCanRead(QvdBuffer *self)
 int QvdBufferCanWrite(QvdBuffer *self)
 {
 #ifdef TRACE
-  qvd_printf("QvdBufferCanWrite offset=%d, size=%d: %d\n", self->offset, self->size, self->offset < self->size);
+  qvd_printf("QvdBufferCanWrite offset=%d, size=%d: %d data:%p \n", self->offset, self->size, self->offset < self->size, self->data);
 #endif
   return self->offset < self->size;
 }
@@ -36,7 +36,7 @@ void QvdBufferReset(QvdBuffer *self)
   self->offset = 0;
   self->size = 0;
 #ifdef TRACE
-  qvd_printf("QvdBufferReset offset=%d, size=%d\n", self->offset, self->size);
+  
 #endif
 }
 
@@ -66,12 +66,23 @@ int QvdBufferRead(QvdBuffer *self, int fd)
   return ret;
 }
 
+void qvd_hexdump(const unsigned char *ptr, ssize_t len) {
+  qvd_printf("%ld:", len);
+  if (len >= 0) {
+    ssize_t i;
+    for (i = 0; i < len; i++)
+      qvd_printf(" %02x", ptr[i]);
+  }
+  qvd_printf("\n");
+}
+
 int QvdBufferWrite(QvdBuffer *self, int fd)
 {
   int ret;
   ret = write(fd, self->data+self->offset, self->size-self->offset);
 #ifdef TRACE
-  qvd_printf("%d: wrote %d\n", fd, ret);
+  qvd_printf("%d: wrote %d data:%p offset:%ld size:%ld \n", fd, ret, self->data, self->offset , self->size);
+  qvd_hexdump(self->data + self->offset, ret);
 #endif
   if (ret >= 0) {
     self->offset += ret;

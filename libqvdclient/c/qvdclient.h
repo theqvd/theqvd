@@ -70,7 +70,7 @@
 #ifndef MIN
 #define MIN(x,y) ((x) < (y) ? (x) : (y))
 #endif
-/* #define TRACE */
+/* #define TRACE 1 */
 #ifdef __cplusplus
 extern "C" {
 #endif
