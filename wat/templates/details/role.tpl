@@ -64,16 +64,6 @@
         </tr>
     <% 
     }
-    if(Wat.C.isSuperadmin()) { 
-    %>
-    <tr>
-        <td><i class="fa fa-building"></i><span data-i18n="Tenant"></span></td>
-        <td>
-            <%= model.get('tenant_name') %>
-        </td>
-    </tr>
-    <%
-    }
     if (Wat.C.checkACL('role.see.inherited-roles')) {
     %>
         <tr>
