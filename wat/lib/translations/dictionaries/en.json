@@ -245,6 +245,7 @@
     "Properties": "Properties",
     "Property": "Property",
     "Property name": "Property name",
+    "Property only visible from outside of the tenant": "Property only visible from outside of the tenant",
     "Property value": "Property value",
     "QVD Config": "QVD Config",
     "QVD Management": "QVD Management",

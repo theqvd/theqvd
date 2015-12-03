@@ -110,7 +110,7 @@ Wat.I.listFields[qvdObj] = {
         'fields': [
             'creation_date'
         ],
-        'acls': 'di.see.log',
+        'acls': 'di.see.creation-date',
         'display': false,
         'sortable': true,
     },
@@ -120,7 +120,7 @@ Wat.I.listFields[qvdObj] = {
             'creation_admin_name',
             'creation_admin_id'
         ],
-        'acls': 'di.see.log',
+        'acls': 'di.see.created-by',
         'display': false,
         'sortable': true,
     }

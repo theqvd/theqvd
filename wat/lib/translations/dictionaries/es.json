@@ -248,6 +248,7 @@
     "Properties": "Propiedades",
     "Property": "Propiedad",
     "Property name": "Nombre de la propiedad",
+    "Property only visible from outside of the tenant": "Propiedad solamente visible desde fuera del tenant",
     "Property value": "Valor de la propiedad",
     "QVD Config": "Configuración de QVD",
     "QVD Management": "Gestión de QVD",

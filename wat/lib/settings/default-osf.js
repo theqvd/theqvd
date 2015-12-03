@@ -178,7 +178,7 @@ Wat.I.detailsFields[qvdObj] = {
         'fields': [
             'creation_date'
         ],
-        'acls': 'osf.see.log',
+        'acls': 'osf.see.creation-date',
         'display': false,
         'sortable': true,
     },
@@ -188,7 +188,7 @@ Wat.I.detailsFields[qvdObj] = {
             'creation_admin_name',
             'creation_admin_id'
         ],
-        'acls': 'osf.see.log',
+        'acls': 'osf.see.created-by',
         'display': false,
         'sortable': true,
     }

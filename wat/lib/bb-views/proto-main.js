@@ -256,11 +256,12 @@ Wat.Views.MainView = Backbone.View.extend({
                     value = that.model.get('properties')[prop.property_id].value;
                 }
                 
-                properties[prop.property_id] = {
+                properties[prop.id] = {
                     value: value,
                     key: prop.key,
                     description: prop.description,
-                    tenant_id: prop.tenant_id
+                    tenant_id: prop.tenant_id,
+                    property_id: prop.property_id,
                 };
             });
 
