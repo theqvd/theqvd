@@ -13,12 +13,7 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint(['key', 'tenant_id']);
 __PACKAGE__->belongs_to(tenant => 'QVD::DB::Result::Tenant',  'tenant_id', { cascade_delete => 0 });
-__PACKAGE__->might_have(properties => 'QVD::DB::Result::Host_Property_List', 'property_id', { cascade_delete => 1 });
-__PACKAGE__->might_have(properties => 'QVD::DB::Result::OSF_Property_List', 'property_id', { cascade_delete => 1 });
-__PACKAGE__->might_have(properties => 'QVD::DB::Result::DI_Property_List', 'property_id', { cascade_delete => 1 });
-__PACKAGE__->might_have(properties => 'QVD::DB::Result::User_Property_List', 'property_id', { cascade_delete => 1 });
-__PACKAGE__->might_have(properties => 'QVD::DB::Result::VM_Property_List', 'property_id', { cascade_delete => 1 });
-__PACKAGE__->has_many(properties => 'QVD::DB::Result::OSF_Property', 'property_id', { cascade_delete => 1 });
+__PACKAGE__->has_many(properties => 'QVD::DB::Result::QVD_Object_Property_List', 'property_id', { cascade_delete => 1 });
 
 sub tenant_name
 {
@@ -43,7 +38,7 @@ sub in_user
     my $args = shift; 
     my $DB = QVD::DB::Simple::db();
 
-    $DB->resultset('User_Property_List')->search({property_id=>$args->id})->all;
+    $DB->resultset('QVD_Object_Property_List')->search({property_id=>$args->id, qvd_object=>'user'})->all;
 }
 
 sub in_vm 
@@ -51,7 +46,7 @@ sub in_vm
     my $args = shift; 
     my $DB = QVD::DB::Simple::db();
 
-    $DB->resultset('VM_Property_List')->search({property_id=>$args->id})->all;
+    $DB->resultset('QVD_Object_Property_List')->search({property_id=>$args->id, qvd_object=>'vm'})->all;
 }
 
 sub in_host 
@@ -59,7 +54,7 @@ sub in_host
     my $args = shift; 
     my $DB = QVD::DB::Simple::db();
 
-    $DB->resultset('Host_Property_List')->search({property_id=>$args->id})->all;
+    $DB->resultset('QVD_Object_Property_List')->search({property_id=>$args->id, qvd_object=>'host'})->all;
 }
 
 sub in_osf 
@@ -67,7 +62,7 @@ sub in_osf
     my $args = shift; 
     my $DB = QVD::DB::Simple::db();
 
-    $DB->resultset('OSF_Property_List')->search({property_id=>$args->id})->all;
+    $DB->resultset('QVD_Object_Property_List')->search({property_id=>$args->id, qvd_object=>'osf'})->all;
 }
 
 sub in_di
@@ -75,7 +70,7 @@ sub in_di
     my $args = shift; 
     my $DB = QVD::DB::Simple::db();
 
-    $DB->resultset('DI_Property_List')->search({property_id=>$args->id})->all;
+    $DB->resultset('QVD_Object_Property_List')->search({property_id=>$args->id, qvd_object=>'di'})->all;
 }
 
 1;

@@ -169,23 +169,23 @@ my $ACTIONS = {
 
 	user_get_property_list => {
 		type_of_action => 'list',
-		  admin4method => 'select',
+		admin4method => 'user_property_action',
 		  acls => [qr/^(user\.see\.properties)$/],
-		qvd_object => 'User_Property_List'
+		qvd_object => 'QVD_Object_Property_List'
 	},
 
 	user_create_property_list => {
 		type_of_action => 'create',
-		 admin4method => 'create',
+		admin4method => 'user_property_action',
 		 acls => [qr/^property\.manage\.user$/],
-		qvd_object => 'User_Property_List'
+		qvd_object => 'QVD_Object_Property_List'
 	},
 
 	user_delete_property_list => {
 		type_of_action => 'delete',
-		 admin4method => 'delete',
+		admin4method => 'user_property_action',
 		 acls => [qr/^property\.manage\.user$/],
-		qvd_object => 'User_Property_List'
+		qvd_object => 'QVD_Object_Property_List'
 	},
 
 	vm_get_list => {
@@ -269,23 +269,23 @@ my $ACTIONS = {
 
 	vm_get_property_list => {
 		type_of_action => 'list',
-		  admin4method => 'select',
+		admin4method => 'vm_property_action',
 		  acls => [qr/^(vm\.see\.properties)$/],
-		qvd_object => 'VM_Property_List'
+		qvd_object => 'QVD_Object_Property_List'
 	},
 
 	vm_create_property_list => {
 		type_of_action => 'create',
-		 admin4method => 'create',
+		admin4method => 'vm_property_action',
 		 acls => [qr/^property\.manage\.vm$/],
-		qvd_object => 'VM_Property_List'
+		qvd_object => 'QVD_Object_Property_List'
 	},
 
 	vm_delete_property_list => {
 		type_of_action => 'delete',
-		 admin4method => 'delete',
+		admin4method => 'vm_property_action',
 		 acls => [qr/^property\.manage\.vm$/],
-		qvd_object => 'VM_Property_List'
+		qvd_object => 'QVD_Object_Property_List'
 	},
 
 	host_get_list => {
@@ -348,23 +348,23 @@ my $ACTIONS = {
 
 	host_get_property_list => {
 		type_of_action => 'list',
-		  admin4method => 'select',
+		admin4method => 'host_property_action',
 		  acls => [qr/^(host\.see\.properties)$/],
-		qvd_object => 'Host_Property_List'
+		qvd_object => 'QVD_Object_Property_List'
 	},
 
 	host_create_property_list => {
 		type_of_action => 'create',
-		 admin4method => 'create',
+		admin4method => 'host_property_action',
 		 acls => [qr/^property\.manage\.host$/],
-		qvd_object => 'Host_Property_List'
+		qvd_object => 'QVD_Object_Property_List'
 	},
 
 	host_delete_property_list => {
 		type_of_action => 'delete',
-		 admin4method => 'delete',
+		admin4method => 'host_property_action',
 		 acls => [qr/^property\.manage\.host$/],
-		qvd_object => 'Host_Property_List'
+		qvd_object => 'QVD_Object_Property_List'
 	},
 
 	osf_get_list => {
@@ -420,23 +420,23 @@ my $ACTIONS = {
 
 	osf_get_property_list => {
 		type_of_action => 'list',
-		  admin4method => 'select',
+		admin4method => 'osf_property_action',
 		  acls => [qr/^(osf\.see\.properties)$/],
-		qvd_object => 'OSF_Property_List'
+		qvd_object => 'QVD_Object_Property_List'
 	},
 
 	osf_create_property_list => {
 		type_of_action => 'create',
-		 admin4method => 'create',
+		admin4method => 'osf_property_action',
 		 acls => [qr/^property\.manage\.osf$/],
-		qvd_object => 'OSF_Property_List'
+		qvd_object => 'QVD_Object_Property_List'
 	},
 
 	osf_delete_property_list => {
 		type_of_action => 'delete',
-		 admin4method => 'delete',
+		admin4method => 'osf_property_action',
 		 acls => [qr/^property\.manage\.osf$/],
-		qvd_object => 'OSF_Property_List'
+		qvd_object => 'QVD_Object_Property_List'
 	},
 
 	di_get_list => {
@@ -490,23 +490,23 @@ my $ACTIONS = {
 
 	di_get_property_list => {
 		type_of_action => 'list',
-		  admin4method => 'select',
+		admin4method => 'di_property_action',
 		  acls => [qr/^(di\.see\.properties)$/],
-		qvd_object => 'DI_Property_List'
+		qvd_object => 'QVD_Object_Property_List'
 	},
 
 	di_create_property_list => {
 		type_of_action => 'create',
-		 admin4method => 'create',
+		admin4method => 'di_property_action',
 		 acls => [qr/^property\.manage\.di$/],
-		qvd_object => 'DI_Property_List'
+		qvd_object => 'QVD_Object_Property_List'
 	},
 
 	di_delete_property_list => {
 		type_of_action => 'delete',
-		 admin4method => 'delete',
+		admin4method => 'di_property_action',
 		 acls => [qr/^property\.manage\.di$/],
-		qvd_object => 'DI_Property_List'
+		qvd_object => 'QVD_Object_Property_List'
 	},
 
 	tag_tiny_list => {

@@ -18,8 +18,9 @@ with 'Throwable';
 
 has 'code', is => 'ro', isa => sub { die "Invalid type for attribute code" if ref(+shift); };
 has 'exception', is => 'ro', isa => sub {};
-has 'failures', is => 'ro', isa => sub { die "Invalid type for attribute failures" 
-					      unless ref(+shift) eq 'HASH'; };
+has 'failures', is => 'ro', isa => sub {
+	die "Invalid type for attribute failures" unless ref(+shift) eq 'HASH';
+};
 
 ## OPTIONAL PARAMETERS
 
@@ -30,6 +31,10 @@ has 'query', is => 'ro', isa => sub { die "Invalid type for attribute nested" if
 # When throwing an exception, it can be specified the object that 
 # caused the exception (i.e. a certain unavailable filter)
 has 'object', is => 'ro', isa => sub { die "Invalid type for attribute object" if ref(+shift); };
+
+# When throwing an exception, it can be specified a custom message for the
+# exception, that can be used to provide additional information
+has 'additional_info', is => 'ro', isa => sub {};
 
 ## CLASS VARIABLES
 
@@ -123,12 +128,13 @@ my $code2message_mapper = {
 # from an exception of DBIx::Class, it's needed to identify the original class with one
 # of the numeric codes of this class. This is the mapper that relates both of them.
 
-my $exception2code_mapper = 
-{
+my $exception2code_mapper = {
     default => { default => 1100},
 
-    'DBIx::Error::DataException' => { default => 6310, select => 6320, update => 6330, create => 6330, set => 6330,
-				      properties => 6340, tags => 6350, acls => 6360, roles => 6370 },
+	'DBIx::Error::DataException' => {
+		default => 6310, select => 6320, update => 6330, create => 6330, set => 6330,
+		properties => 6340, tags => 6350, acls => 6360, roles => 6370
+	},
 
     'DBIx::Error::NotNullViolation' => { default => 6410, tags => 6430, acls => 6440, roles => 6450 },
 
@@ -144,15 +150,15 @@ sub BUILD
 {
     my $self = shift;
 
-# At least one of these parameters must be  provided 
-# in order to build a proper exception
+	# At least one of these parameters must be  provided
+	# in order to build a proper exception
 
     $self->code || $self->exception || $self->failures ||
 	die "needed either code, exception or failures attribute";
 
-# This object is recursive if a QVD::Admin4::Exception object was 
-# provided via the exception parameter. In that case, this object 
-# is built from that one
+	# This object is recursive if a QVD::Admin4::Exception object was
+	# provided via the exception parameter. In that case, this object
+	# is built from that one
  
     $self->rebuild_recursively if $self->recursive;
 
@@ -162,7 +168,7 @@ sub BUILD
     $self->figure_out_code_from_failures
 	if $self->failures;
 
-# prints useful error messages via console
+	# prints useful error messages via console
 
     $self->print_unknown_exception
 	if $self->exception;
@@ -183,10 +189,12 @@ sub print_unknown_exception
 sub recursive
 {
     my $self = shift;
-    return 1 
-	if $self->exception && 
-	ref($self->exception) &&
-	$self->exception->isa('QVD::Admin4::Exception'); 
+	my $is_recursive = 0;
+	if (($self->exception) && ref($self->exception) &&
+		$self->exception->isa('QVD::Admin4::Exception')){
+		$is_recursive = 1;
+	}
+	return $is_recursive;
 }
 
 # Sets object info from the info of another 
@@ -209,6 +217,17 @@ sub message
     my $message = $code2message_mapper->{$self->code};
     $message .= " (".$self->object.")" if defined $self->object;
     $message; 
+}
+
+sub get_default_additional_info_text {
+	my $self = shift;
+	return "No additional information";
+}
+
+sub get_additional_info {
+	my $self = shift;
+	my $text = (defined $self->additional_info) ? $self->additional_info : $self->get_default_additional_info_text();
+	return $text;
 }
 
 sub figure_out_code_from_exception
@@ -254,9 +273,12 @@ sub figure_out_code_from_failures
 sub json
 {
     my $self = shift;
-    { status => $self->code, 
-      message => $self->message,
-      $self->failures ? (failures => $self->failures) : () };
+	return {
+		status => $self->code,
+		message => $self->message(),
+		additional_info => $self->get_additional_info(),
+		$self->failures ? (failures => $self->failures) : (),
+	};
 }
 
 1;

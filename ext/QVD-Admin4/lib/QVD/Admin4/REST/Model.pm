@@ -43,9 +43,8 @@ my $QVD_OBJECTS_TO_LOG_MAPPER = {
     Log => 'log', User => 'user', VM => 'vm', DI => 'di', OSF => 'osf', Host => 'host', 
     Administrator => 'administrator', Tenant => 'tenant', 
     Role => 'role', Config => 'config', Tenant_Views_Setup => 'tenant_view', 
-    Administrator_Views_Setup => 'admin_view', User_Property_List => 'user', VM_Property_List => 'vm',
-    Host_Property_List => 'host', OSF_Property_List => 'osf', DI_Property_List => 'di', Property_List => 'property',  
-	Wat_Setups_By_Tenant => 'wat_setup_by_tenant',
+	Administrator_Views_Setup => 'admin_view', QVD_Object_Property_List => 'property',
+	Property_List => 'property', Wat_Setups_By_Tenant => 'wat_setup_by_tenant',
 };
 
 # Mapper from kinds of actions in this class to available values for 
@@ -616,15 +615,7 @@ my $AVAILABLE_FILTERS = {
 
 	      Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
-	      User_Property_List => [qw(tenant_id)],
-
-	      VM_Property_List => [qw(tenant_id)],
-
-	      Host_Property_List => [qw(tenant_id)],
-
-	      OSF_Property_List => [qw(tenant_id)],
-
-	      DI_Property_List => [qw(tenant_id)],
+		QVD_Object_Property_List => [qw(tenant_id)],
 
 		Property_List => [qw(tenant_id)]
 	},
@@ -764,15 +755,7 @@ my $AVAILABLE_FIELDS = {
 
 	      Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
-	      User_Property_List => [qw(property_id key description)],
-
-	      VM_Property_List => [qw(property_id key description)],
-
-	      Host_Property_List => [qw(property_id key description)],
-
-	      OSF_Property_List => [qw(property_id key description)],
-
-	      DI_Property_List => [qw(property_id key description)],
+		QVD_Object_Property_List => [qw(id property_id key description)],
 
 		Property_List => [qw(id property_id tenant_id key description in_user in_vm in_host in_osf in_di)]
 	},
@@ -898,22 +881,25 @@ my $MANDATORY_FILTERS =
 
 # Default order criteria for every kind of action
 
-my $DEFAULT_ORDER_CRITERIA = 
-	{
-    tiny => { default =>  [qw(name)],
+my $DEFAULT_ORDER_CRITERIA = {
+	tiny => {
+		default =>  [qw(name)],
 	      DI => [qw(disk_image)],
 	      Tenant_Views_Setup => [qw(field)],
 	      Administrator_Views_Setup => [qw(field)],
-              Config => [qw(key)] },
+		Config => [qw(key)]
+	},
 
-    list => { default =>  [qw()],
+	list => {
+		default =>  [qw()],
 	      Tenant_Views_Setup => [qw(field)],
 	      Operative_Views_In_Tenant => [qw(field)],
 	      Administrator_Views_Setup => [qw(field)],
 	      Operative_Views_In_Administrator => [qw(field)],
-              Config => [qw(key)] }
+		Config => [qw(key)]
+	}
 
-	};
+};
 
 
 # Available nested queries for every type of action
@@ -993,11 +979,7 @@ my $MANDATORY_ARGUMENTS = {
 			    Tenant_Views_Setup => [qw(tenant_id field visible view_type device_type qvd_object property)],
 			    Administrator_Views_Setup => [qw(field visible view_type device_type qvd_object property)], # Every admin is able to set just its own views, 
                                                                                                                          # Suitable admin_id forzed in Request.pm
-	      		    User_Property_List => [qw(property_id)],
-	      		    VM_Property_List => [qw(property_id)],
-	      		    Host_Property_List => [qw(property_id)],
-	      		    OSF_Property_List => [qw(property_id)],
-	      		    DI_Property_List => [qw(property_id)],
+	QVD_Object_Property_List => [qw(property_id)],
 	Property_List => [qw(tenant_id key)]
 };
 
@@ -1072,8 +1054,7 @@ my $ip2mac = "ip2mac(me.ip,'".cfg('vm.network.mac.prefix')."')";
 # depict related tables to that one. The element after the prefix 
 # depicts the column of the table.
 
-my $FILTERS_TO_DBIX_FORMAT_MAPPER = 
-	{
+my $FILTERS_TO_DBIX_FORMAT_MAPPER = {
     Log => { 
 	id => 'me.id',
 	admin_id => 'me.administrator_id',
@@ -1319,45 +1300,10 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 	'property' => 'me.property'
     },
 
-    User_Property_List => {
-    	'id' => 'me.property_id',
+	QVD_Object_Property_List => {
+		'id' => 'me.id',
     	'property_id' => 'me.property_id',
-	'tenant_id' => 'properties_list.tenant_id',
-	'tenant_name' => 'me.tenant_name',
-	'description' => 'me.description',
-	'key' => 'properties_list.key'
-    },
-
-    VM_Property_List => {
-    	'id' => 'me.property_id',
-    	'property_id' => 'me.property_id',
-	'tenant_id' => 'properties_list.tenant_id',
-	'tenant_name' => 'me.tenant_name',
-	'description' => 'me.description',
-	'key' => 'properties_list.key'
-    },
-
-    Host_Property_List => {
-    	'id' => 'me.property_id',
-    	'property_id' => 'me.property_id',
-	'tenant_id' => 'properties_list.tenant_id',
-	'tenant_name' => 'me.tenant_name',
-	'description' => 'me.description',
-	'key' => 'properties_list.key'
-    },
-
-    OSF_Property_List => {
-    	'id' => 'me.property_id',
-    	'property_id' => 'me.property_id',
-	'tenant_id' => 'properties_list.tenant_id',
-	'tenant_name' => 'me.tenant_name',
-	'description' => 'me.description',
-	'key' => 'properties_list.key'
-    },
-
-    DI_Property_List => {
-    	'id' => 'me.property_id',
-    	'property_id' => 'me.property_id',
+		'qvd_object' => 'me.qvd_object',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
 	'description' => 'me.description',
@@ -1384,7 +1330,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER =
 		'language' => 'me.language',
 		'tenant_id' => 'me.tenant_id',
 	},
-	};
+};
 
 # Nowadays the mapper for arguments and order criteria
 # is equal to the mapper for filters. That's for
@@ -1405,8 +1351,7 @@ my $ORDER_CRITERIA_TO_DBIX_FORMAT_MAPPER =
 # The special prefic 'view' means that the field must be taken
 # from a related view (See $RELATED_VIEWS_IN_DB).
 
-my $FIELDS_TO_DBIX_FORMAT_MAPPER = 
-	{
+my $FIELDS_TO_DBIX_FORMAT_MAPPER = {
     Log => { 
 	id => 'me.id',
 	admin_id => 'me.administrator_id',
@@ -1660,46 +1605,10 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 	'description' => 'me.acl_description',
     },
 
-    User_Property_List => {
-    	'id' => 'me.property_id',
+	QVD_Object_Property_List => {
+		'id' => 'me.id',
     	'property_id' => 'me.property_id',
-	'tenant_id' => 'properties_list.tenant_id',
-	'tenant_name' => 'me.tenant_name',
-	'description' => 'me.description',
-	'key' => 'properties_list.key'
-    },
-
-    VM_Property_List => {
-    	'id' => 'me.property_id',
-    	'property_id' => 'me.property_id',
-	'tenant_id' => 'properties_list.tenant_id',
-	'tenant_name' => 'me.tenant_name',
-	'description' => 'me.description',
-	'key' => 'properties_list.key'
-    },
-
-    Host_Property_List => {
-    	'id' => 'me.property_id',
-    	'property_id' => 'me.property_id',
-	'tenant_id' => 'properties_list.tenant_id',
-	'tenant_name' => 'me.tenant_name',
-	'description' => 'me.description',
-	'key' => 'properties_list.key'
-    },
-
-    OSF_Property_List => {
-    	'id' => 'me.property_id',
-    	'id' => 'me.property_id',
-    	'property_id' => 'me.property_id',
-	'tenant_id' => 'properties_list.tenant_id',
-	'tenant_name' => 'me.tenant_name',
-	'description' => 'me.description',
-	'key' => 'properties_list.key'
-    },
-
-    DI_Property_List => {
-    	'id' => 'me.property_id',
-    	'property_id' => 'me.property_id',
+		'qvd_object' => 'me.qvd_object',
 	'tenant_id' => 'properties_list.tenant_id',
 	'tenant_name' => 'me.tenant_name',
 	'description' => 'me.description',
@@ -1726,7 +1635,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 		'language' => 'me.language',
 		'tenant_id' => 'me.tenant_id',
 	},
-	};
+};
 
 # This var stores functions intended to 
 # normalize tha value provided to API 
@@ -1778,15 +1687,7 @@ my $DBIX_JOIN_VALUE = {
 
     Administrator_Views_Setup => [ { administrator => 'tenant' }],
 
-    User_Property_List => [ {properties_list => 'tenant'}],
-
-    VM_Property_List => [ {properties_list => 'tenant'}],
-
-    Host_Property_List => [ {properties_list => 'tenant'}],
-
-    OSF_Property_List => [ {properties_list => 'tenant'}],
-
-    DI_Property_List => [ {properties_list => 'tenant'}],
+	QVD_Object_Property_List =>  [ {properties_list => 'tenant'}],
 
     Property_List => [ 'tenant'],
 };
@@ -2509,19 +2410,7 @@ sub type_of_action_log_style
 
 sub get_property_list_name {
 	my $self = shift;
-	my $object_name = shift;
-
-	my $property_list_object_name = undef;
-	my $qvd_object_name = $ARGUMENT_NAME_TO_QVD_OBJECT->{$object_name};
-
-	if (defined $qvd_object_name) {
-		$property_list_object_name = "${qvd_object_name}_Property_List";
-		if (not defined $DB->resultset($property_list_object_name)->all) {
-			$property_list_object_name = undef;
-		}
-	}
-
-	return $property_list_object_name;
+	return "QVD_Object_Property_List";
 }
 
 #########################################

@@ -408,11 +408,6 @@ sub check_nested_queries_validity_in_json
 
 		$admin->re_is_allowed_to($self->qvd_object_model->$method($nested_query)) ||
 			QVD::Admin4::Exception->throw(code => $code, object => $nested_query);
-
-		for my $nested_query_arg (@{$self->json_wrapper->get_nested_query_value($nested_query)}){
-			$self->qvd_object_model->is_nested_query_arg_available($nested_query, $nested_query_arg) ||
-				QVD::Admin4::Exception->throw(code => 6231, object => $nested_query_arg);
-		}
 	}
 }
 
@@ -867,6 +862,11 @@ sub action
 {
     my $self = shift;
     $self->json_wrapper->action;
+}
+
+sub get_type_of_action {
+	my $self = shift;
+	return $self->qvd_object_model->type_of_action;
 }
 
 sub table 

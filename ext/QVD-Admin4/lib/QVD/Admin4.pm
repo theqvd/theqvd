@@ -60,21 +60,30 @@ sub _db { $DB; }
 
 sub select
 {
-    my ($self,$request) = @_;
+	my ($self,$request,$modifiers) = @_;
 
     my @rows;
     my $rs;
 
-    eval { $rs = $DB->resultset($request->table)->search($request->filters,$request->modifiers);
-	   @rows = $rs->all };
+	$modifiers //= {};
+	my %filters = ( %{$request->filters}, %{$modifiers->{'filters'} // {}} );
+	my %modifiers = ( %{$request->modifiers}, %{$modifiers->{'modifiers'} // {}} );
+	eval {
+		$rs = $DB->resultset($request->table)->search(\%filters, \%modifiers);
+		@rows = $rs->all
+	};
 
     QVD::Admin4::Exception->throw(exception => $@, query => 'select') if $@;
 
-    { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
+	{
+		total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count),
       rows => \@rows,
-      extra => $self->get_extra_info_from_related_views($request) }; # Extra info about objects retrieved from database
-}                                                                    # is stored in here. This info has been retrieved
+		extra => $self->get_extra_info_from_related_views($request),
+		# Extra info about objects retrieved from database
+		# is stored in here. This info has been retrieved
                                                                      # by a second request to database
+	};
+}
 
 # Some objects in QVD have some kind of heavy info that cannot be retrieved directly 
 # in the main request to the database. For example, properties and other objects related
@@ -217,10 +226,11 @@ sub get_acls_in_roles
 
 sub update
 {
-    my ($self,$request,%modifiers) = @_;
+	my ($self,$request,$modifiers) = @_;
     my $result = $self->select($request);
     QVD::Admin4::Exception->throw(code => 1300) unless $result->{total};
-    my $conditions = $modifiers{conditions} // [];
+	$modifiers //= {};
+	my $conditions = $modifiers->{conditions} // [];
 
     my $failures;
     for my $obj (@{$result->{rows}})
@@ -262,16 +272,19 @@ sub update_related_objects
 
 sub delete
 {
-    my ($self,$request,%modifiers) = @_;
+	my ($self,$request,$modifiers) = @_;
     my $result = $self->select($request);
     QVD::Admin4::Exception->throw(code => 1300) unless $result->{total};
 
-    my $conditions = $modifiers{conditions} // [];
+	$modifiers //= {};
+	my $conditions = $modifiers->{conditions} // [];
     my $failures;
     for my $obj (@{$result->{rows}})
     {
-	eval { $self->$_($obj) for @$conditions; 
-	       $obj->delete;};
+		eval {
+			$self->$_($obj) for @$conditions;
+			$obj->delete;
+		};
 
 	$failures->{$obj->id} = QVD::Admin4::Exception->new(exception => $@,query => 'delete')->json if $@;
     	$self->report_in_log($request,$obj,$failures && exists $failures->{$obj->id} ? $failures->{$obj->id}->{status} : 0);
@@ -289,7 +302,7 @@ sub vm_delete
 {
     my ($self,$request) = @_;
 
-    $self->delete($request,conditions => [qw(vm_is_stopped)]);
+    $self->delete($request, {conditions => [qw(vm_is_stopped)]} );
 }
 
 # Ad hoc function to di_delete action of API
@@ -297,10 +310,10 @@ sub vm_delete
 sub di_delete {
     my ($self, $request) = @_;
 
-    $self->delete($request,conditions => [qw(di_no_vm_runtimes 
+    $self->delete($request, {conditions => [qw(di_no_vm_runtimes
                                              di_no_dependant_vms
                                              di_no_head_default_tags
-                                             di_delete_disk_image)]);
+                                             di_delete_disk_image)]} );
 }
 
 # It deletes config tokens in the database only when tokens
@@ -313,7 +326,7 @@ sub config_delete
 	# Raise an exception if admin cannot delete config
 	$self->is_admin_allowed_to_config($request);
 
-    my $result = $self->delete($request, conditions => [qw(is_not_custom_config)]);
+    my $result = $self->delete($request, { conditions => [qw(is_not_custom_config)] });
 
     QVD::Config::reload(); # To refresh config tokens in QVD::Config 
     $result;
@@ -329,10 +342,77 @@ sub config_default
 	# Raise an exception if admin cannot modify config
 	$self->is_admin_allowed_to_config($request);
 
-    my $result = $self->delete($request, conditions => [qw(is_custom_config)]);
+    my $result = $self->delete($request, { conditions => [qw(is_custom_config)] } );
 
     QVD::Config::reload(); # To refresh config tokens in QVD::Config 
     $result;
+}
+
+### Manage properties ###
+
+sub user_property_action {
+	my ($self, $request) = @_;
+	return $self->property_action($request, 'user');
+}
+
+sub host_property_action {
+	my ($self, $request) = @_;
+	return $self->property_action($request, 'host');
+}
+
+sub vm_property_action {
+	my ($self, $request) = @_;
+	return $self->property_action($request, 'vm');
+}
+
+sub osf_property_action {
+	my ($self, $request) = @_;
+	return $self->property_action($request, 'osf');
+}
+
+sub di_property_action {
+	my ($self, $request) = @_;
+	return $self->property_action($request, 'di');
+}
+
+sub property_action {
+	my ($self, $request, $object) = @_;
+	my $action = $request->get_type_of_action();
+	my $outcome;
+
+	if ($action eq 'list') {
+		$outcome = $self->property_get_list($request, {qvd_object => $object} );
+	} elsif ($action eq 'create' || $action eq 'update') {
+		$outcome = $self->property_create_or_update($request, {qvd_object => $object});
+	} elsif ($action eq 'delete') {
+		$outcome = $self->property_delete($request, ["is_${object}_property"]);
+	}
+
+	return $outcome;
+}
+
+sub property_get_list {
+	my ($self, $request, $filters) = @_;
+
+	my $result = $self->select($request, { filters => $filters } );
+
+	return $result;
+}
+
+sub property_create_or_update {
+	my ($self, $request, $arguments) = @_;
+
+	my $result = $self->create_or_update($request, { arguments => $arguments } );
+
+	return $result;
+}
+
+sub property_delete {
+	my ($self, $request, $conditions) = @_;
+
+	my $result = $self->delete($request, { conditions => $conditions } );
+
+	return $result;
 }
 
 
@@ -340,16 +420,20 @@ sub config_default
 
 sub create
 {
-    my ($self,$request,%modifiers) = @_;
+	my ($self,$request,$modifiers) = @_;
     my $result;
-    my $conditions = $modifiers{conditions} // [];
+
+	$modifiers //= {};
+	my @conditions = @{$modifiers->{conditions} // []};
+	my %arguments = (%{$request->arguments}, %{$modifiers->{'arguments'} // {}});
+
     my $obj;
     eval 
     {
 		$DB->txn_do(
 			sub {
-				$self->$_($request) for @$conditions;
-			   $obj = $DB->resultset($request->table)->create($request->arguments); 
+				$self->$_($request) for @conditions;
+				$obj = $DB->resultset($request->table)->create(\%arguments);
                            # Create tables related to the main object (i.e. vm_runtimes for vms)
 			   $self->create_related_objects($request,$obj);
                            # Assign and unassign other objects to the main objects (i.e. tags for dis, acls for roles, properties for vms...)
@@ -414,13 +498,16 @@ sub di_create
 
 sub create_or_update
 {
-    my ($self,$request) = @_;
+	my ($self,$request,$modifiers) = @_;
     my $result;
     my $obj;
 
+	$modifiers //= {};
+	my %arguments = (%{$request->arguments}, %{$modifiers->{'arguments'} // {}});
+
 	eval {
 		$DB->txn_do( sub {
-			$obj = $DB->resultset($request->table)->update_or_create($request->arguments);
+			$obj = $DB->resultset($request->table)->update_or_create(\%arguments);
 			       $result->{rows} = [ $obj ] } )
 	};
     
@@ -1549,19 +1636,43 @@ sub assign_property_to_objects {
 
 	my ($self, $obj_names, $property, $request) = @_;
 
+	my $property_list_table_name = $request->qvd_object_model->get_property_list_name();
+
 	for my $obj_name (@$obj_names) {
-		my $property_list_name = $request->qvd_object_model->get_property_list_name($obj_name);
-		if (defined $property_list_name) {
 			try {
-				$DB->resultset($property_list_name)->create({property_id => $property->id});
+			$DB->resultset($property_list_table_name)->create({property_id => $property->id, qvd_object => $obj_name});
 			} catch {
-				QVD::Admin4::Exception->throw(exception => $@, query => 'create') if $@;
-			}
-		} else {
-			QVD::Admin4::Exception->throw(code => 6231, object => $obj_name);
+			QVD::Admin4::Exception->throw(exception => $_, query => 'create',
+				text => sprintf("id: %s, obj: %s ", $property->id, $obj_name));
 		}
 	}
 
+}
+
+# FIXME: These functions shall be removed and use the methods of the object
+sub is_user_property {
+	my ($self, $property) = @_;
+	return ($property->is_user_property());
+}
+
+sub is_host_property {
+	my ($self, $property) = @_;
+	return ($property->is_host_property());
+}
+
+sub is_osf_property {
+	my ($self, $property) = @_;
+	return ($property->is_osf_property());
+}
+
+sub is_vm_property {
+	my ($self, $property) = @_;
+	return ($property->is_vm_property());
+}
+
+sub is_di_property {
+	my ($self, $property) = @_;
+	return ($property->is_di_property());
 }
 
 1;
