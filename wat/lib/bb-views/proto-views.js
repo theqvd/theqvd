@@ -120,6 +120,9 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             if (that.viewKind == 'admin') {
                 Wat.I.formFilters[qvdObj][fieldName] = that.currentFilters[fieldName];
             }
+            else {
+                that.updateCurrentViews(that);
+            }
         }
         else {
             // If update fails, change ckeckbox to previous state
@@ -177,6 +180,9 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             if (that.viewKind == 'admin') {
                 Wat.I.formFilters[qvdObj][fieldName] = that.currentFilters[fieldName];
             }
+            else {
+                that.updateCurrentViews(that);
+            }
         }
         else {
             // If update fails, change ckeckbox to previous state
@@ -232,11 +238,26 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             if (that.viewKind == 'admin') {
                 Wat.I.listFields[qvdObj][fieldName] = that.currentColumns[fieldName];
             }
+            else {
+                that.updateCurrentViews(that);
+            }
         }
         else {
             // If update fails, change ckeckbox to previous state
             $(e.target).prop('checked', !checked);
         }
+    },
+    
+    updateCurrentViews: function (that) {
+        // Get admin setup configuration to get the views updated
+        Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, function () {
+            // Restore possible residous views configuration to default values
+            Wat.I.restoreListColumns();
+            Wat.I.restoreFormFilters();
+
+            // Store views configuration
+            Wat.C.storeViewsConfiguration(that.retrievedData.views);
+        }, that);
     },
     
     changeSection: function (e) {
