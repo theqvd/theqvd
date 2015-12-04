@@ -25,15 +25,15 @@ Wat.I.menuConfigOriginal = {
 };
 
 Wat.I.menuHelpOriginal = {
-    about: {
-        text: 'About',
-        link: '#/about',
-        icon: 'fa fa-asterisk' 
-    },
     documentation: {
         text: 'Documentation',
         link: '#/documentation',
         icon: 'fa fa-book' 
+    },
+    about: {
+        text: 'About',
+        link: '#/about',
+        icon: 'fa fa-asterisk' 
     }
 };
 
@@ -114,7 +114,7 @@ Wat.I.mobileMenuOriginal.logout = {
 Wat.I.cornerMenuOriginal = {
         help: {
             text: 'Help',
-            link: '#/about',
+            link: '#/documentation',
             icon: CLASS_ICON_HELP,
             subMenu: _.extend({}, Wat.I.menuHelpOriginal)
         },
