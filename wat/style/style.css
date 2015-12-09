@@ -1076,7 +1076,7 @@ body {
         .wrapper .content .home-wrapper th.sortable {
           cursor: pointer; }
         .wrapper .content .home-wrapper th.sorted {
-          background-color: #e35e0c;
+          background-color: #737373;
           color: #fdfdfd; }
         .wrapper .content .home-wrapper th i {
           width: 100%;
@@ -1156,7 +1156,7 @@ body {
               .wrapper .content .home-wrapper .home-row .home-cell .summary-table th.sortable {
                 cursor: pointer; }
               .wrapper .content .home-wrapper .home-row .home-cell .summary-table th.sorted {
-                background-color: #e35e0c;
+                background-color: #737373;
                 color: #fdfdfd; }
               .wrapper .content .home-wrapper .home-row .home-cell .summary-table th i {
                 width: 100%;
@@ -1270,7 +1270,7 @@ body {
           .wrapper .content .home-wrapper .log-table th.sortable {
             cursor: pointer; }
           .wrapper .content .home-wrapper .log-table th.sorted {
-            background-color: #e35e0c;
+            background-color: #737373;
             color: #fdfdfd; }
           .wrapper .content .home-wrapper .log-table th i {
             width: 100%;
@@ -1986,7 +1986,7 @@ table.list, table.customize-fields {
     table.list th.sortable, table.customize-fields th.sortable {
       cursor: pointer; }
     table.list th.sorted, table.customize-fields th.sorted {
-      background-color: #e35e0c;
+      background-color: #737373;
       color: #fdfdfd; }
     table.list th i, table.customize-fields th i {
       width: 100%;
@@ -2037,7 +2037,7 @@ table.custom-props, table.details {
     table.custom-props th.sortable, table.details th.sortable {
       cursor: pointer; }
     table.custom-props th.sorted, table.details th.sorted {
-      background-color: #e35e0c;
+      background-color: #737373;
       color: #fdfdfd; }
     table.custom-props th i, table.details th i {
       width: 100%;
@@ -2936,7 +2936,7 @@ table.role-template-tools {
     table.role-template-tools th.sortable {
       cursor: pointer; }
     table.role-template-tools th.sorted {
-      background-color: #e35e0c;
+      background-color: #737373;
       color: #fdfdfd; }
     table.role-template-tools th i {
       width: 100%;

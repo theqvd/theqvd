@@ -85,7 +85,7 @@
         <div class="color-title" data-i18n="Tables header text"></div>
         <input name="cpTableThText" class="js-custom-field colorpicker" value="#333" data-original-value="#333"/>
         <div class="color-title" data-i18n="Tables header background (sorted column)"></div>
-        <input name="cpTableSortedThBg" class="js-custom-field colorpicker" value="#cb540a" data-original-value="#cb540a"/>
+        <input name="cpTableSortedThBg" class="js-custom-field colorpicker" value="#737373" data-original-value="#737373"/>
         <div class="color-title" data-i18n="Tables header text (sorted column)"></div>
         <input name="cpTableSortedThText" class="js-custom-field colorpicker" value="#fdfdfd" data-original-value="#fdfdfd"/>
     </div>
