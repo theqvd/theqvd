@@ -1,7 +1,7 @@
 // Debugging purposes
 
 // If true, the internal or fixed roles cannot be edited from WAT
-RESTRICT_TEMPLATES = false;
+RESTRICT_TEMPLATES = true;
 
 // Debug constants
 DEBUG_ACL_FAILS = false;
