@@ -186,6 +186,11 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     changeTenant: function (e) {
         this.selectedTenant = $(e.target).val();
         
+		// Show loading animation while get tokens
+        $('.bb-config-tokens').html(HTML_MINI_LOADING);
+        $('.secondary-menu ul').remove();
+        $('.secondary-menu').append(HTML_MINI_LOADING);
+
         this.getPrefixes(this);
     },
     
