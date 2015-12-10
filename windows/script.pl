@@ -58,7 +58,8 @@ Source: "installer\bin\*"; DestDir: "{app}\bin"; Flags: ignoreversion recursesub
 Source: "installer\NX\*"; DestDir: "{app}\NX"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "installer\pulseaudio\*"; DestDir: "{app}\pulseaudio"; Flags: ignoreversion recursesubdirs createallsubdirs
 ;Source: "installer\system32\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "installer\Xming\*"; DestDir: "{app}\Xming"; Flags: ignoreversion recursesubdirs createallsubdirs
+;Source: "installer\Xming\*"; DestDir: "{app}\Xming"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "installer\VcxSrv\*"; DestDir: "{app}\VcxSrv"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "installer\pixmaps\*"; DestDir: "{app}\pixmaps"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "installer\locale\*"; DestDir: "{app}\locale"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "installer\qvd-client.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
@@ -73,3 +74,31 @@ Name: "{commondesktop}\QVD Client"; Filename: "{app}\bin\qvd-client.exe"; Workin
 ; Make LanmanServer accept 127.0.0.1 as its netbios name 
 ; REQUIRED for printing to work on Windows 7 
 Root: HKLM; Subkey: "System\CurrentControlSet\Control\Lsa\MSV1_0"; ValueType: multisz; ValueName: "BackConnectionHostNames"; ValueData: "127.0.0.1{break}localhost"; 
+
+[Code]
+
+procedure CurStepChanged(CurStep: TSetupStep);
+var
+	XmingDir, XmingBackupDir: String;
+begin
+    Log('In PostInstall script');
+	
+	XmingDir       := ExpandConstant('{src}') + '\Xming';
+	XmingBackupDir := XmingDir + '-backup';
+	
+	if ( CurStep = ssInstall ) then begin
+		Log('In Install stage, looking for Xming directory: ' + XmingDir);
+		
+		 if DirExists( XmingDir ) then begin
+			Log('Trying to rename ' + XmingDir + ' to ' + XmingBackupDir);
+			if RenameFile(XmingDir, XmingBackupDir ) then begin
+				Log('Rename successful');
+			end else begin
+				Log('Rename failed!');
+			end
+		end else begin
+			Log('Xming directory not found, ok');
+		end
+	end
+end;
+
