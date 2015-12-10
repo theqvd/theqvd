@@ -31,12 +31,12 @@ UNION
       WHEN visible IS NULL THEN false
       ELSE visible
     END,
-    properties_list.id AS property,
+    PropList.id AS property,
     qvd_object
   FROM
-    views_setups_properties_tenant
-    NATURAL INNER JOIN qvd_object_properties_list
-    NATURAL INNER JOIN properties_list
+    views_setups_properties_tenant SetupsProp
+    INNER JOIN qvd_object_properties_list QvdObjPropList ON SetupsProp.qvd_obj_prop_id = QvdObjPropList.id
+    INNER JOIN properties_list PropList ON QvdObjPropList.property_id = PropList.id
 "
 );
 
