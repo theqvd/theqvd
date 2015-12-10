@@ -621,7 +621,6 @@ Wat.I = {
         return fieldType;
     },
     
-    
     validateForm: function (context) {
         var blankControls = $( context + " input[data-required]:blank:visible" );
         if(blankControls.length > 0) {

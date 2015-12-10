@@ -1,6 +1,5 @@
-<div class="customize-options js-customize-options">
+<div class="customize-options customize-options--columns js-customize-options js-customize-options--columns" style="<%= $('select[name="element-select"]').val() == 'columns' ? '' : 'display: none;' %>">
 <div class="js-customize-columns customize-columns customize-block">
-    <span class="h1" data-i18n="Columns"></span>
     <table class="customize-fields">
         <tr>
             <th class="center max-1-icons" data-i18n="[title]A column in list view"><i class="fa fa-columns auto"></i></th>
@@ -67,8 +66,14 @@
             </tr>
     </table>
 </div>
+<div class="js-customize-columns customize-filters customize-block">
+    <div class="h1" data-i18n="Example"></div>
+    <img src="images/views_columns.png" style="width: 100%" />
+</div>
+</div>
+
+<div class="customize-options customize-options--filters js-customize-options js-customize-options--filters" style="<%= $('select[name="element-select"]').val() == 'filters' ? '' : 'display: none;' %>">
 <div class="js-customize-filters customize-filters customize-block">
-    <span class="h1" data-i18n="Filters"></span>
     <table class="customize-fields">
         <tr>
             <th class="center max-1-icons" data-i18n="[title]Desktop version"><i class="fa fa-desktop auto"></i></th>
@@ -150,5 +155,9 @@
                 </td>
             </tr>
     </table>
+</div>
+<div class="js-customize-filters customize-columns customize-block">
+    <div class="h1" data-i18n="Example"></div>
+    <img src="images/views_filters.png" style="width: 100%" />
 </div>
 </div>

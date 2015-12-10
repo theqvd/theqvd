@@ -1,17 +1,41 @@
  <div class="js-custom-views-container <%= cid %> sec-custom-views-<%= viewKind %>" style="display: none;">
+    <div class="details-header">
+        <%
+        if (viewKind == 'tenant') {
+        %>
+            <span class="fa fa-columns h1" data-i18n="Views"></span>
+        <%
+        } else {
+        %>            
+            <span class="fa fa-columns h1" data-i18n="My views"></span>
+        <%
+        }
+        %>
+        <div class="clear mobile"></div>
+        <a href="javascript:" class="button fright fa fa-eraser js-reset-views button-icon" data-i18n="[title]Reset views to default configuration"></a>
+    </div>
+    
      <%
      if (viewKind == 'tenant') {
      %>
         <div class="info-header">
-            <span data-i18n class="fa fa-info-circle">Definition of default elements shown in WAT's sections</span>.<br> 
             <span data-i18n class="fa fa-info-circle">Each administrator will be able to customize his own views overriding this configuration</span>.
         </div>
      <%
      }
      %>
-     <fieldset>
-        <div class="customize-section-selectors">
-            <div class="customize-section-selector">
+     
+    <div class="wrapper-content">
+        <div class="filter js-side">
+            <span class="filter-control desktop">
+                <label for="element-select" data-i18n="Element"></label>
+                <select name="element-select" class="chosen-single">
+                    <option value="columns" data-i18n="Columns"></option>
+                    <option value="filters" data-i18n="Filters"></option>
+                </select>
+            </span>
+
+            <span class="filter-control desktop">
                 <label for="obj-qvd-select" data-i18n="Section"></label>
                 <select name="obj-qvd-select" class="chosen-single">
                     <%
@@ -62,14 +86,14 @@
                     }
                     %>
                 </select>
-            </div>
-
-            <div class="customize-section-selector">    
+            </span>
                 <%
                 if (viewKind == 'tenant' && Wat.C.isSuperadmin()) {
                 %>
-                    <label for="tenant-select">Tenant</label>
+                <span class="filter-control desktop">
+                    <label for="tenant-select" data-i18n="Tenant"></label>
                     <select name="tenant-select" class="chosen-single"></select>    
+                </span>
                 <%
                 }
                 else if (viewKind == 'tenant') {
@@ -79,12 +103,6 @@
                 }
                 %>
             </div>
-            <div class="customize-section-selector">    
-                <a href="javascript:" class="button fa fa-eraser js-reset-views" data-i18n="Reset views to default configuration"></a>
-            </div>
-        </div>    
-    </fieldset>
-
-    <div class="bb-customize-form">
+        <div class="bb-customize-form"></div>
     </div>
 </div>

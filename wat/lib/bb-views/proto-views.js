@@ -17,10 +17,16 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
     events: {
         'change select[name="obj-qvd-select"]': 'changeSection',
         'change select[name="tenant-select"]': 'changeSection',
+        'change select[name="element-select"]': 'changeElement',
         'change .js-desktop-fields>input': 'checkDesktopFilter',
         'change .js-mobile-fields>input': 'checkMobileFilter',
         'change .js-field-check>input': 'checkListColumn',
         'click .js-reset-views': 'resetViews'
+    },
+    
+    changeElement: function (e) {
+        $('.js-customize-options').hide();
+        $('.js-customize-options--' + $(e.target).val()).show();
     },
     
     resetViews: function () {
@@ -244,7 +250,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         }
         else {
             // If update fails, change ckeckbox to previous state
-            $(e.target).prop('checked', !checked);
+            $(that.targetClicked).prop('checked', !checked);
         }
     },
     

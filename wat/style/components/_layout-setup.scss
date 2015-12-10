@@ -57,7 +57,7 @@
     .customize-section-selector {
         margin-bottom: 20px;
         display: table-cell;
-        width: 32%;
+        width: 24%;
         
         &:first-child {
             padding-right: 20px;
@@ -71,8 +71,11 @@
 }
 
 .customize-options {
+    margin-top: 20px; 
+    margin-bottom: 50px; 
+        
     .customize-block {
-        width: 49%;
+        width: 42%;
         display: inline-block;
         vertical-align: top;
         
