@@ -38,7 +38,9 @@ sub in_user
     my $args = shift; 
     my $DB = QVD::DB::Simple::db();
 
-    $DB->resultset('QVD_Object_Property_List')->search({property_id=>$args->id, qvd_object=>'user'})->all;
+	my $rs = $DB->resultset('QVD_Object_Property_List')->search({property_id=>$args->id, qvd_object=>'user'})->first;
+
+	return (defined $rs) ? $rs->id : 0;
 }
 
 sub in_vm 
@@ -46,7 +48,9 @@ sub in_vm
     my $args = shift; 
     my $DB = QVD::DB::Simple::db();
 
-    $DB->resultset('QVD_Object_Property_List')->search({property_id=>$args->id, qvd_object=>'vm'})->all;
+	my $rs = $DB->resultset('QVD_Object_Property_List')->search({property_id=>$args->id, qvd_object=>'vm'})->first;
+
+	return (defined $rs) ? $rs->id : 0;
 }
 
 sub in_host 
@@ -54,7 +58,9 @@ sub in_host
     my $args = shift; 
     my $DB = QVD::DB::Simple::db();
 
-    $DB->resultset('QVD_Object_Property_List')->search({property_id=>$args->id, qvd_object=>'host'})->all;
+	my $rs = $DB->resultset('QVD_Object_Property_List')->search({property_id=>$args->id, qvd_object=>'host'})->first;
+
+	return (defined $rs) ? $rs->id : 0;
 }
 
 sub in_osf 
@@ -62,7 +68,9 @@ sub in_osf
     my $args = shift; 
     my $DB = QVD::DB::Simple::db();
 
-    $DB->resultset('QVD_Object_Property_List')->search({property_id=>$args->id, qvd_object=>'osf'})->all;
+	my $rs = $DB->resultset('QVD_Object_Property_List')->search({property_id=>$args->id, qvd_object=>'osf'})->first;
+
+	return (defined $rs) ? $rs->id : 0;
 }
 
 sub in_di
@@ -70,7 +78,9 @@ sub in_di
     my $args = shift; 
     my $DB = QVD::DB::Simple::db();
 
-    $DB->resultset('QVD_Object_Property_List')->search({property_id=>$args->id, qvd_object=>'di'})->all;
+	my $rs = $DB->resultset('QVD_Object_Property_List')->search({property_id=>$args->id, qvd_object=>'di'})->first;
+
+	return (defined $rs) ? $rs->id : 0;
 }
 
 1;

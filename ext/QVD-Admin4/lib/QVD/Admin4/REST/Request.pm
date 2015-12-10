@@ -203,8 +203,10 @@ sub BUILD
 # Actions 'admin_view_set' and 'admin_view_reset' are supposed to operate
 # over the current admin. The correspondig filters are added in here
 
-    $self->forze_own_admin_id_in_admin_views
-	if $self->qvd_object_model->qvd_object eq 'Administrator_Views_Setup';
+	if ($self->qvd_object_model->qvd_object eq 'Views_Setup_Attributes_Administrator' ||
+		$self->qvd_object_model->qvd_object eq 'Views_Setup_Properties_Administrator') {
+		$self->forze_own_admin_id_in_admin_views;
+	}
 
 # Tenants must be filtered by tenant in a different way than other objects 
 

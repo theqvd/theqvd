@@ -687,7 +687,6 @@ my $ACTIONS = {
 		admin4method => 'get_acls_in_admins'
 	},
 
-
 	number_of_acls_in_role => {
 		type_of_action =>  'ad_hoc',
 			    acls => [qr/^administrator\.see\.acl-list$/],
@@ -728,32 +727,46 @@ my $ACTIONS = {
 		acls => [qr/^views\.see-main\./]
 	},
 
-	tenant_view_set => {
+	tenant_property_view_set => {
 		type_of_action => 'create_or_update',
 		     admin4method => 'create_or_update',
 		     acls => [qr/^views\.update\./],
-		qvd_object => 'Tenant_Views_Setup'
+		qvd_object => 'Views_Setup_Properties_Tenant'
+	},
+
+	tenant_attribute_view_set => {
+		type_of_action => 'create_or_update',
+		admin4method => 'create_or_update',
+		acls => [qr/^views\.update\./],
+		qvd_object => 'Views_Setup_Attributes_Tenant'
 	},
 
 	tenant_view_reset => {
 		type_of_action => 'delete',
-			admin4method => 'delete',
+		admin4method => 'reset_tenant_views',
 			acls => [qr/^views\.update\./],
-		qvd_object => 'Tenant_Views_Setup'
+		qvd_object => 'Views_Setup_Attributes_Tenant'
 	},
 
-	admin_view_set => {
+	admin_property_view_set => {
 		type_of_action => 'create_or_update',
 		    admin4method => 'create_or_update',
 		    acls => [],
-		qvd_object => 'Administrator_Views_Setup'
+		qvd_object => 'Views_Setup_Properties_Administrator'
+	},
+
+	admin_attribute_view_set => {
+		type_of_action => 'create_or_update',
+		admin4method => 'create_or_update',
+		acls => [],
+		qvd_object => 'Views_Setup_Attributes_Administrator'
 	},
 
 	admin_view_reset => {
 		type_of_action => 'delete',
-		       admin4method => 'delete',
+		admin4method => 'reset_admin_views',
 		       acls => [],
-		qvd_object => 'Administrator_Views_Setup'
+		qvd_object => 'Views_Setup_Attributes_Administrator'
 	},
 
 	current_admin_setup => {

@@ -348,6 +348,95 @@ sub config_default
     $result;
 }
 
+sub reset_views {
+	my ($self, $filters, $conditions, $tables) = @_;
+	$conditions //= [];
+
+	for my $table (@$tables) {
+
+		my @all_rows = $DB->resultset($table)->all;
+		my @rows = ();
+		for my $row (@all_rows){
+			my $compliant = 1;
+			while (my ($field, $value) = each (%$filters)) {
+				if($row->$field ne $value){
+					$compliant = 0;
+				}
+			}
+			if($compliant){
+				push @rows, $row;
+			}
+		}
+
+		my $failures;
+		for my $obj (@rows)
+		{
+			eval {
+				$self->$_($obj) for @$conditions;
+				$obj->delete;
+			};
+
+			$failures->{$obj->id} = QVD::Admin4::Exception->new(exception => $@, query => 'delete')->json if $@;
+			#FIXME Report delete action in log
+			#$self->report_in_log($request, $obj, $failures && exists $failures->{$obj->id} ? $failures->{$obj->id}->{status} : 0);
+		}
+		QVD::Admin4::Exception->throw(failures => $failures)
+			if defined $failures;
+	}
+}
+
+sub reset_tenant_views
+{
+	my ($self, $request, $modifiers) = @_;
+	my $result;
+
+	# FIXME: The filters shall be taken from the request
+	my $filters = {};
+
+	my $is_superadmin = $request->qvd_object_model->current_qvd_administrator->is_superadmin();
+	my $filter_tenant_value = $request->json_wrapper->get_filter_value('tenant_id');
+	if(!$is_superadmin and (defined $filter_tenant_value)){
+		QVD::Admin4::Exception->throw(code => 4220, query => 'delete', object => 'tenant_id');
+	}
+	if($is_superadmin and !(defined $filter_tenant_value)){
+		QVD::Admin4::Exception->throw(code => 6220, query => 'delete', object => 'tenant_id');
+	}
+	my $tenant_id = $filter_tenant_value // $request->qvd_object_model->current_qvd_administrator->tenant_id;
+
+	my $qvd_object = $request->json_wrapper->get_filter_value('qvd_object');
+
+	$filters->{tenant_id} = $tenant_id if defined $tenant_id;
+	$filters->{qvd_object} = $qvd_object if defined $qvd_object;
+
+	$self->reset_views($filters, $modifiers->{conditions},
+		[qw(Views_Setup_Attributes_Tenant Views_Setup_Properties_Tenant)]);
+
+	$result->{rows} = [];
+	return $result;
+}
+
+sub reset_admin_views
+{
+	my ($self, $request, $modifiers) = @_;
+	my $result;
+
+	# FIXME: The filters shall be taken from the request
+	my $filters = {};
+
+	my $admin_id = $request->qvd_object_model->current_qvd_administrator->id;
+
+	my $qvd_object = $request->json_wrapper->get_filter_value('qvd_object');
+
+	$filters->{administrator_id} = $admin_id if defined $admin_id;
+	$filters->{qvd_object} = $qvd_object if defined $qvd_object;
+
+	$self->reset_views($filters, $modifiers->{conditions},
+		[qw(Views_Setup_Attributes_Administrator Views_Setup_Properties_Administrator)]);
+
+	$result->{rows} = [];
+	return $result;
+}
+
 ### Manage properties ###
 
 sub user_property_action {

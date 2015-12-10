@@ -9,28 +9,55 @@ __PACKAGE__->result_source_instance->deploy_depends_on(
     ["QVD::DB::Result::Operative_Views_In_Tenant"]
 );
 __PACKAGE__->result_source_instance->is_virtual(0);
+
+my $query_operative_views_in_administrators_only = "
+  (SELECT DISTINCT
+    device_type,
+    view_type,
+    tenant_id,
+    administrator_id,
+    field,
+    CASE
+      WHEN visible IS NULL THEN false
+      ELSE visible
+    END,
+    0 AS property,
+    qvd_object
+  FROM views_setups_attributes_administrator setups
+    INNER JOIN administrators admins ON setups.administrator_id = admins.id
+  UNION
+    SELECT DISTINCT
+      device_type,
+      view_type,
+      tenant_id,
+      administrator_id,
+      key AS field,
+      CASE
+        WHEN visible IS NULL THEN false
+        ELSE visible
+      END,
+      Properties.id AS property,
+      qvd_object
+    FROM
+      views_setups_properties_administrator AdminSetups
+      INNER JOIN qvd_object_properties_list QvdObjProperties ON AdminSetups.qvd_obj_prop_id = QvdObjProperties.id
+      INNER JOIN properties_list Properties ON QvdObjProperties.property_id = Properties.id)
+";
+
 __PACKAGE__->result_source_instance->view_definition(
 "
-SELECT * FROM (
-    SELECT
-       (CASE WHEN (TV.field IS NOT NULL) THEN TV.field ELSE AV.field END) as field, 
-       (CASE WHEN (TV.tenant_id IS NOT NULL) THEN TV.tenant_id ELSE AV.tenant_id END) as tenant_id, 
-       (CASE WHEN (TV.administrator_id IS NOT NULL) THEN TV.administrator_id ELSE AV.administrator_id END) as administrator_id, 
-       (CASE WHEN (AV.visible IS NOT NULL) THEN AV.visible ELSE TV.visible END) as visible,
-       (CASE WHEN (TV.view_type IS NOT NULL) THEN TV.view_type ELSE AV.view_type END) as view_type,
-       (CASE WHEN (TV.device_type IS NOT NULL) THEN TV.device_type ELSE AV.device_type END) as device_type,
-       (CASE WHEN (TV.qvd_object IS NOT NULL) THEN TV.qvd_object ELSE AV.qvd_object END) as qvd_object,
-       (CASE WHEN (TV.property IS NOT NULL) THEN TV.property ELSE AV.property END) as property
-    FROM (administrator_views_setups JOIN administrators ON administrators.id=administrator_views_setups.administrator_id) AV
-     FULL OUTER JOIN
-     (select T.*, A.id as administrator_id from operative_views_in_tenants T LEFT JOIN administrators A ON T.tenant_id=A.tenant_id) TV
-     ON TV.device_type=AV.device_type AND 
-     TV.view_type=AV.view_type AND
-     TV.qvd_object=AV.qvd_object AND
-     TV.field=AV.field AND
-     TV.property=AV.property AND 
-       TV.administrator_id=AV.administrator_id
-    ) M;
+SELECT
+  field,
+  tenant_id,
+  administrator_id,
+  CASE WHEN AdminSetup.visible IS NOT NULL THEN AdminSetup.visible ELSE TenantSetup.visible END AS visible,
+  view_type,
+  device_type,
+  qvd_object,
+  property
+FROM ($query_operative_views_in_administrators_only) AS AdminSetup
+  FULL JOIN operative_views_in_tenants AS TenantSetup
+    USING (tenant_id, device_type, view_type, field, property, qvd_object)
 "
 );
 
@@ -42,7 +69,7 @@ __PACKAGE__->add_columns(
 	view_type   => { data_type => 'administrator_and_tenant_views_setups_view_type_enum' },
 	device_type => { data_type => 'administrator_and_tenant_views_setups_device_type_enum' },
 	qvd_object  => { data_type => 'administrator_and_tenant_views_setups_qvd_object_enum'},
-	property    => { data_type => 'boolean'}
+	property    => { data_type => 'integer'}
 );
 
 __PACKAGE__->set_primary_key( qw/ field tenant_id view_type device_type qvd_object property / );

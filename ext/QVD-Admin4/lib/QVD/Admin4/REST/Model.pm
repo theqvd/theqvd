@@ -42,8 +42,9 @@ my $DB;
 my $QVD_OBJECTS_TO_LOG_MAPPER = {
     Log => 'log', User => 'user', VM => 'vm', DI => 'di', OSF => 'osf', Host => 'host', 
     Administrator => 'administrator', Tenant => 'tenant', 
-    Role => 'role', Config => 'config', Tenant_Views_Setup => 'tenant_view', 
-	Administrator_Views_Setup => 'admin_view', QVD_Object_Property_List => 'property',
+	Role => 'role', Config => 'config', QVD_Object_Property_List => 'property',
+	Views_Setup_Properties_Tenant => 'tenant_view', Views_Setup_Attributes_Tenant => 'tenant_view',
+	Views_Setup_Properties_Administrator => 'admin_view', Views_Setup_Attributes_Administrator => 'admin_view',
 	Property_List => 'property', Wat_Setups_By_Tenant => 'wat_setup_by_tenant',
 };
 
@@ -58,7 +59,8 @@ my $TYPES_OF_ACTION_TO_LOG_MAPPER = {
 
 # List of QVD objects directly assigned to a tenant.
 
-my $DIRECTLY_TENANT_RELATED = [qw(User Administrator Role OSF Tenant_Views_Setup Config)];
+my $DIRECTLY_TENANT_RELATED = [qw(User Administrator Role OSF Config
+	Views_Setup_Attributes_Tenant)];
 
 # Mappers for identity operators between API and DBIx::Class
 # The majority of operators are just the same
@@ -373,7 +375,11 @@ my $ACLS_FOR_ARGUMENTS_IN_UPDATE = {
 		language => [qr/^tenant\.update\.language$/]
 	},
 
-	Tenant_Views_Setup => {
+	Views_Setup_Properties_Tenant => {
+		visible => [qr/^views\.update\.columns$/]
+	},
+
+	Views_Setup_Attributes_Tenant => {
 		visible => [qr/^views\.update\.columns$/]
 	},
 
@@ -381,7 +387,11 @@ my $ACLS_FOR_ARGUMENTS_IN_UPDATE = {
 		visible => [qr/^views\.update\.columns$/]
 	},
 
-	Administrator_Views_Setup => {
+	Views_Setup_Properties_Administrator => {
+		visible => [qr/^views\.update\.columns$/]
+	},
+
+	Views_Setup_Attributes_Administrator => {
 		visible => [qr/^views\.update\.columns$/]
 	},
 
@@ -555,11 +565,15 @@ my $NESTED_QUERIES_TO_ADMIN4_MAPPER = {
 		__roles_changes__unassign_roles => 'del_roles_to_admin'
 	},
 
-    Tenant_Views_Setup => {},
+	Views_Setup_Properties_Tenant => {},
+
+	Views_Setup_Attributes_Tenant => {},
 
     Operative_Views_In_Tenant => {},
 
-    Administrator_Views_Setup => {},
+	Views_Setup_Properties_Administrator => {},
+
+	Views_Setup_Attributes_Administrator => {},
 
     Operative_Views_In_Administrator => {},
 
@@ -605,7 +619,13 @@ my $AVAILABLE_FILTERS = {
 
 	      Administrator => [qw(name description tenant_id tenant_name id language block creation_date creation_admin_id creation_admin_name)],
 
-	      Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
+		Views_Setup_Properties_Tenant => [qw(id tenant_id tenant_name qvd_obj_prop_id key visible view_type device_type qvd_object)],
+
+		Views_Setup_Attributes_Tenant => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object)],
+
+		Views_Setup_Properties_Administrator => [qw(id admin_id qvd_obj_prop_id key visible view_type device_type qvd_object)],
+
+		Views_Setup_Attributes_Administrator => [qw(id admin_id field visible view_type device_type qvd_object)],
 
 	      Operative_Acls_In_Role => [qw(acl_name role_id operative name id description)],
 
@@ -647,7 +667,13 @@ my $AVAILABLE_FILTERS = {
 
 		 Administrator => [qw(name description tenant_id tenant_name role_id acl_id id role_name acl_name language block creation_date creation_admin_id creation_admin_name)],
 
-		 Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
+		Views_Setup_Properties_Tenant => [qw(id tenant_id tenant_name qvd_obj_prop_id key visible view_type device_type qvd_object)],
+
+		Views_Setup_Attributes_Tenant => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object)],
+
+		Views_Setup_Properties_Administrator => [qw(id admin_id qvd_obj_prop_id key visible view_type device_type qvd_object)],
+
+		Views_Setup_Attributes_Administrator => [qw(id admin_id field visible view_type device_type qvd_object)],
 
 	         Operative_Acls_In_Role => [qw(acl_name role_id operative id name description)],
 			   
@@ -683,8 +709,10 @@ my $AVAILABLE_FILTERS = {
 		Host => [qw(id)],
 		Role => [qw(id)],
 		Tenant => [qw(id)],
-                Tenant_Views_Setup => [qw(tenant_id qvd_object)],
-		Administrator_Views_Setup => [qw(qvd_object)]
+		Views_Setup_Properties_Tenant => [qw(qvd_object)],
+		Views_Setup_Attributes_Tenant => [qw(tenant_id qvd_object)],
+		Views_Setup_Properties_Administrator => [qw(qvd_object)],
+		Views_Setup_Attributes_Administrator => [qw(qvd_object)]
 	}, # Every admin is able to delete just its own views, so you cannot filter by admin or id. Suitable admin_id forzed in Request.pm
 
 	update => {
@@ -696,7 +724,12 @@ my $AVAILABLE_FILTERS = {
 		Wat_Setups_By_Tenant => [qw()]
 	},
 
-	create_or_update => { Tenant_Views_Setup => [qw(tenant_id)] },
+	create_or_update => {
+		Views_Setup_Properties_Tenant => [qw()],
+		Views_Setup_Attributes_Tenant => [qw()],
+		Views_Setup_Properties_Administrator => [qw()],
+		Views_Setup_Attributes_Administrator => [qw()],
+	},
 
 	exec => { default => [qw(id tenant_id user_id host_id)] },
 
@@ -742,7 +775,9 @@ my $AVAILABLE_FIELDS = {
 
 	      DI_Tag => [qw(osf_id di_id name id )],
 
-	      Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
+		Views_Setup_Properties_Tenant => [qw(id tenant_id tenant_name qvd_obj_prop_id key visible view_type device_type qvd_object)],
+
+		Views_Setup_Attributes_Tenant => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object)],
 
 	      Operative_Acls_In_Role => [qw(id name roles operative description)],
 
@@ -750,8 +785,11 @@ my $AVAILABLE_FIELDS = {
 
 	      Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
-	      Administrator_Views_Setup => [qw(id tenant_id tenant_name admin_id admin_name field visible view_type 
-                                               device_type qvd_object property)],
+		Views_Setup_Properties_Administrator => [qw(id tenant_id tenant_name admin_id admin_name qvd_obj_prop_id key
+			visible view_type device_type qvd_object)],
+
+		Views_Setup_Attributes_Administrator => [qw(id tenant_id tenant_name admin_id admin_name field
+			visible view_type device_type qvd_object)],
 
 	      Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
@@ -790,7 +828,9 @@ my $AVAILABLE_FIELDS = {
 
 		 DI_Tag => [qw(di_id osf_id name id )],
 
-		 Tenant_Views_Setup => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object property)],
+		Views_Setup_Properties_Tenant => [qw(id tenant_id tenant_name qvd_obj_prop_id key visible view_type device_type qvd_object)],
+
+		Views_Setup_Attributes_Tenant => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object)],
 
         	 Operative_Acls_In_Role => [qw(id name roles operative description)],
 
@@ -798,8 +838,11 @@ my $AVAILABLE_FIELDS = {
 
 		 Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
-		 Administrator_Views_Setup => [qw(id admin_id admin_name tenant_id tenant_name field visible view_type 
-                                                  device_type qvd_object property)],
+		Views_Setup_Properties_Administrator => [qw(id tenant_id tenant_name admin_id admin_name qvd_obj_prop_id key
+			visible view_type device_type qvd_object)],
+
+		Views_Setup_Attributes_Administrator => [qw(id tenant_id tenant_name admin_id admin_name field
+			visible view_type device_type qvd_object)],
 
 		 Operative_Views_In_Administrators => [qw(tenant_id field visible view_type device_type qvd_object property)],
 
@@ -811,9 +854,13 @@ my $AVAILABLE_FIELDS = {
 
 	      DI => [qw(id disk_image)],
 
-	      Tenant_Views_Setup => [qw(id)],
+		Views_Setup_Properties_Tenant => [qw(id)],
 
-		Administrator_Views_Setup => [qw(id)]
+		Views_Setup_Attributes_Tenant => [qw(id)],
+
+		Views_Setup_Properties_Administrator => [qw(id)],
+
+		Views_Setup_Attributes_Administrator => [qw(id)],
 	},
 
     all_ids => { default => [qw(id)]},
@@ -858,8 +905,10 @@ my $MANDATORY_FILTERS =
 		delete => {
 			default => [qw(id)],
 			Config => [qw(key)],
-			Administrator_Views_Setup => [qw()],
-			Tenant_Views_Setup => [qw()]
+			Views_Setup_Properties_Tenant => [qw()],
+			Views_Setup_Attributes_Tenant => [qw()],
+			Views_Setup_Properties_Administrator => [qw()],
+			Views_Setup_Attributes_Administrator => [qw()],
 		},
 
 		update=> {
@@ -885,16 +934,20 @@ my $DEFAULT_ORDER_CRITERIA = {
 	tiny => {
 		default =>  [qw(name)],
 	      DI => [qw(disk_image)],
-	      Tenant_Views_Setup => [qw(field)],
-	      Administrator_Views_Setup => [qw(field)],
+		Views_Setup_Properties_Tenant => [qw(key)],
+		Views_Setup_Attributes_Tenant => [qw(field)],
+		Views_Setup_Properties_Administrator => [qw(key)],
+		Views_Setup_Attributes_Administrator => [qw(field)],
 		Config => [qw(key)]
 	},
 
 	list => {
 		default =>  [qw()],
-	      Tenant_Views_Setup => [qw(field)],
+		Views_Setup_Properties_Tenant => [qw(key)],
+		Views_Setup_Attributes_Tenant => [qw(field)],
+		Views_Setup_Properties_Administrator => [qw(key)],
+		Views_Setup_Attributes_Administrator => [qw(field)],
 	      Operative_Views_In_Tenant => [qw(field)],
-	      Administrator_Views_Setup => [qw(field)],
 	      Operative_Views_In_Administrator => [qw(field)],
 		Config => [qw(key)]
 	}
@@ -918,9 +971,11 @@ my $AVAILABLE_NESTED_QUERIES = {
 		Tenant => [qw()],
 		Role => [qw(__acls__ __roles__)],
 		Administrator => [qw(__roles__)],
-		Tenant_Views_Setup => [qw()],
+		Views_Setup_Properties_Tenant => [qw()],
+		Views_Setup_Attributes_Tenant => [qw()],
+		Views_Setup_Properties_Administrator => [qw()],
+		Views_Setup_Attributes_Administrator => [qw()],
 		Operative_Views_In_Tenant => [qw()],
-		Administrator_Views_Setup => [qw()],
 		Operative_Views_In_Administrator => [qw()],
 		Property_List => [qw(__property_assign__)]
 	},
@@ -938,9 +993,11 @@ my $AVAILABLE_NESTED_QUERIES = {
 			    __roles_changes__assign_roles 
                             __roles_changes__unassign_roles)],
 		Administrator => [qw(__roles_changes__assign_roles __roles_changes__unassign_roles)],
-		Tenant_Views_Setup => [qw()],
+		Views_Setup_Properties_Tenant => [qw()],
+		Views_Setup_Attributes_Tenant => [qw()],
+		Views_Setup_Properties_Administrator => [qw()],
+		Views_Setup_Attributes_Administrator => [qw()],
 		Operative_Views_In_Tenant => [qw()],
-		Administrator_Views_Setup => [qw()],
 		Operative_Views_In_Administrator => [qw()],
 		Wat_Setups_By_Tenant => [qw()]
 	}
@@ -958,8 +1015,10 @@ my $AVAILABLE_ARGUMENTS = {
 			    Tenant => [qw(name language block description)],
 			    Role => [qw(name description)],
 			    Administrator => [qw(name password language block description)],
-			    Tenant_Views_Setup => [qw(visible)],
-			    Administrator_Views_Setup => [qw(visible)],
+	Views_Setup_Properties_Tenant => [qw(visible)],
+	Views_Setup_Attributes_Tenant => [qw(visible)],
+	Views_Setup_Properties_Administrator => [qw(visible)],
+	Views_Setup_Attributes_Administrator => [qw(visible)],
 	Property_List => [qw(key description)],
 	Wat_Setups_By_Tenant => [qw(language block)]
 };
@@ -976,8 +1035,10 @@ my $MANDATORY_ARGUMENTS = {
 			    Tenant => [qw(name language block)],
 			    Role => [qw(tenant_id name fixed internal)],
                             Administrator => [qw(tenant_id name password language block)],
-			    Tenant_Views_Setup => [qw(tenant_id field visible view_type device_type qvd_object property)],
-			    Administrator_Views_Setup => [qw(field visible view_type device_type qvd_object property)], # Every admin is able to set just its own views, 
+	Views_Setup_Properties_Tenant => [qw(qvd_obj_prop_id visible view_type device_type)],
+	Views_Setup_Attributes_Tenant => [qw(tenant_id field visible view_type device_type qvd_object)],
+	Views_Setup_Properties_Administrator => [qw(qvd_obj_prop_id visible view_type device_type)],
+	Views_Setup_Attributes_Administrator => [qw(field visible view_type device_type qvd_object)], # Every admin is able to set just its own views,
                                                                                                                          # Suitable admin_id forzed in Request.pm
 	QVD_Object_Property_List => [qw(property_id)],
 	Property_List => [qw(tenant_id key)]
@@ -1031,15 +1092,23 @@ my $DEFAULT_ARGUMENT_VALUES = {
 		block => '10'
 	},
 
-	Tenant_Views_Setup => {
+	Views_Setup_Properties_Tenant => {
 		visible => 0,
-		property => 0
 	},
 
-	Administrator_Views_Setup =>  {
+	Views_Setup_Attributes_Tenant => {
 		visible => 0,
-		property => 0
-	}
+	},
+
+	Views_Setup_Properties_Administrator => {
+		visible => 0,
+	},
+
+	Views_Setup_Attributes_Administrator =>  {
+		visible => 0,
+	},
+
+
 };
 
 
@@ -1236,7 +1305,16 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER = {
 	'creation_admin_name' => 'creation_log_entry.administrator_name',
     },
     
-    Tenant_Views_Setup => { 	
+	Views_Setup_Properties_Tenant => {
+		'id' => 'me.id',
+		'qvd_obj_prop_id' => 'me.qvd_obj_prop_id',
+		'visible' => 'me.visible',
+		'view_type' => 'me.view_type',
+		'device_type' => 'me.device_type',
+		'qvd_object' => 'me.qvd_object',
+	},
+
+	Views_Setup_Attributes_Tenant => {
 	'id' => 'me.id', 
 	'tenant_id' => 'me.tenant_id', 
 	'field' => 'me.field', 
@@ -1245,7 +1323,6 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER = {
 	'view_type' => 'me.view_type',
 	'device_type' => 'me.device_type',
 	'qvd_object' => 'me.qvd_object',
-	'property' => 'me.property'
     },
     
     Operative_Acls_In_Role => { 
@@ -1276,7 +1353,18 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER = {
 	'property' => 'me.property'
     },
 
-    Administrator_Views_Setup =>  {
+	Views_Setup_Properties_Administrator =>  {
+		'id' => 'me.id',
+		'qvd_obj_prop_id' => 'me.qvd_obj_prop_id',
+		'admin_id' => 'me.administrator_id',
+		'admin_name' => 'administrator.name',
+		'visible' => 'me.visible',
+		'view_type' => 'me.view_type',
+		'device_type' => 'me.device_type',
+		'qvd_object' => 'me.qvd_object',
+	},
+
+	Views_Setup_Attributes_Administrator =>  {
 	'id' => 'me.id',  
 	'tenant_id' => 'tenant.id', 
 	'tenant_name' => 'tenant.name', 
@@ -1532,6 +1620,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER = {
 	'creation_admin_id' => 'creation_log_entry.administrator_id',
 	'creation_admin_name' => 'creation_log_entry.administrator_name',
     },
+
     Tenant => {
 	'name' => 'me.name',
 	'description' => 'me.description',
@@ -1543,7 +1632,16 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER = {
 	'creation_admin_name' => 'creation_log_entry.administrator_name',
     },
 
-    Tenant_Views_Setup => { 	
+	Views_Setup_Properties_Tenant => {
+		'id' => 'me.id',
+		'qvd_obj_prop_id' => 'me.qvd_obj_prop_id',
+		'visible' => 'me.visible',
+		'view_type' => 'me.view_type',
+		'device_type' => 'me.device_type',
+		'qvd_object' => 'me.qvd_object',
+	},
+
+	Views_Setup_Attributes_Tenant => {
 	'id' => 'me.id', 
 	'tenant_id' => 'me.tenant_id', 
 	'field' => 'me.field', 
@@ -1552,7 +1650,6 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER = {
 	'view_type' => 'me.view_type',
 	'device_type' => 'me.device_type',
 	'qvd_object' => 'me.qvd_object',
-	'property' => 'me.property'  
     },
 
     Operative_Views_In_Tenant => { 	
@@ -1565,7 +1662,18 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER = {
 	'property' => 'me.property'  
     },
 
-    Administrator_Views_Setup =>  {
+	Views_Setup_Properties_Administrator =>  {
+		'id' => 'me.id',
+		'qvd_obj_prop_id' => 'me.qvd_obj_prop_id',
+		'admin_id' => 'me.administrator_id',
+		'admin_name' => 'administrator.name',
+		'visible' => 'me.visible',
+		'view_type' => 'me.view_type',
+		'device_type' => 'me.device_type',
+		'qvd_object' => 'me.qvd_object',
+	},
+
+	Views_Setup_Attributes_Administrator =>  {
 	'id' => 'me.id',  
 	'tenant_id' => 'administrator.tenant_id', 
 	'tenant_name' => 'administrator.tenant_name', 
@@ -1683,9 +1791,13 @@ my $DBIX_JOIN_VALUE = {
     
     ACL => [{ role_rels => { role => { admin_rels => 'admin' }}}],
     
-    Tenant_Views_Setup => [ qw(tenant)],
+	Views_Setup_Properties_Tenant => [ qw() ],
 
-    Administrator_Views_Setup => [ { administrator => 'tenant' }],
+	Views_Setup_Attributes_Tenant => [ qw(tenant)],
+
+	Views_Setup_Properties_Administrator => [ { administrator => 'tenant' }],
+
+	Views_Setup_Attributes_Administrator => [ { administrator => 'tenant' }],
 
 	QVD_Object_Property_List =>  [ {properties_list => 'tenant'}],
 
@@ -1712,8 +1824,10 @@ my $DBIX_PREFETCH_VALUE = {
 	      DI_Tag => [{di => {osf => 'tenant'}}],
 	      Administrator => [qw(tenant wat_setups), qw(creation_log_entry)],
 	      Tenant => [qw(wat_setups creation_log_entry)],
-	      Tenant_Views_Setup => [ qw(tenant)],
-		Administrator_Views_Setup => [ { administrator => 'tenant' }]
+		Views_Setup_Properties_Tenant => [ qw()],
+		Views_Setup_Attributes_Tenant => [ qw(tenant)],
+		Views_Setup_Properties_Administrator => [ { administrator => 'tenant' }],
+		Views_Setup_Attributes_Administrator => [ { administrator => 'tenant' }],
 	},
 
 	details => {
@@ -1727,8 +1841,10 @@ my $DBIX_PREFETCH_VALUE = {
 		DI_Tag => [{di => {osf => 'tenant'}}],
 		Administrator => [qw(tenant wat_setups creation_log_entry)],
 		Tenant => [qw(wat_setups creation_log_entry)],
-		Tenant_Views_Setup => [ qw(tenant)],
-		Administrator_Views_Setup => [ { administrator => 'tenant' }]
+		Views_Setup_Properties_Tenant => [ qw()],
+		Views_Setup_Attributes_Tenant => [ qw(tenant)],
+		Views_Setup_Properties_Administrator => [ { administrator => 'tenant' }],
+		Views_Setup_Attributes_Administrator => [ { administrator => 'tenant' }],
 	}
 };
 

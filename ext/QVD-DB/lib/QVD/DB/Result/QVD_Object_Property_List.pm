@@ -10,8 +10,17 @@ __PACKAGE__->add_columns( qvd_object  => { data_type => 'administrator_and_tenan
 
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint([qw(property_id qvd_object)]);
-__PACKAGE__->has_many(setups => 'QVD::DB::Result::Properties_Views_Setup_Tenant', 'id', { cascade_delete => 1 });
+__PACKAGE__->has_many(tenant_prop_setups => 'QVD::DB::Result::Views_Setup_Properties_Tenant', 'id', { cascade_delete => 1 });
+__PACKAGE__->has_many(tenant_attr_setups => 'QVD::DB::Result::Views_Setup_Attributes_Tenant', 'id', { cascade_delete => 1 });
+__PACKAGE__->has_many(admin_prop_setups => 'QVD::DB::Result::Views_Setup_Properties_Administrator', 'id', { cascade_delete => 1 });
+__PACKAGE__->has_many(admin_attr_setups => 'QVD::DB::Result::Views_Setup_Attributes_Administrator', 'id', { cascade_delete => 1 });
 __PACKAGE__->belongs_to(properties_list => 'QVD::DB::Result::Property_List', 'property_id');
+
+sub tenant_id
+{
+	my $self = shift;
+	$self->properties_list->tenant->id;
+}
 
 sub tenant_name
 {
@@ -23,6 +32,11 @@ sub description
 {
 	my $self = shift;
 	$self->properties_list->description;
+}
+
+sub key {
+	my $self = shift;
+	$self->properties_list->key;
 }
 
 sub is_user_property{
