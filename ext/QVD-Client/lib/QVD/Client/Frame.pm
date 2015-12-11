@@ -685,7 +685,6 @@ sub OnUnknownCert {
             }
 
             my $hsizer = Wx::BoxSizer->new(wxHORIZONTAL);
-            my $excl = Wx::StaticText->new($info_panel, -1, "    !");
             my $excl = Wx::StaticText->new($info_panel, -1, "    " . chr(0x26A0));
 
             $font = $excl->GetFont();
