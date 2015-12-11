@@ -279,8 +279,10 @@ sub _authenticate_user {
                 $auth = QVD::L7R::Authenticator->new;
 		txn_do { $this_host->counters->incr_auth_attempts; };
                 if ($auth->authenticate_basic($login, $passwd, $l7r)) {
-		    INFO "Accepted connection from user $login from ip:port ".
-			$l7r->{server}->{client}->peerhost().":".$l7r->{server}->{client}->peerport();
+                    my $client = $l7r->{server}->{client};
+                    my $peerhost = eval { $client->peerhost() } // 'unknown';
+                    my $peerport = eval { $client->peerport() } // 'unknown';
+		    INFO "Accepted connection from user $login from ip:port ${peerhost}:$peerport";
 		    $l7r->{_auth} = $auth;
 		    txn_do { $this_host->counters->incr_auth_ok; };
                     return $auth;
