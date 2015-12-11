@@ -1,0 +1,6 @@
+Revision history for Perl extension QVD::StressTester.
+
+0.01  Mon Dec  7 11:15:24 2015
+	- original version; created by h2xs 1.23 with options
+		-AXn QVD::StressTester
+
