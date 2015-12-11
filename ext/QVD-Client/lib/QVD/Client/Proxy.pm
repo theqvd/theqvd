@@ -51,6 +51,32 @@ sub new {
     bless $self, $class;
 }
 
+sub _add_ssl_error {
+    my ($self, $ssl_depth, $err_no, $err_depth, $err_str) = @_;
+
+    if (!exists $self->{cert_info}->[$ssl_depth]) {
+        $self->{cert_info}->[$ssl_depth] = {
+            errors => [],
+        }
+    }
+
+    my $ci = $self->{cert_info}->[$ssl_depth];
+
+    push @{ $ci->{errors} }, {
+        err_no    => $err_no,
+        err_depth => $err_depth,
+        err_str   => $err_str
+    };
+
+ 
+    $self->{ssl_errors}++;
+
+    if ( $self->is_accepted( 'sha256', $ci->{fingerprint}->{sha256}, $err_no ) ) {
+        DEBUG "SSL error $err_no ignored for certificate " . $ci->{fingerprint}->{sha256};
+        $self->{ssl_ignored_errors}++;
+    }
+}
+
 ## callback receives:
 # 1) a true/false value that indicates what OpenSSL thinks of the certificate
 # 2) a C-style memory address of the certificate store
@@ -282,9 +308,13 @@ sub _get_httpc {
             }
         }
 
-        $args{SSL_ca_path}         = $DARWIN ? core_cfg('path.darwin.ssl.ca.system') : core_cfg('path.ssl.ca.system');
-        $args{SSL_ca_path_alt}     = $QVD::Client::App::user_certs_dir;
-        $args{SSL_ca_path_alt}     =~ s|^~(?=/)|$ENV{HOME} // $ENV{APPDATA}|e;
+        $args{SSL_ca_path}          = $DARWIN ? core_cfg('path.darwin.ssl.ca.system') : core_cfg('path.ssl.ca.system');
+        $args{SSL_ca_path_alt}      = $QVD::Client::App::user_certs_dir;
+        $args{SSL_ca_path_alt}      =~ s|^~(?=/)|$ENV{HOME} // $ENV{APPDATA}|e;
+
+        # We handle the errors here later, rather than having HTTPC die on those errors
+        $args{SSL_fail_on_ocsp}     = 0;
+        $args{SSL_fail_on_hostname} = 0;
 
         DEBUG "SSL CA path: " . $args{SSL_ca_path};
         DEBUG "SSL CA alt path: " . $args{SSL_ca_path_alt};
@@ -343,6 +373,15 @@ sub _get_httpc {
     }
 
     if ($ssl) {
+        if ( (my $herr = $httpc->get_hostname_error()) ) {
+            $self->_add_ssl_error(0, 1001, 0, $herr);
+        }
+
+        if ( (my $oerr = $httpc->get_ocsp_errors()) ) {
+            $self->_add_ssl_error(0, 2001, 0, $oerr);
+        }
+
+
         # We've successfully connected, but there may be stored up verification errors.
         # We ignore them in the verification callback so that we can store all the errors
         # and present them to the user at once here.
