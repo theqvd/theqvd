@@ -8,7 +8,7 @@
             <td>
                 <select name="section_reset">
                     <option value="<%= qvdObj %>"><%= qvdObjName %></option>
-                    <option value="">All sections</option>
+                    <option value="" data-i18n="All sections"></option>
                 </select>
             </td>
         </tr>

@@ -8,7 +8,8 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     
     limitByACLs: true,
     
-    setAction: 'admin_view_set',
+    setActionAttribute: 'admin_attribute_view_set',
+    setActionProperty: 'admin_property_view_set',
     
     viewKind: 'admin',
     currentTokensPrefix: '',

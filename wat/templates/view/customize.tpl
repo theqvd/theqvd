@@ -27,14 +27,16 @@
      
     <div class="wrapper-content">
         <div class="filter js-side">
+            <%
+            if (viewKind == 'tenant' && Wat.C.isSuperadmin()) {
+            %>
             <span class="filter-control desktop">
-                <label for="element-select" data-i18n="Element"></label>
-                <select name="element-select" class="chosen-single">
-                    <option value="columns" data-i18n="Columns"></option>
-                    <option value="filters" data-i18n="Filters"></option>
-                </select>
+                    <label for="tenant-select" data-i18n="Tenant"></label>
+                    <select name="tenant-select" class="chosen-single"></select>
             </span>
-
+            <%
+            }
+            %>
             <span class="filter-control desktop">
                 <label for="obj-qvd-select" data-i18n="Section"></label>
                 <select name="obj-qvd-select" class="chosen-single">
@@ -87,21 +89,14 @@
                     %>
                 </select>
             </span>
-                <%
-                if (viewKind == 'tenant' && Wat.C.isSuperadmin()) {
-                %>
+
                 <span class="filter-control desktop">
-                    <label for="tenant-select" data-i18n="Tenant"></label>
-                    <select name="tenant-select" class="chosen-single"></select>    
+                <label for="element-select" data-i18n="Element"></label>
+                <select name="element-select" class="chosen-single">
+                    <option value="columns" data-i18n="Columns"></option>
+                    <option value="filters" data-i18n="Filters"></option>
+                </select>
                 </span>
-                <%
-                }
-                else if (viewKind == 'tenant') {
-                %>
-                    <input type="hidden" name="tenant-select" value="<%= Wat.C.tenantID %>"/>
-                <%
-                }
-                %>
             </div>
         <div class="bb-customize-form"></div>
     </div>

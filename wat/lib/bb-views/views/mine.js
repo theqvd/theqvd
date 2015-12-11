@@ -3,7 +3,8 @@ Wat.Views.MyViewsView = Wat.Views.ViewsView.extend({
     
     limitByACLs: true,
     
-    setAction: 'admin_view_set',
+    setActionAttribute: 'admin_attribute_view_set',
+    setActionProperty: 'admin_property_view_set',
     
     viewKind: 'admin',
     
@@ -30,7 +31,26 @@ Wat.Views.MyViewsView = Wat.Views.ViewsView.extend({
         this.currentFilters = Wat.I.getFormFilters(this.selectedSection);
         this.currentColumns = Wat.I.getListColumns(this.selectedSection);
         
-        this.renderForm();
+        // Get system properties to complete the dababase data
+        this.properties = new Wat.Collections.Properties({filters: {'tenant_id': Wat.C.tenantID}});
+        
+        var that = this;
+        
+        this.properties.fetch({      
+            complete: function () {
+                // Filter by qvd object
+                var qvdObj = that.selectedSection;
+                
+                var propModels = that.properties.filter(function (mod) {
+                    return mod.get('in_' + qvdObj) !== 0;
+                });
+                
+                that.completeFilterListWithProperties(that.currentFilters, propModels, qvdObj);
+                that.completeColumnListWithProperties(that.currentColumns, propModels, qvdObj);
+                
+                that.renderForm();
+            }
+        });
     },
     
     // Perform the reset action on DB and update interface
@@ -77,6 +97,8 @@ Wat.Views.MyViewsView = Wat.Views.ViewsView.extend({
         
         target.html(template);  
         
+        Wat.T.translate();
+
         Wat.I.chosenElement('[name="section_reset"]', 'single100');
     },
 });

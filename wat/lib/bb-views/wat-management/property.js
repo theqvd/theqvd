@@ -154,6 +154,7 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
     checkProperty: function (e) {
         var checked = $(e.target).is(':checked');
         var propertyId = $(e.target).attr('data-property-id');
+        var propertyInId = $(e.target).attr('data-property-in-id');
         var qvdObj = $(e.target).attr('data-qvd-object');
         var args = {};
         var filters = {};
@@ -167,7 +168,7 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
         else {
             var action = qvdObj + '_delete_property_list';
             filters = {
-                'id': propertyId
+                'id': propertyInId
             };
         }
 
@@ -243,7 +244,8 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
         
         var args = {
             "key": key,
-            "description": description
+            "description": description,
+            "__property_assign__": []
         };
         
         if (Wat.C.isSuperadmin()) {
@@ -255,13 +257,13 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
             args["tenant_id"] = Wat.C.tenantID;
         }
                 
-        this.objChecks = {};
-        var that = this;
         $.each(QVD_OBJS_WITH_PROPERTIES, function (iObj, qvdObj) {
-            that.objChecks[qvdObj] = $('input[name="in_' + qvdObj + '"]').is(':checked');
+            if ($('input[name="in_' + qvdObj + '"]').is(':checked')) {
+                args["__property_assign__"].push(qvdObj);
+            }
         });
         
-        that.createModel(args, that.getLastId);
+        this.createModel(args, this.render);
     },
     
     updateElement: function (dialog) {
@@ -311,56 +313,4 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
     applyDelete: function (that) {
         that.deleteModel({id: that.model.get('property_id')}, that.render, that.model);
     },
-    
-    getLastId: function (that) {
-        if (that.retrievedData.status != STATUS_SUCCESS) {
-            return;
-        }
-        
-        var lastId = that.retrievedData.rows[0].id;
-        
-        // Get all the properties orderer by id desc to get the last property created
-        Wat.A.performAction('property_get_list', {}, {}, {}, that.addPropertyToObjectsAndRender, that, undefined, {"field":"id","order":"-desc"});
-    },
-    
-    addPropertyToObjectsAndRender: function (that) {
-        var lastId = that.retrievedData.rows[0].property_id;
-        
-        var countChecks = 0;
-        var nChecks = 5;
-        
-        $.each(QVD_OBJS_WITH_PROPERTIES, function (iObj, qvdObj) {
-            if (that.objChecks[qvdObj]) {
-                var args = {};
-                var filters = {};
-                var action = qvdObj + '_create_property_list';
-                
-                args = {
-                    'property_id': lastId
-                };
-
-                Wat.A.performAction(action, args, filters, {}, function (that) {
-                    if (that.retrievedData.status == STATUS_SUCCESS) {
-                        //Wat.I.M.showMessage({message: i18n.t('Successfully created'), messageType: 'success'}, that.retrievedData);
-                    }
-                    else {
-                        //Wat.I.M.showMessage({message: i18n.t('Error creating'), messageType: 'error'}, that.retrievedData);
-                    }
-
-                    countChecks++;
-                    
-                    if (countChecks == nChecks) {
-                        that.render();
-                    }
-                }, that);
-            }
-            else {
-                countChecks++;
-            }
-        });
-        
-        if (countChecks == nChecks) {
-            that.render();
-        }
-    }
 });

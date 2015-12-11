@@ -4,7 +4,8 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
 
     limitByACLs: false,
     
-    setAction: 'tenant_view_set',
+    setActionAttribute: 'tenant_attribute_view_set',
+    setActionProperty: 'tenant_property_view_set',
     
     viewKind: 'tenant',
     
@@ -28,11 +29,22 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
         
         var templates = Wat.I.T.getTemplateList('viewsDefault');
         
+        var that = this;
+        
+        
         Wat.A.getTemplates(templates, this.render); 
     },
     
     getDataAndRender: function () {
-        this.getFilters(this);
+        var that = this;
+        
+        // Get system properties to complete the dababase data
+        this.properties = new Wat.Collections.Properties();
+        this.properties.fetch({      
+            complete: function () {
+                that.getFilters(that);
+            }
+        });
     },
     
     // Perform the reset action on DB and update interface
@@ -78,8 +90,9 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
         
         target.html(template); 
         
+        Wat.T.translate();
+        
         Wat.I.chosenElement('[name="section_reset"]', 'single100');
-        Wat.I.chosenElement('[name="tenant_reset"]', 'single100');
     },
     
     getFilters: function (that) {                
@@ -104,21 +117,29 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
         }
         
         var qvdObj = that.selectedSection;
+        var tenantId = that.selectedTenant;
+        
+        // Filter by tenant
+        if (tenantId != undefined) {
+            var propModels = that.properties.where({'tenant_id': parseInt(tenantId)});
+        }
+        else {
+            var propModels = that.properties.models;
+        }
+        
+        // Filter by qvd object
+        var propModels = propModels.filter(function (mod) {
+            return mod.get('in_' + qvdObj) !== 0;
+        });
 
         var defaultFormFilters = Wat.I.getFormDefaultFilters(qvdObj);
 
+        that.completeFilterListWithProperties(defaultFormFilters, propModels, qvdObj);
+
         $.each(that.retrievedData.rows, function (iRegister, register) {
             if (!defaultFormFilters[register.field]) {
-                defaultFormFilters[register.field] = {
-                    'filterField': register.field,
-                    'type': 'text',
-                    'text': register.field,
-                    'noTranslatable': true,
-                    'property': true,
-                    'acls': qvdObj + '.filter.properties',
-                };
+                return;
             }     
-            
             switch (register.device_type) {
                 case 'mobile':
                     defaultFormFilters[register.field].displayMobile = register.visible;
@@ -156,25 +177,29 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
         }
         
         var qvdObj = that.selectedSection;
+        var tenantId = that.selectedTenant;
+        
+        // Filter by tenant
+        if (tenantId != undefined) {
+            var propModels = that.properties.where({'tenant_id': parseInt(tenantId)});
+        }
+        else {
+            var propModels = that.properties.models;
+        }
+        
+        // Filter by qvd object
+        var propModels = propModels.filter(function (mod) {
+            return mod.get('in_' + qvdObj) !== 0;
+        });
         
         var defaultListColumns = Wat.I.getListDefaultColumns(qvdObj);
 
+        that.completeColumnListWithProperties(defaultListColumns, propModels, qvdObj);
+        
         $.each(that.retrievedData.rows, function (iRegister, register) {
             if (defaultListColumns[register.field]) {
                 defaultListColumns[register.field].display = register.visible;
             }
-            else {
-                defaultListColumns[register.field] = {
-                    'display': register.visible,
-                    'noTranslatable': true,
-                    'fields': [
-                        register.field
-                    ],
-                    'acls': qvdObj + '.see.properties',
-                    'property': true,
-                    'text': register.field
-                };
-            }            
         });
               
         that.currentListColumns = defaultListColumns;

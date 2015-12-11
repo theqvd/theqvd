@@ -81,22 +81,35 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
 
         var checked = $(this.targetClicked).is(':checked');
         var fieldName = $(this.targetClicked).parent().attr('data-name');
+        var isProperty = $(this.targetClicked).parent().hasClass('js-is-property');
+        var propertyId = $(this.targetClicked).parent().attr('data-property-id');
+        
+        if (isProperty) {
+            var setAction = this.setActionProperty;
+        }
+        else {
+            var setAction = this.setActionAttribute;
+        }
         
         var qvdObj = this.selectedSection;
 
         if (!this.currentFilters[fieldName] || this.currentFilters[fieldName].displayDesktop != checked) {
             var args = {
-                'field': fieldName,
                 'view_type': 'filter',
                 'device_type': 'desktop',
-                'visible': checked,
-                'qvd_object': qvdObj,
-                'property': !this.currentFilters[fieldName] || this.currentFilters[fieldName].property
+                'visible': checked
             };
             
+            if (isProperty) {
+                args.qvd_obj_prop_id = propertyId;
+            }
+            else {
+                args.qvd_object = qvdObj;
+                args.field = fieldName;
             this.addIDToArgs(args);
+            }
 
-            Wat.A.performAction(this.setAction, args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, this.processCheckDesktopFilter, this);
+            Wat.A.performAction(setAction, args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, this.processCheckDesktopFilter, this);
         }
     },
     
@@ -141,22 +154,35 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
 
         var checked = $(this.targetClicked).is(':checked');
         var fieldName = $(this.targetClicked).parent().attr('data-name');
+        var isProperty = $(this.targetClicked).parent().hasClass('js-is-property');
+        var propertyId = $(this.targetClicked).parent().attr('data-property-id');
+        
+        if (isProperty) {
+            var setAction = this.setActionProperty;
+        }
+        else {
+            var setAction = this.setActionAttribute;
+        }
         
         var qvdObj = this.selectedSection;
         
         if (!this.currentFilters[fieldName] || this.currentFilters[fieldName].displayMobile != checked) {
             var args = {
-                'field': fieldName,
                 'view_type': 'filter',
                 'device_type': 'mobile',
-                'visible': checked,
-                'qvd_object': qvdObj,
-                'property': !this.currentFilters[fieldName] || this.currentFilters[fieldName].property
+                'visible': checked
             };
             
+            if (isProperty) {
+                args.qvd_obj_prop_id = propertyId;
+            }
+            else {
+                args.qvd_object = qvdObj;
+                args.field = fieldName;
             this.addIDToArgs(args);
+            }
 
-            Wat.A.performAction(this.setAction, args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, this.processCheckMobileFilter, this);
+            Wat.A.performAction(setAction, args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, this.processCheckMobileFilter, this);
         }
     },
 
@@ -201,22 +227,36 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
 
         var checked = $(this.targetClicked).is(':checked');
         var fieldName = $(this.targetClicked).parent().attr('data-name');
+        var isProperty = $(this.targetClicked).parent().hasClass('js-is-property');
+        var propertyId = $(this.targetClicked).parent().attr('data-property-id');
+
+        if (isProperty) {
+            var setAction = this.setActionProperty;
+        }
+        else {
+            var setAction = this.setActionAttribute;
+        }
         
         var qvdObj = this.selectedSection;
         
         if (!this.currentColumns[fieldName] || this.currentColumns[fieldName].display != checked) {
             var args = {
-                'field': fieldName,
                 'view_type': 'list_column',
                 'device_type': 'desktop',
-                'visible': checked,
-                'qvd_object': qvdObj,
-                'property': !this.currentColumns[fieldName] || this.currentColumns[fieldName].property
+                'visible': checked
             };
             
+            if (isProperty) {
+                args.qvd_obj_prop_id = propertyId;
+            }
+            else {
+                args.qvd_object = qvdObj;
+                args.field = fieldName;
             this.addIDToArgs(args);
+            }
+            
 
-            Wat.A.performAction(this.setAction, args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, this.processCheckListColumn, this);
+            Wat.A.performAction(setAction, args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, this.processCheckListColumn, this);
         }
     },
     
@@ -340,6 +380,48 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
                 }
                 break;
         }        
-    }
+    },
+    
+    completeColumnListWithProperties: function (columnList, properties, qvdObj) {
+        $.each(properties, function (iProp, prop) {
+            if (columnList[prop.get('key')]) {
+                columnList[prop.get('key')].property = true;
+                columnList[prop.get('key')].property_id = prop.get('in_' + qvdObj);
+                return;
+            }
+            
+            columnList[prop.get('key')] = {
+                'display': 0,
+                'noTranslatable': true,
+                'fields': [
+                    prop.get('key')
+                ],
+                'acls': qvdObj + '.see.properties',
+                'property': true,
+                'property_id': prop.get('in_' + qvdObj),
+                'text': prop.get('key')
+            };
+        });
+    },   
+    
+    completeFilterListWithProperties: function (filterList, properties, qvdObj) {
+        $.each(properties, function (iProp, prop) {
+            if (filterList[prop.get('key')]) {
+                filterList[prop.get('key')].property = true;
+                filterList[prop.get('key')].property_id = prop.get('in_' + qvdObj);
+                return;
+            }
+            
+            filterList[prop.get('key')] = {
+                'filterField': prop.get('key'),
+                'type': 'text',
+                'text': prop.get('key'),
+                'noTranslatable': true,
+                'property': true,
+                'property_id': prop.get('in_' + qvdObj),
+                'acls': qvdObj + '.filter.properties'
+            };
+        });
+    },
 
 });

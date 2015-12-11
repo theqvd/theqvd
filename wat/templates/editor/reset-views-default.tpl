@@ -8,22 +8,12 @@
             <td>
                 <select name="section_reset">
                     <option value="<%= qvdObj %>"><%= qvdObjName %></option>
-                    <option value="">All sections</option>
+                    <option value="" data-i18n="All sections"></option>
                 </select>
             </td>
         </tr>
         <% if (Wat.C.isSuperadmin()) { %>
-            <tr>
-                <td>
-                    Tenant
-                </td>
-                <td>
-                    <select name="tenant_reset">
-                        <option value="<%= tenantId %>"><%= tenantName %></option>
-                        <option value="">All tenants</option>
-                    </select>
-                </td>
-            </tr>
+            <input type="hidden" name="tenant_reset" value="<%= tenantId %>" />
         <% } %>
     </table>
 </div>
