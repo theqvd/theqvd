@@ -74,6 +74,8 @@ Name: "{commondesktop}\QVD Client"; Filename: "{app}\bin\qvd-client.exe"; Workin
 ; Make LanmanServer accept 127.0.0.1 as its netbios name 
 ; REQUIRED for printing to work on Windows 7 
 Root: HKLM; Subkey: "System\CurrentControlSet\Control\Lsa\MSV1_0"; ValueType: multisz; ValueName: "BackConnectionHostNames"; ValueData: "127.0.0.1{break}localhost"; 
+Root: HKLM; Subkey: "System\CurrentControlSet\Services\LanmanServer\Parameters"; ValueType: dword; ValueName: "restrictnullsessaccess"; ValueData: "0";
+Root: HKLM; Subkey: "System\CurrentControlSet\Control\Lsa"; ValueType: dword; ValueName: "EveryoneIncludesAnonymous"; ValueData: "1";
 
 [Code]
 
@@ -83,7 +85,7 @@ var
 begin
     Log('In PostInstall script');
 	
-	XmingDir       := ExpandConstant('{src}') + '\Xming';
+	XmingDir       := ExpandConstant('{app}') + '\Xming';
 	XmingBackupDir := XmingDir + '-backup';
 	
 	if ( CurStep = ssInstall ) then begin
