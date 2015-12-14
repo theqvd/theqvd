@@ -179,6 +179,9 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
                 if (checked) {
                     Wat.I.M.showMessage({message: i18n.t('Successfully created'), messageType: 'success'}, that.retrievedData);
                     $(row).addClass('js-row-property-' + qvdObj);
+                    
+                    // Store ID of created link between property list and object
+                    $(e.target).attr('data-property-in-id', that.retrievedData.rows[0].id);
                 }
                 else {
                     Wat.I.M.showMessage({message: i18n.t('Successfully deleted'), messageType: 'success'}, that.retrievedData);
@@ -191,6 +194,9 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
                             $('.js-zero-properties').show();
                         }
                     }
+                    
+                    // Restore ID of link between property list and object
+                    $(e.target).attr('data-property-in-id', 0);
                 }
                 
             }
