@@ -905,8 +905,9 @@ sub DetectKeyboard {
 	my $user = getpwuid($>);
 	if (defined $user and length $user){
             my $xhost = core_cfg('command.xhost') ;
-            system $xhost, "+si:localuser:$user";
-            DEBUG("xhost executed for $user");
+            my $xhostparam = core_cfg('command.xhost.family') eq "local" ? "+local:" : "+si:localuser:$user" ;
+            system $xhost, $xhostparam;
+            DEBUG("xhost $xhostparam executed for $user");
 	}
 	else {
             WARN("Cannot execute xhost for $user");
