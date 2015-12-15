@@ -1,0 +1,18 @@
+#!/usr/lib/qvd/bin/perl
+
+use strict;
+use warnings;
+
+use QVD::Log;
+
+eval {
+    require QVD::L7R::Nothing;
+    QVD::L7R::Nothing->new->run;
+};
+
+if ($@) {
+    ERROR "Uncaught exception: $@";
+    exit 1
+}
+
+exit 0;

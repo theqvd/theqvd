@@ -531,6 +531,10 @@ internal.hkd.nothing.timeout.on_state.running = 5
 internal.hkd.nothing.timeout.on_state.stopping = 5
 internal.hkd.nothing.timeout.on_state.zombie = 100
 
+internal.l7r.nothing.timeout.x_start = 5
+internal.l7r.nothing.timeout.x_state = 5
+internal.l7r.nothing.timeout.run_forwarder = 5
+
 internal.untar-dis.lock.path = ${path.run}/untar-dis.lock
 
 
