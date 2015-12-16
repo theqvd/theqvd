@@ -26,6 +26,8 @@ my $time;
 my $host = 'localhost';
 my $port = 8443;
 my $verbose;
+my $limit;
+
 sub dbg { say STDERR join(': ', @_) if $verbose }
 
 GetOptions("file|f=s"  => \$file,
@@ -33,10 +35,13 @@ GetOptions("file|f=s"  => \$file,
            "speed|s=i" => \$speed,
            "port|p=i"  => \$port,
            "host|h=s"  => \$host,
+           "limit|n=i" => \$limit,
            "verbose|v" => \$verbose);
 
 my $targets = csv(in => $file);
-#$#$targets = 0;
+if (defined $limit and $limit < @$targets) {
+    $#$targets = $limit - 1;
+}
 
 $time = ($#$targets + 1) / $speed;
 
@@ -97,7 +102,10 @@ sub rpc {
                      $cb->($headers);
                  }
                  else {
-                     my $json = eval { $json->decode($body) };
+                     my $json = eval {
+                         no warnings;
+                         $json->decode($body)
+                     };
                      if ($json) {
                          $cb->($json);
                      }
