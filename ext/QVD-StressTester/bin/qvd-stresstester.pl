@@ -27,6 +27,7 @@ my $host = 'localhost';
 my $port = 8443;
 my $verbose;
 my $limit;
+my $debug;
 
 sub dbg { say STDERR join(': ', @_) if $verbose }
 
@@ -36,13 +37,16 @@ GetOptions("file|f=s"  => \$file,
            "port|p=i"  => \$port,
            "host|h=s"  => \$host,
            "limit|n=i" => \$limit,
-           "verbose|v" => \$verbose);
+           "verbose|v" => \$verbose,
+           "debug|d"   => \$debug,
+          );
 
 my $targets = csv(in => $file);
 if (defined $limit and $limit < @$targets) {
     $#$targets = $limit - 1;
 }
 
+$verbose ||= $debug;
 $time = ($#$targets + 1) / $speed;
 
 my $cv = AE::cv;
@@ -98,6 +102,10 @@ sub rpc {
              sub {
                  my $body = shift;
                  my $headers = shift;
+                 if ($debug) {
+                     dbg "RPC response headers", Dumper($headers);
+                     dbg "RPC response body", Dumper($body);
+                 }
                  if ($headers->{Status} == 426) {
                      $cb->($headers);
                  }
@@ -111,7 +119,7 @@ sub rpc {
                      }
                      else {
                          dbg "rpc failed for user $target->{user}", $@;
-                         dbg "headers", Dumper($headers);
+                         dbg "headers", Dumper($headers) unless $debug;
                          $cv->end;
                      }
                  }
