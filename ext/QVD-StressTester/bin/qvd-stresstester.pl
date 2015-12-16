@@ -12,7 +12,7 @@ use Getopt::Long;
 use Text::CSV_XS qw(csv);
 use AnyEvent;
 use AnyEvent::Socket;
-use AnyEvent::HTTP;
+use QVD::StressTester;
 use URI::Encode qw(uri_encode);
 use MIME::Base64 qw(encode_base64);
 use JSON;
@@ -106,7 +106,7 @@ sub rpc {
                      dbg "RPC response headers", Dumper($headers);
                      dbg "RPC response body", Dumper($body);
                  }
-                 if ($headers->{Status} == 426) {
+                 if ($headers->{Status} == 101) {
                      $cb->($headers);
                  }
                  else {
@@ -143,6 +143,7 @@ sub connect_to_vm {
         headers => { Connection => 'Upgrade',
                      Upgrade => 'QVD/1.0' },
         sub {
+            dbg "connection to VM $target->{vm_id} established";
             %$target = ();
             $cv->end();
         });
