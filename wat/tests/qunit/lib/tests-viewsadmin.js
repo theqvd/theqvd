@@ -1,4 +1,8 @@
 function qvdViewsAdminReal () {
+        // Get system properties to complete the dababase data
+        var properties = new Wat.Collections.Properties();
+        properties.fetch({      
+            complete: function () {    
     module( "Customize administrator views", {
         setup: function() {
             // prepare something for all following tests
@@ -7,7 +11,6 @@ function qvdViewsAdminReal () {
             // clean up after each test
         }
     });
-
         $.each(Wat.I.listFields, function (qvdObj, fields) {
             if ($.inArray(qvdObj, visibleViews) == -1) {
                 return;
@@ -34,22 +37,28 @@ function qvdViewsAdminReal () {
                     }
 
                     var args = {
-                        "field": fieldName,
-                        "view_type": "list_column",
-                        "device_type": "desktop",
-                        "visible": !attrs.display,
-                        "qvd_object": qvdObj,
-                        "property": attrs.property
+                                'view_type': 'list_column',
+                                'device_type': 'desktop',
+                                'visible': !attrs.display
                     };
 
+                            if (attrs.property) {
+                                args.qvd_obj_prop_id = properties.where({key: fieldName})[0].get('in_' + qvdObj);
+                                var action = 'admin_property_view_set';
+                            }
+                            else {
+                                args.qvd_object = qvdObj;
+                                args.field = fieldName;
+                                var action = 'admin_attribute_view_set';
+                            }
 
-                    Wat.A.performAction('admin_view_set', args, {}, {}, function (that) {
+                            Wat.A.performAction(action, args, {}, {}, function (that) {
                         equal(that.retrievedData.status, STATUS_SUCCESS, "View for column list of '" + qvdObj + " -> " + fieldName + "' update successfully from '" + String(attrs.display ? 1 : 0) + "' to '" + String(attrs.display ? 0 : 1) + "' (" + that.retrievedData.message + ")");
 
                         args.visible = attrs.display;
                         start();
 
-                        Wat.A.performAction('admin_view_set', args, {}, {}, function (that) {
+                                Wat.A.performAction(action, args, {}, {}, function (that) {
                             equal(that.retrievedData.status, STATUS_SUCCESS, "View for column list of '" + qvdObj + " -> " + fieldName + "' re-update successfully from '" + String(attrs.display ? 0 : 1) + "' to '" + String(attrs.display ? 1 : 0) + "' (" + that.retrievedData.message + ")");
                             start();
                         }, that);
@@ -64,6 +73,7 @@ function qvdViewsAdminReal () {
             if ($.inArray(qvdObj, visibleViews) == -1) {
                 return;
             }
+                    
             QUnit.asyncTest("Filter views (" + qvdObj + ")", function() {
                 // Number of Assertions we Expect
                 var assertions = 0;
@@ -80,22 +90,29 @@ function qvdViewsAdminReal () {
                     // Filters for desktop 
 
                     var argsDesktop = {
-                        "field": fieldName,
-                        "view_type": "filter",
-                        "device_type": "desktop",
-                        "visible": !attrs.displayDesktop,
-                        "qvd_object": qvdObj,
-                        "property": attrs.property
+                                'view_type': 'filter',
+                                'device_type': 'desktop',
+                                'visible': !attrs.displayDesktop
                     };
 
+                            if (attrs.property) {
+                                argsDesktop.qvd_obj_prop_id = properties.where({key: fieldName})[0].get('in_' + qvdObj);
+                                var action = 'admin_property_view_set';
+                            }
+                            else {
+                                argsDesktop.qvd_object = qvdObj;
+                                argsDesktop.field = fieldName;
+                                var action = 'admin_attribute_view_set';
+                            }
 
-                    Wat.A.performAction('admin_view_set', argsDesktop, {}, {}, function (that) {
+
+                            Wat.A.performAction(action, argsDesktop, {}, {}, function (that) {
                         equal(that.retrievedData.status, STATUS_SUCCESS, "View for column list of '" + qvdObj + " -> " + fieldName + "' update successfully from '" + String(attrs.display ? 1 : 0) + "' to '" + String(attrs.display ? 0 : 1) + "' (" + that.retrievedData.message + ")");
 
                         argsDesktop.visible = attrs.displayDesktop;
                         start();
 
-                        Wat.A.performAction('admin_view_set', argsDesktop, {}, {}, function (that) {
+                                Wat.A.performAction(action, argsDesktop, {}, {}, function (that) {
                             equal(that.retrievedData.status, STATUS_SUCCESS, "View for column list of '" + qvdObj + " -> " + fieldName + "' re-update successfully from '" + String(attrs.display ? 0 : 1) + "' to '" + String(attrs.display ? 1 : 0) + "' (" + that.retrievedData.message + ")");
                             start();
                         }, that);
@@ -104,23 +121,29 @@ function qvdViewsAdminReal () {
                     
                     
                     // Filters for mobile 
-                    
                     var argsMobile = {
-                        "field": fieldName,
-                        "view_type": "filter",
-                        "device_type": "mobile",
-                        "visible": !attrs.displayMobile,
-                        "qvd_object": qvdObj,
-                        "property": attrs.property
+                                'view_type': 'filter',
+                                'device_type': 'mobile',
+                                'visible': !attrs.displayMobile
                     };
 
-                    Wat.A.performAction('admin_view_set', argsMobile, {}, {}, function (that) {
+                            if (attrs.property) {
+                                argsMobile.qvd_obj_prop_id = properties.where({key: fieldName})[0].get('in_' + qvdObj);
+                                var action = 'admin_property_view_set';
+                            }
+                            else {
+                                argsMobile.qvd_object = qvdObj;
+                                argsMobile.field = fieldName;
+                                var action = 'admin_attribute_view_set';
+                            }
+
+                            Wat.A.performAction(action, argsMobile, {}, {}, function (that) {
                         equal(that.retrievedData.status, STATUS_SUCCESS, "View for column list of '" + qvdObj + " -> " + fieldName + "' update successfully from '" + String(attrs.display ? 1 : 0) + "' to '" + String(attrs.display ? 0 : 1) + "' (" + that.retrievedData.message + ")");
 
                         argsMobile.visible = attrs.displayMobile;
                         start();
 
-                        Wat.A.performAction('admin_view_set', argsMobile, {}, {}, function (that) {
+                                Wat.A.performAction(action, argsMobile, {}, {}, function (that) {
                             equal(that.retrievedData.status, STATUS_SUCCESS, "View for column list of '" + qvdObj + " -> " + fieldName + "' re-update successfully from '" + String(attrs.display ? 0 : 1) + "' to '" + String(attrs.display ? 1 : 0) + "' (" + that.retrievedData.message + ")");
                             start();
                         }, that);
@@ -130,9 +153,6 @@ function qvdViewsAdminReal () {
             });
         });
     
-    QUnit.moduleDone(function( details ) {
-        // Reset views after done of the Customize administrator views module
-        if (details.name == 'Customize administrator views') {
             module( "Reset administrator views", {
                 setup: function() {
                     // prepare something for all following tests
@@ -149,6 +169,7 @@ function qvdViewsAdminReal () {
                         start();
                     }, this);
                 });
+                
         }
     });
 }
