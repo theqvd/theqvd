@@ -24,8 +24,7 @@ my $delay = sub {
 sub _vma_client {
     my ($l7r, $vm) = @_;
     my $host = $vm->vm_address;
-    my $port = $vm->vm_port;
-    return QVD::L7R::Nothing::VMAClient->new(host => $host, port => $port);
+    return QVD::L7R::Nothing::VMAClient->new(host => $host);
 }
 
 sub _run_forwarder {
