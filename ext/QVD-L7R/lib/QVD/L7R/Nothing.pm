@@ -39,9 +39,9 @@ sub _run_forwarder {
     $l7r->_tell_client("Connecting X session for VM_ID: " . $vm->id);
 
     txn_do { $this_host->counters->incr_nx_attempts; };
-    delay->($x_run_forwarder_timeout);
+    $delay->($x_run_forwarder_timeout);
     txn_do { $this_host->counters->incr_nx_ok; };
-    delay->($x_run_forwarder_timeout);
+    $delay->($x_run_forwarder_timeout);
     txn_do {
         $vm->discard_changes;
         $l7r->_check_abort($vm);
@@ -51,7 +51,7 @@ sub _run_forwarder {
     $l7r->_tell_client("Connection established");
     $l7r->send_http_response(HTTP_SWITCHING_PROTOCOLS,
                              "X-QVD-Slave-Key: $params{'qvd.slave.key'}");
-    delay->($x_run_forwarder_timeout);
+    $delay->($x_run_forwarder_timeout);
     DEBUG "Starting socket forwarder for VM " . $vm->id;
     db->storage->disconnect;
 }
