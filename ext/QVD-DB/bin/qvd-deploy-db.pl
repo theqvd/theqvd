@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use TryCatch;
 use Getopt::Long;
 use QVD::DB::Simple;
 
@@ -12,6 +13,56 @@ my %functions  = (
 	CURRENT_TIME => \&get_current_time,
 );
 
+# Error codes
+my %error_hash = (
+	ERROR_UNDEFINED => [-1, "Undefined error code"],
+	NO_ERROR => [0, "OK"],
+	ERROR_MISSING_FILE => [1, "Missing file"],
+	ERROR_DB_ALREADY_DEPLOYED => [2, "DB already deployed"],
+	ERROR_DB_DEPLOY_FAILED => [3, "DB deployment failed"],
+	ERROR_DB_POPULATE_FAILED => [4, "Populate database failed"],
+);
+
+sub error_description {
+	my $error = shift;
+	return $error_hash{$error}[1];
+}
+
+sub error_code{
+	my $error = shift;
+	return $error_hash{$error}[0];
+}
+
+sub display_error {
+	my ($error, $message) = @_;
+	my $code = error_code($error);
+	if(!defined $code) { $error = "ERROR_UNDEFINED"; }
+	my $description = error_description($error);
+	print "[ERROR] Code $code: $description. Message:\n $message\n";
+}
+
+# Enumarate types
+my %enumerates = (
+	administrator_and_tenant_views_setups_device_type_enum => [qw(mobile desktop)],
+	administrator_and_tenant_views_setups_qvd_object_enum => [qw(user vm log host osf di role administrator tenant)],
+	administrator_and_tenant_views_setups_view_type_enum => [qw(filter list_column)],
+	log_qvd_object_enum =>
+	[qw(user vm log host osf di role administrator tenant acl config tenant_view admin_view)],
+	log_type_of_action_enum => [qw(create create_or_update delete see update exec login)],
+	wat_setups_by_administrator_and_tenant_language_enum => [qw(es en auto default)],
+);
+
+# Initial single values
+my %initial_values = (
+	VM_State   => [qw(stopped starting running stopping zombie debugging )],
+	VM_Cmd     => [qw(start stop busy)],
+	User_State => [qw(disconnected connecting connected)],
+	User_Cmd   => [qw(abort)],
+	Host_State => [qw(stopped starting running stopping lost)],
+	Host_Cmd   => [qw(stop)]
+);
+
+# Throws an exception if something fails
 sub initData {
 
 	# Check flags
@@ -24,8 +75,7 @@ sub initData {
 	print "- Populating database...\n" if not $checkData;
 
 	# Variables
-	my $outcome = 1;
-	open FILE, "<", $filepath or die "Cannot open file $filepath\n";
+	open FILE, "<", $filepath or die "Cannot open file $filepath";
 	my @lines = <FILE>;
 	chomp(@lines);
 	my $currTableName = '';
@@ -53,9 +103,7 @@ sub initData {
 					@currAttribValues = map {applyFunction($_)} @auxAttribValues;
 					# Check number of attributes of each row
 					if (@currAttribValues != @currAttribNames) {
-						print "[ERROR] Number of attributes is different to number of values in line:\n$line\n";
-						$outcome = 0;
-						last;
+						die "Number of attributes is different to number of values in line:\n$line";
 					} else { # Add values to the db
 						print(join(" | ", @currAttribValues) . "\n") if $verbose;
 						@currAttribHash{@currAttribNames} = @currAttribValues;
@@ -70,8 +118,7 @@ sub initData {
 
 	}
 
-	print "[DONE] Status $outcome\n";
-	return $outcome;
+	return 1;
 }
 
 sub updateSeqs() {
@@ -105,12 +152,9 @@ sub get_file_content {
 	my $filepath = shift;
 	my $content = "";
 
-	if (open FILE, $filepath){
+	open FILE, $filepath or die "Could not open file $filepath";
 		$content = join("",<FILE>);
 		close(FILE);
-	} else {
-		print "[ERROR] Could not open file $filepath\n";
-	}
 
 	return $content;
 }
@@ -120,53 +164,57 @@ sub get_current_time {
 	return sprintf("%04d-%02d-%02d %02d:%02d:%02d+00", $year+1900, $month, $day, $hour, $minute, $second);
 }
 
-### Check IF DB IS DEPLOYED ###
+### MAIN ###
 
+my $error = "NO_ERROR";
 my $force;
 my $verbose = 0;
 my $datafile = "qvd-init-data.dat";
 GetOptions("force|f" => \$force, "file=s" => \$datafile, "verbose|v" => \$verbose) or exit (1);
 
-unless ($force) {
-	eval { db->storage->dbh->do("select count(*) from configs;"); };
-	$@ or die "Database already contains QVD tables, use '--force' to redeploy the database\n";
+try {
+
+	### Check IF DB IS DEPLOYED ###
+	unless ($force) {
+		eval {
+			db->storage->dbh->do("select count(*) from configs;");
+		};
+		if (defined $@) {
+			$error = "ERROR_DB_ALREADY_DEPLOYED";
+			die "Database already contains QVD tables, use '--force' to redeploy the database";
+		}
+	}
+
+	### DATA DEFINITION ###
+
+	# Check if data file exists
+	unless(-e $datafile){
+		$error = "ERROR_MISSING_FILE";
+		die "$datafile does not exist. Use -file option to select the correct file";
+	}
+
+	### DATABASE DEPLOYMENT ###
+
+	# Generate database
+	try{
+		db->deploy({add_drop_table => 1, add_enums => \%enumerates, add_init_vars => \%initial_values});
+	}catch ($exception) {
+		$error = "ERROR_DB_DEPLOY_FAILED"; die "$exception";
+	}
+
+	# Populate database if DATA is valid
+	try{
+		if (initData({ filepath => $datafile, check => 1, verbose => $verbose })) {
+			initData({ filepath => $datafile });
+			updateSeqs();
+		} else {
+			$error = "ERROR_DB_POPULATE_FAILED"; die "Minor error populating database.";
+		}
+	} catch ($exception) {
+		$error = "ERROR_DB_POPULATE_FAILED"; die "$exception";
+	}
+} catch ($exception) {
+	display_error($error, $exception);
 }
 
-### DATA DEFINITION ###
-
-# Check if data file exists
-die "$datafile does not exist. Use -file option to select the correct file.\n" unless(-e $datafile);
-
-# Enumarate types
-my %enumerates = (
-	administrator_and_tenant_views_setups_device_type_enum => [qw(mobile desktop)],
-	administrator_and_tenant_views_setups_qvd_object_enum => [qw(user vm log host osf di role administrator tenant)],
-	administrator_and_tenant_views_setups_view_type_enum => [qw(filter list_column)],
-	log_qvd_object_enum =>
-		[qw(user vm log host osf di role administrator tenant acl config tenant_view admin_view)],
-	log_type_of_action_enum => [qw(create create_or_update delete see update exec login)],
-	wat_setups_by_administrator_and_tenant_language_enum => [qw(es en auto default)],
-);
-
-# Initial single values
-my %initial_values = (
-	VM_State   => [qw(stopped starting running stopping zombie debugging )],
-	VM_Cmd     => [qw(start stop busy)],
-	User_State => [qw(disconnected connecting connected)],
-	User_Cmd   => [qw(abort)],
-	Host_State => [qw(stopped starting running stopping lost)],
-	Host_Cmd   => [qw(stop)]
-);
-
-### DATABASE DEPLOYMENT ###
-
-# Generate database
-db->deploy({add_drop_table => 1, add_enums => \%enumerates, add_init_vars => \%initial_values});
-
-# Populate database if DATA is valid
-initData({filepath => $datafile})
-	if initData({filepath => $datafile, check => 1, verbose => $verbose});
-
-updateSeqs();
-
-1;
+exit(error_code($error));
