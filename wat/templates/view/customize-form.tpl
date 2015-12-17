@@ -48,6 +48,8 @@
         <%
                 }
         %>
+        
+                    <span class="fa fa-info-circle js-default-info" style="<%= field.customized ? 'display: none;' : '' %>" data-i18n="[title]Default value"></span>
                     </td>
                 </tr>
         <%

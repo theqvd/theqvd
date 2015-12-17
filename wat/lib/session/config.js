@@ -158,6 +158,7 @@ Wat.C = {
                     }
                     
                     Wat.I.listFields[view.qvd_object][view.field].display = view.visible;
+                    Wat.I.listFields[view.qvd_object][view.field].customized = true;
                     break;
                 case 'filter':
                     if (!Wat.I.formFilters[view.qvd_object][view.field]) {
@@ -179,6 +180,8 @@ Wat.C = {
                             Wat.I.formFilters[view.qvd_object][view.field].displayDesktop = view.visible;
                             break;
                     }
+                    
+                    Wat.I.formFilters[view.qvd_object][view.field].customized = true;
                     break;
             }
         });

@@ -1,6 +1,3 @@
-<div class="details-header">
-    <span class="<%= CLASS_ICON_PROPERTIES %> h1" data-i18n="Properties"></span>
-</div>
 <%
 if (!Wat.C.checkGroupACL('propertiesManagement')) {
 %>

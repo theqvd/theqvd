@@ -148,6 +148,7 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
                     defaultFormFilters[register.field].displayDesktop = register.visible;
                     break;
             }
+            defaultFormFilters[register.field].customized = true;
         });
         
         that.currentFilters = defaultFormFilters;
@@ -199,6 +200,7 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
         $.each(that.retrievedData.rows, function (iRegister, register) {
             if (defaultListColumns[register.field]) {
                 defaultListColumns[register.field].display = register.visible;
+                defaultListColumns[register.field].customized = true;
             }
         });
               

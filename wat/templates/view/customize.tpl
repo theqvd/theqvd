@@ -11,19 +11,16 @@
         <%
         }
         %>
-        <div class="clear mobile"></div>
-        <a href="javascript:" class="button fright fa fa-eraser js-reset-views button-icon" data-i18n="[title]Reset views to default configuration"></a>
-    </div>
-    
      <%
      if (viewKind == 'tenant') {
      %>
-        <div class="info-header">
-            <span data-i18n class="fa fa-info-circle">Each administrator will be able to customize his own views overriding this configuration</span>.
-        </div>
+        <div data-i18n="[title]Each administrator will be able to customize his own views overriding this configuration" class="fa fa-info-circle"></div>
      <%
      }
      %>
+        <div class="clear mobile"></div>
+        <a href="javascript:" class="button fright fa fa-eraser js-reset-views" data-i18n="Reset views to default configuration"></a>
+    </div>
      
     <div class="wrapper-content">
         <div class="filter js-side">

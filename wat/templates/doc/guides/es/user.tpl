@@ -1163,7 +1163,7 @@ Solución
 <div class="literalblock">
 <div class="content">
 <pre><code>Usuario: batman
-Contraseña: to the rescue</code></pre>
+Contraseña: ********</code></pre>
 </div></div>
 <div class="paragraph"><p>Este administrador tiene las siguientes características:</p></div>
 <div class="ulist"><ul>
