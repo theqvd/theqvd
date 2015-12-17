@@ -2,8 +2,7 @@
     <div data-i18n="Select where to perform the resetting of views"></div>
     <table class="editor-table alternate col-width-100">
         <tr>
-            <td>
-                Section
+            <td data-i18n="Section">
             </td>
             <td>
                 <select name="section_reset">
