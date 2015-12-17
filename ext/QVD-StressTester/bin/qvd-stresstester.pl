@@ -47,7 +47,7 @@ if (defined $limit and $limit < @$targets) {
 }
 
 $verbose ||= $debug;
-$time = ($#$targets + 1) / $speed;
+$time ||= ($#$targets + 1) / $speed;
 
 my $cv = AE::cv;
 
