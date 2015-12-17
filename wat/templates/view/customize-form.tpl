@@ -129,6 +129,10 @@
                     </span>
         <%
                 }
+        %>
+                    <span class="fa fa-info-circle js-default-info" style="<%= filter.customized ? 'display: none;' : '' %>" data-i18n="[title]Default value"></span>
+
+        <%
 
                 filterType = Wat.I.getFieldTypeName(filter.type);
         %>

@@ -255,7 +255,11 @@ Wat.I = {
     },
     
     showAll: function () {
-        var firstLoad = $('.content').html() == '';
+        var firstLoad = $('.content').html() == '' || !this.showed;
+        
+        if (firstLoad) {
+            this.showed = true;
+        }
 
         this.showContent();
 
