@@ -3,11 +3,11 @@
         <%
         if (viewKind == 'tenant') {
         %>
-            <span class="fa fa-columns h1" data-i18n="Views"></span>
+            <span class="<%= CLASS_ICON_VIEWS %> h1" data-i18n="Views"></span>
         <%
         } else {
         %>            
-            <span class="fa fa-columns h1" data-i18n="My views"></span>
+            <span class="<%= CLASS_ICON_VIEWS %> h1" data-i18n="My views"></span>
         <%
         }
         %>

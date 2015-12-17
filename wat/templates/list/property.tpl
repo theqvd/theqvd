@@ -1,15 +1,25 @@
- <%
- if (!Wat.C.checkGroupACL('propertiesManagement')) {
- %>
-    <div class="second_row" data-i18n="Custom properties management is not available"></div>
- <%
- }
- else {
- %>
+<div class="details-header">
+    <span class="<%= CLASS_ICON_PROPERTIES %> h1" data-i18n="Properties"></span>
+</div>
+<%
+if (!Wat.C.checkGroupACL('propertiesManagement')) {
+%>
+<div class="second_row" data-i18n="Custom properties management is not available"></div>
+<%
+}
+else {
+%>    
+    <div class="wrapper-content">
      <div class="js-custom-views-container <%= cid %> sec-properties">
-         <fieldset>
-            <div class="customize-section-selectors">
-                <div class="customize-section-selector">
+             <div class="filter js-side">
+                <% if (Wat.C.isSuperadmin()) { %>
+                <div class="filter-control desktop">
+                    <label for="obj-qvd-select" data-i18n>Tenant</label>
+                    <select name="tenant-select" class="chosen-single">
+                    </select>
+                </div>
+                <% } %>
+                <div class="filter-control desktop">
                     <label for="obj-qvd-select" data-i18n="Section"></label>
                     <select name="obj-qvd-select" class="chosen-single">
                             <option data-i18n="All" value="all" <%= selectedObj == "all" ? 'selected' : '' %>></option>
@@ -43,17 +53,9 @@
                         %>
                     </select>
                 </div>
-                <% if (Wat.C.isSuperadmin()) { %>
-                <div class="customize-section-selector">
-                    <label for="obj-qvd-select" data-i18n>Tenant</label>
-                    <select name="tenant-select" class="chosen-single">
-                    </select>
-                </div>
-                <% } %>
             </div>    
-        </fieldset>
 
-        <div class="bb-property-list list-block col-width-100">
+            <div class="bb-property-list list-block"></div>
         </div>
     </div>
 <%

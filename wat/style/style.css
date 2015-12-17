@@ -1592,20 +1592,6 @@ body {
       @media only screen and (max-width: 41em) {
         .wrapper .content .setup-block .sect2, .wrapper .content .setup-block .sect3 {
           overflow: scroll; } }
-    .wrapper .content .customize-section-selectors {
-      display: table;
-      table-layout: fixed;
-      width: 100%;
-      margin-bottom: 10px; }
-      .wrapper .content .customize-section-selectors .customize-section-selector {
-        margin-bottom: 20px;
-        display: table-cell;
-        width: 24%; }
-        .wrapper .content .customize-section-selectors .customize-section-selector:first-child {
-          padding-right: 20px; }
-        .wrapper .content .customize-section-selectors .customize-section-selector:last-child {
-          padding-left: 20px;
-          vertical-align: bottom; }
     .wrapper .content .customize-options {
       margin-top: 20px;
       margin-bottom: 50px; }
