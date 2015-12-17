@@ -4,7 +4,10 @@ use strict;
 use warnings; 
 
 use Mojolicious::Lite;
-plugin ('Directory' => { root => "/usr/lib/qvd/wat/wat" ,
+
+app->config(hypnotoad => {listen => ['http://*:80']});
+
+plugin ('Directory' => { root => "/usr/lib/qvd/wat" ,
 		dir_index => [qw/index.html index.htm/] 
 	 })->start ; 
 
