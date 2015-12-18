@@ -261,7 +261,7 @@ Wat.Views.MainView = Backbone.View.extend({
                     key: prop.key,
                     description: prop.description,
                     tenant_id: prop.tenant_id,
-                    property_id: prop.property_id,
+                    property_id: prop.id,
                 };
             });
 
