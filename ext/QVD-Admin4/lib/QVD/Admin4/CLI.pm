@@ -70,7 +70,8 @@ sub usage_text {
 sub option_spec {
         [ 'host|h=s'   => 'API host' ],
         [ 'port|p=s'   => 'API port' ],
-    }
+	[ 'type|t=s'   => 'Output type' ],
+}
 
 sub command_map {
 
@@ -105,6 +106,13 @@ sub init {
     my ($host,$port) =  # It gets the API address
 	(($opts->host || 'localhost'), 
 	 ($opts->port || 3000)); 
+	my @output_types = ('TABLE', 'CSV');
+	my $output_type = $opts->type // 'TABLE';
+	if (not grep {$_ eq $output_type} @output_types ) {
+		print "[WARNING] Output type shall be one of:" . join(", ",@output_types).
+			". Using TABLE by default.\n";
+		$output_type = 'TABLE';
+	}
 
 	# Created as objects all addresses in API
 
@@ -155,6 +163,7 @@ sub init {
     $self->cache->set( tenant_name => undef ); 
     $self->cache->set( password => undef ); 
 	$self->cache->set( block => 25 ); # FIXME. Default block value should be taken from a config file or sth.
+	$self->cache->set( display_mode => $output_type );
 
 	if (not $self->is_interactive_mode_enabled()){
 		for my $cache_key (keys %environment_config){

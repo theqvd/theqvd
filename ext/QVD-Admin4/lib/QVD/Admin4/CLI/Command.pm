@@ -713,7 +713,6 @@ my $DEFAULT_FIELDS =
     log => [qw(time admin_name type_of_action qvd_object object_name status)]
 };
 
-
 ##############################################################
 ## METHOD RUN (to be executed when a command is introduced) ##
 ##############################################################
@@ -904,27 +903,48 @@ sub print_count
 # According to fields asked in the query, it prints in a 
 # table in console the info stored in the API response
 
+sub getDisplayTableMode {
+	my $self = shift;
+	return ($self->get_app->cache->get('display_mode') // "TABLE");
+}
+
 sub print_table
 {
-    my ($self,$res,$parsing) = @_;
-    my $n = 0;    
+	my ($self, $res, $parsing) = @_;
 
-    my @fields = $self->get_fields($parsing,$res);
+	my @fields = $self->get_fields($parsing, $res);
 
-    unless (@fields) { $self->print_count($res); return; }
+	unless (@fields) {
+		$self->print_count($res);
+		return;
+	}
 
-    my $tb = Text::UnicodeTable::Simple->new();
-    $tb->set_header(@fields);
-
-    my $rows;
-
+	my $n = 0;
+	my @values = ();
     while (my $field = $res->json("/rows/$n")) 
     { 
-	$tb->add_row( map {  $self->get_field_value($parsing,$field,$_) // '' } @fields );
+		$values[$n] = [ map {
+			$self->get_field_value($parsing, $field, $_) // ''
+		} @fields ];
 	$n++;
     }
 
+	my $display_mode = $self->getDisplayTableMode();
+	if ($display_mode eq "CSV") {
+		print join(";", @fields) . "\n";
+		for ($n = 0; $n < @values; $n++) {
+			print join(";", @{$values[$n]} ) . "\n";
+		}
+	} else {
+		my $tb = Text::UnicodeTable::Simple->new();
+
+		$tb->set_header(@fields);
+		for ($n = 0; $n < @values; $n++) {
+			$tb->add_row( $values[$n] );
+		}
+
     print STDOUT "$tb" . "Total: ".$res->json('/total')."\n";
+	}
 }
 
 #######################################
