@@ -8,19 +8,29 @@ __PACKAGE__->table_class('DBIx::Class::ResultSource::View');
 __PACKAGE__->table('users_view');
 __PACKAGE__->result_source_instance->is_virtual(1);
 __PACKAGE__->result_source_instance->view_definition(
-
-"SELECT me.id                                as id, 
+"
+SELECT
+  me.id as id, 
         json_agg(DISTINCT properties)   as properties_json,
         COUNT(DISTINCT vm_runtimes) as number_of_vms_connected, 
         COUNT(DISTINCT vms)         as number_of_vms
-
- FROM      users me 
- LEFT JOIN (user_properties p LEFT JOIN properties_list pl ON(p.property_id=pl.id)) properties ON(properties.user_id=me.id) 
+FROM users me 
+  LEFT JOIN (
+    SELECT
+      user_props.user_id as user_id,
+      user_props.value as value,
+      prop_list.id as property_id,
+      prop_list.key as key,
+      prop_list.tenant_id as tenant_id,
+      prop_list.description as description
+    FROM user_properties user_props
+      INNER JOIN qvd_object_properties_list qvd_obj_props ON (user_props.property_id=qvd_obj_props.id)
+      INNER JOIN properties_list prop_list ON(qvd_obj_props.property_id=prop_list.id)
+  ) properties ON(properties.user_id=me.id)
  LEFT JOIN vms vms         ON(vms.user_id=me.id) 
  LEFT JOIN vm_runtimes vm_runtimes ON(vm_runtimes.vm_id=vms.id and vm_runtimes.user_state='connected') 
-
- GROUP BY me.id"
-
+GROUP BY me.id
+"
 );
 
 __PACKAGE__->add_columns(

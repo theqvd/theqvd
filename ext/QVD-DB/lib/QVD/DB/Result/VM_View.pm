@@ -8,14 +8,25 @@ __PACKAGE__->table_class('DBIx::Class::ResultSource::View');
 __PACKAGE__->table('vms_view');
 __PACKAGE__->result_source_instance->is_virtual(1);
 __PACKAGE__->result_source_instance->view_definition(
-
-"SELECT me.id            as id, 
+"
+SELECT
+  me.id as id,
         json_agg(DISTINCT properties)   as properties_json
-
- FROM      vms me 
- LEFT JOIN (vm_properties p LEFT JOIN properties_list pl ON(p.property_id=pl.id)) properties ON(properties.vm_id=me.id) 
- GROUP BY me.id"
-
+FROM vms me
+  LEFT JOIN (
+    SELECT
+      vm_props.vm_id as vm_id,
+      vm_props.value as value,
+      prop_list.id as property_id,
+      prop_list.key as key,
+      prop_list.tenant_id as tenant_id,
+      prop_list.description as description
+    FROM vm_properties vm_props
+      INNER JOIN qvd_object_properties_list qvd_obj_props ON (vm_props.property_id=qvd_obj_props.id)
+      INNER JOIN properties_list prop_list ON(qvd_obj_props.property_id=prop_list.id)
+  ) properties ON(properties.vm_id=me.id)
+GROUP BY me.id
+"
 );
 
 __PACKAGE__->add_columns(
