@@ -104,7 +104,7 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
             "qvd_object": qvdObj
         };
         
-        if (tenantId != undefined && tenantId != 0) {
+        if (tenantId != undefined) {
             args.tenant_id = tenantId;
         }
         
@@ -165,7 +165,7 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
             "qvd_object": qvdObj
         };
         
-        if (tenantId != undefined && tenantId != 0) {
+        if (tenantId != undefined) {
             args.tenant_id = tenantId;
         }
         
