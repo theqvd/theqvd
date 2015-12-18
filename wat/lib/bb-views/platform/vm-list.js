@@ -99,17 +99,16 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             });  
         }
                     
-        if ($('[name="tenant_id"]').val() == null) {
-            fillFields();
-        }
-        else {
+        if ($('[name="tenant_id"]').length > 0) {
             Wat.B.bindEvent('change', 'select[name="tenant_id"]', Wat.B.editorBinds.filterTenantOSFs);
             Wat.B.bindEvent('change', '[name="tenant_id"]', Wat.B.editorBinds.filterTenantUsers);
             Wat.I.chosenElement('[name="user_id"]', 'advanced100');
             Wat.I.chosenElement('[name="osf_id"]', 'advanced100');
             Wat.I.chosenElement('[name="di_tag"]', 'advanced100');
         }
-         
+        else {
+            fillFields();
+        }
     },
     
     createElement: function () {
