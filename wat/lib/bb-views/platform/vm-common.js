@@ -31,6 +31,10 @@ Wat.Common.BySection.vm = {
         var filters = {"id": that.id};
         var arguments = {};
         
+        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('user.update.properties')) {
+            arguments["__properties_changes__"] = properties;
+        }
+        
         if (Wat.C.checkACL('vm.update.name')) {
             arguments['name'] = name;
         }     
