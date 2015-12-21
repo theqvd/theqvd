@@ -193,7 +193,7 @@ function vmTestReal () {
 
                                     // Perform changes in testing virtual machine values
                                     performUpdation(WatTests.values.vm, WatTests.updateValues.vm);
-                                    WatTests.valuesExpected.vm['__properties__'] = convertPropsToExpected(WatTests.values.vm['__properties__']);
+                                    WatTests.valuesExpected.vm['__properties__'] = convertPropsToExpected(WatTests.values.vm['__properties__'], 'vm');
 
                                     //////////////////////////////////////////////////////////////////
                                     // After get list of virtual machines, update it

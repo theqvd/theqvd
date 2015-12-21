@@ -165,7 +165,7 @@ function diTestReal () {
 
                             // Perform changes in testing osf values
                             performUpdation(WatTests.values.di, WatTests.updateValues.di);
-                            WatTests.valuesExpected.di['__properties__'] = convertPropsToExpected(WatTests.values.di['__properties__']);
+                            WatTests.valuesExpected.di['__properties__'] = convertPropsToExpected(WatTests.values.di['__properties__'], 'di');
 
                             //////////////////////////////////////////////////////////////////
                             // After get list of DIs, update it

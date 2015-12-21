@@ -51,11 +51,14 @@ function performUpdation (values, updateValues) {
     });
 }
 
-function convertPropsToExpected (props) {
+function convertPropsToExpected (props, qvdObj) {
     var propsExpected = {};
     $.each(props, function (propertyId, propertyValue) {
-        propsExpected[propertyId] = {
-            "key": propertyNames[propertyId],
+        var propertyName = propertyNames[qvdObj][propertyId];
+        var propertyListId = propertyListIDs[propertyName];
+        
+        propsExpected[propertyListId] = {
+            "key": propertyName,
             "tenant_id": 1,
             "value": propertyValue
         }

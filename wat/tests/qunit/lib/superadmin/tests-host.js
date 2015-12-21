@@ -120,7 +120,7 @@ function hostTestReal () {
 
                         // Perform changes in testing host values
                         performUpdation(WatTests.values.host, WatTests.updateValues.host);
-                        WatTests.valuesExpected.host['__properties__'] = convertPropsToExpected(WatTests.values.host['__properties__']);
+                        WatTests.valuesExpected.host['__properties__'] = convertPropsToExpected(WatTests.values.host['__properties__'], 'host');
 
                         //////////////////////////////////////////////////////////////////
                         // After get list of hosts, update it

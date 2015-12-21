@@ -122,7 +122,7 @@ function userTestReal () {
 
                         // Perform changes in testing user values
                         performUpdation(WatTests.values.user, WatTests.updateValues.user);
-                        WatTests.valuesExpected.user['__properties__'] = convertPropsToExpected(WatTests.values.user['__properties__']);
+                        WatTests.valuesExpected.user['__properties__'] = convertPropsToExpected(WatTests.values.user['__properties__'], 'user');
 
                         //////////////////////////////////////////////////////////////////
                         // After get list of users, update it

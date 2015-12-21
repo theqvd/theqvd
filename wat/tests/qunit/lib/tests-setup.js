@@ -5,19 +5,58 @@
 APP_PATH = '../../';
 
 // Id of prop1, prop2 and propN properties. This id is in test machine DB. If changes, test will fail
-var propertyIDs = {
+var propertyListIDs = {
     prop1: 10000,
     prop2: 10001,
     prop3: 10002,
     propN: 10003
 };
 
-var propertyNames = {
-    10000: "prop1",
-    10001: "prop2",
-    10002: "prop3",
-    10003: "propN"
+var propertyListNames = {};
+$.each(propertyListIDs, function (propName, propId) {
+    propertyListNames[propId] = propName;
+});
+
+var propertyIDs = { 
+    user: {
+        prop1: 10008,
+        prop2: 10007,
+        prop3: 10006,
+        propN: 10001
+    },
+    vm: {
+        prop1: 10009,
+        prop2: 10010,
+        prop3: 10011,
+        propN: 10002
+    },
+    host: {
+        prop1: 10014,
+        prop2: 10013,
+        prop3: 10012,
+        propN: 10003
+    },
+    osf: {
+        prop1: 10015,
+        prop2: 10016,
+        prop3: 10017,
+        propN: 10004
+    },
+    di: {
+        prop1: 10020,
+        prop2: 10019,
+        prop3: 10018,
+        propN: 10005
+    },
 };
+
+var propertyNames = {};
+$.each(propertyIDs, function (sec, props) {
+    propertyNames[sec] = {};
+    $.each(props, function (propName, propId) {
+        propertyNames[sec][propId] = propName;
+    });
+});
 
 WatTests = {};
 
@@ -151,22 +190,21 @@ WatTests.values = {
 WatTests.valuesExpected = {};
 
 // Replace properties by IDs
-$.each(WatTests.values, function (iVal, val) {
+$.each(WatTests.values, function (qvdObj, val) {
     if (val['__properties__']) {
-        WatTests.valuesExpected[iVal] = { 
+        WatTests.valuesExpected[qvdObj] = { 
             '__properties__': {}
         };
         
         $.each(val['__properties__'], function (pName, pValue) {
-            WatTests.values[iVal]['__properties__'][propertyIDs[pName]] = pValue;
-        
-            WatTests.valuesExpected[iVal]['__properties__'][propertyIDs[pName]] = {
+            WatTests.values[qvdObj]['__properties__'][propertyIDs[qvdObj][pName]] = pValue;
+            WatTests.valuesExpected[qvdObj]['__properties__'][propertyListIDs[pName]] = {
                 key: pName,
                 tenant_id: 1,
                 value: pValue
             }
                         
-            delete WatTests.values[iVal]['__properties__'][pName];
+            delete WatTests.values[qvdObj]['__properties__'][pName];
         });
     }
 });
@@ -260,11 +298,11 @@ WatTests.updateValues = {
     };
 
 // Replace properties by IDs
-$.each(WatTests.updateValues, function (iVal, val) {
+$.each(WatTests.updateValues, function (qvdObj, val) {
     if (val['__properties_changes__']) {
         $.each(val['__properties_changes__']['set'], function (pName, pValue) {
-            WatTests.updateValues[iVal]['__properties_changes__']['set'][propertyIDs[pName]] = pValue;
-            delete WatTests.updateValues[iVal]['__properties_changes__']['set'][pName];
+            WatTests.updateValues[qvdObj]['__properties_changes__']['set'][propertyIDs[qvdObj][pName]] = pValue;
+            delete WatTests.updateValues[qvdObj]['__properties_changes__']['set'][pName];
         });
     }
 });

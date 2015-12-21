@@ -125,7 +125,7 @@ function osfTestReal () {
 
                         // Perform changes in testing osf values
                         performUpdation(WatTests.values.osf, WatTests.updateValues.osf);
-                        WatTests.valuesExpected.osf['__properties__'] = convertPropsToExpected(WatTests.values.osf['__properties__']);
+                        WatTests.valuesExpected.osf['__properties__'] = convertPropsToExpected(WatTests.values.osf['__properties__'], 'osf');
 
                         //////////////////////////////////////////////////////////////////
                         // After get list of osfs, update it
