@@ -98,7 +98,5 @@ Wat.Views.MyViewsView = Wat.Views.ViewsView.extend({
         target.html(template);  
         
         Wat.T.translate();
-
-        Wat.I.chosenElement('[name="section_reset"]', 'single100');
     },
 });
