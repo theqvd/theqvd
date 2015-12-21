@@ -171,6 +171,16 @@ Wat.B = {
                 $(firstRadiobutton).trigger('click');
             }
         });
+        
+        // Propagate events to click on sections from widget click on homepage
+        this.bindEvent('click', '.js-home-cell', function (e) { 
+            $(e.target).find('a>i').trigger('click');
+        });
+        
+        this.bindEvent('click', '.js-home-cell>div', function (e) { 
+            $(e.target).parent().find('a>i').trigger('click');
+        });
+        
     },
     
     bindLoginEvents: function () {

@@ -25,6 +25,10 @@
         width: 100%;   
         
         .home-cell {
+            .summary-element {
+                cursor: pointer;
+            }
+            
             display: block;
             padding: 0px;
             padding-bottom: 10px;
@@ -35,6 +39,10 @@
             &:hover {
                 border: 1px solid $menu_border;
                 background: darken($col_whiter, 2);
+                
+                .summary-element i:before {
+                    color: $menu_hover_bg;
+                }
             }
             
             border-radius: 6px;
@@ -116,7 +124,7 @@
                     a {
                         color: $col_blacker;
                         
-                        &:hover i:before {
+                        &:hover i:before, &.hover i:before {
                             color: $menu_hover_bg;
                         }
                     }

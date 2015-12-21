@@ -1121,9 +1121,13 @@ body {
           border-radius: 6px;
           margin-top: 10px;
           text-align: center; }
+          .wrapper .content .home-wrapper .home-row .home-cell .summary-element {
+            cursor: pointer; }
           .wrapper .content .home-wrapper .home-row .home-cell:hover {
             border: 1px solid #f7985e;
             background: #f8f8f8; }
+            .wrapper .content .home-wrapper .home-row .home-cell:hover .summary-element i:before {
+              color: #e35e0c; }
           @media screen and (min-width: 41em) {
             .wrapper .content .home-wrapper .home-row .home-cell {
               margin-top: 0px;
@@ -1232,7 +1236,7 @@ body {
             padding-top: 11px; }
             .wrapper .content .home-wrapper .home-row .home-cell .summary-element .summary-element-icon a {
               color: #333; }
-              .wrapper .content .home-wrapper .home-row .home-cell .summary-element .summary-element-icon a:hover i:before {
+              .wrapper .content .home-wrapper .home-row .home-cell .summary-element .summary-element-icon a:hover i:before, .wrapper .content .home-wrapper .home-row .home-cell .summary-element .summary-element-icon a.hover i:before {
                 color: #e35e0c; }
             .wrapper .content .home-wrapper .home-row .home-cell .summary-element .summary-element-icon i {
               font-size: 35px;
