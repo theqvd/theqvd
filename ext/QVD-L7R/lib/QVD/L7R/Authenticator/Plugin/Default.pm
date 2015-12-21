@@ -50,7 +50,7 @@ sub find_tenant {
         ERROR "Unable to infer tenant from login '$login' and no default configured";
         return;
     }
-    ($tenant, $login);
+    ($tenant, $login1);
 }
 
 1;
