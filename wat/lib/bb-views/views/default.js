@@ -91,8 +91,6 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
         target.html(template); 
         
         Wat.T.translate();
-        
-        Wat.I.chosenElement('[name="section_reset"]', 'single100');
     },
     
     getFilters: function (that) {                
