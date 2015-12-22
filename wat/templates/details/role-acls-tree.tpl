@@ -9,14 +9,22 @@
     $.each(sections, function (branch, branchName) {
         var pattern = aclPatterns[branch];
         
+        var isEditable = Wat.C.checkACL('role.update.assign-acl') && (!model.get('fixed') || !RESTRICT_TEMPLATES);
+        
         // If there are not ACLS in system for this pattern, not draw branch
         if (branchStats[pattern].total == 0) {
             return;
         }
         
         var disabledClass = '';
+        var hiddenClass = '';
         if (branchStats[pattern].effective == 0) {
+            if (isEditable) {
             disabledClass = 'disabled-branch';
+        }       
+            else {
+                hiddenClass = 'hidden';
+            }
         }       
         
         var checked = '';
@@ -24,8 +32,8 @@
             checked = 'checked';
         }   
     %>
-        <div class="acls-branch js-acls-branch <%= disabledClass %>" data-branch="<%= branch %>">
-            <% if (Wat.C.checkACL('role.update.assign-acl') && (!model.get('fixed') || !RESTRICT_TEMPLATES)) { %>
+        <div class="acls-branch js-acls-branch <%= disabledClass %> <%= hiddenClass %>" data-branch="<%= branch %>">
+            <% if (isEditable) { %>
                 <input type="checkbox" class="js-branch-check branch-check" data-branch="<%= branch %>" data-tree-kind="sections" <%= checked %>/>
             <% } %>
             <a class="js-branch-button branch-button fa fa-plus-square-o" href="javascript:" data-branch="<%= branch %>" data-tree-kind="sections" data-open="0"></a>
@@ -43,14 +51,22 @@
     $.each(actions, function (branch, branchName) {
         var pattern = aclPatterns[branch];
         
+        var isEditable = Wat.C.checkACL('role.update.assign-acl') && (!model.get('fixed') || !RESTRICT_TEMPLATES);
+        
         // If there are not ACLS in system for this pattern, not draw branch
         if (branchStats[pattern].total == 0) {
             return;
         }
         
         var disabledClass = '';
+        var hiddenClass = '';
         if (branchStats[pattern].effective == 0) {
+            if (isEditable) {
             disabledClass = 'disabled-branch';
+        }       
+            else {
+                hiddenClass = 'hidden';
+            }
         }       
         
         var checked = '';
@@ -58,8 +74,8 @@
             checked = 'checked';
         }  
     %>
-        <div class="acls-branch js-acls-branch <%= disabledClass %>" data-branch="<%= branch %>">
-            <% if (Wat.C.checkACL('role.update.assign-acl') && (!model.get('fixed') || !RESTRICT_TEMPLATES)) { %>
+        <div class="acls-branch js-acls-branch <%= disabledClass %> <%= hiddenClass %>" data-branch="<%= branch %>">
+            <% if (isEditable) { %>
                 <input type="checkbox" class="js-branch-check branch-check" data-branch="<%= branch %>" data-tree-kind="actions" <%= checked %>/>
             <% } %>
             <a class="js-branch-button branch-button fa fa-plus-square-o" href="javascript:" data-branch="<%= branch %>" data-tree-kind="actions" data-open="0"></a>
