@@ -1121,7 +1121,7 @@ body {
           border-radius: 6px;
           margin-top: 10px;
           text-align: center; }
-          .wrapper .content .home-wrapper .home-row .home-cell .summary-element {
+          .wrapper .content .home-wrapper .home-row .home-cell .summary-element, .wrapper .content .home-wrapper .home-row .home-cell.home-pie {
             cursor: pointer; }
           .wrapper .content .home-wrapper .home-row .home-cell:hover {
             border: 1px solid #f7985e;

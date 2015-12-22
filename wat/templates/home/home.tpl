@@ -107,7 +107,7 @@
             <% } %>
             <div class="home-row">
                 <% if (Wat.C.checkACL('vm.stats.running-vms')) { %>
-                <div class="home-cell js-home-cell">
+                <div class="home-cell js-home-cell home-pie">
                     <div class="home-title" data-i18n="Running virtual machines"></div>
                     <div class="home-percent-wrapper">
                         <div class="js-running-vms-percent home-title home-percent js-home-percent"></div>
@@ -120,7 +120,7 @@
                 <% } %>
 
                 <% if (Wat.C.checkACL('user.stats.connected-users')) { %>
-                <div class="home-cell js-home-cell">
+                <div class="home-cell js-home-cell home-pie">
                     <div class="home-title" data-i18n="Connected users"></div>
                     <div class="home-percent-wrapper">
                         <div class="js-connected-users-percent home-title home-percent js-home-percent"></div>
@@ -133,7 +133,7 @@
                 <% } %>
 
                 <% if (Wat.C.checkACL('host.stats.running-hosts')) { %>
-                <div class="home-cell js-home-cell">
+                <div class="home-cell js-home-cell home-pie">
                     <div class="home-title" data-i18n="Running nodes"></div>
                     <div class="home-percent-wrapper">
                         <div class="js-running-hosts-percent home-title home-percent js-home-percent"></div>

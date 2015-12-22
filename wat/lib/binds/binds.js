@@ -175,10 +175,16 @@ Wat.B = {
         // Propagate events to click on sections from widget click on homepage
         this.bindEvent('click', '.js-home-cell', function (e) { 
             $(e.target).find('a>i').trigger('click');
+            $(e.target).find('.js-pie-chart').trigger('click');
         });
         
         this.bindEvent('click', '.js-home-cell>div', function (e) { 
             $(e.target).parent().find('a>i').trigger('click');
+            $(e.target).find('.js-pie-chart').trigger('click');
+        });
+        
+        this.bindEvent('mouseenter mouseleave', '.js-home-cell', function (e) { 
+            $(e.target).find('canvas').trigger(e.type);
         });
         
     },
@@ -516,7 +522,14 @@ Wat.B = {
         },
         
         pieClick: function (e) {
+            // Check if canvas was clicked or any other div, to obtain target
+            if (e.target.nodeName == 'CANVAS') {
             var target = $(e.target).parent().attr('data-target');
+            }
+            else {
+                var target = $(e.target).find('canvas').parent().attr('data-target');
+            }
+            
             window.location = '#/' + target;
         }
     },

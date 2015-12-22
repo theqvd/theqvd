@@ -25,7 +25,7 @@
         width: 100%;   
         
         .home-cell {
-            .summary-element {
+            .summary-element, &.home-pie {
                 cursor: pointer;
             }
             
