@@ -195,6 +195,9 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         var qvdObj = that.selectedSection;
 
         if (that.retrievedData.status == STATUS_SUCCESS) {
+            // If update is performed successfuly, hide default info icon
+            $(that.targetClicked).parent().parent().parent().find('.js-default-info').hide();
+            
             // If update is perfermed successfuly, update in memory
             if (that.currentFilters[fieldName]) {
                 that.currentFilters[fieldName].displayMobile = checked;
