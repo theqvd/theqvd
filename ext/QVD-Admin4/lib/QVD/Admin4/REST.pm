@@ -61,19 +61,22 @@ sub validate_user
     my ($self,%params) = @_;
     my $multitenant = cfg('wat.multitenant');
 
-    return undef if (not defined $params{id}) && 
-	$multitenant && (not defined $params{tenant});
+	if ((not defined $params{id}) && $multitenant && (not defined $params{tenant})) {
+		return undef;
+	}
 
     $params{password} = $self->password_to_token($params{password}) if defined $params{password};
     $params{name} = delete $params{login} if defined $params{login};
-    $params{tenant_id} = eval { $QVD_ADMIN->_db->resultset('Tenant')->search(
-				    { name => delete $params{tenant} })->first->id } 
-    if exists $params{tenant}; 
+	$params{tenant_id} = eval {
+		$QVD_ADMIN->_db->resultset('Tenant')->search(
+			{ name => delete $params{tenant} }
+		)->first->id
+	} if exists $params{tenant};
 
     my $rs = eval { $QVD_ADMIN->_db->resultset('Administrator')->search(\%params) };
     print $@ if $@;
     
-# This grep forbides login for superadmins in monotenant context
+	# This grep forbides login for superadmins in monotenant context
 
     my @admins = grep { $multitenant || $_->is_recovery_admin || 
 			    (not $_->is_superadmin) } $rs->all;
