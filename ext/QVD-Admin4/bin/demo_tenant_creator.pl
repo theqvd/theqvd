@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use List::MoreUtils qw(first_index);
 use Getopt::Long;
+use Backticks;
 
 # Get input parameters
 my $tenant_superadmin = "*";
@@ -37,7 +38,9 @@ my %env_variables = (
 
 # Commands order
 my @order_array = qw/
+	cmd_get_tenants
 	cmd_new_tenant
+	cmd_get_new_tenant
 	cmd_new_admin
 	cmd_assign_role
 	cmd_new_user
@@ -49,11 +52,29 @@ my %order_hash = map { $order_array[$_] => $_ + 1 } 0 .. $#order_array;
 # Commands to be executed
 my %command_outputs = ();
 my %commands = (
+	$order_hash{cmd_get_tenants} => {
+		object => "tenant",
+		action => "get",
+		filters => {
+			name => { operator => "~", value => "%$tenant_name%" },
+		},
+	},
 	$order_hash{cmd_new_tenant} => {
 		object => "tenant",
 		action => "new",
 		arguments => {
-			name => $tenant_name,
+			name => sub {
+				my $n_rows = getCommandRowsNumber($order_hash{cmd_get_tenants});
+				my @tenant_names = map { getCommandRowValue($order_hash{cmd_get_tenants}, $_, "name") } 0 .. $n_rows-1;
+				return getNewTenantName($tenant_name, \@tenant_names);
+			},
+		},
+	},
+	$order_hash{cmd_get_new_tenant} => {
+		object => "tenant",
+		action => "get",
+		filters => {
+			id => sub { getCommandRowValue($order_hash{cmd_new_tenant}, 0, "id") },
 		},
 	},
 	$order_hash{cmd_new_admin}  => {
@@ -144,6 +165,11 @@ sub getCommandFilters {
 	return getCommand($cmd)->{filters} // {};
 }
 
+sub isCommandOptional{
+	my ($cmd) = @_;
+	return getCommand($cmd)->{optional} // 0;
+}
+
 sub getCommandArgumentsAsString {
 	my $cmd = shift;
 	my @pairs = ();
@@ -157,8 +183,15 @@ sub getCommandArgumentsAsString {
 sub getCommandFiltersAsString {
 	my $cmd = shift;
 	my @pairs = ();
-	while( my ($key, $value) = each(getCommandFilters($cmd)) ){
-		push @pairs, "$key=\"$value\"";
+	while( my ($filter_name, $filter_value) = each(getCommandFilters($cmd)) ){
+		my $operator;
+		my $value = $filter_value;
+		if(ref($value) eq 'HASH') {
+			$operator = @$filter_value{operator};
+			$value = @$filter_value{value};
+		}
+		$operator //= "=";
+		push @pairs, "$filter_name$operator\"$value\"";
 	}
 	my $str = join(", ", @pairs);
 	return $str;
@@ -181,8 +214,9 @@ sub executeCommand {
 	my $commandStr = commandAsString($cmd);
 
 	my $qa_command = "$perl $qa $commandStr 2>&1";
-	my $output = `$qa_command`;
-	my $exit_code = ( ($? == -1) ? $! : 0 );
+	my $cmd_output = `$qa_command`;
+	my $output = $cmd_output->stdout();
+	my $exit_code = $cmd_output->exitcode();
 	storeCommandExecution($cmd, $exit_code, $output);
 
 	return $exit_code;
@@ -255,6 +289,19 @@ sub getCommandRowValue {
 	return $value;
 }
 
+sub getNewTenantName {
+	my ($tenant_name, $tenant_list) = @_;
+	my $new_tenant_name = $tenant_name;
+	my $counter = 0;
+
+	while ( (first_index { $_ eq $new_tenant_name } @$tenant_list) != -1 ) {
+		$counter++;
+		$new_tenant_name = "${tenant_name}_${counter}";
+	}
+
+	return $new_tenant_name;
+}
+
 sub parse_csv {
 	my ($csv) = @_;
 	my @lines = split("\n", $csv);
@@ -276,11 +323,27 @@ while( my ($key, $value) = each(%env_variables) ) {
 }
 
 # Execute command list
+my $error_found = 0;
+my $error_message = "";
 for my $cmd (getCommandList()){
 	evaluateCommand($cmd);
-	print "$cmd - " . commandAsString($cmd) . " :\n";
-	print "Exit(" . executeCommand($cmd) . ")\n";
-	print getCommandOutput($cmd);
-	print "\n";
+	my $error_code = executeCommand($cmd);
+	my $cmd_output = getCommandOutput($cmd);
+	chomp($cmd_output);
 	# TODO restoreCommand($cmd)
+
+	print STDERR "$cmd - " . commandAsString($cmd) . " :\n";
+	print STDERR "Exit(" . $error_code . ")\n";
+	print STDERR $cmd_output;
+	print STDERR "\n\n";
+
+	if( (not isCommandOptional($cmd)) && ($error_code != 0)){
+		$error_found = 1;
+		$error_message = $cmd_output;
+		last;
+	}
 }
+
+print STDOUT ($error_found ? $error_message : getCommandRowValue($order_hash{cmd_get_new_tenant}, 0, "name") ) . "\n";
+
+exit($error_found);

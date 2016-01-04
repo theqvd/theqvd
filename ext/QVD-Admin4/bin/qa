@@ -13,6 +13,8 @@ if(@ARGV > 0) {
 	$app->run_interactive( initialize => 1 );
 }
 
+exit($app->exit_status());
+
 __END__
 
 =pod

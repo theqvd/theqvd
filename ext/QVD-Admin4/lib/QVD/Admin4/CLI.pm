@@ -164,6 +164,8 @@ sub init {
     $self->cache->set( password => undef ); 
 	$self->cache->set( block => 25 ); # FIXME. Default block value should be taken from a config file or sth.
 	$self->cache->set( display_mode => $output_type );
+	$self->cache->set( exit_code => 0 );
+
 
 	if (not $self->is_interactive_mode_enabled()){
 		for my $cache_key (keys %environment_config){
@@ -190,10 +192,14 @@ sub handle_exception
 {
     my ($self,$e) = @_;
 
-    ReadMode(0); # This is important. It guarantees that,
+	# This is important. It guarantees that,
                  # after an exception is thrown, the CLI console is in the
                  # right mode (i.e. this is needed when the CLI thrown an exception while it
                  # is in pagination mode; it forces the return to the non-pagination mode)
+	ReadMode(0);
+
+	$self->cache->set( exit_code => 1 );
+
     print $e->message, "\n";
 }
 
@@ -238,6 +244,11 @@ sub read_cmd {
 sub is_interactive_mode_enabled {
 	my $self = shift;
 	return $self->get_interactivity_mode();
+}
+
+sub exit_status {
+	my $self = shift;
+	return $self->cache->get('exit_code');
 }
 
 1;
