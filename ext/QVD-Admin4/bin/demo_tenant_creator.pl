@@ -118,8 +118,8 @@ my %commands = (
 		action => "new",
 		arguments => {
 			osf_id => sub { getCommandRowValue($order_hash{cmd_new_osf}, 0, "id") },
-			disk_image => "empty-image.tar.gz",
-			#disk_image => "ubuntu-13.04-i386-qvd.tar.gz",
+			#disk_image => "empty-image.tar.gz",
+			disk_image => "ubuntu-13.04-i386-qvd.tar.gz",
 		},
 	},
 	$order_hash{cmd_new_vm}  => {
