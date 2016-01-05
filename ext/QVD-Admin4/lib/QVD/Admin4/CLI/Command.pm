@@ -1043,7 +1043,8 @@ sub make_api_query
 sub print_count
 {
     my ($self,$res) = @_;
-	print  "Total: ". ($res->json('/total') // 0) ."\n";
+	my $total = $res->json('/total');
+	print "Total: $total\n" if defined($total);
 }
 
 # It takes the response of the API and the original query
@@ -1244,14 +1245,12 @@ sub ask_api_staging
 			my $total = $msg_data->{total_size} // 0;
 			my $partial = $msg_data->{copy_size} // 0;
 		 my $percentage = ($partial * 100) / $total;
-		 print STDERR "\r";
-		 printf STDERR '%.2f%%', $percentage;
+			#printf STDERR "\r%06.2f%%", $percentage;
 		 $tx->send('Ale');
 	     }
 	     else
 	     {
-			print STDERR "\n";
-			print STDOUT "\n";
+			print STDERR "Upload complete\n";
 		 $tx->finish;
 		}
 	};
