@@ -12,11 +12,15 @@
 <tr><td rowspan="1" colspan="3">search_name_VM</td></tr>
 </thead><tbody>
 <tr>
-	<td>sendKeys</td>
+	<td>type</td>
 	<td>css=input.desktop-filter[name=&quot;name&quot;] </td>
 	<td>VM</td>
 </tr>
-
+<tr>
+	<td>fireEvent</td>
+	<td>css=input.desktop-filter[name=&quot;name&quot;] </td>
+	<td>input</td>
+</tr>
 </tbody></table>
 </body>
 </html>
