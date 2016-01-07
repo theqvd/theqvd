@@ -16,12 +16,33 @@
 <tr><td><a href="../cases/not_present_host_sec">not_present_host_sec</a></td></tr>
 <tr><td><a href="../cases/time_start_measure">time_start_measure</a></td></tr>
 <tr><td><a href="../cases/load_sec_vms">load_sec_vms</a></td></tr>
+<tr><td><a href="../cases/not_present_button_new">not_present_button_new</a></td></tr>
+<tr><td><a href="../cases/click_first_element_check">click_first_element_check</a></td></tr>
+<tr><td><a href="../cases/not_present_button_massive_delete">not_present_button_massive_delete</a></td></tr>
+<tr><td><a href="../cases/present_button_massive_changes">present_button_massive_changes</a></td></tr>
+<tr><td><a href="../cases/click_first_element">click_first_element</a></td></tr>
+<tr><td><a href="../cases/not_present_button_delete">not_present_button_delete</a></td></tr>
+<tr><td><a href="../cases/present_button_edit">present_button_edit</a></td></tr>
 <tr><td><a href="../cases/time_end_measure">time_end_measure</a></td></tr>
 <tr><td><a href="../cases/time_start_measure">time_start_measure</a></td></tr>
 <tr><td><a href="../cases/load_sec_osfs">load_sec_osfs</a></td></tr>
+<tr><td><a href="../cases/not_present_button_new">not_present_button_new</a></td></tr>
+<tr><td><a href="../cases/click_first_element_check">click_first_element_check</a></td></tr>
+<tr><td><a href="../cases/not_present_button_massive_delete">not_present_button_massive_delete</a></td></tr>
+<tr><td><a href="../cases/present_button_massive_changes">present_button_massive_changes</a></td></tr>
+<tr><td><a href="../cases/click_first_element">click_first_element</a></td></tr>
+<tr><td><a href="../cases/not_present_button_delete">not_present_button_delete</a></td></tr>
+<tr><td><a href="../cases/present_button_edit">present_button_edit</a></td></tr>
 <tr><td><a href="../cases/time_end_measure">time_end_measure</a></td></tr>
 <tr><td><a href="../cases/time_start_measure">time_start_measure</a></td></tr>
 <tr><td><a href="../cases/load_sec_dis">load_sec_dis</a></td></tr>
+<tr><td><a href="../cases/not_present_button_new">not_present_button_new</a></td></tr>
+<tr><td><a href="../cases/click_first_element_check">click_first_element_check</a></td></tr>
+<tr><td><a href="../cases/not_present_button_massive_delete">not_present_button_massive_delete</a></td></tr>
+<tr><td><a href="../cases/not_present_button_massive_changes">not_present_button_massive_changes</a></td></tr>
+<tr><td><a href="../cases/click_first_element">click_first_element</a></td></tr>
+<tr><td><a href="../cases/not_present_button_delete">not_present_button_delete</a></td></tr>
+<tr><td><a href="../cases/not_present_button_edit">not_present_button_edit</a></td></tr>
 <tr><td><a href="../cases/time_end_measure">time_end_measure</a></td></tr>
 </tbody></table>
 </body>
