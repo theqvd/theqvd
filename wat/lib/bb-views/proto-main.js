@@ -134,7 +134,7 @@ Wat.Views.MainView = Backbone.View.extend({
         
         var isSuperadmin = Wat.C.isSuperadmin();
                 
-        if (that.viewKind == 'details' || that.editingFromList) {
+        if (that.viewKind == 'details' || that.viewKind == 'admin' || that.editingFromList) {
             var editorMode = 'edit';
             delete that.editingFromList;
         }

@@ -20,7 +20,7 @@
     <tr>
         <td data-i18n="Language"></td>
         <td>
-            <select class="" name="language">
+            <select class="" name="language" id="language">
                 <%
                     $.each(WAT_LANGUAGE_ADMIN_OPTIONS, function (lanCode, lanText) {
                         var selected = '';
