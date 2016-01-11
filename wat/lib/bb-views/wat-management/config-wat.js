@@ -85,14 +85,15 @@ Wat.Views.ConfigWatView = Wat.Views.DetailsView.extend({
         // If change is made succesfully check new language to ender again and translate
         if (that.retrievedData.status == STATUS_SUCCESS) {
             if (that.oldLanguage != that.newLanguage) {
+                Wat.C.tenantLanguage = that.newLanguage;
+                
                 // If administratos has changed the language of his tenant and his language is default, translate interface
                 if (Wat.C.language == 'default') {
-                    Wat.C.tenantLanguage = that.newLanguage;
                     Wat.T.initTranslate();
                 }
             }
             if (that.oldBlock != that.newBlock) {
-                // If administratos has changed the language of his tenant and his language is default, translate interface
+                // If administratos has changed the block size of his tenant and his language is default, translate interface
                 if (Wat.C.block == 0) {
                     Wat.C.tenantBlock = that.newBlock;
                 }
