@@ -44,7 +44,9 @@ Wat.I.G = {
         // When no data, graph looks ugly. Hack to fix it is change dataTotal to 1
         pieData[1].data = dataTotal || 1;
 
-        $(dataStatSelector).html('0/' + dataTotal);
+        $(dataStatSelector).find('.data').html('0');
+        $(dataStatSelector).find('.data-total').html(dataTotal);
+        
         $(percentStatSelector).html('0%');
 
         var plot = $.plot(plotSelector, pieData, {
@@ -75,7 +77,8 @@ Wat.I.G = {
                 plot.draw();
 
                 // Upgrade data and percent stats
-                $(dataStatSelector).html(parseInt(pieData[0].data) + '/' + dataTotal);
+                $(dataStatSelector).find('.data').html(parseInt(pieData[0].data));
+                $(dataStatSelector).find('.data-total').html(dataTotal);
 
                 var percentStat = parseInt((pieData[0].data / dataTotal) * 100);
                 $(percentStatSelector).html(percentStat + '%');
@@ -83,8 +86,12 @@ Wat.I.G = {
                 // When first data reach the real value, stop growing
                 if (pieData[0].data === data1) {
                     clearInterval(growInterval);
+                    $(dataStatSelector).attr('data-finished', '1');
                 }
             }, speed);
+        }
+        else {
+            $(dataStatSelector).attr('data-finished', '1');
         }
     },
     
@@ -134,7 +141,8 @@ Wat.I.G = {
             { label: "",  data: data2, color: Wat.I.G.getGraphColorB()}
         ];
 
-        $(dataStatSelector).html(data1 + '/' + dataTotal);
+        $(dataStatSelector).find('.data').html(data1);
+        $(dataStatSelector).find('.data-total').html(dataTotal);
         
         if (dataTotal == 0) {
             var percentData = 0;

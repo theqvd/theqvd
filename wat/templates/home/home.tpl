@@ -114,7 +114,7 @@
                         <div id="running-vms" class="pie-chart js-pie-chart" data-target="vms/<%= Wat.U.transformFiltersToSearchHash({state: "running"}) %>" width="200px" height="200px"></div>
                     </div>
                     <%= Wat.C.ifACL('<a href="#/vms/' + Wat.U.transformFiltersToSearchHash({state: "running"}) + '">', 'vm.see-main.') %>
-                        <div class="js-running-vms-data home-title"></div>
+                        <div class="js-running-vms-data home-title"><span class="data"></span>/<span class="data-total"></span></div>
                     <%= Wat.C.ifACL('</a>', 'vm.see-main.') %>
                 </div>
                 <% } %>
@@ -127,7 +127,7 @@
                         <div id="connected-users" class="pie-chart js-pie-chart" data-target="users" width="200px" height="200px"></div>
                     </div>
                     <%= Wat.C.ifACL('<a href="#/users">', 'user.see-main.') %>
-                    <div class="js-connected-users-data home-title"></div>
+                    <div class="js-connected-users-data home-title"><span class="data"></span>/<span class="data-total"></span></div>
                     <%= Wat.C.ifACL('</a>', 'user.see-main.') %>
                 </div>
                 <% } %>
@@ -140,7 +140,7 @@
                         <div id="running-hosts" class="pie-chart js-pie-chart" data-target="hosts/<%= Wat.U.transformFiltersToSearchHash({state: "running"}) %>" width="200px" height="200px"></div>
                     </div>
                     <%= Wat.C.ifACL('<a href="#/hosts/' + Wat.U.transformFiltersToSearchHash({state: "running"}) + '">', 'host.see-main.') %>
-                        <div class="js-running-hosts-data home-title"></div>
+                        <div class="js-running-hosts-data home-title"><span class="data"></span>/<span class="data-total"></span></div>
                     <%= Wat.C.ifACL('</a>', 'host.see-main.') %>
                 </div>
                 <% } %>

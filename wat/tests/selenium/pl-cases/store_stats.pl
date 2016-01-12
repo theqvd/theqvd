@@ -1,0 +1,12 @@
+my $nUsers = $sel->get_text("css=span.js-summary-users");
+my $nVMs = $sel->get_text("css=span.js-summary-vms");
+my $nHosts = $sel->get_text("css=span.js-summary-hosts");
+my $nOSFs = $sel->get_text("css=span.js-summary-osfs");
+my $nDIs = $sel->get_text("css=span.js-summary-dis");
+my $nBlockedUsers = $sel->get_text("css=span.js-summary-blocked-users");
+my $nBlockedVMs = $sel->get_text("css=span.js-summary-blocked-vms");
+my $nBlockedHosts = $sel->get_text("css=span.js-summary-blocked-hosts");
+my $nBlockedDIs = $sel->get_text("css=span.js-summary-blocked-dis");
+my $nRunningHosts = $sel->get_text("css=div.js-running-hosts-data span.data");
+my $nConnectedUsers = $sel->get_text("css=div.js-connected-users-data span.data");
+my $nRunningVMs = $sel->get_text("css=div.js-running-vms-data span.data");

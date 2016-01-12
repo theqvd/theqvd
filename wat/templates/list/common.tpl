@@ -70,7 +70,7 @@
                         %>
                             <span class="filter-control desktop">
                                 <label for="<%= name %>" <%= translationAttr %>><%= filter.text %></label>
-                                <select name="<%= name %>" class="desktop-filter <%= filter.class %>" data-filter-field="<%= filter.filterField %>" <%= filter.tenantDepent ? 'data-tenant-depent="1"' : '' %> <%= filter.waitLoading ? 'disabled="disabled" data-waiting-loading="1"' : '' %>>
+                                <select name="<%= name %>" id="filter_<%= name %>" class="desktop-filter <%= filter.class %>" data-filter-field="<%= filter.filterField %>" <%= filter.tenantDepent ? 'data-tenant-depent="1"' : '' %> <%= filter.waitLoading ? 'disabled="disabled" data-waiting-loading="1"' : '' %>>
                                     <% 
                                     /*
                                     var forceSelected = undefined;
