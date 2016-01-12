@@ -38,7 +38,7 @@
     <tr>
         <td data-i18n="Block size"></td>
         <td>
-            <select class="" name="block">
+            <select class="" name="block" id="block">
                 <%
                     $.each(WAT_BLOCK_SIZES_ADMIN, function (blockSize, blockSizeText) {
                         var selected = '';

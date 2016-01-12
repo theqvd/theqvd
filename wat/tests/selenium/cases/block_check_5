@@ -3,28 +3,33 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://172.20.126.16/" />
-<title>load-topmenu-sec-profile</title>
+<link rel="selenium.base" href="http://localhost/" />
+<title>block_check_5</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">load-topmenu-sec-profile</td></tr>
+<tr><td rowspan="1" colspan="3">block_check_5</td></tr>
 </thead><tbody>
 <tr>
-	<td>mouseOver</td>
-	<td>css=li.menu-option.js-menu-option-user</td>
+	<td>verifyText</td>
+	<td>css=span.elements-shown</td>
+	<td>5</td>
+</tr>
+<tr>
+	<td>verifyElementPresent</td>
+	<td>css=table.list tr:nth-child(5)</td>
 	<td></td>
 </tr>
 <tr>
-	<td>click</td>
-	<td>css=a.js-submenu-option-profile</td>
+	<td>verifyElementNotPresent</td>
+	<td>css=table.list tr:nth-child(6)</td>
 	<td></td>
 </tr>
 <tr>
-	<td>waitForElementPresent</td>
-	<td>css=div.sec-profile</td>
-	<td></td>
+	<td>verifyNotText</td>
+	<td>css=span.pagination_total_pages</td>
+	<td>1</td>
 </tr>
 </tbody></table>
 </body>
