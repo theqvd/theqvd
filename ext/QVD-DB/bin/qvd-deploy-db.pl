@@ -161,7 +161,7 @@ sub get_file_content {
 
 sub get_current_time {
 	my ($second, $minute, $hour, $day, $month, $year) = localtime();
-	return sprintf("%04d-%02d-%02d %02d:%02d:%02d+00", $year+1900, $month, $day, $hour, $minute, $second);
+	return sprintf("%04d-%02d-%02d %02d:%02d:%02d+00", $year+1900, $month+1, $day, $hour, $minute, $second);
 }
 
 ### MAIN ###
