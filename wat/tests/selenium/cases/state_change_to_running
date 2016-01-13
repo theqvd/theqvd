@@ -28,7 +28,7 @@
 </tr>
 <tr>
 	<td>waitForElementPresent</td>
-	<td>css=div.loading-mid</td>
+	<td>css=a.js-delete-filter-note[data-filter-name=&quot;state&quot;]</td>
 	<td></td>
 </tr>
 <tr>
