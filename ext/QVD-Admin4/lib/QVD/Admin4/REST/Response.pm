@@ -70,12 +70,12 @@ sub map_dbix_object_to_output_info
 	    my ($info_provider,$method,$argument) = $self->get_info_provider_and_method($dbix_field_key,$dbix_object);
 	    if (defined $argument) 
 	    {
-		$result->{$field_key} = eval { $info_provider->$method($argument) } // undef;
+				$result->{$field_key} = defined $info_provider ? eval { $info_provider->$method($argument) } : undef;
 		print $@ if $@;
 	    }
 	    else
 	    {
-		$result->{$field_key} = eval { $info_provider->$method } // undef;
+				$result->{$field_key} = defined $info_provider ? eval { $info_provider->$method } : undef;
 		print $@ if $@;
 	    }
 	}
