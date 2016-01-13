@@ -852,7 +852,15 @@ my $AVAILABLE_FIELDS = {
 	tiny => {
 		default => [qw(id name)],
 
-	      DI => [qw(id disk_image)],
+		Administrator => [qw(tenant_name id name)],
+
+		User => [qw(tenant_name id name)],
+
+		OSF => [qw(tenant_name id name)],
+
+		DI => [qw(tenant_name id disk_image)],
+
+		Role => [qw(tenant_name id name)],
 
 		Views_Setup_Properties_Tenant => [qw(id)],
 
