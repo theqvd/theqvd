@@ -5,6 +5,10 @@ use List::MoreUtils qw(first_index);
 use Getopt::Long;
 use Backticks;
 
+# Constants
+my $EXIT_ERROR_CODE = 1;
+my $EXIT_OK_CODE = 0;
+
 # Get input parameters
 my $tenant_superadmin = "*";
 my $login_superadmin = "superadmin";
@@ -21,9 +25,12 @@ GetOptions (
 	"newtenant=s" => \$tenant_name,
 	"newadmin=s"  => \$admin_name,
 	"newuser=s"   => \$user_name,
-) or die("[ERROR] Command line arguments not valid\n");
+) or (print("Command line arguments not valid\n") and exit($EXIT_ERROR_CODE));
 
-die("[ERROR] New tenant name not defined\n") if not defined $tenant_name;
+if (not defined $tenant_name) {
+	print ("New tenant name not defined\n");
+	exit($EXIT_ERROR_CODE);
+}
 
 # qvd-administrator tool directory
 my $perl = "/usr/lib/qvd/bin/perl -Mlib::glob=./*/lib";
@@ -346,4 +353,4 @@ for my $cmd (getCommandList()){
 
 print STDOUT ($error_found ? $error_message : getCommandRowValue($order_hash{cmd_get_new_tenant}, 0, "name") ) . "\n";
 
-exit($error_found);
+exit($error_found ? $EXIT_ERROR_CODE : $EXIT_OK_CODE);
