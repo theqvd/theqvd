@@ -120,6 +120,7 @@ my $code2message_mapper = {
     7373 => 'Unable to switch to monotenant mode - More than one tenant in the system',
 	7380 => 'Local configuration tokens cannot be set as global tokens',
 	7381 => 'Global configuration tokens cannot be set locally for a tenant',
+	7390 => 'Configuration token value is already set to the default one',
 
 };
 

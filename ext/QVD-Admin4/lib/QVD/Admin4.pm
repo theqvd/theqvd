@@ -342,10 +342,15 @@ sub config_default
 	# Raise an exception if admin cannot modify config
 	$self->is_admin_allowed_to_config($request);
 
-    my $result = $self->delete($request, { conditions => [qw(is_custom_config)] } );
+	my $result = "";
+	try {
+		$result = $self->delete($request, { conditions => [qw(is_custom_config)] });
+	} catch (QVD::Admin4::Exception $e where {$_->code == 1300}) {
+		QVD::Admin4::Exception->throw(code => 7390);
+	};
 
     QVD::Config::reload(); # To refresh config tokens in QVD::Config 
-    $result;
+	return $result;
 }
 
 sub reset_views {

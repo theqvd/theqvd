@@ -12,6 +12,7 @@ use File::Basename qw(basename dirname);
 use Term::ReadKey;
 use CLI::Framework::Exceptions;
 use utf8::all;
+use POSIX;
 
 our $COMMON_USAGE_TEXT = "
 ======================================================================================================
@@ -176,7 +177,10 @@ my $FILTERS = {
 		creation_admin_name => 'creation_admin_name'
 	},
 
-    config => { key_re => 'key_re' },
+	config => {
+		tenant => 'tenant_id',
+		key_re => 'key_re'
+	},
 
 	admin => {
 		id => 'id',
@@ -606,7 +610,8 @@ my $ARGUMENTS = {
 
 	config => {
 		key => 'key',
-		value => 'value'
+		value => 'value',
+		tenant => 'tenant_id',
 	},
 
 	admin => {
@@ -885,7 +890,7 @@ sub _get
 {
     my ($self,$parsing) = @_;                       # Takes a parsed query
     my $query = $self->make_api_query($parsing);    # Creates a JSON query in API format 
-    $self->run_in_pagination_mode($query,$parsing); # Ask the API and prints a table in pagination mode
+	$self->execute_and_display_query($query,$parsing); # Ask the API and prints a table in pagination mode
 }
 
 # Function to execute a creation table
@@ -906,8 +911,7 @@ sub _create
   
     my $query = $self->make_api_query($parsing);# Creates a JSON query in API format 
 
-    my $res = $self->ask_api($query);
-    $self->print_table($res,$parsing);
+	$self->execute_and_display_query($query,$parsing);
 }
 
 # Function executed for queries that check the acls of an admin or role
@@ -917,8 +921,10 @@ sub _can
     my ($self,$parsing) = @_;
 
     # It gets the id of the involved role or admin
-    my $ids = $self->ask_api({ action => $self->get_all_ids_action($parsing),
-			       filters => $self->get_filters($parsing) })->json('/rows');
+	my $ids = $self->ask_api({
+		action => $self->get_all_ids_action($parsing),
+		filters => $self->get_filters($parsing)
+	})->json('/rows');
 
     # It created an ad hoc JSON query
     my $acl_name = $parsing->parameters->{acl_name}; 
@@ -932,51 +938,47 @@ sub _can
     $parsing = QVD::Admin4::CLI::Grammar::Response->new(
 	response => { command => 'get', obj1 => { qvd_object => 'acl' }});
 
-    $self->run_in_pagination_mode($query,$parsing); # Ask the API and prints a table in pagination mode
+	$self->execute_and_display_query($query,$parsing); # Ask the API and prints a table in pagination mode
 }
 
 # Function intended to execute a query in pagination mode.
 # It sets the console in pagination mode and asks the API and
 # prints a new table for every new page.
 
-sub run_in_pagination_mode
+sub execute_and_display_query
 {
     my ($self,$query,$parsing) = @_;
+	my $app = $self->get_app;
+
+	my $is_pagination_mode_enabled = ($app->get_interactivity_mode() ? 1 : 0);
 
     ReadMode("cbreak"); # This sets the pagination mode in console
 
     # Current pagination parameters setted
-    my ($pause_time, $char);
-    my $offset = 1;
-    $query->{offset} = $offset;
-    my $app = $self->get_app;
+	if($is_pagination_mode_enabled) {
+		$query->{offset} = 1;
     $query->{block} =  $app->cache->get('block');
+	}
+
+	my ($pause_time, $char);
+	do {
 
     # It asks the API for the first page and prints that first page
     my $res = $self->ask_api($query); 
     $self->print_table($res,$parsing); 
 
-    if ($res->json('/total') > $query->{block} ) # If there are more than one page
-    {
-	print STDOUT "--- page $offset ('n' for next, 'b' for back, 'q' for quit) ---\n"; # Instrunctions to paginate
+		if ($is_pagination_mode_enabled) {
+			my $total_pages = ceil($res->json('/total') / $query->{block});
+			print STDOUT "--- page $query->{offset} / $total_pages ('n' for next, 'b' for back, 'q' for quit) ---\n";
 
-	while ($char = ReadKey($pause_time)) { # While a new page is asked
-	    last if $char eq 'q';
+			$char = ReadKey($pause_time);
             
             # Pagination parameters updated
-
-	    $offset++ if $char eq 'n' &&
-		$res->json('/total') >= ($query->{block} * $query->{offset}) + 1;
-	    $offset-- if $char eq 'b' && $query->{offset} > 1;
-	    $query->{offset} = $offset;
-             
-            # New page asked and printed
-
-	    $res = $self->ask_api($query);
-	    $self->print_table($res,$parsing);
-	    print STDOUT "--- page $offset ('n' for next, 'b' for back, 'q' for quit) ---\n";
-	}
+			$query->{offset}++ if ($char eq 'n' && $query->{offset} < $total_pages);
+			$query->{offset}-- if ($char eq 'b' && $query->{offset} > 1);
     }
+
+	} while ($is_pagination_mode_enabled && (defined($char)) && ($char ne 'q'));
 
     ReadMode(0); # Return to normal mode in console 
 }

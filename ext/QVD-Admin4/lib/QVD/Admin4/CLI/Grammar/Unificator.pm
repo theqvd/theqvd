@@ -19,8 +19,8 @@ sub unify
     my $t_subst = $args{target_substitution};
 
     $self->set_substitution($t_subst); # Creates the new substitution that 
-                                       # will be retrieved by the method in 
-    my $flag = 0;                      # case the unification is successful
+	# will be retrieved by the method in case the unification is successful
+	my $flag = 0;
 
     while (my ($key,$t_value) = each %$target)
     {
@@ -32,9 +32,15 @@ sub unify
 	next if $self->is_var($real_s_value);
 
 	if ($self->is_var($real_t_value)) 
-	{ $self->substitution->_set($real_t_value,$real_s_value);  next;}
+		{
+			$self->substitution->_set($real_t_value,$real_s_value);
+			next;
+		}
 
-	if ($real_t_value ne $real_s_value) { $flag = 1; last; }
+		if ($real_t_value ne $real_s_value) {
+			$flag = 1;
+			last;
+		}
     }
 
     $flag ? return 0 : return $self->substitution;

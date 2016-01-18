@@ -51,10 +51,12 @@ sub parse
     my $response = [];
     for my $edge (@{$self->chart->inactive_edges})
     {
-	if ($self->is_root($edge) # is an axiom
-	    && $edge->from eq 0 && $edge->to eq $LAST) # covers the whole sentence
-	{ push @$response, 
-	  $self->grammar->response(clone $edge->node->meaning) ; } # Creates an object QVD::Admin4::CLI::Grammar::Meaning
+		my $is_root = $self->is_root($edge);
+		if ($is_root && $edge->from eq 0 && $edge->to eq $LAST) # covers the whole sentence
+		{
+			push @$response, $self->grammar->response(clone $edge->node->meaning);
+		}
+		# Creates an object QVD::Admin4::CLI::Grammar::Meaning
                                                                    # (a wrapper for the HASH version of the analysis)
     } 
 

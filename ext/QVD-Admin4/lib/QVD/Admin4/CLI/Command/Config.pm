@@ -14,27 +14,36 @@ sub usage_text {
 == GETTING CONFIG TOKENS
 
   config get
-  config get <CONFIG TOKEN NAME>
+  config key=<CONFIG TOKEN NAME>, tenant=<TENANT ID> get
 
   For example: 
-  config get (retrieves all configuration tokens in the system)
-  config get wat.multitenant (retrieves the 'wat.multitenant' configuration token)
+  config get (retrieves all configuration tokens of the current administrator tenant)
+  config key=wat.multitenant, tenant=-1 get (retrieves the global 'wat.multitenant' configuration token)
+  config key=path.log, tenant=10000 get (retrieves the 'path.log' configuration token for tenant 10000)
 
 == SETTING CONFIG TOKENS
 
-  config set <CONFIG TOKEN NAME> = <CONFIG TOKEN VALUE>
+  config set key=<CONFIG TOKEN NAME>, value=<CONFIG TOKEN VALUE>, tenant=<TENANT ID>
   For example: 
-  config set wat.multitenant=1 (Sets the 'wat.multitenant' configuration token to 1)
+  config set key=wat.multitenant, value=1, tenant=1000
+  (Sets the 'wat.multitenant' configuration token to 1 for tenant 10000)
 
 == REMOVING CONFIG TOKENS
 
-  config del <CONFIG TOKEN NAME>
+  config key=<CONFIG TOKEN NAME>, tenant=<TENANT ID> del
   (Only for custom config tokens: default tokens in the system, or tokens codified in
    configuration files cannot be removed)
  
   For example: 
-  config del myconfig (Deletes the 'myconfig' configuration token)
+  config key='myconfig', tenant=10000 del (Deletes the 'myconfig' configuration token for tenant 10000)
 
+== SETTING CONFIG TOKENS TO DEFAULT
+
+  config key=<CONFIG TOKEN NAME>, tenant=<TENANT ID> default
+
+  For example:
+  config key=path.log, tenant=10000 default
+  (Sets the 'path.log' configuration token for tenant 10000 to the default value)
 "
 
 }
@@ -64,7 +73,7 @@ sub run
 
     my $query = $self->make_api_query($parsing); 
 
-    $self->run_in_pagination_mode($query,$parsing);
+	$self->execute_and_display_query($query,$parsing);
 }
 
 1;

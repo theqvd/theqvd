@@ -160,6 +160,14 @@ my $RULES =
 		     order => 0, of => 0, to => 0, with => 1  } ],
    meaning   => sub {  'create' }},
 
+	{
+		left_side => { label => 'CMD', saturated => 0 },
+		right_side => [
+			{ label => 'default', saturated => 1, order => 0, of => 0, to => 0, with => 0 },
+		],
+		meaning   => sub { 'default' }
+	},
+
  { left_side => { label => 'CMD', saturated => 0 }, 
    right_side => [ { label => 'del', saturated => 1,
 		     order => 0, of => 0, to => 0, with => 0  } ],
@@ -249,6 +257,10 @@ my $RULES =
  { left_side => { label => 'QVD_OBJECT', saturated => 0 }, 
    right_side => [ { label => 'di', saturated => 1 } ],
    meaning   => sub {'di'}},
+
+ { left_side => { label => 'QVD_OBJECT', saturated => 0 },
+ right_side => [ { label => 'config', saturated => 1 } ],
+ meaning   => sub {'config'}},
 
  { left_side => { label => "QVD_OBJECT", saturated => 1 }, 
    right_side => [ { label => 'QVD_OBJECT', saturated => 0}, 
@@ -492,36 +504,6 @@ my $RULES =
 		   { label => "role", saturated => 1 },
                    { label => "ITEM", saturated => 1, feature => 0 }],
    meaning => sub { my ($c0,$c1,$c2,$c3) = @_; { command => 'update', obj1 => $c0, arguments => { __roles_changes__ => { unassign_roles => [ fields($c3,'-and') ] }}}}},
-
- { left_side => { label => 'ROOT', saturated => 1 }, 
-   right_side => [ { label => "config", saturated => 1 },
-		   { label => "set", saturated => 1 },
-                   { label => "ITEM", saturated => 1, feature => 1, coordinated => 0 }],
-   meaning => sub { my ($c0,$c1,$c2) = @_; my %args; @args{qw(key value)} =  arguments($c2,'-and','=');
-		    return { command => 'update', obj1 => { qvd_object => 'config'}, arguments => \%args }}},
-
- { left_side => { label => 'ROOT', saturated => 1 }, 
-   right_side => [ { label => "config", saturated => 1 },
-		   { label => "get", saturated => 1 },
-                   { label => "ITEM", saturated => 1, feature => 0, coordinated => 0 }],
-   meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'get', obj1 => { qvd_object => 'config', filters => { key_re => ref($c2) ? shift @$c2 : $c2 }}}}},
-
- { left_side => { label => 'ROOT', saturated => 1 }, 
-   right_side => [ { label => "config", saturated => 1 },
-		   { label => "del", saturated => 1 },
-                   { label => "ITEM", saturated => 1, feature => 0, coordinated => 0 }],
-   meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'delete', obj1 => { qvd_object => 'config', filters => { key => ref($c2) ? shift @$c2 : $c2 }}}}},
-
- { left_side => { label => 'ROOT', saturated => 1 }, 
-   right_side => [ { label => "config", saturated => 1 },
-		   { label => "default", saturated => 1 },
-                   { label => "ITEM", saturated => 1, feature => 0, coordinated => 0 }],
-   meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'default', obj1 => { qvd_object => 'config', filters => { key => ref($c2) ? shift @$c2 : $c2 }}}}},
-
- { left_side => { label => 'ROOT', saturated => 1 }, 
-   right_side => [ { label => "config", saturated => 1 },
-		   { label => "get", saturated => 1 }],
-   meaning => sub { return { command => 'get', obj1 => { qvd_object => 'config' }}}},
 
  { left_side => { label => 'ROOT', saturated => 1 }, 
    right_side => [ { label => "QVD_OBJECT", saturated => 1 },
