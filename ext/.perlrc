@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use File::Tee qw(tee);
 
-use lib::glob '*/lib:../g/p5*/lib';
+use lib::glob '*/lib:../g/p5*/lib:../../commercial/*/*/lib';
 
 $ENV{PERL5LIB} = join(':', grep !ref, @INC);
 
