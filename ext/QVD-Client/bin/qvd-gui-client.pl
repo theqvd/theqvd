@@ -110,16 +110,14 @@ sub OnInit {
 				
 				if ( -f $xming_bin ) {
 				    DEBUG "Xming found at $xming_bin";
+					my @extra_args=split(/\s+/, core_cfg('client.xming.extra_args'));
 					
-					@cmd = ( $xming_bin,
-							'-multiwindow', '-notrayicon', '-nowinkill', '-clipboard', '+bs', '-wm',
-							'-logfile' => File::Spec->join($user_dir, "xserver.log") );
+					@cmd = ( $xming_bin, @extra_args, '-logfile' => File::Spec->join($user_dir, "xserver.log") );
 				} elsif ( -f $vcxsrv_bin ) {
 				    DEBUG "VcxSrv found at $vcxsrv_bin";
+					my @extra_args=split(/\s+/, core_cfg('client.vcxsrv.extra_args'));
 					
-				    @cmd = ( $vcxsrv_bin,
-							'-multiwindow', '-notrayicon', '-nowinkill', '-clipboard', '+bs', '-wm',
-							'-listen', 'tcp', '-logfile' => File::Spec->join($user_dir, "xserver.log") );
+				    @cmd = ( $vcxsrv_bin, @extra_args, '-logfile' => File::Spec->join($user_dir, "xserver.log") );
 				} else {
 				    die "X server not found! Tried '$xming_bin' and '$vcxsrv_bin'";
 				}

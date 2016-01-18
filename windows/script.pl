@@ -11,7 +11,7 @@ my ($revision) = `svn info .` =~ /^Revision:\s*(\d+)/m;
 GetOptions("suffix|s=s" => \$suffix) or die "Getopt failed";
 
 my %pl = ( me       => $0,
-		   version  => '3.5.0',
+		   version  => '3.5.1',
 		   revision => $revision,
            suffix   => $suffix );
 
