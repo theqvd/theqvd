@@ -385,7 +385,7 @@ my $ACTIONS = {
 	osf_tiny_list => {
 		type_of_action => 'tiny',
 		   admin4method => 'select',
-		   acls => [qr/^(di|vm)\.(create\.|filter\.(di|vm))$/],
+		acls => [qr/^(di|vm)\.(create\.|filter\.osf)$/],
 		qvd_object => 'OSF'
 	},
 
