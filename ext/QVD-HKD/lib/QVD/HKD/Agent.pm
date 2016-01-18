@@ -299,6 +299,7 @@ sub _run_cmd {
             push @cmd, < $args >;
         }
     }
+    my @prefix = @{$opts->{prefix} // []};
     INFO "Running command " . perl_quote([@cmd, @args]);
     $opts->{outlives_state} //= $opts->{run_and_forget};
     my @extra = map { ( defined $opts->{$_}
@@ -307,7 +308,7 @@ sub _run_cmd {
                       ( qw(on_prepare), grep /^\d*[<>]$/, keys %$opts);
 
     my $pid;
-    my $w = eval { AnyEvent::Util::run_cmd([@cmd, @args], '$$' => \$pid, @extra) };
+    my $w = eval { AnyEvent::Util::run_cmd([@prefix, @cmd, @args], '$$' => \$pid, @extra) };
     if (defined(my $save_pid_to = $opts->{save_pid_to})) {
         $self->{$save_pid_to} = $pid;
     }
