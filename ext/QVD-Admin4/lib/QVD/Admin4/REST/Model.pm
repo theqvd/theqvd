@@ -858,6 +858,8 @@ my $AVAILABLE_FIELDS = {
 
 		OSF => [qw(tenant_name id name)],
 
+		VM => [qw(tenant_name id name)],
+
 		DI => [qw(tenant_name id disk_image)],
 
 		Role => [qw(tenant_name id name)],
