@@ -8,6 +8,7 @@ use QVD::DB::Simple;
 use QVD::Config;
 use QVD::Config::Core;
 use File::Copy qw(copy move);
+use File::Slurp qw (read_file);
 use Config::Properties;
 use QVD::Admin4::Exception;
 use DateTime;
@@ -1635,42 +1636,45 @@ sub config_get
 
 sub config_ssl {
     my ($self,$admin,$json_wrapper) = @_;
-    my $cert = $json_wrapper->get_argument_value('cert') //
-	QVD::Admin4::Exception->throw(code=>'6240', object => 'cert');
 
-    my $key = $json_wrapper->get_argument_value('key') //
-	QVD::Admin4::Exception->throw(code=>'6240', object => 'key');
+	my %args = (
+		cert => {optional => 0},
+		key  => {optional => 0},
+		crl  => {optional => 1},
+		ca   => {optional => 1},
+	);
 
-    my $crl = $json_wrapper->get_argument_value('crl');
+	for my $key (keys(%args)){
+		my $path = $json_wrapper->get_argument_value($key);
 
-    my $ca = $json_wrapper->get_argument_value('ca');
-
-    rs("SSL_Config")->update_or_create({ key => 'l7r.ssl.cert',
-                                       value => $cert });
-    rs("SSL_Config")->update_or_create({ key => 'l7r.ssl.key',
-                                       value => $key });
-
-    if (defined $crl) {
-        rs("SSL_Config")->update_or_create({ key => 'l7r.ssl.crl',
-                                           value => $crl })
-    }
-    else {
-        rs("SSL_Config")->search({ key => 'l7r.ssl.crl' })->delete;
+		if (!$args{$key}->{optional} && !defined($path)){
+			QVD::Admin4::Exception->throw(code=>'6240', object => $key);
     }
 
-    if (defined $ca) {
-        rs("SSL_Config")->update_or_create({key => 'l7r.ssl.ca',
-                                          value => $ca });
+		if(defined($path)) {
+			my $content = eval { read_file($path) } ||
+				QVD::Admin4::Exception->throw(code=>'2270', object => $path);
+			my $config_token = "l7r.ssl.$key";
+
+			# FIXME: The config token shall be global, thus tenant_id = -1
+			rs("Config")->update_or_create( {
+				key => $config_token,
+				value => $path,
+				tenant_id => $admin->tenant_id,
+			} );
+			rs("SSL_Config")->update_or_create( {
+				key => $config_token,
+				value => $content,
+			} );
     }
-    else {
-        rs("SSL_Config")->search({ key => 'l7r.ssl.ca' })->delete;
     }
 
-    QVD::Config::reload(); # To refresh config tokens in QVD::Config 
-#    notify('qvd_config_changed');
+	QVD::Config::reload();
     
-    { total => 1,
-     rows => [ ] };
+	return {
+		total => 1,
+		rows => [ ],
+	};
 }
 
 sub config_wat_get_details

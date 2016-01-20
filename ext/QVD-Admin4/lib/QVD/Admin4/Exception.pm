@@ -59,6 +59,7 @@ my $code2message_mapper = {
     2251 => 'Unable to move uploaded disk image', 
     2260 => 'Unable to download disk image', 
     2261 => 'Unable to move downloaded disk image', 
+	2270 => 'Unable to read file from disk',
 
     3100 => 'No credentials provided for authentication',
 	3200 => 'Wrong credentials - Login again',

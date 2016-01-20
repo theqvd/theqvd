@@ -51,7 +51,7 @@ my $ACTIONS = {
 
 	config_ssl => {
 		type_of_action =>  'ad_hoc',
-		acls => [qr/^config\.update\./],
+		acls => [qr/^config\.qvd\./],
 		admin4method => 'config_ssl'
 	},
 
