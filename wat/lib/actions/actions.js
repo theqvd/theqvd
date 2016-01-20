@@ -274,9 +274,6 @@ Wat.A = {
             Wat.I.chosenElement(controlSelector, params.chosenType);
         }
         
-        // Change content of chosen combo to Loading while data is loaded
-        $(controlSelector + '+.chosen-container span').html($.i18n.t('Loading'));
-
         // Some starting options can be added as first options
         if (params.startingOptions) {
             $.each($(controlSelector), function () {
@@ -318,6 +315,11 @@ Wat.A = {
                 jsonUrl += '&order_by=' + JSON.stringify(params.order_by);
             }
             
+            Wat.I.disableChosenControls(controlSelector);
+            
+            // Change content of chosen combo to Loading while data is loaded
+            $(controlSelector + '+.chosen-container span').html($.i18n.t('Loading'));
+            
             var request = $.ajax({
                 url: encodeURI(jsonUrl),
                 type: 'POST',
@@ -335,7 +337,7 @@ Wat.A = {
                         
                         var options = '';
 
-                        var optGroup = '';
+                        var optGroups = {};
                         
                         var storedIds = [];
                         
@@ -371,20 +373,50 @@ Wat.A = {
                                 selected = 'selected="selected"';
                             }
 
-                            options += '<option value="' + id + '" ' + selected + '>' + 
+                            var optionHTML = '<option value="' + id + '" ' + selected + '>' +  
                                                                         _.escape(name) + 
                                                                         '<\/option>';
+                                                        
+                            if (params.groupByField) {
+                                var groupField = option[params.groupByField];
+                                
+                                if (!optGroups[groupField]) {
+                                    optGroups[groupField] = '';
+                                }
+                                
+                                optGroups[groupField] += optionHTML
+                            }
+                            else {
+                                options += optionHTML;
+                            }
                         });
 
-                        if (params.group) {
+                        if (params.groupByField) {
+                            $.each(optGroups, function (groupLabel, groupOptions) {
+                                combo.append('<optgroup label="' + groupLabel + '">' + groupOptions + '</optgroup>');
+                            });
+                        }
+                        else if (params.group) {
                             combo.append('<optgroup label="' + params.group + '">' + options + '</optgroup>');
                         }
                         else {
                             combo.append(options);
                         }
 
+                        // Clean loading attribute
+                        $(controlSelector).removeAttr('data-loading');
                     });
 
+                    // Enable again control if isn't tenant filter or current admin is not a superadmin
+                    if (!Wat.C.isSuperadmin() || $('[data-waiting-loading]').length == 0 || ($('[data-waiting-loading]').length > 0 && $(controlSelector).attr('name') != 'tenant')) {
+                        Wat.I.enableChosenControls(controlSelector);
+                    }
+
+                    // If there are any control waiting loading and there arent any loading element more, enable tenant filter
+                    if ($('[data-waiting-loading]').length > 0 && $('[data-loading]').length == 0) {
+                        Wat.I.enableChosenControls('[name="tenant"]');
+                    }
+                    
                     if (params.chosenType) {
                         Wat.I.updateChosenControls(controlSelector);
                     }

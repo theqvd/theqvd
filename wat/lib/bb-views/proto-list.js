@@ -127,8 +127,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         'click .next': 'paginationNext',
         'click .last': 'paginationLast',
         'click a[name="filter_button"]': 'filter',
-        'change .filter-control select': 'filter',
         'change .filter-control select[name="tenant"]': 'changeTenant',
+        'change .filter-control select': 'filter',
         'input .filter-control input.date-filter': 'filter',
         'click .js-button-new': 'openNewElementDialog',
         'click .js-selected-actions-button': 'applySelectedAction',
@@ -829,62 +829,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         Wat.I.addOddEvenRowClass(this.listContainer);
     },
     
-    // Recursive function to fill a select making a query per tenant and grouping it
-    fillSelectGrouped: function (tenants, name, filter, recursive) {
-        // If this select is in loading process, do not load again
-        if (!recursive && $('[name="' + name + '"]').attr('data-loading')) {
-            return; 
-        }
-        
-        var nameField = name == 'di' ? 'disk_image' : 'name';
-
-        $('[name="' + name + '"]').attr('data-loading', 1);
-
-                        if (tenants.length > 0) {
-                            var tenant = tenants.shift();
-
-                            var params = {
-                'action': filter.fillAction,
-                'selectedId': this.filters[filter.filterField] || Wat.I.getFilterSelectedId(filter.options),
-                'controlName': name,
-                                'filters': {
-                                    "tenant_id": tenant.id
-                                },
-                                'order_by': {
-                    "field": [nameField],
-                                    "order": "-asc"
-                                },
-                'chosenType': 'advanced100',
-                'nameAsId': filter.nameAsId
-                            };
-
-            if (tenant.showTenant) {
-                params.group = tenant.name;
-                        }
-
-            var that = this;
-
-                Wat.A.fillSelect(params, function () {
-                if (that.filters[filter.filterField] != undefined) {      
-                    that.updateFilterNotes();
-                }
-                Wat.CurrentView.fillSelectGrouped(tenants, name, filter, true);
-                });
-            }
-        else {
-            $('[name="' + name + '"]').removeAttr('data-loading');
-            
-            // If there are any control waiting loading and there arent any loading element more, enable it
-            if ($('[data-waiting-loading]').length > 0 && $('[data-loading]').length == 0) {
-                Wat.I.enableChosenControls('[data-waiting-loading]');
-            }
-            
-            // Finish filling
-            Wat.T.translate();
-            Wat.I.updateChosenControls('[name="' + name + '"]');
-        }
-    },
-    
     // Fill filter selects 
     fetchFilters: function (type) {
         var that = this;
@@ -922,95 +866,46 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     filter.fillAction = filter.fillAction || name + '_tiny_list';
                     filter.nameAsId = filter.nameAsId || false;
                     
-                    if (Wat.C.isSuperadmin() && classifiedByTenant) {
-                        existTenantControl = $($(tenantFilterSelector + ' option')).length > 0;
-                        
-                        if (existTenantControl) {
-                            var waitingTenants = setInterval (function () {
-                                if ($(tenantFilterSelector + ' option').length > 1) {
-                                    var params = {
-                                        'controlName': name,
-                                        'startingOptions': Wat.I.getFilterStartingOptions(filter.options),
-                                        'chosenType': 'advanced100'
-                                    };
-
-                                    Wat.A.fillSelect(params, function () {
-                                        var filteredByTenant = $(tenantFilterSelector).val() >= SUPERTENANT_ID;
-
-                                        var tenants = [];
-                                        $.each($(tenantFilterSelector + ' option'), function (iT, tenantOption) {
-                                            // If is selected by tenant only store the selected tenant
-                                            if (filteredByTenant && !$(tenantOption).is(':selected')) {
-                                                return;
-                    }
-                    
-                                            var tenant = {
-                                                'id': $(tenantOption).val(),
-                                                'name': $(tenantOption).html(),
-                                                'showTenant': true
-                    }
-                    
-                                            if ($(tenantOption).val() < SUPERTENANT_ID || filteredByTenant) {
-                                                tenant.showTenant = false;
-                                            }
-
-                                            tenants.push(tenant);
-                                        });
-
-                                        Wat.CurrentView.fillSelectGrouped(tenants, name, filter);
-                                    });                
-
-                                    clearInterval(waitingTenants);
-                                }
-                            }, 200);
+                    var nameField = name == 'di' ? 'disk_image' : 'name';
+                    if (classifiedByTenant) {
+                        var orderFields = ['tenant_name', nameField];
                         }
                         else {   
-                            var nameField = name == 'di' ? 'disk_image' : 'name';
+                        var orderFields = [nameField];
+                    }
                             
                             var params = {
+                        'action': filter.fillAction,
+                        'selectedId': that.filters[filter.filterField] || Wat.I.getFilterSelectedId(filter.options),
                                 'controlName': name,
                                 'startingOptions': Wat.I.getFilterStartingOptions(filter.options),
-                                'chosenType': 'advanced100',
+                        'nameAsId': filter.nameAsId,
                                 'order_by': {
-                                    "field": [nameField],
+                            "field": orderFields,
                                     "order": "-asc"
                                 },
                             };
 
-                            Wat.A.fillSelect(params, function () {      
-                                // If not exist tenant control, do a query to retrieve tenants
-                                Wat.A.performAction ('tenant_tiny_list', {}, {}, {}, function(e) {
-                                    var tenants = e.retrievedData.rows;
+                    if (currentExistsOutTenant) {
+                        var paramGlobal = {};
+                        paramGlobal[COMMON_TENANT_ID] = 'None (Common)';
                                     
-                                    if (!tenants) {
-                                        return;
+                        params['startingOptions'] = $.extend({}, params['startingOptions'], paramGlobal);
                                     }
                                     
-                                    $.each(tenants, function (iTenant, tentant) {
-                                        tenants[iTenant].showTenant = true;
-                                    });
+                    if (Wat.C.isSuperadmin() && classifiedByTenant) {                            
+                        var filteredTenantId = Wat.CurrentView.collection.filters.tenant_id;
 
-                                    Wat.CurrentView.fillSelectGrouped(tenants, name, filter);
-                                });
-                            });
-                        }
+                        if (filteredTenantId) {
+                            params.filters = {'tenant_id': filteredTenantId};
                     }
                     else {
-                        // TODO: Make these features in grouped way. Encapsulate this code in recursive function calling it one time if no superadmin
-                    var params = {
-                            'action': filter.fillAction,
-                        'selectedId': that.filters[filter.filterField] || Wat.I.getFilterSelectedId(filter.options),
-                        'controlName': name,
-                        'startingOptions': Wat.I.getFilterStartingOptions(filter.options),
-                            'nameAsId': filter.nameAsId
-                    };
-
-                        if (currentExistsOutTenant) {
-                            var paramGlobal = {};
-                            paramGlobal[COMMON_TENANT_ID] = 'None (Common)';
-                            
-                            params['startingOptions'] = $.extend({}, params['startingOptions'], paramGlobal);
+                            params.groupByField = 'tenant_name';
                         }
+                        }
+
+                    // Add loading attribute to know when a select is being filled
+				    $('[name="' + name + '"]').attr('data-loading', 1);
 
                     Wat.A.fillSelect(params, function () {
                         // In tenant case (except in admins list) has not sense show supertenant in filters
@@ -1027,7 +922,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     });
                 }
             }
-            }
             else {
                 // If any field setted as not fillable is filtered, update it on control
                 if (that.filters[filter.filterField] != undefined) {      
@@ -1038,10 +932,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 }
             }
         });
-        
-        if (Wat.C.isSuperadmin() && !anyTenantDepent) {
-            Wat.I.enableChosenControls('[data-waiting-loading]');
-        }
     },
     
     // Reset filter selects of classified by tenant elements
@@ -1066,7 +956,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     // When change tenant reset fillable selects that can be affected by tenant classification
     changeTenant: function (e) {
-        $(e.target).attr('data-waiting-loading', 1);
+        if ($('[data-tenant-depent]').length > 0) {
+            Wat.I.disableChosenControls('[name="tenant"]');
+        }
         
         // If filter changes to "ALL", remove it from fixed filters
         if ($(e.target).val() == FILTER_ALL) {
@@ -1077,7 +969,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         $('[data-tenant-depent]').val(FILTER_ALL);
         $('[data-tenant-depent]').trigger('change');
         
-        Wat.I.disableChosenControls('[data-waiting-loading]');
         $('.js-delete-filter-note[data-filter-name="tenant"]').hide();
 
         this.resetSelectFiltersByTenant();

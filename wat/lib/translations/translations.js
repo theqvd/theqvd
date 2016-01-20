@@ -77,6 +77,9 @@ Wat.T = {
         
         // Update all the chosen select controls
         $('select').trigger('chosen:updated');  
+        
+        // The selects that were in loading process, will be tagged as loading
+        $('[data-loading]+.chosen-container span').html($.i18n.t('Loading'));
     },
     
     // Translate and show all
