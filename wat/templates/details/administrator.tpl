@@ -3,7 +3,7 @@
     <div class="clear mobile"></div>
     <a class="button2 fright fa fa-eye js-show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>
     
-    <% if(Wat.C.checkACL('administrator.delete.')) { %>
+    <% if(Wat.C.checkACL('administrator.delete.') && Wat.C.adminID != model.get('id')) { %>
     <a class="button fleft button-icon--desktop js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"><span data-i18n="Delete" class="mobile"></span></a>
     <% } %>
     
