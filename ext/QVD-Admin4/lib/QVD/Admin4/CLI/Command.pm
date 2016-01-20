@@ -910,8 +910,8 @@ sub _create
     }
   
     my $query = $self->make_api_query($parsing);# Creates a JSON query in API format 
-
-	$self->execute_and_display_query($query,$parsing);
+	my $res = $self->ask_api($query);
+	$self->print_table($res,$parsing);
 }
 
 # Function executed for queries that check the acls of an admin or role
