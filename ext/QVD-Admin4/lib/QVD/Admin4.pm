@@ -1656,12 +1656,6 @@ sub config_ssl {
 				QVD::Admin4::Exception->throw(code=>'2270', object => $path);
 			my $config_token = "l7r.ssl.$key";
 
-			# FIXME: The config token shall be global, thus tenant_id = -1
-			rs("Config")->update_or_create( {
-				key => $config_token,
-				value => $path,
-				tenant_id => $admin->tenant_id,
-			} );
 			rs("SSL_Config")->update_or_create( {
 				key => $config_token,
 				value => $content,
