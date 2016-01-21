@@ -51,6 +51,12 @@ my $RULES =
    right_side => [ { label => 'set', saturated => 1  } ],
    meaning   => sub { 'set' }},
 
+	{
+		left_side => { label => $UNKNOWN_TAG, saturated => 1 },
+		right_side => [ { label => 'ssl', saturated => 1  } ],
+		meaning   => sub { 'ssl' }
+	},
+
  { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'new', saturated => 1  } ],
    meaning   => sub {  'new' }},
@@ -166,6 +172,14 @@ my $RULES =
 			{ label => 'default', saturated => 1, order => 0, of => 0, to => 0, with => 0 },
 		],
 		meaning   => sub { 'default' }
+	},
+
+	{
+		left_side => { label => 'CMD', saturated => 0 },
+		right_side => [
+			{ label => 'ssl', saturated => 1, order => 0, of => 0, to => 0, with => 1 },
+		],
+		meaning   => sub { 'ssl' }
 	},
 
  { left_side => { label => 'CMD', saturated => 0 }, 

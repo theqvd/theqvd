@@ -44,6 +44,14 @@ sub usage_text {
   For example:
   config key=path.log, tenant=10000 default
   (Sets the 'path.log' configuration token for tenant 10000 to the default value)
+
+== SETTING SSL CONFIG
+
+  config ssl key=<KEY FILE PATH>, cert=<CRT FILE PATH>
+
+  For example:
+  config ssl key=/var/run/qvd/l7r/ssl/key.pem, cert=/var/run/qvd/l7r/ssl/cert.pem
+  (Stores the key and cert files content)
 "
 
 }

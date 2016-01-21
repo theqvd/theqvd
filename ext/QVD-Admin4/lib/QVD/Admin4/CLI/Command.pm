@@ -802,8 +802,9 @@ my $CLI_CMD2API_ACTION = {
 	config => {
 		get => 'config_get',
 		update => 'config_set', 
+		ssl     => 'config_ssl',
 		delete => 'config_delete', 
-		default => 'config_default'
+		default => 'config_default',
 	},
 
 	admin => {
