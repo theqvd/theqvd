@@ -89,6 +89,13 @@
                     if (actionConfig.visibilityCondition) {
                         visibilityConditionAttrs += ' data-visibility-conditioned="true" ';
                         $.each(actionConfig.visibilityCondition, function (tokenName, tokenValue) {
+                            // Replace macros
+                            switch(tokenValue) {
+                                case '__currentAdminId__':
+                                    tokenValue = Wat.C.adminID;
+                                    break;
+                            }
+                            
                             visibilityConditionAttrs += ' data-visibility-cond-' + tokenName + '="' + tokenValue + '" ';
                         });
                     }

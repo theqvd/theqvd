@@ -145,7 +145,12 @@ Wat.I.selectedActions[qvdObj] = {
         'text': 'Delete',
         'acls': 'administrator.delete-massive.',
         'iconClass': 'fa fa-trash',
-        'darkButton': true
+        'darkButton': true,
+        'visibilityCondition': {
+            'type': 'ne',
+            'field': 'id',
+            'value': '__currentAdminId__'
+        }
     }
 };
 
