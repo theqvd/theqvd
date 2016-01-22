@@ -1135,8 +1135,10 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         if (enabledProperties && enabledEditProperties) {
             var filters = {};
             
+            var classifiedByTenant = $.inArray(that.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
+
             // In massive edition for superadmins, only is available the specific properties for superadmins
-            if (Wat.C.isSuperadmin()) {
+            if (Wat.C.isSuperadmin() && classifiedByTenant) {
                 filters['tenant_id'] = SUPERTENANT_ID;
             }
 

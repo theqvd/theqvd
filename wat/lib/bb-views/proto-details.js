@@ -59,7 +59,9 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
                 if (enabledProperties) {
                     var filters = {};
 
-                    if (Wat.C.isMultitenant() && Wat.C.isSuperadmin()) {
+                    var classifiedByTenant = $.inArray(that.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
+                    
+                    if (Wat.C.isMultitenant() && Wat.C.isSuperadmin() && classifiedByTenant) {
                         filters['-or'] = ['tenant_id', that.model.get('tenant_id'), 'tenant_id', SUPERTENANT_ID];
                     }
 

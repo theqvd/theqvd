@@ -226,7 +226,9 @@ Wat.Views.MainView = Backbone.View.extend({
         if (enabledProperties && enabledEditProperties) {
             var filters = {};
 
-            if (editorMode == 'edit') {
+            var classifiedByTenant = $.inArray(that.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
+
+            if (editorMode == 'edit' && classifiedByTenant) {
                 if (Wat.C.isMultitenant() && Wat.C.isSuperadmin()) {
                     filters['-or'] = ['tenant_id', that.model.get('tenant_id'), 'tenant_id', SUPERTENANT_ID];
                 }
