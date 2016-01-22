@@ -76,6 +76,10 @@ my @dlls = (
 );
 
 
+my @modules = (
+	"X11::Protocol::Ext::XC_MISC"
+);
+
 foreach my $dir (@paths) {
 	die "Failed to find path '$dir'" unless ( -d $dir );
 	$ENV{PATH} .= ";\"$dir\"";
@@ -153,6 +157,7 @@ run("exetype", "NX\\nxproxy.exe", "WINDOWS");
 my @pp_args = ("-vvv", "-x", 
     mklist('-I', 'dir', @includes),
  	mklist('-l', 'file', @dlls),
+	mkmodlist( @modules),
 	'-o', 'qvd-client-1.exe', '-log', 'pp.log',
 	'..\..\ext\QVD-Client\bin\qvd-gui-client.pl');
 
@@ -310,6 +315,23 @@ sub is_cygwin {
 }
 
 
+sub mkmodlist {
+	# TODO: do verification
+	
+	my (@modules) = @_;
+	my @ret;
+	
+	foreach my $mod (@modules) {
+		my $ret = system("perl", "-M$mod", "-e", "CORE::say 'Module $mod works';");
+		if (!$ret) {
+			push @ret, '-M', $mod;
+		} else {
+			die "Module $mod not found";
+		}
+	}
+	
+	return @ret;
+}
 sub run {
 	my @args = @_;
 	my $cmd = join(' ', @args);

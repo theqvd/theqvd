@@ -19,6 +19,7 @@ use QVD::Log;
 use QVD::Client::USB;
 use QVD::Client::USB::USBIP;
 use QVD::Client::USB::IncentivesPro;
+use Time::HiRes qw(sleep);
 
 
 my $LINUX = ($^O eq 'linux');
@@ -564,7 +565,7 @@ sub connect_to_vm {
                     WARN "Unable to save key used for slave connections: $^E";
                 }
             }
-            $self->_run($httpc);
+            $self->_run($httpc, %$opts);
             last;
         }
         elsif ($code == HTTP_PROCESSING) {
@@ -589,9 +590,173 @@ sub connect_to_vm {
     DEBUG("Connection closed");
 }
 
+sub _stop_x11 {
+	my $self = shift;
+	
+	unless ( $self->{x11_proc} ) {
+		WARN "X11 wasn't started, not stopping";
+		return;
+	}
+	
+	if ( $self->{x11_proc}->alive ) {
+		DEBUG "X11 process alive with pid " . $self->{x11_proc}->pid . ", killing";
+		
+		if ( $self->{x11_proc}->die ) {
+			INFO "Stopped X11 server";
+		} else {
+			ERROR "Failed to stop X11 server";
+		}
+	} else {
+		WARN "X11 process is already dead";
+	}
+	
+	delete $self->{x11_proc};
+	
+
+}
+
+
+sub _start_x11 {
+	my ($self, %opts) = @_;
+	my @cmd;
+
+
+	###
+	### Checks
+	###
+	
+	$self->_stop_x11 if ( $self->{x11_proc} );
+	
+
+	# No need on Linux
+	if ( $WINDOWS ) {
+		DEBUG "Running on Windows, will start X";
+	} elsif ( $DARWIN ) {
+		DEBUG "Running on Darwin, will start X";
+	} else {
+	    DEBUG "Not running on Windows or Darwin, X is not needed";
+		return;
+	}
+
+	# No need if X11 is already running
+	if ( $QVD::Client::App::orig_display ) {
+		DEBUG "\$DISPLAY is already set, not starting X";
+		return;
+	}
+
+	# No need if we're running under a PP build
+	if ( $ENV{QVD_PP_BUILD} ) {
+		DEBUG "Running under a PP build, not starting X";
+		return;
+	}
+
+	###
+	### Create commandline
+	###
+	
+	if ($WINDOWS) {
+		DEBUG "Running on Windows, detecting X server";
+		
+		$ENV{DISPLAY} = '127.0.0.1:0';
+		my $xming_bin = File::Spec->rel2abs(core_cfg('command.windows.xming'), $QVD::Client::App::app_dir);
+		my $vcxsrv_bin = File::Spec->rel2abs(core_cfg('command.windows.vcxsrv'), $QVD::Client::App::app_dir);
+		
+		if ( -f $xming_bin ) {
+			DEBUG "Xming found at $xming_bin";
+			my @extra_args=split(/\s+/, core_cfg('client.xming.extra_args'));
+			
+			@cmd = ( $xming_bin, @extra_args, '-logfile' => File::Spec->join($QVD::Client::App::user_dir, "xserver.log") );
+		} elsif ( -f $vcxsrv_bin ) {
+			DEBUG "VcxSrv found at $vcxsrv_bin";
+			my @extra_args=split(/\s+/, core_cfg('client.vcxsrv.extra_args'));
+			
+			@cmd = ( $vcxsrv_bin, @extra_args, '-logfile' => File::Spec->join($QVD::Client::App::user_dir, "xserver.log") );
+			
+			if ( $opts{fullscreen} ) {
+				push @cmd, "-fullscreen";
+				@cmd = grep { ! /rootless|mwextwm|multiwindow/ } @cmd;
+			}
+		} else {
+			die "X server not found! Tried '$xming_bin' and '$vcxsrv_bin'";
+		}
+	} else { # DARWIN!
+		$ENV{DISPLAY} = ':0';
+		my $x11_cmd = core_cfg('command.darwin.x11');
+		@cmd = qq(open -a $x11_cmd --args true);
+	}
+
+	###
+	### Execute
+	### 
+	
+	DEBUG("DISPLAY set to $ENV{DISPLAY}");
+	DEBUG("Starting X11 server: " . join(' ', @cmd));
+
+	if ( ($self->{x11_proc} = Proc::Background->new(@cmd))  ) {
+		DEBUG("X server started");
+		if ( $DARWIN ) {
+			DEBUG("Waiting to see if X starts");
+			my $timeout=5;
+			my $all_ok;
+			while($timeout-- > 0) {
+				if (!$self->{x11_proc}->alive) {
+					if (!defined $self->{x11_proc}->wait || ($self->{x11_proc}->wait << 8) > 0 ) {
+						_osx_error("Failed to start X server. Please install XQuartz.");
+						exit(1);
+					} else {
+						$all_ok = 1;
+						last;
+					}
+				}
+				sleep(1);
+			}
+
+			if (!$all_ok) {
+				WARN("X server command still seems to be running. Can't exactly determine whether the server started");
+			}
+		}
+	} else {
+		ERROR("X server failed to start");
+		if ($DARWIN) {
+			 _osx_error("Failed to start X server. Please install XQuartz.");
+		}
+	}
+	
+	
+	###
+	### Try to wait until X11 is accepting connections
+	###
+	my $retries = 100;
+	my $x_ok;
+	
+	DEBUG "Testing whether the X server is up";
+	
+	require X11::Protocol;
+	while(!$x_ok && $retries > 0 ) {
+		eval {
+			
+			my $x = X11::Protocol->new();
+			DEBUG "Connected to X11, release " . $x->release_number;
+			$x_ok = 1;
+		};
+		if ( $@ ) {
+			DEBUG "Error connecting to X11, $retries retries left";
+			$retries--;
+		}
+		
+		sleep 0.1;
+	}
+	
+	if (!$x_ok) {
+		WARN "X11 server started, but connection test failed";
+	} else {
+		INFO "X11 server started and running";
+	}
+
+}
+
 sub _run {
-    my $self = shift;
-    my $httpc = shift;
+    my ($self, $httpc, %opts) = @_;
 
     my %o;
 
@@ -653,6 +818,9 @@ sub _run {
 
     }
 
+	
+	$self->_start_x11( fullscreen => $opts{fullscreen} );
+	
     if ($self->{audio}) {
 	if (defined(my $ps = $ENV{PULSE_SERVER})) {
 	    # FIXME: we should read /etc/pulseaudio/client.conf and
@@ -661,7 +829,7 @@ sub _run {
 	    if ($ps =~ /^(?:tcp:localhost:)?(\d+)$/) {
 		$o{media} = $1;
 	    }
-	    else {
+	    else { 
 		WARN "Unable to detect PulseAudio configuration from \$PULSE_SERVER ($ps)";
 	    }
 	}
@@ -777,6 +945,8 @@ sub _run {
         unlink $slave_port_file ;
     }
 
+	$self->_stop_x11;
+	
     DEBUG("Done.");
 
 }
