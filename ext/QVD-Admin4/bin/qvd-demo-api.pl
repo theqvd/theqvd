@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use Mojolicious::Lite;
+use Deep::Encode;
 use Backticks;
 
 my $perl_path = "$^X";
@@ -10,17 +11,26 @@ my $create_tenant_script_path = "./QVD-Admin4/bin/demo_tenant_creator.pl";
 # Set port
 app->config(hypnotoad => {listen => ['http://localhost:3001']});
 
+sub get_input_json {
+	my $c = shift;
+	my $json = $c->req->json // $c->req->params->to_hash;
+
+	deep_utf8_decode($json);
+
+	return $json;
+}
+
 # Routes
-get '/create_tenant' => sub {
+any [qw(POST GET)] => '/create_tenant' => sub {
 	my $c = shift;
 	my $exit_code = 0;
 	my $message = "OK";
 	my $tenant_name = "";
 
 	# Get parameters from url
-	my $params_hash = $c->req->params->to_hash;
+	my $input_json = get_input_json($c);
 	my @args = ();
-	while(my ($key, $value) = each(%$params_hash)){
+	while(my ($key, $value) = each(%$input_json)){
 		push @args, "-$key";
 		push @args, $value;
 	}
