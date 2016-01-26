@@ -18,6 +18,14 @@ my $tenant_name;
 my $admin_name = "admin";
 my $user_name = "user";
 
+# Images
+my @images = ();
+my %images_map = (
+	empty   => "empty-image.tar.gz",
+	generic => "ubuntu-13.04-i386-qvd.tar.gz",
+);
+
+# Options
 GetOptions (
 	"stenant=s"   => \$tenant_superadmin,
 	"slogin=s"    => \$login_superadmin,
@@ -25,6 +33,7 @@ GetOptions (
 	"newtenant=s" => \$tenant_name,
 	"newadmin=s"  => \$admin_name,
 	"newuser=s"   => \$user_name,
+	"image=s"     => \@images,
 ) or (print("Command line arguments not valid\n") and exit($EXIT_ERROR_CODE));
 
 if (not defined $tenant_name) {
@@ -43,113 +52,125 @@ my %env_variables = (
 	QVD_ADMIN_LOGIN => $login_superadmin,
 );
 
-# Commands order
-my @order_array = qw/
-	cmd_get_tenants
-	cmd_new_tenant
-	cmd_get_new_tenant
-	cmd_new_admin
-	cmd_assign_role
-	cmd_new_user
-	cmd_new_osf
-	cmd_new_di
-	cmd_new_vm/;
-my %order_hash = map { $order_array[$_] => $_ + 1 } 0 .. $#order_array;
-
 # Commands to be executed
+my %command_order = ();
+my %commands = ();
 my %command_outputs = ();
-my %commands = (
-	$order_hash{cmd_get_tenants} => {
-		object => "tenant",
-		action => "get",
-		filters => {
+
+addCommand( "cmd_get_tenants", "tenant", "get",
+	{
 			name => { operator => "~", value => "%$tenant_name%" },
 		},
-	},
-	$order_hash{cmd_new_tenant} => {
-		object => "tenant",
-		action => "new",
-		arguments => {
+	{ }
+);
+addCommand( "cmd_new_tenant", "tenant", "new",
+	{ },
+	{
 			name => sub {
-				my $n_rows = getCommandRowsNumber($order_hash{cmd_get_tenants});
-				my @tenant_names = map { getCommandRowValue($order_hash{cmd_get_tenants}, $_, "name") } 0 .. $n_rows-1;
+			my $n_rows = getCommandRowsNumber(getCommandIdFromName("cmd_get_tenants"));
+			my @tenant_names = map { getCommandRowValue(getCommandIdFromName("cmd_get_tenants"), $_, "name") } 0 .. $n_rows-1;
 				return getNewTenantName($tenant_name, \@tenant_names);
 			},
+	}
+);
+addCommand( "cmd_get_new_tenant", "tenant", "get",
+	{
+		id => sub { getCommandRowValue(getCommandIdFromName("cmd_new_tenant"), 0, "id") },
 		},
-	},
-	$order_hash{cmd_get_new_tenant} => {
-		object => "tenant",
-		action => "get",
-		filters => {
-			id => sub { getCommandRowValue($order_hash{cmd_new_tenant}, 0, "id") },
-		},
-	},
-	$order_hash{cmd_new_admin}  => {
-		object => "admin",
-		action => "new",
-		arguments => {
+	{ }
+);
+addCommand( "cmd_new_admin", "admin", "new",
+	{ },
+	{
 			name => "$admin_name",
-			tenant_id => sub { getCommandRowValue($order_hash{cmd_new_tenant}, 0, "id") },
+		tenant_id => sub { getCommandRowValue(getCommandIdFromName("cmd_new_tenant"), 0, "id") },
 			password => "$admin_name",
+	}
+);
+addCommand( "cmd_assign_role", "admin", "assign role",
+	{
+		id => sub { getCommandRowValue(getCommandIdFromName("cmd_new_admin"), 0, "id") },
 		},
-	},
-	$order_hash{cmd_assign_role}  => {
-		object => "admin",
-		action => "assign role",
-		filters => {
-			id => sub { getCommandRowValue($order_hash{cmd_new_admin}, 0, "id") },
-		},
-		arguments => {
+	{
 			"Administrator" => undef,
-		},
-	},
-	$order_hash{cmd_new_user}  => {
-		object => "user",
-		action => "new",
-		arguments => {
+	}
+);
+addCommand( "cmd_new_user", "user", "new",
+	{ },
+	{
 			name => "$user_name",
 			password => "$user_name",
-			tenant_id => sub { getCommandRowValue($order_hash{cmd_new_tenant}, 0, "id") },
-		},
-	},
-	$order_hash{cmd_new_osf}  => {
-		object => "osf",
-		action => "new",
-		arguments => {
-			name => "osf_default",
-			tenant_id => sub { getCommandRowValue($order_hash{cmd_new_tenant}, 0, "id") },
-		},
-	},
-	$order_hash{cmd_new_di}  => {
-		object => "di",
-		action => "new",
-		arguments => {
-			osf_id => sub { getCommandRowValue($order_hash{cmd_new_osf}, 0, "id") },
-			#disk_image => "empty-image.tar.gz",
-			disk_image => "ubuntu-13.04-i386-qvd.tar.gz",
-		},
-	},
-	$order_hash{cmd_new_vm}  => {
-		object => "vm",
-		action => "new",
-		arguments => {
-			user_id => sub { getCommandRowValue($order_hash{cmd_new_user}, 0, "id") },
-			osf_id => sub { getCommandRowValue($order_hash{cmd_new_osf}, 0, "id") },
-			di_tag => "default",
-			name => "vm_default",
-		},
+		tenant_id => sub { getCommandRowValue(getCommandIdFromName("cmd_new_tenant"), 0, "id") },
 	}
 );
 
+my $image_number = 1;
+my %image_count = map {$_ => 1} keys (%images_map);
+for my $image (@images) {
+	addCommand( "cmd_new_osf_$image_number", "osf", "new",
+		{ },
+		{
+			name => "osf_${image}_$image_count{$image}",
+			tenant_id => sub { getCommandRowValue(getCommandIdFromName("cmd_new_tenant"), 0, "id") },
+		},
+	);
+	addCommand( "cmd_new_di_$image_number", "di", "new",
+		{ },
+		{
+			osf_id => sub { getCommandRowValue(getCommandIdFromName("cmd_new_osf_$image_number"), 0, "id") },
+			disk_image => $images_map{$image} // $image,
+		}
+	);
+	addCommand( "cmd_new_vm_$image_number", "vm", "new",
+		{ },
+		{
+			user_id => sub { getCommandRowValue(getCommandIdFromName("cmd_new_user"), 0, "id") },
+			osf_id => sub {
+				my $id = getCommandRowValue(getCommandIdFromName("cmd_new_osf_$image_number"), 0, "id");
+				$image_number++;
+				return $id;
+	},
+			di_tag => "default",
+			name => "vm_${image}_$image_count{$image}",
+	}
+	);
+	$image_count{$image}++;
+	$image_number++;
+}
+# Need to restart the value to be increased during the execution
+$image_number = 1;
+
+
 # Command methods
 
+sub addCommand {
+	my ($name, $object, $action, $filters, $arguments) = @_;
+	my $id = keys (%command_order) + 1;
+
+	$command_order{$name} = $id;
+
+	$commands{$id} = {
+		object => $object,
+		action => $action,
+		filters => $filters,
+		arguments => $arguments,
+	};
+
+	return $id;
+}
+
 sub getCommandList {
-	return sort(keys(%commands));
+	return sort { $a <=> $b } (keys(%commands));
 }
 
 sub getCommand {
 	my $cmd = shift;
 	return $commands{$cmd};
+}
+
+sub getCommandIdFromName {
+	my $name = shift;
+	return $command_order{$name};
 }
 
 sub getCommandObject {
@@ -351,6 +372,6 @@ for my $cmd (getCommandList()){
 	}
 }
 
-print STDOUT ($error_found ? $error_message : getCommandRowValue($order_hash{cmd_get_new_tenant}, 0, "name") ) . "\n";
+print STDOUT ($error_found ? $error_message : getCommandRowValue(getCommandIdFromName("cmd_get_new_tenant"), 0, "name") ) . "\n";
 
 exit($error_found ? $EXIT_ERROR_CODE : $EXIT_OK_CODE);

@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use Mojolicious::Lite;
+use Mojo::JSON qw(decode_json);
 use Deep::Encode;
 use Backticks;
 
@@ -14,6 +15,12 @@ app->config(hypnotoad => {listen => ['http://localhost:3001']});
 sub get_input_json {
 	my $c = shift;
 	my $json = $c->req->json // $c->req->params->to_hash;
+
+	foreach my $key (keys %{$json}){
+		eval {
+			$json->{$key} = decode_json($json->{$key});
+		}
+	}
 
 	deep_utf8_decode($json);
 
@@ -31,8 +38,15 @@ any [qw(POST GET)] => '/create_tenant' => sub {
 	my $input_json = get_input_json($c);
 	my @args = ();
 	while(my ($key, $value) = each(%$input_json)){
+		if(ref($value) eq "ARRAY") {
+			foreach my $subvalue (@$value){
 		push @args, "-$key";
-		push @args, $value;
+				push @args, "\'$subvalue\'";
+			}
+		} else {
+			push @args, "-$key";
+			push @args, "\'$value\'";
+		}
 	}
 
 	# Call create tenant script
