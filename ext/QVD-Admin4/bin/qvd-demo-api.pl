@@ -30,6 +30,8 @@ sub get_input_json {
 # Routes
 any [qw(POST GET)] => '/create_tenant' => sub {
 	my $c = shift;
+	$c->inactivity_timeout(300);
+
 	my $exit_code = 0;
 	my $message = "OK";
 	my $tenant_name = "";
