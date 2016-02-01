@@ -296,6 +296,10 @@ vm.lxc.unionfs.bind.ro = 1
 # because they run as root and can do anything on the host
 vm.lxc.hooks.allow = 0
 
+# allow DI redirection - disabled by default as it allows to take
+# control of the host
+vm.lxc.redirect.allow = 0
+
 internal.vm.lxc.conf.extra=
 
 ## whether to keep overlay images from one session to the next
