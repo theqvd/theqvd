@@ -580,7 +580,7 @@ sub _run_hook {
                          os_meta => $meta,
                          $self->_hook_args );
 
-            $debug and $self->_debug("running hook $hook< for $name");
+            $debug and $self->_debug("running hook $hook for $name");
             DEBUG "Running hook '$hook' for '$name'";
             $self->_run_cmd( { skip_cmd_lookup => 1 },
                              $hook => @args);
