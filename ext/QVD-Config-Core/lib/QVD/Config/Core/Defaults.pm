@@ -292,6 +292,10 @@ vm.lxc.unionfs.type = overlayfs
 # vm.lxc.unionfs.type = unionfs-fuse
 vm.lxc.unionfs.bind.ro = 1
 
+# allow LXC DIs to have hooks for customization - disabled by default
+# because they run as root and can do anything on the host
+vm.lxc.hooks.allow = 0
+
 internal.vm.lxc.conf.extra=
 
 ## whether to keep overlay images from one session to the next
