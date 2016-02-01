@@ -157,9 +157,15 @@ sub _analyze_os_image {
         DEBUG 'OS image is of type basic';
     }
     elsif (-d "$basefs/rootfs/sbin/") {
+        if (-l "$basefs/rootfs") {
+            ERROR "rootfs inside DI is a symbolic link";
+            return $self->_on_error;
+        }
+        else {
         $self->{meta} = $basefs;
         $self->{basefs_subdir} = 'rootfs';
         DEBUG 'OS image is of type extended';
+    }
     }
     else {
         ERROR "sbin not found at $basefs/sbin or at $basefs/rootfs/sbin for VM $self->{vm_id}";
