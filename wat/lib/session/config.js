@@ -46,8 +46,8 @@ Wat.C = {
     
     // Init Api address configuration
     initApiAddress: function () {
-        this.apiUrl = 'http://' + Wat.C.apiAddress + ':' + Wat.C.apiPort + '/';
-        this.apiWSUrl = 'ws://' + Wat.C.apiAddress + ':' + Wat.C.apiPort + '/ws';
+        this.apiUrl = 'https://' + Wat.C.apiAddress + ':' + Wat.C.apiPort + '/api/';
+        this.apiWSUrl = 'wss://' + Wat.C.apiAddress + ':' + Wat.C.apiPort + '/api/ws';
     },
 
     // Get the base URL for API calls using credentials or session ID

@@ -12,7 +12,7 @@ Wat.WS = {
 
             try {
                 // Let us open a web socket
-                var wsURI = 'ws://' + Wat.C.apiAddress + ':' + Wat.C.apiPort + '/' + stream + '?sid=' + Wat.C.sid + '&action=' + action + urlParams + '&parameters=' + JSON.stringify({source: Wat.C.source});
+                var wsURI = 'wss://' + Wat.C.apiAddress + ':' + Wat.C.apiPort + '/api/' + stream + '?sid=' + Wat.C.sid + '&action=' + action + urlParams + '&parameters=' + JSON.stringify({source: Wat.C.source});
                 var ws = new WebSocket(encodeURI(wsURI));
 
                 ws.onopen = function() {

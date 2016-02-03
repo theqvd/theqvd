@@ -54,6 +54,23 @@ $ENV{MOJO_MAX_MESSAGE_SIZE} = 0;
 
 $ENV{MOJO_TMPDIR} = app->qvd_admin4_api->_cfg('path.storage.images');
 
+# Intended to set the address where the app is supposed to listen with hypnotoad
+my $protocol = "https";
+my $port = 80;
+my $listenAddreses = "*";
+my $certificatePath = "/etc/qvd/certs/server-certificate.pem";
+my $privateKeyPath = "/etc/qvd/certs/server-private-key.pem";
+app->config(hypnotoad => {
+		listen => ["${protocol}://${listenAddreses}:${port}?cert=${certificatePath}&key=${privateKeyPath}"],
+	}
+);
+
+# Static web data provider
+plugin 'Directory' => {
+	root => "/usr/lib/qvd/wat" ,
+	dir_index => [qw/index.html index.htm/]
+};
+
 # This hook prints upload progress of large files in console
 
 app->hook(after_build_tx => sub {
@@ -71,10 +88,6 @@ app->hook(after_build_tx => sub {
 # Intended to store log info about the API
 
 app->log( Mojo::Log->new( path => app->qvd_admin4_api->_cfg('wat.log.filename'), level => 'debug' ) );
-
-# Intended to set the daddress where the app is supposed to listen with hypnotoad
-
-app->config(hypnotoad => {listen => ['http://localhost:3000']});
 
 # Package that implements an ad hoc transport system for the sessions manager (MojoX::Session) 
 # According to MojoX::Session specifications, it must provide methods intended to get the session
@@ -106,7 +119,7 @@ package MojoX::Session::Transport::WAT
 # This url retrieves general info about the API.
 # This url can be accessed without authentication
 
-any [qw(POST GET)] => '/info' => sub {
+any [qw(POST GET)] => '/api/info' => sub {
   my $c = shift;
 
   $c->res->headers->header('Access-Control-Allow-Origin' => '*');
@@ -153,7 +166,7 @@ under sub {
 
 # This is the main url in the API
 
-any [qw(POST GET)] => '/' => sub {
+any [qw(POST GET)] => '/api' => sub {
 
     my $c = shift;
     
@@ -174,7 +187,7 @@ any [qw(POST GET)] => '/' => sub {
 # This websocket is intended to report the current state of the system in real time
 # number of vms running, number vms in a host and so on.
 
-websocket '/ws' => sub {
+websocket '/api/ws' => sub {
 	my $c = shift;
 	$c->app->log->debug("WebSocket opened");
 	$c->inactivity_timeout(30000);
@@ -241,7 +254,7 @@ websocket '/ws' => sub {
 
 # COPY OF DISK IMAGES FROM STAGING
 
-websocket '/staging' => sub {
+websocket '/api/staging' => sub {
     my $c = shift;
     $c->inactivity_timeout(3000);
     $c->app->log->debug("Staging WebSocket opened");
@@ -324,7 +337,7 @@ websocket '/staging' => sub {
 
 # UPLOAD OF DISK IMAGES
 
-any [qw(POST OPTIONS)] => '/di/upload' => sub {
+any [qw(POST OPTIONS)] => '/api/di/upload' => sub {
 
     my $c = shift;
     $c->inactivity_timeout(30000);     
@@ -373,7 +386,7 @@ any [qw(POST OPTIONS)] => '/di/upload' => sub {
 
 # DOWNLOAD OF DISK IMAGES
 
-websocket '/di/download' => sub {
+websocket '/api/di/download' => sub {
     
     my $c = shift;
     $c->inactivity_timeout(30000);     
