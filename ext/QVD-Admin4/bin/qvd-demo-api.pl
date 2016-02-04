@@ -66,14 +66,17 @@ any [qw(POST GET)] => '/create_tenant' => sub {
 		$exit_code = 1;
 	} else {
 		$exit_code = $cmd_output->exitcode();
-		my $output = $cmd_output->stdout();
-		chomp($output);
+		my $stdout = $cmd_output->stdout();
+		chomp($stdout);
+		my $stderr = $cmd_output->stderr();
+		chomp($stderr);
+		$stderr =~ s/\n/, /g;
 		my $OK_code = 0;
 		if($OK_code == $exit_code){
-			$tenant_name = $output;
+			$tenant_name = $stdout;
 		} else {
 			$tenant_name = "";
-			$message = $output;
+			$message = "${stdout}: ${stderr}";
 		}
 	}
 

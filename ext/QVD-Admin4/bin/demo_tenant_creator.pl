@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-use List::MoreUtils qw(first_index);
+use List::MoreUtils qw(first_index uniq);
 use Getopt::Long;
 use Backticks;
 
@@ -16,24 +16,24 @@ my $password_superadmin = "superadmin";
 
 my $tenant_name;
 my $admin_name = "admin";
+my $admin_pass = $admin_name;
 my $user_name = "user";
+my $user_pass = $user_name;
 
 # Images
 my @images = ();
-my %images_map = (
-	empty   => "empty-image.tar.gz",
-	generic => "ubuntu-13.04-i386-qvd.tar.gz",
-);
 
 # Options
 GetOptions (
-	"stenant=s"   => \$tenant_superadmin,
-	"slogin=s"    => \$login_superadmin,
-	"spass=s"     => \$password_superadmin,
-	"newtenant=s" => \$tenant_name,
-	"newadmin=s"  => \$admin_name,
-	"newuser=s"   => \$user_name,
-	"image=s"     => \@images,
+	"sa_tenant=s"      => \$tenant_superadmin,
+	"sa_login=s"       => \$login_superadmin,
+	"sa_password=s"    => \$password_superadmin,
+	"tenant_name=s"    => \$tenant_name,
+	"admin_name=s"     => \$admin_name,
+	"admin_password=s" => \$admin_pass,
+	"user_name=s"      => \$user_name,
+	"user_password=s"  => \$user_pass,
+	"images=s"         => \@images,
 ) or (print("Command line arguments not valid\n") and exit($EXIT_ERROR_CODE));
 
 if (not defined $tenant_name) {
@@ -84,7 +84,7 @@ addCommand( "cmd_new_admin", "admin", "new",
 	{
 			name => "$admin_name",
 		tenant_id => sub { getCommandRowValue(getCommandIdFromName("cmd_new_tenant"), 0, "id") },
-			password => "$admin_name",
+		password => "$admin_pass",
 	}
 );
 addCommand( "cmd_assign_role", "admin", "assign role",
@@ -99,13 +99,13 @@ addCommand( "cmd_new_user", "user", "new",
 	{ },
 	{
 			name => "$user_name",
-			password => "$user_name",
+		password => "$user_pass",
 		tenant_id => sub { getCommandRowValue(getCommandIdFromName("cmd_new_tenant"), 0, "id") },
 	}
 );
 
 my $image_number = 1;
-my %image_count = map {$_ => 1} keys (%images_map);
+my %image_count = map {$_ => 1} uniq (@images);
 for my $image (@images) {
 	addCommand( "cmd_new_osf_$image_number", "osf", "new",
 		{ },
@@ -118,7 +118,7 @@ for my $image (@images) {
 		{ },
 		{
 			osf_id => sub { getCommandRowValue(getCommandIdFromName("cmd_new_osf_$image_number"), 0, "id") },
-			disk_image => $images_map{$image} // $image,
+			disk_image => get_image_filename($image),
 		}
 	);
 	addCommand( "cmd_new_vm_$image_number", "vm", "new",
@@ -341,6 +341,11 @@ sub parse_csv {
 		push(@{$csv_hash->{rows}}, [ split(";", $lines[$i]) ]);
 	}
 	return $csv_hash;
+}
+
+sub get_image_filename {
+	my ($image_name) = @_;
+	return "image-${image_name}.tar.gz";
 }
 
 ### MAIN ###
