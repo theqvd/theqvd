@@ -9,12 +9,7 @@ use QVD::Admin4::CLI::Tokenizer;
 use Mojo::UserAgent;
 use Mojo::URL;
 use Term::ReadKey;
-
-our %environment_config = (
-	login => 'QVD_ADMIN_LOGIN',
-	password => 'QVD_ADMIN_PASSWORD',
-	tenant_name => 'QVD_ADMIN_TENANT',
-);
+use Config::Properties;
 
 sub usage_text { 
 "
@@ -68,9 +63,14 @@ sub usage_text {
 
 
 sub option_spec {
-        [ 'host|h=s'   => 'API host' ],
-        [ 'port|p=s'   => 'API port' ],
-	[ 'type|t=s'   => 'Output type' ],
+	[ 'host|H=s'       => 'API host' ],
+	[ 'port|P=s'       => 'API port' ],
+	[ 'tenant|t=s'     => 'API admin tenant name' ],
+	[ 'login|l=s'      => 'API admin login' ],
+	[ 'password|p=s'   => 'API admin password' ],
+	[ 'format|f=s'     => 'Output format' ],
+	[ 'insecure'       => 'Trust any certificate'],
+	[ 'ca=s'           => 'CA certificate path'],
 }
 
 sub command_map {
@@ -103,45 +103,63 @@ sub command_map {
 sub init {
     my ($self, $opts) = @_;
 
-    my ($host,$port) =  # It gets the API address
-	(($opts->host || 'localhost'), 
-	 ($opts->port || 3000)); 
-	my @output_types = ('TABLE', 'CSV');
-	my $output_type = $opts->type // 'TABLE';
-	if (not grep {$_ eq $output_type} @output_types ) {
-		print "[WARNING] Output type shall be one of:" . join(", ",@output_types).
+	my $config_path = $ENV{"HOME"} . "/.qvd.conf";
+	open my $config_fh, '<', $config_path;
+	my $config = Config::Properties->new();
+	$config->load($config_fh);
+	close $config_fh;
+
+	my ($host, $port, $tenant_name, $login, $password, $insecure, $ca_cert_path, $output_format);
+	$host = ($opts->host // $config->getProperty('qa.host')) // 'localhost';
+	$port = ($opts->port // $config->getProperty('qa.port')) // 80;
+	$tenant_name = $opts->tenant // $config->getProperty('qa.tenant');
+	$login = $opts->login // $config->getProperty('qa.login');
+	$password = $opts->password // $config->getProperty('qa.password');
+	$insecure = ($opts->insecure // $config->getProperty('qa.insecure')) // 0;
+	$ca_cert_path = ($opts->ca // $config->getProperty('qa.ca'));
+	my @output_formats = ('TABLE', 'CSV');
+	$output_format = ($opts->format // $config->getProperty('qa.format')) // 'TABLE';
+	if (not grep {$_ eq $output_format} @output_formats ) {
+		print STDERR "[WARNING] Output format shall be one of:" . join(", ",@output_formats).
 			". Using TABLE by default.\n";
-		$output_type = 'TABLE';
+		$output_format = 'TABLE';
 	}
 
 	# Created as objects all addresses in API
 
     my $api_url = Mojo::URL->new(); 
-    $api_url->scheme('http'); 
+	$api_url->scheme('https');
     $api_url->host($host); 
     $api_url->port($port); 
+	$api_url->path('/api');
     
     my $api_info_url = Mojo::URL->new(); 
-    $api_info_url->scheme('http'); 
+	$api_info_url->scheme('https');
     $api_info_url->host($host); 
     $api_info_url->port($port); 
-    $api_info_url->path('/info');
+	$api_info_url->path('/api/info');
     
     my $api_staging_url = Mojo::URL->new(); 
-    $api_staging_url->scheme('ws'); 
+	$api_staging_url->scheme('wss');
     $api_staging_url->host($host); 
     $api_staging_url->port($port); 
-    $api_staging_url->path('/staging');
+	$api_staging_url->path('/api/staging');
     
     my $api_di_upload_url = Mojo::URL->new(); 
-    $api_di_upload_url->scheme('http'); 
+	$api_di_upload_url->scheme('https');
     $api_di_upload_url->host($host); 
     $api_di_upload_url->port($port); 
-    $api_di_upload_url->path('/di/upload');
+	$api_di_upload_url->path('/api/di/upload');
     
 	# Created a web client
-
-    my $user_agent = Mojo::UserAgent->new;
+	my $user_agent = Mojo::UserAgent->new();
+	unless($opts->insecure){
+		if (not -e $ca_cert_path){
+			die "CA certificate \"$ca_cert_path\" does not exist";
+		} else {
+			$user_agent->ca($ca_cert_path);
+		}
+	}
 
 	# Created objects to parse the input string
 
@@ -155,27 +173,22 @@ sub init {
     $self->cache->set( user_agent => $user_agent ); 
     $self->cache->set( parser => $parser);
     $self->cache->set( tokenizer => $tokenizer );
-    $self->cache->set( api_url => $api_url ); # url '/' in API
-    $self->cache->set( api_info_url => $api_info_url ); # url '/info' in API
-    $self->cache->set( api_di_upload_url => $api_di_upload_url ); # url '/di/upload' in API
-    $self->cache->set( api_staging_url => $api_staging_url ); # ws url '/staging' in API
+	$self->cache->set( api_url => $api_url );
+	$self->cache->set( api_info_url => $api_info_url );
+	$self->cache->set( api_di_upload_url => $api_di_upload_url );
+	$self->cache->set( api_staging_url => $api_staging_url );
     $self->cache->set( login => undef ); # No default credentials provided
     $self->cache->set( tenant_name => undef ); 
     $self->cache->set( password => undef ); 
 	$self->cache->set( block => 25 ); # FIXME. Default block value should be taken from a config file or sth.
-	$self->cache->set( display_mode => $output_type );
+	$self->cache->set( display_mode => $output_format );
 	$self->cache->set( exit_code => 0 );
 
 
 	if (not $self->is_interactive_mode_enabled()){
-		for my $cache_key (keys %environment_config){
-			my $env_key = $environment_config{$cache_key};
-			if (not defined $ENV{$env_key}) {
-				printf("Environment variable %s is not defined\n", $env_key);
-			} else {
-				$self->cache->set( $cache_key => $ENV{$env_key} );
-			}
-		}
+		$self->cache->set( tenant_name => $tenant_name );
+		$self->cache->set( login => $login );
+		$self->cache->set( password => $password );
 	}
 
 }

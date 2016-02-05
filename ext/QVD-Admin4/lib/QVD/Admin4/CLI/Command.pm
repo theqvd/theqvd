@@ -1213,7 +1213,7 @@ sub ask_api_standard {
 		}
 	)->res;
 
-    CLI::Framework::Exception->throw('API returns bad status')
+	CLI::Framework::Exception->throw($res->error->{message})
 	unless $res->code;
 
     $self->check_api_result($res);
@@ -1266,7 +1266,7 @@ sub ask_api_staging
 
     Mojo::IOLoop->start;
 
-    CLI::Framework::Exception->throw('API returns bad status') 
+	CLI::Framework::Exception->throw($res->error->{message})
 	unless $res->code;
 
     $self->check_api_result($res);
