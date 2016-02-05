@@ -105,12 +105,13 @@ addCommand( "cmd_new_user", "user", "new",
 );
 
 my $image_number = 1;
-my %image_count = map {$_ => 1} uniq (@images);
+my %image_count = map {$_ => 0} uniq (@images);
 for my $image (@images) {
+	my $suffix = ($image_count{$image} > 0 ? "_" . $image_count{$image} : "");
 	addCommand( "cmd_new_osf_$image_number", "osf", "new",
 		{ },
 		{
-			name => "osf_${image}_$image_count{$image}",
+			name => "OSF_${image}${suffix}",
 			tenant_id => sub { getCommandRowValue(getCommandIdFromName("cmd_new_tenant"), 0, "id") },
 		},
 	);
@@ -131,7 +132,7 @@ for my $image (@images) {
 				return $id;
 	},
 			di_tag => "default",
-			name => "vm_${image}_$image_count{$image}",
+			name => "Desktop_${image}${suffix}",
 	}
 	);
 	$image_count{$image}++;
@@ -345,7 +346,7 @@ sub parse_csv {
 
 sub get_image_filename {
 	my ($image_name) = @_;
-	return "image-${image_name}.tar.gz";
+	return "Desktop_${image_name}.tar.gz";
 }
 
 ### MAIN ###
