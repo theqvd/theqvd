@@ -10,6 +10,9 @@ my $EXIT_ERROR_CODE = 1;
 my $EXIT_OK_CODE = 0;
 
 # Get input parameters
+my $host = "127.0.0.1";
+my $port = 80;
+
 my $tenant_superadmin = "*";
 my $login_superadmin = "superadmin";
 my $password_superadmin = "superadmin";
@@ -25,6 +28,8 @@ my @images = ();
 
 # Options
 GetOptions (
+	"host=s"           => \$host,
+	"port=s"           => \$port,
 	"sa_tenant=s"      => \$tenant_superadmin,
 	"sa_login=s"       => \$login_superadmin,
 	"sa_password=s"    => \$password_superadmin,
@@ -43,14 +48,8 @@ if (not defined $tenant_name) {
 
 # qvd-administrator tool directory
 my $perl = "/usr/lib/qvd/bin/perl -Mlib::glob=./*/lib";
-my $qa = "./QVD-Admin4/bin/qa -t CSV ";
-
-# Environment variables to be set
-my %env_variables = (
-	QVD_ADMIN_TENANT => $tenant_superadmin,
-	QVD_ADMIN_PASSWORD => $password_superadmin,
-	QVD_ADMIN_LOGIN => $login_superadmin,
-);
+my $qa = "./QVD-Admin4/bin/qa -f CSV -H \"$host\" -P $port " .
+	"-t \"$tenant_superadmin\" -l \"$login_superadmin\" -p \"$password_superadmin\" --insecure";
 
 # Commands to be executed
 my %command_order = ();
@@ -350,11 +349,6 @@ sub get_image_filename {
 }
 
 ### MAIN ###
-
-# Set environment variables
-while( my ($key, $value) = each(%env_variables) ) {
-	$ENV{$key} = $value;
-}
 
 # Execute command list
 my $error_found = 0;
