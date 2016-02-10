@@ -10,6 +10,7 @@ __PACKAGE__->add_columns(
 	id          => { data_type => 'integer', is_auto_increment => 1 },
                           name        => { data_type => 'varchar(80)' },
 	description => { data_type => 'varchar(32768)', is_nullable => 1 },
+	blocked     => { data_type => 'bool', is_nullable => 1, default_value => 0 },
 );
 
 __PACKAGE__->set_primary_key('id');
