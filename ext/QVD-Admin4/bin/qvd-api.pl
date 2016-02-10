@@ -15,6 +15,22 @@ use File::Copy qw(copy move);
 
 plugin 'QVD::Admin4::REST';
 
+# CONFIGURATION
+
+my $protocol = "https";
+my $port = 80;
+my $listenAddreses = "*";
+
+my $certificates = get_certificates();
+eval {
+	create_files( $certificates );
+};
+if ($@) { print $@; exit(1) };
+my $cert_path = (grep { $_ =~ /cert/ } (keys %$certificates))[0];
+my $key_path = (grep { $_ =~ /key/ } (keys %$certificates))[0];
+
+my $wat_path = "/usr/lib/qvd/wat";
+
 # HELPERS
 
 # Intended to check and encode the JSON that receives the API as iunput
@@ -55,20 +71,16 @@ $ENV{MOJO_MAX_MESSAGE_SIZE} = 0;
 $ENV{MOJO_TMPDIR} = app->qvd_admin4_api->_cfg('path.storage.images');
 
 # Intended to set the address where the app is supposed to listen with hypnotoad
-my $protocol = "https";
-my $port = 80;
-my $listenAddreses = "*";
-my $certificatePath = "/etc/qvd/certs/server-certificate.pem";
-my $privateKeyPath = "/etc/qvd/certs/server-private-key.pem";
-app->config(hypnotoad => {
-		listen => ["${protocol}://${listenAddreses}:${port}?cert=${certificatePath}&key=${privateKeyPath}"],
+app->config(
+	hypnotoad => {
+		listen => ["${protocol}://${listenAddreses}:${port}?cert=${cert_path}&key=${key_path}"],
 	}
 );
 
 # Static web data provider
 plugin 'Directory' => {
-	root => "/usr/lib/qvd/wat" ,
-	dir_index => [qw/index.html index.htm/]
+	root => $wat_path,
+	dir_index => [qw/index.html index.htm/],
 };
 
 # This hook prints upload progress of large files in console
@@ -640,4 +652,32 @@ sub report_di_problem_in_log
 	status => $code
 	
 	)->report;
+}
+
+sub get_certificates {
+	my $certificates = {};
+
+	my @files = ("key", "cert");
+	for my $file (@files) {
+		my $path = app->qvd_admin4_api->_cfg("path.l7r.ssl.$file");
+		my $content = app->qvd_admin4_api->_cfg("l7r.ssl.$file");
+		$certificates->{$path} = $content;
+	}
+
+	return $certificates;
+}
+
+sub create_files {
+	my ($files) = @_;
+
+	for my $path (keys %$files){
+		my $content = $files->{$path};
+		if(defined $content && "" ne $content) {
+			open( my $fh, '>', $path ) or die "Could not create file '$path' $!";
+			print $fh $content;
+			close $fh;
+		}
+	}
+
+	return 1;
 }
