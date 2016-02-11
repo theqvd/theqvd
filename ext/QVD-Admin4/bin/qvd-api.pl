@@ -163,14 +163,14 @@ under sub {
 
     my $json = $c->get_input_json;
     
+	my $auth_method = $c->get_auth_method($json);
+
     my %session_args = (
 	store  => [dbi => {dbh => QVD::DB->new()->storage->dbh}],
 	transport => MojoX::Session::Transport::WAT->new(),
 	tx => $c->tx);
 
     my $session = MojoX::Session->new(%session_args);
-
-    my $auth_method = $c->get_auth_method($session,$json);
 
     my ($bool,$exception) = $c->$auth_method($session,$json);
     $c->render(json => $exception->json) if $exception;
@@ -520,12 +520,12 @@ sub get_action_channels
 
 sub get_auth_method
 {
-    my ($c,$session,$json) = @_;   
+	my ($c,$json) = @_;
     return 'create_session' if 
 	defined $json->{login} && defined $json->{password};
 
     return 'update_session' if
-	$session->load;
+		defined $json->{sid};
 
     return 'reject_access';
 }
@@ -573,8 +573,13 @@ sub update_session
 {
     my ($c,$session,$json) = @_;
 
-    if ($session->is_expired)
-    { $session->flush;
+	unless($session->load) {
+		return (0, QVD::Admin4::Exception->new(code => 3200));
+	}
+
+	if ($session->is_expired) {
+
+		$session->flush;
 
       QVD::Admin4::LogReport->new(
 
