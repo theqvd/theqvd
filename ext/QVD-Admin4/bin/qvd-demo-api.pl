@@ -10,7 +10,7 @@ my $perl_path = "$^X";
 my $create_tenant_script_path = "./QVD-Admin4/bin/demo_tenant_creator.pl";
 
 # Set port
-app->config(hypnotoad => {listen => ['http://localhost:3001']});
+app->config(hypnotoad => {listen => ['http://*:3001']});
 
 sub get_input_json {
 	my $c = shift;

@@ -24,6 +24,7 @@ my $user_pass = $user_name;
 
 # Images
 my @images = ();
+my @vms = ();
 
 # Options
 GetOptions (
@@ -37,12 +38,17 @@ GetOptions (
 	"user_name=s"      => \$user_name,
 	"user_password=s"  => \$user_pass,
 	"images=s"         => \@images,
+	"vms=s"            => \@vms,
 ) or (print("Command line arguments not valid\n") and exit($EXIT_ERROR_CODE));
 
 if (not defined $tenant_name) {
 	print ("New tenant name not defined\n");
 	exit($EXIT_ERROR_CODE);
 }
+
+my @image_with_vm = ();
+foreach (@images) { push @image_with_vm, [$_, 0] };
+foreach (@vms) { push @image_with_vm, [$_, 1] };
 
 # qvd-administrator tool directory
 my $perl = "/usr/lib/qvd/bin/perl -Mlib::glob=./*/lib";
@@ -102,9 +108,12 @@ addCommand( "cmd_new_user", "user", "new",
 );
 
 my $image_number = 1;
-my %image_count = map {$_ => 0} uniq (@images);
-for my $image (@images) {
+my %image_count = map {$_ => 0} uniq ( map {$_->[0]} @image_with_vm);
+for my $img_ref (@image_with_vm) {
+	my $image = $img_ref->[0];
+	my $is_vm = $img_ref->[1];
 	my $suffix = ($image_count{$image} > 0 ? "_" . $image_count{$image} : "");
+
 	addCommand( "cmd_new_osf_$image_number", "osf", "new",
 		{ },
 		{
@@ -115,28 +124,29 @@ for my $image (@images) {
 	addCommand( "cmd_new_di_$image_number", "di", "new",
 		{ },
 		{
-			osf_id => sub { getCommandRowValue(getCommandIdFromName("cmd_new_osf_$image_number"), 0, "id") },
+			osf_id => eval "sub { getCommandRowValue(getCommandIdFromName(\"cmd_new_osf_$image_number\"), 0, \"id\") }",
 			disk_image => get_image_filename($image),
 		}
 	);
+
+	if($is_vm) {
 	addCommand( "cmd_new_vm_$image_number", "vm", "new",
 		{ },
 		{
-			user_id => sub { getCommandRowValue(getCommandIdFromName("cmd_new_user"), 0, "id") },
-			osf_id => sub {
-				my $id = getCommandRowValue(getCommandIdFromName("cmd_new_osf_$image_number"), 0, "id");
-				$image_number++;
-				return $id;
-	},
+				user_id => sub { getCommandRowValue( getCommandIdFromName( "cmd_new_user" ), 0, "id" ) },
+				osf_id  => eval "sub {
+					my \$id = getCommandRowValue( getCommandIdFromName( \"cmd_new_osf_$image_number\" ), 0, \"id\" );
+					return \$id;
+				}",
 			di_tag => "default",
 			name => "Desktop_${image}${suffix}",
 	}
 	);
+	}
+
 	$image_count{$image}++;
 	$image_number++;
 }
-# Need to restart the value to be increased during the execution
-$image_number = 1;
 
 
 # Command methods
