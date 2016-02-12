@@ -9,7 +9,15 @@ use QVD::Admin4::CLI::Tokenizer;
 use Mojo::UserAgent;
 use Mojo::URL;
 use Term::ReadKey;
-use Config::Properties;
+
+BEGIN {
+	@QVD::Config::Core::FILES = (
+		'/etc/qvd/qa.conf',
+		($ENV{HOME} || $ENV{APPDATA}).'/.qvd/qa.conf',
+		'qvd-qa.conf',
+	);
+}
+use QVD::Config::Core qw(core_cfg);
 
 sub usage_text { 
 "
@@ -63,8 +71,7 @@ sub usage_text {
 
 
 sub option_spec {
-	[ 'host|H=s'       => 'API host' ],
-	[ 'port|P=s'       => 'API port' ],
+	[ 'url|u=s'        => 'API url. Example: http://127.0.0.1:3000/api' ],
 	[ 'tenant|t=s'     => 'API admin tenant name' ],
 	[ 'login|l=s'      => 'API admin login' ],
 	[ 'password|p=s'   => 'API admin password' ],
@@ -103,22 +110,18 @@ sub command_map {
 sub init {
     my ($self, $opts) = @_;
 
-	my $config_path = $ENV{"HOME"} . "/.qvd.conf";
-	open my $config_fh, '<', $config_path;
-	my $config = Config::Properties->new();
-	$config->load($config_fh);
-	close $config_fh;
-
-	my ($host, $port, $tenant_name, $login, $password, $insecure, $ca_cert_path, $output_format);
-	$host = ($opts->host // $config->getProperty('qa.host')) // 'localhost';
-	$port = ($opts->port // $config->getProperty('qa.port')) // 80;
-	$tenant_name = $opts->tenant // $config->getProperty('qa.tenant');
-	$login = $opts->login // $config->getProperty('qa.login');
-	$password = $opts->password // $config->getProperty('qa.password');
-	$insecure = ($opts->insecure // $config->getProperty('qa.insecure')) // 0;
-	$ca_cert_path = ($opts->ca // $config->getProperty('qa.ca'));
+	my ($url, $tenant_name, $login, $password, $insecure, $ca_cert_path, $output_format);
+	$url = Mojo::URL->new($opts->url // core_cfg('qa.url'));
+	my $url_path = $url->path->trailing_slash(1);
+	$url_path =~ s/\/\//\//g;
+	$url->path($url_path);
+	$tenant_name = $opts->tenant // core_cfg('qa.tenant');
+	$login = $opts->login // core_cfg('qa.login');
+	$password = $opts->password // core_cfg('qa.password');
+	$insecure = $opts->insecure // core_cfg('qa.insecure');
+	$ca_cert_path = $opts->ca // core_cfg('qa.ca');
 	my @output_formats = ('TABLE', 'CSV');
-	$output_format = ($opts->format // $config->getProperty('qa.format')) // 'TABLE';
+	$output_format = $opts->format //core_cfg('qa.format');
 	if (not grep {$_ eq $output_format} @output_formats ) {
 		print STDERR "[WARNING] Output format shall be one of:" . join(", ",@output_formats).
 			". Using TABLE by default.\n";
@@ -127,29 +130,18 @@ sub init {
 
 	# Created as objects all addresses in API
 
-    my $api_url = Mojo::URL->new(); 
-	$api_url->scheme('https');
-    $api_url->host($host); 
-    $api_url->port($port); 
-	$api_url->path('/api');
+	my $api_url = Mojo::URL->new($url . 'api');
+
+	my $api_info_url = Mojo::URL->new($url . 'api/info');
     
-    my $api_info_url = Mojo::URL->new(); 
-	$api_info_url->scheme('https');
-    $api_info_url->host($host); 
-    $api_info_url->port($port); 
-	$api_info_url->path('/api/info');
+	my $api_di_upload_url = Mojo::URL->new($url . 'api/di/upload');
     
-    my $api_staging_url = Mojo::URL->new(); 
+	my $api_staging_url = Mojo::URL->new($url . 'api/staging');
+	if ($api_staging_url->scheme() eq "http"){
+		$api_staging_url->scheme('ws');
+	} else {
 	$api_staging_url->scheme('wss');
-    $api_staging_url->host($host); 
-    $api_staging_url->port($port); 
-	$api_staging_url->path('/api/staging');
-    
-    my $api_di_upload_url = Mojo::URL->new(); 
-	$api_di_upload_url->scheme('https');
-    $api_di_upload_url->host($host); 
-    $api_di_upload_url->port($port); 
-	$api_di_upload_url->path('/api/di/upload');
+	}
     
 	# Created a web client
 	my $user_agent = Mojo::UserAgent->new();

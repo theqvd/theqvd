@@ -10,8 +10,7 @@ my $EXIT_ERROR_CODE = 1;
 my $EXIT_OK_CODE = 0;
 
 # Get input parameters
-my $host = "127.0.0.1";
-my $port = 80;
+my $url = "https://127.0.0.1:80/";
 
 my $tenant_superadmin = "*";
 my $login_superadmin = "superadmin";
@@ -28,8 +27,7 @@ my @images = ();
 
 # Options
 GetOptions (
-	"host=s"           => \$host,
-	"port=s"           => \$port,
+	"url=s"            => \$url,
 	"sa_tenant=s"      => \$tenant_superadmin,
 	"sa_login=s"       => \$login_superadmin,
 	"sa_password=s"    => \$password_superadmin,
@@ -48,7 +46,7 @@ if (not defined $tenant_name) {
 
 # qvd-administrator tool directory
 my $perl = "/usr/lib/qvd/bin/perl -Mlib::glob=./*/lib";
-my $qa = "./QVD-Admin4/bin/qa -f CSV -H \"$host\" -P $port " .
+my $qa = "./QVD-Admin4/bin/qa -f CSV -u \"$url\" " .
 	"-t \"$tenant_superadmin\" -l \"$login_superadmin\" -p \"$password_superadmin\" --insecure";
 
 # Commands to be executed

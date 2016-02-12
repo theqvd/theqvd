@@ -26,6 +26,10 @@ path.run = /var/run/qvd
 path.log = /var/log
 ## temporary files
 path.tmp = /var/tmp
+## directory for API files
+path.api = ${path.run}/api
+## path to index WAT file
+path.wat = /usr/lib/qvd/wat
 ## main storage location for OS images (both KVM and LXC)
 path.storage.root = /var/lib/qvd/storage
 ## OS images ready to be used
@@ -59,6 +63,10 @@ path.ssl.ca.system = /etc/ssl/certs
 path.ssl.ca.personal = certs
 
 path.darwin.ssl.ca.system = /System/Library/OpenSSL/certs/
+
+path.api.ssl = ${path.api}/ssl
+path.api.ssl.key = ${path.api.ssl}/key.pem
+path.api.ssl.cert = ${path.api.ssl}/cert.pem
 
 ## KVM serial port captures or LXC console output
 path.serial.captures = ${path.tmp}/qvd
@@ -266,6 +274,23 @@ l7r.as_user = root
 ## path to the l7r PID file
 l7r.pid_file = ${path.run}/qvd-l7r.pid
 
+# URL API is running
+# Example: https://*:80/
+api.url = https://*:80/
+
+# QVD-Admin parameters
+# url of the API
+qa.url = http://demo.theqvd.com:80/
+# Credentials for qa
+qa.tenant = *
+qa.login = superadmin
+qa.password = superadmin
+# Format options: TABLE, CSV
+qa.format = TABLE
+# Flag to verify the certificate in qa
+qa.insecure = 0
+# Path to the certification authority certificate
+qa.ca =
 
 ## username of the WAT administrator
 wat.admin.login = admin

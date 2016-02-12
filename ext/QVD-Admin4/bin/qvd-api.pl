@@ -15,22 +15,6 @@ use File::Copy qw(copy move);
 
 plugin 'QVD::Admin4::REST';
 
-# CONFIGURATION
-
-my $protocol = "https";
-my $port = 80;
-my $listenAddreses = "*";
-
-my $certificates = get_certificates();
-eval {
-	create_files( $certificates );
-};
-if ($@) { print $@; exit(1) };
-my $cert_path = (grep { $_ =~ /cert/ } (keys %$certificates))[0];
-my $key_path = (grep { $_ =~ /key/ } (keys %$certificates))[0];
-
-my $wat_path = "/usr/lib/qvd/wat";
-
 # HELPERS
 
 # Intended to check and encode the JSON that receives the API as iunput
@@ -71,13 +55,22 @@ $ENV{MOJO_MAX_MESSAGE_SIZE} = 0;
 $ENV{MOJO_TMPDIR} = app->qvd_admin4_api->_cfg('path.storage.images');
 
 # Intended to set the address where the app is supposed to listen with hypnotoad
+# CONFIGURATION
+my $api_url = app->qvd_admin4_api->_cfg('api.url');
+my $cert_path = app->qvd_admin4_api->_cfg('path.api.ssl.cert');
+my $key_path = app->qvd_admin4_api->_cfg('path.api.ssl.key');
+die "Certificate $cert_path file does not exist" unless (-e $cert_path);
+die "Private key $key_path file does not exist" unless (-e $key_path);
+
 app->config(
 	hypnotoad => {
-		listen => ["${protocol}://${listenAddreses}:${port}?cert=${cert_path}&key=${key_path}"],
+		listen => ["$api_url?cert=${cert_path}&key=${key_path}"],
 	}
 );
 
 # Static web data provider
+my $wat_path = app->qvd_admin4_api->_cfg('path.wat');
+
 plugin 'Directory' => {
 	root => $wat_path,
 	dir_index => [qw/index.html index.htm/],
@@ -654,30 +647,3 @@ sub report_di_problem_in_log
 	)->report;
 }
 
-sub get_certificates {
-	my $certificates = {};
-
-	my @files = ("key", "cert");
-	for my $file (@files) {
-		my $path = app->qvd_admin4_api->_cfg("path.l7r.ssl.$file");
-		my $content = app->qvd_admin4_api->_cfg("l7r.ssl.$file");
-		$certificates->{$path} = $content;
-	}
-
-	return $certificates;
-}
-
-sub create_files {
-	my ($files) = @_;
-
-	for my $path (keys %$files){
-		my $content = $files->{$path};
-		if(defined $content && "" ne $content) {
-			open( my $fh, '>', $path ) or die "Could not create file '$path' $!";
-			print $fh $content;
-			close $fh;
-		}
-	}
-
-	return 1;
-}

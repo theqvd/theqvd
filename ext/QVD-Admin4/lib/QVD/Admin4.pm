@@ -5,11 +5,8 @@ use strict;
 use warnings;
 use Moo;
 use QVD::DB::Simple;
-use QVD::Config;
-use QVD::Config::Core;
 use File::Copy qw(copy move);
 use File::Slurp qw (read_file);
-use Config::Properties;
 use QVD::Admin4::Exception;
 use DateTime;
 use List::Util qw(sum);
@@ -23,6 +20,16 @@ use Clone qw(clone);
 use QVD::Admin4::AclsOverwriteList;
 use QVD::Admin4::ConfigsOverwriteList;
 use Mojo::JSON qw(encode_json);
+
+BEGIN {
+	@QVD::Config::Core::FILES = (
+		'/etc/qvd/api.conf',
+		($ENV{HOME} || $ENV{APPDATA}).'/.qvd/api.conf',
+		'qvd-api.conf',
+	);
+}
+use QVD::Config;
+use QVD::Config::Core;
 
 our $VERSION = '0.01';
 
