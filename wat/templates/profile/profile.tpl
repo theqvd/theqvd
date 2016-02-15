@@ -10,6 +10,12 @@
 
 <table class="details details-list col-width-100">
     <tr>
+        <td><i class="<%= CLASS_ICON_TENANTS %>"></i><span data-i18n="Tenant"></span></td>
+        <td>
+            <span><%= tenantName %></span>
+        </td>
+    </tr>
+    <tr>
         <td><i class="fa fa-globe"></i><span data-i18n="Language"></span></td>
         <td>
             <span data-i18n="<%= WAT_LANGUAGE_ADMIN_OPTIONS[language] %>"></span>
