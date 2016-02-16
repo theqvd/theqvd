@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-   <style parent="@android:style/Theme.DeviceDefault.Light" name="QvdTheme"></style>
-</resources>

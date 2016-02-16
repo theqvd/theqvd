@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="com.antlersoft.android.contentxml">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/qvdclient/libs/com.antlersoft.android.contentxml.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

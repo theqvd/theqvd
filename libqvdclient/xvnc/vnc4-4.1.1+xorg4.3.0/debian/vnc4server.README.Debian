@@ -1,2 +1,0 @@
-You can configure vnc4server by adding a vnc.conf file to /etc.
-You can see a sample file in /usr/share/doc/vnc4server/examples.
