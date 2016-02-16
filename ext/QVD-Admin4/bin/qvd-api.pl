@@ -1,4 +1,14 @@
 #!/usr/bin/perl
+
+BEGIN {
+	$QVD::Config::USE_DB = 1;
+	@QVD::Config::FILES = (
+		'/etc/qvd/api.conf',
+		($ENV{HOME} || $ENV{APPDATA}).'/.qvd/api.conf',
+		'qvd-api.conf',
+	);
+}
+
 use Mojolicious::Lite;
 use Mojo::JSON qw(encode_json decode_json j);
 use QVD::Admin4::Exception;

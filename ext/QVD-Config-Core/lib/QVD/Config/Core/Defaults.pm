@@ -64,7 +64,7 @@ path.ssl.ca.personal = certs
 
 path.darwin.ssl.ca.system = /System/Library/OpenSSL/certs/
 
-path.api.ssl = ${path.api}/ssl
+path.api.ssl = /etc/qvd/api/certs
 path.api.ssl.key = ${path.api.ssl}/key.pem
 path.api.ssl.cert = ${path.api.ssl}/cert.pem
 

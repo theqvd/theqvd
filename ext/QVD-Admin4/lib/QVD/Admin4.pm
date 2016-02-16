@@ -20,14 +20,6 @@ use Clone qw(clone);
 use QVD::Admin4::AclsOverwriteList;
 use QVD::Admin4::ConfigsOverwriteList;
 use Mojo::JSON qw(encode_json);
-
-BEGIN {
-	@QVD::Config::Core::FILES = (
-		'/etc/qvd/api.conf',
-		($ENV{HOME} || $ENV{APPDATA}).'/.qvd/api.conf',
-		'qvd-api.conf',
-	);
-}
 use QVD::Config;
 use QVD::Config::Core;
 

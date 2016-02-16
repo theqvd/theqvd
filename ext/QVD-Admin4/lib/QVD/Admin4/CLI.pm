@@ -9,15 +9,7 @@ use QVD::Admin4::CLI::Tokenizer;
 use Mojo::UserAgent;
 use Mojo::URL;
 use Term::ReadKey;
-
-BEGIN {
-	@QVD::Config::Core::FILES = (
-		'/etc/qvd/qa.conf',
-		($ENV{HOME} || $ENV{APPDATA}).'/.qvd/qa.conf',
-		'qvd-qa.conf',
-	);
-}
-use QVD::Config::Core qw(core_cfg);
+use QVD::Config qw(cfg);
 
 sub usage_text { 
 "
@@ -111,17 +103,15 @@ sub init {
     my ($self, $opts) = @_;
 
 	my ($url, $tenant_name, $login, $password, $insecure, $ca_cert_path, $output_format);
-	$url = Mojo::URL->new($opts->url // core_cfg('qa.url'));
-	my $url_path = $url->path->trailing_slash(1);
-	$url_path =~ s/\/\//\//g;
-	$url->path($url_path);
-	$tenant_name = $opts->tenant // core_cfg('qa.tenant');
-	$login = $opts->login // core_cfg('qa.login');
-	$password = $opts->password // core_cfg('qa.password');
-	$insecure = $opts->insecure // core_cfg('qa.insecure');
-	$ca_cert_path = $opts->ca // core_cfg('qa.ca');
+	$url = Mojo::URL->new($opts->url // cfg('qa.url'));
+	$url->path->leading_slash(1)->trailing_slash(1)->canonicalize;
+	$tenant_name = $opts->tenant // cfg('qa.tenant');
+	$login = $opts->login // cfg('qa.login');
+	$password = $opts->password // cfg('qa.password');
+	$insecure = $opts->insecure // cfg('qa.insecure');
+	$ca_cert_path = $opts->ca // cfg('qa.ca');
 	my @output_formats = ('TABLE', 'CSV');
-	$output_format = $opts->format //core_cfg('qa.format');
+	$output_format = $opts->format //cfg('qa.format');
 	if (not grep {$_ eq $output_format} @output_formats ) {
 		print STDERR "[WARNING] Output format shall be one of:" . join(", ",@output_formats).
 			". Using TABLE by default.\n";
