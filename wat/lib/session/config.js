@@ -414,6 +414,11 @@ Wat.C = {
         }
         else {
             switch  (response.status) { 
+                case STATUS_TENANT_RESTRICTED:
+                    // Tenant restricted control will only works when logged (sid defined)
+                    if (!Wat.C.sid) {
+                        break;
+                    }
                 case STATUS_SESSION_EXPIRED:
                 case STATUS_CREDENTIALS_FAIL:
                     // Close dialog (if opened)

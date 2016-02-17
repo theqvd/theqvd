@@ -792,6 +792,7 @@
     "Wrong credentials - Login again": "Wrong credentials - Login again", 
     "Session expired - Login again": "Session expired - Login again", 
     "Problems to update expiration time in session": "Problems to update expiration time in session", 
+    "Access to tenant is restricted": "Access to tenant is restricted", 
     "Unavailable action": "Unavailable action", 
     "Forbidden action for this administrator": "Forbidden action for this administrator", 
     "Forbidden filter for this administrator": "Forbidden filter for this administrator", 

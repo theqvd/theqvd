@@ -795,6 +795,7 @@
     "Wrong credentials - Login again": "Credenciales incorrectas - Inicia sesión de nuevo", 
     "Session expired - Login again": "Sesión expirada - Inicia sesión de nuevo", 
     "Problems to update expiration time in session": "Problemas para actualizar el tiempo de expiración de la sesión", 
+    "Access to tenant is restricted": "Acceso restringido al tenant", 
     "Unavailable action": "Acción no disponible", 
     "Forbidden action for this administrator": "Acción no permitido para este administrador", 
     "Forbidden filter for this administrator": "Filtro no permitido para este administrador", 

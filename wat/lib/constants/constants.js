@@ -30,6 +30,7 @@ ALL_STATUS = {
     3200: 'Wrong credentials - Login again',
     3300: 'Session expired - Login again',
     3400: 'Problems to update expiration time in session',
+    3500: 'Access to tenant is restricted',
 
     4100: 'Unavailable action',
     4210: 'Forbidden action for this administrator',
@@ -100,6 +101,7 @@ STATUS_CREDENTIALS_FAIL = 3100;
 STATUS_NOT_LOGIN = 3200;
 STATUS_SESSION_EXPIRED = 3300;
 STATUS_ERROR_UPDATING_EXPIRATION = 3400;
+STATUS_TENANT_RESTRICTED = 3500;
 
 STATUS_UNAVAILABLE_ACTION = 4100;
 STATUS_FORBIDDEN_ACTION = 4210;

@@ -110,7 +110,7 @@ Wat.L = {
             window.location.reload();
             return;
         }
-        else if (that.retrievedData.status == STATUS_NOT_LOGIN) {
+        else if (that.retrievedData.status == STATUS_NOT_LOGIN || that.retrievedData.status == STATUS_TENANT_RESTRICTED) {
             Wat.L.logOut();
             Wat.I.M.showMessage({message: that.retrievedData.message, messageType: "error"});
             return;
