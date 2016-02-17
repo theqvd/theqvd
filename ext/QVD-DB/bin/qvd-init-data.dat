@@ -25,7 +25,7 @@ id	name	password	tenant_id	description
 
 ### Role ###
 
-id	tenant_id	name	description	fixed	internal
+id	tenant_id	name	description	internal	fixed
 
 1	-1	Administrators Creator	\N	t	t
 2	-1	Administrators Eraser	\N	t	t
@@ -47,52 +47,53 @@ id	tenant_id	name	description	fixed	internal
 18	-1	Nodes Operator	\N	t	t
 19	-1	Nodes Reader	\N	t	t
 20	-1	Nodes Updater	\N	t	t
-21	-1	OSFs Creator	\N	t	t
-22	-1	OSFs Eraser	\N	t	t
-23	-1	OSFs Manager	\N	t	t
-24	-1	OSFs Operator	\N	t	t
-25	-1	OSFs Reader	\N	t	t
-26	-1	OSFs Updater	\N	t	t
-27	-1	QVD Config Manager	\N	t	t
-28	-1	QVD Creator	\N	t	t
-29	-1	QVD Eraser	\N	t	t
-30	-1	QVD Manager	\N	t	t
-31	-1	QVD Operator	\N	t	t
-32	-1	QVD Reader	\N	t	t
-33	-1	QVD Updater	\N	t	t
-34	-1	Roles Creator	\N	t	t
-35	-1	Roles Eraser	\N	t	t
-36	-1	Roles Manager	\N	t	t
-37	-1	Roles Operator	\N	t	t
-38	-1	Roles Reader	\N	t	t
-39	-1	Roles Updater	\N	t	t
-40	-1	Tenants Creator	\N	t	t
-41	-1	Tenants Eraser	\N	t	t
-42	-1	Tenants Manager	\N	t	t
-43	-1	Tenants Reader	\N	t	t
-44	-1	Tenants Updater	\N	t	t
-45	-1	Total Master	\N	t	t
-46	-1	Users Creator	\N	t	t
-47	-1	Users Eraser	\N	t	t
-48	-1	Users Manager	\N	t	t
-49	-1	Users Operator	\N	t	t
-50	-1	Users Reader	\N	t	t
-51	-1	Users Updater	\N	t	t
-52	-1	Views Manager	\N	t	t
-53	-1	Views Operator	\N	t	t
-54	-1	Views Reader	\N	t	t
-55	-1	VMs Creator	\N	t	t
-56	-1	VMs Eraser	\N	t	t
-57	-1	VMs Manager	\N	t	t
-58	-1	VMs Operator	\N	t	t
-59	-1	VMs Reader	\N	t	t
-60	-1	VMs Updater	\N	t	t
-61	-1	WAT Config Manager	\N	t	t
-62	-1	WAT Manager	\N	t	t
-63	-1	Operator L1	\N	t	f
-64	-1	Operator L2	\N	t	f
-65	-1	Operator L3	\N	t	f
-66	-1	Root	\N	t	f
+21	-1	Operator L1	\N	f	t
+22	-1	Operator L2	\N	f	t
+23	-1	Operator L3	\N	f	t
+24	-1	OSFs Creator	\N	t	t
+25	-1	OSFs Eraser	\N	t	t
+26	-1	OSFs Manager	\N	t	t
+27	-1	OSFs Operator	\N	t	t
+28	-1	OSFs Reader	\N	t	t
+29	-1	OSFs Updater	\N	t	t
+30	-1	QVD Config Manager	\N	t	t
+31	-1	QVD Creator	\N	t	t
+32	-1	QVD Eraser	\N	t	t
+33	-1	QVD Manager	\N	t	t
+34	-1	QVD Operator	\N	t	t
+35	-1	QVD Reader	\N	t	t
+36	-1	QVD Updater	\N	t	t
+37	-1	Roles Creator	\N	t	t
+38	-1	Roles Eraser	\N	t	t
+39	-1	Roles Manager	\N	t	t
+40	-1	Roles Operator	\N	t	t
+41	-1	Roles Reader	\N	t	t
+42	-1	Roles Updater	\N	t	t
+43	-1	Root	\N	f	t
+44	-1	Tenants Creator	\N	t	t
+45	-1	Tenants Eraser	\N	t	t
+46	-1	Tenants Manager	\N	t	t
+47	-1	Tenants Operator	\N	t	t
+48	-1	Tenants Reader	\N	t	t
+49	-1	Tenants Updater	\N	t	t
+50	-1	Total Master	\N	t	t
+51	-1	Users Creator	\N	t	t
+52	-1	Users Eraser	\N	t	t
+53	-1	Users Manager	\N	t	t
+54	-1	Users Operator	\N	t	t
+55	-1	Users Reader	\N	t	t
+56	-1	Users Updater	\N	t	t
+57	-1	Views Manager	\N	t	t
+58	-1	Views Operator	\N	t	t
+59	-1	Views Reader	\N	t	t
+60	-1	VMs Creator	\N	t	t
+61	-1	VMs Eraser	\N	t	t
+62	-1	VMs Manager	\N	t	t
+63	-1	VMs Operator	\N	t	t
+64	-1	VMs Reader	\N	t	t
+65	-1	VMs Updater	\N	t	t
+66	-1	WAT Config Manager	\N	t	t
+67	-1	WAT Manager	\N	t	t
 
 
 ### ACL ###
@@ -297,132 +298,135 @@ id	name	description
 197	tenant.create.	Create tenants
 198	tenant.delete.	Delete tenants
 199	tenant.delete-massive.	Delete tenants (massive)
-200	tenant.filter.created-by	Filter tenants by creator
-201	tenant.filter.creation-date	Filter tenants by creation date
-202	tenant.filter.name	Filter tenant by name
-203	tenant.see.blocksize	See tenant's block size
-204	tenant.see.created-by	See tenant's creator
-205	tenant.see.creation-date	See tenant's creation date
-206	tenant.see.description	See tenant's description
-207	tenant.see-details.	Access to tenant's details view
-208	tenant.see.di-list	See tenant's disk images
-209	tenant.see.di-list-block	See tenant's disk blocking state
-210	tenant.see.di-list-tags	See tenant's disk images' tags
-211	tenant.see.id	See tenant's ID
-212	tenant.see.language	See tenant's language
-213	tenant.see.log	See tenant's Log
-214	tenant.see-main.	Access to tenant's main section
-215	tenant.see.user-list	See tenant's users
-216	tenant.see.user-list-block	See tenant's user blocking state
-217	tenant.see.vm-list	See tenant's virtual machines
-218	tenant.see.vm-list-block	See tenant's virtual machines blocking state
-219	tenant.see.vm-list-expiration	See tenant's virtual machines' expiration date
-220	tenant.see.vm-list-state	See tenant's virtual machines' running state
-221	tenant.see.vm-list-user-state	See tenant's virtual machines' user state
-222	tenant.update.blocksize	Update tenant's block size
-223	tenant.update.description	Update tenant's description
-224	tenant.update.language	Update tenant's language
-225	tenant.update-massive.blocksize	Update tenant's block size (massive)
-226	tenant.update-massive.description	Update tenant's description (massive)
-227	tenant.update-massive.language	Update tenant's language (massive)
-228	tenant.update.name	Update tenant's name
-229	user.create.	Create users
-230	user.create.properties	Set properties on users in creation
-231	user.delete.	Delete users
-232	user.delete-massive.	Delete users (massive)
-233	user.filter.block	Filter users by blocking state
-234	user.filter.created-by	Filter users by creator
-235	user.filter.creation-date	Filter users by creation date
-236	user.filter.name	Filter users by name
-237	user.filter.properties	Filter users by properties
-238	user.see.block	See user's blocking state
-239	user.see.created-by	See user's creator
-240	user.see.creation-date	See user's creation date
-241	user.see.description	See user's description
-242	user.see-details.	Access to user's details view
-243	user.see.id	See user's ID
-244	user.see.log	See user's Log
-245	user.see-main.	Access to user's main section
-246	user.see.properties	See user's properties
-247	user.see.vm-list	See user's virtual machines
-248	user.see.vm-list-block	See user's virtual machines' blocking state
-249	user.see.vm-list-expiration	See user's virtual machines' expiration
-250	user.see.vm-list-state	See user's virtual machines' running state
-251	user.see.vm-list-user-state	See user's virtual machines' user state
-252	user.see.vms-info	See number of user's virtual machines
-253	user.stats.blocked	See statistics of number of users
-254	user.stats.connected-users	See statistics of number of connected users
-255	user.stats.summary	See statistics of number of blocked users
-256	user.update.block	Block-Unblock users
-257	user.update.description	Update user's description
-258	user.update-massive.block	Block-Unblock users (massive)
-259	user.update-massive.description	Update user's description (massive)
-260	user.update-massive.properties	Update properties when update users (massive)
-261	user.update.password	Update user's password
-262	user.update.properties	Update properties when update users
-263	views.see-main.	Access to default view's main section
-264	views.update.columns	Set default columns on list views
-265	views.update.filters-desktop	Set default filters on list views for desktop
-266	views.update.filters-mobile	Set default filters on list views for mobile
-267	vm.create.	Create virtual machines
-268	vm.create.di-tag	Set tag in virtual macine's creation
-269	vm.create.properties	Set properties in virtual machine's creation
-270	vm.delete.	Delete virtual machines
-271	vm.delete-massive.	Delete virtual machines (massive)
-272	vm.filter.block	Filter virtual machines by blocking state
-273	vm.filter.created-by	Filter virtual machines by creator
-274	vm.filter.creation-date	Filter virtual machines by creation date
-275	vm.filter.expiration-date	Filter virtual machines by expiration date
-276	vm.filter.host	Filter virtual machines by node
-277	vm.filter.name	Filter virtual machines by name
-278	vm.filter.osf	Filter virtual machines by OS Flavour
-279	vm.filter.properties	Filter virtual machines by properties
-280	vm.filter.state	Filter virtual machines by running state
-281	vm.filter.user	Filter virtual machines by user
-282	vm.see.block	See virtual machine's blocking status
-283	vm.see.created-by	See virtual machine's creator
-284	vm.see.creation-date	See virtual machine's creation date
-285	vm.see.description	See virtual machine's description
-286	vm.see-details.	Access to virtual machine's details view
-287	vm.see.di	See virtual machine's disk image
-288	vm.see.di-tag	See virtual machine's disk image's tag
-289	vm.see.di-version	See virtual machine's disk image's version
-290	vm.see.expiration	See virtual machine's Expiration
-291	vm.see.host	See virtual machine's Node
-292	vm.see.id	See virtual machine's ID
-293	vm.see.ip	See virtual machine's IP address
-294	vm.see.log	See virtual machine's Log
-295	vm.see.mac	See virtual machine's MAC address
-296	vm.see-main.	Access to virtual machine's main section
-297	vm.see.next-boot-ip	See virtual machine's IP address for next boot
-298	vm.see.osf	See virtual machine's OS Flavour
-299	vm.see.port-serial	See virtual machine's Serial port
-300	vm.see.port-ssh	See virtual machine's SSH port
-301	vm.see.port-vnc	See virtual machine's VNC port
-302	vm.see.properties	See virtual machine's properties
-303	vm.see.state	See virtual machine's state
-304	vm.see.user	See virtual machine's user
-305	vm.see.user-state	See virtual machine's user's connection state
-306	vm.stats.blocked	See statistics of number of blocked virtual machines
-307	vm.stats.close-to-expire	See statistics of virtual machines close to expire
-308	vm.stats.running-vms	See statistics of running virtual machines
-309	vm.stats.summary	See statistics of number of virtual machines
-310	vm.update.block	Block-Unblock virtual machines
-311	vm.update.description	Update virtual machine's description
-312	vm.update.disconnect-user	Disconnect user from virtual machine
-313	vm.update.di-tag	Update virtual machine's tag
-314	vm.update.expiration	Update virtual machine's expiration
-315	vm.update-massive.block	Block-Unblock virtual machines (massive)
-316	vm.update-massive.description	Update virtual machine's description (massive)
-317	vm.update-massive.disconnect-user	Disconnect user from virtual machine (massive)
-318	vm.update-massive.di-tag	Update virtual machine's tag (massive)
-319	vm.update-massive.expiration	Update virtual machine's expiration (massive)
-320	vm.update-massive.properties	Update properties when update virtual machines (massive)
-321	vm.update-massive.state	Start-Stop virtual machines (massive)
-322	vm.update.name	Update virtual machine's name
-323	vm.update.properties	Update properties when update virtual machines
-324	vm.update.state	Start-Stop virtual machines
-
+200	tenant.filter.block	Filter tenants by blocking status
+201	tenant.filter.created-by	Filter tenants by creator
+202	tenant.filter.creation-date	Filter tenants by creation date
+203	tenant.filter.name	Filter tenant by name
+204	tenant.see.block	See tenant’s blocking state
+205	tenant.see.blocksize	See tenant's block size
+206	tenant.see.created-by	See tenant's creator
+207	tenant.see.creation-date	See tenant's creation date
+208	tenant.see.description	See tenant's description
+209	tenant.see-details.	Access to tenant's details view
+210	tenant.see.di-list	See tenant's disk images
+211	tenant.see.di-list-block	See tenant's disk blocking state
+212	tenant.see.di-list-tags	See tenant's disk images' tags
+213	tenant.see.id	See tenant's ID
+214	tenant.see.language	See tenant's language
+215	tenant.see.log	See tenant's Log
+216	tenant.see-main.	Access to tenant's main section
+217	tenant.see.user-list	See tenant's users
+218	tenant.see.user-list-block	See tenant's user blocking state
+219	tenant.see.vm-list	See tenant's virtual machines
+220	tenant.see.vm-list-block	See tenant's virtual machines blocking state
+221	tenant.see.vm-list-expiration	See tenant's virtual machines' expiration date
+222	tenant.see.vm-list-state	See tenant's virtual machines' running state
+223	tenant.see.vm-list-user-state	See tenant's virtual machines' user state
+224	tenant.update.block	Block-Unblock tenants
+225	tenant.update.blocksize	Update tenant's block size
+226	tenant.update.description	Update tenant's description
+227	tenant.update.language	Update tenant's language
+228	tenant.update-massive.block	Block-Unblock tenants (massive)
+229	tenant.update-massive.blocksize	Update tenant's block size (massive)
+230	tenant.update-massive.description	Update tenant's description (massive)
+231	tenant.update-massive.language	Update tenant's language (massive)
+232	tenant.update.name	Update tenant's name
+233	user.create.	Create users
+234	user.create.properties	Set properties on users in creation
+235	user.delete.	Delete users
+236	user.delete-massive.	Delete users (massive)
+237	user.filter.block	Filter users by blocking state
+238	user.filter.created-by	Filter users by creator
+239	user.filter.creation-date	Filter users by creation date
+240	user.filter.name	Filter users by name
+241	user.filter.properties	Filter users by properties
+242	user.see.block	See user's blocking state
+243	user.see.created-by	See user's creator
+244	user.see.creation-date	See user's creation date
+245	user.see.description	See user's description
+246	user.see-details.	Access to user's details view
+247	user.see.id	See user's ID
+248	user.see.log	See user's Log
+249	user.see-main.	Access to user's main section
+250	user.see.properties	See user's properties
+251	user.see.vm-list	See user's virtual machines
+252	user.see.vm-list-block	See user's virtual machines' blocking state
+253	user.see.vm-list-expiration	See user's virtual machines' expiration
+254	user.see.vm-list-state	See user's virtual machines' running state
+255	user.see.vm-list-user-state	See user's virtual machines' user state
+256	user.see.vms-info	See number of user's virtual machines
+257	user.stats.blocked	See statistics of number of users
+258	user.stats.connected-users	See statistics of number of connected users
+259	user.stats.summary	See statistics of number of blocked users
+260	user.update.block	Block-Unblock users
+261	user.update.description	Update user's description
+262	user.update-massive.block	Block-Unblock users (massive)
+263	user.update-massive.description	Update user's description (massive)
+264	user.update-massive.properties	Update properties when update users (massive)
+265	user.update.password	Update user's password
+266	user.update.properties	Update properties when update users
+267	views.see-main.	Access to default view's main section
+268	views.update.columns	Set default columns on list views
+269	views.update.filters-desktop	Set default filters on list views for desktop
+270	views.update.filters-mobile	Set default filters on list views for mobile
+271	vm.create.	Create virtual machines
+272	vm.create.di-tag	Set tag in virtual macine's creation
+273	vm.create.properties	Set properties in virtual machine's creation
+274	vm.delete.	Delete virtual machines
+275	vm.delete-massive.	Delete virtual machines (massive)
+276	vm.filter.block	Filter virtual machines by blocking state
+277	vm.filter.created-by	Filter virtual machines by creator
+278	vm.filter.creation-date	Filter virtual machines by creation date
+279	vm.filter.expiration-date	Filter virtual machines by expiration date
+280	vm.filter.host	Filter virtual machines by node
+281	vm.filter.name	Filter virtual machines by name
+282	vm.filter.osf	Filter virtual machines by OS Flavour
+283	vm.filter.properties	Filter virtual machines by properties
+284	vm.filter.state	Filter virtual machines by running state
+285	vm.filter.user	Filter virtual machines by user
+286	vm.see.block	See virtual machine's blocking status
+287	vm.see.created-by	See virtual machine's creator
+288	vm.see.creation-date	See virtual machine's creation date
+289	vm.see.description	See virtual machine's description
+290	vm.see-details.	Access to virtual machine's details view
+291	vm.see.di	See virtual machine's disk image
+292	vm.see.di-tag	See virtual machine's disk image's tag
+293	vm.see.di-version	See virtual machine's disk image's version
+294	vm.see.expiration	See virtual machine's Expiration
+295	vm.see.host	See virtual machine's Node
+296	vm.see.id	See virtual machine's ID
+297	vm.see.ip	See virtual machine's IP address
+298	vm.see.log	See virtual machine's Log
+299	vm.see.mac	See virtual machine's MAC address
+300	vm.see-main.	Access to virtual machine's main section
+301	vm.see.next-boot-ip	See virtual machine's IP address for next boot
+302	vm.see.osf	See virtual machine's OS Flavour
+303	vm.see.port-serial	See virtual machine's Serial port
+304	vm.see.port-ssh	See virtual machine's SSH port
+305	vm.see.port-vnc	See virtual machine's VNC port
+306	vm.see.properties	See virtual machine's properties
+307	vm.see.state	See virtual machine's state
+308	vm.see.user	See virtual machine's user
+309	vm.see.user-state	See virtual machine's user's connection state
+310	vm.stats.blocked	See statistics of number of blocked virtual machines
+311	vm.stats.close-to-expire	See statistics of virtual machines close to expire
+312	vm.stats.running-vms	See statistics of running virtual machines
+313	vm.stats.summary	See statistics of number of virtual machines
+314	vm.update.block	Block-Unblock virtual machines
+315	vm.update.description	Update virtual machine's description
+316	vm.update.disconnect-user	Disconnect user from virtual machine
+317	vm.update.di-tag	Update virtual machine's tag
+318	vm.update.expiration	Update virtual machine's expiration
+319	vm.update-massive.block	Block-Unblock virtual machines (massive)
+320	vm.update-massive.description	Update virtual machine's description (massive)
+321	vm.update-massive.disconnect-user	Disconnect user from virtual machine (massive)
+322	vm.update-massive.di-tag	Update virtual machine's tag (massive)
+323	vm.update-massive.expiration	Update virtual machine's expiration (massive)
+324	vm.update-massive.properties	Update properties when update virtual machines (massive)
+325	vm.update-massive.state	Start-Stop virtual machines (massive)
+326	vm.update.name	Update virtual machine's name
+327	vm.update.properties	Update properties when update virtual machines
+328	vm.update.state	Start-Stop virtual machines
 
 ### ACL_Role_Relation ###
 id	acl_id	role_id	positive
@@ -451,8 +455,8 @@ id	acl_id	role_id	positive
 22	22	6	t
 23	23	6	t
 24	24	6	t
-25	25	27	t
-26	26	61	t
+25	25	30	t
+26	26	66	t
 27	27	7	t
 28	28	7	t
 29	29	7	t
@@ -550,220 +554,224 @@ id	acl_id	role_id	positive
 121	121	13	t
 122	122	13	t
 123	123	13	t
-124	124	21	t
-125	125	21	t
-126	126	21	t
-127	127	21	t
-128	128	22	t
-129	129	22	t
-130	130	25	t
-131	131	25	t
-132	132	25	t
-133	133	25	t
-134	134	25	t
-135	135	25	t
-136	136	25	t
-137	137	25	t
-138	138	25	t
-139	139	25	t
-140	140	25	t
-141	141	25	t
-142	142	25	t
-143	143	24	t
-144	144	25	t
-145	145	25	t
-146	146	25	t
-147	147	25	t
-148	148	25	t
-149	149	25	t
-150	150	25	t
-151	151	25	t
-152	152	25	t
-153	153	25	t
-154	154	25	t
-155	155	25	t
-156	156	25	t
-157	157	24	t
-158	157	63	t
-159	157	25	t
-160	158	25	t
-161	159	25	t
-162	160	25	t
-163	161	26	t
-164	162	26	t
-165	163	26	t
-166	164	26	t
-167	165	26	t
-168	166	26	t
-169	167	26	t
-170	168	26	t
-171	169	26	t
-172	170	27	t
-173	171	27	t
-174	172	27	t
-175	173	27	t
-176	174	27	t
-177	175	27	t
-178	176	34	t
-179	177	35	t
-180	178	35	t
-181	179	38	t
-182	180	38	t
-183	181	38	t
-184	182	38	t
-185	183	38	t
-186	184	38	t
-187	185	38	t
-188	186	38	t
-189	187	38	t
-190	188	38	t
-191	189	38	t
-192	190	38	t
-193	191	38	t
-194	192	37	t
-195	193	37	t
-196	194	39	t
-197	195	39	t
-198	196	39	t
-199	197	40	t
-200	198	41	t
-201	199	41	t
-202	200	43	t
-203	201	43	t
-204	202	43	t
-205	203	43	t
-206	204	43	t
-207	205	43	t
-208	206	43	t
-209	207	43	t
-210	208	43	t
-211	209	43	t
-212	210	43	t
-213	211	43	t
-214	212	43	t
-215	213	43	t
-216	214	43	t
-217	215	43	t
-218	216	43	t
-219	217	43	t
-220	218	43	t
-221	219	43	t
-222	220	43	t
-223	221	43	t
-224	222	44	t
-225	223	44	t
-226	224	44	t
-227	224	66	t
-228	225	44	t
-229	226	44	t
-230	227	44	t
-231	228	66	t
-232	228	44	t
-233	229	46	t
-234	230	46	t
-235	231	47	t
-236	232	47	t
-237	233	50	t
-238	234	50	t
-239	235	50	t
-240	236	50	t
-241	237	50	t
-242	238	50	t
-243	239	50	t
-244	240	50	t
-245	241	50	t
-246	242	50	t
-247	243	50	t
-248	244	50	t
-249	245	50	t
-250	246	50	t
-251	247	50	t
-252	247	66	t
-253	248	50	t
-254	249	50	t
-255	250	50	t
-256	251	50	t
-257	252	50	t
-258	253	50	t
-259	254	50	t
-260	255	50	t
-261	256	49	t
-262	257	51	t
-263	258	49	t
-264	259	51	t
-265	260	51	t
-266	261	51	t
-267	262	51	t
-268	263	54	t
-269	264	53	t
-270	265	53	t
-271	266	53	t
-272	267	55	t
-273	268	55	t
-274	269	55	t
-275	270	56	t
-276	271	56	t
-277	272	59	t
-278	273	59	t
-279	274	59	t
-280	275	59	t
-281	276	59	t
-282	277	59	t
-283	278	59	t
-284	279	59	t
-285	280	59	t
-286	281	59	t
-287	282	59	t
-288	283	59	t
-289	284	59	t
-290	285	59	t
-291	286	59	t
-292	287	59	t
-293	288	59	t
-294	289	59	t
-295	290	59	t
-296	291	59	t
-297	292	59	t
-298	293	59	t
-299	294	59	t
-300	295	59	t
-301	296	59	t
-302	297	59	t
-303	298	59	t
-304	299	59	t
-305	300	59	t
-306	301	59	t
-307	302	59	t
-308	303	59	t
-309	304	59	t
-310	305	59	t
-311	306	59	t
-312	307	59	t
-313	308	59	t
-314	309	59	t
-315	310	58	t
-316	311	60	t
-317	312	58	t
-318	313	60	t
-319	314	60	t
-320	315	58	t
-321	316	60	t
-322	317	58	t
-323	318	60	t
-324	319	60	t
-325	320	60	t
-326	321	58	t
-327	322	63	f
-328	322	60	t
-329	323	60	t
-330	324	58	t
+124	124	24	t
+125	125	24	t
+126	126	24	t
+127	127	24	t
+128	128	25	t
+129	129	25	t
+130	130	28	t
+131	131	28	t
+132	132	28	t
+133	133	28	t
+134	134	28	t
+135	135	28	t
+136	136	28	t
+137	137	28	t
+138	138	28	t
+139	139	28	t
+140	140	28	t
+141	141	28	t
+142	142	28	t
+143	143	27	t
+144	144	28	t
+145	145	28	t
+146	146	28	t
+147	147	28	t
+148	148	28	t
+149	149	28	t
+150	150	28	t
+151	151	28	t
+152	152	28	t
+153	153	28	t
+154	154	28	t
+155	155	28	t
+156	156	28	t
+157	157	27	t
+158	157	21	t
+159	157	28	t
+160	158	28	t
+161	159	28	t
+162	160	28	t
+163	161	29	t
+164	162	29	t
+165	163	29	t
+166	164	29	t
+167	165	29	t
+168	166	29	t
+169	167	29	t
+170	168	29	t
+171	169	29	t
+172	170	30	t
+173	171	30	t
+174	172	30	t
+175	173	30	t
+176	174	30	t
+177	175	30	t
+178	176	37	t
+179	177	38	t
+180	178	38	t
+181	179	41	t
+182	180	41	t
+183	181	41	t
+184	182	41	t
+185	183	41	t
+186	184	41	t
+187	185	41	t
+188	186	41	t
+189	187	41	t
+190	188	41	t
+191	189	41	t
+192	190	41	t
+193	191	41	t
+194	192	40	t
+195	193	40	t
+196	194	42	t
+197	195	42	t
+198	196	42	t
+199	197	44	t
+200	198	45	t
+201	199	45	t
+202	201	48	t
+203	202	48	t
+204	203	48	t
+205	205	48	t
+206	206	48	t
+207	207	48	t
+208	208	48	t
+209	209	48	t
+210	210	48	t
+211	211	48	t
+212	212	48	t
+213	213	48	t
+214	214	48	t
+215	215	48	t
+216	216	48	t
+217	217	48	t
+218	218	48	t
+219	219	48	t
+220	220	48	t
+221	221	48	t
+222	222	48	t
+223	223	48	t
+224	225	49	t
+225	226	49	t
+226	227	49	t
+227	227	43	t
+228	229	49	t
+229	230	49	t
+230	231	49	t
+231	232	43	t
+232	232	49	t
+233	233	51	t
+234	234	51	t
+235	235	52	t
+236	236	52	t
+237	237	55	t
+238	238	55	t
+239	239	55	t
+240	240	55	t
+241	241	55	t
+242	242	55	t
+243	243	55	t
+244	244	55	t
+245	245	55	t
+246	246	55	t
+247	247	55	t
+248	248	55	t
+249	249	55	t
+250	250	55	t
+251	251	55	t
+252	251	43	t
+253	252	55	t
+254	253	55	t
+255	254	55	t
+256	255	55	t
+257	256	55	t
+258	257	55	t
+259	258	55	t
+260	259	55	t
+261	260	54	t
+262	261	56	t
+263	262	54	t
+264	263	56	t
+265	264	56	t
+266	265	56	t
+267	266	56	t
+268	267	59	t
+269	268	58	t
+270	269	58	t
+271	270	58	t
+272	271	60	t
+273	272	60	t
+274	273	60	t
+275	274	61	t
+276	275	61	t
+277	276	64	t
+278	277	64	t
+279	278	64	t
+280	279	64	t
+281	280	64	t
+282	281	64	t
+283	282	64	t
+284	283	64	t
+285	284	64	t
+286	285	64	t
+287	286	64	t
+288	287	64	t
+289	288	64	t
+290	289	64	t
+291	290	64	t
+292	291	64	t
+293	292	64	t
+294	293	64	t
+295	294	64	t
+296	295	64	t
+297	296	64	t
+298	297	64	t
+299	298	64	t
+300	299	64	t
+301	300	64	t
+302	301	64	t
+303	302	64	t
+304	303	64	t
+305	304	64	t
+306	305	64	t
+307	306	64	t
+308	307	64	t
+309	308	64	t
+310	309	64	t
+311	310	64	t
+312	311	64	t
+313	312	64	t
+314	313	64	t
+315	314	63	t
+316	315	65	t
+317	316	63	t
+318	317	65	t
+319	318	65	t
+320	319	63	t
+321	320	65	t
+322	321	63	t
+323	322	65	t
+324	323	65	t
+325	324	65	t
+326	325	63	t
+327	326	21	f
+328	326	65	t
+329	327	65	t
+330	328	63	t
+331	228	47	t
+332	224	47	t
+333	200	48	t
+334	204	48	t
 
 
 ### Role_Administrator_Relation ###
 id	role_id	administrator_id
 
-1	66	1
-2	66	2
+1	43	1
+2	43	2
 
 
 ### Wat_Setups_By_Administrator ###
@@ -784,18 +792,18 @@ id	block	language	tenant_id
 ### Role_Role_Relation ###
 id	inheritor_id	inherited_id
 
-1	66	45
-2	52	53
-3	52	54
-4	42	44
-5	42	41
-6	42	43
-7	42	40
-8	36	38
-9	36	34
-10	36	39
-11	36	35
-12	36	37
+1	43	50
+2	57	58
+3	57	59
+4	46	49
+5	46	45
+6	46	48
+7	46	44
+8	39	41
+9	39	37
+10	39	42
+11	39	38
+12	39	40
 13	3	6
 14	3	2
 15	3	4
@@ -806,69 +814,70 @@ id	inheritor_id	inherited_id
 20	9	10
 21	9	11
 22	9	12
-23	23	24
-24	23	26
-25	23	22
-26	23	21
-27	23	25
+23	26	27
+24	26	29
+25	26	25
+26	26	24
+27	26	28
 28	17	18
 29	17	19
 30	17	16
 31	17	20
 32	17	15
-33	57	60
-34	57	58
-35	57	59
-36	57	55
-37	57	56
-38	48	49
-39	48	46
-40	48	51
-41	48	47
-42	48	50
-43	28	7
-44	28	46
-45	28	55
-46	28	21
-47	32	25
-48	32	50
-49	32	59
-50	32	11
-51	33	26
-52	33	51
-53	33	60
-54	33	12
-55	29	8
-56	29	22
-57	29	56
-58	29	47
-59	31	10
-60	31	58
-61	31	49
-62	31	24
-63	30	57
-64	30	48
-65	30	27
-66	30	9
-67	30	23
-68	62	13
-69	62	52
-70	62	36
-71	62	61
-72	62	3
-73	14	30
-74	14	62
-75	45	17
-76	45	14
-77	45	42
-78	63	32
-79	64	31
-80	64	63
-81	65	17
-82	65	64
-83	65	29
-84	65	28
-85	65	33
+33	62	65
+34	62	63
+35	62	64
+36	62	60
+37	62	61
+38	53	54
+39	53	51
+40	53	56
+41	53	52
+42	53	55
+43	31	7
+44	31	51
+45	31	60
+46	31	24
+47	35	28
+48	35	55
+49	35	64
+50	35	11
+51	36	29
+52	36	56
+53	36	65
+54	36	12
+55	32	8
+56	32	25
+57	32	61
+58	32	52
+59	34	10
+60	34	63
+61	34	54
+62	34	27
+63	33	62
+64	33	53
+65	33	30
+66	33	9
+67	33	26
+68	67	13
+69	67	57
+70	67	39
+71	67	66
+72	67	3
+73	14	33
+74	14	67
+75	50	17
+76	50	14
+77	50	46
+78	21	35
+79	22	34
+80	22	21
+81	23	17
+82	23	22
+83	23	32
+84	23	31
+85	23	36
+86	46	47
 
 ### SSL_Config ###
 key	value

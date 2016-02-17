@@ -301,7 +301,8 @@ my $ACLS_FOR_FIELDS = {
 	Tenant => {
 		description => [qr/^tenant\.see\.description$/] ,
 	      block => [qr/^tenant\.see\.blocksize$/],
-		language => [qr/^tenant\.see\.language$/]
+		language => [qr/^tenant\.see\.language$/],
+		blocked => [qr/^tenant\.see\.block$/],
 	}
 };
 
@@ -372,7 +373,8 @@ my $ACLS_FOR_ARGUMENTS_IN_UPDATE = {
 	Tenant => {
 		description => [qr/^tenant\.update\.description$/],
 	        block => [qr/^tenant\.update\.blocksize$/],
-		language => [qr/^tenant\.update\.language$/]
+		language => [qr/^tenant\.update\.language$/],
+		blocked => [qr/^tenant\.update\.block$/],
 	},
 
 	Views_Setup_Properties_Tenant => {
@@ -457,7 +459,8 @@ my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE = {
 		'***delete***' => [qr/^tenant\.delete-massive\.$/],
 	        block => [qr/^tenant\.update-massive\.blocksize$/],
 	        description => [qr/^tenant\.update-massive\.description$/],
-		language => [qr/^tenant\.update-massive\.language$/]
+		language => [qr/^tenant\.update-massive\.language$/],
+		blocked => [qr/^tenant\.update-massive\.block$/],
 	},
 
 	Role => {
@@ -613,7 +616,7 @@ my $AVAILABLE_FILTERS = {
 
 	      ACL => [qw(id name role_id admin_id description)],
 
-	      Tenant => [qw(id name description language block creation_date creation_admin_id creation_admin_name)],
+		Tenant => [qw(id name description language block blocked creation_date creation_admin_id creation_admin_name)],
 
 	      Role => [qw(name id description fixed internal admin_id inheritor_id tenant_id tenant_name creation_date creation_admin_id creation_admin_name)],
 
@@ -663,7 +666,7 @@ my $AVAILABLE_FILTERS = {
 
 		 Role => [qw(name id description fixed internal admin_id inheritor_id tenant_id tenant_name creation_date creation_admin_id creation_admin_name)],
 
-		 Tenant => [qw(id name description language block creation_date creation_admin_id creation_admin_name)],
+		Tenant => [qw(id name description language block blocked creation_date creation_admin_id creation_admin_name)],
 
 		 Administrator => [qw(name description tenant_id tenant_name role_id acl_id id role_name acl_name language block creation_date creation_admin_id creation_admin_name)],
 
@@ -767,7 +770,7 @@ my $AVAILABLE_FIELDS = {
 
 	      Administrator => [qw(name description roles id language block creation_date creation_admin_id creation_admin_name)],
 
-	      Tenant => [qw(id name description language block creation_date creation_admin_id creation_admin_name)],
+		Tenant => [qw(id name description language block blocked creation_date creation_admin_id creation_admin_name)],
 				   
 	      User => [qw(id name description blocked creation_date creation_admin_id creation_admin_name number_of_vms number_of_vms_connected  properties )],
 
@@ -819,7 +822,7 @@ my $AVAILABLE_FIELDS = {
 
 		 Administrator => [qw(name description roles id language block creation_date creation_admin_id creation_admin_name)],
 
-		 Tenant => [qw(id name description language block creation_date creation_admin_id creation_admin_name)],
+		Tenant => [qw(id name description language block blocked creation_date creation_admin_id creation_admin_name)],
 
 		 User => [qw(id name description blocked  creation_date creation_admin_id creation_admin_name number_of_vms number_of_vms_connected  properties )],
 
@@ -1022,7 +1025,7 @@ my $AVAILABLE_ARGUMENTS = {
                             Host => [qw(name address blocked description)],
                             OSF => [qw(name memory user_storage overlay description)],
                             DI => [qw(blocked disk_image description)],
-			    Tenant => [qw(name language block description)],
+	Tenant => [qw(name language block blocked description)],
 			    Role => [qw(name description)],
 			    Administrator => [qw(name password language block description)],
 	Views_Setup_Properties_Tenant => [qw(visible)],
@@ -1094,7 +1097,8 @@ my $DEFAULT_ARGUMENT_VALUES = {
 
 	Tenant => {
 		language => 'auto',
-		block => '10'
+		block => '10',
+		blocked => 0,
 	},
 
 	Administrator => {
@@ -1308,6 +1312,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER = {
 	'name' => 'me.name',
 	'id' => 'me.id',
 	'description' => 'me.description',
+		'blocked' => 'me.blocked',
 	'language' => 'wat_setups.language',
 	'block' => 'wat_setups.block',
 	'creation_date' => 'creation_log_entry.time',
@@ -1604,6 +1609,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER = {
 	'disk_image' => 'me.path',
 	'description' => 'me.description',
 	'version' => 'me.version',
+		'blocked' => 'me.blocked',
 	'osf_id' => 'me.osf_id',
 	'osf_name' => 'osf.name',
 	'tenant_id' => 'osf.tenant_id',
@@ -1635,6 +1641,7 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER = {
 	'name' => 'me.name',
 	'description' => 'me.description',
 	'id' => 'me.id',
+		'blocked' => 'me.blocked',
 	'language' => 'wat_setups.language',
 	'block' => 'wat_setups.block',
 	'creation_date' => 'creation_log_entry.time',
