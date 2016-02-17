@@ -65,6 +65,7 @@ my $code2message_mapper = {
 	3200 => 'Wrong credentials - Login again',
     3300 => 'Session expired - Login again',
     3400 => 'Problems to update expiration time in session',
+	3500 => 'Access to tenant is restricted',
 
     4100 => 'Unavailable action',
     4110 => 'Invalid or null action name provided',

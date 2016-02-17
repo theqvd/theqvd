@@ -46,6 +46,11 @@ sub update_log_entry_join_condition
     { "$args->{foreign_alias}.id"     => \$sql , };
 }
 
+sub is_blocked
+{
+	my $self = shift;
+	return $self->blocked // 0;
+}
 
 ###############################################################################################
 

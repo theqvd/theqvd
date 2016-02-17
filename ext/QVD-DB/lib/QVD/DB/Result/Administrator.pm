@@ -170,5 +170,11 @@ sub tenants_scoop
     return $self->{tenants_scoop};
 }
 
+sub is_blocked
+{
+	my $self = shift;
+	return $self->tenant->is_blocked;
+}
+
 1;
 

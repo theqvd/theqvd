@@ -19,6 +19,7 @@ use Mojo::Log;
 use Mojo::ByteStream 'b';
 use Deep::Encode;
 use File::Copy qw(copy move);
+use Try::Tiny;
 
 # This plugin is the class intended to manage the API queries.
 # Almost all queries are processed by it
@@ -156,6 +157,7 @@ any [qw(POST GET)] => '/api/info' => sub {
 under sub {
 
     my $c = shift;
+	my $bool = 0;
 
     $c->res->headers->header('Access-Control-Allow-Origin' => '*'); # WAT requirement
     $c->res->headers->header('Access-Control-Expose-Headers' => 'sid'); # WAT requirement
@@ -168,12 +170,41 @@ under sub {
     my %session_args = (
 	store  => [dbi => {dbh => QVD::DB->new()->storage->dbh}],
 	transport => MojoX::Session::Transport::WAT->new(),
-	tx => $c->tx);
+		tx => $c->tx
+	);
 
     my $session = MojoX::Session->new(%session_args);
 
-    my ($bool,$exception) = $c->$auth_method($session,$json);
-    $c->render(json => $exception->json) if $exception;
+	my $exception;
+	try {
+		$bool = $c->$auth_method( $session, $json );
+	} catch {
+		$exception = $_;
+		$bool = 0;
+		$c->render(json => $exception->json);
+	};
+
+	QVD::Admin4::LogReport->new(
+		action => { action => 'login', type_of_action => 'login' },
+		qvd_object => 'administrator',
+		tenant => {
+			tenant_id => $session->data('tenant_id'),
+			tenant_name => $session->data('tenant_name')
+		},
+		object => {
+			object_id =>  $session->data('admin_id'),
+			object_name =>  $session->data('admin_name')
+		},
+		administrator => {
+			administrator_id =>  $session->data('admin_id'),
+			administrator_name =>  $session->data('admin_name'),
+			superadmin =>  $session->data('superadmin')
+		},
+		ip => $c->tx->remote_address,
+		source => eval { $json->{parameters}->{source} } // undef,
+		arguments => {},
+		status => defined($exception) ? $exception->code : 0,
+	)->report;
 
     return $bool;
 };
@@ -537,24 +568,12 @@ sub create_session
 		password => $json->{password});
     $args{tenant} = $json->{tenant} if defined $json->{tenant};
     my $admin = $c->qvd_admin4_api->validate_user(%args);
-	my $exception_code = 3200;
-
-   QVD::Admin4::LogReport->new(
-       action => { action => 'login', type_of_action => 'login' },
-       qvd_object => 'administrator',
-       tenant => eval { $admin->tenant } // undef,
-       object => $admin,
-       administrator => $admin,
-       ip => $c->tx->remote_address,
-       source => eval { $json->{parameters}->{source} } // undef,
-       arguments => \%args,
-		status => ($admin ? 0 : $exception_code),
-       )->report;
 
 	# Login credentials not found
-	if (not $admin) {
-		return (0, QVD::Admin4::Exception->new(code => $exception_code));
-	}
+	QVD::Admin4::Exception->throw(code => 3200) unless (defined($admin));
+
+	# Check if tenant is blocked
+	QVD::Admin4::Exception->throw(code => 3500) if (defined($admin) && $admin->is_blocked());
 
     $c->qvd_admin4_api->load_user($admin);
     $session->create;
@@ -573,52 +592,39 @@ sub update_session
 {
     my ($c,$session,$json) = @_;
 
-	unless($session->load) {
-		return (0, QVD::Admin4::Exception->new(code => 3200));
+	# Session exists
+	QVD::Admin4::Exception->throw(code => 3200) unless($session->load);
+
+	# Session has not expired
+	if (!$session->is_expired) {
+		$session->extend_expires;
+	} else {
+		$session->flush;
+		QVD::Admin4::Exception->throw(code => 3300)
 	}
 
-	if ($session->is_expired) {
-
-		$session->flush;
-
-      QVD::Admin4::LogReport->new(
-
-	  action => { action => 'login', type_of_action => 'login' },
-	  qvd_object => 'administrator',
-	  tenant => { tenant_id => $session->data('tenant_id'), 
-		      tenant_name => $session->data('tenant_name') },
-	  object => { object_id =>  $session->data('admin_id'), 
-		      object_name =>  $session->data('admin_name')},
-	  administrator => { administrator_id =>  $session->data('admin_id'), 
-			     administrator_name =>  $session->data('admin_name'),
-			     superadmin =>  $session->data('superadmin') },
-	  ip => $c->tx->remote_address,
-	  source => eval { $json->{parameters}->{source} } // undef,
-	  arguments => {},
-	  status => 3300
-	  
-	  )->report;
-
-      return (0,QVD::Admin4::Exception->new(code =>3300));}
+	# Administrator is valid
+	my $admin = $c->qvd_admin4_api->validate_user(id => $session->data('admin_id'));
+	QVD::Admin4::Exception->throw(code => 3200) unless $admin;
     
-    my ($bool,$exception) = (1, undef);
+	# Check if tenant is blocked
+	QVD::Admin4::Exception->throw(code => 3500) if (defined($admin) && $admin->is_blocked());
 
-    $session->extend_expires; 
+	# Try to update session
+	for (1 .. 5) {
+		eval { $session->flush };
+		last unless $@;
+	}
+	QVD::Admin4::Exception->throw(code => 3400) if $@;
 
-    my $admin = $c->qvd_admin4_api->validate_user(id => $session->data('admin_id'));
-    return (0,QVD::Admin4::Exception->new(code =>3200)) 
-	unless $admin;
     $c->qvd_admin4_api->load_user($admin);
 
-    for (1 .. 5) { eval { $session->flush }; last unless $@;}
-    ($bool,$exception) = (0,QVD::Admin4::Exception->new(code => 3400)) if $@;
-
-    return ($bool,$exception);
+	return 1;
 }
 
 sub reject_access
 {
-  (0,QVD::Admin4::Exception->new(code => 3100));
+	QVD::Admin4::Exception->throw(code => 3100);
 }
 
 sub report_di_problem_in_log
