@@ -172,6 +172,7 @@ my $FILTERS = {
 		name => 'name', 
 		language => 'language', 
 		block => 'block',
+		blocked => 'blocked',
 		creation_date => 'creation_date', 
 		creation_admin_id => 'creation_admin_id', 
 		creation_admin_name => 'creation_admin_name'
@@ -315,6 +316,7 @@ my $ORDER = {
 		name => 'name', 
 		language => 'language', 
 		block => 'block', 
+		blocked => 'blocked',
 		creation_date => 'creation_date', 
 		creation_admin_id => 'creation_admin_id', 
 		creation_admin_name => 'creation_admin_name'
@@ -452,6 +454,7 @@ my $FIELDS = {
 		name => 'name', 
 		language => 'language', 
 		block => 'block', 
+		blocked => 'blocked',
 		creation_date => 'creation_date', 
 		creation_admin_id => 'creation_admin_id', 
 		creation_admin_name => 'creation_admin_name'
@@ -605,7 +608,8 @@ my $ARGUMENTS = {
 	tenant => {
 		name => 'name',
 		language => 'language', 
-		block => 'block'
+		block => 'block',
+		blocked => 'blocked',
 	},
 
 	config => {
@@ -844,7 +848,7 @@ my $DEFAULT_FIELDS = {
 
     di => [ qw( id tenant name version osf blocked tags ) ],
 
-    tenant => [ qw( id name language block ) ],
+	tenant => [ qw( id name language block blocked) ],
 
     config => [ qw( key value default) ],
 
