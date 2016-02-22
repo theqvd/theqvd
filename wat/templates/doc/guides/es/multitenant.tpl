@@ -653,6 +653,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Deletion of tenants one by one</p></td>
 </tr>
 <tr>
+<td align="left" valign="top"><p class="table"><strong>Filter tenants by blocking status</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.filter.block</p></td>
+<td align="left" valign="top"><p class="table">Filter of tenants list by blocking status</p></td>
+</tr>
+<tr>
 <td align="left" valign="top"><p class="table"><strong>Filter tenants by creator</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.filter.created-by</p></td>
 <td align="left" valign="top"><p class="table">Filter of tenants list by administrator who created it</p></td>
@@ -681,6 +686,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s block size</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see.blocksize</p></td>
 <td align="left" valign="top"><p class="table">The block size in lists pagination of the tenants.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s blocking state</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.see.block</p></td>
+<td align="left" valign="top"><p class="table">Blocking state (blocked/unblocked) of tenants.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s creator</strong></p></td>
@@ -758,6 +768,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">User state (connected/disconnected)) of the virtual machines shown in tenant details view</p></td>
 </tr>
 <tr>
+<td align="left" valign="top"><p class="table"><strong>Block-Unblock tenants (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.update-massive.block</p></td>
+<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of tenants masively.</p></td>
+</tr>
+<tr>
 <td align="left" valign="top"><p class="table"><strong>Update tenant&#8217;s block size (massive)</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.update-massive.blocksize</p></td>
 <td align="left" valign="top"><p class="table">Update the block size in lists pagination of tenants massively.</p></td>
@@ -771,6 +786,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table"><strong>Update tenant&#8217;s language (massive)</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.update-massive.language</p></td>
 <td align="left" valign="top"><p class="table">Update the language of tenants massively.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><strong>Block-Unblock tenants</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.update.block</p></td>
+<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of tenants one by one.</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Update tenant&#8217;s block size</strong></p></td>
@@ -879,7 +899,7 @@ Contraseña: ********</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-14 13:43:35 CEST
+Last updated 2016-02-22 15:52:53 CET
 </div>
 </div>
 </body>
