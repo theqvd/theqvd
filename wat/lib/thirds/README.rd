@@ -14,8 +14,8 @@ Used libraries on QVD Wat and their version, licenses and source sites:
 - jQuery hoverIntent (MIT/GPL License) http://pupunzi.com
 - jQuery waitForImages (MIT License) https://github.com/alexanderdickson/waitForImages
 - jQuery qTip2 v2.2.1 (MIT/GPLv2 License) http://qtip2.com/
+- jQuery Chosen v1.5.1 (MIT License) https://github.com/theqvd/chosen/
 - ExpandingTextareas v0.2.0 (MIT License) https://github.com/bgrins/ExpandingTextareas
-- Chosen v1.4.2 (MIT License) http://harvesthq.github.io/chosen/
 - Font Awesome v4.4.0 (Font: SIL OFL 1.1, CSS: MIT License) http://fortawesome.github.io/Font-Awesome/
 - Font Awesome Animation v0.0.7 (MIT License) http://l-lin.github.io/font-awesome-animation/
 - i18next v1.7.3 (MIT License) http://i18next.com/
