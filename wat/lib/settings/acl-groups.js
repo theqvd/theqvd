@@ -269,6 +269,13 @@ Wat.C.aclGroups.diVmEmbeddedInfo = [
     'di.see.vm-list-user-state',
 ];
 
+///////////////////////////////
+// Tenant ACL groups
+///////////////////////////////
+
+Wat.C.aclGroups.tenantInfo = [
+    'tenant.see.block'
+];
 
 ///////////////////////////////
 // Statistics

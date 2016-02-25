@@ -10,6 +10,21 @@
     <a class="button fright button-icon--desktop js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"><span data-i18n="Edit" class="mobile"></span></a>
     <% } %>
     
+    <% 
+    if (Wat.C.checkACL('tenant.update.block')) {
+        if(model.get('blocked')) {
+    %>
+            <a class="button button-icon--desktop js-button-unblock fa fa-unlock-alt fright" href="javascript:" data-i18n="[title]Unblock"><span data-i18n="Unblock" class="mobile"></span></a>
+    <%
+        } 
+        else { 
+    %>
+            <a class="button button-icon--desktop js-button-block fa fa-lock fright" href="javascript:" data-i18n="[title]Block"><span data-i18n="Block" class="mobile"></span></a>
+    <%
+        }
+    }
+    %>
+    
     <div class="clear mobile"></div>
 </div>
 
@@ -30,6 +45,27 @@
                 else {
                 %>
                     <span class="second_row">-</span>
+                <%
+                }
+                %>
+            </td>
+        </tr>
+    <% 
+    }
+    if (Wat.C.checkACL('tenant.see.block')) { 
+    %>
+        <tr>
+            <td><i class="fa fa-lock"></i><span data-i18n="Blocking"></span></td>
+            <td>
+                <% 
+                if (model.get('blocked')) {
+                %>
+                    <span data-i18n="Blocked"></span>
+                <%
+                }
+                else {
+                %>
+                    <span data-i18n="Unblocked"></span>
                 <%
                 }
                 %>

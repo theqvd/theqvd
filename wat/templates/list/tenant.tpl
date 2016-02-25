@@ -24,6 +24,13 @@
                             </th>
             <%
                             break;
+                        case 'info':
+            %>
+                            <th class="<%= sortAttr %> desktop max-1-icons ">
+                                <i class="fa fa-info-circle normal" data-i18n="[title]Info" title="<%= i18n.t('Info') %>"></i>
+                            </th>
+            <%
+                            
                         case 'id':
             %>
                             <th class="<%= sortAttr %> desktop" data-sortby="id">
@@ -95,6 +102,13 @@
                                 </td>
                 <%
                                 break;
+                            case 'info':
+                %>
+                                <td class="desktop">
+                                    <%= info %>
+                                </td>
+                <%
+                                
                             case 'id':
                 %>
                                 <td class="desktop">

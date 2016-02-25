@@ -10,6 +10,18 @@ Wat.I.listFields[qvdObj] = {
         'text': '',
         'sortable': false,
     },
+    'info': {
+        'display': true,
+        'fields': [
+            'blocked'
+        ],
+        'groupAcls': [
+            'tenantInfo'
+        ],
+        'aclsLogic': 'OR',
+        'text': 'Info',
+        'sortable': false,
+    },
     'id': {
         'display': true,
         'fields': [
@@ -71,6 +83,31 @@ Wat.I.formFilters[qvdObj] = {
         'displayMobile': true,
         'displayDesktop': true
     },
+    'blocked': {
+        'filterField': 'blocked',
+        'type': 'select',
+        'text': 'Blocking',
+        'class': 'chosen-advanced',
+        'fillable': false,
+        'options': [
+            {
+                'value': FILTER_ALL,
+                'text': 'All',
+                'selected': true
+            },
+            {
+                'value': 1,
+                'text': 'Blocked'
+            },
+            {
+                'value': 0,
+                'text': 'Unblocked'
+            }
+                    ],
+        'displayMobile': false,
+        'displayDesktop': true,
+        'acls': 'tenant.filter.block'
+    },
     'administrator': {
         'filterField': 'creation_admin_id',
         'type': 'select',
@@ -131,6 +168,26 @@ Wat.I.selectedActions[qvdObj] = {
         'groupAcls': 'tenantMassiveEdit',
         'aclsLogic': 'OR',
         'iconClass': 'fa fa-pencil'
+    },
+    'block': {
+        'text': 'Block',
+        'acls': 'tenant.update-massive.block',
+        'iconClass': 'fa fa-lock',
+        'visibilityCondition': {
+            'type': 'eq',
+            'field': 'blocked',
+            'value': '0'
+        }
+    },
+    'unblock': {
+        'text': 'Unblock',
+        'acls': 'tenant.update-massive.block',
+        'iconClass': 'fa fa-unlock-alt',
+        'visibilityCondition': {
+            'type': 'eq',
+            'field': 'blocked',
+            'value': '1'
+        }
     },
     'delete': {
         'text': 'Delete',
