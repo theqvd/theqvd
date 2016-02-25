@@ -40,9 +40,6 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
     },
     
     render: function () {        
-        // Temporary hardcoded tenant name
-        var tenantName = '*';
-        
         this.template = _.template(
             Wat.TPL.profile, {
                 cid: this.cid,
@@ -51,7 +48,7 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
                 block: Wat.C.block,
                 tenantLanguage: Wat.C.tenantLanguage,
                 tenantBlock: Wat.C.tenantBlock,
-                tenantName: tenantName
+                tenantName: Wat.C.tenantName
             }
         );
 

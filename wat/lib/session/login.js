@@ -144,8 +144,9 @@ Wat.L = {
         // Store views configuration
         Wat.C.storeViewsConfiguration(that.retrievedData.views);
         
-        // Store tenant ID
+        // Store tenant ID and Name
         Wat.C.tenantID = that.retrievedData.tenant_id;
+        Wat.C.tenantName = that.retrievedData.tenant_name;
         
         // Store admin ID
         Wat.C.adminID = that.retrievedData.admin_id;   
