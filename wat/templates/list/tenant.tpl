@@ -30,7 +30,7 @@
                                 <i class="fa fa-info-circle normal" data-i18n="[title]Info" title="<%= i18n.t('Info') %>"></i>
                             </th>
             <%
-                            
+                            break;
                         case 'id':
             %>
                             <th class="<%= sortAttr %> desktop" data-sortby="id">
@@ -108,7 +108,7 @@
                                     <%= info %>
                                 </td>
                 <%
-                                
+                                break;
                             case 'id':
                 %>
                                 <td class="desktop">
