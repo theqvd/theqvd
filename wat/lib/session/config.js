@@ -9,8 +9,7 @@ Wat.C = {
     loggedIn: false,
     
     // API parameters
-    apiAddress: '', //Will be loaded from external file config.json
-    apiPort: '', // Will be loaded from external file config.json
+    apiUrl: '', // Will be loaded from external file config.json
 
     // Source to be stored by API log
     source: 'WAT',
@@ -46,8 +45,16 @@ Wat.C = {
     
     // Init Api address configuration
     initApiAddress: function () {
-        this.apiUrl = 'https://' + Wat.C.apiAddress + ':' + Wat.C.apiPort + '/api/';
-        this.apiWSUrl = 'wss://' + Wat.C.apiAddress + ':' + Wat.C.apiPort + '/api/';
+        var apiPath = '/api/';
+        this.apiUrl = Wat.C.apiUrl + apiPath;
+
+		// Build websockets URL depending on the used protocol
+        if (Wat.C.apiUrl.substr(0, 5) == 'https') {
+            this.apiWSUrl = 'wss' + Wat.C.apiUrl.substr(5) + apiPath;
+        }
+        else {
+            this.apiWSUrl = 'ws' + Wat.C.apiUrl.substr(4) + apiPath;
+        }
     },
 
     // Get the base URL for API calls using credentials or session ID
@@ -477,7 +484,7 @@ Wat.C = {
     },
     
     setConfigToken: function (token, value) {
-        if ($.inArray(token, ['apiAddress', 'apiPort']) == -1) {
+        if ($.inArray(token, ['apiUrl']) == -1) {
             console.error('A not allowed token was intented to load from config file (' + token + ')');
             return;
         }

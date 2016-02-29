@@ -3,11 +3,10 @@ Configuration file
 
 WAT application have a configuration file named config.json.
 
-This config file has the following format:
+This config file has the following format (without final slash):
 
     {
-        "apiAddress": "172.20.126.16",
-        "apiPort": "3000"
+        "apiUrl": "https://myqvd.com:3000"
     }
 
 This is a JSON formated parameters to get the API Address and Port.
