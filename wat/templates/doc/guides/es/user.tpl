@@ -4680,11 +4680,43 @@ Color de texto de la caja de login
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_link_personalizado_en_inicio_de_sesión">11. Link personalizado en inicio de sesión</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Siempre que se tengan los permisos necesarios, será posible configurar un enlace en la pantalla de inicio de sesión que aparecerá justo debajo de los campos del formulario.</p></div>
+<div class="sect2">
+<h3 id="_configuración">11.1. Configuración</h3>
+<div class="paragraph"><p>Esta configuración se llevará a cabo estableciendo los tokens de configuración necesarios en la sección Gestión de QVD &#8594; Configuración de QVD.</p></div>
+<div class="paragraph"><p>Los tokens que harán falta serán:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>api.public.login.link.src</strong>: URL del enlace
+</p>
+</li>
+<li>
+<p>
+<strong>api.public.login.link.label</strong>: Etiqueta del enlace tal y como aparecerá en la interfaz
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Si uno de los dos no está presente, no se tendrá efecto alguno.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_multi_idioma">11.2. Multi-idioma</h3>
+<div class="paragraph"><p>El enlace es susceptible a las traducciones del sistema, siempre y cuando la cadena contenida en el parámetro <strong>api.public.login.link.label</strong> exista en el diccionario. Si no existiera, aparecería sin traducir sea cual sea el idioma del navegador desde el que se acceda al WAT.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_usos_típicos">11.3. Usos típicos</h3>
+<div class="paragraph"><p>Esta funcionalidad es útil para agregar un enlace a algún tipo de documento de ayuda o de recuperación de contraseñas, aunque es lo suficientemente flexible para aceptar cualquier uso.</p></div>
+</div>
+</div>
+</div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-29 08:54:58 CEST
+Last updated 2016-02-29 12:25:27 CET
 </div>
 </div>
 </body>
