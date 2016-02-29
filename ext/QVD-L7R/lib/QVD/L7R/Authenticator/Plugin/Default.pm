@@ -41,7 +41,7 @@ sub find_tenant {
             my $str = '(?:' . join('|', map {quotemeta} (split //, $separators)) . ')';
             qr/$str/i;
         };
-        ($login1, $tenant) = split $re, $login, 1;
+        ($login1, $tenant) = split $re, $login, 2;
     }
 
     $login1 //= $login;
