@@ -19,6 +19,7 @@ use Mojo::Log;
 use Mojo::ByteStream 'b';
 use Deep::Encode;
 use File::Copy qw(copy move);
+use QVD::Config;
 use Try::Tiny;
 
 # This plugin is the class intended to manage the API queries.
@@ -142,10 +143,14 @@ any [qw(POST GET)] => '/api/info' => sub {
 
   QVD::Config::reload();
   my $localtime = localtime();
-  my $json = { status => 0,
+
+	my $json = {
+		status => 0,
                server_datetime => $localtime,
 	       multitenant => $c->qvd_admin4_api->_cfg('wat.multitenant'),
-               version => { database => $c->qvd_admin4_api->database_version }};
+		version => { database => $c->qvd_admin4_api->database_version },
+		public_configuration => cfg_tree('api.public'),
+	};
 
   $c->render(json => $json );
 };

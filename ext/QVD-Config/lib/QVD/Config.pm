@@ -11,7 +11,7 @@ use QVD::Config::Core qw(core_cfg core_cfg_keys);
 use QVD::Log;
 
 use Exporter qw(import);
-our @EXPORT = qw(cfg ssl_cfg cfg_keys);
+our @EXPORT = qw(cfg ssl_cfg cfg_keys cfg_tree);
 
 our $USE_DB //= 1;
 
@@ -98,6 +98,53 @@ sub cfg_keys {
 	return uniq(@keys_array);
 }
 
+sub cfg_tree {
+    my $preffix = shift;
+
+    my $root = {};
+
+    for my $key (cfg_keys) {
+        my $ekey = $key;
+
+        if (defined $preffix) {
+            $ekey =~ s/^\Q$preffix\E\.// or next;
+        }
+
+        my $tree = $root;
+        my @parts = split /\./, $ekey;
+        @parts = '' unless @parts;
+        while (@parts) {
+            my $part = shift @parts;
+            my $old = $tree->{$part};
+
+            if (@parts) {
+                if (defined $old) {
+                    if (ref $old) {
+                        $tree = $old;
+                    }
+                    else {
+                        $tree = $tree->{$part} = { '' => $old };
+                    }
+                }
+                else {
+                    $tree = $tree->{$part} = {};
+                }
+            }
+            else {
+                my $value = cfg($key);
+                if (ref $old) {
+                    $old->{''} = $value;
+                }
+                else {
+                    $tree->{$part} = $value;
+                }
+            }
+        }
+    }
+
+    return $root;
+}
+
 1;
 
 __END__
@@ -137,11 +184,51 @@ given or otherwise undef.
 
 =item cfg_keys($tenant_id)
 
-Returns the all the configuration keys for a given tenant.
+Returns all the configuration keys for a given tenant.
 
 If no tenant is defined, the value -1 for global configuration is used.
 
 If no entry exists on the database, it returns an empty array.
+
+=item cfg_tree()
+
+=item cfg_tree($preffix)
+
+Builds a tree from the properties, splitting the keys using the dot as
+separator. For instance, with the following configuration:
+
+  name = pete
+  date.birth = 1958-09-12
+  date.death = 2004-05-11
+  surname = moo
+  surname.length = 3
+
+the resulting tree would be...
+
+  my $tree = cfg_tree();
+
+  $tree = {
+    date => {
+      birth => '1958-09-12',
+      death => '2004-05-11'
+    },
+    name => 'pete',
+    surname => {
+      '' => 'moo',
+      length => '3'
+    }
+  };
+
+The C<$preffix> parameter allows to split only a subset of the
+properties. For instance, with the same data as on the previous
+example:
+
+   cfg_tree('date');
+
+makes...
+
+  $tree = { birth => '1958-09-12',
+            death => '2004-05-11' };
 
 =back
 
