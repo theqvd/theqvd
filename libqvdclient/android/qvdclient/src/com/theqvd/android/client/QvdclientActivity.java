@@ -3,10 +3,14 @@ package com.theqvd.android.client;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import com.theqvd.android.xpro.Config;
 import com.theqvd.android.xpro.XvncproActivity;
 import com.theqvd.android.xpro.XvncproException;
+import com.theqvd.client.jni.Qvdclient;
+import com.theqvd.client.jni.QvdclientWrapper;
 import com.theqvd.client.jni.Vm;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -77,7 +81,7 @@ public class QvdclientActivity extends Activity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        tag = getResources().getString(R.string.app_name) + "-QvdclientActivity-" +java.util.Map.Entry.class.getSimpleName();
+        tag = getResources().getString(R.string.app_name_qvd) + "-QvdclientActivity-" +java.util.Map.Entry.class.getSimpleName();
         connectiondb = new ConnectionDB(this.getBaseContext());
         Connection c = getLastConnection();
         ConnectionDB.currconnection = c != null ? c : ConnectionDB.currconnection;
@@ -450,11 +454,22 @@ public class QvdclientActivity extends Activity
     	
     }
     
+    private Connection demoConnection() {
+    	Connection democonnection = new Connection();
+    	democonnection.setName(getResources().getString(R.string.democonnection));
+    	democonnection.setLogin(getResources().getString(R.string.democonnectionlogin));
+    	democonnection.setPassword(getResources().getString(R.string.democonnectionpass));
+    	democonnection.setHost(getResources().getString(R.string.democonnectionhost));
+    	democonnection.setGoogleauthentication(true);
+    	return democonnection;
+    }
     /*
      * Returns the list of all the connections in the database
      */
     private List<Connection> getArrayOfConnections() {
     	ArrayList<Connection> a = new ArrayList<Connection>();
+    	Connection democonnection = demoConnection();
+    	a.add(democonnection);
 		Connection newconnection = new Connection();
 		newconnection.setName(getResources().getString(R.string.newconnection));
 		a.add(newconnection);
@@ -547,8 +562,9 @@ public class QvdclientActivity extends Activity
 				"Author: info@theqvd.com\n" +
 				"Sponsored: http://theqvd.com\n" +
 				"Version: "+getResources().getString(R.string.version)+"\n" +
-						"Revision: $Revision$\n" +
-						"Date: $Date$";
+				"qvdclient: "+ QvdclientWrapper.get_version_text() + "\n"+
+				"Revision: $Revision$\n" +
+				"Date: $Date$";
 	}
     private class AsyncMessageHandler extends Handler {
     	// handleMessage should handle, yes/no cert question and update the result
@@ -638,7 +654,7 @@ public class QvdclientActivity extends Activity
     private void sendAlert(String title, String text) {
     	if (this.isFinishing()) {
     		Log.i(tag, "sending toast instead of alert because application is finishing");
-    		Toast.makeText(getApplication().getApplicationContext(), title + "\n" + text, 30).show();
+    		//Toast.makeText(getApplication().getApplicationContext(), title + "\n" + text, 30).show();
     		return;
     	}
     	AlertDialog.Builder builder = new AlertDialog.Builder(QvdclientActivity.this);

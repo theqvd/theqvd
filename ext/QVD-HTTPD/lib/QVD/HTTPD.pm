@@ -33,6 +33,8 @@ sub _set_options {
     $template->{SSL_crl_file} = \$prop->{SSL_crl_file};
     $prop->{SSL_verify_mode} //= undef;
     $template->{SSL_verify_mode} = \$prop->{SSL_verify_mode};
+    $prop->{SSL_version}     //= "!SSLv3:!SSLv2:!TLSv1";
+    $template->{SSL_version} = \$prop->{SSL_version};
 }
 
 # token          = 1*<any CHAR except CTLs or separators>

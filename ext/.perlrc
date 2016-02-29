@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use File::Tee qw(tee);
 
-use lib::glob '*/lib:../g/p5*/lib';
+use lib::glob '*/lib:../g/p5*/lib:../../commercial/*/*/lib';
 
 $ENV{PERL5LIB} = join(':', grep !ref, @INC);
 
@@ -12,9 +12,10 @@ my $unlink;
 my $name = $0;
 $name =~ s/.*\///;
 unless ($ENV{NO_AUTO_TEE}) {
-    my $root = ($> ? (getpwent($>))[7] . "/tmp/qvd" : '/var/lib/qvd/tmp');
+    my $root = ($> ? (getpwuid( $> ))[7] . "/tmp/qvd" : '/var/lib/qvd/tmp');
     system mkdir => -p => $root;
     if ($name =~ /\bhkd\b/i) {
+        print STDERR "redirecting output to '$root/$name.out'\n";
         open STDOUT, '>', "$root/$name.out";
     }
     else {

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="version">2.3.1</string>
+    <string name="changelog">2.3.1 29/01/2014 x86 fixes\n2.3.0 18/12/2014 Upgraded to xvncpro 4.1 and support for x86 devices\n2.2.0 30/11/2014 Added predefined connection to QVD Demo\n2.1.0 22/11/2014 Added oauth2 for Android authentication\n2.0.1 17/11/2014 New version\n2.0.0 05/10/2014 Updated to xvncpro 4.0.0\n1.9.4 07/04/2014 Support browsable url\n1.9.3 07/04/2013 Update xvncpro to 3.9\n1.9.2 03/2/2013 Update xncpro to 3.8\n1.9.1 07/01/2013 xvncpro update\n1.9 06/1/2013 Merged with xvncpro\n1.8 18/12/2023 Updated Xvnc support 24 bits and race condition bug\n1.7 5/10/2012 Updated Xvncpro\n1.6.1 05/10/2012 Xvnc bug fix\n1.6 04/10/2012 Support client certificates\n1.5 01/10/2012 Added rgb.txt file to X server\n1.4 22/09/2012 Minor correction in theme\n1.3 21/09/2012 Error in theme for older devices corrected\n1.2 19/09/2012 Fix theme to allow menus for Nexus 7\n1.1 Correct URL for the Xvncpro documentation\n1.0 New version:\n  includes embedded X server\n  support for Pocketview VNC\n  and improved security</string>
+    <string name="app_name_qvd">qvdclient</string>
+    <string name="description">descriptionvalue</string>
+    <string name="username_text">login</string>
+    <string name="password_text">password</string>
+    <string name="remotehost_text">Host</string>
+    <string name="edit_connection">edit/save</string>
+    <string name="connect">Connect</string>
+    <string name="help">Help</string>
+    <string name="cancel">Cancel</string>
+    <string name="connectionPrompt">New Connection</string>
+    <string name="connection_text">connection</string>
+    <string name="icon_text">QVD Icon</string>
+    <string name="remoteport_text">Port</string>
+    <string name="geometry_text">geometry</string>
+    <string name="width_text">width</string>
+    <string name="height_text">height</string>
+    <string name="link_text">Link</string>
+    <string-array name="link_array">
+        <item >lan</item>
+        <item >wan</item>
+        <item >adsl</item>
+        <item >isdn</item>
+        <item >modem</item>
+    </string-array>
+    <string name="name_text">description</string>
+    <string name="keyboardlayout_text">Keyboard</string>
+    <string name="defaultkeyboardlayout">pc/105</string>
+    <string name="fullscreen_text">Full screen</string>
+    <string name="defaultremoteport">8443</string>
+    <string name="fullscreenoff">No fullscrn</string>
+    <string name="fullscreenon">fullscreen</string>
+    <string name="help_url">http://docs.theqvd.com/</string>
+    <string name="save">Save</string>
+    <string name="newconnection">New Connection</string>
+    <string name="democonnection">Demo Connection</string>
+    <string name="democonnectionlogin">My Gmail credentials</string>
+    <string name="democonnectionpass">My Gmail credentials</string>
+    <string name="democonnectionhost">demo.theqvd.com</string>
+    <string name="delete_connection_short">del</string>
+    <string name="unabletodelete_alert">You cannot delete the New Connection, it does not exist</string>
+    <string name="unabletodelete_alerttitle">Unable to delete non saved connection</string>
+    <string name="ok">OK</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="duplicateconnectionoverwrite_alert1">The name of the connection &lt;</string>
+    <string name="duplicateconnectionoverwrite_alert2">&gt;already exists in the database. Do you want to overwrite it?</string>
+    <string name="duplicateconnectionoverwrite_alerttitle">Connection already exists</string>
+    <string name="overwrittenconnection_toast">Saved and overwritten connection </string>
+    <string name="savedconnection_toast">Saved connection </string>
+    <string name="changeconnectionname_toast">Please change the name of </string>
+    <string name="errorparsingport_toast">Error parsing port number</string>
+    <string name="errorparsinggeometry_toast">Error parsing width or height resolution</string>
+    <string name="deleteconnectionquestion_alert">Do you want to delete the connection </string>
+    <string name="erroreditnoresult_toast">Error: Returning from Edit Activity without result!!!</string>
+    <string name="deletedconnection_toast">The connection was deleted:</string>
+    <string name="confirmdelete_alerttitle">Confirm delete</string>
+    <string name="debugButton">debug</string>
+    <string name="debugOff">debug off</string>
+    <string name="debugOn">debug on</string>
+    <string name="novmsavailable">No virtual machines available for this user. Please contact the administrator</string>
+    <string name="novmsavailabletitle">No VM available</string>
+    <string name="connectionerrortitle">Connection error</string>
+    <string name="connectionerror">Connection Error. Technical info:</string>
+    <string name="unexpectedresulttitle">Unexpected Result</string>
+    <string name="unexpectedresult">Unexpected result received onActivityResult:</string>
+    <string name="connectingtovm">Connecting to vm:</string>
+    <string name="selectvmcanceltext">No VM selected. Cancelling connection.</string>
+    <string name="optionals_text">Optional</string>
+    <string name="prerrequisites_text">Prerreqs</string>
+    <string name="editvmcancelled_toast">Edit of the VM was cancelled</string>
+    <string name="editvm_toast">Saved VM: </string>
+    <string name="about">About</string>
+    <string name="exit">Exit</string>
+    <string name="changelogtitle">Changelog</string>
+    <string name="installvnc">Install prerrequisites</string>
+    <string name="xvncpro">Xvnc console</string>
+    <string name="unknown_certificate_title">Unknown Certificate</string>
+    <string name="unknown_certificate">Unknown certificate.\nPlease review the data before accepting it:\n</string>
+    <string name="vmlisterrortitle">Error obtaining vm list</string>
+    <string name="xservernotstartedtitle">X server was not started</string>
+    <string name="vmlistisnull">Error obtaining the list of VMs. It is null, and it should not be</string>
+    <string name="connectionfinished">Connection finished</string>
+    <string name="installingprerrequisites">Installing prerrequisites</string>
+    <string name="certfile_text">X509 Cert</string>
+    <string name="keyfile_text">X509 key</string>
+    <string name="noClientCerts">No client certs</string>
+    <string name="useClientCerts">client certs</string>
+    <string name="certorkeynotreadable">The cert and/or key file is not readable</string>
+    <string name="pickfile">Choose</string>
+    <string name="connecting">Connecting</string>
+    <string name="installfilemgr">install file mgr</string>
+    <string name="errorinstallfilemgr_alert">Error installing File Manager</string>
+    <string name="nofilechosen">No file has been chosen</string>
+    <string name="usegoogleauth_text">GoogleAuth</string>
+    <string name="paymentRequiredTitle">Account not active</string>
+    <string name="paymentRequired">Please, contact TheQVD Support for account activation.</string>
+</resources>

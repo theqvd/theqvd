@@ -320,7 +320,7 @@ unsigned int ChipsReg32[] =
     0xB3D0,			        /* DR0xC address of cursor pattern   */
 };
 
-#if defined(__arm32__) && defined(__NetBSD__)
+#if (defined(__arm32__)  || defined(__arm64__)) && defined(__NetBSD__)
 /*
  * Built in TV output modes: These modes have been tested on NetBSD with
  * CT65550 and StrongARM. They give what seems to be the best output for
@@ -2375,7 +2375,7 @@ chipsPreInitHiQV(ScrnInfoPtr pScrn, int flags)
 		   "FP clock set to %7.3f MHz\n",
 		   (float)(cPtr->FPclock / 1000.));
 
-#if defined(__arm32__) && defined(__NetBSD__)
+#if (defined(__arm32__) || defined(__arm64__)) && defined(__NetBSD__)
     ChipsPALMode.next = pScrn->monitor->Modes;
     pScrn->monitor->Modes = &ChipsNTSCMode;
 #endif
@@ -3874,7 +3874,7 @@ CHIPSScreenInit(int scrnIndex, ScreenPtr pScreen, int argc, char **argv)
 	DUALOPEN;
     }
 
-#if defined(__arm32__) && defined(__NetBSD__)
+#if (defined(__arm32__)  || defined(__arm64__)) && defined(__NetBSD__)
     if (strcmp(pScrn->currentMode->name,"PAL") == 0) {
 	xf86DrvMsg(pScrn->scrnIndex, X_CONFIG, "Using built-in PAL TV mode\n");
 	cPtr->TVMode = XMODE_PAL;
@@ -4041,7 +4041,7 @@ CHIPSScreenInit(int scrnIndex, ScreenPtr pScreen, int argc, char **argv)
 	if (pBankInfo == NULL)
 	    return FALSE;
 	
-#if defined(__arm32__)
+#if defined(__arm32__) || defined(__arm64__)
 	cPtr->Bank = -1;
 #endif
 	pBankInfo->pBankA = hwp->Base;
@@ -5695,7 +5695,7 @@ chipsModeInitHiQV(ScrnInfoPtr pScrn, DisplayModePtr mode)
 	}
     }
     
-#if defined(__arm32__) && defined(__NetBSD__)
+#if (defined(__arm32__) || defined(__arm64__)) && defined(__NetBSD__)
     if (cPtr->TVMode != XMODE_RGB) {
 	/*
 	 * Put the console into TV Out mode.

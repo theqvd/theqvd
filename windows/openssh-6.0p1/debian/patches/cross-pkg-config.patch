@@ -1,0 +1,129 @@
+Description: Allow using a cross-architecture pkg-config
+Author: Colin Watson <cjwatson@debian.org>
+Bug: https://bugzilla.mindrot.org/show_bug.cgi?id=1996
+Forwarded: https://bugzilla.mindrot.org/show_bug.cgi?id=1996
+Last-Update: 2011-04-02
+
+Index: b/configure
+===================================================================
+--- a/configure
++++ b/configure
+@@ -9194,8 +9194,9 @@
+ if test "${with_libedit+set}" = set; then :
+   withval=$with_libedit;  if test "x$withval" != "xno" ; then
+ 		if test "x$withval" = "xyes" ; then
+-			# Extract the first word of "pkg-config", so it can be a program name with args.
+-set dummy pkg-config; ac_word=$2
++			if test -n "$ac_tool_prefix"; then
++  # Extract the first word of "${ac_tool_prefix}pkg-config", so it can be a program name with args.
++set dummy ${ac_tool_prefix}pkg-config; ac_word=$2
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+ $as_echo_n "checking for $ac_word... " >&6; }
+ if ${ac_cv_path_PKGCONFIG+:} false; then :
+@@ -9221,7 +9222,6 @@
+   done
+ IFS=$as_save_IFS
+ 
+-  test -z "$ac_cv_path_PKGCONFIG" && ac_cv_path_PKGCONFIG="no"
+   ;;
+ esac
+ fi
+@@ -9235,6 +9235,63 @@
+ fi
+ 
+ 
++fi
++if test -z "$ac_cv_path_PKGCONFIG"; then
++  ac_pt_PKGCONFIG=$PKGCONFIG
++  # Extract the first word of "pkg-config", so it can be a program name with args.
++set dummy pkg-config; ac_word=$2
++{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
++$as_echo_n "checking for $ac_word... " >&6; }
++if ${ac_cv_path_ac_pt_PKGCONFIG+:} false; then :
++  $as_echo_n "(cached) " >&6
++else
++  case $ac_pt_PKGCONFIG in
++  [\\/]* | ?:[\\/]*)
++  ac_cv_path_ac_pt_PKGCONFIG="$ac_pt_PKGCONFIG" # Let the user override the test with a path.
++  ;;
++  *)
++  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
++for as_dir in $PATH
++do
++  IFS=$as_save_IFS
++  test -z "$as_dir" && as_dir=.
++    for ac_exec_ext in '' $ac_executable_extensions; do
++  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
++    ac_cv_path_ac_pt_PKGCONFIG="$as_dir/$ac_word$ac_exec_ext"
++    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
++    break 2
++  fi
++done
++  done
++IFS=$as_save_IFS
++
++  ;;
++esac
++fi
++ac_pt_PKGCONFIG=$ac_cv_path_ac_pt_PKGCONFIG
++if test -n "$ac_pt_PKGCONFIG"; then
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_pt_PKGCONFIG" >&5
++$as_echo "$ac_pt_PKGCONFIG" >&6; }
++else
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
++$as_echo "no" >&6; }
++fi
++
++  if test "x$ac_pt_PKGCONFIG" = x; then
++    PKGCONFIG="no"
++  else
++    case $cross_compiling:$ac_tool_warned in
++yes:)
++{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
++$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
++ac_tool_warned=yes ;;
++esac
++    PKGCONFIG=$ac_pt_PKGCONFIG
++  fi
++else
++  PKGCONFIG="$ac_cv_path_PKGCONFIG"
++fi
++
+ 			if test "x$PKGCONFIG" != "xno"; then
+ 				{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if $PKGCONFIG knows about libedit" >&5
+ $as_echo_n "checking if $PKGCONFIG knows about libedit... " >&6; }
+Index: b/configure.ac
+===================================================================
+--- a/configure.ac
++++ b/configure.ac
+@@ -1434,7 +1434,7 @@
+ 	[  --with-libedit[[=PATH]]   Enable libedit support for sftp],
+ 	[ if test "x$withval" != "xno" ; then
+ 		if test "x$withval" = "xyes" ; then
+-			AC_PATH_PROG([PKGCONFIG], [pkg-config], [no])
++			AC_PATH_TOOL([PKGCONFIG], [pkg-config], [no])
+ 			if test "x$PKGCONFIG" != "xno"; then
+ 				AC_MSG_CHECKING([if $PKGCONFIG knows about libedit])
+ 			 	if "$PKGCONFIG" libedit; then
+Index: b/contrib/Makefile
+===================================================================
+--- a/contrib/Makefile
++++ b/contrib/Makefile
+@@ -1,3 +1,5 @@
++PKG_CONFIG = pkg-config
++
+ all:
+ 	@echo "Valid targets: gnome-ssh-askpass1 gnome-ssh-askpass2"
+ 
+@@ -7,9 +9,9 @@
+ 		`gnome-config --libs gnome gnomeui`
+ 
+ gnome-ssh-askpass2: gnome-ssh-askpass2.c
+-	$(CC) `pkg-config --cflags gtk+-2.0` \
++	$(CC) `$(PKG_CONFIG) --cflags gtk+-2.0` \
+ 		gnome-ssh-askpass2.c -o gnome-ssh-askpass2 \
+-		`pkg-config --libs gtk+-2.0 x11`
++		`$(PKG_CONFIG) --libs gtk+-2.0 x11`
+ 
+ clean:
+ 	rm -f *.o gnome-ssh-askpass1 gnome-ssh-askpass2 gnome-ssh-askpass

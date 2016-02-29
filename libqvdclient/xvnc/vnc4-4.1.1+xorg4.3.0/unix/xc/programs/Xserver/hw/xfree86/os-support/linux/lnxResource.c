@@ -187,6 +187,7 @@ xf86AccResFromOS(resPtr ret)
       defined(__sh__) || \
       defined(__mc68000__) || \
       defined(__arm__) || \
+      defined(__arm64__) || \
       defined(__s390__) || \
       defined(__hppa__)
 

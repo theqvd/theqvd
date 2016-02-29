@@ -260,6 +260,7 @@ bool TcpSocket::sameMachine() {
   VNC_SOCKLEN_T addrlen = sizeof(struct sockaddr_in);
 
   getpeername(getFd(), (struct sockaddr *)&peeraddr, &addrlen);
+  addrlen = sizeof(struct sockaddr_in);
   getsockname(getFd(), (struct sockaddr *)&myaddr, &addrlen);
 
   return (peeraddr.sin_addr.s_addr == myaddr.sin_addr.s_addr);
@@ -282,18 +283,12 @@ bool TcpSocket::enableNagles(int sock, bool enable) {
   return true;
 }
 
-bool TcpSocket::isSocket(int sock)
+bool TcpSocket::isListening(int sock)
 {
-  struct sockaddr_in info;
-  VNC_SOCKLEN_T info_size = sizeof(info);
-  return getsockname(sock, (struct sockaddr *)&info, &info_size) >= 0;
-}
-
-bool TcpSocket::isConnected(int sock)
-{
-  struct sockaddr_in info;
-  VNC_SOCKLEN_T info_size = sizeof(info);
-  return getpeername(sock, (struct sockaddr *)&info, &info_size) >= 0;
+  int listening = 0;
+  VNC_SOCKLEN_T listening_size = sizeof(listening);
+  return getsockopt(sock, SOL_SOCKET, SO_ACCEPTCONN, &listening,
+                    &listening_size) >= 0 && listening;
 }
 
 int TcpSocket::getSockPort(int sock)

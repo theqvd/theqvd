@@ -157,7 +157,7 @@ use Class::StateMachine::Declarative
                                             substates => [ saving_state           => { enter => '_save_state',
                                                                                        on => { _on_error => '_on_done' } },
                                                            dirty                  => { enter => '_check_dirty_flag',
-                                                                                       transitions => { _on_error => 'dirty' } },
+                                                                                       transitions => { _on_error => '/dirty' } },
                                                            heavy                  => { enter => '_heavy_down' },
                                                            checking_lxc           => { enter => '_check_lxc',
                                                                                       transitions => { _on_error => 'killing_lxc' } },
@@ -340,6 +340,7 @@ sub _create_lxc {
 
     # FIXME: make this template-able or configurable in some way
     print $cfg_fh <<EOC;
+lxc.aa_profile=unconfined
 lxc.autodev=1
 lxc.hook.autodev=$qvd_lxc_autodev
 lxc.utsname=$self->{name}
@@ -401,7 +402,19 @@ EOC
         }
     }
 
-    print $cfg_fh, $self->_cfg('internal.vm.lxc.conf.extra'), "\n";
+    my $meta = $self->{os_fs}->image_metadata_dir;
+    if (defined $meta) {
+	my $config_extra = "$meta/lxc/config-extra";
+	if (-f $config_extra) {
+	    print $cfg_fh "lxc.extra=$config_extra\n"
+	}
+	my $fstab = "$meta/lxc/fstab";
+	if (-f $fstab) {
+	    print $cfg_fh "lxc.mount=$fstab\n";
+	}
+    }
+
+    print $cfg_fh $self->_cfg('internal.vm.lxc.conf.extra'), "\n";
     close $cfg_fh;
 
     $self->_on_done;
@@ -409,6 +422,10 @@ EOC
 
 sub _start_lxc {
     my $self = shift;
+
+    my $lxc_version = $self->_cfg('command.version.lxc');
+    my @lxc_cmd = ('lxc-start', -n => $self->{lxc_name}, -P => $self->_cfg('path.run.lxc'));
+    push @lxc_cmd, '-F' if $lxc_version >= 1.1;
 
     my $hv_out = $self->_hypervisor_output_redirection;
 
@@ -420,7 +437,7 @@ sub _start_lxc {
                        '>' => $hv_out,
                        '2>' => $hv_out,
                      },
-                     'lxc-start', -n => $self->{lxc_name}, -P => $self->_cfg('path.run.lxc'));
+                     @lxc_cmd);
     $self->_on_done;
 }
 
@@ -563,7 +580,7 @@ sub _run_hook {
                          os_meta => $meta,
                          $self->_hook_args );
 
-            $debug and $self->_debug("running hook $hook for $name");
+            $debug and $self->_debug("running hook $hook< for $name");
             DEBUG "Running hook '$hook' for '$name'";
             $self->_run_cmd( { skip_cmd_lookup => 1 },
                              $hook => @args);

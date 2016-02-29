@@ -59,8 +59,7 @@ namespace network {
     virtual void shutdown();
 
     static bool enableNagles(int sock, bool enable);
-    static bool isSocket(int sock);
-    static bool isConnected(int sock);
+    static bool isListening(int sock);
     static int getSockPort(int sock);
   private:
     bool closeFd;

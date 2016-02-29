@@ -1465,7 +1465,7 @@ di_tag: Use the disk image with tag "t". Change takes effect on VM start.
 Valid options:
     -f [--filter] FILTER : edits virtual machines matched by FILTER
     --force              : perform the operation without asking
-    -q [--quiet]         : don't print messages
+    -q [--quiet]         : do not print messages
 EOT
 }
 
@@ -1483,15 +1483,25 @@ sub _utc2localtime {
 sub cmd_vm_list {
     my ($self) = @_;
     
-    my $rs = $self->get_resultset('vm')->search({}, {order_by => 'id'});
+    my $rs = $self->get_resultset('vm')->search({}, { order_by => 'me.id',
+						      prefetch => ['user', 'osf', 'di',
+								   { vm_runtime => ['host', 'real_user'] } ] });
     
-    my @header = ("Id","Name","User","RealUser","Ip","OSF", "DI_Tag", "DI", "Host","State","L7R","UserState","Blocked",
+    my @header = ("Id","Name","User","RealUser","Ip","OSF", "DI_Tag", "DI", "Running DI", "Host","State","L7R","UserState","Blocked",
                   "Expire soft", "Expire hard");
     my @body;
-        
-    eval { 
+
+    eval {
+        my %di;
         while (my $vm = $rs->next) {
             my $vmr = $vm->vm_runtime;
+            my $di = $vm->di;
+            $di{$di->id} //= $di;
+            my $current_di;
+            if (defined (my $current_di_id = $vmr->current_di_id)) {
+                $current_di = $di{$current_di_id} //= $vmr->current_di;
+            }
+
             my @row = map { $_ // '-' } (
                 $vm->id,
                 $vm->name,
@@ -1500,7 +1510,8 @@ sub cmd_vm_list {
                 $vm->ip,
                 $vm->osf->name,
                 $vm->di_tag,
-                (defined $vm->di ? $vm->di->version : undef),
+                (defined $di ? $di->version : undef),
+                (defined $current_di ? $current_di->version : undef),
                 (defined $vmr->host ? $vmr->host->name : undef),
                 $vmr->vm_state,
                 undef, # (defined $vmr->l7r_host ? $vmr->l7r_host->name : undef), # FIXME: COMMENTED BECAUSE TRIGGERS ERROR WHEN ASKING DB
@@ -1511,8 +1522,8 @@ sub cmd_vm_list {
             );
             push(@body, \@row);
         }
-    };  
-    
+    };
+
     if ($@) {
         #$self->_print("Wrong syntax, check the command help:\n");
         $self->_die;

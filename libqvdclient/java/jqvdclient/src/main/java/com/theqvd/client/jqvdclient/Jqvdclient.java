@@ -12,6 +12,7 @@ import org.kohsuke.args4j.spi.BooleanOptionHandler;
 import org.kohsuke.args4j.spi.IntOptionHandler;
 
 import com.theqvd.client.jni.QvdException;
+import com.theqvd.client.jni.QvdPaymentException;
 import com.theqvd.client.jni.QvdProgressHandler;
 import com.theqvd.client.jni.QvdclientWrapper;
 import com.theqvd.client.jni.Vm;
@@ -52,15 +53,16 @@ public class Jqvdclient {
 	/**
 	 * @param args
 	 * @throws IOException 
+	 * @throws QvdPaymentException 
 	 */
 //	@Argument
 //    private List<String> arguments = new ArrayList<String>();
 
-	public static void main(String[] args) throws IOException, QvdException {
+	public static void main(String[] args) throws IOException, QvdException, QvdPaymentException {
 		new Jqvdclient().doMain(args);
 	}
 
-	public void doMain(String[] args) throws IOException, QvdException {
+	public void doMain(String[] args) throws IOException, QvdException, QvdPaymentException {
 		CmdLineParser parser = new CmdLineParser(this);
 		try {
             // parse the arguments.
@@ -69,8 +71,7 @@ public class Jqvdclient {
             // you can parse additional arguments if you want.
             // parser.parseArgument("more","args");
             if (version) {
-        		QvdclientWrapper q = new QvdclientWrapper();
-        		System.out.print(q.get_version_text());
+        		System.out.print(QvdclientWrapper.get_version_text());
             	return;
             }
             // after parsing arguments, you should check
@@ -99,7 +100,7 @@ public class Jqvdclient {
 		return ;
 	}
 	
-	void connect() throws QvdException, IOException {
+	void connect() throws QvdException, QvdPaymentException, IOException {
 		int i;
 		AcceptUnknownCertHandler unknown_cert_handler = new AcceptUnknownCertHandler();
 		QvdProgressHandler progress_handler = new PrintProgress();
@@ -131,7 +132,12 @@ public class Jqvdclient {
 		}
 		q.qvd_list_of_vm();
 		Vm vmlist[] = q.getQvdclient().getVmlist();
-		
+		System.out.println("Payment required is "+q.qvd_payment_required());
+		if (q.qvd_payment_required()) {
+			System.err.println("QVD payment required");
+			q.qvd_free();
+			return ;
+		}
 		if (vmlist.length == 0) {
 			System.err.println("No VM available. Num of vms:" + vmlist.length);
 			q.qvd_free();

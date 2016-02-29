@@ -28,6 +28,7 @@ my $vm_poll_time     = cfg('internal.l7r.poll_time.vm');
 my $x_poll_time      = cfg('internal.l7r.poll_time.x');
 my $takeover_timeout = cfg('internal.l7r.timeout.takeover');
 my $vm_start_timeout = cfg('internal.l7r.timeout.vm_start');
+my $vm_stop_timeout  = cfg('internal.l7r.timeout.vm_stop');
 my $x_start_retry    = cfg('internal.l7r.retry.x_start');
 my $x_start_timeout  = cfg('internal.l7r.timeout.x_start');
 my $vma_timeout      = cfg('internal.l7r.timeout.vma');
@@ -37,13 +38,25 @@ sub new {
     my $class = shift;
     my @args = ( host => cfg('l7r.address'),
                  port => cfg('l7r.port') );
+    my $failed = 0;
     if(cfg('l7r.use_ssl')) {
+        if (!-r cfg('path.l7r.ssl.key'))  { $failed = 1; ERROR sprintf "SSL key file '%s' isn't readable",  cfg('path.l7r.ssl.key'); }
+        if (!-r cfg('path.l7r.ssl.cert')) { $failed = 1; ERROR sprintf "SSL cert file '%s' isn't readable", cfg('path.l7r.ssl.cert'); }
+  
+        my @kstat = stat cfg('path.l7r.ssl.cert');
+        if (!@kstat)                      { $failed = 1; ERROR sprintf "Can't stat SSL key file '%s'", cfg('path.l7r.ssl.key'); }
+        if ($kstat[2] & 0007 != 0 )       { $failed = 1; ERROR sprintf "SSL key file '%s' has insecure permissions '%o'", cfg('path.l7r.ssl.key'), $kstat[2]; }
+     
+        $failed and return;
         push @args, ( SSL           => 1,
                       SSL_key_file  => cfg('path.l7r.ssl.key'),
                       SSL_cert_file => cfg('path.l7r.ssl.cert'));
 
         # handle the case where we require the client to have a valid certificate:
         if (cfg('l7r.client.cert.require')) {
+            if (!-r cfg('path.l7r.ssl.ca'))  { $failed = 1; ERROR sprintf "SSL ca file '%s' isn't readable",  cfg('path.l7r.ssl.ca'); }
+            if (!-r cfg('path.l7r.ssl.crl')) { $failed = 1; ERROR sprintf "SSL crl file '%s' isn't readable", cfg('path.l7r.ssl.crl'); }
+            $failed and return;
             push @args, ( SSL_verify_mode => 0x03, # 0x01 => verify peer,
                                                    # 0x02 => fail verification if no peer certificate exists
                           SSL_ca_file     => cfg('path.l7r.ssl.ca'));
@@ -89,7 +102,7 @@ sub ping_processor {
 sub list_of_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
     my $this_host = this_host; $this_host // $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, 'Host is not registered in the database');
-    $this_host->counters->incr_http_requests;
+    txn_do { $this_host->counters->incr_http_requests; };
     DEBUG 'method list_of_vm requested';
     my $auth = $l7r->_authenticate_user($headers);
     if ($this_host->runtime->blocked) {
@@ -130,7 +143,7 @@ sub generate_slave_key {
 sub connect_to_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
     my $this_host = this_host; $this_host // $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, 'Host is not registered in the database');
-    $this_host->counters->incr_http_requests;
+    txn_do { $this_host->counters->incr_http_requests; };
     DEBUG 'method connect_to_vm requested';
     my $auth = $l7r->_authenticate_user($headers);
     my $user_id = $auth->user_id;
@@ -173,6 +186,8 @@ sub connect_to_vm_processor {
             $l7r->throw_http_error(HTTP_FORBIDDEN,
                                        "The requested virtual machine is offline for maintenance");
         };
+        # FIXME: at this point we have not checked yet if the user can
+        # access this machine!!!
         $vm->update({real_user_id => $user_id});
         return $vm,
     };
@@ -217,7 +232,7 @@ sub connect_to_vm_processor {
 sub stop_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
     my $this_host = this_host; $this_host // $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, 'Host is not registered in the database');
-    $this_host->counters->incr_http_requests;
+    txn_do { $this_host->counters->incr_http_requests; };
     DEBUG 'method stop_vm requested';
     my $auth = $l7r->_authenticate_user($headers);
     my $user_id = $auth->user_id;
@@ -227,64 +242,27 @@ sub stop_vm_processor {
         $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Server is blocked");
     }
 
-    header_eq_check($headers, Connection => 'Upgrade') &&
-    header_eq_check($headers, Upgrade => 'QVD/1.0') or do {
-        INFO 'Upgrade HTTP header required';
-        $l7r->throw_http_error(HTTP_UPGRADE_REQUIRED);
-    };
-
     my $query = (uri_split $url)[3];
     my %params = uri_query_split  $query;
     my $vm_id = delete $params{id};
-    my $file_name = delete $params{file_name};
-    unless (defined $vm_id or defined $file_name)  {
+    unless (defined $vm_id) {
         INFO 'Parameter id required';
         $l7r->throw_http_error(HTTP_UNPROCESSABLE_ENTITY, "parameter id is missing");
     }
 
-    my $vm = txn_eval {
-        my $vm;
-        $vm = rs(VM_Runtime)->search({vm_id => $vm_id})->first // do {
-            INFO 'The requested virtual machine does not exist,)'. " VM_ID: $vm_id";
-            $l7r->throw_http_error(HTTP_NOT_FOUND, "The requested virtual machine does not exist");
-        };
-        $vm->blocked and do {
-            INFO 'The requested virtual machine is offline for maintenance'. " VM_ID: $vm_id";
-            $l7r->throw_http_error(HTTP_FORBIDDEN,
-                                       "The requested virtual machine is offline for maintenance");
-        };
-        $vm->update({real_user_id => $user_id});
-        return $vm,
+    my $vm = rs(VM_Runtime)->search({vm_id => $vm_id})->first // do {
+        INFO 'The requested virtual machine does not exist,)'. " VM_ID: $vm_id";
+        $l7r->throw_http_error(HTTP_NOT_FOUND, "The requested virtual machine does not exist");
     };
 
-    if (!$vm) {
-        $l7r->throw_http_error(HTTP_NOT_FOUND, $@);
+    if (!$auth->allow_access_to_vm($vm->vm)) {
+        INFO "User $user_id has tried to access VM $vm_id but (s)he isn't allowed to";
+        $l7r->throw_http_error(HTTP_FORBIDDEN,
+                               "You are not allowed to access requested virtual machine");
     }
 
-    eval {
-        if (!$auth->allow_access_to_vm($vm->vm)) {
-            INFO "User $user_id has tried to access VM $vm_id but (s)he isn't allowed to";
-            $l7r->throw_http_error(HTTP_FORBIDDEN,
-                die                   "You are not allowed to access requested virtual machine");
-        }
-    #    $l7r->_takeover_vm($vm);
-    #    $l7r->_assign_vm($vm);
-    #    $auth->before_connect_to_vm;
-        $l7r->_stop_and_wait_for_vm($vm);
-    };
-    my $saved_err = $@;
-    DEBUG 'Releasing VM'. " VM_ID: $vm_id";
-    $l7r->_release_vm($vm);
-    if ($saved_err) {
-        chomp $saved_err;
-        INFO "The requested virtual machine is not available: '$saved_err'. Retry later". " VM_ID: $vm_id";
-        $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE,
-                          "The requested virtual machine is not available: ",
-                          "$saved_err, retry later");
-    }
-    DEBUG "VM shut down". " VM_ID: $vm_id";
-    $l7r->send_http_response(HTTP_OK);
-
+    $l7r->_stop_and_wait_for_vm($vm);
+    $l7r->send_http_response_with_body(HTTP_OK, 'text/plain', [], "Machine stopped\r\n");
 }
 
 sub _authenticate_user {
@@ -299,14 +277,16 @@ sub _authenticate_user {
 		    return $auth;
 		}
                 $auth = QVD::L7R::Authenticator->new;
-		$this_host->counters->incr_auth_attempts;
+		txn_do { $this_host->counters->incr_auth_attempts; };
                 if ($auth->authenticate_basic($login, $passwd, $l7r)) {
-		    INFO "Accepted connection from user $login from ip:port ".
-			$l7r->{server}->{client}->peerhost().":".$l7r->{server}->{client}->peerport();
+                    my $client = $l7r->{server}->{client};
+                    my $peerhost = eval { $client->peerhost() } // 'unknown';
+                    my $peerport = eval { $client->peerport() } // 'unknown';
+		    INFO "Accepted connection from user $login from ip:port ${peerhost}:$peerport";
 		    $l7r->{_auth} = $auth;
                     my $user = rs(User)->find($auth->user_id);
                     unless ($user->blocked) {
-                        $this_host->counters->incr_auth_ok;
+                        txn_do { $this_host->counters->incr_auth_ok };
                         return $auth
                     }
                     ERROR "User $login is blocked";
@@ -424,91 +404,72 @@ sub _assign_vm {
     }
 }
 
+sub _wait_for_vm {
+    my ($l7r, $vm, $target_state, $timeout) = @_;
+    my $end = $timeout + time;
+    my $vm_id = $vm->id;
+    while (1) {
+        $vm->discard_changes;
+        my $current_state = $vm->vm_state;
+        DEBUG "waiting for VM $vm_id to reach state $target_state from state $current_state";
+
+        return 1 if $current_state eq $target_state;
+
+        if ($current_state eq 'stopped' and
+            not defined $vm->vm_cmd) {
+            DEBUG "VM went to state 'stopped' unexpectedly";
+            return;
+        }
+
+        if (time > $end) {
+            DEBUG "timeout waiting for VM $vm_id to reach state '$target_state'";
+            $l7r->throw_http_error(HTTP_REQUEST_TIMEOUT,
+                                   "VM didn't reach state '$target_state'. Timeout");
+        }
+        $l7r->_tell_client("Waiting for VM to reach state '$target_state'");
+        sleep($vm_poll_time);
+    }
+}
+
 sub _start_and_wait_for_vm {
     my ($l7r, $vm) = @_;
 
-    my $vm_id = $vm->id;
-    my $timeout = time + $vm_start_timeout;
-    my $vm_state = $vm->vm_state;
-
-    if ($vm_state eq 'stopped') {
+    if ($vm->can_send_vm_cmd('start')) {
         $l7r->_tell_client("Starting virtual machine");
         $vm->send_vm_start;
         my $host_id = $vm->host_id;
         notify("qvd_cmd_for_vm_on_host$host_id");
     }
 
-    return if $vm_state eq 'running';
-
-    $l7r->_tell_client("Waiting for VM $vm_id to start");
-    while (1) {
-        DEBUG "waiting for VM $vm_id to come up";
-        sleep($vm_poll_time);
-        $vm->discard_changes;
-        $l7r->_check_abort($vm);
-        my $vm_state = $vm->vm_state;
-        if ($vm_state eq 'running') {
-            DEBUG 'VM is running VM_ID: '. $vm->id;
-            return;
-        }
-        # FIXME: timeout in state starting_1 should be relaxed a bit
-        if (( $vm_state eq 'stopped' and
-              defined $vm->vm_cmd ) or
-            $vm_state =~ /^starting/) {
-            LOGDIE "Unable to start VM $vm_id, operation timed out!\n"
-                if time > $timeout;
-        }
-        else {
-            LOGDIE "Unable to start VM $vm_id in state $vm_state";
-        }
-    }
+    $l7r->_wait_for_vm($vm, 'running', $vm_start_timeout)
+        or LOGDIE "Unable to start VM " . $vm->id;
 }
 
 sub _stop_and_wait_for_vm {
     my ($l7r, $vm) = @_;
 
+    # we don't use transactions in this method as it is a non-critical cmd.
     my $vm_id = $vm->id;
-    my $timeout = time + $vm_start_timeout;
     my $vm_state = $vm->vm_state;
+    my $host_id = $vm->host_id;
 
-    DEBUG "stop_and_wait: VM $vm_id, timeout $timeout, state $vm_state";
+    DEBUG "stop_and_wait: VM $vm_id, timeout $vm_stop_timeout, state $vm_state, host $host_id";
 
-    if ($vm_state eq 'running') {
-        $l7r->_tell_client("Stopping virtual machine");
-        DEBUG "VM $vm_id running, stopping";
+    return 1 if $vm_state eq 'stopped';
+
+    $l7r->_tell_client("Stopping virtual machine");
+    if ($vm->can_send_vm_cmd('stop')) {
         $vm->send_vm_stop;
-        my $host_id = $vm->host_id;
         notify("qvd_cmd_for_vm_on_host$host_id");
     }
-
-    return if $vm_state eq 'stopped';
-
-    $l7r->_tell_client("Waiting for VM $vm_id to stop");
-    while (1) {
-        DEBUG "waiting for VM $vm_id to shut down";
-        sleep($vm_poll_time);
-        $vm->discard_changes;
-        $l7r->_check_abort($vm);
-        my $vm_state = $vm->vm_state;
-        if ($vm_state eq 'stopped') {
-            DEBUG 'VM is running VM_ID: '. $vm->id;
-            return;
-        }
-        # FIXME: timeout in state starting_1 should be relaxed a bit
-        if (( $vm_state eq 'running' and
-              defined $vm->vm_cmd ) or
-            $vm_state =~ /^stopping/) {
-            LOGDIE "Unable to stop VM $vm_id, operation timed out!\n"
-                if time > $timeout;
-        }
-        else {
-            LOGDIE "Unable to stop VM $vm_id in state $vm_state";
-        }
+    elsif ($vm_state ne 'stopping') {
+        $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE,
+                               "The requested virtual machine is in an unstoppable state ($vm_state)");
     }
+
+    $l7r->_wait_for_vm($vm, 'stopped', $vm_stop_timeout)
+        or LOGDIE "Unable to stop VM $vm_id";
 }
-
-
-
 
 sub _start_x {
     my ($l7r, $vm, @params) = @_;
@@ -567,13 +528,13 @@ sub _run_forwarder {
 
     $l7r->_tell_client("Connecting X session for VM_ID: " . $vm->id);
 
-    $this_host->counters->incr_nx_attempts;
+    txn_do { $this_host->counters->incr_nx_attempts; };
     my $socket = IO::Socket::INET->new(PeerAddr => $vm_address,
                                        PeerPort => $vm_x_port,
                                        Proto => 'tcp',
                                        KeepAlive => 1)
         or LOGDIE "Unable to connect to X server  on VM VM_ID: " . $vm->id .  ": $!";
-    $this_host->counters->incr_nx_ok;
+    txn_do { $this_host->counters->incr_nx_ok; };
 
     DEBUG "Socket connected to X server on VM VM_ID: " . $vm->id;
 
@@ -596,7 +557,7 @@ sub _run_forwarder {
     my $t0 = time;
     forward_sockets($l7r->{server}{client}, $socket);
     DEBUG "Session terminated on VM VM_ID: " . $vm->id ;
-    $this_host->counters->incr_short_sessions if time - $t0 < $short_session;
+    txn_do { $this_host->counters->incr_short_sessions } if time - $t0 < $short_session;
 }
 
 sub _vma_client {
@@ -643,7 +604,7 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head1 AUTHOR
 
-Salvador Fandiño, C<< <sfandino at yahoo.com> >>
+Salvador Fandino, C<< <sfandino at yahoo.com> >>
 
 =head1 COPYRIGHT
 

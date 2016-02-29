@@ -11,13 +11,13 @@ QVDCLIENT=qvdclient
 QVDCLIENTOBJ=$(QVDCLIENT).o
 QVDCLIENTLIBLIBS=-L. -lcurl -lcrypto -lssl -lldap -lidn -lrt -ljansson -lXcomp
 QVDCLIENTLIBS=-L. -lqvdclient
-CFLAGS=-fPIC -g 
+CFLAGS:=-fPIC -g $(CFLAGS)
 STATICLIBS=
 STDCLIB=
 
 default: all
 
-all: $(QVDCLIENTLIB) $(QVDCLIENTLIBA) $(QVDCLIENT) 
+all: $(QVDCLIENTLIB) $(QVDCLIENTLIBA) $(QVDCLIENT)
 
 qvdclient: $(QVDCLIENTOBJ) $(QVDCLIENTLIB) $(QVDCLIENTLIBA)
 	$(LD) $(LDFLAGS) -o $(QVDCLIENT) $(QVDCLIENTOBJ) $(QVDCLIENTLIBS)
@@ -39,7 +39,7 @@ checkenv-%:
 	@if [ -z "${${*}}" ]; then \
 	  echo ${*} not defined; \
           exit 1;\
-	fi 
+	fi
 
 install:
 

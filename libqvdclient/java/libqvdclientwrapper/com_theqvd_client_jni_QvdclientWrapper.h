@@ -13,7 +13,7 @@ extern "C" {
  * Signature: ()Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1get_1version_1text
-  (JNIEnv *, jobject);
+  (JNIEnv *, jclass);
 
 /*
  * Class:     com_theqvd_client_jni_QvdclientWrapper
@@ -21,7 +21,7 @@ JNIEXPORT jstring JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1ge
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1get_1version
-  (JNIEnv *, jobject);
+  (JNIEnv *, jclass);
 
 /*
  * Class:     com_theqvd_client_jni_QvdclientWrapper
@@ -54,6 +54,14 @@ JNIEXPORT jint JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1conne
  */
 JNIEXPORT jobjectArray JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1list_1of_1vm
   (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     com_theqvd_client_jni_QvdclientWrapper
+ * Method:    qvd_c_stop_vm
+ * Signature: (JI)I
+ */
+JNIEXPORT jint JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1stop_1vm
+  (JNIEnv *, jobject, jlong, jint);
 
 /*
  * Class:     com_theqvd_client_jni_QvdclientWrapper
@@ -189,6 +197,14 @@ JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1set_1
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1end_1connection
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     com_theqvd_client_jni_QvdclientWrapper
+ * Method:    qvd_c_payment_required
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_theqvd_client_jni_QvdclientWrapper_qvd_1c_1payment_1required
   (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus

@@ -64,12 +64,18 @@ sub _write_file {
         }
         my ($mode, $uid) = (stat $path)[2, 4];
         unless ($uid == $> or $uid == 0) {
-            ERROR "Directory '$path' has the wrong owner (uid: $uid)";
-            return;
+            WARN "Directory '$path' has the wrong owner (uid: $uid), changing to $>";
+            if (!chown $>, -1, $path) {
+                ERROR "chown: '$path': $!";
+                return;
+            }
         }
         if ($mode & 0077) {
-            ERROR sprintf("Directory '%s' has the wrong permissions (%04o)", $path, ($mode & 0777));
-            return;
+            WARN sprintf("Directory '%s' has the wrong permissions (%04o), changing to 0700", $path, ($mode & 0777));
+            if (!chmod 0700, $path) {
+                ERROR "chmod: '$path': $!";
+                return;
+            }
         }
 
         my $fh;

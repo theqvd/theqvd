@@ -1,0 +1,19 @@
+Description: Call restorecon on copied ~/.ssh/authorized_keys if possible
+Author: Tomas Mraz <tmraz@fedoraproject.org>
+Bug-Debian: http://bugs.debian.org/658675
+Bug-Fedora: https://bugzilla.redhat.com/show_bug.cgi?id=739989
+Last-Update: 2012-08-24
+
+Index: b/contrib/ssh-copy-id
+===================================================================
+--- a/contrib/ssh-copy-id
++++ b/contrib/ssh-copy-id
+@@ -41,7 +41,7 @@
+ # strip any trailing colon
+ host=`echo $1 | sed 's/:$//'`
+ 
+-{ eval "$GET_ID" ; } | ssh $host "umask 077; test -d ~/.ssh || mkdir ~/.ssh ; cat >> ~/.ssh/authorized_keys" || exit 1
++{ eval "$GET_ID" ; } | ssh $host "umask 077; test -d ~/.ssh || mkdir ~/.ssh ; cat >> ~/.ssh/authorized_keys && (test -x /sbin/restorecon && /sbin/restorecon ~/.ssh ~/.ssh/authorized_keys >/dev/null 2>&1 || true)" || exit 1
+ 
+ cat <<EOF
+ Now try logging into the machine, with "ssh '$host'", and check in:

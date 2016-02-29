@@ -37,14 +37,14 @@
 #define PreIncDir 
 #undef PostIncDir
 #define PostIncDir
-#define CcCmd /Applications/Xcode.app/Contents/Developer/usr/bin/gcc -arch armv7 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk -miphoneos-version-min=7.0
+#define CcCmd clang -flto -arch armv7 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk -miphoneos-version-min=8.1
 /*#define CcCmd arm-linux-androideabi-gcc*/
 #undef CplusplusCmd
 #define HasCplusplus YES
-#define CplusplusCmd /Applications/Xcode.app/Contents/Developer/usr/bin/g++ -arch armv7 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk -miphoneos-version-min=7.0
+#define CplusplusCmd clang++ -flto -arch armv7 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk -miphoneos-version-min=8.1 -stdlib=libc++
 /*#define CplusplusCmd arm-linux-androideabi-g++ */
 #define DoRanlibCmd YES
-#define RanlibCmd /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/ranlib
+#define RanlibCmd /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib
 /*#define RanlibCmd arm-linux-androideabi-ranlib*/
 #undef ExtraLoadFlags 
 /* #define ExtraLoadFlags -static -static-libgcc */
@@ -56,8 +56,7 @@
 /* #undef	CppCmd	 */
 /* #define	CppCmd	arm-linux-androideabi-cpp*/
 /* #define	CppCmd	gcc -E -traditional-cpp */
-/* #define	CppCmd	/usr/local/bin/cpp-4.7 -traditional-cpp */
-/* #define	CppCmd	/usr/local/bin/cpp-4.7 */
+#define	CppCmd	/usr/bin/cpp -traditional-cpp
 
 #undef LdPostLib
 #define LdPostLib
@@ -68,6 +67,7 @@
 #define ServerXdmcpDefines	/**/
 
 /* Use gcc instead of clang to build imake */
-#define HostCcCmd /usr/local/bin/gcc-4.7
+/* #define HostCcCmd /usr/local/bin/gcc-4.7 */
+#define HostCcCmd /opt/local/bin/gcc-mp-4.7
 #endif
 #include <cross.rules>

@@ -1,0 +1,925 @@
+Description: Add a sandbox fallback mechanism
+Author: Colin Watson <cjwatson@debian.org>
+Bug: https://bugzilla.mindrot.org/show_bug.cgi?id=2011
+Forwarded: https://bugzilla.mindrot.org/show_bug.cgi?id=2011
+Last-Update: 2012-05-26
+
+Index: b/Makefile.in
+===================================================================
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -93,8 +93,8 @@
+ 	loginrec.o auth-pam.o auth-shadow.o auth-sia.o md5crypt.o \
+ 	sftp-server.o sftp-common.o \
+ 	roaming_common.o roaming_serv.o \
+-	sandbox-null.o sandbox-rlimit.o sandbox-systrace.o sandbox-darwin.o \
+-	sandbox-seccomp-filter.o
++	sandbox.o sandbox-null.o sandbox-rlimit.o sandbox-systrace.o \
++	sandbox-darwin.o sandbox-seccomp-filter.o
+ 
+ MANPAGES	= moduli.5.out scp.1.out ssh-add.1.out ssh-agent.1.out ssh-keygen.1.out ssh-keyscan.1.out ssh.1.out sshd.8.out sftp-server.8.out sftp.1.out ssh-keysign.8.out ssh-pkcs11-helper.8.out ssh-vulnkey.1.out sshd_config.5.out ssh_config.5.out
+ MANPAGES_IN	= moduli.5 scp.1 ssh-add.1 ssh-agent.1 ssh-keygen.1 ssh-keyscan.1 ssh.1 sshd.8 sftp-server.8 sftp.1 ssh-keysign.8 ssh-pkcs11-helper.8 ssh-vulnkey.1 sshd_config.5 ssh_config.5
+Index: b/configure.ac
+===================================================================
+--- a/configure.ac
++++ b/configure.ac
+@@ -126,25 +126,6 @@
+ 	#include <linux/seccomp.h>
+ ])
+ fi
+-if test "x$have_seccomp_filter" = "x1" ; then
+-AC_MSG_CHECKING([kernel for seccomp_filter support])
+-AC_RUN_IFELSE([AC_LANG_PROGRAM([[
+-		#include <errno.h>
+-		#include <linux/seccomp.h>
+-		#include <stdlib.h>
+-		#include <sys/prctl.h>
+-	]],
+-	[[ errno = 0;
+-	   prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, NULL, 0, 0);
+-	   exit(errno == EFAULT ? 0 : 1); ]])],
+-	[ AC_MSG_RESULT([yes]) ], [
+-		AC_MSG_RESULT([no])
+-		# Disable seccomp filter as a target
+-		have_seccomp_filter=0
+-	],
+-	[ AC_MSG_RESULT([cross-compiling, assuming yes]) ]
+-)
+-fi
+ 
+ use_stack_protector=1
+ AC_ARG_WITH([stackprotect],
+@@ -2599,21 +2580,24 @@
+ 		fi
+ 	]
+ )
++SANDBOX_STYLE=""
+ if test "x$sandbox_arg" = "xsystrace" || \
+    ( test -z "$sandbox_arg" && test "x$have_systr_policy_kill" = "x1" ) ; then
+ 	test "x$have_systr_policy_kill" != "x1" && \
+ 		AC_MSG_ERROR([systrace sandbox requires systrace headers and SYSTR_POLICY_KILL support])
+-	SANDBOX_STYLE="systrace"
++	SANDBOX_STYLE="$SANDBOX_STYLE systrace"
+ 	AC_DEFINE([SANDBOX_SYSTRACE], [1], [Sandbox using systrace(4)])
+-elif test "x$sandbox_arg" = "xdarwin" || \
++fi
++if test "x$sandbox_arg" = "xdarwin" || \
+      ( test -z "$sandbox_arg" && test "x$ac_cv_func_sandbox_init" = "xyes" && \
+        test "x$ac_cv_header_sandbox_h" = "xyes") ; then
+ 	test "x$ac_cv_func_sandbox_init" != "xyes" -o \
+ 	     "x$ac_cv_header_sandbox_h" != "xyes" && \
+ 		AC_MSG_ERROR([Darwin seatbelt sandbox requires sandbox.h and sandbox_init function])
+-	SANDBOX_STYLE="darwin"
++	SANDBOX_STYLE="$SANDBOX_STYLE darwin"
+ 	AC_DEFINE([SANDBOX_DARWIN], [1], [Sandbox using Darwin sandbox_init(3)])
+-elif test "x$sandbox_arg" = "xseccomp_filter" || \
++fi
++if test "x$sandbox_arg" = "xseccomp_filter" || \
+      ( test -z "$sandbox_arg" && \
+        test "x$have_seccomp_filter" = "x1" && \
+        test "x$ac_cv_header_linux_audit_h" = "xyes" && \
+@@ -2628,21 +2612,24 @@
+ 		AC_MSG_ERROR([seccomp_filter sandbox requires seccomp headers])
+ 	test "x$ac_cv_func_prctl" != "xyes" && \
+ 		AC_MSG_ERROR([seccomp_filter sandbox requires prctl function])
+-	SANDBOX_STYLE="seccomp_filter"
++	SANDBOX_STYLE="$SANDBOX_STYLE seccomp_filter"
+ 	AC_DEFINE([SANDBOX_SECCOMP_FILTER], [1], [Sandbox using seccomp filter])
+-elif test "x$sandbox_arg" = "xrlimit" || \
++fi
++if test "x$sandbox_arg" = "xrlimit" || \
+      ( test -z "$sandbox_arg" && test "x$ac_cv_func_setrlimit" = "xyes" ) ; then
+ 	test "x$ac_cv_func_setrlimit" != "xyes" && \
+ 		AC_MSG_ERROR([rlimit sandbox requires setrlimit function])
+-	SANDBOX_STYLE="rlimit"
++	SANDBOX_STYLE="$SANDBOX_STYLE rlimit"
+ 	AC_DEFINE([SANDBOX_RLIMIT], [1], [Sandbox using setrlimit(2)])
+-elif test -z "$sandbox_arg" || test "x$sandbox_arg" = "xno" || \
++fi
++if test -z "$sandbox_arg" || test "x$sandbox_arg" = "xno" || \
+      test "x$sandbox_arg" = "xnone" || test "x$sandbox_arg" = "xnull" ; then
+-	SANDBOX_STYLE="none"
+-	AC_DEFINE([SANDBOX_NULL], [1], [no privsep sandboxing])
+-else
++	SANDBOX_STYLE="$SANDBOX_STYLE none"
++fi
++if test -z "$SANDBOX_STYLE" ; then
+ 	AC_MSG_ERROR([unsupported --with-sandbox])
+ fi
++SANDBOX_STYLE="${SANDBOX_STYLE# }"
+ 
+ # Cheap hack to ensure NEWS-OS libraries are arranged right.
+ if test ! -z "$SONY" ; then
+Index: b/configure
+===================================================================
+--- a/configure
++++ b/configure
+@@ -5598,48 +5598,6 @@
+ fi
+ 
+ fi
+-if test "x$have_seccomp_filter" = "x1" ; then
+-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking kernel for seccomp_filter support" >&5
+-$as_echo_n "checking kernel for seccomp_filter support... " >&6; }
+-if test "$cross_compiling" = yes; then :
+-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: cross-compiling, assuming yes" >&5
+-$as_echo "cross-compiling, assuming yes" >&6; }
+-
+-else
+-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-
+-		#include <errno.h>
+-		#include <linux/seccomp.h>
+-		#include <stdlib.h>
+-		#include <sys/prctl.h>
+-
+-int
+-main ()
+-{
+- errno = 0;
+-	   prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, NULL, 0, 0);
+-	   exit(errno == EFAULT ? 0 : 1);
+-  ;
+-  return 0;
+-}
+-_ACEOF
+-if ac_fn_c_try_run "$LINENO"; then :
+-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+-$as_echo "yes" >&6; }
+-else
+-
+-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+-$as_echo "no" >&6; }
+-		# Disable seccomp filter as a target
+-		have_seccomp_filter=0
+-
+-fi
+-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+-  conftest.$ac_objext conftest.beam conftest.$ac_ext
+-fi
+-
+-fi
+ 
+ use_stack_protector=1
+ 
+@@ -11898,25 +11856,28 @@
+ 
+ fi
+ 
++SANDBOX_STYLE=""
+ if test "x$sandbox_arg" = "xsystrace" || \
+    ( test -z "$sandbox_arg" && test "x$have_systr_policy_kill" = "x1" ) ; then
+ 	test "x$have_systr_policy_kill" != "x1" && \
+ 		as_fn_error $? "systrace sandbox requires systrace headers and SYSTR_POLICY_KILL support" "$LINENO" 5
+-	SANDBOX_STYLE="systrace"
++	SANDBOX_STYLE="$SANDBOX_STYLE systrace"
+ 
+ $as_echo "#define SANDBOX_SYSTRACE 1" >>confdefs.h
+ 
+-elif test "x$sandbox_arg" = "xdarwin" || \
++fi
++if test "x$sandbox_arg" = "xdarwin" || \
+      ( test -z "$sandbox_arg" && test "x$ac_cv_func_sandbox_init" = "xyes" && \
+        test "x$ac_cv_header_sandbox_h" = "xyes") ; then
+ 	test "x$ac_cv_func_sandbox_init" != "xyes" -o \
+ 	     "x$ac_cv_header_sandbox_h" != "xyes" && \
+ 		as_fn_error $? "Darwin seatbelt sandbox requires sandbox.h and sandbox_init function" "$LINENO" 5
+-	SANDBOX_STYLE="darwin"
++	SANDBOX_STYLE="$SANDBOX_STYLE darwin"
+ 
+ $as_echo "#define SANDBOX_DARWIN 1" >>confdefs.h
+ 
+-elif test "x$sandbox_arg" = "xseccomp_filter" || \
++fi
++if test "x$sandbox_arg" = "xseccomp_filter" || \
+      ( test -z "$sandbox_arg" && \
+        test "x$have_seccomp_filter" = "x1" && \
+        test "x$ac_cv_header_linux_audit_h" = "xyes" && \
+@@ -11931,27 +11892,28 @@
+ 		as_fn_error $? "seccomp_filter sandbox requires seccomp headers" "$LINENO" 5
+ 	test "x$ac_cv_func_prctl" != "xyes" && \
+ 		as_fn_error $? "seccomp_filter sandbox requires prctl function" "$LINENO" 5
+-	SANDBOX_STYLE="seccomp_filter"
++	SANDBOX_STYLE="$SANDBOX_STYLE seccomp_filter"
+ 
+ $as_echo "#define SANDBOX_SECCOMP_FILTER 1" >>confdefs.h
+ 
+-elif test "x$sandbox_arg" = "xrlimit" || \
++fi
++if test "x$sandbox_arg" = "xrlimit" || \
+      ( test -z "$sandbox_arg" && test "x$ac_cv_func_setrlimit" = "xyes" ) ; then
+ 	test "x$ac_cv_func_setrlimit" != "xyes" && \
+ 		as_fn_error $? "rlimit sandbox requires setrlimit function" "$LINENO" 5
+-	SANDBOX_STYLE="rlimit"
++	SANDBOX_STYLE="$SANDBOX_STYLE rlimit"
+ 
+ $as_echo "#define SANDBOX_RLIMIT 1" >>confdefs.h
+ 
+-elif test -z "$sandbox_arg" || test "x$sandbox_arg" = "xno" || \
++fi
++if test -z "$sandbox_arg" || test "x$sandbox_arg" = "xno" || \
+      test "x$sandbox_arg" = "xnone" || test "x$sandbox_arg" = "xnull" ; then
+-	SANDBOX_STYLE="none"
+-
+-$as_echo "#define SANDBOX_NULL 1" >>confdefs.h
+-
+-else
++	SANDBOX_STYLE="$SANDBOX_STYLE none"
++fi
++if test -z "$SANDBOX_STYLE" ; then
+ 	as_fn_error $? "unsupported --with-sandbox" "$LINENO" 5
+ fi
++SANDBOX_STYLE="${SANDBOX_STYLE# }"
+ 
+ # Cheap hack to ensure NEWS-OS libraries are arranged right.
+ if test ! -z "$SONY" ; then
+Index: b/config.h.in
+===================================================================
+--- a/config.h.in
++++ b/config.h.in
+@@ -1365,9 +1365,6 @@
+ /* Sandbox using Darwin sandbox_init(3) */
+ #undef SANDBOX_DARWIN
+ 
+-/* no privsep sandboxing */
+-#undef SANDBOX_NULL
+-
+ /* Sandbox using setrlimit(2) */
+ #undef SANDBOX_RLIMIT
+ 
+Index: b/sandbox-darwin.c
+===================================================================
+--- a/sandbox-darwin.c
++++ b/sandbox-darwin.c
+@@ -16,10 +16,12 @@
+ 
+ #include "includes.h"
+ 
+-#ifdef SANDBOX_DARWIN
+-
+ #include <sys/types.h>
+ 
++#include "ssh-sandbox.h"
++
++#ifdef SANDBOX_DARWIN
++
+ #include <sandbox.h>
+ 
+ #include <errno.h>
+@@ -30,7 +32,6 @@
+ #include <unistd.h>
+ 
+ #include "log.h"
+-#include "sandbox.h"
+ #include "xmalloc.h"
+ 
+ /* Darwin/OS X sandbox */
+@@ -39,8 +40,14 @@
+ 	pid_t child_pid;
+ };
+ 
+-struct ssh_sandbox *
+-ssh_sandbox_init(void)
++static int
++sandbox_darwin_probe(void)
++{
++	return 1;
++}
++
++static void *
++sandbox_darwin_init(void)
+ {
+ 	struct ssh_sandbox *box;
+ 
+@@ -55,9 +62,10 @@
+ 	return box;
+ }
+ 
+-void
+-ssh_sandbox_child(struct ssh_sandbox *box)
++static void
++sandbox_darwin_child(void *vbox)
+ {
++	struct ssh_sandbox *box = vbox;
+ 	char *errmsg;
+ 	struct rlimit rl_zero;
+ 
+@@ -82,17 +90,39 @@
+ 			__func__, strerror(errno));
+ }
+ 
+-void
+-ssh_sandbox_parent_finish(struct ssh_sandbox *box)
++static void
++sandbox_darwin_parent_finish(void *vbox)
+ {
+-	free(box);
++	free(vbox);
+ 	debug3("%s: finished", __func__);
+ }
+ 
+-void
+-ssh_sandbox_parent_preauth(struct ssh_sandbox *box, pid_t child_pid)
++static void
++sandbox_darwin_parent_preauth(void *box, pid_t child_pid)
+ {
++	struct ssh_sandbox *box = vbox;
++
+ 	box->child_pid = child_pid;
+ }
+ 
++Sandbox ssh_sandbox_darwin = {
++	"darwin",
++	sandbox_darwin_probe,
++	sandbox_darwin_init,
++	sandbox_darwin_child,
++	sandbox_darwin_parent_finish,
++	sandbox_darwin_parent_preauth
++};
++
++#else /* !SANDBOX_DARWIN */
++
++Sandbox ssh_sandbox_darwin = {
++	"darwin",
++	NULL,
++	NULL,
++	NULL,
++	NULL,
++	NULL
++};
++
+ #endif /* SANDBOX_DARWIN */
+Index: b/sandbox-null.c
+===================================================================
+--- a/sandbox-null.c
++++ b/sandbox-null.c
+@@ -17,8 +17,6 @@
+ 
+ #include "includes.h"
+ 
+-#ifdef SANDBOX_NULL
+-
+ #include <sys/types.h>
+ 
+ #include <errno.h>
+@@ -38,8 +36,14 @@
+ 	int junk;
+ };
+ 
+-struct ssh_sandbox *
+-ssh_sandbox_init(void)
++static int
++sandbox_null_probe(void)
++{
++	return 1;
++}
++
++static void *
++sandbox_null_init(void)
+ {
+ 	struct ssh_sandbox *box;
+ 
+@@ -51,22 +55,29 @@
+ 	return box;
+ }
+ 
+-void
+-ssh_sandbox_child(struct ssh_sandbox *box)
++static void
++sandbox_null_child(void *vbox)
+ {
+ 	/* Nothing to do here */
+ }
+ 
+-void
+-ssh_sandbox_parent_finish(struct ssh_sandbox *box)
++static void
++sandbox_null_parent_finish(void *vbox)
+ {
+-	free(box);
++	free(vbox);
+ }
+ 
+-void
+-ssh_sandbox_parent_preauth(struct ssh_sandbox *box, pid_t child_pid)
++static void
++sandbox_null_parent_preauth(void *box, pid_t child_pid)
+ {
+ 	/* Nothing to do here */
+ }
+ 
+-#endif /* SANDBOX_NULL */
++Sandbox ssh_sandbox_null = {
++	"null",
++	sandbox_null_probe,
++	sandbox_null_init,
++	sandbox_null_child,
++	sandbox_null_parent_finish,
++	sandbox_null_parent_preauth
++};
+Index: b/sandbox-rlimit.c
+===================================================================
+--- a/sandbox-rlimit.c
++++ b/sandbox-rlimit.c
+@@ -17,9 +17,12 @@
+ 
+ #include "includes.h"
+ 
++#include <sys/types.h>
++
++#include "ssh-sandbox.h"
++
+ #ifdef SANDBOX_RLIMIT
+ 
+-#include <sys/types.h>
+ #include <sys/param.h>
+ #include <sys/time.h>
+ #include <sys/resource.h>
+@@ -32,7 +35,6 @@
+ #include <unistd.h>
+ 
+ #include "log.h"
+-#include "ssh-sandbox.h"
+ #include "xmalloc.h"
+ 
+ /* Minimal sandbox that sets zero nfiles, nprocs and filesize rlimits */
+@@ -41,8 +43,14 @@
+ 	pid_t child_pid;
+ };
+ 
+-struct ssh_sandbox *
+-ssh_sandbox_init(void)
++static int
++sandbox_rlimit_probe(void)
++{
++	return 1;
++}
++
++static void *
++sandbox_rlimit_init(void)
+ {
+ 	struct ssh_sandbox *box;
+ 
+@@ -57,8 +65,8 @@
+ 	return box;
+ }
+ 
+-void
+-ssh_sandbox_child(struct ssh_sandbox *box)
++static void
++sandbox_rlimit_child(void *vbox)
+ {
+ 	struct rlimit rl_zero;
+ 
+@@ -77,17 +85,39 @@
+ #endif
+ }
+ 
+-void
+-ssh_sandbox_parent_finish(struct ssh_sandbox *box)
++static void
++sandbox_rlimit_parent_finish(void *vbox)
+ {
+-	free(box);
++	free(vbox);
+ 	debug3("%s: finished", __func__);
+ }
+ 
+-void
+-ssh_sandbox_parent_preauth(struct ssh_sandbox *box, pid_t child_pid)
++static void
++sandbox_rlimit_parent_preauth(void *vbox, pid_t child_pid)
+ {
++	struct ssh_sandbox *box = vbox;
++
+ 	box->child_pid = child_pid;
+ }
+ 
++Sandbox ssh_sandbox_rlimit = {
++	"rlimit",
++	sandbox_rlimit_probe,
++	sandbox_rlimit_init,
++	sandbox_rlimit_child,
++	sandbox_rlimit_parent_finish,
++	sandbox_rlimit_parent_preauth
++};
++
++#else /* !SANDBOX_RLIMIT */
++
++Sandbox ssh_sandbox_rlimit = {
++	"rlimit",
++	NULL,
++	NULL,
++	NULL,
++	NULL,
++	NULL
++};
++
+ #endif /* SANDBOX_RLIMIT */
+Index: b/sandbox-seccomp-filter.c
+===================================================================
+--- a/sandbox-seccomp-filter.c
++++ b/sandbox-seccomp-filter.c
+@@ -35,11 +35,15 @@
+ 
+ #include "includes.h"
+ 
++#include <sys/types.h>
++
++#include "ssh-sandbox.h"
++
+ #ifdef SANDBOX_SECCOMP_FILTER
+ 
+-#include <sys/types.h>
+ #include <sys/resource.h>
+ #include <sys/prctl.h>
++#include <sys/wait.h>
+ 
+ #include <linux/audit.h>
+ #include <linux/filter.h>
+@@ -57,7 +61,6 @@
+ #include <unistd.h>
+ 
+ #include "log.h"
+-#include "ssh-sandbox.h"
+ #include "xmalloc.h"
+ 
+ /* Linux seccomp_filter sandbox */
+@@ -122,8 +125,33 @@
+ 	pid_t child_pid;
+ };
+ 
+-struct ssh_sandbox *
+-ssh_sandbox_init(void)
++static int
++sandbox_seccomp_filter_probe(void)
++{
++	int status;
++	pid_t pid;
++
++	pid = fork();
++	if (pid == -1) {
++		fatal("fork of seccomp_filter probe child failed");
++	} else if (pid != 0) {
++		/* parent */
++		while (waitpid(pid, &status, 0) < 0) {
++			if (errno == EINTR)
++				continue;
++			fatal("%s: waitpid: %s", __func__, strerror(errno));
++		}
++		return (WIFEXITED(status) && WEXITSTATUS(status) == 0);
++	} else {
++		/* child */
++		errno = 0;
++		prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, NULL, 0, 0);
++		_exit(errno == EFAULT ? 0 : 1);
++	}
++}
++
++static void *
++sandbox_seccomp_filter_init(void)
+ {
+ 	struct ssh_sandbox *box;
+ 
+@@ -143,7 +171,8 @@
+ void mm_log_handler(LogLevel level, const char *msg, void *ctx);
+ 
+ static void
+-ssh_sandbox_violation(int signum, siginfo_t *info, void *void_context)
++sandbox_seccomp_filter_violation(int signum, siginfo_t *info,
++    void *void_context)
+ {
+ 	char msg[256];
+ 
+@@ -155,7 +184,7 @@
+ }
+ 
+ static void
+-ssh_sandbox_child_debugging(void)
++sandbox_seccomp_filter_child_debugging(void)
+ {
+ 	struct sigaction act;
+ 	sigset_t mask;
+@@ -165,7 +194,7 @@
+ 	sigemptyset(&mask);
+ 	sigaddset(&mask, SIGSYS);
+ 
+-	act.sa_sigaction = &ssh_sandbox_violation;
++	act.sa_sigaction = &sandbox_seccomp_filter_violation;
+ 	act.sa_flags = SA_SIGINFO;
+ 	if (sigaction(SIGSYS, &act, NULL) == -1)
+ 		fatal("%s: sigaction(SIGSYS): %s", __func__, strerror(errno));
+@@ -175,8 +204,8 @@
+ }
+ #endif /* SANDBOX_SECCOMP_FILTER_DEBUG */
+ 
+-void
+-ssh_sandbox_child(struct ssh_sandbox *box)
++static void
++sandbox_seccomp_filter_child(void *vbox)
+ {
+ 	struct rlimit rl_zero;
+ 
+@@ -193,7 +222,7 @@
+ 			__func__, strerror(errno));
+ 
+ #ifdef SANDBOX_SECCOMP_FILTER_DEBUG
+-	ssh_sandbox_child_debugging();
++	sandbox_seccomp_filter_child_debugging();
+ #endif /* SANDBOX_SECCOMP_FILTER_DEBUG */
+ 
+ 	debug3("%s: setting PR_SET_NO_NEW_PRIVS", __func__);
+@@ -206,17 +235,39 @@
+ 		      __func__, strerror(errno));
+ }
+ 
+-void
+-ssh_sandbox_parent_finish(struct ssh_sandbox *box)
++static void
++sandbox_seccomp_filter_parent_finish(void *vbox)
+ {
+-	free(box);
++	free(vbox);
+ 	debug3("%s: finished", __func__);
+ }
+ 
+-void
+-ssh_sandbox_parent_preauth(struct ssh_sandbox *box, pid_t child_pid)
++static void
++sandbox_seccomp_filter_parent_preauth(void *vbox, pid_t child_pid)
+ {
++	struct ssh_sandbox *box = vbox;
++
+ 	box->child_pid = child_pid;
+ }
+ 
++Sandbox ssh_sandbox_seccomp_filter = {
++	"seccomp_filter",
++	sandbox_seccomp_filter_probe,
++	sandbox_seccomp_filter_init,
++	sandbox_seccomp_filter_child,
++	sandbox_seccomp_filter_parent_finish,
++	sandbox_seccomp_filter_parent_preauth
++};
++
++#else /* !SANDBOX_SECCOMP_FILTER */
++
++Sandbox ssh_sandbox_seccomp_filter = {
++	"seccomp_filter",
++	NULL,
++	NULL,
++	NULL,
++	NULL,
++	NULL
++};
++
+ #endif /* SANDBOX_SECCOMP_FILTER */
+Index: b/sandbox-systrace.c
+===================================================================
+--- a/sandbox-systrace.c
++++ b/sandbox-systrace.c
+@@ -17,9 +17,12 @@
+ 
+ #include "includes.h"
+ 
++#include <sys/types.h>
++
++#include "ssh-sandbox.h"
++
+ #ifdef SANDBOX_SYSTRACE
+ 
+-#include <sys/types.h>
+ #include <sys/param.h>
+ #include <sys/ioctl.h>
+ #include <sys/syscall.h>
+@@ -38,7 +41,6 @@
+ 
+ #include "atomicio.h"
+ #include "log.h"
+-#include "ssh-sandbox.h"
+ #include "xmalloc.h"
+ 
+ struct sandbox_policy {
+@@ -74,8 +76,14 @@
+ 	pid_t child_pid;
+ };
+ 
+-struct ssh_sandbox *
+-ssh_sandbox_init(void)
++static int
++sandbox_systrace_probe(void)
++{
++	return 1;
++}
++
++static void *
++sandbox_systrace_init(void)
+ {
+ 	struct ssh_sandbox *box;
+ 	int s[2];
+@@ -92,9 +100,10 @@
+ 	return box;
+ }
+ 
+-void
+-ssh_sandbox_child(struct ssh_sandbox *box)
++static void
++sandbox_systrace_child(void *vbox)
+ {
++	struct ssh_sandbox *box = vbox;
+ 	char whatever = 0;
+ 
+ 	close(box->parent_sock);
+@@ -110,7 +119,7 @@
+ }
+ 
+ static void
+-ssh_sandbox_parent(struct ssh_sandbox *box, pid_t child_pid,
++sandbox_systrace_parent(struct ssh_sandbox *box, pid_t child_pid,
+     const struct sandbox_policy *allowed_syscalls)
+ {
+ 	int dev_systrace, i, j, found;
+@@ -179,9 +188,11 @@
+ 	close(box->parent_sock);
+ }
+ 
+-void
+-ssh_sandbox_parent_finish(struct ssh_sandbox *box)
++static void
++sandbox_systrace_parent_finish(void *vbox)
+ {
++	struct ssh_sandbox *box = vbox;
++
+ 	/* Closing this before the child exits will terminate it */
+ 	close(box->systrace_fd);
+ 
+@@ -189,10 +200,32 @@
+ 	debug3("%s: finished", __func__);
+ }
+ 
+-void
+-ssh_sandbox_parent_preauth(struct ssh_sandbox *box, pid_t child_pid)
++static void
++sandbox_systrace_parent_preauth(void *vbox, pid_t child_pid)
+ {
++	struct ssh_sandbox *box = vbox;
++
+ 	ssh_sandbox_parent(box, child_pid, preauth_policy);
+ }
+ 
++Sandbox ssh_sandbox_systrace = {
++	"systrace",
++	sandbox_systrace_probe,
++	sandbox_systrace_init,
++	sandbox_systrace_child,
++	sandbox_systrace_parent_finish,
++	sandbox_systrace_parent_preauth
++};
++
++#else /* !SANDBOX_SYSTRACE */
++
++Sandbox ssh_sandbox_systrace = {
++	"systrace",
++	NULL,
++	NULL,
++	NULL,
++	NULL,
++	NULL
++};
++
+ #endif /* SANDBOX_SYSTRACE */
+Index: b/sandbox.c
+===================================================================
+--- /dev/null
++++ b/sandbox.c
+@@ -0,0 +1,82 @@
++/* $Id$ */
++/*
++ * Copyright (c) 2012 Colin Watson <cjwatson@debian.org>
++ *
++ * Permission to use, copy, modify, and distribute this software for any
++ * purpose with or without fee is hereby granted, provided that the above
++ * copyright notice and this permission notice appear in all copies.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
++ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
++ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
++ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
++ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
++ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++ */
++
++#include <sys/types.h>
++
++#include <stdlib.h>
++#include <stdarg.h>
++
++#include "log.h"
++#include "ssh-sandbox.h"
++
++static Sandbox *sandboxes[] = {
++	&ssh_sandbox_systrace,
++	&ssh_sandbox_darwin,
++	&ssh_sandbox_seccomp_filter,
++	&ssh_sandbox_rlimit,
++	&ssh_sandbox_null,
++	NULL
++};
++
++static Sandbox *selected;
++
++static void
++sandbox_select(void)
++{
++	Sandbox **sandbox;
++
++	if (selected)
++		return;
++
++	for (sandbox = sandboxes; sandbox; sandbox++) {
++		if ((*sandbox)->probe && (*sandbox)->probe()) {
++			selected = *sandbox;
++			return;
++		}
++	}
++
++	/* should never happen, as ssh_sandbox_null always succeeds */
++	fatal("no sandbox implementation found");
++}
++
++void *
++ssh_sandbox_init(void)
++{
++	sandbox_select();
++	return selected->init();
++}
++
++void
++ssh_sandbox_child(void *box)
++{
++	sandbox_select();
++	return selected->child(box);
++}
++
++void
++ssh_sandbox_parent_finish(void *box)
++{
++	sandbox_select();
++	return selected->parent_finish(box);
++}
++
++void
++ssh_sandbox_parent_preauth(void *box, pid_t child_pid)
++{
++	sandbox_select();
++	return selected->parent_preauth(box, child_pid);
++}
+Index: b/ssh-sandbox.h
+===================================================================
+--- a/ssh-sandbox.h
++++ b/ssh-sandbox.h
+@@ -15,9 +15,24 @@
+  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+  */
+ 
+-struct ssh_sandbox;
++typedef struct Sandbox Sandbox;
+ 
+-struct ssh_sandbox *ssh_sandbox_init(void);
+-void ssh_sandbox_child(struct ssh_sandbox *);
+-void ssh_sandbox_parent_finish(struct ssh_sandbox *);
+-void ssh_sandbox_parent_preauth(struct ssh_sandbox *, pid_t);
++struct Sandbox {
++	const char	*name;
++	int		(*probe)(void);
++	void		*(*init)(void);
++	void	    	(*child)(void *);
++	void		(*parent_finish)(void *);
++	void	    	(*parent_preauth)(void *, pid_t);
++};
++
++void *ssh_sandbox_init(void);
++void ssh_sandbox_child(void *);
++void ssh_sandbox_parent_finish(void *);
++void ssh_sandbox_parent_preauth(void *, pid_t);
++
++extern Sandbox ssh_sandbox_systrace;
++extern Sandbox ssh_sandbox_darwin;
++extern Sandbox ssh_sandbox_seccomp_filter;
++extern Sandbox ssh_sandbox_rlimit;
++extern Sandbox ssh_sandbox_null;
+Index: b/sshd.c
+===================================================================
+--- a/sshd.c
++++ b/sshd.c
+@@ -631,7 +631,7 @@
+ {
+ 	int status;
+ 	pid_t pid;
+-	struct ssh_sandbox *box = NULL;
++	void *box = NULL;
+ 
+ 	/* Set up unprivileged child process to deal with network data */
+ 	pmonitor = monitor_init();

@@ -1,0 +1,52 @@
+# GSSAPI
+gssapi.patch
+
+# SELinux
+selinux-role.patch
+copy-id-restorecon.patch
+
+# Key blacklisting
+ssh-vulnkey.patch
+
+# Keepalive handling
+ssh1-keepalive.patch
+keepalive-extensions.patch
+
+# Message adjustments
+syslog-level-silent.patch
+quieter-signals.patch
+helpful-wait-terminate.patch
+
+# Miscellaneous bug fixes
+user-group-modes.patch
+scp-quoting.patch
+shell-path.patch
+dnssec-sshfp.patch
+
+# Versioning
+package-versioning.patch
+debian-banner.patch
+
+# File system layout
+authorized-keys-man-symlink.patch
+lintian-symlink-pickiness.patch
+
+# Documentation
+openbsd-docs.patch
+ssh-argv0.patch
+doc-hash-tab-completion.patch
+
+# Miscellaneous bug fixes
+auth-log-verbosity.patch
+cross-pkg-config.patch
+configure-bashism.patch
+sandbox-fallback.patch
+
+# Debian-specific configuration
+gnome-ssh-askpass2-icon.patch
+debian-config.patch
+
+# Ubuntu additions
+consolekit.patch
+doc-upstart.patch
+mention-ssh-keygen-on-keychange.patch

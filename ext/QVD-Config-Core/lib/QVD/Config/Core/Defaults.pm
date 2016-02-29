@@ -71,10 +71,11 @@ path.client.pixmaps = pixmaps
 path.client.pixmaps.alt = /usr/share/pixmaps
 
 path.qvd.bin = /usr/lib/qvd/bin
+path.usb.database = /usr/share/hwdata/usb.ids
 
 ## paths to external executables
 command.kvm = kvm
-command.kvm-img = kvm-img
+command.kvm-img = qemu-img
 command.sshfs = ${path.qvd.bin}/sshfs
 command.open_file = /usr/bin/xdg-open
 command.sftp-server = /usr/lib/openssh/sftp-server
@@ -105,12 +106,14 @@ command.iptables = iptables
 command.modprobe = /sbin/modprobe
 command.xinit = /usr/bin/xinit
 command.xhost = /usr/bin/xhost
+command.xhost.family = si
 command.nxproxy = /usr/bin/nxproxy
 command.btrfs = /sbin/btrfs
 command.ip = /sbin/ip
 command.x11vnc = /usr/bin/x11vnc
 command.qvd-l7r-slave = ${path.qvd.bin}/qvd-l7r-slave
 command.windows.xming = Xming\\Xming.exe
+command.windows.vcxsrv = VcxSrv\\vcxsrv.exe
 command.windows.pulseaudio = pulseaudio\\pulseaudio.exe
 command.windows.nxproxy = nx\\nxproxy.exe
 command.windows.sftp-server = bin/sftp-server.exe
@@ -128,6 +131,7 @@ command.darwin.sftp-server = /usr/libexec/sftp-server
 
 command.usbsrv = /usr/local/bin/usbsrv
 command.usbclnt = /usr/local/bin/usbclnt
+command.usbip = /usr/bin/usbip
 command.slaveclient = ${path.qvd.bin}/qvd-slaveclient
 
 ## whether to remember password after successful connection
@@ -140,7 +144,7 @@ client.remember_username = 1
 client.show.remember_password = 0
 
 ## whether to show the settings tab
-client.show.settings = 0
+client.show.settings = 1
 
 ## nxproxy's link parameter, can be: modem, isdn, adsl, wan, lan, local or a bandwidth specification (56k, 1m, 100m...)
 client.link = adsl
@@ -152,6 +156,13 @@ client.nxproxy.extra_args =
 ## Sent to the VM side and applied there.
 client.nxagent.extra_args =
 
+## Extra arguments for sshfs. These have been determined as reasonable defaults.
+client.sshfs.extra_args=-o atomic_o_trunc -o idmap=user
+
+## Extra arguments for Windows X servers
+client.xming.extra_args=-multiwindow -notrayicon -nowinkill -clipboard +bs -wm
+client.vcxsrv.extra_args=-rootless -notrayicon -nowinkill -clipboard +bs -wm -listen tcp -silent-dup-error -ac -nomultimonitors
+
 ## nxproxy's geometry parameter
 client.geometry = 1024x768
 ## nxproxy's fullscreen parameter
@@ -159,21 +170,32 @@ client.fullscreen =
 ## enable the Pulse audio server in the client
 client.audio.enable =
 ## something regarding an NX channel
-client.printing.enable =
+client.printing.enable = 1
 ## L7R port the client should connect to
 client.host.port = 8443
 ## L7R host the client should connect to
 client.host.name =
 ## user name for client authentication
 client.user.name =
+## user password for client authentication
+client.user.password =
+## Auto connect when the client is invoked
+client.auto_connect = 0
 ## whether to use SSL in the client↔server communication or not
 client.use_ssl = 1
 client.ssl.use_cert = 0
 ## slave shell
-client.slave.command =
+client.slave.command = bin/qvd-client-slaveserver
 client.slave.client = bin/qvd-slaveclient
+# enable commands used for benchmarking and testing the functionality
+# of the slave channel
+client.slave.debug_commands = 0
 ## enable making slave connections to VM
 client.slave.enable = 1
+## force locale, ignoring system LC_* and LANG environment variables
+client.locale =
+## enable exporting $HOME, /media and /Volumes to the VM.
+client.file_sharing.enable = 1
 
 ## On OSX the window is hard to resize if it's too large, so
 ## we check whether we should default to a lower window size
@@ -188,13 +210,18 @@ client.darwin.screen_resolution.low_res_geometry=800x600
 
 # Enable USB sharing
 client.usb.enable = 0
+client.usb.implementation = USBIP
+client.usb.sudo = 1
+client.usb.usbip.port = 3240
+client.usb.usbip.debug = 0
+client.usb.usbip.log = 0
 
 # Share all USB devices automatically (most of the time not a good idea)
 client.usb.share_all = 0
 
 # List of USB devices to share with the VM. 
-# Syntax: VID:PID, comma separated. Spaces are allowed. For example:
-# 0441:0012, 1234:5678
+# Syntax: VID:PID@serial, comma separated. Spaces are allowed. For example:
+# 0441:0012, 1234:5678@12345678
 client.usb.share_list =
 
 
@@ -261,7 +288,7 @@ admin.ssh.opt.UserKnownHostsFile = /dev/null
 vm.hypervisor = kvm
 
 ## COW fs to use with LXC
-vm.lxc.unionfs.type = aufs
+vm.lxc.unionfs.type = overlayfs
 # vm.lxc.unionfs.type = unionfs-fuse
 vm.lxc.unionfs.bind.ro = 1
 
@@ -342,6 +369,9 @@ vma.user.home.path = /home
 vma.user.default.name = qvd
 vma.user.default.groups =
 vma.default.lang = en_US.UTF-8
+vma.usb.usbip.debug = 0
+vma.usb.usbip.log = 0
+vma.sshfs.extra_args = -o idmap=user -o atomic_o_trunc
 
 # When using LXC if this flag is set, QVD will assume that the home
 # directories are not per virtual machine but per user and that they
@@ -386,6 +416,7 @@ hkd.vm.starting.max = 6
 
 # internal parameters, do not change!!!
 internal.l7r.timeout.vm_start = 270
+internal.l7r.timeout.vm_stop = 270
 internal.l7r.timeout.x_start = 10
 internal.l7r.timeout.vma = 4
 internal.l7r.timeout.takeover = 30
@@ -503,5 +534,16 @@ internal.hkd.agent.l7rmonitor.delay = 60
 internal.hkd.agent.l7rkiller.delay = 61
 
 internal.hkd.agent.config.delay = 10
+
+internal.hkd.nothing.timeout.on_state.starting = 5
+internal.hkd.nothing.timeout.on_state.running = 5
+internal.hkd.nothing.timeout.on_state.stopping = 5
+internal.hkd.nothing.timeout.on_state.zombie = 100
+
+internal.l7r.nothing.timeout.x_start = 5
+internal.l7r.nothing.timeout.x_state = 5
+internal.l7r.nothing.timeout.run_forwarder = 5
+
+internal.untar-dis.lock.path = ${path.run}/untar-dis.lock
 
 wat.multitenant = 0

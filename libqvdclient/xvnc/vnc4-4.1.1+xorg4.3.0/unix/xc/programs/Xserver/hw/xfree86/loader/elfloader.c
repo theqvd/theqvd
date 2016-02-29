@@ -2209,7 +2209,7 @@ int		force;
 
 #endif /*__ia64__*/
 
-#if defined(__arm__)
+#if (defined(__arm__) || defined(__arm64__)) /* This should go to relocation type error */
 	case R_ARM_ABS32:
 	    dest32=(unsigned int *)(secp+rel->r_offset);
 # ifdef ELFDEBUG

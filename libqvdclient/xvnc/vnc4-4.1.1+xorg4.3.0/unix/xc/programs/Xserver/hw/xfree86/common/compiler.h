@@ -90,6 +90,7 @@ extern int ffs(unsigned long);
 #  if !defined(__sparc__) && !defined(__arm32__) \
       && !(defined(__alpha__) && defined(linux))
 
+/* __arm64__ as well */
 extern void outb(unsigned short, unsigned char);
 extern void outw(unsigned short, unsigned short);
 extern void outl(unsigned short, unsigned int);
@@ -97,7 +98,7 @@ extern unsigned int inb(unsigned short);
 extern unsigned int inw(unsigned short);
 extern unsigned int inl(unsigned short);
 
-#  else /* __sparc__,  __arm32__, __alpha__*/
+#  else /* __sparc__,  __arm32__,  __alpha__*/
 
 extern void outb(unsigned long, unsigned char);
 extern void outw(unsigned long, unsigned short);
@@ -848,7 +849,7 @@ static __inline__ void stw_u(unsigned long val, unsigned short *p)
 #    define mem_barrier()         /* XXX: nop for now */
 #    define write_mem_barrier()   /* XXX: nop for now */
 
-#   elif defined(__mips__) || defined(__arm32__)
+#   elif defined(__mips__) || defined(__arm32__) || defined(__arm64__)
 #ifdef __arm32__
 #define PORT_SIZE long
 #else
@@ -1016,6 +1017,26 @@ xf86WriteMmio32Be(__volatile__ void *base, const unsigned long offset,
 #     define mem_barrier()	/* NOP */
 #     define write_mem_barrier()	/* NOP */
 #    endif /* __arm32__ */
+
+#    if defined(__arm64__)
+#    define ldq_u(p)	ldl_u(p)
+#    define ldl_u(p)	((*(unsigned char *)(p))	| \
+			(*((unsigned char *)(p)+1)<<8)	| \
+			(*((unsigned char *)(p)+2)<<16)	| \
+			(*((unsigned char *)(p)+3)<<24))
+#    define ldw_u(p)	((*(unsigned char *)(p)) | \
+			(*((unsigned char *)(p)+1)<<8))
+
+#    define stq_u(v,p)	stl_u(v,p)
+#    define stl_u(v,p)	(*(unsigned char *)(p)) = (v); \
+				(*((unsigned char *)(p)+1)) = ((v) >> 8);  \
+				(*((unsigned char *)(p)+2)) = ((v) >> 16); \
+				(*((unsigned char *)(p)+3)) = ((v) >> 24)
+#    define stw_u(v,p)	(*(unsigned char *)(p)) = (v); \
+				(*((unsigned char *)(p)+1)) = ((v) >> 8)
+#     define mem_barrier()	/* NOP */
+#     define write_mem_barrier()	/* NOP */
+#    endif /* __arm64__ */
 
 #   elif (defined(Lynx) || defined(linux) || defined(__OpenBSD__) || defined(__NetBSD__)) && defined(__powerpc__)
 
@@ -1255,7 +1276,7 @@ inl(unsigned short port)
 #    define mem_barrier()   /* NOP */
 #    define write_mem_barrier()   /* NOP */
 
-#    if !defined(FAKEIT) && !defined(__mc68000__) && !defined(__arm__) && !defined(__sh__) && !defined(__hppa__)
+#    if !defined(FAKEIT) && !defined(__mc68000__) && !defined(__arm__) && !defined(__arm64__) && !defined(__sh__) && !defined(__hppa__)
 #     ifdef GCCUSESGAS
 
 /*
@@ -1364,7 +1385,7 @@ inl(unsigned short port)
 
 #     endif /* GCCUSESGAS */
 
-#    else /* !defined(FAKEIT) && !defined(__mc68000__)  && !defined(__arm__) && !defined(__sh__) && !defined(__hppa__)*/
+#    else /* !defined(FAKEIT) && !defined(__mc68000__)  && !defined(__arm__) && !defined(__arm64__) && !defined(__sh__) && !defined(__hppa__)*/
 
 static __inline__ void
 outb(unsigned short port, unsigned char val)

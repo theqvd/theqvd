@@ -16,11 +16,23 @@ use QVD::HTTP::Headers qw(header_lookup);
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use URI::Escape qw(uri_escape);
 use QVD::Log;
+use QVD::Client::USB;
+use QVD::Client::USB::USBIP;
+use QVD::Client::USB::IncentivesPro;
+
 
 my $LINUX = ($^O eq 'linux');
 my $WINDOWS = ($^O eq 'MSWin32');
 my $DARWIN = ($^O eq 'darwin');
-my $NX_OS = $WINDOWS ? 'windows' : 'linux';
+my $NX_OS = "unknown";
+
+if ( $LINUX ) {
+	$NX_OS = "linux";
+} elsif ( $WINDOWS ) {
+	$NX_OS = "windows";
+} elsif ( $DARWIN ) {
+	$NX_OS = "darwin";
+}
 
 sub new {
     my $class = shift;
@@ -32,9 +44,37 @@ sub new {
         extra           => delete $opts{extra},
         printing        => delete $opts{printing},
         usb             => delete $opts{usb},
+        usb_impl        => delete $opts{usb_impl},
         opts            => \%opts,
     };
+    
     bless $self, $class;
+}
+
+sub _add_ssl_error {
+    my ($self, $ssl_depth, $err_no, $err_depth, $err_str) = @_;
+
+    if (!exists $self->{cert_info}->[$ssl_depth]) {
+        $self->{cert_info}->[$ssl_depth] = {
+            errors => [],
+        }
+    }
+
+    my $ci = $self->{cert_info}->[$ssl_depth];
+
+    push @{ $ci->{errors} }, {
+        err_no    => $err_no,
+        err_depth => $err_depth,
+        err_str   => $err_str
+    };
+
+ 
+    $self->{ssl_errors}++;
+
+    if ( $self->is_accepted( 'sha256', $ci->{fingerprint}->{sha256}, $err_no ) ) {
+        DEBUG "SSL error $err_no ignored for certificate " . $ci->{fingerprint}->{sha256};
+        $self->{ssl_ignored_errors}++;
+    }
 }
 
 ## callback receives:
@@ -45,71 +85,204 @@ sub new {
 ## returns:
 # 1 or 0, depending on whether it thinks the certificate is valid or invalid.
 sub _ssl_verify_callback {
-    my ($self, $ssl_thinks, $mem_addr, $attrs, $errs) = @_;
+    my ($self, $ssl_thinks, $mem_addr, $attrs, $errs, $peer_cert, $ssl_depth) = @_;
     return 1 if $ssl_thinks;
 
     DEBUG("_ssl_verify_callback called: " . join(' ', @_));
-  
 
-    my $cert_pem_str = Net::SSLeay::PEM_get_string_X509 (Net::SSLeay::X509_STORE_CTX_get_current_cert ($mem_addr));
+    if (!exists $self->{cert_info}->[$ssl_depth]) {
+        $self->{cert_info}->[$ssl_depth] = {
+            errors => [],
+        };
+    }
+
+    my $ci = $self->{cert_info}->[$ssl_depth];
+
+    my $cert = Net::SSLeay::X509_STORE_CTX_get_current_cert ($mem_addr);
+    my $cert_pem_str = Net::SSLeay::PEM_get_string_X509 ($cert);
     my $x509 = Crypt::OpenSSL::X509->new_from_string ($cert_pem_str);
+
     my $err_no    = Net::SSLeay::X509_STORE_CTX_get_error($mem_addr);
     my $err_depth = Net::SSLeay::X509_STORE_CTX_get_error_depth($mem_addr);
     my $err_str   = Net::SSLeay::X509_verify_cert_error_string($err_no);
+
+    push @{ $ci->{errors} }, { 
+        err_no    => $err_no,
+        err_depth => $err_depth,
+        err_str   => $err_str 
+    };
+ 
+    $ci->{ssl_ok}           = $ssl_thinks;  
+    $ci->{hash}             = $x509->hash;
+    $ci->{subject}          = _split_dn( $x509->subject );
+    $ci->{serial}           = $x509->serial;
+    $ci->{issuer}           = _split_dn( $x509->issuer );
+    $ci->{not_before}       = $x509->notBefore;
+    $ci->{not_after}        = $x509->notAfter;
+    $ci->{pem}              = $cert_pem_str;
+    $ci->{sig_algo}         = $x509->sig_alg_name;
+    $ci->{bit_length}       = $x509->bit_length; 
+    $ci->{selfsigned}       = $x509->is_selfsigned;
+    $ci->{extensions}       = {};
     
-    my $cert_hash = $x509->hash;
-
-    DEBUG("Verification error at depth $err_depth: $err_str when checking " . $x509->subject); 
-
-    my $cert_temp = <<'EOF';
-Verification error at depth %i:
-%s
-
-Serial: %s
-
-Issuer: %s
-
-Validity:
-    Not before: %s
-    Not after:  %s
-
-Subject: %s
-EOF
-
-    my $cert_data = sprintf($cert_temp,
-                            $err_depth,
-                            $err_str,
-                            (join ':', $x509->serial =~ /../g),
-                            $x509->issuer,
-                            $x509->notBefore,
-                            $x509->notAfter,
-                            $x509->subject);
-
-    my $accept = $self->{client_delegate}->proxy_unknown_cert([$cert_pem_str, $cert_data, $err_no]);
-    DEBUG("Certificate " . $accept ? "accepted" : "rejected");
-
-    return unless $accept;
-
-    ## guardar certificado en archivo
-    my $dir = $QVD::Client::App::user_certs_dir;
-    DEBUG "certificates are stored in $dir";
-    make_path $dir;
-    -d $dir or die "Unable to create directory $dir";
-
-    my $file;
-    foreach my $idx (0..99) {
-        my $basename = sprintf '%s.%d', $cert_hash, $idx;
-        $file = File::Spec->join($dir, $basename);
-        last unless -e $file;
+    foreach my $algo ("sha1", "sha256", "ripemd160") {
+        $ci->{fingerprint}->{$algo} = Net::SSLeay::X509_get_fingerprint($cert, $algo);
     }
-    ## TODO: -e $file and what?
 
-    open my $fd, '>', $file or die "Unable to open '$file': $!";
-    print $fd $cert_pem_str;
-    close $fd;
+    my $exts = $x509->extensions_by_oid();
 
-    return $accept;
+    foreach my $oid (keys %$exts) {
+        my $ext = $$exts{$oid};
+        if ( $oid eq "2.5.29.15" ) { # KeyUsage
+            $ci->{extensions}->{key_usage} = { $ext->hash_bit_string };
+        } elsif ( $oid eq "2.16.840.1.113730.1.1" ) { # nsCertType
+            $ci->{extensions}->{cert_type} = { $ext->hash_bit_string };
+        }
+
+        print STDERR $oid, " ", $ext->object()->name(), ": ", $ext->value(), "\n";
+    }
+
+
+    my @altnames = Net::SSLeay::X509_get_subjectAltNames($cert);
+    my @typenames = qw(Other Email DNS X400 Directory EDIPARTY URI IP RID);
+
+    if ( @altnames ) {
+        $ci->{extensions}->{altnames} = [];
+
+        while (@altnames) {
+            my $type = shift @altnames;
+            my $value = shift @altnames;
+            my $tname = $typenames[$type];
+
+            $value = join('.', unpack('C4', $value)) if ( $type == 7 ); # IP Address
+            push @{ $ci->{extensions}->{altnames} }, { $tname => $value };
+        }
+    }
+
+
+    if (!$ssl_thinks) {
+        DEBUG "SSL error $err_no when checking certificate " . $ci->{fingerprint}->{sha256};
+        $self->{ssl_errors}++;
+
+        if ( $self->is_accepted( 'sha256', $ci->{fingerprint}->{sha256}, $err_no ) ) {
+            DEBUG "SSL error $err_no ignored for certificate " . $ci->{fingerprint}->{sha256};
+
+            $self->{ssl_ignored_errors}++;
+        }
+    }
+
+
+
+    return 1;
 }
+
+sub _split_dn {
+    my ($str) = @_;
+    my $ret = {};
+    my $buf = "";
+    my ($k,$v) = ("", "");
+
+    print STDERR "STR: $str\n";
+
+    while($str) {
+        my ($match, $rest) = ($str =~ m/^(.*?)[,=](.*)$/);
+        $str = $rest;
+        $buf .= $match;
+
+        if ( $buf =~ /\\$/ ) {
+            $buf =~ s/\\$//;
+            $buf .= $k eq "" ? "=" : ",";
+        } else {
+            if ($k eq "") {
+                $k = $buf;
+                $buf = "";
+            } else {
+                $v = $buf;
+                $buf = "";
+            } 
+
+            if ( $k ne "" && $v ne "" ) {
+                for($k, $v) {
+                    s/^\s+//;
+                    s/\s+$//;
+                }
+                $k = lc($k);
+
+                $ret->{$k} = $v;
+                $buf = "";
+                $k = "";
+                $v = "";
+            }
+        }
+    }
+
+    return $ret;
+}
+
+sub accept_cert {
+    my ($self, %data) = @_;
+
+    die "algorithm required" unless ( $data{algo} );
+    die "fingerprint required" unless ( $data{fingerprint} );
+    die "description required" unless ( $data{description} );
+    
+    my $key = $data{algo} . "\$" . $data{fingerprint};
+ 
+    $self->{accepted_certs} //= { };
+    $self->{accepted_certs}->{$key} = \%data;
+    
+    $self->_save_accepted_certs;
+}
+
+sub is_accepted {
+    my ($self, $algo, $fingerprint, $errno) = @_;
+    
+    my $key = "${algo}\$${fingerprint}";
+
+    if ( exists $self->{accepted_certs}->{$key} ) {
+        my $ci = $self->{accepted_certs}->{$key};
+
+        return scalar grep { $_ == $errno } @{ $ci->{errors} };
+    }
+}
+
+sub delete_exception {
+    my ($self, $algo, $fingerprint) = @_;
+
+    my $key = "${algo}\$${fingerprint}";
+    delete $self->{accepted_certs}->{$key};
+}
+
+
+sub _load_accepted_certs {
+    my ($self) = @_;
+    my $file = File::Spec->join($QVD::Client::App::user_dir, "accepted_certs.json");
+    $self->{accepted_certs} = {};
+
+    DEBUG "Loading accepted certificates";
+
+    if (open(my $fd, '<', $file)) {
+        local $/;
+        undef $/;
+        my $data = <$fd>;
+        close $fd;
+
+        $self->{accepted_certs} = from_json( $data, { utf8 => 1 } );
+    } else {
+        WARN "Can't open $file: $!";
+    }
+}
+
+sub _save_accepted_certs {
+    my ($self) = @_;
+    my $file = File::Spec->join($QVD::Client::App::user_dir, "accepted_certs.json");
+
+    DEBUG "Saving accepted certificates";
+    open(my $fd, '>', $file) or die "Can't create $file: $!";
+    print $fd to_json( $self->{accepted_certs}, { utf8 => 1, pretty => 1 } );
+    close $fd;
+}
+
 
 sub _get_httpc {
     my ($self, $host, $port) = @_;
@@ -124,9 +297,24 @@ sub _get_httpc {
     if ($ssl) {
         DEBUG "Using a SSL connection";
         $args{SSL}                 = 1;
-        $args{SSL_ca_path}         = $DARWIN ? core_cfg('path.darwin.ssl.ca.system') : core_cfg('path.ssl.ca.system');
-        $args{SSL_ca_path_alt}     = $QVD::Client::App::user_certs_dir;
-        $args{SSL_ca_path_alt}     =~ s|^~(?=/)|$ENV{HOME} // $ENV{APPDATA}|e;
+
+        foreach my $opt ( @QVD::HTTPC::SSL_OPTIONS ) {
+            DEBUG "Checking if SSL option '$opt' is set";
+
+            my $val = core_cfg("client.ssl.options.$opt", 0);
+            if ( $val ) {
+                INFO "SSL option $opt set: $val";
+                $args{$opt} = $val;
+            }
+        }
+
+        $args{SSL_ca_path}          = $DARWIN ? core_cfg('path.darwin.ssl.ca.system') : core_cfg('path.ssl.ca.system');
+        $args{SSL_ca_path_alt}      = $QVD::Client::App::user_certs_dir;
+        $args{SSL_ca_path_alt}      =~ s|^~(?=/)|$ENV{HOME} // $ENV{APPDATA}|e;
+
+        # We handle the errors here later, rather than having HTTPC die on those errors
+        $args{SSL_fail_on_ocsp}     = 0;
+        $args{SSL_fail_on_hostname} = 0;
 
         DEBUG "SSL CA path: " . $args{SSL_ca_path};
         DEBUG "SSL CA alt path: " . $args{SSL_ca_path_alt};
@@ -139,24 +327,90 @@ sub _get_httpc {
             
             DEBUG "SSL cert: $args{SSL_cert_file}; key: $args{SSL_key_file}";
         }
+
         $args{SSL_verify_callback} = sub { $self->_ssl_verify_callback(@_) };
+
+        $self->_load_accepted_certs();
+        $args{SSL_fingerprint} = [ keys %{ $self->{accepted_certs} } ];
+
+ 
+        # These are used by SSL_verify_callback to store the errors encountered
+        $self->{ssl_errors}         = 0;
+        $self->{ssl_ignored_errors} = 0;
+        $self->{cert_info}          = [];
+
     } else {
         DEBUG "Not using SSL";
     }
-    
-    my $httpc = eval { QVD::HTTPC->new("$host:$port", %args) };
-    unless (defined $httpc) {
-        if ($@) {
-            ERROR("Connection error: $@");
-            $cli->proxy_connection_error(message => $@);
-        }
-        else {
+   
+    my $httpc = QVD::HTTPC->new();
+    my $ret; 
+    eval { $ret = $httpc->connect("$host:$port", %args) };
+
+    if ($@) {
+        ERROR("Connection error: $@");
+        my $msg = $@;
+
+        if ( $@ =~ /hostname verification failed/ ) {
+            if ( $httpc->is_ssl ) {
+                my $sock = $httpc->get_failed_socket;
+                my $certhost = $sock->peer_certificate('commonName');
+ 
+                $msg = "Hostname verification failed.\n\n" .
+                       "Connected to $host:$port, but the certificate belongs to $certhost";
+            } else {
+                $msg = "Hostname verification error on non-SSL connection?";
+            }
+        } elsif ( $@ =~ /certificate verify failed/ ) {
             # User rejected the server SSL certificate. Return to main window.
             INFO("User rejected certificate. Closing connection.");
             $cli->proxy_connection_status('CLOSED');
+            return;
         }
+
+        $cli->proxy_connection_error(message => $msg);
         return;
     }
+
+    if ($ssl) {
+        if ( (my $herr = $httpc->get_hostname_error()) ) {
+            $self->_add_ssl_error(0, 1001, 0, $herr);
+        }
+
+        if ( (my $oerr = $httpc->get_ocsp_errors()) ) {
+            $self->_add_ssl_error(0, 2001, 0, $oerr);
+        }
+
+
+        # We've successfully connected, but there may be stored up verification errors.
+        # We ignore them in the verification callback so that we can store all the errors
+        # and present them to the user at once here.
+        
+        my $errcount = $self->{ssl_errors} - $self->{ssl_ignored_errors};
+
+        if ( $errcount > 0 ) {
+            DEBUG "$errcount SSL errors ( $self->{ssl_errors} total, $self->{ssl_ignored_errors} ignored ) while logging in, asking user";
+
+            my $accept = $self->{client_delegate}->proxy_unknown_cert($self->{cert_info});
+            print STDERR "ACCEPT: $accept\n";
+            if (!$accept) {
+                INFO("User rejected certificate. Closing connection.");
+                $cli->proxy_connection_status('CLOSED');
+                return;
+            }
+            if ( $accept == 2 ) {
+                foreach my $cert ( @{ $self->{cert_info} } ) {
+                    my @errors = map { $_->{err_no} } @{ $cert->{errors} };
+
+                    $self->accept_cert( algo        => 'sha256', 
+                                        fingerprint => $cert->{fingerprint}->{sha256},
+                                        description => $cert->{subject},
+                                        errors      => \@errors );
+                }
+            }
+        }
+    }
+
     $httpc;
 }
 
@@ -245,23 +499,8 @@ sub connect_to_vm {
             
             DEBUG("Body: $body") if (defined $body);
             
-            
             if ( $code != HTTP_PROCESSING ) {
-                if ( $code == HTTP_OK ) {
-                    DEBUG "VM shut down";
-                } elsif ( $code == HTTP_SERVICE_UNAVAILABLE ) {
-                    # VM blocked, this should fail again when start is attempted
-                    DEBUG "VM on blocked server, ignoring";
-                } elsif ( $code == HTTP_NOT_FOUND ) {
-                    # No VM, no problem
-                    DEBUG "VM does not exist, ignoring";
-                } elsif ( $code == HTTP_FORBIDDEN ) {
-                    DEBUG "VM offline for maintenance";
-                } else {
-                    DEBUG "Unrecognized status code $code";
-                }
-            
-                # Leave error reporting to the next step
+                # just ignore the return status from stop_vm and let's connect_to_vm run...
                 last;
             }
         }
@@ -281,7 +520,16 @@ sub connect_to_vm {
         'qvd.client.fullscreen'         => $opts->{fullscreen},
         'qvd.client.printing.enabled'   => $self->{printing},
         'qvd.client.usb.enabled'        => $self->{usb},
+        'qvd.client.usb.implementation' => $self->{usb_impl},
     );
+	
+	if ( $WINDOWS ) {
+		DEBUG "Sending Windows version and host info";
+		require Win32;
+		$o{'qvd.client.os.name'}    = join('; ' , Win32::GetOSName());
+		$o{'qvd.client.os.version'} = join('; ', Win32::GetOSVersion());
+		$o{'qvd.client.hostname'}   = Win32::NodeName();
+	}
 
     $q = join '&', map { uri_escape($_) .'='. uri_escape($o{$_}) } keys %o;
 
@@ -389,62 +637,40 @@ sub _run {
 
      if ( core_cfg('client.slave.enable') && core_cfg('client.usb.enable') ) {
         DEBUG "USB sharing enabled";
-        my $usbsrv = core_cfg('command.usbsrv');
+        
+        my $usb = QVD::Client::USB::instantiate( core_cfg('client.usb.implementation' ) );
+        
+        
+        if ( core_cfg('client.usb.share_all') && $usb->can_autoshare ) {
+		$usb->set_autoshare(1);
+	} else {
+		$usb->set_autoshare(0) if ( $usb->can_autoshare );
+		
+		my @devs = map { [ $_ ] } split(/,/, core_cfg('client.usb.share_list'));
+		$usb->share_list_only(@devs);
+		
+	}
 
-        if ( core_cfg('client.usb.share_all') ) {
-            DEBUG "USB autoshare enabled";
-            system($usbsrv, '-autoshare', 'on');
-        } else {
-            DEBUG "USB autoshare disabled";
-            system($usbsrv, '-autoshare', 'off');
-
-            my @usblist = `$usbsrv -list`;
-            chomp @usblist;
-            my (@unshare, $pid, $vid);
-
-            DEBUG "Getting shared USB devices";
-            foreach my $line ( @usblist ) {
-                if ( $line =~ /^\s*\d+:/ ) {
-                    undef $pid;
-                    undef $vid;
-                }
-
-                if ( $line =~ /Vid: ([a-f0-9]{4})\s+Pid: ([a-f0-9]{4})/i  ) {
-                    ($vid, $pid) = ($1, $2);
-                }
-
-                if ( $line =~ /^\s+Status:.*?shared/ && $pid && $vid ) {
-                    push @unshare, [$vid, $pid];
-                }
-            }
-            
-            DEBUG "Unsharing devices";
-            foreach my $dev (@unshare) {
-                my ($vid, $pid) = @$dev;
-                DEBUG "Unsharing VID $vid, PID $pid";
-                system($usbsrv, "-unshare", "-vid", $vid, "-pid", $pid) == 0
-                    or ERROR "Failed to unshare device with VID $vid, PID $pid";
-            }
-
-            my $tmp = core_cfg('client.usb.share_list', 0) // "";
-            $tmp =~ s/\s+//g;
-
-            DEBUG "Sharing devices: $tmp";
-            foreach my $dev ( split(/,/, $tmp) ) {
-                my ($vid, $pid) = split(/:/, $dev);
-
-                DEBUG "Sharing VID $vid PID $pid";
-                system($usbsrv, "-share", "-vid", $vid, "-pid", $pid) == 0 or ERROR "Failed to share device with VID $vid, PID $pid";
-            }
-        }
     }
-   
-    
-    $o{media} = 4713 if $self->{audio};
+
+    if ($self->{audio}) {
+	if (defined(my $ps = $ENV{PULSE_SERVER})) {
+	    # FIXME: we should read /etc/pulseaudio/client.conf and
+	    # honor it and also be able to forward media to a UNIX
+	    # socket!!!
+	    if ($ps =~ /^(?:tcp:localhost:)?(\d+)$/) {
+		$o{media} = $1;
+	    }
+	    else {
+		WARN "Unable to detect PulseAudio configuration from \$PULSE_SERVER ($ps)";
+	    }
+	}
+	$o{media} //= 4713;
+    }
 
     if ($self->{printing}) {
         if ($WINDOWS) {
-            $o{smb} = 139;
+            $o{smb} = 445;
         } else {
             $o{cups} = 631;
         }
@@ -502,6 +728,11 @@ sub _run {
     } else {
         ERROR("nxproxy failed to start");
         die "nxproxy failed to start";
+    }
+
+    if ( $DARWIN ) {
+        $self->{client_delegate}->proxy_set_environment( DYLD_LIBRARY_PATH => "" );
+        DEBUG "Running on Darwin, unssetting DYLD_LIBRARY_PATH";
     }
 
     DEBUG("Listening on 4040\n");

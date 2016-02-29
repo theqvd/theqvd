@@ -22,7 +22,7 @@ cd ext/QVD-Client
 if [ "$1" == "gdb" ] ; then
 	gdb --args $perl $includes bin/qvd-gui-client.pl
 else
-	$perl $includes bin/qvd-gui-client.pl
+	$perl -w $includes bin/qvd-gui-client.pl
 fi
 
 

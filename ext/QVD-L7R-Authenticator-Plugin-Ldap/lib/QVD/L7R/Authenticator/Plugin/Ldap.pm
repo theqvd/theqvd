@@ -111,7 +111,7 @@ sub authenticate_basic {
             defined $server_error and
             defined $racf_regex) {
             if ($server_error =~ /$racf_regex/) {
-                $auth->{params}->{'qvd.auth.ldap.racf_detailed_error'} = $server_error;
+                $auth->{params}{'qvd.auth.ldap.racf_detailed_error'} = $server_error;
                 DEBUG "binding to DN $dn for user $login failed but server error ".
                     "'$server_error' matches '$racf_regex'";
             }
@@ -137,6 +137,22 @@ sub authenticate_basic {
     my $gidNumber = $entry->get_value('gidNumber');
     $auth->{params}{'qvd.vm.user.gid'} = $gidNumber if defined $gidNumber;
 
+    if (defined (my $uid = $entry->get_value('uid'))) {
+        $auth->{params}{'qvd.vm.user.ldap.name'} = $uid;
+        if (cfg('auth.ldap.normalize.name', 0) or
+            cfg('auth.ldap.name.normalize', 0)) {
+            # we do the normalization here because the normalize_name
+            # method is called too early
+            $auth->{normalized_login} = $uid;
+        }
+    }
+
+    if (defined (my $home = $entry->get_value('homeDirectory'))) {
+        $auth->{params}{'qvd.vm.user.ldap.home'} = $home;
+        if (cfg('auth.ldap.home.set', 0)) {
+            $auth->{params}{'qvd.vm.user.home'} = $home;
+        }
+    }
     return 1;
 }
 
@@ -160,18 +176,20 @@ plugin.
 
 An example configuration would be:
 
- qvd-admin.pl config set l7r.auth.plugins=ldap
-qvd-admin.pl config set auth.ldap.host=ds.theqvd.com
-qvd-admin.pl config set auth.ldap.base=ou=People,dc=theqvd,dc=com
+ qa config set l7r.auth.plugins=ldap
+ qa config set auth.ldap.host=ds.theqvd.com
+ qa config set auth.ldap.base=ou=People,dc=theqvd,dc=com
 
 Another example configuration would be (including the auto config):
 
- qvd-admin.pl config set l7r.auth.plugins=auto,ldap
-qvd-admin.pl config set auth.ldap.host=ldaps://ds.theqvd.com:1636
-qvd-admin.pl config set auth.ldap.base=ou=People,dc=theqvd,dc=com
-qvd-admin.pl config set auth.ldap.scope=sub
-qvd-admin.pl config set auth.ldap.filter=(&(objectClass=inetOrgPerson)(cn=%u))
-qvd-admin.pl config set auth.auto.osf_id=1
+ qa config set l7r.auth.plugins=auto,ldap
+ qa config set auth.ldap.host=ldaps://ds.theqvd.com:1636
+ qa config set auth.ldap.base=ou=People,dc=theqvd,dc=com
+ qa config set auth.ldap.scope=sub
+ qa config set auth.ldap.filter=(&(objectClass=inetOrgPerson)(cn=%u))
+ qa config set auth.auto.osf_id=1
+ qa config set auth.ldap.name.normalize=1
+ qa config set auth.ldap.home.set=1
 
 =head2 OPTIONS
 
@@ -236,6 +254,18 @@ valid or does not meet requirements.
 =item * R004118 Entry native user ID (ibm-nativeId,uid) is not defined to the Security Server.
 
 =back
+
+=item * auth.ldap.name.normalize
+
+Use the uid entry from the user LDAP object to set the login inside
+the virtual machine.
+
+In practice this usually just changes the case of the login.
+
+=item * auth.ldap.home.set
+
+Use the homeDirectory entry from the LDAP user objectto set the home
+directory on the virtual machine.
 
 =back
 
@@ -309,7 +339,7 @@ Please contact L<http://theqvd.com> For support
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010 Qindel FormaciE<oacute>n y Servicios SL.
+Copyright 2010-2015 Qindel FormaciE<oacute>n y Servicios SL.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License version 3 as published

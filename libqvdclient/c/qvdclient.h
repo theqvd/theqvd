@@ -12,9 +12,19 @@
 /* #define BUFFER_SIZE CURL_MAX_WRITE_SIZE * 2 */
 #define BUFFER_SIZE 65536
 #include "qvdbuffer.h"
-#define QVDVERSION 111
-#define QVDABOUT "Version: 1.1.1. $Id$"
-#define QVDCHANGELOG "1.1.1 26/06/2014 Upgraded curl to 7.37.0 and nxcomp to 3.5.0.22 and openssl to 1.0.1h. Use implicit curl_global_init. Debug now goes to stderr.\n"\
+#define QVDVERSION 121
+#define QVDABOUT "Version: 1.2.1. $Id$"
+#define QVDCHANGELOG "1.2.1 26/08/2015 Use ASL logging for Apple, openssl: 1.0.2d, jansson: 2.7\n" \
+                     "1.2.0 07/05/2015 Improve Select on write file descriptors\n" \
+                     "1.1.9 06/05/2015 Use NXTransCleanupForReconnect for IOS\n" \
+                     "1.1.8 06/05/2015 Include nxcomp version in the -v flag\n" \
+                     "1.1.7 03/05/2015 During debug show correct version text\n" \
+                     "1.1.6 28/04/2015 More time to session takeover\n" \
+                     "1.1.5  5/12/2014 Support for HTTP code 402\n" \
+                     "1.1.4 23/11/2014 Extend pass length to 256\n" \
+                     "1.1.3 21/07/2014 Fix -r switch (not in the qvdclient binary only in the lib\n" \
+                     "1.1.2 18/07/2014 Fix hardcoded ip in reconnect (option -2)\n" \
+                     "1.1.1 26/06/2014 Upgraded curl to 7.37.0 and nxcomp to 3.5.0.22 and openssl to 1.0.1h. Use implicit curl_global_init. Debug now goes to stderr.\n" \
                      "1.1.0 21/06/2014 Added support for restart -r, and to reconnect twice\n"\
                      "1.0.1 12/10/2013 in the client added support for environment vars QVDLOGIN QVDPASSWORD and QVDHOST\n"\
                      "                 and in the library support for qvd_get_changelog\n"\
@@ -22,14 +32,15 @@
 /* #define DEBUG 1 */
 #define DEBUG_FLAG_ENV_VAR_NAME "QVD_DEBUG"
 #define DEBUG_FILE_ENV_VAR_NAME "QVD_DEBUG_FILE"
-#define MAX_USERPWD 128
+#define MAX_USERPWD 256
 #define MAX_AUTHDIGEST 4+MAX_USERPWD*4/3
 #define MAX_BASEURL 1024
 #define MAX_PARAM 32
 #define MAX_ERROR_BUFFER 256
 #define MAXDISPLAYSTRING 256
 #define MAX_PATH_STRING 256
-#define MAX_HTTP_RESPONSES_FOR_UPGRADE 10
+/* This can be also a session takeover or VM start */
+#define MAX_HTTP_RESPONSES_FOR_UPGRADE 60
 #define DEFAULT_USERAGENT_PRODUCT "QVD/3.1"
 #define MAX_USERAGENT 128
 #define MAX_OS 128
@@ -59,7 +70,7 @@
 #ifndef MIN
 #define MIN(x,y) ((x) < (y) ? (x) : (y))
 #endif
-/* #define TRACE */
+/* #define TRACE 1 */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -112,6 +123,7 @@ struct qvdclientstruct {
   char client_cert[MAX_PATH_STRING]; /* PEM format */
   char client_key[MAX_PATH_STRING];
   int end_connection;
+  int payment_required;
 } ;
 typedef struct qvdclientstruct qvdclient;
 
@@ -151,7 +163,7 @@ void qvd_progress(qvdclient *qvd, const char *message);
 void set_debug_level(int level);
 int get_debug_level(void);
 void qvd_end_connection(qvdclient *qvd);
-
+int qvd_payment_required(qvdclient *qvd);
 #ifdef __cplusplus
 }
 #endif

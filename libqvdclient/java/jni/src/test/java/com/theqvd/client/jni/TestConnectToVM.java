@@ -42,7 +42,7 @@ public class TestConnectToVM {
 	}
 
 	@Test
-	public void test() throws QvdException {
+	public void test() throws QvdException, QvdPaymentException {
 		assertNotNull("qvd is not null", qvd);
 		try {
 			qvd.qvd_connect_to_vm(0);

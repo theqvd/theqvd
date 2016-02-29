@@ -1,0 +1,479 @@
+Description: Handle SELinux authorisation roles
+ Rejected upstream due to discomfort with magic usernames; a better approach
+ will need an SSH protocol change.  In the meantime, this came from Debian's
+ SELinux maintainer, so we'll keep it until we have something better.
+Author: Manoj Srivastava <srivasta@debian.org>
+Bug: https://bugzilla.mindrot.org/show_bug.cgi?id=1641
+Bug-Debian: http://bugs.debian.org/394795
+Last-Update: 2010-02-27
+
+Index: b/auth.h
+===================================================================
+--- a/auth.h
++++ b/auth.h
+@@ -59,6 +59,7 @@
+ 	char		*service;
+ 	struct passwd	*pw;		/* set if 'valid' */
+ 	char		*style;
++	char		*role;
+ 	void		*kbdintctxt;
+ 	void		*jpake_ctx;
+ #ifdef BSD_AUTH
+Index: b/auth1.c
+===================================================================
+--- a/auth1.c
++++ b/auth1.c
+@@ -383,7 +383,7 @@
+ do_authentication(Authctxt *authctxt)
+ {
+ 	u_int ulen;
+-	char *user, *style = NULL;
++	char *user, *style = NULL, *role = NULL;
+ 
+ 	/* Get the name of the user that we wish to log in as. */
+ 	packet_read_expect(SSH_CMSG_USER);
+@@ -392,11 +392,17 @@
+ 	user = packet_get_cstring(&ulen);
+ 	packet_check_eom();
+ 
++	if ((role = strchr(user, '/')) != NULL)
++		*role++ = '\0';
++
+ 	if ((style = strchr(user, ':')) != NULL)
+ 		*style++ = '\0';
++	else if (role && (style = strchr(role, ':')) != NULL)
++		*style++ = '\0';
+ 
+ 	authctxt->user = user;
+ 	authctxt->style = style;
++	authctxt->role = role;
+ 
+ 	/* Verify that the user is a valid user. */
+ 	if ((authctxt->pw = PRIVSEP(getpwnamallow(user))) != NULL)
+Index: b/auth2.c
+===================================================================
+--- a/auth2.c
++++ b/auth2.c
+@@ -217,7 +217,7 @@
+ {
+ 	Authctxt *authctxt = ctxt;
+ 	Authmethod *m = NULL;
+-	char *user, *service, *method, *style = NULL;
++	char *user, *service, *method, *style = NULL, *role = NULL;
+ 	int authenticated = 0;
+ 
+ 	if (authctxt == NULL)
+@@ -229,8 +229,13 @@
+ 	debug("userauth-request for user %s service %s method %s", user, service, method);
+ 	debug("attempt %d failures %d", authctxt->attempt, authctxt->failures);
+ 
++	if ((role = strchr(user, '/')) != NULL)
++		*role++ = 0;
++
+ 	if ((style = strchr(user, ':')) != NULL)
+ 		*style++ = 0;
++	else if (role && (style = strchr(role, ':')) != NULL)
++		*style++ = '\0';
+ 
+ 	if (authctxt->attempt++ == 0) {
+ 		/* setup auth context */
+@@ -254,8 +259,9 @@
+ 		    use_privsep ? " [net]" : "");
+ 		authctxt->service = xstrdup(service);
+ 		authctxt->style = style ? xstrdup(style) : NULL;
++		authctxt->role = role ? xstrdup(role) : NULL;
+ 		if (use_privsep)
+-			mm_inform_authserv(service, style);
++			mm_inform_authserv(service, style, role);
+ 		userauth_banner();
+ 	} else if (strcmp(user, authctxt->user) != 0 ||
+ 	    strcmp(service, authctxt->service) != 0) {
+Index: b/monitor.c
+===================================================================
+--- a/monitor.c
++++ b/monitor.c
+@@ -145,6 +145,7 @@
+ int mm_answer_pwnamallow(int, Buffer *);
+ int mm_answer_auth2_read_banner(int, Buffer *);
+ int mm_answer_authserv(int, Buffer *);
++int mm_answer_authrole(int, Buffer *);
+ int mm_answer_authpassword(int, Buffer *);
+ int mm_answer_bsdauthquery(int, Buffer *);
+ int mm_answer_bsdauthrespond(int, Buffer *);
+@@ -225,6 +226,7 @@
+     {MONITOR_REQ_SIGN, MON_ONCE, mm_answer_sign},
+     {MONITOR_REQ_PWNAM, MON_ONCE, mm_answer_pwnamallow},
+     {MONITOR_REQ_AUTHSERV, MON_ONCE, mm_answer_authserv},
++    {MONITOR_REQ_AUTHROLE, MON_ONCE, mm_answer_authrole},
+     {MONITOR_REQ_AUTH2_READ_BANNER, MON_ONCE, mm_answer_auth2_read_banner},
+     {MONITOR_REQ_AUTHPASSWORD, MON_AUTH, mm_answer_authpassword},
+ #ifdef USE_PAM
+@@ -811,6 +813,7 @@
+ 	else {
+ 		/* Allow service/style information on the auth context */
+ 		monitor_permit(mon_dispatch, MONITOR_REQ_AUTHSERV, 1);
++		monitor_permit(mon_dispatch, MONITOR_REQ_AUTHROLE, 1);
+ 		monitor_permit(mon_dispatch, MONITOR_REQ_AUTH2_READ_BANNER, 1);
+ 	}
+ #ifdef USE_PAM
+@@ -843,14 +846,37 @@
+ 
+ 	authctxt->service = buffer_get_string(m, NULL);
+ 	authctxt->style = buffer_get_string(m, NULL);
+-	debug3("%s: service=%s, style=%s",
+-	    __func__, authctxt->service, authctxt->style);
++	authctxt->role = buffer_get_string(m, NULL);
++	debug3("%s: service=%s, style=%s, role=%s",
++	    __func__, authctxt->service, authctxt->style, authctxt->role);
+ 
+ 	if (strlen(authctxt->style) == 0) {
+ 		xfree(authctxt->style);
+ 		authctxt->style = NULL;
+ 	}
+ 
++	if (strlen(authctxt->role) == 0) {
++		xfree(authctxt->role);
++		authctxt->role = NULL;
++	}
++
++	return (0);
++}
++
++int
++mm_answer_authrole(int sock, Buffer *m)
++{
++	monitor_permit_authentications(1);
++
++	authctxt->role = buffer_get_string(m, NULL);
++	debug3("%s: role=%s",
++	    __func__, authctxt->role);
++
++	if (strlen(authctxt->role) == 0) {
++		xfree(authctxt->role);
++		authctxt->role = NULL;
++	}
++
+ 	return (0);
+ }
+ 
+@@ -1438,7 +1464,7 @@
+ 	res = pty_allocate(&s->ptyfd, &s->ttyfd, s->tty, sizeof(s->tty));
+ 	if (res == 0)
+ 		goto error;
+-	pty_setowner(authctxt->pw, s->tty);
++	pty_setowner(authctxt->pw, s->tty, authctxt->role);
+ 
+ 	buffer_put_int(m, 1);
+ 	buffer_put_cstring(m, s->tty);
+Index: b/monitor.h
+===================================================================
+--- a/monitor.h
++++ b/monitor.h
+@@ -30,7 +30,7 @@
+ 
+ enum monitor_reqtype {
+ 	MONITOR_REQ_MODULI, MONITOR_ANS_MODULI,
+-	MONITOR_REQ_FREE, MONITOR_REQ_AUTHSERV,
++	MONITOR_REQ_FREE, MONITOR_REQ_AUTHSERV, MONITOR_REQ_AUTHROLE,
+ 	MONITOR_REQ_SIGN, MONITOR_ANS_SIGN,
+ 	MONITOR_REQ_PWNAM, MONITOR_ANS_PWNAM,
+ 	MONITOR_REQ_AUTH2_READ_BANNER, MONITOR_ANS_AUTH2_READ_BANNER,
+Index: b/monitor_wrap.c
+===================================================================
+--- a/monitor_wrap.c
++++ b/monitor_wrap.c
+@@ -318,10 +318,10 @@
+ 	return (banner);
+ }
+ 
+-/* Inform the privileged process about service and style */
++/* Inform the privileged process about service, style, and role */
+ 
+ void
+-mm_inform_authserv(char *service, char *style)
++mm_inform_authserv(char *service, char *style, char *role)
+ {
+ 	Buffer m;
+ 
+@@ -330,11 +330,29 @@
+ 	buffer_init(&m);
+ 	buffer_put_cstring(&m, service);
+ 	buffer_put_cstring(&m, style ? style : "");
++	buffer_put_cstring(&m, role ? role : "");
+ 
+ 	mm_request_send(pmonitor->m_recvfd, MONITOR_REQ_AUTHSERV, &m);
+ 
+ 	buffer_free(&m);
+ }
++
++/* Inform the privileged process about role */
++
++void
++mm_inform_authrole(char *role)
++{
++	Buffer m;
++
++	debug3("%s entering", __func__);
++
++	buffer_init(&m);
++	buffer_put_cstring(&m, role ? role : "");
++
++	mm_request_send(pmonitor->m_recvfd, MONITOR_REQ_AUTHROLE, &m);
++
++	buffer_free(&m);
++}
+ 
+ /* Do the password authentication */
+ int
+Index: b/monitor_wrap.h
+===================================================================
+--- a/monitor_wrap.h
++++ b/monitor_wrap.h
+@@ -41,7 +41,8 @@
+ int mm_is_monitor(void);
+ DH *mm_choose_dh(int, int, int);
+ int mm_key_sign(Key *, u_char **, u_int *, u_char *, u_int);
+-void mm_inform_authserv(char *, char *);
++void mm_inform_authserv(char *, char *, char *);
++void mm_inform_authrole(char *);
+ struct passwd *mm_getpwnamallow(const char *);
+ char *mm_auth2_read_banner(void);
+ int mm_auth_password(struct Authctxt *, char *);
+Index: b/openbsd-compat/port-linux.c
+===================================================================
+--- a/openbsd-compat/port-linux.c
++++ b/openbsd-compat/port-linux.c
+@@ -29,6 +29,12 @@
+ #include <string.h>
+ #include <stdio.h>
+ 
++#ifdef WITH_SELINUX
++#include "key.h"
++#include "hostfile.h"
++#include "auth.h"
++#endif
++
+ #include "log.h"
+ #include "xmalloc.h"
+ #include "port-linux.h"
+@@ -58,7 +64,7 @@
+ 
+ /* Return the default security context for the given username */
+ static security_context_t
+-ssh_selinux_getctxbyname(char *pwname)
++ssh_selinux_getctxbyname(char *pwname, const char *role)
+ {
+ 	security_context_t sc = NULL;
+ 	char *sename = NULL, *lvl = NULL;
+@@ -73,9 +79,16 @@
+ #endif
+ 
+ #ifdef HAVE_GET_DEFAULT_CONTEXT_WITH_LEVEL
+-	r = get_default_context_with_level(sename, lvl, NULL, &sc);
++	if (role != NULL && role[0])
++		r = get_default_context_with_rolelevel(sename, role, lvl, NULL,
++						       &sc);
++	else
++		r = get_default_context_with_level(sename, lvl, NULL, &sc);
+ #else
+-	r = get_default_context(sename, NULL, &sc);
++	if (role != NULL && role[0])
++		r = get_default_context_with_role(sename, role, NULL, &sc);
++	else
++		r = get_default_context(sename, NULL, &sc);
+ #endif
+ 
+ 	if (r != 0) {
+@@ -107,7 +120,7 @@
+ 
+ /* Set the execution context to the default for the specified user */
+ void
+-ssh_selinux_setup_exec_context(char *pwname)
++ssh_selinux_setup_exec_context(char *pwname, const char *role)
+ {
+ 	security_context_t user_ctx = NULL;
+ 
+@@ -116,7 +129,7 @@
+ 
+ 	debug3("%s: setting execution context", __func__);
+ 
+-	user_ctx = ssh_selinux_getctxbyname(pwname);
++	user_ctx = ssh_selinux_getctxbyname(pwname, role);
+ 	if (setexeccon(user_ctx) != 0) {
+ 		switch (security_getenforce()) {
+ 		case -1:
+@@ -138,7 +151,7 @@
+ 
+ /* Set the TTY context for the specified user */
+ void
+-ssh_selinux_setup_pty(char *pwname, const char *tty)
++ssh_selinux_setup_pty(char *pwname, const char *tty, const char *role)
+ {
+ 	security_context_t new_tty_ctx = NULL;
+ 	security_context_t user_ctx = NULL;
+@@ -149,7 +162,7 @@
+ 
+ 	debug3("%s: setting TTY context on %s", __func__, tty);
+ 
+-	user_ctx = ssh_selinux_getctxbyname(pwname);
++	user_ctx = ssh_selinux_getctxbyname(pwname, role);
+ 
+ 	/* XXX: should these calls fatal() upon failure in enforcing mode? */
+ 
+Index: b/openbsd-compat/port-linux.h
+===================================================================
+--- a/openbsd-compat/port-linux.h
++++ b/openbsd-compat/port-linux.h
+@@ -21,8 +21,8 @@
+ 
+ #ifdef WITH_SELINUX
+ int ssh_selinux_enabled(void);
+-void ssh_selinux_setup_pty(char *, const char *);
+-void ssh_selinux_setup_exec_context(char *);
++void ssh_selinux_setup_pty(char *, const char *, const char *);
++void ssh_selinux_setup_exec_context(char *, const char *);
+ void ssh_selinux_change_context(const char *);
+ void ssh_selinux_setfscreatecon(const char *);
+ #endif
+Index: b/platform.c
+===================================================================
+--- a/platform.c
++++ b/platform.c
+@@ -134,7 +134,7 @@
+  * called if sshd is running as root.
+  */
+ void
+-platform_setusercontext_post_groups(struct passwd *pw)
++platform_setusercontext_post_groups(struct passwd *pw, const char *role)
+ {
+ #if !defined(HAVE_LOGIN_CAP) && defined(USE_PAM)
+ 	/*
+@@ -181,7 +181,7 @@
+ 	}
+ #endif /* HAVE_SETPCRED */
+ #ifdef WITH_SELINUX
+-	ssh_selinux_setup_exec_context(pw->pw_name);
++	ssh_selinux_setup_exec_context(pw->pw_name, role);
+ #endif
+ }
+ 
+Index: b/platform.h
+===================================================================
+--- a/platform.h
++++ b/platform.h
+@@ -26,7 +26,7 @@
+ void platform_post_fork_child(void);
+ int  platform_privileged_uidswap(void);
+ void platform_setusercontext(struct passwd *);
+-void platform_setusercontext_post_groups(struct passwd *);
++void platform_setusercontext_post_groups(struct passwd *, const char *);
+ char *platform_get_krb5_client(const char *);
+ char *platform_krb5_get_principal_name(const char *);
+ 
+Index: b/session.c
+===================================================================
+--- a/session.c
++++ b/session.c
+@@ -1471,7 +1471,7 @@
+ 
+ /* Set login name, uid, gid, and groups. */
+ void
+-do_setusercontext(struct passwd *pw)
++do_setusercontext(struct passwd *pw, const char *role)
+ {
+ 	char *chroot_path, *tmp;
+ 
+@@ -1499,7 +1499,7 @@
+ 		endgrent();
+ #endif
+ 
+-		platform_setusercontext_post_groups(pw);
++		platform_setusercontext_post_groups(pw, role);
+ 
+ 		if (options.chroot_directory != NULL &&
+ 		    strcasecmp(options.chroot_directory, "none") != 0) {
+@@ -1625,7 +1625,7 @@
+ 
+ 	/* Force a password change */
+ 	if (s->authctxt->force_pwchange) {
+-		do_setusercontext(pw);
++		do_setusercontext(pw, s->authctxt->role);
+ 		child_close_fds();
+ 		do_pwchange(s);
+ 		exit(1);
+@@ -1652,7 +1652,7 @@
+ 		/* When PAM is enabled we rely on it to do the nologin check */
+ 		if (!options.use_pam)
+ 			do_nologin(pw);
+-		do_setusercontext(pw);
++		do_setusercontext(pw, s->authctxt->role);
+ 		/*
+ 		 * PAM session modules in do_setusercontext may have
+ 		 * generated messages, so if this in an interactive
+@@ -2064,7 +2064,7 @@
+ 	tty_parse_modes(s->ttyfd, &n_bytes);
+ 
+ 	if (!use_privsep)
+-		pty_setowner(s->pw, s->tty);
++		pty_setowner(s->pw, s->tty, s->authctxt->role);
+ 
+ 	/* Set window size from the packet. */
+ 	pty_change_window_size(s->ptyfd, s->row, s->col, s->xpixel, s->ypixel);
+Index: b/session.h
+===================================================================
+--- a/session.h
++++ b/session.h
+@@ -76,7 +76,7 @@
+ Session	*session_new(void);
+ Session	*session_by_tty(char *);
+ void	 session_close(Session *);
+-void	 do_setusercontext(struct passwd *);
++void	 do_setusercontext(struct passwd *, const char *);
+ void	 child_set_env(char ***envp, u_int *envsizep, const char *name,
+ 		       const char *value);
+ 
+Index: b/sshd.c
+===================================================================
+--- a/sshd.c
++++ b/sshd.c
+@@ -734,7 +734,7 @@
+ 	RAND_seed(rnd, sizeof(rnd));
+ 
+ 	/* Drop privileges */
+-	do_setusercontext(authctxt->pw);
++	do_setusercontext(authctxt->pw, authctxt->role);
+ 
+  skip:
+ 	/* It is safe now to apply the key state */
+Index: b/sshpty.c
+===================================================================
+--- a/sshpty.c
++++ b/sshpty.c
+@@ -200,7 +200,7 @@
+ }
+ 
+ void
+-pty_setowner(struct passwd *pw, const char *tty)
++pty_setowner(struct passwd *pw, const char *tty, const char *role)
+ {
+ 	struct group *grp;
+ 	gid_t gid;
+@@ -227,7 +227,7 @@
+ 		    strerror(errno));
+ 
+ #ifdef WITH_SELINUX
+-	ssh_selinux_setup_pty(pw->pw_name, tty);
++	ssh_selinux_setup_pty(pw->pw_name, tty, role);
+ #endif
+ 
+ 	if (st.st_uid != pw->pw_uid || st.st_gid != gid) {
+Index: b/sshpty.h
+===================================================================
+--- a/sshpty.h
++++ b/sshpty.h
+@@ -24,4 +24,4 @@
+ void	 pty_release(const char *);
+ void	 pty_make_controlling_tty(int *, const char *);
+ void	 pty_change_window_size(int, u_int, u_int, u_int, u_int);
+-void	 pty_setowner(struct passwd *, const char *);
++void	 pty_setowner(struct passwd *, const char *, const char *);

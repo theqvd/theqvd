@@ -37,7 +37,7 @@ import android.view.WindowManager;
  * 
  * Class to hold all the configuration strings + the persistent configuration
  * of the application stored in the property files
- * 
+ *
  * @author nito
  *
  */
@@ -104,7 +104,7 @@ public class Config {
 	
 	
 	public static String getAbout(String version) {
-		return "XVnc\nLicense: Licensed under the GPLv3.\nAuthor: Nito@Qindel.ES\nSponsored: http://theqvd.com\nVersion: "+version+"\nRevision: $Revision$\nDate: $Date$";
+		return "XVnc\nLicense: Licensed under the GPLv3.\nAuthor: support@theqvd.com\nSponsored: http://theqvd.com\nVersion: "+version+"\nRevision: $Revision$\nDate: $Date$";
 	}
 	// Class info
 	static final String tag = L.xvncbinary + "-Config-" +java.util.Map.Entry.class.getSimpleName();
@@ -134,6 +134,17 @@ public class Config {
 		setTargetdir(context.getFilesDir().getAbsolutePath());
 		pocketvncconfigfullpath = getTargetdir() + "/" + Config.pocketvncconfig;
 		xvnc = getTargetdir() + "/usr/X11R6/bin/" + L.xvncbinary;
+		if (android.os.Build.CPU_ABI.equals("x86")) {
+			xvnc += "i386";
+		} else if (android.os.Build.CPU_ABI.startsWith("arm")) {
+			// do not do anything
+		} else {
+			Log.e(tag, "Unknown CPU_ABI is neither x86 and not arm*");
+			// TODO throw error here?
+		}
+		//xvnc += specialAndroid22Extension;
+		
+		
 		xvnccmd = xvnc + " :0 -br -nolisten local  -pixelformat rgb888 -pixdepths 1 4 8 15 16 24 32 -PasswordFile="+getTargetdir()+"/etc/vncpasswd";
 		setHeightAndWidth();
 		load_properties();
@@ -175,7 +186,8 @@ public class Config {
 		try {
 			Log.d(tag, "setHeightAndWidth:The Build.VERSION is greater than 17:"+Build.VERSION.SDK_INT);
 		    Point realSize = new Point();
-		    Display.class.getMethod("getRealSize", Point.class).invoke(d, realSize);
+		    Display.class.getMethod("getSize", Point.class).invoke(d, realSize);  // We don't need the RealSize (full resolution) but the available in window..
+//		    Display.class.getMethod("getRealSize", Point.class).invoke(d, realSize);
 		    widthPixels = realSize.x;
 		    heightPixels = realSize.y;
 		    Log.d(tag, "setHeightAndWidth:The Build.VERSION is greater than 17:"+Build.VERSION.SDK_INT+

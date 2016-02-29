@@ -53,7 +53,7 @@
 /* Driver specific headers */
 #include "ct_driver.h"
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
 /*#include <machine/sysarch.h>*/
 #define	arm32_drain_writebuf()	sysarch(1, 0)
 #define ChipsBank(pScreen) CHIPSPTR(xf86Screens[pScreen->myNum])->Bank
@@ -67,7 +67,7 @@ CHIPSSetRead(ScreenPtr pScreen, int bank)
 
     outw(cPtr->PIOBase + 0x3D6, ((((bank << 3) & 0xFF) << 8) | 0x10));
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != ChipsBank(pScreen)) {
 	arm32_drain_writebuf();
@@ -86,7 +86,7 @@ CHIPSSetWrite(ScreenPtr pScreen, int bank)
 
     outw(cPtr->PIOBase + 0x3D6, ((((bank << 3) & 0xFF) << 8) | 0x11));
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != ChipsBank(pScreen)) {
 	arm32_drain_writebuf();
@@ -106,7 +106,7 @@ CHIPSSetReadWrite(ScreenPtr pScreen, int bank)
     outw(cPtr->PIOBase + 0x3D6, ((((bank << 3) & 0xFF) << 8) | 0x10));
     outw(cPtr->PIOBase + 0x3D6, ((((bank << 3) & 0xFF) << 8) | 0x11));
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != ChipsBank(pScreen)) {
 	arm32_drain_writebuf();
@@ -124,7 +124,7 @@ CHIPSSetReadPlanar(ScreenPtr pScreen, int bank)
 
     outw(cPtr->PIOBase + 0x3D6, ((((bank << 5) & 0xFF) << 8) | 0x10));
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != ChipsBank(pScreen)) {
 	arm32_drain_writebuf();
@@ -142,7 +142,7 @@ CHIPSSetWritePlanar(ScreenPtr pScreen, int bank)
 
     outw(cPtr->PIOBase + 0x3D6, ((((bank << 5) & 0xFF) << 8) | 0x11));
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != ChipsBank(pScreen)) {
 	arm32_drain_writebuf();
@@ -161,7 +161,7 @@ CHIPSSetReadWritePlanar(ScreenPtr pScreen, int bank)
     outw(cPtr->PIOBase + 0x3D6, ((((bank << 5) & 0xFF) << 8) | 0x10));
     outw(cPtr->PIOBase + 0x3D6, ((((bank << 5) & 0xFF) << 8) | 0x11));
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != ChipsBank(pScreen)) {
 	arm32_drain_writebuf();
@@ -183,7 +183,7 @@ CHIPSWINSetRead(ScreenPtr pScreen, int bank)
     tmp = inb(cPtr->PIOBase + 0x3D7) & 0xEF;
     outw(cPtr->PIOBase + 0x3D6, (((((bank >> 1) & 0x10) | tmp) << 8) | 0x0C));
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != ChipsBank(pScreen)) {
 	arm32_drain_writebuf();
@@ -206,7 +206,7 @@ CHIPSWINSetWrite(ScreenPtr pScreen, int bank)
     tmp = inb(cPtr->PIOBase + 0x3D7) & 0xBF;
     outw(cPtr->PIOBase + 0x3D6, (((((bank << 1) & 0x40) | tmp) << 8) | 0x0C));
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != ChipsBank(pScreen)) {
 	arm32_drain_writebuf();
@@ -230,7 +230,7 @@ CHIPSWINSetReadWrite(ScreenPtr pScreen, int bank)
     outw(cPtr->PIOBase + 0x3D6,
 	(((((bank << 1) & 0x40) | ((bank >> 1) & 0x10) | tmp) << 8) | 0x0C));
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != ChipsBank(pScreen)) {
 	arm32_drain_writebuf();
@@ -252,7 +252,7 @@ CHIPSWINSetReadPlanar(ScreenPtr pScreen, int bank)
     tmp = inb(cPtr->PIOBase + 0x3D7) & 0xEF;
     outw(cPtr->PIOBase + 0x3D6, (((((bank << 1) & 0x10) | tmp) << 8) | 0x0C));
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != ChipsBank(pScreen)) {
 	arm32_drain_writebuf();
@@ -274,7 +274,7 @@ CHIPSWINSetWritePlanar(ScreenPtr pScreen, int bank)
     tmp = inb(cPtr->PIOBase + 0x3D7) & 0xBF;
     outw(cPtr->PIOBase + 0x3D6, (((((bank << 3) & 0x40) | tmp) << 8) | 0x0C));
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != ChipsBank(pScreen)) {
 	arm32_drain_writebuf();
@@ -298,7 +298,7 @@ CHIPSWINSetReadWritePlanar(ScreenPtr pScreen, int bank)
     outw(cPtr->PIOBase + 0x3D6,
 	(((((bank << 3) & 0x40) | ((bank << 1) & 0x10) | tmp) << 8) | 0x0C));
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != ChipsBank(pScreen)) {
 	arm32_drain_writebuf();
@@ -316,7 +316,7 @@ CHIPSHiQVSetReadWrite(ScreenPtr pScreen, int bank)
 
     outw(cPtr->PIOBase + 0x3D6, (((bank & 0x7F) << 8) | 0x0E));
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != ChipsBank(pScreen)) {
 	arm32_drain_writebuf();
@@ -334,7 +334,7 @@ CHIPSHiQVSetReadWritePlanar(ScreenPtr pScreen, int bank)
 
     outw(cPtr->PIOBase + 0x3D6, ((((bank << 2) & 0x7F) << 8) | 0x0E));
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != ChipsBank(pScreen)) {
 	arm32_drain_writebuf();
@@ -354,7 +354,7 @@ CHIPSSetRead(ScreenPtr pScreen, int bank)
   
     cPtr->writeXR(cPtr, 0x10, ((bank << 3) & 0xFF));
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != cPtr->Bank) {
 	arm32_drain_writebuf();
@@ -373,7 +373,7 @@ CHIPSSetWrite(ScreenPtr pScreen, int bank)
   
     cPtr->writeXR(cPtr, 0x11, ((bank << 3) & 0xFF));
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != cPtr->Bank) {
 	arm32_drain_writebuf();
@@ -393,7 +393,7 @@ CHIPSSetReadWrite(ScreenPtr pScreen, int bank)
     cPtr->writeXR(cPtr, 0x10, ((bank << 3) & 0xFF));
     cPtr->writeXR(cPtr, 0x11, ((bank << 3) & 0xFF));
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != cPtr->Bank) {
 	arm32_drain_writebuf();
@@ -411,7 +411,7 @@ CHIPSSetReadPlanar(ScreenPtr pScreen, int bank)
   
     cPtr->writeXR(cPtr, 0x10, ((bank << 5) & 0xFF));
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != cPtr->Bank) {
 	arm32_drain_writebuf();
@@ -429,7 +429,7 @@ CHIPSSetWritePlanar(ScreenPtr pScreen, int bank)
   
     cPtr->writeXR(cPtr, 0x11, ((bank << 5) & 0xFF));
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != cPtr->Bank) {
 	arm32_drain_writebuf();
@@ -448,7 +448,7 @@ CHIPSSetReadWritePlanar(ScreenPtr pScreen, int bank)
     cPtr->writeXR(cPtr, 0x10, ((bank << 5) & 0xFF));
     cPtr->writeXR(cPtr, 0x11, ((bank << 5) & 0xFF));
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != cPtr->Bank) {
 	arm32_drain_writebuf();
@@ -469,7 +469,7 @@ CHIPSWINSetRead(ScreenPtr pScreen, int bank)
     tmp = cPtr->readXR(cPtr, 0x0C) & 0xEF;
     cPtr->writeXR(cPtr, 0x0C, ((bank >> 1) & 0x10) | tmp);
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != cPtr->Bank) {
 	arm32_drain_writebuf();
@@ -491,7 +491,7 @@ CHIPSWINSetWrite(ScreenPtr pScreen, int bank)
     tmp = cPtr->readXR(cPtr, 0x0C) & 0xBF;
     cPtr->writeXR(cPtr, 0x0C, ((bank << 1) & 0x40) | tmp);
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != cPtr->Bank) {
 	arm32_drain_writebuf();
@@ -513,7 +513,7 @@ CHIPSWINSetReadWrite(ScreenPtr pScreen, int bank)
     tmp = cPtr->readXR(cPtr, 0x0C) & 0xAF;
     cPtr->writeXR(cPtr, 0x0C, ((bank << 1) & 0x40) | ((bank >> 1) & 0x10) | tmp);
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != cPtr->Bank) {
 	arm32_drain_writebuf();
@@ -534,7 +534,7 @@ CHIPSWINSetReadPlanar(ScreenPtr pScreen, int bank)
     tmp = cPtr->readXR(cPtr, 0x0C) & 0xEF;
     cPtr->writeXR(cPtr, 0x0C, ((bank << 1) & 0x10) | tmp);
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != cPtr->Bank) {
 	arm32_drain_writebuf();
@@ -555,7 +555,7 @@ CHIPSWINSetWritePlanar(ScreenPtr pScreen, int bank)
     tmp = cPtr->readXR(cPtr, 0x0C) & 0xBF;
     cPtr->writeXR(cPtr, 0x0C, ((bank << 3) & 0x40) | tmp);
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != cPtr->Bank) {
 	arm32_drain_writebuf();
@@ -577,7 +577,7 @@ CHIPSWINSetReadWritePlanar(ScreenPtr pScreen, int bank)
     tmp = cPtr->readXR(cPtr, 0x0C) & 0xAF;
     cPtr->writeXR(cPtr, 0x0C, ((bank << 3) & 0x40) | ((bank << 1) & 0x10) | tmp);
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != cPtr->Bank) {
 	arm32_drain_writebuf();
@@ -595,7 +595,7 @@ CHIPSHiQVSetReadWrite(ScreenPtr pScreen, int bank)
 
     cPtr->writeXR(cPtr, 0x0E, bank & 0x7F);
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != cPtr->Bank) {
 	arm32_drain_writebuf();
@@ -613,7 +613,7 @@ CHIPSHiQVSetReadWritePlanar(ScreenPtr pScreen, int bank)
 
     cPtr->writeXR(cPtr, 0x0E, (bank << 2) & 0x7F);
 
-#ifdef	__arm32__
+#if defined(__arm32__) || defined(__arm64__)
     /* Must drain StrongARM write buffer on bank switch! */
     if (bank != cPtr->Bank) {
 	arm32_drain_writebuf();

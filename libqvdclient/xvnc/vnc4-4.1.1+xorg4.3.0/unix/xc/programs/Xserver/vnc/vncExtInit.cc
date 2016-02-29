@@ -160,8 +160,7 @@ void vncExtensionInit()
         network::TcpListener* listener = 0;
         network::TcpListener* httpListener = 0;
         if (scr == 0 && vncInetdSock != -1) {
-          if (network::TcpSocket::isSocket(vncInetdSock) &&
-              !network::TcpSocket::isConnected(vncInetdSock))
+          if (network::TcpSocket::isListening(vncInetdSock))
           {
             listener = new network::TcpListener(0, 0, vncInetdSock, true);
             vlog.info("inetd wait");

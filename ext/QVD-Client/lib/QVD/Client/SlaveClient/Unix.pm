@@ -51,6 +51,7 @@ sub handle_share {
 sub handle_mount {
     my ($self, $path, $mountpoint) = @_;
     my $command_sshfs = core_cfg('command.sshfs');
+	my @sshfs_extra_args = split(/\s+/, core_cfg('client.sshfs.extra_args'));
 
     INFO "Mounting remote $path at $mountpoint";
 
@@ -93,9 +94,10 @@ sub handle_mount {
         chdir $mountpoint or die "Unable to chdir to $path: $^E";
 		my @cmd;
 
-        @cmd = ($command_sshfs => "qvd-client:", $mountpoint, -o => 'slave', -o => 'atomic_o_trunc', -o => 'idmap=user');
+        @cmd = ($command_sshfs => "qvd-client:", $mountpoint, -o => 'slave', @sshfs_extra_args);
         push @cmd, -o => "modules=iconv,from_code=$charset" if ($charset);
 
+		DEBUG "sshfs extra args: " . join(' ', @sshfs_extra_args);
         DEBUG "Executing " . join(' ', @cmd);
         exec @cmd or die "Unable to exec " . join(' ', @cmd) . ": $^E";
     }

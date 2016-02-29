@@ -1,0 +1,3 @@
+include ':zoomerWithKeys'
+include ':qvdclient'
+include ':xvncpro'

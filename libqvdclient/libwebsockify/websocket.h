@@ -1,4 +1,8 @@
 #include <openssl/ssl.h>
+#include <sys/types.h> 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #define BUFSIZE 65536
 #define DBUFSIZE (BUFSIZE * 3) / 4 - 20
@@ -75,11 +79,11 @@ ssize_t ws_send(ws_ctx_t *ctx, const void *buf, size_t len);
 
 #define gen_handler_msg(stream, ...) \
     if (! settings.daemon) { \
-        fprintf(stream, "  %d: ", settings.handler_id); \
+        fprintf(stream, "libwebsockify  %d: ", settings.handler_id); \
         fprintf(stream, __VA_ARGS__); \
     }
 
-#define handler_msg(...) gen_handler_msg(stdout, __VA_ARGS__);
+#define handler_msg(...) gen_handler_msg(stderr, __VA_ARGS__);
 #define handler_emsg(...) gen_handler_msg(stderr, __VA_ARGS__);
 
 extern int websockify_loop;
@@ -92,6 +96,6 @@ int decode_hixie(char *src, size_t srclength, u_char *target, size_t targsize, u
 int encode_hybi(u_char const *src, size_t srclength, char *target, size_t targsize, unsigned int opcode);
 int decode_hybi(unsigned char *src, size_t srclength, u_char *target, size_t targsize, unsigned int *opcode, unsigned int *left);
 int resolve_host(struct in_addr *sin_addr, const char *hostname);
-void start_server();
+int start_server();
 
 

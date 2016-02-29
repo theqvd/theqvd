@@ -1,0 +1,202 @@
+#
+# ex: set fileencoding=utf-8
+#
+# Spanish translations for PACKAGE package
+# Traducciones al español para el paquete PACKAGE.
+# Copyright (C) 2014 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Qindel <vadim@qindel.com>, 2014.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: QVD\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-10-05 16:04+0200\n"
+"PO-Revision-Date: 2015-10-05 16:09+0200\n"
+"Last-Translator: Vadim Troshchinskiy <vadim@qindel.es>\n"
+"Language-Team: QVD Team <qvd@qindel.com>\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.8.4\n"
+"X-Poedit-Basepath: ../lib/QVD/Client\n"
+"X-Poedit-KeywordsList: _t\n"
+"X-Poedit-SearchPath-0: Frame.pm\n"
+
+#: Frame.pm:135 Frame.pm:283
+msgid "Connect"
+msgstr "Conectar"
+
+#: Frame.pm:142
+msgid "Settings"
+msgstr "Ajustes"
+
+#: Frame.pm:148
+msgid "Connection"
+msgstr "Conexión"
+
+#: Frame.pm:152
+msgid "Enable audio"
+msgstr "Habilitar sonido"
+
+#: Frame.pm:156
+msgid "Enable printing"
+msgstr "Habilitar impresión"
+
+#: Frame.pm:160
+msgid "Enable port forwarding"
+msgstr "Habilitar reenvío de puertos"
+
+#: Frame.pm:165
+msgid "Enable USB redirection"
+msgstr "Habilitar redirección USB"
+
+#: Frame.pm:172
+msgid "Select devices"
+msgstr "Seleccionar dispositivos"
+
+#: Frame.pm:187
+msgid "Screen"
+msgstr "Pantalla"
+
+#: Frame.pm:190
+msgid "Full screen"
+msgstr "Pantalla completa"
+
+#: Frame.pm:206
+msgid "User"
+msgstr "Usuario"
+
+#: Frame.pm:210
+msgid "Password"
+msgstr "Contraseña"
+
+#: Frame.pm:215
+msgid "Remember password"
+msgstr "Recordar contraseña"
+
+#: Frame.pm:222
+msgid "Server"
+msgstr "Servidor"
+
+#: Frame.pm:228
+msgid "Connection type"
+msgstr "Tipo de enlace"
+
+#: Frame.pm:250
+msgid "Kill current VM"
+msgstr "Reinicio de sesión"
+
+#: Frame.pm:383
+msgid "You don't have any virtual machine available"
+msgstr "No tiene ninguna máquina virtual disponible"
+
+#: Frame.pm:483
+msgid "Connection error"
+msgstr "Error de conexión"
+
+#: Frame.pm:496
+msgid "Select virtual machine:"
+msgstr "Seleccione la máquina virtual:"
+
+#: Frame.pm:497
+msgid "Select virtual machine"
+msgstr "Seleccione la máquina virtual"
+
+#: Frame.pm:501
+msgid " (blocked)"
+msgstr " (bloqueada)"
+
+#: Frame.pm:560
+msgid ""
+"Unrecognized Certificate Authority. See the documentation for instructions "
+"on how to use your own CA."
+msgstr ""
+"Autoridad de certificación (CA) no reconocida. Vea la documentación para "
+"instrucciones sobre como usar su propia CA."
+
+#: Frame.pm:562
+msgid ""
+"The certificate is not yet valid. Make sure your clock is set correctly."
+msgstr ""
+"El certificado todavía no es válido. Compruebe que su reloj esté puesto "
+"correctamente."
+
+#: Frame.pm:564
+msgid "The certificate has expired."
+msgstr "El certificado ha expirado."
+
+#: Frame.pm:566
+msgid "The certificate has been revoked."
+msgstr "El certificado ha sido revocado."
+
+#: Frame.pm:569
+#, perl-format
+msgid ""
+"Unrecognized SSL error #%s. See the certificate information below for "
+"details."
+msgstr ""
+"Error de SSL #%s no reconocido. Vea la información detallada que sigue para "
+"mas detalles."
+
+#: Frame.pm:576
+msgid "Certificate information:"
+msgstr "Información del certificado:"
+
+#: Frame.pm:577
+msgid ""
+"Certificate not found, maybe HKD component is not runnning at server side."
+msgstr ""
+"Certificado no encontrado. Es posible que el componente HKD no está "
+"corriendo en el servidor."
+
+#: Frame.pm:592
+msgid "Ok"
+msgstr "Aceptar"
+
+#: Frame.pm:597
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: Frame.pm:677
+msgid "Select the USB devices to share:"
+msgstr "Seleccione los dispositivos USB a redirigir:"
+
+#: Frame.pm:678
+msgid "USB sharing"
+msgstr "Redirigir dispositivos USB"
+
+#: Frame.pm:799
+msgid "Error saving configuration"
+msgstr "Error al guardar la configuración"
+
+#: Frame.pm:877
+#, perl-format
+msgid "Failed to mount remote folder %s at %s:"
+msgstr "Error al montar carpeta remota %s en %s:"
+
+#: Frame.pm:879
+#, perl-format
+msgid "Path %s was not found on the VM"
+msgstr "La ruta %s no ha sido encontrada en la máquina virtual"
+
+#: Frame.pm:881
+#, perl-format
+msgid "Path %s is forbidden on the VM"
+msgstr "La ruta %s está prohibida en la máquina virtual"
+
+#: Frame.pm:883
+msgid "VM lacks file sharing support. Please install the qvd-sshfs package."
+msgstr ""
+"La máquina virtual no tiene soporte para compartir archivos. Por favor "
+"instale el paquete qvd-sshfs."
+
+#: Frame.pm:885
+msgid "Unrecognized error, full error message follows:"
+msgstr "Error no reconocido. El mensaje de error completo sigue:"
+
+#: Frame.pm:888
+msgid "File sharing error."
+msgstr "Error al compartir archivos"

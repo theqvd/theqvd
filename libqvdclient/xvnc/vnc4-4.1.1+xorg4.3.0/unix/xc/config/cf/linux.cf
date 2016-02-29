@@ -750,6 +750,17 @@ InstallNamedTargetNoClobber(install,file.ad,$(INSTAPPFLAGS),$(XAPPLOADDIR),class
 # define VendorHasX11R6_3libXext	YES	/* XC or XFree86 >= 3.3.1 */
 #endif
 
+#ifdef Aarch64Architecture
+/* Cargoculted from Arm32Architecture w/ -D_XSERVER64 added */
+# define DefaultCCOptions	-fsigned-char
+# ifndef OptimizedCDebugFlags
+#  define OptimizedCDebugFlags	-O3
+# endif
+# define LinuxMachineDefines	-D__aarch64__
+# define ServerOSDefines	XFree86ServerOSDefines -DDDXTIME -DPART_NET
+# define ServerExtraDefines	-DGCCUSESGAS XFree86ServerDefines -D_XSERVER64
+#endif /* Aarch64Architecture */
+
 #ifdef AlphaArchitecture
 # ifndef OptimizedCDebugFlags
 #  define OptimizedCDebugFlags	DefaultGcc2AxpOpt
@@ -777,7 +788,7 @@ InstallNamedTargetNoClobber(install,file.ad,$(INSTAPPFLAGS),$(XAPPLOADDIR),class
 # ifndef OptimizedCDebugFlags
 #  define OptimizedCDebugFlags	-O3
 # endif
-# define LinuxMachineDefines	-D__arm__ -D__arm32__ -U__arm -Uarm
+# define LinuxMachineDefines	-D__arm64__ -U__arm -Uarm
 # define ServerOSDefines	XFree86ServerOSDefines -DDDXTIME -DPART_NET
 # define ServerExtraDefines	-DGCCUSESGAS XFree86ServerDefines
 #endif /* Arm32Achitecture */

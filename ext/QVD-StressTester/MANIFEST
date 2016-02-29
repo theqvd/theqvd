@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/QVD-StressTester.t
+lib/QVD/StressTester.pm
+QVD-StressTester/bin/qvd-stresstester.pl

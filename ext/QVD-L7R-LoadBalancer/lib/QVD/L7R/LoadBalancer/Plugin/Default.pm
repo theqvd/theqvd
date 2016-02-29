@@ -23,7 +23,8 @@ sub get_free_host {
                                 'runtime.state'   => 'running' },
                               { distinct => 1,
                                 join => [qw(runtime vms)],
-                                '+select' => [ { count => 'vms.vm_id', -as => 'amount_of_vms' } ] });
+                                '+select' => [ { count => 'vms.vm_id', -as => 'amount_of_vms' } ],
+                                prefetch => ['runtime'] } );
 
     while (my $host = $rs->next) {
         my $id = $host->id;

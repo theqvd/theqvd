@@ -15,6 +15,7 @@
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <signal.h> // daemonizing
@@ -732,7 +733,7 @@ void signal_handler(sig) {
 /*   return 0; */
 /* } */
 
-void start_server() {
+int start_server() {
     int lsock, csock, pid, clilen, sopt = 1, i, res;
     struct sockaddr_in serv_addr, cli_addr;
     ws_ctx_t *ws_ctx;
@@ -750,7 +751,8 @@ void start_server() {
     /* Resolve listen address */
     if (settings.listen_host && (settings.listen_host[0] != '\0')) {
         if (resolve_host(&serv_addr.sin_addr, settings.listen_host) < -1) {
-            fatal("Could not resolve listen address");
+            error("Could not resolve listen address");
+	    return 1;
         }
     } else {
         serv_addr.sin_addr.s_addr = INADDR_ANY;
@@ -758,8 +760,15 @@ void start_server() {
 
     setsockopt(lsock, SOL_SOCKET, SO_REUSEADDR, (char *)&sopt, sizeof(sopt));
     if (bind(lsock, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
-        fatal("ERROR on binding listener socket");
+        error("ERROR on binding listener socket");
+	return 1;
     }
+    int optval = 1;
+    if (setsockopt(lsock, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(int)) < 0) {
+      error("Cannot set TCP_NODELAY option on listen address");
+      return 1;
+    }
+
     listen(lsock,100);
 
     signal(SIGPIPE, signal_handler);  // catch pipe
@@ -800,7 +809,7 @@ void start_server() {
 	  }
 	  if (res < 0) {
 	    perror("select");
-	    return;
+	    return 1;
 	  }
 	  if (res > 0) {
 	    break;
@@ -808,7 +817,7 @@ void start_server() {
 	}
 	if (!websockify_loop) {
 	  fprintf(stderr, "Ending loop before accept\n");
-	  return;
+	  return 0;
 	}
 	csock = accept(lsock, 
 		       (struct sockaddr *) &cli_addr, 
@@ -866,5 +875,6 @@ void start_server() {
         handler_msg("websockify exit\n");
     }
 
+    return 0;
 }
 

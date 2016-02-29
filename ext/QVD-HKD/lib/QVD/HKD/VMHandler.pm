@@ -18,7 +18,7 @@ use QVD::HKD::Config::Network qw(netmask_len);
 
 use parent qw(QVD::HKD::Agent);
 
-my %hypervisor_class = map { $_ => __PACKAGE__ . '::' . uc $_ } qw(kvm lxc);
+my %hypervisor_class = map { $_ => __PACKAGE__ . '::' . uc $_ } qw(kvm lxc nothing);
 
 my $off = 0;
 sub _allocate_tcp_port {
@@ -353,7 +353,9 @@ sub _capture_fn {
     if ($self->_cfg("vm.$key.capture")) {
         my $path = $self->_cfg("path.$key.captures");
         if (-d $path or mkdir $path, 0700) {
-            my $ts = sprintf("%04d-%02d-%02d-%02d:%02d:%2d-GMT0", (gmtime)[5,4,3,2,1,0]);
+            my @t = gmtime;
+            my $ts = sprintf("%04d-%02d-%02d-%02d:%02d:%02d-GMT0",
+                             $t[5] + 1900, $t[4] + 1, @t[3,2,1,0]);
             $fn = "$path/$key-$self->{vm_id}-$ts.txt";
             DEBUG "Redirecting VM $self->{vm_id} $key I/O to '$fn'";
             return $fn;

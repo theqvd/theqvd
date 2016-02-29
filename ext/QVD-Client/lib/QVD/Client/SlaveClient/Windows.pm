@@ -84,9 +84,10 @@ sub handle_share {
     my ($fh, $tempfile) = tempfile(UNLINK => 1);
     $fh->autoflush(1);
     
-    my $logfile = $QVD::Client::App::user_dir . '/sftp-server.log';
+    my $logfile = File::Spec->join($QVD::Client::App::user_dir, 'sftp-server.log');
 	
     DEBUG "Starting $command_sftp_server to serve $path...\n";
+    DEBUG "Temp file: $tempfile, debug log: $logfile\n";
 
     # To debug sftp-server.exe under GDB:
     # my $command_gdb='c:/mingw/bin/gdb.exe';

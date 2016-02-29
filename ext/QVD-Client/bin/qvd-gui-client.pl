@@ -12,6 +12,8 @@ use Proc::Background;
 
 our ($WINDOWS, $DARWIN, $user_dir, $app_dir, $user_config_filename, $user_certs_dir, $pixmaps_dir);
 
+my $prev_bad_log_level;
+
 BEGIN {
     $WINDOWS = ($^O eq 'MSWin32');
     $DARWIN = ($^O eq 'darwin');
@@ -55,9 +57,21 @@ BEGIN {
         $app_dir = File::Spec->catdir( @dirs[0..$#dirs-1] ); 
     }
 
+	
+	if ( core_cfg('log.level') !~ /^(DEBUG|INFO|WARN|ERROR|FATAL|TRACE|ALL|OFF)$/ ) {
+		$prev_bad_log_level = core_cfg('log.level');
+
+		warn "Bad log.level '$prev_bad_log_level', changing to DEBUG";
+		set_core_cfg('log.level', 'DEBUG');
+	}
 }
 
 use QVD::Log;
+
+if ( $prev_bad_log_level ) {
+	WARN "Bad log.level in config file: '$prev_bad_log_level'";
+	WARN "Changed to " . core_cfg('log.level');
+}
 
 INFO "user_dir: $user_dir";
 INFO "app_dir: $app_dir";
@@ -83,15 +97,30 @@ sub OnInit {
     DEBUG("OnInit called");
 
     if ($WINDOWS or $DARWIN) {
-        unless( $ENV{DISPLAY} ) {
+        unless( $ENV{DISPLAY} || $ENV{QVD_PP_BUILD} ) {
             my @cmd;
             my $proc;
 
             if ($WINDOWS) {
+			    DEBUG "Running on Windows, detecting X server";
+				
                 $ENV{DISPLAY} = '127.0.0.1:0';
-                @cmd = ( File::Spec->rel2abs(core_cfg('command.windows.xming'), $app_dir),
-                         '-multiwindow', '-notrayicon', '-nowinkill', '-clipboard', '+bs', '-wm',
-                         '-logfile' => File::Spec->join($user_dir, "xserver.log") );
+				my $xming_bin = File::Spec->rel2abs(core_cfg('command.windows.xming'), $app_dir);
+				my $vcxsrv_bin = File::Spec->rel2abs(core_cfg('command.windows.vcxsrv'), $app_dir);
+				
+				if ( -f $xming_bin ) {
+				    DEBUG "Xming found at $xming_bin";
+					my @extra_args=split(/\s+/, core_cfg('client.xming.extra_args'));
+					
+					@cmd = ( $xming_bin, @extra_args, '-logfile' => File::Spec->join($user_dir, "xserver.log") );
+				} elsif ( -f $vcxsrv_bin ) {
+				    DEBUG "VcxSrv found at $vcxsrv_bin";
+					my @extra_args=split(/\s+/, core_cfg('client.vcxsrv.extra_args'));
+					
+				    @cmd = ( $vcxsrv_bin, @extra_args, '-logfile' => File::Spec->join($user_dir, "xserver.log") );
+				} else {
+				    die "X server not found! Tried '$xming_bin' and '$vcxsrv_bin'";
+				}
             }
             else { # DARWIN!
                 $ENV{DISPLAY} = ':0';
@@ -132,7 +161,11 @@ sub OnInit {
                 }
             }
         } else {
-                DEBUG("X11 server already running on display $ENV{DISPLAY}, using that.");
+			if (  $ENV{QVD_PP_BUILD} ) {
+				DEBUG("Running under a PP build, not starting X");
+			} else {
+				DEBUG("X11 server already running on display $ENV{DISPLAY}, using that.");
+			}
         }
     }
 
@@ -140,6 +173,11 @@ sub OnInit {
     my $frame = QVD::Client::Frame->new();
     $self->SetTopWindow($frame);
     $frame->Show();
+    if ($self->should_autoconnect()) {
+	INFO("Launching autoconnect");
+	$frame->OnClickConnect;
+    }
+
     return 1;
 };
 
@@ -157,10 +195,13 @@ SCRIPT
 
     close(OSA);
 }
+
+sub should_autoconnect {
+    core_cfg('client.auto_connect', 0);
+}
 package main;
+
 use QVD::Log;
-
-
 
 Wx::InitAllImageHandlers();
 my $app = QVD::Client::App->new();

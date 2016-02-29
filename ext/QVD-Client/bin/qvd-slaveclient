@@ -1,7 +1,27 @@
-#!/usr/lib/qvd/bin/perl
+#!/Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/perl 
+
+eval 'exec /Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
 
 use strict;
 use warnings;
+
+use File::Spec;
+
+my $WINDOWS;
+BEGIN {
+    $WINDOWS = ($^O eq 'MSWin32');
+
+    my $user_dir = File::Spec->rel2abs($WINDOWS
+                                    ? File::Spec->join($ENV{APPDATA}, 'QVD')
+                                    : File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
+    mkdir($user_dir);
+
+    my $user_config_filename = File::Spec->join($user_dir, 'client.conf');
+    $QVD::Config::USE_DB = 0;
+    @QVD::Config::Core::FILES = ( ($WINDOWS ? () : ('/etc/qvd/client.conf')),
+                                  $user_config_filename );
+}
 
 use QVD::Client::SlaveClient;
 use Getopt::Long;
@@ -20,6 +40,13 @@ $help = 1 unless $ret;
 my $cmd = shift @ARGV;
 my @args = @ARGV;
 
-my $c = QVD::Client::SlaveClient->new;
+my $c;
+if ($WINDOWS) {
+    require QVD::Client::SlaveClient::Windows;
+    $c = QVD::Client::SlaveClient::Windows->new($host.':'.$port);
+} else {
+    require QVD::Client::SlaveClient::Unix;
+    $c = QVD::Client::SlaveClient::Unix->new('slave.host' => $host, 'slave.port' => $port);
+}
 
 $c->dispatch($cmd, $help, @args);

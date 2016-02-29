@@ -766,9 +766,9 @@ VENDORMANVERSION = XVendorManVersionString
 #define ConnectionFlags -DSTREAMSCONN
 #else
 #if HasDECnet
-#define ConnectionFlags -DTCPCONN -DUNIXCONN -DDNETCONN
+#define ConnectionFlags -DTCPCONN -DDNETCONN
 #else
-#define ConnectionFlags -DTCPCONN -DUNIXCONN
+#define ConnectionFlags -DTCPCONN
 #endif
 #endif
 #endif

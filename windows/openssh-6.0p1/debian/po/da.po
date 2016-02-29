@@ -1,0 +1,161 @@
+# Danish translation openssh.
+# Copyright (C) 2010 openssh & nedenstående oversættere.
+# This file is distributed under the same license as the openssh package.
+# Claus Hindsgaul <claus.hindsgaul@gmail.com>, 2006.
+# Joe Hansen (joedalton2@yahoo.dk), 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: openssh\n"
+"Report-Msgid-Bugs-To: openssh@packages.debian.org\n"
+"POT-Creation-Date: 2010-01-02 08:55+0000\n"
+"PO-Revision-Date: 2010-08-12 17:30+01:00\n"
+"Last-Translator: Joe Hansen <joedalton2@yahoo.dk>\n"
+"Language-Team: Danish <debian-l10n-danish@lists.debian.org> \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: boolean
+#. Description
+#: ../openssh-server.templates:1001
+msgid "Do you want to risk killing active SSH sessions?"
+msgstr "Vil du risikere at afbryde aktive SSH-forbindelser?"
+
+#. Type: boolean
+#. Description
+#: ../openssh-server.templates:1001
+msgid ""
+"The currently installed version of /etc/init.d/ssh is likely to kill all "
+"running sshd instances. If you are doing this upgrade via an SSH session, "
+"you're likely to be disconnected and leave the upgrade procedure unfinished."
+msgstr ""
+"Den udgave af /etc/init.d/ssh, du har installeret, vil sandsynligvis afbryde "
+"alle sshd-instanser. Hvis du foretager denne opgradering via en SSH-session, "
+"vil du højst sandsynlig blive afbrudt og efterlade opgraderingsproceduren "
+"uafsluttet."
+
+#. Type: boolean
+#. Description
+#: ../openssh-server.templates:1001
+msgid ""
+"This can be fixed by manually adding \"--pidfile /var/run/sshd.pid\" to the "
+"start-stop-daemon line in the stop section of the file."
+msgstr ""
+"Du kan afhjælpe dette ved at tilføje »--pidfile /var/run/sshd.pid« til "
+"linjen start-stop-daemon i stop-afsnittet af filen."
+
+#. Type: note
+#. Description
+#: ../openssh-server.templates:2001
+msgid "New host key mandatory"
+msgstr "Ny værtsnøgle er krævet"
+
+#. Type: note
+#. Description
+#: ../openssh-server.templates:2001
+msgid ""
+"The current host key, in /etc/ssh/ssh_host_key, is encrypted with the IDEA "
+"algorithm. OpenSSH can not handle this host key file, and the ssh-keygen "
+"utility from the old (non-free) SSH installation does not appear to be "
+"available."
+msgstr ""
+"Den aktuelle værtsnøgle, i /etc/ssh/ssh_host_key, er krypteret med en IDEA-"
+"algoritme. OpenSSH kan ikke håndtere en sådan værtsnøglefil, og værktøjet "
+"ssh-keygen fra den gamle (ikke-frie, 'non-free') SSH-installation lader ikke "
+"til at være tilgængeligt."
+
+#. Type: note
+#. Description
+#: ../openssh-server.templates:2001
+msgid "You need to manually generate a new host key."
+msgstr "Du skal manuelt oprette en ny værtsnøgle."
+
+#. Type: boolean
+#. Description
+#: ../openssh-server.templates:3001
+msgid "Disable challenge-response authentication?"
+msgstr "Slå udfordrings-svar godkendelse fra?"
+
+#. Type: boolean
+#. Description
+#: ../openssh-server.templates:3001
+msgid ""
+"Password authentication appears to be disabled in the current OpenSSH server "
+"configuration. In order to prevent users from logging in using passwords "
+"(perhaps using only public key authentication instead) with recent versions "
+"of OpenSSH, you must disable challenge-response authentication, or else "
+"ensure that your PAM configuration does not allow Unix password file "
+"authentication."
+msgstr ""
+"Adgangskodegodkendelse ser ud til at være deaktiveret i din nuværende "
+"OpenSSH-serveropsætning. For at forhindre brugere i at logge ind med "
+"adgangskoder (måske kun med brug af offentlig nøglegodkendelse) med nyere "
+"versioner af OpenSSH, skal du deaktivere udfordrings-svar godkendelse, eller "
+"sikre at din PAM-opsætning ikke tillader godkendelse via Unixadgangskodefil."
+
+#. Type: boolean
+#. Description
+#: ../openssh-server.templates:3001
+msgid ""
+"If you disable challenge-response authentication, then users will not be "
+"able to log in using passwords. If you leave it enabled (the default "
+"answer), then the 'PasswordAuthentication no' option will have no useful "
+"effect unless you also adjust your PAM configuration in /etc/pam.d/ssh."
+msgstr ""
+"Hvis du deaktiverer udfordrings-svar godkendelse, vil brugere ikke være i "
+"stand til at logge ind med adgangskoder. Hvis du lader det være slået til "
+"(standardsvaret), så vil indstillingen 'PasswordAuthentication no' ikke have "
+"nogen effekt, medmindre du også redigerer din PAM-opsætning i /etc/pam.d/ssh."
+
+#. Type: note
+#. Description
+#: ../openssh-server.templates:4001
+msgid "Vulnerable host keys will be regenerated"
+msgstr "Sårbare værtsnøgler vil blive oprettet"
+
+#. Type: note
+#. Description
+#: ../openssh-server.templates:4001
+msgid ""
+"Some of the OpenSSH server host keys on this system were generated with a "
+"version of OpenSSL that had a broken random number generator. As a result, "
+"these host keys are from a well-known set, are subject to brute-force "
+"attacks, and must be regenerated."
+msgstr ""
+"Nogle af OpenSSh-serverens værtsnøgler på dette system blev oprettet med en "
+"version af OpenSSL, som havde en ødelagt tilfældighedstalgenerator. Derfor "
+"er disse værtsnøgler fra et velkendt sæt, der er sårbare over for brutale "
+"(brute-force) angreb og skal derfor genskabes."
+
+#. Type: note
+#. Description
+#: ../openssh-server.templates:4001
+msgid ""
+"Users of this system should be informed of this change, as they will be "
+"prompted about the host key change the next time they log in. Use 'ssh-"
+"keygen -l -f HOST_KEY_FILE' after the upgrade to print the fingerprints of "
+"the new host keys."
+msgstr ""
+"Brugere af dette system bør informeres om denne ændring, da de vil blive "
+"spurgt om værtsnøgleændringen den næste gang de logger ind. Brug 'ssh-keygen "
+"-l -f HOST_KEY_FILE' efter opgraderingen for at udskrive fingeraftryk på de "
+"nye værtsnøgler."
+
+#. Type: note
+#. Description
+#: ../openssh-server.templates:4001
+msgid "The affected host keys are:"
+msgstr "De påvirkede værtsnøgler er:"
+
+#. Type: note
+#. Description
+#: ../openssh-server.templates:4001
+msgid ""
+"User keys may also be affected by this problem. The 'ssh-vulnkey' command "
+"may be used as a partial test for this. See /usr/share/doc/openssh-server/"
+"README.compromised-keys.gz for more details."
+msgstr ""
+"Brugernøgler kan måske også være påvirket af dette problem. Kommandoen 'ssh-"
+"vulnkey' kan bruges som en delvis test vedrørende dette. Se /usr/share/doc/"
+"openssh-server/README.compromised-keys.gz for yderligere detaljer."

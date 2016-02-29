@@ -37,15 +37,16 @@ void help(const char *program)
 	 "  %s : Specifies the password, if not specified with -w\n"
 	 "  %s : Enables debugging, can also be enabled with -d\n"
 	 "  %s : Enables the file were debugging should go to\n"
+	 "  http_proxy/https_proxy: Optional variables to use for proxy settings\n"
+         "       See http://curl.haxx.se/docs/manpage.html for more information\n"
 	 "  DISPLAY : Needed to be correctly setup. In some environments you might need to run one of the following:\n"
 	 "            export DISPLAY=localhost:0; xhost + localhost\n"
 	 "            xhost +si:localuser:$LOGNAME\n"
-	 "\nChangelog:\n%s\n", 
+	 "\nChangelog:\n%s\n",
 	 program, QVDHOST_ENV, QVDLOGIN_ENV, QVDPASSWORD_ENV,
 	 QVDHOST_ENV, QVDLOGIN_ENV, QVDPASSWORD_ENV, DEBUG_FLAG_ENV_VAR_NAME, DEBUG_FILE_ENV_VAR_NAME,
 	 QVDCHANGELOG
 	 );
-  printf("  -r : If there's a running session, restart it\n");
 }
 
 int parse_params(int argc, char **argv, const char **host, int *port, const char **user, const char **pass, const char **geometry, int *fullscreen, int *only_list_of_vm, int *one_vm, int *no_cert_check, int *restart_session, const char **nx_options, const char **client_cert, const char **client_key, int *twice)
@@ -58,7 +59,7 @@ int parse_params(int argc, char **argv, const char **host, int *port, const char
   *user = getenv(QVDLOGIN_ENV);
   *pass = getenv(QVDPASSWORD_ENV);
 
-  while ((opt = getopt(argc, argv, "?dvh:p:u:w:g:flonx:c:k:2")) != -1 )
+  while ((opt = getopt(argc, argv, "?dvrh:p:u:w:g:flonx:c:k:2")) != -1 )
     {
       switch (opt)
 	{
@@ -75,7 +76,7 @@ int parse_params(int argc, char **argv, const char **host, int *port, const char
 	  *host = optarg;
 	  break;
 	case 'p':
-	  errno = 0;	  
+	  errno = 0;
 	  *port = (int) strtol(optarg, &endptr, 10);
 	  if ((errno == ERANGE && (*port == LONG_MAX || *port == LONG_MIN))
 	      || optarg == endptr)
@@ -167,10 +168,10 @@ int parse_params(int argc, char **argv, const char **host, int *port, const char
 	  if (access(*client_cert, R_OK) != 0)
 	    {
 	      fprintf(stderr, "Cert file %s is not accessible: %s\n", *client_cert, strerror(errno));
-	      error = 1;	      
+	      error = 1;
 	    }
 	}
-      
+
       if (*client_key == NULL)
 	{
 	  fprintf(stderr, "If you specify -c then you must specify also -k\n");
@@ -181,7 +182,7 @@ int parse_params(int argc, char **argv, const char **host, int *port, const char
 	  if (access(*client_key, R_OK) != 0)
 	    {
 	      fprintf(stderr, "key file %s is not accessible: %s\n", *client_key, strerror(errno));
-	      error = 1;	      
+	      error = 1;
 	    }
 	}
     }
@@ -199,10 +200,10 @@ int accept_unknown_cert_callback(qvdclient *qvd, const char *cert_pem_str, const
   int result;
   printf("Unknown cert:\n%s\n\nDo you want to accept it? ", cert_pem_str);
   scanf("%20s", answer);
-  result = (strncmp(answer, "y", YES_NO_SIZE) == 0  || 
-	    strncmp(answer, "yes", YES_NO_SIZE) == 0  || 
-	    strncmp(answer, "Y", YES_NO_SIZE) == 0  || 
-	    strncmp(answer, "Yes", YES_NO_SIZE) == 0  || 
+  result = (strncmp(answer, "y", YES_NO_SIZE) == 0  ||
+	    strncmp(answer, "yes", YES_NO_SIZE) == 0  ||
+	    strncmp(answer, "Y", YES_NO_SIZE) == 0  ||
+	    strncmp(answer, "Yes", YES_NO_SIZE) == 0  ||
 	    strncmp(answer, "YES", YES_NO_SIZE) == 0);
   return result;
 }
@@ -213,7 +214,7 @@ void print_vmids(vmlist *vm)
   vmlist *ptr;
   printf("List of vms:\n");
   for (ptr=vm; ptr != NULL; ptr = ptr->next)
-    printf("VM ID:%d NAME:%s STATE:%s BLOCKED:%d\n", 
+    printf("VM ID:%d NAME:%s STATE:%s BLOCKED:%d\n",
 	   ptr->data->id, ptr->data->name, ptr->data->state, ptr->data->blocked);
 }
 int choose_vmid(vmlist *vm)
@@ -230,7 +231,7 @@ int choose_vmid(vmlist *vm)
       for (ptr=vm; ptr != NULL; ptr = ptr->next)
 	if (ptr->data->id == vm_id)
 	  {
-	    printf("You have chosen VM ID:%d NAME:%s STATE:%s BLOCKED:%d\n", 
+	    printf("You have chosen VM ID:%d NAME:%s STATE:%s BLOCKED:%d\n",
 		   ptr->data->id, ptr->data->name, ptr->data->state, ptr->data->blocked);
 	    return vm_id;
 	  }
@@ -334,10 +335,8 @@ int main(int argc, char *argv[], char *envp[]) {
 
   result = qvd_connection(host, port, user, pass, geometry, fullscreen, only_list_of_vm, one_vm, no_cert_check, restart_session, nx_options, cert_file, key_file);
   if (twice) {
-    qvdclient *q2 = qvd_init(host, port, user, pass);
     printf("Two connections requested. Result of first connection was %d\n", result);
-    sleep(10);
-    result = qvd_connection("89.140.90.39", port, user, pass, geometry, fullscreen, only_list_of_vm, one_vm, no_cert_check, restart_session, nx_options, cert_file, key_file);
+    result = qvd_connection(host, port, user, pass, geometry, fullscreen, only_list_of_vm, one_vm, no_cert_check, restart_session, nx_options, cert_file, key_file);
   }
 
   return result;

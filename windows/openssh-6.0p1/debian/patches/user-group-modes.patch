@@ -1,0 +1,202 @@
+Description: Allow harmless group-writability
+ Allow secure files (~/.ssh/config, ~/.ssh/authorized_keys, etc.) to be
+ group-writable, provided that the group in question contains only the
+ file's owner.  Rejected upstream for IMO incorrect reasons (e.g. a
+ misunderstanding about the contents of gr->gr_mem).  Given that
+ per-user groups and umask 002 are the default setup in Debian (for good
+ reasons - this makes operating in setgid directories with other groups
+ much easier), we need to permit this by default.
+Author: Colin Watson <cjwatson@debian.org>
+Bug: https://bugzilla.mindrot.org/show_bug.cgi?id=1060
+Bug-Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=314347
+Last-Update: 2010-02-27
+
+Index: b/readconf.c
+===================================================================
+--- a/readconf.c
++++ b/readconf.c
+@@ -30,6 +30,8 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <pwd.h>
++#include <grp.h>
+ 
+ #include "xmalloc.h"
+ #include "ssh.h"
+@@ -1132,8 +1134,7 @@
+ 
+ 		if (fstat(fileno(f), &sb) == -1)
+ 			fatal("fstat %s: %s", filename, strerror(errno));
+-		if (((sb.st_uid != 0 && sb.st_uid != getuid()) ||
+-		    (sb.st_mode & 022) != 0))
++		if (!secure_permissions(&sb, getuid()))
+ 			fatal("Bad owner or permissions on %s", filename);
+ 	}
+ 
+Index: b/ssh.1
+===================================================================
+--- a/ssh.1
++++ b/ssh.1
+@@ -1312,6 +1312,8 @@
+ .Xr ssh_config 5 .
+ Because of the potential for abuse, this file must have strict permissions:
+ read/write for the user, and not accessible by others.
++It may be group-writable provided that the group in question contains only
++the user.
+ .Pp
+ .It Pa ~/.ssh/environment
+ Contains additional definitions for environment variables; see
+Index: b/ssh_config.5
+===================================================================
+--- a/ssh_config.5
++++ b/ssh_config.5
+@@ -1343,6 +1343,8 @@
+ This file is used by the SSH client.
+ Because of the potential for abuse, this file must have strict permissions:
+ read/write for the user, and not accessible by others.
++It may be group-writable provided that the group in question contains only
++the user.
+ .It Pa /etc/ssh/ssh_config
+ Systemwide configuration file.
+ This file provides defaults for those
+Index: b/auth.c
+===================================================================
+--- a/auth.c
++++ b/auth.c
+@@ -380,8 +380,7 @@
+ 		user_hostfile = tilde_expand_filename(userfile, pw->pw_uid);
+ 		if (options.strict_modes &&
+ 		    (stat(user_hostfile, &st) == 0) &&
+-		    ((st.st_uid != 0 && st.st_uid != pw->pw_uid) ||
+-		    (st.st_mode & 022) != 0)) {
++		    !secure_permissions(&st, pw->pw_uid)) {
+ 			logit("Authentication refused for %.100s: "
+ 			    "bad owner or modes for %.200s",
+ 			    pw->pw_name, user_hostfile);
+@@ -442,8 +441,7 @@
+ 
+ 	/* check the open file to avoid races */
+ 	if (fstat(fileno(f), &st) < 0 ||
+-	    (st.st_uid != 0 && st.st_uid != uid) ||
+-	    (st.st_mode & 022) != 0) {
++	    !secure_permissions(&st, uid)) {
+ 		snprintf(err, errlen, "bad ownership or modes for file %s",
+ 		    buf);
+ 		return -1;
+@@ -458,8 +456,7 @@
+ 		strlcpy(buf, cp, sizeof(buf));
+ 
+ 		if (stat(buf, &st) < 0 ||
+-		    (st.st_uid != 0 && st.st_uid != uid) ||
+-		    (st.st_mode & 022) != 0) {
++		    !secure_permissions(&st, uid)) {
+ 			snprintf(err, errlen,
+ 			    "bad ownership or modes for directory %s", buf);
+ 			return -1;
+Index: b/misc.c
+===================================================================
+--- a/misc.c
++++ b/misc.c
+@@ -48,8 +48,9 @@
+ #include <netdb.h>
+ #ifdef HAVE_PATHS_H
+ # include <paths.h>
+-#include <pwd.h>
+ #endif
++#include <pwd.h>
++#include <grp.h>
+ #ifdef SSH_TUN_OPENBSD
+ #include <net/if.h>
+ #endif
+@@ -642,6 +643,55 @@
+ }
+ 
+ int
++secure_permissions(struct stat *st, uid_t uid)
++{
++	if (st->st_uid != 0 && st->st_uid != uid)
++		return 0;
++	if ((st->st_mode & 002) != 0)
++		return 0;
++	if ((st->st_mode & 020) != 0) {
++		/* If the file is group-writable, the group in question must
++		 * have exactly one member, namely the file's owner.
++		 * (Zero-member groups are typically used by setgid
++		 * binaries, and are unlikely to be suitable.)
++		 */
++		struct passwd *pw;
++		struct group *gr;
++		int members = 0;
++
++		gr = getgrgid(st->st_gid);
++		if (!gr)
++			return 0;
++
++		/* Check primary group memberships. */
++		while ((pw = getpwent()) != NULL) {
++			if (pw->pw_gid == gr->gr_gid) {
++				++members;
++				if (pw->pw_uid != uid)
++					return 0;
++			}
++		}
++		endpwent();
++
++		pw = getpwuid(st->st_uid);
++		if (!pw)
++			return 0;
++
++		/* Check supplementary group memberships. */
++		if (gr->gr_mem[0]) {
++			++members;
++			if (strcmp(pw->pw_name, gr->gr_mem[0]) ||
++			    gr->gr_mem[1])
++				return 0;
++		}
++
++		if (!members)
++			return 0;
++	}
++	return 1;
++}
++
++int
+ tun_open(int tun, int mode)
+ {
+ #if defined(CUSTOM_SYS_TUN_OPEN)
+Index: b/misc.h
+===================================================================
+--- a/misc.h
++++ b/misc.h
+@@ -103,4 +103,6 @@
+ int	 ask_permission(const char *, ...) __attribute__((format(printf, 1, 2)));
+ int	 read_keyfile_line(FILE *, const char *, char *, size_t, u_long *);
+ 
++int	 secure_permissions(struct stat *st, uid_t uid);
++
+ #endif /* _MISC_H */
+Index: b/auth-rhosts.c
+===================================================================
+--- a/auth-rhosts.c
++++ b/auth-rhosts.c
+@@ -256,8 +256,7 @@
+ 		return 0;
+ 	}
+ 	if (options.strict_modes &&
+-	    ((st.st_uid != 0 && st.st_uid != pw->pw_uid) ||
+-	    (st.st_mode & 022) != 0)) {
++	    !secure_permissions(&st, pw->pw_uid)) {
+ 		logit("Rhosts authentication refused for %.100s: "
+ 		    "bad ownership or modes for home directory.", pw->pw_name);
+ 		auth_debug_add("Rhosts authentication refused for %.100s: "
+@@ -283,8 +282,7 @@
+ 		 * allowing access to their account by anyone.
+ 		 */
+ 		if (options.strict_modes &&
+-		    ((st.st_uid != 0 && st.st_uid != pw->pw_uid) ||
+-		    (st.st_mode & 022) != 0)) {
++		    !secure_permissions(&st, pw->pw_uid)) {
+ 			logit("Rhosts authentication refused for %.100s: bad modes for %.200s",
+ 			    pw->pw_name, buf);
+ 			auth_debug_add("Bad file modes for %.200s", buf);

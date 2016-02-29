@@ -11,8 +11,10 @@
 #include <errno.h>
 #include <limits.h>
 #include <getopt.h>
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <netdb.h>
 #include <sys/select.h>
 #include <fcntl.h>
@@ -59,7 +61,7 @@ void do_proxy(ws_ctx_t *ws_ctx, int target) {
     unsigned int tin_start, tin_end;
     ssize_t len, bytes;
 
-    tout_start = tout_end = cout_start = cout_end;
+    tout_start = tout_end = cout_start = cout_end = 0;
     tin_start = tin_end = 0;
     maxfd = client > target ? client+1 : target+1;
 
@@ -111,11 +113,14 @@ void do_proxy(ws_ctx_t *ws_ctx, int target) {
 
         if (FD_ISSET(target, &wlist)) {
             len = tout_end-tout_start;
+	    void *buf_ptr=ws_ctx->tout_buf + tout_start;
             bytes = send(target, ws_ctx->tout_buf + tout_start, len, 0);
             if (pipe_error) { break; }
             if (bytes < 0) {
-                handler_emsg("target connection error: %s\n",
-                             strerror(errno));
+                handler_emsg("target connection error (fd=%d) err=%d: %s."
+			     "buf=%p, len=%ld, tout_end=%ud, tout_start=%ud\n",
+                             target, errno, strerror(errno),
+			     buf_ptr, len, tout_end, tout_start);
                 break;
             }
             tout_start += bytes;
@@ -248,6 +253,13 @@ void proxy_handler(ws_ctx_t *ws_ctx) {
     taddr.sin_family = AF_INET;
     taddr.sin_port = htons(target_port);
 
+    int optval = 1;
+    if (setsockopt(tsock, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(int)) < 0) {
+      handler_emsg("Cannot set TCP_NODELAY option on target socket %s\n",
+		    strerror(errno));
+      return;
+    }
+
     /* Resolve target address */
     if (resolve_host(&taddr.sin_addr, target_host) < -1) {
         handler_emsg("Could not resolve target address: %s\n",
@@ -289,9 +301,15 @@ int websockify(int verbose, const char *listen_host, int listen_port, const char
 
   websockify_loop = 1;
   // Allow only one simultaneous connection
+  int result;
   while (websockify_loop) {
-    start_server();
+    result = start_server();
+    if (result) {
+      handler_emsg("Error in start_server\n");
+      break;
+    }
   }
+  return result;
 }
 
 void websockify_stop() {

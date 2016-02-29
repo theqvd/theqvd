@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/xvncproitem" android:title="@string/xvncpro"></item>
+    <item android:id="@+id/helpitem" android:title="@string/help"></item>
+    <item android:id="@+id/aboutitem" android:title="@string/about"></item>
+    <item android:id="@+id/changelogitem" android:title="@string/changelogtitle"></item>
+    <item android:id="@+id/exititem" android:title="@string/exit"></item>
+</menu><!-- From: file:/home/juanan/temp/AS-migration/qvdclient/qvdclient/src/main/res/menu/qvdclient.xml -->

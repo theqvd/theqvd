@@ -1,0 +1,32 @@
+#! /bin/sh
+# Attempt to tighten libssl dependencies to match the check in entropy.c.
+# Must be run after dpkg-shlibdeps.
+
+client=debian/openssh-client.substvars
+server=debian/openssh-server.substvars
+
+libssl_version="$(dpkg-query -W libssl-dev 2>/dev/null | cut -f2)"
+if [ -z "$libssl_version" ]; then
+	echo "Can't find libssl-dev version; leaving dependencies alone."
+	exit 0
+fi
+libssl_version="$(echo "$libssl_version" | sed 's/[a-z-].*//')"
+
+libssl_package="$(sed -n 's/.*[= ]\(libssl[0-9][a-z0-9+.-]*\).*/\1/p' "$client")"
+if [ "$libssl_package" ]; then
+	new_dep="$libssl_package (>= $libssl_version)"
+	sed -i "/^shlibs:Depends=/s/\$/, $new_dep/" "$client"
+	sed -i "/^shlibs:Depends=/s/\$/, $new_dep/" "$server"
+fi
+
+client_udeb=debian/openssh-client-udeb.substvars
+server_udeb=debian/openssh-server-udeb.substvars
+
+libcrypto_package="$(sed -n 's/.*[= ]\(libcrypto[0-9][a-z0-9+.-]*\).*/\1/p' "$client_udeb")"
+if [ "$libcrypto_package" ]; then
+	new_dep="$libcrypto_package (>= $libssl_version)"
+	sed -i "/^shlibs:Depends=/s/\$/, $new_dep/" "$client_udeb"
+	sed -i "/^shlibs:Depends=/s/\$/, $new_dep/" "$server_udeb"
+fi
+
+exit 0

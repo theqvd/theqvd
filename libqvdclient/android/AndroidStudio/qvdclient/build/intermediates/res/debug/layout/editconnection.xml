@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <TextView
+            android:layout_width="75dip"
+            android:paddingLeft="5dip"
+            android:gravity="left|top"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_height="wrap_content"
+            android:text="@string/name_text" /> 
+        <EditText
+            android:id="@+id/editconnectionname"
+            android:layout_width="150dip"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:inputType="text"
+            android:hint="@string/name_text" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <TextView
+            android:layout_width="75dip"
+            android:paddingLeft="5dip"
+            android:gravity="left|top"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_height="wrap_content"
+            android:text="@string/username_text" />
+        <EditText
+            android:id="@+id/editlogin"
+            android:layout_width="150dip"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:inputType="text"
+            android:hint="@string/username_text" />
+        <ImageView
+            android:id="@+id/imageLogo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="20dip"
+            android:contentDescription="@string/icon_text"
+            android:src="@drawable/icon" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/passwordLine"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <TextView
+            android:layout_width="75dip"
+            android:paddingLeft="5dip"
+            android:gravity="left|top"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_height="wrap_content"
+            android:text="@string/password_text"/>
+        <EditText
+            android:id="@+id/editpassword"
+            android:layout_width="150dip"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:inputType="textPassword"
+            android:hint="@string/password_text" />
+
+        <ToggleButton
+            android:id="@+id/googleauth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/usegoogleauth_text"
+            android:paddingLeft="20dip"
+            android:textOn="@string/usegoogleauth_text" android:textOff="@string/usegoogleauth_text" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <TextView
+            android:layout_width="75dip"
+            android:paddingLeft="5dip"
+            android:gravity="left|top"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_height="wrap_content"
+            android:text="@string/remotehost_text" />
+        <EditText
+            android:id="@+id/edithost"
+            android:layout_height="wrap_content"
+            android:layout_width="150dip"
+            android:inputType="text"
+            android:hint="@string/remotehost_text" />
+        <EditText
+            android:id="@+id/port"
+            android:layout_height="wrap_content"
+            android:layout_width="100dip"
+            android:paddingLeft="20dip"
+            android:hint="@string/remoteport_text"
+            android:text="@string/defaultremoteport"
+            android:digits="0123456789" android:inputType="number" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <TextView
+            android:layout_width="75dip"
+            android:paddingLeft="5dip"
+            android:gravity="left|top"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_height="wrap_content"
+            android:text="@string/geometry_text" />
+        <EditText
+            android:id="@+id/width"
+            android:layout_height="wrap_content"
+            android:layout_width="74dip"
+            android:hint="@string/width_text"
+            android:digits="0123456789" android:inputType="number" />
+        <EditText
+            android:id="@+id/height"
+            android:layout_height="wrap_content"
+            android:layout_width="74dip"
+            android:paddingLeft="8dip"
+            android:hint="@string/height_text"
+            android:digits="0123456789" android:inputType="number" />
+        <ToggleButton
+            android:id="@+id/nofullscreenButton"
+            android:layout_width="100dip"
+            android:layout_height="wrap_content"
+            android:paddingLeft="20dip"
+            android:layout_gravity="center_vertical"
+            android:text="@string/fullscreen_text"
+            android:textOn="@string/fullscreenon" android:textOff="@string/fullscreenoff" />
+    </LinearLayout>
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="75dip"
+            android:paddingLeft="5dip"
+            android:gravity="left|top"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_height="wrap_content"
+            android:text="@string/link_text" />
+         <Spinner
+            android:id="@+id/link_spinner"
+            android:layout_width="150dip"
+            android:layout_height="wrap_content" />
+
+         <ToggleButton
+             android:id="@+id/toggleDebugButton"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="@string/debugButton"
+             android:textOff="@string/debugOff"
+             android:textOn="@string/debugOn"
+             android:layout_gravity="center_vertical" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <TextView
+            android:layout_width="75dip"
+            android:paddingLeft="5dip"
+            android:gravity="left|top"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_height="wrap_content"
+            android:text="@string/keyboardlayout_text" />
+        <EditText
+            android:id="@+id/keyboard"
+            android:layout_height="wrap_content"
+            android:layout_width="150dip"
+            android:inputType="text"
+            android:hint="@string/keyboardlayout_text"
+            android:text="@string/defaultkeyboardlayout" />
+    </LinearLayout>
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="75dip"
+            android:paddingLeft="5dip"
+            android:gravity="left|top"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_height="wrap_content"
+            android:text="@string/localxserver" />
+        <ToggleButton
+            android:id="@+id/nolocalxButton"
+            android:layout_width="150dip"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/local"
+            android:textOn="@string/generic" android:textOff="@string/local" />        
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <TextView
+            android:layout_width="75dip"
+            android:paddingLeft="5dip"
+            android:gravity="left|top"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_height="wrap_content"
+            android:text="@string/certfile_text" />
+        <EditText
+            android:id="@+id/certfile"
+            android:layout_height="wrap_content"
+            android:layout_width="150dip"
+            android:inputType="text"
+            android:hint="@string/certfile_text"
+            android:text="" />
+        <Button
+            android:id="@+id/pickclientcert"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/pickfile" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <TextView
+            android:layout_width="75dip"
+            android:paddingLeft="5dip"
+            android:gravity="left|top"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_height="wrap_content"
+            android:text="@string/keyfile_text" />
+        <EditText
+            android:id="@+id/keyfile"
+            android:layout_height="wrap_content"
+            android:layout_width="150dip"
+            android:inputType="text"
+            android:hint="@string/keyfile_text"
+            android:text="" />
+        <Button
+            android:id="@+id/pickclientkey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/pickfile" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <TextView
+            android:layout_width="75dip"
+            android:paddingLeft="5dip"
+            android:gravity="left|top"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_height="wrap_content"
+            android:text="" />
+
+        <ToggleButton
+            android:id="@+id/useClientCertButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/noClientCerts"
+            android:textOff="@string/noClientCerts"
+            android:textOn="@string/useClientCerts" />
+ 
+    </LinearLayout>
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+        <TextView
+           android:layout_width="75dip"
+           android:layout_height="fill_parent"/>
+        <Button android:text="@string/save"
+            android:id="@+id/saveButton"
+            android:layout_width="85dip"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_height="fill_parent"/>
+        <Button android:text="@string/cancel"
+            android:id="@+id/editCancelButton"
+            android:layout_width="65dip"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_height="fill_parent" />
+
+        <Button
+            android:id="@+id/editHelpButton"
+            android:layout_width="50dip"
+            android:layout_height="fill_parent"
+            android:paddingLeft="10dip"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/help" />
+
+    </LinearLayout>
+</LinearLayout>
+</ScrollView><!-- From: file:/home/juanan/temp/AS-migration/qvdclient/qvdclient/src/main/res/layout/editconnection.xml -->

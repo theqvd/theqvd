@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- From: file:/home/juanan/temp/AS-migration/qvdclient/qvdclient/src/main/res/values-v14/themes.xml -->
+    <eat-comment/>
+    <style name="QvdTheme" parent="@android:style/Theme.DeviceDefault.Light"/>
+</resources>

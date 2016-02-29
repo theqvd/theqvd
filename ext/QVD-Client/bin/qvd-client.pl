@@ -32,6 +32,7 @@ use strict;
 use warnings;
 
 use Proc::Background; 
+use Getopt::Long;
 use JSON;
 
 BEGIN {
@@ -60,15 +61,11 @@ BEGIN {
 use QVD::Client::Proxy;
 use QVD::Log;
 
-my $username = shift @ARGV;
-my $password = shift @ARGV;
-my $host = shift @ARGV;
-my $port = shift @ARGV // core_cfg('client.host.port');
-my $file = shift;
+GetOptions \my %opts, '--username=s', '--password=s', '--host=s', '--port=s', '--file=s', '--ssl!', '--vm-id=s' or die "getopt";
+$opts{'port'} //= core_cfg('client.host.port');
+$opts{'ssl'} //= 0;
+my $file = delete $opts{'file'};
 my $nonblocking=1;
-
-# FIXME: do not use a heuristic but some command line flag for that
-my $ssl = ($port =~ /43$/ ? 1 : undef);
 
 my %connect_info = (
     link          => core_cfg('client.link'),
@@ -80,16 +77,12 @@ my %connect_info = (
     fullscreen    => core_cfg('client.fullscreen'),
     keyboard      => 'pc105/es',
     kill_vm       => 0,
-    port          => $port,
-    ssl           => $ssl,
-    host          => $host,
-    username      => $username,
-    password      => $password,
+    %opts,
 );
 
 $connect_info{file} = $file if defined $file;
 
-my $delegate = QVD::Client::CLI->new(file => $file);
+my $delegate = QVD::Client::CLI->new(file => $file, vm_id => $opts{'vm-id'});
 
 my $proxy = QVD::Client::Proxy->new($delegate, %connect_info);
 my $err_count = 0;
@@ -135,6 +128,7 @@ sub proxy_unknown_cert {
 sub proxy_list_of_vm_loaded {
     my ($self, $vm_data) = @_;
     if (@$vm_data > 0) {
+        return $self->{'vm_id'} if defined $self->{'vm_id'};
         #print "You have ".@$vm_data." virtual machines.\n";
         my $vm = $vm_data->[rand @$vm_data];
         INFO "Connecting to VM called ".$vm->{name}."\n";

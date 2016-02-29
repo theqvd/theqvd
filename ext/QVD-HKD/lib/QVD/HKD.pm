@@ -73,6 +73,7 @@ use Class::StateMachine::Declarative
                                                                 loading_host_row      => { enter => '_load_host_row' },
                                                                 checking_net_ports    => { enter => '_check_net_ports' },
                                                                 checking_address      => { enter => '_check_address' },
+                                                                checking_bridge_fw    => { enter => '_check_bridge_fw' },
                                                                 checking_cgroups      => { enter => '_check_cgroups' } ] },
 
                                        setup => { transitions => { _on_error => 'stopping',
@@ -84,8 +85,9 @@ use Class::StateMachine::Declarative
                                                                  saving_loadbal_data   => { enter => '_save_loadbal_data' },
                                                                  ticking               => { enter => '_start_ticker',
                                                                                             on => { _on_db_ticked => '_on_done' } },
-                                                                 searching_zombies     => { enter => '_search_zombies' },
-                                                                 catching_zombies      => { enter => '_catch_zombies',
+                                                                 cleaningup_zombie_l7rs=> { enter => '_cleanup_zombie_l7rs' },
+                                                                 searching_zombie_vms  => { enter => '_search_zombie_vms' },
+                                                                 catching_zombie_vms   => { enter => '_catch_zombie_vms',
                                                                                             on => { _on_no_vms_are_running => '_on_done' } },
                                                                  agents                => { enter => '_start_agents' } ] } ] },
 
@@ -346,6 +348,7 @@ sub _load_host_row {
 
 sub _check_address {
     my $self = shift;
+    DEBUG "checking the node has configured IP $self->{address}";
     my $address_q = quotemeta $self->{address};
     my $ifaces = `ip -f inet addr show`;
     unless ($ifaces =~ /inet $address_q\b/) {
@@ -365,6 +368,26 @@ sub _check_address {
     $self->_on_done;
 }
 
+sub _check_bridge_fw {
+    my $self = shift;
+    if ($self->_cfg('internal.vm.network.firewall.enable')) {
+        DEBUG "checking kernel module br_netfilter is loaded and working";
+        for my $i (0, 1) {
+            my $out = `sysctl net.bridge.bridge-nf-call-iptables 2>&1`;
+            $out =~ /\s*=\s*\d+$/ and last;
+
+            if ($i) {
+                ERROR "br_netfilter module is not loaded";
+                return $self->_on_error;
+            }
+
+            system modprobe => 'br_netfilter';
+        }
+    }
+
+    $self->_on_done;
+}
+
 sub _check_cgroups {
     my $self = shift;
 
@@ -377,7 +400,8 @@ sub _check_cgroups {
     while (@parts) {
         my $dir = File::Spec->join(@parts);
         if (defined(my $mie = $mi->at($dir))) {
-            if ($mie->fs_type eq 'cgroup') {
+            my $fs_type = $mie->fs_type;
+            if ($fs_type eq 'cgroup' or $fs_type eq 'fuse.lxcfs') {
                 INFO "cgroup found at $dir";
                 return $self->_on_done;
             }
@@ -558,7 +582,8 @@ sub _on_l7r_connection {
     my $l7r = QVD::HKD::L7R->new(config => $self->{config},
                                  db => $self->{db},
                                  node_id => $self->{node_id},
-                                 on_stopped => weak_method_callback($self, '_on_l7r_stopped'));
+                                 on_stopped => weak_method_callback($self, '_on_l7r_stopped')) or
+              die "Couldn't create new L7R object";
     if (my $pid = $l7r->run($fh)) {
         INFO "New L7R process started, PID: $pid";
         $self->{l7r}{$pid} = $l7r;
@@ -726,18 +751,32 @@ sub _kill_all_vms {
     $self->_call_after($self->_cfg("internal.hkd.killing.vms.retry.timeout"), '_kill_all_vms');
 }
 
-sub _search_zombies {
+sub _cleanup_zombie_l7rs {
+    # FIXME: is that enough? should we try to actually kill the process?
     my $self = shift;
-    $self->_query( { save_to => 'zombies',
+    $self->_query( { log_error => 'unable to clean up old l7r connections' },
+                   <<'EOQ', $self->{node_id});
+update vm_runtimes
+   set user_cmd = NULL,
+       l7r_host_id = NULL,
+       l7r_pid = NULL,
+       user_state = 'disconnected'
+   where l7r_host_id = $1
+EOQ
+}
+
+sub _search_zombie_vms {
+    my $self = shift;
+    $self->_query( { save_to => 'zombie_vms',
                      log_error => 'unable to retrieve list of zombie vms from table vm_runtimes' },
                    q(select vm_id from vm_runtimes where host_id=$1 and vm_state != 'stopped'), $self->{node_id});
 }
 
-sub _catch_zombies {
+sub _catch_zombie_vms {
     my $self = shift;
-    my $zombies = delete $self->{zombies};
-    if (@$zombies) {
-        for my $row (@$zombies) {
+    my $zombie_vms = delete $self->{zombie_vms};
+    if (@$zombie_vms) {
+        for my $row (@$zombie_vms) {
             my $vm = $self->_new_vm_handler($row->{vm_id});
             $vm->on_cmd('catch_zombie');
         }
@@ -882,7 +921,7 @@ This module implements the main agent for the HKD daemon.
 
 =head1 AUTHOR
 
-Salvador Fandiño, David Serrano.
+Salvador Fandino, David Serrano.
 
 =head1 COPYRIGHT AND LICENSE
 

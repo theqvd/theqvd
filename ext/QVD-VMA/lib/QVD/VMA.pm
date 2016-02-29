@@ -74,49 +74,49 @@ my $user_shell = cfg('vma.user.shell');
 my $home_partition = $home_drive . '1';
 
 my %on_action =       ( pre_connect    => cfg('vma.on_action.pre-connect'),
-			connect        => cfg('vma.on_action.connect'),
-			stop           => cfg('vma.on_action.stop'),
-			suspend        => cfg('vma.on_action.suspend'),
-			poweroff       => cfg('vma.on_action.poweroff'),
+                        connect        => cfg('vma.on_action.connect'),
+                        stop           => cfg('vma.on_action.stop'),
+                        suspend        => cfg('vma.on_action.suspend'),
+                        poweroff       => cfg('vma.on_action.poweroff'),
                         expire         => cfg('vma.on_action.expire') );
 
 my %on_state =        ( connected      => cfg('vma.on_state.connected'),
-			suspended      => cfg('vma.on_state.suspended'),
-			stopped        => cfg('vma.on_state.disconnected') );
+                        suspended      => cfg('vma.on_state.suspended'),
+                        stopped        => cfg('vma.on_state.disconnected') );
 
 my %on_provisioning = ( mount_home     => cfg('vma.on_provisioning.mount_home'),
-			add_user       => cfg('vma.on_provisioning.add_user'),
-			after_add_user => cfg('vma.on_provisioning.after_add_user') );
+                        add_user       => cfg('vma.on_provisioning.add_user'),
+                        after_add_user => cfg('vma.on_provisioning.after_add_user') );
 
 my %on_printing =     ( connected      => cfg('internal.vma.on_printing.connected'),
-			suspended      => cfg('internal.vma.on_printing.suspended'),
-			stopped        => cfg('internal.vma.on_printing.stopped'));
+                        suspended      => cfg('internal.vma.on_printing.suspended'),
+                        stopped        => cfg('internal.vma.on_printing.stopped'));
 
 my $display       = cfg('internal.nxagent.display');
 my $printing_port = $display + 2000;
 
 my %timeout = ( initiating => cfg('internal.nxagent.timeout.initiating'),
-		listening  => cfg('internal.nxagent.timeout.listening'),
-		suspending => cfg('internal.nxagent.timeout.suspending'),
-		stopping   => cfg('internal.nxagent.timeout.stopping') );
+                listening  => cfg('internal.nxagent.timeout.listening'),
+                suspending => cfg('internal.nxagent.timeout.suspending'),
+                stopping   => cfg('internal.nxagent.timeout.stopping') );
 
 our $nxagent_state_fn = "$run_path/nxagent.state";
 our $nxagent_pid_fn   = "$run_path/nxagent.pid";
 
 my %nx2x = ( initiating   => 'starting',
-	     provisioning => 'provisioning',
-	     starting     => 'listening',
-	     resuming     => 'listening',
-	     started      => 'connected',
-	     resumed      => 'connected',
-	     suspending   => 'suspending',
-	     suspended    => 'suspended',
-	     terminating  => 'stopping',
-	     aborting     => 'stopping',
-	     aborted      => 'stopped',
+             provisioning => 'provisioning',
+             starting     => 'listening',
+             resuming     => 'listening',
+             started      => 'connected',
+             resumed      => 'connected',
+             suspending   => 'suspending',
+             suspended    => 'suspended',
+             terminating  => 'stopping',
+             aborting     => 'stopping',
+             aborted      => 'stopped',
              terminated   => 'stopped',
-	     stopped      => 'stopped',
-	     ''           => 'stopped');
+             stopped      => 'stopped',
+             ''           => 'stopped');
 
 my %running   = map { $_ => 1 } qw(listening connected suspending suspended);
 my %connected = map { $_ => 1 } qw(listening connected);
@@ -137,47 +137,47 @@ sub _call_hook {
     my $detach = shift;
     
     if (length $file) {
-	DEBUG "calling hook '$file' for $name" ; 
-	my $pid = fork;
-	if (!$pid) {
-	    defined $pid or die "fork failed: $!\n";
-	    eval {
-		my $log = _open_log('hooks');
-		my $logfd = fileno $log;
-		POSIX::dup2($logfd, 1);
-		POSIX::dup2($logfd, 2);
-		open STDIN, '<', '/dev/null';
-		if ($detach) {
-		    local $SIG{CHLD};
-		    my $pid2 = fork;
-		    if (!$pid2) {
-			defined $pid2 and exec $file, @_;
-			DEBUG "execution of hook $file for $name failed: $!";
-			# defined $pid2 and POSIX::_exit(0); # grandchild just fallbacks to...
-		    }
-		    POSIX::_exit(0);
-		}
-		else {
-		    do {exec $file, @_ };
-		    die "exec failed: $!\n";
-		}
-	    };
-	    DEBUG "execution of hook $file for $name failed: $@" if $@;
-	    POSIX::_exit(1);
-	}
-	while (1) {
-	    # FIXME: implement timeout for hooks
-	    my $kid = waitpid($pid, 0);
-	    if ($kid < 0) {
-		die "hook process $pid for $name disappeared";
-	    }
-	    if ($kid == $pid) {
-		$? and die "hook $file for $name failed, rc: ". ($? >> 8);
-		return 1;
-	    }
-	    DEBUG "waitpid returned $kid unexpectedly";
-	    sleep 1;
-	}
+        DEBUG "calling hook '$file' for $name" ; 
+        my $pid = fork;
+        if (!$pid) {
+            defined $pid or die "fork failed: $!\n";
+            eval {
+                my $log = _open_log('hooks');
+                my $logfd = fileno $log;
+                POSIX::dup2($logfd, 1);
+                POSIX::dup2($logfd, 2);
+                open STDIN, '<', '/dev/null';
+                if ($detach) {
+                    local $SIG{CHLD};
+                    my $pid2 = fork;
+                    if (!$pid2) {
+                        defined $pid2 and exec $file, @_;
+                        DEBUG "execution of hook $file for $name failed: $!";
+                        # defined $pid2 and POSIX::_exit(0); # grandchild just fallbacks to...
+                    }
+                    POSIX::_exit(0);
+                }
+                else {
+                    do {exec $file, @_ };
+                    die "exec failed: $!\n";
+                }
+            };
+            DEBUG "execution of hook $file for $name failed: $@" if $@;
+            POSIX::_exit(1);
+        }
+        while (1) {
+            # FIXME: implement timeout for hooks
+            my $kid = waitpid($pid, 0);
+            if ($kid < 0) {
+                die "hook process $pid for $name disappeared";
+            }
+            if ($kid == $pid) {
+                $? and die "hook $file for $name failed, rc: ". ($? >> 8);
+                return 1;
+            }
+            DEBUG "waitpid returned $kid unexpectedly";
+            sleep 1;
+        }
     }
     return undef;
 }
@@ -185,14 +185,14 @@ sub _call_hook {
 sub _call_provisioning_hook {
     my $action = shift;
     _call_hook("on provisioning $action", $on_provisioning{$action}, 0,
-	       @_, 'qvd.hook.on_provisioning', $action);
+           @_, 'qvd.hook.on_provisioning', $action);
 }
 
 sub _call_action_hook {
     my $action = shift;
     my $state = _state();
     _call_hook("action $action on state $state", $on_action{$action}, 0,
-	       @_, 'qvd.vm.session.state', $state, 'qvd.hook.on_action', $action);
+           @_, 'qvd.vm.session.state', $state, 'qvd.hook.on_action', $action);
 }
 
 sub _call_state_hook {
@@ -207,12 +207,12 @@ sub _call_printing_hook {
     my $state = _state();
     local $@;
     eval {
-	my $props = Config::Properties->new;
-	open my $fh, '<', $printing_conf or die "Unable to open printing configuration file '$printing_conf': $!";
-	$props->load($fh);
-	close $fh;
-	_call_hook("printing $state", $on_printing{$state}, 1, $props->properties,
-		   'qvd.hook.on_printing', $state);
+        my $props = Config::Properties->new;
+        open my $fh, '<', $printing_conf or die "Unable to open printing configuration file '$printing_conf': $!";
+        $props->load($fh);
+        close $fh;
+        _call_hook("printing $state", $on_printing{$state}, 1, $props->properties,
+               'qvd.hook.on_printing', $state);
     };
     ERROR $@ if $@;
 }
@@ -222,15 +222,15 @@ sub _become_user {
     # Copyright 2003-2005 Martin Andrews
     my $user = shift;
     my ($login, $pass, $uid, $gid, $quota, $comment, $gcos, $home, $shell) =
-	($user =~ /^[0-9]+$/ ? getpwuid($user) : getpwnam($user))
-	    or die "Unknown user $user";
+    ($user =~ /^[0-9]+$/ ? getpwuid($user) : getpwnam($user))
+        or die "Unknown user $user";
 
     my @groups = ($gid, $gid);
     setgrent();
     my $quser = quotemeta $user;
     my $re = qr/\b$quser\b/;
     while( my (undef, undef, $gid2, $members) = getgrent() ) {
-	push @groups, $gid2 if $members =~ $re;
+        push @groups, $gid2 if $members =~ $re;
     }
 
     ($(, $)) = ($gid, join(' ', @groups));
@@ -244,30 +244,30 @@ sub _become_user {
 
 sub _set_environment {
 
-	# Environment doesn't get set properly when logging in through QVD,
-	# so we set it manually.
+    # Environment doesn't get set properly when logging in through QVD,
+    # so we set it manually.
 
-	foreach my $file (qw( /etc/locale.conf /etc/default/locale /etc/environment $ENV{HOME}/.qvd_environment )) { 
-		DEBUG "Trying to load environment from $file";
-		if ( open(my $fh, '<', $file) ) {
-			DEBUG "$file opened, processing";
+    foreach my $file (qw( /etc/locale.conf /etc/default/locale /etc/environment $ENV{HOME}/.qvd_environment )) {
+        DEBUG "Trying to load environment from $file";
+        if ( open(my $fh, '<', $file) ) {
+            DEBUG "$file opened, processing";
 
-			while(my $line = <$fh>) {
-				chomp $line;
-				$line =~ s/[^\\]#.*$//; # Remove comments
-				my ($k, $v) = split(/=/, $line, 2);
-				if ( defined $k && defined $v ) {
-					$ENV{$k} = $v;
-				}
-			}
-		}
-	}
+            while(my $line = <$fh>) {
+                chomp $line;
+                $line =~ s/[^\\]#.*$//; # Remove comments
+                my ($k, $v) = split(/=/, $line, 2);
+                if ( defined $k && defined $v ) {
+                    $ENV{$k} = $v;
+                }
+            }
+        }
+    }
 
     if (!$ENV{LANG}) {
-		# $LANG should be set to an UTF-8 code. Lack of this results in ?'s in
-		# filenames that use non-latin1 characters in the terminal.
-		$ENV{LANG} = cfg('vma.default.lang');
-	}
+        # $LANG should be set to an UTF-8 code. Lack of this results in ?'s in
+        # filenames that use non-latin1 characters in the terminal.
+        $ENV{LANG} = cfg('vma.default.lang');
+    }
 }
 
 sub _read_line {
@@ -287,7 +287,7 @@ sub _write_line {
     my ($fn, $line) = @_;
     DEBUG "_write_line($fn, $line)";
     sysopen my $fh, $fn, O_CREAT|O_RDWR, 644
-	or die "sysopen $fn failed";
+        or die "sysopen $fn failed";
     flock $fh, LOCK_EX;
     seek($fh, 0, 0);
     truncate $fh, 0;
@@ -304,7 +304,7 @@ sub _save_nxagent_state_and_call_hook {
     DEBUG "_save_nxagent_state_and_call_hook: " . join(', ', @_);
 
     _save_nxagent_state(@_);
-    _call_printing_hook;
+    _call_printing_hook if $enable_printing;
     _call_state_hook;
 }
 sub _save_nxagent_pid   { _write_line($nxagent_pid_fn, shift) }
@@ -313,7 +313,7 @@ sub _delete_nxagent_state_and_pid_and_call_hook {
     DEBUG "deleting pid and state files";
     unlink $nxagent_pid_fn;
     unlink $nxagent_state_fn;
-    _call_printing_hook;
+    _call_printing_hook if $enable_printing;
     _call_state_hook;
 }
 
@@ -334,84 +334,84 @@ sub _provisionate_user {
     $groups =~ s/\s//g;
 
     unless (-d $user_home) {
-	DEBUG "user home does not exist yet";
-	_save_nxagent_state('provisioning');
-	unless (_call_provisioning_hook(mount_home => @_)) {
-	    DEBUG "no custom provisioning for mount_home";
-	    if (length $home_drive and -e $home_drive) {
-		my $root_dev = (stat '/')[0];
-		my $home_dev = (stat $home_path)[0];
-		if ($root_dev == $home_dev) {
-		    DEBUG "mounting $home_partition as $home_path";
-		    unless (-e $home_partition) {
-			DEBUG "partitioning $home_drive";
-			system ("echo , | sfdisk $home_drive")
-			    and die "Unable to create partition table on user storage";
-			system ("mkfs.$home_fs" =>  $home_partition)
-			    and die "Unable to create file system on user storage";
-		    }
-		    system mount => $home_partition, $home_path
-			and die 'Unable to mount user storage';
-		}
-	    }
-	    else {
-		DEBUG "using root drive also for homes";
-	    }
-	}
+        DEBUG "user home does not exist yet";
+        _save_nxagent_state('provisioning');
+        unless (_call_provisioning_hook(mount_home => @_)) {
+            DEBUG "no custom provisioning for mount_home";
+            if (length $home_drive and -e $home_drive) {
+                my $root_dev = (stat '/')[0];
+                my $home_dev = (stat $home_path)[0];
+                if ($root_dev == $home_dev) {
+                    DEBUG "mounting $home_partition as $home_path";
+                    unless (-e $home_partition) {
+                        DEBUG "partitioning $home_drive";
+                        system ("echo , | sfdisk $home_drive")
+                            and die "Unable to create partition table on user storage";
+                        system ("mkfs.$home_fs" =>  $home_partition)
+                            and die "Unable to create file system on user storage";
+                    }
+                    system mount => $home_partition, $home_path
+                        and die 'Unable to mount user storage';
+                }
+            }
+            else {
+                DEBUG "using root drive also for homes";
+            }
+        }
     }
 
     unless (getpwnam($user)) {
-	_save_nxagent_state('provisioning');
-	if (_call_provisioning_hook(add_user => @_)) {
-	    _call_provisioning_hook(after_add_user => @_);
-	}
-	else {
-	    eval {
+        _save_nxagent_state('provisioning');
+        if (_call_provisioning_hook(add_user => @_)) {
+            _call_provisioning_hook(after_add_user => @_);
+        }
+        else {
+            eval {
                 my @group_args;
                 push @group_args, (-g => $gid) if defined $gid;
                 push @group_args, $group;
-		DEBUG "executing $groupadd => @group_args";
-                unless (system $groupadd => @group_args) {
+                DEBUG "executing $groupadd => @group_args";
+                unless (system($groupadd => @group_args) == 0) {
                     WARN "provisioning of group '$group' failed\n";
                 }
 
-		my @user_args = ( '-m',              ## create home
+                my @user_args = ( '-m',              ## create home
                                   '-d', $user_home,  ## home dir
                                   '-g', $group,      ## main group
                                   '-s', $user_shell, ## shell
                                 );
-		push @user_args, -G => $groups if length $groups;
-		push @user_args, -u => $uid if $uid;
-		push @user_args, $user;
+                push @user_args, -G => $groups if length $groups;
+                push @user_args, -u => $uid if $uid;
+                push @user_args, $user;
 
-		DEBUG "executing $useradd => @user_args";
-		system $useradd => @user_args and die "provisioning of user '$user' failed\n";
+                DEBUG "executing $useradd => @user_args";
+                system $useradd => @user_args and die "provisioning of user '$user' failed\n";
 
-		_call_provisioning_hook(after_add_user => @_);
-	    };
-	    if ($@) {
-		# clean up, do not left the system in an inconsistent state
-		DEBUG "deleting user $user";
-		system $userdel => '-rf', $user;
-		DEBUG "deleting group $user";
-		system $groupdel => $user;
-		die $@;
-	    }
-	}
+                _call_provisioning_hook(after_add_user => @_);
+            };
+            if ($@) {
+                # clean up, do not left the system in an inconsistent state
+                DEBUG "deleting user $user";
+                system $userdel => '-rf', $user and WARN "'$userdel -rf $user' failed";
+                DEBUG "deleting group $user";
+                system $groupdel => $user and WARN "'$groupdel $user' failed";
+                die $@;
+            }
+        }
     }
 }
 
 my %props2nx = ( 'qvd.client.keyboard'   => 'keyboard',
-		 'qvd.client.os'         => 'client',
-		 'qvd.client.link'       => 'link',
-		 'qvd.client.geometry'   => 'geometry',
-		 'qvd.client.fullscreen' => 'fullscreen' );
+         'qvd.client.os'         => 'client',
+         'qvd.client.link'       => 'link',
+         'qvd.client.geometry'   => 'geometry',
+         'qvd.client.fullscreen' => 'fullscreen' );
 
 sub _fill_props {
     my (%props) = @_;
-		    my $user = $props{'qvd.vm.user.name'}   //= $default_user_name;
-		    $props{'qvd.vm.user.groups'} //= $default_user_groups;
-		    $props{'qvd.vm.user.home'} = "$home_path/$user";
+    my $user = $props{'qvd.vm.user.name'} //= $default_user_name;
+    $props{'qvd.vm.user.groups'} //= $default_user_groups;
+    $props{'qvd.vm.user.home'} //= "$home_path/$user";
     return %props;
 }
 
@@ -429,78 +429,87 @@ sub _fork_monitor {
     $SIG{CHLD} = 'IGNORE';
     my $pid = fork;
     if (!$pid) {
-	defined $pid or die "Unable to start monitor, fork failed: $!\n";
-	undef $SIG{CHLD};
-	eval {
-	    mkdir $run_path, 755;
-	    -d $run_path or die "Directory $run_path does not exist\n";
+        defined $pid or die "Unable to start monitor, fork failed: $!\n";
+        undef $SIG{CHLD};
+        eval {
+            mkdir $run_path, 755;
+            -d $run_path or die "Directory $run_path does not exist\n";
 
-	    # detach from stdio and from process group so it is not killed by Net::Server
-	    open STDIN,  '<', '/dev/null';
-	    POSIX::dup2($logfd, 1);
-	    POSIX::dup2($logfd, 2);
-	    # open STDOUT, '>', '/tmp/xinit-out'; #/dev/null';
-	    # open STDERR, '>', '/tmp/xinit-err'; #/dev/null';
-	    setpgrp(0, 0);
+            # detach from stdio and from process group so it is not killed by Net::Server
+            open STDIN,  '<', '/dev/null';
+            POSIX::dup2($logfd, 1);
+            POSIX::dup2($logfd, 2);
+            # open STDOUT, '>', '/tmp/xinit-out'; #/dev/null';
+            # open STDERR, '>', '/tmp/xinit-err'; #/dev/null';
+            setpgrp(0, 0);
 
-	    _save_nxagent_state_and_call_hook 'initiating';
+            _save_nxagent_state_and_call_hook 'initiating';
 
-	    my $pid = open(my $out, '-|');
-	    if (!$pid) {
-		defined $pid or die ERROR "unable to start X server, fork failed: $!\n";
-		eval {
-		    POSIX::dup2(1, 2); # equivalent to shell 2>&1
-		    _provisionate_user(%props);
-		    _call_action_hook(connect => %props);
-		    _make_nxagent_config(%props);
+            my $pid = open(my $out, '-|');
+            if (!$pid) {
+                defined $pid or die ERROR "unable to start X server, fork failed: $!\n";
+                eval {
+                    POSIX::dup2(1, 2); # equivalent to shell 2>&1
+                    _provisionate_user(%props);
+                    _call_action_hook(connect => %props);
+                    _make_nxagent_config(%props);
 
-		    $ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000) if $enable_audio;
-		    $ENV{NX_CLIENT} = $nxdiag;
-		    $ENV{QVD_SLAVE_CMD} = $command_slave if $command_slave;
+                    $ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000) if $enable_audio;
+                    $ENV{NX_CLIENT} = $nxdiag;
+                    $ENV{QVD_SLAVE_CMD} = $command_slave if $command_slave;
 
-		    # FIXME: Include VM name in -name argument.
-		    # FIXME: Reimplement xinit in Perl in order to allow capturing nxagent ouput alone.
-		    my @cmd = ($xinit => $x_session, @x_session_args_extra,
-                               '--',
-                               $nxagent, ":$display",
-			       '-ac', '-name', 'QVD',
-                               # '-norender', '-defer', '0', # GTK/Cairo require Xrender to work properly
-			       '-display', "nx/nx,options=$nxagent_conf:$display",
-                               @nxagent_args_extra);
-		    say "running @cmd";
-		    _become_user($props{'qvd.vm.user.name'});
-			_set_environment();
-		    exec @cmd;
-		};
-		say "Unable to start X server: " .($@ || $!);
-		POSIX::_exit(1);
-	    }
+                    # FIXME: Include VM name in -name argument.
+                    # FIXME: Reimplement xinit in Perl in order to allow capturing nxagent ouput alone.
+                    my @cmd = ($xinit => $x_session, @x_session_args_extra,
+                           '--',
+                           $nxagent, ":$display",
+                           '-ac', '-name', 'QVD',
+                           # '-norender', '-defer', '0', # GTK/Cairo require Xrender to work properly
+                           '-display', "nx/nx,options=$nxagent_conf:$display",
+                           @nxagent_args_extra);
+                    say "running @cmd";
+                    _become_user($props{'qvd.vm.user.name'});
+                    _set_environment();
+                    exec @cmd;
+                };
+                say "Unable to start X server: " .($@ || $!);
+                POSIX::_exit(1);
+            }
 
-	    while(defined (my $line = <$out>)) {
-		given ($line) {
-		    when (/Info: Agent running with pid '(\d+)'/) {
-			DEBUG "Agent running";
-			_save_nxagent_pid $1;
-		    }
-		    when (/Session: (\w+) session at/) {
-			DEBUG "Session $1, calling hooks";
-			_save_nxagent_state_and_call_hook lc $1;
-		    }
-		    when (/Session: Session (\w+) at/) {
-			DEBUG "Session $1, calling hooks";
-			_save_nxagent_state_and_call_hook lc $1;
-		    }
+            while(defined (my $line = <$out>)) {
+                given ($line) {
+                    when (/Info: Agent running with pid '(\d+)'/) {
+                        DEBUG "Agent running";
+                        _save_nxagent_pid $1;
+                    }
+                    when (/Session: (\w+) session at/) {
+                        DEBUG "Session $1, calling hooks";
+                        _save_nxagent_state_and_call_hook lc $1;
+                    }
+                    when (/Session: Session (\w+) at/) {
+                        DEBUG "Session $1, calling hooks";
+                        _save_nxagent_state_and_call_hook lc $1;
+                    }
                     when (/Listening to slave connections on port '(\d+)'/) {
                         DEBUG "Slave channel opened";
-                        _start_usb($1) if ( $props{'qvd.client.usb.enabled' } );
+                        
+                        if ( $props{'qvd.client.usb.enabled' } ) {
+                            DEBUG "USB forwarding is enabled, implementation is " . $props{'qvd.client.usb.implementation'};
+                            
+                            if ( $props{'qvd.client.usb.implementation'} =~ /USBIP/ ) {
+                                _start_usbip($1);
+                            } else {
+                                _start_usb($1);
+                            }
+                        }
                     }
-		}
-		print $line;
-	    }
-	    print "out closed";
-	};
-	DEBUG $@ if $@;
-	_delete_nxagent_state_and_pid_and_call_hook;
+                }
+                print $line;
+            }
+            print "out closed";
+        };
+        DEBUG $@ if $@;
+        _delete_nxagent_state_and_pid_and_call_hook;
     }
 }
 
@@ -543,9 +552,9 @@ sub _state {
 sub _suspend_session {
     my ($state, $pid) = _state;
     if ($pid and $connected{$state}) {
-	_call_action_hook('suspend', @_);
-	kill HUP => $pid;
-	return 'starting';
+        _call_action_hook('suspend', @_);
+        kill HUP => $pid;
+        return 'starting';
     }
     $state;
 }
@@ -553,9 +562,9 @@ sub _suspend_session {
 sub _stop_session {
     my ($state, $pid) = _state;
     if ($pid) {
-	_call_action_hook('stop', @_);
-	kill TERM => $pid;
-	return 'stopping'
+        _call_action_hook('stop', @_);
+        kill TERM => $pid;
+        return 'stopping'
     }
     $state;
 }
@@ -587,22 +596,21 @@ sub _make_nxagent_config {
     my %props = @_;
     my @nx_args;
     for my $key (keys %props2nx) {
-	my $val = $props{$key} // cfg("vma.default.$key", 0);
-	if (defined $val and length $val) {
-	    $val =~ m{^[\w/\-\+]+$}
-		or die "invalid characters in parameter $key";
-	    push @nx_args, "$props2nx{$key}=$val";
-	}
+        my $val = $props{$key} // cfg("vma.default.$key", 0);
+        if (defined $val and length $val) {
+            $val =~ m{^[\w/\-\+]+$}
+                or die "invalid characters in parameter $key";
+            push @nx_args, "$props2nx{$key}=$val";
+        }
     }
 
     push @nx_args, 'media=1' if $enable_audio;
     push @nx_args, 'slave=1' if $enable_slave;
     push @nx_args, $props{'qvd.client.nxagent.extra_args'} if ($props{'qvd.client.nxagent.extra_args'});
 
-    if ($enable_printing) {
-	# FIXME: check that printing is also enabled on the client
-	my $channel = $props{'qvd.client.os'} eq 'windows' ? 'smb' : 'cups';
-	push @nx_args, "$channel=$printing_port" ;
+    if ($enable_printing && $props{'qvd.client.printing.enabled'}) {
+        my $channel = $props{'qvd.client.os'} eq 'windows' ? 'smb' : 'cups';
+        push @nx_args, "$channel=$printing_port" ;
     }
 
     my $tmp = "$nxagent_conf.tmp";
@@ -617,31 +625,31 @@ sub _start_session {
     my (%props) = _fill_props @_;
     DEBUG "starting session in state $state, pid $pid";
     given ($state) {
-	when ('suspended') {
-	    _call_action_hook(pre_connect => %props);
-	    DEBUG "awaking nxagent";
-	    _save_slave_config(%props);
-	    _save_printing_config(%props);
-	    _save_nxagent_state_and_call_hook 'initiating';
+        when ('suspended') {
+            _call_action_hook(pre_connect => %props);
+            DEBUG "awaking nxagent";
+            _save_slave_config(%props);
+            _save_printing_config(%props);
+            _save_nxagent_state_and_call_hook 'initiating';
             _make_nxagent_config(%props);
-	    kill HUP => $pid;
-	    _call_action_hook(connect => %props);
-	}
-	when ('connected') {
-	    DEBUG "suspend and fail";
-	    kill HUP => $pid;
-	    die "Can't connect to X session in state connected, suspending it, retry later\n";
-	}
-	when ('stopped') {
-	    _call_action_hook(pre_connect => %props);
-	    _save_slave_config(%props);
-	    _save_printing_config(%props);
-	    DEBUG "Forking monitor";
-	    _fork_monitor(%props);
-	}
-	default {
-	    die "Unable to start/resume X session in state $_, try again in a few minutes\n";
-	}
+            kill HUP => $pid;
+            _call_action_hook(connect => %props);
+        }
+        when ('connected') {
+            DEBUG "suspend and fail";
+            kill HUP => $pid;
+            die "Can't connect to X session in state connected, suspending it, retry later\n";
+        }
+        when ('stopped') {
+            _call_action_hook(pre_connect => %props);
+            _save_slave_config(%props);
+            _save_printing_config(%props);
+            DEBUG "Forking monitor";
+            _fork_monitor(%props);
+        }
+        default {
+            die "Unable to start/resume X session in state $_, try again in a few minutes\n";
+        }
     }
     'starting';
 }
@@ -704,6 +712,33 @@ sub _start_usb {
     system(@cmd) == 0 or ERROR "Failed to execute " . join(' ', @cmd) . ": $?";
 }
 
+sub _start_usbip {
+   my ($port) = @_;
+   DEBUG "Starting USBIP";
+   my @cmd;
+   
+   eval {
+       DEBUG "Creating SlaveClient object";
+       require QVD::SlaveClient;
+       my $slave = QVD::SlaveClient->new('localhost:11100');
+
+       DEBUG "Setting up USBIP forwarding";
+       $slave->forward_usbip();
+
+       DEBUG "Forwarding devices";
+       $slave->forward_usbip_devices();
+
+   };
+   if ( $@ ) {
+       if ( $@ =~ /SlaveClient.pm in \@INC/ ) {
+           ERROR "The qvd-slaveclient package is required for USBIP functionality";
+       } else {
+           ERROR "Error while setting up USBIP: $@";
+       }
+   }
+
+}
+
 ################################ RPC methods ######################################
 
 sub SimpleRPC_ping {
@@ -747,6 +782,30 @@ sub HTTP_vnc_connect {
     _vnc_connect($httpd, $headers);
 }
 
+sub _run {
+	my @cmd = @_;
+	my $cmdstr = join(' ', @cmd);
+	
+	DEBUG "Going to run command '$cmdstr'";
+	
+	my $ret = system(@cmd);
+	if ( $ret == -1 ) {
+		ERROR "Failed to execute '$cmdstr': $!\n";
+		return 1;
+	} elsif ( $ret & 127 ) {
+		my $msg = sprintf("died with signal %d, %s coredump\n", ( $?&127), ($?&128) ? 'with' : 'without');
+		ERROR "Command '$cmdstr' $msg";
+		return 1;
+	} else {
+		if ( ($? >> 8) > 0 ) {
+			ERROR "Command '$cmdstr' exited with value " . ( $? >> 8 );
+			return $? >> 8;
+		} else {
+			DEBUG "Command '$cmdstr' exited successfully";
+			return 0;
+		}
+	}
+}
 
 1;
 

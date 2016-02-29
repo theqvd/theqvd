@@ -64,6 +64,7 @@ public class TestLibraryLoad {
 		qvd.qvd_set_os("Linux");
 		qvd.qvd_set_geometry(1024,768);
 		qvd.qvd_set_link("adsl");
+		qvd.qvd_payment_required();
 		qvd.qvd_free();
 
 	}
