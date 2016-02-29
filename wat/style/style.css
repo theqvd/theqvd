@@ -1683,6 +1683,9 @@ body {
               padding-left: 5px; }
             .wrapper .content .login-box .login-main .login-form > div.login-control input {
               width: 100%; }
+          .wrapper .content .login-box .login-main .login-form > div.login-link {
+            float: right;
+            font-size: small; }
           .wrapper .content .login-box .login-main .login-form > div.login-button {
             text-align: right;
             padding-top: 5px; }

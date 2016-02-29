@@ -31,6 +31,11 @@
                         <input type="password" name="admin_password"/>
                     </div>
                 </div>
+                <% if (loginLinkSrc && loginLinkLabel) { %>
+                    <div class="login-control login-link">
+                        <a target="_blank" href="<%= loginLinkSrc %>" data-i18n="<%= loginLinkLabel %>"><%= loginLinkLabel %></a>
+                    </div>
+                <% } %>
                 <div class="login-button">
                     <div>
                         <a class="fa fa-sign-in button js-login-button" data-i18n="Log-in"></a>

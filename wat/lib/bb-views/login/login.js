@@ -31,10 +31,17 @@ Wat.Views.LoginView = Wat.Views.MainView.extend({
             template = Wat.TPL.errorRefresh;
         }
         
+        // Retrieve public configuration 
+        var publicConfig = this.retrievedData.public_configuration || {};
+
         // Fill the html with the template
+        publicConfig.login = publicConfig.login || {};
+        publicConfig.login.link = publicConfig.login.link || {};
         this.template = _.template(
             template, {
-                multitenant: Wat.C.multitenant
+                multitenant: Wat.C.multitenant,
+                loginLinkSrc: publicConfig.login.link.src,
+                loginLinkLabel: publicConfig.login.link.label
             }
         );
         

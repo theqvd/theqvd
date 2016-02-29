@@ -71,6 +71,11 @@
                     }
                 }
                 
+                &.login-link {
+                    float: right;
+                    font-size: small;
+                }
+                
                 &.login-button {
                     text-align: right;
                     padding-top: 5px;
