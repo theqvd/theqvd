@@ -203,10 +203,10 @@ sub combined_properties {
 				 $vm->properties );
 }
 
-sub host_name 
-{
+sub host_name {
     my $self = shift;
-    defined $self->vm_runtime->host ? $self->vm_runtime->host->name : undef;
+    my $host = $self->vm_runtime->host;
+    defined($host) ? $host->name : undef;
 }
 
 sub di_id
