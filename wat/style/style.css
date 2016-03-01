@@ -598,8 +598,8 @@ input[type="checkbox"], input[type="radio"] {
 .chosen-container .chosen-results {
   max-height: 150px; }
   .chosen-container .chosen-results li.highlighted {
-  background-color: #e35e0c;
-  background-image: none; }
+    background-color: #e35e0c;
+    background-image: none; }
 
 .chosen-container * {
   font-weight: normal; }
@@ -1599,15 +1599,15 @@ body {
     .wrapper .content .customize-options {
       margin-top: 20px;
       margin-bottom: 50px; }
-    .wrapper .content .customize-options .customize-block {
+      .wrapper .content .customize-options .customize-block {
         width: 42%;
-      display: inline-block;
-      vertical-align: top; }
-      .wrapper .content .customize-options .customize-block:first-child {
-        padding-right: 10px; }
-      .wrapper .content .customize-options .customize-block:last-child {
-        padding-left: 10px;
-        float: right; }
+        display: inline-block;
+        vertical-align: top; }
+        .wrapper .content .customize-options .customize-block:first-child {
+          padding-right: 10px; }
+        .wrapper .content .customize-options .customize-block:last-child {
+          padding-left: 10px;
+          float: right; }
     .wrapper .content a.button-update-customize {
       float: right;
       margin-top: 20px; }
@@ -1684,7 +1684,8 @@ body {
             .wrapper .content .login-box .login-main .login-form > div.login-control input {
               width: 100%; }
           .wrapper .content .login-box .login-main .login-form > div.login-link {
-            float: right;
+            width: 100%;
+            text-align: right;
             font-size: small; }
           .wrapper .content .login-box .login-main .login-form > div.login-button {
             text-align: right;
