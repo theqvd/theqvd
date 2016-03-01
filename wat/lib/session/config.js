@@ -46,14 +46,14 @@ Wat.C = {
     // Init Api address configuration
     initApiAddress: function () {
         var apiPath = '/api/';
-        this.apiUrl = Wat.C.apiUrl + apiPath;
+        this.apiUrl+= apiPath;
 
 		// Build websockets URL depending on the used protocol
         if (Wat.C.apiUrl.substr(0, 5) == 'https') {
-            this.apiWSUrl = 'wss' + Wat.C.apiUrl.substr(5) + apiPath;
+            this.apiWSUrl = 'wss' + this.apiUrl.substr(5);
         }
         else {
-            this.apiWSUrl = 'ws' + Wat.C.apiUrl.substr(4) + apiPath;
+            this.apiWSUrl = 'ws' + this.apiUrl.substr(4);
         }
     },
 
