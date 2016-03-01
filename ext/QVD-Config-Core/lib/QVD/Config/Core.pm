@@ -11,6 +11,7 @@ my $core_cfg = Config::Properties->new($QVD::Config::Core::defaults);
 
 use Exporter qw(import);
 our @EXPORT = qw(core_cfg core_cfg_all core_cfg_keys save_core_cfg set_core_cfg);
+our @EXPORT_OK = qw(core_cfg_unmangled);
 
 our @FILES;
 @FILES = '/etc/qvd/node.conf' unless @FILES;
@@ -20,6 +21,11 @@ for my $FILE (@FILES) {
     $core_cfg = Config::Properties->new(defaults => $core_cfg);
     $core_cfg->load($cfg_fh);
     close $cfg_fh;
+}
+
+sub core_cfg_unmangled {
+    my $key = shift;
+    return $core_cfg->getProperty($key);
 }
 
 sub core_cfg {

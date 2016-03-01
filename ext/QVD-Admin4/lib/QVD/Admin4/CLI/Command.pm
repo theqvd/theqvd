@@ -808,7 +808,6 @@ my $CLI_CMD2API_ACTION = {
 		update => 'config_set', 
 		ssl     => 'config_ssl',
 		delete => 'config_delete', 
-		default => 'config_default',
 	},
 
 	admin => {
@@ -850,7 +849,7 @@ my $DEFAULT_FIELDS = {
 
 	tenant => [ qw( id name language block blocked) ],
 
-    config => [ qw( key value default) ],
+    config => [ qw( key value default is_default ) ],
 
     admin => [ qw(id tenant name language block) ],
 

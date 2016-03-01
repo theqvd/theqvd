@@ -74,13 +74,6 @@ my $ACTIONS = {
 		admin4method => 'config_set'
 	},
 
-	config_default => {
-		type_of_action =>  'delete',
-		   qvd_object => 'Config',
-		   acls => [qr/^config\.qvd\./],
-		admin4method => 'config_default'
-	},
-
 	config_delete => {
 		type_of_action =>  'delete',
 		   qvd_object => 'Config',

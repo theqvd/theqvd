@@ -18,10 +18,10 @@ use TryCatch;
 use Data::Page;
 use Clone qw(clone);
 use QVD::Admin4::AclsOverwriteList;
-use QVD::Admin4::ConfigsOverwriteList;
+use QVD::Admin4::ConfigClassifier;
 use Mojo::JSON qw(encode_json);
 use QVD::Config;
-use QVD::Config::Core;
+use QVD::Config::Core qw(core_cfg_unmangled);
 
 our $VERSION = '0.01';
 
@@ -323,34 +323,13 @@ sub config_delete
 {
     my ($self,$request) = @_;
 
-	# Raise an exception if admin cannot delete config
-	$self->is_admin_allowed_to_config($request);
+    # Raise an exception if admin cannot delete config
+    $self->check_admin_is_allowed_to_config($request);
 
-    my $result = $self->delete($request, { conditions => [qw(is_not_custom_config)] });
+    my $result = $self->delete($request, { conditions => [qw(is_custom_config)] });
 
     QVD::Config::reload(); # To refresh config tokens in QVD::Config 
     $result;
-}
-
-# It deletes config tokens in the database only when tokens
-# are not custom tokens (they are present either in Defaults.pm or in config files) 
-
-sub config_default
-{
-    my ($self,$request) = @_;
-
-	# Raise an exception if admin cannot modify config
-	$self->is_admin_allowed_to_config($request);
-
-	my $result = "";
-	try {
-		$result = $self->delete($request, { conditions => [qw(is_custom_config)] });
-	} catch (QVD::Admin4::Exception $e where {$_->code == 1300}) {
-		QVD::Admin4::Exception->throw(code => 7390);
-	};
-
-    QVD::Config::reload(); # To refresh config tokens in QVD::Config 
-	return $result;
 }
 
 sub reset_views {
@@ -620,7 +599,7 @@ sub config_set
     my ($self,$request) = @_;
 
 	# Raise an exception if admin cannot modify config
-	$self->is_admin_allowed_to_config($request);
+	$self->check_admin_is_allowed_to_config($request);
 
 	# Modify parameter if no exception is raised
     my $result = $self->create_or_update($request);
@@ -1193,39 +1172,30 @@ sub di_delete_disk_image
     eval { unlink "$images_path/$images_file" };
 }
 
-# It checks if a config token is not only present in DB. Throws an exception otherwise
-
-sub is_not_custom_config
-{
-    my ($self,$obj) = @_;
-    QVD::Admin4::Exception->throw(code=>'7372') if defined eval { core_cfg($obj->key) };
-    return 1;
-}
-
-# It checks if a config token is only present in DB. Throws an exception otherwise
+# Checks if a config token is present in the DB. Throws an exception otherwise
 
 sub is_custom_config
 {
     my ($self,$obj) = @_;
-    QVD::Admin4::Exception->throw(code=>'7371') unless defined eval { core_cfg($obj->key) };
+    QVD::Admin4::Exception->throw(code=>'7370') unless defined eval { is_cfg_key_in_database($obj->key, $obj->tenant_id) };
     return 1;
 }
 
 # Check if the current admin is allowed to change the specified configuration
 
-sub is_admin_allowed_to_config
+sub check_admin_is_allowed_to_config
 {
 	my ($self,$request) = @_;
 
 	# Get current administrator
 	my $admin = $request->qvd_object_model->current_qvd_administrator;
 
-	# Check if configuration parameter to be changed is a global parameter
-	my $col = QVD::Admin4::ConfigsOverwriteList->new(admin_id => $admin->id);
-	my $global_config = $col->is_global_config($request->get_adequate_value('key'));
-
 	# Get the tenant_id the change will take place
 	my $tenant_id = $request->get_adequate_value('tenant_id') // $admin->tenant_id;
+
+	# Check if configuration parameter to be changed is a global parameter
+	my $key = $request->get_adequate_value('key');
+	my $is_declared = defined(get_default_cfg_value($key, $tenant_id));
 
 	# if multitenant is enabled
 	if(cfg('wat.multitenant')) {
@@ -1235,15 +1205,10 @@ sub is_admin_allowed_to_config
 		QVD::Admin4::Exception->throw(code => 4230);
 	}
 
-	# Local tokens cannot be defined as global
-		if ($tenant_id == - 1 && !$global_config) {
-		QVD::Admin4::Exception->throw(code => 7380);
-	}
-
-	# Global tokens cannot be defined locally for a tenant
-		if ($tenant_id != - 1 && $global_config) {
-		QVD::Admin4::Exception->throw(code => 7381);
-	}
+        # Common administrators cannot create new configuration tokens
+		if (!$admin->is_superadmin && !$is_declared) {
+            QVD::Admin4::Exception->throw(code => 7382);
+        }
 	}
 
 	return 1;
@@ -1564,22 +1529,20 @@ sub config_preffix_get
     my ($self,$admin,$json_wrapper) = @_;
 
 	# Tenant is sent as an argument if superadmin
-	my $tenant = $admin->is_superadmin ? $json_wrapper->get_filter_value("tenant_id") : $admin->tenant_id;
+    my $tenant = $admin->is_superadmin ? $json_wrapper->get_filter_value("tenant_id") // -1 : $admin->tenant_id;
+    $tenant = -1 if !cfg('wat.multitenant');
 
-	my @keys = cfg_keys($tenant);
+    # Get filtered token list
+    my @keys = config_get_token_list(
+        $tenant,
+        $json_wrapper->get_filter_value('key'),
+        $json_wrapper->get_filter_value('key_re') );
+
+    # Get preffix
     my %preffix;
-
-	# Several configuration tokens of the sistem are not allowed to be used from the API
-	# The class QVD::Admin4::ConfigsOverwriteList provides the regex that defines the
-	# tokens available from the API.
-
-    my $col = QVD::Admin4::ConfigsOverwriteList->new(admin_id => $admin->id);
-	my $col_re = $col->configs_to_show_re($tenant);
-    my $unclassified;
-
+    my $unclassified = 0;
     for (@keys)
     {
-	next unless m/$col_re/;
 	if (m/^([^.]+)\./) 
 	{  
 	    $preffix{$1} = 1;
@@ -1600,21 +1563,16 @@ sub config_get
     my ($self,$admin,$json_wrapper) = @_;
 
 	# Tenant is sent as an argument if superadmin
-	my $tenant = $admin->is_superadmin ? $json_wrapper->get_filter_value("tenant_id") : $admin->tenant_id;
+    my $tenant = $admin->is_superadmin ? $json_wrapper->get_filter_value("tenant_id") // -1 : $admin->tenant_id;
+    $tenant = -1 if !cfg('wat.multitenant');
 
-	# Several configuration tokens of the sistem are not allowed to be used from the API
-	# The class QVD::Admin4::ConfigsOverwriteList provides the regex that defines the
-	# tokens available from the API.
+    # Get filtered token list
+    my @keys = config_get_token_list(
+        $tenant,
+        $json_wrapper->get_filter_value('key'),
+        $json_wrapper->get_filter_value('key_re') );
 
-    my $col = QVD::Admin4::ConfigsOverwriteList->new(admin_id => $admin->id);
-	my $col_re = $col->configs_to_show_re($tenant);
-    my $cp = $json_wrapper->get_filter_value('key');
-    my $cp_re = $json_wrapper->get_filter_value('key_re');
-	my @keys = cfg_keys($tenant);
-    @keys = grep { $_ =~ /\Q$cp\E/ } @keys if $cp;
-    @keys = grep { $_ =~ /$cp_re/ } @keys if $cp_re;
-    @keys = grep { $_ =~ /$col_re/ } @keys;
-
+    # Generate output
     my $od = $json_wrapper->order_direction // '-asc';
 
     my $total = scalar @keys;
@@ -1627,10 +1585,31 @@ sub config_get
     @keys = reverse @keys if $od eq '-desc'; 
     @keys = $page->splice(\@keys);
 
-   { total => $total,
-     rows => [ map {{ key => $_, 
-	operative_value => cfg($_, $tenant),
-		      default_value => (defined eval{ core_cfg($_)} ? core_cfg($_) : undef) }} @keys ] };
+    return {
+        total => $total,
+        rows => [ map {{ key => $_,
+            operative_value => cfg($_, $tenant),
+            default_value => get_default_cfg_value($_, $tenant),
+            is_default => is_cfg_key_in_database($_, $tenant) ? 0 : 1,
+        } } @keys ],
+    };
+}
+
+sub config_get_token_list {
+    my $tenant = shift;
+    my $key_name = shift;
+    my $key_regex = shift;
+
+    my @keys = cfg_keys($tenant);
+
+    @keys = grep { $_ =~ /\Q$key_name\E/ } @keys if $key_name;
+
+    @keys = grep { $_ =~ /$key_regex/ } @keys if $key_regex;
+
+    @keys = grep { !is_hidden_config($_) } @keys;
+    @keys = grep { is_cfg_key_in_database($_, $tenant) } @keys if $tenant != -1;
+
+    return @keys;
 }
 
 sub config_ssl {
@@ -1764,6 +1743,30 @@ sub is_vm_property {
 sub is_di_property {
 	my ($self, $property) = @_;
 	return ($property->is_di_property());
+}
+
+sub get_default_cfg_value {
+
+    my $key = shift;
+    my $tenant = shift // -1;
+
+    my $value = core_cfg_unmangled($key);
+    return $value if defined($value);
+
+    if ($tenant != -1) {
+        my $row = QVD::DB::Simple::rs( 'Config' )->search( { tenant_id => -1, key => $key } )->first();
+        return $row->value if defined( $row );
+    }
+
+    return undef;
+}
+
+sub is_cfg_key_in_database {
+    my $key = shift;
+    my $tenant = shift // -1;
+
+    my $row = QVD::DB::Simple::rs( 'Config' )->search( { tenant_id => $tenant, key => $key } )->first();
+    return defined( $row );
 }
 
 1;

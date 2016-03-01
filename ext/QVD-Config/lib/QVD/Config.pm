@@ -5,7 +5,6 @@ our $VERSION = '0.02';
 use warnings;
 use strict;
 
-use List::MoreUtils qw(uniq);
 use Config::Properties;
 use QVD::Config::Core qw(core_cfg core_cfg_keys);
 use QVD::Log;
@@ -29,9 +28,7 @@ sub reload {
 sub cfg {
     my $key = shift;
 	my $tenant = shift // -1;
-
-	# TODO Check if config key is mandatory
-	my $mandatory = 1;
+	my $mandatory = shift // 1;
 
 	# Try to get the value from different repositories
 	my $value;
@@ -52,12 +49,6 @@ sub cfg {
             my $row = QVD::DB::Simple::rs('Config')->search({tenant_id => $tenant, key => $key})->first;
             $value = $row->value if defined $row;
         }
-
-        unless (defined $value) {
-			$USE_DB or LOGDIE "Can't read per tenant configuration when DB access is disabled";
-			my $row = QVD::DB::Simple::rs('Config')->search({tenant_id => -1, key => $key})->first;
-			$value = $row->value if defined $row;
-		}
 
 		# If not found in the DB, get it from the ones cached in memory
 		unless (defined $value) {
@@ -95,7 +86,8 @@ sub cfg_keys {
 	push @keys_array, map { $_->key } QVD::DB::Simple::rs('Config')->search({tenant_id => -1});
 	push @keys_array, map { $_->key } QVD::DB::Simple::rs('Config')->search({tenant_id => $tenant}) if $tenant != -1;
 
-	return uniq(@keys_array);
+    my %keys = map { $_ => 1 } @keys_array;
+    return keys %keys;
 }
 
 sub cfg_tree {

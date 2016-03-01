@@ -117,11 +117,9 @@ my $code2message_mapper = {
     7340 => 'Fixed, Head and Default Tags cannot be deleted',
     7350 => 'Forbidden role assignment, inherited role inherits from inheritor',
     7360 => 'Incompatible expiration dates - Soft date must precede the hard one',
-    7371 => 'Non core config items haven\'t default value',
-    7372 => 'Unable to remove a core config item',
+    7370 => 'Unable to remove a core config item',
     7373 => 'Unable to switch to monotenant mode - More than one tenant in the system',
-	7380 => 'Local configuration tokens cannot be set as global tokens',
-	7381 => 'Global configuration tokens cannot be set locally for a tenant',
+    7382 => 'Cannot create new configuration token',
 	7390 => 'Configuration token value is already set to the default one',
 
 };

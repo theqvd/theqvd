@@ -5,7 +5,6 @@ use Moo;
 use QVD::Config;
 use QVD::Admin4::Exception;
 use QVD::Admin4::REST::Filter;
-use QVD::Admin4::ConfigsOverwriteList;
 use QVD::DB::Simple qw(db);
 
 # This class implements a request to the database. In fact, 
@@ -251,12 +250,6 @@ sub check_config_token_availability
 	my $token = $self->get_json_adequate_value('key');
 
 	my $tenant = $ADMIN->is_superadmin ? $self->get_json_adequate_value('tenant_id') : $ADMIN->tenant_id;
-
-	my $col = QVD::Admin4::ConfigsOverwriteList->new(admin_id => $ADMIN->id);
-	my $col_re = $col->configs_to_show_re($tenant);
-
-    QVD::Admin4::Exception->throw(code => 6380, object => $token) 
-	unless $token =~ /$col_re/;
 
 	# This code forbids the switch to monotenant mode if
 	# in the system there are multiple tenants
@@ -582,9 +575,7 @@ sub forze_tenant_assignment_in_creation
 		my $tenant_id_value = $ADMIN->tenant_id;
 
 		# Set tenant_id to -1 if global configuration is changed in monotenant
-		my $col = QVD::Admin4::ConfigsOverwriteList->new(admin_id => $ADMIN->id);
-		if( (!cfg('wat.multitenant')) and ($self->qvd_object_model->qvd_object eq 'Config') and
-			($col->is_global_config($self->get_json_adequate_value('key'))) ){
+		if( (!cfg('wat.multitenant')) and ($self->qvd_object_model->qvd_object eq 'Config') ){
 			$tenant_id_value = -1;
 		}
 
