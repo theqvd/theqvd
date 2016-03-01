@@ -1270,6 +1270,7 @@ sub current_admin_setup
       tenant_block => $administrator->tenant->wat_setups->block,
       admin_id => $administrator->id,
       tenant_id => $administrator->tenant_id,
+      tenant_name => $administrator->tenant->name,
       acls => [ $administrator->acls ],
       views => [ map { { $_->get_columns } }
 		 $DB->resultset('Operative_Views_In_Administrator')->search(
