@@ -155,6 +155,7 @@
     "Fix filter": "Fijar filtro",
     "Forbidden section": "Sección no permitida",
     "Generating preview": "Generando vista previa",
+    "Global (Default)": "Global (Por defecto)",
     "Guide": "Guía",
     "Guide introduction": "Introducción de la guía",
     "Go top": "Ir arriba",
@@ -843,9 +844,7 @@
     "Fixed, Head and Default Tags cannot be deleted": "Los tags Fixed, Head y Default no se pueden eliminar", 
     "Forbidden role assignment, inherited role inherits from inheritor": "Asignación de rol no permitida, un rol heredado hereda del padre",
     "Incompatible expiration dates - Soft date must precede the hard one": "Fechas de expiración incompatibles - La fecha suave debe preceder a la fuerte",
-    "Non core config items haven't default value": "Los elementos de configuración que no son nativos, no tienen valor por defecto",
     "Unable to remove a core config item": "Imposible eliminar un elemento de configuración nativo",
     "Unable to switch to monotenant mode - More than one tenant in the system": "Imposible cambiar a modo monotenant - Hay más de un tenant en el sistema",
-    "Local configuration tokens cannot be set as global tokens": "Los tokens de configuración locales no pueden establecerse como globales",
-    "Global configuration tokens cannot be set locally for a tenant": "Los tokens de configuración globales no pueden establecerse como locales en un tenant"
+    "Cannot create new configuration token": "Imposible crear nuevo token de configuración"
 }

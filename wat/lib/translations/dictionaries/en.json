@@ -153,6 +153,7 @@
     "Fix filter": "Fix filter",
     "Forbidden section": "Forbidden section",
     "Generating preview": "Generating preview",
+    "Global (Default)": "Global (Default)",
     "Guide": "Guide",
     "Guide introduction": "Guide introduction",
     "Hard": "Hard",
@@ -840,9 +841,7 @@
     "Fixed, Head and Default Tags cannot be deleted": "Fixed, Head and Default Tags cannot be deleted", 
     "Forbidden role assignment, inherited role inherits from inheritor": "Forbidden role assignment, inherited role inherits from inheritor",
     "Incompatible expiration dates - Soft date must precede the hard one": "Incompatible expiration dates - Soft date must precede the hard one",
-    "Non core config items haven't default value": "Non core config items haven't default value",
     "Unable to remove a core config item": "Unable to remove a core config item",
     "Unable to switch to monotenant mode - More than one tenant in the system": "Unable to switch to monotenant mode - More than one tenant in the system",
-    "Local configuration tokens cannot be set as global tokens": "Local configuration tokens cannot be set as global tokens",
-    "Global configuration tokens cannot be set locally for a tenant": "Global configuration tokens cannot be set locally for a tenant"
+    "Cannot create new configuration token": "Cannot create new configuration token"
 }

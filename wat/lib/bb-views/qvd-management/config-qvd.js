@@ -114,7 +114,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
                 },
             };
             
-            params['startingOptions'][COMMON_TENANT_ID] = 'None (Common)';
+            params['startingOptions'][COMMON_TENANT_ID] = 'Global (Default)';
             
             Wat.A.fillSelect(params, function () {
                 // There are not tokens in supertenat context by the moment, so we delete the supertenant from tenant selector
@@ -315,17 +315,6 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
                 Wat.I.confirm('dialog/config-change', this.applySave, this);
                 
                 break;
-            case 'set_default':
-                this.configActionFilters = {
-                    "key": token,
-                };
-                
-                if (Wat.C.isSuperadmin()) {
-                    this.configActionFilters['tenant_id'] = this.selectedTenant;
-                }
-                
-                Wat.I.confirm('dialog/config-change', this.applySetDefault, this);
-                break;
             case 'delete':
                 this.configActionFilters = {
                     "key": token,
@@ -343,11 +332,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     applySave: function (that) {
         Wat.A.performAction('config_set', that.configActionArguments, {}, {'error': i18n.t('Error updating'), 'success': 'Successfully updated'}, that.afterChangeToken, that);
     },
-        
-    applySetDefault: function (that) {
-        Wat.A.performAction('config_default', {}, that.configActionFilters, {'error': i18n.t('Error updating'), 'success': 'Successfully updated'}, that.afterChangeToken, that);
-    },
-        
+
     applyDelete: function (that) {
         Wat.A.performAction('config_delete', {}, that.configActionFilters, {'error': i18n.t('Error deleting'), 'success': 'Successfully deleted'}, that.afterChangeToken, that);
     },

@@ -16,7 +16,7 @@ $.each(configTokens, function (iTok, tok) {
     var token = tok.key;
     var value = tok.operative_value;
     var dvalue = tok.default_value;
-
+    var isDefault = tok.is_default;
 
     var tokenSplitted = token.split('.');
     var prefix = tokenSplitted[0];
@@ -24,8 +24,13 @@ $.each(configTokens, function (iTok, tok) {
     <tr class="js-token-row" data-prefix="<%= prefix %>">
         <td>
             <%= _.escape(token) %>
-            
+
             <%
+            if (isDefault) {
+            %>
+                <span class="fa fa-info-circle" data-i18n="[title]Default value"></span>
+            <% 
+            }
             if (QVD_CONFIG_HELP[token] != undefined) {
             %>
                 <div class="second_row token_description"><%= QVD_CONFIG_HELP[token] %></div>
@@ -43,8 +48,8 @@ $.each(configTokens, function (iTok, tok) {
                 if (dvalue == undefined) {
             %>
                     <option value="delete" data-i18n="Delete"></option>
-            <% } else if (dvalue != value) { %>
-                    <option value="set_default" data-i18n="Restore to default value"></option>
+            <% } else if (!isDefault) { %>
+                    <option value="delete" data-i18n="Restore to default value"></option>
             <% } %>
             </select>
             <a class="js-traductable_button actions_button button fa fa-cog" class="token_actions_button" data-token="<%= token %>" data-i18n="Apply"></a>

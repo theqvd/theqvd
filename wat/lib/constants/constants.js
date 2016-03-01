@@ -76,10 +76,8 @@ ALL_STATUS = {
     7340: 'Fixed, Head and Default Tags cannot be deleted',
     7350: 'Forbidden role assignment: inherited role inherits from inheritor',
     7360: 'Incompatible expiration dates - Soft date must precede the hard one',
-    7371: 'Non core config items haven\'t default value',
-    7372: 'Unable to remove a core config item',
-    7380: 'Local configuration tokens cannot be set as global tokens',
-    7381: 'Global configuration tokens cannot be set locally for a tenant'
+    7370: 'Unable to remove a core config item',
+    7382: 'Cannot create new configuration tokens'
 };
 
 STATUS_SUCCESS = 0;
@@ -148,8 +146,7 @@ STATUS_TAG_NOT_DELETED_DUE_FIXED = 7340;
 STATUS_ROLE_NOT_ASSIGNED_DUE_LOOP = 7350;
 
 STATUS_INCOMPATIBLE_EXPIRATION = 7360;
-STATUS_NOT_DEFAULT_CONFIG_TOKEN = 7371;
-STATUS_UNABLE_REMOVE_CONFIG_TOKEN = 7372;
+STATUS_UNABLE_REMOVE_CONFIG_TOKEN = 7370;
 STATUS_UNABLE_SWITCH_MONOTENANT = 7373;
 
 STATUS_FORBIDDEN = 8;
