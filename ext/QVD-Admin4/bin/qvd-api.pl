@@ -142,12 +142,12 @@ any [qw(POST GET)] => '/api/info' => sub {
   $c->res->headers->header('Access-Control-Allow-Origin' => '*');
 
   QVD::Config::reload();
-  my $localtime = localtime();
+  my $utc_time = gmtime();
 
 	my $json = {
 		status => 0,
-               server_datetime => $localtime,
-	       multitenant => $c->qvd_admin4_api->_cfg('wat.multitenant'),
+		server_datetime => $utc_time,
+		multitenant => $c->qvd_admin4_api->_cfg('wat.multitenant'),
 		version => { database => $c->qvd_admin4_api->database_version },
 		public_configuration => cfg_tree('api.public'),
 	};
