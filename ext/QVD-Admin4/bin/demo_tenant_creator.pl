@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use List::MoreUtils qw(first_index uniq);
 use Getopt::Long;
-use Backticks;
+use Capture::Tiny ':all';
 
 # Constants
 my $EXIT_ERROR_CODE = 1;
@@ -51,9 +51,11 @@ foreach (@images) { push @image_with_vm, [$_, 0] };
 foreach (@vms) { push @image_with_vm, [$_, 1] };
 
 # qvd-administrator tool directory
-my $perl = "/usr/lib/qvd/bin/perl -Mlib::glob=./*/lib";
-my $qa = "./QVD-Admin4/bin/qa -f CSV -u \"$url\" " .
-	"-t \"$tenant_superadmin\" -l \"$login_superadmin\" -p \"$password_superadmin\" --insecure";
+my $perl_bin = "/usr/lib/qvd/bin/perl";
+my @perl_args = ("-Mlib::glob=./*/lib");
+my $qa_bin = "./QVD-Admin4/bin/qa";
+my @qa_args = ("-f", "CSV", "-u", "$url", "-t", "$tenant_superadmin", "-l", "$login_superadmin", 
+    "-p", "$password_superadmin", "--insecure");
 
 # Commands to be executed
 my %command_order = ();
@@ -245,17 +247,21 @@ sub commandAsString {
 }
 
 sub executeCommand {
-	my $cmd = shift;
+    my $cmd = shift;
 
-	my $commandStr = commandAsString($cmd);
+    my $object = getCommandObject($cmd);
+    my $action = getCommandAction($cmd);
+    my $args = getCommandArgumentsAsString($cmd);
+    my $filters = getCommandFiltersAsString($cmd);
 
-	my $qa_command = "$perl $qa $commandStr 2>&1";
-	my $cmd_output = `$qa_command`;
-	my $output = $cmd_output->stdout();
-	my $exit_code = $cmd_output->exitcode();
-	storeCommandExecution($cmd, $exit_code, $output);
+    my ($stdout, $stderr, $exit_code) = capture {
+        system($perl_bin, @perl_args, $qa_bin, @qa_args, $object, $filters, $action, $args);
+    };
+    $exit_code >>= 8;
 
-	return $exit_code;
+    storeCommandExecution($cmd, $exit_code, $stdout);
+
+    return $exit_code;
 }
 
 sub evaluateCommand {
