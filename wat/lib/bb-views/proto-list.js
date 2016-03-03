@@ -627,7 +627,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                                         'text': 'Tenant',
                                         'displayDesktop': true,
                                         'displayMobile': true,
-                                        'class': 'chosen-single',
+                                        'class': 'chosen-advanced',
                                         'fillable': true,
                                         'fixable': 'only-positive',
                                         'waitLoading': true,

@@ -109,7 +109,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
                 'action': 'tenant_tiny_list',
                 'selectedId': this.selectedTenant,
                 'controlId': 'tenant_search',
-                'chosenType': 'single100',
+                'chosenType': 'advanced100',
                 'startingOptions': {
                 },
             };

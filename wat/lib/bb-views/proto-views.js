@@ -352,6 +352,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             var params = {
                 'action': 'tenant_tiny_list',
                 'controlName': 'tenant-select',
+                'chosenType': 'advanced100'
             };
 
             Wat.A.fillSelect(params, function () {

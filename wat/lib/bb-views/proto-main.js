@@ -162,7 +162,7 @@ Wat.Views.MainView = Backbone.View.extend({
                 'action': 'tenant_tiny_list',
                 'selectedId': that.selectedTenant || 0,
                 'controlId': 'tenant_editor',
-                'chosenType': 'single100'
+                'chosenType': 'advanced100'
             };
             
             var existsOutTenant = $.inArray(that.qvdObj, QVD_OBJS_EXIST_OUT_TENANT) != -1;
