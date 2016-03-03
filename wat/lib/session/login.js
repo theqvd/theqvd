@@ -100,7 +100,15 @@ Wat.L = {
     checkLogin: function (that) {
         that.password = '';
         
-        if (that.retrievedData.status == ERROR_INTERNAL) {
+        // If request is not corretly performed and session is enabled, logout and reload
+        if (that.retrievedData.status == STATUS_SUCCESS && that.retrievedData.statusText == 'error') {
+            if (Wat.C.sid) {
+                Wat.L.logOut();
+                window.location.reload();
+            }
+            return;
+        }
+        else if (that.retrievedData.status == ERROR_INTERNAL) {
             Wat.I.M.showMessage({message: that.retrievedData.statusText, messageType: "error"});
             return;
         }
