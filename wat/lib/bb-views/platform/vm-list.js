@@ -22,9 +22,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         this.dialogConf.title = $.i18n.t('New Virtual machine');
         Wat.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
         
-        var fillFields = function (tenantId) {
-            var tenantId = tenantId || 0;
-            
+        var fillFields = function () {            
             // If main view is user view, we are creating a virtual machine from user details view. 
             // User and tenant (if exists) controls will be removed
             if (Wat.CurrentView.qvdObj == 'user') {
@@ -44,10 +42,23 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
                     tenantHidden.name = "tenant_id";
                     tenantHidden.value = Wat.CurrentView.model.get('tenant_id');
                     $('.editor-container').append(tenantHidden);
+                    
+                    // Store tenantId to be used on OSF filter
+                    var tenantId = tenantHidden.value;
                 }
             }
-            else if (!tenantId) {
-                // Fill Users select on virtual machines creation form
+            else if ($('[name="tenant_id"]').length > 0) {
+                // When tenant id is present attach change events. User, osf and di will be filled once the events were triggered
+                Wat.B.bindEvent('change', 'select[name="tenant_id"]', Wat.B.editorBinds.filterTenantOSFs);
+                Wat.B.bindEvent('change', '[name="tenant_id"]', Wat.B.editorBinds.filterTenantUsers);
+                Wat.I.chosenElement('[name="user_id"]', 'advanced100');
+                Wat.I.chosenElement('[name="osf_id"]', 'advanced100');
+                Wat.I.chosenElement('[name="di_tag"]', 'advanced100');
+                return;
+            }
+            else {
+                // Fill Users select on virtual machines creation form. 
+                // This filling has sense when the view is the VM view and tenant filter is not present
                 var params = {
                     'action': 'user_tiny_list',
                     'selectedId': '',
@@ -55,12 +66,6 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
                     'chosenType': 'advanced100'
                 };
                 
-                if (tenantId) {
-                    params.filters = {
-                        tenant_id: tenantId
-                    };
-                }
-
                 Wat.A.fillSelect(params, function () {}); 
             }
 
@@ -72,6 +77,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
                 'chosenType': 'advanced100'
             };
             
+            // If tenant is defined, use it on OSF filter
             if (tenantId) {
                 params.filters = {
                     tenant_id: tenantId
@@ -99,16 +105,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             });  
         }
                     
-        if ($('[name="tenant_id"]').length > 0) {
-            Wat.B.bindEvent('change', 'select[name="tenant_id"]', Wat.B.editorBinds.filterTenantOSFs);
-            Wat.B.bindEvent('change', '[name="tenant_id"]', Wat.B.editorBinds.filterTenantUsers);
-            Wat.I.chosenElement('[name="user_id"]', 'advanced100');
-            Wat.I.chosenElement('[name="osf_id"]', 'advanced100');
-            Wat.I.chosenElement('[name="di_tag"]', 'advanced100');
-        }
-        else {
-            fillFields();
-        }
+        fillFields();
     },
     
     createElement: function () {
