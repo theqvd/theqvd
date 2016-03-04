@@ -122,7 +122,7 @@
                         if (col.display == false) {
                             return;
                         }
-                    
+
                         switch(name) {
                             case 'checks':
                                 var checkedAttr = $.inArray(parseInt(model.get('id')), selectedItems) > -1 ? 'checked' : '';
@@ -138,37 +138,41 @@
                                 <td class="js-cell-info">
                                     <%
                                     if (!infoRestrictions || infoRestrictions.state) {
-                                    %>
-                                        <%
-                                        if (model.get('state') == 'stopped') {
-                                        %>
-                                            <i class="fa fa-stop" title="<%= i18n.t('Stopped') %>" data-i18n="[title]Stopped" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
-                                        <%
+                                        switch (model.get('state')) {
+                                            case 'stopped':
+                                                %>
+                                                    <i class="<%= CLASS_ICON_STATUS_STOPPED %>" title="<%= i18n.t('Stopped') %>" data-i18n="[title]Stopped" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
+                                                <%
+                                                break;
+                                            case 'running':
+                                                %>
+                                                    <i class="<%= CLASS_ICON_STATUS_RUNNING %>" title="<%= i18n.t('Running') %>" data-i18n="[title]Running" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
+
+                                                    <%
+                                                    if (model.get('di_id') != model.get('di_id_in_use')) {
+                                                    %>
+                                                        <i class="fa fa-warning warning" title="" data-id="<%= model.get('id') %>" data-i18n="[title]The execution image is different than the assigned image"></i>
+                                                    <%
+                                                    }
+                                                break;
+                                            case 'starting':
+                                                %>
+                                                    <i class="<%= CLASS_ICON_STATUS_STARTING %>" title="<%= model.get('state') %>" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
+                                                <%
+                                                break;
+                                            case 'stopping':
+                                                %>
+                                                    <i class="<%= CLASS_ICON_STATUS_STOPPING %>" title="<%= model.get('state') %>" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
+                                                <%
+                                                break;
+                                            case 'zombie':
+                                                %>
+                                                    <i class="<%= CLASS_ICON_STATUS_ZOMBIE %>" data-i18n="[title]Zombie" title="<%= i18n.t('Zombie') %>" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
+                                                <%
+                                                break;
                                         }
-                                        else if (model.get('state') == 'running'){
-                                        %>
-                                            <i class="fa fa-play" data-i18n="[title]Running" title="<%= i18n.t('Running') %>" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
-                                            
-                                            <%
-                                            if (model.get('di_id') != model.get('di_id_in_use')) {
-                                            %>
-                                                <i class="fa fa-warning warning" title="" data-id="<%= model.get('id') %>" data-i18n="[title]The execution image is different than the assigned image"></i>
-                                            <%
-                                            }
-                                            %>
-                                        <%
-                                        }
-                                        else {
-                                        %>
-                                            <i class="fa fa-spinner fa-spin" title="<%= model.get('state') %>" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
-                                        <%
-                                        }
-                                        %>
-                                    <%
                                     }
-                                    %>
                                     
-                                    <%
                                     var userStateHiddenClass = 'hidden';
                                     if (model.get('user_state') == 'connected' && (!infoRestrictions || infoRestrictions.user_state)) {
                                         userStateHiddenClass = '';

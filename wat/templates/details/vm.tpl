@@ -26,12 +26,12 @@ if (Wat.C.checkACL('vm.see.state')) {
     if (Wat.C.checkACL('vm.update.state') && stateTableClass == 'hidden') {
         if (model.get('state') != 'stopped') { 
     %>
-        <a class="button fright button-icon--desktop js-button-stop-vm fa fa-stop fright" href="javascript:" data-i18n="[title]Stop" data-wsupdate="state-button" data-id="<%= model.get('id') %>"><span data-i18n="Stop" class="mobile"></span></a>
+        <a class="button fright button-icon--desktop js-button-stop-vm <%= CLASS_ICON_STATUS_STOPPED %> fright" href="javascript:" data-i18n="[title]Stop" data-wsupdate="state-button" data-id="<%= model.get('id') %>"><span data-i18n="Stop" class="mobile"></span></a>
     <% 
         }
         else { 
     %>
-        <a class="button fright button-icon--desktop js-button-start-vm fa fa-play fright" href="javascript:" data-i18n="[title]Start" data-wsupdate="state-button" data-id="<%= model.get('id') %>"><span data-i18n="Start" class="mobile"></span></a>
+        <a class="button fright button-icon--desktop js-button-start-vm <%= CLASS_ICON_STATUS_RUNNING %> fright" href="javascript:" data-i18n="[title]Start" data-wsupdate="state-button" data-id="<%= model.get('id') %>"><span data-i18n="Start" class="mobile"></span></a>
     <% 
         }
     } 

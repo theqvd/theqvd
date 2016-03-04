@@ -124,22 +124,22 @@
                                     switch (model.get('state')) {
                                         case'stopped':
                                     %>
-                                        <i class="fa fa-stop" data-i18n="[title]Stopped" title="<%= i18n.t('Stopped') %>" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
+                                        <i class="<%= CLASS_ICON_STATUS_STOPPED %>" data-i18n="[title]Stopped" title="<%= i18n.t('Stopped') %>" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
                                     <%
                                             break;
                                         case 'running':
                                     %>
-                                        <i class="fa fa-play" data-i18n="[title]Running" title="<%= i18n.t('Running') %>" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
+                                        <i class="<%= CLASS_ICON_STATUS_RUNNING %>" data-i18n="[title]Running" title="<%= i18n.t('Running') %>" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
                                     <%
                                             break;
                                         case 'starting':
                                     %>
-                                                <i class="fa fa-spinner fa-spin" data-i18n="[title]Starting" title="<%= i18n.t('Starting') %>" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
+                                                <i class="<%= CLASS_ICON_STATUS_STARTING %>" data-i18n="[title]Starting" title="<%= i18n.t('Starting') %>" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
                                     <%
                                             break;
                                         case 'stopping':
                                     %>
-                                                <i class="fa fa-spinner fa-spin" data-i18n="[title]Stopping" title="<%= i18n.t('Stopping') %>" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
+                                                <i class="<%= CLASS_ICON_STATUS_STOPPING %>" data-i18n="[title]Stopping" title="<%= i18n.t('Stopping') %>" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
                                     <%
                                     }
                                     

@@ -186,6 +186,11 @@ CLASS_ICON_PERSONALAREA = 'fa fa-archive';
 CLASS_ICON_USER = 'fa fa-user';
 CLASS_ICON_LOG = 'fa fa-file-text-o';
 CLASS_ICON_PROPERTIES = 'fa fa-sticky-note-o';
+CLASS_ICON_STATUS_RUNNING = 'fa fa-play';
+CLASS_ICON_STATUS_STOPPED = 'fa fa-stop';
+CLASS_ICON_STATUS_STARTING = 'fa fa-spinner fa-spin';
+CLASS_ICON_STATUS_STOPPING = 'fa fa-spinner fa-spin';
+CLASS_ICON_STATUS_ZOMBIE = 'fa fa-medkit';
 
 // Classification of Qvd Objects
 QVD_OBJS_WITH_PROPERTIES = ['user', 'vm', 'host', 'osf', 'di'];
@@ -363,5 +368,6 @@ DICTIONARY_STATES = {
     running: 'Running',
     stopped: 'Stopped',
     starting: 'Starting',
-    stopping: 'Stopping'
+    stopping: 'Stopping',
+    zombie: 'Zombie'
 };

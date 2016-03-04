@@ -34,6 +34,11 @@
                 stateIcon: '<i class="fa fa-stop faa-flash animated"></i>',
                 style: 'display: none;'
             },
+            zombie: {
+                stateText: DICTIONARY_STATES['zombie'],
+                stateIcon: '<i class="fa fa-medkit faa-flash animated"></i>',
+                style: 'display: none;'
+            },
         };
         
         stateComponents[model.get('state')].style = '';
@@ -46,16 +51,23 @@
                 <span class="h2" data-i18n="Execution state"></span>
                 <% 
                 if (Wat.C.checkACL('vm.update.state')) {
-                    if (model.get('state') != 'stopped') { 
-                %>
-                        <a class="button fright button-icon js-button-stop-vm fa fa-stop fright" href="javascript:" data-i18n="[title]Stop" data-wsupdate="state-button" data-id="<%= model.get('id') %>"></a>
-                        <!--<a style="margin-right: 6px;" class="button fright button-icon js-button-restart-vm fa fa-refresh fright" href="javascript:" data-i18n="[title]Restart" data-wsupdate="state-button-restart" data-id="<%= model.get('id') %>"></a>-->
-                <% 
-                    }
-                    else { 
-                %>
-                        <a class="button fright button-icon js-button-start-vm fa fa-play fright" href="javascript:" data-i18n="[title]Start" data-wsupdate="state-button" data-id="<%= model.get('id') %>"></a>
-                <% 
+                    switch (model.get('state')) {
+                        case 'stopped':
+                            %>
+                                <a class="button fright button-icon js-button-start-vm <%= CLASS_ICON_STATUS_RUNNING %> fright" href="javascript:" data-i18n="[title]Start" data-wsupdate="state-button" data-id="<%= model.get('id') %>"></a>
+                            <%
+                            break;
+                        case 'zombie':
+                            %>
+                                <a class="button fright button-icon invisible fright" href="javascript:" data-i18n="[title]Zombie" data-wsupdate="state-button" data-id="<%= model.get('id') %>"></a>
+                            <% 
+                            break;
+                        default:
+                            %>
+                                <a class="button fright button-icon js-button-stop-vm <%= CLASS_ICON_STATUS_STOPPED %> fright" href="javascript:" data-i18n="[title]Stop" data-wsupdate="state-button" data-id="<%= model.get('id') %>"></a>
+                                <!--<a style="margin-right: 6px;" class="button fright button-icon js-button-restart-vm fa fa-refresh fright" href="javascript:" data-i18n="[title]Restart" data-wsupdate="state-button-restart" data-id="<%= model.get('id') %>"></a>-->
+                            <% 
+                            break;
                     }
                 } 
                 %>
