@@ -106,6 +106,10 @@ sub _validate_tenant {
             ERROR "tenant lookup for '$name' returned reserved id 0";
             return;
         }
+        if ($tenant->blocked) {
+            ERROR "tenant $id ($name) is blocked";
+            return;
+        }
         $auth->{tenant_id} = $id;
         DEBUG "tenant '$name' found, id: $id";
         return 1;
