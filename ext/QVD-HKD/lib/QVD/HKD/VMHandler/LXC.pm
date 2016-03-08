@@ -213,11 +213,14 @@ sub _calculate_attrs {
         my $overlays_parent = $self->_cfg('path.storage.overlayfs');
         $overlays_parent =~ s|/*$|/|;
         $self->{os_overlayfs} = $overlays_parent . join('-', $self->{di_id}, $self->{vm_id}, 'overlayfs');
+        my $junk = join('-', $$, rand(1_000_000));
         unless ($self->_cfg('vm.overlay.persistent')) {
             $self->{os_overlayfs_old} = $overlays_parent . join('-',
                                                                 'deleteme', $self->{di_id}, $self->{vm_id},
-                                                                $$, rand(100000));
+                                                                $junk);
         }
+        $self->{os_workdir} = $overlays_parent . join('-', $self->{vm_id}, 'overlayfs-work');
+        $self->{os_workdir_old} = $overlays_parent . join('-', 'deleteme-work', $self->{vm_id}, $junk);
     }
 
     if ($self->{user_storage_size}) {
@@ -258,6 +261,8 @@ sub _start_os_fs {
                                                basefs_lockfn => $self->{os_basefs_lockfn},
                                                overlayfs     => $self->{os_overlayfs},
                                                overlayfs_old => $self->{os_overlayfs_old},
+                                               workdir       => $self->{os_workdir},
+                                               workdir_old   => $self->{os_workdir_old},
                                                rootfs        => $self->{os_rootfs});
     $self->{os_fs} = $fs;
     $fs->run;

@@ -1,5 +1,0 @@
-?package(xvnc4viewer):needs="X11" \
-	section="Apps/Net" \
-	title="VNC Viewer" \
-        command="xvnc4viewer" \
-        hints="VNC viewer"

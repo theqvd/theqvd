@@ -1,9 +1,0 @@
-This is how the .orig.tar.gz file is generated from two upstream sources.
-
-tar xfz vnc-4_1_1-unixsrc.tar.gz
-mv vnc-4_1_1-unixsrc/ vnc4-4.1.1+X4.3.0
-cd vnc4-4.1.1+X4.3.0/unix/
-tar xfz ../../X430src-1.tgz
-tar xfz ../../X430src-2.tgz 
-tar xfz ../../X430src-3.tgz 
-patch -Np0 < xc.patch

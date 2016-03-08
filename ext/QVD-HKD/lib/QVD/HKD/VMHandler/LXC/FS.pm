@@ -24,6 +24,10 @@ use Class::StateMachine::Declarative
                                  analyze       => { enter => '_analyze_os_image' },
                                  unlocking     => { enter => '_unlock_os_image' } ] },
 
+    workdir  => { substates => [ removing_old => { enter => '_remove_old_workdir' },
+                                 making       => { enter => '_make_workdir' } ] },
+
+
     overlay  => { substates => [ removing_old => { enter => '_remove_old_overlay' },
                                  making       => { enter => '_make_overlay' } ] },
 
@@ -43,7 +47,8 @@ sub new {
     my %mine = map { $_ => delete $opts{$_} }
         qw(vm_id image_path
            basefs basefs_lockfn
-           overlayfs overlayfs_old rootfs
+           overlayfs overlayfs_old
+           workdir workdir_old rootfs
            on_running on_stopped on_error);
 
     my $self = $class->SUPER::new(%opts);
@@ -206,7 +211,7 @@ sub _remove_old_overlay {
     my $overlayfs = $self->{overlayfs};
     if (-e $overlayfs) {
         if (defined (my $overlayfs_old =  $self->{overlayfs_old})) {
-            return $self->_remove_overlay_dir($overlayfs, $overlayfs_old);
+            return $self->_move_dir($overlayfs, $overlayfs_old);
         }
         else {
             DEBUG "Reusing existing overlay directory '$overlayfs'";
@@ -215,13 +220,13 @@ sub _remove_old_overlay {
     $self->_on_done;
 }
 
-sub _remove_overlay_dir {
+sub _move_dir {
     my ($self, $dir, $move_to) = @_;
     unless (rename $dir, $move_to) {
         ERROR "Unable to move old '$dir' out of the way to '$move_to' for VM $self->{vm_id}";
         return $self->_on_error;
     }
-    DEBUG "old overlay directory '$dir' moved to '$move_to'";
+    DEBUG "old directory '$dir' moved to '$move_to'";
     $self->_on_done;
 }
 
@@ -236,17 +241,29 @@ sub _make_overlay {
         return $self->_on_done;
     }
 
-    $self->_make_overlay_dir($overlayfs, $self->{basefs});
+    $self->_make_dir($overlayfs, $self->{basefs});
 }
 
-sub _make_overlay_dir {
+sub _make_dir {
     my ($self, $dir) = @_;
     unless (mkpath($dir)) {
-        ERROR "Unable to create overlay file system '$dir' for VM $self->{vm_id}: $!";
+        ERROR "Unable to create directory '$dir' for VM $self->{vm_id}: $!";
         return $self->_on_error;
     }
-    DEBUG "overlay directory $dir created";
+    DEBUG "directory $dir created";
     $self->_on_done
+}
+
+sub _remove_old_workdir {
+    my $self = shift;
+    DEBUG "skipping old workdir removing";
+    $self->_on_done;
+}
+
+sub _make_workdir {
+    my $self = shift;
+    DEBUG "skipping workdir creation";
+    $self->_on_done;
 }
 
 sub _make_root {
@@ -258,7 +275,7 @@ sub _make_root {
         return $self->_on_error;
     }
 
-    $self->_mount_root($rootfs, @{$self}{qw(basefs overlayfs basefs_subdir)});
+    $self->_mount_root($rootfs, @{$self}{qw(basefs overlayfs basefs_subdir workdir)});
 }
 # _mount_root is a virtual function that must be implemented by all the subclasses
 
