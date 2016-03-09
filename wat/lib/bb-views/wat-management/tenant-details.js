@@ -1,5 +1,43 @@
 Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({  
     qvdObj: 'tenant',
+    
+    cascadeTenantElements: {
+            'vm': {
+                elementName: 'Virtual machines',
+                nameField: 'name',
+                templateSelector: '.bb-tenant-delete-vms',
+                nextObj: 'user'
+             },
+            'user': {
+                elementName: 'Users',
+                nameField: 'name',
+                templateSelector: '.bb-tenant-delete-users',
+                nextObj: 'di'
+             },
+            'di': {
+                elementName: 'Disk images',
+                nameField: 'disk_image',
+                templateSelector: '.bb-tenant-delete-dis',
+                nextObj: 'osf'
+             },
+            'osf': {
+                elementName: 'OS Flavours',
+                nameField: 'name',
+                templateSelector: '.bb-tenant-delete-osfs',
+                nextObj: 'role'
+             },
+            'role': {
+                elementName: 'Roles',
+                nameField: 'name',
+                templateSelector: '.bb-tenant-delete-roles',
+                nextObj: 'administrator'
+             },
+            'administrator': {
+                elementName: 'Administrators',
+                nameField: 'name',
+                templateSelector: '.bb-tenant-delete-administrators'
+             }
+    },
 
     initialize: function (params) {
         this.model = new Wat.Models.Tenant(params);
@@ -8,6 +46,10 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
        
         // Clean previous item name
         this.breadcrumbs.next.next.next.screen="";
+        
+        var templates = Wat.I.T.getTemplateList('tenantDetails');
+        
+        Wat.A.getTemplates(templates, function () {}); 
         
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
     },
@@ -135,4 +177,115 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
             this.renderLogGraph(params);
         }
     },
+    
+    applyDelete: function (that) {
+        //that.deleteModel({id: that.elementId}, that.afterDelete, that.model);
+        var that = this;
+        
+        var dialogConf = {
+            title: 'Deleting tenant',
+            buttons : {
+                "Cancel": function () {                    
+                    Wat.I.closeDialog($(this));
+                },
+                "Delete all": function () {
+                    var that = Wat.CurrentView;
+                    
+                    that.dialog = $(this);
+                                    
+                    // Hide delete all button until all data were retrieved
+                    $('.ui-dialog-buttonset').hide();
+                    that.applyCascadeDelete();
+                }
+            },
+            button1Class : 'fa fa-ban',
+            button2Class : 'fa fa-trash',
+            
+            fillCallback : function (target) {
+                // Hide delete all button until all data were retrieved
+                $('.ui-dialog-buttonset .button').eq(1).hide();
+                
+                // Add common parts of editor to dialog
+                var template = _.template(
+                    Wat.TPL.deleteTenantDialog, {
+                    }
+                );
+
+                target.html(template);
+                
+                Wat.CurrentView.getTenantElements();
+            }
+        }
+
+        Wat.I.dialog(dialogConf);        
+    },
+                            
+    getTenantElements: function (qvdObj) {
+        var qvdObj = qvdObj || 'vm';
+        var that = this;
+        
+        Wat.A.performAction(qvdObj + '_tiny_list', {}, {
+            tenant_id: that.elementId
+            }, {}, function (that) {
+                var template = _.template(
+                    Wat.TPL.deleteTenantDialogElements, {
+                        elementQvdObj: qvdObj,
+                        elementName: that.cascadeTenantElements[qvdObj]['elementName'],
+                        registers: that.retrievedData.rows,
+                        nameField: that.cascadeTenantElements[qvdObj]['nameField'] || 'name'
+                    }
+                );
+                
+                $(that.cascadeTenantElements[qvdObj]['templateSelector']).html(template);
+                
+                if (that.cascadeTenantElements[qvdObj]['nextObj']) {
+                    that.getTenantElements(that.cascadeTenantElements[qvdObj]['nextObj']);
+                }
+                else {
+                    // After finish counting, show delete all button
+                    $('.ui-dialog-buttonset .button').eq(1).show(); 
+                }
+            }, that);
+    },
+    
+    applyCascadeDelete: function (qvdObj) {
+        var qvdObj = qvdObj || 'vm';
+        var that = this;
+        
+        var nElements = parseInt($('[data-qvd-obj="' + qvdObj + '"].js-counter').html());
+        
+        if (!nElements) {
+            if (that.cascadeTenantElements[qvdObj]['nextObj']) {
+                that.applyCascadeDelete(that.cascadeTenantElements[qvdObj]['nextObj']);
+            }
+            else {
+                that.deleteModel({id: that.elementId}, that.afterDelete, that.model);
+            }
+            return;
+        }
+        
+        var elements = $('ul[data-qvd-obj="' + qvdObj + '"] li');
+        var elementIds = [];
+        $.each(elements, function (iElement, element) {
+            elementIds.push($(element).attr('data-id'));
+        });
+
+        Wat.A.performAction(qvdObj + '_delete', {}, {
+            id: elementIds
+            }, {}, function (res) {
+                // TODO: Check (res.retrievedData == STATUS_SUCCESS)
+                var that = Wat.CurrentView;
+            
+                $('[data-qvd-obj="' + qvdObj + '"].js-counter').html('0')
+                $('ul[data-qvd-obj="' + qvdObj + '"] li').remove();
+            
+                if (that.cascadeTenantElements[qvdObj]['nextObj']) {
+                    that.applyCascadeDelete(that.cascadeTenantElements[qvdObj]['nextObj']);
+                }
+                else {
+                    Wat.I.closeDialog(that.dialog);
+                    that.deleteModel({id: that.elementId}, that.afterDelete, that.model);
+                }
+            }, that);
+    }
 });

@@ -48,4 +48,10 @@ Wat.Views.TenantListView = Wat.Views.ListView.extend({
                                 
         this.createModel(arguments, this.fetchList);
     },
+    
+    applyDelete: function (that) {
+        var auxModel = new that.collection.model();  
+        that.resetSelectedItems ();
+        that.deleteModel(that.applyFilters, that.fetchList, auxModel);
+    },
 });

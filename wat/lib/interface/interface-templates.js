@@ -2,7 +2,7 @@
 Wat.I.T = {
     getTemplateList: function (code, params) {
         var templates = {};
-        
+
         switch(code) {
             case 'starting':        
                 templates = {
@@ -230,6 +230,16 @@ Wat.I.T = {
                     },
                     aclsRoles: {
                         name: 'details/role-acls-tree'
+                    }
+                }
+                break;
+            case 'tenantDetails':
+                templates = {
+                    deleteTenantDialog: {
+                        name: 'dialog/delete-tenant'
+                    },
+                    deleteTenantDialogElements: {
+                        name: 'dialog/delete-tenant-elements'
                     }
                 }
                 break;
