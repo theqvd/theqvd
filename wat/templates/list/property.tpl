@@ -12,7 +12,7 @@ else {
                 <% if (Wat.C.isSuperadmin()) { %>
                 <div class="filter-control desktop">
                     <label for="obj-qvd-select" data-i18n>Tenant</label>
-                    <select name="tenant-select" class="chosen-single">
+                    <select name="tenant-select">
                     </select>
                 </div>
                 <% } %>

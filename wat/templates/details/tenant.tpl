@@ -5,7 +5,7 @@
     
     <% if(Wat.C.checkACL('tenant.delete.')) { %>
     <a class="button fleft button-icon--desktop js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"><span data-i18n="Delete" class="mobile"></span></a>
-    <% } %>
+    <% } %> 
     <% if(Wat.C.checkGroupACL('tenantEdit')) { %>
     <a class="button fright button-icon--desktop js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"><span data-i18n="Edit" class="mobile"></span></a>
     <% } %>
@@ -24,7 +24,10 @@
         }
     }
     %>
-    
+       
+    <% if(Wat.C.checkACL('tenant.delete.')) { %>
+    <a class="button fright button-icon--desktop js-button-purge fa fa-eraser" href="javascript:" data-i18n="[title]Purge"><span data-i18n="Purge" class="mobile"></span></a>
+    <% } %>
     <div class="clear mobile"></div>
 </div>
 

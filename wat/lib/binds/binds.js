@@ -97,6 +97,11 @@ Wat.B = {
         this.bindEvent('click', '.js-pie-chart', this.homeBinds.pieClick);
     },
     
+    bindTenantEvents: function () {
+        this.bindEvent('click', '.js-button-delete-tenant-object', this.tenantBinds.purgeTenantObject);
+        this.bindEvent('click', '.js-button-delete-tenant-element', this.tenantBinds.purgeTenantElement);
+    },
+    
     bindNavigationEvents: function () {
         this.bindEvent('click', '.menu-option[data-target]', this.navigationBinds.clickMenu);
         
@@ -837,5 +842,19 @@ Wat.B = {
                 });
             });
         },
-    }
+    },
+    
+    tenantBinds: {
+        purgeTenantObject: function (e) {
+            var qvdObj = $(e.target).attr('data-qvd-obj');
+            
+            Wat.CurrentView.applyCascadeDelete(qvdObj, false);
+        },
+        purgeTenantElement: function (e) {
+            var qvdObj = $(e.target).attr('data-qvd-obj');
+            var elementId = $(e.target).attr('data-id');
+            
+            Wat.CurrentView.applyDeleteElement(qvdObj, elementId);
+        }
+    },
 }

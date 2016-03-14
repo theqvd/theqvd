@@ -240,6 +240,9 @@ Wat.I.T = {
                     },
                     deleteTenantDialogElements: {
                         name: 'dialog/delete-tenant-elements'
+                    },
+                    deleteTenantDialogEmpty: {
+                        name: 'dialog/delete-tenant-empty'
                     }
                 }
                 break;

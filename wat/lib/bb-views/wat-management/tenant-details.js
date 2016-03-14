@@ -4,38 +4,40 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
     cascadeTenantElements: {
             'vm': {
                 elementName: 'Virtual machines',
-                nameField: 'name',
-                templateSelector: '.bb-tenant-delete-vms',
                 nextObj: 'user'
              },
             'user': {
                 elementName: 'Users',
-                nameField: 'name',
-                templateSelector: '.bb-tenant-delete-users',
                 nextObj: 'di'
              },
             'di': {
                 elementName: 'Disk images',
                 nameField: 'disk_image',
-                templateSelector: '.bb-tenant-delete-dis',
                 nextObj: 'osf'
              },
             'osf': {
                 elementName: 'OS Flavours',
-                nameField: 'name',
-                templateSelector: '.bb-tenant-delete-osfs',
                 nextObj: 'role'
              },
             'role': {
                 elementName: 'Roles',
-                nameField: 'name',
-                templateSelector: '.bb-tenant-delete-roles',
                 nextObj: 'administrator'
              },
             'administrator': {
                 elementName: 'Administrators',
-                nameField: 'name',
-                templateSelector: '.bb-tenant-delete-administrators'
+                nextObj: 'property'
+             },
+            'property': {
+                elementName: 'Properties',
+                nameField: 'key',
+                retrievingAction: 'property_get_list',
+                nextObj: 'config'
+             },
+            'config': {
+                elementName: 'Configuration tokens',
+                nameField: 'key',
+                idField: 'key',
+                retrievingAction: 'config_get'
              }
     },
 
@@ -46,12 +48,19 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
        
         // Clean previous item name
         this.breadcrumbs.next.next.next.screen="";
-        
+            
         var templates = Wat.I.T.getTemplateList('tenantDetails');
         
         Wat.A.getTemplates(templates, function () {}); 
         
+        // Bind tenant events
+        Wat.B.bindTenantEvents();
+        
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
+    },
+    
+    events: {
+        'click .js-button-purge': 'openPurgeDialog',
     },
     
     renderSide: function () {
@@ -178,14 +187,13 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
         }
     },
     
-    applyDelete: function (that) {
-        //that.deleteModel({id: that.elementId}, that.afterDelete, that.model);
+    openPurgeDialog: function () {    
         var that = this;
         
         var dialogConf = {
-            title: 'Deleting tenant',
+            title: $.i18n.t('Tenant purgation'),
             buttons : {
-                "Cancel": function () {                    
+                "Close": function () {                    
                     Wat.I.closeDialog($(this));
                 },
                 "Delete all": function () {
@@ -213,53 +221,100 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
 
                 target.html(template);
                 
-                Wat.CurrentView.getTenantElements();
+                Wat.CurrentView.getCascadeElements();
             }
         }
 
-        Wat.I.dialog(dialogConf);        
+        that.dialog = Wat.I.dialog(dialogConf);        
     },
                             
-    getTenantElements: function (qvdObj) {
+    getCascadeElements: function (qvdObj, forward, errors) {
         var qvdObj = qvdObj || 'vm';
+        var forward = typeof(forward) == "undefined" ? true : forward;
+        var errors = errors || false;
+        
         var that = this;
         
-        Wat.A.performAction(qvdObj + '_tiny_list', {}, {
+        var retrievingAction = that.cascadeTenantElements[qvdObj]['retrievingAction'] || qvdObj + '_tiny_list';
+        
+        Wat.A.performAction(retrievingAction, {}, {
             tenant_id: that.elementId
             }, {}, function (that) {
+                // If purge indicator is enabled, disable
+                that.disablePurgeIndicator(qvdObj);
+
                 var template = _.template(
                     Wat.TPL.deleteTenantDialogElements, {
                         elementQvdObj: qvdObj,
                         elementName: that.cascadeTenantElements[qvdObj]['elementName'],
                         registers: that.retrievedData.rows,
-                        nameField: that.cascadeTenantElements[qvdObj]['nameField'] || 'name'
+                        nameField: that.cascadeTenantElements[qvdObj]['nameField'] || 'name',
+                        idField: that.cascadeTenantElements[qvdObj]['idField'] || 'id',
+                        errors: errors
                     }
                 );
                 
-                $(that.cascadeTenantElements[qvdObj]['templateSelector']).html(template);
-                
-                if (that.cascadeTenantElements[qvdObj]['nextObj']) {
-                    that.getTenantElements(that.cascadeTenantElements[qvdObj]['nextObj']);
-                }
-                else {
-                    // After finish counting, show delete all button
-                    $('.ui-dialog-buttonset .button').eq(1).show(); 
+                $('.bb-tenant-delete-' + qvdObj).html(template);
+                Wat.T.translate();
+            
+                if (forward) {
+                    if (that.cascadeTenantElements[qvdObj]['nextObj']) {
+                        that.getCascadeElements(that.cascadeTenantElements[qvdObj]['nextObj']);
+                        return;
+                    }
+
+                    var count = that.getTotalElementsCount();
+
+                    if (count == 0) {
+                        that.afterPurgeTenant();
+                    }
+                    else {
+                        // After finish counting, show delete all button
+                        $('.ui-dialog-buttonset .button').eq(1).show(); 
+                    }
                 }
             }, that);
     },
     
-    applyCascadeDelete: function (qvdObj) {
+    getTotalElementsCount: function () {
+        // Count total elements to know if is necesary delete some dependences
+        var count = 0;
+        $.each($('.js-counter'), function (iCounter, counter) {
+            count+=parseInt($(counter).html());
+        });
+        
+        return count;
+    },
+    
+    enablePurgeIndicator: function (qvdObj) {
+        $('[data-qvd-obj="' + qvdObj + '"].js-counter').addClass('fa fa-eraser');
+    }, 
+    
+    disablePurgeIndicator: function (qvdObj) {
+        $('[data-qvd-obj="' + qvdObj + '"].js-counter').removeClass('fa fa-eraser');
+    },
+    
+    applyCascadeDelete: function (qvdObj, forward) {
         var qvdObj = qvdObj || 'vm';
+        var forward = typeof(forward) == "undefined" ? true : forward;
         var that = this;
         
         var nElements = parseInt($('[data-qvd-obj="' + qvdObj + '"].js-counter').html());
         
-        if (!nElements) {
-            if (that.cascadeTenantElements[qvdObj]['nextObj']) {
-                that.applyCascadeDelete(that.cascadeTenantElements[qvdObj]['nextObj']);
-            }
-            else {
-                that.deleteModel({id: that.elementId}, that.afterDelete, that.model);
+        if (!nElements) {   
+            if (forward) {
+                if (that.cascadeTenantElements[qvdObj]['nextObj']) {
+                    that.applyCascadeDelete(that.cascadeTenantElements[qvdObj]['nextObj']);
+                    return;
+                }
+                
+                var count = that.getTotalElementsCount();
+                if (count == 0) {
+                    that.afterPurgeTenant();
+                }
+                
+                // Hide delete all button until all data were retrieved
+                $('.ui-dialog-buttonset').show();
             }
             return;
         }
@@ -269,22 +324,72 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
         $.each(elements, function (iElement, element) {
             elementIds.push($(element).attr('data-id'));
         });
+        
+        // Build filters with element id
+        var idField = that.cascadeTenantElements[qvdObj]['idField'] || 'id';
+        var filters = {};
+        filters[idField] = elementIds;
 
-        Wat.A.performAction(qvdObj + '_delete', {}, {
-            id: elementIds
-            }, {}, function (res) {
-                // TODO: Check (res.retrievedData == STATUS_SUCCESS)
+        that.enablePurgeIndicator(qvdObj);
+        
+        Wat.A.performAction(qvdObj + '_delete', {}, filters, {}, function (res) {
                 var that = Wat.CurrentView;
-            
-                $('[data-qvd-obj="' + qvdObj + '"].js-counter').html('0')
-                $('ul[data-qvd-obj="' + qvdObj + '"] li').remove();
-            
-                if (that.cascadeTenantElements[qvdObj]['nextObj']) {
-                    that.applyCascadeDelete(that.cascadeTenantElements[qvdObj]['nextObj']);
+                            
+                if (res.retrievedData.status == STATUS_SUCCESS) {
+                    $('[data-qvd-obj="' + qvdObj + '"].js-counter').html('0')
+                    $('ul[data-qvd-obj="' + qvdObj + '"] li').remove();
+                    that.disablePurgeIndicator(qvdObj);
                 }
                 else {
-                    Wat.I.closeDialog(that.dialog);
-                    that.deleteModel({id: that.elementId}, that.afterDelete, that.model);
+                    that.getCascadeElements(qvdObj, false, res.retrievedData.failures);
+                }
+
+                if (forward && that.cascadeTenantElements[qvdObj]['nextObj']) {
+                    that.applyCascadeDelete(that.cascadeTenantElements[qvdObj]['nextObj']);
+                    return;
+                }
+                
+                var count = that.getTotalElementsCount();
+
+                if (count == 0) {
+                    that.afterPurgeTenant();
+                }
+            }, that);
+    },
+    
+    afterPurgeTenant: function () {
+        var template = _.template(
+            Wat.TPL.deleteTenantDialogEmpty, {}
+        );
+        
+        $(this.dialog).html(template);
+        Wat.T.translate();
+
+        // Hide delete all button
+        $('.ui-dialog-buttonset .button').eq(1).hide();
+    },
+    
+    applyDeleteElement: function (qvdObj, elementId) {
+        var that = this;
+        // Build filters with element id
+        var idField = this.cascadeTenantElements[qvdObj]['idField'] || 'id';
+        var filters = {};
+        filters[idField] = elementId;
+        
+        Wat.A.performAction(qvdObj + '_delete', {}, filters, {}, function (that) {                            
+                if (that.retrievedData.status == STATUS_SUCCESS) {
+                    var count = parseInt($('[data-qvd-obj="' + qvdObj + '"].js-counter').html());
+                    $('[data-qvd-obj="' + qvdObj + '"].js-counter').html(count-1)
+                    $('ul[data-qvd-obj="' + qvdObj + '"] li[data-id="' + elementId + '"]').remove();
+                }
+                else {
+                    that.getCascadeElements(qvdObj, false, that.retrievedData.failures);
+                }
+                
+                var count = that.getTotalElementsCount();
+
+                if (count == 0) {
+                    that.afterPurgeTenant();
                 }
             }, that);
     }

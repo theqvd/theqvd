@@ -223,6 +223,7 @@ UNCLASSIFIED_CONFIG_REGEXP = '^((?!\\.).)*$';
 HTML_MINI_LOADING = '<div class="mini-loading"><i class="fa fa-gear fa-spin"></i></div>';
 HTML_LOADING = '<div class="loading"><i class="fa fa-gear fa-spin"></i></div>';
 HTML_MID_LOADING = '<div class="loading-mid"><i class="fa fa-gear fa-spin"></i></div>';
+HTML_MID_LOADING_DELETE = '<div class="loading-mid"><i class="fa fa-trash fa-spin"></i></div>';
 HTML_SORT_ICON = '<i class="fa fa-sort sort-icon"></i>';
 
 // Views combination for current_admin_setup return values

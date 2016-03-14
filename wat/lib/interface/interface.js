@@ -613,7 +613,9 @@ Wat.I = {
                 // Enable scrolling in window when close
                     $('html, body').attr('style', '');
             }
-        });     
+        });  
+        
+        return $(div);
     },
     
     updateLoginOnMenu: function () {

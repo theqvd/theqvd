@@ -1744,7 +1744,7 @@ body {
     height: 250px;
     margin-top: 5px; }
 
-.add-role-button, .delete-role-button, .add-acl-button, .delete-acl-button {
+.add-role-button, .delete-role-button, .add-acl-button, .delete-acl-button, .delete-element-button {
   color: #e35e0c;
   cursor: pointer; }
 
@@ -2915,6 +2915,9 @@ div.list-block div:first-child {
         position: absolute;
         right: 5px;
         padding-left: 10px; }
+
+.cascade-data-list {
+  margin-top: 20px; }
 
 table.list td, table.list th {
   white-space: nowrap; }
