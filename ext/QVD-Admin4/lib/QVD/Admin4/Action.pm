@@ -211,13 +211,6 @@ my $ACTIONS = {
 		qvd_object => 'VM'
 	},
 
-	vm_get_state => {
-		type_of_action => 'state',
-		  admin4method => 'select',
-		  acls => [qr/^vm\.see\.state$/,qr/^vm\.see\.user-state$/],
-		qvd_object => 'VM'
-	},
-
 	vm_update => {
 		type_of_action => 'update',
 	       admin4method => 'update',
