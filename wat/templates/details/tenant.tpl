@@ -25,7 +25,7 @@
     }
     %>
        
-    <% if(Wat.C.checkACL('tenant.delete.')) { %>
+    <% if(Wat.C.checkACL('tenant.purge.')) { %>
     <a class="button fright button-icon--desktop js-button-purge fa fa-eraser" href="javascript:" data-i18n="[title]Purge"><span data-i18n="Purge" class="mobile"></span></a>
     <% } %>
     <div class="clear mobile"></div>

@@ -660,6 +660,7 @@
     "Filter tenants by creator": "Filter tenants by creator",
     "Filter tenants by creation date": "Filter tenants by creation date",
     "Filter tenant by name": "Filter tenant by name", 
+    "Delete all the elements of a tenant": "Delete all the elements of a tenant",
     "Access to tenant's details view": "Access to tenant's details view",
     "Access to tenant's main section": "Access to tenant's main section", 
     "See tenant's block size": "See tenant's block size", 

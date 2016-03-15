@@ -1,6 +1,24 @@
 Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({  
     qvdObj: 'tenant',
     
+    // vm_tiny_list
+    // user_tiny_list
+    // di_tiny_list
+    // osf_tiny_list
+    // role_tiny_list
+    // administrator_tiny_list
+    // property_get_list
+    // config_get
+    
+    // vm_delete
+    // user_delete
+    // di_delete
+    // osf_delete
+    // role_delete
+    // administrator_delete
+    // property_delete
+    // config_delete
+    
     cascadeTenantElements: {
             'vm': {
                 elementName: 'Virtual machines',
