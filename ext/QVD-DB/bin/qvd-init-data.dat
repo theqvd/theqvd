@@ -427,6 +427,7 @@ id	name	description
 326	vm.update.name	Update virtual machine's name
 327	vm.update.properties	Update properties when update virtual machines
 328	vm.update.state	Start-Stop virtual machines
+329	tenant.purge.	Delete all the elements of a tenant
 
 ### ACL_Role_Relation ###
 id	acl_id	role_id	positive
@@ -765,6 +766,7 @@ id	acl_id	role_id	positive
 332	224	47	t
 333	200	48	t
 334	204	48	t
+335	329	45	t
 
 
 ### Role_Administrator_Relation ###
