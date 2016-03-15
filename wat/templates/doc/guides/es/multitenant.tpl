@@ -673,6 +673,11 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Filter of tenants list by tenant&#8217;s name</p></td>
 </tr>
 <tr>
+<td align="left" valign="top"><p class="table"><strong>Delete all the elements of a tenant</strong></p></td>
+<td align="left" valign="top"><p class="table">tenant.purge.</p></td>
+<td align="left" valign="top"><p class="table">Purge a tenant deleting all the elements (vms, users, administrators&#8230;) one by one or massively</p></td>
+</tr>
+<tr>
 <td align="left" valign="top"><p class="table"><strong>Access to tenant&#8217;s details view</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see-details.</p></td>
 <td align="left" valign="top"><p class="table">Access to details view of Tenants. This view includes name</p></td>
@@ -899,7 +904,7 @@ Contraseña: ********</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-02-22 15:52:53 CET
+Last updated 2016-03-15 14:49:48 CET
 </div>
 </div>
 </body>
