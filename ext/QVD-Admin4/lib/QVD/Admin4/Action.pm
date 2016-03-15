@@ -57,7 +57,7 @@ my $ACTIONS = {
 
 	config_get => {
 		type_of_action =>  'ad_hoc',
-		acls => [qr/^config\.qvd\./],
+		acls => [qr/^config\.qvd\./,qr/^tenant\.purge\.$/],
 		admin4method => 'config_get'
 	},
 
@@ -77,7 +77,7 @@ my $ACTIONS = {
 	config_delete => {
 		type_of_action =>  'delete',
 		   qvd_object => 'Config',
-		   acls => [qr/^config\.qvd\./],
+		   acls => [qr/^config\.qvd\./,qr/^tenant\.purge\.$/],
 		admin4method => 'config_delete'
 	},
 
@@ -106,7 +106,7 @@ my $ACTIONS = {
 	user_tiny_list => {
 		type_of_action => 'tiny',
 		   admin4method => 'select',
-		   acls => [qr/^vm\.(create\.|filter\.user)$/],
+		   acls => [qr/^vm\.(create\.|filter\.user)$/,qr/^tenant\.purge\.$/],
 		qvd_object => 'User'
 	},
 
@@ -156,7 +156,7 @@ my $ACTIONS = {
 	user_delete => {
 		type_of_action => 'delete',
 		 admin4method => 'delete',
-		 acls => [qr/^user\.delete\./],
+		 acls => [qr/^user\.delete\./,qr/^tenant\.purge\.$/],
 		qvd_object => 'User'
 	},
 
@@ -199,7 +199,7 @@ my $ACTIONS = {
 	vm_tiny_list => {
 		type_of_action => 'tiny',
 		  admin4method => 'select',
-		   acls => [qr/^(host|osf)\.filter\.vm$/],
+		   acls => [qr/^(host|osf)\.filter\.vm$/,qr/^tenant\.purge\.$/],
 		qvd_object => 'VM'
 	},
 
@@ -249,7 +249,7 @@ my $ACTIONS = {
 	vm_delete => {
 		type_of_action => 'delete',
 	       admin4method => 'vm_delete',
-	       acls => [qr/^vm\.delete\./],
+	       acls => [qr/^vm\.delete\./,qr/^tenant\.purge\.$/],
 		qvd_object => 'VM'
 	},
 
@@ -371,7 +371,7 @@ my $ACTIONS = {
 	osf_tiny_list => {
 		type_of_action => 'tiny',
 		   admin4method => 'select',
-		acls => [qr/^(di|vm)\.(create\.|filter\.osf)$/],
+		acls => [qr/^(di|vm)\.(create\.|filter\.osf)$/,qr/^tenant\.purge\.$/],
 		qvd_object => 'OSF'
 	},
 
@@ -400,7 +400,7 @@ my $ACTIONS = {
 	osf_delete => {
 		type_of_action => 'delete',
 		admin4method => 'delete',
-		acls => [qr/^osf\.delete\./],
+		acls => [qr/^osf\.delete\./,qr/^tenant\.purge\.$/],
 		qvd_object => 'OSF'
 	},
 
@@ -442,7 +442,7 @@ my $ACTIONS = {
 	di_tiny_list => {
 		type_of_action => 'tiny',
 		  admin4method => 'select',
-		  acls => [qr/^osf\.filter\.di$/],
+		  acls => [qr/^osf\.filter\.di$/,qr/^tenant\.purge\.$/],
 		qvd_object => 'DI'
 	},
 
@@ -470,7 +470,7 @@ my $ACTIONS = {
 	di_delete => {
 		type_of_action => 'delete',
 	       admin4method => 'di_delete',
-	       acls => [qr/^di\.delete\./],
+	       acls => [qr/^di\.delete\./,qr/^tenant\.purge\.$/],
 		qvd_object => 'DI'
 	},
 
@@ -517,7 +517,7 @@ my $ACTIONS = {
 	administrator_tiny_list => {
 		type_of_action => 'tiny',
 		    admin4method => 'select',
-		    acls => [qr/^log\.filter\.administrator|[^.]+\.filter\.created-by/],
+		    acls => [qr/^log\.filter\.administrator|[^.]+\.filter\.created-by/,qr/^tenant\.purge\.$/],
 		qvd_object => 'Administrator'
 	},
 
@@ -558,7 +558,7 @@ my $ACTIONS = {
 	administrator_delete => {
 		type_of_action => 'delete',
 		  admin4method => 'delete',
-		  acls => [qr/^administrator\.delete\./],
+		  acls => [qr/^administrator\.delete\./,qr/^tenant\.purge\.$/],
 		qvd_object => 'Administrator'
 	},
 
@@ -619,7 +619,7 @@ my $ACTIONS = {
 	role_tiny_list => {
 		type_of_action => 'tiny',
 		    admin4method => 'select',
-		   acls => [qr/^(administrator\.see\.|role\.see\.inherited-)roles$/],
+		   acls => [qr/^(administrator\.see\.|role\.see\.inherited-)roles$/,qr/^tenant\.purge\.$/],
 		qvd_object => 'Role'
 	},
 
@@ -702,7 +702,7 @@ my $ACTIONS = {
 	role_delete => {
 		type_of_action => 'delete',
 		 admin4method => 'delete',
-		 acls => [qr/^role\.delete\./],
+		 acls => [qr/^role\.delete\./,qr/^tenant\.purge\.$/],
 		qvd_object => 'Role'
 	},
 
@@ -789,25 +789,29 @@ my $ACTIONS = {
 	property_get_list => {
 		type_of_action => 'list',
 		  admin4method => 'select',
+          acls => [qr/^property\.see-main\./,qr/^tenant\.purge\.$/],
 		qvd_object => 'Property_List'
 	},
 
 	property_create => {
 		type_of_action => 'create',
 		 admin4method => 'create',
+        acls => [qr/^property\.see-main\./],
 		qvd_object => 'Property_List'
 	},
 
 	property_update => {
 		type_of_action => 'update',
 		 admin4method => 'update',
+        acls => [qr/^property\.see-main\./],
 		qvd_object => 'Property_List'
 	},
 
 	property_delete => {
 		type_of_action => 'delete',
 		 admin4method => 'delete',
-		qvd_object => 'Property_List'
+        acls => [qr/^property\.see-main\./,qr/^tenant\.purge\.$/],
+		qvd_object => 'Property_List',
 	},
 };
 
