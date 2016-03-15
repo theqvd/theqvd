@@ -3055,6 +3055,14 @@ table.vmst .vmst-vm-cell, table.vmst .vmst-host-cell {
         margin-right: 5px; } }
     .pagination a:before {
       margin-right: 2px; }
+  .pagination input.current-page {
+    width: 40px;
+    text-align: center;
+    vertical-align: top;
+    height: 40px; }
+    @media screen and (min-width: 41em) {
+      .pagination input.current-page {
+        height: 25px; } }
 
 /********************************************************************
 *********************************************************************

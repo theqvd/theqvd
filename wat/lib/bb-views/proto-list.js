@@ -130,6 +130,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         'change .filter-control select[name="tenant"]': 'changeTenant',
         'change .filter-control select': 'filter',
         'input .filter-control input.date-filter': 'filter',
+        'input .pagination input.js-current-page': 'typePage',
+        'keypress .pagination input.js-current-page': 'pressPage',
         'click .js-button-new': 'openNewElementDialog',
         'click .js-selected-actions-button': 'applySelectedAction',
         'click .js-unckeck-all': 'resetSelectedItems'
@@ -992,7 +994,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
 
         var context = $('.' + this.cid);
 
-        context.find('.pagination_current_page').html(currentPage || 1);
+        context.find('.pagination_current_page>input.js-current-page').val(currentPage || 1);
         context.find('.pagination_total_pages').html(totalPages || 1);
         
         context.find('.pagination a').removeClass('disabled');
@@ -1374,4 +1376,47 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         this.updateModel(arguments, filters, this.fetchList, auxModel);
     },
+    
+    // Check pagination text input control to avoid wrong characters
+    typePage: function (e) {
+        if ($(e.target).val() == "") {
+            return;
+        }
+        
+        var inputContent = parseInt($(e.target).val());
+
+        if (inputContent) {
+            $(e.target).val(inputContent);
+        }
+        else if(isNaN(inputContent)) {
+            $(e.target).val(this.collection.offset);
+        }
+    },
+    
+    // When press key on pagination text input
+    pressPage: function (e) {
+        var inputContent = parseInt($(e.target).val());
+        var totalPages = parseInt($('.pagination_total_pages').html());
+        
+        // Control overflow
+        if (inputContent > totalPages) {
+            inputContent = totalPages;
+        }
+        else if (inputContent <= 1) {
+            inputContent = 1;
+        }
+        
+        // When press enter
+        if (e.keyCode == 13) {
+            if (inputContent && this.collection.offset != inputContent) {
+                // Show loading animation while loading
+                $('.' + this.cid).find('.list').html(HTML_MID_LOADING);
+                
+                this.collection.offset = inputContent;
+                this.fetchList();
+            }
+        
+            $(e.target).val(this.collection.offset);
+        }
+    }
 });
