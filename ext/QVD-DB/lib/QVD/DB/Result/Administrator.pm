@@ -134,14 +134,12 @@ sub re_is_allowed_to
 
     for my $acl_re (@acl_res)
     {
-	my $flag = 0;
 	for my $acl_name ($self->acls)
 	{
-	    if ($acl_name =~ /$acl_re/) { $flag = 1; last; }
+	    if ($acl_name =~ /$acl_re/) { return 1; }
 	}
-	return 0 unless $flag;
     }
-    return 1;
+    return 0;
 }
 
 # Tenants where the admin can operate
