@@ -131,6 +131,8 @@ sub is_allowed_to
 sub re_is_allowed_to
 {
     my ($self,@acl_res) = @_;
+    
+    return 1 unless @acl_res;
 
     for my $acl_re (@acl_res)
     {
