@@ -455,7 +455,7 @@ Vista detalle
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_tenant_details.png" alt="screenshot_tenant_details.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Observamos una <strong>cabecera</strong> donde junto al <strong>nombre del tenant</strong> están los <strong>botones para eliminarlo y editarlo</strong>.</p></div>
+<div class="paragraph"><p>Observamos una <strong>cabecera</strong> donde junto al <strong>nombre del tenant</strong> están los <strong>botones para eliminarlo, bloquearlo, editarlo y la herramienta de limpieza</strong>.</p></div>
 <div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos del tenant</strong>.</p></div>
 </div></div>
 </dd>
@@ -900,11 +900,100 @@ Contraseña: ********</code></pre>
 <div class="paragraph"><p>Básicamente <strong>la diferencia será</strong>, que en este modo, <strong>el administrador de recuperación tendrá</strong>, además de los que tiene en modo monotenant, <strong>acceso a gestión de Tenants</strong>.</p></div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_limpieza_de_un_tenant">10. Limpieza de un tenant</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Los tenants tienen una herramienta de limpieza que nos permitirá tener una visión global de todos los elementos dependientes del tenant y además eliminarlos de uno en uno o de forma masiva.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Elementos dependientes
+</dt>
+<dd>
+<p>
+Los elementos dependientes de un tenant son:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Máquinas virtuales
+</p>
+</li>
+<li>
+<p>
+Usuarios
+</p>
+</li>
+<li>
+<p>
+Imágenes de disco
+</p>
+</li>
+<li>
+<p>
+OS Flavours
+</p>
+</li>
+<li>
+<p>
+Roles
+</p>
+</li>
+<li>
+<p>
+Administradores
+</p>
+</li>
+<li>
+<p>
+Propiedades personalizadas
+</p>
+</li>
+<li>
+<p>
+Tokens de configuración
+</p>
+</li>
+</ul></div>
+</dd>
+</dl></div>
+<div class="paragraph"><p>Esta herramienta se encuentra en la vista detalle de los tenant junto a los botones de edición y bloqueo.</p></div>
+<div class="paragraph"><p>Al accionar esta herramienta se abre una ventana modal y se chequean los diferentes elementos dependientes, apareciendo, de haberlos, una lista en cada una de las categorías.</p></div>
+<div class="paragraph"><p>Con diferentes botones de eliminado se podrán eliminar:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Elemento a elemento
+</p>
+</li>
+<li>
+<p>
+Todos los elementos de un grupo. Por ejemplo: Todas las máquinas virtuales.
+</p>
+</li>
+<li>
+<p>
+Todos los elementos del tenant. En este caso se hará un borrado ordenado para evitar coflictos de dependencias.
+</p>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Conflictos de dependencias
+</dt>
+<dd>
+<p>
+Algunos elementos de un tenant pueden depender de otros como por ejemplo un Usuario que contega Máquinas virtuales, un OSF que contenga Imágenes de disco o un rol que herede de otros roles.
+</p>
+</dd>
+</dl></div>
+</li>
+</ul></div>
+<div class="paragraph"><p>Si al intentar eliminar un elemento hubiese un conflicto de dependencia, no será eliminado y aparecerá junto a él un símbolo de advertencia. Si pasamos el ratón por encima del icono, podremos leer el error sucedido.</p></div>
+</div>
+</div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-03-15 14:49:48 CET
+Last updated 2016-03-16 09:27:32 CET
 </div>
 </div>
 </body>
