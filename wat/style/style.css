@@ -107,7 +107,7 @@ body {
   height: 100vh !important; }
 
 a, a:active, a:hover {
-  color: #cb540a;
+  color: #FF5C00;
   text-decoration: none;
   font-weight: bold; }
   a i.hover, a:active i.hover, a:hover i.hover {
@@ -157,10 +157,10 @@ fieldset {
   text-align: center; }
   .error-404 i.fa, .error-refresh i.fa {
     font-size: 90px;
-    color: #b3b3b3; }
+    color: #595959; }
   .error-404 div, .error-refresh div {
     font-size: 50px;
-    color: #b3b3b3; }
+    color: #595959; }
 
 .error-refresh {
   margin-top: 30px; }
@@ -547,11 +547,13 @@ input {
 select, input, textarea, .button, .button2 {
   border-radius: 4px;
   border-style: solid;
-  border-color: #cacaca;
-  border-width: thin;
+  border-width: 0;
   -webkit-box-shadow: inset 1px 1px 1px 0px #dddddd;
   -moz-box-shadow: inset 1px 1px 1px 0px #dddddd;
   box-shadow: inset 1px 1px 1px 0px #dddddd; }
+
+.button2 {
+  border-width: thin; }
 
 select {
   width: 100%; }
@@ -625,31 +627,25 @@ input[type="checkbox"], input[type="radio"] {
 a.button, button.button {
   z-index: 2;
   color: #fdfdfd;
-  background-color: #cb540a;
-  background-image: -moz-linear-gradient(top, #f36a15, #cb540a);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#f36a15), to(#cb540a));
-  background-image: -webkit-linear-gradient(top, #f36a15, #cb540a);
-  background-image: -o-linear-gradient(top, #f36a15, #cb540a);
-  background-image: linear-gradient(to bottom, #f36a15, #cb540a);
+  background-color: #FF5C00;
   background-repeat: repeat-x;
-  border: solid 1px #9a4008;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
   white-space: nowrap; }
   a.button:hover, button.button:hover {
     cursor: pointer;
-    border-color: #b24a09; }
+    border-color: #cc4700; }
     a.button:hover:before, button.button:hover:before {
       color: #fdfdfd; }
   a.button:active, button.button:active {
     color: #f0f0f0;
-    background-color: #cb540a;
-    background-image: -moz-linear-gradient(top, #cb540a, #f36a15);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#cb540a), to(#f36a15));
-    background-image: -webkit-linear-gradient(top, #cb540a, #f36a15);
-    background-image: -o-linear-gradient(top, #cb540a, #f36a15);
-    background-image: linear-gradient(to bottom, #cb540a, #f36a15); }
+    background-color: #e65000;
+    background-image: -moz-linear-gradient(top, #e65000, #ff6a1a);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#e65000), to(#ff6a1a));
+    background-image: -webkit-linear-gradient(top, #e65000, #ff6a1a);
+    background-image: -o-linear-gradient(top, #e65000, #ff6a1a);
+    background-image: linear-gradient(to bottom, #e65000, #ff6a1a); }
   a.button:focus, button.button:focus {
     outline: 0; }
   a.button:before, button.button:before {
@@ -658,14 +654,8 @@ a.button, button.button {
 a.button2, button.button2 {
   z-index: 2;
   color: #e35e0c;
-  background-color: #f0f0f0;
-  background-image: -moz-linear-gradient(top, #ffffff, #f0f0f0);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#f0f0f0));
-  background-image: -webkit-linear-gradient(top, #ffffff, #f0f0f0);
-  background-image: -o-linear-gradient(top, #ffffff, #f0f0f0);
-  background-image: linear-gradient(to bottom, #ffffff, #f0f0f0);
+  background-color: #fdfdfd;
   background-repeat: repeat-x;
-  border: solid 1px #d7d7d7;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
@@ -691,14 +681,8 @@ a.button2, button.button2 {
 a.button--green, button.button--green {
   z-index: 2;
   color: #fdfdfd;
-  background-color: #004d00;
-  background-image: -moz-linear-gradient(top, #008000, #004d00);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#008000), to(#004d00));
-  background-image: -webkit-linear-gradient(top, #008000, #004d00);
-  background-image: -o-linear-gradient(top, #008000, #004d00);
-  background-image: linear-gradient(to bottom, #008000, #004d00);
+  background-color: #006600;
   background-repeat: repeat-x;
-  border: solid 1px #001a00;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
@@ -724,14 +708,8 @@ a.button--green, button.button--green {
 a.button--red, button.button--red {
   z-index: 2;
   color: #fdfdfd;
-  background-color: #800000;
-  background-image: -moz-linear-gradient(top, #b30000, #800000);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#b30000), to(#800000));
-  background-image: -webkit-linear-gradient(top, #b30000, #800000);
-  background-image: -o-linear-gradient(top, #b30000, #800000);
-  background-image: linear-gradient(to bottom, #b30000, #800000);
+  background-color: #990000;
   background-repeat: repeat-x;
-  border: solid 1px #4d0000;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
@@ -811,6 +789,11 @@ a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.di
   .button-icon--mobile:before {
     margin: 0px !important; } }
 
+.button-transparent {
+  cursor: pointer; }
+  .button-transparent:before {
+    margin-right: 5px; }
+
 /********************************************************************
 *********************************************************************
 *********************************************************************
@@ -831,6 +814,15 @@ body {
 
 .super-wrapper {
   padding-top: 60px; }
+  .super-wrapper.super-wrapper--login {
+    background: #d9d9d9;
+    padding: 0;
+    height: 100vh; }
+    .super-wrapper.super-wrapper--login .wrapper {
+      background: #d9d9d9;
+      margin: 0px; }
+    .super-wrapper.super-wrapper--login .loading {
+      color: #fdfdfd; }
 
 .header-wrapper {
   height: 60px;
@@ -871,70 +863,71 @@ body {
       background-size: 100%; }
     .header-wrapper .header .superadmin-select {
       margin: 10px 3px; }
-  .header-wrapper .message-container {
-    position: fixed;
-    top: 0px;
-    left: 5%;
-    width: 90%;
-    padding: 12px 20px;
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
-    border-top: 0px;
-    color: #fdfdfd;
-    font-weight: bold;
-    z-index: 1001;
-    display: none; }
-    @media screen and (min-width: 41em) {
-      .header-wrapper .message-container {
-        left: 20px;
-        width: 40%; } }
-    .header-wrapper .message-container.success {
-      background: #00b300; }
-    .header-wrapper .message-container.error {
-      background: #e60000; }
-    .header-wrapper .message-container.info {
-      background: #5577ff; }
-    .header-wrapper .message-container.warning {
-      background: #e6bf00; }
-    .header-wrapper .message-container .message-close {
-      float: right;
-      top: 6px;
-      right: 8px;
+
+.message-container {
+  position: fixed;
+  top: 0px;
+  left: 5%;
+  width: 90%;
+  padding: 12px 20px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  border-top: 0px;
+  color: #fdfdfd;
+  font-weight: bold;
+  z-index: 1001;
+  display: none; }
+  @media screen and (min-width: 41em) {
+    .message-container {
+      left: 20px;
+      width: 40%; } }
+  .message-container.success {
+    background: #00b300; }
+  .message-container.error {
+    background: #e60000; }
+  .message-container.info {
+    background: #5577ff; }
+  .message-container.warning {
+    background: #e6bf00; }
+  .message-container .message-close {
+    float: right;
+    top: 6px;
+    right: 8px;
+    font-size: 20px;
+    cursor: pointer; }
+  .message-container .message {
+    padding-top: 10px; }
+    .message-container .message summary {
+      line-height: 20px; }
+    .message-container .message article.expandedMessage {
+      display: none;
+      font-size: 0.9em;
+      line-height: 0.9em;
+      padding: 14px 30px;
+      margin-top: 10px;
+      background: #e9e9e9;
+      color: #333;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      font-weight: normal; }
+      @media screen and (min-width: 41em) {
+        .message-container .message article.expandedMessage {
+          font-size: 0.9em;
+          line-height: 1.2em; } }
+      .message-container .message article.expandedMessage ul {
+        margin-top: 5px;
+        margin-left: 8px; }
+        .message-container .message article.expandedMessage ul li {
+          margin-top: 4px;
+          display: list-item; }
+          .message-container .message article.expandedMessage ul li:before, .message-container .message article.expandedMessage ul li i:before {
+            margin-right: 5px; }
+    .message-container .message .expand-message {
+      cursor: pointer;
       font-size: 20px;
-      cursor: pointer; }
-    .header-wrapper .message-container .message {
-      padding-top: 10px; }
-      .header-wrapper .message-container .message summary {
-        line-height: 20px; }
-      .header-wrapper .message-container .message article.expandedMessage {
-        display: none;
-        font-size: 0.9em;
-        line-height: 0.9em;
-        padding: 14px 30px;
-        margin-top: 10px;
-        background: #e9e9e9;
-        color: #333;
-        margin-top: 10px;
-        margin-bottom: 10px;
-        border-radius: 4px;
-        font-weight: normal; }
-        @media screen and (min-width: 41em) {
-          .header-wrapper .message-container .message article.expandedMessage {
-            font-size: 0.9em;
-            line-height: 1.2em; } }
-        .header-wrapper .message-container .message article.expandedMessage ul {
-          margin-top: 5px;
-          margin-left: 8px; }
-          .header-wrapper .message-container .message article.expandedMessage ul li {
-            margin-top: 4px;
-            display: list-item; }
-            .header-wrapper .message-container .message article.expandedMessage ul li:before, .header-wrapper .message-container .message article.expandedMessage ul li i:before {
-              margin-right: 5px; }
-      .header-wrapper .message-container .message .expand-message {
-        cursor: pointer;
-        font-size: 20px;
-        float: left;
-        margin-right: 15px; }
+      float: left;
+      margin-right: 15px; }
 
 .loading, .loading-mid {
   width: 75px;
@@ -1634,62 +1627,83 @@ body {
         width: 100%; }
     .wrapper .content .token-action-select {
       width: auto; }
-    .wrapper .content .login-box {
-      width: 90%;
-      height: 250px;
-      margin: 50px auto;
-      color: #333;
-      border-radius: 20px;
-      border: 3px solid #cacaca;
-      background: #d7d7d7;
-      display: table;
-      table-layout: fixed;
-      padding: 30px 20px; }
-      @media screen and (min-width: 41em) {
-        .wrapper .content .login-box {
-          width: 650px;
-          height: 300px; } }
-      .wrapper .content .login-box .login-side {
-        display: none;
-        width: 240px;
-        text-align: center;
-        border-right: 2px dotted #bdbdbd; }
+    .wrapper .content .login-wrapper {
+      background: #d9d9d9;
+      color: #595959; }
+      .wrapper .content .login-wrapper .login-box {
+        width: 90%;
+        height: 250px;
+        margin: 0px auto;
+        display: table;
+        table-layout: fixed;
+        padding: 20px 20px; }
         @media screen and (min-width: 41em) {
-          .wrapper .content .login-box .login-side {
-            display: table-cell; } }
-        .wrapper .content .login-box .login-side div.logo-login {
-          width: 150px;
-          height: 227px;
-          display: inline-block;
-          background-image: url('../images/logo-login.png');
-          background-repeat: no-repeat;
-          background-size: 100%; }
-      .wrapper .content .login-box .login-main {
-        display: table-cell;
-        vertical-align: middle; }
-        .wrapper .content .login-box .login-main .login-form {
-          text-align: left;
-          margin: 0 auto;
-          width: 180px;
-          font-size: 1.1em; }
-          @media screen and (min-width: 41em) {
-            .wrapper .content .login-box .login-main .login-form {
-              width: 220px;
-              font-size: 1.2em; } }
-          .wrapper .content .login-box .login-main .login-form > div.login-control {
-            padding-bottom: 20px; }
-            .wrapper .content .login-box .login-main .login-form > div.login-control > div:first-child {
-              padding-bottom: 5px;
-              padding-left: 5px; }
-            .wrapper .content .login-box .login-main .login-form > div.login-control input {
-              width: 100%; }
-          .wrapper .content .login-box .login-main .login-form > div.login-link {
-            width: 100%;
-            text-align: right;
-            font-size: small; }
-          .wrapper .content .login-box .login-main .login-form > div.login-button {
-            text-align: right;
-            padding-top: 5px; }
+          .wrapper .content .login-wrapper .login-box {
+            width: 400px;
+            height: 300px; } }
+        .wrapper .content .login-wrapper .login-box .login-main {
+          position: relative;
+          display: table-cell;
+          vertical-align: middle; }
+          .wrapper .content .login-wrapper .login-box .login-main div.logo-login {
+            width: 100px;
+            height: 95px;
+            position: absolute;
+            right: 0px;
+            top: 3px;
+            background-image: url('../images/wat-logo.png');
+            background-repeat: no-repeat;
+            background-size: 100%; }
+            @media screen and (min-width: 41em) {
+              .wrapper .content .login-wrapper .login-box .login-main div.logo-login {
+                top: 20px; } }
+          .wrapper .content .login-wrapper .login-box .login-main div.header1-login {
+            font-size: 26pt;
+            font-weight: bold;
+            margin-top: 65px;
+            margin-bottom: 5px; }
+            @media screen and (min-width: 41em) {
+              .wrapper .content .login-wrapper .login-box .login-main div.header1-login {
+                font-size: 36pt; } }
+          .wrapper .content .login-wrapper .login-box .login-main div.header2-login {
+            font-size: 15pt;
+            margin-bottom: 10px; }
+            @media screen and (min-width: 41em) {
+              .wrapper .content .login-wrapper .login-box .login-main div.header2-login {
+                font-size: 18pt; } }
+          .wrapper .content .login-wrapper .login-box .login-main .login-form {
+            text-align: left;
+            margin: 0 auto;
+            font-size: 1.1em; }
+            @media screen and (min-width: 41em) {
+              .wrapper .content .login-wrapper .login-box .login-main .login-form {
+                width: 100%;
+                font-size: 1.2em; } }
+            .wrapper .content .login-wrapper .login-box .login-main .login-form > div.login-control {
+              padding-bottom: 5px; }
+              .wrapper .content .login-wrapper .login-box .login-main .login-form > div.login-control > div:first-child {
+                padding-bottom: 5px; }
+              .wrapper .content .login-wrapper .login-box .login-main .login-form > div.login-control input {
+                width: 100%;
+                height: 45px;
+                color: #e35e0c; }
+                .wrapper .content .login-wrapper .login-box .login-main .login-form > div.login-control input:-webkit-autofill {
+                  -webkit-box-shadow: 0 0 0px 1000px #fcdcc8 inset;
+                  -webkit-text-fill-color: #e35e0c; }
+            .wrapper .content .login-wrapper .login-box .login-main .login-form > div.login-link {
+              width: 100%;
+              text-align: right;
+              font-size: small;
+              margin-bottom: 20px; }
+            .wrapper .content .login-wrapper .login-box .login-main .login-form > div.login-button {
+              text-align: right;
+              padding-top: 5px; }
+              .wrapper .content .login-wrapper .login-box .login-main .login-form > div.login-button a {
+                width: 100%;
+                text-align: center;
+                display: inline-block;
+                height: 45px;
+                padding-top: 7px; }
     .wrapper .content .wrapper-content {
       width: 95vw; }
 
@@ -1878,9 +1892,8 @@ select[name="role"] {
   height: 30px;
   margin-top: 50px;
   text-align: center;
-  color: #666666;
-  border-top: 2px solid #cacaca;
-  background: #d7d7d7;
+  color: #FF5C00;
+  background: #BFBFBF;
   width: 100%;
   position: fixed;
   bottom: 0px;
@@ -3087,14 +3100,8 @@ table.vmst .vmst-vm-cell, table.vmst .vmst-host-cell {
   .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus {
     z-index: 2;
     color: #fdfdfd;
-    background-color: #cb540a;
-    background-image: -moz-linear-gradient(top, #f36a15, #cb540a);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#f36a15), to(#cb540a));
-    background-image: -webkit-linear-gradient(top, #f36a15, #cb540a);
-    background-image: -o-linear-gradient(top, #f36a15, #cb540a);
-    background-image: linear-gradient(to bottom, #f36a15, #cb540a);
+    background-color: #e35e0c;
     background-repeat: repeat-x;
-    border: solid 1px #9a4008;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none;
@@ -3321,13 +3328,16 @@ body {
   font-size: 14px; }
 
 * {
-  font-family: 'Droid Sans', Lato, 'Open Sans', FontAwesome !important;
+  font-family: 'Open Sans', FontAwesome !important;
   font-size: 0.9em;
   line-height: 0.9em; }
   @media screen and (min-width: 41em) {
     * {
       font-size: 0.9em;
       line-height: 1.2em; } }
+
+div.header1-login {
+  font-family: 'Prosto One' !important; }
 
 th, td * {
   font-size: 1.3em;
@@ -3582,10 +3592,10 @@ td {
   .doc-text body {
     margin: 1em 5% 1em 5%; }
   .doc-text a {
-    color: #cb540a;
+    color: #FF5C00;
     text-decoration: underline; }
   .doc-text a:visited {
-    color: #cb540a; }
+    color: #FF5C00; }
   .doc-text em {
     font-style: italic;
     color: #823607; }

@@ -263,9 +263,13 @@ Wat.I = {
 
         this.showContent();
 
-		// Header will be shown in logout ever
-        if (firstLoad || window.location.hash == '#/logout') {
+		// When session is not started, header will not be shown
+        if (Wat.C.sid && firstLoad) {
             $('.header-wrapper').css('visibility','visible').hide().fadeIn('fast');
+        }
+        
+        if (!Wat.C.sid) {
+            $('.header-wrapper').hide();
         }
 
         if (firstLoad) {
@@ -470,12 +474,30 @@ Wat.I = {
     renderMain: function () { 
         var that = this;
         
+        var footerLinks = {
+            'copyright': 'http://qindel.com/',
+            'terms': 'http://qindel.com/',
+            'policy': 'http://qindel.com/',
+            'contact': 'javascript:',
+        };
+        
+        var currentLan = window.i18n.lng();
+        switch (currentLan) {
+            case 'es':
+                footerLinks.contact = "http://theqvd.com/es/contacto";
+                break;
+            default:
+                footerLinks.contact = "http://theqvd.com/contact";
+                break;
+        }
+        
         // Fill the html with the template and the collection
         var template = _.template(
             Wat.TPL.main, {
                 loggedIn: Wat.C.loggedIn,
                 cornerMenu: this.cornerMenu,
-                forceDesktop: $.cookie('forceDesktop')
+                forceDesktop: $.cookie('forceDesktop'),
+                footerLinks: footerLinks
             });
         
         $('.bb-super-wrapper').html(template);

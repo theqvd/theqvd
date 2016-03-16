@@ -8,6 +8,9 @@ Wat.Views.LoginView = Wat.Views.MainView.extend({
                 
         Wat.C.language = 'auto';
         
+        $('.js-super-wrapper').addClass('super-wrapper--login');
+        $('body').css('background',$('.super-wrapper--login').css('background-color'));
+
         var templates = Wat.I.T.getTemplateList('login');
 
         Wat.A.getTemplates(templates,  this.getApiInfo, this);
@@ -47,6 +50,6 @@ Wat.Views.LoginView = Wat.Views.MainView.extend({
         
         $(this.el).html(this.template);
         
-        Wat.T.translateAndShow();        
+        Wat.T.translateAndShow();
     }
 });

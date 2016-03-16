@@ -74,3 +74,11 @@ a, button {
         margin: 0px !important;
     }
 }
+
+.button-transparent {
+	cursor: pointer;
+    
+    &:before {
+        margin-right: 5px;
+    }
+}

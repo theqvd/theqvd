@@ -49,6 +49,9 @@ Wat.Views.MainView = Backbone.View.extend({
                 }
             }, 100);
         }
+        
+        $('.js-super-wrapper').removeClass('super-wrapper--login');
+        $('body').css('background','');
     },
     
     addCommonTemplates: function () {

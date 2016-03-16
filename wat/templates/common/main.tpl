@@ -39,11 +39,13 @@
         </div>
 
         </div>
-        <div class="message-container js-message-container">
-            <i class="message-close js-message-close fa fa-times-circle"></i>
-            <span class="message"></span>
-        </div>
 </div>
+
+<div class="message-container js-message-container">
+    <i class="message-close js-message-close fa fa-times-circle"></i>
+    <span class="message"></span>
+</div>
+
 <div class="wrapper">
     <% if (Wat.C.showServerClock) { %>
     <div class="server-datetime-wrapper js-server-datetime-wrapper">
@@ -64,9 +66,10 @@
 </div>
     <div class="js-responsive-switch responsive-switch <%= !forceDesktop ? 'mobile' : '' %>">
         <% if (forceDesktop) { %>
-            <a class="fa fa-mobile button2 js-unforce-desktop" data-i18n="Mobile version"></a>
+            <a class="fa fa-mobile button-transparent event js-unforce-desktop" data-i18n="Mobile version"></a>
         <% } else { %>
-            <a class="fa fa-desktop button2 js-force-desktop" data-i18n="Desktop version"></a>
+            <a class="fa fa-desktop button-transparent event js-force-desktop" data-i18n="Desktop version"></a>
         <% } %>
     </div>
-<div class="footer" data-link="<a href='http://qindel.com'>Qindel Group</a>"></div>
+
+<div class="footer"><a href="<%= footerLinks.copyright %>" target="_blank">Qindel Group &copy; <%= new Date().getFullYear() %></a> | <a href="<%= footerLinks.terms %>" data-i18n="Terms of use" target="_blank"></a> | <a href="<%= footerLinks.policy %>" data-i18n="Cookie privacy and data protection" target="_blank"></a> | <a href="<%= footerLinks.contact %>" data-i18n="Contact" target="_blank"></a></div>

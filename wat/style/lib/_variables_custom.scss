@@ -1,6 +1,6 @@
 /* INCLUDED: variables_custom */
 
-$button_bg: $col_brand;
+$button_bg: #FF5C00;
 $button_text: $col_whiter;
 
 $button2_bg: $col_whiter;
@@ -9,14 +9,14 @@ $button2_text: $col_brand;
 $header_logo: '../images/logo-header.png';
 $header_bg: darken($col_whiter, 15);
 
-$footer_bg: darken($col_whiter, 15);
-$footer_text: lighten($col_blacker, 20);
+$footer_bg: #BFBFBF;
+$footer_text: #FF5C00;
 
-$col_links_text: darken($col_brand, 5);
+$col_links_text: #FF5C00;
 
-$login_logo: '../images/logo-login.png';
-$login_bg: darken($col_whiter, 15);
-$login_text: $col_blacker;
+$login_logo: '../images/wat-logo.png';
+$login_bg: #d9d9d9;
+$login_text: #595959;
 
 $graph_color_a: $col_brand;
 $graph_color_b: darken($col_whiter, 15);

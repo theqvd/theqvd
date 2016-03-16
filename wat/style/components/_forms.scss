@@ -54,11 +54,14 @@ input {
 select, input, textarea, .button, .button2 {
     border-radius: $form_elements_radius;
     border-style: solid;
-    border-color: darken($col_whiter, 20%);
-    border-width: thin;
+    border-width: 0;
     -webkit-box-shadow: inset 1px 1px 1px 0px #dddddd;
        -moz-box-shadow: inset 1px 1px 1px 0px #dddddd;
             box-shadow: inset 1px 1px 1px 0px #dddddd;
+}
+
+.button2 {
+    border-width: thin;
 }
 
 select {
@@ -129,3 +132,4 @@ input[type="checkbox"], input[type="radio"] {
     max-height: 300px;
     overflow-x: auto;
 }
+

@@ -226,7 +226,7 @@ Wat.I.C = {
             
             'col_links_text': 'cpLink',
             
-            'login_bg': 'cpLoginBoxBg',
+            'login_bg': 'cpLoginBg',
             'login_text': 'cpLoginBoxText',
             
             'graph_color_a': 'cpGraphColorA',

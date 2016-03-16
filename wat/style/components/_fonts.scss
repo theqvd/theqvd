@@ -14,9 +14,13 @@ body {
 }
 
 * {
-    font-family: 'Droid Sans', Lato, 'Open Sans', FontAwesome !important; 
+    font-family: 'Open Sans', FontAwesome !important; 
     
     @include font-size(1);
+}
+
+div.header1-login {
+    font-family: 'Prosto One' !important;
 }
 
 th, td * {

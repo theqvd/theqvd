@@ -16,29 +16,29 @@
         <div class="color-title" data-i18n="Footer background"></div>
         <input name="cpFooterBg" class="js-custom-field colorpicker" value="#d7d7d7" data-original-value="#d7d7d7"/>
         <div class="color-title" data-i18n="Footer text"></div>
-        <input name="cpFooterText" class="js-custom-field colorpicker" value="#808080" data-original-value="#808080"/>
+        <input name="cpFooterText" class="js-custom-field colorpicker" value="#FF5C00" data-original-value="#FF5C00"/>
     </div>
 
     <div name="buttons_and_links" class="customize-section js-customize-section">
         <div class="color-title" data-i18n="Button1 background"></div>
-        <input name="cpButton1Bg" class="js-custom-field colorpicker" value="#cb540a" data-original-value="#cb540a"/>
+        <input name="cpButton1Bg" class="js-custom-field colorpicker" value="#FF5C00" data-original-value="#FF5C00"/>
         <div class="color-title" data-i18n="Button1 text"></div>
         <input name="cpButton1Text" class="js-custom-field colorpicker" value="#fdfdfd" data-original-value="#fdfdfd"/>
         <div class="color-title" data-i18n="Button2 background"></div>
         <input name="cpButton2Bg" class="js-custom-field colorpicker" value="#fdfdfd" data-original-value="#fdfdfd"/>
         <div class="color-title" data-i18n="Button2 text"></div>
-        <input name="cpButton2Text" class="js-custom-field colorpicker" value="#cb540a" data-original-value="#cb540a"/>
+        <input name="cpButton2Text" class="js-custom-field colorpicker" value="#FF5C00" data-original-value="#FF5C00"/>
         <div class="color-title" data-i18n="Text links"></div>
-        <input name="cpLink" class="js-custom-field colorpicker" value="#cb540a" data-original-value="#cb540a"/>
+        <input name="cpLink" class="js-custom-field colorpicker" value="#FF5C00" data-original-value="#FF5C00"/>
     </div>
 
     <div name="login_screen" class="customize-section js-customize-section">
         <div class="color-title" data-i18n="Login logo"></div>
-        <input name="cpLoginLogo" class="js-custom-field custom-field-text" value="images/logo-login.png" data-original-value="images/logo-login.png"/>
-        <div class="color-title" data-i18n="Login box background"></div>
-        <input name="cpLoginBoxBg" class="js-custom-field colorpicker" value="#d7d7d7" data-original-value="#d7d7d7"/>
-        <div class="color-title" data-i18n="Login box text"></div>
-        <input name="cpLoginBoxText" class="js-custom-field colorpicker" value="#333" data-original-value="#333"/>
+        <input name="cpLoginLogo" class="js-custom-field custom-field-text" value="images/wat-logo.png" data-original-value="images/wat-logo.png"/>
+        <div class="color-title" data-i18n="Login background"></div>
+        <input name="cpLoginBg" class="js-custom-field colorpicker" value="#d9d9d9" data-original-value="#d9d9d9"/>
+        <div class="color-title" data-i18n="Login text"></div>
+        <input name="cpLoginBoxText" class="js-custom-field colorpicker" value="#595959" data-original-value="#595959"/>
     </div>
 
     <div name="graphs" class="customize-section js-customize-section">

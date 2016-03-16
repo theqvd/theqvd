@@ -80,12 +80,11 @@
     z-index: 2;
     
     color: $col;
-    @include linear-gradient($col_back);
+    
+    background-color: $col_back;
 
     background-repeat: repeat-x;
-
-    border: solid 1px darken($col_back, 15);
-
+    
     -webkit-box-shadow: none;
        -moz-box-shadow: none;
             box-shadow: none;
