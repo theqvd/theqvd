@@ -27,7 +27,8 @@
     }
     
     .ui-state-hover, .ui-state-focus  {
-        @include button($col_whiter, $col_brand);
+        @include button($button_text, $button_bg);
+        background-image: none;
     }
     
     .ui-dialog-buttonset {

@@ -195,9 +195,7 @@ div.list-block div:first-child {
     }
 }
 
-.cascade-data-list {
-    margin-top: 20px;
-}
+
 
 table.list {
     td, th {
@@ -213,7 +211,16 @@ table.list {
     td.cell-link.even:hover {
         background: darken($col_whiter, 8);
     }
+    
+    &.cascade-data-list {
+        margin-top: 20px;
+
+        td, th {
+            white-space: normal;
+        }
+    }
 }
+
 
 table.role-template-tools {
     @include table-base (alternate-rows);
