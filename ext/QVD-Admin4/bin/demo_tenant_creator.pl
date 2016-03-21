@@ -10,7 +10,7 @@ my $EXIT_ERROR_CODE = 1;
 my $EXIT_OK_CODE = 0;
 
 # Get input parameters
-my $url = "https://127.0.0.1:80/";
+my $url = "https://127.0.0.1:443/";
 
 my $tenant_superadmin = "*";
 my $login_superadmin = "superadmin";
