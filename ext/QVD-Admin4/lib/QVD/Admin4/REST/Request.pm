@@ -230,10 +230,6 @@ sub BUILD
 # qvd_object=vm
  
     $self->forze_filtering_by_acls_for_filter_values;
-
-# After check and changes, filters are retrieved as a simple hash
-
-    $self->{filters} = $self->filters->hash;
 }
 
 ###############

@@ -66,7 +66,7 @@ sub select
     my $rs;
 
 	$modifiers //= {};
-	my %filters = ( %{$request->filters}, %{$modifiers->{'filters'} // {}} );
+	my %filters = ( %{$request->filters->hash}, %{$modifiers->{'filters'} // {}} );
 	my %modifiers = ( %{$request->modifiers}, %{$modifiers->{'modifiers'} // {}} );
 	eval {
 		$rs = $DB->resultset($request->table)->search(\%filters, \%modifiers);
@@ -118,7 +118,7 @@ sub tenant_view_get_list
 # So, in this case, filters are added in a second 'search' call
 
     eval { $rs = $DB->resultset($request->table)->search()->search(
-	       $request->filters,$request->modifiers);
+	       $request->filters->hash,$request->modifiers);
 	   @rows = $rs->all };
 
     QVD::Admin4::Exception->throw(exception => $@, query => 'select') if $@;
@@ -150,7 +150,7 @@ sub acl_get_list
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
 
     eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
-	       $request->filters, $request->modifiers);
+	       $request->filters->hash, $request->modifiers);
 	   @rows = $rs->all };
     QVD::Admin4::Exception->throw(exception => $@, query => 'select') if $@;
 
@@ -183,7 +183,7 @@ sub get_acls_in_admins
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
 
     eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
-	       $request->filters, $request->modifiers);
+	       $request->filters->hash, $request->modifiers);
 	   @rows = $rs->all };
     QVD::Admin4::Exception->throw(exception => $@, query => 'select') if $@;
 
@@ -214,7 +214,7 @@ sub get_acls_in_roles
 # over the regular assignation of acls for the administrator.
 
     eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
-	       $request->filters, $request->modifiers);
+	       $request->filters->hash, $request->modifiers);
 	   @rows = $rs->all };
     QVD::Admin4::Exception->throw(exception => $@, query => 'select') if $@;
 
