@@ -150,6 +150,7 @@ any [qw(POST GET)] => '/api/info' => sub {
 		multitenant => $c->qvd_admin4_api->_cfg('wat.multitenant'),
 		version => { database => $c->qvd_admin4_api->database_version },
 		public_configuration => cfg_tree('api.public'),
+		auth => { separators => [ split('', cfg('l7r.auth.plugin.default.separators')) ] },
 	};
 
   $c->render(json => $json );
