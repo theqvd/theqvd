@@ -654,34 +654,41 @@ sub OnUnknownCert {
             if ( $e == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT ) {
                 $err_desc .= $self->_t("Unable to find issuer's certificate.");
                 _add_advice(\@advice, $self->_t("If you are using your own CA, see the documentation on how to make the client use your certificate."));
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_untrusted');
             } elsif ( $e == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY ) {
                 $err_desc .= $self->_t("Unable to find issuer's certificate.");
                 _add_advice(\@advice, $self->_t("If you are using your own CA, see the documentation on how to make the client use your certificate."));
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_untrusted');
             } elsif ( $e == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE ) {
                 $err_desc .= $self->_t("Unable to verify the first certificate");
                 _add_advice(\@advice, $self->_t("If you are using your own CA, see the documentation on how to make the client use your certificate."));
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_untrusted');
             } elsif ( $e == X509_V_ERR_CERT_UNTRUSTED ) {
                 $err_desc .= $self->_t("Root certificate not trusted.");
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_untrusted');
             } elsif ( $e == X509_V_ERR_CERT_NOT_YET_VALID ) {
                 $err_desc .= $self->_t("The certificate is not yet valid.");
                 _add_advice(\@advice, $self->_t("Make sure your clock is set correctly."));
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_not_yet_valid');
             } elsif ( $e == X509_V_ERR_CERT_HAS_EXPIRED ) {
                 $err_desc .= $self->_t("The certificate has expired.");
                 _add_advice(\@advice, sprintf($self->_t("Remind %s (%s) to renew the certificate", $cert->{subject}->{o}, $cert->{subject}->{email})));
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_expired');
             } elsif ( $e == X509_V_ERR_CERT_REVOKED ) {
                 $err_desc .= $self->_t("The certificate has been revoked.");
-                $no_ok_button = 1;
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_revoked');
             } elsif ( $e == 1001 ) {
                 $err_desc .= $self->_t("Hostname verification failed.");
                 _add_advice(\@advice, $self->_t("This certificate belongs to another host. ". 
                                                 "This is a sign of either misconfiguration or an ongoing attempt to compromise security."));
-                $no_ok_button = 1;
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_bad_host');
             } elsif ( $e == 2001 ) {
                 $err_desc .= $self->_t("The certificate has been revoked");
                 _add_advice(\@advice, $self->_t("The certificate has been revoked by its issuing authority. A new certificate is required."));
-                $no_ok_button = 1;
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_revoked');
             } else {
                 $err_desc .= sprintf($self->_t("Unrecognized SSL error."), $e);
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_unknown_error');
             }
 
             my $hsizer = Wx::BoxSizer->new(wxHORIZONTAL);
@@ -767,6 +774,7 @@ sub OnUnknownCert {
 
     }
 
+
     my $but_cancel = Wx::Button->new($dialog, -1, $self->_t('Cancel'));
     Wx::Event::EVT_BUTTON($dialog, $but_cancel->GetId, sub { $but_clicked->(0) });
     $bsizer->Add($but_cancel, 0, wxALL, 5);
@@ -784,15 +792,64 @@ sub OnUnknownCert {
          $but_cancel->SetDefault;
     }
 
+
+    if ( !$no_ok_button && core_cfg('client.ssl.error_timeout') > 0 ) {
+        my $timeout = core_cfg('client.ssl.error_timeout');
+
+        $but_ok->Enable(0);
+        $but_ok_permanent->Enable(0);
+
+        Wx::Event::EVT_TIMER($dialog, -1, \&OnCertDialogTimer);
+        my $timer = Wx::Timer->new($dialog);
+        $dialog->{accept_countdown} = $timeout; 
+        $dialog->{ok_button} = $but_ok;
+        $dialog->{save_button} = $but_ok_permanent;
+        $dialog->{ok_orig_text} = $but_ok->GetLabel();
+        $dialog->{save_orig_text} = $but_ok_permanent->GetLabel();
+        $dialog->{timer} = $timer;
+        $but_ok->SetLabel( $dialog->{ok_orig_text} . " ($timeout)" );
+        $but_ok_permanent->SetLabel( $dialog->{save_orig_text} . " ($timeout)" );
+
+
+
+        $timer->Start(1000,0);
+    }
+
+
+
     $dialog->SetEscapeId( $but_cancel->GetId );
 
     $dialog->ShowModal();
+
+    if ( $dialog->{timer} ) {
+       $dialog->{timer}->Stop();
+    }
 
     $self->{timer}->Start();
 
     { lock $accept_cert; cond_signal $accept_cert; }
 }
 
+sub OnCertDialogTimer {
+    my $self = shift;
+
+    $self->{accept_countdown}--;
+
+    if ( $self->{accept_countdown} <= 0 ) {
+        $self->{ok_button}->Enable(1) if ($self->{ok_button});
+        $self->{save_button}->Enable(1) if ($self->{save_button});
+
+        $self->{ok_button}->SetLabel( $self->{ok_orig_text} );
+        $self->{save_button}->SetLabel( $self->{save_orig_text} );
+        $self->{timer}->Stop();
+
+    } else {
+        $self->{ok_button}->SetLabel( $self->{ok_orig_text} . " ($self->{accept_countdown})" );
+        $self->{save_button}->SetLabel( $self->{save_orig_text} . " ($self->{accept_countdown})" );
+    }
+
+
+}
 sub OnTimer {
     my $self = shift;
     $self->{progress_bar}->Pulse;
