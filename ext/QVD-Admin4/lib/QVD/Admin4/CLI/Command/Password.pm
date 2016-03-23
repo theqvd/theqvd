@@ -25,7 +25,6 @@ sub run
 
     my $res = $self->ask_api(
 	{ action => 'myadmin_update',
-	  filters => { id => { '=' => $id }}, 
 	  arguments => { password => $password }});
 
 }
