@@ -135,7 +135,7 @@ sub init {
     
 	# Created a web client
 	my $user_agent = Mojo::UserAgent->new();
-	unless($opts->insecure){
+	unless($insecure){
 		if (not -e $ca_cert_path){
 			die "CA certificate \"$ca_cert_path\" does not exist";
 		} else {
