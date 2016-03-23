@@ -41,7 +41,8 @@ my $DB;
 
 my $QVD_OBJECTS_TO_LOG_MAPPER = {
     Log => 'log', User => 'user', VM => 'vm', DI => 'di', OSF => 'osf', Host => 'host', 
-    Administrator => 'administrator', Tenant => 'tenant', 
+    My_Admin => 'administrator', Administrator => 'administrator', 
+    My_Tenant => 'tenant', Tenant => 'tenant', 
 	Role => 'role', Config => 'config', QVD_Object_Property_List => 'property',
 	Views_Setup_Properties_Tenant => 'tenant_view', Views_Setup_Attributes_Tenant => 'tenant_view',
 	Views_Setup_Properties_Administrator => 'admin_view', Views_Setup_Attributes_Administrator => 'admin_view',
@@ -720,11 +721,13 @@ my $AVAILABLE_FILTERS = {
 
 	update => {
 		default => [qw(id tenant_id)],
-		Config => [qw(key value)],
+        My_Admin => [],
+        My_Tenant => [],
+        Config => [qw(key value)],
 		Host => [qw(id)],
 		Role => [qw(id)],
 		Tenant => [qw(id)],
-		Wat_Setups_By_Tenant => [qw()]
+        Wat_Setups_By_Tenant => [qw()]
 	},
 
 	create_or_update => {
@@ -927,6 +930,8 @@ my $MANDATORY_FILTERS =
 		update=> {
 			default => [qw(id)],
 			Config => [qw(key tenant_id)],
+            My_Admin => [],
+            My_Tenant => [],
 			Wat_Setups_By_Tenant => [qw()]
 		},
 
@@ -1025,9 +1030,11 @@ my $AVAILABLE_ARGUMENTS = {
                             Host => [qw(name address blocked description)],
                             OSF => [qw(name memory user_storage overlay description)],
                             DI => [qw(blocked disk_image description)],
-	Tenant => [qw(name language block blocked description)],
+    My_Tenant => [qw(name language block description)],
+    Tenant => [qw(name language block blocked description)],
 			    Role => [qw(name description)],
-			    Administrator => [qw(name password language block description)],
+    My_Admin => [qw(name password language block description)],
+    Administrator => [qw(name password language block description)],
 	Views_Setup_Properties_Tenant => [qw(visible)],
 	Views_Setup_Attributes_Tenant => [qw(visible)],
 	Views_Setup_Properties_Administrator => [qw(visible)],
@@ -1180,6 +1187,14 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER = {
 	'id' => 'me.id',
     },
     
+    My_Admin => {
+        'name' => 'me.name',
+        'language' => 'wat_setups.language',
+        'block' => 'wat_setups.block',
+        'password' => 'me.password',
+        'description' => 'me.description',
+    },
+        
     Administrator => {
 	'name' => 'me.name',
 	'language' => 'wat_setups.language',
@@ -1318,6 +1333,14 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER = {
 	'creation_date' => 'creation_log_entry.time',
 	'creation_admin_id' => 'creation_log_entry.administrator_id',
 	'creation_admin_name' => 'creation_log_entry.administrator_name',
+    },
+        
+    My_Tenant => {
+        'name' => 'me.name',
+        'id' => 'me.id',
+        'description' => 'me.description',
+        'language' => 'wat_setups.language',
+        'block' => 'wat_setups.block'
     },
     
 	Views_Setup_Properties_Tenant => {

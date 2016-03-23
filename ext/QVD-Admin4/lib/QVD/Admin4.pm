@@ -1770,4 +1770,20 @@ sub is_cfg_key_in_database {
     return defined( $row );
 }
 
+sub myadmin_update {
+    my ($self,$request,$modifiers) = @_;
+
+    $request->filters->add_filter("id", $request->administrator->id);
+
+    return $self->update($request,$modifiers);
+}
+
+sub mytenant_update {
+    my ($self,$request,$modifiers) = @_;
+
+    $request->filters->add_filter("id", $request->administrator->tenant_id);
+
+    return $self->update($request,$modifiers);
+}
+
 1;

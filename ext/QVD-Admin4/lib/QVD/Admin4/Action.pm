@@ -551,8 +551,8 @@ my $ACTIONS = {
 
 	myadmin_update => {
 		type_of_action => 'update',
-		  admin4method => 'update',
-		qvd_object => 'Administrator'
+		admin4method => 'myadmin_update',
+		qvd_object => 'My_Admin'
 	},
 
 	administrator_delete => {
@@ -598,8 +598,9 @@ my $ACTIONS = {
 
 	mytenant_update => {
 		type_of_action => 'update',
-		     admin4method => 'update',
-		qvd_object => 'Tenant'
+		admin4method => 'mytenant_update',
+		qvd_object => 'My_Tenant',
+		acls => [qr/^config\.wat\./]
 	},
 
 	tenant_create => {

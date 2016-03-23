@@ -43,6 +43,9 @@ has 'qvd_object_model', is => 'ro', isa => sub { die "Invalid type for attribute
 has 'administrator', is => 'ro', isa => sub {
     die "Invalid type for attribute administrator" unless ref(+shift) eq 'QVD::DB::Result::Administrator';
 };
+has 'table', is => 'rw', isa => sub {
+    die "Invalid type for attribute db_table" unless ref(+shift) eq 'SCALAR';
+};
 has 'modifiers', is => 'ro', isa => sub { die "Invalid type for attribute modifiers" 
 					      unless ref(+shift) eq 'HASH'; }, 
                              default => sub { {  group_by => [], # TO DO: default dbix grouping fails for ordering in related tables. This avoids 
@@ -62,6 +65,12 @@ has 'nested_queries', is => 'ro', isa => sub { die "Invalid type for attribute n
 has 'related_views', is => 'ro', isa => sub { die "Invalid type for attribute related_views" 
 						   unless ref(+shift) eq 'ARRAY'; }, default => sub { []; };
 
+# Map to get the DBIx table name from QVD OBJECT
+my $QVD_OBJECT_TO_DBIX_TABLE = {
+    'My_Admin' => 'Administrator',
+    'My_Tenant' => 'Tenant',
+};
+
 # The constructor triggers several checks
 # over the input query. And it throws an informative exception
 # in case one check don't pass. Otherwise, the constructor
@@ -76,8 +85,13 @@ has 'related_views', is => 'ro', isa => sub { die "Invalid type for attribute re
 sub BUILD 
 {
     my $self = shift;
+    my $qvd_object = $self->qvd_object_model->qvd_object;
 
+    # Store the administrator that generates the request
     $self->{administrator} = $self->qvd_object_model->current_qvd_administrator;
+
+    # Set the DBIx table the request will be executed against by default
+    $self->{table} = $self->qvd_obj_to_table($qvd_object);
 
 # CHECKS OR DIE
 
@@ -85,23 +99,20 @@ sub BUILD
 # This function checks if the requested config tokens
 # are available from the API
 
-    $self->check_config_token_availability
-	if $self->qvd_object_model->qvd_object eq 
-	'Config';
+    $self->check_config_token_availability 
+        if $qvd_object eq 'Config';
 
 # Operative acls must be asked just for one role
 # Otherwise the request doesn't make sense 
 
     $self->check_unique_role_in_acls_search
-	if $self->qvd_object_model->qvd_object eq 
-	'Operative_Acls_In_Role';
+        if $qvd_object eq 'Operative_Acls_In_Role';
 
 # Operative acls must be asked just for one admin
 # Otherwise the request doesn't make sense 
 
-    $self->check_unique_admin_in_acls_search
-	if $self->qvd_object_model->qvd_object eq 
-	'Operative_Acls_In_Administrator';
+    $self->check_unique_admin_in_acls_search 
+        if $qvd_object eq 'Operative_Acls_In_Administrator';
 
 # It checks if the requested fields to retrieve 
 # are available
@@ -123,15 +134,8 @@ sub BUILD
 # are available in the system and if the current
 # admin is allowed to use them
 
-# The action 'myadmin_update' is used to change the 
-# personal configuration of the current admin
-# (password, language...). The checks are different  
-# in that case: an admin can only use 'myadmin_update'
-# to change its own values
-
     $self->check_update_arguments_validity_in_json if
-	$self->qvd_object_model->type_of_action eq 'update' &&
-	(not $self->json_wrapper->action eq 'myadmin_update');
+	$self->qvd_object_model->type_of_action eq 'update';
 
 # It checks if the arguments in a creation query
 # are available in the system and if the current
@@ -176,16 +180,15 @@ sub BUILD
 # This method adds to the request an extra filter
 # that avoids the recovery admin to be selected
 
-    $self->hide_recovery_mode_administrator
-	if $self->qvd_object_model->qvd_object eq 'Administrator';
+    $self->hide_recovery_mode_administrator 
+        if $qvd_object eq 'Administrator';
 
 # The accion 'get_acls_in_admins' without an admin_id filter 
 # is supposed to ask for the operative acls in the current admin.
 # This methods adds the corresponding filter if needed 
 
-    $self->set_default_admin_id_in_acls_search
-	if $self->qvd_object_model->qvd_object eq 
-	'Operative_Acls_In_Administrator';
+    $self->set_default_admin_id_in_acls_search 
+        if $qvd_object eq 'Operative_Acls_In_Administrator';
 
 # Requests must include a proper filter by tenant, cause
 # non-superadmin admins can only operate over its own
@@ -194,19 +197,13 @@ sub BUILD
 
     $self->forze_filtering_by_tenant;
 
-# The action 'myadmin_update' can be only used over the current
-# admin. This method adds the corresponding filters
-
-    $self->forze_filtering_by_own_admin
-	if $self->json_wrapper->action eq 'myadmin_update';
-
 # Actions 'admin_view_set' and 'admin_view_reset' are supposed to operate
 # over the current admin. The correspondig filters are added in here
 
-	if ($self->qvd_object_model->qvd_object eq 'Views_Setup_Attributes_Administrator' ||
-		$self->qvd_object_model->qvd_object eq 'Views_Setup_Properties_Administrator') {
-		$self->forze_own_admin_id_in_admin_views;
-	}
+    if ($qvd_object eq 'Views_Setup_Attributes_Administrator' ||
+        $qvd_object eq 'Views_Setup_Properties_Administrator') {
+        $self->forze_own_admin_id_in_admin_views;
+    }
 
 # Tenants must be filtered by tenant in a different way than other objects 
 
@@ -218,7 +215,7 @@ sub BUILD
     $self->forze_tenant_assignment_in_creation
 	if $self->qvd_object_model->type_of_action =~ /^create(_or_update)?$/ &&
 	$self->qvd_object_model->directly_tenant_related &&
-	$self->qvd_object_model->qvd_object ne 'Tenant';
+        $qvd_object ne 'Tenant';
 
 # This method adds filters in order to avoid selecting
 # objects the admin doesn't have acls for. These acls
@@ -446,21 +443,6 @@ sub hide_recovery_mode_administrator
     my $id = $self->qvd_object_model->map_filter_to_dbix_format('id');
     $self->filters->add_filter($id,{ '!=' => 0 }); # Recovery admin is by convention id 0
 }
-
-sub forze_filtering_by_own_admin
-{
-    my $self = shift;
-
-    for my $id ($self->json_wrapper->get_filter_value('id'))
-    {
-        QVD::Admin4::Exception->throw(code => 6320, object => 'id')
-            unless $id  eq $self->administrator->id;
-    } 
-
-    my $id = $self->qvd_object_model->map_filter_to_dbix_format('id');
-    $self->filters->add_filter($id,$self->administrator->id);
-}
-
 
 sub forze_own_admin_id_in_admin_views
 {
@@ -863,12 +845,6 @@ sub get_type_of_action {
 	return $self->qvd_object_model->type_of_action;
 }
 
-sub table 
-{
-    my $self = shift;
-    $self->qvd_object_model->qvd_object;
-}
-
 # Tables that must be created when creating an object
 # (i.e. vm_runtimes for vms)
 
@@ -927,6 +903,11 @@ sub add_to_order_by
     my $order_criteria = $self->modifiers->{order_by}->{'-desc'} //
 	$self->modifiers->{order_by}->{'-asc'};
     push @$order_criteria, $key;
+}
+
+sub qvd_obj_to_table {
+    my ($self,$qvd_obj) = @_;
+    return $QVD_OBJECT_TO_DBIX_TABLE->{$qvd_obj} // $qvd_obj;
 }
 
 1;
