@@ -40,6 +40,9 @@ has 'qvd_object_model', is => 'ro', isa => sub { die "Invalid type for attribute
 
 # These are the main accessors used in QVD::Admin4
 
+has 'administrator', is => 'ro', isa => sub {
+    die "Invalid type for attribute administrator" unless ref(+shift) eq 'QVD::DB::Result::Administrator';
+};
 has 'modifiers', is => 'ro', isa => sub { die "Invalid type for attribute modifiers" 
 					      unless ref(+shift) eq 'HASH'; }, 
                              default => sub { {  group_by => [], # TO DO: default dbix grouping fails for ordering in related tables. This avoids 
@@ -59,8 +62,6 @@ has 'nested_queries', is => 'ro', isa => sub { die "Invalid type for attribute n
 has 'related_views', is => 'ro', isa => sub { die "Invalid type for attribute related_views" 
 						   unless ref(+shift) eq 'ARRAY'; }, default => sub { []; };
 
-my $ADMIN;
-
 # The constructor triggers several checks
 # over the input query. And it throws an informative exception
 # in case one check don't pass. Otherwise, the constructor
@@ -76,7 +77,7 @@ sub BUILD
 {
     my $self = shift;
 
-    $ADMIN = $self->qvd_object_model->current_qvd_administrator;
+    $self->{administrator} = $self->qvd_object_model->current_qvd_administrator;
 
 # CHECKS OR DIE
 
@@ -245,7 +246,8 @@ sub check_config_token_availability
 	# it is an unavailable one
 	my $token = $self->get_json_adequate_value('key');
 
-	my $tenant = $ADMIN->is_superadmin ? $self->get_json_adequate_value('tenant_id') : $ADMIN->tenant_id;
+    my $tenant = $self->administrator->is_superadmin ?
+        $self->get_json_adequate_value('tenant_id') : $self->administrator->tenant_id;
 
 	# This code forbids the switch to monotenant mode if
 	# in the system there are multiple tenants
@@ -348,11 +350,13 @@ sub check_create_arguments_validity_in_json
     my $self = shift;
     my $admin = $self->qvd_object_model->current_qvd_administrator;
 
-    $self->json_wrapper->has_argument($_) || 
-	defined $self->qvd_object_model->get_default_argument_value($_,$self->json_wrapper) ||
-        ($_ eq 'tenant_id' && (not $ADMIN->is_superadmin)) || 
-	QVD::Admin4::Exception->throw(code => 6240 , object => $_)
-	for $self->qvd_object_model->mandatory_arguments;
+    for ($self->qvd_object_model->mandatory_arguments) {
+         unless ($self->json_wrapper->has_argument($_) ||
+            defined $self->qvd_object_model->get_default_argument_value($_,$self->json_wrapper) ||
+            ($_ eq 'tenant_id' && (not $self->administrator->is_superadmin))) {
+             QVD::Admin4::Exception->throw(code => 6240 , object => $_);
+         }
+    }
     
     $self->qvd_object_model->available_argument($_) || 
 	$self->qvd_object_model->mandatory_argument($_) ||
@@ -432,8 +436,8 @@ sub set_default_admin_id_in_acls_search
 {
     my $self = shift;
     my $admin_id = $self->qvd_object_model->map_filter_to_dbix_format('admin_id');
-    $self->filters->add_filter('me.admin_id',{ '=' => $ADMIN->id})
-	unless $self->filters->get_filter_value($admin_id);
+    $self->filters->add_filter('me.admin_id',{ '=' => $self->administrator->id}) 
+        unless $self->filters->get_filter_value($admin_id);
 }
 
 sub hide_recovery_mode_administrator
@@ -449,12 +453,12 @@ sub forze_filtering_by_own_admin
 
     for my $id ($self->json_wrapper->get_filter_value('id'))
     {
-	QVD::Admin4::Exception->throw(code => 6320, object => 'id')
-	    unless $id  eq $ADMIN->id;
+        QVD::Admin4::Exception->throw(code => 6320, object => 'id')
+            unless $id  eq $self->administrator->id;
     } 
 
     my $id = $self->qvd_object_model->map_filter_to_dbix_format('id');
-    $self->filters->add_filter($id,$ADMIN->id);
+    $self->filters->add_filter($id,$self->administrator->id);
 }
 
 
@@ -465,12 +469,12 @@ sub forze_own_admin_id_in_admin_views
     if ($self->qvd_object_model->type_of_action eq 'create_or_update')
     {
 	my $admin_id = $self->qvd_object_model->map_argument_to_dbix_format('admin_id');
-	$self->instantiate_argument($admin_id,$ADMIN->id);
+        $self->instantiate_argument($admin_id,$self->administrator->id);
     }
     else # delete actions
     {
 	my $admin_id = $self->qvd_object_model->map_filter_to_dbix_format('admin_id');
-	$self->filters->add_filter($admin_id,$ADMIN->id);
+        $self->filters->add_filter($admin_id,$self->administrator->id);
     }
 }
 
@@ -484,18 +488,18 @@ sub forze_filtering_by_tenant
 
     if ($self->json_wrapper->has_filter($tenant_id))
     {
-	QVD::Admin4::Exception->throw(code => 4220, object => 'tenant_id') 
-	    unless $ADMIN->is_superadmin; # Only superadmins can filter by tenant
+        QVD::Admin4::Exception->throw(code => 4220, object => 'tenant_id') 
+            unless $self->administrator->is_superadmin; # Only superadmins can filter by tenant
     }
-    elsif ($self->qvd_object_model->qvd_object eq 'Log' && $ADMIN->is_superadmin)
+    elsif ($self->qvd_object_model->qvd_object eq 'Log' && $self->administrator->is_superadmin)
     {
 	# In log, entries without tenant specification must be retrieved as well
 	my $IS_NULL = "$tenant_id IS NULL";
-	$self->filters->add_filter('-or', [$tenant_id,$ADMIN->tenants_scoop,\$IS_NULL]);
+        $self->filters->add_filter('-or', [$tenant_id,$self->administrator->tenants_scoop,\$IS_NULL]);
     }
     else
     {
-	$self->filters->add_filter($tenant_id,$ADMIN->tenants_scoop);
+        $self->filters->add_filter($tenant_id,$self->administrator->tenants_scoop);
     }
 }
 
@@ -503,7 +507,7 @@ sub forze_filtering_tenants_by_tenant
 {
     my $self = shift;
 
-    my @ids = @{$ADMIN->tenants_scoop}; # All tenants available for the admin
+    my @ids = @{$self->administrator->tenants_scoop}; # All tenants available for the admin
 
 # By convention, tenant 0 is the special tenant of superadmins 
 # Tenant 0 is special. It cannot be deleted and when listing
@@ -536,7 +540,7 @@ sub forze_filtering_by_acls_for_filter_values
 	for my $value ($self->qvd_object_model->get_filter_values_with_acls($filter)) # Values of a filter that may
 	{                                                                             # have acls associated
 	    my @acls = $self->qvd_object_model->get_acls_for_filter_value($filter,$value);
-	    push @forbidden_values, $value unless $ADMIN->re_is_allowed_to(@acls);
+        push @forbidden_values, $value unless $self->administrator->re_is_allowed_to(@acls);
 	}
     
 	my @requested_values = ($self->json_wrapper->get_filter_value($filter)) // ();
@@ -560,7 +564,7 @@ sub forze_tenant_assignment_in_creation
 {
     my $self = shift;
 
-    if ($ADMIN->is_superadmin)
+    if ($self->administrator->is_superadmin)
     { # Mandatory argument for superadmins
 	QVD::Admin4::Exception->throw(code => 6240 , object => 'tenant_id')
 	    unless $self->json_wrapper->has_argument('tenant_id');
@@ -568,7 +572,7 @@ sub forze_tenant_assignment_in_creation
     else
     { # For non-superadmins a tenant_id assignation is forced according to the tenant_id of the admin
 		my $tenant_id_key = $self->qvd_object_model->map_argument_to_dbix_format('tenant_id');
-		my $tenant_id_value = $ADMIN->tenant_id;
+        my $tenant_id_value = $self->administrator->tenant_id;
 
 		# Set tenant_id to -1 if global configuration is changed in monotenant
 		if( (!cfg('wat.multitenant')) and ($self->qvd_object_model->qvd_object eq 'Config') ){
@@ -688,7 +692,7 @@ sub set_parameters_in_request
 	my $value = $self->json_wrapper->get_parameter_value($key);
 	$self->set_parameter($key,$value);
     }
-    $self->set_parameter('administrator',$ADMIN);
+    $self->set_parameter('administrator',$self->administrator);
 }
 
 
