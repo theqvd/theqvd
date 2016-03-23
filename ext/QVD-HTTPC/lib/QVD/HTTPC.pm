@@ -37,7 +37,7 @@ our @SSL_OPTIONS = qw( SSL_hostname SSL_ca SSL_ca_file SSL_ca_path SSL_client_ca
                        SSL_check_crl SSL_crl_file SSL_ocsp_mode SSL_ocsp_staple_callback SSL_ocsp_cache SSL_reuse_ctx
                        SSL_create_ctx_callback SSL_session_cache_size SSL_session_cache SSL_session_key SSL_session_id_context
                        SSL_error_trap SSL_npn_protocols SSL_alpn_protocols 
-                       SSL_ca_path_alt SSL_use_ocsp SSL_fail_on_ocsp SSL_fail_on_hostname
+                       SSL_ca_path_alt SSL_use_ocsp SSL_fail_on_ocsp SSL_fail_on_hostname SSL_debug
                     );
 
 sub _create_socket {
@@ -57,7 +57,7 @@ sub _create_socket {
         $self->{SSL_fail_on_hostname}  //= 1;
         
 
-        IO::Socket::SSL->import('debug3');
+        IO::Socket::SSL->import('debug3') if ($self->{SSL_debug});
 
         my %args = ( SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_PEER() );
         $args{$_} = $self->{$_} for grep { exists $self->{$_} } @SSL_OPTIONS;
@@ -67,6 +67,7 @@ sub _create_socket {
         delete $args{SSL_use_ocsp};
         delete $args{SSL_fail_on_ocsp};
         delete $args{SSL_fail_on_hostname};
+        delete $args{SSL_debug};
 
         if (defined $args{SSL_ca_path} && defined $self->{SSL_ca_path_alt}) {
             # SSL_ca_path_alt is deprecated since as of IO::Socket::SSL 2.020 the CA path is
@@ -89,14 +90,11 @@ sub _create_socket {
         $args{SSL_hostname}        //= $sslhost;
         $args{SSL_ocsp_mode}       //= IO::Socket::SSL::SSL_OCSP_FULL_CHAIN() | IO::Socket::SSL::SSL_OCSP_FAIL_HARD();
 
-        use Data::Dumper;
-        print STDERR "ssl args:\n" . Dumper( \%args );
-
         $s = IO::Socket::SSL->new(PeerAddr => $target, Blocking => 0, %args);
 
         if ( $s && !$s->verify_hostname( $args{SSL_verifycn_name}, $self->{SSL_verifycn_scheme} // "http" ) ) {
-            print STDERR "VERIFY ERR: ". $s->errstr() . "\n";
-            print STDERR "SSL ERR   : $IO::Socket::SSL::SSL_ERROR\n";
+            #print STDERR "VERIFY ERR: ". $s->errstr() . "\n";
+            #print STDERR "SSL ERR   : $IO::Socket::SSL::SSL_ERROR\n";
 
             $self->{hostname_error} = "Hostname verification failed";
 
@@ -107,13 +105,13 @@ sub _create_socket {
         }
 
         if ( $s && $self->{SSL_use_ocsp} ) {
-            $IO::Socket::SSL::DEBUG=3;
+            $IO::Socket::SSL::DEBUG=3 if ( $self->{SSL_debug} );
             my $ocsp = $s->ocsp_resolver();
             $self->{ocsp_errors} = $ocsp->resolve_blocking();
 
-            if ( $self->{ocsp_errors} ) {
-                print STDERR "OCSP ERR: $self->{ocsp_errors}\n";
-            }
+            #if ( $self->{ocsp_errors} ) {
+            #    print STDERR "OCSP ERR: $self->{ocsp_errors}\n";
+            #}
 
             if ( $self->{ocsp_errors} && $self->{SSL_fail_on_ocsp} ) {
                 $self->{failed_socket} = $s;
