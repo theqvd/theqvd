@@ -584,13 +584,13 @@ sub OnUnknownCert {
     my $err_desc;
     my @advice;
 
-    my $dialog = Wx::Dialog->new($self, undef, $self->_t("Invalid certificate"));
+    my $dialog = Wx::Dialog->new($self, -1, $self->_t("Invalid certificate"));
     my $main_sizer = Wx::BoxSizer->new(wxVERTICAL);
     my $no_ok_button;
 
 
-    use Data::Dumper;
-    print STDERR Dumper([$data]);
+    #use Data::Dumper;
+    #print STDERR Dumper([$data]);
 
     my $tab_ctl;
     my $show_details = 1;

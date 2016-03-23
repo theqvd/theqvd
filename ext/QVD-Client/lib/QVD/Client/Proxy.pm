@@ -19,6 +19,7 @@ use QVD::Log;
 use QVD::Client::USB;
 use QVD::Client::USB::USBIP;
 use QVD::Client::USB::IncentivesPro;
+use Carp;
 
 
 my $LINUX = ($^O eq 'linux');
@@ -139,7 +140,7 @@ sub _ssl_verify_callback {
             $ci->{extensions}->{cert_type} = { $ext->hash_bit_string };
         }
 
-        print STDERR $oid, " ", $ext->object()->name(), ": ", $ext->value(), "\n";
+        #print STDERR $oid, " ", $ext->object()->name(), ": ", $ext->value(), "\n";
     }
 
 
@@ -177,17 +178,19 @@ sub _ssl_verify_callback {
 }
 
 sub _split_dn {
-    my ($str) = @_;
+    my ($dn) = @_;
     my $ret = {};
     my $buf = "";
     my ($k,$v) = ("", "");
 
-    print STDERR "STR: $str\n";
+    #print STDERR "STR: $dn\n";
 
+    my $str = $dn;
     while($str) {
         my ($match, $rest) = ($str =~ m/^(.*?)[,=](.*)$/);
+
         $str = $rest;
-        $buf .= $match;
+        $buf .= $match if (defined $match);
 
         if ( $buf =~ /\\$/ ) {
             $buf =~ s/\\$//;
@@ -392,7 +395,7 @@ sub _get_httpc {
             DEBUG "$errcount SSL errors ( $self->{ssl_errors} total, $self->{ssl_ignored_errors} ignored ) while logging in, asking user";
 
             my $accept = $self->{client_delegate}->proxy_unknown_cert($self->{cert_info});
-            print STDERR "ACCEPT: $accept\n";
+            #print STDERR "ACCEPT: $accept\n";
             if (!$accept) {
                 INFO("User rejected certificate. Closing connection.");
                 $cli->proxy_connection_status('CLOSED');
