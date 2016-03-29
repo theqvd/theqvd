@@ -3,7 +3,7 @@
 eval 'exec /usr/lib/qvd/bin/perl  -S $0 ${1+"$@"}'
     if 0; # not running under some shell
 
-{
+BEGIN {
     package QVD::Client::App;
 
     use warnings;
@@ -116,13 +116,84 @@ sub proxy_set_environment {
 }
 
 sub proxy_unknown_cert {
-    ## Accept all certificates for now.
-    # my ($self, $cert_arr) = @_;
-    # my ($cert_pem_str, $cert_data) = @$cert_arr;
-    # print "$cert_data\n";
-    # print "Accept certificate? [y/N] ";
-    # return <STDIN> =~ /^y/i;
+    my ($self, $cert_data) = @_;
+
+    print "Error validating certificate:\n";
+    my $n=1;
+    foreach my $cert ( @{ $cert_data} ) {
+        print "Certificate $n:\n";
+        print $self->format_cert($cert_data->[0]);
+        $n++;
+    }
+
+    print "\n";
+    print "Do you wish to continue and connect anyway?\n";
+    print "\n";
+
+    my $answer = "";
+
+    while(1) {
+        print "Enter 'yes' to continue, 'accept' to permanently accept the certificate,\n";
+        print "or 'quit' to quit.\n\n";
+
+        my $answer = <STDIN>;
+        chomp $answer;
+        if ( $answer =~ /yes/ ) {
+           return 1;
+        } elsif ( $answer =~ /accept/ ) {
+           return 2;
+        } elsif ( $answer =~ /quit/ ) {
+           return 0;
+        } elsif ( $answer =~ /dump/ ) {
+           require Data::Dumper;
+           die Data::Dumper->Dumper([@_]);
+        }
+    }
+
     1;
+}
+
+
+sub format_cert {
+    my ($self, $cert)  = @_;
+    my $ret = "";
+    $ret .= "\tCertificate for:\n" . $self->format_org($cert->{subject});
+    $ret .= "\tIssued by:\n" . $self->format_org($cert->{issuer});
+    $ret .= "\tFingerprint: " . $cert->{fingerprint}->{sha256} . "\n";
+    $ret .= "\tNot before : " . $cert->{not_before}. "\n";
+    $ret .= "\tNot after  : " . $cert->{not_after} . "\n";
+    $ret .= "\tSize       : " . $cert->{bit_length} . " bits\n";
+
+    if ( exists $cert->{extensions}->{altnames} ) {
+        $ret .= "\tNames:\n";
+        foreach my $alt ( @{ $cert->{extensions}->{altnames} } ) {
+            foreach my $k ( keys %{$alt} ) {
+                $ret .= "\t\t$k: $alt->{$k}\n"; 
+            }
+        }
+    } 
+ 
+
+    $ret .= "\tErrors:\n";
+
+    foreach my $err ( @{$cert->{errors}} ) {
+        $ret .= "\t\tError #" . $err->{err_no} . ": " . $err->{err_str} . "\n";
+    }
+
+    return $ret;
+}
+sub format_org {
+    my ($self, $org) = @_;
+
+    my $ret = "";
+    $ret .= "\t\tCommon Name        : " . $org->{cn} . "\n";
+    $ret .= "\t\tOrganizational Unit: " . $org->{ou} . "\n";
+    $ret .= "\t\tOrganization       : " . $org->{o} . "\n";
+    $ret .= "\t\tLocation           : " . $org->{l} . "\n";
+    $ret .= "\t\tState              : " . $org->{st} . "\n";
+    $ret .= "\t\tCountry            : " . $org->{c} . "\n";
+
+    return $ret;
 }
 
 sub proxy_list_of_vm_loaded {
