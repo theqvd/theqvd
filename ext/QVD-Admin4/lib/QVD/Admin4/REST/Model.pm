@@ -44,6 +44,7 @@ my $QVD_OBJECTS_TO_LOG_MAPPER = {
     My_Admin => 'administrator', Administrator => 'administrator', 
     My_Tenant => 'tenant', Tenant => 'tenant', 
 	Role => 'role', Config => 'config', QVD_Object_Property_List => 'property',
+    Operative_Views_In_Tenant => 'tenant_view', Operative_Views_In_Administrator => 'admin_view',
 	Views_Setup_Properties_Tenant => 'tenant_view', Views_Setup_Attributes_Tenant => 'tenant_view',
 	Views_Setup_Properties_Administrator => 'admin_view', Views_Setup_Attributes_Administrator => 'admin_view',
 	Property_List => 'property', Wat_Setups_By_Tenant => 'wat_setup_by_tenant',
@@ -306,6 +307,12 @@ my $ACLS_FOR_FIELDS = {
 		blocked => [qr/^tenant\.see\.block$/],
 	}
 };
+
+# Acls needed to order by every field in actions regarding
+# a certain QVD object
+
+my $ACLS_FOR_ORDER_CRITERIA =
+    $ACLS_FOR_FIELDS;
 
 # Acls needed to update every field in actions regarding
 # a certain QVD object
@@ -945,6 +952,58 @@ my $MANDATORY_FILTERS =
 			Operative_Acls_In_Administrator => [qw()]
 		}, # FIX ME. HAS DEFAULT VALUE IN Request.pm. DEFAULT SYSTEM FOR FILTERS NEEDED
 	};
+
+my $AVAILABLE_ORDER_CRITERIA = {
+    default => [],
+    
+    Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time antiquity status source ip type_of_action qvd_object object_deleted admin_deleted superadmin)],
+    
+    Config => [qw(key)],
+    
+    OSF => [qw(id name tenant_id tenant_name description overlay user_storage memory tenant_id tenant_name creation_date creation_admin_id creation_admin_name)],
+    
+    Role => [qw(id name tenant_id tenant_name description fixed internal creation_date creation_admin_id creation_admin_name)],
+    
+    DI => [qw(id disk_image tenant_id tenant_name description version osf_id osf_name blocked creation_date creation_admin_id creation_admin_name)],
+    
+    VM => [qw(id name tenant_id tenant_name description user_id user_name osf_id osf_name di_tag blocked storage
+        expiration_soft expiration_hard state host_id user_state ip ssh_port vnc_port serial_port
+        creation_date creation_admin_id creation_admin_name )],
+    
+    ACL => [qw(id name description)],
+    
+    Administrator => [qw(id name tenant_id tenant_name description language block creation_date creation_admin_id creation_admin_name)],
+    
+    Tenant => [qw(id name description language block blocked creation_date creation_admin_id creation_admin_name)],
+    
+    User => [qw(id name tenant_id tenant_name description blocked creation_date creation_admin_id creation_admin_name )],
+    
+    Host => [qw(id name description address blocked state creation_date creation_admin_id creation_admin_name number_of_vms_connected properties )],
+    
+    DI_Tag => [qw(osf_id di_id name id )],
+    
+    Views_Setup_Properties_Tenant => [qw(qvd_obj_prop_id key visible view_type device_type qvd_object)],
+    
+    Views_Setup_Attributes_Tenant => [qw(tenant_id field visible view_type device_type qvd_object)],
+    
+    Operative_Acls_In_Role => [qw(id name roles operative description)],
+    
+    Operative_Acls_In_Administrator => [qw(id name roles operative description)],
+    
+    Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
+    
+    Views_Setup_Properties_Administrator => [qw(id tenant_id tenant_name admin_id admin_name qvd_obj_prop_id key
+        visible view_type device_type qvd_object)],
+    
+    Views_Setup_Attributes_Administrator => [qw(id tenant_id tenant_name admin_id admin_name field
+        visible view_type device_type qvd_object)],
+    
+    Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)],
+    
+    QVD_Object_Property_List => [qw(id property_id)],
+    
+    Property_List => [qw(id property_id tenant_id key description )]
+};
 
 # Default order criteria for every kind of action
 
@@ -1939,7 +1998,10 @@ sub BUILD
 
     $self->set_info_by_type_of_action_and_qvd_object(
 	'available_fields',$AVAILABLE_FIELDS,1);
-
+    
+    $self->set_info_by_qvd_object(
+        'available_order_criteria',$AVAILABLE_ORDER_CRITERIA);
+    
     $self->set_info_by_type_of_action_and_qvd_object(
 	'default_order_criteria',$DEFAULT_ORDER_CRITERIA);
 
@@ -1999,8 +2061,9 @@ sub initialize_info_model
 	$self->{model_info} = {
     unambiguous_filters => [],                                                                 
     related_views_in_db => [],
-    available_filters => [],                                                                 
-    available_fields => [],                                                                  
+    available_filters => [],
+    available_fields => [],
+    available_order_criteria => [],
     available_arguments => [],                                                               
     available_nested_queries => [],                                                               
     mandatory_arguments => [],                                                               
@@ -2145,6 +2208,13 @@ sub available_filters
     my $self = shift;
     my $filters =  $self->{model_info}->{available_filters} // [];
     @$filters;
+}
+
+sub available_order_criteria
+{
+    my $self = shift;
+    my $criteria =  $self->{model_info}->{available_order_criteria} // [];
+    @$criteria;
 }
 
 sub unambiguous_filters
@@ -2300,6 +2370,17 @@ sub available_filter
     $_ eq $filter && return 1
 	for $self->available_filters;
 
+    return 0;
+}
+
+sub available_order_criterium
+{
+    my $self = shift;
+    my $criterium = shift;
+    
+    $_ eq $criterium && return 1
+        for $self->available_order_criteria;
+    
     return 0;
 }
 
@@ -2483,6 +2564,12 @@ sub get_acls_for_field
 {
     my ($self,$field) = @_;
     $self->get_acls($ACLS_FOR_FIELDS,$field);
+}
+
+sub get_acls_for_order_criterium
+{
+    my ($self,$criterium) = @_;
+    $self->get_acls($ACLS_FOR_ORDER_CRITERIA,$criterium);
 }
 
 sub get_acls_for_argument_in_creation

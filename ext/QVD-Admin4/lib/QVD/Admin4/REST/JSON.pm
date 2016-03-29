@@ -146,7 +146,7 @@ sub order_criteria
     } 
     else
     {
-	return [];
+	return undef;
     }			 
 }
 
@@ -242,15 +242,6 @@ sub has_argument
     return 0;
 }
 
-sub has_order_criterium
-{
-    my ($self,$order_criterium) = @_;
-
-    $_ eq $order_criterium && return 1
-	for @{$self->order_criteria};
-    return 0;
-}
-
 sub get_filter_value
 {
     my ($self,$filter) = @_;
@@ -267,14 +258,6 @@ sub get_argument_value
 {
     my ($self,$argument) = @_;
     return $self->arguments->{$argument};
-}
-
-sub get_order_criterium
-{
-    my ($self,$order_criterium) = @_;
-    $order_criterium eq $_ && return $_
-	for @{$self->order_criteria};
-    return undef;
 }
 
 sub forze_filter_deletion
@@ -295,14 +278,6 @@ sub forze_argument_deletion
     delete $self->json->{arguments}->{$argument};
 }
 
-sub forze_order_criterium_deletion
-{
-    my ($self,$order_criterium) = @_;
-    
-    $self->json->{order_by}->{field} = 
-	[ grep { $_ ne $order_criterium } @{$self->order_criteria} ];
-}
-
 sub forze_filter_addition
 {
     my ($self,$key,$value) = @_;
@@ -319,15 +294,6 @@ sub forze_argument_addition
 {
     my ($self,$key,$value) = @_;
     $self->json->{arguments}->{$key} = $value;
-}
-
-sub forze_order_criterium_addition
-{
-    my ($self,$order_criterium) = @_;
-    
-    my $order_criteria = $self->order_criteria;
-    push @$order_criteria,$order_criterium;
-    $self->json->{order_by}->{order} = $order_criteria;
 }
 
 1;

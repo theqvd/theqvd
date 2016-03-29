@@ -407,6 +407,28 @@ sub check_nested_queries_validity_in_json
 sub check_order_by_validity_in_json
 {
     my $self = shift;
+    
+    my $order_direction = $self->json_wrapper->order_direction;
+    if(defined($order_direction)){
+        unless ( grep { $_ eq $order_direction } qw(-asc -desc) ){
+            QVD::Admin4::Exception->throw(code => 6600, object => $order_direction);
+        }
+    }
+
+    my $order_criteria = $self->json_wrapper->order_criteria // [];
+
+    for (@{$order_criteria}) {
+        unless ($self->qvd_object_model->available_order_criterium($_)) {
+            QVD::Admin4::Exception->throw(code => 6610, object => $_);
+        }
+    }
+
+    for (@{$order_criteria}) {
+        my @acls = $self->qvd_object_model->get_acls_for_order_criterium($_);
+        unless ( $self->administrator->re_is_allowed_to(@acls) ) {
+            QVD::Admin4::Exception->throw(code => 4260, object => $_);
+        }
+    }
 }
 
 sub check_fields_validity_in_json # Fields to retrieve
@@ -895,14 +917,6 @@ sub add_to_prefetch
 {
     my ($self,$key) = @_;
     push @{$self->modifiers->{prefetch}}, $key;
-}
-
-sub add_to_order_by
-{
-    my ($self,$key) = @_;
-    my $order_criteria = $self->modifiers->{order_by}->{'-desc'} //
-	$self->modifiers->{order_by}->{'-asc'};
-    push @$order_criteria, $key;
 }
 
 sub qvd_obj_to_table {

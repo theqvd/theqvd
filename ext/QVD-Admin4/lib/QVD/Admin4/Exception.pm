@@ -75,7 +75,8 @@ my $code2message_mapper = {
     4230 => 'Forbidden argument for this administrator',
     4240 => 'Forbidden massive action for this administrator',
     4250 => 'Forbidden field for this administrator',
-
+    4260 => 'Forbidden sorted by field for this administrator',
+    
     5110 => 'Unable to disconnect user in current state',
     5120 => 'Unable to stop VM in current state',
     5130 => 'Unable to start VM in current state',
@@ -103,7 +104,9 @@ my $code2message_mapper = {
     6430 => 'No tag provided',
     6440 => 'No acl provided',
     6450 => 'No role provided',
-
+    6600 => 'Invalid order direction',
+    6610 => 'Invalid order by field',
+    
     7100 => 'Refered related items don\'t exist',
     7110 => 'Unable to accomplish, refered related items don\'t exist',
     7120 => 'Unable to remove, other items depend on it',
