@@ -534,7 +534,10 @@ sub connect_to_vm {
 		$o{'qvd.client.hostname'}   = Win32::NodeName();
 	}
 
-    $q = join '&', map { uri_escape($_) .'='. uri_escape($o{$_}) } keys %o;
+    $q = join '&', map { 
+        warn "Undefined value for option $_" unless defined $o{$_};
+        uri_escape($_) .'='. uri_escape($o{$_}) 
+    } keys %o;
 
     DEBUG("Sending parameters: $q");
     $httpc->send_http_request(
