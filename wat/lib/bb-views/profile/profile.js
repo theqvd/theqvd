@@ -75,7 +75,7 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
             return;
         }
         
-        var filters = {"id": this.id};
+        var filters = {};
         var arguments = {};
         
         var context = $('.' + this.cid + '.editor-container');
