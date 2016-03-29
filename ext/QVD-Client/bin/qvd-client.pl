@@ -60,12 +60,53 @@ BEGIN {
 
 use QVD::Client::Proxy;
 use QVD::Log;
+my %opts;
 
-GetOptions \my %opts, '--username=s', '--password=s', '--host=s', '--port=s', '--file=s', '--ssl!', '--vm-id=s' or die "getopt";
+GetOptions \%opts,
+    '--username=s',
+    '--password=s',
+    '--host=s',
+    '--port=s',
+    '--file=s',
+    '--ssl!',
+    '--vm-id=s',
+    '--ssl-errors=s',
+    '--help',
+    or die "getopt";
+
 $opts{'port'} //= core_cfg('client.host.port');
-$opts{'ssl'} //= 0;
+$opts{'ssl'} //= 1;
+$opts{'ssl-errors'} //= 'ask';
+
+
+if ( $opts{help} ) {
+    print <<HELP;
+$0 [options]
+QVD commandline client
+
+--username         Login username
+--password         Login password
+--host             Server to connect to
+--port             Port QVD is running on
+--file             Open file in VM
+--ssl, --no-ssl    Enable or disable the use of SSL
+--ssl-errors       What to do in case of SSL errors. Valid values are:
+                   'ask', 'continue' and 'abort'
+--help             Shows this text
+HELP
+
+    exit(0);
+}
+
+
 my $file = delete $opts{'file'};
+my $ssl_errors = delete $opts{'ssl-errors'};
 my $nonblocking=1;
+
+if ( $ssl_errors !~ /^(ask|continue|abort)$/ ) {
+    print STDERR "Valid values for --ssl-errors: ask, continue or abort\n";
+    exit(1);
+}
 
 my %connect_info = (
     link          => core_cfg('client.link'),
@@ -126,28 +167,36 @@ sub proxy_unknown_cert {
         $n++;
     }
 
-    print "\n";
-    print "Do you wish to continue and connect anyway?\n";
-    print "\n";
+    if ( $ssl_errors =~ /ask/i ) {
+        print "\n";
+        print "Do you wish to continue and connect anyway?\n";
+        print "\n";
 
-    my $answer = "";
+        my $answer = "";
+ 
+        while(1) {
+            print "Enter 'yes' to continue, 'accept' to permanently accept the certificate,\n";
+            print "or 'quit' to quit.\n\n";
 
-    while(1) {
-        print "Enter 'yes' to continue, 'accept' to permanently accept the certificate,\n";
-        print "or 'quit' to quit.\n\n";
-
-        my $answer = <STDIN>;
-        chomp $answer;
-        if ( $answer =~ /yes/ ) {
-           return 1;
-        } elsif ( $answer =~ /accept/ ) {
-           return 2;
-        } elsif ( $answer =~ /quit/ ) {
-           return 0;
-        } elsif ( $answer =~ /dump/ ) {
-           require Data::Dumper;
-           die Data::Dumper->Dumper([@_]);
+            my $answer = <STDIN>;
+            chomp $answer;
+            if ( $answer =~ /yes/ ) {
+               return 1;
+            } elsif ( $answer =~ /accept/ ) {
+               return 2;
+            } elsif ( $answer =~ /quit/ ) {
+               return 0;
+            } elsif ( $answer =~ /dump/ ) {
+               require Data::Dumper;
+               die Data::Dumper->Dumper([@_]);
+            }
         }
+    } elsif ( $ssl_errors =~ /quit|abort|exit/i ) {
+        print "Aborting\n";
+        return 0;
+    } elsif ( $ssl_errors =~ /continue|accept|ok/i ) {
+        print "Continuing\n";
+        return 1;
     }
 
     1;
@@ -225,6 +274,7 @@ sub proxy_connection_error {
     my $self = shift;
     my %args = @_;
     ERROR 'Connection error: ',$args{message},"\n";
+    print STDERR "Connection error: $args{message}\n";
     $self->{error} = $args{message};
 }
 
