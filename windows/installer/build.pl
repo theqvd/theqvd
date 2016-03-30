@@ -133,7 +133,7 @@ unless( $no_debug_installer ) {
 
 	
 msg("Undoing changes to nxproxy");
-run("svn", "revert", "NX\\nxproxy.exe");
+run("git", "checkout", "NX\\nxproxy.exe");
 
 msg("Done!\n");
 
