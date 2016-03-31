@@ -742,12 +742,12 @@ sub OnUnknownCert {
          push @$info,  { $self->_t("Issued by") => _format_aligned( _cert_fullname($cert, $cert->{issuer}), "\t") };
 
          if ( exists $cert->{extensions}->{altnames} ) {
-             push @$info, { 'Alternative names' => _format_aligned($cert->{extensions}->{altnames}, "\t") };
+             push @$info, { $self->_t("Alternative names") => _format_aligned($cert->{extensions}->{altnames}, "\t") };
          }
 
          if ( exists $cert->{extensions}->{cert_type} ) {
              my $ct = $cert->{extensions}->{cert_type};
-             push @$info, { 'Uses' => join(", ", grep { $ct->{$_} } keys %$ct) };
+             push @$info, { $self->_t("Uses") => join(", ", grep { $ct->{$_} } keys %$ct) };
          }
 
          push @$info, { $self->_t("Bit length") => $cert->{bit_length} };
