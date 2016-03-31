@@ -3,7 +3,6 @@
 *.com
 *.class
 *.dll
-*.exe
 *.o
 *.so
 
@@ -55,3 +54,6 @@ windows/installer/locale
 windows/Output
 windows/archive
 windows/script.iss
+
+# Generated files
+windows/installer/qvd-client*.exe
