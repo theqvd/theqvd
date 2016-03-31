@@ -678,7 +678,36 @@ sub OnUnknownCert {
                 $err_desc .= $self->_t("The certificate has been revoked.");
                 $no_ok_button = 1 unless core_cfg('client.ssl.allow_revoked');
             } elsif ( $e == 1001 ) {
-                $err_desc .= $self->_t("Hostname verification failed.");
+                my @hostnames = ( $cert->{subject}->{cn} );
+                my $str_hostnames = "";
+
+                # If SubjectAltName is present, the clients are supposed to ignore the Common Name.
+                #
+                # TODO: Perhaps check if SubjectAltName includes the CN, and warn if it doesn't. But
+                # this is really an improperly created certificate, so the value of telling the user
+                # that is limited.
+ 
+                if ( exists $cert->{extensions}->{altnames} ) {
+                    @hostnames = ();
+
+                    foreach my $ent ( @{ $cert->{extensions}->{altnames} } ) {
+                       push @hostnames, values(%$ent);
+                    }
+                }
+
+                while(@hostnames) {
+                    if ( $str_hostnames ) {
+                        if ( scalar @hostnames > 1 ) {
+                           $str_hostnames .= ", ";
+                        } else {
+                           $str_hostnames .= " " . $self->_t("and") . " ";
+                        }
+                    }
+  
+                    $str_hostnames .= shift(@hostnames);
+                }
+
+                $err_desc .= sprintf($self->_t("Hostname verification failed.\nThe cert is only valid for %s"), $str_hostnames);
                 _add_advice(\@advice, $self->_t("This certificate belongs to another host. ". 
                                                 "This is a sign of either misconfiguration or an ongoing attempt to compromise security."));
                 $no_ok_button = 1 unless core_cfg('client.ssl.allow_bad_host');
@@ -702,7 +731,7 @@ sub OnUnknownCert {
 
 
  
-            $hsizer->Add(Wx::StaticText->new($info_panel, -1, " $err_desc"), 0, wxALL, 5);
+            $hsizer->Add(Wx::StaticText->new($info_panel, -1, $err_desc), 0, wxALL, 5);
             $problems_sizer->Add($hsizer, 0, wxALL, 0);
          } 
          
