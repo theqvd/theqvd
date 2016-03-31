@@ -69,6 +69,14 @@
                             break;
                     }
                 });
+                
+                if (Wat.C.isMultitenant()) { 
+            %>
+                    <th class="col-width-100" data-sortby="name">
+                        <span data-i18n="Global username"><%= i18n.t('Global username') %></span>
+                    </th>
+            <%
+                }
             %>
         </tr>
     </thead>
@@ -183,6 +191,14 @@
                                 break;
                         }
                     });
+                
+                    if (Wat.C.isMultitenant()) { 
+                %>
+                        <td class="desktop">
+                            <%= Wat.C.getLoginData(model.get('name'), model.get('tenant_name')) %>
+                        </td>
+                <%
+                    }
                 %>
             </tr>
         <% }); %>

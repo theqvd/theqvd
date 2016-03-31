@@ -566,5 +566,26 @@ Wat.C = {
     setupLibraries: function () {
         // Attach fast click events to separate tap from click
         Wat.I.attachFastClick(); 
+    },
+    
+    getFirstAuthSeparator: function () {
+        var firstSeparator = this.authSeparators ? this.authSeparators[0] : '';
+        
+        return firstSeparator;
+    },
+    
+    getLoginData: function (name, tenant) {        
+        // If tenant not defined, get current tenant (tenant admin cases)
+        tenant = tenant || Wat.C.tenantName;
+        
+        // If name not defined, get current login name
+        name = name || Wat.C.login;
+
+        // In monotenant cases, login data is just username
+        if (!this.isMultitenant()) {
+            return name;
+        }
+        
+        return name + Wat.C.getFirstAuthSeparator() + tenant;
     }
 }

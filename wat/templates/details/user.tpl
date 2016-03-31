@@ -146,6 +146,16 @@
             </td>
         </tr>
     <% 
+    }   
+    if (Wat.C.isMultitenant()) { 
+    %>
+        <tr>
+            <td><i class="fa fa-sitemap"></i><span data-i18n="Global username">Global username</span></td>
+            <td>
+                 <%= Wat.C.getLoginData(model.get('name'), model.get('tenant_name')) %>
+            </td>
+        </tr>
+    <%   
     }
     %>
     <tbody class="bb-properties"></tbody>

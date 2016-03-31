@@ -619,7 +619,7 @@ Wat.I = {
     },
     
     updateLoginOnMenu: function () {
-        $('.js-menu-corner').find('.js-login').html(Wat.C.login);
+        $('.js-menu-corner').find('.js-login').html(Wat.C.getLoginData());
     },
     
     controls: {
