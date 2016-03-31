@@ -63,7 +63,7 @@ Wat.L = {
         }
         
         if (Wat.C.sid) {
-            Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, Wat.L.checkLogin, Wat.C);
+            Wat.A.apiInfo(Wat.L.getApiInfo, {});
         }
         else {
             Wat.L.afterLogin ();
@@ -77,8 +77,25 @@ Wat.L = {
     // If credentials not retrieved, get it from login form
     tryLogin: function (user, password, tenant) {
         var user = $('input[name="admin_user"]').val() || user;
+        
+        if (Wat.C.multitenant) {
+            $.each(Wat.C.authSeparators, function (iSep, separator) {
+                if (user.search(separator) == -1) {
+                    return;
+                }
+                
+                Wat.C.userTenant = user;
+
+                var userTenant = user.split(separator);
+                
+                user = userTenant[0];
+                tenant = userTenant[1];
+                
+                return false;
+            });
+        }
+        
         var password = $('input[name="admin_password"]').val() || password;
-        var tenant = $('input[name="admin_tenant"]').val() || tenant;
         
         if (!user) {
             Wat.I.M.showMessage({message: "Empty user", messageType: "error"});
@@ -88,6 +105,19 @@ Wat.L = {
         Wat.C.login = user;
         Wat.C.password = password;
         Wat.C.tenant = tenant;
+        
+        Wat.A.apiInfo(Wat.L.getApiInfo, {});
+    },
+    
+    getApiInfo: function (that) {
+        // Store server datetime
+        Wat.C.serverDatetime = that.retrievedData.server_datetime;
+        
+        // Store tenant mode
+        Wat.C.multitenant = parseInt(that.retrievedData.multitenant);
+        
+        // Store authentication separators
+        Wat.C.authSeparators = that.retrievedData.auth.separators;
         
         Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, Wat.L.checkLogin, Wat.C);
     },
@@ -142,8 +172,6 @@ Wat.L = {
         Wat.C.block = that.retrievedData.admin_block;
         Wat.C.tenantBlock = that.retrievedData.tenant_block;
         
-        // Store server datetime
-        Wat.C.serverDatetime = that.retrievedData.server_datetime;
         
         // Restore possible residous views configuration to default values
         Wat.I.restoreListColumns();
@@ -158,9 +186,6 @@ Wat.L = {
         
         // Store admin ID
         Wat.C.adminID = that.retrievedData.admin_id;   
-        
-        // Store tenant mode
-        Wat.C.multitenant = parseInt(that.retrievedData.multitenant);
         
         // Store time lag between server and client
         var currentDate = new Date();

@@ -7,17 +7,6 @@
             <div class="header2-login">Administrator panel</div>
             <form class="login-form js-login-form" target="remember" method="post" action="index.html">
                 <div class="login-form">
-                    <%
-                    if (parseInt(multitenant)) {
-                    %>
-                        <div class="login-control">
-                            <div>
-                                <input type="text" name="admin_tenant" data-i18n="[placeholder]Tenant"/>
-                            </div>
-                        </div>
-                    <%
-                    }
-                    %>
                     <div class="login-control">
                         <div>
                             <input type="text" name="admin_user" data-i18n="[placeholder]User"/>

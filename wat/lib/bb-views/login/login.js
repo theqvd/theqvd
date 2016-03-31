@@ -26,6 +26,7 @@ Wat.Views.LoginView = Wat.Views.MainView.extend({
     render: function () {  
         if (this.retrievedData.status == STATUS_SUCCESS) {
             Wat.C.multitenant = this.retrievedData.multitenant;
+            Wat.C.authSeparators = this.retrievedData.auth.separators;
         }
         
         var template = Wat.TPL.login;
