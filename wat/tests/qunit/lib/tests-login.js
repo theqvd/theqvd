@@ -14,7 +14,7 @@ function loginTest (login, password, tenant, callback) {
             this.clock.restore();
             
             // Number of Assertions we Expect     
-            expect( 4 );
+            expect( 3 );
             
             // Sometimes router is not ready at this point. Wait for it
             var waitingRouter = setInterval(function(){ 
@@ -28,9 +28,8 @@ function loginTest (login, password, tenant, callback) {
 
                         equal(Wat.CurrentView.qvdObj, "home", "Home access granted after auth");
 
-                        equal($.cookie('qvdWatSid'), Wat.C.sid, "Session ID stored in cookies");
-                        equal($.cookie('qvdWatLogin'), Wat.C.login, "User stored in cookies");
-
+                        equal($.cookie('sid'), Wat.C.sid, "Session ID stored in cookies");
+                        
                         start();
                         callback();
                     }

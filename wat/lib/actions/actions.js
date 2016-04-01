@@ -138,11 +138,8 @@ Wat.A = {
                     return;
                 }
                 
-                if (raw.getResponseHeader('sid')) {
-                    Wat.C.sid = raw.getResponseHeader('sid');
-                }
-                else {
-                    //console.log('NO SID FOUND');
+                if (response['sid']) {
+                    Wat.C.sid = response['sid'];
                 }
                 
                 if (that) {

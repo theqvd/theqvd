@@ -6,8 +6,7 @@ Wat.L = {
     
     // Process log out including cookies removement
     logOut: function () {
-        $.removeCookie('qvdWatSid', { path: '/' });
-        $.removeCookie('qvdWatLogin', { path: '/' });
+        $.removeCookie('sid', { path: '/' });
         Wat.C.loggedIn = false;
         Wat.C.sid = '';
         Wat.C.login = '';
@@ -23,8 +22,7 @@ Wat.L = {
     //      login: administrator username
     logIn: function (sid, login) {
         Wat.C.loggedIn = true;
-        $.cookie('qvdWatSid', sid, { expires: Wat.C.loginExpirationDays, path: '/' });
-        $.cookie('qvdWatLogin', login, { expires: Wat.C.loginExpirationDays, path: '/' });
+        $.cookie('sid', sid, { expires: Wat.C.loginExpirationDays, path: '/' });
         
         // Reload screen after login
         var locationHash = window.location.hash;
@@ -40,7 +38,7 @@ Wat.L = {
     
     // Check if current admin is properly logged in
     isLogged: function () {
-        if (Wat.C.loggedIn && Wat.C.sid != '' && $.cookie('qvdWatSid') && $.cookie('qvdWatSid') == Wat.C.sid && Wat.C.login != '' && $.cookie('qvdWatLogin') && $.cookie('qvdWatLogin') == Wat.C.login) {
+        if (Wat.C.loggedIn && Wat.C.sid != '' && $.cookie('sid') && $.cookie('sid') == Wat.C.sid && Wat.C.login != '') {
             return true;
         }
         else {
@@ -51,10 +49,9 @@ Wat.L = {
     
     // Recover login cookies if exist and call to API to check if credentials are correct
     rememberLogin: function () {
-        if ($.cookie('qvdWatSid') && $.cookie('qvdWatLogin')) {
+        if ($.cookie('sid')) {
             Wat.C.loggedIn = true;
-            Wat.C.sid = $.cookie('qvdWatSid');
-            Wat.C.login = $.cookie('qvdWatLogin');
+            Wat.C.sid = $.cookie('sid');
         }
         else {
             Wat.C.loggedIn = false;
@@ -163,6 +160,9 @@ Wat.L = {
         
         // Store retrieved acls
         Wat.C.acls = that.retrievedData.acls;
+        
+        // Store login
+        Wat.C.login = that.retrievedData.admin_name;       
         
         // Store language
         Wat.C.language = that.retrievedData.admin_language;
