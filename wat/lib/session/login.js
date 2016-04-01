@@ -6,7 +6,9 @@ Wat.L = {
     
     // Process log out including cookies removement
     logOut: function () {
-        $.removeCookie('sid', { path: '/' });
+        if (Wat.C.crossOrigin) {
+            $.removeCookie('sid', { path: '/' });
+        }
         Wat.C.loggedIn = false;
         Wat.C.sid = '';
         Wat.C.login = '';
@@ -22,7 +24,10 @@ Wat.L = {
     //      login: administrator username
     logIn: function (sid, login) {
         Wat.C.loggedIn = true;
-        $.cookie('sid', sid, { expires: Wat.C.loginExpirationDays, path: '/' });
+        
+        if (Wat.C.crossOrigin) {
+            $.cookie('sid', sid, { expires: Wat.C.loginExpirationDays, path: '/' });
+        }
         
         // Reload screen after login
         var locationHash = window.location.hash;
@@ -38,7 +43,12 @@ Wat.L = {
     
     // Check if current admin is properly logged in
     isLogged: function () {
-        if (Wat.C.loggedIn && Wat.C.sid != '' && $.cookie('sid') && $.cookie('sid') == Wat.C.sid && Wat.C.login != '') {
+        var cookieChecking = true;
+        if (Wat.C.crossOrigin && (!$.cookie('sid') || $.cookie('sid') != Wat.C.sid)) {
+            cookieChecking = false;
+        }
+        
+        if (Wat.C.loggedIn && Wat.C.sid != '' && Wat.C.login != '' && cookieChecking) {
             return true;
         }
         else {
@@ -49,18 +59,23 @@ Wat.L = {
     
     // Recover login cookies if exist and call to API to check if credentials are correct
     rememberLogin: function () {
-        if ($.cookie('sid')) {
-            Wat.C.loggedIn = true;
-            Wat.C.sid = $.cookie('sid');
+        if (Wat.C.crossOrigin) {
+            if ($.cookie('sid')) {
+                Wat.C.loggedIn = true;
+                Wat.C.sid = $.cookie('sid');
+            }
+            else {
+                Wat.C.loggedIn = false;
+                Wat.C.sid = '';
+                Wat.C.login = '';
+            }
         }
         else {
-            Wat.C.loggedIn = false;
-            Wat.C.sid = '';
-            Wat.C.login = '';
+            Wat.C.loggedIn = true;
         }
         
-        if (Wat.C.sid) {
-            Wat.A.apiInfo(Wat.L.getApiInfo, {});
+        if (Wat.C.sid || !Wat.C.crossOrigin) {
+            Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, Wat.L.checkLogin, Wat.C);
         }
         else {
             Wat.L.afterLogin ();
