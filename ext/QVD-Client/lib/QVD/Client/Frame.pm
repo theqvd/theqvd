@@ -641,6 +641,14 @@ sub OnConnectionError {
         $msg = $message;
     }
 
+    my $translated = $msg;
+
+    if ( $msg =~ /The server has rejected your login/ ) {
+        $translated = $self->_t("The server has rejected your login. Please verify that your username and password are correct");
+    } else {
+        WARN "Untranslated connection error: $msg";
+    }
+
     my $dialog = Wx::MessageDialog->new($self, $msg, $self->_t("Connection error"), wxOK | wxICON_ERROR);
     DEBUG "Showing error to user";
     $dialog->ShowModal();

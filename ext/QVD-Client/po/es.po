@@ -97,6 +97,14 @@ msgstr "Condiciones del servicio"
 msgid "You don't have any virtual machine available"
 msgstr "No tiene ninguna máquina virtual disponible"
 
+#: Frame.pm:521
+msgid ""
+"The server has rejected your login. Please verify that your username and "
+"password are correct"
+msgstr ""
+"El servidor ha rechazado la conexión. Por favor compruebe que su nombre de "
+"usuario y contraseña sean correctos."
+
 #: Frame.pm:529
 #, perl-format
 msgid "Error establishing a SSL connection: %s"
