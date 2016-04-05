@@ -99,7 +99,7 @@ my $ACTIONS = {
 		type_of_action => 'list',
 		  admin4method => 'select',
 		  channels => [qw(user_created user_deleted user_changed vm_created vm_deleted)],
-		  acls => [qr/^(user\.see-main\.|[^.]+\.see\.user-list)$/],
+		  acls => [qr/^(user\.see-main\.)$/, qr/^tenant\.see\.user-list$/],
 		qvd_object => 'User'
 	},
 
@@ -113,14 +113,7 @@ my $ACTIONS = {
 	user_all_ids => {
 		type_of_action => 'all_ids',
 		  admin4method => 'select',
-		  acls => [qr/^user\.[^.]+-massive\.|user\.see-main\./],
-		qvd_object => 'User'
-	},
-
-	user_list_details => {
-		type_of_action => 'details',
-		      admin4method => 'select',
-		      acls => [qr/^user\.see-details\./],
+		  acls => [qr/^(user\.[^.]+-massive\.|user\.see-main\.)$/],
 		qvd_object => 'User'
 	},
 
@@ -278,14 +271,14 @@ my $ACTIONS = {
 		type_of_action => 'list',
 		   admin4method => 'select',
 		   channels => [qw(host_created host_deleted host_changed vm_created vm_deleted)],
-		   acls => [qr/^host\.see-main\./],
+		   acls => [qr/^host\.see-main\.$/],
 		qvd_object => 'Host'
 	},
 
 	host_all_ids => {
 		type_of_action => 'all_ids',
 		  admin4method => 'select',
-		  acls => [qr/^host\.[^.]+-massive\.|host\.see-main\./],
+		  acls => [qr/^host\.[^.]+-massive\./, qr/^host\.see-main\.$/],
 		qvd_object => 'Host'
 	},
 
@@ -328,7 +321,7 @@ my $ACTIONS = {
 	host_delete => {
 		type_of_action => 'delete',
 		 admin4method => 'delete',
-		 acls => [qr/^host\.delete\./],
+		 acls => [qr/^host\.delete\.$/],
 		qvd_object => 'Host'
 	},
 
@@ -357,7 +350,7 @@ my $ACTIONS = {
 		type_of_action => 'list',
 		  admin4method => 'select',
 		  channels => [qw(vm_created vm_deleted di_created di_deleted)],
-		  acls => [qr/^osf\.see-main\./],
+		  acls => [qr/^osf\.see-main\.$/],
 		qvd_object => 'OSF'
 	},
 
@@ -494,18 +487,20 @@ my $ACTIONS = {
 		 acls => [qr/^property\.manage\.di$/],
 		qvd_object => 'QVD_Object_Property_List'
 	},
+    
+    tag_tiny_list => {
+        type_of_action => 'tiny',
+        admin4method => 'select',
+        qvd_object => 'DI_Tag',
+        acls => [qr/^vm\.create\.$/, qr/^vm\.update\.$/],
+    },
 
-	tag_tiny_list => {
-		type_of_action => 'tiny',
-		   admin4method => 'select',
-		qvd_object => 'DI_Tag'
-	},
-
-	tag_get_list => {
-		type_of_action => 'list',
-		   admin4method => 'select',
-		qvd_object => 'DI_Tag'
-	},
+    tag_get_list => {
+        type_of_action => 'list',
+        admin4method => 'select',
+        qvd_object => 'DI_Tag',
+        acls => [qr/^vm\.create\.$/, qr/^vm\.update\.$/],
+    },
 
 	administrator_get_list => {
 		type_of_action => 'list',
@@ -531,7 +526,7 @@ my $ACTIONS = {
 	administrator_all_ids => {
 		type_of_action => 'all_ids',
 		   admin4method => 'select',
-		   acls => [qr/^administrator\.[^.]+-massive\.|administrator\.see-details\./],
+		   acls => [qr/^administrator\.[^.]+-massive\.|administrator\.see-main\./],
 		qvd_object => 'Administrator'
 	},
 
@@ -565,20 +560,21 @@ my $ACTIONS = {
 	tenant_tiny_list => {
 		type_of_action => 'tiny',
 		      admin4method => 'select',
-		qvd_object => 'Tenant'
-	},
+		qvd_object => 'Tenant',
+        acls => [qr/^tenant\.see-main\.$/]
+    },
 
 	tenant_get_list => {
 		type_of_action => 'list',
 		     admin4method => 'select',
-		     acls => [qr/^tenant\.see-main\./],
+		     acls => [qr/^tenant\.see-main\.$/],
 		qvd_object => 'Tenant'
 	},
 
 	tenant_get_details => {
 		type_of_action => 'details',
 			admin4method => 'select',
-			acls => [qr/^(tenant\.see-details)\./],
+			acls => [qr/^(tenant\.see-details)\.$/],
 		qvd_object => 'Tenant'
 	},
 
@@ -627,21 +623,21 @@ my $ACTIONS = {
 	role_get_list => {
 		type_of_action => 'list',
 		   admin4method => 'select',
-		   acls => [qr/^role\.see-main\./],
+		   acls => [qr/^role\.see-main\.$/],
 		qvd_object => 'Role'
 	},
 
 	role_get_details => {
 		type_of_action => 'details',
 		      admin4method => 'select',
-		   acls => [qr/^role\.see-details\./],
+		   acls => [qr/^role\.see-details\.$/],
 		qvd_object => 'Role'
 	},
 
 	role_all_ids => {
 		type_of_action => 'all_ids',
 		  admin4method => 'select',
-		  acls => [qr/^role\.[^.]+-massive\.|role\.see-main\./],
+		  acls => [qr/^role\.[^.]+-massive\./, qr/^role\.see-main\.$/],
 		qvd_object => 'Role'
 	},
 
@@ -706,55 +702,55 @@ my $ACTIONS = {
 		 acls => [qr/^role\.delete\./,qr/^tenant\.purge\.$/],
 		qvd_object => 'Role'
 	},
+ 
+    tenant_view_get_list => {
+        type_of_action => 'list',
+        admin4method => 'tenant_view_get_list',
+        qvd_object => 'Operative_Views_In_Tenant',
+        acls => [qr/^views\.see-main\.$/]
+    },
 
-	tenant_view_get_list => {
-		type_of_action => 'list',
-			  admin4method => 'tenant_view_get_list',
-			  qvd_object => 'Operative_Views_In_Tenant',
-		acls => [qr/^views\.see-main\./]
-	},
+    tenant_property_view_set => {
+        type_of_action => 'create_or_update',
+        admin4method => 'create_or_update',
+        acls => [qr/^views\.update\.$/],
+        qvd_object => 'Views_Setup_Properties_Tenant'
+    },
 
-	tenant_property_view_set => {
-		type_of_action => 'create_or_update',
-		     admin4method => 'create_or_update',
-		     acls => [qr/^views\.update\./],
-		qvd_object => 'Views_Setup_Properties_Tenant'
-	},
+    tenant_attribute_view_set => {
+        type_of_action => 'create_or_update',
+        admin4method => 'create_or_update',
+        acls => [qr/^views\.update\.$/],
+        qvd_object => 'Views_Setup_Attributes_Tenant'
+    },
 
-	tenant_attribute_view_set => {
-		type_of_action => 'create_or_update',
-		admin4method => 'create_or_update',
-		acls => [qr/^views\.update\./],
-		qvd_object => 'Views_Setup_Attributes_Tenant'
-	},
+    tenant_view_reset => {
+        type_of_action => 'delete',
+        admin4method => 'reset_tenant_views',
+        acls => [qr/^views\.update\.$/],
+        qvd_object => 'Views_Setup_Attributes_Tenant'
+    },
 
-	tenant_view_reset => {
-		type_of_action => 'delete',
-		admin4method => 'reset_tenant_views',
-			acls => [qr/^views\.update\./],
-		qvd_object => 'Views_Setup_Attributes_Tenant'
-	},
+    admin_property_view_set => {
+        type_of_action => 'create_or_update',
+        admin4method => 'create_or_update',
+        acls => [],
+        qvd_object => 'Views_Setup_Properties_Administrator'
+    },
 
-	admin_property_view_set => {
-		type_of_action => 'create_or_update',
-		    admin4method => 'create_or_update',
-		    acls => [],
-		qvd_object => 'Views_Setup_Properties_Administrator'
-	},
+    admin_attribute_view_set => {
+        type_of_action => 'create_or_update',
+        admin4method => 'create_or_update',
+        acls => [],
+        qvd_object => 'Views_Setup_Attributes_Administrator'
+    },
 
-	admin_attribute_view_set => {
-		type_of_action => 'create_or_update',
-		admin4method => 'create_or_update',
-		acls => [],
-		qvd_object => 'Views_Setup_Attributes_Administrator'
-	},
-
-	admin_view_reset => {
-		type_of_action => 'delete',
-		admin4method => 'reset_admin_views',
-		       acls => [],
-		qvd_object => 'Views_Setup_Attributes_Administrator'
-	},
+    admin_view_reset => {
+        type_of_action => 'delete',
+        admin4method => 'reset_admin_views',
+        acls => [],
+        qvd_object => 'Views_Setup_Attributes_Administrator'
+    },
 
 	current_admin_setup => {
 		type_of_action => 'ad_hoc',

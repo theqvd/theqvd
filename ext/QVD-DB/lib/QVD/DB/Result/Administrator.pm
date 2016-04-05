@@ -114,20 +114,6 @@ sub get_roles_info
     $out; 
 }
 
-sub is_allowed_to
-{
-    my ($self,@acl_names) = @_;
-    my %acls = map { $_ => 1 } $self->acls;
-
-    for my $acl_name (@acl_names)
-    {
-	return 0 unless defined $acls{$acl_name};
-    }
-
-    return 1;
-}
-
-
 sub re_is_allowed_to
 {
     my ($self,@acl_res) = @_;
