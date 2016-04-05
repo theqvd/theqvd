@@ -141,6 +141,11 @@
                                     %>
                                                 <i class="<%= CLASS_ICON_STATUS_STOPPING %>" data-i18n="[title]Stopping" title="<%= i18n.t('Stopping') %>" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
                                     <%
+                                            break;
+                                        case 'lost':
+                                    %>
+                                                <i class="<%= CLASS_ICON_STATUS_LOST %>" data-i18n="[title]Lost" title="<%= i18n.t('Lost') %>" data-wsupdate="state" data-id="<%= model.get('id') %>"></i>
+                                    <%
                                     }
                                     
                                     

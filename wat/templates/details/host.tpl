@@ -98,6 +98,11 @@
                     <span data-i18n data-wsupdate="state-text" data-id="<%= model.get('id') %>">Stopping</span>
                 <%
                     break;
+                case 'lost':
+                %>
+                    <span data-i18n data-wsupdate="state-text" data-id="<%= model.get('id') %>">Lost</span>
+                <%
+                    break;
                 }
                 %>
             </td>

@@ -209,6 +209,21 @@ Wat.I.formFilters[qvdObj] = {
                 'value': 'stopped',
                 'text': 'Stopped',
                 'selected': false
+            },
+            {
+                'value': 'starting',
+                'text': 'Starting',
+                'selected': false
+            },
+            {
+                'value': 'stopping',
+                'text': 'Stopping',
+                'selected': false
+            },
+            {
+                'value': 'lost',
+                'text': 'Lost',
+                'selected': false
             }
                     ],
         'displayMobile': false,

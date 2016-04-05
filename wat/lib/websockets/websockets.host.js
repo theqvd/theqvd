@@ -23,6 +23,11 @@ Wat.WS.changeWebsocketHost = function (id, field, data) {
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('title', i18n.t('Stopped'));
                     $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(i18n.t('Stopped'));
                     break;
+                case 'lost':
+                    $('[data-wsupdate="state"][data-id="' + id + '"]').attr('class', CLASS_ICON_STATUS_LOST);
+                    $('[data-wsupdate="state"][data-id="' + id + '"]').attr('title', i18n.t('Lost'));
+                    $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(i18n.t('Lost'));
+                    break;
                 default:
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('class', 'fa fa-spinner fa-spin');
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('title',  data);
