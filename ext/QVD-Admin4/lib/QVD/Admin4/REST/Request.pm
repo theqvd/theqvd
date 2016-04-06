@@ -756,19 +756,11 @@ sub set_order_by_in_request
     my $self = shift;
 
     my $order_direction = $self->json_wrapper->order_direction // '-asc';
-    my $order_criteria = $self->json_wrapper->order_criteria;
-    $order_criteria = [$self->qvd_object_model->default_order_criteria] 
-	unless  @$order_criteria;
+    my $order_criteria = $self->json_wrapper->order_criteria // 
+        [$self->qvd_object_model->default_order_criteria];
 
-    $self->modifiers->{order_by}->{'-desc'} =
-	delete $self->modifiers->{order_by}->{'-asc'}
-    if $order_direction eq '-desc';
-
-    for my $order_criterium (@$order_criteria)
-    {
-	$self->add_to_order_by(
-	    $self->qvd_object_model->map_order_criteria_to_dbix_format($order_criterium));
-    }
+    $self->modifiers->{order_by}->{$order_direction} = 
+        [ map { $self->qvd_object_model->map_order_criteria_to_dbix_format($_) } @$order_criteria ];
 }
 
 sub set_nested_queries_in_request
