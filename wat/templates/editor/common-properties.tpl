@@ -3,7 +3,7 @@
 %>
         <tr style="display: none;" class="js-editor-property-row" data-tenant-id="<%= property.tenant_id %>">
             <td>
-                <input type="hidden" class="custom-prop-name" value="<%= property.property_id %>">
+                <input type="hidden" class="custom-prop-id" value="<%= property.property_id %>">
                 <span class="custom-prop-name"><%= property.key %></span>
                 <% if (property.tenant_id == SUPERTENANT_ID) { %>
                     <a class="fright fa fa-eye-slash needsclick" data-i18n="[title]Property only visible from outside of the tenant"></a>

@@ -250,9 +250,9 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     fillEditorProperties: function (that) {
-        if (that.retrievedData.total > 0) {
-            var properties = {};
-            
+        var properties = {};
+        
+        if (that.retrievedData.total > 0) {            
             $.each(that.retrievedData.rows, function (iProp, prop) {
                 var value = '';
                 
@@ -269,10 +269,10 @@ Wat.Views.MainView = Backbone.View.extend({
                     property_id: prop.id,
                 };
             });
-
-            // Override properties including not setted on element
-            that.model.set({properties: properties});
         }
+            
+        // Override properties including not setted on element
+        that.model.set({properties: properties});
         
         that.template = _.template(
                     Wat.TPL.editorCommonProperties, {
@@ -322,7 +322,7 @@ Wat.Views.MainView = Backbone.View.extend({
     
     // Parse properties from create/edit forms
     parseProperties: function (mode) {
-        var propNames = $('.' + this.cid + '.editor-container input.custom-prop-name');
+        var propIds = $('.' + this.cid + '.editor-container input.custom-prop-id');
         var propValues = $('.' + this.cid + '.editor-container input.custom-prop-value');
         
         switch (mode) {
@@ -351,13 +351,13 @@ Wat.Views.MainView = Backbone.View.extend({
         
         var setProps = {};
 
-        for(i=0;i<propNames.length;i++) {
-            var name = propNames.eq(i);
+        for(i=0;i<propIds.length;i++) {
+            var id = propIds.eq(i);
             var value = propValues.eq(i);
                  
-            setProps[name.val()] = value.val();
+            setProps[id.val()] = value.val();
         }
-
+        
         this.properties = {
             'set' : setProps
         };

@@ -75,8 +75,15 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     },
     
     completePropertiesAndRender: function (that) {
-        if (that.retrievedData.total > 0 && that.model.get('properties')) {
-            var properties = {};
+		// If is an element without properties just render
+        if (!that.model.get('properties')) {
+            that.render;
+            return;
+        }
+        
+        var properties = {};
+
+        if (that.retrievedData.total > 0) {
             $.each(that.retrievedData.rows, function (iProp, prop) {
                 properties[prop.property_id] = {
                     value: that.model.get('properties')[prop.property_id] ? that.model.get('properties')[prop.property_id].value : '',
@@ -86,11 +93,11 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
                     property_id: prop.property_id,
                 };
             });
-
-            // Override properties including not setted on element
-            that.model.set({properties: properties});
         }
-
+        
+        // Override properties including not setted on element
+        that.model.set({properties: properties});
+        
         that.render();
     },
     
