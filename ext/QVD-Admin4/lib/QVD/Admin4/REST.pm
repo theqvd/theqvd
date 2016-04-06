@@ -167,7 +167,8 @@ sub process_query
        my %args = (status => 0, result => $result);
        $args{json_wrapper} = $json_wrapper;
        $args{qvd_object_model} = $qvd_object_model
-	   if $qvd_object_model;
+           if $qvd_object_model;
+       $args{administrator} = $self->administrator;
 
        $response = QVD::Admin4::REST::Response->new(%args);
 

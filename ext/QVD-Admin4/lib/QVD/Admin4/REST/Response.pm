@@ -21,12 +21,20 @@ has 'qvd_object_model', is => 'ro', isa => sub { die "Invalid type" unless ref(+
 # This is the original request that the API received
 has 'json_wrapper', is => 'ro', isa => sub { die "Invalid type" unless ref(+shift) eq 'QVD::Admin4::REST::JSON'; };
 
+# Administrator who will process the response
+has 'administrator', is => 'ro', isa => sub {
+    die "Invalid type for attribute administrator" unless ref(+shift) eq 'QVD::DB::Result::Administrator';
+};
+
 sub BUILD
 {
     my $self = shift;
-
+    
     $self->map_result_from_dbix_objects_to_output_info
-	if $self->qvd_object_model;
+        if $self->qvd_object_model;
+    
+    $self->remove_global_tenant_properties
+        unless $self->administrator->is_superadmin;
 }
 
 ############################################
@@ -53,7 +61,6 @@ sub map_dbix_object_to_output_info
     my ($self,$dbix_object) = @_;
 
     my $result = {};
-    my $admin = $self->qvd_object_model->current_qvd_administrator;
 
     for my $field_key ($self->calculate_fields) # list of fields that must be retrieved
     {                                           # for every object
@@ -82,6 +89,27 @@ sub map_dbix_object_to_output_info
     }
 
     $result;
+}
+
+sub remove_global_tenant_properties {
+    my ($self) = @_;
+    
+    my $rows_ref = eval { $self->result->{rows} };
+    return if !defined($rows_ref);
+    
+    for my $row (@{$rows_ref}) {
+        if (defined( $row->{properties} )) {
+            my $properties = $row->{properties};
+        
+            for my $prop_id (keys %{$properties}) {
+                my $prop_tenant_id = eval { $properties->{$prop_id}->{tenant_id} };
+                delete $properties->{$prop_id}
+                    if defined( $prop_tenant_id ) && $prop_tenant_id != $self->{administrator}->tenant_id;
+            }
+        }
+    }
+    
+    $self->result->{rows} = $rows_ref;
 }
 
 # AUXILIAR FUNCTIONS
@@ -144,12 +172,12 @@ sub calculate_fields
     }
     else
     {
-	@available_fields = $self->qvd_object_model->available_fields;
-	
-	my $admin = $self->qvd_object_model->current_qvd_administrator;
-	# This grep deletes from the output fields the admin doesn't have acls for
-	@available_fields = grep  { $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_field($_)) } 
-	@available_fields;
+        @available_fields = $self->qvd_object_model->available_fields;
+    
+        # This grep deletes from the output fields the admin doesn't have acls for
+        @available_fields = grep  { 
+            $self->{administrator}->re_is_allowed_to($self->qvd_object_model->get_acls_for_field($_)) 
+        } @available_fields;
     }
 
     $self->{available_fields} = \@available_fields;
