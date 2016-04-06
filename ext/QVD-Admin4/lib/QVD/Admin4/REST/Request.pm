@@ -50,7 +50,7 @@ has 'modifiers', is => 'ro', isa => sub { die "Invalid type for attribute modifi
 					      unless ref(+shift) eq 'HASH'; }, 
                              default => sub { {  group_by => [], # TO DO: default dbix grouping fails for ordering in related tables. This avoids 
 						                # grouping, but turns off DISTINCT...
-						join => [], order_by => { '-asc' => []}  }};
+						join => [], order_by => { }  }};
 has 'filters', is => 'ro', isa => sub { die "Invalid type for attribute failures" 
 					    unless ref(+shift) eq 'HASH'; }, default => sub { {}; };
 has 'parameters', is => 'ro', isa => sub { die "Invalid type for attribute parameters" 
