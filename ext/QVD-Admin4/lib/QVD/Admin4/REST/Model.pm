@@ -1024,7 +1024,7 @@ my $AVAILABLE_ORDER_CRITERIA = {
     
     Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)],
     
-    QVD_Object_Property_List => [qw(id property_id)],
+    QVD_Object_Property_List => [qw(id key property_id)],
     
     Property_List => [qw(id property_id tenant_id key description )]
 };
