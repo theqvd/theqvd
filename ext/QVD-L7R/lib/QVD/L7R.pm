@@ -359,7 +359,7 @@ sub _release_vm {
         # It can't be done here as...
         #   $vm->update({ real_user_id => undef });
 
-        if (defined $pid  and $pid  == $$  and
+        if (defined $pid and $pid == $$ and
             defined $host_id and $host_id == this_host_id) {
             DEBUG 'calling clear l7r all for vm ' . $vm->id;
             $vm->clear_l7r_all;
