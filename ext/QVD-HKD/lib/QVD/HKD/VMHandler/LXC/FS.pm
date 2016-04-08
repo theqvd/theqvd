@@ -219,7 +219,12 @@ sub _make_overlay {
         return $self->_on_done;
     }
 
-    $self->_make_dir($overlayfs, $self->{basefs});
+    $self->_make_overlay_dir($overlayfs, $self->{basefs});
+}
+
+sub _make_overlay_dir {
+    my $self = shift;
+    $self->_make_dir(@_);
 }
 
 sub _make_dir {
