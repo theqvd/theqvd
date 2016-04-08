@@ -88,8 +88,11 @@ sub pid { shift->{saved_pid} }
 
 sub _clean_row {
     my $self = shift;
+    my $pid = $self->{saved_pid};
+    defined $pid or return $self->_on_done;
+
     $self->_query({ ignore_errors => 1 },
-                  <<'EOQ', $self->{node_id}, $self->{saved_pid});
+                  <<'EOQ', $self->{node_id}, $pid);
 update vm_runtimes
    set user_cmd = NULL,
        l7r_host_id = NULL,
