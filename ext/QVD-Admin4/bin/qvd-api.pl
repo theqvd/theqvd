@@ -77,6 +77,9 @@ die "Private key $key_path file does not exist" unless (-e $key_path);
 app->config(
 	hypnotoad => {
 		listen => ["$api_url?cert=${cert_path}&key=${key_path}"],
+		accepts => 1000,
+		clients => 1000,
+		workers => 4
 	}
 );
 

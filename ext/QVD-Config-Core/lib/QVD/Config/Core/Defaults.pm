@@ -275,12 +275,12 @@ l7r.as_user = root
 l7r.pid_file = ${path.run}/qvd-l7r.pid
 
 # URL API is running
-# Example: https://*:80/
-api.url = https://*:80/
+# Example: https://*:443/
+api.url = https://*:443/
 
 # QVD-Admin parameters
 # url of the API
-qa.url = http://demo.theqvd.com:80/
+qa.url = https://demo.theqvd.com:443/
 # Credentials for qa
 qa.tenant = *
 qa.login = superadmin
