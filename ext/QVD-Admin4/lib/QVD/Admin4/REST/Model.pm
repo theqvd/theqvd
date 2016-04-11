@@ -54,7 +54,8 @@ my $QVD_OBJECTS_TO_LOG_MAPPER = {
 # the 'type_of_action' column in the log table of DB
 
 my $TYPES_OF_ACTION_TO_LOG_MAPPER = {
-    list => 'see', details => 'see', tiny => 'see', delete => 'delete', update => 'update', 
+    list => 'see', details => 'see', tiny => 'see', all_ids => 'see',
+    delete => 'delete', update => 'update', 
     create_or_update => 'create_or_update', exec => 'exec', 
     state => 'see', create => 'create' 
 };
@@ -700,7 +701,7 @@ my $AVAILABLE_FILTERS = {
 
 		Tenant => [qw(id name description language block blocked creation_date creation_admin_id creation_admin_name)],
 
-		 Administrator => [qw(name description tenant_id tenant_name language block creation_date creation_admin_id creation_admin_name)],
+		 Administrator => [qw(id name description tenant_id tenant_name language block creation_date creation_admin_id creation_admin_name)],
 
 		Views_Setup_Properties_Tenant => [qw(id tenant_id tenant_name qvd_obj_prop_id key visible view_type device_type qvd_object)],
 
