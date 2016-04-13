@@ -7,6 +7,8 @@ use QVD::API::Exception;
 use QVD::API::REST::Filter;
 use QVD::DB::Simple qw(db);
 
+use Clone qw(clone);
+
 # This class implements a request to the database. In fact, 
 # objects of this class are used by the methods in QVD::API 
 # in order to ask the database via DBIx::Class.
@@ -86,6 +88,7 @@ sub BUILD
 {
     my $self = shift;
     my $qvd_object = $self->qvd_object_model->qvd_object;
+    my $type_of_action = $self->qvd_object_model->type_of_action;
 
     # Store the administrator that generates the request
     $self->{administrator} = $self->qvd_object_model->current_qvd_administrator;
@@ -94,13 +97,6 @@ sub BUILD
     $self->{table} = $self->qvd_obj_to_table($qvd_object);
 
 # CHECKS OR DIE
-
-# Not all config tokens can be updated from the API
-# This function checks if the requested config tokens
-# are available from the API
-
-    $self->check_config_token_availability 
-        if $qvd_object eq 'Config';
 
 # Operative acls must be asked just for one role
 # Otherwise the request doesn't make sense 
@@ -121,8 +117,8 @@ sub BUILD
 
 # It checks if the current admin is allowed to delete
 
-    $self->check_acls_for_deleting if
-	$self->qvd_object_model->type_of_action eq 'delete';
+    $self->check_acls_for_deleting 
+        if $type_of_action eq 'delete';
 
 # It checks if the filters in the input query
 # are available in the system and if the current
@@ -134,22 +130,22 @@ sub BUILD
 # are available in the system and if the current
 # admin is allowed to use them
 
-    $self->check_update_arguments_validity_in_json if
-	$self->qvd_object_model->type_of_action eq 'update';
+    $self->check_update_arguments_validity_in_json 
+        if $type_of_action eq 'update';
 
 # It checks if the arguments in a creation query
 # are available in the system and if the current
 # admin is allowed to use them
 
-    $self->check_create_arguments_validity_in_json if
-	$self->qvd_object_model->type_of_action =~ /^create(_or_update)?$/;
+    $self->check_create_arguments_validity_in_json 
+        if $type_of_action =~ /^create(_or_update)?$/;
 
 # It checks if the nested queries in a creation or update query 
 # (tags, custom properties, role and acls assignations...) are 
 # available in the system and if the current admin is allowed to use them
 
-    $self->check_nested_queries_validity_in_json if
-	$self->qvd_object_model->type_of_action =~ /^(cre|upd)ate$/;
+    $self->check_nested_queries_validity_in_json
+        if $type_of_action =~ /^(create|update)$/;
 
 # It checks if the order criteria in a query
 # are available in the system and if the current
@@ -208,14 +204,14 @@ sub BUILD
 # Tenants must be filtered by tenant in a different way than other objects 
 
     $self->forze_filtering_tenants_by_tenant
-        if $self->qvd_object_model->qvd_object eq 'Tenant';
+        if $qvd_object eq 'Tenant';
 
 # When creating a new object it must be assigned to the right tenant
 
-    $self->forze_tenant_assignment_in_creation
-	if $self->qvd_object_model->type_of_action =~ /^create(_or_update)?$/ &&
-	$self->qvd_object_model->directly_tenant_related &&
-        $qvd_object ne 'Tenant';
+    $self->forze_tenant_assignment_in_creation 
+        if $type_of_action =~ /^create(_or_update)?$/ &&
+            $self->qvd_object_model->directly_tenant_related &&
+            $qvd_object ne 'Tenant';
 
 # This method adds filters in order to avoid selecting
 # objects the admin doesn't have acls for. These acls
@@ -233,37 +229,6 @@ sub BUILD
 ###############
 ## CHECKINGS ##
 ###############
-
-sub check_config_token_availability
-{
-    my $self = shift;
-
-	# This code gives a regex that denotes the set of acls that can be
-	# accessed via API. If the config token requested doesn't match this regex
-	# it is an unavailable one
-	my $token = $self->get_json_adequate_value('key');
-
-    my $tenant = $self->administrator->is_superadmin ?
-        $self->get_json_adequate_value('tenant_id') : $self->administrator->tenant_id;
-
-	# This code forbids the switch to monotenant mode if
-	# in the system there are multiple tenants
-
-    my $token_value = $self->qvd_object_model->type_of_action eq 'delete' ?
-	'0' : $self->json_wrapper->get_argument_value('value');
-
-    my $false_in_postgres = '^(f(alse)?|no?|off|0)$';
-
-	# Raise exception if cannot change to monotenant
-	QVD::API::Exception->throw(code => 7373)
-		if $token eq 'wat.multitenant' &&
-	$token_value =~ /$false_in_postgres/ &&
-        # There are more than 1 normal tenant 
-			# (in addition to tenant 0 for
-			# superadmins and invalid tenant -1)
-			QVD::DB::Simple::db()->resultset('Tenant')->search()->count != 3;
-}
-
 
 sub check_unique_admin_in_acls_search
 {
@@ -284,23 +249,28 @@ sub check_unique_role_in_acls_search
 sub check_filters_validity_in_json
 {
     my $self = shift;
-
-    $self->qvd_object_model->available_filter($_) || 
-	$self->qvd_object_model->has_property($_) || # is a custom property
-	QVD::API::Exception->throw(code => 6210, object => $_)
-	for $self->json_wrapper->filters_list;
+    
+    my @filters = @{$self->json_wrapper->filter_name_list};
+    
+    for my $filter (@filters){
+        QVD::API::Exception->throw(code => 6210, object => $filter) unless 
+            ($self->qvd_object_model->available_filter($filter) ||
+            $self->qvd_object_model->has_property($filter));
+    }
 
     my $admin = $self->qvd_object_model->current_qvd_administrator;
 
-    $admin->re_is_allowed_to(
-	$self->qvd_object_model->get_acls_for_filter(
-	    $self->qvd_object_model->has_property($_) ? 'properties' : $_)) || # There is just one acl for all custom properties 
-	QVD::API::Exception->throw(code => 4220, object => $_)
-	for $self->json_wrapper->filters_list;
-
-    $self->json_wrapper->has_filter($_) ||
-	QVD::API::Exception->throw(code => 6220, object => $_)
-	for $self->qvd_object_model->mandatory_filters;
+    for my $filter (@filters) {
+        QVD::API::Exception->throw(code => 4220, object => $filter) 
+            unless $admin->re_is_allowed_to( 
+                $self->qvd_object_model->get_acls_for_filter(
+                    $self->qvd_object_model->has_property($filter) ? 'properties' : $filter));
+    }
+    
+    for my $mandatory_filter ($self->qvd_object_model->mandatory_filters){
+        QVD::API::Exception->throw(code => 6220, object => $mandatory_filter) 
+            unless length(grep {$_ eq $mandatory_filter} @filters) > 0;
+    }
 }
 
 # When needed, it checks if the admin can perform massive
@@ -454,16 +424,14 @@ sub check_fields_validity_in_json # Fields to retrieve
 sub set_default_admin_id_in_acls_search
 {
     my $self = shift;
-    my $admin_id = $self->qvd_object_model->map_filter_to_dbix_format('admin_id');
-    $self->filters->add_filter('me.admin_id',{ '=' => $self->administrator->id}) 
-        unless $self->filters->get_filter_value($admin_id);
+    $self->filters->add_filter('admin_id', { '=' => $self->administrator->id}) 
+        unless $self->filters->get_filter_value('admin_id');
 }
 
 sub hide_recovery_mode_administrator
 {
     my $self = shift;
-    my $id = $self->qvd_object_model->map_filter_to_dbix_format('id');
-    $self->filters->add_filter($id,{ '!=' => 0 }); # Recovery admin is by convention id 0
+    $self->filters->add_filter('id', { '!=' => 0 }); # Recovery admin is by convention id 0
 }
 
 sub forze_own_admin_id_in_admin_views
@@ -477,8 +445,7 @@ sub forze_own_admin_id_in_admin_views
     }
     else # delete actions
     {
-	my $admin_id = $self->qvd_object_model->map_filter_to_dbix_format('admin_id');
-        $self->filters->add_filter($admin_id,$self->administrator->id);
+        $self->filters->add_filter('admin_id', $self->administrator->id);
     }
 }
 
@@ -488,22 +455,18 @@ sub forze_filtering_by_tenant
 
     return unless $self->qvd_object_model->available_filter('tenant_id');
 
-    my $tenant_id = $self->qvd_object_model->map_filter_to_dbix_format('tenant_id');
-
-    if ($self->json_wrapper->has_filter($tenant_id))
+    if ($self->json_wrapper->has_filter('tenant_id'))
     {
         QVD::API::Exception->throw(code => 4220, object => 'tenant_id') 
             unless $self->administrator->is_superadmin; # Only superadmins can filter by tenant
     }
     elsif ($self->qvd_object_model->qvd_object eq 'Log' && $self->administrator->is_superadmin)
     {
-	# In log, entries without tenant specification must be retrieved as well
-	my $IS_NULL = "$tenant_id IS NULL";
-        $self->filters->add_filter('-or', [$tenant_id,$self->administrator->tenants_scoop,\$IS_NULL]);
+        # Logs for superadmin shall not filtered by tenant
     }
     else
     {
-        $self->filters->add_filter($tenant_id,$self->administrator->tenants_scoop);
+        $self->filters->add_filter('tenant_id', $self->administrator->tenants_scoop);
     }
 }
 
@@ -519,8 +482,7 @@ sub forze_filtering_tenants_by_tenant
 
     @ids = grep { $_ ne 0 } @ids if 
 	$self->qvd_object_model->type_of_action =~ /^delete|list$/;
-    my $id = $self->qvd_object_model->map_filter_to_dbix_format('id');
-    $self->filters->add_filter($id,\@ids);
+    $self->filters->add_filter('id', \@ids);
 }
 
 # This method adds filters in order to avoid selecting
@@ -539,27 +501,26 @@ sub forze_filtering_by_acls_for_filter_values
 
     for my $filter ($self->qvd_object_model->get_filters_with_acls_for_values) # Filters whose values may have 
     {                                                                          # acls associated
-	my @forbidden_values;
-
-	for my $value ($self->qvd_object_model->get_filter_values_with_acls($filter)) # Values of a filter that may
-	{                                                                             # have acls associated
-	    my @acls = $self->qvd_object_model->get_acls_for_filter_value($filter,$value);
-        push @forbidden_values, $value unless $self->administrator->re_is_allowed_to(@acls);
-	}
-    
-	my @requested_values = ($self->json_wrapper->get_filter_value($filter)) // ();
-
-	for my $requested_value (@requested_values)
-	{
-	    for my $forbidden_value (@forbidden_values)
-	    {
-		QVD::API::Exception->throw(code => 4221, object => $requested_value) 
-		    if $requested_value eq $forbidden_value;
-	    }
-	}
-
-	my $filter_dbix = $self->qvd_object_model->map_filter_to_dbix_format($filter); 
-	$self->filters->add_filter('-not',{ $filter_dbix => \@forbidden_values });
+        my @forbidden_values;
+        
+        for my $value ($self->qvd_object_model->get_filter_values_with_acls($filter)) # Values of a filter that may
+        {                                                                             # have acls associated
+            my @acls = $self->qvd_object_model->get_acls_for_filter_value($filter,$value);
+            push @forbidden_values, $value unless $self->administrator->re_is_allowed_to(@acls);
+        }
+        
+        my @requested_values = ($self->json_wrapper->get_filter_value($filter)) // ();
+        
+        for my $requested_value (@requested_values)
+        {
+            for my $forbidden_value (@forbidden_values)
+            {
+                QVD::API::Exception->throw(code => 4221, object => $requested_value)
+                    if $requested_value eq $forbidden_value;
+            }
+        }
+        
+        $self->filters->add_filter('-not',{ $filter => \@forbidden_values });
     }
 }
 
@@ -602,90 +563,68 @@ sub forze_tenant_assignment_in_creation
 sub set_filters_in_request
 {
     my $self = shift;
-    my $filters = $self->json_wrapper->filters;
+    
+    $self->{filters} = $self->json_wrapper->filters_obj;
+}
 
-    $self->{filters} = QVD::API::REST::Filter->new(
-	# The hash of filters in the input query
-	hash => $self->json_wrapper->filters_obj->hash, 
-        # A list of mandatory filters that must be unambiguous for this kind 
-        # of query (i.e. 'id' for delete/update queries) 
-	unambiguous_filters => [$self->qvd_object_model->unambiguous_filters]); 
-                                                                                
+sub get_dbi_format_filters {
+    my $self = shift;
+    
+    my $filters_dbi = clone $self->filters;
+    
     my $found_properties = 0; # number of custom properties found
 
-    # For every filter. This is the list of filters that appear in the
-    # potentially complex filters structure of the input query. In that
-    # complex structure, one filter may appear many times, in different places
-    # (i.e. OR [ filter1 = A, filter1 = B ]). In this list we have every filter
-    # just once
-
-    for my $k ($self->filters->list_filters) 
+    for my $filter_path (@{$filters_dbi->filter_list()})
     {
+        my $key = QVD::API::REST::Filter::filter_name_from_path($filter_path);
+        my $value = $filters_dbi->filter_value($filter_path);
 
-	my $is_property = $self->qvd_object_model->has_property($k);
-	my $key_dbix_format;
+        my $is_property = $self->qvd_object_model->has_property( $key );
 
-	if ($is_property) 
-	{ 
+        my $key_dbix;
+        if ($is_property)
+        {
             # To filter by a property, the corresponding properties table must be joined.
             # This code uses the aliases system for multiple joins of the same table in DBIC
-	    $self->add_to_join('properties'); 
-	    $found_properties++;
-	    $key_dbix_format = $found_properties > 1 ?
-		"properties_$found_properties" : 'properties'; 
-	}
-	else
-	{
-	    $key_dbix_format = $self->qvd_object_model->map_filter_to_dbix_format($k); 
-	}
+            $self->add_to_join( 'properties' );
+            $found_properties++;
+            $key_dbix = $found_properties > 1 ? "properties_$found_properties" : 'properties';
+        } else {
+            $key_dbix = $self->qvd_object_model->map_filter_to_dbix_format( $key );
+        }
 
-        # For every value of the current filter in the input filters structure.
-        # For example, if the input filters structure is OR [ filter1 = A, filter1 = B ]
-        # and $k = filter1, this list is (A, B) 
+        unless ($is_property)
+        {
+            if (ref($value) eq 'ARRAY')
+            {
+                $value = [ map { $self->qvd_object_model->normalize_value($key,$_) } @$value ];
+            }
+            else
+            {
+                $value = $self->qvd_object_model->normalize_value($key,$value)
+            }
+        }
 
-	for my $ref_v ($self->filters->get_filter_ref_value($k))
-	{
-	    # $ref_v is a hash reference that points to the value of the filter $k
-            # in a specific place in the complex imput structure of filters
-            # We need to use a reference in order to operate over the filter value
-            # no matter where that value is in the complex input structure
-	    my $v = $self->filters->get_value($ref_v); # $v is the value as a string
+        my $op = $filters_dbi->filter_operator($filter_path);
+        $op = $self->qvd_object_model->normalize_operator($op);
 
-	    unless ($is_property)
-	    {
-		if (ref($v) && ref($v) eq 'ARRAY')
-		{
-		    $_ = $self->qvd_object_model->normalize_value($k,$_) for @$v;
-		}
-		else
-		{
-		    $v = $self->qvd_object_model->normalize_value($k,$v) 		    
-		}
-	    }
+        # This is according DBIC format
+        my $value_normalized = $is_property ?
+            [$key_dbix.".key" => { $op => $key }, $key_dbix.".value" => { $op => $value } ] :
+            { $op => $value };
 
-	    my $op = $self->filters->get_operator($ref_v); # $k and $v must be related by a specific operator (=, <, >...)
-	    $op = $self->qvd_object_model->normalize_operator($op);
-
-            # This is according DBIC format
-	    my $value_normalized = $is_property ?  
-		[$key_dbix_format.".key" => { $op => $k },
-		 $key_dbix_format.".value" => { $op => $v } ] : { $op => $v };
-
-	    # This code sets the normalized value in the hash ref, in the original
-            # place of the value in the complex filters structure
-	    if ($is_property)
-	    {
-		$self->filters->set_filter($ref_v,'-and',$value_normalized);
-	    }
-	    else
-	    {
-		$self->filters->set_filter($ref_v,$key_dbix_format,$value_normalized);
-	    }
-	}
+        if ($is_property)
+        {
+            $filters_dbi->set_filter_value($filter_path, $value_normalized);
+        }
+        else
+        {
+            $filters_dbi->set_filter_value($filter_path, $value_normalized);
+            $filters_dbi->set_filter_key($filter_path, $key_dbix);
+        }
     }
-    # If new filters have been added (properties), the flattened
-    # list of filters must be recalculated
-    $self->filters->flatten_filters if $found_properties;
+
+    return $filters_dbi->hash;
 }
 
 sub set_parameters_in_request
@@ -845,7 +784,7 @@ sub get_adequate_value{
 	my ($self, $key) = @_;
 	return $self->qvd_object_model->type_of_action eq 'delete' ?
 		$self->json_wrapper->get_filter_value($key) :
-		$self->arguments->{$key} ;
+		[ $self->arguments->{$key} ];
 }
 
 sub action 

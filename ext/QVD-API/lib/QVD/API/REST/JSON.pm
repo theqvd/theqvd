@@ -37,7 +37,8 @@ sub BUILD
     # needed for manage complex filters that may have logical operatos
 
     $self->{filters_obj} = QVD::API::REST::Filter->new(
-	hash => $self->{json}->{filters} // {} );
+        filter => $self->{json}->{filters} // {} 
+    );
 }
 
 sub original_request
@@ -115,12 +116,21 @@ sub arguments
     return $self->json->{arguments} || {};
 }
 
-sub filters_list
+sub filter_name_list
 {
     my $self = shift;
-    return $self->{filters_obj}->list_filters;
+    my @names = ();
+    for my $path (@{$self->{filters_obj}->filter_list}){
+        push @names, QVD::API::REST::Filter::filter_name_from_path($path);
+    }
+    return \@names;
 }
 
+sub filter_path_list
+{
+    my $self = shift;
+    return $self->{filters_obj}->filter_list;
+}
 
 sub parameters_list
 {
@@ -209,10 +219,10 @@ sub nested_queries
 sub has_filter
 {
     my ($self,$filter) = @_;
+    
+    my @filters = grep {$_ eq $filter} @{$self->filter_name_list()};
 
-    $_ eq $filter && return 1
-	for $self->filters_list;
-    return 0;
+    return (@filters > 0 ? 1 : 0);
 }
 
 sub has_parameter
@@ -245,7 +255,16 @@ sub has_argument
 sub get_filter_value
 {
     my ($self,$filter) = @_;
-    return $self->{filters_obj}->get_filter_value($filter);
+    my @paths = @{$self->filter_path_list()};
+    @paths = grep { QVD::API::REST::Filter::filter_name_from_path($_) eq $filter } @paths;
+    
+    my $values = [];
+    for my $path (@paths){
+        my $value = $self->{filters_obj}->filter_value($path);
+        push @$values, @$value if (ref($value) eq 'ARRAY');
+        push @$values, $value if (ref($value) eq '');
+    }
+    return $values;
 }
 
 sub get_parameter_value

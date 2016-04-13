@@ -1,40 +1,71 @@
-
 package QVD::API::REST::Request::Config_Field;
+
 use strict;
 use warnings;
-use Moose;
-use Mojo::JSON qw(decode_json encode_json);
+use Moo;
+use QVD::Config;
+use QVD::Config::Core qw(core_cfg_unmangled);
+use QVD::DB::Simple;
+use QVD::Admin4::ConfigClassifier;
 
-extends 'QVD::API::REST::Request';
 
-my $mapper =  Config::Properties->new();
-$mapper->load(*DATA);
+has 'key', is => 'ro', isa => sub { die "Invalid type for attribute key" unless ref(+shift) eq ''; }, 
+    required => 1;
+
+has 'tenant_id', is => 'ro', isa => sub { die "Invalid type for attribute tenant_id" unless ref(+shift) eq ''; }, 
+    required => 1;
+
+# Public methods
 
 sub BUILD
 {
     my $self = shift;
+}
 
-    $self->{mapper} = $mapper;
+sub operative_value {
+    my $self = shift;
+    return cfg($self->key, $self->tenant_id);
+}
 
-    $self->json->{arguments}->{filter_options} = 
-	encode_json($self->json->{arguments}->{filter_options})
-	if defined $self->json->{arguments}->{filter_options};
+sub default_value {
+    my $self = shift;
+    return _get_default_cfg_value($self->key, $self->tenant_id);
+}
 
-    $self->_check;
-    $self->_map;
+sub is_default {
+    my $self = shift;
+    return _is_cfg_key_in_database($self->key, $self->tenant_id) ? 0 : 1,
+}
+
+sub is_hidden {
+    my $self = shift;
+    return QVD::Admin4::ConfigClassifier::is_hidden_config($self->key);
+}
+
+# Private methods
+
+sub _get_default_cfg_value {
+    
+    my $key = shift;
+    my $tenant = shift // -1;
+    
+    my $value = core_cfg_unmangled($key);
+    return $value if defined($value);
+    
+    if ($tenant != -1) {
+        my $row = QVD::DB::Simple::rs( 'Config' )->search( { tenant_id => -1, key => $key } )->first();
+        return $row->value if defined( $row );
+    }
+    
+    return undef;
+}
+
+sub _is_cfg_key_in_database {
+    my $key = shift;
+    my $tenant = shift // -1;
+    
+    my $row = QVD::DB::Simple::rs( 'Config' )->search( { tenant_id => $tenant, key => $key } )->first();
+    return defined( $row );
 }
 
 1;
-
-__DATA__
-
-id = me.id
-name = me.name
-qvd_obj = me.qvd_obj
-get_details = me.get_details
-get_list = me.get_list
-filter_list = me.filter_list
-filter_details = me.filter_details
-argument = me.argument
-tenant = me.tenant_id
-filter_options = me.filter_options

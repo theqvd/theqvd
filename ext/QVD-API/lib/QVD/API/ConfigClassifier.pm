@@ -21,7 +21,7 @@ sub is_hidden_config {
 
     my $regex = $HIDDEN_TOKENS;
 
-    return ($key =~ /$regex/);
+    return ($key =~ /$regex/) ? 1 : 0;
 }
 
 1;

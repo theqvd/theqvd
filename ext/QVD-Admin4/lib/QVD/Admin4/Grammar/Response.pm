@@ -30,7 +30,7 @@ sub BUILD
     $self->{command} = $json->{command};
     $self->{qvd_object} = eval { $json->{obj1}->{qvd_object} };
 
-    $self->{filters} = QVD::API::REST::Filter->new(hash => eval { $json->{obj1}->{filters} } // {});
+    $self->{filters} = QVD::API::REST::Filter->new(filter => $json->{obj1}->{filters} // {});
     $self->{arguments} = $json->{arguments} // {};
     $self->{parameters} = $json->{parameters} // {};
     $self->{fields} = $json->{fields} // [];

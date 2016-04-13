@@ -11,96 +11,96 @@ use Mojo::URL;
 use Term::ReadKey;
 use QVD::Config qw(cfg);
 
-sub usage_text { 
-"
-==============================================================================
-                           AVAILABLE COMMANDS
-==============================================================================
-
-   For a specific explanation of the following commands run:
-   usage <COMMAND>
-   i.e. usage login
-
-== CLI GENERAL MANAGEMENT COMMANDS
-
-   usage (retrieves instructions about the usage of the app) 
-   
-   login (Intended to log in as a QVD administrator)
-   
-   logout (Intended to log out)
-   
-   password (Intended to change current QVD administrator password)
-
-   block (Intended to change current QVD administrator pagination block)
-   
-   version (Retrieves information about the QVD version the app is connected to)
-      
-   log (retrieves log entries about the QVD server activity) 
-
-== QVD OBJECTS COMMANDS
-
-    vm (Intended to QVD virtual machines management)
-
-    user (Intended to QVD users management)
-
-    host (Intended to QVD hosts management)
-
-    osf (Intended to QVD OSFs management)
-
-    di (Intended to QVD disk images management)
-
-    tenant (Intended to QVD tenants management)
-
-    role (Intended to QVD roles management)
-
-    acl (Intended to QVD acls management)
-
-    admin (Intended to QVD administrators management)
-
-    config (Intended to QVD configuration management)
-";
+sub usage_text {
+	"
+    ==============================================================================
+                               AVAILABLE COMMANDS
+    ==============================================================================
+    
+       For a specific explanation of the following commands run:
+       usage <COMMAND>
+       i.e. usage login
+    
+    == CLI GENERAL MANAGEMENT COMMANDS
+    
+       usage (retrieves instructions about the usage of the app) 
+       
+       login (Intended to log in as a QVD administrator)
+       
+       logout (Intended to log out)
+       
+       password (Intended to change current QVD administrator password)
+    
+       block (Intended to change current QVD administrator pagination block)
+       
+       version (Retrieves information about the QVD version the app is connected to)
+          
+       log (retrieves log entries about the QVD server activity) 
+    
+    == QVD OBJECTS COMMANDS
+    
+        vm (Intended to QVD virtual machines management)
+    
+        user (Intended to QVD users management)
+    
+        host (Intended to QVD hosts management)
+    
+        osf (Intended to QVD OSFs management)
+    
+        di (Intended to QVD disk images management)
+    
+        tenant (Intended to QVD tenants management)
+    
+        role (Intended to QVD roles management)
+    
+        acl (Intended to QVD acls management)
+    
+        admin (Intended to QVD administrators management)
+    
+        config (Intended to QVD configuration management)
+    ";
 }
 
 
 sub option_spec {
 	[ 'url|u=s'        => 'API url. Example: http://127.0.0.1:3000/api' ],
-	[ 'tenant|t=s'     => 'API admin tenant name' ],
-	[ 'login|l=s'      => 'API admin login' ],
-	[ 'password|p=s'   => 'API admin password' ],
-	[ 'format|f=s'     => 'Output format' ],
-	[ 'insecure'       => 'Trust any certificate'],
-	[ 'ca=s'           => 'CA certificate path'],
+		[ 'tenant|t=s'     => 'API admin tenant name' ],
+		[ 'login|l=s'      => 'API admin login' ],
+		[ 'password|p=s'   => 'API admin password' ],
+		[ 'format|f=s'     => 'Output format' ],
+		[ 'insecure'       => 'Trust any certificate'],
+		[ 'ca=s'           => 'CA certificate path'],
 }
 
 sub command_map {
 
-    log      => 'QVD::Admin4::Command::Log',
-    usage    => 'QVD::Admin4::Command::Usage',
-    version  => 'QVD::Admin4::Command::Version',
-    config   => 'QVD::Admin4::Command::Config',
-    tenant   => 'QVD::Admin4::Command::Tenant',
-    role     => 'QVD::Admin4::Command::Role',
-    acl      => 'QVD::Admin4::Command::ACL',
-    admin    => 'QVD::Admin4::Command::Admin',
-    tag      => 'QVD::Admin4::Command::Tag',
-    property => 'QVD::Admin4::Command::Property',
-    vm       => 'QVD::Admin4::Command::VM',
-    user     => 'QVD::Admin4::Command::User',
-    host     => 'QVD::Admin4::Command::Host',
-    osf      => 'QVD::Admin4::Command::OSF',
-    di       => 'QVD::Admin4::Command::DI',
-    login    => 'QVD::Admin4::Command::Login',
-    logout   => 'QVD::Admin4::Command::Logout',
-    password => 'QVD::Admin4::Command::Password',
-    block    => 'QVD::Admin4::Command::Block',
-    menu     => 'QVD::Admin4::Command::Menu',
-    }
+	log      => 'QVD::Admin4::Command::Log',
+		usage    => 'QVD::Admin4::Command::Usage',
+		version  => 'QVD::Admin4::Command::Version',
+		config   => 'QVD::Admin4::Command::Config',
+		tenant   => 'QVD::Admin4::Command::Tenant',
+		role     => 'QVD::Admin4::Command::Role',
+		acl      => 'QVD::Admin4::Command::ACL',
+		admin    => 'QVD::Admin4::Command::Admin',
+		tag      => 'QVD::Admin4::Command::Tag',
+		property => 'QVD::Admin4::Command::Property',
+		vm       => 'QVD::Admin4::Command::VM',
+		user     => 'QVD::Admin4::Command::User',
+		host     => 'QVD::Admin4::Command::Host',
+		osf      => 'QVD::Admin4::Command::OSF',
+		di       => 'QVD::Admin4::Command::DI',
+		login    => 'QVD::Admin4::Command::Login',
+		logout   => 'QVD::Admin4::Command::Logout',
+		password => 'QVD::Admin4::Command::Password',
+		block    => 'QVD::Admin4::Command::Block',
+		menu     => 'QVD::Admin4::Command::Menu',
+}
 
 # This is executen when the app is run.
 # It initalizes all objects and sets all parameters
 
 sub init {
-    my ($self, $opts) = @_;
+	my ($self, $opts) = @_;
 
 	my ($url, $tenant_name, $login, $password, $insecure, $ca_cert_path, $output_format);
 	$url = Mojo::URL->new($opts->url // cfg('qa.url'));
@@ -114,7 +114,7 @@ sub init {
 	$output_format = $opts->format //cfg('qa.format');
 	if (not grep {$_ eq $output_format} @output_formats ) {
 		print STDERR "[WARNING] Output format shall be one of:" . join(", ",@output_formats).
-			". Using TABLE by default.\n";
+				". Using TABLE by default.\n";
 		$output_format = 'TABLE';
 	}
 
@@ -123,16 +123,16 @@ sub init {
 	my $api_url = Mojo::URL->new($url . 'api');
 
 	my $api_info_url = Mojo::URL->new($url . 'api/info');
-    
+
 	my $api_di_upload_url = Mojo::URL->new($url . 'api/di/upload');
-    
+
 	my $api_staging_url = Mojo::URL->new($url . 'api/staging');
 	if ($api_staging_url->scheme() eq "http"){
 		$api_staging_url->scheme('ws');
 	} else {
-	$api_staging_url->scheme('wss');
+		$api_staging_url->scheme('wss');
 	}
-    
+
 	# Created a web client
 	my $user_agent = Mojo::UserAgent->new();
 	unless($insecure){
@@ -145,23 +145,23 @@ sub init {
 
 	# Created objects to parse the input string
 
-    my $unificator = QVD::Admin4::Grammar::Unificator->new();
-    my $grammar = QVD::Admin4::Grammar->new();
+	my $unificator = QVD::Admin4::Grammar::Unificator->new();
+	my $grammar = QVD::Admin4::Grammar->new();
 	my $parser = QVD::Admin4::Parser->new(grammar => $grammar, unificator => $unificator);
-    my $tokenizer = QVD::Admin4::Tokenizer->new();
+	my $tokenizer = QVD::Admin4::Tokenizer->new();
 
 	# Set parameters available from the whole app.
 
-    $self->cache->set( user_agent => $user_agent ); 
-    $self->cache->set( parser => $parser);
-    $self->cache->set( tokenizer => $tokenizer );
+	$self->cache->set( user_agent => $user_agent );
+	$self->cache->set( parser => $parser);
+	$self->cache->set( tokenizer => $tokenizer );
 	$self->cache->set( api_url => $api_url );
 	$self->cache->set( api_info_url => $api_info_url );
 	$self->cache->set( api_di_upload_url => $api_di_upload_url );
 	$self->cache->set( api_staging_url => $api_staging_url );
-    $self->cache->set( login => undef ); # No default credentials provided
-    $self->cache->set( tenant_name => undef ); 
-    $self->cache->set( password => undef ); 
+	$self->cache->set( login => undef ); # No default credentials provided
+	$self->cache->set( tenant_name => undef );
+	$self->cache->set( password => undef );
 	$self->cache->set( block => 25 ); # FIXME. Default block value should be taken from a config file or sth.
 	$self->cache->set( display_mode => $output_format );
 	$self->cache->set( exit_code => 0 );
@@ -179,23 +179,23 @@ sub init {
 sub quit_signals { qw( q quit exit ) }
 
 sub render {
-    my ($self,$output) = @_;
-    print $output unless $output =~ /[01]/;
+	my ($self,$output) = @_;
+	print $output unless $output =~ /[01]/;
 }
 
 sub handle_exception
 {
-    my ($self,$e) = @_;
+	my ($self,$e) = @_;
 
 	# This is important. It guarantees that,
-                 # after an exception is thrown, the CLI console is in the
-                 # right mode (i.e. this is needed when the CLI thrown an exception while it
-                 # is in pagination mode; it forces the return to the non-pagination mode)
+	# after an exception is thrown, the CLI console is in the
+	# right mode (i.e. this is needed when the CLI thrown an exception while it
+	# is in pagination mode; it forces the return to the non-pagination mode)
 	ReadMode(0);
 
 	$self->cache->set( exit_code => 1 );
 
-    print $e->message, "\n";
+	print $e->message, "\n";
 }
 
 # This method has been copy/pasted from CLI::Framework
@@ -207,33 +207,33 @@ sub handle_exception
 
 sub read_cmd {
 
-    my ($app) = @_;
+	my ($app) = @_;
 
-    require Text::ParseWords;
+	require Text::ParseWords;
 
-    my $term = $app->{_readline};
-    
-    unless( $term ) {
-        require Term::ReadLine;
-        $term = Term::ReadLine->new('CLIF Application');
-        select $term->OUT;
-        $app->{_readline} = $term;
-    }
-    my $command_request = $term->readline('> ');
+	my $term = $app->{_readline};
 
-    if(! defined $command_request ) {
+	unless( $term ) {
+		require Term::ReadLine;
+		$term = Term::ReadLine->new('CLIF Application');
+		select $term->OUT;
+		$app->{_readline} = $term;
+	}
+	my $command_request = $term->readline('> ');
 
-        @ARGV = $app->quit_signals();
-        print "\n"; 
-    }
-    else {
-	$command_request =~ s/'/\\'/g; # These are the
-	$command_request =~ s/"/\\"/g; # added lines
-        @ARGV = Text::ParseWords::shellwords( $command_request );
-        $term->addhistory($command_request)
-            if $command_request =~ /\S/ and !$term->Features->{autohistory};
-    }
-    return 1;
+	if(! defined $command_request ) {
+
+		@ARGV = $app->quit_signals();
+		print "\n";
+	}
+	else {
+		$command_request =~ s/'/\\'/g; # These are the
+		$command_request =~ s/"/\\"/g; # added lines
+		@ARGV = Text::ParseWords::shellwords( $command_request );
+		$term->addhistory($command_request)
+			if $command_request =~ /\S/ and !$term->Features->{autohistory};
+	}
+	return 1;
 }
 
 sub is_interactive_mode_enabled {

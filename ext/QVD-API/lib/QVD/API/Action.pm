@@ -56,15 +56,10 @@ my $ACTIONS = {
 	},
 
 	config_get => {
-		type_of_action =>  'ad_hoc',
+		type_of_action => 'list',
+		qvd_object => 'Config',
 		acls => [qr/^config\.qvd\./,qr/^tenant\.purge\.$/],
 		admin4method => 'config_get'
-	},
-
-	config_preffix_get => {
-		type_of_action =>  'ad_hoc',
-			acls => [qr/^config\.qvd\./],
-		admin4method => 'config_preffix_get'
 	},
 
 	config_set => {

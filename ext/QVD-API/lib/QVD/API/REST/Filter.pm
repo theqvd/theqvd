@@ -21,363 +21,418 @@ use QVD::API::Exception;
 # the structure, or it's needed to normalize all occurrences of the same filter 
 # key or value, and so on.
 
+# Available logical and comparison operators in the input hash
+my %LOGICAL_OPERATORS = ( -and => 1, -or => 1, -not => 1 );
+my %COMPARISON_OPERATORS = (
+    '>' => '>',
+    '<' => '<',
+    '<=' => '<=',
+    '>=' => '>=',
+    '=' => 'eq',
+    '<>' => '!=',
+    '!=' => 'ne',
+    '~' => \&_include,
+    'LIKE' => \&_include );
+
+for (keys %COMPARISON_OPERATORS) {
+    my $op = $COMPARISON_OPERATORS{$_};
+    next if ref $op;
+    $COMPARISON_OPERATORS{$_} = eval "sub { \$_[0] $op \$_[1] }";
+}
+
+# Separator for each node name in a path
+my $SEPARATOR = "::";
+
+# Default comparison operator
+my $DEFAULT_COMPARISON_OP = '=';
+
+# Root operator of the filter tree
+my $ROOT_OP = '-and';
+
+# Initial counter value
+my $INITIAL_COUNTER = 1;
+
 # Input: a hash of filters according DBIC format for filters
-has 'hash', is => 'ro', isa => sub { die "Invalid type for attribute hash" unless ref(+shift) eq 'HASH'; }, required => 1;
+has 'filter', is => 'ro', isa => sub { die "Invalid filter format" unless ref(+shift) eq 'ARRAY'; }, 
+    coerce => sub {
+        my $filter = eval { [ $ROOT_OP, _normalize_filter($_[0]) ] };
+        print $@ if $@;
+        return $filter;
+    }, required => 1;
 
-# A list of filters that must be unambiguous for a kind of query
-# (i.e. 'id' for delete/update queries). Some queries must select one or
-# more objects in an unambiguous way. For example, in the API, the delete 
-# and update queries must provide an unambiguous set of ids intended to
-# identify, unambiguously, the objects that must be deleted or updated.
-# That list of unambiguous filters must be provided in here
-has 'unambiguous_filters', is => 'ro', isa => sub { my $f = shift; die "Invalid type for attribute unambiguous_filter" 
-						       unless ( ref($f) && ref($f) eq 'ARRAY') ;};
-
-# Available logical operator in the input hash
-my $LOGICAL_OPERATORS = { -and => 1, -or => 1, -not => 1 };
+# Constructor
 
 sub BUILD
 {
     my $self = shift;
 
-    my $hash = clone $self->hash;
-    $self->{hash} = $hash; 
-
-# Even non-complex filters structures are normalized as complex structures with
-# logical operator (i.e. { filter1 => value } is normalized as { -and => [ filter1 => value ] })
-
-    $self->normalize_simple_filter
-	if $self->filter_without_logical_operator;
-
-# The key idea to manage complex structures of filters is 
-# to create a flattened version of the complex structure
-# That flattened version is a hash, where keys are the filter keys
-# that appear in the original structure. And values are, for every filter key,
-# the list of values that that key had in the original structure. 
-# It's crucial that those values are, in fact, references to the original values. 
-
-# Thanks to that flattened structure it's possible to list the filters in the structure,
-# to check is a filter exists, to normalize filters and values in all the places of the original
-# structure where they appear, and so on
-
-# The method flatten_filters creates that flattened structure
-
-    $self->flatten_filters;
-
-# It checks if the filters structure fits the conditions about
-# unambiguous filters. 
-
-    $self->{unambiguous_filters} //= [];
-    $self->check_unambiguous_filters;
+    my $filter = $self->{hash};
+    
+    $filter = _normalize_filter($filter);
+    
+    eval {
+        _validate_filter($filter);
+    };
+    if($@){
+        die "Invalid filter format: $@";
+    }
+    
+    $self->{hash} = $filter;
 }
 
-####################################################################
-# TO CHECK IF UNAMBIGUOUS FILTERS ARE UNAMBIGUOUS IN THE STRUCTURE #
-####################################################################
+# Private methods
 
-# Some queries must select one or more objects in an unambiguous way. 
-# For example, in the API, the delete and update queries must provide 
-# an unambiguous set of ids intended to identify, unambiguously, the 
-# objects that must be deleted or updated. That list of mandatory unambiguous 
-# filters must be provided in the unambiguous_filters parameter of the constructor.
-
-sub check_unambiguous_filters
-{
+sub _root_key {
     my $self = shift;
-
-    for my $f (@{$self->unambiguous_filters})
-    {
-	my $n = scalar $self->get_filter_ref_value($f) // next;
-
-        QVD::API::Exception->throw(code => 6321, object => $f)  if 
-	    ( $n > 1 || (not $self->is_obligatory($f)) );
-    }
+    return $self->{filter}[0];
 }
 
-sub is_obligatory
+sub _normalize_filter
 {
-    my ($self,$f) = @_;
-    my $first_level = eval { $self->hash->{-and}} // return 0;
-    return $self->is_obligatory_rec($first_level,$f);
-}
+    my ($filter) = @_;
 
+    my @filter_array = ref($filter) eq 'HASH' ? %$filter : @$filter;
 
-sub is_obligatory_rec
-{
-    my ($self,$list_of_key_values,$searched_key) = @_;
+    for (my $index = 0; $index < @filter_array; $index += 2) {
+        my $key = $filter_array[$index];
+        my $value = $filter_array[$index+1];
 
-    my $position = 0;
-    my ($key,$value);
-    my $odd = sub { my $n = shift; return $n % 2; };
-    my $set_value = sub { $value = shift; };
-    my $set_key = sub { ($key,$value) = (shift,undef); };
-
-    for my $item (@$list_of_key_values)
-    {
-	$odd->($position++) ? 
-	    $set_value->($item) : $set_key->($item);
-
-	return 1 if $key eq $searched_key;
-	return 1 if defined $value && $key eq '-and' &&
-	    $self->is_obligatory_rec($value,$searched_key);
+        if (exists $LOGICAL_OPERATORS{$key}){
+            $filter_array[$index+1] = _normalize_filter($value);
+        } elsif(ref($key) eq '') {
+            my $operator = $DEFAULT_COMPARISON_OP;
+            if (ref($value) eq 'HASH'){
+                $operator = (keys %$value)[0];
+                $value = $value->{$operator};
+                if(!exists $COMPARISON_OPERATORS{$operator}){
+                    die "Hash shall contain operator and operand";
+                }
+            }
+            $filter_array[$index+1] = { $operator => (ref($value) eq 'ARRAY') ? $value : [$value] };
+        } else {
+            die "Key values shall be scalar or operator";
+        }
     }
 
+    return \@filter_array;
+}
+
+sub _paths
+{
+    my $origin = shift;
+    my $filter = shift;
+    my $paths = [];
+
+    my @filter_array = @$filter;
+    my %key_counter = ();
+    while (@filter_array) {
+        my $key = shift @filter_array;
+        my $value = shift @filter_array;
+        $key_counter{$key} = exists $key_counter{$key} ? $key_counter{$key} + 1 : $INITIAL_COUNTER;
+        
+        my $new_origin = ($origin eq '') ? "$key" : "$origin$SEPARATOR$key";
+        $new_origin .= "[$key_counter{$key}]";
+        if(exists $LOGICAL_OPERATORS{$key}){
+            push @$paths, @{_paths($new_origin, $value)};
+        } else {
+            # unshift is used to sort the elements backwards, in order to iterate without dependencies
+            # Example: in {"-and": [id,100,id,101]} the counter id of -or[1]::id[2] depends on -and[1]::id[1]
+            # if -and[1]::id[1] is removed, -and[1]::id[2] becomes -and[1]::id[1]
+            unshift @$paths, $new_origin;
+        }
+    }
+    
+    return $paths;
+}
+
+sub _filter_node {
+    my ($self,$path) = @_;
+    
+    my @node_names = split /$SEPARATOR/, $path;
+    
+    my $current_node = $self->{filter};
+
+    while(@node_names){
+        my ($node_name, $node_counter) = _name_and_counter(shift @node_names);
+        my $index = 0;
+        my %key_counter = ();
+        while ($index < @$current_node) {
+            my $key = $current_node->[$index];
+            my $value = $current_node->[$index+1];
+            $key_counter{$key} = exists $key_counter{$key} ? $key_counter{$key} + 1 : $INITIAL_COUNTER;
+
+            if($key eq $node_name && $key_counter{$key} == $node_counter){
+                if(@node_names == 0){
+                    return [$current_node, $index];
+                } else {
+                    $current_node = $value;
+                    last;
+                }
+            }
+            $index += 2;
+        }
+    }
+    
+    return undef;
+}
+
+sub _normalize_comparison_operator {
+    my $operator = shift;
+    return (eval { $COMPARISON_OPERATORS{$operator} } // $operator);
+}
+
+sub _satisfy {
+    my $self = shift;
+    my $element = shift;
+    my $key = shift;
+    my $value = shift;
+    
+    if (exists $LOGICAL_OPERATORS{$key}) {
+        if($key eq '-and'){
+            my $index = 0;
+            while($index < $#{$value}){
+                my $new_key = $value->[$index];
+                my $new_value = $value->[$index+1];
+                $index += 2;
+                return 0 unless $self->_satisfy($element, $new_key, $new_value);
+            }
+            return 1;
+        } elsif($key eq '-or'){
+            my $index = 0;
+            while($index < $#{$value}){
+                my $new_key = $value->[$index];
+                my $new_value = $value->[$index+1];
+                $index += 2;
+                return 1 if $self->_satisfy($element, $new_key, $new_value);
+            }
+            return 0;
+        } elsif($key eq '-not'){
+            my $index = 0;
+            while($index < $#{$value}){
+                my $new_key = $value->[$index];
+                my $new_value = $value->[$index+1];
+                $index += 2;
+                return 0 if $self->_satisfy($element, $new_key, $new_value);
+            }
+            return 1;
+        } else {
+            die "Logical operator $key not supported";
+        }
+    } else {
+        my $elem_value = eval { $element->{$key} } // eval { $element->$key };
+        return 0 unless defined($elem_value);
+
+        my $op = (keys(%$value))[0];
+        my $values = $value->{$op};
+        for my $cmp_value (@{$values}){
+            return 1 if _evaluate_expression($elem_value, $op, $cmp_value);
+        }
+        return 0;
+    }
+    
     return 0;
-} 
+}
 
-############################################################
-# TO NORMALIZE FILTER STRUCTURES WITHOUT LOGICAL OPERATORS #
-############################################################
-# Even non-complex filters structures are normalized as complex structures with
-# logical operator (i.e. { filter1 => value } is normalized as { -and => [ filter1 => value ] })
+# Public methods
 
-# It checks if the filters structure has logical operators
-
-sub filter_without_logical_operator
+sub filter_list
 {
     my $self = shift;
-    my $has_not_logical_operator = 0;
-    for (keys %{$self->hash})
-    {
-	next if exists $LOGICAL_OPERATORS->{$_};
-	$has_not_logical_operator = 1;
-    }
-
-    $has_not_logical_operator;
-}
-
-# It takes a simple filters structure
-# without logical operators and creates
-# an equivalent structure with an -and logical operator
-# This is usefult cause, thanks to that, all filters
-# structures are supposed to be logical operators structures
-
-sub normalize_simple_filter
-{
-    my $self = shift;
-    my $filter = $self->hash;
-
-    my @filter;
-
-    while (my ($k,$v) = each %$filter)
-    {
-	push @filter, ($k,$v);
-    }
-    $self->{hash} = { -and => \@filter };
-}
-
-#################################################
-## TO BUILD THE FLATTENED STRUCTURE OF FILTERS ##
-#################################################
-
-# The key idea to manage complex structures of filters is 
-# to create a flattened version of the complex structure.
-# That flattened version is a hash, where keys are the filter keys
-# that appear in the original structure. And values are, for every filter key,
-# the list of values that that key had in the original structure. 
-# It's crucial that those values are, in fact, references to the original values. 
-
-# Thanks to that flattened structure it's possible to list the filters in the structure,
-# to check is a filter exists, to normalize filters and values in all the places of the original
-# structure where they appear, and so on
-
-sub flatten_filters
-{
-    my $self = shift;
-    my $filters = $self->hash;
-
-    $self->{flatten_filters} = {};
-    while (my ($k,$v) = each %$filters)
-    {
-	$self->flatten_filters_rec($v);
-    }
-}
-
-sub flatten_filters_rec
-{
-    my ($self,$filters) = @_;  
-
-    my $position = 0;
-    my ($key,$value);
-    my $odd = sub { my $n = shift; return $n % 2; };
-    my $set_value = sub { $value = shift; };
-    my $set_key = sub { ($key,$value) = (shift,undef); };
-
-    for my $item (@$filters)
-    {
-	$odd->($position++) ? 
-	    $set_value->($item) : $set_key->($item);
-
-	if (defined $value)
-	{
-	    if (exists $LOGICAL_OPERATORS->{$key})
-	    {
-		$self->flatten_filters_rec($value);
-	    }
-	    else
-	    {
-		$self->flatten_filter($filters,$position);
-	    }
-	}
-    }
-}
-
-sub flatten_filter
-{
-    my ($self,$ref,$index) = @_;
-    my $key_i = $index - 2;
-    my $val_i = $index - 1;
-    $self->{flatten_filters}->{$$ref[$key_i]} //= [];
-    push @{$self->{flatten_filters}->{$$ref[$key_i]}}, 
-    { ref => $ref, index => $key_i };
-}
-
-#############################################################
-# SET/GET methods that let you manage the filters structure #
-# (normalize values, check if  a filter exists...)          #
-#############################################################
-
-# The typical way to get and set (maybe normalize) the filters
-# of the complex structure of filters:
-
-# a) List the filters with 'list_filters'
-# b) For every filter, get all its values in the complex structure
-#    with 'get_filter_ref_value'. That function retrieves references.
-#    Every reference points to a specific occurrence of a filter 
-#    in the original structure. 
-# c) By accessing one of those references, you can get and set the key, 
-#    operator and value of the corresponding original occurrence of the
-#    filter (methods 'get_value', 'get_operator', 'set_filter')
-
-sub list_filters
-{
-    my $self = shift;
-    keys %{$self->{flatten_filters}};
+    return _paths('', $self->{filter}[1]);
 }
 
 sub has_filter
 {
-    my ($self,$f) = @_;
+    my ($self,$path) = @_;
+    
+    return 0 unless defined($path);
+    my $root_path = $self->_root_key() . "$SEPARATOR" . $path;
+    my $node_ref = $self->_filter_node($root_path);
 
-    $self->{flatten_filters}->{$f};
-}
-
-# It returns a list of references that give access to
-# the original values of the filter in the original
-# structure
-
-sub get_filter_ref_value
-{
-    my ($self,$f) = @_;
-    my $values = $self->{flatten_filters}->{$f} // 
-	return ();
-    @$values;    
-}
-
-# Returns the list of values that the filter $f
-# have in the original complex structure (not references but
-# actual values)
-
-sub get_filter_value
-{
-    my ($self,$f) = @_;
-
-    my @vals = map {$self->get_value($_)} $self->get_filter_ref_value($f);
-
-    scalar @vals > 1 ? return @vals : return $vals[0];
-}
-
-# $ref_and_index is one of the references that retrieves 
-# get_filter_ref_value. It let you get the actual value of the
-# filter from the reference (that's to say, the value of the
-# filter in a specific position of the original structure)
-
-sub get_value
-{
-    my ($self,$ref_and_index) = @_;
-    my $ref = $ref_and_index->{ref};
-
-    my $key_i = $ref_and_index->{index};
-    my $val_i = $key_i + 1;
-    my $val = $$ref[$val_i];
-
-    if (ref($val) && ref($val) eq 'HASH')
-    {
-	my @val = values %$val;
-	$val = shift @val;
+    if (defined($node_ref)){
+        return 1;
+    } else {
+        return 0;
     }
-   
-    $val;
 }
 
-
-# $ref_and_index is one of the references that retrieves 
-# get_filter_ref_value. It let you get the operator that relates the
-# filter with its value from the reference (that's to say, the operator of the
-# filter in a specific position of the original structure).
-
-sub get_operator
+sub filter_value
 {
-    my ($self,$ref_and_index) = @_;
-    my $ref = $ref_and_index->{ref};
-    my $key_i = $ref_and_index->{index};
-    my $val_i = $key_i + 1;
-    my $val = $$ref[$val_i];
-    my $op = '=';
-
-    if (ref($val) && ref($val) eq 'HASH')
-    {
-	my @ops = keys %$val;
-	$op = shift @ops;
+    my ($self,$path) = @_;
+    
+    return undef unless defined($path);
+    my $root_path = $self->_root_key() . "$SEPARATOR" . $path;
+    my $node_info = $self->_filter_node($root_path);
+    
+    if (defined($node_info)){
+        my ($array_ref, $index) = @$node_info;
+        my $value = $array_ref->[$index + 1];
+        my $operand = (values %$value)[0];
+        return $operand;
     }
 
-    $op;
+    return undef;
 }
 
-
-# $ref_and_index is one of the references that retrieves 
-# get_filter_ref_value. It let you set the key and value of the
-# filter the reference (that's to say, the key and value of the
-# filter in a specific position of the original structure).
-
-sub set_filter
+sub filter_operator
 {
-    my ($self,$ref_and_index,$key,$val) = @_;
-    my $ref = $ref_and_index->{ref};
-    my $key_i = $ref_and_index->{index};
-    my $val_i = $key_i + 1;
-    my $old_key = $$ref[$key_i]; 
-    $$ref[$key_i] = $key;
-    $$ref[$val_i] = $val;
-    $self->{flatten_filters}->{$key} =
-	delete $self->{flatten_filters}->{$old_key};
-}
-
-# It deletes a filter from the whole structure
-
-sub del_filter
-{
-    my ($self,$f) = @_;
-
-    for my $ref_and_index ($self->filters->get_filter_ref_value($f))
-    {
-	my $ref = $ref_and_index->{ref};
-	my $key_i = $ref_and_index->{index};
-	splice @$ref,  $key_i, 2;
+    my ($self,$path) = @_;
+    
+    return undef unless defined($path);
+    my $root_path = $self->_root_key() . "$SEPARATOR" . $path;
+    my $node_info = $self->_filter_node($root_path);
+    
+    if (defined($node_info)){
+        my ($array_ref, $index) = @$node_info;
+        my $value = $array_ref->[$index + 1];
+        my $operator = (keys %$value)[0];
+        return $operator;
     }
-
-    $self->flatten_filters;
+    
+    return undef;
 }
-
-# It adds a filter to the top of the structure
 
 sub add_filter
 {
-    my ($self,$k,$v) = @_;
+    my ($self,$path,$value) = @_;
+    
+    my @node_names = split /$SEPARATOR/, $path;
+    my $new_key = pop @node_names;
+    my $subpath = join( $SEPARATOR, @node_names );
+    my $root_subpath = join( $SEPARATOR, ($self->_root_key(), @node_names) );
+    
+    eval {
+        ($new_key, $value) = @{_normalize_filter([$new_key, $value])};
+    };
+    if($@){
+        die "Invalid filter format: $@";
+    }
+    
+    my $node_info = $self->_filter_node($root_subpath);
+    if(!defined($node_info)){
+        $self->add_filter($subpath, []);
+        $node_info = $self->_filter_node($root_subpath);
+    }
+    
+    my ($array_ref, $index) = @$node_info;
+    $array_ref = $array_ref->[$index + 1];
+    push(@$array_ref, $new_key);
+    push(@$array_ref, $value);
+    
+    return $value;
+}
 
-    my $filter = $self->hash;
-    $self->{hash} = { -and => [$k, $v, each %$filter] };
-    $self->flatten_filter($self->{hash}->{-and},2);
+sub del_filter
+{
+    my ($self,$path) = @_;
+    
+    my $root_path = $self->_root_key() . "$SEPARATOR" . $path;
+    my $node_info = $self->_filter_node($root_path);
+
+    if (defined($node_info)) {
+        my ($array_ref, $index) = @$node_info;
+        splice @$array_ref, $index, 1;
+        return splice @$array_ref, $index, 1;
+    }
+
+    return undef;
+}
+
+sub set_filter_key
+{
+    my ($self,$path,$new_key) = @_;
+    
+    my $root_path = $self->_root_key() . "$SEPARATOR" . $path;
+    my $node_info = $self->_filter_node($root_path);
+    
+    die "Filter key shall be a Scalar" unless ref($new_key) eq '';
+    
+    if (defined($node_info)) {
+        my ($array_ref, $index) = @$node_info;
+        $array_ref->[$index] = $new_key;
+        return $new_key;
+    }
+    
+    return undef;
+}
+
+sub set_filter_value
+{
+    my ($self,$path,$new_value) = @_;
+    
+    my $root_path = $self->_root_key() . "$SEPARATOR" . $path;
+    my $name = filter_name_from_path($root_path);
+    
+    eval {
+        ($name, $new_value) = @{_normalize_filter([$name, $new_value])};
+    };
+    if($@){
+        die "Invalid filter format: $@";
+    }
+    
+    my $node_info = $self->_filter_node($root_path);
+    
+    if (defined($node_info)) {
+        my ($array_ref, $index) = @$node_info;
+        $array_ref->[$index+1] = $new_value;
+        return $new_value;
+    }
+
+    return undef;
+}
+
+sub cgrep
+{
+    my ($self, @list) = @_;
+    my $root_key = $self->_root_key();
+    return (grep {$self->_satisfy($_, $root_key, $self->{filter}[1])} @list);
+}
+
+sub hash {
+    my $self = shift;
+    return { @{$self->{filter}} };
+}
+
+# Static private methods
+
+sub _name_and_counter {
+    my $node = shift;
+    
+    my ($name, $counter) = ($node =~ /^(.*?)(?:\[(\d+)\])?$/);
+    $counter //= $INITIAL_COUNTER;
+    
+    return ($name, $counter);
+}
+
+sub _evaluate_expression {
+    my ($element1, $operator, $element2) = @_;
+    $operator = _normalize_comparison_operator($operator);
+    
+    return $operator->($element1, $element2);
+}
+
+sub _include {
+    my ($element, $subelement) = @_;
+
+    my ($may_not_start_with, $matched_element, $may_not_end_with) = ($subelement =~ /^(%?)(.*?)(%?)$/);
+    $matched_element = quotemeta $matched_element;
+
+    my $regex = (($may_not_start_with) ? "" : "\^") . $matched_element . (($may_not_end_with) ? "" : "\$");
+    return $element =~ $regex;
+}
+
+# Static public methods
+
+sub filter_name_from_path {
+    my $path = shift;
+    my ($name, undef) = _name_and_counter((split /$SEPARATOR/, $path)[-1]);
+    return $name;
+}
+
+sub filter_counter_from_path {
+    my $path = shift;
+    my (undef, $counter) = _name_and_counter((split /$SEPARATOR/, $path)[-1]);
+    return $counter;
 }
 
 1;

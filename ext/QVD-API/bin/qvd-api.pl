@@ -21,6 +21,7 @@ use Deep::Encode;
 use File::Copy qw(copy move);
 use QVD::Config;
 use Try::Tiny;
+use Data::Rmap qw(rmap_ref);
 
 # This plugin is the class intended to manage the API queries.
 # Almost all queries are processed by it
@@ -545,20 +546,29 @@ sub get_input_json
 	unless ($json)
 	{
 		$json =  { map { $_ => b($c->param($_))->encode('UTF-8')->to_string } keys($c->req->params->to_hash) };
-
-		eval
-		{
-			$json->{filters} =  decode_json($json->{filters}) if exists $json->{filters};
-			$json->{arguments} = decode_json($json->{arguments}) if exists $json->{arguments};
-			$json->{order_by} = decode_json($json->{order_by}) if exists $json->{order_by};
-			$json->{fields} = decode_json($json->{fields}) if exists $json->{fields};
-			$json->{parameters} = decode_json($json->{parameters}) if exists $json->{parameters}
-		};
+        eval
+        {
+            convert_json_to_hash($json, "filters");
+            convert_json_to_hash($json, "arguments");
+            convert_json_to_hash($json, "order_by");
+            convert_json_to_hash($json, "fields");
+            convert_json_to_hash($json, "parameters");
+        };
 
 		$c->render(json => QVD::API::Exception->new(code => 6100)->json) if $@;
 	}
 	$json->{parameters}->{remote_address} = $c->tx->remote_address; # For Log purposes
 	$json;
+}
+
+sub convert_json_to_hash {
+    my $json = shift;
+    my $key = shift;
+    
+    if (exists $json->{$key}){
+        $json->{$key} = decode_json($json->{$key});
+        rmap_ref { $_ = "$_" if ref($_) eq 'JSON::PP::Boolean' } $json->{$key};
+    }
 }
 
 sub process_api_query

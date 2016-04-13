@@ -1388,22 +1388,8 @@ sub get_all_ids_action
 sub get_filters
 {
     my ($self,$parsing) = @_;
-    my $filters = $parsing->filters // {};
 
-    for my $k ($parsing->filters->list_filters)
-    {
-	my $normalized_k = $FILTERS->{$parsing->qvd_object}->{$k} // $k;
-
-	for my $ref_v ($parsing->filters->get_filter_ref_value($k))
-	{
-	    my $op = $parsing->filters->get_operator($ref_v);
-	    my $v = $parsing->filters->get_value($ref_v);
-	    $v = $self->get_value($parsing,$k,$v,'filter');
-
-	    $parsing->filters->set_filter($ref_v,$normalized_k, {$op => $v});
-	}
-    }
-    $parsing->filters->hash;
+    return $parsing->filters->hash // {};
 }
 
 # Normalizes the arguments in a request according the
