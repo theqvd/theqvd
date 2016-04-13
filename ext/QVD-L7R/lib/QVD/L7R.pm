@@ -500,6 +500,8 @@ sub _run_forwarder {
     txn_do {
         $vm->discard_changes;
         $l7r->_check_abort($vm);
+        $vm->user_state eq 'connecting'
+            or LOGDIE "User state unexpectedly went to ".$vm->user_state;
         $vm->set_user_state('connected');
     };
     DEBUG "Connected on VM VM_ID: " . $vm->id ;
