@@ -312,9 +312,10 @@ sub _takeover_vm {
                                 l7r_pid => $$,
                                 l7r_host_id => this_host_id,
                                 user_cmd => undef);
+            DEBUG "User state set to 'connecting'";
         };
         unless ($@) {
-            DEBUG "txn_eval with no issues";
+            DEBUG "L7R takeover succeeded";
             $l7r->_tell_client("Session acquired for VM_ID: ". $vm->id);
             return;
         }
