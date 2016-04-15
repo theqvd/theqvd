@@ -20,6 +20,7 @@ my $swperl = 'C:\strawberry';
 my $gettext = "C:\\gettext";
 
 
+
 my @paths = (
 	"$prog\\Resource Hacker",
 	"$prog\\Inno Setup 5"
@@ -41,11 +42,25 @@ my @dlls = (
 		"$swperl\\perl\\site\\lib\\auto\\Net\\SSLeay\\libeay32.dll",
 		"$swperl\\perl\\site\\lib\\auto\\Net\\SSLeay\\ssleay32.dll",
 		"$swperl\\perl\\site\\lib\\auto\\Net\\SSLeay\\ssleay.dll",
+		"$swperl\\perl\\site\\lib\\auto\\Net\\SSLeay\\libeay32.xs.dll",
+		"$swperl\\perl\\site\\lib\\auto\\Net\\SSLeay\\ssleay32.xs.dll",
+		"$swperl\\perl\\site\\lib\\auto\\Net\\SSLeay\\ssleay.xs.dll",
+		
+		"$swperl\\perl\\vendor\\lib\\auto\\Net\\SSLeay\\libeay32.dll",
+		"$swperl\\perl\\vendor\\lib\\auto\\Net\\SSLeay\\ssleay32.dll",
+		"$swperl\\perl\\vendor\\lib\\auto\\Net\\SSLeay\\ssleay.dll",
+		"$swperl\\perl\\vendor\\lib\\auto\\Net\\SSLeay\\libeay32.xs.dll",
+		"$swperl\\perl\\vendor\\lib\\auto\\Net\\SSLeay\\ssleay32.xs.dll",
+		"$swperl\\perl\\vendor\\lib\\auto\\Net\\SSLeay\\ssleay.xs.dll",	
+	],
+	[
+		"$swperl\\perl\\site\\lib\\auto\\Crypt\\OpenSSL\\X509\\X509.dll",
+		"$swperl\\perl\\site\\lib\\auto\\Crypt\\OpenSSL\\X509\\X509.xs.dll"
 	],
 	"$swperl\\c\\bin\\libeay32_.dll",
 	"$swperl\\c\\bin\\ssleay32_.dll",
 	"$swperl\\c\\bin\\zlib1_.dll",
-	"$swperl\\perl\\site\\lib\\auto\\Crypt\\OpenSSL\\X509\\X509.dll",
+
 	"$swperl\\c\\bin\\libiconv-2_.dll",
 	"$gettext\\bin\\intl.dll",
 	"$gettext\\bin\\libasprintf-0.dll",
@@ -61,6 +76,18 @@ foreach my $dir (@paths) {
 }
 
 msg("PATH: $ENV{PATH}\n");
+
+
+my $perl_bin      = find_binary_path("perl.exe", "$swperl/perl/bin/", $ENV{PATH});
+my $pp_bin        = find_binary_path("pp", "$swperl/perl/site/bin/",dirname($perl_bin) . "/../site/bin",  $ENV{PATH});
+my $reshacker_bin = find_binary_path(["reshacker.exe", "ResourceHacker.exe"], "$prog/Resource Hacker", $ENV{PATH});
+my $git_bin       = find_binary_path("git.exe", "$prog/git", "c:\\cygwin\\bin", $ENV{PATH});
+
+
+msg("Adding $swperl\\c\\lib to PATH\n");
+$ENV{PATH} = "$ENV{PATH};$swperl\\c\\lib";
+
+
 
 # This environment variable tells the client it's being called in a PP
 # build. That will make it exit automatically. This makes automated
@@ -108,9 +135,10 @@ my @pp_args = ("-vvv", "-x",
 	'-o', 'qvd-client-1.exe', '-log', 'pp.log',
 	'..\..\ext\QVD-Client\bin\qvd-gui-client.pl');
 
-run("pp", "-gui", @pp_args);
+run($pp_bin, "-gui", @pp_args);
 
-run("reshacker -addoverwrite qvd-client-1.exe, qvd-client.exe, pixmaps\\qvd.ico,icongroup,WINEXE,");
+run($reshacker_bin, "-addoverwrite", "qvd-client-1.exe, qvd-client.exe, pixmaps\\qvd.ico,icongroup,WINEXE,");
+
 unlink('qvd-client-1.exe');
 unlink glob('..\Output\*');
 mkdir "..\\archive";
@@ -132,8 +160,8 @@ unless( $no_debug_installer ) {
 }
 
 	
-msg("Undoing changes to nxproxy");
-run("git", "checkout", "NX\\nxproxy.exe");
+msg("Undoing changes to nxproxy\n");
+run($git_bin, "checkout", is_cygwin($git_bin) ? "NX/nxproxy.exe" : "NX\\nxproxy.exe");
 
 msg("Done!\n");
 
@@ -188,6 +216,75 @@ sub mklist {
 	}
 	die "Missing files" if ($missing);
 	return @ret;
+}
+
+sub find_binary_path {
+	my ($arg_binaries, @paths) = @_;
+	
+	
+	my @binaries = ref($arg_binaries) eq "ARRAY" ? @$arg_binaries :  ($arg_binaries);
+	@paths = map { split /;/ } @paths;
+	
+
+	my $fullpath;
+	my $bin;
+	my $path;
+	
+	msg("Trying to find ");
+	my $first_bin = 1;
+	my $found;
+	
+	foreach $bin (@binaries) {
+		msg(" or ") unless ($first_bin);
+		msg($bin);
+		undef $first_bin;
+		
+		foreach $path (@paths) {
+			$fullpath = File::Spec->catdir($path, $bin);
+			if ( -f $fullpath ) {
+				$found = 1;
+				last;
+			}
+			
+		}
+	}
+	msg("... ");
+	
+	if ( $found ) {
+		msg("Found at $fullpath\n");
+		return $fullpath;
+	} else {
+		die "Not found! Tried looking at: " . join("\n", @paths);
+	}
+}
+
+# Check whether a binary cygwin one.
+# Currently using a rather simplistic approach.
+sub is_cygwin {
+	my ($file) = @_;
+	my $buf = "";
+	my $buf2 = "";
+	my $read;
+	my $read_size = 1024;
+	
+	my $is_cygwin = 0;
+	
+	open(my $fh, '<', $file) or die "Can't open $file: $!";
+	while( ($read = read($fh, $buf, $read_size)) > 0 ) {
+		# Keep twice the read size in memory to deal with the possibility
+		# of the string being split across reads.
+		
+		$buf2 .= $buf;
+		if ( $buf2 =~ /cygwin\d+\.dll/ ) {
+			$is_cygwin = 1;
+			last;
+		}
+		$buf2 = substr($buf2, $read_size) if length($buf) > $read_size;
+	}
+	close $file;
+	
+	return $is_cygwin;
+	
 }
 
 sub run {
