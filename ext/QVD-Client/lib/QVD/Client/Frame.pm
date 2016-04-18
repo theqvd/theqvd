@@ -726,6 +726,23 @@ sub OnUnknownCert {
 
          $cert_data .= _format_aligned($info);
 
+         
+
+        # my $t = $self->_t("Certificate for:\n%s" .
+        #                   "Issued by  :\n%s"  .
+        #                   "Fingerprint: %s (%s)\n" .
+        #                   "Serial     : %s\n" .
+        #                   "Valid from : %s\n" .
+        #                   "Valid until: %s\n");
+
+        # $cert_data .= sprintf($t, _format_aligned( _cert_fullname($cert, $cert->{subject}, 1), "\t"),
+        #                           _format_aligned( _cert_fullname($cert, $cert->{issuer}), "\t"),
+        #                           $cert->{fingerprint}, $cert->{fingerprint_algo},
+        #                           $cert->{serial},
+        #                           $cert->{not_before},
+        #                           $cert->{not_after}) . "\n\n";
+ 
+        
     }
 
     if (@advice) {
