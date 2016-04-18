@@ -41,12 +41,18 @@ sub txn_eval (&) {
     my $db = db;
     if (wantarray) {
         my @r = eval { $db->txn_do(@_) };
-        DEBUG "txn_eval failed: $@" if $@;
+	if ($@) {
+	    DEBUG "txn_eval failed: $@";
+	    $@ or LOGDIE 'Internal error: Log::Log4perl is mangling $@';
+	}
         return @r;
     }
     else {
         my $r = eval { $db->txn_do(@_) };
-        DEBUG "txn_eval failed: $@" if $@;
+	if ($@) {
+	    DEBUG "txn_eval failed: $@";
+	    $@ or LOGDIE 'Internal error: Log::Log4perl is mangling $@';
+	}
         return $r;
     }
 }
