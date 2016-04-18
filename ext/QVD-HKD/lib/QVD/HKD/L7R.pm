@@ -45,7 +45,7 @@ sub run {
     $self->{fh} = $fh;
     DEBUG "L7R fh: $fh, fileno: " . (eval {fileno($fh)} // '<undef>');
     $self->_on_run;
-    DEBUG "New L7R process $self->{pid}";
+    DEBUG "New L7R process $self->{saved_pid}";
     return $self->{saved_pid};
 }
 
@@ -74,7 +74,7 @@ sub _kill {
     my $self = shift;
     my $signal = ($self->{hard}++ ? 'KILL' : 'TERM');
     DEBUG "Killing L7R process $self->{pid} with signal $signal";
-    kill $signal, $self->{pid};
+    kill $signal, $self->{pid} if $self->{pid};
 }
 
 sub _set_state_timer {
@@ -88,8 +88,11 @@ sub pid { shift->{saved_pid} }
 
 sub _clean_row {
     my $self = shift;
+    my $pid = $self->{saved_pid};
+    defined $pid or return $self->_on_done;
+
     $self->_query({ ignore_errors => 1 },
-                  <<'EOQ', $self->{node_id}, $self->{saved_pid});
+                  <<'EOQ', $self->{node_id}, $pid);
 update vm_runtimes
    set user_cmd = NULL,
        l7r_host_id = NULL,

@@ -216,15 +216,12 @@ sub connect_to_vm_processor {
         $l7r->_wait_for_x($vm);
         $l7r->_run_forwarder($vm, %params);
     };
-    my $saved_err = $@;
-    DEBUG 'Releasing VM'. " VM_ID: $vm_id";
-    $l7r->_release_vm($vm);
-    if ($saved_err) {
-        chomp $saved_err;
-        INFO "The requested virtual machine is not available: '$saved_err'. Retry later". " VM_ID: $vm_id";
+    if ($@) {
+        chomp $@;
+        INFO "The requested virtual machine is not available: '$@'. Retry later". " VM_ID: $vm_id";
         $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE,
                           "The requested virtual machine is not available: ",
-                          "$saved_err, retry later");
+                          "$@, retry later");
     }
     DEBUG "Session ended". " VM_ID: $vm_id";
 }
@@ -324,9 +321,10 @@ sub _takeover_vm {
                                 l7r_pid => $$,
                                 l7r_host_id => this_host_id,
                                 user_cmd => undef);
+            DEBUG "User state set to 'connecting'";
         };
         unless ($@) {
-            DEBUG "txn_eval with no issues";
+            DEBUG "L7R takeover succeeded";
             $l7r->_tell_client("Session acquired for VM_ID: ". $vm->id);
             return;
         }
@@ -350,35 +348,6 @@ sub _takeover_vm {
 
         # FIXME: check the VM has not left the state running
     }
-}
-
-sub _release_vm {
-    my ($l7r, $vm) = @_;
-    DEBUG 'Releasing VM for VM_ID: '.$vm->id;
-    txn_eval {
-        $vm->discard_changes;
-        my $pid = $vm->l7r_pid;
-        my $host_id = $vm->l7r_host_id;
-        if ($vm->is_ephemeral && $vm->vm_state eq 'running') {
-            $vm->send_vm_stop; # Clean up ephemeral VMs
-        }
-
-        # FIXME: the HKD should take care of reclaiming ephemeral
-        # virtual machines back into the pool:
-        # It can't be done here as...
-        #   $vm->update({ real_user_id => undef });
-
-        if (defined $pid  and $pid  == $$  and
-            defined $host_id and $host_id == this_host_id) {
-            DEBUG 'calling clear l7r all for vm ' . $vm->id;
-            $vm->clear_l7r_all;
-        }
-        else {
-            DEBUG 'not calling clear_l7r_all for vm ' . $vm->id
-                . " where pid=$pid, \$\$=$$, host=$host_id, this_host=". this_host_id;
-        }
-    };
-    $@ and INFO "L7R release failed but don't bother, HKD will cleanup the mess: $@";
 }
 
 sub _assign_vm {
@@ -541,6 +510,8 @@ sub _run_forwarder {
     txn_do {
         $vm->discard_changes;
         $l7r->_check_abort($vm);
+        $vm->user_state eq 'connecting'
+            or LOGDIE "User state unexpectedly went to ".$vm->user_state;
         $vm->set_user_state('connected');
     };
     DEBUG "Connected on VM VM_ID: " . $vm->id ;
