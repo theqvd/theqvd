@@ -59,204 +59,89 @@ sub new {
 ## returns:
 # 1 or 0, depending on whether it thinks the certificate is valid or invalid.
 sub _ssl_verify_callback {
-    my ($self, $ssl_thinks, $mem_addr, $attrs, $errs, $peer_cert, $ssl_depth) = @_;
+    my ($self, $ssl_thinks, $mem_addr, $attrs, $errs) = @_;
     return 1 if $ssl_thinks;
 
     DEBUG("_ssl_verify_callback called: " . join(' ', @_));
-
-    if (!exists $self->{cert_info}->[$ssl_depth]) {
-        $self->{cert_info}->[$ssl_depth] = {
-            errors => [],
-        };
-    }
-
-    my $ci = $self->{cert_info}->[$ssl_depth];
-
-    my $cert = Net::SSLeay::X509_STORE_CTX_get_current_cert ($mem_addr);
-    my $cert_pem_str = Net::SSLeay::PEM_get_string_X509 ($cert);
+    
+    my $cert_pem_str = Net::SSLeay::PEM_get_string_X509 (Net::SSLeay::X509_STORE_CTX_get_current_cert ($mem_addr));
     my $x509 = Crypt::OpenSSL::X509->new_from_string ($cert_pem_str);
-
     my $err_no    = Net::SSLeay::X509_STORE_CTX_get_error($mem_addr);
     my $err_depth = Net::SSLeay::X509_STORE_CTX_get_error_depth($mem_addr);
     my $err_str   = Net::SSLeay::X509_verify_cert_error_string($err_no);
-
-    push @{ $ci->{errors} }, { 
-        err_no    => $err_no,
-        err_depth => $err_depth,
-        err_str   => $err_str 
-    };
- 
-    $ci->{ssl_ok}           = $ssl_thinks;  
-    $ci->{hash}             = $x509->hash;
-    $ci->{subject}          = _split_dn( $x509->subject );
-    $ci->{serial}           = $x509->serial;
-    $ci->{issuer}           = _split_dn( $x509->issuer );
-    $ci->{not_before}       = $x509->notBefore;
-    $ci->{not_after}        = $x509->notAfter;
-    $ci->{pem}              = $cert_pem_str;
-    $ci->{sig_algo}         = $x509->sig_alg_name;
-    $ci->{bit_length}       = $x509->bit_length; 
-    $ci->{selfsigned}       = $x509->is_selfsigned;
-    $ci->{extensions}       = {};
     
-    foreach my $algo ("sha1", "sha256", "ripemd160") {
-        $ci->{fingerprint}->{$algo} = Net::SSLeay::X509_get_fingerprint($cert, $algo);
-    }
+    my $cert_hash = $x509->hash;
 
-    my $exts = $x509->extensions_by_oid();
+    DEBUG("Verification error at depth $err_depth: $err_str when checking " . $x509->subject); 
 
-    foreach my $oid (keys %$exts) {
-        my $ext = $$exts{$oid};
-        if ( $oid eq "2.5.29.15" ) { # KeyUsage
-            $ci->{extensions}->{key_usage} = { $ext->hash_bit_string };
-        } elsif ( $oid eq "2.16.840.1.113730.1.1" ) { # nsCertType
-            $ci->{extensions}->{cert_type} = { $ext->hash_bit_string };
-        }
+    my $cert_temp = <<'EOF';
+Verification error at depth %i:
+%s
 
-        print STDERR $oid, " ", $ext->object()->name(), ": ", $ext->value(), "\n";
-    }
+Serial: %s
 
+Issuer: %s
 
-    my @altnames = Net::SSLeay::X509_get_subjectAltNames($cert);
-    my @typenames = qw(Other Email DNS X400 Directory EDIPARTY URI IP RID);
+Validity:
+    Not before: %s
+    Not after:  %s
 
-    if ( @altnames ) {
-        $ci->{extensions}->{altnames} = [];
+Subject: %s
+EOF
 
-        while (@altnames) {
-            my $type = shift @altnames;
-            my $value = shift @altnames;
-            my $tname = $typenames[$type];
+    my $cert_data = sprintf($cert_temp,
+                            $err_depth,
+                            $err_str,
+                            (join ':', $x509->serial =~ /../g),
+                            $x509->issuer,
+                            $x509->notBefore,
+                            $x509->notAfter,
+                            $x509->subject);
 
-            $value = join('.', unpack('C4', $value)) if ( $type == 7 ); # IP Address
-            push @{ $ci->{extensions}->{altnames} }, { $tname => $value };
-        }
-    }
+    my $accept = $self->{client_delegate}->proxy_unknown_cert([$cert_pem_str, $cert_data, $err_no]);
+    DEBUG("Certificate " . $accept ? "accepted" : "rejected");
 
+    return unless $accept;
 
-    if (!$ssl_thinks) {
-        DEBUG "SSL error $err_no when checking certificate " . $ci->{fingerprint}->{sha256};
-        $self->{ssl_errors}++;
+    ## guardar certificado en archivo
+    my $dir = $QVD::Client::App::user_certs_dir;
+    DEBUG "certificates are stored in $dir";
+    make_path $dir;
+    -d $dir or die "Unable to create directory $dir";
 
-        if ( $self->is_accepted( 'sha256', $ci->{fingerprint}->{sha256}, $err_no ) ) {
-            DEBUG "SSL error $err_no ignored for certificate " . $ci->{fingerprint}->{sha256};
+    # Save the accepted certificate to disk.
+    # Certificates may be accepted even if they're already in storage, for instance because the cert
+    # has expired.
+    #
+    # We do a simple check to see if we saved this cert already.
+    my $idx = 0;
+    while(1) {
+        my $file;
+        my $basename = sprintf '%s.%d', $cert_hash, $idx;
+        $file = File::Spec->join($dir, $basename);
+        
+        if ( -e $file ) {
+             open(my $fd, '<', $file) or die "Can't open '$file' for reading: $!";
+             local $/;
+             my $cert_str = <$fd>;
+             close $fd;
 
-            $self->{ssl_ignored_errors}++;
-        }
-    }
-
-
-
-    return 1;
-}
-
-sub _split_dn {
-    my ($str) = @_;
-    my $ret = {};
-    my $buf = "";
-    my ($k,$v) = ("", "");
-
-    print STDERR "STR: $str\n";
-
-    while($str) {
-        my ($match, $rest) = ($str =~ m/^(.*?)[,=](.*)$/);
-        $str = $rest;
-        $buf .= $match;
-
-        if ( $buf =~ /\\$/ ) {
-            $buf =~ s/\\$//;
-            $buf .= $k eq "" ? "=" : ",";
+             if ( $cert_str eq $cert_pem_str ) {
+                 DEBUG "Certificate already saved in $file";
+                 last;
+             }
         } else {
-            if ($k eq "") {
-                $k = $buf;
-                $buf = "";
-            } else {
-                $v = $buf;
-                $buf = "";
-            } 
-
-            if ( $k ne "" && $v ne "" ) {
-                for($k, $v) {
-                    s/^\s+//;
-                    s/\s+$//;
-                }
-                $k = lc($k);
-
-                $ret->{$k} = $v;
-                $buf = "";
-                $k = "";
-                $v = "";
-            }
+             DEBUG "Saving certificate in $file";
+             open my $fd, '>', $file or die "Unable to open '$file': $!";
+             print $fd $cert_pem_str;
+             close $fd;
+             last;
         }
+        $idx++;
     }
 
-    return $ret;
+    return $accept;
 }
-
-sub accept_cert {
-    my ($self, %data) = @_;
-
-    die "algorithm required" unless ( $data{algo} );
-    die "fingerprint required" unless ( $data{fingerprint} );
-    die "description required" unless ( $data{description} );
-    
-    my $key = $data{algo} . "\$" . $data{fingerprint};
- 
-    $self->{accepted_certs} //= { };
-    $self->{accepted_certs}->{$key} = \%data;
-    
-    $self->_save_accepted_certs;
-}
-
-sub is_accepted {
-    my ($self, $algo, $fingerprint, $errno) = @_;
-    
-    my $key = "${algo}\$${fingerprint}";
-
-    if ( exists $self->{accepted_certs}->{$key} ) {
-        my $ci = $self->{accepted_certs}->{$key};
-
-        return scalar grep { $_ == $errno } @{ $ci->{errors} };
-    }
-}
-
-sub delete_exception {
-    my ($self, $algo, $fingerprint) = @_;
-
-    my $key = "${algo}\$${fingerprint}";
-    delete $self->{accepted_certs}->{$key};
-}
-
-
-sub _load_accepted_certs {
-    my ($self) = @_;
-    my $file = File::Spec->join($QVD::Client::App::user_dir, "accepted_certs.json");
-    $self->{accepted_certs} = {};
-
-    DEBUG "Loading accepted certificates";
-
-    if (open(my $fd, '<', $file)) {
-        local $/;
-        undef $/;
-        my $data = <$fd>;
-        close $fd;
-
-        $self->{accepted_certs} = from_json( $data, { utf8 => 1 } );
-    } else {
-        WARN "Can't open $file: $!";
-    }
-}
-
-sub _save_accepted_certs {
-    my ($self) = @_;
-    my $file = File::Spec->join($QVD::Client::App::user_dir, "accepted_certs.json");
-
-    DEBUG "Saving accepted certificates";
-    open(my $fd, '>', $file) or die "Can't create $file: $!";
-    print $fd to_json( $self->{accepted_certs}, { utf8 => 1, pretty => 1 } );
-    close $fd;
-}
-
 
 sub _get_httpc {
     my ($self, $host, $port) = @_;
@@ -286,81 +171,24 @@ sub _get_httpc {
             
             DEBUG "SSL cert: $args{SSL_cert_file}; key: $args{SSL_key_file}";
         }
-
         $args{SSL_verify_callback} = sub { $self->_ssl_verify_callback(@_) };
-
-        $self->_load_accepted_certs();
-        $args{SSL_fingerprint} = [ keys %{ $self->{accepted_certs} } ];
-
- 
-        # These are used by SSL_verify_callback to store the errors encountered
-        $self->{ssl_errors}         = 0;
-        $self->{ssl_ignored_errors} = 0;
-        $self->{cert_info}          = [];
-
     } else {
         DEBUG "Not using SSL";
     }
-   
-    my $httpc = QVD::HTTPC->new();
-    my $ret; 
-    eval { $ret = $httpc->connect("$host:$port", %args) };
-
-    if ($@) {
-        ERROR("Connection error: $@");
-        my $msg = $@;
-
-        if ( $@ =~ /hostname verification failed/ ) {
-            if ( $httpc->is_ssl ) {
-                my $sock = $httpc->get_failed_socket;
-                my $certhost = $sock->peer_certificate('commonName');
- 
-                $msg = "Hostname verification failed.\n\n" .
-                       "Connected to $host:$port, but the certificate belongs to $certhost";
-            } else {
-                $msg = "Hostname verification error on non-SSL connection?";
-            }
-        } elsif ( $@ =~ /certificate verify failed/ ) {
+    
+    my $httpc = eval { QVD::HTTPC->new("$host:$port", %args) };
+    unless (defined $httpc) {
+        if ($@) {
+            ERROR("Connection error: $@");
+            $cli->proxy_connection_error(message => $@);
+        }
+        else {
             # User rejected the server SSL certificate. Return to main window.
             INFO("User rejected certificate. Closing connection.");
             $cli->proxy_connection_status('CLOSED');
-            return;
         }
-
-        $cli->proxy_connection_error(message => $msg);
         return;
     }
-
-    if ($ssl) {
-        # We've successfully connected, but there may be stored up verification errors.
-        # We ignore them in the verification callback so that we can store all the errors
-        # and present them to the user at once here.
-        
-        my $errcount = $self->{ssl_errors} - $self->{ssl_ignored_errors};
-
-        if ( $errcount > 0 ) {
-            DEBUG "$errcount SSL errors ( $self->{ssl_errors} total, $self->{ssl_ignored_errors} ignored ) while logging in, asking user";
-
-            my $accept = $self->{client_delegate}->proxy_unknown_cert($self->{cert_info});
-            print STDERR "ACCEPT: $accept\n";
-            if (!$accept) {
-                INFO("User rejected certificate. Closing connection.");
-                $cli->proxy_connection_status('CLOSED');
-                return;
-            }
-            if ( $accept == 2 ) {
-                foreach my $cert ( @{ $self->{cert_info} } ) {
-                    my @errors = map { $_->{err_no} } @{ $cert->{errors} };
-
-                    $self->accept_cert( algo        => 'sha256', 
-                                        fingerprint => $cert->{fingerprint}->{sha256},
-                                        description => $cert->{subject},
-                                        errors      => \@errors );
-                }
-            }
-        }
-    }
-
     $httpc;
 }
 

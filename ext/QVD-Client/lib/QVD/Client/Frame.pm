@@ -21,42 +21,7 @@ use constant EVT_CONN_STATUS       => Wx::NewEventType;
 use constant EVT_UNKNOWN_CERT      => Wx::NewEventType;
 use constant EVT_SET_ENVIRONMENT   => Wx::NewEventType;
 
-use constant X509_V_OK                                        => 0;
-use constant X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT             => 2;
-use constant X509_V_ERR_UNABLE_TO_GET_CRL                     => 3;
-use constant X509_V_ERR_UNABLE_TO_DECRYPT_CERT_SIGNATURE      => 4;
-use constant X509_V_ERR_UNABLE_TO_DECRYPT_CRL_SIGNATURE       => 5;
-use constant X509_V_ERR_UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY    => 6;
-use constant X509_V_ERR_CERT_SIGNATURE_FAILURE                => 7;
-use constant X509_V_ERR_CRL_SIGNATURE_FAILURE                 => 8;
-use constant X509_V_ERR_CERT_NOT_YET_VALID                    => 9;
-use constant X509_V_ERR_CERT_HAS_EXPIRED                      => 10;
-use constant X509_V_ERR_CRL_NOT_YET_VALID                     => 11;
-use constant X509_V_ERR_CRL_HAS_EXPIRED                       => 12;
-use constant X509_V_ERR_ERROR_IN_CERT_NOT_BEFORE_FIELD        => 13;
-use constant X509_V_ERR_ERROR_IN_CERT_NOT_AFTER_FIELD         => 14;
-use constant X509_V_ERR_ERROR_IN_CRL_LAST_UPDATE_FIELD        => 15;
-use constant X509_V_ERR_ERROR_IN_CRL_NEXT_UPDATE_FIELD        => 16;
-use constant X509_V_ERR_OUT_OF_MEM                            => 17;
-use constant X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT           => 18;
-use constant X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN             => 19;
-use constant X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY     => 20;
-use constant X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE       => 21;
-use constant X509_V_ERR_CERT_CHAIN_TOO_LONG                   => 22; 
-use constant X509_V_ERR_CERT_REVOKED                          => 23;
-use constant X509_V_ERR_INVALID_CA                            => 24;
-use constant X509_V_ERR_PATH_LENGTH_EXCEEDED                  => 25;
-use constant X509_V_ERR_INVALID_PURPOSE                       => 26;
-use constant X509_V_ERR_CERT_UNTRUSTED                        => 27;
-use constant X509_V_ERR_CERT_REJECTED                         => 28;
-use constant X509_V_ERR_SUBJECT_ISSUER_MISMATCH               => 29;
-use constant X509_V_ERR_AKID_SKID_MISMATCH                    => 30;
-use constant X509_V_ERR_AKID_ISSUER_SERIAL_MISMATCH           => 31;
-use constant X509_V_ERR_KEYUSAGE_NO_CERTSIGN                  => 32;
-use constant X509_V_ERR_APPLICATION_VERIFICATION              => 50;
-
 my $vm_id :shared;
-
 my %connect_info :shared;
 my $accept_cert :shared;
 my $set_env :shared;
@@ -580,208 +545,62 @@ sub OnConnectionStatusChanged {
 
 sub OnUnknownCert {
     my ($self, $event) = @_;
-    my $data = $event->GetData();
+    my $evt_data = $event->GetData();
+    my ($cert_pem_str, $cert_data, $cert_errno) = @$evt_data;
     my $err_desc;
-    my @advice;
 
-    my $dialog = Wx::Dialog->new($self, undef, $self->_t("Invalid certificate"));
-    my $main_sizer = Wx::BoxSizer->new(wxVERTICAL);
+    my $dialog = Wx::Dialog->new($self, undef, 'Invalid certificate');
+    my $vsizer = Wx::BoxSizer->new(wxVERTICAL);
     my $no_ok_button;
 
-
-    use Data::Dumper;
-    print STDERR Dumper([$data]);
-
-    my $tab_ctl;
-    my $show_details = 1;
-
-
-    if ( $show_details ) {
-        $tab_ctl = Wx::Notebook->new($dialog, -1, wxDefaultPosition, wxDefaultSize, 0, "tab");
-        $main_sizer->Add($tab_ctl);
-    }
-
-
-    my $info_panel = $self->{panel} = Wx::Panel->new($tab_ctl // $dialog, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL ); # / broken highlighter
-    my $info_sizer = Wx::BoxSizer->new(wxVERTICAL);
-    $info_panel->SetSizer( $info_sizer );
-
-    my $details_panel;
-    my $details_sizer;
-
-
-
-
-
-    if ( $tab_ctl ) {
-        $tab_ctl->AddPage( $info_panel, $self->_t("Problems") );
-
-
-        $details_panel = Wx::Panel->new($tab_ctl, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-        $details_sizer = Wx::BoxSizer->new(wxVERTICAL);
-        $details_panel->SetSizer($details_sizer);
-
-        $tab_ctl->AddPage( $details_panel, $self->_t("Details"));
+    # Net::SSLeay doesn't seem to have error constants. Values taken from:
+    # http://www.openssl.org/docs/apps/verify.html#
+    
+    if ( $cert_errno == 2 || $cert_errno == 20 || $cert_errno == 21 || $cert_errno == 27 ) {
+        $err_desc = $self->_t("Unrecognized Certificate Authority. See the documentation for instructions on how to use your own CA.");
+    } elsif ( $cert_errno == 9 ) {
+        $err_desc = $self->_t("The certificate is not yet valid. Make sure your clock is set correctly.");
+    } elsif ( $cert_errno == 10 ) {
+        $err_desc = $self->_t("The certificate has expired.");
+    } elsif ( $cert_errno == 23 ) {
+        $err_desc = $self->_t("The certificate has been revoked.");
+        $no_ok_button = 1;
     } else {
-        $main_sizer->Add($info_panel);
+        $err_desc = sprintf($self->_t("Unrecognized SSL error #%s. See the certificate information below for details."), $cert_errno);
     }
 
+    $err_desc .= "\n";
 
-    my $problems_box  = Wx::StaticBox->new($info_panel, -1, $self->_t("Results of the certificate check"));
-    my $problems_sizer= Wx::StaticBoxSizer->new($problems_box, wxVERTICAL);
-    $info_sizer->Add($problems_sizer, 0, wxALL | wxEXPAND, 5);
+    $vsizer->Add(Wx::StaticText->new($dialog, -1, $err_desc), 0, wxALL, 5);
 
-    my $cert_data;
-
-    foreach my $cert (@$data) {
-        my $infoline = _cert_name($cert, $cert->{subject});
-        my $infotext = Wx::StaticText->new($info_panel, -1, $infoline);
-        my $font = $infotext->GetFont();
-        $font->SetWeight(wxFONTWEIGHT_BOLD);
-        $infotext->SetFont($font);
-        $problems_sizer->Add($infotext, 0, wxALL, 5);
-
-        
-
-        foreach my $error (@{ $cert->{errors} }) {
-            my $e = $error->{err_no};
-
-            # Net::SSLeay doesn't seem to have error constants. Values taken from:
-            # http://www.openssl.org/docs/apps/verify.html#
-   
-            $err_desc = sprintf($self->_t("Error #%s:"), $e) . " ";
-
-            if ( $e == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT ) {
-                $err_desc .= $self->_t("Unable to find issuer's certificate");
-                _add_advice(\@advice, $self->_t("If you are using your own CA, see the documentation on how to make the client use your certificate."));
-            } elsif ( $e == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY ) {
-                $err_desc .= $self->_t("Unable to find issuer's certificate");
-                _add_advice(\@advice, $self->_t("If you are using your own CA, see the documentation on how to make the client use your certificate."));
-            } elsif ( $e == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE ) {
-                $err_desc .= $self->_t("Unable to verify the first certificate");
-                _add_advice(\@advice, $self->_t("If you are using your own CA, see the documentation on how to make the client use your certificate."));
-            } elsif ( $e == X509_V_ERR_CERT_UNTRUSTED ) {
-                $err_desc .= $self->_t("Root certificate not trusted");
-            } elsif ( $e == X509_V_ERR_CERT_NOT_YET_VALID ) {
-                $err_desc .= $self->_t("The certificate is not yet valid.");
-                _add_advice(\@advice, $self->_t("Make sure your clock is set correctly."));
-            } elsif ( $e == X509_V_ERR_CERT_HAS_EXPIRED ) {
-                $err_desc .= $self->_t("The certificate has expired.");
-                _add_advice(\@advice, sprintf($self->_t("Remind %s (%s) to renew the certificate", $cert->{subject}->{o}, $cert->{subject}->{email})));
-            } elsif ( $e == X509_V_ERR_CERT_REVOKED ) {
-                $err_desc .= $self->_t("The certificate has been revoked.");
-                $no_ok_button = 1;
-            } else {
-                $err_desc .= sprintf($self->_t("Unrecognized SSL error."), $e);
-            }
-
-            my $hsizer = Wx::BoxSizer->new(wxHORIZONTAL);
-            my $excl = Wx::StaticText->new($info_panel, -1, "    !");
-            my $excl = Wx::StaticText->new($info_panel, -1, "    " . chr(0x26A0));
-
-            $font = $excl->GetFont();
-            $font->SetWeight(wxFONTWEIGHT_BOLD);
-            $excl->SetFont($font);
-            $excl->SetForegroundColour(wxRED);
-            $hsizer->Add($excl, 0, wxALL, 5);
-
-
- 
-            $hsizer->Add(Wx::StaticText->new($info_panel, -1, " $err_desc"), 0, wxALL, 5);
-            $problems_sizer->Add($hsizer, 0, wxALL, 0);
-         } 
-         
-
-         my $info = [];
-         push @$info,  { $self->_t("Certificate for") => _format_aligned( _cert_fullname($cert, $cert->{subject}), "\t") };
-         push @$info,  { $self->_t("Issued by") => _format_aligned( _cert_fullname($cert, $cert->{issuer}), "\t") };
-
-         if ( exists $cert->{extensions}->{altnames} ) {
-             push @$info, { 'Alternative names' => _format_aligned($cert->{extensions}->{altnames}, "\t") };
-         }
-
-         if ( exists $cert->{extensions}->{cert_type} ) {
-             my $ct = $cert->{extensions}->{cert_type};
-             push @$info, { 'Uses' => join(", ", grep { $ct->{$_} } keys %$ct) };
-         }
-
-         push @$info, { $self->_t("Bit length") => $cert->{bit_length} };
-
-
-         foreach my $algo ( keys %{ $cert->{fingerprint} } ) {
-             push @$info,  {  $self->_t("Fingerprint") . " ($algo)" => $cert->{fingerprint}->{$algo} };
-         }
-         push @$info,  { $self->_t("Serial")      => $cert->{serial} };
-         push @$info,  { $self->_t("Valid from")  => $cert->{not_before} };
-         push @$info,  { $self->_t("Valid until") => $cert->{not_after} };
-
-         $cert_data .= _format_aligned($info);
-
-         
-
-        # my $t = $self->_t("Certificate for:\n%s" .
-        #                   "Issued by  :\n%s"  .
-        #                   "Fingerprint: %s (%s)\n" .
-        #                   "Serial     : %s\n" .
-        #                   "Valid from : %s\n" .
-        #                   "Valid until: %s\n");
-
-        # $cert_data .= sprintf($t, _format_aligned( _cert_fullname($cert, $cert->{subject}, 1), "\t"),
-        #                           _format_aligned( _cert_fullname($cert, $cert->{issuer}), "\t"),
-        #                           $cert->{fingerprint}, $cert->{fingerprint_algo},
-        #                           $cert->{serial},
-        #                           $cert->{not_before},
-        #                           $cert->{not_after}) . "\n\n";
- 
-        
-    }
-
-    if (@advice) {
-        $info_sizer->Add(Wx::StaticText->new($info_panel, -1, $self->_t('Recommendations:')), 0, wxALL, 5);
-        foreach my $line (@advice) {
-            $info_sizer->Add(Wx::StaticText->new($info_panel, -1, "  " . chr(0x2022) . " " . $line), 0, wxALL, 5);
-        }
-
-    }
-
-
-    if ( $details_sizer ) {
-        my $tc = Wx::TextCtrl->new($details_panel, -1, $cert_data, wxDefaultPosition, [600,300], wxTE_MULTILINE|wxTE_READONLY);
-        $tc->SetFont (Wx::Font->new(10, wxDEFAULT, wxNORMAL, wxNORMAL, 0, 'Courier New'));
-        $details_sizer->Add($tc, 1, wxALL|wxEXPAND, 5);
-    }
+    $vsizer->Add(Wx::StaticText->new($dialog, -1, $self->_t('Certificate information:')), 0, wxALL, 5); 
+    my $tc = Wx::TextCtrl->new($dialog, -1, $cert_data ? $cert_data : $self->_t('Certificate not found, maybe HKD component is not runnning at server side.'), wxDefaultPosition, [600,300], wxTE_MULTILINE|wxTE_READONLY);
+    $tc->SetFont (Wx::Font->new(12, wxDEFAULT, wxNORMAL, wxNORMAL, 0, 'Courier New'));
+    $vsizer->Add($tc, 1, wxALL|wxEXPAND, 5);
 
     my $but_clicked = sub {
         lock $accept_cert;
-        my $do_accept = shift;
-        $accept_cert = $do_accept; # ($do_accept and ($cert_data ne ""));
-        cond_signal $accept_cert;
+        $accept_cert = (shift and ($cert_data ne ""));
+	cond_signal $accept_cert;
         $dialog->EndModal(0);
         $dialog->Destroy();
     };
-
     my $bsizer = Wx::BoxSizer->new(wxHORIZONTAL);
 
     my $but_ok;
-    my $but_ok_permanent;
     unless ($no_ok_button) {
-        $but_ok     = Wx::Button->new($dialog, -1, $self->_t('Accept temporarily')) ;
+        $but_ok     = Wx::Button->new($dialog, -1, $self->_t('Ok')) ;
         Wx::Event::EVT_BUTTON($dialog, $but_ok    ->GetId, sub { $but_clicked->(1) });
         $bsizer->Add($but_ok, 0, wxALL, 5);
-
-        $but_ok_permanent = Wx::Button->new($dialog, -1, $self->_t('Accept permanently')) ;
-        Wx::Event::EVT_BUTTON($dialog, $but_ok_permanent->GetId, sub { $but_clicked->(2) });
-        $bsizer->Add($but_ok_permanent, 0, wxALL, 5);
-
     }
 
     my $but_cancel = Wx::Button->new($dialog, -1, $self->_t('Cancel'));
     Wx::Event::EVT_BUTTON($dialog, $but_cancel->GetId, sub { $but_clicked->(0) });
     $bsizer->Add($but_cancel, 0, wxALL, 5);
-    $main_sizer->Add($bsizer);
+    $vsizer->Add($bsizer);
 
-    $dialog->SetSizer($main_sizer);
-    $main_sizer->Fit($dialog);
+    $dialog->SetSizer($vsizer);
+    $vsizer->Fit($dialog);
 
     $self->{timer}->Stop();
 
@@ -1115,84 +934,5 @@ sub get_osx_resolutions {
 sub _t {
 	my ($self, @args) = @_;
 	return $self->{domain}->get(@args);
-}
-
-sub _cert_name {
-        my ($cert, $object) = @_;
-        my $ret;
-        if ( exists $cert->{extensions}->{cert_type} ) {
-            my $ct = $cert->{extensions}->{cert_type};
-            $ret = "[" . join(", ", grep { $ct->{$_} } keys %$ct) . "] ";
-        }
- 
-        $ret .= "$object->{cn}";
-        return $ret;     
-}
-
-sub _cert_fullname {
-        my ($cert, $object) = @_;
-        my @ret;
-        my $types;
-
-        # Keeps things sorted
-        push @ret, { 'Common Name (CN)'        => $object->{cn} };
-        push @ret, { 'Organization (O)'        => $object->{o}  };
-        push @ret, { 'Organizational Unit (OU)'=> $object->{ou} };
-        push @ret, { 'Location (L)'            => $object->{l}  };
-        push @ret, { 'Country (C)'             => $object->{c}  };
-
-        return \@ret;     
-}
-
-sub _format_aligned {
-        my ($data, $indent) = @_;
-        my $maxlen = 0;
-        my $ret;
-        $indent //= "";
-
-        foreach my $row (@$data) {
-            my ($k) = keys($row);
-            $maxlen = length($k) if ( $maxlen < length($k));
-        }
-
-        foreach my $row (@$data) {
-            my ($k) = keys($row);
-            my $v = $row->{$k};
-
-            $ret .= $indent . $k . (" " x ($maxlen-length($k))) . ": ";
-            if ( $v =~ /\n/ ) {
-                $ret .= "\n";
-            }
-             
-            if ( $v =~ /^([A-F0-9]{2}:?)+$/i ) {
-                # Format fingerprints in a more readable way
-                my @bytes = split(/:/, $v);
-                my $count;
-                while(my $byte = shift @bytes) {
-                    $ret .= "$byte ";
-                    $count++;
-
-                    $ret .= " " if ( $count % 4 == 0);
-                    $ret .= " " if ( $count % 8 == 0);
-                    $ret .= "\n" . (" "x($maxlen+2)) if ( $count % 16 == 0 && scalar @bytes);
-                }
-
-                $ret .= "\n"; # unless ( $count % 16 == 0 ); # Already added a newline in the loop
-            } else {
-                $ret .= "$v\n";
-            }
-
-        }
-
-        return $ret;
-}
-
-sub _add_advice {
-	my ($aref, $advice) = @_;
-	foreach my $line (@$aref) {
-		return if $line eq $advice;
-	}
-
-	push @$aref, $advice;
 }
 1;

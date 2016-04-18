@@ -42,11 +42,6 @@ sub new {
     if(cfg('l7r.use_ssl')) {
         if (!-r cfg('path.l7r.ssl.key'))  { $failed = 1; ERROR sprintf "SSL key file '%s' isn't readable",  cfg('path.l7r.ssl.key'); }
         if (!-r cfg('path.l7r.ssl.cert')) { $failed = 1; ERROR sprintf "SSL cert file '%s' isn't readable", cfg('path.l7r.ssl.cert'); }
-  
-        my @kstat = stat cfg('path.l7r.ssl.cert');
-        if (!@kstat)                      { $failed = 1; ERROR sprintf "Can't stat SSL key file '%s'", cfg('path.l7r.ssl.key'); }
-        if ($kstat[2] & 0007 != 0 )       { $failed = 1; ERROR sprintf "SSL key file '%s' has insecure permissions '%o'", cfg('path.l7r.ssl.key'), $kstat[2]; }
-     
         $failed and return;
         push @args, ( SSL           => 1,
                       SSL_key_file  => cfg('path.l7r.ssl.key'),
