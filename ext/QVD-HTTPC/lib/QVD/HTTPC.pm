@@ -93,7 +93,7 @@ sub _create_socket {
             die "hostname verification failed: " . $s->errstr();
         }
 
-        if ( $s && !$self->{SSL_ocsp_no_resolve} ) {
+        if ( !$self->{SSL_ocsp_no_resolve} ) {
             $IO::Socket::SSL::DEBUG=3;
             my $ocsp = $s->ocsp_resolver();
             my $ocsp_errors = $ocsp->resolve_blocking();
