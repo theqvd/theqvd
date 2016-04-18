@@ -31,7 +31,7 @@ my $CRLF = "\r\n";
 # Added:
 #     SSL_ca_path_alt (not a real OpenSSL option, we handle it)
 #
-our @SSL_OPTIONS = qw( SSL_hostname SSL_ca SSL_ca_file SSL_ca_path SSL_client_ca SSL_client_ca_file SSL_fingerprint
+my @SSL_OPTIONS = qw( SSL_hostname SSL_ca SSL_ca_file SSL_ca_path SSL_client_ca SSL_client_ca_file SSL_fingerprint
                       SSL_passwd_cb SSL_use_cert SSL_version SSL_cipher_list SSL_honor_cipher_order SSL_dh_file SSL_dh SSL_ecdh_curve
                       SSL_verify_callback SSL_verifycn_scheme SSL_verifycn_publicsuffix SSL_verifycn_name 
                       SSL_check_crl SSL_crl_file SSL_ocsp_mode SSL_ocsp_staple_callback SSL_ocsp_cache SSL_reuse_ctx
