@@ -32,12 +32,11 @@ my $CRLF = "\r\n";
 #     SSL_ca_path_alt (not a real OpenSSL option, we handle it)
 #
 our @SSL_OPTIONS = qw( SSL_hostname SSL_ca SSL_ca_file SSL_ca_path SSL_client_ca SSL_client_ca_file SSL_fingerprint
-                       SSL_passwd_cb SSL_use_cert SSL_version SSL_cipher_list SSL_honor_cipher_order SSL_dh_file SSL_dh SSL_ecdh_curve
-                       SSL_verify_callback SSL_verifycn_scheme SSL_verifycn_publicsuffix SSL_verifycn_name 
-                       SSL_check_crl SSL_crl_file SSL_ocsp_mode SSL_ocsp_staple_callback SSL_ocsp_cache SSL_reuse_ctx
-                       SSL_create_ctx_callback SSL_session_cache_size SSL_session_cache SSL_session_key SSL_session_id_context
-                       SSL_error_trap SSL_npn_protocols SSL_alpn_protocols 
-                       SSL_ca_path_alt SSL_use_ocsp SSL_fail_on_ocsp SSL_fail_on_hostname
+                      SSL_passwd_cb SSL_use_cert SSL_version SSL_cipher_list SSL_honor_cipher_order SSL_dh_file SSL_dh SSL_ecdh_curve
+                      SSL_verify_callback SSL_verifycn_scheme SSL_verifycn_publicsuffix SSL_verifycn_name 
+                      SSL_check_crl SSL_crl_file SSL_ocsp_mode SSL_ocsp_staple_callback SSL_ocsp_cache SSL_reuse_ctx
+                      SSL_create_ctx_callback SSL_session_cache_size SSL_session_cache SSL_session_key SSL_session_id_context
+                      SSL_error_trap SSL_npn_protocols SSL_alpn_protocols SSL_ca_path_alt SSL_ocsp_no_resolve
                     );
 
 sub _create_socket {
@@ -52,21 +51,14 @@ sub _create_socket {
 
         die "IO::Socket::SSL >= 2.020 required" unless ( $IO::Socket::SSL::VERSION >= 2.020 );
 
-        $self->{SSL_use_ocsp}          //= 1;
-        $self->{SSL_fail_on_ocsp}      //= 1;
-        $self->{SSL_fail_on_hostname}  //= 1;
-        
-
         IO::Socket::SSL->import('debug3');
 
         my %args = ( SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_PEER() );
         $args{$_} = $self->{$_} for grep { exists $self->{$_} } @SSL_OPTIONS;
 
-        # These are not real IO::Socket::SSL arguments
+        # This is not a real IO::Socket::SSL argument
         delete $args{SSL_ca_path_alt};
-        delete $args{SSL_use_ocsp};
-        delete $args{SSL_fail_on_ocsp};
-        delete $args{SSL_fail_on_hostname};
+        delete $args{SSL_ocsp_no_resolve};
 
         if (defined $args{SSL_ca_path} && defined $self->{SSL_ca_path_alt}) {
             # SSL_ca_path_alt is deprecated since as of IO::Socket::SSL 2.020 the CA path is
@@ -94,30 +86,20 @@ sub _create_socket {
 
         $s = IO::Socket::SSL->new(PeerAddr => $target, Blocking => 0, %args);
 
-        if ( $s && !$s->verify_hostname( $args{SSL_verifycn_name}, $self->{SSL_verifycn_scheme} // "http" ) ) {
-            print STDERR "VERIFY ERR: ". $s->errstr() . "\n";
-            print STDERR "SSL ERR   : $IO::Socket::SSL::SSL_ERROR\n";
-
-            $self->{hostname_error} = "Hostname verification failed";
-
-            if ( $self->{SSL_fail_on_hostname} ) {
-                $self->{failed_socket} = $s;
-                die "hostname verification failed: " . $self->{hostname_error};
-            }
+        if ( $s && ! $s->verify_hostname( $args{SSL_verifycn_name}, $self->{SSL_verifycn_scheme} // "http" ) ) {
+            $self->{failed_socket} = $s;
+            print STDERR "ERRSTR : ". $s->errstr() . "\n";
+            print STDERR "SSL ERR: $IO::Socket::SSL::SSL_ERROR\n";
+            die "hostname verification failed: " . $s->errstr();
         }
 
-        if ( $s && $self->{SSL_use_ocsp} ) {
+        if ( $s && !$self->{SSL_ocsp_no_resolve} ) {
             $IO::Socket::SSL::DEBUG=3;
             my $ocsp = $s->ocsp_resolver();
-            $self->{ocsp_errors} = $ocsp->resolve_blocking();
-
-            if ( $self->{ocsp_errors} ) {
-                print STDERR "OCSP ERR: $self->{ocsp_errors}\n";
-            }
-
-            if ( $self->{ocsp_errors} && $self->{SSL_fail_on_ocsp} ) {
+            my $ocsp_errors = $ocsp->resolve_blocking();
+            if ( $ocsp_errors ) {
                 $self->{failed_socket} = $s;
-                die "OCSP validation error: " . $self->{ocsp_errors};
+                die "OCSP validation error: $ocsp_errors";
             }
         }
     }
@@ -165,12 +147,6 @@ sub get_socket { shift->{socket} }
 # Used to access IO::Socket::SSL information when the connection failed to
 # complete due to an error.
 sub get_failed_socket { shift->{failed_socket} }
-
-sub get_hostname_error { shift->{hostname_error} }
-
-sub get_ocsp_errors { shift->{ocsp_errors} }
-
-
 
 sub _print {
     my $self = shift;

@@ -652,16 +652,16 @@ sub OnUnknownCert {
             $err_desc = sprintf($self->_t("Error #%s:"), $e) . " ";
 
             if ( $e == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT ) {
-                $err_desc .= $self->_t("Unable to find issuer's certificate.");
+                $err_desc .= $self->_t("Unable to find issuer's certificate");
                 _add_advice(\@advice, $self->_t("If you are using your own CA, see the documentation on how to make the client use your certificate."));
             } elsif ( $e == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY ) {
-                $err_desc .= $self->_t("Unable to find issuer's certificate.");
+                $err_desc .= $self->_t("Unable to find issuer's certificate");
                 _add_advice(\@advice, $self->_t("If you are using your own CA, see the documentation on how to make the client use your certificate."));
             } elsif ( $e == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE ) {
                 $err_desc .= $self->_t("Unable to verify the first certificate");
                 _add_advice(\@advice, $self->_t("If you are using your own CA, see the documentation on how to make the client use your certificate."));
             } elsif ( $e == X509_V_ERR_CERT_UNTRUSTED ) {
-                $err_desc .= $self->_t("Root certificate not trusted.");
+                $err_desc .= $self->_t("Root certificate not trusted");
             } elsif ( $e == X509_V_ERR_CERT_NOT_YET_VALID ) {
                 $err_desc .= $self->_t("The certificate is not yet valid.");
                 _add_advice(\@advice, $self->_t("Make sure your clock is set correctly."));
@@ -670,15 +670,6 @@ sub OnUnknownCert {
                 _add_advice(\@advice, sprintf($self->_t("Remind %s (%s) to renew the certificate", $cert->{subject}->{o}, $cert->{subject}->{email})));
             } elsif ( $e == X509_V_ERR_CERT_REVOKED ) {
                 $err_desc .= $self->_t("The certificate has been revoked.");
-                $no_ok_button = 1;
-            } elsif ( $e == 1001 ) {
-                $err_desc .= $self->_t("Hostname verification failed.");
-                _add_advice(\@advice, $self->_t("This certificate belongs to another host. ". 
-                                                "This is a sign of either misconfiguration or an ongoing attempt to compromise security."));
-                $no_ok_button = 1;
-            } elsif ( $e == 2001 ) {
-                $err_desc .= $self->_t("The certificate has been revoked");
-                _add_advice(\@advice, $self->_t("The certificate has been revoked by its issuing authority. A new certificate is required."));
                 $no_ok_button = 1;
             } else {
                 $err_desc .= sprintf($self->_t("Unrecognized SSL error."), $e);
