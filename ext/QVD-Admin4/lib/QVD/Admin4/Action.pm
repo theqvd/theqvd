@@ -713,21 +713,21 @@ my $ACTIONS = {
     tenant_property_view_set => {
         type_of_action => 'create_or_update',
         admin4method => 'create_or_update',
-        acls => [qr/^views\.update\.$/],
+        acls => [qr/^views\.update\./],
         qvd_object => 'Views_Setup_Properties_Tenant'
     },
 
     tenant_attribute_view_set => {
         type_of_action => 'create_or_update',
         admin4method => 'create_or_update',
-        acls => [qr/^views\.update\.$/],
+        acls => [qr/^views\.update\./],
         qvd_object => 'Views_Setup_Attributes_Tenant'
     },
 
     tenant_view_reset => {
         type_of_action => 'delete',
         admin4method => 'reset_tenant_views',
-        acls => [qr/^views\.update\.$/],
+        acls => [qr/^views\.update\./],
         qvd_object => 'Views_Setup_Attributes_Tenant'
     },
 
