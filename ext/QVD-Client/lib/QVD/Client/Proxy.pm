@@ -271,6 +271,17 @@ sub _get_httpc {
     if ($ssl) {
         DEBUG "Using a SSL connection";
         $args{SSL}                 = 1;
+
+        foreach my $opt ( @QVD::HTTPC::SSL_OPTIONS ) {
+            DEBUG "Checking if SSL option '$opt' is set";
+
+            my $val = core_cfg("client.ssl.options.$opt", 0);
+            if ( $val ) {
+                INFO "SSL option $opt set: $val";
+                $args{$opt} = $val;
+            }
+        }
+
         $args{SSL_ca_path}         = $DARWIN ? core_cfg('path.darwin.ssl.ca.system') : core_cfg('path.ssl.ca.system');
         $args{SSL_ca_path_alt}     = $QVD::Client::App::user_certs_dir;
         $args{SSL_ca_path_alt}     =~ s|^~(?=/)|$ENV{HOME} // $ENV{APPDATA}|e;
