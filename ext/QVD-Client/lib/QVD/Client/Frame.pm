@@ -715,11 +715,12 @@ sub OnUnknownCert {
          }
 
          push @$info, { $self->_t("Bit length") => $cert->{bit_length} };
-
+         push @$info, { $self->_t("Signature algorithm") => $cert->{sig_algo} };
 
          foreach my $algo ( keys %{ $cert->{fingerprint} } ) {
              push @$info,  {  $self->_t("Fingerprint") . " ($algo)" => $cert->{fingerprint}->{$algo} };
          }
+         push @$info,  { $self->_t("Hash")        => $cert->{hash} };
          push @$info,  { $self->_t("Serial")      => $cert->{serial} };
          push @$info,  { $self->_t("Valid from")  => $cert->{not_before} };
          push @$info,  { $self->_t("Valid until") => $cert->{not_after} };
