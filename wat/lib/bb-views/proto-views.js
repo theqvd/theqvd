@@ -305,7 +305,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
     
     updateCurrentViews: function (that) {
         // Get admin setup configuration to get the views updated
-        Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, function () {
+        Wat.A.performAction('current_admin_setup', {}, {}, {}, function () {
             // Restore possible residous views configuration to default values
             Wat.I.restoreListColumns();
             Wat.I.restoreFormFilters();

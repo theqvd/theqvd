@@ -119,7 +119,7 @@ Wat.L = {
         // Store authentication separators
         Wat.C.authSeparators = that.retrievedData.auth.separators;
         
-        Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, Wat.L.checkLogin, Wat.C);
+        Wat.A.performAction('current_admin_setup', {}, {}, {}, Wat.L.checkLogin, Wat.C);
     },
     
     // After call to API to get admin setup, check response

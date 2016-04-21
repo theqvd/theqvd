@@ -227,16 +227,6 @@ HTML_MID_LOADING = '<div class="loading-mid"><i class="fa fa-gear fa-spin"></i><
 HTML_MID_LOADING_DELETE = '<div class="loading-mid"><i class="fa fa-trash fa-spin"></i></div>';
 HTML_SORT_ICON = '<i class="fa fa-sort sort-icon"></i>';
 
-// Views combination for current_admin_setup return values
-VIEWS_COMBINATION = {
-    views_combination: 
-        [
-            {'device_type': 'mobile', 'view_type': 'filter'}, 
-            {'device_type': 'desktop', 'view_type': 'filter'}, 
-            {'device_type': 'desktop', 'view_type': 'list_column'}
-        ]
-};
-
 // Languages
 WAT_LANGUAGES = {
     "en": "English",
