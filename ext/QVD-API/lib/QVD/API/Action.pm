@@ -23,12 +23,6 @@ has 'name', is => 'ro', isa => sub {}, required => 1;
 
 my $ACTIONS = {
 
-	sources_in_log => {
-		type_of_action => 'ad_hoc',
-		       admin4method => 'sources_in_log',
-		acls => [qr/^(log\.see-(main|details)\.|(administrator|di|host|osf|role|tenant|user|vm)\.see\.log)$/],
-	},
-
 	log_get_list => {
 		type_of_action => 'list',
 		  admin4method => 'select',
@@ -747,10 +741,12 @@ my $ACTIONS = {
         qvd_object => 'Views_Setup_Attributes_Administrator'
     },
 
-	current_admin_setup => {
-		type_of_action => 'ad_hoc',
-		admin4method => 'current_admin_setup'
-	},
+    current_admin_setup => {
+        acls => [],
+        type_of_action => 'list',
+        qvd_object => 'My_Admin',
+        admin4method => 'current_admin_setup'
+    },
 
 	qvd_objects_statistics => {
 		type_of_action =>  'multiple',

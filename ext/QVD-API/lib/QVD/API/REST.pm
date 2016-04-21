@@ -164,7 +164,10 @@ sub process_query
 	
        my $result = $self->$restmethod($action,$json_wrapper,$qvd_object_model);
 
-       my %args = (status => 0, result => $result);
+       my %args = (
+           status => 0,
+           data => $result
+       );
        $args{json_wrapper} = $json_wrapper;
        $args{qvd_object_model} = $qvd_object_model
            if $qvd_object_model;

@@ -2,6 +2,8 @@ package QVD::API::REST::Response;
 use strict;
 use warnings;
 use Moo;
+use Clone qw(clone);
+use Scalar::Util qw(blessed);
 
 # This class is intended to build a successful response of the API.
 # The object which this class implements takes the output of a method 
@@ -10,9 +12,9 @@ use Moo;
 # So the main processing in this class is to map from DBIx::Class objects to
 # HASH structures suitable to be encoded as JSON.
 
-# 'result' is the parameter in which the output of the QVD::API method
+# 'data' is the parameter in which the output of the QVD::API method
 # is provided to the constructor
-has 'result', is => 'ro', isa => sub { die "Invalid type" unless ref(+shift) eq 'HASH'; }, default => sub {{};};
+has 'data', is => 'ro', isa => sub { die "Invalid type" unless ref(+shift) eq 'HASH'; }, default => sub {{};};
 
 # This is the model used to know what fields to retrieve are available 
 # for the action executed
@@ -21,174 +23,114 @@ has 'qvd_object_model', is => 'ro', isa => sub { die "Invalid type" unless ref(+
 # This is the original request that the API received
 has 'json_wrapper', is => 'ro', isa => sub { die "Invalid type" unless ref(+shift) eq 'QVD::API::REST::JSON'; };
 
-# Administrator who will process the response
-has 'administrator', is => 'ro', isa => sub {
-    die "Invalid type for attribute administrator" unless ref(+shift) eq 'QVD::DB::Result::Administrator';
-};
-
 sub BUILD
 {
     my $self = shift;
+
+    if (defined($self->qvd_object_model)) {
+        my $rows = $self->data->{rows};
+        if (defined( $rows )) {
+            $self->data->{rows} = $self->_process_data_array( $rows );
+        } else {
+            $self->{data} = ($self->_process_data_array( [ $self->data ] ))->[0];
+        }
     
-    $self->map_result_from_dbix_objects_to_output_info
-        if $self->qvd_object_model;
+        eval { delete $self->data->{extra} };
     
-    $self->remove_global_tenant_properties
-        unless $self->administrator->is_superadmin;
+        $self->data->{status} = 0;
+        $self->data->{message} = 'Successful completion';
+    }
 }
 
-############################################
-## MAIN FUNCTIONS TO MAP FROM DBIx::CLASS ##
-## OBJECTS TO HASH                        ##
-############################################
-
-sub map_result_from_dbix_objects_to_output_info
+sub _process_data_array
 {
     my $self = shift;
-    return unless defined $self->result->{rows};
+    my $elements = shift;
 
-    $_ = $self->map_dbix_object_to_output_info($_)
-	for @{$self->result->{rows}};
+    my $processed_elements = [ map { $self->_process_element($_) } @{$elements} ];
 
-# ad hoc mapping for all_ids actions
+    # ad hoc mapping for all_ids actions
 
-    $self->map_result_to_list_of_ids
-	if $self->qvd_object_model->type_of_action eq 'all_ids';
+    $processed_elements = $self->_map_result_to_list_of_ids($processed_elements)
+        if $self->qvd_object_model->type_of_action eq 'all_ids';
+    
+    return $processed_elements;
 }
 
-sub map_dbix_object_to_output_info
+sub _process_element
 {
-    my ($self,$dbix_object) = @_;
+    my ($self, $element) = @_;
 
     my $result = {};
-
-    for my $field_key ($self->calculate_fields) # list of fields that must be retrieved
-    {                                           # for every object
-	if ($self->qvd_object_model->has_property($field_key)) # checks if the field is a custom property
-	{
-	    $result->{$field_key} = $self->get_property_value($dbix_object,$field_key);
-	}
-	else
-	{	    
-	    my $dbix_field_key = $self->qvd_object_model->map_field_to_dbix_format($field_key);
-
-	    # The field value would be provided from different sources
-            # (i.e. the main DBIx::Class object, or a related view)  
-	    my ($info_provider,$method,$argument) = $self->get_info_provider_and_method($dbix_field_key,$dbix_object);
-	    if (defined $argument) 
-	    {
-				$result->{$field_key} = defined $info_provider ? eval { $info_provider->$method($argument) } : undef;
-		print $@ if $@;
-	    }
-	    else
-	    {
-				$result->{$field_key} = defined $info_provider ? eval { $info_provider->$method } : undef;
-		print $@ if $@;
-	    }
-	}
-    }
-
-    $result;
-}
-
-sub remove_global_tenant_properties {
-    my ($self) = @_;
     
-    my $rows_ref = eval { $self->result->{rows} };
-    return if !defined($rows_ref);
-    
-    for my $row (@{$rows_ref}) {
-        if (defined( $row->{properties} )) {
-            my $properties = $row->{properties};
-        
-            for my $prop_id (keys %{$properties}) {
-                my $prop_tenant_id = eval { $properties->{$prop_id}->{tenant_id} };
-                delete $properties->{$prop_id}
-                    if defined( $prop_tenant_id ) && $prop_tenant_id != $self->{administrator}->tenant_id;
-            }
+    for my $field (@{$self->_get_field_list})
+    {
+        if ($self->qvd_object_model->has_property($field))
+        {
+            $result->{$field} = $self->_get_property_value($element, $field);
+        }
+        else
+        {
+            $result->{$field} = eval { 
+                blessed($element) ?
+                    $self->_get_dbix_object_value($element, $field) : 
+                    $element->{$field}
+            };
+            print $@ if $@;
         }
     }
-    
-    $self->result->{rows} = $rows_ref;
+
+    return $result;
 }
 
-# AUXILIAR FUNCTIONS
-
-# This function assumes that $dbix_field_key is a string
-# that defines  where the value of a field can be found
-# The syntax of that string was defined in QVD::API::REST::Model
-# and used in the class variable $QVD::API::REST::Model::$FIELDS_TO_DBIX_FORMAT_MAPPER 
-
-# From that string this function returns:
-
-# a) The object from which the value must be returned (provider)
-# b) The method that must be executed in that object (method)
-# c) Optionally, the argument that must be passed to that method 
-
-sub get_info_provider_and_method
+sub _get_dbix_object_value
 {
-    my ($self,$dbix_field_key,$dbix_object) = @_;
+    my ($self, $dbix_object, $field) = @_;
 
+    my $dbix_field_key = $self->qvd_object_model->map_field_to_dbix_format($field);
     my ($table,$column) = $dbix_field_key =~ /^(.+)\.(.+)$/;
-    return ($dbix_object,$column) if $table eq 'me';
-
-    if ($table eq 'view') # view is a special prefix that says that 
-    {                     # the value of this field must be provided by a related view
-                          # whose result was saved in the 'extra' key of the QVD::API result
-
-	if (my ($method,$argument) = $column =~ /^([^#]+)#([^#]+)$/) 
-		{
-			return ($self->result->{extra}->{$dbix_object->id},$method,$argument)
-		};
-	return ($self->result->{extra}->{$dbix_object->id},$column);
+    
+    if($table eq 'me') {
+        return $dbix_object->$column;
+    } elsif ($table eq 'view') {
+        # view is a special prefix that says that
+        # the value of this field must be provided by a related view
+        # whose result was saved in the 'extra'
+        return ($self->data->{extra}->{$dbix_object->id}->$column);
+    } else {
+        return $dbix_object->$table->$column;
     }
     return ($dbix_object->$table,$column);
 }
 
-# Custom Properties are stored in the 'extra' key of the QVD::API result
-
-sub get_property_value
+sub _get_property_value
 {
     my ($self,$dbix_object,$property) = @_;
 
-    my $val = eval { $self->result->{extra}->{$dbix_object->id}->properties->{$property} }
-    // undef;
-}
+    return eval { $self->data->{extra}->{$dbix_object->id}->properties->{$property} };
+};
 
-# Calculates the fields that must be provided for every object in the API output
-# It depends on the available fields for the action that was executed and the
-# fields that were explicitally requested
-
-sub calculate_fields
+sub _get_field_list
 {
-    my ($self,$dbix_obj) = @_;
-    return @{$self->{available_fields}} if defined $self->{available_fields};
+    my ($self) = @_;
 
     my @available_fields;
 
-    if ($self->specific_fields_asked) # The input query included explicitally 
-    {                                 # a list of fields to return
-	@available_fields = $self->json_wrapper->fields_list;
+    if ($self->json_wrapper->fields_list)
+    {
+        @available_fields = $self->json_wrapper->fields_list;
     }
     else
     {
         @available_fields = $self->qvd_object_model->available_fields;
-    
+        
+        my $admin = $self->qvd_object_model->current_qvd_administrator;
         # This grep deletes from the output fields the admin doesn't have acls for
-        @available_fields = grep  { 
-            $self->{administrator}->re_is_allowed_to($self->qvd_object_model->get_acls_for_field($_)) 
-        } @available_fields;
+        @available_fields = grep  { $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_field($_)) }
+            @available_fields;
     }
 
-    $self->{available_fields} = \@available_fields;
-
-    @available_fields;
-}
-
-sub specific_fields_asked
-{
-    my $self = shift;
-    $self->json_wrapper->fields_list;
+    return \@available_fields;
 }
 
 #############################################################################
@@ -198,17 +140,17 @@ sub specific_fields_asked
 sub json
 {
     my $self = shift;
-    delete $self->result->{extra};
-    { status => 0,message => 'Successful completion',%{$self->result}};
+    return clone ($self->data);
 }
 
 # ad hoc mapping for all_ids actions
 
-sub map_result_to_list_of_ids
+sub _map_result_to_list_of_ids
 {
     my $self = shift;
-    $self->result->{rows} = 
-	[ map { $_->{id} } @{$self->result->{rows}} ];
+    my $list = shift;
+    
+    return [ map { $_->{id} } @{$list} ];
 }
 
 1;

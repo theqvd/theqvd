@@ -655,6 +655,8 @@ my $AVAILABLE_FILTERS = {
 
 	      Administrator => [qw(name description tenant_id tenant_name id language block creation_date creation_admin_id creation_admin_name)],
 
+        My_Admin => [],
+
 		Views_Setup_Properties_Tenant => [qw(id tenant_id tenant_name qvd_obj_prop_id key visible view_type device_type qvd_object)],
 
 		Views_Setup_Attributes_Tenant => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object)],
@@ -800,7 +802,9 @@ my $AVAILABLE_FIELDS = {
 
 	      ACL => [qw(id name description)],
 
-	      Administrator => [qw(name description roles id language block creation_date creation_admin_id creation_admin_name)],
+	      Administrator => [qw( name description roles id language block creation_date creation_admin_id creation_admin_name)],
+
+        My_Admin => [qw(admin_id tenant_id tenant_name admin_language tenant_language acls views admin_block tenant_block)],
 
 		Tenant => [qw(id name description language block blocked creation_date creation_admin_id creation_admin_name)],
 				   
@@ -2230,7 +2234,6 @@ sub map_field_to_dbix_format
 
     my $mapped_field = $self->fields_to_dbix_format_mapper->{$field};
     return $mapped_field if defined $mapped_field;
-    return 'view.properties#'.$field if $self->has_property($field);
 
     die "No mapping available for field $field";
 }
