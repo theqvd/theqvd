@@ -119,8 +119,8 @@ foreach my $pat ( 'wxbase*.dll', 'wxmsw*_adv_*.dll', 'wxmsw*_core_*.dll') {
 msg("Generating locale...\n");
 my $installer_dir = getcwd();
 chdir("..\\..\\ext\\QVD-Client") or die "Can't chdir to QVD-Client directory";
-run("Build.PL");
-run("Build");
+run("perl", "Build.PL");
+run("perl", "Build");
 
 msg("Copying locale files...\n");
 dircopy("blib\\locale", "..\\..\\windows\\installer\\locale") or die "Failed to copy locale files";
