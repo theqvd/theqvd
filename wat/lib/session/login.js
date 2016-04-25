@@ -28,7 +28,6 @@ Wat.L = {
         if (Wat.C.crossOrigin) {
             $.cookie('sid', sid, { expires: Wat.C.loginExpirationDays, path: '/' });
         }
-        
         // Reload screen after login
         var locationHash = window.location.hash;
         
@@ -73,9 +72,9 @@ Wat.L = {
         else {
             Wat.C.loggedIn = true;
         }
-        
+
         if (Wat.C.sid || !Wat.C.crossOrigin) {
-            Wat.A.performAction('current_admin_setup', {}, VIEWS_COMBINATION, {}, Wat.L.checkLogin, Wat.C);
+	        Wat.A.apiInfo(Wat.L.getApiInfo, {});
         }
         else {
             Wat.L.afterLogin ();
@@ -141,8 +140,7 @@ Wat.L = {
     //      that: Current context where will be stored API call return
     checkLogin: function (that) {
         that.password = '';
-        
-        // If request is not corretly performed and session is enabled, logout and reload
+        // If request is not correctly performed and session is enabled, logout and reload
         if (that.retrievedData.status == STATUS_SUCCESS && that.retrievedData.statusText == 'error') {
             if (Wat.C.sid) {
                 Wat.L.logOut();
@@ -172,7 +170,7 @@ Wat.L = {
             that.sid = '';
             return;
         }
-        
+
         // Store retrieved acls
         Wat.C.acls = that.retrievedData.acls;
         
@@ -209,7 +207,6 @@ Wat.L = {
         
         // Configure visability
         Wat.C.configureVisibility();
-        
         if (Wat.CurrentView.qvdObj == 'login') {
             Wat.L.logIn(that.sid, that.login);
                 

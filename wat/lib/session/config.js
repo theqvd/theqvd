@@ -428,6 +428,7 @@ Wat.C = {
                     }
                 case STATUS_SESSION_EXPIRED:
                 case STATUS_CREDENTIALS_FAIL:
+		case STATUS_NOT_LOGIN:
                     // Close dialog (if opened)
                     $('.js-dialog-container').remove();
                     $('html, body').attr('style', '');
