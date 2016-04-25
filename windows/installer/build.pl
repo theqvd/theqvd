@@ -116,6 +116,11 @@ foreach my $pat ( 'wxbase*.dll', 'wxmsw*_adv_*.dll', 'wxmsw*_core_*.dll') {
 	push @dlls, @dllpaths;
 }
 
+
+msg("Clearing output folder...\n");
+unlink glob('..\Output\*');
+	
+	
 msg("Generating locale...\n");
 my $installer_dir = getcwd();
 chdir("..\\..\\ext\\QVD-Client") or die "Can't chdir to QVD-Client directory";
@@ -168,7 +173,6 @@ msg("Done!\n");
 sub build_installer {
 	my ($extra_opts) = @_;
 	
-	unlink glob('..\Output\*');
 	
 	run("perl ..\\script.pl $extra_opts >..\\script.iss");
 	run("ISCC.exe ..\\script.iss");
