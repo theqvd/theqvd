@@ -90,4 +90,11 @@ any [qw(POST GET)] => '/create_tenant' => sub {
 	$c->render(json => $json);
 };
 
+get '/status' => sub{
+	my $c = shift;
+	$c->inactivity_timeout(300);
+
+	$c->render(json => { status => 0 , message => 'I am alive' });
+};
+
 app->start;
