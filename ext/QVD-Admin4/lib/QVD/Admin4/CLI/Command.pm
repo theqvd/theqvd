@@ -1229,52 +1229,55 @@ sub ask_api_standard {
 
 sub ask_api_staging
 {
-	my ($self, $query, $ua, $url, $credentials) = @_;
+    my ($self, $query, $ua, $url, $credentials) = @_;
 
     for my $k (keys %$query)
     {
-	my $v = $query->{$k};
-		$query->{$k} = ref($v) ? encode_json($v) : $v;
+        my $v = $query->{$k};
+        $query->{$k} = ref($v) ? encode_json($v) : $v;
     }
 
-	$url->query(%$query, %$credentials, parameters => '{ "source" :  "CLI" }');
+    $url->query(%$query, %$credentials, parameters => '{ "source" :  "CLI" }');
 
-    my $res = {}; 
-	my $on_message_cb = sub {
+    my $res = {};
+    my $msg_data = {};
+    my $on_message_cb = sub {
 
-		my ($tx, $msg) = @_;
-	     
-		$res = $tx->res;
-		my $msg_data = decode_json($msg);
-		if ($msg_data->{status} eq 1000)
-	     {  
-			my $total = $msg_data->{total_size} // 0;
-			my $partial = $msg_data->{copy_size} // 0;
-		 my $percentage = ($partial * 100) / $total;
-			#printf STDERR "\r%06.2f%%", $percentage;
-		 $tx->send('Ale');
-	     }
-	     else
-	     {
-			print STDERR "Upload complete\n";
-		 $tx->finish;
-		}
-	};
+        my ($tx, $msg) = @_;
 
-	$ua->websocket("$url" =>  sub {
-		my ($ua, $tx) = @_;
-		$tx->on(message => $on_message_cb);
-		$tx->send('Ale');
-	} );
+        $res = $tx->res;
+        $msg_data = decode_json($msg);
+        if ($msg_data->{status} == 1000)
+        {
+            my $total = $msg_data->{total_size} // 0;
+            my $partial = $msg_data->{copy_size} // 0;
+            my $percentage = ($total > 0 ? $partial / $total : 1) * 100 ;
+            printf STDERR "\r%06.2f%%", $percentage;
+            $tx->send('ECHO Request');
+        }
+        else
+        {
+            print STDERR sprintf("\nUpload finished (%s) : %s\n", $msg_data->{status}, $msg_data->{message});
+            $tx->finish;
+        }
+    };
+
+    $ua->websocket("$url" =>  sub {
+            my ($ua, $tx) = @_;
+            $tx->on(message => $on_message_cb);
+            $tx->send('ECHO Request');
+        } );
 
     Mojo::IOLoop->start;
 
-	CLI::Framework::Exception->throw($res->error->{message})
-	unless $res->code;
-
+    CLI::Framework::Exception->throw($res->error->{message})
+        unless $res->code;
+    CLI::Framework::Exception->throw($msg_data->{message})
+        unless $msg_data->{status} == 0000;
+    
     $self->check_api_result($res);
 
-	return $res;
+    return $res;
 }
 
 # Method to create a DI uploading the image from local

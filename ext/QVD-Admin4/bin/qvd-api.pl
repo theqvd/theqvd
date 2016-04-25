@@ -323,70 +323,83 @@ websocket '/api/staging' => sub {
 
     my $accomplished=0;
 
-    $c->on(message => sub { my ($c,$msg) = @_;
-                            my $sf_size = eval { -s "$staging_path/$staging_file" } // 0;
-                            my $if_size = eval { -s "$images_path/$images_file" } // 0;
-                            $c->send(b(encode_json({ status => 1000,
-						     total_size => $sf_size,
-						     copy_size => $if_size }))->decode('UTF-8'))
-				unless $accomplished;});
+    $c->on(message => sub { 
+        my ($c,$msg) = @_;
+        unless ($accomplished) {
+            my $sf_size = eval { -s "$staging_path/$staging_file" } // 0;
+            my $if_size = eval { -s "$images_path/$images_file" } // 0;
+            $c->send( b( encode_json( {
+                    status     => 1000,
+                    total_size => $sf_size,
+                    copy_size  => $if_size } ) 
+                )->decode( 'UTF-8' )
+            );
+        }
+    });
 
     my $tx = $c->tx;
     my $fc = Mojo::IOLoop::ForkCall->new;
     $fc->run(
-        sub { $c->app->log->debug("Starting copy");
-	      
-	      my $response;
+        sub {
+            my $response = {};
+            try {
+                $c->app->log->debug( "Starting copy" );
 
-	      $response = QVD::Admin4::Exception->new(code=>'2220')->json
-		  unless -d $images_path;
+                QVD::Admin4::Exception->throw( code => '2220' )
+                    unless -d $images_path;
 
-	      $response //= QVD::Admin4::Exception->new(code=>'2230')->json
-		  unless -d $staging_path;
+                QVD::Admin4::Exception->throw( code => '2230' )
+                    unless -d $staging_path;
 
-	      $response //= QVD::Admin4::Exception->new(code=>'2240')->json
-		  unless -e "$staging_path/$staging_file";
+                QVD::Admin4::Exception->throw( code => '2240' )
+                    unless -e "$staging_path/$staging_file";
 
-	      unless ($response)
-	      {
-		  for (1 .. 5)
-		  {
-		      eval { copy("$staging_path/$staging_file","$images_path/$images_file") };
-		      $@ ? print $@ : last;
-		  }
-	      }
-	      
-	      if ($response || $@)
-	      {
-		  $c->report_di_problem_in_log(json => $json,tx => $tx, code => $response ? $response->{status} : 2210);
-		  $response //= QVD::Admin4::Exception->new(code=>'2210')->json;
-	      }
-	      else
-	      {
-		  $response = $c->process_api_query($json);
-		  if ($response->{status} eq 0)
-		  {
-		      my $di_id = ${$response->{rows}}[0]->{id};
-		      eval { move("$images_path/$images_file","$images_path/".$di_id . '-' . $staging_file) };
+                for (1 .. 5)
+                {
+                    eval { copy( "$staging_path/$staging_file", "$images_path/$images_file" ) };
+                    $@ ? print $@ : last;
+                }
 
-		      if ($@) 
-		      {
-			  $c->qvd_admin4_api->_db->resultset('DI')->find({ id => $di_id })->delete;
-			  $c->qvd_admin4_api->_db->resultset('Log')->find(
-			      { object_id => $di_id, qvd_object => 'di' })->update(
-			      { object_id => undef, object_name => undef, status => 2210});
-			  $response = QVD::Admin4::Exception->new(code => 2210)->json;
-		      }
-		  }
-	      }
+                if ($@)
+                {
+                    $c->report_di_problem_in_log( json => $json, tx => $tx, code =>
+                            $response ? $response->{status} : 2210 );
+                    QVD::Admin4::Exception->throw( code => '2210' );
+                }
+                else
+                {
+                    $response = $c->process_api_query( $json );
+                    if ($response->{status} == 0000)
+                    {
+                        my $di_id = ${$response->{rows}}[0]->{id};
+                        eval { move( "$images_path/$images_file", "$images_path/".$di_id.'-'.$staging_file ) };
 
-              return $response; },
-        sub { my ($fc, $err, $response) = @_;
-	      $err //= 'no error signals';
-              $c->app->log->debug("Copy finished: $err");
-	      $accomplished=1;
-              $c->send(b(encode_json($response))->decode('UTF-8')); }
-        );
+                        if ($@)
+                        {
+                            $c->qvd_admin4_api->_db->resultset( 'DI' )->find( { id => $di_id } )->delete;
+                            $c->qvd_admin4_api->_db->resultset( 'Log' )->find(
+                                { object_id => $di_id, qvd_object => 'di' } )->update(
+                                { object_id => undef, object_name => undef, status => 2210 } );
+                            QVD::Admin4::Exception->throw( code => 2210 );
+                        }
+                    }
+                }
+            } catch {
+                my $exception = $_;
+                $response = $exception->json;
+            };
+
+            return $response; 
+        },
+        sub {
+            my ($fc, $err, $response) = @_;
+            my $code = $response->{status};
+            my $msg = $response->{message};
+            $c->app->log->debug("Copy finished ($code): $msg");
+            $accomplished=1;
+            $c->send(b(encode_json($response))->decode('UTF-8')); 
+        }
+    );
 };
 
 
