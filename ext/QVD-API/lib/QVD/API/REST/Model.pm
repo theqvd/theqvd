@@ -805,7 +805,7 @@ my $AVAILABLE_FIELDS = {
 
 	      Administrator => [qw( name description roles id language block creation_date creation_admin_id creation_admin_name)],
 
-        My_Admin => [qw(admin_id tenant_id tenant_name admin_language tenant_language acls views admin_block tenant_block)],
+        My_Admin => [qw(admin_id admin_name tenant_id tenant_name admin_language tenant_language acls views admin_block tenant_block)],
 
 		Tenant => [qw(id name description language block blocked creation_date creation_admin_id creation_admin_name)],
 				   

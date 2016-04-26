@@ -1294,6 +1294,7 @@ sub current_admin_setup
         admin_block => $administrator->wat_setups->block,
         tenant_block => $administrator->tenant->wat_setups->block,
         admin_id => $administrator->id,
+        admin_name => $administrator->name,
         tenant_id => $administrator->tenant_id,
         tenant_name => $administrator->tenant->name,
         acls => [ $administrator->acls ],
