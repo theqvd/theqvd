@@ -91,7 +91,7 @@ Wat.L = {
         
         if (Wat.C.multitenant) {
             $.each(Wat.C.authSeparators, function (iSep, separator) {
-                if (user.search(separator) == -1) {
+                if (!user || user.search(separator) == -1) {
                     return;
                 }
                 
@@ -105,7 +105,6 @@ Wat.L = {
                 return false;
             });
         }
-        
         var password = $('input[name="admin_password"]').val() || password;
         
         if (!user) {
@@ -116,7 +115,7 @@ Wat.L = {
         Wat.C.login = user;
         Wat.C.password = password;
         Wat.C.tenant = tenant;
-        
+
         Wat.A.apiInfo(Wat.L.getApiInfo, {});
     },
     
@@ -129,7 +128,6 @@ Wat.L = {
         
         // Store authentication separators
         Wat.C.authSeparators = that.retrievedData.auth.separators;
-        
         Wat.A.performAction('current_admin_setup', {}, {}, {}, Wat.L.checkLogin, Wat.C);
     },
     
@@ -140,6 +138,7 @@ Wat.L = {
     //      that: Current context where will be stored API call return
     checkLogin: function (that) {
         that.password = '';
+
         // If request is not correctly performed and session is enabled, logout and reload
         if (that.retrievedData.status == STATUS_SUCCESS && that.retrievedData.statusText == 'error') {
             if (Wat.C.sid) {
@@ -150,6 +149,13 @@ Wat.L = {
         }
         else if (that.retrievedData.status == ERROR_INTERNAL) {
             Wat.I.M.showMessage({message: that.retrievedData.statusText, messageType: "error"});
+            return;
+        }
+        else if (!Wat.C.login && that.retrievedData.status == STATUS_NOT_LOGIN) {
+            // First loading
+            Wat.I.M.showMessage({message: that.retrievedData.message, messageType: "error"});
+            Wat.C.configureVisibility();
+            Wat.L.afterLogin ();
             return;
         }
         else if (that.retrievedData.status == STATUS_SESSION_EXPIRED || that.retrievedData.status == STATUS_CREDENTIALS_FAIL || that.retrievedData.status == STATUS_NOT_LOGIN || that.retrievedData.status == STATUS_TENANT_RESTRICTED) {

@@ -238,12 +238,13 @@ Wat.Router = Backbone.Router.extend({
 
          // ------- Current administrator ------- //
         that.on('route:logout', function (actions) {
-            Wat.L.logOut();
+            Wat.A.apiLogOut(function (that) {
+                Wat.L.logOut();
+                Wat.C.configureVisibility();
+                Wat.I.renderMain();
 
-            Wat.C.configureVisibility();
-            Wat.I.renderMain();
-
-            that.performRoute();
+                that.performRoute();
+            }, that);
         });          
         that.on('route:profile', function (actions) {
             that.performRoute('profile', Wat.Views.ProfileView);

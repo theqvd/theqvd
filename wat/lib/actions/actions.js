@@ -59,6 +59,18 @@ Wat.A = {
             }
         });
     },
+
+    // Check if any action can be affected by expiration or not
+    isExpirableAction: function (action) {
+        switch (action) {
+            case 'current_admin_setup':
+                return false;
+                break;
+            default:
+                return false;
+                break;
+        }
+    },
     
     // Perform any action of the API
     // Params:
@@ -129,7 +141,7 @@ Wat.A = {
                 }                   
             },
             success: function (response, result, raw) {
-                if (Wat.C.sessionExpired(response)) {
+                if (Wat.A.isExpirableAction() && Wat.C.sessionExpired(response)) {
                     return;
                 }
                 
@@ -232,6 +244,33 @@ Wat.A = {
 
                     Wat.I.M.showMessage(messageParams, response);
                 }                
+            }
+        };
+        
+        $.ajax(params);
+    },
+    
+    // Call server side logout action
+    // Params:
+    //      successCallback: function that will be executed after action execution.
+    //      that: current context where will be stored retrieved response and passed as parameter to successCallback function.
+    apiLogOut: function (successCallback, that) {
+        var url = Wat.C.getApiUrl() + 'logout';
+        if (Wat.C.crossOrigin) {
+            url += '?sid=' + Wat.C.sid;
+        }
+        
+        var params = {
+            url: encodeURI(url),
+            type: 'POST',
+            dataType: 'json',
+            processData: false,
+            parse: true,
+            success: function (response, result, raw) {
+                successCallback(that);    
+            },
+            error: function (response, result, raw) {
+                Wat.I.M.showMessage({message: i18n.t('Error logging out'), messageType: 'error'});
             }
         };
         
