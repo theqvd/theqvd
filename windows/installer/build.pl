@@ -62,7 +62,7 @@ my @dlls = (
 	"$swperl\\c\\bin\\zlib1_.dll",
 
 	"$swperl\\c\\bin\\libiconv-2_.dll",
-	"$gettext\\bin\\intl.dll",
+	"$gettext\\bin\\libintl3.dll",
 	"$gettext\\bin\\libasprintf-0.dll",
 	"$gettext\\bin\\libgcc_s_dw2-1.dll",
 	"$gettext\\bin\\libgettextlib-0-18-1.dll",
