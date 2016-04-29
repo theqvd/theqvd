@@ -1,19 +1,19 @@
 #!/usr/lib/qvd/bin/perl
 use strict;
 use warnings;
-use QVD::Admin4::CLI;
-use QVD::Admin4::CLI::Grammar;
-use QVD::Admin4::CLI::Parser;
-use QVD::Admin4::CLI::Parser::Unificator;
-use QVD::Admin4::CLI::Tokenizer;
+use QVD::Admin4;
+use QVD::Admin4::Grammar;
+use QVD::Admin4::Parser;
+use QVD::Admin4::Parser::Unificator;
+use QVD::Admin4::Tokenizer;
 use Text::Table;
 use Test::More;
 
-my $unificator = QVD::Admin4::CLI::Parser::Unificator->new();
-my $grammar = QVD::Admin4::CLI::Grammar->new();
-my $parser = QVD::Admin4::CLI::Parser->new( grammar => $grammar, unificator => $unificator);
-my $tokenizer = QVD::Admin4::CLI::Tokenizer->new();
-my $CLI = QVD::Admin4::CLI->new( parser => $parser, tokenizer => $tokenizer);
+my $unificator = QVD::Admin4::Parser::Unificator->new();
+my $grammar = QVD::Admin4::Grammar->new();
+my $parser = QVD::Admin4::Parser->new( grammar => $grammar, unificator => $unificator);
+my $tokenizer = QVD::Admin4::Tokenizer->new();
+my $CLI = QVD::Admin4->new( parser => $parser, tokenizer => $tokenizer);
 
 
 my %TEST_SUITE = (

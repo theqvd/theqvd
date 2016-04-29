@@ -1,6 +1,0 @@
-Revision history for Perl extension QVD::Admin4.
-
-0.01  Mon Jul 14 10:29:58 2014
-	- original version; created by h2xs 1.23 with options
-		-AX -n QVD::Admin4
-

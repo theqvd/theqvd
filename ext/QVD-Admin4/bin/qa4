@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+use strict;
+use 5.010;
+use warnings;
+
+BEGIN {
+	$QVD::Config::USE_DB = 0;
+	@QVD::Config::Core::FILES = (
+		'/etc/qvd/qa.conf',
+		($ENV{HOME} || $ENV{APPDATA}).'/.qvd/qa.conf',
+		'qvd-qa.conf',
+	);
+}
+
+use QVD::Admin4;
+
+# Script intended to create and run an instance of the CLI.
+
+my $app = QVD::Admin4->new();
+if(@ARGV > 0) {
+	require Text::ParseWords;
+	my @processed_args = ();
+	for my $arg (@ARGV){
+		$arg =~ s/$_/\\$_/g for ('\'', '"');
+		push @processed_args, Text::ParseWords::shellwords( $arg );
+	}
+	@ARGV = @processed_args;
+	$app->run( initialize => 1 );
+} else {
+	$app->run_interactive( initialize => 1 );
+}
+
+exit($app->exit_status());
+
+__END__
+
+=pod
+
+=head1 PURPOSE
+
+Script intended to create and run an instance of the CLI.
+
+=cut

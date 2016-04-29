@@ -1,4 +1,4 @@
-QVD-CLI version 0.01
+QVD-Admin4 version 0.01
 =======================
 
 The README is used to introduce the module and provide instructions on
@@ -16,47 +16,63 @@ INSTALLATION
 
 To install this module type the following:
 
-    perl Makefile.PL
-    make
-    make test
-    make install
+   perl Makefile.PL
+   make
+   make test
+   make install
 
 DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-    CLI::Framework::Exceptions
+    AnyEvent::Pg::Pool
+    Capture::Tiny
     Clone
-    Data::Dumper
-    Encode
+    Config::Properties
+    Data::Page
+    DateTime
+    DBIx::Error
+    Deep::Encode
+    Digest::SHA
     File::Basename
+    File::Copy
+    File::Slurp
+    Getopt::Long
+    List::MoreUtils
+    List::Util
+    Mojo::ByteStream,
     Mojo::IOLoop
+    Mojo::IOLoop::ForkCall
     Mojo::JSON
+    Mojolicious::Lite
+    Mojo::Log
     Mojo::Message::Response
     Mojo::URL
     Mojo::UserAgent
+    MojoX::Session
     Moo
+    Moose
     POSIX
+    QVD::API
+    QVD::API::AclsOverwriteList
+    QVD::API::Action
+    QVD::API::ConfigsOverwriteList
+    QVD::API::DBConfigProvider
+    QVD::API::Exception
+    QVD::API::LogReport
     QVD::API::REST::Filter
-    QVD::Admin4::Command
-    QVD::Admin4::Grammar
-    QVD::Admin4::Grammar::Response
-    QVD::Admin4::Grammar::Rule
-    QVD::Admin4::Grammar::Substitution
-    QVD::Admin4::Grammar::Unificator
-    QVD::Admin4::Parser
-    QVD::Admin4::Parser::Agenda
-    QVD::Admin4::Parser::Chart
-    QVD::Admin4::Parser::Edge
-    QVD::Admin4::Parser::Node
-    QVD::Admin4::Tokenizer
-    QVD::Admin4::Tokenizer::Token
+    QVD::API::REST::JSON
+    QVD::API::REST::Model
+    QVD::API::REST::Request
+    QVD::API::REST::Response
     QVD::Config
-    Term::ReadKey
-    Term::ReadLine
-    Text::ParseWords
-    Text::SimpleTable::AutoWidth
-    Text::UnicodeTable::Simple
+    QVD::Config::Core
+    QVD::Config::Network
+    QVD::DB::Simple
+    QVD::L7R::LoadBalancer
+    Scalar::Util
+    TryCatch
+    Try::Tiny
     utf8::all
 
 COPYRIGHT AND LICENCE

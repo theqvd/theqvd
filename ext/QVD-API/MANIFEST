@@ -2,5 +2,5 @@ Changes
 Makefile.PL
 MANIFEST
 README
-t/cli.t
-lib/QVD/Admin4.pm
+t/QVD-API.t
+lib/QVD/API.pm

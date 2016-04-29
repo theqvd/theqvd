@@ -1,7 +1,0 @@
-[% META title = "Adding vm" %]
-<h1><a href="[% c.uri_for('/vm') %]">Virtual machines</a> &raquo; New</h1>
-<span class="step_1_on"></span><span class="step_2_off"></span><span class="step_3_off"></span>
-
-<div><a href="[% c.uri_for('/vm') %]">Cancel</a></div>
-
-[% FormBuilder.render %]

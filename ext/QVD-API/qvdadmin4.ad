@@ -1,0 +1,1029 @@
+
+= La API del sistema de administración de QVD4
+
+
+== Estructura general
+
+
+La API es una aplicación `Mojolicious::Lite` definida en el archivo `wat.pl`. Es una interfaz REST que recibe una _query_ en formato JSON, ejecuta la tarea  correspondiente a esa petición, y devuelve a su vez un JSON como respuesta. El cerebro de la aplicación es un objeto `QVD::API::REST`. Cuando la API recibe una _query_, se la pasa a este objeto, que será el encargado de orquestar todo el procesamiento y devolver una respuesta. Concretamente, el objeto `QVD::API::REST` articula las siguientes clases para llevar a cabo su cometido: `QVD::API::Action`, `QVD::API::REST::Model`, `QVD::API::REST::Request` y `QVD::API`. 
+
+`QVD::API` proporciona todos los métodos que en última instancia ejecutan las acciones que piden las _queries_. Por tanto, pudiera decirse que `QVD::API::REST`, al recibir una petición, se la pasa como argumento a un método de `QVD::API` y devuelve el resultado que arroja este. 
+
+Pero la realidad es más compleja. Téngase en cuenta que a cada acción soportada por la API le corresponde un método concreto de `QVD::API`. Así pues, ¿cómo se establece la correspondencia entre el nombre de la acción solicitada en la _query_ y el método que debe ejecutarse en `QVD::API`?  Del siguiente modo. Tomando como parámetro el nombre de la acción solicitada, se crea un nuevo objeto `QVD::API::Action`. Este objeto proporciona la configuración básica de la acción en cuestión. Entre otras cosas, especifica el método de `QVD::API` a utilizar.
+
+Además, de acuerdo con otras especificaciones proporcionadas por el objeto `QVD::API::Action`, se crea un objeto `QVD::API::REST::Model`: un modelo que define cómo debe ser una acción del tipo especificado. Este modelo se utilizará para comprobar que la petición recibida es legítima, y para ajustarla al formato que esperan los métodos de `QVD::API`.
+
+Así pues, la _query_ que recibe `QVD::API::REST` no es exactamente la que este le pasa al método de `QVD::API`. En realidad, la _query_ se les pasa a estos métodos en forma de objeto `QVD::API::REST::Request`. Este objeto representa una _query_ correcta y expresada en un formato concreto. El constructor del objeto `QVD::API::REST::Request` toma como parámetros la _query_ y su modelo `QVD::API::REST::Model` correspondiente. Siempre a partir del modelo, comprueba que la _query_ sea correcta y la traduce al formato necesario. Esta versión corregida y adaptada de la _query_ es lo que se  pasa como argumento al método de `QVD::API` que ejecuta la acción.
+
+En resumen, la API recibe una _query_ en formato JSON. Esta _query_ se le pasa al objeto `QVD::API::REST`, encargado de gestionarla y devolver una respuesta. Este objeto recupera cierta información relevante sobre la acción solicitada, en forma de objetos `QVD::API::Action` y `QVD::API::REST::Model`. Con dicha información crea un objeto `QVD::API::REST::Request` (una nueva versión de la _query_,  corregida y ajustada a un determinado formato). A continuación, ejecuta el método de `QVD::API` correspondiente a la acción solicitada pasándole como argumento el objeto `QVD::API::REST::Request`. La salida de ese método es lo que la API devuelve como respuesta, también en formato JSON.
+
+=== La clase `QVD::API::REST::JSON`
+
+La API recibe la _query_ en formato JSON. Lo primero que hace el sistema con este JSON es crear un objeto de tipo `QVD::API::REST::JSON`. Es un _wrapper_ que permite gestionar la _query_ con facilidad. Una vez creado el objeto, toda la información que se quiera sacar de la _query_ se le consultará a este. Por comodidad, en la documentación se habla de la _query_ de entrada. En realidad, esas alusiones hacen referencia al objeto  `QVD::API::REST::JSON` que hace de _wrapper_ de la _query_ original.
+
+=== La clase `QVD::API::Action`
+
+Un objeto `QVD::API::Action` se crea con un parámetro obligatorio `name` (el nombre de la acción que se está pidiendo realizar, tomado de la _query_). Este objeto contiene la información básica, de arranque, de la acción que se ha solicitado. Concretamente, cuenta con los siguientes atributos:
+
+* El atributo `type_of_action` establece el tipo de  acción solicita (hay acciones de visualización, de creación, de actualización, de borrado...). 
+* El atributo `qvd_object` establece el tipo de objeto de QVD al que la acción afecta: `vm`, `user`, `osf`, `di`, `host`, etc. 
+
+* El atributo `restmethod` establece el método que debe ejecutarse en `QVD::API::REST` para invocar la acción.
+
+* El atributo `admin4method` establece el método que debe ejecutarse en `QVD::API` para invocar la acción.
+
+La clase `QVD::API::Action` define una lista cerrada de posibles acciones que la API permite realizar. El nombre de la acción solicitada se le pasa al constructor de `QVD::API::Action` en el parámetro `name`. Si el valor de `name` no estuviera contemplado en la lista de acciones disponibles, la creación del objeto `QVD::API::Action` fallaría. Este es el sistema que comprueba  que las peticiones que se hacen a la API estén soportadas por ella. En la clase `QVD::API::Action`  también se codifican, para cada acción disponible en la API, los acls necesarios para ejecutarla. Una vez creado el objeto, se comprueba que el administrador que hace la petición cuente con los permisos necesarios. En caso contrario, se lanza un error.
+
+=== La clase `QVD::API::REST::Model`
+
+La clase `QVD::API::REST::Model` es un repositorio de información donde se especifica, para cada tipo de acción, qué filtros admite esta acción, qué argumentos, qué criterios de ordenación; qué campos devuelve; qué valores por defecto pudieran tener esos elementos; qué acls necesita un administrador para usarlos; cómo se traduce cada uno de ellos al formato adecuado para consultar a la base de datos (`DBIx::Class`), etc. Toda esta información se guarda en la clase  `QVD::API::REST::Model` en forma de variables de clase.  
+
+
+Cuando se crea un objeto `QVD::API::REST::Model`, se le pasan al constructor los parámetros `qvd_object` y `type_of_action`. El valor de estos parámetros determina el tipo de acción para el que se crea el objeto, y con ello, el tipo de información que se debe cargar en él. En concreto, se toma de las variables de clase la información correspondiente  a los valores de estos parámetros y se crea un repositorio con esa información.  Después, el objeto creado cuenta con una serie de métodos _accessors_ que permiten consultar el repositorio: `available_filters` devuelve la lista de filtros disponibles, `available_filter` chequea si un filtro concreto está disponible, `get_acls_for_filter` devuelve los acls necesarios para usar un filtro concreto, `map_filter_to_dbix_format` devuelve la traducción de un filtro al formato de `DBIx::Class`, etc.
+
+=== La clase `QVD::API::REST::Request`
+
+Una vez creados el _wrapper_ para la _query_ de entrada (`QVD::API::REST::JSON`) y el modelo de la acción solicitada (`QVD::API::REST::Model`) ya es posible crear una petición de tipo `QVD::API::REST::Request`. Este objeto será lo que se le pase como argumento al método encargado de ejecutar la acción (un método de `QVD::API`). Representa una petición que puede hacerse a la base de datos a través de `DBIx::Class`. Provee toda la información necesaria para efectuar la petición: tabla a la que consultar, _joins_ de otras tablas, filtros, argumentos si los hubiera, criterios de ordenación, etc. Este objeto se construye cotejando la _query_ de entrada con el modelo correspondiente. Su constructor lanza una serie de chequeos que comprueban que, conforme al modelo, la _query_ es correcta: los filtros, argumentos... son adecuados; y el administrador que hace la petición tiene acls suficientes para utilizar esos elementos. También se fuerzan, cuando es necesario, ciertos filtros, como el de tenant (un administrador de tenant solo debe poder ver la información de su tenant). Además, se traducen los elementos de la _query_ al formato utilizado por `DBIx::Class`.
+
+
+==== El filtrado por tenant
+
+Uno de los cometidos cruciales de la clase `QVD::API::REST::Request` es forzar el filtrado por tenant. Un administrador puede ser o no superadministrador. Lo que caracteriza a un superadministrador es su asociación con el tenant de `id`  0 (desde ahora tenant 0). Cualquier administrador asociado a un tenant distinto de 0 no es un superadministrador. A efectos funcionales, la diferencia entre un administrador normal y un superadministrador es el ámbito sobre el que pueden operar.
+
+* El ámbito de un superadministrador es el conjunto de los tenants del sistema.
+
+* El ámbito de un administrador normal es exclusivamente el tenant al que está asociado.  
+
+Un administrador puede efectuar todas las operaciones que le permitan sus acls. Pero esas operaciones las podrá efectuar solo dentro de su ámbito. Así pues, un administrador del tenant 1 con acls para crear máquinas virtuales podrá crear máquinas virtuales, pero solo dentro del tenant 1. Además, si dicho administrador tiene acls para ver las máquinas virtuales, podrá ver solo las máquinas virtuales del tenant 1. En cambio un superadministrador con los mismos acls podrá crear las máquinas virtuales en cualquiera de los tenants del sistema, y podrá ver las máquinas virtuales de todos los tenants.
+
+Esto tiene ciertas implicaciones a la hora de crear las _queries_ que un administrador manda a la API. Un administrador normal debe obviar en todo caso el concepto de tenant. Las _queries_ que mande a la API no deben incluir filtros ni argumentos relativos al tenant. Será la API misma la que, en función del tenant del administrador, efectúe el filtrado oportuno o añada los argumentos oportunos. En cambio, un superadministrador sí debe contemplar el concepto de tenant: debe mandar en sus _queries_ los filtros y argumentos oportunos relativos al concepto de tenant.
+
+El control sobre estas cuestiones lo efectúa la clase `QVD::API::REST::Request`. Un objeto de esta clase representa una petición a la base de datos. Así pues, cuando se construye esta petición es necesario comprobar que el filtrado por tenant es el adecuado para el administrador que efectúa la petición, o que los objetos a crear se crearán en cada caso en el tenant adecuado. Para ello, `QVD::API::REST::Request` efectúa una serie de operaciones sobre la _query_ de entrada:
+
+* Si el administrador es superadministrador y fuera necesario para la acción solicitada, se comprueba si la _query_ tiene el filtro o argumento necesario relativo al tenant sobre el que operar. 
+* Si el administrador no es superadministrador, se comprueba que la _query_ no incluya especificaciones sobre el tenant en el que operar.
+* Si el administrador no es superadministrador y la acción lo requiere, se añade un filtro o argumento que restrinja el tenant sobre el que operar. El valor de ese filtro o argumento será el correspondiente al tenant del administrador. 
+
+=== La clase `QVD::API::REST`
+
+Una vez creado el objeto `QVD::API::REST::Request`, se ejecuta propiamente la acción solicitada. Para ello, se usan los atributos `restmethod` y `admin4method` del objeto `QVD::API::Action` que representa a la acción. El atributo `restmethod` especifica el nombre de un método de `QVD::API::REST` (en adelante *R*). Y el atributo `admin4method` especifica el nombre de un método de `QVD::API` (en adelante *A*). Para ejecutar la acción, en primer lugar se ejecuta *R*, y dentro de *R* se ejecuta *A*. En realidad, es este segundo el método  que propiamente ejecuta la acción (la clase `QVD::API` es la  que opera sobre la base de datos). La razón de que *A* no se ejecute directamente, sino a través de *R*, es que `QVD::API` cuenta con distintos tipos de métodos, y cada uno de ellos se invoca de un modo distinto. El método *R* es el encargado de invocar *A* del modo adecuado.
+
+Los métodos *R* posibles son:
+
+* `process_standard_query`, para las acciones de funcionamiento regular, la inmensa mayoría.
+* `process_ad_hoc_query`, para acciones de funcionamiento particular. 
+* `process_multiple_query`, para acciones que requieren la ejecución de múltiples métodos *A*. 
+
+Los métodos *A* pueden llegar a ser muchos, pero la inmensa mayor parte de las acciones de funcionamiento regular usan los mismos métodos: `select`, `update`, `create`, `create_or_update`, `delete`. En realidad, los objetos `QVD::API::REST::Model` y `QVD::API::REST::Request` vistos arriba están pensados solo para las acciones regulares (ejecutadas desde `process_standard_query`). De hecho, el objeto  `QVD::API::REST::Request` se crea en `process_standard_query`. El resto de acciones (ejecutadas desde `process_ad_hoc_query` y `process_multiple_query`) se ejecutan mediante métodos _ad hoc_ que efectúan sus chequeos de forma independiente. En concreto, estos métodos toman como argumento un objeto de tipo `QVD::API::REST::JSON`.
+
+=== La clase `QVD::API`
+
+La clase `QVD::API` no es mucho más que un conjunto de funciones. Estas son las funciones que, en última instancia, ejecutan las acciones que se solicitan a la API. 
+
+==== Métodos regulares
+
+La mayor parte de estas funciones efectúan una operación contra la base de datos (a través de `DBIx::Class`) y devuelven el resultado que esta arroja. Hay cinco funciones principales, encargadas de ejecutar la inmensa mayor parte de las aciones:
+
+* `delete` borra objetos de la base de datos.
+
+* `create` crea objetos nuevos en la base de datos.
+
+* `update` actualiza información de la base de datos.
+
+* `create_or_update` intenta actualizar un objeto, pero si este no existiese, lo crea. Se utiliza solo para algunos objetos del sistema para los cuales esta abstracción se ha visto útil (_tokens_ de configuración).
+
+* `select` devuelve información de la base de datos. 
+
+
+Además, existen otros métodos que en última instancia ejecutan  esas funciones principales , pero que, además, efectúan chequeos u operaciones extra. Por ejemplo, los métodos `vm_delete` o `di_delete` son los encargados de ejecutar las acciones de borrado de  `vm` y `di`. En definitiva, estos métodos ejecutan el método regular `delete`, pero establecen ciertas condiciones extra que han de cumplir los objetos para que de hecho se puedan borrar. Por su parte, el método  `di_create` crea un `di` lanzando el método `create`, pero, además, crea las _tags_ de ese `di` y actualiza su columna `path`. 
+
+Por último, existen en la clase métodos de ejecución de máquinas virtuales: `vm_start`, `vm_stop` y `vm_user_disconnect`.
+
+Todas estas acciones regulares, como ya se ha dicho, reciben como argumento un objeto `QVD::API::REST::Request` que representa la _query_ de entrada. Este objeto proporciona varios _accessors_ cruciales que devuelven la información necesaria para hacer las peticiones a través de `DBIx::Class` :
+
+* `table` establece el `Schema` contra el cual se debe ejecutar la consulta a la base de datos.
+* `filters` define los filtros de las peticiones.
+* `modifiers` define otros rasgos necesarios para definir adecuadamente una petición (_join_, _prefetch_, _order_, etc.).  
+* `arguments` define los argumentos necesarios en las funciones de creación o actualización.
+* `related_objects_arguments` define los argumentos necesarios en las funciones de creación o actualización que no se encuentran en la base de datos en la tabla propia del objeto afectado, sino en una tabla relacionada.
+
+El diseño del método `select`  ha tenido que solucionar cuestiones de eficiencia. Lo hace de dos modos:
+
+* Ante la consulta a una tabla de la base de datos, `DBIx::Class` devuelve un conjunto de objetos. Normalmente, parte de la información de esos objetos reside en tablas relacionadas con la tabla original. Por ello, para que el objeto en cuestión pueda devolver tal información tiene que hacer consultas extra a la base de datos. Cuando se devuelve un número considerable de objetos, las consultas se multiplican y el tiempo de respuesta se dispara. La solución es usar el rasgo _prefetch_ de `DBIx::Class`. Este rasgo permite recoger esa información relacionada directamente en la primera consulta. El  _prefetch_ para cada acción se codifica en la clase `QVD::API::REST::Model` y se le pasa al método `select` mediante el objeto `QVD::API::REST::Request`.
+* Pero cierta  información relacionada con un objeto, la que se encuentra en una relación de uno a muchos, no puede seleccionarse mediante el rasgo _prefetch_. Por ejemplo, una `vm` puede tener muchas `properties`. Pues bien, estas `properties` no pueden extraerse en una única consulta junto a la `vm`. Por ello, este tipo de información nunca se extrae de la consulta principal a la base de datos. En cambio, se ha diseñado un sistema que, en una segunda consulta, extrae la información extra pesada. Esta segunda consulta utiliza una vista. Cada objeto de QVD con información pesada cuenta con una vista que devuelve esa información. Una vez hechas la consulta principal y la consulta extra, la información de la segunda se le inyecta al resultado de la primera. De nuevo, es en `QVD::API::REST::Model` donde se codifica qué vista se relaciona con cada objeto de QVD; y es a través de `QVD::API::REST::Request` como se hace llegar esa información al método `select`.
+
+Los métodos `create` y `update` no solo permiten crear y actualizar objetos. También permiten establecer relaciones entre estos objetos y otros objetos del sistema. Estas operaciones se han llamado _nested queries_ (son acciones secundarias, anidadas en la petición principal). Las _nested quieries_ existentes en el sistema son de tres tipos:
+
+* Asignación y borrado de _custom properties_ para `vm`, `user`, `di`, `osf`, `host`.
+
+* Asignación y eliminación de _tags_ para `di`.
+
+* Asignación y desasignación acls y roles para administradores y roles.
+
+La API admite _nested queries_ para ciertas acciones. En la sintaxis de la API, estas _nested queries_ se codifican como argumentos con una clave especial, reservada. Si la _query_ cuenta con argumentos de este estilo, los métodos  `create` y `update`, además de efectuar sus operaciones principales, ejecutan funciones que llevan a cabo las asignaciones o desasignaciones de elementos oportunas.
+
+==== Métodos irregulares
+
+Hay otros métodos en `QVD::API` que pudieran llamarse irregulares. Estos métodos no toman como argumento un objeto de tipo `QVD::API::REST::Request`, sino de tipo `QVD::API::REST::JSON`. Este objeto es una versión de la _query_ de entrada que no ha sido chequeada ni traducida al formato de `DBIx::Class`. Métodos de este tipo son, por ejemplo, aquellos que no trabajan contra la base de datos. Es el caso de  `config_get`, que devuelve los _tokens_ de configuración del sistema. Estos _tokens_ los proporciona la clase `QVD::Config`, no la base de datos. También hay métodos que, por su particularidad, aunque usan la base de datos, no es posible asimilarlos al sistema general (`current_admin_setup`, `get_number_of_acls_in_admin`, etc.).    
+
+==== Métodos con vistas
+
+Por último, existen en `QVD::API` métodos regulares (en el sentido de que toman por argumento un objeto `QVD::API::REST::Request`) pero de comportamiento particular. Los métodos regulares al uso operan sobre objetos reales, correspondientes a tablas concretas de la base de datos: `vm`, `user`, `host` etc. Pero existen otros métodos que operan sobre objetos virtuales: vistas. Estas vistas se han creado como objetos de `DBIx::Class` y son objetos válidos en `QVD::API::Action` y `QVD::API::REST::Model`. Es decir, el sistema los contempla  como objetos igualmente válidos que el resto de objetos de QVD, pero a nivel de base de datos no existen. Esto hace que solo se pueda efectuar sobre ellos operaciones de búsqueda. Sin embargo, no es posible consultar estas vistas con  el método general `select`, pues en `DBIx::Class` la consulta sobre vistas (el filtrado, en realidad) se hace de un modo ligéramente distinto de la consulta sobre tablas reales. 
+
+Por ejemplo, en el sistema se contemplan los siguientes objetos virtuales relativos a acls:
+
+* `Operative_Acls_In_Role`. La vista a la que está asociado este objeto es el producto cartesiano de los acls y los roles del sistema. Para cada par acl/rol, se establece un _flag_ que dice si el rol en cuentión tiene habilidato el acl. El objeto admite filtros que permiten restringir esta información para un rol determinado. Con ello, el método `get_acls_in_roles` permite consultar qué acls están  operativos en un rol determinado y qué acls no lo están.  
+
+* `Operative_Acls_In_Administrator`. La vista a la que está asociado este objeto es el producto cartesiano de los acls y los administradores del sistema. Para cada par acl/administrador, se establece un _flag_ que dice si el administrador en cuentión tiene habilidato el acl. El objeto admite filtros que permiten restringir esta información para un administrador determinado. Con ello, el método `get_acls_in_admins` permite consultar qué acls están  operativos en un administrador determinado y qué acls no lo están.  
+
+Los otros dos objetos virtuales que contempla el sistema son `Operative_Views_In_Tenant` y `Operative_Views_In_Administrator`.
+
+== El sistema de acls
+
+El sistema cuenta con una lista cerrada de acls. Estos acls están asociados en el código a las distintas operaciones que requieran control de permisos. El sistema permite a un administrador efectuar una operación solo si tiene los acls necesarios para ello según el código. En concreto, existen dos niveles de control de permisos en el código:
+
+* Cada acción  soportada por la API puede tener asociada una lista con los acls necesarios para ejecutarse. Esta asociación se establece en la clase `QVD::API::Action`. Cuando la API recibe la petición de ejecutar una acción, crea un objeto `QVD::API::Action` correspondiente a esa acción. Este objeto tiene un método que permite comprobar si un administrador determinado tiene los acls requeridos para ejecutar la acción en cuestión.
+
+* Aunque un administrador pueda ejecutar una acción, quizá no pueda hacer todo aquello que la acción permite. Por ejemplo, un administrador puede tener permisos para ejecutar una acción de actualización de máquinas virtuales. Pero aun así, este administrador puede no tener permisos para actualizar todos los campos de las máquinas virtuales. Quizá haya algún campo en concreto que no pueda actualizar. Por tanto, el sistema contempla un segundo nivel de control de acls: cada uno de los filtros, argumentos, etc. que admite la API puede tener también asociada una lista de acls. Si el administrador no tiene esos acls, no puede usar el elemento en cuestión. La asociación de esos elementos con los acls se hace en la clase `QVD::API::REST::Model`. Un objeto de esta clase permite comprobar si un administrador tiene los acls necesarios para usar cada uno de estos elementos. 
+
+Estas asociaciones de acls a acciones o elementos de una acción siempre siguen la misma estructura. Una acción o elemento lleva asociada una lista de expresiones regulares. Cada expresión regular define un conjunto de acls. Se considera que un administrador tiene acls suficientes para utilizar una acción o elemento si, para cada una de esas expresiones regulares, tiene algún acl que unifique con ella. Esta comprobación se hace, en última instancia, siempre mediante el método `re_is_allowed_to` de la clase `QVD::DB::Result::Administrator`. 
+
+En concreto, cuando la API recibe una _query_ efectúa estas comprobaciones de acls en dos puntos:
+
+* Primero se comprueba que la acción en sí se pueda ejecutar.  En la clase `QVD::API::REST` se crea el objeto `QVD::API::Action` y se ejecuta un método de esta clase que hace la comprobación.
+
+* En segundo lugar, se comprueba que todos los elementos de la _query_ se pueden usar.  En la clase `QVD::API::REST::Request` se cotejan los elementos incluidos en la _query_ con los acls asociados a esos elementos en el modelo `QVD::API::REST::Model` correspondiente. En este caso, las comprobaciones son múltiples y usan diversos métodos (para filtros, argumentos, campos a devolver...).
+
+=== Herencia de acls
+
+Cada administrador puede tener asociados varios roles. Los acls con los que cuenta un administrador son los acls operativos en sus roles. En principio, un administrador tendrá disponible un acl **a** si y solo si **a** es un acl operativo en alguno de sus roles. Las relaciones de asignación entre administradores y roles se establecen en la base de datos en la tabla  `role_administrator_relations` que se corresponde con el objeto `QVD::DB::Result::Role_Administrator_Relation`.
+
+Por su parte, un rol tiene asignados acls. Estos acls son los que, en principio, están operativos en él. Un rol admite tres tipos de asignaciones de acls:
+
+* A un rol se le pueden asignar directamente acls para que estén operativos en él (acls positivos).
+
+* A un rol se le pueden asignar también otros roles. En este caso, el rol en cuestión asume como operativos todos los acls operativos en los roles heredados. 
+
+* A un rol se le puede eliminar un acl heredado si se le asigna un acl negativo. Si un rol hereda el acl **a**, en principio, tendría **a** como acl operativo. Pero si además se le asigna directamente **a** como acl negativo, el rol en cuestión deja de tener **a** como acl operativo.
+
+La asignación de un rol a otro se establece mediante la tabla de la base de datos `role_role_relations`, a la que corresponde la clase `QVD::DB::Result::Role_Role_Relation`. La asignación de acls a roles (acls tanto positivos como negativos) se hace mediante la tabla de la base de datos `acl_role_relations`. La clase correspondiente es `QVD::DB::Result::ACL_Role_Relation`. Esta tabla y estos objetos tienen un flag `positive` que determina si el acl se asigna al rol como acl positivo o negativo.
+
+NOTE: Por tanto, los acls _per se_ no son positivos ni negativos. Lo que puede ser positivo o negativo es la asignación de acl a rol. El acl se puede asignar como acl positivo o como acl negativo.
+
+La API permite asignar y desasignar acls y roles a un rol. Para ello se usan  _nested quieries_ dentro de las acciones `role_update` y `role_create`. Los métodos de `QVD::API` encargados de efectuar estas asignaciones efectúan una serie de operaciones que no resultan del todo transparentes. A saber:
+
+* Cuando se solicita el añadido de un acl **a** a un rol, este no se efectúa si, de hecho, **a** ya estaba operativo en el rol. 
+
+* Cuando se solicita el añadido de un acl **a** a un rol, y en el rol ya existía **a** como negativo, se elimina el **a** negativo. 
+
+* Cuando se solicita la eliminación de un acl **a** y en el rol afectado existía **a** como heredado, se añade una asignación de **a** como acl negativo. 
+
+* Cuando a un rol **R1** que tiene asignado un acl **a** (ya sea como positivo o negativo) se le añade un rol **R2**, se elimina de **R1** el acl **a** si **R2** tiene como acl operativo a **a**. 
+
+* No se permite asignar el rol **R2** a **R1** si **R1** hereda de **R2**. 
+
+
+Estas operaciones se llevan a cabo a fin de mantener cierta integridad en el sistema de acls de la base de datos, a fin de asegurar que en este sistema se dan ciertas condiciones. El sistema que calcula qué acls operativos hay en un administrador o rol asume que la base de datos es consistente con estas condiciones. Las condiciones que se pretenden mantener son:
+
+* La asignación directa de acls y la asignación de acls por herencia no deben ser redundantes. Si un rol hereda un acl **a**, no puede tener también a **a** asignado directamente.
+
+* Un acl **a** no puede estar asignado a un rol al tiempo como positivo y como negativo. 
+
+* Las relaciones de herencia tienen que tener forma de árbol, no pueden darse bucles donde un rol termine heredando de sí mismo.
+
+En la base de datos, existe una tabla de acls `acls`  y otra de roles `roles`. Y, como se ha visto, existe una tabla `role_role_relations` de relaciones rol/rol y otra `acl_role_relations` de relaciones acl/rol. Además, se ha definido una vista llamada `all_acl_role_relations`, encargada de hacer el trabajo duro. Esta vista toma la información de las tablas anteriores, y con ella calcula, para cada rol, qué acls tiene operativos teniendo en cuenta las relaciones de herencia y la asignación de acls positivos y negativos. A su vez, esta vista es utilizada por los dos _shemas_ de `DBIx::Class` que se usan en todo el sistema para extraer los acls operativos en un administrador o rol:  
+
+* `QVD::DB::Result::Operative_Acls_In_Administrator` y
+
+* `QVD::DB::Result::Operative_Acls_In_Role`.
+
+Estos _schemas_ son, a su vez, vistas, pero no codificadas directamente en la base de datos, sino mediante `DBIx::Class`.
+
+=== Sobrescritura de acls
+
+Como se ha visto, el cálculo de los acls que tiene un administrador depende de los roles que tiene asignados. Sin embargo, ese conjunto de acls operativos para un administrador se puede sobrescribir, se puede modificar. Se ha creado un sistema que permite definir listas de acls que, en un contexto determinado, se le pueden  quitar o añadir a un  administrador o rol, con independencia de los acls que tenga asignados o heredados. En concreto, actualmente, se han definido dos casos de sobrescritura:
+
+* Cuando el administrador no es superadministrador. En estos casos, con independencia de los roles que tenga asignados, se le anulan al administrador todos los acls que permitan gestionar tenants. Esto se debe a que, en estos contextos, el concepto de tenant debe quedar oculto, el sistema debe funcionar como si la diferencia entre tenants no existiera. 
+
+* Cuando el administrador es el administrador de recuperación. Este administrador no tiene asignado rol alguno. Sin embargo, mediante sobrescritura, se le añaden los acls necesarios para recuperar el sistema (relativos a tenants, roles, administradores y configuración). Gracias a ello, se asegura que siempre tenga los acls necesarios para llevar a cabo su cometido.
+
+Mediante este sistema de sobrescritura de acls se puede forzar el particionado de las herramientas de administración de QVD. Eliminando grupos de acls es posible prohibir el acceso y/o visualización de ciertas partes del sistema. Esto es útil para una potencial separación de una versión libre y una versión _commercial_ del sistema. 
+
+Para determinar en cada caso qué acls se deben sobrescribir, se usa `QVD::API::AclsOverwriteList`. El constructor de esta clase toma como parámetro al administrador para el que se quiere efectuar la sobrescritura. Y el objeto resultante informa de los acls que deben sobrescribirse para él, mediante los siguientes  métodos:
+
+* `acls_to_open_re`. Este método devuelve una expresión regular que define el conjunto de acls que deben habilitarse como operativos para el administrador.
+
+* `acls_to_close_re`. Este método devuelve una expresión regular que define el conjunto de acls que deben prohibirse  para el administrador.
+
+* `acls_to_hide_re`. Este método devuelve una expresión regular que define el conjunto de acls que deben, no solo prohibirse, sino también esconderse,  para el administrador. Los acls arrojados por el método anterior son los que el administrador debe ver como no operativos para él. En cambio, los acls de este método son los acls que el administrador no debe ni siquiera ver que existen en el sistema.
+
+Como se ha dicho antes, las clases que permiten en todo el sistema ver qué acls están operativos en un administrador o rol son:
+
+
+* `QVD::DB::Result::Operative_Acls_In_Administrator` y
+
+* `QVD::DB::Result::Operative_Acls_In_Role`.
+
+Estas clases son _schemas_ de `DBIx::Class`. Son vistas que devuelven los acls operativos en cada administrador o rol. Es en estas vistas donde se efectúa la sobrescritura de acls. Para ello, se les ha colocado a las vistas  _placeholders_ que deben ser instanciados con el resultado de los métodos `acls_to_close_re`, `acls_to_open_re` y `acls_to_hide_re` de un objeto `QVD::API::AclsOverwriteList` correspondiente al administrador para el cual se consultan los acls. Para instanciar estos _placeholders_ se usa el rasgo `bind` de `DBIx::Class`. 
+
+== Vistas configurables
+
+El WAT permite configurar qué elementos de los objetos de QVD se pueden ver. Por ejemplo, un administrador puede configurar si, para las máquinas virtuales, quiere que el WAT le muestre o no el nombre de la máquina, la ip, el usuario al que pertenece o el OSF al que está asociada. Esta configuración puede hacerse a nivel de tenant y de administrador. La configuración a nivel de tenant es la configuración por defecto para los administradores de cada tenant, y se puede sobrescribir después para cada administrador particular. Todo ello se guarda en las tablas `tenant_views_setups` y `administrator_views_setups` de la base de datos. En  cada una de las filas de estas tablas, se establece, para un tenant o administrador, si un elemento concreto debe mostrarse o no en un contexto determinado. En concreto, cada fila consta de estas columnas:
+
+* `qvd_object`. Establece el tipo de objeto de QVD para el cual se quiere mostrar u ocultar un elemento (`vm`, `user`...)
+* `field`. Establece el elemento que se quiere mostrar u ocultar. Para `vm`, por ejemplo, `name`, `ip`, `mac`, etc. Este es un campo libre en la base de datos. Los elementos que se guardan aquí son los que puede mostrar el WAT, que no son necesariamente idénticos a los que se contemplan en la API. 
+* `visible`. Tiene un valor booleano. Establece si el elemento en cuestión se quiere mostrar (`true`) u ocultar (`false`).
+* `device_type`. Establece el tipo de dispositivo (`mobile` o `desktop`) en el que se quiere mostrar u ocultar el elemento.
+* `view_type`. Establece el tipo de contexto del WAT en el que se quiere mostrar u ocultar el elemento (`list`, `details` o `filters`).
+* `tenant_id` o `administrator_id`. Establecen, respectivamente para `tenant_views_setups` o `administrator_views_setups`, el tenant o administrador para el que se establece la configuración.
+
+En resumen, para configurar en un tenant qué elementos de cada objeto de QVD se muestran en cada contexto del WAT, se introducen en la base de datos registros en la tabla `tenant_views_setups`. Cada uno de esos registros establece, para un determinado elemento de un objeto de QVD, en un contexto determinado, si tiene que mostrarse u ocultarse. Cada administrador de ese tenant puede después sobrescribir esa configuración introduciendo los registros correspondientes en la tabla `administrator_views_setups`. En adelante a este tipo de registros se le llamará _view_. En realidad, por defecto, todos los elementos del WAT son visibles a menos que existan _views_ que pidan lo contrario. Si un elemento determinado no tiene _views_ que hagan referencia a él, será un elemento visible en todo contexto. 
+
+La API, mediante la acción `current_admin_setup`, puede devolver las _views_ apropiadas para el administrador que hace la petición. Estas _views_ devueltas por la API serán, fundamentalmente, el resultado de cruzar las _views_ del tenant con las _views_ del administrador, donde, como se ha dicho, estas segundas sobrescriben a las primeras. Este juego de sobrescritura a partir de las tablas `tenant_views_setups` y `administrator_views_setups` lo hace una vista creada mediante `DBIx::Class`: `Operative_Views_In_Administrator`. Esta es la vista que consulta `current_admin_setup` para devolver las _views_ del administrador en funciones.
+
+=== Las _custom properties_
+
+Las _custom properties_ también son elementos susceptibles de ser mostrados u ocultados en el WAT de acuerdo con el sistema de _views_. El WAT  muestra por defecto todo elemento para el que no reciba _view_ de la API. Sin embargo, se ha considerado oportuno que las _properties_, por defecto, no se muestren. Para conseguir este efecto sin romper la lógica del WAT, es necesario que la API devuelva _views_ que explícitamente marquen cada _property_ como  visible o no visible en todos los contextos existentes, teniendo en cuanta que no visible será el valor por defecto de estas _views_. 
+
+De ello se encarga la vista `Operative_Views_In_Administrator`. Esta vista, además de calcular las _views_ de un administrador a partir del cruce de las _views_ de la base de datos, crea por defecto una serie de _views_ virtuales, no guardadas en la base de datos, pensadas para ocultar las _properties_ en aquellos contextos para los que no existen _views_ reales. El trabajo duro de creación de las _views_ virtuales lo hace una vista de la base de datos a la que se hace referencia desde `Operative_Views_In_Administrator`: `operative_views_in_tenants`. Esta vista lista las _properties_ existentes el la base de datos para cada tipo de objeto de QVD. Por cada una de ellas, se crean _views_ que establecen, para todos los contextos posibles, si se muestran o se ocultan. Para aquellos contextos para los cuales sí existe una _view_ real, se usa esa, para aquellos en los que no, se crea una _view_ virtual con valor `visible` `false`. 
+
+Otra peculiaridad de las _custom properties_ es que pueden ser eliminadas del sistema. Los elementos de un objeto de QVD siempre existen en el sistema (las `vm` siempre tienen `ip` o `mac`). Sin embargo, las _properties_ pueden ser borradas. Cuando una _property_ se elimina del sistema, hay que borrar también las _views_ que pudiera tener asociadas. Para ello, a la acción de borrado de _properties_ de la base de datos se le ha añadido un _trigger_ que lanza una función de borrado de _views_. La función en cuestión se llama `delete_views_for_removed_property`. Los _triggers_ que invocan esta función son:
+
+* `delete_views_for_removed_vm_property`
+
+* `delete_views_for_removed_user_property`
+
+* `delete_views_for_removed_osf_property`
+
+* `delete_views_for_removed_di_property`
+
+* `delete_views_for_removed_host_property`
+
+
+= El CLI
+
+== Nociones básicas para empezar a usar el CLI
+
+El CLI es una aplicación `CLI::Framework` definida en el archivo `qa`. De momento, solo funciona en modo interactivo. Para arrancar el CLI, se ejecuta el archivo `qa`, pasándole como parámetros el _host_ y el puerto donde escucha la API de administración de QVD contra la que se quiere trabajar.
+....
+qa --host=localhost --port=3000
+....
+
+Con ello, se abre una consola donde se pueden introducir comandos. Para aprender a utilizar la herramienta, ejecútese en esa consola el comando `usage`. 
+
+....
+> usage
+....
+
+Este comando devuelve la lista de comandos disponibles en el CLI. Además, al ejecutarse `usage` seguido del nombre de un comando (por ejemplo, `login`), se devuelve una explicación más detallada del uso del comando en cuestión.
+
+....
+
+> usage login
+
+....
+
+Para hacer consultas a la API es necesario, en primer lugar, loguearse con una cuenta de administrador. Para ello, se debe ejecutar el comando `login`.
+
+....
+> login
+....
+
+Al ejecutar este comando, se abre un diálogo en el que se deben introducir las credenciales de la cuenta de administrador con la que se quiere loguearse. Si la API gestiona un QVD en modo monotenant, estas credenciales serán el nombre del administrador y la contraseña; si la API gestiona un QVD en modo multitenant, además, se pedirá el nombre del tenant del administrador.
+
+....
+>login
+Name: superadmin
+Tenant: *
+Password:
+>
+....
+
+Una vez se ha hecho login con éxito, se puede comenzar a hacer consultas a la API. Los comandos que se usan para ello coinciden con los nombres de los objetos de QVD: por ejemplo, el comando `vm` es el encargado de llevar a cabo peticiones a la API relativas a máquinas virtuales, `host` es el encargado de las consultas relativas a los _hosts_, etc. Como se ha dicho arriba, para conocer la lista completa de comandos disponibles, se debe ejecutar el comando `usage`. 
+
+....
+> usage
+....
+
+Y para  conocer los detalles de uso de cada uno de estos comandos, se ejecuta `usage` seguido del nombre del comando
+
+....
+> usage vm
+....
+
+Cada comando podrá ir seguido de una secuencia de argumentos. En otras palabras, cualquier petición que se introduzca en la consola del CLI está compuesta por una serie de palabras. La primera de esas palabras es el comando y todas las demás forman la secuencia de argumentos. Por ejemplo, la siguiente es una orden válida en el CLI:  
+
+....
+> vm state=running get id, name
+....
+
+Esta orden pide que se muestren el `id` y el `name` de todas las máquinas virtuales que estén en estado `running`. A ojos del usuario, la diferencia entre el comando y los argumentos no es obvia. A sus ojos, la petición es sencillamente una oración que debe ajustarse a una gramática determinada y tiene un significado. Sin embargo, como se verá a continuación, sí es esta una distinción importante a nivel interno  (además, el comando `usage` sí hace esta distinción transparente para los usuarios).
+
+== Diseño general del CLI
+
+El CLI se ha creado a partir del _framework_ `CLI::Framework`. El ejecutable que permite poner en marcha la herramienta es el archivo `qa`, pero la clase que define propiamente el CLI es `QVD::API::CLI`, una subclase de `CLI::Framework`. A su vez, los comandos  del CLI son subtipos de  `CLI::Framework::Command`. En definitiva, a todos los efectos, el CLI es una aplicación de tipo `CLI::Framework`, sigue su lógica y utiliza sus recursos. Como en toda aplicación `CLI::Framework`, en la clase que define el CLI (`QVD::API::CLI`) se registran los comandos disponibles. Y cada uno de estos comandos se ha definido, además, como una clase independiente: `QVD::API::CLI::Command::VM` para el comando `vm`, `QVD::API::CLI::Command::Host` para el comando `host`, etc.
+
+
+Como se ha dicho antes, y de acuerdo con lo establecido en `CLI::Framework`,  la primera palabra de toda petición hecha al CLI debe ser un comando registrado como tal en `QVD::API::CLI`, y el resto de palabras se le pasan al comando como argumentos. Así pues, dada una petición como la siguiente,
+
+....
+> vm state=running get id, name
+....
+
+`vm` es el comando, y `state=running get id, name` es la lista de argumentos. Dicho de otro modo, cuando se introduce esa petición en la consola del CLI, se ejecuta el método `run` de un objeto  `QVD::API::CLI::Command::VM`, pasándole como argumentos `state=running get id, name`.
+
+La mayoría de los comandos del CLI (aquellos que se corresponden con objetos de QVD) funcionan de forma prácticamente idéntica. De hecho, todos ellos se han definido como subclases de una clase común `QVD::API::CLI::Command` (que a su vez es subclase de `CLI::Framework::Command`). Esta clase común es la que guarda la lógica común que determina cómo se procesa un comando del CLI. Esta lógica es, básicamente, la siguiente: el comando inroducido en el CLI junto a los argumentos que lo siguen forman una oración; un _parser_ analiza esta oración; a partir de ese análisis, se construye un JSON susceptible de ser enviado como petición a la API;  se envía dicha petición a la API; y cuando esta responde, se saca la respuesta por consola en forma de tabla. En resumen:
+
+* Un _parser_ analiza la petición escrita en la consola del CLI.
+
+* El resultado del análisis del _parser_ se manda como petición a la API.
+
+* La respuesta de la API se convierte en una tabla y se saca por consola.
+
+Por tanto, para explicar con más detalle el diseño del CLI, será necesario explicar el funcionamiento del _parser_ encargado de procesar las peticiones, y será necesario explicar también la clase `QVD::API::CLI::Command`, encargada de articular los tres pasos necesarios para ejecutar cada petición. 
+
+== El _parser_ de las peticiones del CLI
+
+El proceso de _parsing_ recibe como _input_ una oración en forma de _string_. En primer lugar, un objeto `QVD::API::CLI::Tokenizer`  divide esa _string_ y la convierte en una lista ordenada de _tokens_ (_grosso modo_, las palabras de la oración). A continuación, esa lista de _tokens_ se pasa como _input_ a un objeto `QVD::API::CLI::Parser` encargado de llevar a cabo el análisis sintáctico en forma de estructura arbórea. El resultado de este análisis sintáctico es una lista de análisis posibles para la oración, a partir de los cuales pueden hacerse peticiones a la API.
+
+Por ejemplo, la siguiente oración permite recuperar en el CLI el nombre de todas las máquinas virtuales:
+
+....
+vm get name
+.... 
+
+Esta oración se le pasa como _input_ al objeto `QVD::API::CLI::Tokenizer`, que devuelve la siguiente lista de _tokens_:
+
+....
+('vm', 'get', 'name')
+....
+
+A su vez, esta lista de _tokens_ se le pasa como _input_ al objeto `QVD::API::CLI::Parser`, que devuelve un análisis correspondiente a una estructura arbórea del tipo de la siguiente:
+
+....
+       X'         
+       /\
+     vm  X
+         /\
+      get  name
+....
+
+== El algoritmo de análisis sintáctico (visión simplista)
+
+Dicho de un modo muy simplista, el algoritmo de análisis sintáctico de `QVD::API::CLI::Parser` consiste en crear de forma iterativa constituyentes sintácticos a partir de otros constituyentes previamente creados. Los constituyentes iniciales del proceso son los _tokens_ que el _parser_ recibe como _input_. Así pues, en el ejemplo anterior, `get` y `name` se unen para formar `X`; y, a su vez, `vm` y `X` se unen también para crear `X'`. Pero este proceso de unión de constituyentes está regulado: no es posible unir dos constituyentes cualesquiera para crear un nuevo constituyente. Para que dos o más constituyentes se puedan unir, se tienen que dar ciertas condiciones:
+
+En primer lugar, los constituyentes que se unen tienen que ser contiguos. En el ejemplo anterior, el constituyente `vm` ocupa la posición 0, `get` la posición 1 y `name` la posición 2. A su vez, `X` ocupa las posiciones 1 y 2, y `X'` ocupa todas las posiciones (0, 1 y 2). Dadas estas posiciones, y dado que para que dos constituyentes puedan unirse deben ser contiguos, en el ejemplo anterior `vm` se puede unir a `X` y `get` puede unirse a `name`; pero, en ningún caso se podrían unir directamente `vm` y `name`, porque sus posiciones (0 y 2) no son contiguas. Esta restricción evita también que dos constituyentes se unan si uno incluye al otro. Por ejemplo, `X` y `name` no pueden unirse, pues sus posiciones se solapan, luego tampoco son contiguas.
+
+En segundo lugar, el _parser_ siempre analiza conforme a una gramática, que será un objeto de tipo `QVD::API::CLI::Grammar`. Así pues, para unir dos constituyentes de un determinado tipo, debe existir en esa gramática una regla que permita unir constituyentes del tipo en cuestión. Una versión muy simpista de este tipo de gramática, aplicable al ejemplo anterior, pudiera tener la lógica representada a continuación. 
+....
+Regla 1: X => get + name
+Regla 2: X' => vm + X
+....  
+
+La regla 1 es la que permite crear un constituyente  `X` a partir de `get` y `name`; y la regla 2 es la que permite crear `X'` a partir de `vm` y `X`. En ningún caso se podría crear, en cambio, conforme a esta gramática, un constituyente mediante la unión directa de `vm` y `get`, pues no existe regla alguna que legitime esa unión.
+
+
+El proceso iterativo de análisis acaba cuando ya no es posible crear nuevos constituyentes que respeten las restricciones anteriores. En ese momento, el algoritmo pasa a comprobar si se ha construido algún constituyente que cumpla estos requisitos:
+
+* Que cubra todas las posiciones de la oración. Por ejemplo, para el ejemplo anterior, el constituyente debería cubrir las posiciones 0, 1 y 2.
+
+* Que sea un constituyente definido en la gramática como axioma. Dicho en términos lingüísticos: es un constituyente que representa a una oración completa. En el ejemplo anterior, este constituyente debería ser `X'`.
+
+En definitiva, cuando el proceso iterativo de construcción de constituyentes termina, se crea una lista con todos los constituyentes creados que cubren la oración completa y son axiomas. Básicamente, esa lista de constituyentes será la respuesta del _parser_. Si la lista está vacía, la oración de entrada se considera agramatical, y si tiene más de un elemento, se considera ambigua. Para el CLI lo deseable es que la lista cuente con un elemento, de modo que la oración se considere gramatical no ambigua, y permita efectuar una llamada concreta a la API.
+
+
+== El algoritmo de análisis sintáctico (visión compleja)
+
+
+Como se ha dicho antes, el objeto encargado de llevar a cabo el análisis sintáctico de las oraciones se define en la clase `QVD::API::CLI::Parser`. Pero este objeto no trabaja solo, sino que, para llevar a cabo su cometido, utiliza una serie de objetos auxiliares:
+
+* La clase `QVD::API::CLI::Grammar` define la gramática conforme a la cual el _parser_ analiza.
+
+* La clase `QVD::API::CLI::Parser::Edge` define, _grosso modo_, a los constituyentes que el _parser_ va creando. 
+
+* La clase `QVD::API::CLI::Parser::Chart` define el repositorio de constituyentes creados por el análisis. En adelante, se le identificará como el _chart_. 
+
+* La clase `QVD::API::CLI::Parser::Agenda` define la lista de constituyentes creados en la última iteración del proceso. En adelante, se identificará a esta lista como _agenda_.
+
+Como se ve, el _parser_ cuenta con dos repositorios distintos de constituyentes: el _chart_ y la _agenda_. Además, el proceso de análisis es, como se ha dicho, iterativo. En cada iteración número _n_, el _chart_ contiene todos los constituyentes que se han ido creando durante las iteraciones anteriores a la iteración inmediatamente anterior (las número  _n_ - 2 y anteriores). Y la _agenda_ contiene los constituyentes que se han creado en la iteración inmediatamente anterior (la número _n_ - 1). Así pues, en cada iteración, se toman los constituyentes de la _agenda_ y se opera con ellos a fin de crear nuevos constituyentes. Una vez efectuadas estas operaciones, esos  constituyentes recién creados se pasan a la _agenda_ de la iteración siguiente (la _n_ + 1); mientras que los constituyentes de la _agenda_ actual se pasan al _chart_. El final del proceso se alcanza cuando en una iteración la _agenda_ que se crea para la siguiente iteración es una lista vacía. En cuanto al comienzo del proceso, en la primera iteración (_n_ = 1), la _agenda_ está formada por la lista de _tokens_ que se le pasan al _parser_ como _input_; y el _chart_ está vacío (no ha habido iteraciones anteriores que hayan creado constituyentes). Véase el siguiente pseudocódigo que representa todo ello.
+
+....
+
+chart = ()
+agenda = tokens
+
+while (lenght agenda > 0)
+{
+  new_agenda = get_new_constituents(agenda)
+  chart = chart + agenda	     
+  agenda = new_agenda
+}
+
+....
+
+Esta es la lógica iterativa básica del algoritmo de análisis de `QVD::API::CLI::Parser`. Queda por explicar en qué consisten las operaciones de creación de nuevos constituyentes a partir de los constituyentes de la agenda. 
+
+Para entender estas operaciones de creación de constituyentes hay que introducir el concepto de _edge_ (objeto de tipo `QVD::API::CLI::Parser::Edge`). Se ha dicho antes que un _edge_ es, _grosso modo_, un constituyente. En realidad, un _edge_ es un objeto que representa a un constituyente, y que además, tiene dos listas: `found` y `to_find`. En estas listas se guardan los constituyentes menores que forman al constituyente que define el _edge_. En `found` aparecen los constituyentes menores que ya han sido encontrados en el análisis; mientras que en `to_find` aparecen los constituyentes aún pendientes de ser encontrados. Todo _edge_ se crea tomando como modelo una regla de la gramática. Por ejemplo, recuérdese la siguiente regla vista anteriormente
+
+....
+X => get + name
+....
+
+Tomando como modelo esta regla, se podrían crear estos tres _edges_ distintos:
+
+....
+[ X, found(), to_find(get, name)]
+[ X, found(get), to_find(name)]
+[ X, found(get, name), to_find()]
+.... 
+
+Los tres representan al mismo tipo de constituyente: `X`. Pero todos ellos tienen un valor distinto para `found` y `to_find`.  El primer _edge_ representa a un constituyente hipotético `X` cuyos constituyentes menores no han sido encontrados aún en el análisis. El segundo _edge_ representa a un constituyente  `X` también hipotético, cuyo constituyente menor `name` ya ha sido encontrado en el análisis, pero al que aún le falta por encontrar `name`. En cambio, el último _edge_ representa a un constituyente `X` real, un constituyente cuya presencia en la oración ya está comprobada, pues en el análisis ya se han encontrado tanto  `get` como `name`. Los _edges_ con una lista `to_find` vacía se llaman _edges_ inactivos. Y los _edges_ con algún elemento en su lista `to_find` (algún elemento pendiente de encontrar) se llaman _edges_ activos.
+
+Así pues, las unidades de análisis que usa el _parser_ no son propiamente los constituyentes, sino  los _edges_. Estos serán los objetos que se guarden en la _agenda_ y el _chart_ y los que se van creando en cada iteración del proceso de análisis. Así pues, conforme a lo que se ha explicado antes, en cada iteración del proceso de análisis se toman los _edges_ de la _agenda_ y se crean, a partir de ellos, nuevos _edges_ mediante la aplicación de dos tipos de operaciones: la expansión de _edges_ y la combinación de _edges_.
+
+La expansión es un proceso que se intenta aplicar, en cada iteración, a cada uno de los _edges_ inactivos de la _agenda_. Para cada uno de estos _edges_ inactivos *x*, se buscan todas las reglas de la gramática en las que *x* aparezca como primer elemento de la lista de constituyentes menores; es decir, reglas del tipo de:
+
+....
+
+X => x
+X => x + y
+X => x + y + ...
+....
+
+A continuación, cada una de estas reglas se usa como modelo para crear un _edge_ nuevo. Cada uno de estos _edges_ representará al elemento que aparece en la margen izquierda de la regla correspondiente, tendrá en `found` a *x* y en `to_find`, si los hubiera, al resto de constituyentes menores. Por ejemplo, la expansión de *x* a partir de las reglas anteriores daría lugar, respectivamente, a los _edges_ siguientes:
+
+....
+[ X, found(x), to_find()]
+[ X, found(x), to_find(y)]
+[ X, found(x), to_find(y, ...)]
+.... 
+
+Como se ve, estos _edges_ resultantes de la expansión de *x* serán activos o inactivos según fuera la regla que sirvió de modelo para su creación. Si la regla en cuestión tiene en la margen derecha otros elementos detrás de *x*, el _edge_ resultante es activo; si *x* es el único elemento de esa margen derecha, el _edge_ es inactivo. En definitiva, la expansión consiste en crear _edges_ que representen, de acuerdo con las reglas de la gramática, a un constituyente (en el ejemplo de arriba *X*) a partir de la existencia del primero de sus constituyentes menores (*x*). Esta operación, como se ha dicho, se aplica en cada iteración a cada uno de los _edges_ inactivos de la _agenda_, representantes de *x*.
+
+El segundo tipo de operación es la combinación de _edges_. La combinación siempre se hace entre un _edge_ de la _agenda_ y un _edge_ del _chart_. En concreto, en cada iteración del proceso de análisis, cada _edge_ inactivo de la _agenda_ se intenta combinar con todos los _edges_ activos del _chart_; y cada _edge_ activo de la _agenda_ se intenta combinar con los _edges_ inactivos del _chart_. De un modo u otro, la combinación se hace siempre entre un _edge_ activo y otro inactivo. Dos _edges_ combinan si el  inactivo representa al primer constituyente de la lista `to_find` del  activo. Cuando dos _edges_ combinan, el _parser_ crea un tercer _edge_ que representa a la combinación de los dos. Por ejemplo los dos _edges_ marcados como Activo e Inactivo a continuación, al combinar, desatan la creación del tercer _edge_: Resultado. 
+
+....
+Activo:    [ X, found(x), to_find(y)]
+Inactivo:  [ y, found(), to_find()]
+Resultado: [ X, found(x,y), to_find()]
+.... 
+
+Como se ve, los _edges_ Activo e Inactivo combinan porque el constituyente representado por el inactivo, y el primer elemento del `to_find` del activo son ambos *y*. El _edge_ resultante de la combinación es idéntico al _edge_ activo original salvo porque, en él, *y* ya está encontrado (aparece en `found`, no en `to_find`). El que el _edge_ resultante de una combinación sea activo o inactivo depende de que el _edge_ activo original tuviese en `to_find` o no más elementos pendientes de encontrar. 
+ 
+
+Recopilando todo lo expuesto anteriormente, se puede explicar el algoritmo de _parsing_ con más precisión. Este  algoritmo define un proceso iterativo en el que, en cada iteración, se crean _edges_ nuevos a partir de los _edges_ creados en iteraciones anteriores. Los procedimientos que permiten crear estos _edges_ son la expansión y la combinación. En cada iteración, cada _edge_ inactivo de la _agenda_ se expande de acuerdo con las reglas de la gramática y se combina con los _edges_  activos del _chart_; y cada _edge_ activo de la _agenda_ se combina con los _edges_ inactivos del _chart_.  Véase la representación de todo ello en el siguiente pseudocódigo.
+
+....
+
+chart = ()
+agenda = tokens
+
+while (lenght(agenda) > 0)
+{
+  new_agenda = ()
+
+  for edge (agenda)
+  {
+    if (inactive(edge))
+    {  
+      inactive_edge = edge
+
+      for rule (rules(edge))
+      {
+        new_agenda = new_agenda + expand(inactive_edge,rule)
+      }
+
+      for active_edge (active_edges(chart))
+      {
+        new_agenda = new_agenda + combine(inactive_edge,active_edge)
+      }
+    }
+    else
+    {
+      active_edge = edge
+
+      for inactive_edge (inactive_edges(chart))
+      {
+        new_agenda = new_agenda + combine(inactive_edge,active_edge)
+      }
+    }
+  }
+
+  chart = chart + agenda	     
+  agenda = new_agenda
+}
+
+....
+
+== El algoritmo de análisis sintáctico (Unificación)
+
+Hasta ahora se ha mostrado una versión simplificada de la gramática utilizada por el CLI. Los constituyentes vistos en las reglas gramaticales hasta el momento han sido  meros elementos atómicos:
+
+....
+
+X => x + y
+X' => z + X
+....
+
+En cambio, en la gramática del CLI, cada constituyente de una regla es una estructuras de rasgos, un conjunto de pares clave/valor. La gramática que se acaba de mostrar podría reformularse, entonces, como sigue:
+
+....
+
+{ "label" : "X", "full" : false } => { "label" : "x" } + { "label" : "y" }
+{ "label" : "X", "full" : true } => { "label" : "z" } + { "label" : "X", "full" : false }
+....
+
+Además, se ha introducido en la gramática del CLI un sencillo sistema que permite estipular que un mismo rasgo en distintos constituyentes de una regla tiene que tener el mismo valor.  Por ejemplo, en la siguiente regla, `#label` es una variable, con ámbito sobre toda la regla. Esta regla establece  que el rasgo `label` de los dos constituyentes tiene que tener el mismo valor, sea este el que sea:
+
+....
+
+{ "label" : #label, "level" : 2 } => { "label" : #label, "level" : 1 }
+
+....
+
+Intuitivamente, podría decirse que la regla permite tomar un constituyente de nivel 1 (`level` 1) del tipo que sea (`label #label`) y convertirlo en un constituyente del mismo tipo, pero en nivel 2 (`level` 2). Si bien con una cierta limitación, el sistema también permite definir reglas que establezcan que, para formar un nuevo constituyente, se deben unir dos constituyentes cuyo valor para un cierto rasgo debe ser el mismo. Es lo que ocurre en la siguiente regla, que permite la unión de dos constituyentes siempre y cuando estos tengan el mismo `label`.
+
+....
+
+{ "label" : #label } => { "label" : #label } + { "label" : #label }
+
+....
+
+Pero, como se ha dicho, este sistema de identidades entre rasgos de distintos constituyentes de una regla tiene ciertas limitaciones. La razón es que, debido al diseño  del _parser_, no es posible establecer identidades, directamente, entre los constituyentes de la margen derecha de una regla. Las identidades se establecen, en cambio, entre cada uno de los constituyentes de la margen derecha con el constituyente de la margen izquierda. Así pues, para la regla anterior,  el _parser_  controla que el primer constituyente de la derecha tenga el mismo `label` que el constituyente de la izquierda; y, después controla que el segundo constituyente de la derecha tenga también el mismo `label` que el de la izquierda. De este modo, indirectamente, se obliga a que los dos constituyentes de la derecha tengan el mismo valor. Pero esto hace necesario incluir el rasgo  `label` con valor `#label` en la margen izquierda de la regla; con lo cual, las siguientes reglas serían imposibles en el CLI:
+
+....
+
+{ } => { "label" : #label } + { "label" : #label }
+{ "label" : "X" } => { "label" : #label } + { "label" : #label }
+
+....
+
+
+Como se ha visto en apartados anteriores, en el proceso de _parsing_ es necesario comparar  constituyentes para determinar si son o no del mismo tipo. Por ejemplo, para determinar si el constituyente `x` puede expandirse con la regla `X => x + y`, es necesario ver si ese  constituyente `x` es del mismo tipo que el constituyente `x` de la regla. En un sistema con constituyentes atómicos, dos constituyentes son del mismo tipo, sencillamente, si son exactamente iguales. Pero en un sistema en el que los constituyentes son estructuras de rasgos, ¿cuándo se puede decir que dos constituyentes son  del mismo tipo? Por ejemplo, parece obvio que `{ "label" : "x" }` y `{ "label" : "x" }` sí son del mismo tipo; mientras que `{ "label" : "x" }` y `{ "label" : "y" }` no lo son. Pero ¿son `{ "label" : "X" }` y `{ "label" : "X", "full" : false }` del mismo tipo? 
+
+En el CLI, la propiedad que determina si dos constituyentes son del mismo tipo es la unificación: dos constituyentes A y B son del mismo tipo si A y B unifican. Dos constituyentes A y B unifican si para todo rasgo de A presente en B se da al menos una de estas situaciones:
+
+* El valor del rasgo de A es idéntico al de B.
+* El valor del rasgo de A es una variable.
+* El valor del rasgo de B es una variable.
+
+En concreto, el _parser_ del CLI establece tres situaciones en las que hay que comprobar si dos constituyentes son del mismo tipo o no, si unifican o no.
+
+* Para determinar si un constituyente puede expandirse o no mediante una regla de la gramática. En este caso el constituyente en cuestión debe unificar con el primer constituyente de la margen derecha de la regla.
+
+* Para determinar si un _edge_ activo combina con uno inactivo. Para ello, el constituyente representado por el inactivo debe unificar con el primer elemento que tenga el activo en su lista `to_find`.
+
+* Para determinar si uno de los constituyentes creados por el _parser_ es un axioma de la gramática o no. Para ello, el constituyente en cuestión  debe unificar con la definición de axioma de la gramática.
+
+Estas tres comprobaciones las hace el _parser_ en la clase `QVD::API::CLI::Parser`. Para llevarlas a cabo, se usan las siguientes clases: `QVD::API::CLI::Grammar::Substitution` y `QVD::API::CLI::Grammar::Unification`. La clase `QVD::API::CLI::Grammar::Substitution` es una sustitución, un diccionario que permite especificar un valor para cada variable de un constituyente. Así pues, cada constituyente *C* en el análisis tiene asociada una sustitución *S* que puede especificar el valor de sus variables. El resultado de especificar las variables de *C* de acuerdo con *S* da lugar a un constituyente virtual *C'*. Por ejemplo, si *C* es `{ "label" : #label }` y *S* es `{ #label : "X" }`, entonces *C'* es `{ "label" : "X" }`. Cuando el _parser_ intenta unificar dos constituyentes *C1* y *C2*, en realidad lo que hace es comparar sus respectivas versiones virtuales *C1'* y *C2'*, resultantes de aplicar a  *C1* y *C2* las respectivas sustituciones.
+
+La clase `QVD::API::CLI::Grammar::Unification` define al objeto encargado en el análisis de comprobar si dos constituyentes unifican o no. El método `unify` de esta clase  toma cuatro argumentos: dos constituyentes *C1* y *C2* con sus respectivas sustituciones *S1* y *S2*. El método aplica *S1* y *S2* respectivamente a *C1* y *C2* y crea los constituyentes virtuales *C1'* y *C2'*. Después compara estos constituyentes: si no unifican devuelve 0. Pero si sí unifican, el método devuelve un valor positivo.
+
+La  unificación, tal como se ha definido en el CLI, es en realidad una operación asimétrica. El método `unify` siempre se ejecuta sobre constituyentes que, en el proceso de análisis, cumplen funciones distintas. Uno de ellos siempre es un constituyente real, creado en el análisis; y otro es un constituyente hipotético, tomado de la margen derecha de una regla gramatical (expansión) o de una lista `to_find` de un _edge_ activo (combinación). Dicho en términos intuitivos, el constituyente hipotético es un elemento que se busca, es una posición pendiente de cubrir; y el constituyente real es el candidato que intenta cubrir esa posición. El constituyente hipotético es la variable y el constituyente real es su instancia. Así pues, la unificación se ha definido en el CLI como una operación asimétrica que comprueba si un constituyente real es un buen candidato para cubrir la posición de un constituyente hipotético.  
+
+Se ha dicho que, cuando estos  dos tipos de constituyentes unifican, el método `unify` devuelve un valor positivo, y si no unifican, devuelve 0. Pues bien, ese valor positivo que devuelve `unify` tras una unificación exitosa es, en concreto, una nueva sustitución, un objeto `QVD::API::CLI::Grammar::Substitution`. Esta es la sustitución que hay que aplicarle al constituyente hipotético para añadirle la especificidad que el constituyente real puede aportarle. En concreto, esta sustitución contendrá la información que ya existía en la sustitución del constituyente hipotético, más aquellas variables de dicho constituyente hipotético para las cuales el constituyente real sí tuviera un valor. Por ejemplo, el método `unify`, para los argumentos siguientes devolvería la sustitución que se presenta a continuación.
+
+....
+
+Constituyente de origen:                 { "label" : "x", "key" : #key }
+Sustitución del constituyente de origen: { #key : "none" }
+Constituyente meta:                      { "label" : #label, "level" : #level, "key" : #key }
+Sustitución del constituyente meta:      { #level : 1 }
+
+Sustitución resultante:                  { #level : 1, #label : "x", #key : "none" }
+....
+
+Cabe preguntarse, por último, ¿para qué `unify` crea esta nueva sustitución si, en principio, el objetivo de la unificación es sencillamente determinar si dos constituyentes son del mismo tipo? En principio, bastaría con que `unify` devolviese un valor booleano sencillo (1 o 0).  Como se acaba de ver, la unificación se efectúa, fundamentalmente, en contextos de expansión  y combinación de constituyentes. En ambos contextos, si la unificación es exitosa, el _parser_ crea un nuevo constituyente. Pues bien, la sustitución que devuelve el método `unify` es la sustitución que el _parser_ asigna a ese nuevo constituyente. Es crucial recordar aquí que ese nuevo constituyente es estructuralmente mayor que los constituyentes unificados. Ese nuevo constituyente incluye como constituyente menor al constituyente hipotético (legitimado como real por haber unificado con el constituyente real). La sustitución creada por el método `unify` es capaz de añadir la debida especificidad tanto a ese nuevo constituyente mayor como al constituyente hipotético, pues ambos están en el mismo dominio de variables. De este modo, el _parser_ consigue que el valor de una variable en el constituyente menor sea el mismo que en el constituyente mayor.
+
+Con todo ello se empieza a comprender cómo asigna el _parser_ una sustitución a cada constituyente del análisis. Los primeros constituyentes de un análisis (correspondientes a los _tokens_ de entrada) llevan asignadas sustituciones triviales vacías. A partir de ahí todo constituyente mayor se crea por expansión o combinación. Las sustituciones que se asignan a esos constituyentes son las devueltas por los respectivos procesos de unificación que legitimaron su creación. 
+
+
+== El algoritmo de análisis sintáctico (Significado)
+
+El análisis que hace el _parser_ del CLI es una estructura arbórea del estilo de
+
+....
+       X'         
+       /\
+     vm  X
+         /\
+      get  name
+....
+
+Sin embargo, lo que interesa en el CLI  no es este tipo de análisis, sino el significado que ese análisis lleva aparejado. Este significado es un HASH que, codificado en JSON y salvando las distancias, es válido como petición a la API de administración de QVD. 
+
+Cada constituyente del análisis tiene asociado un HASH, ARRAY o escalar que es su significado. El significado de un constituyente se crea composicionalmente a partir del significado de  sus constituyentes menores. Toda regla de la gramática define un constituyente creado a partir de la unión de sus constituyentes menores. Pues bien, toda regla de la gramática tiene asociada una función que calcula el significado del constituyente que define a partir del significado de sus constituyentes menores. La función toma como argumento la lista de significados de sus constituyentes menores y, a partir de ellos, crea un nuevo HASH, ARRAY o escalar que se devuelve como significado del constituyente mayor.
+
+El _parser_, para cada constituyente que crea, crea además su significado, ejecutando la función correspondiente. Para ello ejecuta el método `percolate_meaning_from_constituents` en la clase `QVD::API::CLI::Parser`. Una vez todo el proceso de análisis ha concluido, por cada análisis satisfactorio existe un significado: el significado asociado al constituyente superior del análisis en cuestión. La lista de significados será el _output_ real del proceso de _parsing_. Más en concreto, cada uno de esos significados el _parser_ lo convierte en un objeto `QVD::API::CLI::Meaning`. Este objeto no es más que un _wrapper_ que permite acceder de forma sencilla al HASH original. 
+
+== La clase `QVD::API::CLI::Command`
+
+Esta clase es la superclase de la  mayor parte de los comandos del CLI. Todo comando de una aplicación `CLI::Framework`, como el CLI, tiene un método  `run`. Este método es el que se ejecuta cuando se introduce el comando en la consola de la herramienta. La mayoría de los comandos del CLI definen un método `run` muy sencillo que prácticamente solo invoca al método `run` de la superclase `QVD::API::CLI::Command`. Por su parte, el método `run` en `QVD::API::CLI::Command` sí tiene cierta complejidad. Opera de forma diferente en función del tipo de petición que se haya hecho al CLI; pero, en líneas generales, ejecuta, de forma secuencial, los cuatro métodos siguientes:
+
+* `parse_string`. Este método toma como argumento la petición hecha al CLI en forma de _string_. Es el método encargado de ejecutar el _parser_ que analiza esa petición. Su _output_ es la lista de análisis que el _parser_ hace para esa petición. Cada uno de esos análisis es un objeto de tipo `QVD::API::CLI::Grammar::Response`. A partir de él se puede construir una consulta a la API de administración de QVD.
+*  `make_api_query`. Toma como argumento el objeto `QVD::API::CLI::Grammar::Response` que devuelve `parse_string`. A partir de él crea un JSON útil para ser mandado como petición a la API. Este proceso es la interfaz que transforma la petición tal como se concibe en el CLI en una petición apropiada para la API. Esta no es siempre una transformación trivial. Una petición hecha al CLI no tiene por qué tener una correspondencia directa con una petición a la API. En ocasiones una petición hecha al CLI requiere varias peticiones a la API, o los nombres de los filtros, argumentos, etc. deben ser ajustados... 
+      
+* `ask_api`. Este método toma como argumento el JSON que devuelve  `make_api_query`. A este JSON le añade las credenciales necesarias para autenticarse en la API (tomadas de los parámetros existentes el la sesión del CLI). Con ello, manda la petición a la API y devuelve el resultado que esta le arroja en forma de objeto. 
+* `print_table`. Este método toma como argumentos el objeto `QVD::API::CLI::Grammar::Response` a partir del cual se hizo la consulta a la API y el objeto que arroja la API como respuesta. Haciendo un cotejo de ambos, crea una tabla `Text::UnicodeTable::Simple` y la saca por consola.   
+
+Es crucial la idea de que una petición hecha al CLI, tal como se define en el CLI, no tienen por qué corresponderse con una petición hecha a la API. Esto es un rasgo de diseño importante que da al sistema la necesaria versatilidad. El CLI, por requerimientos de la API, distingue entre peticiones de visualización y creación de elementos por un lado; y peticiones de borrado y actualización por otro. La diferencia estriba en que las acciones que gestionan el borrado y actualización en la API obligan a especificar el _id_ de los objetos sobre los que se quiere operar; lo cual no ocurre en las acciones de visualización y creación (al menos en las que se invocan desde el CLI). En cambio, el CLI permite invocar cualquiera de estas operaciones sin necesidad de filtrar por _id_.  Véase la diferencia en este ejemplo. El CLI permite hacer la siguiente petición, que borraría todas las máquinas virtuales cuyo nombre empezase por 'vm':
+
+....
+vm name ~ vm delete
+....
+
+La API, en cambio, solo permite ejecutar la acción de borrado sobre máquinas virtuales concretas identificadas por _id_. 
+
+....
+
+{ "action":"vm_delete", "filters":{"id":[1,2,3,4,5,6]}}
+
+....
+
+Por ello, cuando el CLI recibe la petición vista arriba, tiene que hacer no una, sino dos peticiones a la API. En la primera, pide todos los _ids_ de las máquinas virtuales que empiezan por 'vm'. Y, una vez tiene esa lista de _ids_, manda con ellos, ahora sí, la petición de borrado.
+
+....
+
+{ "action":"vm_all_ids", "filters":{"name":{"~":"vm"}}}
+{ "action":"vm_delete", "filters":{"id":[1,2,3,4,5,6]}}
+....
+
+Existen otras situaciones que requieren el uso de llamadas extra a la API. En general, pudiera ocurrir para cualquier acción que admita determinados filtros o argumentos. La API también usa el _id_ para identificar a los objetos de QVD relacionados con el objeto principal de una petición. Así pues, para filtrar máquinas virtuales en función de su OSF, se usa el filtro `osf_id`:
+
+....
+
+{ "action":"vm_get_list", "filters":{"osf_id":1}}
+....
+
+Sin embargo, en el CLI, esos objetos relacionados se identifican por nombre:
+
+....
+
+vm osf = myOSF get
+....
+
+Por tanto, de nuevo será necesario que, antes de pedir las máquinas virtuales a la API, se le pida el id del OSF 'myOSF':
+
+....
+{ "action":"osf_all_ids", "filters":{"name":{"=":"myOSF"}}}
+{ "action":"vm_get_list", "filters":{"osf_id":1}}
+....
+
+En definitiva, el CLI admite unas acciones, cada una con sus filtros y/o argumentos. La cuestión es que ni la _key_ ni el valor de esos filtros y argumentos tiene por qué tener correspondencia con los filtros y argumentos que admite la API. Todo este, a veces complejo, paso de la petición del CLI a la de la API se gestiona en la clase `QVD::API::CLI::Command` mediante variables de clase que establecen las correspondencias entre los elementos encontrados en la petición del CLI y los elementos correspondientes en la petición a la API. Estas variables son consultadas por las funciones encargadas de hacer el _mapping_ de una petición a otra. Todas ellas toman como argumento un objeto `QVD::API::CLI::Grammar::Response` que representa, como se ha dicho, el análisis de la petición hecha al CLI. De acuerdo con ese análisis, se extrae de las variables de clase la información pertinente para la petición en cuestión. 
+
+== Otros
+
+=== Elementos creados directamente en la base de datos
+
+La base de datos de QVD4 no puede crearse solamente haciendo _deploy_ del esquema definido mediante DBIC. Es necesario, también añadir los siguientes elementos:
+
+* La vista `all_acl_role_relations`. Devuelve, para todos los pares acl/rol posibles en la base de datos, un _flag_ que determina si el acl está o no operativo en el rol.
+
+* La vista  `operative_views_in_tenants`. Devuelve todos los _tokens_ de configuración de vistas del WAT para cada tenant. Además de devolver los _tokens_ físicamente presentes en la base de datos, crea, si es necesario, otros virtuales para forzar el comportamiento por defecto de las _custom properties_.
+
+* La función `delete_views_for_removed_property` se ejecuta cuando una _custom property_ se borra en la base de datos. La función borra de la base de datos todos los _tokens_ de configuración de vistas del WAT relativos a la _custom property_ borrada.
+
+* Los _triggers_ que lanzan la función anterior:
+** `delete_views_for_removed_di_property`.
+** `delete_views_for_removed_host_property`.
+** `delete_views_for_removed_osf_property`.
+** `delete_views_for_removed_user_property`.
+** `delete_views_for_removed_vm_property`.
+
+* Los _triggers_ usados para lanzar notificaciones que se leen en el _websocket_ de la API: 
+** `di_blocked_or_unblocked_trigger`.
+** `di_created_or_removed_trigger`.
+** `host_blocked_or_unblocked_trigger`.
+** `host_created_or_removed_trigger`.
+** `host_state_changed_trigger`.
+** `osf_created_or_removed_trigger`.
+** `user_blocked_or_unblocked_trigger`.
+** `user_created_or_removed_trigger`.
+** `user_state_changed_trigger`.
+** `vm_blocked_or_unblocked_trigger`.
+** `vm_created_or_removed_trigger`.
+** `vm_expiration_date_changed_trigger`.
+** `vm_state_changed_trigger`.
+
+* Las siguientes son las funciones que notifican los eventos a petición de los _triggers_ anteriores:
+** `di_blocked_or_unblocked_notify`.
+** `di_created_or_removed_notify`.
+** `host_blocked_or_unblocked_notify`.
+** `host_created_or_removed_notify`.
+** `host_state_changed_notify`.
+** `osf_created_or_removed_notify`.
+** `user_blocked_or_unblocked_notify`.
+** `user_created_or_removed_notify`.
+** `user_state_changed_notify`.
+** `vm_blocked_or_unblocked_notify`.
+** `vm_created_or_removed_notify`.
+** `vm_expiration_date_changed_notify`.
+** `vm_state_changed_notify`.
+
+
+
+* La función `ip2mac`. Convierte una ip en su correspondiente mac. Necesaria para la ordenación por mac en la API.
+
+== Protocolos de _websockets_
+
+La API provee tres direcciones _websocket_: `/ws`, `/staging` y `/di/download`.
+
+`/ws` es el _websocket_ de monitorización del sistema. Manda avisos ante ciertas notificaciones de la base de datos. El cliente se conecta a este _websocket_ con una url en la que manda una petición normal a la API:  
+
+....
+ws://localhost:3000/ws/?sid=blablabla&action=vm_get_details&filters={"id":2}&fields=["state"]
+....
+
+Una vez registrada la petición, el servidor la ejecuta por primera vez y le manda al cliente la respuesta propia de la API para esa petición:
+
+....
+{"total" :1,
+ "status":0,
+ "message":"Successful completion",
+ "rows":[{"state":"stopped"}]}
+....
+
+A partir de entonces, el servidor se pone a escuchar notificaciones de la base de datos que puedan indicar que el resultado de esa petición pudiera haber cambiado. Cada dos segundos, se comprueba si ha habido nuevas notificaciones; y  si sí las ha habido, se vuelve a ejecutar la misma petición y se manda el nuevo resultado: 
+
+....
+
+{"total" :1,
+ "status":0,
+ "message":"Successful completion",
+ "rows":[{"state":"starting"}]}
+
+....
+
+El servidor espera que siempre que manda un mensaje, el cliente le responda con un mensaje cualquiera. Cuando el servidor recibe ese mensaje, crea un _timer_ que, tras 25 segundos de espera, manda a su vez un mensaje 'AKN' al cliente. Si antes de terminar esos 25 segundos, el servidor recibe un nuevo mensaje del cliente, pone el _timer_ a 0 y vuelve a esperar 25 segundos para mandar un 'AKN'. Con esto se consigue que, al menos cada 25 segundos, se dé un intercambio de mensajes entre cliente y servidor. De este modo se evitan posibles _timeouts_.
+
+`/staging` admite una petición de creación de `DI` a partir de una imagen presente en `storage/staging`. Es un _websocket_ capaz de monitorizar el progreso de la copia de la imagen desde `storage/staging` a `storage/images`.
+
+La url que abre el _websocket_ pudiera ser la siguiente:
+
+....
+ws://localhost:3000/ws/?sid=blablabla&action=di_create&arguments={"osf_id":1,"disk_image":"unaimagendedisco-3.0.tar.gz"}
+....
+
+El _websocket_, una vez abierto, crea el  `DI` pedido y cuando ha terminado el proceso, manda la respuesta normal de la API para tal petición:
+
+....
+{"total" :1,
+ "status":0,
+ "message":"Successful completion",
+ "rows":[{"id":"4"}]}
+....
+
+Pero ese proceso, debido a la copia de la imagen de disco, puede llegar a ser muy largo. Así pues, el _websocket_ tiene habilitado un sistema de monitorización del progreso de la copia. El servidor, cada vez que recibe un mensaje cualquiera del cliente, le manda un JSON del siguiente tipo, donde se informa del tamaño total de la imagen y del tamaño que se ha copiado hats el momento:
+
+....
+{"status":1000,
+ "total_size":1000000000,
+ "copy_size":100000}
+....
+   
+Así pues, en un uso normal de este _websocket_, el cliente abre la conexión. A continuación, le manda al servidor un mensaje cualquiera. El servidor le responde con el progreso de la copia de la imagen. Cuando el cliente recibe esa respuesta, vuelve a mandar un mensaje cualquiera al servidor. De nuevo, el servidor le responde con el progreso de la copia. Este bucle continúa hasta que el servidor termina la creación del `DI`. En ese momento, el servidor manda al cliente la respuesta normal de la API para esa petición. Cuando el cliente recibe este tipo de respuesta, debe dejar de mandar mensajes al servidor y cerrar la conexión.
+
+`/di/download` admite una petición de creación de `DI` a partir de una imagen que se debe descargar de una url. En este caso, el _websocket_ lo que monitoriza  es el progreso de descarga de la imagen. El protocolo de este _websocket_ es idéntico al de `/staging`. 
+
+== Sintaxis de la API
+
+=== Credenciales
+
+Toda llamada a la API (excepto en la url `/info`) necesita proporcionar las credenciales que permitan identificar a un administrador válido. Existen dos tipos de credenciales potencialmente válidas:
+
+* `login`, `password` y, si se está en modo multitenant, `tenant`. Son las credenciales que permiten identificar a un administrador para loguearse.
+* `sid`. Es el identificador de la sesión de un administrador previamente logueado.
+
+Así pues, las siguientes peticiones a la API son potencialmente válidas:
+
+....
+{ "login":"benja", "password":"benja", "tenant":"Madrid", ... }
+{ "sid":"aaaa", ... }
+....
+
+=== Acción
+
+También es necesario proporcionar en la petición el nombre de la acción que se pide ejecutar: `action`. 
+....
+{ "sid":"aaaa", "action":"vm_get_list" }
+....
+
+=== Filtros
+
+Ciertas acciones admiten filtros que permiten discriminar sobre qué objetos se debe aplicar una operación. Estos filtros se pueden añadir a la petición como valor de `filters`. 
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"name":"myVM","state":"running" }}
+....
+
+El valor de `filters` es un HASH con pares clave/valor. Un par del tipo de `"name":"myVM"` sencillamente establece que los objetos seleccionados deben tener un nombre igual a 'myVM'. Este es el par clave/valor más sencillo definido por la API. 
+
+Pero la API también permite establecer filtros con operadores distintos a "igual". Por ejemplo, en las siguientes peticiones se piden objetos cuyos ids sean igual a 2, distinto de 2, mayor que 2, menor que 2, etc.
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"id":{"=":"2"} }}
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"id":{"!=":"2"} }}
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"id":{">":"2"} }}
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"id":{"<":"2"} }}
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"id":{">=":"2"} }}
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"id":{"<=":"2"} }}
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"id":{"-between":["1","2"]} }}
+
+....
+
+Y en las siguientes peticiones se piden objetos cuyo nombre sea igual a "myV", o que sea distinto a "myVM", o que empiece por "my".
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"name":{"=":"myVM"} }}
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"name":{"!=":"myVM"} }}
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"name":{"~":"my%"} }}
+....
+
+En realidad, cualquier operador posible en DBIC está disponible a través de la API. La única excepción es el operador `~` que es exactamente equivalente al LIKE de SQL. La API convierte internamente `~` en LIKE.
+
+También es posible en la API que el valor de un filtro sea no un único elemento sino una ARRAY de elementos:
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"id":["1","2","3"] }}
+....
+
+En este ejemplo, la API devolverá, si existen, los objetos de id 1, 2 y 3.
+ 
+Además, la API admite filtros complejos con operadores lógicos. La sintaxis de este tipo de filtros es exactamente la misma que hay en DBIC. Los operadores disponibles son `-and`, `-or` y `-not`. Cada uno de estos operadores es una clave cuyo valor será una ARRAY. En esa ARRAY se han de listar pares claves/valor que obedezcan a la sintaxis de los filtros vista hasta el momento. Por ejemplo, la siguiente expresión filtra objetos de id 1, 2 o 3 que tengan o `name` "myVM" o un `name` que empiece por "your":
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"id":["1","2","3"], "-or":["name", "myVM", "name", { "~":"your%"}] }}
+....
+ 
+Los operadores lógicos pueden anidarse:
+
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "filters":{"-and":["id", ["1","2","3"], "-or":["name", "myVM", "name", { "~":"your%"}] ]}}
+....
+
+=== Argumentos
+
+Las acciones de creación y actualización de objetos necesitan especificar argumentos. Estos se colocan como valor de `arguments`. Este valor de   `arguments` es en HASH con pares clave/valor. Por ejemplo, la siguiente petición toma un objeto con nombre "myVM" y le cambia el nombre a "yourVM",
+
+....
+{ "sid":"aaaa", "action":"vm_update", "filters":{"name":"myVM"}, "arguments":{"name":"yourVM"}}
+....
+
+La API ha definido una serie de argumentos especiales que se han llamado _nested queries_. Estos argumentos permiten efectuar ciertas asignaciones de objetos de QVD a un objeto principal:  asignar `tags` a `DIs`; asignar _custom properties_ a máquinas virtuales, usuarios, OSFs, _hosts_ o `DIs`;  asignar acls o roles a un rol; o asignar roles a administradores.
+
+Así pues, en las acciones de creación, es posible incluir los siguientes argumentos, que añaden al objeto recién creado _properties_, _tags_, acls o roles: 
+
+....
+{ "action":"vm_create", "arguments":{ "__properties__":{"key1":"value1","key2":"value2"}}}
+
+{ "action":"di_create", "arguments":{ "__tags__":["tag1","tag2"]}}
+
+{ "action":"role_create", "arguments":{ "__tags__":["acl1","acl2"],"__roles__":["role1","role2"]}}
+
+{ "action":"admin_create", "arguments":{ "__roles__":["role1","role2"]}}
+....
+
+Las opciones de las acciones de actualización de elementos son más, pues en la actualización es posible tanto asignar como desasignar elementos. Por simplicidad, a continuación ni se incluyen otros argumentos obligatorios ni las debidas credenciales:
+
+....
+{ "action":"vm_update", "arguments":{"__properties_changes__":{"set":{"key1":"value1"},"delete":["key2"]}}}
+
+{ "action":"di_update", "arguments":{"__tags_changes__":{"create":["tag1","tag2"],"delete":["tag3"]}}}
+
+{ "action":"role_update", "arguments":{"__acls_changes__":{"assign_acls":["acl1"],"unassign_acls":["acl2"]},"__roles_changes__":{"assign_roles":["role1"],"unassign_roles":["role2"]}}}
+
+{ "action":"admin_update", "arguments":{"__roles_changes__":{"assign_roles":["role1"],"unassign_roles":["role2"]}}}
+....
+
+=== Campos a devolver
+
+La API  permite especificar una lista de campos a devolver para cada objeto.  Esa lista se coloca en la petición como valor del campo `fields`. Así pues, en la siguiente petición, para cada una de las máquinas virtuales encontradas, se devuelve solo el id, el nombre y el estado.
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "fields":["id","name","state"] }
+....
+
+Si la petición no incluye `fields`, para cada objeto encontrado se devuelven todos los campos disponibles.
+
+=== Ordenación 
+
+Para establecer criterios de ordenación de los objetos que devuelve la API se usa `order_by`. El valor de `order_by` es un HASH con dos claves: `field` y `order`. La clave `field` toma por valor el campo por el cual se debe establecer la ordenación; y la clave `order` toma por valor un indicador que determina si la ordenación debe ser ascendente (`-asc`) o descendente (`-desc`).
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "order_by":{"field":"id","order":"-desc" }}
+....
+
+Si no se especifica `order`, la API toma el valor por defecto, que es `-asc`. Además, también se permite establecer más de un criterio de ordenación:
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "order_by":{"field":["id","name"],"order":"-desc" }}
+....
+
+=== Paginación
+
+La API también permite que se le especifiquen criterios de paginación. Para ello, es necesario incluir en la petición los campos `block` y `offset`. El valor de `block` debe ser un número que determine la cantidad de objetos que se deben mostrar por página; y el valor de  `offset` es el número de página que se está pidiendo. Así pues, la siguiente _query_ pide la página 3, dada una paginación en la que cada página contiene 20 elementos.
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "block":20, "offset":3}
+....
+
+=== Parmámetros
+
+Por último, la API incluye un campo `parameters` que admite como valor un HASH. En este HASH se le puede pasar a la API información de forma libre. Por ejemplo, actualmente un cliente puede identificarse en la clave `source` de este HASH, y la API así puede saber desde dónde está recibiendo la petición. 
+
+....
+{ "sid":"aaaa", "action":"vm_get_list", "parameters":{"source":"WAT"}
+{ "sid":"aaaa", "action":"vm_get_list", "parameters":{"source":"CLI"}
+{ "sid":"aaaa", "action":"vm_get_list", "parameters":{"Hola":"Esto no sirve para nada"}
+....
+
+== Cómo añadir una acción a la API.
+
+Se registra la acción en `QVD::API::Action`. Para ello, se debe añadir un par clave/valor a la variable `$ACTIONS` de esa clase. La clave es el nombre de la nueva acción y el valor es un HASH con la siguiente información:
+
+* El tipo de acción (si es de creación, de visualización, de actualización...).
+* El tipo de objeto de QVD al que hace referencia (si es de máquinas virtuales, de usuarios, de _hosts_...).
+* La lista de acls necesarios para ejecutar la acción.
+* El método de `QVD::API` necesario para ejecutar la acción.
+
+Por ejemplo, para añadir la acción `vm_get_something`, se puede establecer lo siguiente en `$ACTIONS`:
+
+....
+
+$ACTIONS =
+{
+ ...
+
+ vm_get_something => { type_of_action => "list",
+                       qvd_object => "VM",
+                       acls       => [qr/^vm\.see-main\.$/],
+		       admin4method => 'select'},	
+
+ ...
+} 
+
+....
+
+Los valores habituales para `type_of_action` son `list`, `details`, `tiny`, `all_ids`, `update`, `create`, `create_or_update` y `delete`.  
+
+Los valores habituales para `qvd_object` son `VM`, `User`, `OSF`, `DI`, `Host`, `Tenant`, `Administrator`, `Role` y `ACL`.  
+
+El valor de `acls` es una lista de expresiones regulares. La idea es que la acción se puede ejecutar si el administrador tiene al menos un acl que unifique con cada expresión regular. 
+
+Los valores habituales para `admin4method` son `select`, `update`, `create`, `create_or_update` y `delete`. 
+
+Cada par `type_of_action`/`qvd_object` lleva especificado en `QVD::API::REST::Model` todos los filtros, argumentos, criterios de ordenación que le son propios y los acls necesarios para usar esos elementos.
+
+Si se quiere crear una acción que funcione de forma diferente a las acciones regulares del CRUD, habrá que implementar una función a propósito en `QVD::API`. Una práctica habitual es crear una función que en última instancia remita a la función regular pero que antes y/o después ejecute un código extra.
+
+Por ejemplo, imagínese que se quiere definir un compartiento no estándar para la acción `vm_get_something`. Para ello, se crea una función  `vm_get_something` en `QVD::API` y, en `QVD::API::Action`, en lugar de poner como valor de `qvdadmin4` el método estándar  `select` se coloca `vm_get_something`.
+ 
+....
+
+sub vm_get_something
+{
+    my ($self,$request) = @_;
+
+    # Here something more
+    
+    my $result = $self->select($request);
+
+    # Here something more
+   
+    return $result;
+}
+
+.... 
+
+== Cómo añadir un nuevo tipo de acción a la API.
+
+Quizá también se necesite, no solo añadir una nueva acción conforme a la tipología actual de acciones; sino añadir un nuevo tipo de acción que permita crear acciones que, de forma estándar, se comporten de un modo nuevo. Es decir, quizá se quiera añadir en `$Actions` en  `QVD::API::Action` una entrada como la siguiente:
+
+....
+
+$ACTIONS =
+{
+ ...
+
+ vm_get_something => { type_of_action => "weird",
+                       qvd_object => "VM",
+                       acls       => [qr/^vm\.see-main\.$/],
+		       admin4method => 'select'},	
+
+ ...
+} 
+
+....
+
+Esta acción ejecuta el método regular `select`, pero es una acción de un tipo nuevo: `weird`. Para definir este nuevo tipo de acción hay que tocar las variables de clase de `QVD::API::REST::Model`. En ellas se define qué filtros, argumentos, criterios de ordenación, etc. son apropiados para estas acciones. Y se define también qué acls se necesitan para usar esos elementos. Concretamente, habrá que incluir entradas para `weird` en las siguientes variables:
+
+* `AVAILABLE_FILTERS`. Por cada par `weird`/`qvd_object`, se listan los filtros disponibles.
+* `MANDATORY_FILTERS`. Por cada par `weird`/`qvd_object`, se listan los filtros obligatorios.
+* `UNAMBIGUOUS_FILTERS`. Hay algunas acciones que solo se aplican sobre objetos identificados unívocamente. Por ejemplo, las acciones de tipo `details`, `update` y `delete` solo se ejecutan sobre objetos unívocamente identificados por `id`. Y las acciones `get_acls_in_admins` y `get_acls_in_roles` se aplican, respectivamente, sobre un administrador unívocamente identificado en `admin_id` y un rol  unívocamente identificado en `role_id`. Si las acciones de tipo `weird` son de este tipo, es necesario que se especifique en esta variable, para cada par `weird`/`qvd_object`,  qué filtro es el que permite identificar unívocamente a los objetos afectados. 
+* `AVAILABLE_FIELDS`. Por cada par `weird`/`qvd_object`, se listan los campos que la API devuelve.
+* `DEFAULT_ORDER_CRITERIA`. Por cada par `weird`/`qvd_object`, se puede establecer una ordenación por defecto.
+* `AVAILABLE_NESTED_QUERY`. Si las acciones de tipo `weird` están pensadas para usar, de un modo u otro, las funciones `create` o `update` de `QVD::API`, y se usan para objetos susceptibles de tener acls, roles, _tags_ o _properties_, se les puede asignar las _nested queries_ que soporta el sistema, también por cada par  `weird`/`qvd_object`. 
+* `DBIX_PREFETCH_VALUE`. Si las acciones `weird` van a devolver información presente en la base de datos en tablas relacionadas, es necesario incluir en esta variable una entrada para  `weird` en la que se listen, para cada `qvd_object` las tablas relacionadas de las que se va a sacar información. Esta lista debe seguir el formato de DBIC para el rasgo `weird`. 
+* `$RELATED_VIEWS_IN_DB`. No se puede incluir en `DBIX_PREFETCH_VALUE` información relacionada que esté en una relación de 1 a muchos con la tabla principal (por ejemplo, _properties_). Esa información debería sacarse con una vista de DBIC. Para ello, debería incluirse una entrada de `weird` en  `$RELATED_VIEWS_IN_DB`.  
+* `TYPES_OF_ACTION_TO_LOG_MAPPER`. En el log se establece, en cada registro, el tipo de acción que se ejecutó. Habrá que añadir en la base de datos `weird` como  tipo de acción posible, y en `TYPES_OF_ACTION_TO_LOG_MAPPER` una entrada que convierta el nombre del tipo de acción en `QVD::API::REST::Model` al nombre en la base de datos.  
