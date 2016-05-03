@@ -218,7 +218,6 @@ DEFAULT_OSF_MEMORY = 256;
 
 // Config
 UNCLASSIFIED_CONFIG_CATEGORY = 'unclassified';
-UNCLASSIFIED_CONFIG_REGEXP = '^((?!\\.).)*$';
 
 // Html pieces
 HTML_MINI_LOADING = '<div class="mini-loading"><i class="fa fa-gear fa-spin"></i></div>';

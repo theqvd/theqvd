@@ -56,7 +56,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
             filter['tenant_id'] = that.selectedTenant;
         }
             
-        Wat.A.performAction('config_preffix_get', {}, filter, {}, that.processPrefixes, that);
+        Wat.A.performAction('config_get', {}, filter, {}, that.processPrefixes, that, null, {"field": "key", "order":"-asc"});
     },
     
     processPrefixes: function (that) {
@@ -64,8 +64,27 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
             return;
         }
         
-        that.prefixes = that.retrievedData.rows;
+        that.prefixes = [];
+        var unclassifiedCount = 0;
+        $.each(that.retrievedData.rows, function (iConfig, config) {
+            var firstDotPos = config.key.indexOf('.');
+            if(firstDotPos > -1) {
+                var prefix = config.key.substring(0,firstDotPos);
                 
+                if ($.inArray(prefix, that.prefixes) == -1) {
+                    that.prefixes.push(prefix);
+                }
+            }
+            else {
+                unclassifiedCount++;
+            }
+        });
+        
+        that.prefixes.sort();
+        
+        if (unclassifiedCount) {
+            that.prefixes.push(UNCLASSIFIED_CONFIG_CATEGORY);
+        }
 
         var filter = {};
         if (Wat.C.isSuperadmin()) {
@@ -78,11 +97,11 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         }
         
         if (that.currentTokensPrefix == UNCLASSIFIED_CONFIG_CATEGORY) {
-            filter['key_re'] = UNCLASSIFIED_CONFIG_REGEXP;
+            filter['-not'] = { key : {'~':'%.%'} };
             Wat.A.performAction('config_get', {}, filter, {}, that.processTokensRender, that);
         }
         else {
-            filter['key_re'] = '^' + that.currentTokensPrefix + '\\.';
+            filter['key'] = {'~': that.currentTokensPrefix + '.%'};
             Wat.A.performAction('config_get', {}, filter, {}, that.processTokensRender, that);
         }
     },
@@ -144,7 +163,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
             if (Wat.C.isSuperadmin()) {
                 filter['tenant_id'] = that.selectedTenant;
             }
-            Wat.A.performAction('config_preffix_get', {}, filter, {}, that.processPrefixes, that);
+            Wat.A.performAction('config_get', {}, filter, {}, that.processPrefixes, that);
         }
         else {
             that.renderConfigurationTokens();
@@ -251,11 +270,11 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         }
         
         if (this.currentTokensPrefix == UNCLASSIFIED_CONFIG_CATEGORY) {
-            filter['key_re'] = UNCLASSIFIED_CONFIG_REGEXP;
+            filter['-not'] = { key : {'~':'%.%'} };
             Wat.A.performAction('config_get', {}, filter, {}, this.processTokensRenderTokens, this);
         }
         else {
-            filter['key_re'] = '^' + this.currentTokensPrefix + '\\.';
+            filter['key'] = {'~': this.currentTokensPrefix + '.%'};
             Wat.A.performAction('config_get', {}, filter, {}, this.processTokensRenderTokens, this);
         }
     },
@@ -397,9 +416,14 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
             filter['tenant_id'] = that.selectedTenant;
         }
         
-        if (that.currentTokensPrefix == UNCLASSIFIED_CONFIG_CATEGORY) {
-            filter['key_re'] = UNCLASSIFIED_CONFIG_REGEXP;
+        if (that.currentTokensPrefix == UNCLASSIFIED_CONFIG_CATEGORY && $('[data-prefix="unclassified"]').length > 0) {
+            // If changed token is unclassified (no prefix) and exist others of same kind, use special filter
+            filter['-not'] = { key : {'~':'%.%'} };
             Wat.A.performAction('config_get', {}, filter, {}, that.processTokensRenderTokens, that);
+        }
+        else if (that.currentTokensPrefix == UNCLASSIFIED_CONFIG_CATEGORY) {
+            // If changed token is first unclassified (no prefix), process prefixes again to add new option in side menu
+            Wat.A.performAction('config_get', {}, filter, {}, that.processPrefixes, that);
         }
         else if ($.inArray(that.currentTokensPrefix, that.prefixes) != -1) {
             if (!$.isEmptyObject(Wat.C.currentSearch)) {
@@ -407,7 +431,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
             }
             else {
                 // If there is a current search, filter by it. Otherwise filter by current selected prefix    
-                filter['key_re'] = '^' + that.currentTokensPrefix + '\\.';
+                filter['key'] = {'~': that.currentTokensPrefix + '.%'};
             }
             
 			// If the prefix of the changed token exist, render it after change
@@ -415,7 +439,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         }
         else {
 			// If the prefix of the changed token doesnt exist, render all to create this new prefix in side menu
-            Wat.A.performAction('config_preffix_get', {}, filter, {}, that.processPrefixes, that);
+            Wat.A.performAction('config_get', {}, filter, {}, that.processPrefixes, that);
         }
     }
 });

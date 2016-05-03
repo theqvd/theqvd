@@ -22,7 +22,7 @@ function qvdConfigTestReal () {
             
             var getAction = 'config_get';
             var getBranchFilters = {
-                'key_re': '^model\\.',
+                'key': {'~': 'model.%'},
                 'tenant_id': tenantId
             };
             var getTokenFilters = {
@@ -142,7 +142,7 @@ function qvdConfigTestReal () {
             
             var getAction = 'config_get';
             var getBranchFilters = {
-                'key_re': '^' + customBranch + '\\.',
+                'key': {'~': customBranch + '.%'},
                 'tenant_id': tenantId
             };
             var getTokenFilters = {
