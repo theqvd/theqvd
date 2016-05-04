@@ -5,20 +5,32 @@ use warnings;
 use 5.010;
 use Getopt::Long;
 
-my $suffix = "";
-my ($revision) = `svn info .` =~ /^Revision:\s*(\d+)/m;
+my $version = "0.0.0.0";
+my $build = 0;
+my $output;
 
-GetOptions("suffix|s=s" => \$suffix) or die "Getopt failed";
+GetOptions(
+	"version|v=s"  => \$version,
+	"build|b=s"    => \$build,
+	"output|o=s"   => \$output
+) or die "Getopt failed";
 
-my %pl = ( me       => $0,
-		   version  => '3.5.1',
-		   revision => $revision,
-           suffix   => $suffix );
+
+my %pl = (
+	me       => $0,
+	version  => $version,
+	build    => $build
+);
+
+
+open(my $fh, '>', $output) or die "Can't create $output: $!";
 
 while (<DATA>) {
 	s|{pl:(\w+)}|$pl{$1} // warn "unknown variable {pl:$1}"|ge;
-	print;
+	print $fh $_;
 }
+
+close $fh;
 
 __DATA__
 #define VCXSRV_PATH GetEnv('VCXSRV_PATH')
@@ -34,8 +46,8 @@ __DATA__
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{DD625C30-A6B1-4C48-A3C2-19B39771028F}
 AppName=QVD Client
-AppVerName=QVD Client {pl:version}-{pl:revision}{pl:suffix}
-AppVersion={pl:version}-{pl:revision}
+AppVerName=QVD Client {pl:version}
+AppVersion={pl:version}
 AppPublisher=QindelGroup
 AppPublisherURL=http://theqvd.com/
 AppSupportURL=http://theqvd.com/
@@ -44,7 +56,7 @@ DefaultDirName={pf}\QVD
 DisableDirPage=yes
 DefaultGroupName=QVD Client
 DisableProgramGroupPage=yes
-OutputBaseFilename=qvd-client-setup-{pl:version}-{pl:revision}{pl:suffix}
+OutputBaseFilename=qvd-client-setup-{pl:version}
 Compression=lzma
 SolidCompression=yes
 SetupIconFile=installer\pixmaps\qvd.ico
