@@ -1108,44 +1108,44 @@ my $AVAILABLE_NESTED_QUERIES = {
 # Available arguments for update actions
 
 my $AVAILABLE_ARGUMENTS = {
-	Config => [qw(value)],
-			    User => [qw(name password blocked description)],
-                            VM => [qw(name ip blocked expiration_soft expiration_hard storage di_tag description)],
-                            Host => [qw(name address blocked description)],
-                            OSF => [qw(name memory user_storage overlay description)],
-                            DI => [qw(blocked description)],
+    Config => [qw(value)],
+    User => [qw(name password blocked description)],
+    VM => [qw(name ip blocked expiration_soft expiration_hard storage di_tag description)],
+    Host => [qw(name address blocked description)],
+    OSF => [qw(name memory user_storage overlay description)],
+    DI => [qw(blocked description)],
     My_Tenant => [qw(name language block description)],
     Tenant => [qw(name language block blocked description)],
-			    Role => [qw(name description)],
+    Role => [qw(name description)],
     My_Admin => [qw(name password language block description)],
     Administrator => [qw(name password language block description)],
-	Views_Setup_Properties_Tenant => [qw(visible)],
-	Views_Setup_Attributes_Tenant => [qw(visible)],
-	Views_Setup_Properties_Administrator => [qw(visible)],
-	Views_Setup_Attributes_Administrator => [qw(visible)],
-	Property_List => [qw(key description)],
-	Wat_Setups_By_Tenant => [qw(language block)]
+    Views_Setup_Properties_Tenant => [qw(visible)],
+    Views_Setup_Attributes_Tenant => [qw(visible)],
+    Views_Setup_Properties_Administrator => [qw(visible)],
+    Views_Setup_Attributes_Administrator => [qw(visible)],
+    Property_List => [qw(key description)],
+    Wat_Setups_By_Tenant => [qw(language block)]
 };
 
 # Available arguments for creation actions
 
 my $MANDATORY_ARGUMENTS = {
-	Config => [qw(tenant_id key value)],
-			    User => [qw(tenant_id name password blocked)],
-			    VM => [qw(name user_id ip osf_id di_tag state user_state blocked)],
-			    Host => [qw(name address frontend backend blocked state)],
-			    OSF => [qw(tenant_id name memory overlay user_storage)],
-                            DI => [qw(version disk_image osf_id blocked)],
-			    Tenant => [qw(name language block)],
-			    Role => [qw(tenant_id name fixed internal)],
-                            Administrator => [qw(tenant_id name password language block)],
-	Views_Setup_Properties_Tenant => [qw(qvd_obj_prop_id visible view_type device_type)],
-	Views_Setup_Attributes_Tenant => [qw(tenant_id field visible view_type device_type qvd_object)],
-	Views_Setup_Properties_Administrator => [qw(qvd_obj_prop_id visible view_type device_type)],
-	Views_Setup_Attributes_Administrator => [qw(field visible view_type device_type qvd_object)], # Every admin is able to set just its own views,
-                                                                                                                         # Suitable admin_id forzed in Request.pm
-	QVD_Object_Property_List => [qw(property_id)],
-	Property_List => [qw(tenant_id key)]
+    Config => [qw(tenant_id key value)],
+    User => [qw(tenant_id name password blocked)],
+    VM => [qw(name user_id ip osf_id di_tag user_state blocked)],
+    Host => [qw(name address frontend backend blocked)],
+    OSF => [qw(tenant_id name memory overlay user_storage)],
+    DI => [qw(version disk_image osf_id blocked)],
+    Tenant => [qw(name language block)],
+    Role => [qw(tenant_id name fixed internal)],
+    Administrator => [qw(tenant_id name password language block)],
+    Views_Setup_Properties_Tenant => [qw(qvd_obj_prop_id visible view_type device_type)],
+    Views_Setup_Attributes_Tenant => [qw(tenant_id field visible view_type device_type qvd_object)],
+    Views_Setup_Properties_Administrator => [qw(qvd_obj_prop_id visible view_type device_type)],
+    Views_Setup_Attributes_Administrator => [qw(field visible view_type device_type qvd_object)], # Every admin is able to set just its own views,
+    # Suitable admin_id forzed in Request.pm
+    QVD_Object_Property_List => [qw(property_id)],
+    Property_List => [qw(tenant_id key)]
 };
 
 # Default values for some mandatory arguments in creation

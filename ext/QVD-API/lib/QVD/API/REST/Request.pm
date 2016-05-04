@@ -662,16 +662,16 @@ sub set_arguments_in_request_with_defaults
 {
     my $self = shift;
 
-    for my $key ($self->qvd_object_model->mandatory_arguments)
+    for my $key (keys (%{$self->qvd_object_model->default_argument_values}) )
     {
-	next if $self->json_wrapper->has_argument($key);
+        next if $self->json_wrapper->has_argument($key);
 
-	my $key_dbix_format = 
-	    $self->qvd_object_model->map_argument_to_dbix_format($key);
+        my $key_dbix_format =
+            $self->qvd_object_model->map_argument_to_dbix_format($key);
 
-	my $value = $self->qvd_object_model->get_default_argument_value($key,$self->json_wrapper);
+        my $value = $self->qvd_object_model->get_default_argument_value($key,$self->json_wrapper);
 
-	$self->instantiate_argument($key_dbix_format,$value);
+        $self->instantiate_argument($key_dbix_format,$value);
     }
 }
 
