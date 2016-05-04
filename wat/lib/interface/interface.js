@@ -724,8 +724,27 @@ Wat.I = {
                 var conditionType = $(element).attr('data-visibility-cond-type');
                 var conditionField = $(element).attr('data-visibility-cond-field');
                 var conditionValue = $(element).attr('data-visibility-cond-value');
-                                
-                $(element).hide();    
+                    
+                // Process AND/OR clauses
+
+                // For single and OR clauses, necessary matches will be just one
+                var necessaryMatches = 1;
+                
+                // AND
+                if (conditionValue.indexOf(' AND ') != -1) {
+                    var conditionValues = conditionValue.split(' AND ');
+                    var necessaryMatches = conditionValues.length;
+                }
+                // OR
+                else if (conditionValue.indexOf(' OR ') != -1) {
+                    var conditionValues = conditionValue.split(' OR ');
+                }
+                // Single
+                else {
+                    var conditionValues = [conditionValue];
+                }
+                
+                $(element).hide();
                 
                 var positiveItems = 0;
                 $.each(Wat.CurrentView.selectedItems, function (i, selectedId) {
@@ -737,19 +756,26 @@ Wat.I = {
                         return false;
                     }
                     
-                switch(conditionType) {
-                    case 'eq':
-                            if (selectedModel.get(conditionField) == conditionValue) {
-                                    positiveItems++;   
-                            }
-                        break;
-                    case 'ne':
-                            if (selectedModel.get(conditionField) != conditionValue) {
-                                    positiveItems++;     
-                            }
-                        break;
-                }
-            });
+                    var matches = 0;
+                    $.each(conditionValues, function (iVal, conditionValue) {     
+                        switch(conditionType) {
+                            case 'eq':
+                                    if (selectedModel.get(conditionField) == conditionValue) {
+                                            matches++;   
+                                    }
+                                break;
+                            case 'ne':
+                                    if (selectedModel.get(conditionField) != conditionValue) {
+                                            matches++;     
+                                    }
+                                break;
+                        }
+                    });
+                    
+                    if (matches >= necessaryMatches) {
+                        positiveItems++;
+                    }
+                });
                 
                 // If any item was positive in check, show the conditioned option
                 if (positiveItems > 0) {

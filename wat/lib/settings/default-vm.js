@@ -599,9 +599,9 @@ Wat.I.selectedActions[qvdObj] = {
         'acls': 'vm.update-massive.state',
         'iconClass': 'fa fa-stop',
         'visibilityCondition': {
-            'type': 'ne',
+            'type': 'eq',
             'field': 'state',
-            'value': 'stopped'
+            'value': 'running OR starting'
         }
     },
     'block': {
