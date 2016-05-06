@@ -27,6 +27,13 @@ use Try::Tiny;
 
 plugin 'QVD::API::REST';
 
+# Plugin for dropping privileges
+
+my $user = app->qvd_admin4_api->_cfg('api.user');
+my $group = app->qvd_admin4_api->_cfg('api.group');
+plugin SetUserGroup => {user => $user, group => $group}
+    if $< == 0 or $> == 0;
+
 # HELPERS
 
 # Intended to check and encode the JSON that receives the API as iunput
@@ -75,12 +82,13 @@ die "Certificate $cert_path file does not exist" unless (-e $cert_path);
 die "Private key $key_path file does not exist" unless (-e $key_path);
 
 app->config(
-	hypnotoad => {
-		listen => ["$api_url?cert=${cert_path}&key=${key_path}"],
-		accepts => 1000,
-		clients => 1000,
-		workers => 4
-	}
+    hypnotoad => {
+        listen => ["$api_url?cert=${cert_path}&key=${key_path}"],
+        accepts => 1000,
+        clients => 1000,
+        workers => 4,
+        pid_file => '/var/lib/qvd/qvd-api.pid'
+    }
 );
 
 # Static web data provider

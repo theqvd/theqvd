@@ -34,6 +34,7 @@ WriteMakefile(
         'Mojo::Message::Response' => 0,
         'Mojo::URL' => 0,
         'Mojo::UserAgent' => 0,
+        'Mojolicious::Plugin::SetUserGroup' => 0,
         'MojoX::Session' => 0,
         'Moo' => 0,
         'Moose' => 0,

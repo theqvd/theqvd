@@ -49,6 +49,7 @@ This module requires these other modules and libraries:
     Mojo::Message::Response
     Mojo::URL
     Mojo::UserAgent
+    Mojolicious::Plugin::SetUserGroup'
     MojoX::Session
     Moo
     Moose
