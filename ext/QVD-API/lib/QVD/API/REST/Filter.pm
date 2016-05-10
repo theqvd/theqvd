@@ -65,19 +65,6 @@ has 'filter', is => 'ro', isa => sub { die "Invalid filter format" unless ref(+s
 sub BUILD
 {
     my $self = shift;
-
-    my $filter = $self->{hash};
-    
-    $filter = _normalize_filter($filter);
-    
-    eval {
-        _validate_filter($filter);
-    };
-    if($@){
-        die "Invalid filter format: $@";
-    }
-    
-    $self->{hash} = $filter;
 }
 
 # Private methods

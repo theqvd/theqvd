@@ -19,6 +19,7 @@ use Data::Page;
 use Clone qw(clone);
 use QVD::API::AclsOverwriteList;
 use QVD::API::ConfigClassifier;
+use QVD::API::REST::Request::Config_Field;
 use Mojo::JSON qw(encode_json);
 use QVD::Config;
 use QVD::Config::Core qw(core_cfg_unmangled);
@@ -65,13 +66,13 @@ sub select
     my @rows;
     my $rs;
 
-	$modifiers //= {};
-	my %filters = ( %{$request->filters->hash}, %{$modifiers->{'filters'} // {}} );
-	my %modifiers = ( %{$request->modifiers}, %{$modifiers->{'modifiers'} // {}} );
-	eval {
-		$rs = $DB->resultset($request->table)->search(\%filters, \%modifiers);
-		@rows = $rs->all
-	};
+    $modifiers //= {};
+    my %filters = ( %{$request->get_dbi_format_filters()}, %{$modifiers->{filters} // {}} );
+    my %modifiers = ( %{$request->modifiers}, %{$modifiers->{modifiers} // {}} );
+    eval {
+        $rs = $DB->resultset($request->table)->search(\%filters, \%modifiers);
+        @rows = $rs->all
+    };
 
     QVD::API::Exception->throw(exception => $@, query => 'select') if $@;
 
@@ -150,8 +151,8 @@ sub acl_get_list
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
 
     eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
-	       $request->filters->hash, $request->modifiers);
-	   @rows = $rs->all };
+        %{$request->get_dbi_format_filters()}, $request->modifiers);
+        @rows = $rs->all };
     QVD::API::Exception->throw(exception => $@, query => 'select') if $@;
 
     { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
@@ -183,8 +184,8 @@ sub get_acls_in_admins
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
 
     eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
-	       $request->filters->hash, $request->modifiers);
-	   @rows = $rs->all };
+        %{$request->get_dbi_format_filters()}, $request->modifiers);
+        @rows = $rs->all };
     QVD::API::Exception->throw(exception => $@, query => 'select') if $@;
 
     { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
@@ -214,8 +215,8 @@ sub get_acls_in_roles
 # over the regular assignation of acls for the administrator.
 
     eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
-	       $request->filters->hash, $request->modifiers);
-	   @rows = $rs->all };
+        %{$request->get_dbi_format_filters()}, $request->modifiers);
+        @rows = $rs->all };
     QVD::API::Exception->throw(exception => $@, query => 'select') if $@;
 
     { total => ($rs->is_paged ? $rs->pager->total_entries : $rs->count), 
@@ -1177,7 +1178,11 @@ sub di_delete_disk_image
 sub is_custom_config
 {
     my ($self,$obj) = @_;
-    QVD::API::Exception->throw(code=>'7370') unless defined eval { is_cfg_key_in_database($obj->key, $obj->tenant_id) };
+    QVD::API::Exception->throw(code=>'7370') unless defined eval {
+        QVD::API::REST::Request::Config_Field->new( {
+                key => $obj->key, tenant_id => $obj->tenant_id
+            } )->is_default;
+    };
     return 1;
 }
 
@@ -1190,28 +1195,49 @@ sub check_admin_is_allowed_to_config
 	# Get current administrator
 	my $admin = $request->qvd_object_model->current_qvd_administrator;
 
-	# Get the tenant_id the change will take place
-	my $tenant_id = $request->get_adequate_value('tenant_id') // $admin->tenant_id;
+    # Check multitenant mode
+    my $is_multitenant = cfg('wat.multitenant');
 
-	# Check if configuration parameter to be changed is a global parameter
-	my $key = $request->get_adequate_value('key');
-	my $is_declared = defined(get_default_cfg_value($key, $tenant_id));
+    # Get the tenant_id the change will take place
+    my $tenant_id = $request->get_adequate_value('tenant_id');
+    $tenant_id = eval { $tenant_id->[0] };
 
-	# if multitenant is enabled
-	if(cfg('wat.multitenant')) {
-	# Common administrators can only modify configuration in his tenant
+    # Common administrators can only modify configuration in his tenant
+    if ($is_multitenant & !$admin->is_superadmin && ($admin->tenant_id != $tenant_id)) {
+        QVD::API::Exception->throw( code => 4230 );
+    }
 
-		if (!$admin->is_superadmin && ($admin->tenant_id != $tenant_id)) {
-		QVD::API::Exception->throw(code => 4230);
-	}
+    # Check if configuration parameter to be changed is a global parameter
+    my $keys = $request->get_adequate_value('key');
+    for my $key (@$keys) {
+        my $config_field = QVD::API::REST::Request::Config_Field->new( {
+                key => $key, tenant_id => $tenant_id
+            } );
+        my $token_value = eval { $request->get_adequate_value('value')->[0] } // $config_field->default_value();
+        my $is_declared = defined( $config_field->default_value );
 
-        # Common administrators cannot create new configuration tokens
-		if (!$admin->is_superadmin && !$is_declared) {
-            QVD::API::Exception->throw(code => 7382);
+        if ($is_multitenant) {
+            # Common administrators cannot create new configuration tokens
+            if (!$admin->is_superadmin && !$is_declared) {
+                QVD::API::Exception->throw( code => 7382 );
+            }
+
+            # Raise exception if cannot change to monotenant
+            my $false_in_postgres = '^(f(alse)?|no?|off|0)$';
+            if ($key eq 'wat.multitenant' &&
+                $token_value =~ /$false_in_postgres/ &&
+                # There are more than 1 normal tenant 
+                # (in addition to tenant 0 for
+                # superadmins and invalid tenant -1)
+                QVD::DB::Simple::db()->resultset('Tenant')->search()->count != 3) {
+                QVD::API::Exception->throw(code => 7373)
+
+            }
         }
-	}
 
-	return 1;
+    }
+
+    return 1;
 }
 
 ######################################
@@ -1258,23 +1284,23 @@ sub dis_in_staging
 
 sub current_admin_setup
 {
-    my ($self,$administrator,$json_wrapper) = @_;
+    my ($self,$request) = @_;
 
-    my $localtime = localtime();
+    my $administrator = $request->administrator;
 
-    { server_datetime => $localtime,
-      multitenant => cfg('wat.multitenant'),
-      admin_language => $administrator->wat_setups->language,
-      tenant_language => $administrator->tenant->wat_setups->language,
-      admin_block => $administrator->wat_setups->block,
-      tenant_block => $administrator->tenant->wat_setups->block,
-      admin_id => $administrator->id,
-      tenant_id => $administrator->tenant_id,
-      tenant_name => $administrator->tenant->name,
-      acls => [ $administrator->acls ],
-      views => [ map { { $_->get_columns } }
-		 $DB->resultset('Operative_Views_In_Administrator')->search(
-		     {administrator_id => $administrator->id})->all ]};
+    return {
+        admin_language => $administrator->wat_setups->language,
+        tenant_language => $administrator->tenant->wat_setups->language,
+        admin_block => $administrator->wat_setups->block,
+        tenant_block => $administrator->tenant->wat_setups->block,
+        admin_id => $administrator->id,
+        tenant_id => $administrator->tenant_id,
+        tenant_name => $administrator->tenant->name,
+        acls => [ $administrator->acls ],
+        views => [ map { { $_->get_columns } }
+            $DB->resultset('Operative_Views_In_Administrator')->search(
+                {administrator_id => $administrator->id})->all ]
+    };
 }
 
 # This function receives an administrator and a list of acl patterns. 
@@ -1293,30 +1319,6 @@ sub get_number_of_acls_in_admin
 
     my $rs = $DB->resultset('Operative_Acls_In_Administrator')->search(
 	{},{bind => $bind})->search({admin_id => $admin_id});
-
-    $self->get_number_of_acls($rs,$acl_patterns);
-}
-
-sub get_number_of_acls_in_admin_old
-{
-    my ($self,$administrator,$json_wrapper) = @_;
-
-    my $acl_patterns = $json_wrapper->get_filter_value('acl_pattern') // '%';
-    $acl_patterns = ref($acl_patterns) ? $acl_patterns : [$acl_patterns];
-    my $admin_id = $json_wrapper->get_filter_value('admin_id') //
-        QVD::API::Exception->throw(code=>'6220', object => 'admin_id');
-
-# This view needs to bind three placeholders. The values of the 
-# placeholders must be regular expresions that define lists of 
-# acls forbidden, allowed or hidden for the current administrator. 
-# Those lists of acls are the acls that should be overwritten 
-# over the regular assignation of acls for the administrator.
-
-    my $aol = QVD::API::AclsOverwriteList->new(admin_id => $admin_id);
-    my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
-
-    my $rs = $DB->resultset('Operative_Acls_In_Administrator')->search(
-        {},{bind => $bind})->search({admin_id => $admin_id});
 
     $self->get_number_of_acls($rs,$acl_patterns);
 }
@@ -1521,96 +1523,37 @@ sub top_populated_hosts
     return [@hosts[0 .. $array_limit]];
 }
 
-# It returns the list of prefixes of the configuration tokens 
-# of the system: For example, for wat.multitenant, the prefix is
-# wat.
-
-sub config_preffix_get
-{
-    my ($self,$admin,$json_wrapper) = @_;
-
-	# Tenant is sent as an argument if superadmin
-    my $tenant = $admin->is_superadmin ? $json_wrapper->get_filter_value("tenant_id") // -1 : $admin->tenant_id;
-    $tenant = -1 if !cfg('wat.multitenant');
-
-    # Get filtered token list
-    my @keys = config_get_token_list(
-        $tenant,
-        $json_wrapper->get_filter_value('key'),
-        $json_wrapper->get_filter_value('key_re') );
-
-    # Get preffix
-    my %preffix;
-    my $unclassified = 0;
-    for (@keys)
-    {
-	if (m/^([^.]+)\./) 
-	{  
-	    $preffix{$1} = 1;
-	}
-	else
-	{
-	    $unclassified = 1;
-	}
-    }
-    my @preffix = sort keys %preffix; 
-    push @preffix, 'unclassified' if $unclassified;
-    { total => scalar @preffix,
-      rows => \@preffix };
-}
-
 sub config_get
 {
-    my ($self,$admin,$json_wrapper) = @_;
+    my ($self,$request) = @_;
 
-	# Tenant is sent as an argument if superadmin
-    my $tenant = $admin->is_superadmin ? $json_wrapper->get_filter_value("tenant_id") // -1 : $admin->tenant_id;
-    $tenant = -1 if !cfg('wat.multitenant');
+    my $tenant_id = $request->filters->filter_value('tenant_id');
+    my $operator = $request->filters->filter_operator('tenant_id');
+    my $tenant_filter = QVD::API::REST::Filter->new( filter => {id => {$operator => $tenant_id} } );
 
-    # Get filtered token list
-    my @keys = config_get_token_list(
-        $tenant,
-        $json_wrapper->get_filter_value('key'),
-        $json_wrapper->get_filter_value('key_re') );
+    my @rows = ();
+    eval {
+        my $rs = $DB->resultset('Tenant')->search($tenant_filter->hash);
+        @rows = $rs->all
+    };
 
-    # Generate output
-    my $od = $json_wrapper->order_direction // '-asc';
+    my @keys = ();
+    while(@rows){
+        my $row = shift @rows;
 
-    my $total = scalar @keys;
-    my $block = $json_wrapper->block // $total;
-    my $offset = $json_wrapper->offset // 1;
+        my @all_keys = cfg_keys($tenant_id);
 
-    my $page = Data::Page->new($total, $block, $offset);
+        push @keys, map { QVD::API::REST::Request::Config_Field->new({key => $_, tenant_id => $row->id}) } @all_keys;
+    }
 
-    @keys = sort { $a cmp $b } @keys;
-    @keys = reverse @keys if $od eq '-desc'; 
-    @keys = $page->splice(\@keys);
+    $request->filters->add_filter("is_hidden", 0);
+
+    @keys = $request->filters->cgrep(@keys);
 
     return {
-        total => $total,
-        rows => [ map {{ key => $_,
-            operative_value => cfg($_, $tenant),
-            default_value => get_default_cfg_value($_, $tenant),
-            is_default => is_cfg_key_in_database($_, $tenant) ? 0 : 1,
-        } } @keys ],
+        total => scalar @keys,
+        rows => \@keys
     };
-}
-
-sub config_get_token_list {
-    my $tenant = shift;
-    my $key_name = shift;
-    my $key_regex = shift;
-
-    my @keys = cfg_keys($tenant);
-
-    @keys = grep { $_ =~ /\Q$key_name\E/ } @keys if $key_name;
-
-    @keys = grep { $_ =~ /$key_regex/ } @keys if $key_regex;
-
-    @keys = grep { !is_hidden_config($_) } @keys;
-    @keys = grep { is_cfg_key_in_database($_, $tenant) } @keys if $tenant != -1;
-
-    return @keys;
 }
 
 sub config_ssl {
@@ -1744,30 +1687,6 @@ sub is_vm_property {
 sub is_di_property {
 	my ($self, $property) = @_;
 	return ($property->is_di_property());
-}
-
-sub get_default_cfg_value {
-
-    my $key = shift;
-    my $tenant = shift // -1;
-
-    my $value = core_cfg_unmangled($key);
-    return $value if defined($value);
-
-    if ($tenant != -1) {
-        my $row = QVD::DB::Simple::rs( 'Config' )->search( { tenant_id => -1, key => $key } )->first();
-        return $row->value if defined( $row );
-    }
-
-    return undef;
-}
-
-sub is_cfg_key_in_database {
-    my $key = shift;
-    my $tenant = shift // -1;
-
-    my $row = QVD::DB::Simple::rs( 'Config' )->search( { tenant_id => $tenant, key => $key } )->first();
-    return defined( $row );
 }
 
 sub myadmin_update {

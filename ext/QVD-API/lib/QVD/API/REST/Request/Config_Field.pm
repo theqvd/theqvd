@@ -6,7 +6,7 @@ use Moo;
 use QVD::Config;
 use QVD::Config::Core qw(core_cfg_unmangled);
 use QVD::DB::Simple;
-use QVD::Admin4::ConfigClassifier;
+use QVD::API::ConfigClassifier;
 
 
 has 'key', is => 'ro', isa => sub { die "Invalid type for attribute key" unless ref(+shift) eq ''; }, 
@@ -39,7 +39,7 @@ sub is_default {
 
 sub is_hidden {
     my $self = shift;
-    return QVD::Admin4::ConfigClassifier::is_hidden_config($self->key);
+    return QVD::API::ConfigClassifier::is_hidden_config($self->key);
 }
 
 # Private methods
