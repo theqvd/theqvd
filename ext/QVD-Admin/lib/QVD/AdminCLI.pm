@@ -108,6 +108,7 @@ sub set_filter {
     my ($self, $filter_string) = @_;
     my @filter_array = split /,/, $filter_string; 
     my %conditions = _split_on_equals(@filter_array);
+    $self->_check_arguments_syntax(%conditions);
     $self->{admin}->set_filter(%conditions);
 }
 
@@ -141,6 +142,8 @@ sub _syntax_check {
     my %args = _split_on_equals(@_);
     $self->{errors} = 0;
 
+    $self->_check_arguments_syntax(%args);
+
     if (exists $syntax_check_cbs{$obj}{$cmd}) {
         $syntax_check_cbs{$obj}{$cmd}->(\$self->{errors}, \%args);
     }
@@ -168,6 +171,15 @@ sub _syntax_check {
             $help_cb->();
         }
         exit 1;
+    }
+}
+
+sub _check_arguments_syntax {
+    my ($self, %args) = @_;
+    foreach my $key (keys %args){
+        unless (defined($args{$key})) {
+            $self->_die("Syntax error: undefined value for key: '$key'\n");
+        }
     }
 }
 
