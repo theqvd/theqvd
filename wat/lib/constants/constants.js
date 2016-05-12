@@ -6,6 +6,9 @@ RESTRICT_TEMPLATES = true;
 // Debug constants
 DEBUG_ACL_FAILS = false;
 
+// noVNC include URI
+INCLUDE_URI= "lib/thirds/noVNC/include/";
+
 // Status codes returned by the API
 ALL_STATUS = {
     0000: 'Successful completion',

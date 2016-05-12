@@ -12,7 +12,8 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
     },
     
     events: {
-        'click .js-execution-params-button': 'showExecutionParams'
+        'click .js-execution-params-button': 'showExecutionParams',
+        'click .js-button-spy-vm': 'spyVM'
     },
     
     showExecutionParams: function () {
