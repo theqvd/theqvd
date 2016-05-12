@@ -269,7 +269,7 @@ sub check_filters_validity_in_json
     
     for my $mandatory_filter ($self->qvd_object_model->mandatory_filters){
         QVD::API::Exception->throw(code => 6220, object => $mandatory_filter) 
-            unless length(grep {$_ eq $mandatory_filter} @filters) > 0;
+            unless grep {$_ eq $mandatory_filter} @filters;
     }
 }
 
