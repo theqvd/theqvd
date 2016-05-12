@@ -246,6 +246,13 @@ Wat.I.T = {
                     }
                 }
                 break;
+            case 'commonVMS':
+                templates = {
+                   spyVM: {
+                    name: 'common/vms-spy'
+                   }
+                }
+                break;
             default:
                 // Empty object will be returned
                 break;

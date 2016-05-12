@@ -2,7 +2,9 @@
 Wat.Common.BySection.vm = {
     // This initialize function will be executed one time and deleted
     initializeCommon: function (that) {
-        // Empty
+        var templates = Wat.I.T.getTemplateList('commonVMS');
+        
+        this.templates = $.extend({}, this.templates, templates);
     },
     
     updateElement: function (dialog) {
@@ -100,4 +102,37 @@ Wat.Common.BySection.vm = {
 
         Wat.A.fillSelect(params);
     },
+    
+    spyVM: function () {
+        var that = this;
+        
+        var dialogConf = {
+            title: $.i18n.t('Spy'),
+            buttons : {
+                "Close": function () {       
+                    $('#disconnectButton').trigger('click');
+                    Wat.I.closeDialog($(this));
+                },
+            },
+            button1Class : 'fa fa-ban',
+            
+            fillCallback : function (target) {
+                // Add common parts of editor to dialog
+                var template = _.template(
+                    Wat.TPL.spyVM, {
+                    }
+                );
+                
+                var noVNCIncludes = '<script src="lib/thirds/noVNC/include/util.js"></script><script src="lib/thirds/noVNC/include/ui.js"></script>';
+
+                target.html(template + noVNCIncludes);   
+                
+                setTimeout(function () {
+                    $('#noVNC_connect_button').trigger('click');
+                }, 1000);
+            }
+        }
+
+        that.dialog = Wat.I.dialog(dialogConf);  
+    }
 }
