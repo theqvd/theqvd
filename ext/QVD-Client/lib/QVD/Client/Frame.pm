@@ -282,9 +282,11 @@ sub new {
         $self->{link}->Select($link_select);
     }
 
-    $grid_sizer->Add(Wx::StaticText->new($panel, -1, $self->_t("Kill current VM")), 0, wxALL, 5);
-    $self->{kill_vm} = Wx::CheckBox->new ($panel, -1, '', wxDefaultPosition);
-    $grid_sizer->Add($self->{kill_vm});
+    if(core_cfg('client.kill_vm.display')) {
+        $grid_sizer->Add( Wx::StaticText->new( $panel, -1, $self->_t( "Kill current VM" ) ), 0, wxALL, 5 );
+        $self->{kill_vm} = Wx::CheckBox->new ( $panel, -1, '', wxDefaultPosition );
+        $grid_sizer->Add( $self->{kill_vm} );
+    }
 
     if ($DARWIN && !core_cfg('client.darwin.screen_resolution.verified')) {
 	my @min_res = split(/x/, core_cfg('client.darwin.screen_resolution.min'));

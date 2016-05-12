@@ -232,6 +232,9 @@ client.usb.share_all = 0
 # 0441:0012, 1234:5678@12345678
 client.usb.share_list =
 
+## display kill vm session checkbox
+client.kill_vm.display = 0
+
 
 ## umask for the L7R process
 l7r.user.umask = 0022
