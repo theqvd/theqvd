@@ -1093,9 +1093,22 @@ sub start_file_sharing {
         if ($WINDOWS) {
             # User's home + all drives
             push @shares, $ENV{USERPROFILE};
+            DEBUG "Sharing user profile: $ENV{USERPROFILE}";
+
             eval "use Win32API::File";
             for my $drive (Win32API::File::getLogicalDrives()) {
-            	push @shares, $drive if -d $drive;
+                my $dt = Win32API::File::GetDriveType($drive);
+                if (!-d $drive) {
+                    DEBUG "Not sharing $drive: not a directory";
+                    next;
+                }
+
+                unless($dt == Win32API::File::DRIVE_REMOVABLE() || $dt == Win32API::File::DRIVE_CDROM()) {
+                    DEBUG "Not sharing $drive: not removable nor CD-ROM. Type: $dt";
+                    next;
+                }
+                
+                push @shares, $drive;
             }
         } else {
             # User's home + /media
