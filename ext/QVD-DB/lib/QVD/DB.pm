@@ -23,6 +23,7 @@ my $db_name   = core_cfg('database.name');
 my $db_user   = core_cfg('database.user');
 my $db_host   = core_cfg('database.host');
 my $db_passwd = core_cfg('database.password');
+my $db_port   = core_cfg('database.port', 0);
 
 my $db_connect_timeout = core_cfg('internal.database.client.connect.timeout');
 my $db_keepidle        = core_cfg('internal.database.client.socket.keepidle');
@@ -38,7 +39,11 @@ sub new {
         $db_user =~ s/\s*$//;
         $db_passwd =~ s/\s*$//;
     }
-    $class->SUPER::connect("dbi:Pg:dbname=$db_name;host=$db_host;connect_timeout=$db_connect_timeout",
+
+    my $data_source = "dbi:Pg:dbname=$db_name;host=$db_host;connect_timeout=$db_connect_timeout";
+    $data_source .= ";port=$db_port" if defined $db_port;
+
+    $class->SUPER::connect($data_source,
 			   $db_user, $db_passwd,
                            { RaiseError => 1,
 			     AutoCommit => 1,
