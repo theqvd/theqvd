@@ -1,4 +1,42 @@
-QVD 3.5.0
+
+QVD-3.5.3
+=========
+	- qa checks incorrect arguments in syntax
+	- Upgrade Log::Dispatch module 
+	- Remove from login screen the checkbox to kill the VM by configuration. 
+
+
+QVD-3.5.2 
+=========
+	- Cleaning build files 
+	- Windows client Atart X server just before connecting. 
+	- Ensure we have a PID for the L7R before trying to cleanup in the database
+	- Remove _release_vm method and stop calling it
+	- Ensure we don't set vm_user_state to connected if it was not connecing before... trying to catch bugs here. 
+	- Improve debugging 
+	- QVD::L7R fix no-ssl connection support 
+
+
+QVD-3.5.1
+=========
+
+   - Check module br_netfilter is loaded when the HKD starts
+   - refactor stop_vm, start_and_wait_for_vm and _atop_and_wait_for_vm cleaning the logic and facotring out common code
+   - Do not require Upgrade for stop_vm method 
+   - Add support for internal.l7r.timeout.vm_stop setting
+
+
+QVD-3.5.x
+=========
+	- Client: honor $PULSE_SERVER environment variable for audio
+          redirection
+	- Client: Fix error handling for file sharing on Darwin
+	- Client: Send slave channel auth if available, for 3.5 compatibility
+	- Client: Tell the VM correctly which OS we're using
+	- Client: Enable settings tab and printing by default
+	- VMA: Fix SlaveServer
+
+QVD-3.5.0
 =========
 	- Fix #1511: leave printers not configured by QVD untouched
 	- Fix #1507: L7R was responding 'I am alive' even when the host was blocked
