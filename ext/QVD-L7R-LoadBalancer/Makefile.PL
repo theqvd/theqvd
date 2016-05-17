@@ -2,10 +2,16 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+my $SUF_VERSION = "";
+if  ( defined $ENV{BUILD_NUMBER} ) {
+  $SUF_VERSION = '.' . $ENV{BUILD_NUMBER} ;
+}
+
+
 WriteMakefile(
     NAME                => 'QVD::L7R::LoadBalancer',
     AUTHOR              => q{QVD Team <qvd@qindel.com>},
-    VERSION		=> '3.1'.$ENV{BUILD_NUMBER},
+    VERSION		=> '3.5'.$SUF_VERSION,
     ABSTRACT       => 'lib/QVD/L7R/LoadBalancer.pm',
     LICENSE		=> 'gpl',
     PL_FILES            => {},

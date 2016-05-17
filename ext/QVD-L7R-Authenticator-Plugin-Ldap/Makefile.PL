@@ -4,9 +4,15 @@ use warnings;
 
 use ExtUtils::MakeMaker;
 
+my $SUF_VERSION = "";
+if  ( defined $ENV{BUILD_NUMBER} ) {
+  $SUF_VERSION = '.' . $ENV{BUILD_NUMBER} ;
+}
+
+
 WriteMakefile( NAME          => 'QVD::L7R::Authenticator::Plugin::Ldap',
 	       AUTHOR        => 'QVD Team <qvd@qindel.com>',
-	       VERSION	     => '3.1'.$ENV{BUILD_NUMBER},
+	       VERSION	     => '3.5'.$SUF_VERSION,
 	       ABSTRACT => 'lib/QVD/L7R/Authenticator/Plugin/Ldap.pm',
 	       LICENSE       => 'GPL3',
 	       PREREQ_PM     => { 'Test::More'       => 0,

@@ -1,8 +1,13 @@
 use 5.010;
 use ExtUtils::MakeMaker;
 
+my $SUF_VERSION = "";
+if  ( defined $ENV{BUILD_NUMBER} ) {
+  $SUF_VERSION = '.' . $ENV{BUILD_NUMBER} ;
+}
+
 WriteMakefile( NAME          => 'QVD::HKD',
-               VERSION       => '3.5'.$ENV{BUILD_NUMBER},
+               VERSION       => '3.5'.$SUF_VERSION ,
                PREREQ_PM     => { 'Class::StateMachine' => '0.23',
                                   'Class::StateMachine::Declarative' => '0.01',
                                   'AnyEvent' => '5.34',
