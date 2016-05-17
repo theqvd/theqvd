@@ -25,7 +25,7 @@ else {
 my $build = new Module::Build(
 	module_name      => 'QVD::Admin::Web',
 	dist_author       => 'QVD Team <qvd@qindel.com',
-	dist_version     => '3.5.'.$SUF_VERSION ,
+	dist_version     => '3.5'.$SUF_VERSION ,
 	dist_abstract    => 'QVD::Admin::Web - Catalyst based application',
 	license          => 'gpl',
 

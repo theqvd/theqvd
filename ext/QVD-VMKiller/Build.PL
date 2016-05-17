@@ -14,7 +14,7 @@ my $cron_dst = '/etc/cron.d';
 my $build = new Module::Build(
 	module_name      => 'QVD::VMKiller',
 	dist_author      => 'QVD Team <qvd@qindel.com',
-	dist_version     => '3.5.'.$SUF_VERSION ,
+	dist_version     => '3.5'.$SUF_VERSION ,
 	dist_abstract    => 'QVD::VMKiller - Kill QVD Zombies VM',
 	license          => 'gpl',
 
