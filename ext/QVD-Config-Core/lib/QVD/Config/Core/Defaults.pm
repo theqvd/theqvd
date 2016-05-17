@@ -279,9 +279,12 @@ l7r.pid_file = ${path.run}/qvd-l7r.pid
 
 # URL API is running
 # Example: https://*:443/
-api.url = https://*:443/
+api.url = https://*:80/
 api.user = root
 api.group = root
+
+api.stdout.filename = /dev/null
+api.stderr.filename = /dev/null
 
 # QVD-Admin parameters
 # url of the API

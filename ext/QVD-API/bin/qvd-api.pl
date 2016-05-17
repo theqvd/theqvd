@@ -145,6 +145,18 @@ package MojoX::Session::Transport::WAT
 ######## URLS ########
 ######################
 
+# Common 
+under sub {
+    my $c = shift;
+
+    my $stdout_file = $c->qvd_admin4_api->_cfg('api.stdout.filename');
+    my $stderr_file = $c->qvd_admin4_api->_cfg('api.stderr.filename');
+    open STDOUT, ">>", $stdout_file if defined($stdout_file);
+    open STDERR, ">>", $stderr_file if defined($stderr_file);
+
+    return 1;
+};
+
 # This url retrieves general info about the API.
 # This url can be accessed without authentication
 
@@ -168,367 +180,371 @@ any [qw(POST GET)] => '/api/info' => sub {
   $c->render(json => $json );
 };
 
-# Mojolicious::Lite 'under' is intended to check authentication credentials
-# All urls written in this file after 'under' will be reached only after 
-# the 'under' function is executed and returns 'true'.
+group {
 
-under sub {
+    # Mojolicious::Lite 'under' is intended to check authentication credentials
+    # All urls written in this file after 'under' will be reached only after 
+    # the 'under' function is executed and returns 'true'.
 
-    my $c = shift;
-	my $bool = 0;
+    under sub {
 
-    $c->res->headers->header('Access-Control-Allow-Origin' => '*'); # WAT requirement
-    $c->res->headers->header('Access-Control-Expose-Headers' => 'sid'); # WAT requirement
-    QVD::Config::reload(); # Needed to avoid QVD::Config refreshing problems
+        my $c = shift;
+        my $bool = 0;
 
-    my $json = $c->get_input_json;
-    
-	my $auth_method = $c->get_auth_method($json);
+        $c->res->headers->header('Access-Control-Allow-Origin' => '*'); # WAT requirement
+        $c->res->headers->header('Access-Control-Expose-Headers' => 'sid'); # WAT requirement
+        QVD::Config::reload(); # Needed to avoid QVD::Config refreshing problems
 
-    my %session_args = (
-	store  => [dbi => {dbh => QVD::DB->new()->storage->dbh}],
-	transport => MojoX::Session::Transport::WAT->new(),
-		tx => $c->tx
-	);
+        my $json = $c->get_input_json;
 
-    my $session = MojoX::Session->new(%session_args);
+        my $auth_method = $c->get_auth_method( $json );
 
-	my $exception;
-	try {
-		$bool = $c->$auth_method( $session, $json );
-	} catch {
-		$exception = $_;
-		$bool = 0;
-		$c->render(json => $exception->json);
-	};
+        my %session_args = (
+            store  => [dbi => {dbh => QVD::DB->new()->storage->dbh}],
+            transport => MojoX::Session::Transport::WAT->new(),
+            tx => $c->tx
+        );
 
-	QVD::API::LogReport->new(
-		action => { action => 'login', type_of_action => 'login' },
-		qvd_object => 'administrator',
-		tenant => {
-			tenant_id => $session->data('tenant_id'),
-			tenant_name => $session->data('tenant_name')
-		},
-		object => {
-			object_id =>  $session->data('admin_id'),
-			object_name =>  $session->data('admin_name')
-		},
-		administrator => {
-			administrator_id =>  $session->data('admin_id'),
-			administrator_name =>  $session->data('admin_name'),
-			superadmin =>  $session->data('superadmin')
-		},
-		ip => $c->tx->remote_address,
-		source => eval { $json->{parameters}->{source} } // undef,
-		arguments => {},
-		status => defined($exception) ? $exception->code : 0,
-	)->report;
+        my $session = MojoX::Session->new(%session_args);
 
-    return $bool;
-};
+        my $exception;
+        try {
+            $bool = $c->$auth_method( $session, $json );
+        } catch {
+            $exception = $_;
+            $bool = 0;
+            $c->render(json => $exception->json);
+        };
 
+        QVD::API::LogReport->new(
+            action => { action => 'login', type_of_action => 'login' },
+            qvd_object => 'administrator',
+            tenant => {
+                tenant_id => $session->data('tenant_id'),
+                tenant_name => $session->data('tenant_name')
+            },
+            object => {
+                object_id =>  $session->data('admin_id'),
+                object_name =>  $session->data('admin_name')
+            },
+            administrator => {
+                administrator_id =>  $session->data('admin_id'),
+                administrator_name =>  $session->data('admin_name'),
+                superadmin =>  $session->data('superadmin')
+            },
+            ip => $c->tx->remote_address,
+            source => eval { $json->{parameters}->{source} } // undef,
+            arguments => {},
+            status => defined($exception) ? $exception->code : 0,
+        )->report;
 
-# This is the main url in the API
-
-any [qw(POST GET)] => '/api' => sub {
-
-    my $c = shift;
-    
-    $c->inactivity_timeout(30000);     
-    my $json = $c->get_input_json;
-    my $response = $c->process_api_query($json);
-
-	# Retrieving the right encode is tricky.
-	# With this system accents and so on are supported.
-	# WARNING: we're rendering in json text mode. The json mode break the accents
-	# Maybe a problem in Mojo?
- 
-    deep_utf8_decode($response);
-    $c->render(text => b(encode_json($response))->decode('UTF-8'));
-};
+        return $bool;
+    };
 
 
-# This websocket is intended to report the current state of the system in real time
-# number of vms running, number vms in a host and so on.
+    # This is the main url in the API
 
-websocket '/api/ws' => sub {
-	my $c = shift;
-	$c->app->log->debug("WebSocket opened");
-	$c->inactivity_timeout(30000);
-	my $json = $c->get_input_json;
-	my $notification = 0;
-	my %payload_hash;
+    any [qw(POST GET)] => '/api' => sub {
 
-	my $res = $c->process_api_query($json);
-	$c->send(b(encode_json($res))->decode('UTF-8'));
+        my $c = shift;
 
-	# For every action requested to the API we can get 0, 1 or more channels to listen in the
-	# database. When the database notifies in those channels, this ws executes the action again
-	# and sends the updated info to the client
+        $c->inactivity_timeout(30000);     
+        my $json = $c->get_input_json;
+        my $response = $c->process_api_query($json);
 
-	for my $channel ($c->get_action_channels($json))
-	{
-		$c->qvd_admin4_api->_pool->listen($channel,on_notify => sub {
-			my ($pg_pool, $channel, $pid, $payload) = @_;
-			%payload_hash = split(/[=;]/, $payload);
-			$payload_hash{channel} = $channel;
-			$notification = 1;
-		});
-	}
+        # Retrieving the right encode is tricky.
+        # With this system accents and so on are supported.
+        # WARNING: we're rendering in json text mode. The json mode break the accents
+        # Maybe a problem in Mojo?
 
-	my $currentTenant = $c->qvd_admin4_api->{administrator}->tenant->id;
-	my $recurring = Mojo::IOLoop->recurring(
-		2 => sub {
-			my $received_tenant_id = $payload_hash{tenant_id} // -1;
-			if ($notification and (($currentTenant == 0) or
-				($received_tenant_id == -1) or
-				($received_tenant_id == $currentTenant))) {
-
-				$c->app->log->debug("WebSocket refreshing information");
-				my $res = $c->process_api_query($json);
-				$c->send(b(encode_json($res))->decode('UTF-8'));
-			}
-
-			$notification = 0;
-			%payload_hash = ();
-
-			return 1;
-		}
-	);
-
-	my $timer;
-	$c->on(message => sub {
-		my ($c, $msg) = @_;
-		$c->app->log->debug("WebSocket $msg signal received");
-		Mojo::IOLoop->remove($timer) if $timer;
-		$timer = Mojo::IOLoop->timer(25 => sub { $c->send('AKN'); } );
-	});
-
-	$c->on(finish => sub {
-		my ($c, $code) = @_;
-		Mojo::IOLoop->remove($timer) if $timer;
-		Mojo::IOLoop->remove($recurring) if $recurring;
-		$c->app->log->debug("WebSocket closed with status $code");
-	});
-};
+        deep_utf8_decode($response);
+        $c->render(text => b(encode_json($response))->decode('UTF-8'));
+    };
 
 
-# URLs intended to DI creation
-# Three systems supported:
+    # This websocket is intended to report the current state of the system in real time
+    # number of vms running, number vms in a host and so on.
 
-# COPY OF DISK IMAGES FROM STAGING
+    websocket '/api/ws' => sub {
+        my $c = shift;
+        $c->app->log->debug("WebSocket opened");
+        $c->inactivity_timeout(30000);
+        my $json = $c->get_input_json;
+        my $notification = 0;
+        my %payload_hash;
 
-websocket '/api/staging' => sub {
-    my $c = shift;
-    $c->inactivity_timeout(3000);
-    $c->app->log->debug("Staging WebSocket opened");
+        my $res = $c->process_api_query($json);
+        $c->send(b(encode_json($res))->decode('UTF-8'));
 
-    my $json = $c->get_input_json;
-    $json->{sid} //= $c->tx->res->headers->header('sid');
-    my $images_path  = $c->qvd_admin4_api->_cfg('path.storage.images');
-    my $staging_path = $c->qvd_admin4_api->_cfg('path.storage.staging');
-    my $staging_file = eval { $json->{arguments}->{disk_image} } // ''; 
-    my $images_file = $staging_file . '-tmp'. rand;
+        # For every action requested to the API we can get 0, 1 or more channels to listen in the
+        # database. When the database notifies in those channels, this ws executes the action again
+        # and sends the updated info to the client
 
-    my $accomplished=0;
-
-    $c->on(message => sub { 
-        my ($c,$msg) = @_;
-        unless ($accomplished) {
-            my $sf_size = eval { -s "$staging_path/$staging_file" } // 0;
-            my $if_size = eval { -s "$images_path/$images_file" } // 0;
-            $c->send( b( encode_json( {
-                    status     => 1000,
-                    total_size => $sf_size,
-                    copy_size  => $if_size } ) 
-                )->decode( 'UTF-8' )
-            );
+        for my $channel ($c->get_action_channels($json))
+        {
+            $c->qvd_admin4_api->_pool->listen($channel,on_notify => sub {
+                my ($pg_pool, $channel, $pid, $payload) = @_;
+                %payload_hash = split(/[=;]/, $payload);
+                $payload_hash{channel} = $channel;
+                $notification = 1;
+            });
         }
-    });
 
-    my $tx = $c->tx;
-    my $fc = Mojo::IOLoop::ForkCall->new;
-    $fc->run(
-        sub {
-            my $response = {};
-            try {
-                $c->app->log->debug( "Starting copy" );
+        my $currentTenant = $c->qvd_admin4_api->{administrator}->tenant->id;
+        my $recurring = Mojo::IOLoop->recurring(
+            2 => sub {
+                my $received_tenant_id = $payload_hash{tenant_id} // -1;
+                if ($notification and (($currentTenant == 0) or
+                    ($received_tenant_id == -1) or
+                    ($received_tenant_id == $currentTenant))) {
 
-                QVD::API::Exception->throw( code => '2220' )
-                    unless -d $images_path;
-
-                QVD::API::Exception->throw( code => '2230' )
-                    unless -d $staging_path;
-
-                QVD::API::Exception->throw( code => '2240' )
-                    unless -e "$staging_path/$staging_file";
-
-                for (1 .. 5)
-                {
-                    eval { copy( "$staging_path/$staging_file", "$images_path/$images_file" ) };
-                    $@ ? print $@ : last;
+                    $c->app->log->debug("WebSocket refreshing information");
+                    my $res = $c->process_api_query($json);
+                    $c->send(b(encode_json($res))->decode('UTF-8'));
                 }
 
-                if ($@)
+                $notification = 0;
+                %payload_hash = ();
+
+                return 1;
+            }
+        );
+
+        my $timer;
+        $c->on(message => sub {
+            my ($c, $msg) = @_;
+            $c->app->log->debug("WebSocket $msg signal received");
+            Mojo::IOLoop->remove($timer) if $timer;
+            $timer = Mojo::IOLoop->timer(25 => sub { $c->send('AKN'); } );
+        });
+
+        $c->on(finish => sub {
+            my ($c, $code) = @_;
+            Mojo::IOLoop->remove($timer) if $timer;
+            Mojo::IOLoop->remove($recurring) if $recurring;
+            $c->app->log->debug("WebSocket closed with status $code");
+        });
+    };
+
+
+    # URLs intended to DI creation
+    # Three systems supported:
+
+    # COPY OF DISK IMAGES FROM STAGING
+
+    websocket '/api/staging' => sub {
+        my $c = shift;
+        $c->inactivity_timeout(3000);
+        $c->app->log->debug("Staging WebSocket opened");
+
+        my $json = $c->get_input_json;
+        $json->{sid} //= $c->tx->res->headers->header('sid');
+        my $images_path  = $c->qvd_admin4_api->_cfg('path.storage.images');
+        my $staging_path = $c->qvd_admin4_api->_cfg('path.storage.staging');
+        my $staging_file = eval { $json->{arguments}->{disk_image} } // ''; 
+        my $images_file = $staging_file . '-tmp'. rand;
+
+        my $accomplished=0;
+
+        $c->on(message => sub { 
+            my ($c,$msg) = @_;
+            unless ($accomplished) {
+                my $sf_size = eval { -s "$staging_path/$staging_file" } // 0;
+                my $if_size = eval { -s "$images_path/$images_file" } // 0;
+                $c->send( b( encode_json( {
+                        status     => 1000,
+                        total_size => $sf_size,
+                        copy_size  => $if_size } ) 
+                    )->decode( 'UTF-8' )
+                );
+            }
+        });
+
+        my $tx = $c->tx;
+        my $fc = Mojo::IOLoop::ForkCall->new;
+        $fc->run(
+            sub {
+                my $response = {};
+                try {
+                    $c->app->log->debug( "Starting copy" );
+
+                    QVD::API::Exception->throw( code => '2220' )
+                        unless -d $images_path;
+
+                    QVD::API::Exception->throw( code => '2230' )
+                        unless -d $staging_path;
+
+                    QVD::API::Exception->throw( code => '2240' )
+                        unless -e "$staging_path/$staging_file";
+
+                    for (1 .. 5)
+                    {
+                        eval { copy( "$staging_path/$staging_file", "$images_path/$images_file" ) };
+                        $@ ? print $@ : last;
+                    }
+
+                    if ($@)
+                    {
+                        $c->report_di_problem_in_log( json => $json, tx => $tx, code =>
+                                $response ? $response->{status} : 2210 );
+                        QVD::API::Exception->throw( code => '2210' );
+                    }
+                    else
+                    {
+                        $response = $c->process_api_query( $json );
+                        if ($response->{status} == 0000)
+                        {
+                            my $di_id = ${$response->{rows}}[0]->{id};
+                            eval { move( "$images_path/$images_file", "$images_path/".$di_id.'-'.$staging_file ) };
+
+                            if ($@)
+                            {
+                                $c->qvd_admin4_api->_db->resultset( 'DI' )->find( { id => $di_id } )->delete;
+                                $c->qvd_admin4_api->_db->resultset( 'Log' )->find(
+                                    { object_id => $di_id, qvd_object => 'di' } )->update(
+                                    { object_id => undef, object_name => undef, status => 2210 } );
+                                QVD::API::Exception->throw( code => 2210 );
+                            }
+                        }
+                    }
+                } catch {
+                    my $exception = $_;
+                    $response = $exception->json;
+                };
+
+                return $response; 
+            },
+            sub {
+                my ($fc, $err, $response) = @_;
+                my $code = $response->{status};
+                my $msg = $response->{message};
+                $c->app->log->debug("Copy finished ($code): $msg");
+                $accomplished=1;
+                $c->send(b(encode_json($response))->decode('UTF-8')); 
+            }
+        );
+    };
+
+
+    # UPLOAD OF DISK IMAGES
+
+    any [qw(POST OPTIONS)] => '/api/di/upload' => sub {
+
+        my $c = shift;
+        $c->inactivity_timeout(30000);     
+        my $response;
+
+        if ($c->req->method eq 'POST')
+        {
+            my $json = $c->get_input_json;
+            my $file = eval { $c->req->upload('file') };
+
+            if ($file)
+            {
+                $response = $c->process_api_query($json);
+
+                if ($response->{status} eq 0)
                 {
-                    $c->report_di_problem_in_log( json => $json, tx => $tx, code =>
-                            $response ? $response->{status} : 2210 );
-                    QVD::API::Exception->throw( code => '2210' );
+                    my $di_id = ${$response->{rows}}[0]->{id};
+                    my $disk_image = $json->{arguments}->{disk_image}; 
+                    my $images_path  = $c->qvd_admin4_api->_cfg('path.storage.images');
+
+                    eval { $file->move_to($images_path .'/'. $di_id . '-'. $disk_image) };
+
+                    if ($@) 
+                    {
+                        $c->qvd_admin4_api->_db->resultset('DI')->find({ id => $di_id })->delete;
+                        $c->qvd_admin4_api->_db->resultset('Log')->find(
+                            { object_id => $di_id, qvd_object => 'di' })->update(
+                            { object_id => undef, object_name => undef, status => 2251});
+                        $response = QVD::API::Exception->new(code => 2251)->json;
+                    }
                 }
-                else
-                {
+            }
+            else
+            {
+                $c->report_di_problem_in_log(json => $json, code => 2250);
+                $response = QVD::API::Exception->new(code => 2250)->json;
+            }
+        }
+        else
+        {
+            $response = {status => 0};
+        }
+        deep_utf8_decode($response);
+        $c->render(text => b(encode_json($response))->decode('UTF-8'));
+    };
+
+    # DOWNLOAD OF DISK IMAGES
+
+    websocket '/api/di/download' => sub {
+
+        my $c = shift;
+        $c->inactivity_timeout(30000);     
+
+        my ($size,$len) = (0,0);
+
+        $c->ua->on(start => sub {
+                my ($ua, $tx) = @_;
+                $tx->req->once(finish => sub {
+                        $tx->res->on(progress => sub {
+                                my $msg = shift;
+                                return unless $len = $msg->headers->content_length;
+
+                                $size = $msg->content->progress;
+                                my $percent = $size == $len ? 100 : int($size / ($len / 100));
+                                print "\rProgress: ", $size == $len ? 100 : int($size / ($len / 100)), '%';
+                            });
+                    });
+            }); 
+
+        my $json = $c->get_input_json;
+
+        my $url = decode_json($json->{url});
+        my $tx2 = $c->ua->build_tx(GET => $url);
+
+        my ($response,$accomplished); 
+
+        $c->ua->start($tx2, sub {
+                my ($ua,$tx) = @_;
+
+                if ($tx->res->code eq 200)
+                { 
                     $response = $c->process_api_query( $json );
-                    if ($response->{status} == 0000)
+
+                    if ($response->{status} eq 0)
                     {
                         my $di_id = ${$response->{rows}}[0]->{id};
-                        eval { move( "$images_path/$images_file", "$images_path/".$di_id.'-'.$staging_file ) };
-
-                        if ($@)
+                        my $disk_image = $json->{arguments}->{disk_image}; 
+                        my $images_path  = $c->qvd_admin4_api->_cfg('path.storage.images');
+                        my $image_name = $images_path .'/'. $di_id . '-'. $disk_image;
+                        eval { $tx->res->content->asset->move_to($image_name) };
+                        if ($@) 
                         {
-                            $c->qvd_admin4_api->_db->resultset( 'DI' )->find( { id => $di_id } )->delete;
-                            $c->qvd_admin4_api->_db->resultset( 'Log' )->find(
-                                { object_id => $di_id, qvd_object => 'di' } )->update(
-                                { object_id => undef, object_name => undef, status => 2210 } );
-                            QVD::API::Exception->throw( code => 2210 );
+                            $c->qvd_admin4_api->_db->resultset('DI')->find({ id => $di_id })->delete;
+                            $c->qvd_admin4_api->_db->resultset('Log')->find(
+                                { object_id => $di_id, qvd_object => 'di' })->update(
+                                { object_id => undef, object_name => undef, status => 2261});
+                            $response = QVD::API::Exception->new(code => 2261)->json;
                         }
                     }
                 }
-            } catch {
-                my $exception = $_;
-                $response = $exception->json;
-            };
+                else
+                {
+                    $c->report_di_problem_in_log(json => $json,code => 2260);
+                    $response = QVD::API::Exception->new(code => 2260)->json;
+                }
 
-            return $response; 
-        },
-        sub {
-            my ($fc, $err, $response) = @_;
-            my $code = $response->{status};
-            my $msg = $response->{message};
-            $c->app->log->debug("Copy finished ($code): $msg");
-            $accomplished=1;
-            $c->send(b(encode_json($response))->decode('UTF-8')); 
-        }
-    );
-};
+                $accomplished = 1; }); 
 
+        $c->on(message => sub { my ($c,$msg) = @_; 
+                my $to_send = $accomplished ? $response : { status => 1000, total_size => $len, copy_size => $size };
+                $c->send(encode_json($to_send)); });
 
-# UPLOAD OF DISK IMAGES
-
-any [qw(POST OPTIONS)] => '/api/di/upload' => sub {
-
-    my $c = shift;
-    $c->inactivity_timeout(30000);     
-    my $response;
-
-    if ($c->req->method eq 'POST')
-    {
-	my $json = $c->get_input_json;
-	my $file = eval { $c->req->upload('file') };
-
-	if ($file)
-	{
-	    $response = $c->process_api_query($json);
-	    
-	    if ($response->{status} eq 0)
-	    {
-		my $di_id = ${$response->{rows}}[0]->{id};
-		my $disk_image = $json->{arguments}->{disk_image}; 
-		my $images_path  = $c->qvd_admin4_api->_cfg('path.storage.images');
-
-		eval { $file->move_to($images_path .'/'. $di_id . '-'. $disk_image) };
-
-		if ($@) 
-		{
-		    $c->qvd_admin4_api->_db->resultset('DI')->find({ id => $di_id })->delete;
-		    $c->qvd_admin4_api->_db->resultset('Log')->find(
-			{ object_id => $di_id, qvd_object => 'di' })->update(
-			{ object_id => undef, object_name => undef, status => 2251});
-			$response = QVD::API::Exception->new(code => 2251)->json;
-		}
-	    }
-	}
-	else
-	{
-	    $c->report_di_problem_in_log(json => $json, code => 2250);
-	    $response = QVD::API::Exception->new(code => 2250)->json;
-	}
-    }
-    else
-    {
-	$response = {status => 0};
-    }
-    deep_utf8_decode($response);
-    $c->render(text => b(encode_json($response))->decode('UTF-8'));
-};
-
-# DOWNLOAD OF DISK IMAGES
-
-websocket '/api/di/download' => sub {
-    
-    my $c = shift;
-    $c->inactivity_timeout(30000);     
-
-    my ($size,$len) = (0,0);
-
-    $c->ua->on(start => sub {
-	my ($ua, $tx) = @_;
-	$tx->req->once(finish => sub {
-	    $tx->res->on(progress => sub {
-		my $msg = shift;
-		return unless $len = $msg->headers->content_length;
-	      
-		$size = $msg->content->progress;
-		my $percent = $size == $len ? 100 : int($size / ($len / 100));
-		print "\rProgress: ", $size == $len ? 100 : int($size / ($len / 100)), '%';
-			 });
-		       });
-	    }); 
-    
-    my $json = $c->get_input_json;
-
-    my $url = decode_json($json->{url});
-    my $tx2 = $c->ua->build_tx(GET => $url);
-
-    my ($response,$accomplished); 
-
-    $c->ua->start($tx2, sub { my ($ua,$tx) = @_;
-
-			      if ($tx->res->code eq 200)
-			      { 
-				  $response = $c->process_api_query($json);
-				  
-				  if ($response->{status} eq 0)
-				  {
-				      my $di_id = ${$response->{rows}}[0]->{id};
-				      my $disk_image = $json->{arguments}->{disk_image}; 
-				      my $images_path  = $c->qvd_admin4_api->_cfg('path.storage.images');
-				      my $image_name = $images_path .'/'. $di_id . '-'. $disk_image;
-				      eval { $tx->res->content->asset->move_to($image_name) };
-				      if ($@) 
-				      {
-					  $c->qvd_admin4_api->_db->resultset('DI')->find({ id => $di_id })->delete;
-					  $c->qvd_admin4_api->_db->resultset('Log')->find(
-					      { object_id => $di_id, qvd_object => 'di' })->update(
-					      { object_id => undef, object_name => undef, status => 2261});
-					  $response = QVD::API::Exception->new(code => 2261)->json;
-				      }
-				  }
-			      }
-			      else
-			      {
-				  $c->report_di_problem_in_log(json => $json,code => 2260);
-				  $response = QVD::API::Exception->new(code => 2260)->json;
-			      }
-
-			      $accomplished = 1; }); 
-
-    $c->on(message => sub { my ($c,$msg) = @_; 
-			    my $to_send = $accomplished ? $response : { status => 1000, total_size => $len, copy_size => $size };
-			    $c->send(encode_json($to_send)); });
-
-    $c->send(encode_json({ status => 1000,
-			   total_size => $len,
-			   copy_size => $size }));
+        $c->send(encode_json({ status => 1000,
+                total_size => $len,
+                copy_size => $size }));
+    };
 };
 
 app->start;
