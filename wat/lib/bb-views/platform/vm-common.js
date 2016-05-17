@@ -128,7 +128,7 @@ Wat.Common.BySection.vm = {
                 target.html(template + noVNCIncludes);   
                 
                 setTimeout(function () {
-                    $('#noVNC_connect_button').trigger('click');
+                    //$('#noVNC_connect_button').trigger('click');
                 }, 1000);
             }
         }
