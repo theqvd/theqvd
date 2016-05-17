@@ -7,6 +7,12 @@ use Module::Build;
 
 my $apache_dst; 
 my $apache_conf;
+
+my $SUF_VERSION = "";
+if  ( defined $ENV{BUILD_NUMBER} ) {
+	$SUF_VERSION = '.' . $ENV{BUILD_NUMBER} ;
+}
+
 if ( -f '/etc/debian_version' ) {
 	$apache_conf = 'qvd-wat.conf';
 	$apache_dst = '/etc/apache2/sites-available' ;
@@ -19,7 +25,7 @@ else {
 my $build = new Module::Build(
 	module_name      => 'QVD::Admin::Web',
 	dist_author       => 'QVD Team <qvd@qindel.com',
-	dist_version     => '3.3'.$ENV{SVN_REVISION},
+	dist_version     => '3.5.'.$SUF_VERSION ,
 	dist_abstract    => 'QVD::Admin::Web - Catalyst based application',
 	license          => 'gpl',
 
