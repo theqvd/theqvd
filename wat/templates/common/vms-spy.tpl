@@ -104,7 +104,7 @@
     </div>
 
     <!-- Settings Panel -->
-    <div id="noVNC_settings" class="triangle-right top" style="display: none;">
+    <div id="noVNC_settings" class="noVNC_settings" class="triangle-right top">
         <span id="noVNC_settings_menu">
             <ul>
                 <li><input id="noVNC_encrypt" type="checkbox"> Encrypt</li>
@@ -161,7 +161,7 @@
     <h1 id="noVNC_logo" style="display: none;"><span>no</span><br />VNC</h1>
         
     <!-- HTML5 Canvas -->
-    <div id="noVNC_container" style="width: 100%;">
+    <div id="noVNC_container">
         <canvas id="noVNC_canvas" class="noVNC_canvas" width="0" height="0">
                     Canvas not supported.
         </canvas>

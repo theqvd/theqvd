@@ -3333,8 +3333,8 @@ div.tagsinput span.tag a {
   width: 100% !important;
   height: auto !important; }
 
-.noVNC_controls {
-  display: none !important; }
+.noVNC_controls, .noVNC_settings {
+  sdisplay: none !important; }
 
 /********************************************************************
 *********************************************************************
