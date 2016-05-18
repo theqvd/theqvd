@@ -7,7 +7,9 @@ RESTRICT_TEMPLATES = true;
 DEBUG_ACL_FAILS = false;
 
 // noVNC include URI
-INCLUDE_URI= "lib/thirds/noVNC/include/";
+INCLUDE_URI = "lib/thirds/noVNC/include/";
+VNC_MIN_HEIGHT = 400;
+VNC_MIN_WIDTH = 600;
 
 // Status codes returned by the API
 ALL_STATUS = {

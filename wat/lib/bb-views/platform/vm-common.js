@@ -109,12 +109,38 @@ Wat.Common.BySection.vm = {
         var dialogConf = {
             title: $.i18n.t('Spy'),
             buttons : {
+                "Full screen": function () { 
+                    $('.ui-dialog').addClass('ui-dialog--fullscreen');   
+                    $(".ui-dialog-buttonset button span.fa-expand").parent().hide();
+                    $(".ui-dialog-buttonset button span.fa-compress").parent().show();
+                    $('.ui-dialog-titlebar').hide();
+                    UI.toggleFullscreen();
+
+                    UI.onresize();
+                },
+                "Normal screen": function () {
+                    $('.ui-dialog').removeClass('ui-dialog--fullscreen');
+                    $(".ui-dialog-buttonset button span.fa-expand").parent().show();
+                    $(".ui-dialog-buttonset button span.fa-compress").parent().hide();
+                    $('.ui-dialog-titlebar').show();
+                    UI.toggleFullscreen();
+                    
+                    UI.onresize();
+                },
                 "Close": function () {       
+                    console.log($('.ui-dialog.ui-dialog--fullscreen'));
+                    if($('.ui-dialog.ui-dialog--fullscreen').length > 0) {
+                        UI.toggleFullscreen();
+                    }
+                    
                     $('#disconnectButton').trigger('click');
+
                     Wat.I.closeDialog($(this));
                 },
             },
-            button1Class : 'fa fa-ban',
+            button1Class : 'fa fa-expand',
+            button2Class : 'fa fa-compress',
+            button3Class : 'fa fa-ban',
             
             fillCallback : function (target) {
                 // Add common parts of editor to dialog
@@ -122,13 +148,45 @@ Wat.Common.BySection.vm = {
                     Wat.TPL.spyVM, {
                     }
                 );
-                
-                var noVNCIncludes = '<script src="lib/thirds/noVNC/include/util.js"></script><script src="lib/thirds/noVNC/include/ui.js"></script>';
 
-                target.html(template + noVNCIncludes);   
+                var noVNCIncludes = '<script src="lib/thirds/noVNC/include/util.js"></script><script src="lib/thirds/noVNC/include/ui.js"></script>';
+                
+                target.html(template + noVNCIncludes); 
+                
+                UI.onresize = function () {
+                    var dialogWidth = parseInt($('.dialog-container').css('width').replace('px',''));
+                    var dialogHeight = parseInt($('.dialog-container').css('height').replace('px',''));
+                    
+                    var w = dialogWidth;
+                    /*
+                    if (w > 1024) {
+                        w = 1024;
+                    }
+                    */
+                    
+                    var h = parseInt(2*(w/3));
+                    
+                    var maxHeight = window.innerHeight * 0.97;
+                    if (h > maxHeight) {
+                        h = maxHeight;
+                        w = h * 1.5;
+                    }
+                    
+                    var display = UI.rfb.get_display();
+                    var scaleRatio = display.autoscale(w,h,false);
+                    UI.rfb.get_mouse().set_scale(scaleRatio);
+                    $('.noVNC_container').css('visibility', 'visible');
+                };
+                
+                UI.updateDocumentTitle = function(rfb, name) {
+                    $('.ui-dialog-titlebar').html($('.ui-dialog-titlebar').html() + ' - ' + name);
+                };
+                
+                // Hide normal screen button from the begining
+                $(".ui-dialog-buttonset button span.fa-compress").parent().hide();
                 
                 setTimeout(function () {
-                    //$('#noVNC_connect_button').trigger('click');
+                    $('#noVNC_connect_button').trigger('click');
                 }, 1000);
             }
         }

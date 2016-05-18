@@ -249,7 +249,7 @@ var UI;
             if (!UI.rfb) return;
 
             var size = UI.getCanvasLimit();
-
+            
             if (size && UI.rfb_state === 'normal' && UI.rfb.get_display()) {
                 var display = UI.rfb.get_display();
                 var scaleType = UI.getSetting('resize');
@@ -287,7 +287,7 @@ var UI;
             var pos = Util.getPosition(container);
             var w = pos.width;
             var h = pos.height;
-
+            
             container.style.overflow = "visible";
 
             if (isNaN(w) || isNaN(h)) {

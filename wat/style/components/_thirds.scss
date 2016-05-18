@@ -147,6 +147,52 @@
     @extend %no-outline;
 }
 
+.ui-dialog--fullscreen {
+    width: 100vw !important;
+    height: 100vh !important;
+    left: 0 !important;
+    top: 0 !important;
+    background: #444;
+    
+    .dialog-container {
+        height: 100vh !important;
+        max-height: 100vh !important;
+        background: #222;
+        float: right;
+        width: 90% !important;
+    }
+    
+    .ui-dialog-buttonpane {
+        float: left;
+        width: 10%;
+        background: #444;
+        border: 0;
+        margin-left: 0px;
+    }
+    
+    .ui-dialog-buttonset {
+        width: 100%;
+        padding: 0px;
+        text-align: left;
+        margin: 0px;
+        background: #444;
+
+        .button {
+            margin-left: 0px;
+            width: 100%;
+            
+            span {
+                font-size: 11px;
+                
+                &:before {
+                    display: block;
+                    font-size: 30px;
+                }
+            }
+        }
+    }
+}
+
 // jQuery DateTimePicker styles
 
 .xdsoft_datetimepicker .xdsoft_calendar {
@@ -342,12 +388,14 @@ div.tagsinput span.tag a {
     color:#FEFEFE
 }
 
-
-.noVNC_canvas {
-    width: 100% !important;
-    height: auto !important;
+.noVNC_screen {
+    text-align: center;
 }
 
-.noVNC_controls, .noVNC_settings {
-    sdisplay: none !important;
+.noVNC_controls, .noVNC_settings, .noVNC_xvp, .noVNC_status {
+    display: none !important;
 }
+
+ .noVNC_container {
+     visibility: hidden;
+ }

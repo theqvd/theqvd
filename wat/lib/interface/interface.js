@@ -581,9 +581,11 @@ Wat.I = {
 
                     var button1 = buttonsText[0];
                     var button2 = buttonsText[1];
+                    var button3 = buttonsText[2];
 
                     Wat.T.translateElementContain($(button1));
                     Wat.T.translateElementContain($(button2));
+                    Wat.T.translateElementContain($(button3));
 
                     // Delete jQuery UI default classes
                     buttons.attr("class", "");
@@ -592,6 +594,7 @@ Wat.I = {
 
                     $(button1).addClass(dialogConf.button1Class);
                     $(button2).addClass(dialogConf.button2Class);
+                    $(button3).addClass(dialogConf.button3Class);
                 
                 // Call to the callback function that will fill the dialog
                     dialogConf.fillCallback($(this), that);
