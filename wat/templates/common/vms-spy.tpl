@@ -38,7 +38,7 @@
         </div>
     </div>
 
-    <div id="noVNC_status"></div>
+    <div id="noVNC_status" class="noVNC_status"></div>
 
     <!--noVNC Buttons-->
     <div class="noVNC-buttons-right" style="display: none;">
@@ -95,7 +95,7 @@
     </div>
 
     <!-- XVP Shutdown/Reboot Panel -->
-    <div id="noVNC_xvp" class="triangle-right top">
+    <div id="noVNC_xvp" class="noVNC_xvp" class="triangle-right top">
         <span id="noVNC_xvp_menu">
             <input type="button" id="xvpShutdownButton" value="Shutdown" />
             <input type="button" id="xvpRebootButton" value="Reboot" />
@@ -146,8 +146,8 @@
     <!-- Connection Panel -->
     <div id="noVNC_controls" class="noVNC_controls" class="triangle-right top">
         <ul>
-            <li><label><strong>Host: </strong><input id="noVNC_host" /></label></li>
-            <li><label><strong>Port: </strong><input id="noVNC_port" /></label></li>
+            <li><label><strong>Host: </strong><input id="noVNC_host" value="172.26.9.185" /></label></li>
+            <li><label><strong>Port: </strong><input id="noVNC_port" value="6080" /></label></li>
             <li><label><strong>Password: </strong><input id="noVNC_password" type="password" /></label></li>
             <li><label><strong>Token: </strong><input id="noVNC_token"/></label></li>
             <li><input id="noVNC_connect_button" type="button" value="Connect"></li>
@@ -157,11 +157,11 @@
 </div> <!-- End of noVNC-control-bar -->
 
 
-<div id="noVNC_screen">
+<div id="noVNC_screen" class="noVNC_screen">
     <h1 id="noVNC_logo" style="display: none;"><span>no</span><br />VNC</h1>
         
     <!-- HTML5 Canvas -->
-    <div id="noVNC_container">
+    <div id="noVNC_container" class="noVNC_container">
         <canvas id="noVNC_canvas" class="noVNC_canvas" width="0" height="0">
                     Canvas not supported.
         </canvas>
