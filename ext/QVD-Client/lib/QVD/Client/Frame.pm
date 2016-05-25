@@ -226,6 +226,41 @@ sub new {
         $self->{fullscreen}->SetValue( core_cfg("client.fullscreen" ) );
         $settings_sizer->Add($self->{fullscreen}, 0, wxALL, 5);
         
+        #######################
+        # Sharing
+        ########################
+       
+
+        my $sharing_panel = Wx::Panel->new($tab_ctl, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+        $tab_ctl->AddPage( $sharing_panel, $self->_t("Shared folders"));
+        my $sharing_sizer = Wx::BoxSizer->new(wxVERTICAL);
+        $sharing_panel->SetSizer($sharing_sizer);
+        
+        $self->{share_enable}  = Wx::CheckBox->new($sharing_panel, -1, $self->_t("Enable sharing"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
+        $self->{share_list}     = Wx::ListBox->new($sharing_panel, -1, wxDefaultPosition, wxDefaultSize, [], 0, wxDefaultValidator, "Share list");
+        $self->{share_btnsizer} = Wx::BoxSizer->new(wxHORIZONTAL);
+        $self->{share_add}      = Wx::Button->new($sharing_panel, -1, $self->_t("Add"));
+        $self->{share_del}      = Wx::Button->new($sharing_panel, -1, $self->_t("Remove"));
+
+
+        $self->{share_enable}->SetValue( core_cfg('client.file_sharing.enable') );
+
+        $sharing_sizer->Add($self->{share_enable}, 0, wxALL);
+        $sharing_sizer->Add($self->{share_list}, 1, wxEXPAND);
+        $sharing_sizer->Add($self->{share_btnsizer}, 0, wxALL);
+        
+        $self->{share_btnsizer}->Add($self->{share_add}, 0, wxALL);
+        $self->{share_btnsizer}->Add($self->{share_del}, 0, wxALL);
+
+        Wx::Event::EVT_BUTTON($sharing_panel, $self->{share_add}->GetId, sub { share_add($self); });
+        Wx::Event::EVT_BUTTON($sharing_panel, $self->{share_del}->GetId, sub { share_del($self); });
+
+
+
+#        my $shared_sizer = Wx::StaticBoxSizer->new(Wx::StaticBox->new($self->{sharing_panel}, wxID_ANY, $self->_t("Shared folders")), wxHORIZONTAL);
+#        $settings_sizer->Add($shared_sizer, 1, wxEXPAND);
+#        $shared_sizer->Add( Wx::StaticText->new($sharing_panel, -1, $self->_t("No folders have been shared yet")), 0, wxALL, 5) ;
+
     }
 
     my $ver_sizer  = Wx::BoxSizer->new(wxVERTICAL);
@@ -361,6 +396,10 @@ sub new {
     $self->{proc} = undef;
     $self->{proc_pid} = undef;
     $self->{log} = "";
+    $self->{shares} = [];
+
+
+    $self->load_share_list();
 
 	if( $ENV{QVD_PP_BUILD} ) {
 		INFO "Being called from PP build. Exiting.";
@@ -985,12 +1024,45 @@ sub select_usb_devices {
 
 }
 
+sub share_add {
+    my ($self) = @_;
+    my $dialog = Wx::DirDialog->new($self, $self->_t("Select the folder to share"), "");  
+    $dialog->ShowModal();
+    my $selected = $dialog->GetPath();
+    
+    if ( $selected ) {
+        push @{ $self->{shares} }, $selected;
+        $self->update_share_list();
+    }
+}
+
+sub share_del {
+    my ($self) = @_;
+
+    my ($first_selection) = $self->{share_list}->GetSelections();
+    $self->{share_list}->Delete($first_selection);
+    splice @{$self->{shares}}, $first_selection,1;
+
+
+}
 
 ################################################################################
 #
 # Helpers
 #
 ################################################################################
+
+
+sub update_share_list() {
+    my ($self) = @_;
+
+    $self->{shares} //= [];
+    my %tmp = map { $_ => 1 } @{$self->{shares}};
+    $self->{shares} = [ sort keys %tmp ];
+    $self->{share_list}->Clear();
+    $self->{share_list}->InsertItems( $self->{shares}, 0 );
+
+}
 
 sub DetectKeyboard {
 
@@ -1074,6 +1146,18 @@ sub SaveConfiguration {
     
     #set_core_cfg('client.geometry', $self->{geometry}->GetValue());
 
+    set_core_cfg('client.file_sharing.enable', $self->{share_enable}->IsChecked() ? 1 : 0) if ($self->{share_enable});
+
+    my $share_num=0;
+    foreach my $share (@{ $self->{shares} }) {
+        set_core_cfg("client.share.$share_num", $share);
+        $share_num++;
+    }
+
+    set_core_cfg("client.share.$share_num", "");
+
+
+
     local $@;
     eval { save_core_cfg($QVD::Client::App::user_config_filename) };
     if ($@) {
@@ -1085,14 +1169,23 @@ sub SaveConfiguration {
     }
 }
 
-sub start_file_sharing {
-    my $slave_client_proc;
-    if (core_cfg('client.slave.enable', 1) && core_cfg('client.file_sharing.enable', 1)) {
-        #my $slave_client_cmd = $QVD::Client::App::app_dir . '/bin/qvd-slaveclient';
-        my @shares;
+
+sub load_share_list {
+    my ($self) = @_;
+    $self->{shares} = [];
+
+ 
+    if ( core_cfg("client.share.0", 0) ne "" ) {
+        my $num = 0;
+        my $dir;
+        while( ($dir = core_cfg("client.share.$num", 0)) ne "" ) {
+            push @{$self->{shares}}, $dir;
+            $num++;
+        }
+    } else {
         if ($WINDOWS) {
             # User's home + all drives
-            push @shares, $ENV{USERPROFILE};
+            push @{ $self->{shares} }, $ENV{USERPROFILE};
             DEBUG "Sharing user profile: $ENV{USERPROFILE}";
 
             eval "use Win32API::File";
@@ -1108,17 +1201,29 @@ sub start_file_sharing {
                     next;
                 }
                 
-                push @shares, $drive;
+                push @{$self->{shares}}, $drive;
             }
         } else {
             # User's home + /media
-            push @shares, $ENV{HOME};
-            push @shares, '/media' if -e '/media';
-            push @shares, '/Volumes' if -e '/Volumes'; # For OS X
+            push @{$self->{shares}}, $ENV{HOME};
+            push @{$self->{shares}}, '/media' if -e '/media';
+            push @{$self->{shares}}, '/Volumes' if -e '/Volumes'; # For OS X
         }
+    }
+ 
+    $self->update_share_list();
+
+}
+
+
+sub start_file_sharing {
+    my ($self) = @_;
+
+    my $slave_client_proc;
+    if (core_cfg('client.slave.enable', 1) && core_cfg('client.file_sharing.enable', 1)) {
 
         use QVD::Client::SlaveClient;
-        for my $share (@shares) {
+        for my $share (@{ $self->{shares} }) {
             INFO("Starting folder sharing for $share");
             for (my $conn_attempt = 0; $conn_attempt < 10; $conn_attempt++) {
                 local $@;

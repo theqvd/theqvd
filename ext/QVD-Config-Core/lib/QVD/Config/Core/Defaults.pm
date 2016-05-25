@@ -180,6 +180,8 @@ client.fullscreen =
 client.audio.enable =
 ## something regarding an NX channel
 client.printing.enable = 1
+## Enable sharing client-side folders towards the VM
+client.file_sharing.enable = 1
 ## L7R port the client should connect to
 client.host.port = 8443
 ## L7R host the client should connect to
