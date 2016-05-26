@@ -41,9 +41,7 @@ Wat.U = {
         
         remainingTimeAttr = '';
         remainingTimeAttrObj = {};
-        console.info(rawRemainingTime);
         if (rawRemainingTime.expired) {
-            console.info("EXPIRED");
             remainingTime = $.i18n.t("Expired");
         }
         else {
@@ -65,15 +63,6 @@ Wat.U = {
             // If remainingTimeAttr is not empty, remainingTime will be empty
             remainingTime = remainingTimeAttr ? '' : remainingTime;
         }
-
-        console.warn({
-            returnType: returnType,
-            remainingTime: remainingTime,            
-            remainingTimeAttr: remainingTimeAttr,
-            priorityClass: priorityClass,
-            expired: rawRemainingTime.expired,
-            rawTime: rawRemainingTime,
-        });
         
         return {
             returnType: returnType,

@@ -798,7 +798,8 @@ my $AVAILABLE_FIELDS = {
 
 	      VM => [qw(storage id name description user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
                         state host_id host_name  di_id user_state ip mac next_boot_ip ssh_port vnc_port serial_port 
-                        creation_date creation_admin_id creation_admin_name di_version di_name di_id properties ip_in_use di_id_in_use di_name_in_use di_version_in_use )],
+                        creation_date creation_admin_id creation_admin_name di_version di_name di_id properties ip_in_use di_id_in_use di_name_in_use di_version_in_use
+	                time_until_expiration_soft time_until_expiration_hard )],
 
 	      ACL => [qw(id name description)],
 

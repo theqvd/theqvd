@@ -57,6 +57,11 @@ Wat.I.L = {
                     Wat.T.translateXMonths();
                     Wat.T.translateXYears();
                 }
+                
+                // If is expired, remove attr to avoid future useless checks
+                if (processedTime.expired) {
+                    $(element).removeAttr('data-countdown');
+                }
             });
         }, 1000);
     }
