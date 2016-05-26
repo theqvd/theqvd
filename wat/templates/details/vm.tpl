@@ -290,39 +290,10 @@ switch (model.get('state')) {
                     }
                     else {
                         var remainingTimes = {
-                            soft: { 
-                                rawTime: model.get('time_until_expiration_soft')
-                            },
-                            hard: { 
-                                rawTime: model.get('time_until_expiration_hard')
-                            }
+                            soft: Wat.U.processRemainingTime(model.get('time_until_expiration_soft')),
+                            hard: Wat.U.processRemainingTime(model.get('time_until_expiration_hard'))
                         };
                         
-                        $.each (remainingTimes, function (iRema, rema) { 
-                            var processedRemainingTime = Wat.U.processRemainingTime(rema.rawTime);
-                            
-                            remainingTimes[iRema].priorityClass = processedRemainingTime.priorityClass;
-                            remainingTimes[iRema].remainingTime = '';
-                            remainingTimes[iRema].returnType = processedRemainingTime.returnType;
-                            remainingTimes[iRema].remainingTimeAttr = '';
-                            remainingTimes[iRema].expired = processedRemainingTime.expired;
-                            
-                            switch (processedRemainingTime.returnType) {
-                                case 'exact':
-                                    remainingTimes[iRema].remainingTime = processedRemainingTime.remainingTime;
-                                    break;
-                                case 'days':
-                                    remainingTimes[iRema].remainingTimeAttr = 'data-days="' + processedRemainingTime.remainingTime + '"';
-                                    break;
-                                case 'months':
-                                    remainingTimes[iRema].remainingTimeAttr = 'data-months="' + processedRemainingTime.remainingTime + '"';
-                                    break;
-                                case '>year':
-                                    remainingTimes[iRema].remainingTimeAttr = 'data-years="' + processedRemainingTime.remainingTime + '"';
-                                    break;
-                            }
-                        });
-
                         if (remainingTimes.hard.expired) {
                 %>
                             <td><span class="error" data-i18n="Expired"></span></td>
@@ -339,18 +310,7 @@ switch (model.get('state')) {
                                             <tr>
                                                 <td class="<%= remainingTimes.soft.priorityClass %>" data-i18n="Soft"></td>
                                                 <td class="<%= remainingTimes.soft.priorityClass %>"><%= model.get('expiration_soft').replace('T',' ') %></td>
-                                                <%
-                                                if (remainingTimes.soft.expired) {
-                                                %>
-                                                    <td class="<%= remainingTimes.soft.priorityClass %>" <%= remainingTimes.soft.remainingTimeAttr %>><span data-i18n="Expired"></span></td>
-                                                <%
-                                                }
-                                                else {
-                                                %>
-                                                    <td class="<%= remainingTimes.soft.priorityClass %>" <%= remainingTimes.soft.remainingTimeAttr %>><%= remainingTimes.soft.remainingTime %></td>
-                                                <%    
-                                                }
-                                                %>
+                                                <td class="<%= remainingTimes.soft.priorityClass %>" <%= remainingTimes.soft.remainingTimeAttr %> data-countdown data-raw="<%= Wat.U.base64.encodeObj(model.get('time_until_expiration_soft')) %>"><%= remainingTimes.soft.remainingTime %></td>
                                             </tr>
                                         <%
                                             }
@@ -359,7 +319,7 @@ switch (model.get('state')) {
                                             <tr>
                                                 <td class="<%= remainingTimes.hard.priorityClass %>" data-i18n="Hard"></td>
                                                 <td class="<%= remainingTimes.hard.priorityClass %>"><%= model.get('expiration_hard').replace('T',' ') %></td>
-                                                <td class="<%= remainingTimes.hard.priorityClass %>" <%= remainingTimes.hard.remainingTimeAttr %>><%= remainingTimes.hard.remainingTime %></td>
+                                                <td class="<%= remainingTimes.hard.priorityClass %>" <%= remainingTimes.hard.remainingTimeAttr %> data-countdown data-raw="<%= Wat.U.base64.encodeObj(model.get('time_until_expiration_hard')) %>"><%= remainingTimes.hard.remainingTime %></td>
                                             </tr>
                                         <%
                                             }

@@ -33,25 +33,8 @@ Wat.Models.Log = Wat.Models.Model.extend({
         }
         
         var processedAntiquity = Wat.U.processRemainingTime(response.antiquity);
-        var AntiquityTime = '';
-        var AntiquityTimeAttr = '';
         
-        switch (processedAntiquity.returnType) {
-            case 'exact':
-                AntiquityTime = processedAntiquity.remainingTime;
-                break;
-            case 'days':
-                AntiquityTimeAttr = 'data-days="' + processedAntiquity.remainingTime + '"';
-                break;
-            case 'months':
-                AntiquityTimeAttr = 'data-months="' + processedAntiquity.remainingTime + '"';
-                break;
-            case '>year':
-                AntiquityTimeAttr = 'data-years="' + processedAntiquity.remainingTime + '"';
-                break;
-        }
-        
-        response.antiquityHTML = '<span ' + AntiquityTimeAttr + '>' + AntiquityTime + '</span>';
+        response.antiquityHTML = '<span ' + processedAntiquity.remainingTimeAttr + '>' + processedAntiquity.remainingTime + '</span>';
                                                 
         return response;
     },

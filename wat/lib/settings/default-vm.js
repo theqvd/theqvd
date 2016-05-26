@@ -187,6 +187,44 @@ Wat.I.listFields[qvdObj] = {
         'display': false,
         'sortable': true,
     },
+    'expiration_soft': {
+        'text': 'Soft expiration',
+        'fields': [
+            'expiration_soft',
+            'time_until_expiration_soft'
+        ],
+        'acls': 'vm.see.expiration',
+        'display': false,
+        'sortable': true,
+    },
+    'expiration_hard': {
+        'text': 'Hard expiration',
+        'fields': [
+            'expiration_hard',
+            'time_until_expiration_hard'
+        ],
+        'acls': 'vm.see.expiration',
+        'display': false,
+        'sortable': true,
+    },
+    'time_until_expiration_soft': {
+        'text': 'Time for soft expiration',
+        'fields': [
+            'time_until_expiration_soft'
+        ],
+        'acls': 'vm.see.expiration',
+        'display': false,
+        'sortable': true,
+    },
+    'time_until_expiration_hard': {
+        'text': 'Time for hard expiration',
+        'fields': [
+            'time_until_expiration_hard'
+        ],
+        'acls': 'vm.see.expiration',
+        'display': false,
+        'sortable': true,
+    },
     'creation_date': {
         'text': 'Creation date',
         'fields': [

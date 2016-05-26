@@ -120,6 +120,8 @@ var Wat = {
         C: {},
         // Graphs (lib/interface/interface-graphs.js)
         G: {},
+        // Live (lib/interface/interface-live.js)
+        L: {},
         // Messages (lib/interface/interface-messages.js)
         M: {},
         // Templates (lib/interface/interface-templates.js)

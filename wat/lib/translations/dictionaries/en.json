@@ -373,6 +373,8 @@
     "This disk image is already setted as default - To change this, another disk image of the same OSF must be setted as default": "This disk image is already setted as default - To change this, another disk image of the same OSF must be setted as default",
     "This virtual machine will expire": "This virtual machine will expire",
     "This section step by step": "This section step by step",
+    "Time for hard expiration": "Time for hard expiration",
+    "Time for soft expiration": "Time for soft expiration",
     "Total": "Total",
     "Type": "Type",
     "Unblock": "Unblock",

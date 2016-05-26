@@ -377,6 +377,8 @@
     "This disk image is already setted as default - To change this, another disk image of the same OSF must be setted as default": "Esta imagen de disco es la predeterminada - Para cambiar esto, otra imagen de disco del mismo OSF debe ser establecida como predeterminada",
     "This virtual machine will expire": "Esta máquina virtual expirará",
     "This section step by step": "Esta sección paso a paso",
+    "Time for hard expiration": "Tiempo para expiración dura",
+    "Time for soft expiration": "Tiempo para expiración suave",
     "Total": "Total",
     "Type": "Tipo",
     "Unblock": "Desbloquear",

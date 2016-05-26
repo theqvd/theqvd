@@ -18,5 +18,8 @@
 
         // Get templates and after that read config file
         Wat.A.getTemplates(templates, Wat.C.readConfigFile);
+        
+        // Start countdown
+        Wat.I.L.countdown();
 	});
 })(window, document, jQuery)

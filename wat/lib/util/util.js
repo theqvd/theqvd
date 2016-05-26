@@ -16,9 +16,9 @@ Wat.U = {
         if (rawRemainingTime.days < 1 && rawRemainingTime.months == 0) {
             priorityClass = 'error';
             
-            rawRemainingTime.hours = rawRemainingTime.hours < 10 ? '0' + rawRemainingTime.hours : rawRemainingTime.hours;
-            rawRemainingTime.minutes = rawRemainingTime.minutes < 10 ? '0' + rawRemainingTime.minutes : rawRemainingTime.minutes;
-            rawRemainingTime.seconds = rawRemainingTime.seconds < 10 ? '0' + rawRemainingTime.seconds : rawRemainingTime.seconds;
+            rawRemainingTime.hours = parseInt(rawRemainingTime.hours) < 10 ? '0' + parseInt(rawRemainingTime.hours) : rawRemainingTime.hours;
+            rawRemainingTime.minutes = parseInt(rawRemainingTime.minutes) < 10 ? '0' + parseInt(rawRemainingTime.minutes) : rawRemainingTime.minutes;
+            rawRemainingTime.seconds = parseInt(rawRemainingTime.seconds) < 10 ? '0' + parseInt(rawRemainingTime.seconds) : rawRemainingTime.seconds;
                 
             remainingTime = rawRemainingTime.hours + ':' + rawRemainingTime.minutes + ':' + rawRemainingTime.seconds;
             returnType = 'exact';
@@ -38,12 +38,50 @@ Wat.U = {
             remainingTime = '>1';
             returnType = '>year';
         }
+        
+        remainingTimeAttr = '';
+        remainingTimeAttrObj = {};
+        console.info(rawRemainingTime);
+        if (rawRemainingTime.expired) {
+            console.info("EXPIRED");
+            remainingTime = $.i18n.t("Expired");
+        }
+        else {
+            switch (returnType) {
+                case 'days':
+                    remainingTimeAttr = 'data-days="' + remainingTime + '"';
+                    remainingTimeAttrObj['data-days'] = remainingTime;
+                    break;
+                case 'months':
+                    remainingTimeAttr = 'data-months="' + remainingTime + '"';
+                    remainingTimeAttrObj['data-months'] = remainingTime;
+                    break;
+                case '>year':
+                    remainingTimeAttr = 'data-years="' + remainingTime + '"';
+                    remainingTimeAttrObj['data-years'] = remainingTime;
+                    break;
+            }
 
+            // If remainingTimeAttr is not empty, remainingTime will be empty
+            remainingTime = remainingTimeAttr ? '' : remainingTime;
+        }
+
+        console.warn({
+            returnType: returnType,
+            remainingTime: remainingTime,            
+            remainingTimeAttr: remainingTimeAttr,
+            priorityClass: priorityClass,
+            expired: rawRemainingTime.expired,
+            rawTime: rawRemainingTime,
+        });
+        
         return {
             returnType: returnType,
-            remainingTime: remainingTime,
+            remainingTime: remainingTime,            
+            remainingTimeAttr: remainingTimeAttr,
             priorityClass: priorityClass,
-            expired: rawRemainingTime.expired
+            expired: rawRemainingTime.expired,
+            rawTime: rawRemainingTime,
         };
     },
     

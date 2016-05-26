@@ -305,6 +305,44 @@
                                 </td>
                 <%
                                 break;
+                            case 'expiration_soft':
+                %>
+                                <td class="desktop">
+                                    <%
+                                        if (model.get('time_until_expiration_soft')) {
+                                            var remainingTimeSoft = Wat.U.processRemainingTime(model.get('time_until_expiration_soft'));
+                                    %>
+                                            <div class="<%= remainingTimeSoft.priorityClass %>" <%= remainingTimeSoft.remainingTimeAttr %> data-countdown data-raw="<%= Wat.U.base64.encodeObj(model.get('time_until_expiration_soft')) %>">
+                                                <%= remainingTimeSoft.remainingTime %>
+                                            </div>
+                                            <div class="second_row">
+                                                <%= model.get('expiration_soft') ? model.get('expiration_soft').replace('T',' ') : '' %>
+                                            </div>
+                                    <%
+                                        }
+                                    %>
+                                </td>
+                <%
+                                break;
+                            case 'expiration_hard':
+                %>
+                                <td class="desktop">
+                                    <%
+                                        if (model.get('time_until_expiration_hard')) {
+                                            var remainingTimeHard = Wat.U.processRemainingTime(model.get('time_until_expiration_hard'));
+                                    %>
+                                        <div class="<%= remainingTimeHard.priorityClass %>" <%= remainingTimeHard.remainingTimeAttr %> data-countdown data-raw="<%= Wat.U.base64.encodeObj(model.get('time_until_expiration_hard')) %>">
+                                            <%= remainingTimeHard.remainingTime %>
+                                        </div>
+                                        <div class="second_row">
+                                            <%= model.get('expiration_hard') ? model.get('expiration_hard').replace('T',' ') : '' %>
+                                        </div>
+                                    <%
+                                        }
+                                    %>
+                                </td>
+                <%
+                                break;
                             default:
                 %>
                                 <td class="desktop" data-wsupdate="<%= name %>" data-id="<%= model.get('id') %>">
