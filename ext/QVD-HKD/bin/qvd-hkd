@@ -54,7 +54,12 @@ require QVD::HKD;
 daemonize;
 umask oct $umask;
 
-my $hkd = QVD::HKD->new(config_file => $config_file);
-$hkd->run;
+my $ok = eval {
+    my $hkd = QVD::HKD->new(config_file => $config_file);
+    $hkd->run;
+    undef $hkd;
+    1;
+}
 
-undef $hkd;
+$ok or ERROR "Exception: $@";
+
