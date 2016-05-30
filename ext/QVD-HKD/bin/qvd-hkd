@@ -59,7 +59,7 @@ my $ok = eval {
     $hkd->run;
     undef $hkd;
     1;
-}
+};
 
 $ok or ERROR "Exception: $@";
 
