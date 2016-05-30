@@ -1566,6 +1566,9 @@ body {
         margin-right: 5px; }
     .wrapper .content .execution-params {
       display: none; }
+    .wrapper .content .vmst-vm-name {
+      overflow: visible;
+      max-width: 100px; }
     .wrapper .content .setup-side {
       width: 100%; }
       @media screen and (min-width: 41em) {
