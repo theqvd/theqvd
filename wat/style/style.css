@@ -243,7 +243,8 @@ fieldset {
       border: 1px solid #666;
       padding: 5px;
       background: #FFF;
-      border-radius: 3px; }
+      border-radius: 3px;
+      padding-bottom: 7px; }
     .filter-notes .filter-notes-list .fa.delete-filter-note:before {
       font-size: 22px;
       color: #fdfdfd;
@@ -251,9 +252,12 @@ fieldset {
       border-right: 1px solid grey;
       margin-left: -5px;
       padding-right: 7px;
-      padding-left: 9px;
+      padding-left: 7px;
       vertical-align: middle;
-      padding-top: 1px; }
+      padding-top: 1px;
+      padding-bottom: 0px;
+      border-bottom-left-radius: 3px;
+      border-top-left-radius: 3px; }
     .filter-notes .filter-notes-list .fa.fix-filter-note:before {
       font-size: 22px;
       color: #fdfdfd;
@@ -261,10 +265,13 @@ fieldset {
       border-left: 1px solid grey;
       margin-right: -5px;
       margin-left: 5px;
-      padding-right: 9px;
+      padding-right: 7px;
       padding-left: 7px;
       vertical-align: middle;
-      padding-top: 1px; }
+      padding-top: 1px;
+      padding-bottom: 0px;
+      border-bottom-right-radius: 3px;
+      border-top-right-radius: 3px; }
     .filter-notes .filter-notes-list .fa.fix-filter-note.fix-filter-note--enabled:before {
       background: #404040; }
 
