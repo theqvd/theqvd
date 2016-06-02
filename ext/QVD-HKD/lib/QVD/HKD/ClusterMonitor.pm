@@ -102,7 +102,7 @@ sub _on_unassign_vms_result {
 
 sub _unassign_l7rs {
     my ($self) = @_;
-    $self->_query(<<EOQ, time);
+    $self->_query(<<'EOQ', time);
 update vm_runtimes
     set user_state  = 'disconnected',
         user_state_ts = $1,
