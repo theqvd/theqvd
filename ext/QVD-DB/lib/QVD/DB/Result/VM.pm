@@ -85,16 +85,6 @@ sub get_procedures
 	# Define procedures to listen and notify
 	my @notify_procs_array = (
 		{
-			name => 'vm_blocked_or_unblocked_notify',
-			sql  => '$function$ BEGIN listen vm_blocked_or_unblocked; PERFORM pg_notify(\'vm_blocked_or_unblocked\', \'tenant_id=\' || (SELECT tenant_id FROM users WHERE id = (SELECT user_id FROM vms WHERE id = NEW.vm_id))::text); RETURN NULL; END; $function$',
-			parameters => [],
-		},
-		{
-			name => 'vm_runtime_notify',
-			sql  => '$function$ BEGIN listen vm_changed; PERFORM pg_notify(\'vm_changed\', \'tenant_id=\' || (SELECT tenant_id FROM users WHERE id = (SELECT user_id FROM vms WHERE id = NEW.vm_id))::text); RETURN NULL; END; $function$',
-			parameters => [],
-		},
-		{
 			name => 'vm_changed_notify',
 			sql  => '$function$ BEGIN listen vm_changed; PERFORM pg_notify(\'vm_changed\', \'tenant_id=\' || (SELECT tenant_id FROM users WHERE id = NEW.user_id)::text); RETURN NULL; END; $function$',
 			parameters => [],
@@ -128,28 +118,6 @@ sub get_triggers
 	my @triggers_array = ();
 
 	my @notify_triggers_array = (
-		{
-			name => 'vm_blocked_or_unblocked_trigger',
-			when => 'AFTER',
-			events => [qw/UPDATE/],
-			fields    => [qw/blocked/],
-			on_table  => 'vm_runtimes',
-			condition => undef,
-			procedure => 'vm_blocked_or_unblocked_notify',
-			parameters => [],
-			scope  => 'ROW',
-		},
-		{
-			name => 'vm_runtime_changed_trigger',
-			when => 'AFTER',
-			events => [qw/UPDATE/],
-			fields    => [qw/vm_state/],
-			on_table  => 'vm_runtimes',
-			condition => undef,
-			procedure => 'vm_runtime_notify',
-			parameters => [],
-			scope  => 'ROW',
-		},
 		{
 			name => 'vm_changed_trigger',
 			when => 'AFTER',
