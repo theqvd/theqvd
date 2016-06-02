@@ -56,6 +56,7 @@ WriteMakefile(
         'QVD::Config::Network' => 0,
         'QVD::DB::Simple' => 0,
         'QVD::L7R::LoadBalancer' => 0,
+        'QVD::VMProxy' => 0,
         'Scalar::Util' => 0,
         'TryCatch' => 0,
         'Try::Tiny' => 0,

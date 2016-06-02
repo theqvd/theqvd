@@ -20,6 +20,7 @@ use Mojo::ByteStream 'b';
 use Deep::Encode;
 use File::Copy qw(copy move);
 use QVD::Config;
+use QVD::VMProxy;
 use Try::Tiny;
 use Data::Rmap qw(rmap_ref);
 
@@ -213,7 +214,7 @@ group {
         } catch {
             $exception = $_;
             $bool = 0;
-            $c->render(json => $exception->json);
+            $c->render(json => $exception->json, status => 401);
         };
 
         QVD::API::LogReport->new(
@@ -544,6 +545,31 @@ group {
         $c->send(encode_json({ status => 1000,
                 total_size => $len,
                 copy_size => $size }));
+    };
+
+    websocket '/vmproxy' => sub {
+        my $c = shift;
+        $c->inactivity_timeout(30000);
+
+        $c->app->log->debug("VM Proxy WebSocket opened");
+        $c->render_later->on(finish => sub { $c->app->log->debug("VM Proxy WebSocket closed"); });
+
+        my $json = $c->get_input_json;
+        my $vm_id = $json->{arguments}->{vm_id};
+        die QVD::API::Exception->new(code => 6240, object => "vm_id")->message unless (defined($vm_id));
+
+        my ($vm_ip, $vm_port) = $c->qvd_admin4_api->get_ip_and_port_from_vm_id( $vm_id );
+        die QVD::API::Exception->new(code => 6310, object => $vm_id)->message unless (defined($vm_ip) && defined($vm_port));
+
+        my $tx = $c->tx;
+        $tx->with_protocols( 'binary' );
+
+        my $ws = QVD::VMProxy->new( address => $vm_ip, port => $vm_port );
+        $ws->on( error => sub {
+            $c->app->log->error( "Error in ws: ".$_[1] );
+            $tx->finish( 1011, $_[1] )
+        } );
+        $ws->open( $tx );
     };
 };
 

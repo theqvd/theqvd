@@ -332,5 +332,20 @@ sub password_to_token
     Digest::SHA::sha256_base64(cfg('l7r.auth.plugin.default.salt') . $password);
 }
 
+# Returns neccesary data to connect to a VM
+sub get_ip_and_port_from_vm_id {
+    my ($self, $vm_id) = @_;
+
+    my @rows;
+    my $rs;
+
+    eval {
+        $rs = _db->resultset('VM_Runtime')->search({vm_id => $vm_id});
+        @rows = $rs->all
+    };
+
+    return (@rows) ? ($rows[0]->vm_address, $rows[0]->vm_vma_port) : undef;
+}
+
 1;
 
