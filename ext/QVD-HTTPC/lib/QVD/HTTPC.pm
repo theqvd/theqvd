@@ -73,7 +73,7 @@ sub _create_socket {
             # an array. Support the old way of doing things here.
 
             if ( ref($args{SSL_ca_path}) eq "ARRAY" ) {
-                push $args{SSL_ca_path}, $self->{SSL_ca_path_alt};
+                push @{$args{SSL_ca_path}}, $self->{SSL_ca_path_alt};
             } else {
                 $args{SSL_ca_path} = [ $args{SSL_ca_path}, $self->{SSL_ca_path_alt} ];
             }
