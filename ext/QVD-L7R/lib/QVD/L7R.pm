@@ -52,17 +52,17 @@ sub new {
                       SSL_key_file  => cfg('path.l7r.ssl.key'),
                       SSL_cert_file => cfg('path.l7r.ssl.cert'));
 
-        # handle the case where we require the client to have a valid certificate:
+        # Handle the case where we require the client to have a valid certificate:
         if (cfg('l7r.client.cert.require')) {
-            if (!-r cfg('path.l7r.ssl.ca'))  { $failed = 1; ERROR sprintf "SSL ca file '%s' isn't readable",  cfg('path.l7r.ssl.ca'); }
-            if (!-r cfg('path.l7r.ssl.crl')) { $failed = 1; ERROR sprintf "SSL crl file '%s' isn't readable", cfg('path.l7r.ssl.crl'); }
-            $failed and return;
-            push @args, ( SSL_verify_mode => 0x03, # 0x01 => verify peer,
-                                                   # 0x02 => fail verification if no peer certificate exists
-                          SSL_ca_file     => cfg('path.l7r.ssl.ca'));
-
-            my $crl = cfg('path.l7r.ssl.crl');
-            push @args, SSL_crl_file => $crl if -f $crl;
+            my $path_ca = cfg('path.l7r.ssl.ca');
+            -r $path_ca or LOGDIE "SSL ca file '$path_ca' isn't readable";
+            push @args, ( SSL_verify_mode => 0x03, # 0x01 => verify peer, 0x02 => fail verification if no peer certificate exists
+                          SSL_ca_file     => $path_ca );
+            my $path_crl = cfg('path.l7r.ssl.crl');
+            if (-f $path_crl) {
+                -r $path_crl or LOGDIE "SSL crl file '$path_crl' isn't readable";
+                push @args, SSL_crl_file => $path_crl;
+            }
         }
     }
     $class->SUPER::new(@args);
