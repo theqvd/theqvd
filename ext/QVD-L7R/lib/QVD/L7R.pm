@@ -38,19 +38,20 @@ sub new {
     my $class = shift;
     my @args = ( host => cfg('l7r.address'),
                  port => cfg('l7r.port') );
-    my $failed = 0;
+
     if(cfg('l7r.use_ssl')) {
-        if (!-r cfg('path.l7r.ssl.key'))  { $failed = 1; ERROR sprintf "SSL key file '%s' isn't readable",  cfg('path.l7r.ssl.key'); }
-        if (!-r cfg('path.l7r.ssl.cert')) { $failed = 1; ERROR sprintf "SSL cert file '%s' isn't readable", cfg('path.l7r.ssl.cert'); }
-  
-        my @kstat = stat cfg('path.l7r.ssl.cert');
-        if (!@kstat)                      { $failed = 1; ERROR sprintf "Can't stat SSL key file '%s'", cfg('path.l7r.ssl.key'); }
-        if ($kstat[2] & 0007 != 0 )       { $failed = 1; ERROR sprintf "SSL key file '%s' has insecure permissions '%o'", cfg('path.l7r.ssl.key'), $kstat[2]; }
-     
-        $failed and return;
+        my $path_key = cfg('path.l7r.ssl.key');
+        -r $path_key or LOGDIE "SSL key file '$path_key' isn't readable";
+
+        my $path_cert = cfg('path.l7r.ssl.cert');
+        -r $path_cert or LOGDIE "SSL cert file '$path_cert' isn't readable";
+        my $mode_cert = (stat $path_cert)[2] // LOGDIE "Can't stat SSL key file '$path_cert'";
+        $mode_cert & 0007 and LOGDIE sprintf("SSL key file '%s' has insecure permissions '%o'",
+                                             $path_cert, $mode_cert);
+
         push @args, ( SSL           => 1,
-                      SSL_key_file  => cfg('path.l7r.ssl.key'),
-                      SSL_cert_file => cfg('path.l7r.ssl.cert'));
+                      SSL_key_file  => $path_key,
+                      SSL_cert_file => $path_cert );
 
         # Handle the case where we require the client to have a valid certificate:
         if (cfg('l7r.client.cert.require')) {
