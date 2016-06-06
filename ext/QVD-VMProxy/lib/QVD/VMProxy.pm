@@ -10,7 +10,7 @@ has ioloop => sub { Mojo::IOLoop->singleton };
 has [qw/address port/];
 
 sub open {
-    my ($self, $tx) = @_;
+    my ($self, $tx, $timeout) = @_;
 
     my %args = (
         address => $self->address,
@@ -45,6 +45,8 @@ sub open {
         },
         sub {
             my ($delay, $stream) = @_;
+
+            Mojo::IOLoop->stream($tx->connection)->timeout($timeout);
 
             $stream->on(error => sub { $self->emit(error => "TCP error: $_[1]") });
             $stream->on(close => sub { 

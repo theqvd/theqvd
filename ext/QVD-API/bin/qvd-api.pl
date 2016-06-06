@@ -549,7 +549,7 @@ group {
 
     websocket '/vmproxy' => sub {
         my $c = shift;
-        $c->inactivity_timeout(30000);
+        $c->inactivity_timeout(10);
 
         $c->app->log->debug("VM Proxy WebSocket opened");
         $c->render_later->on(finish => sub { $c->app->log->debug("VM Proxy WebSocket closed"); });
@@ -558,18 +558,21 @@ group {
         my $vm_id = $json->{arguments}->{vm_id};
         die QVD::API::Exception->new(code => 6240, object => "vm_id")->message unless (defined($vm_id));
 
-        my ($vm_ip, $vm_port) = $c->qvd_admin4_api->get_ip_and_port_from_vm_id( $vm_id );
-        die QVD::API::Exception->new(code => 6310, object => $vm_id)->message unless (defined($vm_ip) && defined($vm_port));
+        my $vm = $c->qvd_admin4_api->_db->resultset('VM_Runtime')->find($vm_id);
+        if (defined($vm) && (my $vm_ip = $vm->vm_address) && (my $vm_port = $vm->vm_vma_port)) {
+            my $tx = $c->tx;
+            $tx->with_protocols( 'binary' );
 
-        my $tx = $c->tx;
-        $tx->with_protocols( 'binary' );
-
-        my $ws = QVD::VMProxy->new( address => $vm_ip, port => $vm_port );
-        $ws->on( error => sub {
-            $c->app->log->error( "Error in ws: ".$_[1] );
-            $tx->finish( 1011, $_[1] )
-        } );
-        $ws->open( $tx );
+            my $ws = QVD::VMProxy->new( address => $vm_ip, port => $vm_port );
+            $ws->on( error => sub {
+                $c->app->log->error( "Error in ws: ".$_[1] );
+                $tx->finish( 1011, $_[1] )
+            } );
+            $ws->open($tx, 30000);
+        }
+        else {
+            die QVD::API::Exception->new(code => 6310, object => $vm_id)->message;
+        }
     };
 };
 
