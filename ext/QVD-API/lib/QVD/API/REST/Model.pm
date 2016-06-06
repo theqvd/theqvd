@@ -1454,7 +1454,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER = {
         'visible' => 'me.visible',
         'view_type' => 'me.view_type',
         'device_type' => 'me.device_type',
-        'qvd_object' => 'me.qvd_object',
+        'qvd_object' => 'qvd_obj_prop.qvd_object',
     },
 
     Views_Setup_Attributes_Tenant => {
@@ -1506,13 +1506,12 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER = {
         'visible' => 'me.visible',
         'view_type' => 'me.view_type',
         'device_type' => 'me.device_type',
-        'qvd_object' => 'me.qvd_object',
+        'qvd_object' => 'qvd_obj_prop.qvd_object',
     },
 
     Views_Setup_Attributes_Administrator =>  {
         'id' => 'me.id',
-        'tenant_id' => 'administrator.id',
-        'tenant_name' => 'administrator.name',
+        'tenant_id' => 'administrator.tenant_id',
         'admin_id' => 'me.administrator_id',
         'field' => 'me.field',
         'admin_name' => 'administrator.name',

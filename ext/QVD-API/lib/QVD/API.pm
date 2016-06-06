@@ -14,7 +14,7 @@ use File::Basename qw(basename dirname);
 use QVD::API::REST::Model;
 use QVD::API::REST::Request;
 use DBIx::Error;
-use TryCatch;
+use Try::Tiny;
 use Data::Page;
 use Clone qw(clone);
 use QVD::API::AclsOverwriteList;
@@ -333,93 +333,44 @@ sub config_delete
     $result;
 }
 
-sub reset_views {
-	my ($self, $filters, $conditions, $tables) = @_;
-	$conditions //= [];
+sub reset_views
+{
+    my ($self, $request, $modifiers, $tables) = @_;
+    my $result;
 
-	for my $table (@$tables) {
+    my $request_copy = clone $request;
 
-		my @all_rows = $DB->resultset($table)->all;
-		my @rows = ();
-		for my $row (@all_rows){
-			my $compliant = 1;
-			while (my ($field, $value) = each (%$filters)) {
-				if($row->$field ne $value){
-					$compliant = 0;
-				}
-			}
-			if($compliant){
-				push @rows, $row;
-			}
-		}
+    for my $table (@$tables) {
+        $request_copy->{table} = $table;
+        try {
+                $self->delete( $request, $modifiers );
+        }
+        catch {
+            my $exception = $_;
+            QVD::API::Exception->throw({exception => $exception}) unless $exception->code == 1300;
+        }
+    }
 
-		my $failures;
-		for my $obj (@rows)
-		{
-			eval {
-				$self->$_($obj) for @$conditions;
-				$obj->delete;
-			};
-
-			$failures->{$obj->id} = QVD::API::Exception->new(exception => $@, query => 'delete')->json if $@;
-			#FIXME Report delete action in log
-			#$self->report_in_log($request, $obj, $failures && exists $failures->{$obj->id} ? $failures->{$obj->id}->{status} : 0);
-		}
-		QVD::API::Exception->throw(failures => $failures)
-			if defined $failures;
-	}
+    $result->{rows} = [];
+    return $result;
 }
 
 sub reset_tenant_views
 {
-	my ($self, $request, $modifiers) = @_;
-	my $result;
+    my ($self, $request, $modifiers) = @_;
 
-	# FIXME: The filters shall be taken from the request
-	my $filters = {};
+    my $tables = [ qw(Views_Setup_Attributes_Tenant Views_Setup_Properties_Tenant) ];
 
-	my $is_superadmin = $request->qvd_object_model->current_qvd_administrator->is_superadmin();
-	my $filter_tenant_value = $request->json_wrapper->get_filter_value('tenant_id');
-	if(!$is_superadmin and (defined $filter_tenant_value)){
-		QVD::API::Exception->throw(code => 4220, query => 'delete', object => 'tenant_id');
-	}
-	if($is_superadmin and !(defined $filter_tenant_value)){
-		QVD::API::Exception->throw(code => 6220, query => 'delete', object => 'tenant_id');
-	}
-	my $tenant_id = $filter_tenant_value // $request->qvd_object_model->current_qvd_administrator->tenant_id;
-
-	my $qvd_object = $request->json_wrapper->get_filter_value('qvd_object');
-
-	$filters->{tenant_id} = $tenant_id if defined $tenant_id;
-	$filters->{qvd_object} = $qvd_object if defined $qvd_object;
-
-	$self->reset_views($filters, $modifiers->{conditions},
-		[qw(Views_Setup_Attributes_Tenant Views_Setup_Properties_Tenant)]);
-
-	$result->{rows} = [];
-	return $result;
+    return $self->reset_views($request, $modifiers, $tables);
 }
 
 sub reset_admin_views
 {
-	my ($self, $request, $modifiers) = @_;
-	my $result;
+    my ($self, $request, $modifiers) = @_;
 
-	# FIXME: The filters shall be taken from the request
-	my $filters = {};
-
-	my $admin_id = $request->qvd_object_model->current_qvd_administrator->id;
-
-	my $qvd_object = $request->json_wrapper->get_filter_value('qvd_object');
-
-	$filters->{administrator_id} = $admin_id if defined $admin_id;
-	$filters->{qvd_object} = $qvd_object if defined $qvd_object;
-
-	$self->reset_views($filters, $modifiers->{conditions},
-		[qw(Views_Setup_Attributes_Administrator Views_Setup_Properties_Administrator)]);
-
-	$result->{rows} = [];
-	return $result;
+    my $tables = [ qw(Views_Setup_Attributes_Administrator Views_Setup_Properties_Administrator) ];
+    
+    return $self->reset_views($request, $modifiers, $tables);
 }
 
 ### Manage properties ###
@@ -717,9 +668,9 @@ sub report_in_log
 
    if ($qvd_object =~ /^(tenant|admin)_view$/ && $type_of_action eq 'delete')
    {
-       @{$arguments}{qw(field visible view_type device_type qvd_object property)} = 
+       @{$arguments}{qw(field visible view_type device_type qvd_object)} = 
 	   ($obj->field, $obj->visible, $obj->view_type, $obj->device_type, 
-	    $obj->qvd_object, $obj->property);
+	    $obj->qvd_object);
    }
 
    my $admin = $request->get_parameter_value('administrator');
