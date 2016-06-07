@@ -47,6 +47,7 @@ sub open {
             my ($delay, $stream) = @_;
 
             Mojo::IOLoop->stream($tx->connection)->timeout($timeout);
+            $stream->timeout($timeout);
 
             $stream->on(error => sub { $self->emit(error => "TCP error: $_[1]") });
             $stream->on(close => sub { 
