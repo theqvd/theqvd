@@ -58,7 +58,6 @@ update host_runtimes set state = 'lost'
     where state != 'stopped'
       and state != 'starting'
       and state != 'lost'
-      and not blocked
       and host_id != $1
       and $2 < extract('epoch' from (now() - ok_ts))
     returning host_id
