@@ -711,6 +711,21 @@ sub OnUnknownCert {
                 _add_advice(\@advice, $self->_t("This certificate belongs to another host. ". 
                                                 "This is a sign of either misconfiguration or an ongoing attempt to compromise security."));
                 $no_ok_button = 1 unless core_cfg('client.ssl.allow_bad_host');
+            } elsif ( $e == 1002 ) {
+                # sig_algo contains something like: md5WithRSAEncryption. 
+                # Extract the hash part from it.
+                my $hash = $cert->{sig_algo};
+                $hash =~ m/^(\w+\d+)/;
+
+                $err_desc .= sprintf($self->_t("Insecure hash algorithm: %s"), $1);
+                _add_advice(\@advice, $self->_t("This certificate uses a deprecated and insecure hash algorithm. ".
+                                                "It should be replaced with a new one as soon as possible."));
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_insecure_sign_algo');
+            } elsif ( $e == 1003 ) {
+                $err_desc .= sprintf($self->_t("Weak key: %s bits"), $cert->{bit_length});
+                _add_advice(\@advice, $self->_t("This certificate uses a weak key and can be broken by brute force. ".
+                                                "It should be replaced with a stronger one as soon as possible."));
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_weak_key');
             } elsif ( $e == 2001 ) {
                 $err_desc .= $self->_t("The certificate has been revoked");
                 _add_advice(\@advice, $self->_t("The certificate has been revoked by its issuing authority. A new certificate is required."));

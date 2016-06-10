@@ -48,9 +48,11 @@ sub new {
         if ($kstat[2] & 0007 != 0 )       { $failed = 1; ERROR sprintf "SSL key file '%s' has insecure permissions '%o'", cfg('path.l7r.ssl.key'), $kstat[2]; }
      
         $failed and return;
-        push @args, ( SSL           => 1,
-                      SSL_key_file  => cfg('path.l7r.ssl.key'),
-                      SSL_cert_file => cfg('path.l7r.ssl.cert'));
+        push @args, ( SSL               => 1,
+                      SSL_key_file      => cfg('path.l7r.ssl.key'),
+                      SSL_cert_file     => cfg('path.l7r.ssl.cert'),
+                      SSL_version       => cfg('l7r.ssl.options.SSL_version'),
+                      SSL_cipher_list   => cfg('l7r.ssl.options.SSL_cipher_list'));
 
         # handle the case where we require the client to have a valid certificate:
         if (cfg('l7r.client.cert.require')) {

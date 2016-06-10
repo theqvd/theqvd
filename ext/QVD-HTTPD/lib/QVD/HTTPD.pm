@@ -35,6 +35,8 @@ sub _set_options {
     $template->{SSL_verify_mode} = \$prop->{SSL_verify_mode};
     $prop->{SSL_version}     //= "TLSv1_1:!SSLv3:!SSLv2:!TLSv1";
     $template->{SSL_version} = \$prop->{SSL_version};
+    $prop->{SSL_cipher_list} //= undef;
+    $template->{SSL_cipher_list} = \$prop->{SSL_cipher_list};
 }
 
 # token          = 1*<any CHAR except CTLs or separators>
@@ -66,9 +68,13 @@ sub process_request {
             push @extra, SSL_check_crl => 1, SSL_crl_file  => $server->{SSL_crl_file}
                 if defined $server->{SSL_crl_file};
         }
+        warn "SSL version: $server->{SSL_version}";
+
 	IO::Socket::SSL->start_SSL($socket, SSL_server => 1, NonBlocking => 1,
 				   SSL_cert_file => $server->{SSL_cert_file},
 				   SSL_key_file  => $server->{SSL_key_file},
+				   SSL_version   => $server->{SSL_version},
+				   SSL_cipher_list => $server->{SSL_cipher_list},
                                    @extra);
 	$socket->isa('IO::Socket::SSL')
 	    or die "SSL negotiation failed: " . IO::Socket::SSL::errstr()

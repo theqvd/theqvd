@@ -270,10 +270,20 @@ sub _load_accepted_certs {
         my $data = <$fd>;
         close $fd;
 
-        $self->{accepted_certs} = from_json( $data, { utf8 => 1 } );
+        eval {
+            $self->{accepted_certs} = from_json( $data, { utf8 => 1 } );
+        };
+        if ( $@ ) {
+            ERROR "Failed to load accepted certificates: $@\nData:\n$data";
+        }
     } else {
         WARN "Can't open $file: $!";
     }
+
+    if (!$self->{accepted_certs} || ref($self->{accepted_certs} ne "HASH")) {
+        $self->{accepted_certs} = {};
+    }
+
 }
 
 sub _save_accepted_certs {
@@ -281,9 +291,14 @@ sub _save_accepted_certs {
     my $file = File::Spec->join($QVD::Client::App::user_dir, "accepted_certs.json");
 
     DEBUG "Saving accepted certificates";
-    open(my $fd, '>', $file) or die "Can't create $file: $!";
-    print $fd to_json( $self->{accepted_certs}, { utf8 => 1, pretty => 1 } );
-    close $fd;
+    eval {
+        open(my $fd, '>', $file) or die "Can't create $file: $!";
+        print $fd to_json( $self->{accepted_certs}, { utf8 => 1, pretty => 1 } );
+        close $fd;
+    };
+    if ( $@ ) {
+        ERROR "Failed to save accepted certificates: $@\nData:\n$self->{accepted_certs}";
+    }
 }
 
 
@@ -380,6 +395,22 @@ sub _get_httpc {
             $self->_add_ssl_error(0, 1001, 0, $herr);
         }
 
+        my $depth=0;
+        foreach my $cert ( @{ $self->{cert_info} } ) {
+            my $algo = $cert->{sig_algo};
+            my $bits = $cert->{bit_length};
+
+            if ( $algo =~ /^(md2|md4||md5|sha1)/i ) {
+                $self->_add_ssl_error($depth, 1002, 0, "Insecure hash algorithm: $1");
+            }
+
+            if ( $bits && $bits <= 1024 ) {
+                $self->_add_ssl_error($depth, 1003, 0, "Weak key: $bits bits");
+            }
+
+            $depth++;
+        }
+
         if ( (my $oerr = $httpc->get_ocsp_errors()) ) {
             $self->_add_ssl_error(0, 2001, 0, $oerr);
         }
@@ -465,8 +496,17 @@ sub connect_to_vm {
         return;
     }
     INFO("Authentication successful");
+    my $vm_list;
 
-    my $vm_list = JSON->new->decode($body);
+    eval {
+        $vm_list = JSON->new->decode($body);
+    };
+
+    if ( $@ ) {
+        ERROR "Failed to parse JSON: $@";
+        ERROR "Body: $body";
+        die "Failed to parse VM list";
+    }
 
     my $vm_id = $cli->proxy_list_of_vm_loaded($vm_list);
 

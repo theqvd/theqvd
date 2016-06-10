@@ -226,6 +226,14 @@ client.ssl.allow_expired=1
 ## local clock problem.
 client.ssl.allow_not_yet_valid=1
 
+## Allow certificates that use old, insecure signature algorithms:
+## MD2, MD4, MD5 and SHA1
+client.ssl.allow_insecure_sign_algo=1
+
+## Allow certificates with a bit length <= 1024 bits.
+## They're obsolete and shouldn't be used.
+client.ssl.allow_weak_key=0
+
 ## Allow continuing in case of an unrecognized SSL error
 client.ssl.allow_unknown_error=1
 
@@ -300,6 +308,9 @@ l7r.loadbalancer.plugin.default.weight.cpu = 1
 l7r.loadbalancer.plugin.default.weight.random = 1
 
 l7r.client.cert.require = 0
+
+l7r.ssl.options.SSL_version = TLSv1_2:!SSLv3:!SSLv2:!TLSv1
+l7r.ssl.options.SSL_cipher_list = HIGH:!aNULL:!MD5:!RC4:!3DES:!DES:!MEDIUM:!LOW:!EXPORT
 
 ## umask for the HKD process
 hkd.user.umask = 0022
