@@ -2,11 +2,16 @@ use strict;
 use warnings;
 use Module::Build;
 
+my $SUF_VERSION = "";
+if  ( defined $ENV{BUILD_NUMBER} ) {
+    $SUF_VERSION = '.' . $ENV{BUILD_NUMBER} ;
+}
+
 my $builder = Module::Build->new(
     module_name         => 'QVD::VMA::SlaveClient',
     license             => 'gpl',
     dist_author         => q{QVD Team <qvd@qindel.com>},
-    dist_version        => '3.3',
+    dist_version        => '3.5' .  $SUF_VERSION,
     dist_abstract    	=> 'QVD::VMA::SlaveClient',
     configure_requires => { 'Module::Build' => 0.38  },
     build_requires => {

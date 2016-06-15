@@ -457,10 +457,16 @@ sub _rpc_callback {
     $self->__call_on_done_or_error_callback($opts, $error);
 }
 
+sub __call_after_callback {
+    my ($self, $method, @args) = @_;
+    delete $self->{call_after_watcher};
+    $self->$method(@args);
+}
+
 sub _call_after {
-    my ($self, $delay, $method, @args) = @_;
+    my ($self, $delay, @call) = @_;
     $self->{call_after_watcher} = AE::timer($delay, 0,
-                                            weak_method_callback($self, $method, @args));
+                                            weak_method_callback($self, __call_after_callback => @call));
 }
 
 sub _flock {

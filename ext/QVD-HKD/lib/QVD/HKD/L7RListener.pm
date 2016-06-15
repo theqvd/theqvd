@@ -103,6 +103,7 @@ sub _save_ssl_config {
             unlink $fn;
         }
     }
+    INFO "L7R SSL configuration regenerated, ok=$ok" if $use_ssl;
     $self->{configured} = $ok;
 }
 
@@ -124,6 +125,7 @@ sub _start_listener {
 
 sub _stop_listener {
     my $self = shift;
+    INFO "L7RListener stopped";
     delete $self->{server};
 }
 
