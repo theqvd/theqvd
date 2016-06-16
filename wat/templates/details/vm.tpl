@@ -73,8 +73,12 @@ if (Wat.C.checkACL('vm.see.state')) {
     <% 
         }
     } 
+        if (model.get('state') == 'running') { 
     %>
-        <a class="button fright button-icon--desktop js-button-spy-vm fa fa-user-secret fright" href="javascript:" data-i18n="[title]Spy" data-wsupdate="spy-button" data-id="<%= model.get('id') %>"><span data-i18n="Spy" class="mobile"></span></a>
+            <a class="button fright button-icon--desktop js-button-spy-vm fa fa-user-secret fright" href="javascript:" data-i18n="[title]Spy" data-wsupdate="spy-button" data-id="<%= model.get('id') %>"><span data-i18n="Spy" class="mobile"></span></a>
+    <% 
+        }
+    %>
         
     <div class="clear mobile"></div>
 </div>
