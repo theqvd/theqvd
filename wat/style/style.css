@@ -3148,8 +3148,8 @@ table.vmst .vmst-vm-cell, table.vmst .vmst-host-cell {
         margin-right: 10px; }
   .ui-dialog .dialog-container {
     overflow-y: auto;
-    padding-left: 30px;
-    padding-right: 30px;
+    padding-left: 0px;
+    padding-right: 0px;
     max-height: 70vh !important;
     height: auto; }
 
@@ -3370,6 +3370,9 @@ div.tagsinput span.tag a {
 
 .noVNC_container {
   visibility: hidden; }
+
+.noVNC_canvas {
+  cursor: auto !important; }
 
 /********************************************************************
 *********************************************************************

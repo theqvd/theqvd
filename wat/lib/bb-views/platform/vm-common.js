@@ -128,12 +128,11 @@ Wat.Common.BySection.vm = {
                     UI.onresize();
                 },
                 "Close": function () {       
-                    console.log($('.ui-dialog.ui-dialog--fullscreen'));
                     if($('.ui-dialog.ui-dialog--fullscreen').length > 0) {
                         UI.toggleFullscreen();
                     }
                     
-                    $('#disconnectButton').trigger('click');
+                    UI.rfb.disconnect();
 
                     Wat.I.closeDialog($(this));
                 },
@@ -146,48 +145,26 @@ Wat.Common.BySection.vm = {
                 // Add common parts of editor to dialog
                 var template = _.template(
                     Wat.TPL.spyVM, {
+                        vmId:  Wat.CurrentView.id,
+                        apiHost: Wat.C.apiUrl.split("/")[2].split(':')[0],
+                        apiPort: Wat.C.apiUrl.split("/")[2].split(':')[1],
+                        sid: Wat.C.sid
                     }
                 );
 
-                var noVNCIncludes = '<script src="lib/thirds/noVNC/include/util.js"></script><script src="lib/thirds/noVNC/include/ui.js"></script>';
+                var noVNCIncludes = '<script src="lib/thirds/noVNC/include/util.js"></script><script src="lib/thirds/noVNC/include/ui-wat.js"></script>';
                 
-                target.html(template + noVNCIncludes); 
-                
-                UI.onresize = function () {
-                    var dialogWidth = parseInt($('.dialog-container').css('width').replace('px',''));
-                    var dialogHeight = parseInt($('.dialog-container').css('height').replace('px',''));
-                    
-                    var w = dialogWidth;
-                    /*
-                    if (w > 1024) {
-                        w = 1024;
-                    }
-                    */
-                    
-                    var h = parseInt(2*(w/3));
-                    
-                    var maxHeight = window.innerHeight * 0.97;
-                    if (h > maxHeight) {
-                        h = maxHeight;
-                        w = h * 1.5;
-                    }
-                    
-                    var display = UI.rfb.get_display();
-                    var scaleRatio = display.autoscale(w,h,false);
-                    UI.rfb.get_mouse().set_scale(scaleRatio);
-                    $('.noVNC_container').css('visibility', 'visible');
-                };
-                
-                UI.updateDocumentTitle = function(rfb, name) {
-                    $('.ui-dialog-titlebar').html($('.ui-dialog-titlebar').html() + ' - ' + name);
-                };
+                target.html(template + noVNCIncludes);
                 
                 // Hide normal screen button from the begining
                 $(".ui-dialog-buttonset button span.fa-compress").parent().hide();
-                
-                setTimeout(function () {
-                    $('#noVNC_connect_button').trigger('click');
-                }, 1000);
+                    
+                var loopCheck = setInterval(function () {
+                    if(typeof $D == "function") {
+                        UI.connect();
+                        clearInterval(loopCheck);
+                    }
+                }, 400);
             }
         }
 
