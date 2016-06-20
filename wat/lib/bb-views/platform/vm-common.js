@@ -158,7 +158,7 @@ Wat.Common.BySection.vm = {
                     if(typeof $D == "function") {
                         Util.Debug = Util.Info = Util.Warn = Util.Error = function () {};
                         
-                        var level = 'error';
+                        var level = 'debug';
                         switch (level) {
                             case 'debug':
                                 Util.Debug = function (msg) { UI.log('DEBUG', msg); };
@@ -187,13 +187,29 @@ Wat.Common.BySection.vm = {
     },
     
     changeSettingLog: function (e) {
-        switch ($(e.target).val()) {
-            case "enabled":
-                $('.noVNC_log').show();
-                $('.noVNC_log').draggable({handle: '.drag-title'});
-                break;
+        var level = $(e.target).val();
+        
+        switch (level) {
             case "disabled":
                 $('.noVNC_log').hide();
+                break;
+            default:
+                $('.noVNC_log').show();
+                $('.noVNC_log').draggable({handle: '.drag-title'});
+                $('.log-line-debug, .log-line-info, .log-line-warn, .log-line-error').hide();
+                $('.log-line-' + level).show();
+                switch (level) {
+                    case 'debug':
+                        $('.log-line-debug').show();
+                    case 'info':
+                        $('.log-line-info').show();
+                    case 'warn':
+                        $('.log-line-warn').show();
+                    case 'error':
+                        $('.log-line-error').show();
+                    default:
+                        break;
+                }
                 break;
         }
     },    

@@ -427,6 +427,22 @@ div.tagsinput span.tag a {
         padding: 4px;
         height: 180px;
         border: 1px solid #eee;
+        
+        .log-line-debug, .log-line-info, .log-line-warn, .log-line-error {
+            display: none;
+        }
+        
+        .log-line-info {
+            color: aqua;
+        }    
+        
+        .log-line-warn {
+            color: yellow;
+        }   
+        
+        .log-line-error {
+            color: red;
+        }
     }
     
     .drag-title {

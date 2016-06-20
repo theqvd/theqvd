@@ -653,7 +653,7 @@ var UI;
                 $('.noVNC_screen .loading').hide();
             }
             
-            UI.log("STATE: " + state, msg);
+            UI.log("CONNECTION", "STATE: " + state + " - " + msg);
 
             UI.updateVisualState();
         },
@@ -665,7 +665,18 @@ var UI;
             if (msg != undefined) {
                 logMsg += " - " + msg;
             }
-            $('.noVNC_screen .noVNC_log .log-registers').prepend("<p>" + logMsg + "</p>");
+            
+            var lineClass = '';
+            
+            switch (state) {
+                case 'DEBUG':
+                case 'INFO':
+                case 'WARN':
+                case 'ERROR':
+                    lineClass = "js-log-line-" + state.toLowerCase() + " log-line-" + state.toLowerCase();
+            }
+            
+            $('.noVNC_screen .noVNC_log .log-registers').prepend('<p class="' + lineClass + '">' + logMsg + '</p>');
         },
 
         // Disable/enable controls depending on connection state
