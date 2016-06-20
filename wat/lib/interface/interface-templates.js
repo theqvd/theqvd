@@ -248,9 +248,12 @@ Wat.I.T = {
                 break;
             case 'commonVMS':
                 templates = {
-                   spyVM: {
-                    name: 'common/vms-spy'
-                   }
+                    spyVM: {
+                        name: 'common/vms-spy'
+                    },
+                    spyVMSettings: {
+                        name: 'common/vms-spy-settings'
+                    }
                 }
                 break;
             default:

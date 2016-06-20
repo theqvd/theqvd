@@ -64,31 +64,26 @@
             </ul>
         </span>
     </div>
-    <!-- Connection Panel -->
-    <div id="noVNC_controls" class="noVNC_controls" class="triangle-right top">
-        <ul>
-            <li><label><strong>Host: </strong><input id="noVNC_host" value="gotham.qindel.com" /></label></li>
-            <li><label><strong>Port: </strong><input id="noVNC_port" value="443" /></label></li>
-            <li><label><strong>Password: </strong><input id="noVNC_password" type="password" /></label></li>
-            <li><label><strong>Token: </strong><input id="noVNC_token" value="<%= vmId %>" /></label></li>
-            <li><label><strong>VM Id: </strong><input id="noVNC_vmId" value="<%= vmId %>" /></label></li>
-            <li><label><strong>API Host: </strong><input id="noVNC_apiHost" value="<%= apiHost %>" /></label></li>
-            <li><label><strong>API Port: </strong><input id="noVNC_apiPort" value="<%= apiPort %>" /></label></li>
-            <li><label><strong>SID: </strong><input id="noVNC_sid" value="<%= sid %>" /></label></li>
-            <li><input id="noVNC_connect_button" type="button" value="Connect"></li>
-        </ul>
-    </div>
-
 </div> <!-- End of noVNC-control-bar -->
 
 
+<input id="noVNC_vmId" type="hidden" value="<%= vmId %>" />
+<input id="noVNC_apiHost" type="hidden" value="<%= apiHost %>" />
+<input id="noVNC_apiPort" type="hidden" value="<%= apiPort %>" />
+<input id="noVNC_sid" type="hidden" value="<%= sid %>" />
+    
 <div id="noVNC_screen" class="noVNC_screen">
-    <h1 id="noVNC_logo" style="display: none;"><span>no</span><br />VNC</h1>
-        
+    <%= HTML_LOADING %>
+    
     <!-- HTML5 Canvas -->
     <div id="noVNC_container" class="noVNC_container">
-        <canvas id="noVNC_canvas" class="noVNC_canvas" width="0" height="0">
+        <canvas id="noVNC_canvas" class="noVNC_canvas noVNC_canvas--viewonly" width="0" height="0">
                     Canvas not supported.
         </canvas>
+    </div>
+    
+    <div class="noVNC_log" style="display: none;">
+        <div class="drag-title js-drag-title"><i class="fa fa-arrows">Log</i></div>
+        <div class="log-registers js-log-registers"></div>
     </div>
 </div>
