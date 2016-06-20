@@ -17,7 +17,10 @@
         <span data-i18n="Log"></span>
         <select class="js-vms-spy-setting-log" class="chosen-single">
             <option value="disabled" data-i18n="Hidden"></option>
-            <option value="enabled" data-i18n="Visible"></option>
+            <option value="error" data-i18n="Error">Error</option>
+            <option value="warn" data-i18n="Warning">Warning</option>
+            <option value="info" data-i18n="Info">Info</option>
+            <option value="debug" data-i18n="Debug">Debug</option>
         </select>
     </div>
 </div>
