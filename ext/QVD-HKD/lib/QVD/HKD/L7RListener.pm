@@ -79,14 +79,19 @@ sub _write_file {
         }
 
         my $fh;
+        my $old_umask = umask;
+        umask 0700;
         unless ( open $fh, '>', $fn  and
                  binmode $fh         and
                  print $fh $contents and
                  close $fh) {
+            umask $old_umask;
             ERROR "Unable to write file '$fn': $!";
             return;
         }
+        umask $old_umask;
     }
+
     1;
 }
 
