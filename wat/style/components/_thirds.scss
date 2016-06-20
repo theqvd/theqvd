@@ -150,12 +150,13 @@
 .ui-dialog--fullscreen {
     width: 100vw !important;
     height: 100vh !important;
+    overflow-y: hidden;
     left: 0 !important;
     top: 0 !important;
     background: #444;
     
     .dialog-container {
-        height: 100vh !important;
+        height: 96vh !important;
         max-height: 100vh !important;
         background: #222;
         float: right;
@@ -390,6 +391,7 @@ div.tagsinput span.tag a {
 
 .noVNC_screen {
     text-align: center;
+    position: relative;
 }
 
 .noVNC_controls, .noVNC_settings, .noVNC_xvp, .noVNC_status {
@@ -400,6 +402,54 @@ div.tagsinput span.tag a {
      visibility: hidden;
  }
 
-.noVNC_canvas {
+.noVNC_canvas--interactive {
+    cursor: none !important;
+}
+
+.noVNC_canvas--viewonly {
     cursor: auto !important;
+}
+
+.noVNC_log {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 200px;
+    width: 600px;
+
+    .log-registers {
+        overflow-y: scroll;
+        font-size: x-small;
+        line-height: 13px;
+        background: #222;
+        color: #eee;
+        text-align: left;
+        padding: 4px;
+        height: 180px;
+        border: 1px solid #eee;
+    }
+    
+    .drag-title {
+        width: 100%;
+        height: 20px;
+        background-color: #666;
+        color: #eee;
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+        padding: 3px;
+        cursor: pointer;
+        text-align: left;
+    }
+}
+
+.vms-spy-settings {
+    display: none;
+    color: #eee;
+    padding: 4px;
+    font-size: small;
+    border: 1px solid #eee;
+    
+    div {
+        margin-bottom: 5px;
+    }
 }

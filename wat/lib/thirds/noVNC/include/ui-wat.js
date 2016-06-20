@@ -53,6 +53,7 @@ var UI;
 
         // Render default UI and initialize settings menu
         start: function(callback) {
+            return;
             UI.isTouchDevice = 'ontouchstart' in document.documentElement;
 
             // Stylesheet selection dropdown
@@ -186,7 +187,7 @@ var UI;
                                   'onXvpInit': UI.updateXvpVisualState,
                                   'onClipboard': UI.clipReceive,
                                   'onFBUComplete': UI.FBUComplete,
-                                  'onFBResize': UI.updateViewDrag,
+                                  'onFBResize': UI.updateViewDragClient,
                                   'onDesktopName': UI.updateDocumentTitle});
                 return true;
             } catch (exc) {
@@ -249,28 +250,38 @@ var UI;
                 return;
             }
             
-            var dialogWidth = parseInt($('.dialog-container').css('width').replace('px',''));
-            var dialogHeight = parseInt($('.dialog-container').css('height').replace('px',''));
+            var dialogWidth, dialogHeight;
+            setTimeout(function () {
+                dialogWidth = parseInt($('.dialog-container').css('width').replace('px',''));
+                dialogHeight = parseInt($('.dialog-container').css('height').replace('px','')) - 40;
+                
+                var w = dialogWidth;
+                var h = dialogHeight;
 
-            var w = dialogWidth;
-            /*
-            if (w > 1024) {
-                w = 1024;
-            }
-            */
+                var maxHeight = window.innerHeight;
+                if (h > maxHeight) {
+                    h = maxHeight;
+                    w = h * 1.5;
+                }
+                
+                var display = UI.rfb.get_display();
+                var scaleRatio = display.autoscale(w,h,false);
+                UI.rfb.get_mouse().set_scale(scaleRatio);
+                $('.noVNC_container').css('visibility', 'visible');
 
-            var h = parseInt(2*(w/3));
+            }, 100);
 
-            var maxHeight = window.innerHeight * 0.97;
-            if (h > maxHeight) {
-                h = maxHeight;
-                w = h * 1.5;
-            }
-
+        },
+        
+        setClientResolution: function () {
+            var clientResolution = UI.getClientResolution();
+            
+            var w = clientResolution.width;
+            var h = clientResolution.height;
+            
             var display = UI.rfb.get_display();
             var scaleRatio = display.autoscale(w,h,false);
             UI.rfb.get_mouse().set_scale(scaleRatio);
-            $('.noVNC_container').css('visibility', 'visible');
         },
 
         getCanvasLimit: function () {
@@ -638,7 +649,23 @@ var UI;
         },
 
         updateState: function(rfb, state, oldstate, msg) {
+            if (state == 'normal') {
+                $('.noVNC_screen .loading').hide();
+            }
+            
+            UI.log("STATE: " + state, msg);
+
             UI.updateVisualState();
+        },
+        
+        log: function (state, msg) {
+            var now = new Date();
+            
+            var logMsg = now.toLocaleString() + " - [" + state + "]";
+            if (msg != undefined) {
+                logMsg += " - " + msg;
+            }
+            $('.noVNC_screen .noVNC_log .log-registers').prepend("<p>" + logMsg + "</p>");
         },
 
         // Disable/enable controls depending on connection state
@@ -685,10 +712,6 @@ var UI;
             var sid = $('#noVNC_sid').val();
 
             var path = 'vmproxy?sid=' + sid + '&arguments={"vm_id":"' + vmId + '"}';
-            
-            if ((!apiHost) || (!apiPort)) {
-                throw new Error("Must set host and port");
-            }
 
             if (!UI.initRFB()) return;
 
@@ -821,9 +844,20 @@ var UI;
                 }
             }
         },
+        
+        updateViewDragClient: function (drag) {
+            switch ($('.js-vms-spy-setting-resolution').val()) {
+                case 'adapted':
+                    $('.js-vms-spy-setting-resolution').trigger('change');
+                    break;
+                case 'original':                
+                    UI.updateViewDrag(drag);
+                    break;
+            }
+        },
 
         // Update the viewport drag/move button
-        updateViewDrag: function(drag) {
+        updateViewDrag: function(drag) {   
             if (!UI.rfb) return;
 
             // Check if viewport drag is possible
@@ -852,8 +886,16 @@ var UI;
                 }
             }
         },
+        
+        getClientResolution: function () {
+            return {
+                width: UI.rfb.get_display()._fb_width,
+                height: UI.rfb.get_display()._fb_height
+            };
+        },
 
-        toggleViewDrag: function() {
+        toggleViewDrag: function() {            alert(11);
+
             if (!UI.rfb) return;
 
             if (UI.rfb.get_viewportDrag()) {
@@ -967,73 +1009,6 @@ var UI;
             } else {
                 UI.lastKeyboardinput = newValue;
             }
-        },
-
-        keyInputBlur: function() {
-            $D('showKeyboard').className = "noVNC_status_button";
-            //Weird bug in iOS if you change keyboardVisible
-            //here it does not actually occur so next time
-            //you click keyboard icon it doesnt work.
-            UI.hideKeyboardTimeout = setTimeout(function() { UI.setKeyboard(); },100);
-        },
-
-        showExtraKeys: function() {
-            UI.keepKeyboard();
-            if(UI.extraKeysVisible === false) {
-                $D('toggleCtrlButton').style.display = "inline";
-                $D('toggleAltButton').style.display = "inline";
-                $D('sendTabButton').style.display = "inline";
-                $D('sendEscButton').style.display = "inline";
-                $D('showExtraKeysButton').className = "noVNC_status_button_selected";
-                UI.extraKeysVisible = true;
-            } else if(UI.extraKeysVisible === true) {
-                $D('toggleCtrlButton').style.display = "";
-                $D('toggleAltButton').style.display = "";
-                $D('sendTabButton').style.display = "";
-                $D('sendEscButton').style.display = "";
-                $D('showExtraKeysButton').className = "noVNC_status_button";
-                UI.extraKeysVisible = false;
-            }
-        },
-
-        toggleCtrl: function() {
-            UI.keepKeyboard();
-            if(UI.ctrlOn === false) {
-                UI.rfb.sendKey(XK_Control_L, true);
-                $D('toggleCtrlButton').className = "noVNC_status_button_selected";
-                UI.ctrlOn = true;
-            } else if(UI.ctrlOn === true) {
-                UI.rfb.sendKey(XK_Control_L, false);
-                $D('toggleCtrlButton').className = "noVNC_status_button";
-                UI.ctrlOn = false;
-            }
-        },
-
-        toggleAlt: function() {
-            UI.keepKeyboard();
-            if(UI.altOn === false) {
-                UI.rfb.sendKey(XK_Alt_L, true);
-                $D('toggleAltButton').className = "noVNC_status_button_selected";
-                UI.altOn = true;
-            } else if(UI.altOn === true) {
-                UI.rfb.sendKey(XK_Alt_L, false);
-                $D('toggleAltButton').className = "noVNC_status_button";
-                UI.altOn = false;
-            }
-        },
-
-        sendTab: function() {
-            UI.keepKeyboard();
-            UI.rfb.sendKey(XK_Tab);
-        },
-
-        sendEsc: function() {
-            UI.keepKeyboard();
-            UI.rfb.sendKey(XK_Escape);
-        },
-
-        setKeyboard: function() {
-            UI.keyboardVisible = false;
         },
 
         //Helper to add options to dropdown.

@@ -109,39 +109,19 @@ Wat.Common.BySection.vm = {
         var dialogConf = {
             title: $.i18n.t('Spy'),
             buttons : {
-                "Full screen": function () { 
-                    $('.ui-dialog').addClass('ui-dialog--fullscreen');   
-                    $(".ui-dialog-buttonset button span.fa-expand").parent().hide();
-                    $(".ui-dialog-buttonset button span.fa-compress").parent().show();
-                    $('.ui-dialog-titlebar').hide();
-                    UI.toggleFullscreen();
-
-                    UI.onresize();
-                },
-                "Normal screen": function () {
-                    $('.ui-dialog').removeClass('ui-dialog--fullscreen');
-                    $(".ui-dialog-buttonset button span.fa-expand").parent().show();
-                    $(".ui-dialog-buttonset button span.fa-compress").parent().hide();
-                    $('.ui-dialog-titlebar').show();
-                    UI.toggleFullscreen();
-                    
-                    UI.onresize();
-                },
-                "Close": function () {       
-                    if($('.ui-dialog.ui-dialog--fullscreen').length > 0) {
-                        UI.toggleFullscreen();
-                    }
-                    
+                "Close": function () { 
                     UI.rfb.disconnect();
 
                     Wat.I.closeDialog($(this));
-                },
+                }
             },
-            button1Class : 'fa fa-expand',
-            button2Class : 'fa fa-compress',
-            button3Class : 'fa fa-ban',
+            
+            button1Class : 'fa fa-ban',
             
             fillCallback : function (target) {
+                $('.ui-dialog').addClass('ui-dialog--fullscreen');   
+                $('.noVNC_log').draggable();
+                
                 // Add common parts of editor to dialog
                 var template = _.template(
                     Wat.TPL.spyVM, {
@@ -158,10 +138,45 @@ Wat.Common.BySection.vm = {
                 
                 // Hide normal screen button from the begining
                 $(".ui-dialog-buttonset button span.fa-compress").parent().hide();
-                    
+                
+                // Configure settings
+                var templateSettings = _.template(
+                    Wat.TPL.spyVMSettings, {
+                    }
+                );
+                
+                $(".ui-dialog-buttonset button:last-child").parent().append(templateSettings);
+                Wat.T.translate();
+                Wat.I.chosenElement('.vms-spy-settings select', 'single100');
+                
+                $(".ui-dialog-buttonset .js-vms-spy-setting-resolution").on('change', that.changeSettingResolution);
+                $(".ui-dialog-buttonset .js-vms-spy-setting-mode").on('change', that.changeSettingMode);
+                $(".ui-dialog-buttonset .js-vms-spy-setting-log").on('change', that.changeSettingLog);
+                
+                
                 var loopCheck = setInterval(function () {
                     if(typeof $D == "function") {
+                        Util.Debug = Util.Info = Util.Warn = Util.Error = function () {};
+                        
+                        var level = 'error';
+                        switch (level) {
+                            case 'debug':
+                                Util.Debug = function (msg) { UI.log('DEBUG', msg); };
+                            case 'info':
+                                Util.Info  = function (msg) { UI.log('INFO', msg); };
+                            case 'warn':
+                                Util.Warn  = function (msg) { UI.log('WARN', msg); };
+                            case 'error':
+                                Util.Error = function (msg) { UI.log('ERROR', msg); };
+                            case 'none':
+                                break;
+                        }
+                        
                         UI.connect();
+                        
+                        $(".js-vms-spy-settings").show();
+
+                        //UI.onresize();
                         clearInterval(loopCheck);
                     }
                 }, 400);
@@ -169,5 +184,43 @@ Wat.Common.BySection.vm = {
         }
 
         that.dialog = Wat.I.dialog(dialogConf);  
+    },
+    
+    changeSettingLog: function (e) {
+        switch ($(e.target).val()) {
+            case "enabled":
+                $('.noVNC_log').show();
+                $('.noVNC_log').draggable({handle: '.drag-title'});
+                break;
+            case "disabled":
+                $('.noVNC_log').hide();
+                break;
+        }
+    },    
+    
+    changeSettingResolution: function (e) {
+        switch ($(e.target).val()) {
+            case "adapted":
+                UI.onresize();
+                break;
+            case "original":
+                UI.setClientResolution();
+                break;
+        }
+    },
+    
+    changeSettingMode: function (e) {
+        switch ($(e.target).val()) {
+            case "view_only":
+                UI.rfb.set_view_only(true);
+                $('.noVNC_canvas').addClass('noVNC_canvas--viewonly');
+                $('.noVNC_canvas').removeClass('noVNC_canvas--interactive');
+                break;
+            case "interactive":
+                UI.rfb.set_view_only(false);
+                $('.noVNC_canvas').removeClass('noVNC_canvas--viewonly');
+                $('.noVNC_canvas').addClass('noVNC_canvas--interactive');
+                break;
+        }
     }
 }
