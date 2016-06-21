@@ -200,7 +200,7 @@ install: function(toclevels) {
 }
 
 }
-asciidoc.install(2);
+asciidoc.install(3);
 /*]]>*/
 </script>
 </head>
@@ -1163,7 +1163,7 @@ Solución
 <div class="literalblock">
 <div class="content">
 <pre><code>Usuario: batman
-Contraseña: ********</code></pre>
+Contraseña: to the rescue</code></pre>
 </div></div>
 <div class="paragraph"><p>Este administrador tiene las siguientes características:</p></div>
 <div class="ulist"><ul>
@@ -1457,176 +1457,176 @@ cellspacing="0" cellpadding="4">
 <col width="33%" />
 <thead>
 <tr>
-<th align="left" valign="top">ACL    </th>
-<th align="left" valign="top">ACL code       </th>
-<th align="left" valign="top">Description</th>
+<th align="left" valign="top">ACL </th>
+<th align="left" valign="top">Código ACL </th>
+<th align="left" valign="top">Descripción</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create users</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Crear usuarios</strong></p></td>
 <td align="left" valign="top"><p class="table">user.create.</p></td>
-<td align="left" valign="top"><p class="table">Creation of users including initial settings for name and password.</p></td>
+<td align="left" valign="top"><p class="table">Creación de usuarios incluyendo los ajustes iniciales para el nombre y la contraseña.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set properties on users in creation</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Configurar las propiedades durante la creación del usuario</strong></p></td>
 <td align="left" valign="top"><p class="table">user.create.properties</p></td>
-<td align="left" valign="top"><p class="table">Setting of custom properties in the creation process of users.</p></td>
+<td align="left" valign="top"><p class="table">Ajustes de las propiedades personalizables durante el proceso de creación de usuarios.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete users (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Eliminar usuarios (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">user.delete-massive.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of users massively.</p></td>
+<td align="left" valign="top"><p class="table">Eliminación masiva de usuarios.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete users</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Eliminar usuarios</strong></p></td>
 <td align="left" valign="top"><p class="table">user.delete.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of users one by one.</p></td>
+<td align="left" valign="top"><p class="table">Eliminación de usuarios uno a uno.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter users by blocking status</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtro de usuarios por estado de bloqueo</strong></p></td>
 <td align="left" valign="top"><p class="table">user.filter.block</p></td>
-<td align="left" valign="top"><p class="table">Filter of users list by disk image&#8217;s blocking status</p></td>
+<td align="left" valign="top"><p class="table">Filtro de la lista de usuarios por el estado de bloqueo de la imagen del disco</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter users by creator</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtro de usuarios por creador</strong></p></td>
 <td align="left" valign="top"><p class="table">user.filter.created-by</p></td>
-<td align="left" valign="top"><p class="table">Filter of users list by administrator who created it</p></td>
+<td align="left" valign="top"><p class="table">Filtro de la lista de usuarios por administrador que la creó</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter users by creation date</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtro de usuarios por fecha de creación</strong></p></td>
 <td align="left" valign="top"><p class="table">user.filter.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Filter of users list by date when it was created</p></td>
+<td align="left" valign="top"><p class="table">Filtro de la lista de usuarios por fecha en la que se creó</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter users by name</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtro de usuarios por nombre</strong></p></td>
 <td align="left" valign="top"><p class="table">user.filter.name</p></td>
-<td align="left" valign="top"><p class="table">Filter of users list by user&#8217;s name.</p></td>
+<td align="left" valign="top"><p class="table">Filtro de la lista de usuarios por nombre del usuario.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter users by properties</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar usuarios por propiedades</strong></p></td>
 <td align="left" valign="top"><p class="table">user.filter.properties</p></td>
-<td align="left" valign="top"><p class="table">Filter of users list by desired custom property.</p></td>
+<td align="left" valign="top"><p class="table">Filtro de la lista de usuarios por propiedad personalizable deseada.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to user&#8217;s details view</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Acceso a la vista detallada del usuario</strong></p></td>
 <td align="left" valign="top"><p class="table">user.see-details.</p></td>
-<td align="left" valign="top"><p class="table">This ACL grants the access to the details view. The minimum data on it is name</p></td>
+<td align="left" valign="top"><p class="table">Este ACL garantiza el acceso a la vista detallada. El dato mínimo es el nombre</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to user&#8217;s main section</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Acceso a la sección principal del usuario</strong></p></td>
 <td align="left" valign="top"><p class="table">user.see-main.</p></td>
-<td align="left" valign="top"><p class="table">This ACL grants the access to the list. The minimum data on it is name</p></td>
+<td align="left" valign="top"><p class="table">Este ACL garantiza el acceso a la lista. El dato mínimo es el nombre</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s blocking state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver el estado de bloqueo del usuario</strong></p></td>
 <td align="left" valign="top"><p class="table">user.see.block</p></td>
-<td align="left" valign="top"><p class="table">Blocking state (blocked/unblocked) of users</p></td>
+<td align="left" valign="top"><p class="table">Estado de bloqueo (bloqueado/desbloqueado) de los usuarios</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s creator</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver creador del usuario</strong></p></td>
 <td align="left" valign="top"><p class="table">user.see.created-by</p></td>
-<td align="left" valign="top"><p class="table">WAT administrator who created a user.</p></td>
+<td align="left" valign="top"><p class="table">Administrador WAT que creó un usuario.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s creation date</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver fecha de creación del usuario</strong></p></td>
 <td align="left" valign="top"><p class="table">user.see.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Datetime when a user was created</p></td>
+<td align="left" valign="top"><p class="table">Fecha en la que se creó el usuario</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver descripción del usuario</strong></p></td>
 <td align="left" valign="top"><p class="table">user.see.description</p></td>
-<td align="left" valign="top"><p class="table">The description of the users.</p></td>
+<td align="left" valign="top"><p class="table">Descripción de los usuarios.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s ID</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver identidad del usuario</strong></p></td>
 <td align="left" valign="top"><p class="table">user.see.id</p></td>
-<td align="left" valign="top"><p class="table">The database identiefier of the users. Useful to make calls from CLI.</p></td>
+<td align="left" valign="top"><p class="table">Base de datos identificativa de los usuarios. Útil para realizar llamadas desde CLI.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s properties</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver propiedades del usuario</strong></p></td>
 <td align="left" valign="top"><p class="table">user.see.properties</p></td>
-<td align="left" valign="top"><p class="table">The custom properties of the users.</p></td>
+<td align="left" valign="top"><p class="table">Las propiedades personalizables de los usuarios.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver máquinas virtuales de los usuarios</strong></p></td>
 <td align="left" valign="top"><p class="table">user.see.vm-list</p></td>
-<td align="left" valign="top"><p class="table">See the virtual machines of one user in his details view. This view will contain: name, state, block and expire information of each vm</p></td>
+<td align="left" valign="top"><p class="table">Ver las máquinas virtuales de un usuario en vista detallada. Esta vista contiene: nombre, estado, bloqueo y fecha de expiración de cada mv</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s virtual machines' blocking state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver el estado de bloqueo de las máquinas virtuales del usuario</strong></p></td>
 <td align="left" valign="top"><p class="table">user.see.vm-list-block</p></td>
-<td align="left" valign="top"><p class="table">Blocking info of the virtual machines shown in user details view</p></td>
+<td align="left" valign="top"><p class="table">La información de bloqueo de las máquinas virtuales se muestra en la vista detallada del usuario</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s virtual machines' expiration</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver expiración de las máquinas virtuales del usuario</strong></p></td>
 <td align="left" valign="top"><p class="table">user.see.vm-list-expiration</p></td>
-<td align="left" valign="top"><p class="table">Expiration info of the virtual machines shown in user details view</p></td>
+<td align="left" valign="top"><p class="table">La información de expiración de las máquinas virtuales se muestra en la vista detallada</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s virtual machines' running state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estado del funcionamiento de las máquinas virtuales del usuario</strong></p></td>
 <td align="left" valign="top"><p class="table">user.see.vm-list-state</p></td>
-<td align="left" valign="top"><p class="table">State (stopped/started) of the virtual machines shown in user details view</p></td>
+<td align="left" valign="top"><p class="table">El estado (parado/iniciado) de las máquinas virtuales se muestra en la vista detallada del usuario</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s virtual machines' user state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver el estado del usuario de las máquinas virtuales del usuario</strong></p></td>
 <td align="left" valign="top"><p class="table">user.see.vm-list-user-state</p></td>
-<td align="left" valign="top"><p class="table">User state (connected/disconnected)) of the virtual machines shown in user details view</p></td>
+<td align="left" valign="top"><p class="table">El estado de usuario (conectado/desconectado) de las máquinas virtuales se muestra en la vista detallada del usuario</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See number of user&#8217;s virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver número de máquinas virtuales del usuario</strong></p></td>
 <td align="left" valign="top"><p class="table">user.see.vms-info</p></td>
-<td align="left" valign="top"><p class="table">Total and connected virtual machines of this user</p></td>
+<td align="left" valign="top"><p class="table">Número de máquinas virtuales total y desconectadas de este usuario</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of number of users</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estadística de número de usuarios</strong></p></td>
 <td align="left" valign="top"><p class="table">user.stats.blocked</p></td>
-<td align="left" valign="top"><p class="table">Total of blocked users in current tenant or all system for superadministrators.</p></td>
+<td align="left" valign="top"><p class="table">Total de usuarios bloqueados en el usuario por superadministradores.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of number of connected users</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estadística del número de usuarios conectados</strong></p></td>
 <td align="left" valign="top"><p class="table">user.stats.connected-users</p></td>
-<td align="left" valign="top"><p class="table">Total of users connected in at least one virtual machine.</p></td>
+<td align="left" valign="top"><p class="table">Total de usuarios conectados en al menos una máquina virtual</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of number of blocked users</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estadística del número de usuarios bloqueados</strong></p></td>
 <td align="left" valign="top"><p class="table">user.stats.summary</p></td>
-<td align="left" valign="top"><p class="table">Total of users in current tenant or all system for superadministrators.</p></td>
+<td align="left" valign="top"><p class="table">Total de usuarios en el usuario actual o todo el sistema por superadministradores.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Block-Unblock users (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Bloqueo-Desbloqueo usuarios (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">user.update-massive.block</p></td>
-<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of users massively.</p></td>
+<td align="left" valign="top"><p class="table">Actualización del bloqueo (bloqueo/desbloqueo) masivo de los usuarios.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update user&#8217;s description (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualización de la descripción del usuario (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">user.update-massive.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of users massively.</p></td>
+<td align="left" valign="top"><p class="table">Actualización masiva de la descripción del usuario.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update properties when update users (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualización de las propiedades durante la actualización de los usuarios (masiva)</strong></p></td>
 <td align="left" valign="top"><p class="table">user.update-massive.properties</p></td>
-<td align="left" valign="top"><p class="table">Update properties in user&#8217;s massive update process.</p></td>
+<td align="left" valign="top"><p class="table">Actualización de propiedades en el proceso de actualización masiva del usuario.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Block-Unblock users</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Bloqueo-Desbloqueo de usuarios</strong></p></td>
 <td align="left" valign="top"><p class="table">user.update.block</p></td>
-<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of users one by one.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar el estado de bloqueo de los usuarios (bloqueado/desbloqueado) uno a uno.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update user&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualización de la descripción del usuario</strong></p></td>
 <td align="left" valign="top"><p class="table">user.update.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of users one by one.</p></td>
+<td align="left" valign="top"><p class="table">Actualización de la descripción de los usuarios una a una.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update user&#8217;s password</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar contraseña del usuario</strong></p></td>
 <td align="left" valign="top"><p class="table">user.update.password</p></td>
-<td align="left" valign="top"><p class="table">Update the password of users.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar contraseña de los usuarios.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update properties when update users</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar propiedades durante la actualización de usuarios</strong></p></td>
 <td align="left" valign="top"><p class="table">user.update.properties</p></td>
-<td align="left" valign="top"><p class="table">Update properties in user&#8217;s one by one update process.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar propiedades en el proceso de actualización del usuario una a una.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1645,290 +1645,290 @@ cellspacing="0" cellpadding="4">
 <thead>
 <tr>
 <th align="left" valign="top">ACL    </th>
-<th align="left" valign="top">ACL code       </th>
-<th align="left" valign="top">Description</th>
+<th align="left" valign="top">Código ACL    </th>
+<th align="left" valign="top">Descripción</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Crear máquinas virtuales</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.create.</p></td>
-<td align="left" valign="top"><p class="table">Creation of virtual machines including initial setting for name, user and OS flavour.</p></td>
+<td align="left" valign="top"><p class="table">Creación de las máquinas virtuales incluyendo los ajustes iniciales para el nombre, usuario y OS flavour.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set tag in virtual macine&#8217;s creation</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Establecer la etiqueta en la creación de las máquinas virtuales</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.create.di-tag</p></td>
-<td align="left" valign="top"><p class="table">Setting of disk image&#8217;s tag in the creation process of virtual machines. Without this ACL, the system will set <em>default</em> automatically.</p></td>
+<td align="left" valign="top"><p class="table">Ajustes de la etiqueta de la imagen del disco durante el proceso de creación de las máquinas virtuales. Sin este ACL, el sistema establecerá "por defecto" automáticamente.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set properties in virtual machine&#8217;s creation</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Establecer propiedades en la creación de las máquinas virtuales</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.create.properties</p></td>
-<td align="left" valign="top"><p class="table">Setting of custom properties in the creation process of virtual machines.</p></td>
+<td align="left" valign="top"><p class="table">Ajustes de las propiedades personalizables en el proceso de creación de las máquinas virtuales.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete virtual machines (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Eliminación máquinas virtuales (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.delete-massive.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of virtual machines massively.</p></td>
+<td align="left" valign="top"><p class="table">Eliminación de máquinas virtuales masivamente.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Eliminación máquinas virtuañes</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.delete.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of virtual machines one by one.</p></td>
+<td align="left" valign="top"><p class="table">Eliminación de máquinas virtuales una a una</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by creator</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar máquinas virtuales por creador</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.filter.created-by</p></td>
-<td align="left" valign="top"><p class="table">Filter of virtual machines list by administrator who created it</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de máquinas virtuales por administrador que la creó</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by creation date</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar máquinas virtuales por fecha de creación</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.filter.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Filter of virtual machines list by date when it was created</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de máquinas virtuales por fecha en la que fue creada</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by expiration date</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar máquinas virtuales por fecha de expiración</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.filter.expiration-date</p></td>
-<td align="left" valign="top"><p class="table">Filter of virtual machines list by date when it will expire. This is refered to the hard expiration.</p></td>
+<td align="left" valign="top"><p class="table">Filtar lista de máquinas virtuales por fecha en la que expiraráof virtual machines list by date when it will expire. Esto se refiere a la expiración hard.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by host</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar máquinas virtuales por host</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.filter.host</p></td>
-<td align="left" valign="top"><p class="table">Filter of virtual machines list by host where the virtual machines are running.</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de máquinas virtuales por host cuando estas esten en funcionamiento.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by name</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar máquinas virtuales por nombre</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.filter.name</p></td>
-<td align="left" valign="top"><p class="table">Filter of virtual machines list by virtual machine&#8217;s name</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de máquinas virtuales por su nombre.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by OS Flavour</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar máquinas virtuales por OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.filter.osf</p></td>
-<td align="left" valign="top"><p class="table">Filter of virtual machines list by OS flavour assigned to the virtual machine.</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de máquinas virtuales por OS flavour asignado a la máquina virtual.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by properties</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar máquinas virtuales por propiedades</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.filter.properties</p></td>
-<td align="left" valign="top"><p class="table">Filter of virtual machines list by desired custom property.</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de máquinas virtuales por propiedad personalizable deseada.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by running state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar máquinas virtuales por estado de funcionamiento</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.filter.state</p></td>
-<td align="left" valign="top"><p class="table">Filter of virtual machines list by virtual machine&#8217;s state (stopped/started)</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de máquinas virtuales por el estado de la máquina virtua (parado/iniciado)</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by user</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar máquinas virtuales por usuario</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.filter.user</p></td>
-<td align="left" valign="top"><p class="table">Filter of virtual machines list by user who the virtual machines belong.</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de máquinas virtuales por usuario a quien pertenece la máquina virtual.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to virtual machine&#8217;s details view</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Acceso a la vista detallada de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see-details.</p></td>
-<td align="left" valign="top"><p class="table">This ACL grants the access to the details view. The minimum data on it is name</p></td>
+<td align="left" valign="top"><p class="table">Este ACL garantiza el acceso a la vista detallada. El dato mínimo es el nombre.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to virtual machine&#8217;s main section</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Acceso a la sección principal de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see-main.</p></td>
-<td align="left" valign="top"><p class="table">This ACL grants the access to the list. The minimum data on it is disk_image</p></td>
+<td align="left" valign="top"><p class="table">Este ACL garantiza el acceso a la lista. El dato mínimo es la imagen_disco.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s blocking status</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estado de bloqueo de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.block</p></td>
-<td align="left" valign="top"><p class="table">Blocking state (blocked/unblocked) of virtual machines</p></td>
+<td align="left" valign="top"><p class="table">Estado de bloqueo (bloqueado/desbloqueado) de las máquinas virtuales</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s creator</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver creador de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.created-by</p></td>
-<td align="left" valign="top"><p class="table">WAT administrator who created a virtual machine.</p></td>
+<td align="left" valign="top"><p class="table">Administrador WAT que creó la máquina virtual.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s creation date</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver fecha de creación de la mv</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Datetime when a virtual machine was created</p></td>
+<td align="left" valign="top"><p class="table">Fecha en la que se creó la máquina virtual</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver descripción de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.description</p></td>
-<td align="left" valign="top"><p class="table">The description of virtual machines.</p></td>
+<td align="left" valign="top"><p class="table">Descripción de la máquina virtual.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s disk image</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver imagen del disco de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.di</p></td>
-<td align="left" valign="top"><p class="table">Disk images used by each virtual machine</p></td>
+<td align="left" valign="top"><p class="table">Imágenes de disco usadas por cada máquina virtual</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s disk image&#8217;s tag</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver etiqueta de la imagen del disco de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.di-tag</p></td>
-<td align="left" valign="top"><p class="table">Disk image&#8217;s tag assigned in each virtual machine to define which disk image will be used.</p></td>
+<td align="left" valign="top"><p class="table">Etiqueta de la imagen del disco asignada a cada máquina virtual para definir la imagen de disco que se utilizará.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s disk image&#8217;s version</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver versión de la imagen del disco de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.di-version</p></td>
-<td align="left" valign="top"><p class="table">Disk image&#8217;s version used by each virtual machine</p></td>
+<td align="left" valign="top"><p class="table">Versión de la imagen del disco usada por cada máquina virtual</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s Expiration</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver expiración de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.expiration</p></td>
-<td align="left" valign="top"><p class="table">Expiration info of the virtual machines.</p></td>
+<td align="left" valign="top"><p class="table">Información sobre la expiración de las máquinas virtuales.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s Node</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver Nodo de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.host</p></td>
-<td align="left" valign="top"><p class="table">Host where each virtual machines are running</p></td>
+<td align="left" valign="top"><p class="table">Host que está haciendo funcionando cada máquina virtual</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s ID</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver ID de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.id</p></td>
-<td align="left" valign="top"><p class="table">The database identiefier of the virtual machines. Useful to make calls from CLI.</p></td>
+<td align="left" valign="top"><p class="table">Base de datos identificativa de las máquinas virtuales. Útil para realizar llamadas desde CLI.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s IP address</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver dirección IP de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.ip</p></td>
-<td align="left" valign="top"><p class="table">Current IP addres of the virtual machines.</p></td>
+<td align="left" valign="top"><p class="table">Dirección IP actual de las máquinas virtuales.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s MAC address</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver dirección MAC de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.mac</p></td>
-<td align="left" valign="top"><p class="table">MAC address of the virtual machines.</p></td>
+<td align="left" valign="top"><p class="table">Dirección MAC de la máquinas virtuales</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s IP address for next boot</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver dirección IP de la máquina virtual para el próximo arranque</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.next-boot-ip</p></td>
-<td align="left" valign="top"><p class="table">IP address that will be assigned in the next boot of the virtual machines.</p></td>
+<td align="left" valign="top"><p class="table">Dirección IP address que será asignada en el próximo arranque de las máquinas virtuales.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s OS Flavour</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver OS Flavour de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.osf</p></td>
-<td align="left" valign="top"><p class="table">OS flavours assigned to each virtual machine.</p></td>
+<td align="left" valign="top"><p class="table">OS flavours asignados a cada máquina virtual.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s Serial port</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver puerto de serie de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.port-serial</p></td>
-<td align="left" valign="top"><p class="table">Serial port assigned to a running virtual machine.</p></td>
+<td align="left" valign="top"><p class="table">Puerto de serie asignado a una máquina virtual en funcionamiento.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s SSH port</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver puerto SSH de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.port-ssh</p></td>
-<td align="left" valign="top"><p class="table">SSH port assigned to a running virtual machine.</p></td>
+<td align="left" valign="top"><p class="table">Puerto SSH asignado a una máquina virtual en funcionamiento.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s VNC port</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver puerto VNC de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.port-vnc</p></td>
-<td align="left" valign="top"><p class="table">VNC port assigned to a running virtual machine.</p></td>
+<td align="left" valign="top"><p class="table">Puerto VNC asignado a una máquina virtual en funcionamiento.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s properties</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver propiedades de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.properties</p></td>
-<td align="left" valign="top"><p class="table">The custom properties of the virtual machines.</p></td>
+<td align="left" valign="top"><p class="table">Propiedades customizables de las máquinas virtuales.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estado de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.state</p></td>
-<td align="left" valign="top"><p class="table">The status of the virtual machines (stopped/started)</p></td>
+<td align="left" valign="top"><p class="table">Estado de las máquinas virtuales (parado/iniciado)</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s user</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver usuario de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.user</p></td>
-<td align="left" valign="top"><p class="table">The user owner of the virtual machines.</p></td>
+<td align="left" valign="top"><p class="table">El usuario propietario de las máquinas virtuales.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s user&#8217;s connection state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estado de conexión del usuario de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.see.user-state</p></td>
-<td align="left" valign="top"><p class="table">The user state of a virtual machine (connected/disconnected)</p></td>
+<td align="left" valign="top"><p class="table">Estado de usuario de una máquina virtual (conectado/desconectado)</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of number of blocked virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estadística del número de máquinas virtuales bloqueadas</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.stats.blocked</p></td>
-<td align="left" valign="top"><p class="table">Total of blocked virtual machines in current tenant or all system for superadministrators.</p></td>
+<td align="left" valign="top"><p class="table">Número total de máquinas virtuales bloqueadas en el usuario actual o en todo el sistema por superadministradores.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of virtual machines close to expire</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estadística de las máquinas virtuales a punto de expirar</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.stats.close-to-expire</p></td>
-<td align="left" valign="top"><p class="table">Info of the virutal machines that will be expire (hard expiration) in next 7 days.</p></td>
+<td align="left" valign="top"><p class="table">Información sobre las máquinas virtuales que expirarán que expirarán (expiración hard) en 7 días.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of running virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estadística de las máquinas virtuales en funcionamiento</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.stats.running-vms</p></td>
-<td align="left" valign="top"><p class="table">Total of running virtual machines in current tenant or all system for superadministrators.</p></td>
+<td align="left" valign="top"><p class="table">Número total de máquinas virtuales en el usuario actual o en todo el sistema por superadministradores.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of number of virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estadística del número de máquinas virtuales</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.stats.summary</p></td>
-<td align="left" valign="top"><p class="table">Total of virtual machines in current tenant or all system for superadministrators.</p></td>
+<td align="left" valign="top"><p class="table">Número total de máquinas virtuales en el usuario actual o en todo el sistema por superadministradores.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Block-Unblock virtual machines (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Bloqueo-Desbloqueo de las máquinas virtuales (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.update-massive.block</p></td>
-<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of virtual machines massively.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar estado de bloqueo (bloqueado/desbloqueado) de las máquinas virtuales masivamente.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s description (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar descripción de las máquinas virtuales (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.update-massive.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of virtual machines massively.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar descripción de las máquinas virtuales masivamente.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s tag (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar etiqueta de las máquinas virtuales (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.update-massive.di-tag</p></td>
-<td align="left" valign="top"><p class="table">Update the disk image&#8217;s tag setted on virtual machines massively.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar la etiqueta de la imagen del disco establecida en las máquinas virtuales masivamente.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Disconnect user from virtual machine (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Desconectar al usuario de la máquina virtual (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.update-massive.disconnect-user</p></td>
-<td align="left" valign="top"><p class="table">Disconnect the user connected to virtual machines massively.</p></td>
+<td align="left" valign="top"><p class="table">Desconectar usuario conectado a las máquinas virtuales masivamente.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s expiration (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar expiración de las máquinas virtuales (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.update-massive.expiration</p></td>
-<td align="left" valign="top"><p class="table">Update the expiration date times of virtual machines massively.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar las fechas de expiración de las máquinas virtuales masivamente.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update properties when update virtual machines (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar propiedades al actualizar las máquinas virtuales (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.update-massive.properties</p></td>
-<td align="left" valign="top"><p class="table">Update properties in virtual machines&#8217;s massive update process.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar propiedades de las máquinas virtuales durante el proceso masivo de actualización de las máquinas virtuales.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Start-Stop virtual machines (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Iniciar-Parar máquinas virtuales (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.update-massive.state</p></td>
-<td align="left" valign="top"><p class="table">Start/Stop virtual machines massively.</p></td>
+<td align="left" valign="top"><p class="table">Iniciar/Parar máquinas virtuales masivamente.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Block-Unblock virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Bloquear-Desbloquear máquinas virtuales</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.update.block</p></td>
-<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of virtual machines one by one.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar el estado de bloqueo (bloqueado/desbloqueado) de las máquinas virtuales una a una.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar descripción de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.update.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of virtual machines one by one.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar la descripción de las máquinas virtuales una a una.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s tag</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar etiqueta de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.update.di-tag</p></td>
-<td align="left" valign="top"><p class="table">Update the disk image&#8217;s tag setted on virtual machines one by one.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar la etiqueta de la imagen del disco establecida en las máquinas virtuales una a una.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Disconnect user from virtual machine</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Desconectar usuario de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.update.disconnect-user</p></td>
-<td align="left" valign="top"><p class="table">Disconnect the user connected to virtual machines one by one.</p></td>
+<td align="left" valign="top"><p class="table">Desconectar el usuario conectado a la máquina virtual uno a uno.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s expiration</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar expiración de la máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.update.expiration</p></td>
-<td align="left" valign="top"><p class="table">Update the expiration date times of virtual machines one by one.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar la fecha de expiración de las máquinas virtuales una a una.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s name</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar el nombre de las máquinas virtuales</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.update.name</p></td>
-<td align="left" valign="top"><p class="table">Update the name of virtual machines.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar el nombre de las máquinas virtuales.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update properties when update virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar propiedades al actualizar las máquinas virtuales</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.update.properties</p></td>
-<td align="left" valign="top"><p class="table">Update properties in virtual machines&#8217;s one by one update process.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar propiedades en la máquina virtual una a una durante el proceso de actualización.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Start-Stop virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Iniciar-Parar las máquinas virtuales</strong></p></td>
 <td align="left" valign="top"><p class="table">vm.update.state</p></td>
-<td align="left" valign="top"><p class="table">Start/Stop virtual machines one by one.</p></td>
+<td align="left" valign="top"><p class="table">Iniciar/Detener máquinas virtuales una a una.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1947,215 +1947,215 @@ cellspacing="0" cellpadding="4">
 <thead>
 <tr>
 <th align="left" valign="top">ACL    </th>
-<th align="left" valign="top">ACL code       </th>
-<th align="left" valign="top">Description</th>
+<th align="left" valign="top">Código ACL    </th>
+<th align="left" valign="top">Descripción</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create nodes</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Crear nodos</strong></p></td>
 <td align="left" valign="top"><p class="table">host.create.</p></td>
-<td align="left" valign="top"><p class="table">Creation of hosts including initial setting for name and address.</p></td>
+<td align="left" valign="top"><p class="table">Creación de nodos de host incluyendo los ajustes iniciales para nombre y dirección.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set properties on nodes in creation</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Establecer propiedades de los nodos en creación</strong></p></td>
 <td align="left" valign="top"><p class="table">host.create.properties</p></td>
-<td align="left" valign="top"><p class="table">Setting of custom properties in the creation process of hosts.</p></td>
+<td align="left" valign="top"><p class="table">Ajustes de propiedades personalizables en el proceso de creación de los host.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete nodes (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Eliminación de nodos (masiva)</strong></p></td>
 <td align="left" valign="top"><p class="table">host.delete-massive.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of hosts massively.</p></td>
+<td align="left" valign="top"><p class="table">Eliminación masiva de hosts.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete nodes</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Eliminar nodos</strong></p></td>
 <td align="left" valign="top"><p class="table">host.delete.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of hosts one by one.</p></td>
+<td align="left" valign="top"><p class="table">Eliminación de hosts uno a uno.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter nodes by blocking status</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar nodos por estado de bloqueo</strong></p></td>
 <td align="left" valign="top"><p class="table">host.filter.block</p></td>
-<td align="left" valign="top"><p class="table">Filter of hosts list by disk image&#8217;s blocking status</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de hosts por el estado de bloqueo de la imagen del disco.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter nodes by creator</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar nodos por creador</strong></p></td>
 <td align="left" valign="top"><p class="table">host.filter.created-by</p></td>
-<td align="left" valign="top"><p class="table">Filter of hosts list by administrator who created it</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de hosts por host que la creó.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter nodes by creation date</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar nodos por fecha de creación</strong></p></td>
 <td align="left" valign="top"><p class="table">host.filter.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Filter of hosts list by date when it was created</p></td>
+<td align="left" valign="top"><p class="table">Fitrar lista de hosts por fecha en la que fue creado.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter nodes by name</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar nodos por nombre</strong></p></td>
 <td align="left" valign="top"><p class="table">host.filter.name</p></td>
-<td align="left" valign="top"><p class="table">Filter of hosts list by host&#8217;s name</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de hosts por nombre del host.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter nodes by properties</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar nodos por propiedades</strong></p></td>
 <td align="left" valign="top"><p class="table">host.filter.properties</p></td>
-<td align="left" valign="top"><p class="table">Filter of hosts list by desired custom property.</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de hosts por propiedad personalizable deseada.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter nodes by running state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar nodos por estado de funcionamiento</strong></p></td>
 <td align="left" valign="top"><p class="table">host.filter.state</p></td>
-<td align="left" valign="top"><p class="table">Filter of hosts list by running state.</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de hosts por estado de funcionamiento.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter nodes by virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar nodos por máquinas virtuales</strong></p></td>
 <td align="left" valign="top"><p class="table">host.filter.vm</p></td>
-<td align="left" valign="top"><p class="table">Filter of hosts list by virtual machine that is running in the host.</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de hosts por máquina virtual del host en funcionamiento.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to node&#8217;s details view</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Acceso a la vista detallada de nodos</strong></p></td>
 <td align="left" valign="top"><p class="table">host.see-details.</p></td>
-<td align="left" valign="top"><p class="table">This ACL grants the access to the details view. The minimum data on it is name</p></td>
+<td align="left" valign="top"><p class="table">Este ACL garantiza el acceso a la vista detallada. El dato mínimo es el nombre.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to node&#8217;s main section</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Acceso a la sección principal de nodos</strong></p></td>
 <td align="left" valign="top"><p class="table">host.see-main.</p></td>
-<td align="left" valign="top"><p class="table">Access to hosts section (without it, it won&#8217;t appear in menu)</p></td>
+<td align="left" valign="top"><p class="table">Acceso a la sección del host (sin esto, no aparecerá en el menú)</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s IP address</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver dirección IP del nodo</strong></p></td>
 <td align="left" valign="top"><p class="table">host.see.address</p></td>
-<td align="left" valign="top"><p class="table">IP address of the hosts.</p></td>
+<td align="left" valign="top"><p class="table">Dirección IP de los hosts.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s blocking state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estado de bloqueo del nodo</strong></p></td>
 <td align="left" valign="top"><p class="table">host.see.block</p></td>
-<td align="left" valign="top"><p class="table">Blocking state (blocked/unblocked) of hosts</p></td>
+<td align="left" valign="top"><p class="table">Estado de bloqueo (bloqueado/desbloqueado) de los hosts</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s creator</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver creador del nodo</strong></p></td>
 <td align="left" valign="top"><p class="table">host.see.created-by</p></td>
-<td align="left" valign="top"><p class="table">WAT administrator who created a host.</p></td>
+<td align="left" valign="top"><p class="table">Administrador WAT que creó el host.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s creation date</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver fecha de creación del nodo</strong></p></td>
 <td align="left" valign="top"><p class="table">host.see.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Datetime when a host was created</p></td>
+<td align="left" valign="top"><p class="table">Fecha en la que se creó un host</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver descripción del nodo</strong></p></td>
 <td align="left" valign="top"><p class="table">host.see.description</p></td>
-<td align="left" valign="top"><p class="table">The description of the hosts.</p></td>
+<td align="left" valign="top"><p class="table">Descripción de los hosts.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s ID</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver ID del nodo</strong></p></td>
 <td align="left" valign="top"><p class="table">host.see.id</p></td>
-<td align="left" valign="top"><p class="table">The database identiefier of the hosts. Useful to make calls from CLI.</p></td>
+<td align="left" valign="top"><p class="table">Base de datos identificativa de los hosts. Útil para realizar llamadas desde CLI.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s properties</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver propiedades de los nodos</strong></p></td>
 <td align="left" valign="top"><p class="table">host.see.properties</p></td>
-<td align="left" valign="top"><p class="table">The custom properties of the hosts.</p></td>
+<td align="left" valign="top"><p class="table">Propiedades personalizables de los hosts.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s running state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estado de funcionamiento de los hosts</strong></p></td>
 <td align="left" valign="top"><p class="table">host.see.state</p></td>
-<td align="left" valign="top"><p class="table">State of the hosts (stopped/started)</p></td>
+<td align="left" valign="top"><p class="table">Estado de los hosts  (parado/iniciado)</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s running virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver máquinas virtuales del nodo</strong></p></td>
 <td align="left" valign="top"><p class="table">host.see.vm-list</p></td>
-<td align="left" valign="top"><p class="table">See the virtual machines running on one host in his details view. This view will contain: name, state, block and expire information of each vm</p></td>
+<td align="left" valign="top"><p class="table">Ver máquinas virtuales en funcionamiento por un host en vista detallada. Esta vista contendrá: nombre, estado, bloqueo e información de expiración de cada mv</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s running virtual machines' blocking state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estado de bloqueo de la máquinas virtuales en funcionamiento del nodo</strong></p></td>
 <td align="left" valign="top"><p class="table">host.see.vm-list-block</p></td>
-<td align="left" valign="top"><p class="table">Blocking info of the virtual machines shown in host details view</p></td>
+<td align="left" valign="top"><p class="table">Información de bloqueo de las máquinas virtuales mostradas en la vista detallada del host.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s running virtual machines' expiration</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver expiración de las máquinas virtuales del nodo</strong></p></td>
 <td align="left" valign="top"><p class="table">host.see.vm-list-expiration</p></td>
-<td align="left" valign="top"><p class="table">Expiration info of the virtual machines shown in host details view</p></td>
+<td align="left" valign="top"><p class="table">Información de expiración de las máquinas virtuales mostradas en la vista detallada del host.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s running virtual machines' running state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estado de funcionamiento de las máquinas virtuales en funcionamiento del nodo</strong></p></td>
 <td align="left" valign="top"><p class="table">host.see.vm-list-state</p></td>
-<td align="left" valign="top"><p class="table">State (stopped/started) of the virtual machines shown in host details view</p></td>
+<td align="left" valign="top"><p class="table">Estado (parado/iniciado) de las máquinas virtuales mostradas en la vista detallada del host.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s running virtual machines' user state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estado del usuario de las máquinas virtuales en funcionamiento del nodo</strong></p></td>
 <td align="left" valign="top"><p class="table">host.see.vm-list-user-state</p></td>
-<td align="left" valign="top"><p class="table">User state (connected/disconnected) of the virtual machines shown in host details view</p></td>
+<td align="left" valign="top"><p class="table">Estado de usuario (conectado/desconectado) de las máquinas virtuales mostrada en la vista detallada del host.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See number of running vms running on nodes</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver número de mvs en funcionamiento en los nodos</strong></p></td>
 <td align="left" valign="top"><p class="table">host.see.vms-info</p></td>
-<td align="left" valign="top"><p class="table">Virtual machines information such as how many virtual machines are running in each host</p></td>
+<td align="left" valign="top"><p class="table">Máquinas virtuales tales como cuántas máquinas virtuales funcionan en cada host.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of number of blocked nodes</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estadísticas del número de nodos bloqueados</strong></p></td>
 <td align="left" valign="top"><p class="table">host.stats.blocked</p></td>
-<td align="left" valign="top"><p class="table">Total of blocked hosts in current tenant or all system for superadministrators.</p></td>
+<td align="left" valign="top"><p class="table">Número total de hosts en el usuario actual o en todo el sistema por superadministradores.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of running nodes</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estadísticas de los nodos en funcionamiento</strong></p></td>
 <td align="left" valign="top"><p class="table">host.stats.running-hosts</p></td>
-<td align="left" valign="top"><p class="table">Total of running hosts in current tenant or all system for superadministrators.</p></td>
+<td align="left" valign="top"><p class="table">Total de hosts en funcionamiento en el usuario actual o en todo el sistema por superadministradores.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of number of nodes</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estadísticas del número de nodos</strong></p></td>
 <td align="left" valign="top"><p class="table">host.stats.summary</p></td>
-<td align="left" valign="top"><p class="table">Total of hosts in current tenant or all system for superadministrators.</p></td>
+<td align="left" valign="top"><p class="table">Total de hosts en funcionamiento en el usuario actual o en todo el sistema por superadministradores.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of nodes with most running Vms</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estadística de nodos con el mayor número de Mvs en funcionamiento</strong></p></td>
 <td align="left" valign="top"><p class="table">host.stats.top-hosts-most-vms</p></td>
-<td align="left" valign="top"><p class="table">Top 5 of hosts with most running virtual machines.</p></td>
+<td align="left" valign="top"><p class="table">Top 5 de hosts con mayor número de máquinas virtuales en funcionamiento.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Block-Unblock nodes (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Bloqueo-Desbloqueo de nodos (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">host.update-massive.block</p></td>
-<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of hosts massively.</p></td>
+<td align="left" valign="top"><p class="table">Actualización del estado de bloqueo (bloqueo/desbloqueo) masivo de hosts.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update node&#8217;s description (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualización de la descripción de nodos (masiva)</strong></p></td>
 <td align="left" valign="top"><p class="table">host.update-massive.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of the hosts massively.</p></td>
+<td align="left" valign="top"><p class="table">Actualización masiva de la descripción de los hosts.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update properties when update nodes (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar propiedades al actualizar nodos (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">host.update-massive.properties</p></td>
-<td align="left" valign="top"><p class="table">Update properties in node&#8217;s massive update process.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar propiedades en el proceso de actualización masivo del nodo.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Stop all virtual machines of a node (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Detener todas las máquinas virtuales del nodo (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">host.update-massive.stop-vms</p></td>
-<td align="left" valign="top"><p class="table">Stop all the virtual machines of hosts massively.</p></td>
+<td align="left" valign="top"><p class="table">Detención masiva de las máquinas virtuales del host.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update node&#8217;s address</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar dirección del nodo</strong></p></td>
 <td align="left" valign="top"><p class="table">host.update.address</p></td>
-<td align="left" valign="top"><p class="table">Update the IP address of the hosts.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar la dirección IP de los hosts.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Block-Unblock nodes</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Bloque-Desbloqueo de nodos</strong></p></td>
 <td align="left" valign="top"><p class="table">host.update.block</p></td>
-<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of hosts one by one.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar el estado de bloqueo (bloqueado/desbloqueado) de los hosts uno a uno.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update node&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar la descripción del nodo</strong></p></td>
 <td align="left" valign="top"><p class="table">host.update.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of the hosts one by one.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar la descripción de los hosts una a una.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update node&#8217;s name</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar nombre del nodo</strong></p></td>
 <td align="left" valign="top"><p class="table">host.update.name</p></td>
-<td align="left" valign="top"><p class="table">Update the name of the hosts.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar nombre de los hosts.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update properties when update nodes</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar propiedades al actualizar nodos</strong></p></td>
 <td align="left" valign="top"><p class="table">host.update.properties</p></td>
-<td align="left" valign="top"><p class="table">Update properties in node&#8217;s one by one update process.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar propiedades en el proceso de actualización del nodo una a una.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Stop all virtual machines of a node</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Detener todas las máquinas virtuales de un nodo</strong></p></td>
 <td align="left" valign="top"><p class="table">host.update.stop-vms</p></td>
-<td align="left" valign="top"><p class="table">Stop all the virtual machines of hosts one by one.</p></td>
+<td align="left" valign="top"><p class="table">Detener todas las máquinas virtuales de los hosts una a una.</p></td>
 </tr>
 </tbody>
 </table>
@@ -2175,234 +2175,229 @@ cellspacing="0" cellpadding="4">
 <tr>
 <th align="left" valign="top">ACL    </th>
 <th align="left" valign="top">ACL code       </th>
-<th align="left" valign="top">Description</th>
+<th align="left" valign="top">Descripción</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create OS Flavours</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Crear OS Flavours</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.create.</p></td>
-<td align="left" valign="top"><p class="table">Creation of OS flavours including initial setting for name.</p></td>
+<td align="left" valign="top"><p class="table">Creación de OS flavours incluyendo los ajustes iniciales para el nombre.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set memory in OS Flavour&#8217;s creation</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Establecer la memoria en la creación del OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.create.memory</p></td>
-<td align="left" valign="top"><p class="table">Setting of memory in the creation process of OS flavours.</p></td>
+<td align="left" valign="top"><p class="table">Establecer la memoria durante el proceso de creación de los OS flavours.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set properties in OS Flavour&#8217;s creation</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Establecer la creación del OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.create.properties</p></td>
-<td align="left" valign="top"><p class="table">Setting of custom properties in the creation process of OS flavours.</p></td>
+<td align="left" valign="top"><p class="table">Ajuste de las propiedades personalizables en el proceso de creación de las OS flavour.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set user storage in OS Flavour&#8217;s creation</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Establecer almacenaje del usuario en la creación de los OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.create.user-storage</p></td>
-<td align="left" valign="top"><p class="table">Setting of user storage in the creation process of OS flavours.</p></td>
+<td align="left" valign="top"><p class="table">Establecer almacenaje del usuario en el proceso de creación de los OS flavour.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete OS Flavours (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Eliminar OS Flavours (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.delete-massive.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of OS flavours massively.</p></td>
+<td align="left" valign="top"><p class="table">Eliminación masiva de los OS flavours.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete OS Flavours</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Eliminar OS Flavours</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.delete.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of OS flavours one by one.</p></td>
+<td align="left" valign="top"><p class="table">Eliminación de los OS flavours uno a uno.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter OS Flavours by creator</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar OS Flavours por creador</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.filter.created-by</p></td>
-<td align="left" valign="top"><p class="table">Filter of OS flavours list by administrator who created it</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de OS por administrador que lo creó.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter OS Flavours by creation date</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar OS Flavours por fecha de creación</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.filter.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Filter of OS flavours list by date when it was created</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de los OS flavours por fecha en la que se creó</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter OS Flavours by disk image</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar OS Flavours por imagen del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.filter.di</p></td>
-<td align="left" valign="top"><p class="table">Filter of OS flavours list by disk image&#8217;s that belong to the OSF.</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de los OS flavours por imagen del disco que pertenece al OSF.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter OS Flavours by name</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar OS Flavours por nombre</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.filter.name</p></td>
-<td align="left" valign="top"><p class="table">Filter of OS flavours list by OSF&#8217;s name.</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de los OS flavours por nombre OSF.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter OS Flavours by properties</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar OS Flavours por propiedades</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.filter.properties</p></td>
-<td align="left" valign="top"><p class="table">Filter of OSF flavours list by desired custom property.</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de los OSF flavours por propiedad personalizable deseada.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter OS Flavours by virtual machine</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar OS Flavours por máquina virtual</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.filter.vm</p></td>
-<td align="left" valign="top"><p class="table">Filter of OS flavours list by virtual machines assigned to the OSFs.</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de los OS flavours por máquina virtual asignada al OSFs.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to OS Flavour&#8217;s details view</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Acceso a la vista detallada de OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.see-details.</p></td>
-<td align="left" valign="top"><p class="table">This ACL grants the access to the details view. The minimum data on it is name</p></td>
+<td align="left" valign="top"><p class="table">Este ACL garantiza el acceso a la vista detallada. El dato mínimo es el nombre.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to OS Flavour&#8217;s main section</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Acceso a la sección principal de OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.see-main.</p></td>
-<td align="left" valign="top"><p class="table">This ACL grants the access to the list. The minimum data on it is nname</p></td>
+<td align="left" valign="top"><p class="table">Este garantiza el acceso a la lista. El dato mínimo es el nombre.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s creator</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver creador de OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.see.created-by</p></td>
-<td align="left" valign="top"><p class="table">WAT administrator who created an OS flavour.</p></td>
+<td align="left" valign="top"><p class="table">Administrador WAT administrador que creó un OS flavour.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s creation date</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver fecha de creación de OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.see.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Datetime when an OS flavour image was created</p></td>
+<td align="left" valign="top"><p class="table">Fecha en la que la imagen de un OS fue creada.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver descripción de OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.see.description</p></td>
-<td align="left" valign="top"><p class="table">The description of the OSFs.</p></td>
+<td align="left" valign="top"><p class="table">Descripción de OSFs.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s disk images</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver imágenes del disco de OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.see.di-list</p></td>
-<td align="left" valign="top"><p class="table">See the disk images of this osf in his details view. This view will contain: name, block, tags, default, head and the feature of change which is default one</p></td>
+<td align="left" valign="top"><p class="table">Ver imágenes del disco de este osf en vista detallada. Esta vista contendrá: nombre, bloqueo, etiquetas, características por defecto, encabezado y la característica de cambio que viene por defecto.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s disk blocking state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estado de bloqueo del disco de OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.see.di-list-block</p></td>
-<td align="left" valign="top"><p class="table">Blocking info of the disk images shown in osf details view</p></td>
+<td align="left" valign="top"><p class="table">Información de bloqueo de las imágenes del disco mostradas en la vista detallada de osf.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s disk images' default state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estado por defecto de las imágenes del disco de OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.see.di-list-default</p></td>
-<td align="left" valign="top"><p class="table">What of the Dis is the default one in osf details view</p></td>
+<td align="left" valign="top"><p class="table">En la vista detallada de osf se muestra qué imagen viene por defecto.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Change OS Flavour&#8217;s disk images' default info</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Cambiar información por defecto de la imagen del disco de OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.see.di-list-default-update</p></td>
-<td align="left" valign="top"><p class="table">Controls to change the default disk image of an osf in osf details view</p></td>
+<td align="left" valign="top"><p class="table">Controles para cambiar la imagen del disco por defecto de un osf en vista detallada.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s disk images' head info</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver información del encabezado de la imagen del disco de OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.see.di-list-head</p></td>
-<td align="left" valign="top"><p class="table">What of the Dis is the head (last created) in osf details view</p></td>
+<td align="left" valign="top"><p class="table">En la vista detallada de osf se muestra cual de Dis es el encabezado (creado por última vez).</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s disk images' tags</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver etiquetas de las imágenes del disco de OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.see.di-list-tags</p></td>
-<td align="left" valign="top"><p class="table">Tags of the disk images shown in osf details view</p></td>
+<td align="left" valign="top"><p class="table">Las etiquetas de las imágenes del disco se muestran en la vista detallada de osf.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See number of OS Flavour&#8217;s disk images</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver número de imágenes de disco del OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.see.dis-info</p></td>
-<td align="left" valign="top"><p class="table">Number of disk images assigned to each OS flavours</p></td>
+<td align="left" valign="top"><p class="table">Número de imágenes de disco asignado a cada OS flavour.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s ID</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver ID de OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.see.id</p></td>
-<td align="left" valign="top"><p class="table">The database identiefier of the OS flavours. Useful to make calls from CLI.</p></td>
+<td align="left" valign="top"><p class="table">Base de datos identificativa de los OS flavour. Útil para realizar llamadas desde CLI.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s memory</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver memoria de OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.see.memory</p></td>
-<td align="left" valign="top"><p class="table">Amount of memory in the OS flavours</p></td>
+<td align="left" valign="top"><p class="table">Cantidad de memoria en los OS flavours.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s overlay</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver revestimiento del OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.see.overlay</p></td>
-<td align="left" valign="top"><p class="table">Overlay configuration of the OS flavours</p></td>
+<td align="left" valign="top"><p class="table">Configuración de revestimiento de los OS flavour.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s properties</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver propiedades de OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.see.properties</p></td>
-<td align="left" valign="top"><p class="table">The custom properties of the OS flavours</p></td>
+<td align="left" valign="top"><p class="table">Propiedades personalizables del OS flavours</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s user storage</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver almacenaje de usuario de OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.see.user-storage</p></td>
-<td align="left" valign="top"><p class="table">User storage of the OS flavours</p></td>
+<td align="left" valign="top"><p class="table">Almacenaje de usuario de los OS flavour.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver máquinas virtuales del OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">osf.see.vm-list</p></td>
-<td align="left" valign="top"><p class="table">See the virtual machines using this osf in his details view. This view will contain: name, state, block, di tag and expire information of each vm</p></td>
+<td align="left" valign="top"><p class="table">Ver máquinas virtuales en uso de este osf en vista detallada. Esta vista contendrá: nombre, estado, bloqueo, etiqueta di e información sobre la expiración de cada mv</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s virtual machines' blocking state</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.vm-list-block</p></td>
-<td align="left" valign="top"><p class="table">Blocking info of the virtual machines shown in osf details view</p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estado de bloqueo de las máquinas virtuales de OS Flavour</strong></p></td>
+<td align="left" valign="top"><p class="table">osf.see.vm-list-block  IInformación de bloqueo de las máquinas virtuales mostrada osf en vista detallada</p></td>
+<td align="left" valign="top"><p class="table">Ver expiración de las máquinas virtuales del OS Flavour</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s virtual machines' expiration</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.vm-list-expiration</p></td>
-<td align="left" valign="top"><p class="table">Expiration info of the virtual machines shown in osf details view</p></td>
+<td align="left" valign="top"><p class="table"><strong>osf.see.vm-list-expiration</strong></p></td>
+<td align="left" valign="top"><p class="table">Información de expiration de las máquinas virtuales mostrada en osf en vista detallada</p></td>
+<td align="left" valign="top"><p class="table">Ver estado de funcionamiento de las máquinas virtuales de OS Flavour</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s virtual machines' running state</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.vm-list-state</p></td>
-<td align="left" valign="top"><p class="table">State (stopped/started) of the virtual machines shown in osf details view</p></td>
+<td align="left" valign="top"><p class="table"><strong>osf.see.vm-list-state</strong></p></td>
+<td align="left" valign="top"><p class="table">Estado (parado/iniciado) de las máquinas virtuales mostrado en osf en vista detallada</p></td>
+<td align="left" valign="top"><p class="table">Ver estado del usuario de las máquinas virtuales de OS Flavour</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s virtual machines' user state</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.vm-list-user-state</p></td>
-<td align="left" valign="top"><p class="table">User state (connected/disconnected) of the virtual machines shown in osf details view</p></td>
+<td align="left" valign="top"><p class="table"><strong>osf.see.vm-list-user-state</strong></p></td>
+<td align="left" valign="top"><p class="table">Estado del usuario (conectado/desconectado) de las máquinas virtuales mostrado en osf en vista detallada</p></td>
+<td align="left" valign="top"><p class="table">Ver número de máquinas virtuales de OS Flavour</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See number of OS Flavour&#8217;s virtual machines</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.vms-info</p></td>
-<td align="left" valign="top"><p class="table">Number of virtual machines that are using a Disk image of each OS flavours</p></td>
+<td align="left" valign="top"><p class="table"><strong>osf.see.vms-info</strong></p></td>
+<td align="left" valign="top"><p class="table">Número de máquinas virtuales que están utilizando una imagen del Disco de cada OS flavour</p></td>
+<td align="left" valign="top"><p class="table">Ver estadística del número de OS Flavour</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of number of OS Flavours</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.stats.summary</p></td>
-<td align="left" valign="top"><p class="table">Total of OS flavours in current tenant or all system for superadministrators.</p></td>
+<td align="left" valign="top"><p class="table"><strong>osf.stats.summary</strong></p></td>
+<td align="left" valign="top"><p class="table">Total de OS flavours en el usuario actual o todo el sistema por superadministradores.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar la descripción de OS Flavour (masivo)</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s description (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update-massive.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of OSF flavours massively.</p></td>
+<td align="left" valign="top"><p class="table"><strong>osf.update-massive.description</strong></p></td>
+<td align="left" valign="top"><p class="table">Actualizar de forma masiva la descripción de OSF.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar la memoria de OS Flavour (masivo)</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s memory (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update-massive.memory</p></td>
-<td align="left" valign="top"><p class="table">Update the memory of OSF flavours massively.</p></td>
+<td align="left" valign="top"><p class="table"><strong>osf.update-massive.memory</strong></p></td>
+<td align="left" valign="top"><p class="table">Actualizar masivamente la memoria de OSF flavour.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar propiedades al actualizar OSFs (masivo)</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update properties when update OSFs (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update-massive.properties</p></td>
-<td align="left" valign="top"><p class="table">Update properties in OSF&#8217;s massive update process.</p></td>
+<td align="left" valign="top"><p class="table"><strong>osf.update-massive.properties</strong></p></td>
+<td align="left" valign="top"><p class="table">Actualizar propiedades de forma masiva en OSF&#8217;s en el proceso de actualización.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar el almacenaje de usuario de OS Flavour (masivo)</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s user storage (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update-massive.user-storage</p></td>
-<td align="left" valign="top"><p class="table">Update the memory of OSF flavours massively.</p></td>
+<td align="left" valign="top"><p class="table"><strong>osf.update-massive.user-storage</strong></p></td>
+<td align="left" valign="top"><p class="table">Actualizar memoria de OSF flavours de forma masiva.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar descripción de OS Flavour</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s description</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of OSF flavours one by one.</p></td>
+<td align="left" valign="top"><p class="table"><strong>osf.update.description</strong></p></td>
+<td align="left" valign="top"><p class="table">Actualizar la descripción de los OSF flavours una a una.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar memoria de OS Flavour</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s memory</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update.memory</p></td>
-<td align="left" valign="top"><p class="table">Update the memory of OSF flavours one by one.</p></td>
+<td align="left" valign="top"><p class="table"><strong>osf.update.memory</strong></p></td>
+<td align="left" valign="top"><p class="table">Actualizar memoria de OSF flavours una a una.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar nombre de OS Flavour</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s name</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update.name</p></td>
-<td align="left" valign="top"><p class="table">Update the name of OSF flavour&#8217;s.</p></td>
+<td align="left" valign="top"><p class="table"><strong>osf.update.name</strong></p></td>
+<td align="left" valign="top"><p class="table">Actualizar el nombre de OSF flavour.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar propiedades al actualizar OSFs</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update properties when update OSFs</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update.properties</p></td>
-<td align="left" valign="top"><p class="table">Update properties in OSF&#8217;s one by one update process.</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s user storage</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update.user-storage</p></td>
-<td align="left" valign="top"><p class="table">Update the user storage of OSF flavours one by one.</p></td>
+<td align="left" valign="top"><p class="table"><strong>osf.update.properties</strong></p></td>
+<td align="left" valign="top"><p class="table">Actualizar propiedades en OSF&#8217;s una a una durante un proces de actualización.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar el almacenaje de usuario de OS Flavour</p></td>
 </tr>
 </tbody>
 </table>
@@ -2421,220 +2416,221 @@ cellspacing="0" cellpadding="4">
 <thead>
 <tr>
 <th align="left" valign="top">ACL    </th>
-<th align="left" valign="top">ACL code       </th>
-<th align="left" valign="top">Description</th>
+<th align="left" valign="top">Código ACL    </th>
+<th align="left" valign="top">Descripción</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create disk images</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Crear imágenes del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">di.create.</p></td>
-<td align="left" valign="top"><p class="table">Creation of hosts including initial setting for disk image and OS flavour.</p></td>
+<td align="left" valign="top"><p class="table">Creación de hosts incluyendo los ajustes iniciales para la imagen del disc y OS flavour.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set disk images as default on disk images creation</strong></p></td>
-<td align="left" valign="top"><p class="table">di.create.default</p></td>
-<td align="left" valign="top"><p class="table">Setting of disk image as default in the creation process of disk images.</p></td>
+<td align="left" valign="top"><p class="table"><strong>Establecer imágenes del disco por defecto en la creación de imágenes del disco</strong></p></td>
+<td align="left" valign="top"><p class="table">di.create.defaul</p></td>
+<td align="left" valign="top"><p class="table">Establecer imágenes del disco por defecto en el proceso de creación de imágenes del disco.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set properties on disk images creation</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Establecer propiedades en la creación de imagenes del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">di.create.properties</p></td>
-<td align="left" valign="top"><p class="table">Setting of custom properties in the creation process of disk images.</p></td>
+<td align="left" valign="top"><p class="table">Ajuste de propiedades personalizadas en el proceso de creación de imágenes del disco.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set tags on disk images creation</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Establecer etiquetas en la creación de imágenes del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">di.create.tags</p></td>
-<td align="left" valign="top"><p class="table">Setting of tags in the creation process of disk images.</p></td>
+<td align="left" valign="top"><p class="table">Ajustes de las etiquetas en el proceso de creación de las imágenes del disco.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set version on disk images creation</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Establecer versión en la creación de imágenes del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">di.create.version</p></td>
-<td align="left" valign="top"><p class="table">Setting of version in the creation process of disk images. Without this ACL, the system will set it automatically with a string based on the timestamp and an order digit.</p></td>
+<td align="left" valign="top"><p class="table">Ajuste de la versión en el proceso de creación de imágenes del disco. Sin este ACL, el sistema lo establecerá automáticamente como una base fija en el timestamp y una serie de dígitos.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete disk images (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Eliminación de imágenes del disco (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">di.delete-massive.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of disk images massively.</p></td>
+<td align="left" valign="top"><p class="table">Eliminación masiva deá imágenes del disco</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete disk images</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Eliminar imágenes del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">di.delete.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of disk images one by one.</p></td>
+<td align="left" valign="top"><p class="table">Eliminación de imágenes del disco una a una.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter disk images by blocking status</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar imágenes del disco por estado de bloqueo</strong></p></td>
 <td align="left" valign="top"><p class="table">di.filter.block</p></td>
-<td align="left" valign="top"><p class="table">Filter of disk images list by disk image&#8217;s blocking status</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de imágenes del disco por estado de bloqueo</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter disk images by creator</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar imágenes del disco por creador</strong></p></td>
 <td align="left" valign="top"><p class="table">di.filter.created-by</p></td>
-<td align="left" valign="top"><p class="table">Filter of disk images list by administrator who created it</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista imágenes del disco por administrador que la creó</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter disk images by creation date</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar imágenes del disco por fecha de creación</strong></p></td>
 <td align="left" valign="top"><p class="table">di.filter.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Filter of disk images list by date when it was created</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de imágenes del disco por fecha en la que fue creada</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter disk images by DI&#8217;s name</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar imágenes del disco por nombre de DI</strong></p></td>
 <td align="left" valign="top"><p class="table">di.filter.disk-image</p></td>
-<td align="left" valign="top"><p class="table">Filter of disk images list by disk image&#8217;s name</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de imágenes del disco por nombre de imágen del disco</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter disk images by OS Flavour</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar imágenes del disco por OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">di.filter.osf</p></td>
-<td align="left" valign="top"><p class="table">Filter of disk images list by OS flavour</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de imágenes del disco por OS flavour</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter disk images by properties</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar imágenes del disco por propiedades</strong></p></td>
 <td align="left" valign="top"><p class="table">di.filter.properties</p></td>
-<td align="left" valign="top"><p class="table">Filter of disk images list by desired custom property.</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de imágenes del disco por propiedad personalizable deseada.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to disk image&#8217;s details view</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Acceso a la vista detallada de imágenes del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">di.see-details.</p></td>
-<td align="left" valign="top"><p class="table">This ACL grants the access to the details view. The minimum data on it is disk image</p></td>
+<td align="left" valign="top"><p class="table">Este ACL garantiza el acceso a la vista detallada. El dato mínimo es la imágen del disco.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to disk image&#8217;s main section</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Acceso a la sección principal de imágenes del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">di.see-main.</p></td>
-<td align="left" valign="top"><p class="table">This ACL grants the access to the list. The minimum data on it is disk_image</p></td>
+<td align="left" valign="top"><p class="table">Este ACL garantiza el acceso a la lista. El dato mínimo es la disk_image</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s blocking state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estado de bloqueo de la imágen del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">di.see.block</p></td>
-<td align="left" valign="top"><p class="table">Blocking state of disk images</p></td>
+<td align="left" valign="top"><p class="table">Estado de bloqueo de las imágenes del disco</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s creator</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver creador de la imagen del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">di.see.created-by</p></td>
-<td align="left" valign="top"><p class="table">Wat administrator who created a disk image</p></td>
+<td align="left" valign="top"><p class="table">Administrador Wat que creó una imagen del disco</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s creation date</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver fecha de creación de la imagen del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">di.see.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Datetime when a disk image was created</p></td>
+<td align="left" valign="top"><p class="table">Fecha en la que se creó una imagen del disco</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OSF&#8217;s default disk image</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver imagen del disco por defecto de OSF</strong></p></td>
 <td align="left" valign="top"><p class="table">di.see.default</p></td>
-<td align="left" valign="top"><p class="table">If a disk image is setted as default image within the OSF where it belongs</p></td>
+<td align="left" valign="top"><p class="table">Si una imagen de disco es establecida como imagen por defecto en el OSF al que pertenece</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver descripción de la imagen del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">di.see.description</p></td>
-<td align="left" valign="top"><p class="table">The description of disk images.</p></td>
+<td align="left" valign="top"><p class="table">Descripción de imágenes del disco.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OSF&#8217;s last created disk image</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver la última imagen de disco creada de OSF</strong></p></td>
 <td align="left" valign="top"><p class="table">di.see.head</p></td>
-<td align="left" valign="top"><p class="table">If a disk image is the last created image within the OSF where it belongs</p></td>
+<td align="left" valign="top"><p class="table">Si una imagen de disco es la última en ser creada en el OSF al que pertenece</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s ID</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver ID de la imagen del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">di.see.id</p></td>
-<td align="left" valign="top"><p class="table">The database identiefier of disk images. Useful to make calls from CLI.</p></td>
+<td align="left" valign="top"><p class="table">Base de datos identificativo de las imágenes del disco. Útil para realizar llamadas desde CLI.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s OS Flavour</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver imagen del disco de OS Flavour</strong></p></td>
 <td align="left" valign="top"><p class="table">di.see.osf</p></td>
-<td align="left" valign="top"><p class="table">The OS Flavour associated to the disk images.</p></td>
+<td align="left" valign="top"><p class="table">El OS Flavour asociado a las imágenes del disco.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s properties</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver propiedades de imagen del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">di.see.properties</p></td>
-<td align="left" valign="top"><p class="table">The custom properties of the disk images.</p></td>
+<td align="left" valign="top"><p class="table">Propiedades personalizables de las imágenes del disco.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s tags</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver etiquetas de imagen del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">di.see.tags</p></td>
-<td align="left" valign="top"><p class="table">The disk images tags</p></td>
+<td align="left" valign="top"><p class="table">Las etiquetas de las imágenes del disco</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s version</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver version de imagen del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">di.see.version</p></td>
-<td align="left" valign="top"><p class="table">The disk images version</p></td>
+<td align="left" valign="top"><p class="table">Versión de las imágenes del disco</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s list of virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver máquinas virtuales de la imagen del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">di.see.vm-list</p></td>
-<td align="left" valign="top"><p class="table">Virtual machines using this image in his details view. This view will contain: name and tag of each vm</p></td>
+<td align="left" valign="top"><p class="table">Máquinas virtuales usando esta imagen en vista. Esta vista contendrá: nombre y etiqueta de cada mv</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See blocking state of VM&#8217;s list of DI&#8217;s</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estado de bloqueo de la lista de las máquinas virtuales de DI</strong></p></td>
 <td align="left" valign="top"><p class="table">di.see.vm-list-block</p></td>
-<td align="left" valign="top"><p class="table">Blocking info of the virtual machines shown in DI details view</p></td>
+<td align="left" valign="top"><p class="table">Información de bloqueo de las máquinas virtuales mostrada en la vista detallada de DI</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See expiration of VM&#8217;s list of DI&#8217;s</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver expiración de la lista de mvs de DI</strong></p></td>
 <td align="left" valign="top"><p class="table">di.see.vm-list-expiration</p></td>
-<td align="left" valign="top"><p class="table">Expiration info of the virtual machines shown in DI details view</p></td>
+<td align="left" valign="top"><p class="table">Información de expiración de las máquinas virtuales mostradas en la vista detallada de DI.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See running state of VM&#8217;s list of DI&#8217;s</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estado de funcionamiento de la lista de máquinas virtuales de DI</strong></p></td>
 <td align="left" valign="top"><p class="table">di.see.vm-list-state</p></td>
-<td align="left" valign="top"><p class="table">State (stop/started) of the virtual machines shown in DI details view</p></td>
+<td align="left" valign="top"><p class="table">Estado (parado/iniciado) de las máquinas virtuales mostradas en vista detallada de DI</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user state of VM&#8217;s list of DI&#8217;s</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estado de usuario de la lista de MV de DI</strong></p></td>
 <td align="left" valign="top"><p class="table">di.see.vm-list-user-state</p></td>
-<td align="left" valign="top"><p class="table">User state (connected/disconnected) of the virtual machines shown in DI details view</p></td>
+<td align="left" valign="top"><p class="table">Estado de usuario (conectado/desconectado) de las máquinas virtuales mostradas en vista detallada de DI.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of number of blocked disk images</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estadística del número de imágenes del disco bloqueadas</strong></p></td>
 <td align="left" valign="top"><p class="table">di.stats.blocked</p></td>
-<td align="left" valign="top"><p class="table">Total of blocked disk images in current tenant or all system for superadministrators.</p></td>
+<td align="left" valign="top"><p class="table">Total de imágenes de disco bloqueadas en el usuario actual o todo el sistema por
+superadministradores.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of number of disk images</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estadística del número de imágenes del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">di.stats.summary</p></td>
-<td align="left" valign="top"><p class="table">Total of disk images in current tenant or all system for superadministrators.</p></td>
+<td align="left" valign="top"><p class="table">Total de imágenes del disco en el usuario actual o en todo el sistema por superadministradores.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Block-Unblock disk images (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Bloqueo-Desbloqueo de imágenes del disco (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">di.update-massive.block</p></td>
-<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of disk images massively.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar estado de bloqueo (bloqueado/desbloqueado) de las imágenes del disco de forma masiva.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update disk image&#8217;s description (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar la descripción de la imagen del disco (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">di.update-massive.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of disk images massively.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar la descripción de las imágenes del disco de forma masiva.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update properties when update disk images (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar propiedades al actualizar imágenes del disco (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">di.update-massive.properties</p></td>
-<td align="left" valign="top"><p class="table">Update properties in disk image&#8217;s massive update process.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar propiedades en el proceso de actualización de imágenes del disco de forma masiva.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update disk image&#8217;s tags (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar etiquetas de la imagen del disco (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">di.update-massive.tags</p></td>
-<td align="left" valign="top"><p class="table">Update the tags (create and delete) of disk images massively.</p></td>
+<td align="left" valign="top"><p class="table">Actualización de etiquetas (crear y eliminar) de las imágenes del disco de forma masiva.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Block-Unblock disk images</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Bloqueo-Desbloqueo de imágenes del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">di.update.block</p></td>
-<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of disk images one by one.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar el estado de bloqueo (bloqueado/desbloqueado) de las imágenes del disco una a una.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set disk images as default</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Establecer imágenes del disco por defecto</strong></p></td>
 <td align="left" valign="top"><p class="table">di.update.default</p></td>
-<td align="left" valign="top"><p class="table">Set as default a disk image in the OS flavour where it belongs.</p></td>
+<td align="left" valign="top"><p class="table">Establecer por defecto una imagen del disco en OS flavour donde pertenece.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update disk image&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar la descripción de la imagen del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">di.update.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of disk images one by one.</p></td>
+<td align="left" valign="top"><p class="table">Actualización de la de la descripción de las imágenes del disco una a una.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update properties when update disk images</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar propiedades al actualizar imágenes del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">di.update.properties</p></td>
-<td align="left" valign="top"><p class="table">Update properties in disk image&#8217;s one by one update process.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar propiedades en el proceso de actualización de las imágenes del disco una a una.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update disk image&#8217;s tags</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar etiquetas de las imágenes del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">di.update.tags</p></td>
-<td align="left" valign="top"><p class="table">Update the tags (create and delete) of disk images one by one.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar las etiquetas (crear y eliminar) de las imágenes del disco una a una.</p></td>
 </tr>
 </tbody>
 </table>
@@ -2653,125 +2649,125 @@ cellspacing="0" cellpadding="4">
 <thead>
 <tr>
 <th align="left" valign="top">ACL    </th>
-<th align="left" valign="top">ACL code       </th>
-<th align="left" valign="top">Description</th>
+<th align="left" valign="top">Código ACL    </th>
+<th align="left" valign="top">Descripción</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create administrators</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Crear administradores</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.create.</p></td>
-<td align="left" valign="top"><p class="table">Create WAT Administrators. It includes name and password setting</p></td>
+<td align="left" valign="top"><p class="table">Crear Administradores WAT. Incluye ajustes para nombre y contraseña</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set language on administrator creation</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Establecer idioma en la creación del administrador</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.create.language</p></td>
-<td align="left" valign="top"><p class="table">Setting of language in the creation process of administrators.</p></td>
+<td align="left" valign="top"><p class="table">Ajuste de idioma en el proceso de creación de administradores.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete administrators</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Eliminar administradores</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.delete-massive.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of WAT administrators massively.</p></td>
+<td align="left" valign="top"><p class="table">Eliminación masiva de administradores WAT.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete administrators (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Eliminar administradores (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.delete.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of WAT administrators one by one.</p></td>
+<td align="left" valign="top"><p class="table">Eliminación de administradores WAT uno a uno.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter administrators by creator</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar administradores por creador</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.filter.created-by</p></td>
-<td align="left" valign="top"><p class="table">Filter of administrators list by administrator who created it</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de administradores por administrador que lo creó</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter administrators by creation date</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar administradores por fecha de creación</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.filter.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Filter of administrators list by date when it were created</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de administradores por fecha en la que fue creado</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter administrators by name</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar administradores por nombre</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.filter.name</p></td>
-<td align="left" valign="top"><p class="table">Filter of administrators list by administrator&#8217;s name</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de administradores por nombre de administrador</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to administrator&#8217;s details view</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Acceso a la vista detallada de administradores</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.see-details.</p></td>
-<td align="left" valign="top"><p class="table">Access to details view of WAT administrators. This view includes name</p></td>
+<td align="left" valign="top"><p class="table">Acceso a la vista detallada de administradores WAT. Esta vista incluye el nombre</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to administrator&#8217;s main section</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Acceso a la sección principal de administradores</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.see-main.</p></td>
-<td align="left" valign="top"><p class="table">Access to WAT Administrators section (without it, it won&#8217;t appear in menu). This list view includes name</p></td>
+<td align="left" valign="top"><p class="table">Acceso a la sección de administradores WAT (sin esto, no aparecerá en el menu). Esta vista de la lista incluye el nombre</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See administrator&#8217;s ACLs</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver ACLs de administradores</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.see.acl-list</p></td>
-<td align="left" valign="top"><p class="table">Effective ACL list for a WAT administrator calculated from the assigned roles</p></td>
+<td align="left" valign="top"><p class="table">Lista efectiva de ACL para un administrador WAT calculado a partir de los roles asignados</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Source roles of Administrator&#8217;s ACL</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Roles de origen de ACL del administrador</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.see.acl-list-roles</p></td>
-<td align="left" valign="top"><p class="table">Which role is the origin of each effective acls in WAT administrator details view</p></td>
+<td align="left" valign="top"><p class="table">Que rol es el origen de cada uno de los acls efectivos en la vista detallada de un administrador WAT</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk administrator&#8217;s creator</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver administrador creador del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.see.created-by</p></td>
-<td align="left" valign="top"><p class="table">Wat administrator who created an administrator</p></td>
+<td align="left" valign="top"><p class="table">Administrador Wat que creó un administrador</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk administrator&#8217;s creation date</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver fecha de creación del administrador del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.see.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Datetime when an administrator was created</p></td>
+<td align="left" valign="top"><p class="table">Fecha en la que se creó un administrador</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See administrator&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver descripción del administrador</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.see.description</p></td>
-<td align="left" valign="top"><p class="table">The description of the WAT administrators.</p></td>
+<td align="left" valign="top"><p class="table">La descripción de los administradores WAT.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See administrator&#8217;s ID</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver ID del administrador</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.see.id</p></td>
-<td align="left" valign="top"><p class="table">The database identiefier of the WAT administrators. Useful to make calls from CLI.</p></td>
+<td align="left" valign="top"><p class="table">La base de datos identificativa de los administradores WAT. Útil para realizar llamadas desde CLI.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See administrator&#8217;s language</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver idioma del administrador</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.see.language</p></td>
-<td align="left" valign="top"><p class="table">Language of the WAT administrators.</p></td>
+<td align="left" valign="top"><p class="table">Idioma de los administradores WAT</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See administrator&#8217;s Roles</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver roles de los administradores</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.see.roles</p></td>
-<td align="left" valign="top"><p class="table">Assigned roles to the WAT administrator</p></td>
+<td align="left" valign="top"><p class="table">Roles asignados al administrador WAT</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update administrator&#8217;s description (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar descripción del administrador (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.update-massive.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of administrators massively.</p></td>
+<td align="left" valign="top"><p class="table">Actualización masiva de administradores.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update administrator&#8217;s language (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar idioma del administrador (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.update-massive.language</p></td>
-<td align="left" valign="top"><p class="table">Update the language of administrators massively.</p></td>
+<td align="left" valign="top"><p class="table">Actualización masiva del idioma de los administradores.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Assign-Unassign administrator&#8217;s roles</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Asignar-Desvincular roles del administrador</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.update.assign-role</p></td>
-<td align="left" valign="top"><p class="table">Assign roles to WAT administrators to give to them their ACLs.</p></td>
+<td align="left" valign="top"><p class="table">Asignar roles a los administradores WAT para dárselos a sus ACLs.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update administrator&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar descripción del administrador</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.update.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of administrators one by one.</p></td>
+<td align="left" valign="top"><p class="table">Actualización de la descripción de los administradores una a una.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update administrator&#8217;s language</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar idioma de los administradores</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.update.language</p></td>
-<td align="left" valign="top"><p class="table">Update the language of administrators one by one.</p></td>
+<td align="left" valign="top"><p class="table">Actualización del idioma de los administradores uno a uno.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Change administrator&#8217;s password</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Cambiar la contraseña del administrador</strong></p></td>
 <td align="left" valign="top"><p class="table">administrator.update.password</p></td>
-<td align="left" valign="top"><p class="table">Update WAT administrator password (it doesn&#8217;t include roles management)</p></td>
+<td align="left" valign="top"><p class="table">Actualizar contraseña del administrador WAT (no incluye gestión de roles)</p></td>
 </tr>
 </tbody>
 </table>
@@ -2790,110 +2786,110 @@ cellspacing="0" cellpadding="4">
 <thead>
 <tr>
 <th align="left" valign="top">ACL    </th>
-<th align="left" valign="top">ACL code       </th>
-<th align="left" valign="top">Description</th>
+<th align="left" valign="top">Código ACL    </th>
+<th align="left" valign="top">Descripción</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create roles</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Crear roles</strong></p></td>
 <td align="left" valign="top"><p class="table">role.create.</p></td>
-<td align="left" valign="top"><p class="table">Creation of roles including initial setting for name.</p></td>
+<td align="left" valign="top"><p class="table">Creación de roles incluyendo los ajustes iniciales para el nombre.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete roles (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Eliminar roles (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">role.delete-massive.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of roles massively.</p></td>
+<td align="left" valign="top"><p class="table">Eliminación masiva de roles.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete roles</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Eliminación de roles</strong></p></td>
 <td align="left" valign="top"><p class="table">role.delete.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of roles one by one.</p></td>
+<td align="left" valign="top"><p class="table">Eliminación de roles uno a uno.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter roles by creator</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar roles por creador</strong></p></td>
 <td align="left" valign="top"><p class="table">role.filter.created-by</p></td>
-<td align="left" valign="top"><p class="table">Filter of roles list by administrator who created it</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de roles por administrador que lo creó</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter roles by creation date</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar roles por fecha de creación</strong></p></td>
 <td align="left" valign="top"><p class="table">role.filter.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Filter of roles list by date when it was created</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de roles por fecha en la que se creó</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter roles by name</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar roles por nombre</strong></p></td>
 <td align="left" valign="top"><p class="table">role.filter.name</p></td>
-<td align="left" valign="top"><p class="table">Filter of roles list by role&#8217;s name</p></td>
+<td align="left" valign="top"><p class="table">Filtrar lista de roles por nombre del rol</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to role&#8217;s details view</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Acceso a la vista detallada de roles</strong></p></td>
 <td align="left" valign="top"><p class="table">role.see-details.</p></td>
-<td align="left" valign="top"><p class="table">Access to details view of Roles. This view includes name</p></td>
+<td align="left" valign="top"><p class="table">Acceso a la vista detallada de Roles. Esta vista incluye el nombre</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to role&#8217;s main section</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Acceso a la sección principal del rol</strong></p></td>
 <td align="left" valign="top"><p class="table">role.see-main.</p></td>
-<td align="left" valign="top"><p class="table">Access to the roles view. The minimum data on it is name</p></td>
+<td align="left" valign="top"><p class="table">Acceso a la vista de roles. El dato mínimo es el nombre.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See role&#8217;s acls</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver acls del rol</strong></p></td>
 <td align="left" valign="top"><p class="table">role.see.acl-list</p></td>
-<td align="left" valign="top"><p class="table">Effective ACL list for a role  calculated from the inherited roles</p></td>
+<td align="left" valign="top"><p class="table">La lista ACL efectiva para un rol se calcula a partir de los roles heredados</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See role&#8217;s acls' origin roles</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver roles originales de los acls' de los roles</strong></p></td>
 <td align="left" valign="top"><p class="table">role.see.acl-list-roles</p></td>
-<td align="left" valign="top"><p class="table">Which role is the origin of each effective acls in role details view</p></td>
+<td align="left" valign="top"><p class="table">Qué rol es el origen de cada acl efectivo en la vista detallada del rol</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See role&#8217;s creator</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver creador del rol</strong></p></td>
 <td align="left" valign="top"><p class="table">role.see.created-by</p></td>
-<td align="left" valign="top"><p class="table">Wat administrator who created a role</p></td>
+<td align="left" valign="top"><p class="table">Administrador wat que creó el rol</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See role&#8217;s creation date</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver fecha de creación del rol</strong></p></td>
 <td align="left" valign="top"><p class="table">role.see.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Datetime when a role was created</p></td>
+<td align="left" valign="top"><p class="table">Fecha en la que fue creado un rol</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See role&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver descripción del rol</strong></p></td>
 <td align="left" valign="top"><p class="table">role.see.description</p></td>
-<td align="left" valign="top"><p class="table">The description of a role.</p></td>
+<td align="left" valign="top"><p class="table">Descripción de un rol.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See role&#8217;s ID</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver ID del rol</strong></p></td>
 <td align="left" valign="top"><p class="table">role.see.id</p></td>
-<td align="left" valign="top"><p class="table">The database identiefier of the roles. Useful to make calls from CLI.</p></td>
+<td align="left" valign="top"><p class="table">Base de datos identificativa de los roles. Útil para hacer llamadas desde CLI.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See role&#8217;s inherited roles</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver roles heredados del rol</strong></p></td>
 <td align="left" valign="top"><p class="table">role.see.inherited-roles</p></td>
-<td align="left" valign="top"><p class="table">Inherited roles of a role.</p></td>
+<td align="left" valign="top"><p class="table">Roles heredados de un rol.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update role&#8217;s description (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar de la descripción del rol (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">role.update-massive.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of roles massively.</p></td>
+<td align="left" valign="top"><p class="table">Actualización masiva de la descripción de los roles.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Assign-Unassign role&#8217;s ACLs</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Asignar-Desvincular ACLs del rol</strong></p></td>
 <td align="left" valign="top"><p class="table">role.update.assign-acl</p></td>
-<td align="left" valign="top"><p class="table">Add/Remove acl on role.</p></td>
+<td align="left" valign="top"><p class="table">Añadir/Quitar acl al rol.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Assign-Unassign role&#8217;s inherited roles</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Asignar-Desvincular roles heredados del rol</strong></p></td>
 <td align="left" valign="top"><p class="table">role.update.assign-role</p></td>
-<td align="left" valign="top"><p class="table">Manage the inheritance of roles adding roles in others.</p></td>
+<td align="left" valign="top"><p class="table">Gestión de la herencia de roles añadiendo roles a otros.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update role&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar descripción del rol</strong></p></td>
 <td align="left" valign="top"><p class="table">role.update.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of roles one by one.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar la descripción de los roles una a una.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update role&#8217;s name</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar nombre del rol</strong></p></td>
 <td align="left" valign="top"><p class="table">role.update.name</p></td>
-<td align="left" valign="top"><p class="table">Update the name of roles.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar los nombres de los roles.</p></td>
 </tr>
 </tbody>
 </table>
@@ -2912,40 +2908,40 @@ cellspacing="0" cellpadding="4">
 <thead>
 <tr>
 <th align="left" valign="top">ACL    </th>
-<th align="left" valign="top">ACL code       </th>
-<th align="left" valign="top">Description</th>
+<th align="left" valign="top">Código ACL    </th>
+<th align="left" valign="top">Descripción</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to properties&#8217;s main section</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Acceso a la sección principal de propiedades</strong></p></td>
 <td align="left" valign="top"><p class="table">property.see-main.</p></td>
-<td align="left" valign="top"><p class="table">Access to custom properties managment section</p></td>
+<td align="left" valign="top"><p class="table">Acceso a la sección de gestión de las propiedades personalizables.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Manage user&#8217;s custom properties</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Gestionar de propiedades personalizables del usuario</strong></p></td>
 <td align="left" valign="top"><p class="table">property.manage.user</p></td>
-<td align="left" valign="top"><p class="table">Create, update and delete custom properties of users.</p></td>
+<td align="left" valign="top"><p class="table">Crear, actualizar y borrar propiedades personalizables de los usuarios.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Manage virtual machines&#8217;s custom properties</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Gestionar propiedades personalizables de las máquinas virtuales</strong></p></td>
 <td align="left" valign="top"><p class="table">property.manage.vm</p></td>
-<td align="left" valign="top"><p class="table">Create, update and delete custom properties of virtual machines.</p></td>
+<td align="left" valign="top"><p class="table">Crear, actualizar y eliminar propiedades personalizables de las máquinas virtuales.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Manage node&#8217;s custom properties</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Gestionar propiedades personalizables del nodo</strong></p></td>
 <td align="left" valign="top"><p class="table">property.manage.host</p></td>
-<td align="left" valign="top"><p class="table">Create, update and delete custom properties of nodes.</p></td>
+<td align="left" valign="top"><p class="table">Crear, actualizar y eliminar propiedades personalizables de los nodos.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Manage OSF&#8217;s custom properties</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Gestionar propiedades personalizables de OSF</strong></p></td>
 <td align="left" valign="top"><p class="table">property.manage.osf</p></td>
-<td align="left" valign="top"><p class="table">Create, update and delete custom properties of OS Flavours.</p></td>
+<td align="left" valign="top"><p class="table">Crear, actualizar y eliminar propiedades personalizables de OS Flavours.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Manage disk image&#8217;s custom properties</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Gestionar propiedades personalizables de la imagen del disco</strong></p></td>
 <td align="left" valign="top"><p class="table">property.manage.di</p></td>
-<td align="left" valign="top"><p class="table">Create, update and delete custom properties of disk images.</p></td>
+<td align="left" valign="top"><p class="table">Crear, actualizar y eliminar propiedades personalizables de las imágenes del disco.</p></td>
 </tr>
 </tbody>
 </table>
@@ -2964,30 +2960,30 @@ cellspacing="0" cellpadding="4">
 <thead>
 <tr>
 <th align="left" valign="top">ACL    </th>
-<th align="left" valign="top">ACL code       </th>
-<th align="left" valign="top">Description</th>
+<th align="left" valign="top">Código ACL    </th>
+<th align="left" valign="top">Descripción</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to default view&#8217;s main section</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Acceso a la sección principal de vista por defecto</strong></p></td>
 <td align="left" valign="top"><p class="table">views.see-main.</p></td>
-<td align="left" valign="top"><p class="table">Access to WAT Customize section (without it, it won&#8217;t appear in menu).</p></td>
+<td align="left" valign="top"><p class="table">Acceso a la sección personalizable de WAT (sin esto, no aparecerá en el menu).</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set default columns on list views</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Establecer columnas por defecto en la vista listado</strong></p></td>
 <td align="left" valign="top"><p class="table">views.update.columns</p></td>
-<td align="left" valign="top"><p class="table">Set what columns will be shown in list views by default by tenant</p></td>
+<td align="left" valign="top"><p class="table">Establecer las columnas que se mostrarán en la vista listado por defecto por el usuario</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set default filters on list views for desktop</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Establecer filtros por defecto en la vista listado para el escritorio</strong></p></td>
 <td align="left" valign="top"><p class="table">views.update.filters-desktop</p></td>
-<td align="left" valign="top"><p class="table">Set what filters will be shown in list views by default for desktop version by tenant</p></td>
+<td align="left" valign="top"><p class="table">Establecer los filtros que se mostrarán en las vistas listado por defecto para la versión de escritorio por el usuario.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set default filters on list views for mobile</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Establecer filtros por defecto en las vistas listado para móvil</strong></p></td>
 <td align="left" valign="top"><p class="table">views.update.filters-mobile</p></td>
-<td align="left" valign="top"><p class="table">Set what filters will be shown in list views by default for mobile version by tenant</p></td>
+<td align="left" valign="top"><p class="table">Establecer los filtros que aparecerán en las vistas listado por defecto en la versión para móvil por el usuario.</p></td>
 </tr>
 </tbody>
 </table>
@@ -3006,20 +3002,20 @@ cellspacing="0" cellpadding="4">
 <thead>
 <tr>
 <th align="left" valign="top">ACL    </th>
-<th align="left" valign="top">ACL code       </th>
-<th align="left" valign="top">Description</th>
+<th align="left" valign="top">Código ACL    </th>
+<th align="left" valign="top">Descripción</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>QVD&#8217;s configuration management</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Gestión de la configuración de QVD&#8217;s</strong></p></td>
 <td align="left" valign="top"><p class="table">config.qvd.</p></td>
-<td align="left" valign="top"><p class="table">Manage QVD configuration (add/update tokens).</p></td>
+<td align="left" valign="top"><p class="table">Gestionar la configuración QVD  (añadir/actualizar tokens).</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>WAT&#8217;s configuration management</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Gestión de la configuración WAT</strong></p></td>
 <td align="left" valign="top"><p class="table">config.wat.</p></td>
-<td align="left" valign="top"><p class="table">Manage WAT configuration (language&#8230;).</p></td>
+<td align="left" valign="top"><p class="table">Gestión de la configuración WAT (idioma&#8230;).</p></td>
 </tr>
 </tbody>
 </table>
@@ -4680,43 +4676,11 @@ Color de texto de la caja de login
 </div>
 </div>
 </div>
-<div class="sect1">
-<h2 id="_link_personalizado_en_inicio_de_sesión">11. Link personalizado en inicio de sesión</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>Siempre que se tengan los permisos necesarios, será posible configurar un enlace en la pantalla de inicio de sesión que aparecerá justo debajo de los campos del formulario.</p></div>
-<div class="sect2">
-<h3 id="_configuración">11.1. Configuración</h3>
-<div class="paragraph"><p>Esta configuración se llevará a cabo estableciendo los tokens de configuración necesarios en la sección Gestión de QVD &#8594; Configuración de QVD.</p></div>
-<div class="paragraph"><p>Los tokens que harán falta serán:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<strong>api.public.login.link.src</strong>: URL del enlace
-</p>
-</li>
-<li>
-<p>
-<strong>api.public.login.link.label</strong>: Etiqueta del enlace tal y como aparecerá en la interfaz
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>Si uno de los dos no está presente, no se tendrá efecto alguno.</p></div>
-</div>
-<div class="sect2">
-<h3 id="_multi_idioma">11.2. Multi-idioma</h3>
-<div class="paragraph"><p>El enlace es susceptible a las traducciones del sistema, siempre y cuando la cadena contenida en el parámetro <strong>api.public.login.link.label</strong> exista en el diccionario. Si no existiera, aparecería sin traducir sea cual sea el idioma del navegador desde el que se acceda al WAT.</p></div>
-</div>
-<div class="sect2">
-<h3 id="_usos_típicos">11.3. Usos típicos</h3>
-<div class="paragraph"><p>Esta funcionalidad es útil para agregar un enlace a algún tipo de documento de ayuda o de recuperación de contraseñas, aunque es lo suficientemente flexible para aceptar cualquier uso.</p></div>
-</div>
-</div>
-</div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-02-29 12:25:27 CET
+Last updated 2016-03-17 09:27:41 CET
 </div>
 </div>
 </body>

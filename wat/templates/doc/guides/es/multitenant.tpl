@@ -200,7 +200,7 @@ install: function(toclevels) {
 }
 
 }
-asciidoc.install(2);
+asciidoc.install(3);
 /*]]>*/
 </script>
 </head>
@@ -268,7 +268,7 @@ asciidoc.install(2);
 </div>
 </div>
 <div class="sect1">
-<h2 id="_cambio_de_modo_monotenant_multitenant">2. Cambio de modo (monotenant ↔ multitenant)</h2>
+<h2 id="_cambio_de_modo_monotenant_8592_8594_multitenant">2. Cambio de modo (monotenant &#8592;&#8594; multitenant)</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
@@ -455,7 +455,7 @@ Vista detalle
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_tenant_details.png" alt="screenshot_tenant_details.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Observamos una <strong>cabecera</strong> donde junto al <strong>nombre del tenant</strong> están los <strong>botones para eliminarlo, bloquearlo, editarlo y la herramienta de limpieza</strong>.</p></div>
+<div class="paragraph"><p>Observamos una <strong>cabecera</strong> donde junto al <strong>nombre del tenant</strong> están los <strong>botones para eliminarlo y editarlo</strong>.</p></div>
 <div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos del tenant</strong>.</p></div>
 </div></div>
 </dd>
@@ -631,191 +631,186 @@ cellspacing="0" cellpadding="4">
 <col width="33%" />
 <thead>
 <tr>
-<th align="left" valign="top">ACL    </th>
-<th align="left" valign="top">ACL code       </th>
-<th align="left" valign="top">Description</th>
+<th align="left" valign="top">ACL </th>
+<th align="left" valign="top">código ACL </th>
+<th align="left" valign="top">Descripción</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create tenants</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Crear tenants</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.create.</p></td>
-<td align="left" valign="top"><p class="table">Creation of tenants including initial settings for name.</p></td>
+<td align="left" valign="top"><p class="table">Crear tenants incluyendo la configuración inicial por nombre.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete tenants (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Eliminar tenants (masivamente)</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.delete-massive.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of tenants massively.</p></td>
+<td align="left" valign="top"><p class="table">eliminar masivamente los tenants.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete tenants</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Eliminar tenants</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.delete.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of tenants one by one</p></td>
+<td align="left" valign="top"><p class="table">Eliminación de tenants uno por uno.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter tenants by blocking status</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar los tenants bloqueando su estatus</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.filter.block</p></td>
-<td align="left" valign="top"><p class="table">Filter of tenants list by blocking status</p></td>
+<td align="left" valign="top"><p class="table">Filtrar listado de tenants bloqueando sus estatus</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter tenants by creator</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar tenants por creador</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.filter.created-by</p></td>
-<td align="left" valign="top"><p class="table">Filter of tenants list by administrator who created it</p></td>
+<td align="left" valign="top"><p class="table">Filtro del listado de tenants por el administrador que lo creo</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter tenants by creation date</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar tenants por fecha de creación</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.filter.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Filter of tenants list by date when it was created</p></td>
+<td align="left" valign="top"><p class="table">Filtrar el listado de tenants por la fecha cuando fue creado</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter tenants by name</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Filtrar tenants por nombre</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.filter.name</p></td>
-<td align="left" valign="top"><p class="table">Filter of tenants list by tenant&#8217;s name</p></td>
+<td align="left" valign="top"><p class="table">Filtrar el listado de tenants por el nombre del tenant.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete all the elements of a tenant</strong></p></td>
-<td align="left" valign="top"><p class="table">tenant.purge.</p></td>
-<td align="left" valign="top"><p class="table">Purge a tenant deleting all the elements (vms, users, administrators&#8230;) one by one or massively</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><strong>Access to tenant&#8217;s details view</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Acceso a la vista de los detalles del tenant</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see-details.</p></td>
-<td align="left" valign="top"><p class="table">Access to details view of Tenants. This view includes name</p></td>
+<td align="left" valign="top"><p class="table">Acceso a la vista de detalles de los Tenants. Esta vista incluye nombre</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to tenant&#8217;s main section</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Acceso a la sección principal del tenant</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see-main.</p></td>
-<td align="left" valign="top"><p class="table">Access to the tenants list. This view includes name</p></td>
+<td align="left" valign="top"><p class="table">Acceso al listado de tenants. Esta vista incluye nombre</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s block size</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver el tamaño del bloque del tenant</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see.blocksize</p></td>
-<td align="left" valign="top"><p class="table">The block size in lists pagination of the tenants.</p></td>
+<td align="left" valign="top"><p class="table">El tamaño del bloque en los listados de paginación de los tenants..</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s blocking state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver el estado de bloqueo del tenant</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see.block</p></td>
-<td align="left" valign="top"><p class="table">Blocking state (blocked/unblocked) of tenants.</p></td>
+<td align="left" valign="top"><p class="table">Estado bloqueado (bloqueado/desbloqueado) de los tenants.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s creator</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver el creador del tenant</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see.created-by</p></td>
-<td align="left" valign="top"><p class="table">Wat administrator who created a tenant</p></td>
+<td align="left" valign="top"><p class="table">El administrador WAT que creó el tenant</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s creation date</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver fecha de creación del tenant</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Datetime when a tenant was created</p></td>
+<td align="left" valign="top"><p class="table">Fecha y hora de creación cuando se creó el tenant</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver la descripción del tenant</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see.description</p></td>
-<td align="left" valign="top"><p class="table">The description of the tenants.</p></td>
+<td align="left" valign="top"><p class="table">La descripción de los tenants.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s disk images</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver imagenes de disco del tenant</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see.di-list</p></td>
-<td align="left" valign="top"><p class="table">See the disk images of this tenant in his details view. This view will contain: name, block, tags, default and head</p></td>
+<td align="left" valign="top"><p class="table">Ver imágenes de disco de este tenant en su vista detalle. Esta vista contiene: nombre, bloque, etiquetas, por defecto y encabezado</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s disk blocking state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver el estado bloqueado del disco del tenant</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see.di-list-block</p></td>
-<td align="left" valign="top"><p class="table">Blocking info of the disk images shown in tenant details view</p></td>
+<td align="left" valign="top"><p class="table">Bloqueado de la información del disco de imágenes que se muestra en la vista detalle del tenant</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s disk images' tags</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver las etiquetas de las imágenes de disco del tenant</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see.di-list-tags</p></td>
-<td align="left" valign="top"><p class="table">Tags of the disk images shown in tenant details view</p></td>
+<td align="left" valign="top"><p class="table">Etiquetas de imágenes de disco que aparecen en la vista detalle en el tenant.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s ID</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver identificación del tenant</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see.id</p></td>
-<td align="left" valign="top"><p class="table">The database identiefier of the tenants. Useful to make calls from CLI.</p></td>
+<td align="left" valign="top"><p class="table">La base de datos que identifica los tenants. Útil para hacer llamadas desde CLI.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s language</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver idioma del tenant</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see.language</p></td>
-<td align="left" valign="top"><p class="table">The language setted by default for any administrar that belong to a tenant</p></td>
+<td align="left" valign="top"><p class="table">El idioma establecido por defecto para cualquier administrador que pertenezca a un tenant</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s users</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver usuarios del tenant</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see.user-list</p></td>
-<td align="left" valign="top"><p class="table">See the users of one tenant in his details view. This view will contain: name and blocking information of each user</p></td>
+<td align="left" valign="top"><p class="table">Ver usuarios de un tenant en su vista detalle. Esta vista incluirá: el nombre y la información de bloqueo para cada usuario.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s user blocking state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver el estado bloqueado del usuario del tenant</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see.user-list-block</p></td>
-<td align="left" valign="top"><p class="table">Blocking info of the users shown in tenant details view</p></td>
+<td align="left" valign="top"><p class="table">Información de bloqueo de los usuarios que aparece en la vista detalle del tenant.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s virtual machines</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver máquinas virtuales del tenant</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see.vm-list</p></td>
-<td align="left" valign="top"><p class="table">See the virtual machines of one tenant in his details view. This view will contain: name, state, block and expire information of each vm</p></td>
+<td align="left" valign="top"><p class="table">Ver las máquinas virtuales de un tenant en la vista detallada. Esta vista incluye: nombre, estado,de bloqueo y fecha de vencimiento de cada mv</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s virtual machines blocking state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver el estado de bloqueo de las máquinas virtuales</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see.vm-list-block</p></td>
-<td align="left" valign="top"><p class="table">Blocking info of the virtual machines shown in tenant details view</p></td>
+<td align="left" valign="top"><p class="table">La información del bloqueo de las máquinas virtuales aparece en la vista detallada del tenant</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s virtual machines' expiration date</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver fecha de vencimiento de las máquinas virtuales del tenant</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see.vm-list-expiration</p></td>
-<td align="left" valign="top"><p class="table">Expiration info of the virtual machines shown in tenant details view</p></td>
+<td align="left" valign="top"><p class="table">La información sobre el vencimiento de las máquinas virtuales aparece en las vista detallada del tenant</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s virtual machines' running state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver estado de funcionamiento de las máquinas virtuales del tenant</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see.vm-list-state</p></td>
-<td align="left" valign="top"><p class="table">State (stopped/started) of the virtual machines shown in tenant details view</p></td>
+<td align="left" valign="top"><p class="table">El estado (apagado/encendido) de las máquinas virtuales aparece en la vista detallada del tenant</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See tenant&#8217;s virtual machines' user state</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Ver el estado de usuario de las máquinas virtuales del tenant</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.see.vm-list-user-state</p></td>
-<td align="left" valign="top"><p class="table">User state (connected/disconnected)) of the virtual machines shown in tenant details view</p></td>
+<td align="left" valign="top"><p class="table">Estado del usuario (conectado/desconectado) de las máquinas virtuales que aparece en la vista detallada del tenant</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Block-Unblock tenants (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Tenants bloqueados y desbloqueados (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.update-massive.block</p></td>
-<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of tenants masively.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar masivamente el estado de bloqueo (bloqueado/desbloqueado)</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update tenant&#8217;s block size (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar el tamaño del bloque del tenant (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.update-massive.blocksize</p></td>
-<td align="left" valign="top"><p class="table">Update the block size in lists pagination of tenants massively.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar el tamaño del bloque en el listado de paginación de los tenants masivamente.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update tenant&#8217;s description (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar la descripción del tenant (masiva)</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.update-massive.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of tenants massively.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar masivamente la descripción de los tenants.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update tenant&#8217;s language (massive)</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar el lidioma del tenant (masivo)</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.update-massive.language</p></td>
-<td align="left" valign="top"><p class="table">Update the language of tenants massively.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar el idioma de los tenant de forma masiva.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Block-Unblock tenants</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Tenants bloqueados-desbloqueados</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.update.block</p></td>
-<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of tenants one by one.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar el estado de bloqueo (bloqueado/desbloqueado) de los tenants uno por uno.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update tenant&#8217;s block size</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar el tamaño bloque del tenant</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.update.blocksize</p></td>
-<td align="left" valign="top"><p class="table">Update the block size in lists pagination of tenants one by one.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar el tamaño del bloque en los listados de paginación uno por uno.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update tenant&#8217;s description</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar la descripción del tenant</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.update.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of tenants one by one.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar la descripción de los tenants uno por uno.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update tenant&#8217;s language</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar el lenguaje del tenant</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.update.language</p></td>
-<td align="left" valign="top"><p class="table">Update the language of tenants one by one.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar el lenguaje de los tenants uno por uno.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update tenant&#8217;s name</strong></p></td>
+<td align="left" valign="top"><p class="table"><strong>Actualizar el nombre de los tenants</strong></p></td>
 <td align="left" valign="top"><p class="table">tenant.update.name</p></td>
-<td align="left" valign="top"><p class="table">Update the name of tenants.</p></td>
+<td align="left" valign="top"><p class="table">Actualizar el nombre de los tenants.</p></td>
 </tr>
 </tbody>
 </table>
@@ -894,106 +889,17 @@ Tenants Eraser
 <div class="literalblock">
 <div class="content">
 <pre><code>Usuario: batman
-Contraseña: ********</code></pre>
+Contraseña: to the rescue</code></pre>
 </div></div>
 <div class="paragraph"><p>En este caso tendrá ligeras diferencias con el que tendremos en modo monotenant.</p></div>
 <div class="paragraph"><p>Básicamente <strong>la diferencia será</strong>, que en este modo, <strong>el administrador de recuperación tendrá</strong>, además de los que tiene en modo monotenant, <strong>acceso a gestión de Tenants</strong>.</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_limpieza_de_un_tenant">10. Limpieza de un tenant</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>Los tenants tienen una herramienta de limpieza que nos permitirá tener una visión global de todos los elementos dependientes del tenant y además eliminarlos de uno en uno o de forma masiva.</p></div>
-<div class="dlist"><dl>
-<dt class="hdlist1">
-Elementos dependientes
-</dt>
-<dd>
-<p>
-Los elementos dependientes de un tenant son:
-</p>
-<div class="ulist"><ul>
-<li>
-<p>
-Máquinas virtuales
-</p>
-</li>
-<li>
-<p>
-Usuarios
-</p>
-</li>
-<li>
-<p>
-Imágenes de disco
-</p>
-</li>
-<li>
-<p>
-OS Flavours
-</p>
-</li>
-<li>
-<p>
-Roles
-</p>
-</li>
-<li>
-<p>
-Administradores
-</p>
-</li>
-<li>
-<p>
-Propiedades personalizadas
-</p>
-</li>
-<li>
-<p>
-Tokens de configuración
-</p>
-</li>
-</ul></div>
-</dd>
-</dl></div>
-<div class="paragraph"><p>Esta herramienta se encuentra en la vista detalle de los tenant junto a los botones de edición y bloqueo.</p></div>
-<div class="paragraph"><p>Al accionar esta herramienta se abre una ventana modal y se chequean los diferentes elementos dependientes, apareciendo, de haberlos, una lista en cada una de las categorías.</p></div>
-<div class="paragraph"><p>Con diferentes botones de eliminado se podrán eliminar:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Elemento a elemento
-</p>
-</li>
-<li>
-<p>
-Todos los elementos de un grupo. Por ejemplo: Todas las máquinas virtuales.
-</p>
-</li>
-<li>
-<p>
-Todos los elementos del tenant. En este caso se hará un borrado ordenado para evitar coflictos de dependencias.
-</p>
-<div class="dlist"><dl>
-<dt class="hdlist1">
-Conflictos de dependencias
-</dt>
-<dd>
-<p>
-Algunos elementos de un tenant pueden depender de otros como por ejemplo un Usuario que contega Máquinas virtuales, un OSF que contenga Imágenes de disco o un rol que herede de otros roles.
-</p>
-</dd>
-</dl></div>
-</li>
-</ul></div>
-<div class="paragraph"><p>Si al intentar eliminar un elemento hubiese un conflicto de dependencia, no será eliminado y aparecerá junto a él un símbolo de advertencia. Si pasamos el ratón por encima del icono, podremos leer el error sucedido.</p></div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-03-16 09:27:32 CET
+Last updated 2016-06-21 16:09:00 CEST
 </div>
 </div>
 </body>

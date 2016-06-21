@@ -4,7 +4,7 @@ Wat.D = {
     //      selectedGuide: guide name.
     getDocBody: function (docParams, callBack) {        
         // Load language
-        var lan = $.i18n.options.lng;
+        var lan = Wat.C.language == "default" ? Wat.C.tenantLanguage : Wat.C.language;
         
         if ($.inArray(lan, DOC_AVAILABLE_LANGUAGES) === -1) {
             lan = DOC_DEFAULT_LANGUAGE;

@@ -429,7 +429,9 @@ Wat.B = {
         clickScreenHelp: function (e) {
             var docSection = $(e.target).attr('data-docsection');
             
-            var section = Wat.I.docSections[docSection].es;
+            var lan = Wat.C.language == "default" ? Wat.C.tenantLanguage : Wat.C.language;
+            
+            var section = Wat.I.docSections[docSection][lan];
             var guide = Wat.I.docSections[docSection].guide;
             
             var guideSection = [
@@ -443,7 +445,7 @@ Wat.B = {
             
             if (Wat.I.docSections[docSectionMultitenant] != undefined) {
                 guideSection.push({
-                    section: Wat.I.docSections[docSectionMultitenant].es,
+                    section: Wat.I.docSections[docSectionMultitenant][lan],
                     guide: Wat.I.docSections[docSectionMultitenant].guide
                 });
             }
