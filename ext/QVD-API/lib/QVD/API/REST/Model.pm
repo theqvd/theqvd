@@ -1276,6 +1276,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER = {
     },
     
     My_Admin => {
+        'id'   => 'me.id',
         'name' => 'me.name',
         'language' => 'wat_setups.language',
         'block' => 'wat_setups.block',
