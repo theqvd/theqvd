@@ -928,7 +928,7 @@ Fechas de expiración
 </li>
 </ul></div>
 </div></div>
-</dd>
+<div class="dlist"><dl>
 <dt class="hdlist1">
 Estado de ejecución
 </dt>
@@ -995,6 +995,8 @@ Si la imagen por defecto del OSF cambia, observamos que en los atributos aparece
 </li>
 </ul></div>
 </div></div>
+</dd>
+</dl></div>
 </dd>
 </dl></div>
 </div></div>

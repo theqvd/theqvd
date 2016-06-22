@@ -245,7 +245,7 @@ cellspacing="0" cellpadding="4">
 <thead>
 <tr>
 <th align="left" valign="top">Chrome </th>
-<th align="left" valign="top">Firefox </th>
+<th align="left" valign="top">Firefox        </th>
 <th align="left" valign="top">Internet Explorer </th>
 <th align="left" valign="top">Opera</th>
 </tr>
@@ -254,7 +254,7 @@ cellspacing="0" cellpadding="4">
 <tr>
 <td align="left" valign="top"><p class="table">40+</p></td>
 <td align="left" valign="top"><p class="table">31+</p></td>
-<td align="left" valign="top"><p class="table">11+  </p></td>
+<td align="left" valign="top"><p class="table">11+</p></td>
 <td align="left" valign="top"><p class="table">31+</p></td>
 </tr>
 </tbody>
@@ -278,9 +278,9 @@ cellspacing="0" cellpadding="4">
 <col width="25%" />
 <thead>
 <tr>
-<th align="left" valign="top">iOS Safari </th>
-<th align="left" valign="top">iOS Chrome </th>
-<th align="left" valign="top">Android Browser </th>
+<th align="left" valign="top">iOS Safari     </th>
+<th align="left" valign="top">iOS Chrome     </th>
+<th align="left" valign="top">Android Browser    </th>
 <th align="left" valign="top">Android Chrome</th>
 </tr>
 </thead>
@@ -288,7 +288,7 @@ cellspacing="0" cellpadding="4">
 <tr>
 <td align="left" valign="top"><p class="table">8.4+</p></td>
 <td align="left" valign="top"><p class="table">40+</p></td>
-<td align="left" valign="top"><p class="table">4.3+    </p></td>
+<td align="left" valign="top"><p class="table">4.3+</p></td>
 <td align="left" valign="top"><p class="table">44+</p></td>
 </tr>
 </tbody>
@@ -882,7 +882,7 @@ Manage his own ACLs, in this way being able to get total permits or even lose th
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-21 10:25:33 CEST
+Last updated 2016-06-22 08:54:59 CEST
 </div>
 </div>
 </body>

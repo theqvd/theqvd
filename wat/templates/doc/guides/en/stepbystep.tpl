@@ -868,7 +868,7 @@ Expiration dates
 </li>
 </ul></div>
 </div></div>
-<div class="dlist"><dl>
+</dd>
 <dt class="hdlist1">
 Execution status
 </dt>
@@ -887,18 +887,18 @@ Execution status
 <div class="paragraph"><p>In this case a warning will appear to make us realise that an execution parameter is different to the current ones, and if we want it to change we will have to restart the virtual machine.</p></div>
 <div class="paragraph"><p>The chart with the execution state also has a control to start/stop the virtual machine.</p></div>
 <div class="paragraph"><p>Depending on the moment, the virtual machine can go through 4 different states:</p></div>
-<div class="paragraph"><p>Running*: A simple version will appear with a buttom to show the execution parameters. The buttom to stop the machine will be available</p></div>
-<div class="paragraph"><p>+</p></div>
-</div></div>
-</dd>
-</dl></div>
-</dd>
-</dl></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Running</strong>: A simple version will appear with a buttom to show the execution parameters. The buttom to stop the machine will be available
+</p>
+<div class="openblock">
+<div class="content">
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/vm_execution_state_running.png" alt="vm_execution_state_running.png" width="960px" />
 </span></p></div>
 </div></div>
-<div class="ulist"><ul>
+</li>
 <li>
 <p>
 <strong>Stopped</strong>: When the machine is stopped, it will be shown like this and the buttom to start it will be available.
@@ -922,8 +922,9 @@ Execution status
 </div></div>
 </li>
 </ul></div>
-<div class="openblock">
-<div class="content">
+</div></div>
+</dd>
+</dl></div>
 </div></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
@@ -961,7 +962,12 @@ Edition
 <td class="content">We can also access to the edition of the element from the list view with the massive actions that are situated under the list only if we select one element.</td>
 </tr></table>
 </div>
-<div class="paragraph"><p>--  a</p></div>
+</div></div>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_nodes">4.3. Nodes</h3>
 <div class="paragraph"><p>In this section, QVD nodes are managed.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
@@ -1104,19 +1110,18 @@ Massive editor
 <div class="paragraph"><p>If custom properties do not exist in the nodes the massive edition will not be authorised.</p></div>
 </div></div>
 </dd>
-</dl></div>
-<div class="paragraph"><p>Creation</p></div>
-<div class="paragraph"><p>+</p></div>
-</div></div>
-</dd>
-</dl></div>
+<dt class="hdlist1">
+Creation
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_host_create.png" alt="screenshot_host_create.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>When creating a node we will establish its name, IP address and opcionally we can create properties.</p></div>
-<div class="openblock">
-<div class="content">
-<div class="dlist"><dl>
+</div></div>
+</dd>
 <dt class="hdlist1">
 Detail view
 </dt>
@@ -1176,6 +1181,9 @@ Edition
 </div></div>
 </dd>
 </dl></div>
+</div>
+<div class="sect2">
+<h3 id="_os_flavours">4.4. OS Flavours</h3>
 <div class="paragraph"><p>In this part OSFs of QVD are managed, in which the images of the disc are grouped.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
@@ -1305,7 +1313,12 @@ Edition
 <td class="content">We can also access to the edition of the element from the list view with the massive actions that are situated under the list only if we select one element.</td>
 </tr></table>
 </div>
-<div class="paragraph"><p>--   </p></div>
+</div></div>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_disk_images">4.5. Disk images</h3>
 <div class="paragraph"><p>In this section, QVD disk images are managed including versions and tags.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
@@ -1434,12 +1447,12 @@ Edit images: Tags edition will not appear in the massive editor. In order to man
 </div>
 </div></div>
 </dd>
-</dl></div>
-<div class="paragraph"><p>Massive editor:</p></div>
-<div class="paragraph"><p>+</p></div>
-</div></div>
-</dd>
-</dl></div>
+<dt class="hdlist1">
+Massive editor
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_di_massiveeditor.png" alt="screenshot_di_massiveeditor.png" width="960px" />
 </span></p></div>
@@ -1447,7 +1460,7 @@ Edit images: Tags edition will not appear in the massive editor. In order to man
 <div class="paragraph"><p>As any other massive editor, the value which will be defined, it would rewrite the one that could exist in all the edited elements.</p></div>
 <div class="paragraph"><p>If there are not custom properties in the disk images, the massive edition will not be enabled.</p></div>
 </div></div>
-<div class="dlist"><dl>
+</dd>
 <dt class="hdlist1">
 Creation
 </dt>
@@ -2144,8 +2157,11 @@ It might be common to establish the same property in different types of QVD elem
 </span></p></div>
 <div class="paragraph"><p>The parameters are clasified in categories. These categories correspond with the first segment of the name of the parameter, it means inmediately preceding the first stop.</p></div>
 <div class="paragraph"><p><em>For example, the parameters that start with "admin" will be included in the "admin" category, as we can see in the snapshot.</em></p></div>
-<div class="paragraph"><p>Navigation and research__</p></div>
-<div class="paragraph"><p>+</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Navigation and research
+</dt>
+<dd>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p>It is possible to navigate through the different categories to edit its parameters or to use the <strong>search control</strong> to find the parameters that contain a <strong>substring</strong>.</p></div>
@@ -2153,7 +2169,7 @@ It might be common to establish the same property in different types of QVD elem
 <img src="images/doc_images/screenshot_config_search.png" alt="screenshot_config_search.png" width="960px" />
 </span></p></div>
 </div></div>
-<div class="dlist"><dl>
+</dd>
 <dt class="hdlist1">
 Parameters creation
 </dt>
