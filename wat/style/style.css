@@ -3223,17 +3223,21 @@ table.vmst .vmst-vm-cell, table.vmst .vmst-host-cell {
   top: 0 !important;
   background: #444; }
   .ui-dialog--fullscreen .dialog-container {
-    height: 96vh !important;
-    max-height: 100vh !important;
-    background: #222;
-    float: right;
-    width: 90% !important; }
+    background: #222; }
+    @media screen and (min-width: 41em) {
+      .ui-dialog--fullscreen .dialog-container {
+        height: 96vh !important;
+        max-height: 100vh !important;
+        float: right;
+        width: 85% !important; } }
   .ui-dialog--fullscreen .ui-dialog-buttonpane {
-    float: left;
-    width: 10%;
     background: #444;
     border: 0;
     margin-left: 0px; }
+    @media screen and (min-width: 41em) {
+      .ui-dialog--fullscreen .ui-dialog-buttonpane {
+        float: left;
+        width: 15%; } }
   .ui-dialog--fullscreen .ui-dialog-buttonset {
     width: 100%;
     padding: 0px;
@@ -3241,13 +3245,13 @@ table.vmst .vmst-vm-cell, table.vmst .vmst-host-cell {
     margin: 0px;
     background: #444; }
     .ui-dialog--fullscreen .ui-dialog-buttonset .button {
-      margin-left: 0px;
-      width: 100%; }
-      .ui-dialog--fullscreen .ui-dialog-buttonset .button span {
-        font-size: 11px; }
-        .ui-dialog--fullscreen .ui-dialog-buttonset .button span:before {
-          display: block;
-          font-size: 30px; }
+      margin-left: 0px; }
+      @media screen and (min-width: 41em) {
+        .ui-dialog--fullscreen .ui-dialog-buttonset .button {
+          width: 100%; } }
+      @media only screen and (max-width: 41em) {
+        .ui-dialog--fullscreen .ui-dialog-buttonset .button {
+          float: right; } }
 
 .xdsoft_datetimepicker .xdsoft_calendar td > div {
   padding: 6px; }
@@ -3414,14 +3418,29 @@ div.tagsinput span.tag a {
     cursor: pointer;
     text-align: left; }
 
-.vms-spy-settings {
+.vms-spy-settings, .vms-spy-details {
   display: none;
   color: #eee;
-  padding: 4px;
+  background: #555;
+  padding: 8px;
   font-size: small;
-  border: 1px solid #eee; }
-  .vms-spy-settings div {
+  border: 1px solid #eee;
+  margin-top: 10px; }
+  @media only screen and (max-width: 41em) {
+    .vms-spy-settings, .vms-spy-details {
+      width: 31%;
+      float: left;
+      height: 200px;
+      margin-right: 15px; } }
+  .vms-spy-settings div, .vms-spy-details div {
     margin-bottom: 5px; }
+  .vms-spy-settings legend, .vms-spy-details legend {
+    color: #eee;
+    text-align: left; }
+  .vms-spy-settings .details-data, .vms-spy-details .details-data {
+    padding-left: 8px;
+    margin-bottom: 8px;
+    font-size: 10px; }
 
 /********************************************************************
 *********************************************************************

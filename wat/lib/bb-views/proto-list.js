@@ -1256,6 +1256,10 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     that.applyDisconnect(that);
                 }
                 break;
+            case 'spy':
+                var model = that.collection.where({id: that.selectedItems[0]})[0];
+                that.applySpyVM(model);
+                break;
             // Used in Hosts
             case 'stop_all':
                 if (elementsOutOfView) {

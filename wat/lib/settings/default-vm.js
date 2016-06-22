@@ -654,6 +654,17 @@ Wat.I.selectedActions[qvdObj] = {
             'value': 'connected'
         }
     },
+    'spy': {
+        'text': 'Spy',
+        'acls': 'vm.spy.',
+        'iconClass': 'fa fa-user-secret',
+        'otherClass': 'js-only-one',
+        'visibilityCondition': {
+            'type': 'eq',
+            'field': 'state',
+            'value': 'running'
+        }
+    },
     'delete': {
         'text': 'Delete',
         'acls': 'vm.delete-massive.',
