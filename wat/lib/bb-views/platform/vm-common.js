@@ -103,7 +103,11 @@ Wat.Common.BySection.vm = {
         Wat.A.fillSelect(params);
     },
     
-    spyVM: function () {
+    spyVM: function () {        
+        this.applySpyVM(this.model);
+    },
+    
+    applySpyVM: function (vmModel) { 
         var that = this;
         
         var dialogConf = {
@@ -125,7 +129,7 @@ Wat.Common.BySection.vm = {
                 // Add common parts of editor to dialog
                 var template = _.template(
                     Wat.TPL.spyVM, {
-                        vmId:  Wat.CurrentView.id,
+                        vmId:  vmModel.get('id'),
                         apiHost: Wat.C.apiUrl.split("/")[2].split(':')[0],
                         apiPort: Wat.C.apiUrl.split("/")[2].split(':')[1],
                         sid: Wat.C.sid
@@ -139,13 +143,20 @@ Wat.Common.BySection.vm = {
                 // Hide normal screen button from the begining
                 $(".ui-dialog-buttonset button span.fa-compress").parent().hide();
                 
-                // Configure settings
+                // Configure details and settings
+                var templateDetails = _.template(
+                    Wat.TPL.spyVMDetails, {
+                        model: vmModel
+                    }
+                );
+                                
                 var templateSettings = _.template(
                     Wat.TPL.spyVMSettings, {
                     }
                 );
                 
-                $(".ui-dialog-buttonset button:last-child").parent().append(templateSettings);
+                $(".ui-dialog-buttonset button:last-child").parent().append(templateDetails + templateSettings);
+                
                 Wat.T.translate();
                 Wat.I.chosenElement('.vms-spy-settings select', 'single100');
                 
@@ -175,6 +186,7 @@ Wat.Common.BySection.vm = {
                         UI.connect();
                         
                         $(".js-vms-spy-settings").show();
+                        $(".js-vms-spy-details").show();
 
                         //UI.onresize();
                         clearInterval(loopCheck);
@@ -183,7 +195,7 @@ Wat.Common.BySection.vm = {
             }
         }
 
-        that.dialog = Wat.I.dialog(dialogConf);  
+        this.dialog = Wat.I.dialog(dialogConf);  
     },
     
     changeSettingLog: function (e) {

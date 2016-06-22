@@ -253,6 +253,9 @@ Wat.I.T = {
                     },
                     spyVMSettings: {
                         name: 'common/vms-spy-settings'
+                    },
+                    spyVMDetails: {
+                        name: 'common/vms-spy-details'
                     }
                 }
                 break;

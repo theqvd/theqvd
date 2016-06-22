@@ -55,7 +55,7 @@ if (Wat.C.checkACL('vm.see.state')) {
     <% 
     if (Wat.C.checkACL('vm.update.disconnect-user') && model.get('user_state') == 'connected') {
     %>
-        <a class="button button-icon js-button-disconnect-user fa fa-plug fright" href="javascript:" data-i18n="[title]Disconnect user"></a>
+        <a class="button button-icon js-button-disconnect-user fa fa-plug fright" href="javascript:" data-i18n="[title]Disconnect user"><span data-i18n="Disconnect user" class="mobile"></span></a>
     <%
     }
     %>
@@ -73,7 +73,7 @@ if (Wat.C.checkACL('vm.see.state')) {
     <% 
         }
     } 
-        if (model.get('state') == 'running') { 
+        if (Wat.C.checkACL('vm.spy.') && model.get('state') == 'running') { 
     %>
             <a class="button fright button-icon--desktop js-button-spy-vm fa fa-user-secret fright" href="javascript:" data-i18n="[title]Spy" data-wsupdate="spy-button" data-id="<%= model.get('id') %>"><span data-i18n="Spy" class="mobile"></span></a>
     <% 
