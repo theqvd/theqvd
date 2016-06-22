@@ -165,6 +165,9 @@ sub new {
     }
     
     my $panel = $self->{panel} = Wx::Panel->new($tab_ctl // $self, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL ); # / broken highlighter
+
+    $panel->SetBackgroundColour(Wx::Colour->new(217,217,217));
+
     
     if ( $tab_ctl ) {
         $tab_ctl->AddPage( $panel, $self->_t("Connect") );
@@ -174,87 +177,132 @@ sub new {
         
         
         $settings_panel = Wx::Panel->new($tab_ctl, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+        $settings_panel->SetBackgroundColour(Wx::Colour->new(255,255,255));
         $tab_ctl->AddPage( $settings_panel, $self->_t("Settings"));
         my $settings_sizer = Wx::BoxSizer->new(wxVERTICAL);
         $settings_panel->SetSizer($settings_sizer);
         
 
         ###############################
-        $settings_sizer->Add( Wx::StaticText->new($settings_panel, -1, $self->_t("Connection")), 0, wxALL, 5);
-        $settings_sizer->Add( Wx::StaticLine->new($settings_panel, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL, "line"), 0, wxEXPAND | wxLEFT | wxRIGHT, 5 );
+
+        my $this_text = Wx::StaticText->new($settings_panel, -1, $self->_t("Options"));
+        $this_text->SetFont(Wx::Font->new(10,wxDEFAULT,wxDEFAULT,wxBOLD,0,""));
+        $settings_sizer->Add( $this_text , 0, wxALL|wxEXPAND, 0);
 
 
-        $self->{audio} = Wx::CheckBox->new($settings_panel, -1, $self->_t("Enable audio"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
+        my $grid_sizer = Wx::FlexGridSizer->new(0, 2, 0, 0);
+        $settings_sizer->Add($grid_sizer, 0, wxALL|wxEXPAND, 20);
+
+        $grid_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Enable audio")), 0, wxALL, 0);
+        $self->{audio} = Wx::CheckBox->new($settings_panel, -1, "" , wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, wxDefaultValidator, "checkBox");
         $self->{audio}->SetValue( core_cfg("client.audio.enable" ) );
-        $settings_sizer->Add($self->{audio});
+        $grid_sizer->Add($self->{audio});
 
-        $self->{printing} = Wx::CheckBox->new($settings_panel, -1, $self->_t("Enable printing"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
+        $grid_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Enable printing")), 0, wxALL, 0);
+        $self->{printing} = Wx::CheckBox->new($settings_panel, -1, "", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, wxDefaultValidator, "checkBox");
         $self->{printing}->SetValue( core_cfg("client.printing.enable" ) );
-        $settings_sizer->Add($self->{printing});
+        $grid_sizer->Add($self->{printing});
 
-        $self->{forwarding} = Wx::CheckBox->new($settings_panel, -1, $self->_t("Enable port forwarding"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
-        $self->{forwarding}->SetValue( core_cfg("client.slave.enable" ) );
-        $settings_sizer->Add($self->{forwarding});
-
-        if ( !$WINDOWS && !$DARWIN ) {
-            $self->{usb_redirection} = Wx::CheckBox->new($settings_panel, -1, $self->_t("Enable USB redirection"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
-            $self->{usb_redirection}->SetValue( core_cfg("client.usb.enable" ) );
-            $settings_sizer->Add($self->{usb_redirection});
-        
-            $self->{usbip_devices} = Wx::TextCtrl->new($settings_panel, -1, core_cfg('client.usb.share_list') ?  core_cfg('client.usb.share_list') : "");
-            $settings_sizer->Add($self->{usbip_devices}, 0, wxEXPAND);
-        
-            $self->{usbip_list_button} = Wx::Button->new($settings_panel, -1, $self->_t("Select devices"));
-            $settings_sizer->Add($self->{usbip_list_button});            
-            Wx::Event::EVT_BUTTON($settings_panel, $self->{usbip_list_button}->GetId, sub { select_usb_devices($self); });
-            
-            
-
-    
-            
-            
-        }
-        
-        
-        $settings_sizer->AddSpacer(5);
-
-        ###############################
-        $settings_sizer->Add( Wx::StaticText->new($settings_panel, -1, $self->_t("Screen")), 0, wxALL, 5);
-        $settings_sizer->Add( Wx::StaticLine->new($settings_panel, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL, "line"), 0, wxEXPAND | wxLEFT | wxRIGHT, 5 );
-
-        $self->{fullscreen} = Wx::CheckBox->new($settings_panel, -1, $self->_t("Full screen"));
+        $grid_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Full screen")), 0, wxALL, 0);
+        $self->{fullscreen} = Wx::CheckBox->new($settings_panel, -1, "", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, wxDefaultValidator, "checkBox");
         $self->{fullscreen}->SetValue( core_cfg("client.fullscreen" ) );
-        $settings_sizer->Add($self->{fullscreen}, 0, wxALL, 5);
+        $grid_sizer->Add($self->{fullscreen});
+
+
+
         
+        ###############################
+
+        my $this_text = Wx::StaticText->new($settings_panel, -1, $self->_t("Connectivity"));
+        $this_text->SetFont(Wx::Font->new(10,wxDEFAULT,wxDEFAULT,wxBOLD,0,""));
+        $settings_sizer->Add( $this_text , 0, wxALL|wxEXPAND, 0);
+
+        my $grid_sizer = Wx::FlexGridSizer->new(0, 2, 0, 0);
+        $settings_sizer->Add($grid_sizer, 0, wxALL|wxEXPAND, 20);
+
+        if (!core_cfg('client.force.host.name', 0)) {
+            $grid_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Server")), 0, wxALL, 0);
+            $self->{host} = Wx::TextCtrl->new($settings_panel, -1, core_cfg('client.host.name'),wxDefaultPosition,[160,30]);
+            $grid_sizer->Add($self->{host}, 0, wxALL, 5);
+        }
+
+        if (!core_cfg('client.force.link', 0)) {
+            $grid_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Connection type")), 0, wxALL, 0);
+            my @link_options = ("Local", "ADSL", "Modem");
+            $self->{link} = Wx::Choice->new($settings_panel, -1, wxDefaultPosition, [160,30]);
+            $grid_sizer->Add($self->{link}, 0, wxALL, 5);
+            $self->{link}->AppendItems(\@link_options);
+
+        my $link_select;
+        if ( core_cfg('client.link') eq "lan" || core_cfg('client.link') eq "local") {
+                $link_select = 0 ;
+        }
+        elsif ( core_cfg('client.link') eq "adsl" || core_cfg('client.link') eq "wan" ) {
+                $link_select = 1 ;
+        }
+        elsif ( core_cfg('client.link') eq "modem" || core_cfg('client.link') eq "isdn") {
+                $link_select = 2;
+        }
+        else {
+                $link_select = 1;
+        }
+            $self->{link}->Select($link_select);
+        }
+
+
         #######################
         # Sharing
         ########################
-       
 
-        my $sharing_panel = Wx::Panel->new($tab_ctl, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-        $tab_ctl->AddPage( $sharing_panel, $self->_t("Shared folders"));
-        my $sharing_sizer = Wx::BoxSizer->new(wxVERTICAL);
-        $sharing_panel->SetSizer($sharing_sizer);
+        my $this_text = Wx::StaticText->new($settings_panel, -1, $self->_t("Share"));
+        $this_text->SetFont(Wx::Font->new(10,wxDEFAULT,wxDEFAULT,wxBOLD,0,""));
+        $settings_sizer->Add( $this_text , 0, wxALL|wxEXPAND, 0);
+
+        my $grid_sizer = Wx::FlexGridSizer->new(0, 4, 0, 0);
+        $settings_sizer->Add($grid_sizer, 0, wxALL|wxEXPAND, 20);
+
+        $grid_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Enable shared folders")), 0, wxALL, 0);
+        $self->{share_enable} = Wx::CheckBox->new($settings_panel, -1, "", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, wxDefaultValidator, "checkBox");
+        $self->{share_enable}->SetValue( core_cfg("client.file_sharing.enable" ) );
+        $grid_sizer->Add($self->{share_enable});
+
+        $self->{share_add} = Wx::Button->new($settings_panel, -1, $self->_t("Add"));
+        $grid_sizer->Add($self->{share_add}, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 5);
+        $self->{share_add}->SetDefault;
+
+        $self->{share_del} = Wx::Button->new($settings_panel, -1, $self->_t("Remove"));
+        $grid_sizer->Add($self->{share_del}, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 5);
+        $self->{share_del}->SetDefault;
+
+        $self->{share_list} = Wx::ListBox->new($settings_panel, -1, wxDefaultPosition, [200,100] ,  [] , wxLB_EXTENDED|wxLB_NEEDED_SB|wxLB_SORT , wxDefaultValidator, "sharedFoldersList");
+        $settings_sizer->Add($self->{share_list}, 0, wxALL|wxEXPAND , 5);
+
+
+        #######################
+        # USB
+        ########################
+
+        if ( !$WINDOWS && !$DARWIN ) {
+            my $grid_sizer = Wx::FlexGridSizer->new(0, 4, 0, 0);
+            $settings_sizer->Add($grid_sizer, 0, wxALL|wxEXPAND, 20);
+
+            $grid_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Enable USB redirection")), 0, wxALL, 0);
+            $self->{usb_redirection} = Wx::CheckBox->new($settings_panel, -1, "", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, wxDefaultValidator, "checkBox");
+            $self->{usb_redirection}->SetValue( core_cfg("client.usb.enable" ) );
+            $grid_sizer->Add($self->{usb_redirection});
         
-        $self->{share_enable}  = Wx::CheckBox->new($sharing_panel, -1, $self->_t("Enable sharing"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
-        $self->{share_list}     = Wx::ListBox->new($sharing_panel, -1, wxDefaultPosition, wxDefaultSize, [], 0, wxDefaultValidator, "Share list");
-        $self->{share_btnsizer} = Wx::BoxSizer->new(wxHORIZONTAL);
-        $self->{share_add}      = Wx::Button->new($sharing_panel, -1, $self->_t("Add"));
-        $self->{share_del}      = Wx::Button->new($sharing_panel, -1, $self->_t("Remove"));
+            $self->{usbip_list_button_add} = Wx::Button->new($settings_panel, -1, $self->_t("Add"));
+            $grid_sizer->Add($self->{usbip_list_button_add});            
+            Wx::Event::EVT_BUTTON($settings_panel, $self->{usbip_list_button_add}->GetId, sub { select_usb_devices($self); });
 
+            $self->{usbip_list_button_delete} = Wx::Button->new($settings_panel, -1, $self->_t("Remove"));
+            $grid_sizer->Add($self->{usbip_list_button_delete});            
+            Wx::Event::EVT_BUTTON($settings_panel, $self->{usbip_list_button_delete}->GetId, sub { select_usb_devices($self); });
 
-        $self->{share_enable}->SetValue( core_cfg('client.file_sharing.enable') );
-
-        $sharing_sizer->Add($self->{share_enable}, 0, wxALL);
-        $sharing_sizer->Add($self->{share_list}, 1, wxEXPAND);
-        $sharing_sizer->Add($self->{share_btnsizer}, 0, wxALL);
+            $self->{usbip_devices} = Wx::TextCtrl->new($settings_panel, -1, core_cfg('client.usb.share_list') ?  core_cfg('client.usb.share_list') : "");
+            $settings_sizer->Add($self->{usbip_devices}, 0, wxEXPAND);
         
-        $self->{share_btnsizer}->Add($self->{share_add}, 0, wxALL);
-        $self->{share_btnsizer}->Add($self->{share_del}, 0, wxALL);
-
-        Wx::Event::EVT_BUTTON($sharing_panel, $self->{share_add}->GetId, sub { share_add($self); });
-        Wx::Event::EVT_BUTTON($sharing_panel, $self->{share_del}->GetId, sub { share_del($self); });
-
+        }
 
 
 #        my $shared_sizer = Wx::StaticBoxSizer->new(Wx::StaticBox->new($self->{sharing_panel}, wxID_ANY, $self->_t("Shared folders")), wxHORIZONTAL);
@@ -265,62 +313,28 @@ sub new {
 
     my $ver_sizer  = Wx::BoxSizer->new(wxVERTICAL);
 
-    my $bm_logo_big = Wx::Bitmap->new(File::Spec->join($QVD::Client::App::pixmaps_dir, 'qvd-big.png'),
+    my $bm_logo_big = Wx::Bitmap->new(File::Spec->join($QVD::Client::App::pixmaps_dir, 'qvd-client-front.gif'),
                                       wxBITMAP_TYPE_ANY);
     $ver_sizer->Add( Wx::StaticBitmap->new($panel, -1, $bm_logo_big),
-                     0, wxLEFT|wxRIGHT|wxTOP|wxALIGN_CENTER_HORIZONTAL, 20 );
+                     0, wxTOP|wxALIGN_CENTER_HORIZONTAL, 100 );
 
-    my $grid_sizer = Wx::GridSizer->new(1, 2, 0, 0);
+
+    my $grid_sizer = Wx::GridSizer->new(1, 1, 0, 0);
     $ver_sizer->Add($grid_sizer, 1, wxALL|wxEXPAND, 20);
 
-    $grid_sizer->Add(Wx::StaticText->new($panel, -1, $self->_t("User")), 0, wxALL, 5);
-    $self->{username} = Wx::TextCtrl->new($panel, -1, core_cfg('client.remember_username') ?  core_cfg('client.user.name') : "");
-    $grid_sizer->Add($self->{username}, 1, wxALL|wxEXPAND, 5);
+#    $grid_sizer->Add(Wx::StaticText->new($panel, -1, $self->_t("User")), 0, wxALL, 5);
+    $self->{username} = Wx::TextCtrl->new($panel, -1, core_cfg('client.remember_username') ?  core_cfg('client.user.name') : "", wxDefaultPosition, [400,30]);
+    $grid_sizer->Add($self->{username}, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
 
-    $grid_sizer->Add(Wx::StaticText->new($panel, -1, $self->_t("Password")), 0, wxALL, 5);
-    $self->{password} = Wx::TextCtrl->new($panel, -1, core_cfg('client.user.password') ?  core_cfg('client.user.password') : '', wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
-    $grid_sizer->Add($self->{password}, 0, wxALL|wxEXPAND, 5);
+#    $grid_sizer->Add(Wx::StaticText->new($panel, -1, $self->_t("Password")), 0, wxALL, 5);
+    $self->{password} = Wx::TextCtrl->new($panel, -1, "", wxDefaultPosition, [400,30], wxTE_PASSWORD);
+    $grid_sizer->Add($self->{password}, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
 
     if (core_cfg('client.show.remember_password')) {
         $grid_sizer->Add(Wx::StaticText->new($panel, -1, $self->_t("Remember password")), 0, wxALL, 5);
         $self->{remember_pass} = Wx::CheckBox->new ($panel, -1, '', wxDefaultPosition);
         $self->{remember_pass}->SetValue(core_cfg('client.remember_password') ? 1 : 0);
         $grid_sizer->Add($self->{remember_pass}, 1, wxALL, 5);
-    }
-
-    if (!core_cfg('client.force.host.name', 0)) {
-        $grid_sizer->Add(Wx::StaticText->new($panel, -1, $self->_t("Server")), 0, wxALL, 5);
-        $self->{host} = Wx::TextCtrl->new($panel, -1, core_cfg('client.host.name'));
-        $grid_sizer->Add($self->{host}, 1, wxALL|wxEXPAND, 5);
-    }
-
-    if (!core_cfg('client.force.link', 0)) {
-        $grid_sizer->Add(Wx::StaticText->new($panel, -1, $self->_t("Connection type")), 0, wxALL, 5);             
-        my @link_options = ("Local", "ADSL", "Modem");
-        $self->{link} = Wx::Choice->new($panel, -1);
-        $grid_sizer->Add($self->{link}, 1, wxALL|wxEXPAND, 5);
-        $self->{link}->AppendItems(\@link_options);
-
-	my $link_select; 
-	if ( core_cfg('client.link') eq "lan" || core_cfg('client.link') eq "local") {
-		$link_select = 0 ; 
-	}
-	elsif ( core_cfg('client.link') eq "adsl" || core_cfg('client.link') eq "wan" ) {
-		$link_select = 1 ; 
-	}
-	elsif ( core_cfg('client.link') eq "modem" || core_cfg('client.link') eq "isdn") {
-		$link_select = 2; 
-	}
-	else {
-		$link_select = 1; 
-	}	
-        $self->{link}->Select($link_select);
-    }
-
-    if(core_cfg('client.kill_vm.display')) {
-        $grid_sizer->Add( Wx::StaticText->new( $panel, -1, $self->_t( "Kill current VM" ) ), 0, wxALL, 5 );
-        $self->{kill_vm} = Wx::CheckBox->new ( $panel, -1, '', wxDefaultPosition );
-        $grid_sizer->Add( $self->{kill_vm} );
     }
 
     if ($DARWIN && !core_cfg('client.darwin.screen_resolution.verified')) {
@@ -352,9 +366,15 @@ sub new {
     }
 
     # port goes here!
-    $self->{connect_button} = Wx::Button->new($panel, -1, $self->_t("Connect"));
-    $ver_sizer->Add($self->{connect_button}, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 20);
+    $self->{connect_button} = Wx::Button->new($panel, -1, $self->_t("Connect"),wxDefaultPosition,[400,30]);
+    $self->{connect_button}->SetBackgroundColour(Wx::Colour->new(229,90,0));
+    $grid_sizer->Add($self->{connect_button}, 0, wxALIGN_TOP|wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
     $self->{connect_button}->SetDefault;
+
+    $self->{kill_vm} = Wx::CheckBox->new ($panel, -1, 'Restart Session', wxDefaultPosition,wxDefaultSize);
+    $grid_sizer->Add($self->{kill_vm},0,wxALIGN_LEFT|wxALIGN_TOP|wxALL,5);
+
+    $ver_sizer->AddSpacer(100);
 
     $self->{progress_bar} = Wx::Gauge->new($panel, -1, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL|wxGA_SMOOTH);
     $self->{progress_bar}->SetValue(0);
@@ -381,7 +401,15 @@ sub new {
     $self->Show(1);
     (core_cfg('client.remember_username') && length core_cfg('client.user.name')) ? $self->{password}->SetFocus() : $self->{username}->SetFocus();
 
+    # Hide everything if shared folders is unselected
+    $self->OnClickSharedFolders();
+
     Wx::Event::EVT_BUTTON($self, $self->{connect_button}->GetId, \&OnClickConnect);
+    Wx::Event::EVT_BUTTON($self, $self->{share_add}->GetId, \&share_add);
+    Wx::Event::EVT_BUTTON($self, $self->{share_del}->GetId, \&share_del);
+
+    Wx::Event::EVT_CHECKBOX($self, $self->{share_enable}->GetId, \&OnClickSharedFolders);
+
     Wx::Event::EVT_TIMER($self, -1, \&OnTimer);
 
     Wx::Event::EVT_COMMAND($self, -1, EVT_CONNECTION_ERROR, \&OnConnectionError);
@@ -548,6 +576,24 @@ sub OnClickConnect {
         lock(%connect_info);
         cond_signal(%connect_info);
     }
+}
+
+
+sub OnClickSharedFolders {
+    my( $self, $event ) = @_;
+
+    if ( $self->{share_enable}->GetValue() ){
+        # Enable picking
+        $self->{share_add}->Show(1);
+        $self->{share_del}->Show(1);
+        $self->{share_list}->Show(1);
+    }else{
+        # Disable picking
+        $self->{share_add}->Show(0);
+        $self->{share_del}->Show(0);
+        $self->{share_list}->Show(0);
+    }
+
 }
 
 sub OnConnectionError {
@@ -1045,6 +1091,7 @@ sub share_del {
 
 
 }
+
 
 ################################################################################
 #
