@@ -727,7 +727,7 @@ var UI;
             if (!UI.initRFB()) return;
 
             UI.rfb.set_encrypt(true);
-            UI.rfb.set_true_color(UI.getSetting('true_color'));
+            UI.rfb.set_true_color(true);
             UI.rfb.set_local_cursor(UI.getSetting('cursor'));
             UI.rfb.set_shared(UI.getSetting('shared'));
             UI.rfb.set_view_only(true);
