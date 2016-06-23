@@ -80,7 +80,7 @@ sub _write_file {
 
         my $fh;
         my $old_umask = umask;
-        umask 0700;
+        umask 0077;
         unless ( open $fh, '>', $fn  and
                  binmode $fh         and
                  print $fh $contents and
