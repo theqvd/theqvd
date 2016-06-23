@@ -30,6 +30,8 @@ path.tmp = /var/tmp
 path.api = ${path.run}/api
 ## path to index WAT file
 path.wat = /usr/lib/qvd/wat
+## path to index User Portal file
+path.up = /usr/lib/qvd/up
 ## main storage location for OS images (both KVM and LXC)
 path.storage.root = /var/lib/qvd/storage
 ## OS images ready to be used
@@ -340,14 +342,23 @@ l7r.as_user = root
 ## path to the l7r PID file
 l7r.pid_file = ${path.run}/qvd-l7r.pid
 
-# URL API is running
-# Example: https://*:443/
+# QVD API parameters
 api.url = https://*:443/
 api.user = root
 api.group = root
 
 api.stdout.filename = /dev/null
 api.stderr.filename = /dev/null
+
+# QVD User Portal API parameters
+up-api.url = https://*:4433
+up-api.user = root
+up-api.group = root
+
+up-api.stdout.filename = /dev/null
+up-api.stderr.filename = /dev/null
+
+up-api.l7r.address = localhost
 
 # QVD-Admin parameters
 # url of the API
@@ -370,8 +381,9 @@ wat.admin.login = admin
 ## path to the log file
 log.filename = ${path.log}/qvd.log
 
-## WAT logs go into its own file to avoid permission issues as the process is not run as root
-wat.log.filename = ${path.log}/qvd-wat.log
+## API logs go into its own file to avoid permission issues as the process is not run as root
+log.api.filename = ${path.log}/qvd-api.log
+log.up-api.filename = ${path.log}/qvd-up-api.log
 
 ## log verbosity (FATAL, ERROR, WARN, INFO, DEBUG or TRACE)
 log.level = INFO

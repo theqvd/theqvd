@@ -9,6 +9,7 @@ use Carp;
 use feature 'switch';
 use URI::Split qw(uri_split);
 use MIME::Base64 'decode_base64';
+use MojoX::Session;
 use IO::Socket::Forwarder qw(forward_sockets);
 
 use QVD::Config;
@@ -164,10 +165,15 @@ sub connect_to_vm_processor {
 
     my $query = (uri_split $url)[3];
     my %params = uri_query_split  $query;
-    my $vm_id = delete $params{id};
-    my $file_name = delete $params{file_name};
+
+    my $vm_id;
+    if (defined $l7r->{session}) {
+        $vm_id = $l7r->{session}->{vm_id};
+    } else {
+        $vm_id = delete $params{id};
+    }
     
-    unless (defined $vm_id or defined $file_name)  {
+    unless (defined $vm_id)  {
         INFO 'Parameter id required';
         $l7r->throw_http_error(HTTP_UNPROCESSABLE_ENTITY, "parameter id is missing");
     }
@@ -242,9 +248,15 @@ sub stop_vm_processor {
         $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Server is blocked");
     }
 
-    my $query = (uri_split $url)[3];
-    my %params = uri_query_split  $query;
-    my $vm_id = delete $params{id};
+    my $vm_id;
+    if (defined $l7r->{session}) {
+        $vm_id = $l7r->{session}->{vm_id};
+    } else {
+        my $query = (uri_split $url)[3];
+        my %params = uri_query_split  $query;
+        $vm_id = delete $params{id};
+    }
+
     unless (defined $vm_id) {
         INFO 'Parameter id required';
         $l7r->throw_http_error(HTTP_UNPROCESSABLE_ENTITY, "parameter id is missing");
@@ -268,39 +280,63 @@ sub stop_vm_processor {
 sub _authenticate_user {
     my ($l7r, $headers) = @_;
     my $this_host = this_host; $this_host // $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, 'Host is not registered in the database');
-    if (my ($credentials) = header_lookup($headers, 'Authorization')) {
+
+    my ($login, $passwd, $sid);
+    if( $sid = header_lookup($headers, 'sid-l7r') ){
+        my $session = _create_session_handler();
+        $l7r->{session} = {};
+        if ($session->load($sid)){
+            if($session->is_expired) {
+                $session->clear;
+                $sid = undef;
+                ERROR "Session expired";
+            } else {
+                $login = $session->data->{login};
+                $passwd = $session->data->{password};
+                $l7r->{session} = $session->data;
+                $session->expire;
+                $session->clear;
+            }
+            $session->flush;
+        } else {
+            ERROR "Session $sid does not exist";
+        }
+    } elsif (my ($credentials) = header_lookup($headers, 'Authorization')) {
         if (my ($basic) = $credentials =~ /^Basic (.*)$/) {
-            if (my ($login, $passwd) = decode_base64($basic) =~ /^([^:]+):(.*)$/) {
-		my $auth = $l7r->{_auth};
-		if (defined $auth and
-		    $auth->recheck_authentication_basic($login, $passwd, $l7r)) {
-		    return $auth;
-		}
-                $auth = QVD::L7R::Authenticator->new;
-		txn_do { $this_host->counters->incr_auth_attempts; };
-                if ($auth->authenticate_basic($login, $passwd, $l7r)) {
-                    my $client = $l7r->{server}->{client};
-                    my $peerhost = eval { $client->peerhost() } // 'unknown';
-                    my $peerport = eval { $client->peerport() } // 'unknown';
-		    INFO "Accepted connection from user $login from ip:port ${peerhost}:$peerport";
-		    $l7r->{_auth} = $auth;
-                    my $user = rs(User)->find($auth->user_id);
-                    unless ($user->blocked) {
-                        txn_do { $this_host->counters->incr_auth_ok };
-                        return $auth
-                    }
-                    ERROR "User $login is blocked";
-                }
-                else {
-                    ERROR "Failed login attempt from user $login";
-                }
-            }
-            else {
-                ERROR "Unable to decode authentication credentials";
-            }
+            ERROR "Unable to decode authentication credentials"
+                unless ( ($login, $passwd) = decode_base64($basic) =~ /^([^:]+):(.*)$/ );
         }
         else {
             ERROR "unimplemented authentication mechanism";
+        }
+    } else {
+        ERROR "No authentication credentials provided";
+    }
+
+    if ( (defined($login) && defined($passwd)) || defined($sid) ) {
+        my $auth = $l7r->{_auth};
+        if (defined $auth and
+            $auth->recheck_authentication_basic($login, $passwd, $sid)) {
+            return $auth;
+        } else {
+            $auth = QVD::L7R::Authenticator->new;
+            txn_do { $this_host->counters->incr_auth_attempts; };
+            if ($auth->authenticate_basic( $login, $passwd, $l7r )) {
+                my $client = $l7r->{server}->{client};
+                my $peerhost = eval { $client->peerhost() } // 'unknown';
+                my $peerport = eval { $client->peerport() } // 'unknown';
+                INFO "Accepted connection from user $login from ip:port ${peerhost}:$peerport";
+                $l7r->{_auth} = $auth;
+                my $user = rs( User )->find( $auth->user_id );
+                unless ($user->blocked) {
+                    txn_do { $this_host->counters->incr_auth_ok };
+                    return $auth
+                }
+                ERROR "User $login is blocked";
+            }
+            else {
+                ERROR "Failed login attempt from user $login";
+            }
         }
     }
     $l7r->throw_http_error(HTTP_UNAUTHORIZED, ['WWW-Authenticate: Basic realm="QVD"']);
@@ -553,6 +589,14 @@ sub _check_abort {
     my $cmd = $vm->user_cmd;
     LOGDIE "Aborted by contending session VM VM_ID: ". $vm->id
         if (defined $cmd and $cmd eq 'abort');
+}
+
+sub _create_session_handler {
+    my $session = MojoX::Session->new(
+        store     => [dbi => {dbh => db->storage->dbh, table => "session_l7r"}],
+    );
+
+    return $session;
 }
 
 1;
