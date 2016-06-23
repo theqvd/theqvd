@@ -55,8 +55,8 @@
                                             textValue = currentFilters[filter.filterField][firstKey];
                                             
                                             if (firstKey == '~') {
-                                                // Remove wildcards (%25)
-                                                textValue = textValue.substring(3, textValue.length-3);
+                                                // Remove wildcards
+                                                textValue = textValue.replace(/%/g, '');
                                             }
                                         }
                                     }

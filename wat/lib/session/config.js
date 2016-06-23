@@ -454,12 +454,19 @@ Wat.C = {
     },
     
     // Abort stored ajax requests
-    abortRequests: function () {
+    abortRequests: function (action) {
         var that = this;
         
         $.each(that.requests, function(idx, jqXHR) {
             if (jqXHR == undefined) {
                 return;
+            }
+            
+            var requestAction = Wat.U.getURLParameter(jqXHR.requestURL, 'action');
+            
+            // If action is defined, only abort requests of same action
+            if (action && requestAction != action) {
+                return;    
             }
             
             jqXHR.abort();

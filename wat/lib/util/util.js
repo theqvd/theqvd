@@ -217,5 +217,18 @@ Wat.U = {
         var dFormatted = Wat.U.getDate(d.getTime());
         
         return dFormatted;
+    },
+    
+    // Parse an URL to get required parameter
+    getURLParameter: function (url, parameter) {
+        var regex = /[?&]([^=#]+)=([^&#]*)/g,
+            url = url,
+            params = {},
+            match;
+        while(match = regex.exec(url)) {
+            params[match[1]] = match[2];
+        }
+        
+        return params[parameter];
     }
 }

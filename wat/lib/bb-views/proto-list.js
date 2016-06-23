@@ -204,6 +204,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     // Get filter parameters of the form, set in collection, fetch list and render it
     filter: function (e) {
+		// Abort current requests calling to same action
+        Wat.C.abortRequests(this.collection.action);
+        
         var that = this;
         
         $('.list').html(HTML_MID_LOADING);
