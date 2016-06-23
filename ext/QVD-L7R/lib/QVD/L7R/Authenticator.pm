@@ -119,8 +119,9 @@ sub _validate_tenant {
 }
 
 sub recheck_authentication_basic {
-    my ($auth, $login, $passwd, $l7r) = @_;
-    $auth->{login} eq $login and $auth->{passwd} eq $passwd and $auth->{authenticated}
+    my ($auth, $login, $passwd, $sid) = @_;
+    return ( (($auth->{login} eq $login and $auth->{passwd} eq $passwd) or ($auth->{sid} eq $sid)) 
+        and $auth->{authenticated} );
 }
 
 sub authenticate_basic {

@@ -42,7 +42,7 @@ sub _set_options {
 #                | "," | ";" | ":" | "\" | <">
 #                | "/" | "[" | "]" | "?" | "="
 #                | "{" | "}" | SP | HT
-my $token_re = qr/[!#\$%&'*+\-\.0-9a-zA-Z]+/;
+my $token_re = qr/[!#\$%&'*+_\-\.0-9a-zA-Z]+/;
 
 sub post_accept_hook {
     my $self = shift;

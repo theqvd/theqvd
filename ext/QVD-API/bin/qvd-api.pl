@@ -121,7 +121,7 @@ app->hook(after_render => sub {
 
 # Intended to store log info about the API
 
-app->log( Mojo::Log->new( path => app->qvd_admin4_api->_cfg('wat.log.filename'), level => 'debug' ) );
+app->log( Mojo::Log->new( path => app->qvd_admin4_api->_cfg('log.api.filename'), level => 'debug' ) );
 
 # Package that implements an ad hoc transport system for the sessions manager (MojoX::Session) 
 # According to MojoX::Session specifications, it must provide methods intended to get the session
