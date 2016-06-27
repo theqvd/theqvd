@@ -1,7 +1,5 @@
 package QVD::Client::Frame;
 
-use Data::Dumper;
-
 use threads;
 use threads::shared;
 use Wx qw[:everything];
@@ -300,10 +298,6 @@ sub new {
         }
 
 
-#        my $shared_sizer = Wx::StaticBoxSizer->new(Wx::StaticBox->new($self->{sharing_panel}, wxID_ANY, $self->_t("Shared folders")), wxHORIZONTAL);
-#        $settings_sizer->Add($shared_sizer, 1, wxEXPAND);
-#        $shared_sizer->Add( Wx::StaticText->new($sharing_panel, -1, $self->_t("No folders have been shared yet")), 0, wxALL, 5) ;
-
     }
 
     my $ver_sizer  = Wx::BoxSizer->new(wxVERTICAL);
@@ -317,11 +311,9 @@ sub new {
     my $grid_sizer = Wx::GridSizer->new(1, 1, 0, 0);
     $ver_sizer->Add($grid_sizer, 1, wxALL|wxEXPAND, 20);
 
-#    $grid_sizer->Add(Wx::StaticText->new($panel, -1, $self->_t("User")), 0, wxALL, 5);
     $self->{username} = Wx::TextCtrl->new($panel, -1, core_cfg('client.remember_username') ?  core_cfg('client.user.name') : "", wxDefaultPosition, [300,30]);
     $grid_sizer->Add($self->{username}, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
 
-#    $grid_sizer->Add(Wx::StaticText->new($panel, -1, $self->_t("Password")), 0, wxALL, 5);
     $self->{password} = Wx::TextCtrl->new($panel, -1, "", wxDefaultPosition, [300,30], wxTE_PASSWORD);
     $grid_sizer->Add($self->{password}, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
 
@@ -1045,9 +1037,6 @@ sub load_usb_devices {
         push $self->{usb_devices} , $dev;
     }
 
-#    my %tmp = map { $_ => 1 } @{$self->{usb_devices}};
-#    $self->{usb_devices} = [ sort keys %tmp ];
-#    $self->{usbip_device_list}->Clear();
     $self->{usbip_device_list}->InsertItems( $self->{usb_devices}, 0 );
 
 
