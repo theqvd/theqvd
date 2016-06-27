@@ -1,5 +1,7 @@
 package QVD::Client::Frame;
 
+use Data::Dumper;
+
 use threads;
 use threads::shared;
 use Wx qw[:everything];
@@ -177,6 +179,7 @@ sub new {
         
         
         $settings_panel = Wx::Panel->new($tab_ctl, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+        $self->{settings_panel} = $settings_panel;
         $settings_panel->SetBackgroundColour(Wx::Colour->new(255,255,255));
         $tab_ctl->AddPage( $settings_panel, $self->_t("Settings"));
         my $settings_sizer = Wx::BoxSizer->new(wxVERTICAL);
@@ -291,16 +294,8 @@ sub new {
             $self->{usb_redirection}->SetValue( core_cfg("client.usb.enable" ) );
             $grid_sizer->Add($self->{usb_redirection});
         
-            $self->{usbip_list_button_add} = Wx::Button->new($settings_panel, -1, $self->_t("Add"));
-            $grid_sizer->Add($self->{usbip_list_button_add});            
-            Wx::Event::EVT_BUTTON($settings_panel, $self->{usbip_list_button_add}->GetId, sub { select_usb_devices($self); });
-
-            $self->{usbip_list_button_delete} = Wx::Button->new($settings_panel, -1, $self->_t("Remove"));
-            $grid_sizer->Add($self->{usbip_list_button_delete});            
-            Wx::Event::EVT_BUTTON($settings_panel, $self->{usbip_list_button_delete}->GetId, sub { select_usb_devices($self); });
-
-            $self->{usbip_devices} = Wx::TextCtrl->new($settings_panel, -1, core_cfg('client.usb.share_list') ?  core_cfg('client.usb.share_list') : "");
-            $settings_sizer->Add($self->{usbip_devices}, 0, wxEXPAND);
+            $self->{usbip_device_list} = Wx::CheckListBox->new($settings_panel, -1, wxDefaultPosition, [200,100] ,  [] , wxLB_EXTENDED|wxLB_NEEDED_SB|wxLB_SORT , wxDefaultValidator, "usbip_devices");
+            $settings_sizer->Add($self->{usbip_device_list}, 0, wxALL|wxEXPAND , 5);
         
         }
 
@@ -323,11 +318,11 @@ sub new {
     $ver_sizer->Add($grid_sizer, 1, wxALL|wxEXPAND, 20);
 
 #    $grid_sizer->Add(Wx::StaticText->new($panel, -1, $self->_t("User")), 0, wxALL, 5);
-    $self->{username} = Wx::TextCtrl->new($panel, -1, core_cfg('client.remember_username') ?  core_cfg('client.user.name') : "", wxDefaultPosition, [400,30]);
+    $self->{username} = Wx::TextCtrl->new($panel, -1, core_cfg('client.remember_username') ?  core_cfg('client.user.name') : "", wxDefaultPosition, [300,30]);
     $grid_sizer->Add($self->{username}, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
 
 #    $grid_sizer->Add(Wx::StaticText->new($panel, -1, $self->_t("Password")), 0, wxALL, 5);
-    $self->{password} = Wx::TextCtrl->new($panel, -1, "", wxDefaultPosition, [400,30], wxTE_PASSWORD);
+    $self->{password} = Wx::TextCtrl->new($panel, -1, "", wxDefaultPosition, [300,30], wxTE_PASSWORD);
     $grid_sizer->Add($self->{password}, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
 
     if (core_cfg('client.show.remember_password')) {
@@ -366,7 +361,7 @@ sub new {
     }
 
     # port goes here!
-    $self->{connect_button} = Wx::Button->new($panel, -1, $self->_t("Connect"),wxDefaultPosition,[400,30]);
+    $self->{connect_button} = Wx::Button->new($panel, -1, $self->_t("Connect"),wxDefaultPosition,[300,30]);
     $self->{connect_button}->SetBackgroundColour(Wx::Colour->new(229,90,0));
     $grid_sizer->Add($self->{connect_button}, 0, wxALIGN_TOP|wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
     $self->{connect_button}->SetDefault;
@@ -403,12 +398,14 @@ sub new {
 
     # Hide everything if shared folders is unselected
     $self->OnClickSharedFolders();
+    $self->OnClickUSBShare();
 
     Wx::Event::EVT_BUTTON($self, $self->{connect_button}->GetId, \&OnClickConnect);
     Wx::Event::EVT_BUTTON($self, $self->{share_add}->GetId, \&share_add);
     Wx::Event::EVT_BUTTON($self, $self->{share_del}->GetId, \&share_del);
 
     Wx::Event::EVT_CHECKBOX($self, $self->{share_enable}->GetId, \&OnClickSharedFolders);
+    Wx::Event::EVT_CHECKBOX($self, $self->{usb_redirection}->GetId, \&OnClickUSBShare);
 
     Wx::Event::EVT_TIMER($self, -1, \&OnTimer);
 
@@ -425,9 +422,12 @@ sub new {
     $self->{proc_pid} = undef;
     $self->{log} = "";
     $self->{shares} = [];
+    $self->{usb_devices} = [];
+    $self->{disconnected_usb_devices} = [];
 
 
     $self->load_share_list();
+    $self->load_usb_devices();
 
 	if( $ENV{QVD_PP_BUILD} ) {
 		INFO "Being called from PP build. Exiting.";
@@ -593,6 +593,23 @@ sub OnClickSharedFolders {
         $self->{share_del}->Show(0);
         $self->{share_list}->Show(0);
     }
+
+    $self->{settings_panel}->Layout();
+
+}
+
+sub OnClickUSBShare {
+    my( $self, $event ) = @_;
+
+    if ( $self->{usb_redirection}->GetValue() ){
+        # Enable device list
+        $self->{usbip_device_list}->Show(1);
+    }else{
+        # Disable device list
+        $self->{usbip_device_list}->Show(0);
+    }
+
+    $self->{settings_panel}->Layout();
 
 }
 
@@ -1013,16 +1030,33 @@ sub OnSetEnvironment {
     cond_signal $set_env;
 }
 
-sub select_usb_devices {
-	my ($self) = @_;
+sub load_usb_devices {
+    my ($self) = shift;
+    
+    my $usb = QVD::Client::USB::instantiate( core_cfg('client.usb.implementation') );
+    my @devices = @{ $usb->list_devices };
+    my @selected;
+    
+    foreach my $d ( @devices ){
+    	
+        my $dev = $d->{vendor} . " " . $d->{product} 
+            .  " (" . $d->{vid} . ":" . $d->{pid} 
+            . ( $d->{serial} ? '@' . $d->{serial} : "") . ")";
+        push $self->{usb_devices} , $dev;
+    }
 
-	my $usb = QVD::Client::USB::instantiate( core_cfg('client.usb.implementation') );
-	my @devices = @{ $usb->list_devices };
-	my @selected;
-	my $cursel = $self->{usbip_devices}->GetValue();
+#    my %tmp = map { $_ => 1 } @{$self->{usb_devices}};
+#    $self->{usb_devices} = [ sort keys %tmp ];
+#    $self->{usbip_device_list}->Clear();
+    $self->{usbip_device_list}->InsertItems( $self->{usb_devices}, 0 );
+
+
+
+	# Build selection list from our saved config
+
+	my $cursel = core_cfg('client.usb.share_list', '');
 	my @parts = split(/,/, $cursel);
 
-	# Build selection list from the contents of the textbox
 	foreach my $part (@parts) {
 		my ($v, $p, $id);
 		$part =~ s/^\s+//;
@@ -1031,43 +1065,32 @@ sub select_usb_devices {
 		($v, $p) = split(/:/, $part);
 		($p, $id) = split(/@/, $p) if ( $p =~ /@/ );
 
+                my $is_connected=0;
 		for(my $i=0;$i<=scalar @devices;$i++) {
 			my $d = $devices[$i];
 			if ( $d->{vid} eq $v && $d->{pid} eq $p && (!defined $id || $d->{serial} eq $id)) {
 				push @selected, $i;
+                                $is_connected=1;
 			}
 		}
-	}
-    
-	my $dialog = new Wx::MultiChoiceDialog(
-		$self, 
-		$self->_t("Select the USB devices to share:"), 
-		$self->_t("USB sharing"), 
-		[
-		map {
-			$_->{vendor} . " " . $_->{product} . 
-			" (" . $_->{vid} . ":" . $_->{pid} . ( $_->{serial} ? '@' . $_->{serial} : "") . ")";
-		} @devices
-		],
-	);
-
-	$dialog->SetSelections(@selected);
-
-        if ( $dialog->ShowModal() == wxID_OK ) {
-		my @selected = $dialog->GetSelections();
-		
-		my $devs = "";
-		foreach my $sel (@selected) {
-			my $d = $devices[$sel];
-			
-			$devs .= ", " if ( $devs ne "" );
-			$devs .= $d->{vid} . ":" . $d->{pid};
-			$devs .= '@' . $d->{serial} if ( $d->{serial} );
-		}
-		
-		$self->{usbip_devices}->SetValue( $devs );
+                if ( ! $is_connected ) {
+                    # Make sure we don't forget about devices although they're not connected now
+                    push $self->{disconnected_usb_devices}, $v.":".$p.( defined $id ? "@".$id : '');
+                }
 	}
 
+	foreach my $i (@selected){
+		$self->{usbip_device_list}->Check($i,1);
+	}
+
+}
+
+sub share_del {
+    my ($self) = @_;
+
+    my ($first_selection) = $self->{share_list}->GetSelections();
+    $self->{share_list}->Delete($first_selection);
+    splice @{$self->{shares}}, $first_selection,1;
 }
 
 sub share_add {
@@ -1088,8 +1111,6 @@ sub share_del {
     my ($first_selection) = $self->{share_list}->GetSelections();
     $self->{share_list}->Delete($first_selection);
     splice @{$self->{shares}}, $first_selection,1;
-
-
 }
 
 
@@ -1110,6 +1131,7 @@ sub update_share_list() {
     $self->{share_list}->InsertItems( $self->{shares}, 0 );
 
 }
+
 
 sub DetectKeyboard {
 
@@ -1180,8 +1202,23 @@ sub SaveConfiguration {
         set_core_cfg('client.remember_password', ($self->{remember_pass}->IsChecked() ? 1 : 0));
     }
 
-    if ($self->{usbip_devices}) {
-        set_core_cfg('client.usb.share_list', $self->{usbip_devices}->GetValue());
+    if ($self->{usbip_device_list}) {
+        my $usb_list;
+        # If it was checked, save it
+        foreach my $usb_t ( @{ $self->{usb_devices} } ){
+            if ( $self->{usbip_device_list}->IsChecked( $self->{usbip_device_list}->FindString($usb_t) ) ){
+                my $usb = $usb_t;  # Do not modify the original contents of usb_devices
+                $usb =~ s/.*\((.*)\)/$1/;
+                $usb_list .= "," if ( $usb_list );
+                $usb_list .= $usb ;
+            }
+	}
+        # If it is in the disconnected list, it was checked before. Don't forget about it
+        foreach my $disconnected ( @{ $self->{disconnected_usb_devices} } ){
+            $usb_list .= "," if ( $usb_list );
+            $usb_list .= $disconnected;
+        }
+	set_core_cfg('client.usb.share_list', ($usb_list ? $usb_list : "") );
         set_core_cfg('client.usb.enable', $self->{usb_redirection}->GetValue()); 
     }
     
