@@ -180,7 +180,7 @@ sub new {
         $self->{settings_panel} = $settings_panel;
         $settings_panel->SetBackgroundColour(Wx::Colour->new(255,255,255));
         $tab_ctl->AddPage( $settings_panel, $self->_t("Settings"));
-        my $settings_sizer = Wx::BoxSizer->new(wxVERTICAL);
+        my $settings_sizer = Wx::FlexGridSizer->new(0, 1,-10,0);
         $settings_panel->SetSizer($settings_sizer);
         
 
@@ -297,6 +297,9 @@ sub new {
         
         }
 
+       $settings_sizer->Add( Wx::HyperlinkCtrl->new( $settings_panel , -1, 'Qindel Group © 2016 | Terms of use','http://www.google.es',
+            wxDefaultPosition, wxDefaultSize, 0 , ''), 0 , wxALIGN_CENTER_HORIZONTAL|wxALIGN_BOTTOM|wxBOTTOM, 5 );
+
 
     }
 
@@ -308,7 +311,7 @@ sub new {
                      0, wxTOP|wxALIGN_CENTER_HORIZONTAL, 100 );
 
 
-    my $grid_sizer = Wx::GridSizer->new(1, 1, 0, 0);
+    my $grid_sizer = Wx::GridSizer->new(1, 1, -10, 0);
     $ver_sizer->Add($grid_sizer, 1, wxALL|wxEXPAND, 20);
 
     $self->{username} = Wx::TextCtrl->new($panel, -1, core_cfg('client.remember_username') ?  core_cfg('client.user.name') : "", wxDefaultPosition, [300,30]);
@@ -366,6 +369,8 @@ sub new {
     $self->{progress_bar} = Wx::Gauge->new($panel, -1, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL|wxGA_SMOOTH);
     $self->{progress_bar}->SetValue(0);
     $ver_sizer->Add($self->{progress_bar}, 0, wxEXPAND, 0);
+
+    $ver_sizer->Add( Wx::HyperlinkCtrl->new( $panel , -1, 'Qindel Group © 2016 | Terms of use','http://www.google.es',wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL , ''), 0 , wxALIGN_CENTER_HORIZONTAL, 5 );
 
     $self->SetTitle("QVD");
     my $icon = Wx::Icon->new();
