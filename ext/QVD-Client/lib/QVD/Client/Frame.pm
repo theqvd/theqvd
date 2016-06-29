@@ -192,7 +192,7 @@ sub new {
 
 
         my $grid_sizer = Wx::FlexGridSizer->new(0, 2, 0, 0);
-        $settings_sizer->Add($grid_sizer, 0, wxALL|wxEXPAND, 20);
+        $settings_sizer->Add($grid_sizer, 0, wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND, 20);
 
         $grid_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Enable audio")), 0, wxALL, 0);
         $self->{audio} = Wx::CheckBox->new($settings_panel, -1, "" , wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, wxDefaultValidator, "checkBox");
@@ -219,7 +219,7 @@ sub new {
         $settings_sizer->Add( $this_text , 0, wxALL|wxEXPAND, 0);
 
         my $grid_sizer = Wx::FlexGridSizer->new(0, 2, 0, 0);
-        $settings_sizer->Add($grid_sizer, 0, wxALL|wxEXPAND, 20);
+        $settings_sizer->Add($grid_sizer, 0, wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND, 20);
 
         if (!core_cfg('client.force.host.name', 0)) {
             $grid_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Server")), 0, wxALL, 0);
@@ -260,7 +260,7 @@ sub new {
         $settings_sizer->Add( $this_text , 0, wxALL|wxEXPAND, 0);
 
         my $grid_sizer = Wx::FlexGridSizer->new(0, 4, 0, 0);
-        $settings_sizer->Add($grid_sizer, 0, wxALL|wxEXPAND, 20);
+        $settings_sizer->Add($grid_sizer, 0, wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND, 20);
 
         $grid_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Enable shared folders")), 0, wxALL, 0);
         $self->{share_enable} = Wx::CheckBox->new($settings_panel, -1, "", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, wxDefaultValidator, "checkBox");
@@ -285,7 +285,7 @@ sub new {
 
         if ( !$WINDOWS && !$DARWIN ) {
             my $grid_sizer = Wx::FlexGridSizer->new(0, 4, 0, 0);
-            $settings_sizer->Add($grid_sizer, 0, wxALL|wxEXPAND, 20);
+            $settings_sizer->Add($grid_sizer, 0, wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND, 20);
 
             $grid_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Enable USB redirection")), 0, wxALL, 0);
             $self->{usb_redirection} = Wx::CheckBox->new($settings_panel, -1, "", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, wxDefaultValidator, "checkBox");
@@ -296,10 +296,6 @@ sub new {
             $settings_sizer->Add($self->{usbip_device_list}, 0, wxALL|wxEXPAND , 5);
         
         }
-
-       $settings_sizer->Add( Wx::HyperlinkCtrl->new( $settings_panel , -1, 'Qindel Group © 2016 | Terms of use','http://www.google.es',
-            wxDefaultPosition, wxDefaultSize, 0 , ''), 0 , wxALIGN_CENTER_HORIZONTAL|wxALIGN_BOTTOM|wxBOTTOM, 5 );
-
 
     }
 
@@ -358,6 +354,7 @@ sub new {
     # port goes here!
     $self->{connect_button} = Wx::Button->new($panel, -1, $self->_t("Connect"),wxDefaultPosition,[300,30]);
     $self->{connect_button}->SetBackgroundColour(Wx::Colour->new(229,90,0));
+    $self->{connect_button}->SetForegroundColour(Wx::Colour->new(255,255,255));
     $grid_sizer->Add($self->{connect_button}, 0, wxALIGN_TOP|wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
     $self->{connect_button}->SetDefault;
 
@@ -370,7 +367,7 @@ sub new {
     $self->{progress_bar}->SetValue(0);
     $ver_sizer->Add($self->{progress_bar}, 0, wxEXPAND, 0);
 
-    $ver_sizer->Add( Wx::HyperlinkCtrl->new( $panel , -1, 'Qindel Group © 2016 | Terms of use','http://www.google.es',wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL , ''), 0 , wxALIGN_CENTER_HORIZONTAL, 5 );
+    $ver_sizer->Add( Wx::HyperlinkCtrl->new( $panel , -1, 'Qindel Group © 2016 | Terms of use','http://theqvd.com/product/demo-old/terms-of-service',wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL , ''), 0 , wxALIGN_CENTER_HORIZONTAL, 5 );
 
     $self->SetTitle("QVD");
     my $icon = Wx::Icon->new();
