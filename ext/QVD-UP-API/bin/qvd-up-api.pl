@@ -120,6 +120,21 @@ any [ qw(POST) ] => '/login' => sub {
 
     my $http_code = $auth_tx->res->code // 502;
     my $http_message = $auth_tx->res->message // "Authentication server unavailable";
+
+    my $user_id;
+    try {
+        my $user_filter = {
+            login => $user,
+            password => $password
+        };
+        $user_filter->{ tenant_id } = $DB->resultset( "Tenant" )->search( { name => $tenant } )->first->id
+            if cfg( 'wat.multitenant' );
+        $user_id = $DB->resultset( "User" )->first( $user_filter )->id;
+    } catch {
+        $http_code = 502;
+        $http_message = "Database unavailable";
+    };
+
     if ($http_code == 200) {
         my $session = create_up_session_handler( $c->tx, $DB->storage->dbh );
 
@@ -128,16 +143,17 @@ any [ qw(POST) ] => '/login' => sub {
         $session->data( tenant_name => $tenant );
         $session->data( login => $login );
         $session->data( password => $password );
+        $session->data( user_id => $user_id );
         $session->flush;
 
         $http_message = "Logged in correctly";
     }
 
-    my $json = {
-        message => $http_message
-    };
-        
-    $c->render(json => $json, status => $http_code);
+my $json = {
+    message => $http_message
+};
+    
+$c->render(json => $json, status => $http_code);
 };
 
 # Authenticated actions of the API
@@ -145,62 +161,90 @@ group {
 
     # Check credentials
     under sub {
-            my $c = shift;
+        my $c = shift;
 
-            my $session = create_up_session_handler($c->tx, $DB->storage->dbh);
+        my $session = create_up_session_handler($c->tx, $DB->storage->dbh);
 
-            my $is_logged = 0;
-            my $message = "Incorrect credentials";
-            if ($session->load){
-                if($session->is_expired){
-                    $session->clear;
-                    $is_logged = 0;
-                    $message = "Session expired";
-                }else{
-                    $c->stash({session => $session});
-                    $is_logged = 1;
-                }
-                $session->flush;
+        my $is_logged = 0;
+        my $message = "Incorrect credentials";
+        if ($session->load){
+            if($session->is_expired){
+                $session->clear;
+                $is_logged = 0;
+                $message = "Session expired";
+            }else{
+                $c->stash({session => $session});
+                $is_logged = 1;
             }
-            
-            if(!$is_logged){
-                $c->render(text => $message, status => 401);
-            }
+            $session->flush;
+        }
+        
+        if(!$is_logged){
+            $c->render(text => $message, status => 401);
+        }
 
-            return $is_logged;
-        };
+        return $is_logged;
+    };
 
         # Session logout
-        any [ qw(POST) ] => '/logout' => sub {
-                my $c = shift;
+    any [ qw(POST) ] => '/logout' => sub {
+        my $c = shift;
 
-                my $session = $c->stash('session');
-                $session->expire;
-                $session->clear;
-                $session->flush;
-                
-                $c->render(text => "Logged out", status => 200);
-            };
+        my $session = $c->stash('session');
+        $session->expire;
+        $session->clear;
+        $session->flush;
+        
+        $c->render(text => "Logged out", status => 200);
+    };
 
-        any [qw(POST)] => '/connect_vm' => sub {
-            my $c = shift;
+    any [qw(GET)] => '/vm_list' => sub {
+        my $c = shift;
 
-                my $data = $c->req->params->to_hash;
-                my $vm_id = $data->{vm_id} // "";
+        my $http_code = 200;
+        my $http_message = "OK";
+        my $vm_list = [];
 
-                my $session_l7r = create_l7r_session_handler($DB->storage->dbh);
-                my $session_up = $c->stash->{session};
-                $session_l7r->create;
-                $session_l7r->data->{vm_id} = $vm_id;
-                $session_l7r->data->{login} = $session_up->data->{login};
-                $session_l7r->data->{password} = $session_up->data->{password};
-                $session_l7r->flush;
+        try {
+            $vm_list = [ map { 
+                    blocked => $_->vm_runtime->blocked, 
+                    name => $_->name, 
+                    id => $_->id, 
+                    state => $_->vm_runtime->vm_state 
+                },
+                $DB->resultset( "VM" )->search( { user_id => $c->stash('session')->data('user_id') } )->all ];
+        } catch {
+            $http_code = 502;
+            $http_message = "Database unavailable";
+        };
 
-                my $file_name = $session_l7r->sid . ".qvd";
-                my $file_data = $session_l7r->sid . "\n";
-                print $file_data;
-                $c->render_file(data => $file_data, filename => $file_name, format => 'qvd');
-            };
+        my $json = {
+            message => $http_message,
+            vms => $vm_list
+        };
+
+        $c->render(json => $json, status => $http_code);
+    };
+
+    any [qw(POST)] => '/vm_connect' => sub {
+    my $c = shift;
+
+        my $data = $c->req->params->to_hash;
+        my $vm_id = $data->{vm_id} // "";
+
+        my $session_l7r = create_l7r_session_handler($DB->storage->dbh);
+        my $session_up = $c->stash->{session};
+        $session_l7r->create;
+        $session_l7r->data->{vm_id} = $vm_id;
+        $session_l7r->data->{login} = $session_up->data->{login};
+        $session_l7r->data->{password} = $session_up->data->{password};
+        $session_l7r->flush;
+
+        my $file_name = $session_l7r->sid . ".qvd";
+        my $file_data = $session_l7r->sid . "\n";
+        print $file_data;
+        $c->render_file(data => $file_data, filename => $file_name, format => 'qvd');
+    };
 };
 
 app->start;
