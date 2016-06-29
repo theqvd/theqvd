@@ -18,55 +18,54 @@ body {
 
 * {
     @include in(mobile) {
-        //max-width: 50em !important;
         min-width: 0 !important;
     }
 }
 
 .super-wrapper {
     padding-top: 60px;
+    &.super-wrapper--login {
+        background: $login_bg;
+        padding: 0; 
+        height: 100vh;
+        .wrapper {
+            background: $login_bg;
+            margin: 0px;
+        }
+        
+        .loading {
+            color: $col_whiter;
+        }
+    }
 }
 
 .header-wrapper {
     @extend %invisible;
 
     height: 60px;
-    border-bottom: 2px solid darken($col_header, 20);
-    background: $col_header;
-    color: $col_headertext;
+    border-bottom: 2px solid darken($header_bg, 5);
+    background: $header_bg;
     position: fixed;
     top: 0px;
-    width: 100%;
-    z-index: 100;
     
-    a {
-        color: white;
+    width: 100%;
+
+    @include in(desktop) {
+        width: auto;
+        min-width: 100%;
     }
+    
+    z-index: 100;
     
     &.header-wrapper--mini {
         height: 40px;
         
-        img.logo {
+        div.logo {
             height: 35px;
-        }
-        
-        .logged-info {
-            display: none;
-        }
-        
-        .corner-menu {
-            margin-top: 5px;
+            width: 80px;
         }
         
         opacity: 0.90;
-    }
-    
-    .corner-menu {
-        float: right;
-        
-        &>li>ul>li {
-            background: $col_brand;
-        }
     }
     
     .header {
@@ -74,11 +73,21 @@ body {
                 
         @include width-wrapper;
 
-        @extend %center-wrapper; 
+        padding-left: 5px;
+        padding-right: 5px;
+
+        @include in(desktop) {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
         
         .logo {
             height: 55px;
-            margin: 2px 0px;
+            width: 125px;
+            margin: 5px 0px;
+            background-image: url($header_logo);
+            background-repeat: no-repeat;
+            background-size: 100%;
         }
         
         .superadmin-select {
@@ -86,97 +95,93 @@ body {
         }
         
     }
-    
-    .message-container {
-        position: fixed;
-        top: 0px;
+}
 
-        left: 5%;
-        width: 90%;
-        @include in(desktop) {
-            left: 20px;
-            width: 40%;
-        }
-        
-        padding: 12px 20px;
-        border-bottom-left-radius: 20px;
-        border-bottom-right-radius: 20px;
-        border-top: 0px;
-        color: $col_whiter;
-        font-weight: bold;
-        z-index: 1001;
-        display: none;
-                
-        &.success {
-            color: darken($col_green, 5);
-            background: $col_whiter;
-        }
-        
-        &.error {
-            color: darken($col_red, 5);
-            background: $col_whiter;
-        }
-        
-        &.info {
-            color: darken($col_blue, 5);
-            background: $col_whiter;
-        }
-        
-        &.warning {
-            color: darken($col_yellow, 5);
-            background: $col_whiter;
+.message-container {
+    position: fixed;
+    top: 0px;
+
+    left: 5%;
+    width: 90%;
+    @include in(desktop) {
+        left: 20px;
+        width: 40%;
+    }
+
+    padding: 12px 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    border-top: 0px;
+    color: $col_whiter;
+    font-weight: bold;
+    z-index: 1001;
+    display: none;
+
+    &.success {
+        background: darken($col_green, 5);
+    }
+
+    &.error {
+        background: darken($col_red, 5);
+    }
+
+    &.info {
+        background: darken($col_blue, 5);
+    }
+
+    &.warning {
+        background: darken($col_yellow, 5);
+    }
+
+    .message-close {
+        float:right;
+        //position: absolute;
+        top: 6px;
+        right: 8px;
+        @include icon-size(20px);
+        cursor: pointer;
+    }
+
+    .message {
+        padding-top: 10px;
+
+        summary {
+            line-height: 20px;
         }
 
-        .message-close {
-            float:right;
-            //position: absolute;
-            top: 6px;
-            right: 8px;
-            @include icon-size(20px);
-            cursor: pointer;
-        }
-        
-        .message {
-            padding-top: 10px;
-            
-            summary {
-                line-height: 20px;
-            }
-            
-            article.expandedMessage {
-                display: none;
-                @include font-size(1);
-                padding: 14px 30px;
-                margin-top: 10px;
-                
-                background: darken($col_whiter, 8);
-                color: $col_blacker;
-                margin-top: 10px;
-                margin-bottom: 10px;
-                border-radius: 4px;
-                
-                font-weight: normal;
-                
-                ul {
-                    margin-top: 5px;
-                    margin-left: 8px;
-                    li {
-                        margin-top: 4px;
-                        display: list-item;
-                        
-                        &:before, i:before {
-                            margin-right: 5px;
-                        }
+        article.expandedMessage {
+            display: none;
+            @include font-size(1);
+            padding: 14px 30px;
+            margin-top: 10px;
+
+            background: darken($col_whiter, 8);
+            color: $col_blacker;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+
+            font-weight: normal;
+
+            ul {
+                margin-top: 5px;
+                margin-left: 8px;
+                li {
+                    margin-top: 4px;
+                    display: list-item;
+
+                    &:before, i:before {
+                        margin-right: 5px;
                     }
                 }
             }
-            
-            .expand-message {
-                cursor: pointer;
-                @include icon-size(20px);
-                float:left;
-                margin-right: 15px;
-            }
+        }
+
+        .expand-message {
+            cursor: pointer;
+            @include icon-size(20px);
+            float:left;
+            margin-right: 15px;
         }
     }
 }
@@ -226,16 +231,25 @@ body {
 
 .wrapper {
     @extend %invisible;
+    
 
-    @extend %center-wrapper;
-        
+    width: 99%;
+    margin: 0 auto;
+    
+    padding-left: 5px;
+    padding-right: 5px;
+    
     @include in(desktop) {
-        @extend %center-wrapper-mobile;
+        padding-left: 20px;
+        padding-right: 20px;
     }
     
     @include width-wrapper;
 
     background-color: $col_whiter;
+    margin-bottom: 50px;
+    margin-left: 5px;
+    
     position: relative;
     
     .menu {
@@ -269,8 +283,13 @@ body {
         @extend %clearfix;
         
         display: table;
-        width: 100%;
         margin: 0 auto;
+        
+        width: 96%;
+
+        @include in(desktop) {
+            width: 100%;
+        }
         
         // Different view layouts
         @import "layout-home";
@@ -288,6 +307,25 @@ body {
 @import "layout-roles";
 @import "layout-editor";
 
+.responsive-switch {
+    margin-bottom: 45px; 
+    width: 100%;
+    
+    @include in(desktop) {
+        position: absolute;
+        margin-left: auto;
+        margin-right: auto;
+        left: 0;
+        right: 0;
+        bottom: 0px;
+    }
+    
+    a {
+        display: table;
+        margin: 0 auto;
+    }
+}
+
 .footer {
     @extend %invisible;
 
@@ -296,11 +334,10 @@ body {
     height: 30px;
     margin-top: 50px;
     text-align: center;
-    color: $col_headertext;
+    color: $footer_text;
     @extend %clearfix;
     
-    border-top: 2px solid darken($col_header, 5);
-    background: $col_header;
+    background: $footer_bg;
     width: 100%;
     
     position: fixed;
@@ -317,7 +354,6 @@ body {
     
     a {
         line-height: 14px;
-        color: $col_headerlink;
     }
 }
 
@@ -329,15 +365,16 @@ body {
 }
 
 /* Responsive generic layout */
-.desktop {
+.desktop, .desktop-row {
     display: none;
-    visibility: hidden;
 }
 
 @include in(desktop) {
     .desktop {
         display: block;
-        visibility: visible;
+    }
+    .desktop-row {
+        display: table-row;
     }
     
     td.desktop, th.desktop {
@@ -349,7 +386,6 @@ body {
     
     .mobile {
         display: none;
-        visibility: hidden;
     }
 }
 
@@ -367,17 +403,13 @@ span.text {
 
 .related-doc {
     display: inline-table;
+    margin-top: 20px;
     margin-bottom: 80px;
     padding-left: 20px;
-    
-    .related-doc-title {
-        font-weight: bold; 
-        margin-bottom: 10px; 
-        margin-top: 10px;
-    }
-    
+    width: 100%;
+
     a.button2 {
-        margin-bottom: 10px;
+        margin-bottom: 15px;
         display: block;
     }
 }
@@ -395,9 +427,18 @@ span.text {
     }
 }
 
-.list-wrapper, .details-list-wrapper {
-    margin-bottom: 65px;
-    padding-top: 20px;
+.server-datetime-wrapper {
+    position: fixed;
+    right: 0;
+    top: 60px;
+    font-size: 12px;
+    padding: 7px 15px 4px 5px;
+    background: #eee;
+    border-bottom-left-radius: 8px;
+    z-index: 2;
+    opacity: 0.8;
+    
+    &.server-datetime-wrapper--mini {
+        top: 40px;
+    }
 }
-
-

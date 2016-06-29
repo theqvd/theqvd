@@ -26,39 +26,9 @@
 
 
 
-
 @font-face {
-  font-family: 'Lato';
+  font-family: 'Prosto One';
   font-style: normal;
   font-weight: 400;
-  src: local('Lato Regular'), local('Lato-Regular'), url(lato/9k-RPmcnxYEPm8CNFsH2gg.woff) format('woff');
-}
-@font-face {
-  font-family: 'Lato';
-  font-style: normal;
-  font-weight: 700;
-  src: local('Lato Bold'), local('Lato-Bold'), url(lato/wkfQbvfT_02e2IWO3yYueQ.woff) format('woff');
-}
-@font-face {
-  font-family: 'Lato';
-  font-style: normal;
-  font-weight: 900;
-  src: local('Lato Black'), local('Lato-Black'), url(lato/BVtM30trf7q_jfqYeHfjtA.woff) format('woff');
-}
-
-
-
-
-
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Droid Sans'), local('DroidSans'), url(droidsans/s-BiyweUPV0v-yRb-cjciBsxEYwM7FgeyaSgU71cLG0.woff) format('woff');
-}
-@font-face {
-  font-family: 'Droid Sans';
-  font-style: normal;
-  font-weight: 700;
-  src: local('Droid Sans Bold'), local('DroidSans-Bold'), url(droidsans/EFpQQyG9GqCrobXxL-KRMQFhaRv2pGgT5Kf0An0s4MM.woff) format('woff');
+  src: local('Prosto One'), local('ProstoOne'), url(prostoone/ProstoOne-Regular.ttf) format('truetype');
 }

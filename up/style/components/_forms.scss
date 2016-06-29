@@ -14,6 +14,7 @@ option {
 }
 
 label {
+    display: block;
     margin-bottom: 8px;
 }
 
@@ -23,16 +24,10 @@ select {
     min-height: 22px;
     padding: 4px;
     
-    &[name="selected_actions_select"] {
-        width: auto;
-        float: left;
-        margin-bottom: 10px;
-    }
-    
     -webkit-appearance: normal;
 }
 
-.actions_button, select[name="selected_actions_select"] {
+.actions_button {
     width: 100%;
     height: $input_height_mobile;
     border: 1px solid darken($col_whiter, 20);
@@ -43,7 +38,7 @@ select {
 }
     
 
-input, .button, .button2 {
+input, textarea, .button, .button2 {
     padding: 4px 8px;
     line-height: 30px;
     border-color: #ccc;
@@ -56,25 +51,35 @@ input {
     line-height: $height_input;
 }
 
-select, input, .button, .button2 {
+select, input, textarea, .button, .button2 {
     border-radius: $form_elements_radius;
     border-style: solid;
-    border-color: darken($col_whiter, 20%);
-    border-width: thin;
+    border-width: 0;
     -webkit-box-shadow: inset 1px 1px 1px 0px #dddddd;
        -moz-box-shadow: inset 1px 1px 1px 0px #dddddd;
             box-shadow: inset 1px 1px 1px 0px #dddddd;
 }
 
+.button2 {
+    border-width: thin;
+}
+
+select {
+    width: 100%;
+}
+
 input[type="checkbox"], input[type="radio"] {
-    width: 20px;
-    height: 20px;
+    /* Trick for make checkboxes resizable on firefox */
+    -moz-appearance: none;
+    
+    width: 24px;
+    height: 24px;
     box-shadow: none;
     border-width: 0;
     
     @include in(desktop) {
-        width: 14px;
-        height: 14px;
+        width: 20px;
+        height: 20px;
     }
 }
 
@@ -110,9 +115,13 @@ input[type="checkbox"], input[type="radio"] {
     @include linear-gradient($col_whiter);
 }
 
-.chosen-container .chosen-results li.highlighted {
+.chosen-container .chosen-results { 
+    max-height: 150px;
+    
+    li.highlighted {
     background-color: $col_brand;
     background-image: none;
+    }
 }
 
 .chosen-container * {
@@ -123,3 +132,4 @@ input[type="checkbox"], input[type="radio"] {
     max-height: 300px;
     overflow-x: auto;
 }
+

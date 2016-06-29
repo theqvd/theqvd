@@ -20,6 +20,14 @@
 
     width: ($width_list_side - 2) * 1%;
     height: auto;
+    background: darken($col_whiter, 3);
+    border: 2px solid darken($col_whiter, 7);
+    padding: 9px;
+    border-radius: 6px;
+    
+    i.fa {
+        margin-right: 8px;
+    }
 
     .filter-control {
         margin-bottom: 10px;
@@ -28,15 +36,13 @@
 
     @if $list_side == left {
         float: left;
-        padding-right: 2%;
+        padding-right: 1%;
         margin-right: 2%;
-        border-right: 1px dotted darken($col_whiter, 15);
     }
     @else if $list_side == right {
         float: right;
-        padding-left: 2%;
-        margin-left: 2%;
-        border-left: 1px dotted darken($col_whiter, 15);
+        padding-left: 1%;
+        margin-left: 1%;
     }
 
     hr {
@@ -119,6 +125,7 @@
     .selected-elements {
         margin-top: 9px;
         float: left;
+        color: $col_whiter;
     }
 }
 
@@ -141,213 +148,40 @@ fieldset {
     
     &.action-selected {
         margin-top: 35px;
+        display: none;
+        position: fixed;
+        top: 50px;
+        right: 10px;
+
+        width: 100px;
+
+        @include in(desktop) {
+        width: 250px;
+        }        
+        
+        a.button, a.button2 {
+            @include in(mobile) {
+                text-align: center;
+            }
+        }
+        min-height: 100px;
+        background: lighten($col_blacker, 10);
+
+        .title {
+            color: $col_whiter;
+            margin-bottom: 20px;
+            font-weight: bold;
+            line-height: 20px;
     }
+    } 
 
     .chosen-container {
         margin-top: -6px;
-    }
-
-    .action-selected-select {
-        margin-bottom: 10px;
-        width: 100%;
-    } 
-
-    .action-selected-button a {
-        @include in(desktop) {
-            float: right;
-        }
     }       
 
     legend {
         text-align: left;
         color: $col_blacker;
         padding: 0px 10px;
-    }
-}
-
-/* Grid styles */
-
-.grid-cell {
-    float: left;
-    
-    width: 100%;
-    margin: 0px 0px 15px 0px;
-
-    @include in(desktop) {
-        width: 215px;
-        margin: 10px;
-    }
-        
-    background: $col-whiter;
-    
-    padding: 10px;
-    border-radius: 4px;
-    border: #ddd solid 4px;
-    
-    a {
-        &.button, &.button2 {
-            text-align: center;
-            margin-bottom: 3px;
-            margin-top: 3px;
-            
-            &.connect-btn {
-                width: 60%;
-                float: right;
-                margin-top: 0px;
-                
-                @include in(desktop) {
-                    margin-bottom: 0px;
-                    width: 100%;
-                    float: none;
-                }
-            }
-        }
-    }
-    
-    .vm-link {
-        float: left;
-        margin-left: 10px;
-        @include in(desktop) {
-            float: none;
-            margin: inherit;
-        }
-    }
-    
-    .vm-name {
-        width: 100%;
-        
-        @include in(desktop) {
-            width: 100%;
-        }
-    }
-    
-    .vm-screenshot {
-        background: url('../images/screenshot-test.png');
-    }  
-    
-    .vm-screenshot-off {
-        background: url('../images/screenshot-off.png');
-    }
-    
-
-    .vm-screenshot, .vm-screenshot-off {
-        background-size: auto 100%;
-        background-position: center; 
-        background-repeat: no-repeat;
-        
-        width: 35%;
-        height: 75px;
-        float: left;
-        
-        @include in(desktop) {
-            width: 100%;
-            height: 150px;
-            float: none;
-            margin-top: 5px;
-            margin-bottom: 5px;
-        }
-        
-        position: relative;
-        
-        
-        .state-icon, .warning-icon, .vm-warn-buttons {
-            position: absolute;
-        }
-        
-        .vm-warn-buttons {
-            background: $col-blacker;
-            opacity: 0.8;
-            position: absolute;
-            left: 0;
-            
-            width: 100%;
-            height: 33px;
-            bottom: -38px;
-            border-radius: 6px;
-            
-            @include in(desktop) {
-                width: 60px;
-                top: 0;
-                border-radius: 0px;
-                border-bottom-right-radius: 10px;
-                height: 30px;
-                bottom: -35px;
-                border-radius: 10px;
-            }
-        }
-        
-        .state-icon, .warning-icon {
-            bottom: -36px;
-            width: 28px;
-            height: 28px;
-            padding: 5px;
-            
-            @include in(desktop) {
-                top: 3px;
-                width: 24px;
-                height: 24px;
-                padding: 3px;
-            }
-            
-            background: $col-whiter;
-            border-radius: 100%;
-        }
-        
-        .state-icon {
-            left: 14px;
-            @include in(desktop) {
-                left: 3px;
-            }
-        }
-        
-        .warning-icon {
-            right: 10px;
-            @include in(desktop) {
-                left: 32px;
-            }
-        }
-    }
-    
-    .vm-link {
-        width: 60%;
-        float: right;
-        position: relative;
-        height: 37px;
-        
-        @include in(desktop) {
-            height: 25px;
-            float: none;
-            width: 100%;
-            position: relative;
-
-            a {
-                width: 100%;
-            }
-        }
-    }
-    
-    .vm-link-button {
-        width: 60%;
-        float: right;
-        
-        @include in(desktop) {
-            width: 100%;
-            float: none;
-        }
-        
-        &.desktop {
-            @include in(desktop) {
-                display: block;
-            }
-        }
-    }
-}
-
-.profile-select {
-    clear: none;
-    padding: 4px;
-    width: 100%;
-    @include in(desktop) {
-        width: 35%;
     }
 }

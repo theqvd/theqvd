@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://localhost/" />
+<title>language_change_to_en</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">language_change_to_en</td></tr>
+</thead><tbody>
+<tr>
+	<td>storeElementIndex</td>
+	<td>css=select[name=&quot;blocked&quot;] option[value=&quot;1&quot;]</td>
+	<td>actionIndex</td>
+</tr>
+<tr>
+	<td>clickAt</td>
+	<td>css=#filter_blocked_chosen</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAt</td>
+	<td>css=div#filter_blocked_chosen .chosen-results [data-option-array-index=${actionIndex}]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForElementPresent</td>
+	<td>css=a.js-delete-filter-note[data-filter-name=&quot;blocked&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForElementNotPresent</td>
+	<td>css=div.loading-mid</td>
+	<td></td>
+</tr>
+</tbody></table>
+</body>
+</html>

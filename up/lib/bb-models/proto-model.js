@@ -14,7 +14,6 @@ Wat.Models.Model = Backbone.Model.extend({
         else {
             var view = 'list';
         }
-        
         switch (view) {
             case 'detail':
                 return this.processResponse(response.rows[0]);
@@ -23,7 +22,7 @@ Wat.Models.Model = Backbone.Model.extend({
                 return this.processResponse(response);
                 break;
             case 'error':
-                Wat.I.showMessage({messageType: 'error'}, response);
+                Wat.I.M.showMessage({messageType: 'error'}, response);
                 break;
         }
     },
@@ -31,8 +30,10 @@ Wat.Models.Model = Backbone.Model.extend({
     processResponse: function (response) {
         // If found creation_date field, replace ugly T by blank space
         if (response) {
+            // Creation date must be converted to local timezone and proper format
             if (response.creation_date) {
                 response.creation_date = response.creation_date.replace("T", " ");
+                response.creation_date = Wat.U.getLocalDatetimeFormatted(response.creation_date);
             }
         
             // Escape strings to avoid injections
@@ -53,9 +54,13 @@ Wat.Models.Model = Backbone.Model.extend({
     },
     
     url: function () {
-        return Wat.C.getBaseUrl() + 
-            "&action=" + this.actionPrefix + "_get_details" + 
-            "&filters={\"id\":" + this.id + "}";
+        var url = Wat.C.getBaseUrl();
+        url += "&action=" + this.actionPrefix + "_get_details";
+        if (this.id != undefined) {
+            url += "&filters={\"id\":" + this.id + "}";
+        }
+        
+        return url
     },
     
     setActionPrefix: function (newActionPrefix) {
@@ -81,7 +86,7 @@ Wat.Models.Model = Backbone.Model.extend({
         var params = _.extend({
             type: 'POST',
             dataType: 'json',
-            url: that.url(),
+            url: encodeURI(that.url()),
             processData: false
         }, options);
         
@@ -90,11 +95,11 @@ Wat.Models.Model = Backbone.Model.extend({
     
     save: function(attributes, options) { 
         options = {
-            url: Wat.C.getBaseUrl() + 
+            url: encodeURI(Wat.C.getBaseUrl() + 
                 "&action=" + this.operation +
                 "&filters=" + JSON.stringify(options.filters) + 
                 "&arguments=" + JSON.stringify(attributes) +
-                "&parameters=" + JSON.stringify({source: Wat.C.source})
+                "&parameters=" + JSON.stringify({source: Wat.C.source}))
         };
         
         return Backbone.Model.prototype.save.call(this, attributes, options);

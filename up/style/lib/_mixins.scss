@@ -31,11 +31,11 @@
 // Layout
 @mixin width-wrapper {
     min-width: $min_width_mobile;
-    max-width: $max_width_mobile;
+    //max-width: $max_width_mobile;
 
     @include in(desktop) {
         min-width: $min_width_wrapper;
-        max-width: $max_width_wrapper;
+        //max-width: $max_width_wrapper;
     }
 }
 
@@ -80,12 +80,11 @@
     z-index: 2;
     
     color: $col;
-    @include linear-gradient($col_back);
+    
+    background-color: $col_back;
 
     background-repeat: repeat-x;
-
-    border: solid 1px darken($col_back, 15);
-
+    
     -webkit-box-shadow: none;
        -moz-box-shadow: none;
             box-shadow: none;
@@ -112,6 +111,8 @@
         margin-right: 10px;
         color: $col;
     }
+    
+    white-space: nowrap;
 }
 
 @mixin button--disabled () {
@@ -168,6 +169,14 @@
     }
 }
 
+// Not responsive version of font-size mixin
+@mixin font-size-static($size_index) {
+    $size: nth($font-sizes, $size_index);
+    $height: $size;
+    font-size: $size * 1em;
+    line-height: ($height + 0.3) * 1em;
+}
+
 @mixin icon-size($size) {
     font-size: $size;
 }
@@ -183,7 +192,8 @@
         font-weight: bold;
         text-align: left;
         border-bottom: #ccc solid 1px;
-        background: darken($col_whiter, 15); 
+        color: $table_header_text;
+        background: $table_header_bg; 
         
         .sort-icon {
             float: right;
@@ -197,8 +207,8 @@
         @extend %not-selectable;
     
         &.sorted {
-            background-color: $col_brand;
-            color: $col_whiter;
+            background-color: $table_sorted_header_bg;
+            color: $table_sorted_header_text;
         }
         
         i {
@@ -228,21 +238,15 @@
                 border-right: 0px;
             }
         }
-        
-        &:last-child {
-            td {
-                border-bottom: 0;
-            }
-        }
     }
     
     >tbody:nth-child(2) tr:first-child {
-        td:first-child {
-            border-right: dotted 1px darken($col_whiter, 10);
+        td: first-child {
+            //border-right: dotted 1px darken($col_whiter, 10);
         }
         
         td {
-            border-top: dotted 1px darken($col_whiter, 10);
+            //border-top: dotted 1px darken($col_whiter, 10);
         }
     }
 

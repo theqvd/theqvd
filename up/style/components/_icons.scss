@@ -35,7 +35,7 @@ td {
         text-align: center;
     }
     
-    i.fa-lock, i.fa-unlock {
+    i.fa-lock, i.fa-unlock-alt {
         @include icon-size(($table_icons_size_mobile + 3) + px);
         
         @include in(desktop) {        
