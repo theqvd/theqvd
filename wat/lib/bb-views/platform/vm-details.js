@@ -36,7 +36,12 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
     },
     
     events: {
-        'click .js-execution-params-button': 'showExecutionParams'
+        'click .js-execution-params-button': 'showExecutionParams',
+        'click .js-button-disconnect-user': 'applyDisconnectVMUser'
+    },
+    
+    applyDisconnectVMUser: function (that) {
+        Wat.CurrentView.disconnectVMUser ({id: Wat.CurrentView.id});
     },
     
     showExecutionParams: function () {
