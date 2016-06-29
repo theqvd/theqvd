@@ -19,8 +19,8 @@ body {
     height: 100vh !important;
 }
 
-a {
-    color: $col_links;
+a, a:active, a:hover {
+    color: $col_links_text;
     text-decoration: none;
     font-weight: bold;
     
@@ -57,10 +57,6 @@ fieldset {
         color: lighten($col_blacker, 43);
         text-align: right;
     }
-    
-    &.dialog-form {
-        margin-top: 15px;
-    }
 }
 
 // Titles
@@ -91,19 +87,16 @@ fieldset {
 .error {
     color: darken($col_red, 10);
 }
-.not-notify {
-    color: #CCC;
-}
 
 .error-404, .error-refresh {
     text-align: center;
     i.fa {
         font-size: 90px;
-        color: lighten($col_blacker, 50);
+        color: $login_text;
     }    
     div {
         font-size: 50px;
-        color: lighten($col_blacker, 50);
+        color: $login_text;
     }
 }
 
@@ -147,7 +140,10 @@ fieldset {
     }
     
     .loading-big-message {
+        font-size: 18px;
+        @include in(desktop) {
         font-size: 24px;
+        }
         color: $col_whiter;
         margin-bottom: 20px;
     }
@@ -165,31 +161,41 @@ fieldset {
     
     .loading-big-box {
         background: black;
+        
+        width: 100vw;
+        height: 100vh;
+        margin-top: 0px;
+        border-radius: 0;
+        min-height: 400px;
+        text-align: center;
+        padding: 50px;
+        
+        @include in(desktop) {
         border-radius: 15px;
         width: 70vw;
         height: 70vh;
-        min-height: 400px;
         margin: 70px auto;
-        text-align: center;
-        padding: 50px;
+        }
     }
 }
 
 .filter-notes {
-    border: 1px rgb(182, 182, 0) solid;
+    border: 1px #DDDDBB solid;
     padding: 8px;
     border-radius: 4px;
-    background: rgb(246, 247, 175);
+    background: #FBFBC9;
     margin-top: -20px;
     margin-bottom: 15px;
     min-height: 40px;
     
     .fa:before {
         margin-right: 4px;
+        font-size: 20px;
     }
     
     .filter-notes-list {
-        display: block;
+        display: inline;
+        margin-left: 20px;
         margin-top: 15px;
         margin-bottom: 10px;
         li {
@@ -199,6 +205,44 @@ fieldset {
             padding: 5px;
             background: #FFF;
             border-radius: 3px;
+            padding-bottom: 7px;
+        }
+        
+        .fa.delete-filter-note:before {
+            font-size: 22px;
+            color: $col_whiter;
+            background: $col_red;
+            border-right: 1px solid grey;
+            margin-left: -5px;
+            padding-right: 7px;
+            padding-left: 7px;
+            vertical-align: middle;
+            padding-top: 1px;
+            padding-bottom: 0px;
+            border-bottom-left-radius: 3px;
+            border-top-left-radius: 3px;
+        }
+        
+        .fa.fix-filter-note {
+            &:before {
+                font-size: 22px;
+                color: $col_whiter;
+                background: darken($col_whiter, 15);
+                border-left: 1px solid grey;
+                margin-right: -5px;
+                margin-left: 5px;
+                padding-right: 7px;
+                padding-left: 7px;
+                vertical-align: middle;
+                padding-top: 1px;
+                padding-bottom: 0px;
+                border-bottom-right-radius: 3px;
+                border-top-right-radius: 3px;
+            }
+            
+            &.fix-filter-note--enabled:before {
+                background: lighten($col_blacker, 5);
+            }
         }
     }
 }
@@ -213,10 +257,9 @@ fieldset {
     }
 }
 
-.underselect-option {
-    margin-top: 3px;
-    padding-top: 3px;
-    height: 14px;
-    font-size: 10px;
+.fake-graph-a {
+    color: $graph_color_a
 }
-
+.fake-graph-b {
+    color: $graph_color_b
+}

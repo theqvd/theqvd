@@ -20,7 +20,7 @@
             @include in(desktop) {
                 @include icon-size(23px);
             }
-            vertical-align: bottom;
+            vertical-align: text-top;
             padding-top: 0px;
         }
         
@@ -38,6 +38,17 @@
         
         &:before {
             margin-right: 2px;
+        }
+    }
+    
+    input.current-page {
+        width: 40px;
+        text-align: center;
+        vertical-align: top;
+        
+        height: 40px;
+        @include in(desktop) {
+            height: 25px;
         }
     }
 }

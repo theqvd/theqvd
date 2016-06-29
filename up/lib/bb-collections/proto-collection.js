@@ -3,7 +3,6 @@ Wat.Collections.Collection = Backbone.Collection.extend({
     elementsTotal: 0,
     status: 0,
     offset: 1,
-    block: 15,
 
     filters: {},
     // Order by id by default
@@ -12,12 +11,11 @@ Wat.Collections.Collection = Backbone.Collection.extend({
     initialize: function (params) {
         params = params || {};
         
-        this.block = params.block || this.block;
+        this.block = params.block || Wat.C.getBlock();
         this.offset = params.offset || this.offset;
         this.filters = params.filters || this.filters;
         this.action = params.action || this.actionPrefix + '_get_list';
         this.sort = params.sort || this.sort;
-        
     },
     
     getListUrl: function () {
@@ -59,7 +57,7 @@ Wat.Collections.Collection = Backbone.Collection.extend({
         var params = _.extend({
             type: 'POST',
             dataType: 'json',
-            url: that.getListUrl(),
+            url: encodeURI(that.getListUrl()),
             processData: false
         }, options);
         

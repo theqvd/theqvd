@@ -19,7 +19,7 @@
         padding: 5px;
 
         .ui-dialog-titlebar-close {
-            display: inline;
+            display: none;
         }
         
         border-bottom-left-radius: 0;
@@ -27,20 +27,16 @@
     }
     
     .ui-state-hover, .ui-state-focus  {
-        @include button($col_whiter, $col_brand);
+        @include button($button_text, $button_bg);
+        background-image: none;
     }
     
     .ui-dialog-buttonset {
         padding: 10px;
         text-align: right;
-        width: 100%;
         
         .button {
-            width: 100%;
-            @include in(desktop) {
-                width: auto;
-                margin-left: 30px;
-            }
+            margin-left: 30px;
             .ui-button-text:before {
                 margin-right: 10px;
             }
@@ -73,7 +69,6 @@
 .dialog-container, .dialog-container-template {
     display: none;
     padding: 0;
-    padding-bottom: 30px !important;
 }
 
 .dialog-container-template {
@@ -93,8 +88,7 @@
     padding: 1px;
     margin-bottom: 50px;
     position: fixed;
-    border: 2px solid $col_brand;
-
+    
     @include in(mobile) {
         position: absolute;
         left: auto !important;
@@ -111,13 +105,8 @@
         //height: 85vh !important;
     }
     
-    table.shrinkable td {
-        @include in(mobile) {
-            display: block;
-        }
-    }
-    
     td {
+        display: block;
         padding-bottom: 5px;
 
         @include in(desktop) {
@@ -125,7 +114,7 @@
             //padding-bottom: 0px;
         }
         
-        input[type="text"], input[type="password"] {
+        input[type="text"], input[type="password"], textarea {
             width: 100%;
             @include in(desktop) {
                 //width: auto;
@@ -152,13 +141,6 @@
                 max-width: 100px;
             }
         
-        }
-    }
-    
-    .form-table {
-        td {
-            padding-top: 10px;
-            padding-bottom: 10px;
         }
     }
     
@@ -221,3 +203,141 @@ div.tagsinput span.tag a {
     height: 25px !important;
 }
 
+// Tooltip
+
+.ui-tooltip {
+    @include in(mobile) {
+        display: none;
+        visibility: hidden;
+    }
+}
+
+// jQuery Extruder
+
+.extruder {
+    &.left {
+        .flap {
+            font-size:18px;
+            color:white;
+            top:0;
+            padding:10px 0 10px 10px;
+            background:#000;
+            width: 40px;
+            position:absolute;
+            right:0;
+            -moz-border-radius:0 10px 10px 0;
+            -webkit-border-top-right-radius:10px;
+            -webkit-border-bottom-right-radius:10px;
+            -moz-box-shadow:#666 2px 0px 3px;
+            -webkit-box-shadow:#666 2px 0px 3px;
+            cursor: pointer;
+
+
+            .flapLabel {
+                background: #000;
+                cursor: pointer;
+            }
+        }
+
+        .content {
+            /*border-right:3px solid #772B14;*/
+        }
+    }
+}
+
+.extruder-content, .ext-wrapper, .extruder-content .text {
+    background: #333 !important;
+}
+
+
+// Colorpicker
+
+.evo-pop {
+    * {
+        text-shadow: none !important;
+    }
+    
+    width: 210px !important;
+}
+
+.customizer {  
+    * {
+        text-shadow: none !important;
+    }
+    .customizer-title {
+        color: $col_whiter;
+        text-align: center;
+        font-weight: bold;
+    }
+    
+    .extruder-content {
+        &>.text {
+            width: auto !important;
+            padding-right: 0px;
+        }
+    }
+    
+    .customize-panel {
+        color: $col_whiter;
+        overflow-y: auto;
+        padding-right: 10px;
+        margin-top: 10px;
+        height: 55vh;
+        
+        input.colorpicker {
+            width: 90px;
+        }
+
+        .evo-colorind {
+            width: 30px !important;
+            height: 30px !important;
+        }
+
+        &>div {
+            //width: 170px !important;
+
+        }
+        
+        .evo-cp-wrap {
+            width: 135px !important;
+        }
+
+        .custom-field-text {
+            width: 100%;
+        }
+        
+        .customize-section {
+            display: none;
+        }
+    }
+        
+    .custom-btn {
+        width: 200px !important;
+        text-shadow: none;
+        margin-top: 10px;
+        margin-left: 15px;
+        text-align: center;
+    }
+    
+    .customize-section {        
+        font-size: 12px;
+        margin-bottom: 15px;
+
+        legend {
+            text-align: left;
+        }
+        
+        .color-title {
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+        
+        margin-top: 20px;
+    }
+}
+
+.qtip-default {
+    border:1px solid #222;
+    background-color:#444;
+    color:#FEFEFE
+}

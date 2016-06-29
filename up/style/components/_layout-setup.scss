@@ -1,24 +1,32 @@
 .setup-side {
-    width: ($width_setup_side - 2) * 1%;
-    height: auto;
+    width: 100%;
+    @include in(desktop) {
+        width: ($width_setup_side - 2) * 1%;
+        height: auto;
 
-    @if $setup_side == left {
-        float: left;
-        padding-right: 2%;
-        margin-right: 2%;
-        border-right: 1px dotted darken($col_whiter, 15);
-    }
-    @else if $setup_side == right {
-        float: right;
-        padding-left: 2%;
-        margin-left: 2%;
-        border-left: 1px dotted darken($col_whiter, 15);
+        @if $setup_side == left {
+            float: left;
+            padding-right: 2%;
+            margin-right: 2%;
+            border-right: 1px dotted darken($col_whiter, 15);
+        }
+        @else if $setup_side == right {
+            float: right;
+            padding-left: 2%;
+            margin-left: 2%;
+            border-left: 1px dotted darken($col_whiter, 15);
+        }
     }
 }
 
 
 .setup-block {
-    width: ($width_setup_content - 2) * 1%;
+    width: 90%;
+    
+    @include in(desktop) {
+        width: ($width_setup_content - 2) * 1%;
+    }
+    
     height: auto;
 
     @if $setup_side == left {
@@ -33,33 +41,20 @@
     }
     
     margin-bottom: 60px;
-}
-
-.customize-section-selectors {
-    display: table;
-    table-layout: fixed;
-    width: 100%;
-    margin-bottom: 10px;
-    .customize-section-selector {
-        margin-bottom: 20px;
-        display: table-cell;
-        width: 32%;
-        
-        &:first-child {
-            padding-right: 20px;
-        }
-        
-        &:last-child {
-            padding-left: 20px;
-            text-align: right;
-            vertical-align: bottom;
+    
+    .sect2, .sect3 {
+        @include in(mobile) {
+            overflow: scroll;
         }
     }
 }
 
 .customize-options {
+    margin-top: 20px; 
+    margin-bottom: 50px; 
+        
     .customize-block {
-        width: 49%;
+        width: 42%;
         display: inline-block;
         vertical-align: top;
         
@@ -81,11 +76,14 @@ a.button-update-customize {
 
 .config-table {
     margin-bottom: 3px;
-    table-layout: fixed;
     
     td {
         text-align: left; 
         vertical-align: middle;
+        
+        &:last-child {
+            text-align: center;
+        }
     }
     
     th {
@@ -113,4 +111,8 @@ a.button-update-customize {
     input {
         width: 100%;
     }
+}
+
+.token-action-select {
+    width: auto;
 }

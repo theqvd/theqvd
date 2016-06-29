@@ -2,8 +2,7 @@
 Wat.WS = {
     websockets: {},
     debug: 0,
-    openWebsocket: function (qvdObj, action, params, callback, stream, viewType) {  
-        return;
+    openWebsocket: function (qvdObj, action, params, callback, stream, viewType) {        
         if ("WebSocket" in window) {
             if (Wat.WS.debug) {
                 console.info("WebSocket is supported by your Browser!");
@@ -11,52 +10,69 @@ Wat.WS = {
             
             var urlParams = Wat.U.objToUrl(params);
 
-            // Let us open a web socket
-            var ws = new WebSocket('ws://' + Wat.C.apiAddress + '/' + stream + '?sid=' + Wat.C.sid + '&action=' + action + urlParams + '&parameters=' + JSON.stringify({source: Wat.C.source}));
-            
-            ws.onopen = function() {
-                // Web Socket is connected, send data using send()
-                if (Wat.WS.debug) {
-                    console.info("Websocket opened");
-                }
-                ws.send("HI");
-            };
-            ws.onmessage = function (evt) { 
-                var received_msg = evt.data;
-                
-                if (received_msg != 'AKN') {
-                    var data = JSON.parse(received_msg);
-                    
-                    if (params.filters) {
-                        var id = params.filters.id
-                    }
-                    
+            try {
+                // Let us open a web socket
+                var wsURI = Wat.C.apiWSUrl + stream + '?' + Wat.C.getUrlSid() + '&action=' + action + urlParams + '&parameters=' + JSON.stringify({source: Wat.C.source});
+                var ws = new WebSocket(encodeURI(wsURI));
+
+                ws.onopen = function() {
+                    // Web Socket is connected, send data using send()
                     if (Wat.WS.debug) {
-                        console.info("Message is received: ");
-                        console.info(action + ' : ' + id + ' : ' + JSON.stringify(data));
+                        console.info("Websocket opened");
                     }
-                    
-                    callback(qvdObj, id, data, ws, viewType);
+                    ws.send("HI");
+                };
+                ws.onmessage = function (evt) { 
+                    var received_msg = evt.data;
+
+                    if (received_msg != 'AKN') {
+                        var data = JSON.parse(received_msg);
+
+                        if (params.filters) {
+                            var id = params.filters.id
+                        }
+
+                        if (Wat.WS.debug) {
+                            console.info("Message is received: ");
+                            console.info(action + ' : ' + id + ' : ' + JSON.stringify(data));
+                        }
+
+                        callback(qvdObj, id, data, ws, viewType);
+                    }
+                    setTimeout(function () {
+                        if (ws.readyState == WS_OPEN) {
+                            ws.send("AKN");
+                        }
+                    }, 500);
+                };
+
+                ws.onclose = function() { 
+                    // websocket is closed.
+                    if (Wat.WS.debug) {
+                        console.info("Connection is closed...");
+                    }
+                };
+
+                if (this.websockets[this.cid] == undefined) {
+                    this.websockets[this.cid] = [];
                 }
-                setTimeout(function () {
-                    if (ws.readyState == WS_OPEN) {
-                        ws.send("AKN");
-                    }
-                }, 500);
-            };
-            
-            ws.onclose = function() { 
-                // websocket is closed.
+
+                this.websockets[this.cid].push(ws);
+                
                 if (Wat.WS.debug) {
-                    console.info("Connection is closed...");
+                    if (window.console) {
+                        console.info('#WS currently opened: ' + this.websockets[this.cid].length);
+                    }
                 }
-            };
-            
-            if (this.websockets[this.cid] == undefined) {
-                this.websockets[this.cid] = [];
+                
             }
-            
-            this.websockets[this.cid].push(ws);
+            catch (exception) { 
+                if (Wat.WS.debug) {
+                    if (window.console) {
+                        console.warn(exception);
+                    }
+                }
+            }
         }
         else {
             // The browser doesn't support WebSocket
@@ -98,27 +114,54 @@ Wat.WS = {
     openStatsWebsockets: function (qvdObj, fields, cid) {
         this.cid = cid;
         var that = this;
-
-        var filters = {
-            id: null
-        };
         
-        $.each(fields, function (iField, field) {
-            that.openWebsocket(qvdObj, 'qvd_objects_statistics', {
-                filters: filters, 
-                fields: field
-            }, that.changeWebsocket, 'ws', 'stats');
-        });
+        that.openWebsocket(qvdObj, 'qvd_objects_statistics', { 
+            fields: fields
+        }, that.changeWebsocket, 'ws', 'stats');
     },
     
-    openListWebsockets: function (qvdObj, models, fields, cid) {
+    openListWebsockets: function (qvdObj, collection, fields, cid) {
         this.closeViewWebsockets(cid);
 
         var that = this;
                 
-        $.each(models, function (iModel, model) {
+        // NON-EFFICIENT VERSION: Monitoring elements one per socket
+        /*
+        $.each(collection.models, function (iModel, model) {
             that.openDetailsWebsockets (qvdObj, model, fields, cid, 'list');
         });
+        */
+        
+        // IMPROVED VERSION 1: Monitoring just the shown elements
+        that.cid = cid;
+        
+        // Build an OR filter with the IDs of all visible elements
+        var filters = {
+            '-or': []
+        };
+        $.each(collection.pluck('id'), function (iId, id) {
+            filters['-or'].push('id');
+            filters['-or'].push(id);
+        });
+          
+		// Add id to required fields to know which register belong wich element in retrieved data
+        fields.push('id');
+        
+        that.openWebsocket(qvdObj, qvdObj + '_get_list', {
+            filters: filters, 
+            fields: fields
+        }, that.changeWebsocket, 'ws', 'list');
+
+        // IMPROVED VERSION 2: Live monitoring where some elements can dissapear from list and appear another ones
+        /*
+        that.openWebsocket(qvdObj, qvdObj + '_get_list', {
+            offset: collection.offset, 
+            block: collection.block, 
+            filters: collection.filters, 
+            order_by: collection.sort, 
+            fields: fields
+        }, that.changeWebsocket, 'ws', 'list');
+        */
     },    
     
     openDetailsWebsockets: function (qvdObj, model, fields, cid, viewType) {
@@ -137,19 +180,42 @@ Wat.WS = {
     },
     
     changeWebsocket: function (qvdObj, id, data, ws, viewType) { 
-        if (data.rows) {
-            if (data.rows.length > 0) {
-                data = data.rows[0];
-            }
-            else {
-                data = [];
-            }
-        }
-        else {
-            data = data;
+        switch (viewType) {
+            case 'list':
+            case 'details':
+                data = data.rows;
+                break;
+            case 'stats':
+                data = [data];
+                break;
         }
         
-        $.each(data, function (field, value) {
+        $.each(data, function (iRow, row) {
+            // If view type is a list. Id is taken from retrieved data
+            if (viewType == 'list') {
+                id = row.id;
+                delete row.id;
+        }
+        
+            $.each(row, function (field, value) {
+                var paramsChange = {};
+                paramsChange[field] = value;
+                
+                if (viewType == 'details' && Wat.CurrentView.model) {
+                    var model = Wat.CurrentView.model;
+                }
+                else if (viewType == 'list' && Wat.CurrentView.collection) {
+                    var model = Wat.CurrentView.collection.where({id: id})[0];
+                }
+
+                // Update model
+                if (model) {
+                model.set(paramsChange);
+                }
+
+                // Check visibility conditions of the selected items dialog. Usefull when this dialog is opened during websockets changes
+                Wat.I.checkVisibilityConditions();
+                
             switch (qvdObj) {
                 case 'vm':
                     Wat.WS.changeWebsocketVm(id, field, value, viewType);
@@ -167,6 +233,7 @@ Wat.WS = {
                     Wat.WS.changeWebsocketStats(field, value);
                     break;
             }
+        });
         });
     }
 }

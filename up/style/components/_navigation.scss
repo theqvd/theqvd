@@ -27,9 +27,9 @@
 
             min-width: 100px;
             padding: 8px 12px 8px 12px;
-            background: $col_whiter;
-            color: $col_blacker;
-            border: 1px solid lighten($col_brand, 20%);
+            background: $menu_bg;
+            color: $menu_text;
+            border: 1px solid $menu_border;
             cursor: pointer;
 
             &:last-child {
@@ -90,9 +90,15 @@
             border: 0;
         }
 
-            .menu-option--selected, .menu-option:hover, .lateral-menu-option--selected, .lateral-menu-option:hover {
-                background: $col_brand;
-                color: $col_whiter;
+            .menu-option--selected, .lateral-menu-option--selected {
+                background: $menu_selected_bg;
+                color: $menu_selected_text;
+                border: 1px solid transparent;
+            }
+        
+            .menu-option:hover, .lateral-menu-option:hover {
+                background: $menu_hover_bg;
+                color: $menu_hover_text;
                 border: 1px solid transparent;
             }
 
@@ -115,7 +121,7 @@
     
     z-index: 1000;
     position: absolute;
-    bottom: 10px;
+    top: 20px;
     right: 80px;
     display: none;
     
@@ -131,22 +137,28 @@
             margin: 5px;
             position: relative;
             cursor: default;
+            padding-bottom: 5px;
+            padding-top: 5px;
+            
+            &.menu-option>a {
+                color: $menu_header_text;
+            }
         
             &.menu-option-current {
-                border-bottom: 2px dotted $col_whiter;
-                border-top: 2px dotted $col_whiter;
-                padding-top: 2px;
-                padding-bottom: 1px;
+                border-bottom: 2px dotted $menu_header_selected_text;
+                border-top: 2px dotted $menu_header_selected_text;
+                a {
+                    color: $menu_header_selected_text;
+                }
             }
             
             &>ul {
-                border: solid 1px lighten($col_brand, 30);
-                background: $col_whiter;
+                border: solid 1px $submenu_border;
                 opacity: 0.9;
                 display: none;
                 position: absolute;
-                left: -9px;
-                top: 18px;
+                left: 0px;
+                top: 28px;
                 border-bottom-left-radius: $menu_radius;
                 border-bottom-right-radius: $menu_radius;
                 z-index: 3;
@@ -155,6 +167,9 @@
                         padding: 8px;
                         white-space: nowrap;
                         width: 100%;
+                        color: $submenu_text;
+                        background: $submenu_bg;
+                        
                         &:before {
                             margin-right: 5px;
                         }
@@ -167,8 +182,8 @@
                         
                         &:hover {
                             font-weight: bold;
-                            color: $col_whiter;
-                            background: $col_brand;
+                            color: $submenu_hover_text;
+                            background: $submenu_hover_bg;
                         }
                     }
                     
@@ -178,6 +193,26 @@
                     }
                 }
             }
+        }
+    }
+    
+    li.menu-option.needsclick.menu-option:last-child {
+        margin-left: 10px;
+        background-color: $col_whiter;
+        padding: 8px;
+        border: 1px solid darken($col_whiter, 8);
+        
+        i {
+            padding-right: 25px;
+            &:before {
+                font-size: 25px;
+                position: absolute;
+                top: 4px;
+            }
+        }
+        
+        .js-menu-submenu-user {
+            top: 32px;
         }
     }
 }

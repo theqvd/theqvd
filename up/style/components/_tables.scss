@@ -36,7 +36,7 @@ table.custom-props {
 
 table.details, table.custom-props {
     td:first-child {
-        vertical-align: middle;
+        vertical-align: top;
         white-space: nowrap;
         
         i.fa {
@@ -165,13 +165,7 @@ $security_margin: 5;
 
 /* Table scroll */
 
-div.list-block {
-    @include in(desktop) {
-        margin-bottom: 80px;
-    }
-}
-
-div.list-block>div:first-child {
+div.list-block div:first-child {
     width: 100%;
     
     .list-navigation, div.list {
@@ -199,27 +193,54 @@ div.list-block>div:first-child {
             }
         }
     }
-    
-    @include in(desktop) {
-        width: 50%;
-        min-width: 960px;
-        margin: 0 auto;
-    }
 }
+
+
 
 table.list {
     td, th {
-        @include in(desktop) {
-            white-space: nowrap;
-        }
+        white-space: nowrap;
     }     
+    
+    td.cell-link:hover {
+        cursor: pointer;
+    }     
+    td.cell-link.odd:hover {
+        background: darken($col_whiter, 12);
+    }    
+    td.cell-link.even:hover {
+        background: darken($col_whiter, 8);
+    }
+    
+    &.cascade-data-list {
+        margin-top: 20px;
+
+        td, th {
+            white-space: normal;
+        }
+    }
 }
 
-table.role-template-matrix {
-    width: 100%;
+
+table.role-template-tools {
     @include table-base (alternate-rows);
+    
+    width: 100%;
+    font-size: 14px;
+    margin: 0 0;
+
     td {
-        padding: 8px !important;
+        text-align: center;
+        padding: 5px !important;
+        
+        input[type="checkbox"] {
+            /* Trick for make checkboxes resizable on firefox */
+            -moz-appearance: none;
+
+            width: 20px;
+            height: 20px;
+        }
+        
         a.no-text-button {
             text-align: center;
             &:before {
@@ -228,44 +249,35 @@ table.role-template-matrix {
             }
         }
     }
-}
-
-table.profile-options {
-    width: 100%;
-    margin-top: 10px;
-    table-layout: fixed;
-    border-spacing: 4px;
-    border-collapse: separate;
-}
-
-
-table.profile-change-table, table.profile-settings-table, table.settings-table {
-    td { 
-        padding: 3px;
-        font-size: 18px;
-        vertical-align: top;
-        
-        input[type="radio"], input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-        }
+    
+    td:first-child {
+        text-align: left;
     }
 }
 
-table.settings-table {
-    td:last-child {
-        text-align: center;
-        @include in(desktop) {
-            width: 150px;
-        }
+
+.tools-roles, .tools-templates {
+    background: $col_whiter !important; 
+    display: none;
+}
+
+table.vmst {
+    i.vmst-vm, i.vmst-host, i.vmst-dot {
+        width: 100%;
         
-        .chosen-container {
-            text-align: left;
-            
-            font-size: 12px;
-            @include in(desktop) {
-                font-size: 14px;
-            }
+        &.vmst-dot {
+            font-size: 9px;
+            margin-top: 10px;
+        }        
+        
+        &.vmst-dot-branch {
+            margin-top: 0px;
+            line-height: 1px;
         }
+    }
+    
+    .vmst-vm-cell, .vmst-host-cell {
+        width: 50%; 
+        vertical-align: bottom;
     }
 }

@@ -3,28 +3,19 @@
 // Colors
 $col_whiter : #fdfdfd;
 $col_blacker: #333;
-$col_links_old : #ff8d13;
 $col_brand: darken(#f36d15, 5);
-$col_links : darken($col_brand, 5);
 $col_green : #00CC00;
 $col_red : #FF0000;
 $col_yellow : #FFD600;
 $col_blue : #6e8aff;
 
-$col_loginbox : $col_brand;
-$col_logintext : $col_whiter;
-
-$col_header : $col_brand;
-$col_headertext : $col_whiter;
-$col_headerlink : white;
-
 $bg_body : $col_whiter;
 
 // Wrapper
-$min_width_wrapper : 1024px;
+$min_width_wrapper : 960px;
 $max_width_wrapper : 2048px;
 $min_width_mobile : 0px;
-$max_width_mobile : 40em;
+$max_width_mobile : 41em;
 
 // Radius
 $form_elements_radius : 4px;
@@ -46,7 +37,7 @@ $input_height: 28px;
 // Layout
 $width_list_side: 15;
 $width_list_content: 100 - $width_list_side;
-$list_side: right;
+$list_side: left;
 
 $width_setup_side: 18;
 $width_setup_content: 100 - $width_setup_side;
