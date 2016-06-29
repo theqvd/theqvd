@@ -36,6 +36,11 @@ plugin 'Directory' => {
 # Plugin to render QVD Client configuration files
 plugin 'RenderFile';
 
+##### HELPERS #####
+
+# Query finishes and returns a response with a message and httpcode
+helper (render_response => \&render_response);
+
 ##### CONFIGURATION #####
 
 # Intended to set the address where the app is supposed to listen with hypnotoad
@@ -89,27 +94,40 @@ under sub {
 };
 
 # This url retrieves general info about the API.
-any [qw(GET)] => '/info' => sub {
+any [qw(GET)] => '/api/info' => sub {
     my $c = shift;
 
     my $json = {
         status => "up",
     };
 
-    $c->render(json => $json, status => 200);
+    return $c->render_response(json => $json, status => 200);
 };
 
 # Generate session
-any [ qw(POST) ] => '/login' => sub {
+any [ qw(POST) ] => '/api/login' => sub {
     my $c = shift;
 
     my $data = $c->req->params->to_hash;
-        
-    my $user = $data->{user} // "";
+
+    my $login = $data->{login};
     my $password = $data->{password} // "";
-    my $tenant = $data->{tenant};
-    my $separator = substr(cfg('l7r.auth.plugin.default.separators'), 0, 1);
-    my $login = $user . ($tenant ? "${separator}${tenant}" : "");
+        
+    if (!defined($login)){
+        return $c->render_response(message => 'Query parameter <login> is missing', code => 400);
+    }
+
+    my ($user, $tenant);
+    if (cfg('wat.multitenant')){
+        for my $separator (split "", cfg('l7r.auth.plugin.default.separators')){
+            ($user, $tenant) = split $separator, $login;
+            print "$separator $login $user $tenant\n";
+            last if (defined($user) && defined($tenant));
+        }
+    } else {
+        $user = $login;
+    }
+
     my $authorization = "Basic " . encode_base64($login . ":". $password);
 
     my $ua = Mojo::UserAgent->new;
@@ -121,39 +139,47 @@ any [ qw(POST) ] => '/login' => sub {
     my $http_code = $auth_tx->res->code // 502;
     my $http_message = $auth_tx->res->message // "Authentication server unavailable";
 
-    my $user_id;
+    return $c->render_response(message => $http_message, code => $http_code)
+        unless $http_code == 200;
+
+    my $user_obj;
     try {
         my $user_filter = {
             login => $user,
             password => $password
         };
-        $user_filter->{ tenant_id } = $DB->resultset( "Tenant" )->search( { name => $tenant } )->first->id
-            if cfg( 'wat.multitenant' );
-        $user_id = $DB->resultset( "User" )->first( $user_filter )->id;
+
+        if (cfg( 'wat.multitenant' )) {
+            $user_filter->{ tenant_id } = $DB->resultset( "Tenant" )->search( { name => $tenant } )->first->id;
+            return $c->render_response(message => "Invalid credentials", code => 401) 
+                unless defined $user_filter->{ tenant_id };
+        }
+
+        $user_obj = $DB->resultset( "User" )->first( $user_filter );
+
+        return $c->render_response(message => "Invalid credentials", code => 401)
+            unless defined $user_obj;
+
     } catch {
-        $http_code = 502;
-        $http_message = "Database unavailable";
+        print $_;
+        return $c->render_response(message => "Database related issue", code => 502);
     };
 
-    if ($http_code == 200) {
-        my $session = create_up_session_handler( $c->tx, $DB->storage->dbh );
+    my $session;
+    $session = create_up_session_handler( $c->tx, $DB->storage->dbh );
 
-        $session->create;
-        $session->data( user_name => $user );
-        $session->data( tenant_name => $tenant );
-        $session->data( login => $login );
-        $session->data( password => $password );
-        $session->data( user_id => $user_id );
-        $session->flush;
+    $session->create;
+    $session->data( user_name => $user );
+    $session->data( tenant_name => $tenant );
+    $session->data( login => $login );
+    $session->data( password => $password );
+    $session->data( user_id => $user_obj->id );
+    $session->flush;
 
-        $http_message = "Logged in correctly";
-    }
+    my $json = { };
+    $json->{sid} = $session->sid if defined($session);
 
-my $json = {
-    message => $http_message
-};
-    
-$c->render(json => $json, status => $http_code);
+    return $c->render_response(message => "Logged in correctly", code => 200, json => $json);
 };
 
 # Authenticated actions of the API
@@ -180,29 +206,27 @@ group {
         }
         
         if(!$is_logged){
-            $c->render(text => $message, status => 401);
+            $c->render_response(message => $message, code => 401);
         }
 
         return $is_logged;
     };
 
         # Session logout
-    any [ qw(POST) ] => '/logout' => sub {
+    any [ qw(POST) ] => '/api/logout' => sub {
         my $c = shift;
 
         my $session = $c->stash('session');
         $session->expire;
         $session->clear;
         $session->flush;
-        
-        $c->render(text => "Logged out", status => 200);
+       
+        return $c->render_response(message => "Logged out", code => 200);
     };
 
-    any [qw(GET)] => '/vm_list' => sub {
+    any [qw(GET)] => '/api/vm_list' => sub {
         my $c = shift;
 
-        my $http_code = 200;
-        my $http_message = "OK";
         my $vm_list = [];
 
         try {
@@ -214,26 +238,28 @@ group {
                 },
                 $DB->resultset( "VM" )->search( { user_id => $c->stash('session')->data('user_id') } )->all ];
         } catch {
-            $http_code = 502;
-            $http_message = "Database unavailable";
+            print $_;
+            return $c->render_respone(message => "Database related issue", code => 502);
         };
 
         my $json = {
-            message => $http_message,
             vms => $vm_list
         };
 
-        $c->render(json => $json, status => $http_code);
+        return $c->render_response(code => 200, json => $json);
     };
 
-    any [qw(POST)] => '/vm_connect' => sub {
-    my $c = shift;
+    any [qw(POST)] => '/api/vm_connect/:vm_id' => [vm_id => qr/\d+/] => sub {
+        my $c = shift;
 
-        my $data = $c->req->params->to_hash;
-        my $vm_id = $data->{vm_id} // "";
+        my $vm_id = $c->param('vm_id');
+        my $session_up = $c->stash->{session};
+
+        my $vm = $DB->resultset( "VM" )
+            ->search( { id => $vm_id, user_id => $session_up->data->{user_id} } )->first;
+        return $c->render_response(message => "Invalid VM", code => 400) unless defined($vm);
 
         my $session_l7r = create_l7r_session_handler($DB->storage->dbh);
-        my $session_up = $c->stash->{session};
         $session_l7r->create;
         $session_l7r->data->{vm_id} = $vm_id;
         $session_l7r->data->{login} = $session_up->data->{login};
@@ -242,8 +268,7 @@ group {
 
         my $file_name = $session_l7r->sid . ".qvd";
         my $file_data = $session_l7r->sid . "\n";
-        print $file_data;
-        $c->render_file(data => $file_data, filename => $file_name, format => 'qvd');
+        return $c->render_file(data => $file_data, filename => $file_name, format => 'qvd');
     };
 };
 
@@ -273,4 +298,19 @@ sub create_up_session_handler {
     );
     
     return $session;
+}
+
+sub render_response {
+    my $c = shift;
+    my %args = @_;
+
+    my $json = $args{json} // {};
+    my $message = $args{message};
+    my $code = $args{code} // 200;
+    
+    $json->{message} = $message if defined($message);
+    
+    $c->render(json => $json, status => $code);
+    
+    return 1;
 }
