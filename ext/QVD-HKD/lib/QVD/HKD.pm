@@ -74,7 +74,7 @@ use Class::StateMachine::Declarative
                                                                 checking_net_ports    => { enter => '_check_net_ports' },
                                                                 checking_address      => { enter => '_check_address' },
                                                                 checking_bridge_fw    => { enter => '_check_bridge_fw' },
-                                                                checking_cgroups      => { enter => '_check_cgroups' } ] },
+                                                                checking_hypervisor   => { enter => '_check_hypervisor' } ] },
 
                                        setup => { transitions => { _on_error => 'stopping',
                                                                    _on_cmd_stop => 'stopping' },
@@ -388,9 +388,12 @@ sub _check_bridge_fw {
     $self->_on_done;
 }
 
-sub _check_cgroups {
+sub _check_hypervisor {
     my $self = shift;
 
+    return $self->_on_done;
+
+    # FIXME: move this code to a hypervisor-dependant section
     return $self->_on_done
         unless $self->_cfg('vm.hypervisor') eq 'lxc';
 
