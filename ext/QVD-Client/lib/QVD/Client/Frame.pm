@@ -162,6 +162,7 @@ sub new {
 	
     if ( core_cfg('client.show.settings') ) {
         $tab_ctl = Wx::Notebook->new($self, -1, wxDefaultPosition, wxDefaultSize, 0, "tab");
+        $self->{tab_ctl} = $tab_ctl;
     }
     
     my $panel = $self->{panel} = Wx::Panel->new($tab_ctl // $self, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL ); # / broken highlighter
@@ -180,7 +181,7 @@ sub new {
         $self->{settings_panel} = $settings_panel;
         $settings_panel->SetBackgroundColour(Wx::Colour->new(255,255,255));
         $tab_ctl->AddPage( $settings_panel, $self->_t("Settings"));
-        my $settings_sizer = Wx::FlexGridSizer->new(0, 1,-10,0);
+        my $settings_sizer = Wx::BoxSizer->new(wxVERTICAL);
         $settings_panel->SetSizer($settings_sizer);
         
 
@@ -188,11 +189,11 @@ sub new {
 
         my $this_text = Wx::StaticText->new($settings_panel, -1, $self->_t("Options"));
         $this_text->SetFont(Wx::Font->new(10,wxDEFAULT,wxDEFAULT,wxBOLD,0,""));
-        $settings_sizer->Add( $this_text , 0, wxALL|wxEXPAND, 0);
+        $settings_sizer->Add( $this_text , 0, wxTOP|wxEXPAND, 10);
 
 
         my $grid_sizer = Wx::FlexGridSizer->new(0, 2, 0, 0);
-        $settings_sizer->Add($grid_sizer, 0, wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND, 20);
+        $settings_sizer->Add($grid_sizer, 0, wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND, 0);
 
         $grid_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Enable audio")), 0, wxALL, 0);
         $self->{audio} = Wx::CheckBox->new($settings_panel, -1, "" , wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, wxDefaultValidator, "checkBox");
@@ -216,10 +217,10 @@ sub new {
 
         my $this_text = Wx::StaticText->new($settings_panel, -1, $self->_t("Connectivity"));
         $this_text->SetFont(Wx::Font->new(10,wxDEFAULT,wxDEFAULT,wxBOLD,0,""));
-        $settings_sizer->Add( $this_text , 0, wxALL|wxEXPAND, 0);
+        $settings_sizer->Add( $this_text , 0, wxTOP|wxEXPAND, 10);
 
         my $grid_sizer = Wx::FlexGridSizer->new(0, 2, 0, 0);
-        $settings_sizer->Add($grid_sizer, 0, wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND, 20);
+        $settings_sizer->Add($grid_sizer, 0, wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND, 0);
 
         if (!core_cfg('client.force.host.name', 0)) {
             $grid_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Server")), 0, wxALL, 0);
@@ -257,10 +258,10 @@ sub new {
 
         my $this_text = Wx::StaticText->new($settings_panel, -1, $self->_t("Share"));
         $this_text->SetFont(Wx::Font->new(10,wxDEFAULT,wxDEFAULT,wxBOLD,0,""));
-        $settings_sizer->Add( $this_text , 0, wxALL|wxEXPAND, 0);
+        $settings_sizer->Add( $this_text , 0, wxTOP|wxEXPAND, 10);
 
         my $grid_sizer = Wx::FlexGridSizer->new(0, 4, 0, 0);
-        $settings_sizer->Add($grid_sizer, 0, wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND, 20);
+        $settings_sizer->Add($grid_sizer, 0, wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND, 0);
 
         $grid_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Enable shared folders")), 0, wxALL, 0);
         $self->{share_enable} = Wx::CheckBox->new($settings_panel, -1, "", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, wxDefaultValidator, "checkBox");
@@ -276,7 +277,7 @@ sub new {
         $self->{share_del}->SetDefault;
 
         $self->{share_list} = Wx::ListBox->new($settings_panel, -1, wxDefaultPosition, [200,100] ,  [] , wxLB_EXTENDED|wxLB_NEEDED_SB|wxLB_SORT , wxDefaultValidator, "sharedFoldersList");
-        $settings_sizer->Add($self->{share_list}, 0, wxALL|wxEXPAND , 5);
+        $settings_sizer->Add($self->{share_list}, 0, wxALL|wxEXPAND , 0);
 
 
         #######################
@@ -284,8 +285,8 @@ sub new {
         ########################
 
         if ( !$WINDOWS && !$DARWIN ) {
-            my $grid_sizer = Wx::FlexGridSizer->new(0, 4, 0, 0);
-            $settings_sizer->Add($grid_sizer, 0, wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND, 20);
+            my $grid_sizer = Wx::FlexGridSizer->new(0, 2, 0, 0);
+            $settings_sizer->Add($grid_sizer, 0, wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND, 0);
 
             $grid_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Enable USB redirection")), 0, wxALL, 0);
             $self->{usb_redirection} = Wx::CheckBox->new($settings_panel, -1, "", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, wxDefaultValidator, "checkBox");
@@ -293,9 +294,24 @@ sub new {
             $grid_sizer->Add($self->{usb_redirection});
         
             $self->{usbip_device_list} = Wx::CheckListBox->new($settings_panel, -1, wxDefaultPosition, [200,100] ,  [] , wxLB_EXTENDED|wxLB_NEEDED_SB|wxLB_SORT , wxDefaultValidator, "usbip_devices");
-            $settings_sizer->Add($self->{usbip_device_list}, 0, wxALL|wxEXPAND , 5);
+            $settings_sizer->Add($self->{usbip_device_list}, 0, wxALL|wxEXPAND , 0);
         
         }
+
+
+        # Hide everything if shared folders is unselected
+        $self->OnClickSharedFolders();
+        $self->OnClickUSBShare();
+
+        # Register all events related to settings tab
+        Wx::Event::EVT_BUTTON($self, $self->{share_add}->GetId, \&share_add);
+        Wx::Event::EVT_BUTTON($self, $self->{share_del}->GetId, \&share_del);
+    
+        Wx::Event::EVT_CHECKBOX($self, $self->{share_enable}->GetId, \&OnClickSharedFolders);
+        Wx::Event::EVT_CHECKBOX($self, $self->{usb_redirection}->GetId, \&OnClickUSBShare);
+    
+        Wx::Event::EVT_NOTEBOOK_PAGE_CHANGED($self, $self->{tab_ctl}->GetId, \&OnTabChange);
+
 
     }
 
@@ -390,17 +406,7 @@ sub new {
     $self->Show(1);
     (core_cfg('client.remember_username') && length core_cfg('client.user.name')) ? $self->{password}->SetFocus() : $self->{username}->SetFocus();
 
-    # Hide everything if shared folders is unselected
-    $self->OnClickSharedFolders();
-    $self->OnClickUSBShare();
-
     Wx::Event::EVT_BUTTON($self, $self->{connect_button}->GetId, \&OnClickConnect);
-    Wx::Event::EVT_BUTTON($self, $self->{share_add}->GetId, \&share_add);
-    Wx::Event::EVT_BUTTON($self, $self->{share_del}->GetId, \&share_del);
-
-    Wx::Event::EVT_CHECKBOX($self, $self->{share_enable}->GetId, \&OnClickSharedFolders);
-    Wx::Event::EVT_CHECKBOX($self, $self->{usb_redirection}->GetId, \&OnClickUSBShare);
-
     Wx::Event::EVT_TIMER($self, -1, \&OnTimer);
 
     Wx::Event::EVT_COMMAND($self, -1, EVT_CONNECTION_ERROR, \&OnConnectionError);
@@ -533,7 +539,7 @@ sub OnClickConnect {
         keyboard      => $self->DetectKeyboard,
         port          => $DEFAULT_PORT,
         ssl           => $USE_SSL,
-        host          => core_cfg('client.force.host.name', 0) // $self->{host}->GetValue,
+        host          => core_cfg('client.force.host.name', 0) // core_cfg('client.host.name'),
         (map { $_ => $self->{$_}->GetValue } grep { defined $self->{$_} } qw(username password kill_vm)),
     );
 
@@ -604,6 +610,16 @@ sub OnClickUSBShare {
     }
 
     $self->{settings_panel}->Layout();
+
+}
+
+sub OnTabChange {
+    my( $self, $event ) = @_;
+
+    # We only save settings when we're leaving the settings tab
+    if ( $self->{tab_ctl}->GetPageText($event->GetOldSelection()) eq 'Settings' ){
+        $self->SaveConfiguration();
+    } 
 
 }
 
@@ -1005,6 +1021,7 @@ sub OnExit {
         cond_signal(%connect_info);
         $self->{worker_thread}->join();
     }
+    $self->SaveConfiguration();
     $self->Destroy();
 }
 
@@ -1039,7 +1056,7 @@ sub load_usb_devices {
         push $self->{usb_devices} , $dev;
     }
 
-    $self->{usbip_device_list}->InsertItems( $self->{usb_devices}, 0 );
+    $self->{usbip_device_list}->InsertItems( $self->{usb_devices}, 0 ) if ( defined $self->{tab_ctl} );
 
 
 
@@ -1169,8 +1186,8 @@ sub DetectKeyboard {
 sub EnableControls {
     my ($self, $enabled) = @_;
     $self->{$_}->Enable($enabled) for qw(connect_button username password);
-    if (!core_cfg('client.force.link',      0)) { $self->{link}->Enable($enabled); }
-    if (!core_cfg('client.force.host.name', 0)) { $self->{host}->Enable($enabled); }
+    if (!core_cfg('client.force.link',      0)) { $self->{link}->Enable($enabled) if( $self->{tab_ctl}); }
+    if (!core_cfg('client.force.host.name', 0)) { $self->{host}->Enable($enabled) if( $self->{tab_ctl}); }
 }
 
 sub SaveConfiguration {
@@ -1181,11 +1198,11 @@ sub SaveConfiguration {
         # If remembering the username is disabled, erase any previously stored value
         set_core_cfg('client.user.name', "");
     }
-    if (!core_cfg('client.force.host.name', 0)) {
+    if (!core_cfg('client.force.host.name', 0) and $self->{host}) {
         set_core_cfg('client.host.name', $self->{host}->GetValue());
     }
     #set_core_cfg('client.host.port', $self->{port}->GetValue());
-    if (!core_cfg('client.force.link', 0)) {
+    if (!core_cfg('client.force.link', 0) and $self->{link}) {
         set_core_cfg('client.link', lc($self->{link}->GetStringSelection()));
     }
 
@@ -1286,7 +1303,7 @@ sub load_share_list {
         }
     }
  
-    $self->update_share_list();
+    $self->update_share_list() if ( defined $self->{tab_ctl} );
 
 }
 
