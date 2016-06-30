@@ -343,6 +343,18 @@ sub _create_lxc {
     my $lxc_version = $self->_cfg('command.version.lxc');
     my $qvd_lxc_autodev = $self->_cfg('command.qvd-lxc-autodev');
 
+    my $memory = $self->{memory};
+    my $memory_limits = <<EOML;
+lxc.cgroup.memory.limit_in_bytes=${memory}M
+lxc.cgroup.memory.memsw.limit_in_bytes=${memory}M
+EOML
+
+    my $cgroup_memory_lxc = $self->_cgroup_path('memory');
+    unless (-f "$cgroup_memory_lxc/memory.memsw.limit_in_bytes") {
+        WARN "Memory limits can not be set. The argument 'swapaccount=1' must be passed to the kernel at boot time";
+        $memory_limits =~ s/^/# /mg;
+    }
+
     # FIXME: make this template-able or configurable in some way
     print $cfg_fh <<EOC;
 lxc.aa_profile=unconfined
@@ -362,7 +374,7 @@ lxc.rootfs=$self->{os_rootfs}
 lxc.mount.entry=$self->{home_fstab}
 lxc.pivotdir=qvd-pivot
 lxc.cgroup.cpu.shares=1024
-
+$memory_limits
 #lxc.cap.drop=sys_module audit_control audit_write linux_immutable mknod net_admin net_raw sys_admin sys_boot sys_resource sys_time
 
 # Deny access to all devices, except...
@@ -475,10 +487,41 @@ sub _check_dirty_flag {
     return $self->_on_done;
 }
 
+
+sub _cgroup_path {
+    my ($self, $control) = @_;
+    my $path = $self->_cfg("path.cgroup.$control.lxc", '');
+
+    unless (length $path) {
+        my $base = $self->_cfg("path.cgroup");
+        if (opendir my $dh, $base) {
+            while (defined (my $entry = readdir $dh)) {
+                DEBUG "looking for cgroup control $control in $base/$entry";
+                if ($entry =~ /(?:^|,)\Q$control\E(?:,|$)/) {
+                    $path = "$base/$entry/lxc";
+                    DEBUG "cgroups $control path calculated to be $path";
+                    last;
+                }
+            }
+        }
+    }
+
+    LOGDIE "Unable to find cgroup control $control"
+            unless length $path;
+
+    unless (-d $path) {
+        mkdir $path;
+        LOGDIE "Directory $path does not exist and cannot be created either"
+            unless -d $path;
+    }
+
+    return $path;
+}
+
 sub _kill_lxc {
     my $self = shift;
     my @pids;
-    my $cgroup_cpu_lxc = $self->_cfg('path.cgroup.cpu.lxc');
+    my $cgroup_cpu_lxc = $self->_cgroup_path('cpu');
     my $fn = "$cgroup_cpu_lxc/$self->{lxc_name}/cgroup.procs";
     if (open my $fh, '<', $fn) {
         chomp(@pids = <$fh>);

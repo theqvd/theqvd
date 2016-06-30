@@ -65,7 +65,7 @@ path.serial.captures = ${path.tmp}/qvd
 path.hypervisor.captures = ${path.tmp}/qvd
 
 path.cgroup = /sys/fs/cgroup
-path.cgroup.cpu.lxc = ${path.cgroup}/cpu/lxc
+# path.cgroup.cpu.lxc = ${path.cgroup}/cpu/lxc
 
 path.client.pixmaps = pixmaps
 path.client.pixmaps.alt = /usr/share/pixmaps
