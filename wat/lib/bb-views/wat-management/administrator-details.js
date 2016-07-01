@@ -102,7 +102,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
                     Wat.I.closeDialog($(this));
                 }
             },
-            button1Class : 'fa fa-check js-button-close',
+            buttonClasses : ['fa fa-check js-button-close'],
             fillCallback : function(target) {
                 $(target).html(HTML_MID_LOADING);
                 $(target).css('padding', '0px');
