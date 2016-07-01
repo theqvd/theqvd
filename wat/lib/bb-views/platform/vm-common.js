@@ -120,7 +120,7 @@ Wat.Common.BySection.vm = {
                 }
             },
             
-            button1Class : 'fa fa-ban',
+            buttonClasses : ['fa fa-ban'],
             
             fillCallback : function (target) {
                 $('.ui-dialog').addClass('ui-dialog--fullscreen');   
