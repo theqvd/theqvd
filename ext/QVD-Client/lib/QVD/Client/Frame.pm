@@ -295,20 +295,21 @@ sub new {
         
             $self->{usbip_device_list} = Wx::CheckListBox->new($settings_panel, -1, wxDefaultPosition, [200,100] ,  [] , wxLB_EXTENDED|wxLB_NEEDED_SB|wxLB_SORT , wxDefaultValidator, "usbip_devices");
             $settings_sizer->Add($self->{usbip_device_list}, 0, wxALL|wxEXPAND , 0);
+
         
         }
 
 
-        # Hide everything if shared folders is unselected
+        # Hide everything if shared folders or usb is unselected
         $self->OnClickSharedFolders();
-        $self->OnClickUSBShare();
+        $self->OnClickUSBShare() if defined($self->{usb_redirection});
 
         # Register all events related to settings tab
         Wx::Event::EVT_BUTTON($self, $self->{share_add}->GetId, \&share_add);
         Wx::Event::EVT_BUTTON($self, $self->{share_del}->GetId, \&share_del);
     
         Wx::Event::EVT_CHECKBOX($self, $self->{share_enable}->GetId, \&OnClickSharedFolders);
-        Wx::Event::EVT_CHECKBOX($self, $self->{usb_redirection}->GetId, \&OnClickUSBShare);
+        Wx::Event::EVT_CHECKBOX($self, $self->{usb_redirection}->GetId, \&OnClickUSBShare) if defined($self->{usb_redirection});
     
         Wx::Event::EVT_NOTEBOOK_PAGE_CHANGED($self, $self->{tab_ctl}->GetId, \&OnTabChange);
 
@@ -427,7 +428,7 @@ sub new {
 
 
     $self->load_share_list();
-    $self->load_usb_devices();
+    $self->load_usb_devices() if defined($self->{usb_redirection});
 
 	if( $ENV{QVD_PP_BUILD} ) {
 		INFO "Being called from PP build. Exiting.";
