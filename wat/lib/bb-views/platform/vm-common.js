@@ -136,7 +136,7 @@ Wat.Common.BySection.vm = {
                     }
                 );
 
-                var noVNCIncludes = '<script src="lib/thirds/noVNC/include/util.js"></script><script src="lib/thirds/noVNC/include/ui-wat.js"></script>';
+                var noVNCIncludes = '<script src="lib/thirds/noVNC/include/util.js"></script><script src="lib/interface/interface-noVNC.js"></script>';
                 
                 target.html(template + noVNCIncludes);
                 
