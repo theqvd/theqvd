@@ -25,7 +25,6 @@ use AnyEvent::Semaphore;
 use AnyEvent::Pg::Pool;
 use Linux::Proc::Net::TCP;
 use Linux::Proc::Net::UDP;
-use Linux::Proc::Mountinfo;
 use Method::WeakCallback qw(weak_method_callback);
 use Time::HiRes ();
 
@@ -37,7 +36,6 @@ use QVD::HKD::ClusterMonitor;
 use QVD::HKD::DHCPDHandler;
 use QVD::HKD::CommandHandler;
 use QVD::HKD::VMCommandHandler;
-use QVD::HKD::VMHandler;
 use QVD::HKD::L7RListener;
 use QVD::HKD::L7R;
 use QVD::HKD::L7RKiller;
@@ -74,7 +72,7 @@ use Class::StateMachine::Declarative
                                                                 checking_net_ports    => { enter => '_check_net_ports' },
                                                                 checking_address      => { enter => '_check_address' },
                                                                 checking_bridge_fw    => { enter => '_check_bridge_fw' },
-                                                                checking_hypervisor   => { enter => '_check_hypervisor' } ] },
+                                                                starting_hypervisor   => { enter => '_start_hypervisor' } ] },
 
                                        setup => { transitions => { _on_error => 'stopping',
                                                                    _on_cmd_stop => 'stopping' },
@@ -324,8 +322,10 @@ sub _sync_db_config {
     }
     $self->{heavy}->size($self->_cfg('internal.hkd.max_heavy'));
 
-    if (my $agent = $self->{l7r_listener}) {
-        $agent->on_config_changed;
+    for my $agent_name (qw(l7r_listener hypervisor)) {
+        if (my $agent = $self->{$agent_name}) {
+            $agent->on_config_changed;
+        }
     }
 }
 
@@ -388,32 +388,20 @@ sub _check_bridge_fw {
     $self->_on_done;
 }
 
-sub _check_hypervisor {
+my %hypervisor_class = map { $_ => __PACKAGE__ . '::Hypervisor::' . uc $_ } qw(kvm lxc nothing);
+
+sub _start_hypervisor {
     my $self = shift;
 
+    my $hypervisor = $self->_cfg('vm.hypervisor');
+    my $hypervisor_class = $hypervisor_class{$hypervisor} // croak "unsupported hypervisor $hypervisor";
+    eval "require $hypervisor_class; 1" or LOGDIE "unable to load module $hypervisor_class:\n$@";
+    $self->{hypervisor} = $hypervisor_class->new(config => $self->{config},
+                                                 db     => $self->{db});
+
+    DEBUG 'Starting hypervisor';
+    $self->{hypervisor}->run;
     return $self->_on_done;
-
-    # FIXME: move this code to a hypervisor-dependant section
-    return $self->_on_done
-        unless $self->_cfg('vm.hypervisor') eq 'lxc';
-
-    my $mi = Linux::Proc::Mountinfo->read;
-    my $dir = $self->_cfg('path.cgroup.cpu.lxc');
-    my @parts = File::Spec->splitdir(File::Spec->rel2abs($dir));
-    while (@parts) {
-        my $dir = File::Spec->join(@parts);
-        if (defined(my $mie = $mi->at($dir))) {
-            my $fs_type = $mie->fs_type;
-            if ($fs_type eq 'cgroup' or $fs_type eq 'fuse.lxcfs') {
-                INFO "cgroup found at $dir";
-                return $self->_on_done;
-            }
-            last;
-        }
-        pop @parts;
-    }
-    ERROR "$dir does not lay inside a cgroups file system";
-    $self->_on_error;
 }
 
 sub _save_state {
@@ -536,7 +524,9 @@ my @agent_names = qw(command_handler
                      ticker
                      l7r_killer
                      expiration_monitor
-                     cluster_monitor);
+                     cluster_monitor
+                     hypervisor
+                   );
 
 sub _check_all_agents_have_stopped {
     my $self = shift;
@@ -629,14 +619,15 @@ sub _on_cmd {
 
 sub _new_vm_handler {
     my ($self, $vm_id) = @_;
-    my $vm = $self->{vm}{$vm_id} = QVD::HKD::VMHandler->new(config => $self->{config},
-                                                            vm_id =>  $vm_id,
-                                                            node_id => $self->{node_id},
-                                                            db => $self->{db},
-                                                            vm_lock_fh => $self->{vm_lock_fh},
-                                                            heavy => $self->{heavy},
-                                                            dhcpd_handler => $self->{dhcpd_handler},
-                                                            on_stopped => sub { $self->_on_vm_stopped($vm_id) });
+    my $vm = $self->{vm}{$vm_id} =
+        $self->{hypervisor}->new_vm_handler(config => $self->{config},
+                                            vm_id =>  $vm_id,
+                                            node_id => $self->{node_id},
+                                            db => $self->{db},
+                                            vm_lock_fh => $self->{vm_lock_fh},
+                                            heavy => $self->{heavy},
+                                            dhcpd_handler => $self->{dhcpd_handler},
+                                            on_stopped => sub { $self->_on_vm_stopped($vm_id) });
     $vm;
 }
 

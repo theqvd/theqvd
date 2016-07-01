@@ -70,6 +70,8 @@ sub _main_state {
 
 sub _cfg { shift->{config}->_cfg(@_) }
 
+sub _cfg_optional { shift->{config}->_cfg_optional(@_) }
+
 sub _maybe_callback {
     my $self = shift;
     my $cb = shift;

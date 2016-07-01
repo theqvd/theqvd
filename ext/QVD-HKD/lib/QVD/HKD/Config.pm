@@ -62,14 +62,20 @@ sub _load_base_config {
 
 sub _cfg {
     my $self = shift;
+    $self->_cfg_optional(@_) // LOGDIE "configuration entry $_[0] missing";
+}
+
+sub _cfg_optional {
+    my $self = shift;
     my $value = $self->{props}->getProperty(@_);
-    unless (defined $value) {
-        $debug and $self->_debug("configuration entry for key $_[0] missing");
-        LOGDIE "configuration entry $_[0] missing";
+    if (defined $value) {
+        $value =~ s/\${(.*?)}/$1 eq '{' ? '${' : $self->_cfg($1)/ge;
+        $debug and $self->_debug("config: $_[0] = $value");
     }
-    $value =~ s/\${(.*?)}/$1 eq '{' ? '${' : $self->_cfg($1)/ge;
-    $debug and $self->_debug("config: $_[0] = $value");
-    $value;
+    else {
+        $debug and $self->_debug("config: $_[0] is undef");
+    }
+    $value
 }
 
 sub set_db {

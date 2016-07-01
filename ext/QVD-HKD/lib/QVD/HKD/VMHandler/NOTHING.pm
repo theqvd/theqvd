@@ -89,16 +89,17 @@ sub _do_nothing {
     my $self = shift;
     my $state = $self->state;
     $state =~ s|/|.|g;
+    my $hypervisor_name = $self->{hypervisor}->name;
     while (1) {
-        my $delay = $self->_cfg("internal.hkd.$self->{hypervisor}.timeout.on_state.$state", 0);
+        my $delay = $self->_cfg("internal.hkd.$hypervisor_name.timeout.on_state.$state", 0);
         if ($delay > 0) {
-            DEBUG "config for internal.hkd.$self->{hypervisor}.timeout.on_state.$state is $delay";
+            DEBUG "config for internal.hkd.$hypervisor_name.timeout.on_state.$state is $delay";
 
             $delay = 0.7 * $delay + 0.6 * rand($delay); # $delay +/- 30%
             $self->_call_after($delay, '_on_done');
             return;
         }
-        DEBUG "no config entry found for internal.hkd.$self->{hypervisor}.timeout.on_state.$state";
+        DEBUG "no config entry found for internal.hkd.$hypervisor_name.timeout.on_state.$state";
         $state =~ s/\.[^\.]*$// or last;
     }
     LOGDIE "timeout for state ".$self->state." not found";

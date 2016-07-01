@@ -46,21 +46,14 @@ sub new {
 
     my $dhcpd_handler = delete $opts{dhcpd_handler};
     my $vm_lock_fh = delete $opts{vm_lock_fh};
+    my $hypervisor = delete $opts{hypervisor};
     my $self = $class->SUPER::new(%opts);
     $self->{vm_id} = $vm_id;
     $self->{dhcpd_handler} = $dhcpd_handler;
     $self->{vm_lock_fh} = $vm_lock_fh;
-    my $hypervisor = lc $self->_cfg('vm.hypervisor');
-    DEBUG "Using hypervisor type '$hypervisor'";
     $self->{hypervisor} = $hypervisor;
-    my $hypervisor_class = $hypervisor_class{$hypervisor} // croak "unsupported hypervisor $hypervisor";
-    eval "require $hypervisor_class; 1" or croak "unable to load module $hypervisor_class:\n$@";
-    $self->bless($hypervisor_class);
-    $self->_init_hypervisor;
     $self;
 }
-
-sub _init_hypervisor {}
 
 sub on_cmd {
     my ($self, $cmd) = @_;
@@ -97,6 +90,17 @@ select name, user_id, osf_id,
   where vms.id = $1
     and users.id = vms.user_id
 EOQ
+}
+
+sub _check_hypervisor {
+    my $self = shift;
+    if ($self->{hypervisor}->ok) {
+        $self->_on_done;
+    }
+    else {
+        DEBUG "Aborting VM because hypervisor is not ok";
+        $self->_on_error;
+    }
 }
 
 sub _calculate_attrs {
@@ -344,7 +348,8 @@ sub _set_state_timer {
     my $self = shift;
     my $state = $self->state;
     $state =~ s|/|.|g;
-    $self->_call_after($self->_cfg("internal.hkd.$self->{hypervisor}.timeout.on_state.$state"), '_on_state_timeout');
+    my $hypervisor_name = $self->{hypervisor}->name;
+    $self->_call_after($self->_cfg("internal.hkd.$hypervisor_name.timeout.on_state.$state"), '_on_state_timeout');
 }
 
 sub _capture_fn {
