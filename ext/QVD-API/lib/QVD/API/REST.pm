@@ -10,7 +10,7 @@ use QVD::API::REST::JSON;
 use QVD::API::Exception;
 use QVD::API::Action;
 use TryCatch;
-use AnyEvent::Pg::Pool;
+use Mojo::Pg;
 use QVD::Config;
 use QVD::API::LogReport;
 use Mojo::JSON qw(encode_json);
@@ -282,24 +282,21 @@ sub get_channels
 # Provides a pool to the database in order to listen events
 # from the mojo app
 
-sub _pool
+sub pool
 {
     my $self = shift;
-    $self->{pool} //=
-	AnyEvent::Pg::Pool->new( {host     => cfg('database.host'),
-				  dbname   => cfg('database.name'),
-				  user     => cfg('database.user'),
-				  password => cfg('database.password') },
-				 timeout            => cfg('internal.database.pool.connection.timeout'),
-				 global_timeout     => cfg('internal.database.pool.connection.global_timeout'),
-				 connection_delay   => cfg('internal.database.pool.connection.delay'),
-				 connection_retries => cfg('internal.database.pool.connection.retries'),
-				 size               => cfg('internal.database.pool.size'),
-				    on_connect_error   => sub {},
-				 on_transient_error => sub {},
-	);
 
-    return $self->{pool};
+    unless(defined($self->{pg_db})){
+        my $host     = cfg('database.host');
+        my $dbname   = cfg('database.name');
+        my $user     = cfg('database.user');
+        my $password = cfg('database.password');
+        my $pg = Mojo::Pg->new("postgresql://${user}:${password}\@${host}/${dbname}");
+
+        $self->{pg_db} = $pg;
+    }
+
+    return $self->{pg_db}->pubsub;
 }
 
 # Gives access to the configuration tokens to the mojo app

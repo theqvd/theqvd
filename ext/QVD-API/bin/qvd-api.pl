@@ -205,7 +205,7 @@ group {
         my $json = $c->get_input_json;
 
         my %session_args = (
-            store  => [dbi => {dbh => QVD::DB->new()->storage->dbh}],
+            store  => [dbi => {dbh => QVD::DB::Simple->db()->storage->dbh}],
             transport => MojoX::Session::Transport::WAT->new(),
             tx => $c->tx,
             ip_match => 1
@@ -315,10 +315,10 @@ group {
 
         for my $channel ($c->get_action_channels($json))
         {
-            $c->qvd_admin4_api->_pool->listen($channel,on_notify => sub {
-                my ($pg_pool, $channel, $pid, $payload) = @_;
+            $c->qvd_admin4_api->pool->listen($channel => sub {
+                my ($pool, $payload) = @_;
                 %payload_hash = split(/[=;]/, $payload);
-                $payload_hash{channel} = $channel;
+                $payload_hash{channel} = eval { "$channel" };
                 $notification = 1;
             });
         }
@@ -723,7 +723,7 @@ sub report_di_problem_in_log
 	$tx->remote_address;
 
     my %session_args = (
-	store  => [dbi => {dbh => QVD::DB->new()->storage->dbh}],
+	store  => [dbi => {dbh => QVD::DB::Simple->db()->storage->dbh}],
 	transport => MojoX::Session::Transport::WAT->new(),
 	tx => $c->tx);
 

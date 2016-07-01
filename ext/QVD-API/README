@@ -58,7 +58,6 @@ This module requires these other modules and libraries:
     QVD::API::AclsOverwriteList
     QVD::API::Action
     QVD::API::ConfigsOverwriteList
-    QVD::API::DBConfigProvider
     QVD::API::Exception
     QVD::API::LogReport
     QVD::API::REST::Filter
