@@ -187,12 +187,12 @@
                                     <%
                                     }
                                     
+                                    var expirationHiddenClass = 'hidden';
                                     if ((model.get('expiration_soft') || model.get('expiration_hard')) && (!infoRestrictions || infoRestrictions.expiration)) {
-                                    %>
-                                        <i class="fa fa-clock-o icon-info" data-i18n="[title]This virtual machine will expire" title="<%= i18n.t('This virtual machine will expire') %>"></i>
-                                    <%
+                                        expirationHiddenClass = '';
                                     }
                                     %>
+                                        <i class="fa fa-clock-o icon-info <%= expirationHiddenClass %>" data-i18n="[title]This virtual machine will expire" title="<%= i18n.t('This virtual machine will expire') %>" data-wsupdate="expiration-icon" data-expiration_soft="<%= model.get('expiration_soft') %>" data-expiration_hard="<%= model.get('expiration_hard') %>" data-id="<%= model.get('id') %>"></i>
                                 </td>
                 <%
                                 break;
@@ -307,40 +307,12 @@
                                 break;
                             case 'expiration_soft':
                 %>
-                                <td class="desktop">
-                                    <%
-                                        if (model.get('time_until_expiration_soft')) {
-                                            var remainingTimeSoft = Wat.U.processRemainingTime(model.get('time_until_expiration_soft'));
-                                    %>
-                                            <div class="<%= remainingTimeSoft.priorityClass %>" <%= remainingTimeSoft.remainingTimeAttr %> data-countdown data-raw="<%= Wat.U.base64.encodeObj(model.get('time_until_expiration_soft')) %>">
-                                                <%= remainingTimeSoft.remainingTime %>
-                                            </div>
-                                            <div class="second_row">
-                                                <%= model.get('expiration_soft') ? model.get('expiration_soft').replace('T',' ') : '' %>
-                                            </div>
-                                    <%
-                                        }
-                                    %>
-                                </td>
+                                <td class="desktop bb-vm-list-expiration" data-wsupdate="expiration_soft-cell" data-id="<%= model.get('id') %>" data-expiration_soft="<%= model.get('expiration_soft') %>"></td>
                 <%
                                 break;
                             case 'expiration_hard':
                 %>
-                                <td class="desktop">
-                                    <%
-                                        if (model.get('time_until_expiration_hard')) {
-                                            var remainingTimeHard = Wat.U.processRemainingTime(model.get('time_until_expiration_hard'));
-                                    %>
-                                        <div class="<%= remainingTimeHard.priorityClass %>" <%= remainingTimeHard.remainingTimeAttr %> data-countdown data-raw="<%= Wat.U.base64.encodeObj(model.get('time_until_expiration_hard')) %>">
-                                            <%= remainingTimeHard.remainingTime %>
-                                        </div>
-                                        <div class="second_row">
-                                            <%= model.get('expiration_hard') ? model.get('expiration_hard').replace('T',' ') : '' %>
-                                        </div>
-                                    <%
-                                        }
-                                    %>
-                                </td>
+                                <td class="desktop bb-vm-list-expiration" data-wsupdate="expiration_hard-cell" data-id="<%= model.get('id') %>" data-expiration_hard="<%= model.get('expiration_hard') %>"></td>
                 <%
                                 break;
                             default:
