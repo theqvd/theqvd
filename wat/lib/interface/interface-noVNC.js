@@ -197,78 +197,18 @@ var UI;
         },
 
         addMouseHandlers: function() {
-            /*
-            // Setup interface handlers that can't be inline
-            $D("noVNC_view_drag_button").onclick = UI.toggleViewDrag;
-            $D("noVNC_mouse_button0").onclick = function () { UI.setMouseButton(1); };
-            $D("noVNC_mouse_button1").onclick = function () { UI.setMouseButton(2); };
-            $D("noVNC_mouse_button2").onclick = function () { UI.setMouseButton(4); };
-            $D("noVNC_mouse_button4").onclick = function () { UI.setMouseButton(0); };
-            $D("showKeyboard").onclick = UI.showKeyboard;
-
-            $D("keyboardinput").oninput = UI.keyInput;
-            $D("keyboardinput").onblur = UI.keyInputBlur;
-            $D("keyboardinput").onsubmit = function () { return false; };
-
-            $D("showExtraKeysButton").onclick = UI.showExtraKeys;
-            $D("toggleCtrlButton").onclick = UI.toggleCtrl;
-            $D("toggleAltButton").onclick = UI.toggleAlt;
-            $D("sendTabButton").onclick = UI.sendTab;
-            $D("sendEscButton").onclick = UI.sendEsc;
-
-            $D("sendCtrlAltDelButton").onclick = UI.sendCtrlAltDel;
-            $D("xvpShutdownButton").onclick = UI.xvpShutdown;
-            $D("xvpRebootButton").onclick = UI.xvpReboot;
-            $D("xvpResetButton").onclick = UI.xvpReset;
-            $D("noVNC_status").onclick = UI.togglePopupStatus;
-            $D("noVNC_popup_status").onclick = UI.togglePopupStatus;
-            $D("xvpButton").onclick = UI.toggleXvpPanel;
-            $D("clipboardButton").onclick = UI.toggleClipboardPanel;
-            $D("fullscreenButton").onclick = UI.toggleFullscreen;
-            $D("settingsButton").onclick = UI.toggleSettingsPanel;
-            $D("connectButton").onclick = UI.toggleConnectPanel;
-            $D("disconnectButton").onclick = UI.disconnect;
-            $D("descriptionButton").onclick = UI.toggleConnectPanel;
-
-            $D("noVNC_clipboard_text").onfocus = UI.displayBlur;
-            $D("noVNC_clipboard_text").onblur = UI.displayFocus;
-            $D("noVNC_clipboard_text").onchange = UI.clipSend;
-            $D("noVNC_clipboard_clear_button").onclick = UI.clipClear;
-
-            $D("noVNC_settings_menu").onmouseover = UI.displayBlur;
-            $D("noVNC_settings_menu").onmouseover = UI.displayFocus;
-            $D("noVNC_apply").onclick = UI.settingsApply;
-
-            $D("noVNC_connect_button").onclick = UI.connect;
-            $D("noVNC_resize").onchange = UI.enableDisableViewClip;
-
-            */
         },
 
         onresize: function (callback) {
-            if ($('.dialog-container').css('width') == undefined || $('.dialog-container').css('height') == undefined) {
-                return;
-            }
-            
-            var dialogWidth, dialogHeight;
             setTimeout(function () {
-                dialogWidth = parseInt($('.dialog-container').css('width').replace('px',''));
-                dialogHeight = parseInt($('.dialog-container').css('height').replace('px','')) - 40;
-                
-                var w = dialogWidth;
-                var h = dialogHeight;
-
-                var maxHeight = window.innerHeight;
-                if (h > maxHeight) {
-                    h = maxHeight;
-                    w = h * 1.5;
-                }
-                
+                var w = window.innerWidth;
+                var h = window.innerHeight*1.2;
+                w = h * 1.5;
+                                
                 var display = UI.rfb.get_display();
+                console.log(display);
                 var scaleRatio = display.autoscale(w,h,false);
                 UI.rfb.get_mouse().set_scale(scaleRatio);
-                $('.noVNC_container').css('visibility', 'visible');
-
             }, 100);
 
         },
@@ -653,7 +593,7 @@ var UI;
                 $('.noVNC_screen .loading').hide();
             }
             
-            UI.log("CONNECTION", "STATE: " + state + " - " + msg);
+            UI.log("INFO", "STATE: " + state + " - " + msg);
 
             UI.updateVisualState();
         },
@@ -676,7 +616,7 @@ var UI;
                     lineClass = "js-log-line-" + state.toLowerCase() + " log-line-" + state.toLowerCase();
             }
             
-            $('.noVNC_screen .noVNC_log .log-registers').prepend('<p class="' + lineClass + '">' + logMsg + '</p>');
+            $('.vms-spy-log .log-registers').prepend('<p class="' + lineClass + '">' + logMsg + '</p>');
         },
 
         // Disable/enable controls depending on connection state

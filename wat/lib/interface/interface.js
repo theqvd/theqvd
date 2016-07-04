@@ -698,14 +698,12 @@ Wat.I = {
         }
         else {
             this.showSelectedItemsMenu();
-                this.checkVisibilityConditions();
+            this.checkVisibilityConditions();
                 
             if (selectedItems == 1) {
-                $('.js-only-one').show();
                 $('.js-only-massive').hide();
             }
             else {
-                $('.js-only-massive').show();
                 $('.js-only-one').hide();
             }
         }

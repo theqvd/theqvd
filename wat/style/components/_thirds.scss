@@ -296,6 +296,7 @@ div.tagsinput span.tag a {
 
 .extruder-content, .ext-wrapper, .extruder-content .text {
     background: #333 !important;
+    overflow: visible !important;
 }
 
 
@@ -400,10 +401,6 @@ div.tagsinput span.tag a {
     display: none !important;
 }
 
- .noVNC_container {
-     visibility: hidden;
- }
-
 .noVNC_canvas--interactive {
     cursor: none !important;
 }
@@ -412,12 +409,9 @@ div.tagsinput span.tag a {
     cursor: auto !important;
 }
 
-.noVNC_log {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 200px;
-    width: 600px;
+.vms-spy-log {
+    display: none;
+    width: 100%;
 
     .log-registers {
         overflow-y: scroll;
@@ -427,7 +421,7 @@ div.tagsinput span.tag a {
         color: #eee;
         text-align: left;
         padding: 4px;
-        height: 180px;
+        height: 200px;
         border: 1px solid #eee;
         
         .log-line-debug, .log-line-info, .log-line-warn, .log-line-error {
@@ -460,8 +454,8 @@ div.tagsinput span.tag a {
     }
 }
 
-.vms-spy-settings, .vms-spy-details {
-    display: none;
+.vms-spy-settings, .vms-spy-details, .vms-spy-log {
+    //display: none;
     color: #eee;
     background: #555;
     padding: 8px;

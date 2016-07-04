@@ -81,9 +81,58 @@
                     Canvas not supported.
         </canvas>
     </div>
+</div>
+
+<!-- Settings panel -->
+<div class="js-vm-spy-settings-panel {title:'Settings'}">
+    <fieldset class="vms-spy-details js-vms-spy-details">
+        <legend data-i18n="Details"></legend>
+        <div data-i18n="Virtual machine"></div>
+        <p class="details-data"><span data-i18n="Name"></span>: <span class="bold"><%= model.get('name') %></span></p>
+
+        <% if (Wat.C.checkACL('vm.see.user') || Wat.C.checkACL('vm.see.user-state')) { %>
+            <div data-i18n="User"></div>
+            <% if (Wat.C.checkACL('vm.see.user')) { %>
+                <p class="details-data"><span data-i18n="Name"></span>: <span class="bold"><%= model.get('user_name') %></span></p>
+            <% } %>
+            <% if (Wat.C.checkACL('vm.see.user-state')) { %>
+                <p class="details-data"><span data-i18n="State"></span>: <span class="bold"><%= model.get('user_state') %></span></p>
+            <% } %>
+        <% } %>
+    </fieldset>
+
+    <fieldset class="vms-spy-settings js-vms-spy-settings">
+        <legend data-i18n="Settings"></legend>
+        <div>
+            <span data-i18n="Resolution"></span>
+            <select class="js-vms-spy-setting-resolution" class="chosen-single">
+                <option value="adapted" data-i18n="Adapted"></option>
+                <option value="original" data-i18n="Original"></option>
+            </select>
+        </div>
+        <% if (Wat.C.checkACL('vm.spy.interactive')) { %>
+            <div>
+                <span data-i18n="Mode"></span>
+                <select class="js-vms-spy-setting-mode" class="chosen-single">
+                    <option value="view_only" data-i18n="View only"></option>
+                    <option value="interactive" data-i18n="Interactive"></option>
+                </select>
+            </div>
+        <% } %>
+        <div>
+            <span data-i18n="Log"></span>
+            <select class="js-vms-spy-setting-log" class="chosen-single">
+                <option value="disabled" data-i18n="Hidden"></option>
+                <option value="error" data-i18n="Error">Error</option>
+                <option value="warn" data-i18n="Warning">Warning</option>
+                <option value="info" data-i18n="Info">Info</option>
+                <option value="debug" data-i18n="Debug">Debug</option>
+            </select>
+        </div>
+    </fieldset>
     
-    <div class="noVNC_log" style="display: none;">
-        <div class="drag-title js-drag-title"><i class="fa fa-arrows">Log</i></div>
+    <fieldset class="vms-spy-log js-vms-spy-log">
+        <legend data-i18n="Log"></legend>
         <div class="log-registers js-log-registers"></div>
-    </div>
+    </fieldset>
 </div>

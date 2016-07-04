@@ -3313,7 +3313,8 @@ div.tagsinput span.tag a {
     cursor: pointer; }
 
 .extruder-content, .ext-wrapper, .extruder-content .text {
-  background: #333 !important; }
+  background: #333 !important;
+  overflow: visible !important; }
 
 .evo-pop {
   width: 210px !important; }
@@ -3374,22 +3375,16 @@ div.tagsinput span.tag a {
 .noVNC_controls, .noVNC_settings, .noVNC_xvp, .noVNC_status {
   display: none !important; }
 
-.noVNC_container {
-  visibility: hidden; }
-
 .noVNC_canvas--interactive {
   cursor: none !important; }
 
 .noVNC_canvas--viewonly {
   cursor: auto !important; }
 
-.noVNC_log {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 200px;
-  width: 600px; }
-  .noVNC_log .log-registers {
+.vms-spy-log {
+  display: none;
+  width: 100%; }
+  .vms-spy-log .log-registers {
     overflow-y: scroll;
     font-size: x-small;
     line-height: 13px;
@@ -3397,17 +3392,17 @@ div.tagsinput span.tag a {
     color: #eee;
     text-align: left;
     padding: 4px;
-    height: 180px;
+    height: 200px;
     border: 1px solid #eee; }
-    .noVNC_log .log-registers .log-line-debug, .noVNC_log .log-registers .log-line-info, .noVNC_log .log-registers .log-line-warn, .noVNC_log .log-registers .log-line-error {
+    .vms-spy-log .log-registers .log-line-debug, .vms-spy-log .log-registers .log-line-info, .vms-spy-log .log-registers .log-line-warn, .vms-spy-log .log-registers .log-line-error {
       display: none; }
-    .noVNC_log .log-registers .log-line-info {
+    .vms-spy-log .log-registers .log-line-info {
       color: aqua; }
-    .noVNC_log .log-registers .log-line-warn {
+    .vms-spy-log .log-registers .log-line-warn {
       color: yellow; }
-    .noVNC_log .log-registers .log-line-error {
+    .vms-spy-log .log-registers .log-line-error {
       color: red; }
-  .noVNC_log .drag-title {
+  .vms-spy-log .drag-title {
     width: 100%;
     height: 20px;
     background-color: #666;
@@ -3418,8 +3413,7 @@ div.tagsinput span.tag a {
     cursor: pointer;
     text-align: left; }
 
-.vms-spy-settings, .vms-spy-details {
-  display: none;
+.vms-spy-settings, .vms-spy-details, .vms-spy-log {
   color: #eee;
   background: #555;
   padding: 8px;
@@ -3427,17 +3421,17 @@ div.tagsinput span.tag a {
   border: 1px solid #eee;
   margin-top: 10px; }
   @media only screen and (max-width: 41em) {
-    .vms-spy-settings, .vms-spy-details {
+    .vms-spy-settings, .vms-spy-details, .vms-spy-log {
       width: 31%;
       float: left;
       height: 200px;
       margin-right: 15px; } }
-  .vms-spy-settings div, .vms-spy-details div {
+  .vms-spy-settings div, .vms-spy-details div, .vms-spy-log div {
     margin-bottom: 5px; }
-  .vms-spy-settings legend, .vms-spy-details legend {
+  .vms-spy-settings legend, .vms-spy-details legend, .vms-spy-log legend {
     color: #eee;
     text-align: left; }
-  .vms-spy-settings .details-data, .vms-spy-details .details-data {
+  .vms-spy-settings .details-data, .vms-spy-details .details-data, .vms-spy-log .details-data {
     padding-left: 8px;
     margin-bottom: 8px;
     font-size: 10px; }
@@ -3693,6 +3687,9 @@ td {
 
 .nopadding {
   padding: 0px; }
+
+* {
+  text-shadow: 0 0; }
 
 .doc-text {
   /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
