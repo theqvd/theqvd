@@ -151,7 +151,7 @@ Wat.Views.VMSpyView = Wat.Views.MainView.extend({
     
     clickKeyboard: function (e) {
         // focus on a visible input may work
+	$('.js-vm-spy-settings-panel').closeMbExtruder();
         $('#kbi').focus();
-		$('#kbi').hide();
     }
 });

@@ -132,7 +132,6 @@
         <div class="mobile">
             <span data-i18n="Keyboard"></span>
             <a class="button fa fa-keyboard-o js-vnc-keyboard col-width-100" data-i18n="Show"></a>
-            <input type="text" id="kbi" style="display: none;"></input>
         </div>
     </fieldset>
     
@@ -141,3 +140,6 @@
         <div class="log-registers js-log-registers"></div>
     </fieldset>
 </div>
+
+<!-- Invisible input to show keyboard on mobile devices using focus trick -->
+<input type="text" id="kbi" style="outline: none; background: transparent; font-size: 0px; line-height: 0px; position: absolute; bottom: -100px;"></input>
