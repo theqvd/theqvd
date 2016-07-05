@@ -74,6 +74,7 @@
     
 <div id="noVNC_screen" class="noVNC_screen">
     <%= HTML_LOADING %>
+    <%= HTML_ERROR %>
     
     <!-- HTML5 Canvas -->
     <div id="noVNC_container" class="noVNC_container">
@@ -142,4 +143,4 @@
 </div>
 
 <!-- Invisible input to show keyboard on mobile devices using focus trick -->
-<input type="text" id="kbi" style="outline: none; background: transparent; font-size: 0px; line-height: 0px; position: absolute; bottom: -100px;"></input>
+<input type="text" id="kbi" class="out-of-borders invisible-box"></input>

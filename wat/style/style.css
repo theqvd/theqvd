@@ -936,21 +936,21 @@ body {
       float: left;
       margin-right: 15px; }
 
-.loading, .loading-mid {
+.loading, .loading-mid, .error-loading {
   width: 75px;
   top: 25vh;
   color: #e4e4e4;
   margin: 50px auto; }
   @media screen and (min-width: 41em) {
-    .loading, .loading-mid {
+    .loading, .loading-mid, .error-loading {
       font-size: 200px;
       width: 200px;
       top: 25vh; } }
 
-.loading {
+.loading, .error-loading {
   font-size: 75px; }
   @media screen and (min-width: 41em) {
-    .loading {
+    .loading, .error-loading {
       font-size: 200px; } }
 
 .loading-mid {
@@ -1976,6 +1976,19 @@ span.text {
   opacity: 0.8; }
   .server-datetime-wrapper.server-datetime-wrapper--mini {
     top: 40px; }
+
+.out-of-borders {
+  position: absolute;
+  right: -1000px;
+  bottom: -1000px; }
+
+.invisible-box {
+  outline: none;
+  box-shadow: none;
+  border: 0px solid;
+  background: transparent;
+  font-size: 0px;
+  line-height: 0px; }
 
 /********************************************************************
 *********************************************************************

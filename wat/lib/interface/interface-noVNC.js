@@ -616,7 +616,17 @@ var UI;
                     lineClass = "js-log-line-" + state.toLowerCase() + " log-line-" + state.toLowerCase();
             }
             
-            $('.vms-spy-log .log-registers').prepend('<p class="' + lineClass + '">' + logMsg + '</p>');
+            $('.vms-spy-log .log-registers').prepend('<p class="' + lineClass + '">' + logMsg + '</p>'); 
+            
+            if (state == 'ERROR') {
+                // If error, open lateral menu and show log
+                $('.js-vm-spy-settings-panel').openMbExtruder();                    
+                $('.js-vms-spy-setting-log').val('error');
+                $('.js-vms-spy-setting-log').trigger('chosen:updated');
+                $('.js-vms-spy-setting-log').trigger('change');
+                $('.loading').hide();
+                $('.error-loading').show();
+            }
         },
 
         // Disable/enable controls depending on connection state

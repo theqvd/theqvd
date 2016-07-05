@@ -43,6 +43,8 @@ Wat.Views.VMSpyView = Wat.Views.MainView.extend({
               
         $('.bb-super-wrapper').html(template + noVNCIncludes);
         
+        $('.error-loading').hide();
+        
         Wat.T.translate();
         
         $('.js-vm-spy-settings-panel').buildMbExtruder({
@@ -151,7 +153,7 @@ Wat.Views.VMSpyView = Wat.Views.MainView.extend({
     
     clickKeyboard: function (e) {
         // focus on a visible input may work
-	$('.js-vm-spy-settings-panel').closeMbExtruder();
+        $('.js-vm-spy-settings-panel').closeMbExtruder();
         $('#kbi').focus();
     }
 });
