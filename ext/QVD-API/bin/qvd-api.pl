@@ -559,7 +559,9 @@ group {
         die QVD::API::Exception->new(code => 6240, object => "vm_id")->message unless (defined($vm_id));
 
         my $vm = $c->qvd_admin4_api->_db->resultset('VM_Runtime')->find($vm_id);
-        if (defined($vm) && (my $vm_ip = $vm->vm_address) && (my $vm_port = $vm->vm_vma_port)) {
+        if (defined($vm) && (my $vm_ip = $vm->vm_address) && (my $vm_port = $vm->vm_vma_port) 
+            && ($vm->vm_state eq 'running')) 
+        {
             my $tx = $c->tx;
             $tx->with_protocols( 'binary' );
 
@@ -570,7 +572,8 @@ group {
             } );
             $ws->open($tx, 30000);
         }
-        else {
+        else 
+        {
             die QVD::API::Exception->new(code => 6310, object => $vm_id)->message;
         }
     };
