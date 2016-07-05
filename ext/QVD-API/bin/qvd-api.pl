@@ -221,7 +221,7 @@ group {
         } catch {
             $exception = $_;
             $bool = 0;
-            $c->render(json => $exception->json, status => 401);
+            $c->render(json => $exception->json);
         };
 
         QVD::API::LogReport->new(
