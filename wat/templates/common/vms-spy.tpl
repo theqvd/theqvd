@@ -129,6 +129,11 @@
                 <option value="debug" data-i18n="Debug">Debug</option>
             </select>
         </div>
+        <div class="mobile">
+            <span data-i18n="Keyboard"></span>
+            <a class="button fa fa-keyboard-o js-vnc-keyboard col-width-100" data-i18n="Show"></a>
+            <input type="text" id="kbi" style="display: none;"></input>
+        </div>
     </fieldset>
     
     <fieldset class="vms-spy-log js-vms-spy-log">

@@ -462,13 +462,6 @@ div.tagsinput span.tag a {
     font-size: small;
     border: 1px solid #eee;
     margin-top: 10px;
-    
-    @include in(mobile) {
-        width: 31%;
-        float: left;
-        height: 200px;
-        margin-right: 15px;
-    }
         
     div {
         margin-bottom: 5px;

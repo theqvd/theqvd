@@ -55,7 +55,8 @@ Wat.Views.VMSpyView = Wat.Views.MainView.extend({
                 $(".js-vms-spy-setting-resolution").on('change', that.changeSettingResolution);
                 $(".js-vms-spy-setting-mode").on('change', that.changeSettingMode);
                 $(".js-vms-spy-setting-log").on('change', that.changeSettingLog);
-
+                $(".js-vnc-keyboard").on('click', that.clickKeyboard);
+                
                 Wat.T.translate();
                 Wat.I.chosenConfiguration();
                 Wat.I.chosenElement('.vms-spy-settings select', 'single100');
@@ -146,5 +147,11 @@ Wat.Views.VMSpyView = Wat.Views.MainView.extend({
                 $('.noVNC_canvas').addClass('noVNC_canvas--interactive');
                 break;
         }
+    },
+    
+    clickKeyboard: function (e) {
+        // focus on a visible input may work
+        $('#kbi').focus();
+		$('#kbi').hide();
     }
 });

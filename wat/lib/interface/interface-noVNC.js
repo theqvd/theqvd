@@ -202,11 +202,11 @@ var UI;
         onresize: function (callback) {
             setTimeout(function () {
                 var w = window.innerWidth;
-                var h = window.innerHeight*1.2;
+                var h = window.innerHeight*0.99;
                 w = h * 1.5;
                                 
                 var display = UI.rfb.get_display();
-                console.log(display);
+                
                 var scaleRatio = display.autoscale(w,h,false);
                 UI.rfb.get_mouse().set_scale(scaleRatio);
             }, 100);
