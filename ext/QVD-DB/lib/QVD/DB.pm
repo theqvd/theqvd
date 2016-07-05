@@ -20,10 +20,10 @@ __PACKAGE__->load_namespaces(result_namespace => 'Result');
 __PACKAGE__->exception_action(sub { croak @_ ; DBIx::Class::Exception::throw(@_);});
 
 
-my $db_name   = core_cfg('database.name'); # FIXME: INSTANTIATED IN THE CONSTRUCTOR
-my $db_user   = core_cfg('database.user'); # FIXME: INSTANTIATED IN THE CONSTRUCTOR
-my $db_host   = core_cfg('database.host'); # FIXME: INSTANTIATED IN THE CONSTRUCTOR
-my $db_passwd = core_cfg('database.password'); # FIXME: INSTANTIATED IN THE CONSTRUCTOR
+my $db_name   = core_cfg('database.name');
+my $db_user   = core_cfg('database.user');
+my $db_host   = core_cfg('database.host');
+my $db_passwd = core_cfg('database.password');
 my $db_port   = core_cfg('database.port', 0);
 
 my $db_connect_timeout = core_cfg('internal.database.client.connect.timeout');

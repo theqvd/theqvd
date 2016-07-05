@@ -1,8 +1,8 @@
 package QVD::DB::Translator;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
+use feature 'state';
 use QVD::Log;
-use List::Util qw(sum);
 
 =head1 NAME
 
@@ -16,6 +16,56 @@ supported by DBIx::Class package.
 Errors during the translation will be written in the QVD::Log;
 
 =cut
+
+sub _check_arg_list {
+    my ($name, $args, %opts) = @_;
+    my $value = $args->{$name};
+
+    $value //= $opts{default};
+
+    unless (defined $value and @$value) {
+        $opts{optional} and return;
+        LOGDIE "Argument $name is mandatory (list)"
+    }
+
+    if ($opts{uc}) {
+        $value = [map uc, @$value];
+    }
+
+    if (my $valid = $opts{valid}) {
+        grep($_, @$valid) or LOGDIE "Argument $name item '$_' is not valid"
+            for @$value;
+    }
+    elsif ($opts{keyword} // 1) {
+        /^\w+$/ or LOGDIE "Argument $name item '$_' is not a valid keyword"
+            for @$value;
+    }
+    @$value;
+}
+
+sub _check_arg {
+    my ($name, $args, %opts) = @_;
+    my $value = $args->{$name};
+
+    $value //= $opts{default};
+
+    unless (defined $value) {
+        $opts{optional} or return;
+        LOGDIE "Argument $name is mandatory (list)";
+    }
+
+    $value = uc $value if $opts{uc};
+
+    if (my $valid = $opts{valid}) {
+        grep($_ eq $value, @$valid) or LOGDIE "Argument $name value '$value' is not valid"
+    }
+    elsif ($opts{keyword} // 1) {
+        $value =~ /^\w+$/ or LOGDIE "Argument $name value '$value' is not a valid keyword"
+    }
+    $value
+}
+
+sub _sql_join { join(' ', grep { defined and length } @_) }
 
 =head2 translate_create_procedure
 
@@ -33,26 +83,22 @@ Returns undef in case an error is encounter during the translation.
 
 =cut
 
+
 sub translate_create_procedure {
-	my ($args) = @_;
-	my @checks = ();
+    my ($args) = @_;
 
-	my $replace = (($args->{replace} // 0) >= 1 ) ? "OR REPLACE" : "";
-	my $name = $args->{name} // "";
-	my $returns = (($args->{returns} // "") ne "") ? "RETURNS $args->{returns}" : "";
-	my $language = ($args->{language} // "plpgsql");
-	my $sql = ($args->{sql} // "");
-	my @params = @{$args->{parameters} // []};
+    my $name = _check_arg(name => $args);
+    my $replace = _check_arg(replace => $args, default => 0);
+    my $returns = _check_arg(returns => $args, keyword => 0);
+    my $language = _check_arg(language => $args, default => 'plpgsql');
+    my $sql = _check_arg(sql => $args, keyword => 0);
+    my @params = _check_arg_list(parameters => $args, optional => 1);
 
-	ERROR "Procedure {name} cannot be empty" if ( $checks[push(@checks, $name eq "") - 1] );
-	ERROR "Procedure {sql} command cannot be empty" if ( $checks[push(@checks, $sql eq "") - 1] );
-
-	my $translation = undef;
-	if ( (sum(@checks) // 0) == 0) {
-		$translation = "CREATE $replace FUNCTION $name(".join(",",@params).") $returns LANGUAGE $language AS $sql;";
-	}
-
-	return $translation;
+    _sql_join('CREATE',
+              ($replace ? 'OR REPLACE' : ''),
+              "FUNCTION $name(", join(', ', @params), ')',
+              ($returns ? "RETURNS $returns" : ''),
+              "LANGUAGE $language as $sql");
 }
 
 =head2 translate_drop_procedure
@@ -67,19 +113,10 @@ Returns undef in case an error is encounter during the translation.
 =cut
 
 sub translate_drop_procedure {
-	my ($args) = @_;
-	my @checks = ();
+    my ($args) = @_;
+    my $name = _check_arg(name => $args);
 
-	my $name = $args->{name} // "";
-
-	ERROR "Procedure {name} cannot be empty" if ( $checks[push(@checks, $name eq "") - 1] );
-
-	my $translation = undef;
-	if ( (sum(@checks) // 0) == 0) {
-		$translation = "DROP FUNCTION IF EXISTS $name();";
-	}
-
-	return $translation;
+    "DROP FUNCTION IF EXISTS $name();";
 }
 
 =head2 translate_create_trigger
@@ -101,42 +138,26 @@ Returns undef in case an error is encounter during the translation.
 =cut
 
 sub translate_create_trigger {
-	my ($args) = @_;
-	my @checks = ();
+    my ($args) = @_;
 
-	my $name = $args->{name} // "";
-	my $when = uc($args->{when} // "");
-	my @when_params = ("AFTER", "BEFORE", "INSTEAD OF");
-	my @events = map { uc } @{($args->{events} // ())};
-	my @events_params = {"INSERT", "UPDATE", "DELETE", "TRUNCATE"};
-	my @fields = @{$args->{fields} // []};
-	my $table = $args->{on_table} // "";
-	my $scope = $args->{scope} // "";
-	my @scope_params = ("ROW", "STATEMENT");
-	# TODO add condition
-	my $procedure = $args->{procedure} // "";
-	my @params = @{$args->{parameters} // []};
+    my $name = _check_arg(name => $args);
+    my $procedure = _check_arg(procedure => $args);
+    my $table = _check_arg(on_table => $args);
+    my $when = _check_arg(when => $args, uc => 1,
+                          valid => ['AFTER', 'BEFORE', 'INSTEAD OF']);
+    my $scope = _check_arg(scope => $args,
+                           valid => [qw(ROW STATEMENT)]);
 
-	ERROR "Trigger {name} cannot be empty" if ( $checks[push(@checks, $name eq "") - 1] );
-	ERROR "Trigger {when} cannot be empty" if ( $checks[push(@checks, $when eq "") - 1] );
-	ERROR "Trigger {when} invalid parameters. Expected: @when_params"
-		if ( $checks[push(@checks, not($when ~~ @when_params))- 1] );
-	ERROR "Trigger {events} cannot be empty" if ( $checks[push(@checks, "@events" eq "") - 1] );
-	ERROR "Trigger {on_table} cannot be empty" if ( $checks[push(@checks, $table eq "") - 1] );
-	# FIXME Check events_params
-	ERROR "Trigger {scope} cannot be empty" if ( $checks[push(@checks, $scope eq "") - 1] );
-	ERROR "Trigger {scope} invalid parameters. Expected: @scope_params"
-		if ( $checks[push(@checks, not($scope ~~ @scope_params))- 1] );
+    my @events = _check_arg_list(events => $args, uc => 1,
+                                 valid => [qw(INSERT UPDATE DELETE TRUNCATE )]);
+    my @fields = _check_arg_list(fields => $args, optional => 1);
+    my @params = _check_arg_list(parameters => $args, optional => 1);
 
-	my $translation = undef;
-	if ( (sum(@checks) // 0) == 0) {
-		# FIXME fields are not asociated with the UPDATE event
-		$translation = "CREATE TRIGGER $name $when ".join(" OR ", @events).
-			(@fields ? " OF ".join(",",@fields) : "").
-			" ON $table FOR EACH $scope EXECUTE PROCEDURE $procedure(".join(",",@params).")";
-	}
-
-	return $translation;
+    _sql_join("CREATE TRIGGER $name $when",
+              (join ' OR ', @events),
+              (@fields ? (OF => join(', ', @fields)) : ''),
+              "ON $table FOR EACH $scope EXECUTE PROCEDURE",
+              "$procedure(", join(', ', @params), ")");
 }
 
 =head2 translate_drop_trigger
@@ -152,21 +173,12 @@ Returns undef in case an error is encounter during the translation.
 =cut
 
 sub translate_drop_trigger {
-	my ($args) = @_;
-	my @checks = ();
+    my ($args) = @_;
 
-	my $name = $args->{name} // "";
-	my $table = $args->{on_table} // "";
+    my $name = _check_arg(name => $args);
+    my $table = _check_arg(on_table => $args);
 
-	ERROR "Trigger {name} cannot be empty" if ( $checks[push(@checks, $name eq "") - 1] );
-	ERROR "Trigger {on_table} cannot be empty" if ( $checks[push(@checks, $table eq "") - 1] );
-
-	my $translation = undef;
-	if ( (sum(@checks) // 0) == 0) {
-		$translation = "DROP TRIGGER IF EXISTS $name on $table";
-	}
-
-	return $translation;
+    "DROP TRIGGER IF EXISTS $name on $table";
 }
 
 =head1 AUTHOR

@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use Moo;
 use QVD::API::Exception;
-use QVD::API::DBConfigProvider;
 
 has 'json_wrapper', is => 'ro', isa => sub { die "Invalid type for attribute json_wrapper" 
 						 unless ref(+shift) eq 'QVD::API::REST::JSON'; }, required => 1;

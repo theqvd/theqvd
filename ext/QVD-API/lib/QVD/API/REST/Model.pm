@@ -805,7 +805,7 @@ my $AVAILABLE_FIELDS = {
 
 	      Administrator => [qw( name description roles id language block creation_date creation_admin_id creation_admin_name)],
 
-        My_Admin => [qw(admin_id tenant_id tenant_name admin_language tenant_language acls views admin_block tenant_block)],
+        My_Admin => [qw(admin_id admin_name tenant_id tenant_name admin_language tenant_language acls views admin_block tenant_block)],
 
 		Tenant => [qw(id name description language block blocked creation_date creation_admin_id creation_admin_name)],
 				   
@@ -1276,6 +1276,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER = {
     },
     
     My_Admin => {
+        'id'   => 'me.id',
         'name' => 'me.name',
         'language' => 'wat_setups.language',
         'block' => 'wat_setups.block',
@@ -1453,7 +1454,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER = {
         'visible' => 'me.visible',
         'view_type' => 'me.view_type',
         'device_type' => 'me.device_type',
-        'qvd_object' => 'me.qvd_object',
+        'qvd_object' => 'qvd_obj_prop.qvd_object',
     },
 
     Views_Setup_Attributes_Tenant => {
@@ -1505,13 +1506,12 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER = {
         'visible' => 'me.visible',
         'view_type' => 'me.view_type',
         'device_type' => 'me.device_type',
-        'qvd_object' => 'me.qvd_object',
+        'qvd_object' => 'qvd_obj_prop.qvd_object',
     },
 
     Views_Setup_Attributes_Administrator =>  {
         'id' => 'me.id',
-        'tenant_id' => 'administrator.id',
-        'tenant_name' => 'administrator.name',
+        'tenant_id' => 'administrator.tenant_id',
         'admin_id' => 'me.administrator_id',
         'field' => 'me.field',
         'admin_name' => 'administrator.name',

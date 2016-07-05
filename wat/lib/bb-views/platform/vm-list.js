@@ -1,6 +1,6 @@
 Wat.Views.VMListView = Wat.Views.ListView.extend({  
     qvdObj: 'vm',
-    liveFields: ['state', 'user_state', 'ip', 'host_id', 'host_name', 'ssh_port', 'vnc_port', 'serial_port'],
+    liveFields: ['state', 'user_state', 'ip', 'host_id', 'host_name', 'ssh_port', 'vnc_port', 'serial_port', 'expiration_soft', 'expiration_hard', 'time_until_expiration_soft', 'time_until_expiration_hard'],
     
     relatedDoc: {
         image_update: "Images update guide",
@@ -10,7 +10,36 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
     initialize: function (params) {   
         this.collection = new Wat.Collections.VMs(params);
         
+        var templates = Wat.I.T.getTemplateList('vmList');
+        Wat.A.getTemplates(templates, function () {});
+        
         Wat.Views.ListView.prototype.initialize.apply(this, [params]);
+    },
+    
+    renderListBlock: function () {
+        Wat.Views.ListView.prototype.renderListBlock.apply(this, []);
+        
+        if (Wat.C.checkACL('vm.see.expiration')) {
+            $.each($('.bb-vm-list-expiration'), function (iCell, cell) {
+                var expirationType = typeof $(cell).attr('data-expiration_soft') == "undefined" ? 'hard' : 'soft';
+                var id = $(cell).attr('data-id');
+                var model = Wat.CurrentView.collection.where({id: parseInt(id)})[0];
+                
+                if (model.get('expiration_' + expirationType)) {
+                    var template = _.template(
+                            Wat.TPL.vmListExpiration, {
+                                expiration: model.get('expiration_' + expirationType),
+                                remainingTime: Wat.U.processRemainingTime(model.get('time_until_expiration_' + expirationType)),
+                                time_until_expiration_raw: Wat.U.base64.encodeObj(model.get('time_until_expiration_' + expirationType)),
+                            }
+                        );
+                    
+                    $(cell).html(template);
+                }
+            });
+            
+            Wat.T.translate();
+        }
     },
     
     // This events will be added to view events

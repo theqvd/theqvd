@@ -12,7 +12,7 @@ Wat.WS = {
 
             try {
                 // Let us open a web socket
-                var wsURI = Wat.C.apiWSUrl + stream + '?sid=' + Wat.C.sid + '&action=' + action + urlParams + '&parameters=' + JSON.stringify({source: Wat.C.source});
+                var wsURI = Wat.C.apiWSUrl + stream + '?' + Wat.C.getUrlSid() + '&action=' + action + urlParams + '&parameters=' + JSON.stringify({source: Wat.C.source});
                 var ws = new WebSocket(encodeURI(wsURI));
 
                 ws.onopen = function() {
@@ -195,45 +195,43 @@ Wat.WS = {
             if (viewType == 'list') {
                 id = row.id;
                 delete row.id;
-        }
-        
+            }
+            
+            // Save data of retrieved query on WS channel
+            if (viewType == 'details' && Wat.CurrentView.model) {
+                var model = Wat.CurrentView.model;
+            }
+            else if (viewType == 'list' && Wat.CurrentView.collection) {
+                var model = Wat.CurrentView.collection.where({id: id})[0];
+            }
+
+            // Update model
+            if (model) {
+                model.set(row);
+            }
+            
             $.each(row, function (field, value) {
-                var paramsChange = {};
-                paramsChange[field] = value;
-                
-                if (viewType == 'details' && Wat.CurrentView.model) {
-                    var model = Wat.CurrentView.model;
-                }
-                else if (viewType == 'list' && Wat.CurrentView.collection) {
-                    var model = Wat.CurrentView.collection.where({id: id})[0];
-                }
-
-                // Update model
-                if (model) {
-                model.set(paramsChange);
-                }
-
                 // Check visibility conditions of the selected items dialog. Usefull when this dialog is opened during websockets changes
                 Wat.I.checkVisibilityConditions();
                 
-            switch (qvdObj) {
-                case 'vm':
-                    Wat.WS.changeWebsocketVm(id, field, value, viewType);
-                    break;
-                case 'user':
-                    Wat.WS.changeWebsocketUser(id, field, value);
-                    break;
-                case 'host':
-                    Wat.WS.changeWebsocketHost(id, field, value);
-                    break;
-                case 'osf':
-                    Wat.WS.changeWebsocketOsf(id, field, value);
-                    break;
-                case 'home':
-                    Wat.WS.changeWebsocketStats(field, value);
-                    break;
-            }
-        });
+                switch (qvdObj) {
+                    case 'vm':
+                        Wat.WS.changeWebsocketVm(id, field, value, viewType);
+                        break;
+                    case 'user':
+                        Wat.WS.changeWebsocketUser(id, field, value);
+                        break;
+                    case 'host':
+                        Wat.WS.changeWebsocketHost(id, field, value);
+                        break;
+                    case 'osf':
+                        Wat.WS.changeWebsocketOsf(id, field, value);
+                        break;
+                    case 'home':
+                        Wat.WS.changeWebsocketStats(field, value);
+                        break;
+                }
+            });
         });
     }
 }

@@ -1,5 +1,5 @@
 Wat.WS.changeWebsocketVm = function (id, field, data, viewType) {
-   switch (field) {
+    switch (field) {
         case 'state':
             if (viewType == 'details' && Wat.CurrentView.model) {
                 // Add this effect when data will be received only when change
@@ -79,10 +79,12 @@ Wat.WS.changeWebsocketVm = function (id, field, data, viewType) {
                 case 'connected':
                     $('[data-wsupdate="user_state"][data-id="' + id + '"]').show();
                     $('[data-wsupdate="user_state-text"][data-id="' + id + '"]').html(i18n.t('Connected')); 
+                    $('[data-wsupdate="user_state-button"]').show(); 
                     break;
                 case 'disconnected':
                     $('[data-wsupdate="user_state"][data-id="' + id + '"]').hide();
                     $('[data-wsupdate="user_state-text"][data-id="' + id + '"]').html(i18n.t('Disconnected')); 
+                    $('[data-wsupdate="user_state-button"]').hide(); 
                     break;
             }
             break;
@@ -120,6 +122,89 @@ Wat.WS.changeWebsocketVm = function (id, field, data, viewType) {
             break;
         case 'ip_in_use':
             $('[data-wsupdate="ip"][data-id="' + id + '"]').html(data); 
+            break;
+        case 'expiration_soft':
+        case 'expiration_hard':   
+            switch (viewType) {
+                case 'list':
+                    // Expiration ICON on info column
+                    if ($('[data-wsupdate="expiration-icon"]').length > 0) {
+                        // Update expiration data on iconattributes
+                        $('[data-wsupdate="expiration-icon"][data-id="' + id + '"]').attr('data-' + field, data);
+                        
+                        var newExpiration = {
+                            expiration_soft: $('[data-wsupdate="expiration-icon"][data-id="' + id + '"]').attr('data-expiration_soft'),
+                            expiration_hard: $('[data-wsupdate="expiration-icon"][data-id="' + id + '"]').attr('data-expiration_hard')
+                        }
+                    
+                        if (newExpiration.expiration_soft || newExpiration.expiration_hard) {
+                            $('[data-wsupdate="expiration-icon"][data-id="' + id + '"]').show();
+                        }
+                        else {
+                            $('[data-wsupdate="expiration-icon"][data-id="' + id + '"]').hide();
+                        }
+                    }
+                    
+                    // Expiration CELL on expiration columns
+                    if ($('[data-wsupdate="' + field + '-cell"]').length > 0) {
+                        var oldExpiration = $('[data-wsupdate="' + field + '-cell"][data-id="' + id + '"]').attr('data-' + field);
+                        var newExpiration = data;
+                        
+                        // Update expiration data on cells attributes
+                        $('[data-wsupdate="' + field + '-cell"][data-id="' + id + '"]').attr('data-' + field, newExpiration);
+                        
+                        if (data) {                
+                            var expChanged = false;
+                            if (typeof oldExpiration == "undefined" || oldExpiration != newExpiration) {
+                                expChanged = true;
+                            }
+
+                            if (expChanged) {
+                                var model = Wat.CurrentView.collection.where({id: id})[0];
+                                var remainingTime = Wat.U.processRemainingTime(model.get('time_until_' + field));
+                                
+                                var template = _.template(
+                                    Wat.TPL.vmListExpiration, {
+                                        remainingTime: remainingTime,
+                                        expiration: model.get(field),
+                                        time_until_expiration_raw: Wat.U.base64.encodeObj(model.get('time_until_' + field)),
+                                    }
+                                );
+
+                                $('[data-wsupdate="' + field + '-cell"][data-id="' + id + '"]').html(template);
+                            }
+                        }
+                        else {
+                            $('[data-wsupdate="' + field + '-cell"][data-id="' + id + '"]').html('');
+                        }
+                    }
+                    break;
+                case 'details':
+                    // Expiration row on details view
+                    if (Wat.C.checkACL('vm.see.expiration')) {
+                        var model = Wat.CurrentView.model;
+
+                        var remainingTime = Wat.U.processRemainingTime(model.get('time_until_' + field));
+                        
+                        // Update expiration data on row attributes
+                        $('[data-wsupdate="' + field + '-row"][data-id="' + id + '"]').attr('data-' + field, data);
+
+                        var template = _.template(
+                            Wat.TPL.vmDetailsExpiration, {
+                                expiration_soft: model.get('expiration_soft'),
+                                expiration_hard: model.get('expiration_hard'),
+                                remainingTimeSoft: Wat.U.processRemainingTime(model.get('time_until_expiration_soft')),
+                                remainingTimeHard: Wat.U.processRemainingTime(model.get('time_until_expiration_hard')),
+                                time_until_expiration_soft_raw: Wat.U.base64.encodeObj(model.get('time_until_expiration_soft')),
+                                time_until_expiration_hard_raw: Wat.U.base64.encodeObj(model.get('time_until_expiration_hard')),
+                            }
+                        );
+
+                        $('.bb-vm-details-expiration').html(template);
+                        Wat.T.translate();
+                    }
+                    break;
+            }
             break;
     }
 }

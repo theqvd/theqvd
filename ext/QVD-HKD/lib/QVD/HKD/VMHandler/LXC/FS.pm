@@ -58,8 +58,11 @@ sub new {
     my $driver = $self->_cfg('vm.lxc.unionfs.type');
     $driver =~ s/-/_/g;
     $class .= "::$driver";
-    $self->bless($class);
-
+    eval {
+        $self->bless($class);
+        DEBUG "FS object is $self";
+    };
+    $@ and DEBUG "blessing $self to $class failed: $@";
     $self
 }
 

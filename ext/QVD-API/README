@@ -1,4 +1,4 @@
-QVD-Admin4 version 0.01
+QVD-API version 0.01
 =======================
 
 The README is used to introduce the module and provide instructions on
@@ -58,7 +58,6 @@ This module requires these other modules and libraries:
     QVD::API::AclsOverwriteList
     QVD::API::Action
     QVD::API::ConfigsOverwriteList
-    QVD::API::DBConfigProvider
     QVD::API::Exception
     QVD::API::LogReport
     QVD::API::REST::Filter

@@ -53,9 +53,9 @@ if (Wat.C.checkACL('vm.see.state')) {
     %>
     
     <% 
-    if (Wat.C.checkACL('vm.update.disconnect-user') && model.get('user_state') == 'connected') {
+    if (Wat.C.checkACL('vm.update.disconnect-user')) {
     %>
-        <a class="button button-icon js-button-disconnect-user fa fa-plug fright" href="javascript:" data-i18n="[title]Disconnect user"><span data-i18n="Disconnect user" class="mobile"></span></a>
+        <a class="button button-icon js-button-disconnect-user fa fa-plug fright <%= model.get('user_state') != 'connected' ? 'hidden' : '' %>" href="javascript:" data-wsupdate="user_state-button" data-i18n="[title]Disconnect user"><span data-i18n="Disconnect user" class="mobile"></span></a>
     <%
     }
     %>
@@ -281,62 +281,7 @@ switch (model.get('state')) {
     }
     if (Wat.C.checkACL('vm.see.expiration')) {
     %>
-        <tr>
-            <td><i class="fa fa-warning"></i><span data-i18n="Expiration"></span></td>
-                <%
-                    var expiration_soft = model.get('expiration_soft');
-                    var expiration_hard = model.get('expiration_hard');
-                    if (!expiration_soft && !expiration_hard) {
-                %>
-                    <td>
-                        <div class="no-elements" data-i18n="No"></div>
-                    </td>
-                <%
-                    }
-                    else {
-                        var remainingTimes = {
-                            soft: Wat.U.processRemainingTime(model.get('time_until_expiration_soft')),
-                            hard: Wat.U.processRemainingTime(model.get('time_until_expiration_hard'))
-                        };
-                        
-                        if (remainingTimes.hard.expired) {
-                %>
-                            <td><span class="error" data-i18n="Expired"></span></td>
-                <%
-                        }
-                        else {
-                %>
-                            <td class="inner-table">
-                                <table class="expiration-table">
-                                    <tbody>
-                                        <%
-                                            if (expiration_soft) {
-                                        %>
-                                            <tr>
-                                                <td class="<%= remainingTimes.soft.priorityClass %>" data-i18n="Soft"></td>
-                                                <td class="<%= remainingTimes.soft.priorityClass %>"><%= model.get('expiration_soft').replace('T',' ') %></td>
-                                                <td class="<%= remainingTimes.soft.priorityClass %>" <%= remainingTimes.soft.remainingTimeAttr %> data-countdown data-raw="<%= Wat.U.base64.encodeObj(model.get('time_until_expiration_soft')) %>"><%= remainingTimes.soft.remainingTime %></td>
-                                            </tr>
-                                        <%
-                                            }
-                                            if (expiration_hard) {
-                                        %>
-                                            <tr>
-                                                <td class="<%= remainingTimes.hard.priorityClass %>" data-i18n="Hard"></td>
-                                                <td class="<%= remainingTimes.hard.priorityClass %>"><%= model.get('expiration_hard').replace('T',' ') %></td>
-                                                <td class="<%= remainingTimes.hard.priorityClass %>" <%= remainingTimes.hard.remainingTimeAttr %> data-countdown data-raw="<%= Wat.U.base64.encodeObj(model.get('time_until_expiration_hard')) %>"><%= remainingTimes.hard.remainingTime %></td>
-                                            </tr>
-                                        <%
-                                            }
-                                        %>
-                                    </tbody>
-                                </table>
-                            </td>
-                <%
-                        }
-                    }
-                %>
-        </tr>
+        <tr class="bb-vm-details-expiration" data-wsupdate="expiration_soft-row" data-id="<%= model.get('id') %>" data-expiration_soft="<%= model.get('expiration_soft') %>" data-expiration_hard="<%= model.get('expiration_hard') %>"></tr>
     <% 
     }
     if (Wat.C.checkACL('vm.see.block')) {

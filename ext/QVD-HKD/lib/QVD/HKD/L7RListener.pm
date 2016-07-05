@@ -79,14 +79,19 @@ sub _write_file {
         }
 
         my $fh;
+        my $old_umask = umask;
+        umask 0077;
         unless ( open $fh, '>', $fn  and
                  binmode $fh         and
                  print $fh $contents and
                  close $fh) {
+            umask $old_umask;
             ERROR "Unable to write file '$fn': $!";
             return;
         }
+        umask $old_umask;
     }
+
     1;
 }
 
@@ -103,6 +108,7 @@ sub _save_ssl_config {
             unlink $fn;
         }
     }
+    INFO "L7R SSL configuration regenerated, ok=$ok" if $use_ssl;
     $self->{configured} = $ok;
 }
 
@@ -124,6 +130,7 @@ sub _start_listener {
 
 sub _stop_listener {
     my $self = shift;
+    INFO "L7RListener stopped";
     delete $self->{server};
 }
 

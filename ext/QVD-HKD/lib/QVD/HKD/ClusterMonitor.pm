@@ -58,7 +58,6 @@ update host_runtimes set state = 'lost'
     where state != 'stopped'
       and state != 'starting'
       and state != 'lost'
-      and not blocked
       and host_id != $1
       and $2 < extract('epoch' from (now() - ok_ts))
     returning host_id
@@ -102,9 +101,10 @@ sub _on_unassign_vms_result {
 
 sub _unassign_l7rs {
     my ($self) = @_;
-    $self->_query(<<EOQ);
+    $self->_query(<<'EOQ', time);
 update vm_runtimes
     set user_state  = 'disconnected',
+        user_state_ts = $1,
         user_cmd    = NULL,
         l7r_host_id = NULL,
         l7r_pid     = NULL

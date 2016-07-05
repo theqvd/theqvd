@@ -2,9 +2,16 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+
+my $SUF_VERSION = "";
+if  ( defined $ENV{BUILD_NUMBER} ) {
+  $SUF_VERSION = '.' . $ENV{BUILD_NUMBER} ;
+}
+
+
 WriteMakefile( NAME          => 'QVD::Admin',
                AUTHOR        => 'QVD Team <qvd@qindel.es>',
-               VERSION	     => '3.3'.$ENV{BUILD_NUMBER},
+               VERSION	     => '3.5'.$SUF_VERSION ,
                ABSTRACT      => 'QVD::Admin',
                EXE_FILES     => [ 'bin/qvd-admin.pl'],
                PL_FILES      => {},

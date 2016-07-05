@@ -54,10 +54,9 @@ helper (get_action_channels => \&get_action_channels);
 
 # Helpers for authentication purposes.
 
-helper (get_auth_method => \&get_auth_method);
+helper (credentials_provided => \&credentials_provided);
 helper (create_session => \&create_session);
 helper (update_session => \&update_session);
-helper (reject_access => \&reject_access);
 
 # Reports problems with disk images upload/download/copy in log
 
@@ -115,6 +114,12 @@ app->hook(after_build_tx => sub {
 		 })
 });
 
+app->hook(after_render => sub {
+    my ($c, $output, $format) = @_;
+        
+    $c->res->headers->header('Access-Control-Allow-Origin' => '*');
+});
+
 # Intended to store log info about the API
 
 app->log( Mojo::Log->new( path => app->qvd_admin4_api->_cfg('wat.log.filename'), level => 'debug' ) );
@@ -128,17 +133,23 @@ package MojoX::Session::Transport::WAT
     use base qw(MojoX::Session::Transport);
 
     sub get {
-	my ($self) = @_;
-	my $json = $self->tx->req->json;
-	my $sid = $json ? $json->{sid} : $self->tx->req->params->param('sid');
-
-	return $sid;
+        my ($self) = @_;
+    
+        my $sid = $self->tx->req->params->param('sid');
+        
+        unless (defined($sid)) {
+            my $cookie = (grep { $_->name eq "sid" } @{$self->tx->req->cookies})[0];
+            $sid = $cookie->value if defined($cookie);
+        }
+    
+        return $sid;
     }
-
+    
     sub set {
-	my ($self, $sid, $expires) = @_;
-	$self->tx->res->headers->header('sid' => $sid);
-	return 1;
+        my ($self, $sid, $expires) = @_;
+        my $cookie = Mojo::Cookie::Response->new(name => 'sid', value => $sid, expires => $expires, httponly => 1, secure => 1);
+        $self->tx->res->cookies($cookie);
+        return 1;
     }
 }
 
@@ -163,8 +174,6 @@ under sub {
 
 any [qw(POST GET)] => '/api/info' => sub {
   my $c = shift;
-
-  $c->res->headers->header('Access-Control-Allow-Origin' => '*');
 
   QVD::Config::reload();
   my $utc_time = gmtime();
@@ -192,25 +201,23 @@ group {
         my $c = shift;
         my $bool = 0;
 
-        $c->res->headers->header('Access-Control-Allow-Origin' => '*'); # WAT requirement
-        $c->res->headers->header('Access-Control-Expose-Headers' => 'sid'); # WAT requirement
         QVD::Config::reload(); # Needed to avoid QVD::Config refreshing problems
 
         my $json = $c->get_input_json;
 
-        my $auth_method = $c->get_auth_method( $json );
-
         my %session_args = (
-            store  => [dbi => {dbh => QVD::DB->new()->storage->dbh}],
+            store  => [dbi => {dbh => QVD::DB::Simple->db()->storage->dbh}],
             transport => MojoX::Session::Transport::WAT->new(),
-            tx => $c->tx
+            tx => $c->tx,
+            ip_match => 1
         );
 
         my $session = MojoX::Session->new(%session_args);
 
         my $exception;
         try {
-            $bool = $c->$auth_method( $session, $json );
+            $bool = $c->credentials_provided($json) ? $c->create_session($session, $json) : $c->update_session($session);
+            $c->stash({session => $session});
         } catch {
             $exception = $_;
             $bool = 0;
@@ -252,6 +259,10 @@ group {
         $c->inactivity_timeout(30000);     
         my $json = $c->get_input_json;
         my $response = $c->process_api_query($json);
+            
+        if ($json->{action} eq "current_admin_setup") {
+            $response->{sid} = $c->stash('session')->sid;
+        }
 
         # Retrieving the right encode is tricky.
         # With this system accents and so on are supported.
@@ -259,6 +270,28 @@ group {
         # Maybe a problem in Mojo?
 
         deep_utf8_decode($response);
+        $c->render(text => b(encode_json($response))->decode('UTF-8'));
+    };
+
+    # Log out url
+    any [qw(POST GET)] => '/api/logout' => sub {
+    
+        my $c = shift;
+    
+        $c->inactivity_timeout(30000);
+    
+        my $session = $c->stash('session');
+        $session->expire;
+        $session->clear;
+    
+        my $code = $session->flush ? 0000 : 3600;
+        my $exception = QVD::API::Exception->new(code => $code);
+    
+        my $response = {
+            status => $exception->code,
+            message => $exception->message
+        };
+    
         $c->render(text => b(encode_json($response))->decode('UTF-8'));
     };
 
@@ -283,10 +316,10 @@ group {
 
         for my $channel ($c->get_action_channels($json))
         {
-            $c->qvd_admin4_api->_pool->listen($channel,on_notify => sub {
-                my ($pg_pool, $channel, $pid, $payload) = @_;
+            $c->qvd_admin4_api->pool->listen($channel => sub {
+                my ($pool, $payload) = @_;
                 %payload_hash = split(/[=;]/, $payload);
-                $payload_hash{channel} = $channel;
+                $payload_hash{channel} = eval { "$channel" };
                 $notification = 1;
             });
         }
@@ -624,7 +657,7 @@ sub process_api_query
     my ($c,$json) = @_;
 
     my $response = $c->qvd_admin4_api->process_query($json);
-    $response->{sid} = $c->res->headers->header('sid');
+
     return $response;
 }
 
@@ -637,16 +670,15 @@ sub get_action_channels
     @$channels;
 }
 
-sub get_auth_method
+sub credentials_provided
 {
-	my ($c,$json) = @_;
-    return 'create_session' if 
-	defined $json->{login} && defined $json->{password};
+    my ($c,$json) = @_;
 
-    return 'update_session' if
-		defined $json->{sid};
-
-    return 'reject_access';
+    if (defined $json->{login} && defined $json->{password}){
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 sub create_session
@@ -678,7 +710,7 @@ sub create_session
 
 sub update_session
 {
-    my ($c,$session,$json) = @_;
+    my ($c,$session) = @_;
 
 	# Session exists
 	QVD::API::Exception->throw(code => 3200) unless($session->load);
@@ -710,11 +742,6 @@ sub update_session
 	return 1;
 }
 
-sub reject_access
-{
-	QVD::API::Exception->throw(code => 3100);
-}
-
 sub report_di_problem_in_log
 {
     my ($c,%args) = @_;
@@ -728,7 +755,7 @@ sub report_di_problem_in_log
 	$tx->remote_address;
 
     my %session_args = (
-	store  => [dbi => {dbh => QVD::DB->new()->storage->dbh}],
+	store  => [dbi => {dbh => QVD::DB::Simple->db()->storage->dbh}],
 	transport => MojoX::Session::Transport::WAT->new(),
 	tx => $c->tx);
 

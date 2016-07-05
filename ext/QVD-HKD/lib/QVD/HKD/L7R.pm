@@ -92,14 +92,15 @@ sub _clean_row {
     defined $pid or return $self->_on_done;
 
     $self->_query({ ignore_errors => 1 },
-                  <<'EOQ', $self->{node_id}, $pid);
+                  <<'EOQ', time, $self->{node_id}, $pid);
 update vm_runtimes
    set user_cmd = NULL,
        l7r_host_id = NULL,
        l7r_pid  = NULL,
-       user_state = 'disconnected'
-   where l7r_host_id = $1
-     and l7r_pid = $2
+       user_state = 'disconnected',
+       user_state_ts = $1
+   where l7r_host_id = $2
+     and l7r_pid = $3
 EOQ
 }
 

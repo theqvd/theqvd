@@ -126,6 +126,9 @@ sub _open_log {
     my $name = shift;
     my $log_fn = "$log_path/qvd-$name.log";
     open my $log, '>>', $log_fn or die "unable to open $name log file $log_fn\n";
+    my $ofh = select $log;
+    $| = 1;
+    select $ofh;
     print $log "=== Opened log file at " . scalar localtime . " ====\n";
     DEBUG "Opened $name log at $log_path/qvd-$name.log";
     return $log;
@@ -686,21 +689,28 @@ sub _vnc_connect {
         unless defined $pid;
 
     my $uid = (stat "/proc/$pid")[4];
-    $httpd->throw_http_error(QVD::HTTP::StatusCodes::HTTP_SERVICE_UNAVAILABLE, "Unable to retrieve UID for nxagent process")
+    $httpd->throw_http_error(QVD::HTTP::StatusCodes::HTTP_SERVICE_UNAVAILABLE, "Unable to retrieve UID for nxagent process\n")
         unless defined $uid;
 
     my $log = _open_log("x11vnc");
-    setpgrp(0, 0);
-    _become_user($uid);
+    $httpd->throw_http_error(QVD::HTTP::StatusCodes::HTTP_SERVICE_UNAVAILABLE, "Unable to open log file for x11vnc\n")
+        unless defined $log;
 
     $httpd->send_http_response(QVD::HTTP::StatusCodes::HTTP_SWITCHING_PROTOCOLS);
 
-    POSIX::dup2(fileno($httpd->{server}{client}), 0);
-    POSIX::dup2(fileno($httpd->{server}{client}), 1);
-    POSIX::dup2(fileno($log), 2);
+    eval {
+        POSIX::dup2(fileno($log), 2);
 
-    eval { exec($x11vnc, -display => ":$display", '-inetd') };
-    ERROR "unable to start x11vnc: $!";
+        setpgrp(0, 0);
+        _become_user($uid);
+
+        POSIX::dup2(fileno($httpd->{server}{client}), 0);
+        POSIX::dup2(fileno($httpd->{server}{client}), 1);
+
+        exec($x11vnc, -display => ":$display", '-inetd')
+    };
+
+    print {$log} "Unable to start x11vnc: " . ($@ || $!);
     POSIX::_exit(-1);
 }
 

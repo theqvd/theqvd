@@ -2,10 +2,15 @@ use strict;
 use warnings;
 use Module::Build;
 
+my $SUF_VERSION = "";
+if  ( defined $ENV{BUILD_NUMBER} ) {
+	$SUF_VERSION = '.' . $ENV{BUILD_NUMBER} ;
+}
+
 my $build = new Module::Build(
 	module_name      => 'QVD::Config::Core',
 	dist_author       => 'QVD Team <qvd@qindel.com',
-	dist_version     => '3.1'.$ENV{SVN_REVISION},
+	dist_version     => '3.5'.$SUF_VERSION,
 	dist_abstract    => 'QVD::Admin::Web - Catalyst based application',
 	license          => 'gpl',
 

@@ -1,6 +1,6 @@
 Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({  
     qvdObj: 'vm',
-    liveFields: ['state', 'user_state', 'ip', 'ip_in_use', 'host_id', 'host_name', 'ssh_port', 'vnc_port', 'serial_port', 'di_id_in_use', 'di_name_in_use', 'di_version_in_use'],
+    liveFields: ['state', 'user_state', 'ip', 'ip_in_use', 'host_id', 'host_name', 'ssh_port', 'vnc_port', 'serial_port', 'di_id_in_use', 'di_name_in_use', 'di_version_in_use', 'expiration_soft', 'expiration_hard', 'time_until_expiration_soft', 'time_until_expiration_hard'],
 
     relatedDoc: {
         image_update: "Images update guide"
@@ -8,7 +8,31 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
     
     initialize: function (params) {
         this.model = new Wat.Models.VM(params);
+        
+        var templates = Wat.I.T.getTemplateList('vmDetails');
+        Wat.A.getTemplates(templates, function () {});
+        
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
+    },    
+    
+    render: function () {
+        Wat.Views.DetailsView.prototype.render.apply(this, []);
+        
+        if (Wat.C.checkACL('vm.see.expiration')) {
+            var template = _.template(
+                        Wat.TPL.vmDetailsExpiration, {
+                            expiration_soft: this.model.get('expiration_soft'),
+                            expiration_hard: this.model.get('expiration_hard'),
+                            remainingTimeSoft: Wat.U.processRemainingTime(this.model.get('time_until_expiration_soft')),
+                            remainingTimeHard: Wat.U.processRemainingTime(this.model.get('time_until_expiration_hard')),
+                            time_until_expiration_soft_raw: Wat.U.base64.encodeObj(this.model.get('time_until_expiration_soft')),
+                            time_until_expiration_hard_raw: Wat.U.base64.encodeObj(this.model.get('time_until_expiration_hard')),
+                        }
+                    );
+
+            $('.bb-vm-details-expiration').html(template);
+            Wat.T.translate();
+        }
     },
     
     events: {

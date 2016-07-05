@@ -66,6 +66,7 @@ my $code2message_mapper = {
     3300 => 'Session expired - Login again',
     3400 => 'Problems to update expiration time in session',
 	3500 => 'Access to tenant is restricted',
+    3600 => 'Error in log out',
 
     4100 => 'Unavailable action',
     4110 => 'Invalid or null action name provided',
@@ -153,12 +154,16 @@ my $exception2code_mapper = {
 sub BUILD
 {
     my $self = shift;
+    
+    my $code_defined = defined($self->code);
+    my $exception_defined = defined($self->exception);
+    my $failures_defined = defined($self->failures);
 
-	# At least one of these parameters must be  provided
-	# in order to build a proper exception
+    # At least one of these parameters must be  provided
+    # in order to build a proper exception
 
-    $self->code || $self->exception || $self->failures ||
-	die "needed either code, exception or failures attribute";
+    die "needed either code, exception or failures attribute" unless
+        $code_defined || $exception_defined || $failures_defined;
 
 	# This object is recursive if a QVD::API::Exception object was
 	# provided via the exception parameter. In that case, this object
@@ -167,15 +172,15 @@ sub BUILD
     $self->rebuild_recursively if $self->recursive;
 
     $self->figure_out_code_from_exception
-	unless $self->code || $self->failures;
+        unless $code_defined || $failures_defined;
 
     $self->figure_out_code_from_failures
-	if $self->failures;
+        if $failures_defined;
 
-	# prints useful error messages via console
+    # prints useful error messages via console
 
     $self->print_unknown_exception
-	if $self->exception;
+        if $exception_defined;
 }
 
 sub print_unknown_exception

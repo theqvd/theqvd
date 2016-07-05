@@ -69,7 +69,7 @@ Wat.C = {
             return baseUrl;
         }
         else {
-            return this.getApiUrl() + "?sid=" + this.sid;
+            return this.getApiUrl() + "?" + Wat.C.getUrlSid();
         }
     },
     
@@ -80,12 +80,12 @@ Wat.C = {
     
     // Get the API URL for update DIs
     getUpdateDiUrl: function () {
-        return this.getApiUrl() + "di/upload?sid=" + this.sid;
+        return this.getApiUrl() + "di/upload?" + Wat.C.getUrlSid();
     }, 
     
     // Get the API URL for download DIs from URL
     getDownloadDiUrl: function (url) {
-        return this.getApiUrl() + "di/download?sid=" + this.sid + "&url=" + url;
+        return this.getApiUrl() + "di/download?" + Wat.C.getUrlSid() + "&url=" + url;
     },
     
     // Return if current admin is superadmin
@@ -428,15 +428,16 @@ Wat.C = {
                     }
                 case STATUS_SESSION_EXPIRED:
                 case STATUS_CREDENTIALS_FAIL:
+                case STATUS_NOT_LOGIN:
                     // Close dialog (if opened)
                     $('.js-dialog-container').remove();
                     $('html, body').attr('style', '');
                     
                     // Store message on cookies to print it after reloading
-            $.cookie('messageToShow', JSON.stringify({'message': ALL_STATUS[response.status], 'messageType': 'error'}), {expires: 1, path: '/'});
-            window.location = '#/logout';
-            return true;
-        }
+                    $.cookie('messageToShow', JSON.stringify({'message': ALL_STATUS[response.status], 'messageType': 'error'}), {expires: 1, path: '/'});
+                    window.location = '#/logout';
+                    return true;
+            }
         }
         
         return false;
@@ -552,7 +553,10 @@ Wat.C = {
                 $.each(configTokens, function (token, value) {
                     Wat.C.setConfigToken(token, value);
                 });
-                                
+                
+                // Check cross-origin
+                Wat.C.checkCrossOrigin();
+                    
                 // After read configuration file, we will set API address
                 Wat.C.initApiAddress();
                 }
@@ -587,5 +591,23 @@ Wat.C = {
         }
         
         return name + Wat.C.getFirstAuthSeparator() + tenant;
+    },
+
+    // Check if client URL hostname and API hostname is the same (CORS situation)
+    checkCrossOrigin: function () {
+        var apiHostname = this.apiUrl.match(/^https?\:\/\/([^\/:?#]+)(?:[\/:?#]|$)/i)[1];
+        var clientHostname = document.location.hostname;
+
+        this.crossOrigin = !(apiHostname == clientHostname);
+    },
+    
+    // Get SID parameter for URL building if necessary
+    getUrlSid: function () {
+        var urlSid = '';
+        if (this.crossOrigin && this.sid) {
+            urlSid = "&sid=" + this.sid;
+        }
+        
+        return urlSid;
     }
 }

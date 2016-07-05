@@ -62,6 +62,73 @@ __PACKAGE__->belongs_to('rel_user_cmd' => 'QVD::DB::Result::User_Cmd', 'user_cmd
 __PACKAGE__->belongs_to(current_di => 'QVD::DB::Result::DI', 'current_di_id');
 __PACKAGE__->belongs_to(current_osf => 'QVD::DB::Result::OSF', 'current_osf_id');
 
+####### TRIGGERS ############################################################################
+
+sub get_procedures
+{
+    my @procedures_array = ();
+
+    # Define procedures to listen and notify
+    my @notify_procs_array = (
+        {
+            name => 'vm_blocked_or_unblocked_notify',
+            sql  => '$function$ BEGIN listen vm_blocked_or_unblocked; PERFORM pg_notify(\'vm_blocked_or_unblocked\', \'tenant_id=\' || (SELECT tenant_id FROM users WHERE id = (SELECT user_id FROM vms WHERE id = NEW.vm_id))::text); RETURN NULL; END; $function$',
+            parameters => [],
+        },
+        {
+            name => 'vm_runtime_notify',
+            sql  => '$function$ BEGIN listen vm_changed; PERFORM pg_notify(\'vm_changed\', \'tenant_id=\' || (SELECT tenant_id FROM users WHERE id = (SELECT user_id FROM vms WHERE id = NEW.vm_id))::text); RETURN NULL; END; $function$',
+            parameters => [],
+        },
+    );
+
+    for my $proc (@notify_procs_array){
+        $proc->{replace} = 1;
+        $proc->{language} = 'plpgsql';
+        $proc->{returns} = 'trigger';
+    }
+
+    push @procedures_array, @notify_procs_array;
+
+    # Return all procedures
+    return @procedures_array;
+}
+
+sub get_triggers
+{
+    my @triggers_array = ();
+
+    my @notify_triggers_array = (
+        {
+            name => 'vm_blocked_or_unblocked_trigger',
+            when => 'AFTER',
+            events => [qw/UPDATE/],
+            fields    => [qw/blocked/],
+            on_table  => 'vm_runtimes',
+            condition => undef,
+            procedure => 'vm_blocked_or_unblocked_notify',
+            parameters => [],
+            scope  => 'ROW',
+        },
+        {
+            name => 'vm_runtime_changed_trigger',
+            when => 'AFTER',
+            events => [qw/UPDATE/],
+            fields    => [qw/vm_state user_state vm_expiration_soft vm_expiration_hard/],
+            on_table  => 'vm_runtimes',
+            condition => undef,
+            procedure => 'vm_runtime_notify',
+            parameters => [],
+            scope  => 'ROW',
+        }
+    );
+
+    push @triggers_array, @notify_triggers_array;
+
+    return @triggers_array;
+}
+
+################################################################################################
 
 sub set_vm_state {
     my $vm = shift;

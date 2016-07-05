@@ -253,6 +253,20 @@ Wat.I.T = {
                     }
                 }
                 break;
+            case 'vmDetails':
+                templates = {
+                    vmDetailsExpiration: {
+                        name: 'details/vm-expiration'
+                    },
+                }
+                break;
+            case 'vmList':
+                templates = {
+                    vmListExpiration: {
+                        name: 'list/vm-expiration'
+                    },
+                }
+                break;
             default:
                 // Empty object will be returned
                 break;
