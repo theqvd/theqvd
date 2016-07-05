@@ -1979,8 +1979,8 @@ span.text {
 
 .out-of-borders {
   position: absolute;
-  right: -1000px;
-  bottom: -1000px; }
+  left: -20px;
+  top: -20px; }
 
 .invisible-box {
   outline: none;
