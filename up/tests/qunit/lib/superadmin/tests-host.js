@@ -29,7 +29,7 @@ function hostTestFake () {
 
             this.server.respondWith(
                 "POST", 
-                Wat.C.apiUrl + '?sid=' + Wat.C.sid  + '&action=host_get_details&filters={"id":' + fakeValues.id + '}',
+                Up.C.apiUrl + '?sid=' + Up.C.sid  + '&action=host_get_details&filters={"id":' + fakeValues.id + '}',
                 [
                     200, 
                     { "Content-Type": "application/json" },
@@ -37,10 +37,10 @@ function hostTestFake () {
                 ]
            );
 
-            Wat.Router.watRouter.trigger('route:detailsHost', [fakeValues.id]);        
+            Up.Router.watRouter.trigger('route:detailsHost', [fakeValues.id]);        
 
             // Bind to the change event on the model
-            Wat.CurrentView.model.bind('change', callback);
+            Up.CurrentView.model.bind('change', callback);
 
             this.server.respond();
 
@@ -55,7 +55,7 @@ function hostTestFake () {
                 }
             });
 
-            deepEqual(callback.getCall(0).args[0], Wat.CurrentView.model, "Spied result and Backbone model should be equal");
+            deepEqual(callback.getCall(0).args[0], Up.CurrentView.model, "Spied result and Backbone model should be equal");
         });
 }
 
@@ -77,14 +77,14 @@ function hostTestReal () {
 
             expect(assertions);
 
-            Wat.Router.watRouter.trigger('route:listHost');
+            Up.Router.watRouter.trigger('route:listHost');
 
-            Wat.CurrentView.model = new Wat.Models.Host();
+            Up.CurrentView.model = new Up.Models.Host();
 
             //////////////////////////////////////////////////////////////////
             // Create Host
             //////////////////////////////////////////////////////////////////
-            Wat.CurrentView.createModel(WatTests.values.host, function (e) { 
+            Up.CurrentView.createModel(WatTests.values.host, function (e) { 
                 equal(e.retrievedData.status, STATUS_SUCCESS, "Host created succesfully (" + JSON.stringify(WatTests.values.host) + ")");
 
                 if(e.retrievedData.status == STATUS_SUCCESS) {
@@ -98,7 +98,7 @@ function hostTestReal () {
                 //////////////////////////////////////////////////////////////////
                 // After create, get list of users matching by the created name
                 //////////////////////////////////////////////////////////////////
-                WatTests.models.host = new Wat.Models.Host({
+                WatTests.models.host = new Up.Models.Host({
                     id: WatTests.values.host.id
                 });            
 
@@ -125,7 +125,7 @@ function hostTestReal () {
                         //////////////////////////////////////////////////////////////////
                         // After get list of hosts, update it
                         //////////////////////////////////////////////////////////////////
-                        Wat.CurrentView.updateModel(WatTests.updateValues.host, {'id': WatTests.values.host.id}, function (e) { 
+                        Up.CurrentView.updateModel(WatTests.updateValues.host, {'id': WatTests.values.host.id}, function (e) { 
                             equal(e.retrievedData.status, 0, "Host updated succesfully (" + JSON.stringify(WatTests.updateValues.host) + ")");
 
                             //////////////////////////////////////////////////////////////////
@@ -152,15 +152,15 @@ function hostTestReal () {
                                     //////////////////////////////////////////////////////////////////
                                     // After match the updated user, delete it
                                     //////////////////////////////////////////////////////////////////
-                                    Wat.CurrentView.deleteModel({'id': WatTests.values.host.id}, function (e) { 
+                                    Up.CurrentView.deleteModel({'id': WatTests.values.host.id}, function (e) { 
                                         equal(e.retrievedData.status, 0, "Host deleted succesfully (ID: " + JSON.stringify(WatTests.values.host.id) + ")");
 
                                         // Unblock task runner
                                         start();
-                                    }, Wat.CurrentView.model);
+                                    }, Up.CurrentView.model);
                                 }
                             });
-                        }, Wat.CurrentView.model);
+                        }, Up.CurrentView.model);
                     }
                 });
             });

@@ -1,4 +1,4 @@
-Wat.I.M = {
+Up.I.M = {
     // Messages
     showMessage: function (msg, response) {
         // Process message to set expanded message if proceeds
@@ -19,7 +19,7 @@ Wat.I.M = {
         
         $('.message').html(expandIcon + summaryMessage + expandedMessage);
         
-        Wat.T.translate();
+        Up.T.translate();
 
         $('.message-container').hide().slideDown(500);
         $('.message-container').removeClass('success error info warning');
@@ -28,7 +28,7 @@ Wat.I.M = {
         // Success and info messages will be hidden automatically
         if (msg.messageType != 'error' && msg.messageType != 'warning') {
             this.messageTimeout = setTimeout(function() { 
-                Wat.I.M.closeMessage();
+                Up.I.M.closeMessage();
             },3000);
         }
     },

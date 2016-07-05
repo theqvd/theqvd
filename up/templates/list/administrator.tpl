@@ -70,7 +70,7 @@
                     }
                 });
                 
-                if (Wat.C.isMultitenant()) { 
+                if (Up.C.isMultitenant()) { 
             %>
                     <th class="col-width-100" data-sortby="name">
                         <span data-i18n="Global username"><%= i18n.t('Global username') %></span>
@@ -148,7 +148,7 @@
                             case 'name':
                                 var cellClass = 'js-name';
                                 var cellAttrs = '';
-                                if (Wat.C.checkACL('administrator.see-details.')) {
+                                if (Up.C.checkACL('administrator.see-details.')) {
                                     cellClass += ' cell-link';
                                     cellAttrs += 'data-i18n="[title]Click for details"';
                                 }
@@ -157,10 +157,10 @@
                                 
                 %>
                                 <td <%= cellAttrs %>>
-                                    <%= Wat.C.ifACL('<a href="#/administrator/' + model.get('id') + '">', 'administrator.see-details.') %>
-                                    <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'administrator.see-details.') %>
+                                    <%= Up.C.ifACL('<a href="#/administrator/' + model.get('id') + '">', 'administrator.see-details.') %>
+                                    <%= Up.C.ifACL('<i class="fa fa-search"></i>', 'administrator.see-details.') %>
                                         <span class="text"><%= model.get('name') %></span>
-                                    <%= Wat.C.ifACL('</a>', 'administrator.see-details.') %>
+                                    <%= Up.C.ifACL('</a>', 'administrator.see-details.') %>
                                     <div class="mobile info-in-name-cell">
                                         <%= info %>
                                     </div>
@@ -192,10 +192,10 @@
                         }
                     });
                 
-                    if (Wat.C.isMultitenant()) { 
+                    if (Up.C.isMultitenant()) { 
                 %>
                         <td class="desktop">
-                            <%= Wat.C.getLoginData(model.get('name'), model.get('tenant_name')) %>
+                            <%= Up.C.getLoginData(model.get('name'), model.get('tenant_name')) %>
                         </td>
                 <%
                     }

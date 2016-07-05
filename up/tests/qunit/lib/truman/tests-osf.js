@@ -23,14 +23,14 @@ function osfTestReal () {
 
             expect(assertions);
 
-            Wat.Router.watRouter.trigger('route:listOSF');
+            Up.Router.watRouter.trigger('route:listOSF');
 
-            Wat.CurrentView.model = new Wat.Models.OSF();
+            Up.CurrentView.model = new Up.Models.OSF();
 
             //////////////////////////////////////////////////////////////////
             // Create OSF
             //////////////////////////////////////////////////////////////////
-            Wat.CurrentView.createModel(WatTests.values.osf, function (e) { 
+            Up.CurrentView.createModel(WatTests.values.osf, function (e) { 
                 equal(e.retrievedData.status, STATUS_FORBIDDEN_ACTION, "OSF cannot be created due ACLs restriction (" + JSON.stringify(WatTests.values.osf) + ")");
 
                 if(e.retrievedData.status == STATUS_FORBIDDEN_ACTION) {
@@ -45,7 +45,7 @@ function osfTestReal () {
                 //////////////////////////////////////////////////////////////////
                 // Try to get list of osfs matching by the existing ID
                 //////////////////////////////////////////////////////////////////
-                WatTests.models.osf = new Wat.Models.OSF({
+                WatTests.models.osf = new Up.Models.OSF({
                     id: WatTests.values.osf.id
                 });            
                                 
@@ -66,9 +66,9 @@ function osfTestReal () {
                         //////////////////////////////////////////////////////////////////
                         // After get list of osfs, update it
                         //////////////////////////////////////////////////////////////////
-                        Wat.CurrentView.updateModel(WatTests.updateValues.osf, {'id': WatTests.values.osf.id}, function (e) { 
+                        Up.CurrentView.updateModel(WatTests.updateValues.osf, {'id': WatTests.values.osf.id}, function (e) { 
                             equal(e.retrievedData.status, STATUS_FORBIDDEN_ARGUMENT, "OSF cannot be updated due ACLs restriction (" + JSON.stringify(WatTests.updateValues.osf) + ")");
-                        }, Wat.CurrentView.model);
+                        }, Up.CurrentView.model);
                         
                         
                         // Truman will not be able to update properties 
@@ -80,7 +80,7 @@ function osfTestReal () {
                         //////////////////////////////////////////////////////////////////
                         // After get list of osfs, update it
                         //////////////////////////////////////////////////////////////////
-                        Wat.CurrentView.updateModel(WatTests.updateValues.osf, {'id': WatTests.values.osf.id}, function (e) { 
+                        Up.CurrentView.updateModel(WatTests.updateValues.osf, {'id': WatTests.values.osf.id}, function (e) { 
                             equal(e.retrievedData.status, 0, "OSF updated succesfully (" + JSON.stringify(WatTests.updateValues.osf) + ")");
 
                             //////////////////////////////////////////////////////////////////
@@ -106,7 +106,7 @@ function osfTestReal () {
                                     start();
                                 }
                             });
-                        }, Wat.CurrentView.model);
+                        }, Up.CurrentView.model);
                     }
                 });
             });

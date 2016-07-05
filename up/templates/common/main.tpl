@@ -47,7 +47,7 @@
 </div>
 
 <div class="wrapper">
-    <% if (Wat.C.showServerClock) { %>
+    <% if (Up.C.showServerClock) { %>
     <div class="server-datetime-wrapper js-server-datetime-wrapper">
         <div style="display: none;">
             <i class="fa fa-calendar"></i>

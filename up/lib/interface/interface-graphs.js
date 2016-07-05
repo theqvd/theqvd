@@ -1,4 +1,4 @@
-Wat.I.G = {
+Up.I.G = {
     drawPieChart: function (name, data, loadTime) {
         var plotSelector = '#' + name;
         
@@ -35,8 +35,8 @@ Wat.I.G = {
             };
         
         var pieData = [
-            { label: "",  data: 0, color: Wat.I.G.getGraphColorA()},
-            { label: "",  data: 0, color: Wat.I.G.getGraphColorB()}
+            { label: "",  data: 0, color: Up.I.G.getGraphColorA()},
+            { label: "",  data: 0, color: Up.I.G.getGraphColorB()}
         ];
 
         // First data start from 0 and second one from total to make grow effect
@@ -137,8 +137,8 @@ Wat.I.G = {
         }
         
         var pieData = [
-            { label: "",  data: data1, color: Wat.I.G.getGraphColorA()},
-            { label: "",  data: data2, color: Wat.I.G.getGraphColorB()}
+            { label: "",  data: data1, color: Up.I.G.getGraphColorA()},
+            { label: "",  data: data2, color: Up.I.G.getGraphColorB()}
         ];
 
         $(dataStatSelector).find('.data').html(data1);
@@ -189,7 +189,7 @@ Wat.I.G = {
         });
 
         var maxValue = data.length > 0 ? data[0].number_of_vms : 10;
-        var dataSet = [{ label: "", data: barData, color: Wat.I.G.getGraphColorA() }];
+        var dataSet = [{ label: "", data: barData, color: Up.I.G.getGraphColorA() }];
 
         var options = {
             series: {
@@ -267,7 +267,7 @@ Wat.I.G = {
                     }
                 });
 
-                dataSet = [{ label: "", data: barData, color: Wat.I.G.getGraphColorA() }];
+                dataSet = [{ label: "", data: barData, color: Up.I.G.getGraphColorA() }];
                 $.plot($(plotSelector), dataSet, options);
 
                 // After last load, clear interval
@@ -359,7 +359,7 @@ Wat.I.G = {
         });
 
         var maxValue = data.length > 0 ? data[0].number_of_vms : 10;
-        var dataSet = [{ label: "", data: barData, color: Wat.I.G.getGraphColorA() }];
+        var dataSet = [{ label: "", data: barData, color: Up.I.G.getGraphColorA() }];
 
         var options = {
             series: {
@@ -416,7 +416,7 @@ Wat.I.G = {
         var plot = $.plot($(plotSelector), dataSet, options);
         
         if (barData.length > 0 ) {
-            dataSet = [{ label: "", data: barData, color: Wat.I.G.getGraphColorA() }];
+            dataSet = [{ label: "", data: barData, color: Up.I.G.getGraphColorA() }];
             $.plot($(plotSelector), dataSet, options);
             
             window.plot = plot;
@@ -493,12 +493,12 @@ Wat.I.G = {
             
             if (iNode % modTicks == 0) {
                 var longDate = new Date(node.id*1000);
-                var month = Wat.U.padNumber(longDate.getMonth() + 1);
-                var day = Wat.U.padNumber(longDate.getDate());
-                //var year = Wat.U.padNumber(longDate.getFullYear());
-                var hour = Wat.U.padNumber(longDate.getHours());
-                var minute = Wat.U.padNumber(longDate.getMinutes());
-                //var second = Wat.U.padNumber(longDate.getSeconds());
+                var month = Up.U.padNumber(longDate.getMonth() + 1);
+                var day = Up.U.padNumber(longDate.getDate());
+                //var year = Up.U.padNumber(longDate.getFullYear());
+                var hour = Up.U.padNumber(longDate.getHours());
+                var minute = Up.U.padNumber(longDate.getMinutes());
+                //var second = Up.U.padNumber(longDate.getSeconds());
                 var shortDate = month + "/" + day + " " + hour + ":" + minute;
 
                 ticks.push([iNode, shortDate]);
@@ -519,7 +519,7 @@ Wat.I.G = {
             });
         });
 
-        var dataSet = [{ label: "", data: barData, color: Wat.I.G.getGraphColorA() }];
+        var dataSet = [{ label: "", data: barData, color: Up.I.G.getGraphColorA() }];
 
         var options = {
             series: {
@@ -587,7 +587,7 @@ Wat.I.G = {
         var plot = $.plot($(plotSelector), dataSet, options);
         
         if (barData.length > 0 ) {
-            dataSet = [{ label: "", data: barData, color: Wat.I.G.getGraphColorA() }];
+            dataSet = [{ label: "", data: barData, color: Up.I.G.getGraphColorA() }];
             $.plot($(plotSelector), dataSet, options);
             
             window.plot = plot;
@@ -617,7 +617,7 @@ Wat.I.G = {
                     }
                 });
 
-                dataSet = [{ label: "", data: barData, color: Wat.I.G.getGraphColorA() }];
+                dataSet = [{ label: "", data: barData, color: Up.I.G.getGraphColorA() }];
                 $.plot($(plotSelector), dataSet, options);
 
                 // After last load, clear interval
@@ -670,7 +670,7 @@ Wat.I.G = {
                 var min = limits[item.dataIndex].min;
                 var max = limits[item.dataIndex].max;
                 
-                if (item && Wat.C.checkACL('host.see-details.')) {
+                if (item && Up.C.checkACL('host.see-details.')) {
                     //window.location = "#/host/" + ids[item.dataIndex];
                 }
             }

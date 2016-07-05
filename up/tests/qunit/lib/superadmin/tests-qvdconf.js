@@ -15,7 +15,7 @@ function qvdConfigTestReal () {
 
             expect(assertions);
 
-            Wat.Router.watRouter.trigger('route:setupConfig');
+            Up.Router.watRouter.trigger('route:setupConfig');
             
             // Define different parameters for get, set and default actions
             var searchedKey = 'model.user.login.case-sensitive';
@@ -47,7 +47,7 @@ function qvdConfigTestReal () {
             var defaultMessage = 'QVD config key restored to default value correctly';
             
             // Get 'model.' branch
-            Wat.A.performAction(getAction, {}, getBranchFilters, {}, function (that) {
+            Up.A.performAction(getAction, {}, getBranchFilters, {}, function (that) {
                 var keyFound = false;
                 var valueFound = null;
                 var defaultValueFound = null;
@@ -91,19 +91,19 @@ function qvdConfigTestReal () {
                 }
                 
                 // First Update (Update or set default)
-                Wat.A.performAction(firstUpdateAction, firstUpdateArguments, firstUpdateFilters, {}, function (that) {
+                Up.A.performAction(firstUpdateAction, firstUpdateArguments, firstUpdateFilters, {}, function (that) {
                     equal(that.retrievedData.status, STATUS_SUCCESS, "QVD config key update successfully");
                     
                     // After first update, get key to check if the value was properly changed
-                    Wat.A.performAction(getAction, {}, getTokenFilters, {}, function (that) {
+                    Up.A.performAction(getAction, {}, getTokenFilters, {}, function (that) {
                         equal(that.retrievedData.rows[0].operative_value, firstNewValue, firstMessage + " (" + firstNewValue + ")");
 
                         // Second Update (Update or set default)
-                        Wat.A.performAction(secondUpdateAction, secondUpdateArguments, secondUpdateFilters, {}, function (that) {
+                        Up.A.performAction(secondUpdateAction, secondUpdateArguments, secondUpdateFilters, {}, function (that) {
                             equal(that.retrievedData.status, STATUS_SUCCESS, "QVD config key update successfully");
                     
                             // After second update, get key to check if the value was properly changed
-                            Wat.A.performAction(getAction, {}, getTokenFilters, {}, function (that) {
+                            Up.A.performAction(getAction, {}, getTokenFilters, {}, function (that) {
                                 equal(that.retrievedData.rows[0].operative_value, secondNewValue, secondMessage + " (" + secondNewValue + ")");
                                 
                                 start();
@@ -128,7 +128,7 @@ function qvdConfigTestReal () {
 
             expect(assertions);
 
-            Wat.Router.watRouter.trigger('route:setupConfig');
+            Up.Router.watRouter.trigger('route:setupConfig');
             
             // Define different parameters for get, set and default actions
             var customBranch = getRandomStr();
@@ -185,58 +185,58 @@ function qvdConfigTestReal () {
             };
             
             // Check if custom branch doesnt exist yet
-            Wat.A.performAction(getAction, {}, getBranchFilters, {}, function (that) {
+            Up.A.performAction(getAction, {}, getBranchFilters, {}, function (that) {
                 equal(that.retrievedData.total, 0, "Branch " + customBranch + ".* doesnt exist yet");
                                 
                 // Create custom key
-                Wat.A.performAction(updateAction, updateArguments, updateFilters, {}, function (that) {
+                Up.A.performAction(updateAction, updateArguments, updateFilters, {}, function (that) {
                     equal(that.retrievedData.status, STATUS_SUCCESS, "QVD config custom key created successfully");
                     
                     // After creation, get key to check if the value was properly changed
-                    Wat.A.performAction(getAction, {}, getTokenFilters, {}, function (that) {
+                    Up.A.performAction(getAction, {}, getTokenFilters, {}, function (that) {
                         equal(that.retrievedData.rows[0].operative_value, customValue, "Value of created key recovered successfully (" + customValue + ")");
 
                         // Create another custom key
-                        Wat.A.performAction(updateAction, updateArguments2, updateFilters2, {}, function (that) {
+                        Up.A.performAction(updateAction, updateArguments2, updateFilters2, {}, function (that) {
                             equal(that.retrievedData.status, STATUS_SUCCESS, "QVD config custom key created successfully");
 
                             // After second creation, get key to check if the value was properly changed
-                            Wat.A.performAction(getAction, {}, getTokenFilters2, {}, function (that) {
+                            Up.A.performAction(getAction, {}, getTokenFilters2, {}, function (that) {
                                 equal(that.retrievedData.rows[0].operative_value, customValue2, "Value of created key retrieved successfully (" + customValue2 + ")");
                                 
                                 // Check if custom branch exist and have two results
-                                Wat.A.performAction(getAction, {}, getBranchFilters, {}, function (that) {
+                                Up.A.performAction(getAction, {}, getBranchFilters, {}, function (that) {
                                     equal(that.retrievedData.total, 2, "Branch " + customBranch + ".* exist and have two keys");
                              
                                     // Update one of the keys
-                                    Wat.A.performAction(updateAction, updateNewArguments, updateNewFilters, {}, function (that) {
+                                    Up.A.performAction(updateAction, updateNewArguments, updateNewFilters, {}, function (that) {
                                         equal(that.retrievedData.status, STATUS_SUCCESS, "QVD config key update successfully");
 
                                         // After update, get key to check if the value was properly changed
-                                        Wat.A.performAction(getAction, {}, getTokenFilters, {}, function (that) {
+                                        Up.A.performAction(getAction, {}, getTokenFilters, {}, function (that) {
                                             equal(that.retrievedData.rows[0].operative_value, customNewValue, "Updated value of the custom config key retrieved successfully (" + customNewValue + ")");
                                             // Delete custom key
-                                            Wat.A.performAction(deleteAction, {}, deleteFilters, {}, function (that) {
+                                            Up.A.performAction(deleteAction, {}, deleteFilters, {}, function (that) {
                                                 equal(that.retrievedData.status, STATUS_SUCCESS, "Deleted key successfully (" + customFullKey + ")");
 
                                                 // After deletion, try to recover key to check if is really deleted
-                                                Wat.A.performAction(getAction, {}, getTokenFilters, {}, function (that) {
+                                                Up.A.performAction(getAction, {}, getTokenFilters, {}, function (that) {
                                                     equal(that.retrievedData.total, 0, "Recently deleted key is not found (" + customFullKey + ")");
 
                                                     // Try to get branch to check if only one key is retrieved
-                                                    Wat.A.performAction(getAction, {}, getBranchFilters, {}, function (that) {
+                                                    Up.A.performAction(getAction, {}, getBranchFilters, {}, function (that) {
                                                         equal(that.retrievedData.total, 1, "Branch " + customBranch + ".* exist and has just 1 key");
                                                         
                                                         // Delete another custom key
-                                                        Wat.A.performAction(deleteAction, {}, deleteFilters2, {}, function (that) {
+                                                        Up.A.performAction(deleteAction, {}, deleteFilters2, {}, function (that) {
                                                             equal(that.retrievedData.status, STATUS_SUCCESS, "Deleted key successfully (" + customFullKey2 + ")");
 
                                                             // After deletion, try to recover key to check if is really deleted
-                                                            Wat.A.performAction(getAction, {}, getTokenFilters2, {}, function (that) {
+                                                            Up.A.performAction(getAction, {}, getTokenFilters2, {}, function (that) {
                                                                 equal(that.retrievedData.total, 0, "Recently deleted key is not found (" + customFullKey2 + ")");
                                                                 
                                                                 // Finally we try to recover branch to check that doesnt exist
-                                                                Wat.A.performAction(getAction, {}, getBranchFilters, {}, function (that) {
+                                                                Up.A.performAction(getAction, {}, getBranchFilters, {}, function (that) {
                                                                     equal(that.retrievedData.total, 0, "Branch " + customBranch + ".* doesnt exist anymore");
 
                                                                     start();
@@ -293,7 +293,7 @@ function qvdConfigTestReal () {
                     'value': 1
                 };
                 
-                Wat.A.performAction(updateAction, createArguments, {}, {}, function (that) {
+                Up.A.performAction(updateAction, createArguments, {}, {}, function (that) {
                     equal(that.retrievedData.status, STATUS_SUCCESS, "QVD config custom key '" + that.key + "' created successfully");
                     start();
 
@@ -302,7 +302,7 @@ function qvdConfigTestReal () {
                         "value": "0"
                     };
                     
-                    Wat.A.performAction(updateAction, updateArguments, {}, {}, function (that) {
+                    Up.A.performAction(updateAction, updateArguments, {}, {}, function (that) {
                         equal(that.retrievedData.status, STATUS_SUCCESS, "Config key '" + that.key + "' update successfully to '" + that.value + "' (" + that.retrievedData.message + ")");
 
                         var updateArguments = {
@@ -311,7 +311,7 @@ function qvdConfigTestReal () {
                         };
                         start();
 
-                        Wat.A.performAction(updateAction, updateArguments, {}, {}, function (that) {
+                        Up.A.performAction(updateAction, updateArguments, {}, {}, function (that) {
                             equal(that.retrievedData.status, STATUS_SUCCESS, "Config key '" + that.key + "' update successfully to '" + that.value + "' (" + that.retrievedData.message + ")");
                             start();
                             
@@ -320,7 +320,7 @@ function qvdConfigTestReal () {
                             };
                             
                             // Delete another custom key
-                            Wat.A.performAction(deleteAction, {}, deleteFilters, {}, function (that) {
+                            Up.A.performAction(deleteAction, {}, deleteFilters, {}, function (that) {
                                 equal(that.retrievedData.status, STATUS_SUCCESS, "Deleted key successfully (" + that.key + ")");
                                 start();
                             }, deleteFilters);

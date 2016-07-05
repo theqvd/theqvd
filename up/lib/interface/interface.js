@@ -1,5 +1,5 @@
 // Pure interface utilities
-Wat.I = {
+Up.I = {
         // Styles Customizer Tool (interface-customize.js)
     C: {},
     // Graphs (interface-graphs.js)
@@ -118,7 +118,7 @@ Wat.I = {
             filters.qvd_obj = qvdObj;
         }
 
-        Wat.A.performAction('config_field_get_list', {}, filters, {}, this.setCustomizationFieldsCallback, this);
+        Up.A.performAction('config_field_get_list', {}, filters, {}, this.setCustomizationFieldsCallback, this);
     },
     
     setCustomizationFieldsCallback: function (that) {
@@ -241,7 +241,7 @@ Wat.I = {
     applyBredcrumbsACLs: function (breadcrumbs) {
         var level = breadcrumbs;
         while (1) {
-            if (level.linkACL != undefined && !Wat.C.checkACL(level.linkACL)) {
+            if (level.linkACL != undefined && !Up.C.checkACL(level.linkACL)) {
                 delete level.link;
             }
             
@@ -264,11 +264,11 @@ Wat.I = {
         this.showContent();
 
 		// When session is not started, header will not be shown
-        if (Wat.C.sid && firstLoad) {
+        if (Up.C.sid && firstLoad) {
             $('.header-wrapper').css('visibility','visible').hide().fadeIn('fast');
         }
         
-        if (!Wat.C.sid) {
+        if (!Up.C.sid) {
             $('.header-wrapper').hide();
         }
 
@@ -320,7 +320,7 @@ Wat.I = {
     updateSortIcons: function (view) {
         // If not view is passed, use currentView
             if (view === undefined) {
-                view = Wat.CurrentView;
+                view = Up.CurrentView;
             }
         
         // Get the context to the view
@@ -364,7 +364,7 @@ Wat.I = {
         
         var optionsPast = {
             dayOfWeekStart: 1,
-            lang: Wat.C.language,
+            lang: Up.C.language,
             format:'Y-m-d',
             maxDate: 0,
             timepicker: false,
@@ -374,8 +374,8 @@ Wat.I = {
             closeOnDateSelect: true
         };
         
-        if (Wat.C.language != 'auto') {
-            var lan = Wat.T.getLanguage(Wat.C.language);
+        if (Up.C.language != 'auto') {
+            var lan = Up.T.getLanguage(Up.C.language);
             
             // If lan is auto, change i18next macro by navigator language
             if (lan == '__lng__') {
@@ -493,8 +493,8 @@ Wat.I = {
         
         // Fill the html with the template and the collection
         var template = _.template(
-            Wat.TPL.main, {
-                loggedIn: Wat.C.loggedIn,
+            Up.TPL.main, {
+                loggedIn: Up.C.loggedIn,
                 cornerMenu: this.cornerMenu,
                 forceDesktop: $.cookie('forceDesktop'),
                 footerLinks: footerLinks
@@ -502,7 +502,7 @@ Wat.I = {
         
         $('.bb-super-wrapper').html(template);
         
-        if (Wat.C.loggedIn) {
+        if (Up.C.loggedIn) {
             this.renderMenu();
         }
         else {
@@ -517,13 +517,13 @@ Wat.I = {
     renderMenu: function () {
         // Fill the html with the template and the collection
         var template = _.template(
-            Wat.TPL.menu, {
-                userMenu: Wat.I.userMenu,
-                helpMenu: Wat.I.helpMenu,
-                configMenu: Wat.I.configMenu,
-                setupMenu: Wat.I.setupMenu,
-                menu: Wat.I.menu,
-                mobileMenu: Wat.I.mobileMenu
+            Up.TPL.menu, {
+                userMenu: Up.I.userMenu,
+                helpMenu: Up.I.helpMenu,
+                configMenu: Up.I.configMenu,
+                setupMenu: Up.I.setupMenu,
+                menu: Up.I.menu,
+                mobileMenu: Up.I.mobileMenu
             });
 
         $('.bb-menu').html(template);
@@ -582,8 +582,8 @@ Wat.I = {
                     var button1 = buttonsText[0];
                     var button2 = buttonsText[1];
 
-                    Wat.T.translateElementContain($(button1));
-                    Wat.T.translateElementContain($(button2));
+                    Up.T.translateElementContain($(button1));
+                    Up.T.translateElementContain($(button2));
 
                     // Delete jQuery UI default classes
                     buttons.attr("class", "");
@@ -597,7 +597,7 @@ Wat.I = {
                     dialogConf.fillCallback($(this), that);
                 
                 // Translate dialog strings
-                    Wat.T.translateElement($(this).find('[data-i18n]'));
+                    Up.T.translateElement($(this).find('[data-i18n]'));
                 
                 // Focus on first text input
                     $(this).find('input[type="text"]').eq(0).trigger('focus');
@@ -619,7 +619,7 @@ Wat.I = {
     },
     
     updateLoginOnMenu: function () {
-        $('.js-menu-corner').find('.js-login').html(Wat.C.getLoginData());
+        $('.js-menu-corner').find('.js-login').html(Up.C.getLoginData());
     },
     
     controls: {
@@ -747,8 +747,8 @@ Wat.I = {
                 $(element).hide();
                 
                 var positiveItems = 0;
-                $.each(Wat.CurrentView.selectedItems, function (i, selectedId) {
-                    var selectedModel = Wat.CurrentView.collection.where({id: selectedId})[0];      
+                $.each(Up.CurrentView.selectedItems, function (i, selectedId) {
+                    var selectedModel = Up.CurrentView.collection.where({id: selectedId})[0];      
                     
                     // If any item is out of view (other page), all options will be shown
                     if (selectedModel == undefined) {
@@ -800,12 +800,12 @@ Wat.I = {
             title: '<i class="fa fa-question"></i>',
             buttons : {
                 "Cancel": function () {
-                    Wat.I.closeDialog($(this));
+                    Up.I.closeDialog($(this));
                 },
                 "Accept": function () {
-                    Wat.I.closeDialog($(this));
+                    Up.I.closeDialog($(this));
                     if (loadingBlock) {
-                        Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
+                        Up.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
                     }
                     successCallback(that);
                 }
@@ -813,9 +813,9 @@ Wat.I = {
             button1Class : 'fa fa-ban js-button-cancel',
             button2Class : 'fa fa-check js-button-accept',
             fillCallback : function(target) { 
-                var templates = Wat.I.T.getTemplateList('confirm', {templateName: templateName});
+                var templates = Up.I.T.getTemplateList('confirm', {templateName: templateName});
 
-                Wat.A.getTemplates(templates, Wat.I.fillTemplate, {
+                Up.A.getTemplates(templates, Up.I.fillTemplate, {
                     target: target,
                     templateName: 'confirmTemplate'
                 });
@@ -847,11 +847,11 @@ Wat.I = {
 
         dialogConf.buttons = {
             "Read full documentation": function (e) {
-                Wat.I.closeDialog($(this));
+                Up.I.closeDialog($(this));
                 window.location = '#documentation/' + guideSection[0].guide;
             },
             Close: function (e) {
-                Wat.I.closeDialog($(this));
+                Up.I.closeDialog($(this));
             }
         };
 
@@ -865,12 +865,12 @@ Wat.I = {
 
             // Fill div with section documentation
             $.each (guideSection, function (iGS, gS) {
-                Wat.D.fillDocSection(gS.guide, gS.section, undefined, undefined, target);
+                Up.D.fillDocSection(gS.guide, gS.section, undefined, undefined, target);
             });
         };
 
 
-        Wat.I.dialog(dialogConf, this);
+        Up.I.dialog(dialogConf, this);
     },
     
     getFilterStartingOptions: function (options) {
@@ -913,11 +913,11 @@ Wat.I = {
     getRealView: function (that) {
         var realView = null;
         
-        if (Wat.CurrentView.cid == that.cid) {
-            realView = Wat.CurrentView;
+        if (Up.CurrentView.cid == that.cid) {
+            realView = Up.CurrentView;
         }
         else {
-            $.each (Wat.CurrentView.sideViews, function (iV, view) {
+            $.each (Up.CurrentView.sideViews, function (iV, view) {
                 if (view != undefined && view.cid == that.cid) {
                     realView = view;
                 }
@@ -931,11 +931,11 @@ Wat.I = {
     getUsefulView: function (qvdObj, functionName) {
         var usefulView = null;
         
-        if (typeof Wat.CurrentView[functionName] == 'function' && Wat.CurrentView.qvdObj == qvdObj) {
-            usefulView = Wat.CurrentView;
+        if (typeof Up.CurrentView[functionName] == 'function' && Up.CurrentView.qvdObj == qvdObj) {
+            usefulView = Up.CurrentView;
         }
         else {
-            $.each (Wat.CurrentView.sideViews, function (iV, view) {
+            $.each (Up.CurrentView.sideViews, function (iV, view) {
                 if (view != undefined && typeof view[functionName] == 'function' && view.qvdObj == qvdObj) {
                     usefulView = view;
                 }
@@ -947,7 +947,7 @@ Wat.I = {
     
     closeDialog: function (dialog) {
         dialog.dialog('close').remove();
-        delete Wat.CurrentView.dialog;
+        delete Up.CurrentView.dialog;
     },
     
     fixTableScrollStyles: function () {
@@ -1008,16 +1008,16 @@ Wat.I = {
     },
     
     startServerClock: function () {
-        if (Wat.C.serverTimeUpdater == undefined && Wat.C.serverDatetime) {
+        if (Up.C.serverTimeUpdater == undefined && Up.C.serverDatetime) {
             // Get timestamp from configuration and print on interface
-            var d = new Date (Wat.C.serverDatetime);
+            var d = new Date (Up.C.serverDatetime);
             var date = d.toString().slice(0, 15);
             var time = d.toString().slice(16, 24);
             $('.js-server-date').html(date);
             $('.js-server-time').html(time);
         
             // Create a loop to update timestamp every second
-            Wat.C.serverTimeUpdater = setInterval(function(){
+            Up.C.serverTimeUpdater = setInterval(function(){
                 var currentDatetime = $('.js-server-date').html() + ' ' + $('.js-server-time').html();
                 var currentUnixTimestamp = Math.round(new Date(currentDatetime).getTime()/1000);
                 currentUnixTimestamp++;
@@ -1032,9 +1032,9 @@ Wat.I = {
     
     stopServerClock: function () {
         $('.js-server-datetime-wrapper').hide();
-        clearInterval(Wat.C.serverTimeUpdater);
-        delete Wat.C.serverTimeUpdater;
-        delete Wat.C.serverDatetime;
+        clearInterval(Up.C.serverTimeUpdater);
+        delete Up.C.serverTimeUpdater;
+        delete Up.C.serverDatetime;
     },
     
     attachFastClick: function () {
@@ -1052,9 +1052,9 @@ Wat.I = {
     
     // Fill template given target and templateName
     fillTemplate: function (element) {
-        element.target.html(Wat.TPL[element.templateName]);
+        element.target.html(Up.TPL[element.templateName]);
         
-        Wat.T.translate();
+        Up.T.translate();
     },
 
     // When change a filter, check fussion notes to delete the associated filter if is necessary
@@ -1062,7 +1062,7 @@ Wat.I = {
         $.each(FUSSION_NOTES, function (fNKey, fNote) {
             var fName = '';
             
-            if (fNote.qvdObj != Wat.CurrentView.qvdObj) {
+            if (fNote.qvdObj != Up.CurrentView.qvdObj) {
                 return;
             }
             
@@ -1075,7 +1075,7 @@ Wat.I = {
             }
             
             if (fName != '') {
-                Wat.I.cleanFussionFilter(fName);
+                Up.I.cleanFussionFilter(fName);
             }
         });
     },
@@ -1084,10 +1084,10 @@ Wat.I = {
     cleanFussionFilter: function (fName) {
         // If not exist in filters use name directly
         if (!$('[name="' + fName + '"]').length) {
-            Wat.CurrentView.cleanFilter(fName);
+            Up.CurrentView.cleanFilter(fName);
         }
         else {
-            Wat.CurrentView.cleanFilter($('[name="' + fName + '"]').attr('data-filter-field'));
+            Up.CurrentView.cleanFilter($('[name="' + fName + '"]').attr('data-filter-field'));
 
             switch($('[name="' + fName + '"]').prop('tagName')) {
                 case 'INPUT':

@@ -15,14 +15,14 @@ function hostTestReal () {
 
             expect(assertions);
 
-            Wat.Router.watRouter.trigger('route:listHost');
+            Up.Router.watRouter.trigger('route:listHost');
 
-            Wat.CurrentView.model = new Wat.Models.Host();
+            Up.CurrentView.model = new Up.Models.Host();
 
             //////////////////////////////////////////////////////////////////
             // Create Host
             //////////////////////////////////////////////////////////////////
-            Wat.CurrentView.createModel(WatTests.values.host, function (e) { 
+            Up.CurrentView.createModel(WatTests.values.host, function (e) { 
                 equal(e.retrievedData.status, STATUS_FORBIDDEN_ACTION, "Host cannot be created due ACLs restriction (" + JSON.stringify(WatTests.values.host) + ")");
 
                 if(e.retrievedData.status == STATUS_FORBIDDEN_ACTION) {
@@ -37,7 +37,7 @@ function hostTestReal () {
                 //////////////////////////////////////////////////////////////////
                 // Try to get list of hosts matching by the existing ID
                 //////////////////////////////////////////////////////////////////
-                WatTests.models.host = new Wat.Models.Host({
+                WatTests.models.host = new Up.Models.Host({
                     id: WatTests.values.host.id
                 });            
                                 
@@ -52,7 +52,7 @@ function hostTestReal () {
                         //////////////////////////////////////////////////////////////////
                         // Try to update host
                         //////////////////////////////////////////////////////////////////
-                        Wat.CurrentView.updateModel(WatTests.updateValues.host, {'id': WatTests.values.host.id}, function (e) { 
+                        Up.CurrentView.updateModel(WatTests.updateValues.host, {'id': WatTests.values.host.id}, function (e) { 
                             equal(e.retrievedData.status, STATUS_FORBIDDEN_ACTION, "Host cannot be updated due ACLs restriction (" + JSON.stringify(WatTests.updateValues.host) + ")");
 
                             start();

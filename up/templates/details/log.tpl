@@ -7,7 +7,7 @@
 
     <table class="details details-list col-width-100">
     <% 
-    if (Wat.C.checkACL('log.see-details.')) { 
+    if (Up.C.checkACL('log.see-details.')) { 
     %>
         <tr>
             <td><i class="fa fa-asterisk"></i><span data-i18n="Id"></span></td>
@@ -19,14 +19,14 @@
             <td><i class="<%= CLASS_ICON_ADMINS %>"></i><span data-i18n="Administrator"></span></td>
             <td>
                 <%
-                    var showAdminLink = (Wat.C.isSuperadmin() || !model.get('superadmin')) && !model.get('admin_deleted'); 
+                    var showAdminLink = (Up.C.isSuperadmin() || !model.get('superadmin')) && !model.get('admin_deleted'); 
                 %>
                 <%= 
-                !showAdminLink ? '' : Wat.C.ifACL('<a href="#/administrator/' + model.get('admin_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'administrator.see-details.') 
+                !showAdminLink ? '' : Up.C.ifACL('<a href="#/administrator/' + model.get('admin_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'administrator.see-details.') 
                 %>
                     <span class="text"><%= model.get('admin_name') %></span>
                 <%= 
-                !showAdminLink ? '' : Wat.C.ifACL('</a>', 'administrator.see-details.') 
+                !showAdminLink ? '' : Up.C.ifACL('</a>', 'administrator.see-details.') 
                 %>
             </td>
         </tr>
@@ -60,11 +60,11 @@
             <td>
                 <% if (model.get('object_name')) { %>
                     <%= 
-                    model.get('object_deleted') ? '' : Wat.C.ifACL('<a href="#/' + model.get('qvd_object') + '/' + model.get('object_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'log.see-details.') 
+                    model.get('object_deleted') ? '' : Up.C.ifACL('<a href="#/' + model.get('qvd_object') + '/' + model.get('object_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'log.see-details.') 
                     %>
                         <span class="text"><%= model.get('object_name') %></span>
                     <%= 
-                    model.get('object_deleted') ? '' : Wat.C.ifACL('</a>', 'log.see-details.') 
+                    model.get('object_deleted') ? '' : Up.C.ifACL('</a>', 'log.see-details.') 
                     %>
                 <% 
                 } 
@@ -75,11 +75,11 @@
                         case 'login':
                             %>
                             <%= 
-                            model.get('admin_deleted') ? '' : Wat.C.ifACL('<a href="#/administrator/' + model.get('admin_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'administrator.see-details.') 
+                            model.get('admin_deleted') ? '' : Up.C.ifACL('<a href="#/administrator/' + model.get('admin_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'administrator.see-details.') 
                             %>
                             <span class="text"><%= model.get('admin_name') %></span>
                             <%= 
-                            model.get('admin_deleted') ? '' : Wat.C.ifACL('</a>', 'administrator.see-details.') 
+                            model.get('admin_deleted') ? '' : Up.C.ifACL('</a>', 'administrator.see-details.') 
                             %>
                             <%
                             break;
@@ -124,13 +124,13 @@
                 <span><%= model.get('ip') %></span>
             </td>
         </tr>
-        <% if (Wat.C.isSuperadmin() && model.attributes.tenant_id != undefined) { %>
+        <% if (Up.C.isSuperadmin() && model.attributes.tenant_id != undefined) { %>
         <tr>
             <td><i class="<%= CLASS_ICON_TENANTS %>"></i><span data-i18n="Tenant"></span></td>
             <td>
-                <%= Wat.C.ifACL('<a href="#/tenant/' + model.get('tenant_id') + '">', 'tenant.see-details.') %>
+                <%= Up.C.ifACL('<a href="#/tenant/' + model.get('tenant_id') + '">', 'tenant.see-details.') %>
                 <%= model.get('tenant_name') %>
-                <%= Wat.C.ifACL('</a>', 'tenant.see-details.') %>
+                <%= Up.C.ifACL('</a>', 'tenant.see-details.') %>
             </td>
         </tr>
         <% } %>

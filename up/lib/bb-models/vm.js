@@ -1,4 +1,4 @@
-Wat.Models.VM = Wat.Models.Model.extend({
+Up.Models.VM = Up.Models.Model.extend({
     actionPrefix: 'vm',
     
     defaults: {

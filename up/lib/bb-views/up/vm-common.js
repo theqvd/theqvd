@@ -1,5 +1,5 @@
 // Common lib for VM views (list and details)
-Wat.Common.BySection.vm = {
+Up.Common.BySection.vm = {
     // This initialize function will be executed one time and deleted
     initializeCommon: function (that) {
         // Empty
@@ -13,7 +13,7 @@ Wat.Common.BySection.vm = {
             that.id = that.selectedItems[0];
         }
                 
-        var valid = Wat.Views.DetailsView.prototype.updateElement.apply(that, [dialog]);
+        var valid = Up.Views.DetailsView.prototype.updateElement.apply(that, [dialog]);
         
         if (!valid) {
             return;
@@ -31,23 +31,23 @@ Wat.Common.BySection.vm = {
         var filters = {"id": that.id};
         var arguments = {};
         
-        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('user.update.properties')) {
+        if (!$.isEmptyObject(properties.set) && Up.C.checkACL('user.update.properties')) {
             arguments["__properties_changes__"] = properties;
         }
         
-        if (Wat.C.checkACL('vm.update.name')) {
+        if (Up.C.checkACL('vm.update.name')) {
             arguments['name'] = name;
         }     
         
-        if (Wat.C.checkACL('vm.update.di-tag')) {
+        if (Up.C.checkACL('vm.update.di-tag')) {
             arguments['di_tag'] = di_tag;
         }
         
-        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL(this.qvdObj + 'vm.update.properties')) {
+        if (!$.isEmptyObject(properties.set) && Up.C.checkACL(this.qvdObj + 'vm.update.properties')) {
             arguments["__properties_changes__"] = properties;
         }
         
-        if (Wat.C.checkACL('vm.update.expiration')) {
+        if (Up.C.checkACL('vm.update.expiration')) {
             // If expire is checked
             if (context.find('input.js-expire').is(':checked')) {
                 var expiration_soft = context.find('input[name="expiration_soft"]').val();
@@ -68,7 +68,7 @@ Wat.Common.BySection.vm = {
             }
         }
         
-        if (Wat.C.checkACL('vm.update.description')) {
+        if (Up.C.checkACL('vm.update.description')) {
             arguments["description"] = description;
         }
                 
@@ -82,10 +82,10 @@ Wat.Common.BySection.vm = {
                 
         this.dialogConf.title = $.i18n.t('Edit Virtual machine') + ": " + this.model.get('name');
         
-        Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
+        Up.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
         
         // Virtual machine form include a date time picker control, so we need enable it
-        Wat.I.enableDataPickers();
+        Up.I.enableDataPickers();
                 
         var params = {
             'action': 'tag_tiny_list',
@@ -98,6 +98,6 @@ Wat.Common.BySection.vm = {
             'chosenType': 'single100'
         };
 
-        Wat.A.fillSelect(params);
+        Up.A.fillSelect(params);
     },
 }

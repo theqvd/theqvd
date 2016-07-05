@@ -1,4 +1,4 @@
-Wat.Views.DetailsView = Wat.Views.MainView.extend({
+Up.Views.DetailsView = Up.Views.MainView.extend({
     elementId: 0,
     detailsContainer: '.bb-details',
     sideContainer: '.bb-details-side',
@@ -11,7 +11,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     */
     
     initialize: function (params) {
-        Wat.Views.MainView.prototype.initialize.apply(this);
+        Up.Views.MainView.prototype.initialize.apply(this);
 
         this.elementId = params.id;
         
@@ -24,17 +24,17 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         
         this.addDetailsTemplates();
 
-        Wat.A.getTemplates(this.templates, this.fetchDetails, this); 
+        Up.A.getTemplates(this.templates, this.fetchDetails, this); 
     },
     
     addDetailsTemplates: function () {
-        var templates = Wat.I.T.getTemplateList('details', {qvdObj: this.qvdObj});
+        var templates = Up.I.T.getTemplateList('details', {qvdObj: this.qvdObj});
         
         this.templates = $.extend({}, this.templates, templates);
     },
     
     setBreadCrumbs: function () {
-        this.breadcrumbs = Wat.I.getDetailsBreadCrumbs(this.qvdObj);
+        this.breadcrumbs = Up.I.getDetailsBreadCrumbs(this.qvdObj);
     }, 
     
     setViewACL: function () {
@@ -61,11 +61,11 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
 
                     var classifiedByTenant = $.inArray(that.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
                     
-                    if (Wat.C.isMultitenant() && Wat.C.isSuperadmin() && classifiedByTenant) {
+                    if (Up.C.isMultitenant() && Up.C.isSuperadmin() && classifiedByTenant) {
                         filters['-or'] = ['tenant_id', that.model.get('tenant_id'), 'tenant_id', SUPERTENANT_ID];
                     }
 
-                    Wat.A.performAction(that.qvdObj + '_get_property_list', {}, filters, {}, that.completePropertiesAndRender, that, undefined, {"field":"key","order":"-asc"});
+                    Up.A.performAction(that.qvdObj + '_get_property_list', {}, filters, {}, that.completePropertiesAndRender, that, undefined, {"field":"key","order":"-asc"});
                 }
                 else {
                     that.render();
@@ -116,7 +116,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
 
     render: function () {
         // If user have not access to main section, redirect to home
-        if (!Wat.C.checkACL(this.viewACL)) {
+        if (!Up.C.checkACL(this.viewACL)) {
             window.location = '#';
             return;
         }
@@ -154,7 +154,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         
         if (this.notFound) {
             this.template = _.template(
-                Wat.TPL.warn404, {
+                Up.TPL.warn404, {
                 }
             );
 
@@ -165,11 +165,11 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             //delete nextBread.screen;
         }
         else { 
-            var enabledProperties = $.inArray(this.qvdObj, QVD_OBJS_WITH_PROPERTIES) != -1 && Wat.C.checkACL(this.qvdObj + '.see.properties');
+            var enabledProperties = $.inArray(this.qvdObj, QVD_OBJS_WITH_PROPERTIES) != -1 && Up.C.checkACL(this.qvdObj + '.see.properties');
             
             // Fill the html with the template and the model
             this.template = _.template(
-                Wat.TPL.detailsCommon, {
+                Up.TPL.detailsCommon, {
                     model: this.model,
                     enabledProperties: enabledProperties,
                     cid: this.cid,
@@ -182,7 +182,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             this.printBreadcrumbs(this.breadcrumbs, '');
 
             this.template = _.template(
-                Wat.TPL.details, {
+                Up.TPL.details, {
                     model: this.model,
                     detailsFields: this.detailsFields,
                     enabledProperties: enabledProperties
@@ -192,7 +192,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             $(this.detailsContainer).html(this.template);
         
             this.template = _.template(
-                Wat.TPL.detailsSide, {
+                Up.TPL.detailsSide, {
                     model: this.model,
                     qvdObj: this.qvdObj
                 }
@@ -203,7 +203,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             if (enabledProperties) {
                 var filters = {};
                 
-                if (Wat.C.isMultitenant() && Wat.C.isSuperadmin()) {
+                if (Up.C.isMultitenant() && Up.C.isSuperadmin()) {
                     filters['tenant_id'] = this.model.get('tenant_id');
                 }
                 
@@ -216,18 +216,18 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             $('.js-show-details-actions').hide();
         }
         
-        Wat.T.translateAndShow();
+        Up.T.translateAndShow();
         
         // Open websockets for live fields
         if (this.liveFields) {
-            Wat.WS.openDetailsWebsockets(this.qvdObj, this.model, this.liveFields, this.cid);
+            Up.WS.openDetailsWebsockets(this.qvdObj, this.model, this.liveFields, this.cid);
         }
     },
     
     renderProperties: function () {
         // Fill the html with the template and the model
         this.template = _.template(
-            Wat.TPL.detailsCommonProperties, {
+            Up.TPL.detailsCommonProperties, {
                 properties: this.model.get('properties')
             }
         );
@@ -244,7 +244,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     },  
     
     askDelete: function () {
-        Wat.I.confirm('dialog/confirm-undone', this.applyDelete, this);
+        Up.I.confirm('dialog/confirm-undone', this.applyDelete, this);
     },
     
     toggleActions: function (e) {
@@ -291,15 +291,15 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     
     setDetailsFields: function () {
         // Get Fields from configuration
-        this.detailsFields = Wat.I.getDetailsFields(this.qvdObj);
+        this.detailsFields = Up.I.getDetailsFields(this.qvdObj);
         
         // Check acls on fields to remove forbidden ones
-        Wat.C.purgeConfigData(this.detailsFields);
+        Up.C.purgeConfigData(this.detailsFields);
 
         // The superadmin have an extra field on lists: tenant
         
         // Every element but the hosts has tenant
-        if (Wat.C.isSuperadmin() && this.qvdObj != 'host') {
+        if (Up.C.isSuperadmin() && this.qvdObj != 'host') {
             this.detailsFields.tenant = {
                 'text': 'Tenant',
                 'display': true,
@@ -316,7 +316,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         var result = {};
         
         $.each(acls, function (acl, layer) {
-            if (Wat.C.checkACL(acl)) {
+            if (Up.C.checkACL(acl)) {
                 pass++;
                 result[acl] = true;
             }
@@ -367,7 +367,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         
         var that = this;
         
-        Wat.A.performAction ('log_get_list', {}, filters, {}, function(result){
+        Up.A.performAction ('log_get_list', {}, filters, {}, function(result){
             var dataGroups = 50;
             
             if (result.retrievedData.total > 0) {
@@ -424,7 +424,7 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             // We know that it is rendered when CSS width attribute change from 'XXX%' to 'XXXpx'
             setTimeout(function () {
                 if ($('#graph-log').css('width').indexOf("%") == -1) {
-                    Wat.I.G.drawBarChartLog('graph-log', data);
+                    Up.I.G.drawBarChartLog('graph-log', data);
                 }
             }, 50);
         }

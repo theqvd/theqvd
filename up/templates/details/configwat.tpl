@@ -4,7 +4,7 @@
     <div class="clear mobile"></div>
     <a class="button2 fright fa fa-eye js-show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>
     
-    <% if(Wat.C.checkACL('config.wat.')) { %>
+    <% if(Up.C.checkACL('config.wat.')) { %>
     <a class="button fright button-icon--desktop js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"><span data-i18n="Edit" class="mobile"></span></a>
     <% } %>
     
@@ -12,7 +12,7 @@
     </div>
 
     <% 
-    if (Wat.C.checkACL('config.wat.')) { 
+    if (Up.C.checkACL('config.wat.')) { 
     %>
     <table class="details details-list col-width-100">
         <tr>
@@ -36,7 +36,7 @@
                 <span><%= model.get('block') %></span>
             </td>
         </tr>
-        <% if (Wat.C.isSuperadmin() || !Wat.C.isMultitenant()) { %>
+        <% if (Up.C.isSuperadmin() || !Up.C.isMultitenant()) { %>
         <tr class="desktop-row">
             <td><i class="fa fa-paint-brush"></i><span data-i18n="Style customizer tool"></span></td>
             <td>

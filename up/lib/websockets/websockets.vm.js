@@ -1,7 +1,7 @@
-Wat.WS.changeWebsocketVm = function (id, field, data, viewType) {
+Up.WS.changeWebsocketVm = function (id, field, data, viewType) {
    switch (field) {
         case 'state':
-            if (viewType == 'details' && Wat.CurrentView.model) {
+            if (viewType == 'details' && Up.CurrentView.model) {
                 // Add this effect when data will be received only when change
                 $('.js-body-state').hide();
                 $('[data-wsupdate="state-' + data + '"][data-id="' + id + '"]').show();
@@ -39,9 +39,9 @@ Wat.WS.changeWebsocketVm = function (id, field, data, viewType) {
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('title', i18n.t('Stopped'));
                     $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(i18n.t('Stopped')).removeClass('faa-flash animated');
                     $('[data-wsupdate="state-button"][data-id="' + id + '"]').removeClass('js-button-stop-vm ' + CLASS_ICON_STATUS_STOPPED + ' invisible').addClass('js-button-start-vm ' + CLASS_ICON_STATUS_RUNNING).attr('title', i18n.t('Start')).find('span').html(i18n.t('Start')); 
-                    if (Wat.CurrentView.restarting) {
-                        Wat.CurrentView.restarting = false;
-                        Wat.CurrentView.startVM();
+                    if (Up.CurrentView.restarting) {
+                        Up.CurrentView.restarting = false;
+                        Up.CurrentView.startVM();
                     }
                     break;
                 case 'starting':

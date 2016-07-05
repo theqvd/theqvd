@@ -1,5 +1,5 @@
 <table>
-    <% if (Wat.C.isSuperadmin()) { %>
+    <% if (Up.C.isSuperadmin()) { %>
         <tr>
             <td data-i18n="Tenant"></td>
             <td>

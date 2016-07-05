@@ -1,108 +1,108 @@
-Wat.C.aclGroups = {};
+Up.C.aclGroups = {};
 
 ///////////////////////////////
 // Administrator ACL groups
 ///////////////////////////////
-Wat.C.aclGroups.administratorEdit = [
+Up.C.aclGroups.administratorEdit = [
     'administrator.update.password',
     'administrator.update.language',
     'administrator.update.description'
 ];
 
-Wat.C.aclGroups.administratorMassiveEdit = [
+Up.C.aclGroups.administratorMassiveEdit = [
     'administrator.update-massive.description'
 ];
 
-Wat.C.aclGroups.administratorMassiveActions = [
+Up.C.aclGroups.administratorMassiveActions = [
     'administrator.delete-massive.',
 ];
 // Massive actions include massive edit ACLs
-$.merge(Wat.C.aclGroups.administratorMassiveActions, Wat.C.aclGroups.administratorMassiveEdit);
+$.merge(Up.C.aclGroups.administratorMassiveActions, Up.C.aclGroups.administratorMassiveEdit);
 
 
 ///////////////////////////////
 // Roles ACL groups
 ///////////////////////////////
-Wat.C.aclGroups.roleEdit = [
+Up.C.aclGroups.roleEdit = [
     'role.update.name',
     'role.update.description'
 ];
 
-Wat.C.aclGroups.roleMassiveEdit = [
+Up.C.aclGroups.roleMassiveEdit = [
     'role.update-massive.description'
 ];
 
-Wat.C.aclGroups.roleMassiveActions = [
+Up.C.aclGroups.roleMassiveActions = [
     'role.delete-massive.',
 ];
 // Massive actions include massive edit ACLs
-$.merge(Wat.C.aclGroups.roleMassiveActions, Wat.C.aclGroups.roleMassiveEdit);
+$.merge(Up.C.aclGroups.roleMassiveActions, Up.C.aclGroups.roleMassiveEdit);
 
 ///////////////////////////////
 // Tenants ACL groups
 ///////////////////////////////
-Wat.C.aclGroups.tenantEdit = [
+Up.C.aclGroups.tenantEdit = [
     'tenant.update.name',
     'tenant.update.language',
     'tenant.update.description'
 ];
 
-Wat.C.aclGroups.tenantMassiveEdit = [
+Up.C.aclGroups.tenantMassiveEdit = [
     'tenant.update.description'
 ];
 
-Wat.C.aclGroups.tenantMassiveActions = [
+Up.C.aclGroups.tenantMassiveActions = [
     'tenant.delete-massive.',
 ];
 
-Wat.C.aclGroups.tenantDiEmbeddedInfo = [
+Up.C.aclGroups.tenantDiEmbeddedInfo = [
     'tenant.see.di-list-default',
     'tenant.see.di-list-head',
     'tenant.see.di-list-tags',
     'tenant.see.di-list-block'
 ];
 
-Wat.C.aclGroups.tenantVmEmbeddedInfo = [
+Up.C.aclGroups.tenantVmEmbeddedInfo = [
     'tenant.see.vm-list-block',
     'tenant.see.vm-list-state',
     'tenant.see.vm-list-expiration',
     'tenant.see.vm-list-user-state'
 ];
 
-Wat.C.aclGroups.tenantUserEmbeddedInfo = [
+Up.C.aclGroups.tenantUserEmbeddedInfo = [
     'tenant.see.user-list-block'
 ];
 
 // Massive actions include massive edit ACLs
-$.merge(Wat.C.aclGroups.tenantMassiveActions, Wat.C.aclGroups.tenantMassiveEdit);
+$.merge(Up.C.aclGroups.tenantMassiveActions, Up.C.aclGroups.tenantMassiveEdit);
 
 ///////////////////////////////
 // User ACL groups
 ///////////////////////////////
-Wat.C.aclGroups.userEdit = [
+Up.C.aclGroups.userEdit = [
     'user.update.password',
     'user.update.properties',
     'user.update.description'
 ];
 
-Wat.C.aclGroups.userInfo = [
+Up.C.aclGroups.userInfo = [
     'user.see.block'
 ];
 
-Wat.C.aclGroups.userMassiveEdit = [
+Up.C.aclGroups.userMassiveEdit = [
     'user.update-massive.properties',
     'role.update-massive.description'
 ];
 
-Wat.C.aclGroups.userMassiveActions = [
+Up.C.aclGroups.userMassiveActions = [
     'user.delete-massive.',
     'user.update-massive.block',
     'vm.update-massive.disconnect-user'
 ];
 // Massive actions include massive edit ACLs
-$.merge(Wat.C.aclGroups.userMassiveActions, Wat.C.aclGroups.userMassiveEdit);
+$.merge(Up.C.aclGroups.userMassiveActions, Up.C.aclGroups.userMassiveEdit);
 
-Wat.C.aclGroups.userVmEmbeddedInfo = [
+Up.C.aclGroups.userVmEmbeddedInfo = [
     'user.see.vm-list-block',
     'user.see.vm-list-state',
     'user.see.vm-list-expiration',
@@ -112,14 +112,14 @@ Wat.C.aclGroups.userVmEmbeddedInfo = [
 ///////////////////////////////
 // Virtual Machine ACL groups
 ///////////////////////////////
-Wat.C.aclGroups.vmInfo = [
+Up.C.aclGroups.vmInfo = [
     'vm.see.block',
     'vm.see.state',
     'vm.see.expiration',
     'vm.see.user-state'
 ];
 
-Wat.C.aclGroups.vmEdit = [
+Up.C.aclGroups.vmEdit = [
     'vm.update.name',
     'vm.update.di-tag',
     'vm.update.expiration',
@@ -127,21 +127,21 @@ Wat.C.aclGroups.vmEdit = [
     'vm.update.description'
 ];
 
-Wat.C.aclGroups.vmMassiveEdit = [
+Up.C.aclGroups.vmMassiveEdit = [
     'vm.update-massive.di-tag',
     'vm.update-massive.expiration',
     'vm.update-massive.properties',
     'vm.update-massive.description'
 ];
 
-Wat.C.aclGroups.vmMassiveActions = [
+Up.C.aclGroups.vmMassiveActions = [
     'vm.delete-massive.',
     'vm.update-massive.block',
     'vm.update-massive.disconnect-user',
     'vm.update-massive.state'
 ];
 
-Wat.C.aclGroups.vmRemoteAdminDetails = [
+Up.C.aclGroups.vmRemoteAdminDetails = [
     'vm.see.host',
     'vm.see.next-boot-ip',
     'vm.see.port-ssh',
@@ -149,7 +149,7 @@ Wat.C.aclGroups.vmRemoteAdminDetails = [
     'vm.see.port-serial'
 ];
 
-Wat.C.aclGroups.vmStateInfoDetails = [
+Up.C.aclGroups.vmStateInfoDetails = [
     'vm.see.host',
     'vm.see.ip',
     'vm.see.di',
@@ -160,32 +160,32 @@ Wat.C.aclGroups.vmStateInfoDetails = [
 ];
 
 // Massive actions include massive edit ACLs
-$.merge(Wat.C.aclGroups.vmMassiveActions, Wat.C.aclGroups.vmMassiveEdit);
+$.merge(Up.C.aclGroups.vmMassiveActions, Up.C.aclGroups.vmMassiveEdit);
 
 
 ///////////////////////////////
 // Hosts ACL groups
 ///////////////////////////////
-Wat.C.aclGroups.hostEdit = [
+Up.C.aclGroups.hostEdit = [
     'host.update.name',
     'host.update.address',
     'host.update.properties',
     'host.update.description'
 ];
 
-Wat.C.aclGroups.hostMassiveEdit = [
+Up.C.aclGroups.hostMassiveEdit = [
     'host.update-massive.properties',
     'host.update-massive.description'
 ];
 
-Wat.C.aclGroups.hostMassiveActions = [
+Up.C.aclGroups.hostMassiveActions = [
     'host.delete-massive.',
     'host.update-massive.block'
 ];
 // Massive actions include massive edit ACLs
-$.merge(Wat.C.aclGroups.hostMassiveActions, Wat.C.aclGroups.hostMassiveEdit);
+$.merge(Up.C.aclGroups.hostMassiveActions, Up.C.aclGroups.hostMassiveEdit);
 
-Wat.C.aclGroups.hostVmEmbeddedInfo = [
+Up.C.aclGroups.hostVmEmbeddedInfo = [
     'host.see.vm-list-block',
     'host.see.vm-list-state',
     'host.see.vm-list-expiration',
@@ -196,7 +196,7 @@ Wat.C.aclGroups.hostVmEmbeddedInfo = [
 ///////////////////////////////
 // OSF Flavours ACL groups
 ///////////////////////////////
-Wat.C.aclGroups.osfEdit = [
+Up.C.aclGroups.osfEdit = [
     'osf.update.name',
     'osf.update.memory',
     'osf.update.user-storage',
@@ -204,18 +204,18 @@ Wat.C.aclGroups.osfEdit = [
     'osf.update.description'
 ];
 
-Wat.C.aclGroups.osfMassiveEdit = [
+Up.C.aclGroups.osfMassiveEdit = [
     'osf.update-massive.memory',
     'osf.update-massive.user-storage',
     'osf.update-massive.properties',
     'osf.update-massive.description'
 ];
 
-Wat.C.aclGroups.osfMassiveActions = [
+Up.C.aclGroups.osfMassiveActions = [
     'osf.delete-massive.'
 ];
 
-Wat.C.aclGroups.osfDiEmbeddedInfo = [
+Up.C.aclGroups.osfDiEmbeddedInfo = [
     'osf.see.di-list-default',
     'osf.see.di-list-head',
     'osf.see.di-list-tags',
@@ -223,9 +223,9 @@ Wat.C.aclGroups.osfDiEmbeddedInfo = [
 ];
 
 // Massive actions include massive edit ACLs
-$.merge(Wat.C.aclGroups.osfMassiveActions, Wat.C.aclGroups.osfMassiveEdit);
+$.merge(Up.C.aclGroups.osfMassiveActions, Up.C.aclGroups.osfMassiveEdit);
 
-Wat.C.aclGroups.osfVmEmbeddedInfo = [
+Up.C.aclGroups.osfVmEmbeddedInfo = [
     'osf.see.vm-list-block',
     'osf.see.vm-list-state',
     'osf.see.vm-list-expiration',
@@ -236,33 +236,33 @@ Wat.C.aclGroups.osfVmEmbeddedInfo = [
 ///////////////////////////////
 // Disk Image ACL groups
 ///////////////////////////////
-Wat.C.aclGroups.diEdit = [
+Up.C.aclGroups.diEdit = [
     'di.update.tags-create',
     'di.update.tags-delete',
     'di.update.properties',
     'di.update.description'
 ];
 
-Wat.C.aclGroups.diInfo = [
+Up.C.aclGroups.diInfo = [
     'di.see.block',
     'di.see.tags'
 ];
 
-Wat.C.aclGroups.diMassiveEdit = [
+Up.C.aclGroups.diMassiveEdit = [
     'di.update-massive.tags-add',
     'di.update-massive.tags-delete',
     'di.update-massive.properties',
     'di.update-massive.description'
 ];
 
-Wat.C.aclGroups.diMassiveActions = [
+Up.C.aclGroups.diMassiveActions = [
     'di.delete-massive.',
     'di.update-massive.block'
 ];
 // Massive actions include massive edit ACLs
-$.merge(Wat.C.aclGroups.diMassiveActions, Wat.C.aclGroups.diMassiveEdit);
+$.merge(Up.C.aclGroups.diMassiveActions, Up.C.aclGroups.diMassiveEdit);
 
-Wat.C.aclGroups.diVmEmbeddedInfo = [
+Up.C.aclGroups.diVmEmbeddedInfo = [
     'di.see.vm-list-block',
     'di.see.vm-list-state',
     'di.see.vm-list-expiration',
@@ -273,14 +273,14 @@ Wat.C.aclGroups.diVmEmbeddedInfo = [
 // Tenant ACL groups
 ///////////////////////////////
 
-Wat.C.aclGroups.tenantInfo = [
+Up.C.aclGroups.tenantInfo = [
     'tenant.see.block'
 ];
 
 ///////////////////////////////
 // Statistics
 ///////////////////////////////
-Wat.C.aclGroups.statisticsSummaryObjects = [
+Up.C.aclGroups.statisticsSummaryObjects = [
     'user.stats.summary',
     'vm.stats.summary',
     'host.stats.summary',
@@ -289,7 +289,7 @@ Wat.C.aclGroups.statisticsSummaryObjects = [
 ];
 
       
-Wat.C.aclGroups.statisticsBlockedObjects = [
+Up.C.aclGroups.statisticsBlockedObjects = [
     'user.stats.blocked',
     'vm.stats.blocked',
     'host.stats.blocked',
@@ -299,7 +299,7 @@ Wat.C.aclGroups.statisticsBlockedObjects = [
 ///////////////////////////////
 // Properties
 ///////////////////////////////
-Wat.C.aclGroups.propertiesManagement = [
+Up.C.aclGroups.propertiesManagement = [
     'property.manage.user',
     'property.manage.vm',
     'property.manage.host',

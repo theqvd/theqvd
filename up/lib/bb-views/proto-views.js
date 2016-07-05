@@ -1,4 +1,4 @@
-Wat.Views.ViewsView = Wat.Views.MainView.extend({
+Up.Views.ViewsView = Up.Views.MainView.extend({
     sideContainer: '.bb-setup-side',
     setupFormContainer: '.bb-customize-form',
     setupOption: 'customize',
@@ -6,10 +6,10 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
     selectedTenant: '0',
 
     initialize: function (params) {
-        Wat.Views.MainView.prototype.initialize.apply(this, [params]);
+        Up.Views.MainView.prototype.initialize.apply(this, [params]);
         
         // If administrator is superadmin, use selected tenant. Otherwise, his tenant
-        if (!Wat.C.isSuperadmin()) {
+        if (!Up.C.isSuperadmin()) {
             this.selectedTenant = undefined;
         }
     },
@@ -38,11 +38,11 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
 
         dialogConf.buttons = {
             Cancel: function (e) {
-                Wat.I.closeDialog($(this));
+                Up.I.closeDialog($(this));
             },
             "Reset": function (e) {
                 that.performResetViews ();
-                Wat.I.closeDialog($(this));
+                Up.I.closeDialog($(this));
             }
         };
         
@@ -52,7 +52,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         dialogConf.fillCallback = that.fillResetViewsEditor;
 
 
-        Wat.I.dialog(dialogConf, this);
+        Up.I.dialog(dialogConf, this);
     },
     
     showViewsMessage: function (response) {
@@ -73,7 +73,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
                 break;
         }
 
-        Wat.I.M.showMessage(messageParams, response);
+        Up.I.M.showMessage(messageParams, response);
     },
     
     checkDesktopFilter: function (e) {
@@ -109,7 +109,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             this.addIDToArgs(args);
             }
 
-            Wat.A.performAction(setAction, args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, this.processCheckDesktopFilter, this);
+            Up.A.performAction(setAction, args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, this.processCheckDesktopFilter, this);
         }
     },
     
@@ -140,7 +140,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             }
 
             if (that.viewKind == 'admin') {
-                Wat.I.formFilters[qvdObj][fieldName] = that.currentFilters[fieldName];
+                Up.I.formFilters[qvdObj][fieldName] = that.currentFilters[fieldName];
             }
             else {
                 that.updateCurrentViews(that);
@@ -185,7 +185,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             this.addIDToArgs(args);
             }
 
-            Wat.A.performAction(setAction, args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, this.processCheckMobileFilter, this);
+            Up.A.performAction(setAction, args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, this.processCheckMobileFilter, this);
         }
     },
 
@@ -216,7 +216,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             }
 
             if (that.viewKind == 'admin') {
-                Wat.I.formFilters[qvdObj][fieldName] = that.currentFilters[fieldName];
+                Up.I.formFilters[qvdObj][fieldName] = that.currentFilters[fieldName];
             }
             else {
                 that.updateCurrentViews(that);
@@ -262,7 +262,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             }
             
 
-            Wat.A.performAction(setAction, args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, this.processCheckListColumn, this);
+            Up.A.performAction(setAction, args, {}, {'error': i18n.t('Error updating'), 'success': i18n.t('Successfully updated')}, this.processCheckListColumn, this);
         }
     },
     
@@ -291,7 +291,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             }
             
             if (that.viewKind == 'admin') {
-                Wat.I.listFields[qvdObj][fieldName] = that.currentColumns[fieldName];
+                Up.I.listFields[qvdObj][fieldName] = that.currentColumns[fieldName];
             }
             else {
                 that.updateCurrentViews(that);
@@ -305,13 +305,13 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
     
     updateCurrentViews: function (that) {
         // Get admin setup configuration to get the views updated
-        Wat.A.performAction('current_admin_setup', {}, {}, {}, function () {
+        Up.A.performAction('current_admin_setup', {}, {}, {}, function () {
             // Restore possible residous views configuration to default values
-            Wat.I.restoreListColumns();
-            Wat.I.restoreFormFilters();
+            Up.I.restoreListColumns();
+            Up.I.restoreFormFilters();
 
             // Store views configuration
-            Wat.C.storeViewsConfiguration(that.retrievedData.views);
+            Up.C.storeViewsConfiguration(that.retrievedData.views);
         }, that);
     },
     
@@ -320,7 +320,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         $('.js-customize-filters').html(HTML_MID_LOADING);
         this.selectedSection = $('select[name="obj-qvd-select"]').val();
 
-        if (Wat.C.isSuperadmin()) {
+        if (Up.C.isSuperadmin()) {
             this.selectedTenant = $('select[name="tenant-select"]').val();
         }
         else {
@@ -334,7 +334,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         $(this.el).html(this.template);
         
         this.template = _.template(
-            Wat.TPL.viewCustomize, {
+            Up.TPL.viewCustomize, {
                 selectedSection: this.selectedSection,
                 limitByACLs: this.limitByACLs,
                 viewKind: this.viewKind,
@@ -347,7 +347,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         // Store as selected the current selected section
         this.selectedSection = $('select[name="obj-qvd-select"]').val();
         
-        if (Wat.C.isSuperadmin()) {
+        if (Up.C.isSuperadmin()) {
             // Fill Tenant select on viees customization view
             var params = {
                 'action': 'tenant_tiny_list',
@@ -355,8 +355,8 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
                 'chosenType': 'advanced100'
             };
 
-            Wat.A.fillSelect(params, function () {
-                Wat.I.updateChosenControls('[name="tenant-select"]');
+            Up.A.fillSelect(params, function () {
+                Up.I.updateChosenControls('[name="tenant-select"]');
             });  
         }
         
@@ -365,7 +365,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
     
     renderForm: function () {        
         this.template = _.template(
-            Wat.TPL.viewFormCustomize, {
+            Up.TPL.viewFormCustomize, {
                 filters: this.currentFilters,
                 columns: this.currentColumns,
                 limitByACLs: this.limitByACLs
@@ -378,14 +378,14 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         
         $('.js-custom-views-container').show();
         
-        Wat.T.translateAndShow();
+        Up.T.translateAndShow();
     },
     
     addIDToArgs: function (args) {
         switch (this.viewKind) {
             case 'tenant':
                 // If administrator is superadmin, use selected tenant. Otherwise, no tenant filter will be used
-                if (Wat.C.isSuperadmin()) {
+                if (Up.C.isSuperadmin()) {
                     args['tenant_id'] = this.selectedTenant;
                 }
                 break;

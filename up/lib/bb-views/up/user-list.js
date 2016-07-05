@@ -1,24 +1,24 @@
-Wat.Views.UserListView = Wat.Views.ListView.extend({
+Up.Views.UserListView = Up.Views.ListView.extend({
     qvdObj: 'user',
     liveFields: ['number_of_vms_connected', 'number_of_vms'],
 
     initialize: function (params) {
-        this.collection = new Wat.Collections.Users(params);
+        this.collection = new Up.Collections.Users(params);
         
-        Wat.Views.ListView.prototype.initialize.apply(this, [params]);
+        Up.Views.ListView.prototype.initialize.apply(this, [params]);
     },
         
     // This events will be added to view events
     listEvents: {},
     
     openNewElementDialog: function (e) {
-        this.model = new Wat.Models.User();
+        this.model = new Up.Models.User();
         this.dialogConf.title = $.i18n.t('New User');
-        Wat.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
+        Up.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
     },
     
     createElement: function () {    
-        var valid = Wat.Views.ListView.prototype.createElement.apply(this);
+        var valid = Up.Views.ListView.prototype.createElement.apply(this);
         
         if (!valid) {
             return;
@@ -35,7 +35,7 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
             "blocked": blocked ? 1 : 0
         };
         
-        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('user.create.properties')) {
+        if (!$.isEmptyObject(properties.set) && Up.C.checkACL('user.create.properties')) {
             arguments["__properties__"] = properties.set;
         }
         
@@ -55,7 +55,7 @@ Wat.Views.UserListView = Wat.Views.ListView.extend({
             arguments['password'] = password;
         }
         
-        if (Wat.C.isSuperadmin()) {
+        if (Up.C.isSuperadmin()) {
             var tenant_id = context.find('select[name="tenant_id"]').val();
             arguments['tenant_id'] = tenant_id;
         }

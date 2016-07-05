@@ -1,4 +1,4 @@
-Wat.Views.ListView = Wat.Views.MainView.extend({
+Up.Views.ListView = Up.Views.MainView.extend({
     collection: {},
     sortedBy: '',
     sortedOrder: '',
@@ -30,9 +30,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     initialize: function (params) {        
 		// If there are fixed filters, add them to collection
-        if (!$.isEmptyObject(Wat.I.fixedFilters)) {
-            params.filters = $.extend({}, params.filters, Wat.I.fixedFilters);
-            this.collection.filters = $.extend({}, this.collection.filters, Wat.I.fixedFilters);
+        if (!$.isEmptyObject(Up.I.fixedFilters)) {
+            params.filters = $.extend({}, params.filters, Up.I.fixedFilters);
+            this.collection.filters = $.extend({}, this.collection.filters, Up.I.fixedFilters);
             
             var classifiedByTenant = $.inArray(this.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
             if (!classifiedByTenant && this.collection.filters['tenant_id']) {
@@ -40,7 +40,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             }
         }
         
-        Wat.Views.MainView.prototype.initialize.apply(this);
+        Up.Views.MainView.prototype.initialize.apply(this);
         
         this.setFilters();
         this.setColumns();
@@ -59,11 +59,11 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.extendEvents(this.listEvents);
         this.addListTemplates();
         
-        Wat.A.getTemplates(this.templates, this.render); 
+        Up.A.getTemplates(this.templates, this.render); 
     },
     
     addListTemplates: function () {
-        var templates = Wat.I.T.getTemplateList('list', {qvdObj: this.qvdObj});
+        var templates = Up.I.T.getTemplateList('list', {qvdObj: this.qvdObj});
         
         this.templates = $.extend({}, this.templates, templates);
     },
@@ -189,7 +189,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         // Add common parts of editor to dialog
         var template = _.template(
-                    Wat.TPL.sortingRow, {
+                    Up.TPL.sortingRow, {
                         nColumns: nColumns,
                         orderClass: orderClass,
                         sortedFieldName: sortedFieldName
@@ -217,7 +217,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         // Solve dependences in case of fussioned filters
         if (e) {
-            Wat.I.solveFilterDependences($(e.target).attr('name'), $(e.target).attr('data-filter-field'));
+            Up.I.solveFilterDependences($(e.target).attr('name'), $(e.target).attr('data-filter-field'));
         }
         
         var filters = {};
@@ -246,22 +246,22 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                         switch (filter.transform) {
                             case 'dateLessThanPast':
                                 filters[filterControl.attr('data-filter-field')] = {
-                                    "<": Wat.U.getRelativeDate(filterControl.val() * -1)
+                                    "<": Up.U.getRelativeDate(filterControl.val() * -1)
                                 };
                                 break;
                             case 'dateGreatThanPast':
                                 filters[filterControl.attr('data-filter-field')] = {
-                                    ">": Wat.U.getRelativeDate(filterControl.val() * -1)
+                                    ">": Up.U.getRelativeDate(filterControl.val() * -1)
                                 };
                                 break;
                             case 'dateLessThanFuture':
                                 filters[filterControl.attr('data-filter-field')] = {
-                                    "<": Wat.U.getRelativeDate(filterControl.val())
+                                    "<": Up.U.getRelativeDate(filterControl.val())
                                 };
                                 break;
                             case 'dateGreatThanFuture':
                                 filters[filterControl.attr('data-filter-field')] = {
-                                    ">": Wat.U.getRelativeDate(filterControl.val())
+                                    ">": Up.U.getRelativeDate(filterControl.val())
                                 };
                                 break;
                         }
@@ -325,7 +325,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
 
         this.resetSelectedItems ();
         
-        var searchHash = Wat.U.transformFiltersToSearchHash(filters);
+        var searchHash = Up.U.transformFiltersToSearchHash(filters);
         var currentHash = '#' + this.qvdObj + 's/' + searchHash;
 
         // If pushState is available in browser, modify hash with current section
@@ -354,16 +354,16 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     /* Clean filter from object memory and collection */
     cleanFilter: function (fKey) {
-        delete Wat.CurrentView.filters[fKey];
-        delete Wat.CurrentView.initFilters[fKey];
-        Wat.CurrentView.collection.deleteFilter(fKey);
+        delete Up.CurrentView.filters[fKey];
+        delete Up.CurrentView.initFilters[fKey];
+        Up.CurrentView.collection.deleteFilter(fKey);
     },
     
     updateFilterNotes: function (firstLoad) {     
         var that = this;
         
         // Show-Hide filter notes only when view is not embeded
-        if (this.cid == Wat.CurrentView.cid) {
+        if (this.cid == Up.CurrentView.cid) {
             var filtersContainer = '.' + this.cid + ' .filter';
             
             var filterNotes = {};
@@ -426,14 +426,14 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                         if (filterControl.val() == FILTER_ALL || filterControl.val() == undefined) {
                             if (!firstLoad) {
                                 // If fixable filter changes to ALL value, unfixed it
-                                delete Wat.I.fixedFilters[filterControl.attr('data-filter-field')];
+                                delete Up.I.fixedFilters[filterControl.attr('data-filter-field')];
                             }
                             return true;
                         }
 
                         // If fixable filter changes, change stored data
-                        if (Wat.I.fixedFilters[filterControl.attr('data-filter-field')]) {
-                            Wat.I.fixedFilters[filterControl.attr('data-filter-field')] = filterControl.val();
+                        if (Up.I.fixedFilters[filterControl.attr('data-filter-field')]) {
+                            Up.I.fixedFilters[filterControl.attr('data-filter-field')] = filterControl.val();
                         }
                         
                         filterNotes[filterControl.attr('name')] = {
@@ -485,8 +485,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             
             $.each(filterNotes, function(fNoteName, fNote) {
                 if (fNote.replaceValue) {
-                    if (Wat.CurrentView.collection.length) {
-                        fNote.value = Wat.CurrentView.collection.models[0].get(fNote.replaceValue);
+                    if (Up.CurrentView.collection.length) {
+                        fNote.value = Up.CurrentView.collection.models[0].get(fNote.replaceValue);
                     }
                 }
 
@@ -501,7 +501,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     var field = $('[name="' + fNoteName + '"]').attr('data-filter-field');                  
                     
                     var extraClass = '';
-                    if (Wat.I.fixedFilters[field]) {
+                    if (Up.I.fixedFilters[field]) {
                         extraClass = 'fix-filter-note--enabled';
                     }
                     note += '<a href="javascript:" class="js-fix-filter-note fix-filter-note ' + extraClass + ' fa fa-thumb-tack" data-filter-name="' + fNoteName + '" data-filter-type="' + fNote.type + '" data-i18n="[title]Fix filter"></a>';
@@ -533,7 +533,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             $('.check_all').prop("checked", false);
         }
         
-        Wat.I.updateSelectedItems(this.selectedItems.length);
+        Up.I.updateSelectedItems(this.selectedItems.length);
     },
     
     // Set as checked all the checkboxes of a list and store the IDs
@@ -552,13 +552,13 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                             $.each($('.js-check-it'), function (iCheckbox, checkbox) {
                                 that.selectedItems.push(parseInt($(checkbox).attr('data-id')));
                             });
-                            Wat.I.closeDialog($(this));
-                            Wat.I.updateSelectedItems(that.selectedItems.length);
+                            Up.I.closeDialog($(this));
+                            Up.I.updateSelectedItems(that.selectedItems.length);
                         },
                         "Select all": function () {
                             $('.js-check-it').prop("checked", true);
                             that.dialog = $(this);
-                            Wat.A.performAction(that.qvdObj + '_all_ids', {}, that.collection.filters, {}, that.storeAllSelectedIds, that);
+                            Up.A.performAction(that.qvdObj + '_all_ids', {}, that.collection.filters, {}, that.storeAllSelectedIds, that);
                         }
                     },
                     button1Class : 'fa fa-eye',
@@ -566,7 +566,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     fillCallback : this.fillCheckSelector
                 }
 
-                Wat.I.dialog(dialogConf);
+                Up.I.dialog(dialogConf);
             }
             else {
                 $('.js-check-it').prop("checked", true);
@@ -574,12 +574,12 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 $.each($('.js-check-it'), function (iCheckbox, checkbox) {
                     that.selectedItems.push(parseInt($(checkbox).attr('data-id')));
                 });
-                Wat.I.updateSelectedItems(that.selectedItems.length);
+                Up.I.updateSelectedItems(that.selectedItems.length);
             }
         } else {
             $('.js-check-it').prop("checked", false);
             this.resetSelectedItems ();
-            Wat.I.updateSelectedItems(this.selectedItems.length);
+            Up.I.updateSelectedItems(this.selectedItems.length);
         }
     },
     
@@ -593,17 +593,17 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             that.selectedItems = that.retrievedData.rows;
         }
         
-        Wat.I.closeDialog(that.dialog);
-        Wat.I.updateSelectedItems(that.selectedItems.length);
+        Up.I.closeDialog(that.dialog);
+        Up.I.updateSelectedItems(that.selectedItems.length);
         that.selectedAll = true;
     },
     
     fillCheckSelector: function (target) {
-        var that = Wat.CurrentView;
+        var that = Up.CurrentView;
         
         // Add common parts of editor to dialog
         that.template = _.template(
-                    Wat.TPL.selectChecks, {
+                    Up.TPL.selectChecks, {
                     }
                 );
 
@@ -612,16 +612,16 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     setFilters: function () {
         // Get Filters from configuration
-        this.formFilters = Wat.I.getFormFilters(this.qvdObj);
+        this.formFilters = Up.I.getFormFilters(this.qvdObj);
 
         // Check filters on columns to remove forbidden ones
-        Wat.C.purgeConfigData(this.formFilters);
+        Up.C.purgeConfigData(this.formFilters);
         
         // The superadmin have an extra filter: tenant
         
         // Every element but the hosts has tenant
         var classifiedByTenant = $.inArray(this.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
-        if (Wat.C.isSuperadmin() && classifiedByTenant) {
+        if (Up.C.isSuperadmin() && classifiedByTenant) {
             var tenantFilter = { tenant: 
                                     {
                                         'filterField': 'tenant_id',
@@ -650,16 +650,16 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     setColumns: function () {
         // Get Columns from configuration
-        this.columns = Wat.I.getListColumns(this.qvdObj);
+        this.columns = Up.I.getListColumns(this.qvdObj);
                 
         // Check acls on columns to remove forbidden ones
-        Wat.C.purgeConfigData(this.columns);
+        Up.C.purgeConfigData(this.columns);
         
         // The superadmin have an extra field on lists: tenant
         
         // Add tenant column to any element where it has sense
         var classifiedByTenant = $.inArray(this.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
-        if (Wat.C.isSuperadmin() && classifiedByTenant) {
+        if (Up.C.isSuperadmin() && classifiedByTenant) {
             this.columns.tenant = {
                 'text': 'Tenant',
                 'displayDesktop': true,
@@ -672,22 +672,22 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     setSelectedActions: function () {
         // Get Actions from configuration
-        this.selectedActions = Wat.I.getSelectedActions(this.qvdObj);
+        this.selectedActions = Up.I.getSelectedActions(this.qvdObj);
         
         // Check actions on columns to remove forbidden ones
-        Wat.C.purgeConfigData(this.selectedActions);
+        Up.C.purgeConfigData(this.selectedActions);
     },
 
     setListActionButton: function () {
         // Get Action button from configuration
-        this.listActionButton = Wat.I.getListActionButton(this.qvdObj);
+        this.listActionButton = Up.I.getListActionButton(this.qvdObj);
         
         // Check actions on columns to remove forbidden ones
-        Wat.C.purgeConfigData(this.listActionButton);
+        Up.C.purgeConfigData(this.listActionButton);
     },
     
     setBreadCrumbs: function () {
-        this.breadcrumbs = Wat.I.getListBreadCrumbs(this.qvdObj);
+        this.breadcrumbs = Up.I.getListBreadCrumbs(this.qvdObj);
     },
     
     // Fetch collection and render list
@@ -704,8 +704,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 }
                 
                 that.renderList(that.listContainer);
-                Wat.I.updateSortIcons(that);
-                Wat.I.updateChosenControls();
+                Up.I.updateSortIcons(that);
+                Up.I.updateChosenControls();
             }
         });
     },
@@ -714,11 +714,11 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     render: function () {
         var that = this;
         
-        var embeddedView = that.cid != Wat.CurrentView.cid;
+        var embeddedView = that.cid != Up.CurrentView.cid;
         
         // If user have not access to main section, redirect to home
-        if (!embeddedView && that.whatRender && !Wat.C.checkACL(that.qvdObj + '.see-main.')) {
-            Wat.Router.watRouter.trigger('route:defaultRoute');
+        if (!embeddedView && that.whatRender && !Up.C.checkACL(that.qvdObj + '.see-main.')) {
+            Up.Router.watRouter.trigger('route:defaultRoute');
             return;
         }
         
@@ -740,7 +740,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     renderAll: function () {
         // Fill the html with the template and the collection
         var template = _.template(
-            Wat.TPL.listCommonList, {
+            Up.TPL.listCommonList, {
                 formFilters: this.formFilters,
                 currentFilters: this.collection.filters,
                 cid: this.cid
@@ -768,7 +768,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         // Fill the list
         var template = _.template(
-            Wat.TPL.listCommonBlock, {
+            Up.TPL.listCommonBlock, {
                 formFilters: that.formFilters,
                 selectedActions: that.selectedActions,
                 listActionButton: that.listActionButton,
@@ -780,7 +780,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         $(that.listBlockContainer).html(template);
                         
         // Only fetch filters if view is not embeded
-        if (Wat.CurrentView.cid == this.cid) {
+        if (Up.CurrentView.cid == this.cid) {
             this.fetchFilters('all');
         }
 
@@ -791,15 +791,15 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         // When the list were rendered in actions such as sorting, filtering or pagination, 
         // the strings will be individually translated
         
-        Wat.T.translate();
-        Wat.I.enableDataPickers();
+        Up.T.translate();
+        Up.I.enableDataPickers();
     },    
     
     // Render only the list. Usefull to functions such as pagination, sorting and filtering where is not necessary render controls
     renderList: function () {
         // Fill the list
         var template = _.template(
-            Wat.TPL['list_' + this.qvdObj], {
+            Up.TPL['list_' + this.qvdObj], {
                 models: this.collection.models,
                 filters: this.collection.filters,
                 columns: this.columns,
@@ -813,22 +813,22 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.paginationUpdate();
         this.shownElementsLabelUpdate();
         
-        Wat.I.updateSelectedItems(this.selectedItems.length);
+        Up.I.updateSelectedItems(this.selectedItems.length);
         
         // Open websockets for live fields
         if (this.liveFields) {
-            Wat.WS.openListWebsockets(this.qvdObj, this.collection, this.liveFields, this.cid);
+            Up.WS.openListWebsockets(this.qvdObj, this.collection, this.liveFields, this.cid);
         }
         
-        Wat.T.translateAndShow();
+        Up.T.translateAndShow();
         
         this.updateFilterNotes(true);
         
-        Wat.I.addSortIcons(this.cid);
+        Up.I.addSortIcons(this.cid);
         
-        Wat.I.adaptSideSize();
+        Up.I.adaptSideSize();
         
-        Wat.I.addOddEvenRowClass(this.listContainer);
+        Up.I.addOddEvenRowClass(this.listContainer);
     },
     
     // Fill filter selects 
@@ -841,7 +841,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         var anyTenantDepent = false;
         var tenantFilterSelector = 'select[name="tenant"]';
         
-        if (Wat.I.isMobile()) {
+        if (Up.I.isMobile()) {
             tenantFilterSelector += '.mobile-filter';
         }
         else {
@@ -849,7 +849,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         
         $.each(this.formFilters, function(name, filter) {
-            if ((Wat.I.isMobile() && !filter.displayMobile) || (!Wat.I.isMobile() && !filter.displayDesktop)) {
+            if ((Up.I.isMobile() && !filter.displayMobile) || (!Up.I.isMobile() && !filter.displayDesktop)) {
                 return;
             }
             
@@ -878,9 +878,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                             
                             var params = {
                         'action': filter.fillAction,
-                        'selectedId': that.filters[filter.filterField] || Wat.I.getFilterSelectedId(filter.options),
+                        'selectedId': that.filters[filter.filterField] || Up.I.getFilterSelectedId(filter.options),
                                 'controlName': name,
-                                'startingOptions': Wat.I.getFilterStartingOptions(filter.options),
+                                'startingOptions': Up.I.getFilterStartingOptions(filter.options),
                         'nameAsId': filter.nameAsId,
                                 'order_by': {
                             "field": orderFields,
@@ -895,8 +895,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                         params['startingOptions'] = $.extend({}, params['startingOptions'], paramGlobal);
                                     }
                                     
-                    if (Wat.C.isSuperadmin() && classifiedByTenant) {                            
-                        var filteredTenantId = Wat.CurrentView.collection.filters.tenant_id;
+                    if (Up.C.isSuperadmin() && classifiedByTenant) {                            
+                        var filteredTenantId = Up.CurrentView.collection.filters.tenant_id;
 
                         if (filteredTenantId) {
                             params.filters = {'tenant_id': filteredTenantId};
@@ -909,14 +909,14 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     // Add loading attribute to know when a select is being filled
 				    $('[name="' + name + '"]').attr('data-loading', 1);
 
-                    Wat.A.fillSelect(params, function () {
+                    Up.A.fillSelect(params, function () {
                         // In tenant case (except in admins list) has not sense show supertenant in filters
                             if (!currentExistsInSupertenant && name == 'tenant') {
                             // Remove supertenant from tenant selector
                                 $(tenantFilterSelector + ' option[value="0"]').remove();
                         }
                                                 
-                        Wat.I.updateChosenControls('[name="' + name + '"]');
+                        Up.I.updateChosenControls('[name="' + name + '"]');
                         
                         if (that.filters[filter.filterField] != undefined) {      
                             that.updateFilterNotes();
@@ -947,7 +947,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 $('select[name="' + name + '"] option').remove();
                 $('select[name="' + name + '"] optgroup').remove();
                 
-                Wat.I.updateChosenControls('[name="' + name + '"]');
+                Up.I.updateChosenControls('[name="' + name + '"]');
 
                 if (that.filters[filter.filterField] != undefined) {      
                     that.updateFilterNotes();
@@ -959,12 +959,12 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     // When change tenant reset fillable selects that can be affected by tenant classification
     changeTenant: function (e) {
         if ($('[data-tenant-depent]').length > 0) {
-            Wat.I.disableChosenControls('[name="tenant"]');
+            Up.I.disableChosenControls('[name="tenant"]');
         }
         
         // If filter changes to "ALL", remove it from fixed filters
         if ($(e.target).val() == FILTER_ALL) {
-            delete Wat.I.fixedFilters[$(e.target).attr('data-filter-field')];
+            delete Up.I.fixedFilters[$(e.target).attr('data-filter-field')];
         }
         
         // When tenant changes reset all filters with tenant dependence
@@ -1084,11 +1084,11 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             return;
         }
         
-        that.templateEditor = Wat.TPL.editorMassive;
+        that.templateEditor = Up.TPL.editorMassive;
         
         that.dialogConf.buttons = {
             Cancel: function () {
-                Wat.I.closeDialog($(this));
+                Up.I.closeDialog($(this));
             },
             Update: function () {
                 that.dialog = $(this);
@@ -1106,14 +1106,14 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     fillMassiveEditor: function (target) {
-        var that = Wat.CurrentView;
+        var that = Up.CurrentView;
         
         // Add common parts of editor to dialog
         that.template = _.template(
-                    Wat.TPL.editorCommon, {
+                    Up.TPL.editorCommon, {
                         classifiedByTenant: 0,
                         editorMode: 'massive_edit',
-                        isSuperadmin: Wat.C.isSuperadmin(),
+                        isSuperadmin: Up.C.isSuperadmin(),
                         blocked: undefined,
                         properties: [],
                         cid: that.cid
@@ -1124,7 +1124,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
 
         // Add specific parts of editor to dialog
         that.template = _.template(
-                    Wat.TPL.editorMassive, {
+                    Up.TPL.editorMassive, {
                         model: that.model
                     }
                 );
@@ -1132,7 +1132,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         $(that.editorContainer).html(that.template);
         
         var enabledProperties = $.inArray(that.qvdObj, QVD_OBJS_WITH_PROPERTIES) != -1;
-        var enabledEditProperties = Wat.C.checkACL(that.qvdObj + '.update-massive.properties');
+        var enabledEditProperties = Up.C.checkACL(that.qvdObj + '.update-massive.properties');
         
         if (enabledProperties && enabledEditProperties) {
             var filters = {};
@@ -1140,7 +1140,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             var classifiedByTenant = $.inArray(that.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
 
             // In massive edition for superadmins, only is available the specific properties for superadmins
-            if (Wat.C.isSuperadmin() && classifiedByTenant) {
+            if (Up.C.isSuperadmin() && classifiedByTenant) {
                 filters['tenant_id'] = SUPERTENANT_ID;
             }
 
@@ -1152,7 +1152,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
 
             that.editorMode = 'massive-edit';
                 
-            Wat.A.performAction(that.qvdObj + '_get_property_list', {}, filters, {}, that.fillEditorProperties, that, undefined, {"field":"key","order":"-asc"});
+            Up.A.performAction(that.qvdObj + '_get_property_list', {}, filters, {}, that.fillEditorProperties, that, undefined, {"field":"key","order":"-asc"});
         }
         
         that.configureMassiveEditor (that);
@@ -1167,7 +1167,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
 
         if (!this.selectedItems.length) {
-            Wat.I.M.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
+            Up.I.M.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
             return;
         }
 
@@ -1192,18 +1192,18 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         if (this.selectedItems.length > 100) {
             loadingBlock = true;
             if (!elementsOutOfView) {
-                Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
+                Up.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
             }
         }
         
         var that = this;
         switch(action) {
             case 'delete':
-                Wat.I.confirm('dialog/confirm-undone', that.applyDelete, that, loadingBlock);
+                Up.I.confirm('dialog/confirm-undone', that.applyDelete, that, loadingBlock);
                 break;
             case 'block':
                 if (elementsOutOfView) {
-                    Wat.I.confirm('dialog/confirm-out-of-view', that.applyBlock, that, loadingBlock);
+                    Up.I.confirm('dialog/confirm-out-of-view', that.applyBlock, that, loadingBlock);
                 }
                 else {
                     that.applyBlock(that);
@@ -1211,7 +1211,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 break;
             case 'unblock':
                 if (elementsOutOfView) {
-                    Wat.I.confirm('dialog/confirm-out-of-view', that.applyUnblock, that, loadingBlock);
+                    Up.I.confirm('dialog/confirm-out-of-view', that.applyUnblock, that, loadingBlock);
                 }
                 else {
                     that.applyUnblock(that);
@@ -1222,7 +1222,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 // The function that will open the Massive changes dialog is: openMassiveChangesDialog
                 // Each qvd object have the option of do things before with setupMassiveChangesDialog and after with configureMassiveEditor                
                 if (elementsOutOfView) {
-                    Wat.I.confirm('dialog/confirm-out-of-view', that.setupMassiveChangesDialog, that, loadingBlock);
+                    Up.I.confirm('dialog/confirm-out-of-view', that.setupMassiveChangesDialog, that, loadingBlock);
                 }
                 else {
                     that.setupMassiveChangesDialog(that);
@@ -1231,7 +1231,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             // Used in VMs
             case 'start':
                 if (elementsOutOfView) {
-                    Wat.I.confirm('dialog/confirm-out-of-view', that.applyStart, that, loadingBlock);
+                    Up.I.confirm('dialog/confirm-out-of-view', that.applyStart, that, loadingBlock);
                 }
                 else {
                     that.applyStart(that);
@@ -1239,7 +1239,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 break;
             case 'stop':
                 if (elementsOutOfView) {
-                    Wat.I.confirm('dialog/confirm-out-of-view', that.applyStop, that, loadingBlock);
+                    Up.I.confirm('dialog/confirm-out-of-view', that.applyStop, that, loadingBlock);
                 }
                 else {
                     that.applyStop(that);
@@ -1250,7 +1250,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 break;
             case 'disconnect':
                 if (elementsOutOfView) {
-                    Wat.I.confirm('dialog/confirm-out-of-view', that.applyDisconnect, that, loadingBlock);
+                    Up.I.confirm('dialog/confirm-out-of-view', that.applyDisconnect, that, loadingBlock);
                 }
                 else {
                     that.applyDisconnect(that);
@@ -1259,7 +1259,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             // Used in Hosts
             case 'stop_all':
                 if (elementsOutOfView) {
-                    Wat.I.confirm('dialog/confirm-out-of-view', that.applyStopAll, that, loadingBlock);
+                    Up.I.confirm('dialog/confirm-out-of-view', that.applyStopAll, that, loadingBlock);
                 }
                 else {
                     that.applyStopAll(that);
@@ -1268,14 +1268,14 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             // Used in Users
             case 'disconnect_all':
                 if (elementsOutOfView) {
-                    Wat.I.confirm('dialog/confirm-out-of-view', that.applyDisconnectAll, that, loadingBlock);
+                    Up.I.confirm('dialog/confirm-out-of-view', that.applyDisconnectAll, that, loadingBlock);
                 }
                 else {
                     that.applyDisconnectAll(that);
                 }
                 break;
             case 'delete_acl':
-                Wat.I.confirm('dialog/confirm-undone', that.applyDeleteACL, that, loadingBlock);
+                Up.I.confirm('dialog/confirm-undone', that.applyDeleteACL, that, loadingBlock);
                 break;
         };
     },
@@ -1300,7 +1300,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     resetSelectedItems: function () {
         if (this.selectedItems.length > 0) {
-            Wat.I.hideSelectedItemsMenu();
+            Up.I.hideSelectedItemsMenu();
         }
         this.selectedAll = false;
         this.selectedItems = [];
@@ -1318,7 +1318,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     updateMassiveElement: function (dialog, id) {
-        var valid = Wat.Views.ListView.prototype.updateElement.apply(this, [dialog]);
+        var valid = Up.Views.ListView.prototype.updateElement.apply(this, [dialog]);
         
         if (!valid) {
             return;
@@ -1329,7 +1329,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         var arguments = {};
         
-        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL(this.qvdObj + '.update-massive.properties')) {
+        if (!$.isEmptyObject(properties.set) && Up.C.checkACL(this.qvdObj + '.update-massive.properties')) {
             arguments['__properties_changes__'] = properties;
         }
         
@@ -1337,7 +1337,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
 
         var description = context.find('textarea[name="description"]').val();
         
-        if (description != '' && Wat.C.checkACL(this.qvdObj + '.update-massive.description')) {
+        if (description != '' && Up.C.checkACL(this.qvdObj + '.update-massive.description')) {
             arguments["description"] = description;
         }
         
@@ -1349,28 +1349,28 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         switch (this.qvdObj) {
             case 'user':
-                auxModel = new Wat.Models.User();
+                auxModel = new Up.Models.User();
                 break;
             case 'vm':
-                auxModel = new Wat.Models.VM();
+                auxModel = new Up.Models.VM();
                 break;
             case 'host':
-                auxModel = new Wat.Models.Host();
+                auxModel = new Up.Models.Host();
                 break;
             case 'osf':
-                auxModel = new Wat.Models.OSF();
+                auxModel = new Up.Models.OSF();
                 break;
             case 'di':
-                auxModel = new Wat.Models.DI();
+                auxModel = new Up.Models.DI();
                 break;
             case 'administrator':
-                auxModel = new Wat.Models.Admin();
+                auxModel = new Up.Models.Admin();
                 break;
             case 'role':
-                auxModel = new Wat.Models.Role();
+                auxModel = new Up.Models.Role();
                 break;
             case 'tenant':
-                auxModel = new Wat.Models.Tenant();
+                auxModel = new Up.Models.Tenant();
                 break;
         }
         

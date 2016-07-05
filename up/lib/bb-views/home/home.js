@@ -1,4 +1,4 @@
-Wat.Views.HomeView = Wat.Views.MainView.extend({
+Up.Views.HomeView = Up.Views.MainView.extend({
     qvdObj: 'home',
     
     relatedDoc: {
@@ -53,16 +53,16 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
     initialize: function (params) {
         $('.js-platform-menu').hide();
 
-        Wat.Views.MainView.prototype.initialize.apply(this, [params]);
-        Wat.B.bindHomeEvents();
+        Up.Views.MainView.prototype.initialize.apply(this, [params]);
+        Up.B.bindHomeEvents();
                 
-        var templates = Wat.I.T.getTemplateList('home');
+        var templates = Up.I.T.getTemplateList('home');
         
-        Wat.A.getTemplates(templates, this.getStatistics, this); 
+        Up.A.getTemplates(templates, this.getStatistics, this); 
     },
     
     getStatistics: function (that) {
-        Wat.A.performAction('qvd_objects_statistics', {}, {}, {}, that.render, that);
+        Up.A.performAction('qvd_objects_statistics', {}, {}, {}, that.render, that);
     },
     
     render: function () {
@@ -77,7 +77,7 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
                 
         // Fill the html with the template and the model
         this.template = _.template(
-            Wat.TPL.home, {
+            Up.TPL.home, {
                 stats: this.stats,
                 cid: this.cid
             }
@@ -91,10 +91,10 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
                 
         this.loadData(this.stats);
                 
-        Wat.T.translateAndShow();
+        Up.T.translateAndShow();
         
         // Open websockets for live fields
-        Wat.WS.openStatsWebsockets(this.qvdObj, this.liveFields, this.cid);
+        Up.WS.openStatsWebsockets(this.qvdObj, this.liveFields, this.cid);
     },
     
     renderVmsExpire: function () {
@@ -104,14 +104,14 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         
         // Fill the html with the template and the model
         this.template = _.template(
-            Wat.TPL.homeVMsExpire, {
+            Up.TPL.homeVMsExpire, {
                 vms_with_expiration_date: this.stats.vms_with_expiration_date
             }
         );
         
         $(".bb-vms-expire").html(this.template);
                 
-        Wat.T.translate();
+        Up.T.translate();
     },
     
     loadData: function (stats) {
@@ -120,13 +120,13 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         }
         
         var runningHostsData = [stats.running_hosts_count, stats.hosts_count - stats.running_hosts_count];
-        Wat.I.G.drawPieChart('running-hosts', runningHostsData);      
+        Up.I.G.drawPieChart('running-hosts', runningHostsData);      
         
         var connectedUsersData = [stats.connected_users_count, stats.users_count - stats.connected_users_count];
-        Wat.I.G.drawPieChart('connected-users', connectedUsersData);
+        Up.I.G.drawPieChart('connected-users', connectedUsersData);
         
         var runningVMSData = [stats.running_vms_count, stats.vms_count - stats.running_vms_count];
-        Wat.I.G.drawPieChart('running-vms', runningVMSData);
+        Up.I.G.drawPieChart('running-vms', runningVMSData);
 
         if ($('#hosts-more-vms').html() != undefined) {
             // Trick to draw bar chart when the div where it will be located will be rendered
@@ -139,7 +139,7 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
                         hostsMoreVMSData.push(population);
                     });
 
-                    Wat.I.G.drawBarChartRunningVMs('hosts-more-vms', hostsMoreVMSData);
+                    Up.I.G.drawBarChartRunningVMs('hosts-more-vms', hostsMoreVMSData);
                 }
             }, 50);
         }
@@ -184,7 +184,7 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
                     doc.save('QVD-Summary-' + dateTime + '.pdf');
                 }
 
-                Wat.CurrentView.render();
+                Up.CurrentView.render();
             },
               allowTaint: true,
               logging: false,

@@ -1,5 +1,5 @@
 <table>
-    <% if (Wat.C.checkACL('config.wat.')) { %>
+    <% if (Up.C.checkACL('config.wat.')) { %>
         <tr>
             <td data-i18n="Language"></td>
             <td>
@@ -37,7 +37,7 @@
                 </select>
             </td>
         </tr>
-        <% if (Wat.C.isSuperadmin() || !Wat.C.isMultitenant()) { %>
+        <% if (Up.C.isSuperadmin() || !Up.C.isMultitenant()) { %>
             <tr class="desktop-row">
             <td data-i18n="Style customizer tool"></td>
             <td>

@@ -2,7 +2,7 @@ var qvdObj = 'log';
 
 // Columns configuration on list view
 // type_ofaction, qvd_object, object_name, admin_id, time
-Wat.I.listFields[qvdObj] = {
+Up.I.listFields[qvdObj] = {
     'see_details': {
         'display': true,
         'fields': [
@@ -85,11 +85,11 @@ Wat.I.listFields[qvdObj] = {
     }
 };
 
-Wat.I.listDefaultFields[qvdObj] = $.extend({}, Wat.I.listFields[qvdObj]);
+Up.I.listDefaultFields[qvdObj] = $.extend({}, Up.I.listFields[qvdObj]);
 
         
 // Filters configuration on list view
-Wat.I.formFilters[qvdObj] = {
+Up.I.formFilters[qvdObj] = {
     'antiquity': {
         'filterField': 'time',
         'type': 'select',
@@ -223,7 +223,7 @@ Wat.I.formFilters[qvdObj] = {
 };
 
 $.each(LOG_TYPE_OBJECTS, function(typeObject, typeObjectName) {
-    Wat.I.formFilters[qvdObj]['object']['options'].push({
+    Up.I.formFilters[qvdObj]['object']['options'].push({
         'value': typeObject,
         'text': typeObjectName,
         'selected': false
@@ -231,7 +231,7 @@ $.each(LOG_TYPE_OBJECTS, function(typeObject, typeObjectName) {
 });
 
 $.each(LOG_TYPE_ACTIONS, function(typeAction, typeActionName) {
-    Wat.I.formFilters[qvdObj]['action']['options'].push({
+    Up.I.formFilters[qvdObj]['action']['options'].push({
         'value': typeAction,
         'text': typeActionName,
         'selected': false
@@ -239,11 +239,11 @@ $.each(LOG_TYPE_ACTIONS, function(typeAction, typeActionName) {
 });
 
 
-Wat.I.formDefaultFilters[qvdObj] = $.extend({}, Wat.I.formFilters[qvdObj]);
+Up.I.formDefaultFilters[qvdObj] = $.extend({}, Up.I.formFilters[qvdObj]);
 
 // Breadcrumbs configuration on list view
-$.extend(Wat.I.listBreadCrumbs[qvdObj], Wat.I.homeBreadCrumbs);
-Wat.I.listBreadCrumbs[qvdObj]['next'] = {
+$.extend(Up.I.listBreadCrumbs[qvdObj], Up.I.homeBreadCrumbs);
+Up.I.listBreadCrumbs[qvdObj]['next'] = {
             'screen': 'WAT Management',
             'next': {
                 'screen': 'Log registers'
@@ -251,9 +251,9 @@ Wat.I.listBreadCrumbs[qvdObj]['next'] = {
         };
 
 // Breadcrumbs configuration on details view
-$.extend(true, Wat.I.detailsBreadCrumbs[qvdObj], Wat.I.listBreadCrumbs[qvdObj]);
+$.extend(true, Up.I.detailsBreadCrumbs[qvdObj], Up.I.listBreadCrumbs[qvdObj]);
 
-Wat.I.detailsBreadCrumbs[qvdObj].next = {
+Up.I.detailsBreadCrumbs[qvdObj].next = {
             'screen': 'WAT Management',
             'next': {
                 'screen': 'Log registers',

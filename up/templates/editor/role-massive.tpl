@@ -1,5 +1,5 @@
 <table>
-    <% if (Wat.C.checkACL('role.update-massive.description')) { %>
+    <% if (Up.C.checkACL('role.update-massive.description')) { %>
     <tr>
         <td data-i18n="Description"></td>
         <td>

@@ -1,6 +1,6 @@
 function qvdViewsAdminReal () {
         // Get system properties to complete the dababase data
-        var properties = new Wat.Collections.Properties();
+        var properties = new Up.Collections.Properties();
         properties.fetch({      
             complete: function () {    
     module( "Customize administrator views", {
@@ -11,7 +11,7 @@ function qvdViewsAdminReal () {
             // clean up after each test
         }
     });
-        $.each(Wat.I.listFields, function (qvdObj, fields) {
+        $.each(Up.I.listFields, function (qvdObj, fields) {
             if ($.inArray(qvdObj, visibleViews) == -1) {
                 return;
             }
@@ -52,13 +52,13 @@ function qvdViewsAdminReal () {
                                 var action = 'admin_attribute_view_set';
                             }
 
-                            Wat.A.performAction(action, args, {}, {}, function (that) {
+                            Up.A.performAction(action, args, {}, {}, function (that) {
                         equal(that.retrievedData.status, STATUS_SUCCESS, "View for column list of '" + qvdObj + " -> " + fieldName + "' update successfully from '" + String(attrs.display ? 1 : 0) + "' to '" + String(attrs.display ? 0 : 1) + "' (" + that.retrievedData.message + ")");
 
                         args.visible = attrs.display;
                         start();
 
-                                Wat.A.performAction(action, args, {}, {}, function (that) {
+                                Up.A.performAction(action, args, {}, {}, function (that) {
                             equal(that.retrievedData.status, STATUS_SUCCESS, "View for column list of '" + qvdObj + " -> " + fieldName + "' re-update successfully from '" + String(attrs.display ? 0 : 1) + "' to '" + String(attrs.display ? 1 : 0) + "' (" + that.retrievedData.message + ")");
                             start();
                         }, that);
@@ -69,7 +69,7 @@ function qvdViewsAdminReal () {
             });
         });
     
-        $.each(Wat.I.formFilters, function (qvdObj, fields) {
+        $.each(Up.I.formFilters, function (qvdObj, fields) {
             if ($.inArray(qvdObj, visibleViews) == -1) {
                 return;
             }
@@ -106,13 +106,13 @@ function qvdViewsAdminReal () {
                             }
 
 
-                            Wat.A.performAction(action, argsDesktop, {}, {}, function (that) {
+                            Up.A.performAction(action, argsDesktop, {}, {}, function (that) {
                         equal(that.retrievedData.status, STATUS_SUCCESS, "View for column list of '" + qvdObj + " -> " + fieldName + "' update successfully from '" + String(attrs.display ? 1 : 0) + "' to '" + String(attrs.display ? 0 : 1) + "' (" + that.retrievedData.message + ")");
 
                         argsDesktop.visible = attrs.displayDesktop;
                         start();
 
-                                Wat.A.performAction(action, argsDesktop, {}, {}, function (that) {
+                                Up.A.performAction(action, argsDesktop, {}, {}, function (that) {
                             equal(that.retrievedData.status, STATUS_SUCCESS, "View for column list of '" + qvdObj + " -> " + fieldName + "' re-update successfully from '" + String(attrs.display ? 0 : 1) + "' to '" + String(attrs.display ? 1 : 0) + "' (" + that.retrievedData.message + ")");
                             start();
                         }, that);
@@ -137,13 +137,13 @@ function qvdViewsAdminReal () {
                                 var action = 'admin_attribute_view_set';
                             }
 
-                            Wat.A.performAction(action, argsMobile, {}, {}, function (that) {
+                            Up.A.performAction(action, argsMobile, {}, {}, function (that) {
                         equal(that.retrievedData.status, STATUS_SUCCESS, "View for column list of '" + qvdObj + " -> " + fieldName + "' update successfully from '" + String(attrs.display ? 1 : 0) + "' to '" + String(attrs.display ? 0 : 1) + "' (" + that.retrievedData.message + ")");
 
                         argsMobile.visible = attrs.displayMobile;
                         start();
 
-                                Wat.A.performAction(action, argsMobile, {}, {}, function (that) {
+                                Up.A.performAction(action, argsMobile, {}, {}, function (that) {
                             equal(that.retrievedData.status, STATUS_SUCCESS, "View for column list of '" + qvdObj + " -> " + fieldName + "' re-update successfully from '" + String(attrs.display ? 0 : 1) + "' to '" + String(attrs.display ? 1 : 0) + "' (" + that.retrievedData.message + ")");
                             start();
                         }, that);
@@ -164,7 +164,7 @@ function qvdViewsAdminReal () {
                 QUnit.asyncTest("Reset views", function() {
                     expect(1);
 
-                    Wat.A.performAction('admin_view_reset',{},{},{}, function (that) {
+                    Up.A.performAction('admin_view_reset',{},{},{}, function (that) {
                         equal(that.retrievedData.status, STATUS_SUCCESS, "Views resetted to default configuration successfully");
                         start();
                     }, this);

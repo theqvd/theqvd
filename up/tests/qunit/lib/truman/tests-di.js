@@ -20,14 +20,14 @@ function diTestReal () {
 
             expect(assertions);
 
-            Wat.Router.watRouter.trigger('route:listDI');
+            Up.Router.watRouter.trigger('route:listDI');
 
-            Wat.CurrentView.model = new Wat.Models.DI();
+            Up.CurrentView.model = new Up.Models.DI();
 
             //////////////////////////////////////////////////////////////////
             // Create DI
             //////////////////////////////////////////////////////////////////
-            Wat.CurrentView.createModel(WatTests.values.di, function (e) { 
+            Up.CurrentView.createModel(WatTests.values.di, function (e) { 
                 equal(e.retrievedData.status, STATUS_FORBIDDEN_ACTION, "DI cannot be created due ACLs restriction (" + JSON.stringify(WatTests.values.di) + ")");
 
                 if(e.retrievedData.status == STATUS_FORBIDDEN_ACTION) {
@@ -42,7 +42,7 @@ function diTestReal () {
                 //////////////////////////////////////////////////////////////////
                 // Try to get list of dis matching by the existing ID
                 //////////////////////////////////////////////////////////////////
-                WatTests.models.di = new Wat.Models.DI({
+                WatTests.models.di = new Up.Models.DI({
                     id: WatTests.values.di.id
                 });            
                                 
@@ -68,11 +68,11 @@ function diTestReal () {
                         //////////////////////////////////////////////////////////////////
                         // Try to update di
                         //////////////////////////////////////////////////////////////////
-                        Wat.CurrentView.updateModel(WatTests.updateValues.di, {'id': WatTests.values.di.id}, function (e) { 
+                        Up.CurrentView.updateModel(WatTests.updateValues.di, {'id': WatTests.values.di.id}, function (e) { 
                             equal(e.retrievedData.status, STATUS_FORBIDDEN_ARGUMENT, "Disk Image cannot be updated due ACLs restriction (" + JSON.stringify(WatTests.updateValues.di) + ")");
 
                             start();
-                        }, Wat.CurrentView.model);
+                        }, Up.CurrentView.model);
                     }
                 });
             });

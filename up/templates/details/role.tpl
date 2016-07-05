@@ -3,16 +3,16 @@
     <div class="clear mobile"></div>
     <a class="button2 fright fa fa-eye js-show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>
     
-    <% if(Wat.C.checkACL('role.delete.') && (!model.get('fixed') || !RESTRICT_TEMPLATES)) { %>
+    <% if(Up.C.checkACL('role.delete.') && (!model.get('fixed') || !RESTRICT_TEMPLATES)) { %>
     <a class="button fleft button-icon--desktop js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"><span data-i18n="Delete" class="mobile"></span></a>
     <% } %>
-    <% if(Wat.C.checkGroupACL('roleEdit') && (!model.get('fixed') || !RESTRICT_TEMPLATES)) { %>
+    <% if(Up.C.checkGroupACL('roleEdit') && (!model.get('fixed') || !RESTRICT_TEMPLATES)) { %>
     <a class="button fright button-icon--desktop js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"><span data-i18n="Edit" class="mobile"></span></a>
     <% } %>
-    <% if(Wat.C.checkACL('role.update.assign-role') && (!model.get('fixed') || !RESTRICT_TEMPLATES)) { %>
+    <% if(Up.C.checkACL('role.update.assign-role') && (!model.get('fixed') || !RESTRICT_TEMPLATES)) { %>
     <a class="button fright button-icon--desktop js-tools-templates-btn <%= CLASS_ICON_TEMPLATES %>" href="javascript:" data-i18n="[title]Inherit templates"><span data-i18n="Inherit templates" class="mobile"></span></a>
     <% } %>
-    <% if(Wat.C.checkACL('role.update.assign-role') && (!model.get('fixed') || !RESTRICT_TEMPLATES)) { %>
+    <% if(Up.C.checkACL('role.update.assign-role') && (!model.get('fixed') || !RESTRICT_TEMPLATES)) { %>
     <a class="button fright button-icon--desktop js-tools-roles-btn <%= CLASS_ICON_ROLES %>" href="javascript:" data-i18n="[title]Inherit roles"><span data-i18n="Inherit roles" class="mobile"></span></a>
     <% } %>
     
@@ -21,19 +21,19 @@
 
 <table class="details details-list col-width-100">
     <%   
-    if (Wat.C.isSuperadmin()) { 
+    if (Up.C.isSuperadmin()) { 
     %>
         <tr>
             <td><i class="<%= CLASS_ICON_TENANTS %>"></i><span data-i18n="Tenant"></span></td>
             <td>
-                <%= Wat.C.ifACL('<a href="#/tenant/' + model.get('tenant_id') + '">', 'tenant.see-details.') %>
+                <%= Up.C.ifACL('<a href="#/tenant/' + model.get('tenant_id') + '">', 'tenant.see-details.') %>
                 <%= model.get('tenant_name') %>
-                <%= Wat.C.ifACL('</a>', 'tenant.see-details.') %>
+                <%= Up.C.ifACL('</a>', 'tenant.see-details.') %>
             </td>
         </tr>
     <%   
     }
-    if (Wat.C.checkACL('role.see.id')) { 
+    if (Up.C.checkACL('role.see.id')) { 
     %>
     <tr>
         <td><i class="fa fa-asterisk"></i><span data-i18n="Id"></span></td>
@@ -43,7 +43,7 @@
     </tr>
     <% 
     }
-    if (Wat.C.checkACL('role.see.description')) { 
+    if (Up.C.checkACL('role.see.description')) { 
     %>
         <tr>
             <td><i class="fa fa-align-justify"></i><span data-i18n="Description"></span></td>
@@ -64,7 +64,7 @@
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('role.see.inherited-roles')) {
+    if (Up.C.checkACL('role.see.inherited-roles')) {
     %>
         <tr>
             <td><i class="<%= CLASS_ICON_ROLES %>"></i><span data-i18n="Inherited roles"></span></td>
@@ -90,7 +90,7 @@
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('role.see.created-by')) {
+    if (Up.C.checkACL('role.see.created-by')) {
     %>
         <tr>
             <td><i class="<%= CLASS_ICON_ADMINS %>"></i><span data-i18n="Created by"></span></td>
@@ -100,7 +100,7 @@
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('role.see.creation-date')) {
+    if (Up.C.checkACL('role.see.creation-date')) {
     %>
         <tr>
             <td><i class="fa fa-clock-o"></i><span data-i18n="Creation date"></span></td>
@@ -116,7 +116,7 @@
 <div class="bb-role-inherited-roles role-inherited-roles"></div>
 
 <% 
-if (Wat.C.checkACL('role.see.acl-list')) { 
+if (Up.C.checkACL('role.see.acl-list')) { 
 %>
     <div class="bb-role-acls-tree role-acls-tree"></div>
 <% 

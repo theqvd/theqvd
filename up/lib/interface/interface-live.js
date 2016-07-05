@@ -1,4 +1,4 @@
-Wat.I.L = {
+Up.I.L = {
     // Countdown update of interfaces elements second by second
     countdown: function () {        
         setInterval(function () {   
@@ -7,7 +7,7 @@ Wat.I.L = {
                 var rawData = $(element).attr('data-raw');
                 
                 // Decode from base64 to Object
-                var data = Wat.U.base64.decodeObj(rawData);
+                var data = Up.U.base64.decodeObj(rawData);
                 
                 // Calculate remaining time in seconds
                 var seconds = parseInt(data.seconds) + (parseInt(data.minutes) * 60) + (parseInt(data.hours) * 60 * 60) + (parseInt(data.days) * 60 * 60 * 24);
@@ -31,11 +31,11 @@ Wat.I.L = {
                 data.seconds = seconds;
                 
                 // Encode remaining time in base64 and store in DOM
-                rawData = Wat.U.base64.encodeObj(data);
+                rawData = Up.U.base64.encodeObj(data);
                 $(element).attr('data-raw', rawData);
                 
                 // Process time
-                var processedTime = Wat.U.processRemainingTime(data);
+                var processedTime = Up.U.processRemainingTime(data);
                 
                 // Update attributes used to translate not exact times
                 $(element).removeAttr('data-days data-months data-years');
@@ -53,9 +53,9 @@ Wat.I.L = {
                 }
                 else {
                     // Translate not exact dates
-                    Wat.T.translateXDays();
-                    Wat.T.translateXMonths();
-                    Wat.T.translateXYears();
+                    Up.T.translateXDays();
+                    Up.T.translateXMonths();
+                    Up.T.translateXYears();
                 }
                 
                 // If is expired, remove attr to avoid future useless checks

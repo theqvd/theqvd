@@ -1,8 +1,8 @@
-// Common lib for DI views (list and details)
-Wat.Common.BySection.di = {
+ Common lib for DI views (list and details)
+Up.Common.BySection.di = {
     // This initialize function will be executed one time and deleted
     initializeCommon: function (that) {
-        var templates = Wat.I.T.getTemplateList('commonDI');
+        var templates = Up.I.T.getTemplateList('commonDI');
         
         this.templates = $.extend({}, this.templates, templates);
     },
@@ -16,7 +16,7 @@ Wat.Common.BySection.di = {
             that.model = that.collection.where({id: that.selectedItems[0]})[0];
         }
         
-        var valid = Wat.Views.DetailsView.prototype.updateElement.apply(that, [dialog]);
+        var valid = Up.Views.DetailsView.prototype.updateElement.apply(that, [dialog]);
         
         if (!valid) {
             return;
@@ -28,13 +28,13 @@ Wat.Common.BySection.di = {
         var context = $('.' + that.cid + '.editor-container');
                         
         var tags = context.find('input[name="tags"]').val();
-        var newTags = tags && Wat.C.checkACL('di.update.tags') ? tags.split(',') : [];
+        var newTags = tags && Up.C.checkACL('di.update.tags') ? tags.split(',') : [];
         var description = context.find('textarea[name="description"]').val();
 
         var def = context.find('input[name="default"][value=1]').is(':checked');
         
         // If we set default (only if the DI wasn't default), add this tag
-        if (def && !that.model.get('default') && Wat.C.checkACL('di.update.default')) {
+        if (def && !that.model.get('default') && Up.C.checkACL('di.update.default')) {
             newTags.push('default');
         }
                 
@@ -47,18 +47,18 @@ Wat.Common.BySection.di = {
         var filters = {"id": that.id};
         var arguments = {};
         
-        if (Wat.C.checkACL('di.update.tags') || Wat.C.checkACL('di.update.default')) {
+        if (Up.C.checkACL('di.update.tags') || Up.C.checkACL('di.update.default')) {
             arguments['__tags_changes__'] = {
                 'create': createdTags,
                 'delete': deletedTags
             };
         }
         
-        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('di.update.properties')) {
+        if (!$.isEmptyObject(properties.set) && Up.C.checkACL('di.update.properties')) {
             arguments["__properties_changes__"] = properties;
         }
         
-        if (Wat.C.checkACL('di.update.description')) {
+        if (Up.C.checkACL('di.update.description')) {
             arguments["description"] = description;
         }
         
@@ -74,15 +74,15 @@ Wat.Common.BySection.di = {
                 
         this.dialogConf.title = $.i18n.t('Disk image') + ": " + this.model.get('disk_image');
 
-        Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
+        Up.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
         
         // Configure tags inputs
-        Wat.I.tagsInputConfiguration();
+        Up.I.tagsInputConfiguration();
     },
     
     // Check if any running VM has suffered changes with a DI update
     checkMachinesChanges: function (that) {
-        var realView = Wat.I.getRealView(that);
+        var realView = Up.I.getRealView(that);
 
         // Get stored tag changes depending on if the view is embeded or not
         var tagChanges = realView.tagChanges;
@@ -98,7 +98,7 @@ Wat.Common.BySection.di = {
             var success = true;
         }
         
-        if (success && tagChanges && Wat.C.checkACL('vm.update.expiration')) {
+        if (success && tagChanges && Up.C.checkACL('vm.update.expiration')) {
             var tagChanges = tagChanges["create"].concat(tagChanges["delete"]);
             
             if (tagChanges.length > 0) {
@@ -111,10 +111,10 @@ Wat.Common.BySection.di = {
                 var vmFilters = {
                     "-or": tagCond, 
                     "state": "running",
-                    "osf_id": Wat.CurrentView.model.get('osf_id')
+                    "osf_id": Up.CurrentView.model.get('osf_id')
                 };
                 
-                Wat.A.performAction('vm_get_list', {}, vmFilters, {}, that.warnMachinesChanges, that);
+                Up.A.performAction('vm_get_list', {}, vmFilters, {}, that.warnMachinesChanges, that);
             }
             else {
                 switch (realView.viewKind) {
@@ -158,7 +158,7 @@ Wat.Common.BySection.di = {
             }
         }
         
-        var realView = Wat.I.getRealView(that);
+        var realView = Up.I.getRealView(that);
         
         switch (realView.viewKind) {
             case 'details':
@@ -175,11 +175,11 @@ Wat.Common.BySection.di = {
         
         this.dialogConf.title = $.i18n.t('There are VMs affected by the latest action');
 
-        this.templateEditor = Wat.TPL.editorAffectedVM;
+        this.templateEditor = Up.TPL.editorAffectedVM;
         
         this.dialogConf.buttons = {
             Cancel: function () {
-                Wat.I.closeDialog($(this));
+                Up.I.closeDialog($(this));
             },
             Update: function () {
                 that.dialog = $(this);
@@ -189,8 +189,8 @@ Wat.Common.BySection.di = {
                 });
                 
                 if (affectedVMsIds.length == 0) {
-                    Wat.I.closeDialog(that.dialog);
-                    Wat.I.M.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
+                    Up.I.closeDialog(that.dialog);
+                    Up.I.M.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
                     return;
                 }
                 
@@ -199,7 +199,7 @@ Wat.Common.BySection.di = {
                 };
                 
                 args = {};
-                if (Wat.C.checkACL('vm.update.expiration')) {
+                if (Up.C.checkACL('vm.update.expiration')) {
                     var expiration_soft = that.dialog.find('input[name="expiration_soft"]').val();
                     var expiration_hard = that.dialog.find('input[name="expiration_hard"]').val();
 
@@ -217,8 +217,8 @@ Wat.Common.BySection.di = {
                     'success': i18n.t('Successfully updated')
                 };
                 
-                Wat.A.performAction ('vm_update', args, filters, messages, function (that) {
-                    Wat.I.closeDialog(that.dialog);
+                Up.A.performAction ('vm_update', args, filters, messages, function (that) {
+                    Up.I.closeDialog(that.dialog);
                 }, that);
             }
         };
@@ -233,7 +233,7 @@ Wat.Common.BySection.di = {
 
         // Add specific parts of editor to dialog
         var template = _.template(
-                    Wat.TPL.editorAffectedVMList, {
+                    Up.TPL.editorAffectedVMList, {
                         affectedVMs: affectedVMs
                     }
                 );

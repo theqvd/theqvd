@@ -1,5 +1,5 @@
 <table>
-    <% if (Wat.C.checkACL('vm.update.description')) { %>
+    <% if (Up.C.checkACL('vm.update.description')) { %>
     <tr>
         <td data-i18n="Description"></td>
         <td>
@@ -25,7 +25,7 @@
         </td>
     </tr>
     <% 
-    if (Wat.C.checkACL('di.update.tags')) { 
+    if (Up.C.checkACL('di.update.tags')) { 
     %>
         <tr>
             <td data-i18n="Tags"></td>

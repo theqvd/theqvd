@@ -1,4 +1,4 @@
-Wat.D = {
+Up.D = {
     // Get a documentation guide from template and return <body> of this document to be ebeded in WAT
     // Params:
     //      selectedGuide: guide name.
@@ -10,27 +10,27 @@ Wat.D = {
             lan = DOC_DEFAULT_LANGUAGE;
         }
         
-        var templates = Wat.I.T.getTemplateList('docSection', {lan: lan, guide: docParams.guide});
+        var templates = Up.I.T.getTemplateList('docSection', {lan: lan, guide: docParams.guide});
         
-        Wat.A.getTemplates(templates, callBack, docParams);
+        Up.A.getTemplates(templates, callBack, docParams);
     },
     
     processDocBody: function (docParams) {
         var pattern = /<body[^>]*>((.|[\n\r])*)<\/body>/im
-        var array_matches = pattern.exec(Wat.TPL.docSection);
+        var array_matches = pattern.exec(Up.TPL.docSection);
         
         docParams.docBody = array_matches[1];
         
-        Wat.D.processDocSection(docParams);
+        Up.D.processDocSection(docParams);
     }, 
     
     fillDocBody: function (docParams) {
         var pattern = /<body[^>]*>((.|[\n\r])*)<\/body>/im
-        var array_matches = pattern.exec(Wat.TPL.docSection);
+        var array_matches = pattern.exec(Up.TPL.docSection);
         
         docParams.docBody = array_matches[1];
         
-        Wat.D.fillTemplateString(docParams.docBody, docParams.target, true, docParams);
+        Up.D.fillTemplateString(docParams.docBody, docParams.target, true, docParams);
     },
     
     fillTemplateString: function (string, target, toc, docParams) {
@@ -65,7 +65,7 @@ Wat.D = {
             target: target
         };
         
-        if (guide == 'multitenant' && !Wat.C.isSuperadmin()) {
+        if (guide == 'multitenant' && !Up.C.isSuperadmin()) {
             this.fillTemplateString (null, target, toc, docParams);
             return;
         }

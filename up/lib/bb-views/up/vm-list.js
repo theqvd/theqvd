@@ -1,4 +1,4 @@
-Wat.Views.VMListView = Wat.Views.ListView.extend({  
+Up.Views.VMListView = Up.Views.ListView.extend({  
     qvdObj: 'vm',
     liveFields: ['state', 'user_state', 'ip', 'host_id', 'host_name', 'ssh_port', 'vnc_port', 'serial_port'],
     
@@ -8,30 +8,30 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
     },
     
     initialize: function (params) {   
-        this.collection = new Wat.Collections.VMs(params);
+        this.collection = new Up.Collections.VMs(params);
         
-        Wat.Views.ListView.prototype.initialize.apply(this, [params]);
+        Up.Views.ListView.prototype.initialize.apply(this, [params]);
     },
     
     // This events will be added to view events
     listEvents: {},
     
     openNewElementDialog: function (e) {
-        this.model = new Wat.Models.VM();
+        this.model = new Up.Models.VM();
         
         this.dialogConf.title = $.i18n.t('New Virtual machine');
-        Wat.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
+        Up.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
         
         var fillFields = function () {            
             // If main view is user view, we are creating a virtual machine from user details view. 
             // User and tenant (if exists) controls will be removed
-            if (Wat.CurrentView.qvdObj == 'user') {
+            if (Up.CurrentView.qvdObj == 'user') {
                 $('[name="user_id"]').parent().parent().remove();
 
                 var userHidden = document.createElement('input');
                 userHidden.type = "hidden";
                 userHidden.name = "user_id";
-                userHidden.value = Wat.CurrentView.model.get('id');
+                userHidden.value = Up.CurrentView.model.get('id');
                 $('.editor-container').append(userHidden);
 
                 if ($('[name="tenant_id"]').length > 0) {
@@ -40,7 +40,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
                     var tenantHidden = document.createElement('input');
                     tenantHidden.type = "hidden";
                     tenantHidden.name = "tenant_id";
-                    tenantHidden.value = Wat.CurrentView.model.get('tenant_id');
+                    tenantHidden.value = Up.CurrentView.model.get('tenant_id');
                     $('.editor-container').append(tenantHidden);
                     
                     // Store tenantId to be used on OSF filter
@@ -49,11 +49,11 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             }
             else if ($('[name="tenant_id"]').length > 0) {
                 // When tenant id is present attach change events. User, osf and di will be filled once the events were triggered
-                Wat.B.bindEvent('change', 'select[name="tenant_id"]', Wat.B.editorBinds.filterTenantOSFs);
-                Wat.B.bindEvent('change', '[name="tenant_id"]', Wat.B.editorBinds.filterTenantUsers);
-                Wat.I.chosenElement('[name="user_id"]', 'advanced100');
-                Wat.I.chosenElement('[name="osf_id"]', 'advanced100');
-                Wat.I.chosenElement('[name="di_tag"]', 'advanced100');
+                Up.B.bindEvent('change', 'select[name="tenant_id"]', Up.B.editorBinds.filterTenantOSFs);
+                Up.B.bindEvent('change', '[name="tenant_id"]', Up.B.editorBinds.filterTenantUsers);
+                Up.I.chosenElement('[name="user_id"]', 'advanced100');
+                Up.I.chosenElement('[name="osf_id"]', 'advanced100');
+                Up.I.chosenElement('[name="di_tag"]', 'advanced100');
                 return;
             }
             else {
@@ -66,7 +66,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
                     'chosenType': 'advanced100'
                 };
                 
-                Wat.A.fillSelect(params, function () {}); 
+                Up.A.fillSelect(params, function () {}); 
             }
 
             // Fill OSF select on virtual machines creation form
@@ -84,11 +84,11 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
                 };
             }
 
-            Wat.I.chosenElement('[name="di_tag"]', 'advanced100');
+            Up.I.chosenElement('[name="di_tag"]', 'advanced100');
             
             $('[name="osf_id"] option').remove();
             
-            Wat.A.fillSelect(params, function () {
+            Up.A.fillSelect(params, function () {
                 // Fill DI Tags select on virtual machines creation form after fill OSF combo
                 var params = {
                     'action': 'tag_tiny_list',
@@ -101,7 +101,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
                     'chosenType': 'advanced100'
                 };
 
-                Wat.A.fillSelect(params); 
+                Up.A.fillSelect(params); 
             });  
         }
                     
@@ -109,7 +109,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
     },
     
     createElement: function () {
-        var valid = Wat.Views.ListView.prototype.createElement.apply(this);
+        var valid = Up.Views.ListView.prototype.createElement.apply(this);
         
         if (!valid) {
             return;
@@ -128,13 +128,13 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             "osf_id": osf_id
         };
         
-        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('vm.create.properties')) {
+        if (!$.isEmptyObject(properties.set) && Up.C.checkACL('vm.create.properties')) {
             arguments["__properties__"] = properties.set;
         }
         
         var di_tag = context.find('select[name="di_tag"]').val();
         
-        if (di_tag && Wat.C.checkACL('vm.create.di-tag')) {
+        if (di_tag && Up.C.checkACL('vm.create.di-tag')) {
             arguments.di_tag = di_tag;
         }
         
@@ -157,7 +157,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             'error': 'Error starting Virtual machine'
         }
         
-        Wat.A.performAction ('vm_start', {}, filters, messages, function(){}, this);
+        Up.A.performAction ('vm_start', {}, filters, messages, function(){}, this);
     },
     
     // Different functions applyed to the selected items in list view
@@ -185,12 +185,12 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             return;
         }
         
-        Wat.A.performAction('osf_all_ids', {}, {"vm_id": that.selectedItems}, {}, that.openMassiveChangesDialog, that);
+        Up.A.performAction('osf_all_ids', {}, {"vm_id": that.selectedItems}, {}, that.openMassiveChangesDialog, that);
     },
     
     configureMassiveEditor: function (that) {
         // Virtual machine form include a date time picker control, so we need enable it
-        Wat.I.enableDataPickers();
+        Up.I.enableDataPickers();
         
         var osfId = FILTER_ALL;
         // If there are returned more than 1 OSFs, it will restrict tag selection to head and default
@@ -218,11 +218,11 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             'chosenType': 'advanced100'
         };
         
-        Wat.A.fillSelect(params);
+        Up.A.fillSelect(params);
     },
     
     updateMassiveElement: function (dialog, id) {
-        var valid = Wat.Views.ListView.prototype.updateElement.apply(this, [dialog]);
+        var valid = Up.Views.ListView.prototype.updateElement.apply(this, [dialog]);
         
         if (!valid) {
             return;
@@ -233,7 +233,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         
         var arguments = {};
         
-        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('vm.update-massive.properties')) {
+        if (!$.isEmptyObject(properties.set) && Up.C.checkACL('vm.update-massive.properties')) {
             arguments["__properties_changes__"] = properties;
         }
         
@@ -244,15 +244,15 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         
         var filters = {"id": id};
         
-        if (description != '' && Wat.C.checkACL('vm.update-massive.description')) {
+        if (description != '' && Up.C.checkACL('vm.update-massive.description')) {
             arguments["description"] = description;
         }
         
-        if (di_tag != '' && Wat.C.checkACL('vm.update-massive.di-tag')) {
+        if (di_tag != '' && Up.C.checkACL('vm.update-massive.di-tag')) {
             arguments["di_tag"] = di_tag;
         }
         
-        if (Wat.C.checkACL('vm.update-massive.expiration')) {
+        if (Up.C.checkACL('vm.update-massive.expiration')) {
             // If expire is checked
             if (context.find('input.js-expire').is(':checked')) {
                 var expiration_soft = context.find('input[name="expiration_soft"]').val();
@@ -270,7 +270,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         
         this.resetSelectedItems();
         
-        var auxModel = new Wat.Models.VM();
+        var auxModel = new Up.Models.VM();
         this.updateModel(arguments, filters, this.fetchList, auxModel);
     }
 });

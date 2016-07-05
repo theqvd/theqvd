@@ -1,10 +1,10 @@
-Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({  
+Up.Views.UserDetailsView = Up.Views.DetailsView.extend({  
     qvdObj: 'user',
     liveFields: ['number_of_vms_connected', 'number_of_vms'],
 
     initialize: function (params) {
-        this.model = new Wat.Models.User(params);
-        Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
+        this.model = new Up.Models.User(params);
+        Up.Views.DetailsView.prototype.initialize.apply(this, [params]);
     },
     
     renderSide: function () {
@@ -23,22 +23,22 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
             params.listContainer = sideContainer;
             params.forceListColumns = {name: true};
 
-            if (Wat.C.checkGroupACL('userVmEmbeddedInfo')) {
+            if (Up.C.checkGroupACL('userVmEmbeddedInfo')) {
                 params.forceListColumns['info'] = true;
             }
 
             // Check ACLs to show or not info icons in Users list
             params.forceInfoRestrictions = {};
-            if (Wat.C.checkACL('user.see.vm-list-block')) {
+            if (Up.C.checkACL('user.see.vm-list-block')) {
                 params.forceInfoRestrictions.block = true;
             }
-            if (Wat.C.checkACL('user.see.vm-list-expiration')) {
+            if (Up.C.checkACL('user.see.vm-list-expiration')) {
                 params.forceInfoRestrictions.expiration = true;
             }
-            if (Wat.C.checkACL('user.see.vm-list-state')) {
+            if (Up.C.checkACL('user.see.vm-list-state')) {
                 params.forceInfoRestrictions.state = true;
             }
-            if (Wat.C.checkACL('user.see.vm-list-user-state')) {
+            if (Up.C.checkACL('user.see.vm-list-user-state')) {
                 params.forceInfoRestrictions.user_state = true;
             }
 
@@ -46,7 +46,7 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
             params.block = 5;
             params.filters = {"user_id": this.elementId};
 
-            this.sideViews.push(new Wat.Views.VMListView(params));
+            this.sideViews.push(new Up.Views.VMListView(params));
         }
         
         if (sideCheck['user.see.log']) { 
@@ -55,7 +55,7 @@ Wat.Views.UserDetailsView = Wat.Views.DetailsView.extend({
             // Render Related log list on side
             var params = this.getSideLogParams(sideContainer);
             
-            this.sideViews.push(new Wat.Views.LogListView(params));
+            this.sideViews.push(new Up.Views.LogListView(params));
             
             this.renderLogGraph(params);
         }

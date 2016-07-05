@@ -1,4 +1,4 @@
-Wat.I.menuUserOriginal = {
+Up.I.menuUserOriginal = {
     profile: {
         text: 'Profile',
         link: '#/profile',
@@ -16,7 +16,7 @@ Wat.I.menuUserOriginal = {
     }
 };
 
-Wat.I.menuConfigOriginal = {
+Up.I.menuConfigOriginal = {
     config: {
         text: 'QVD Config',
         link: '#/config',
@@ -24,7 +24,7 @@ Wat.I.menuConfigOriginal = {
     }
 };
 
-Wat.I.menuHelpOriginal = {
+Up.I.menuHelpOriginal = {
     documentation: {
         text: 'Documentation',
         link: '#/documentation',
@@ -37,7 +37,7 @@ Wat.I.menuHelpOriginal = {
     }
 };
 
-Wat.I.menuSetupOriginal = {
+Up.I.menuSetupOriginal = {
     watconfig: {
         text: 'WAT Config',
         link: '#/watconfig',
@@ -75,7 +75,7 @@ Wat.I.menuSetupOriginal = {
     }
 };
 
-Wat.I.menuOriginal = {
+Up.I.menuOriginal = {
     users: {
         icon: CLASS_ICON_USERS,
         text: 'Users',
@@ -103,41 +103,41 @@ Wat.I.menuOriginal = {
     }
 };
 
-Wat.I.mobileMenuOriginal = _.extend({}, Wat.I.menuOriginal);
+Up.I.mobileMenuOriginal = _.extend({}, Up.I.menuOriginal);
 
-Wat.I.mobileMenuOriginal.logout = {
+Up.I.mobileMenuOriginal.logout = {
     icon: CLASS_ICON_LOGOUT,
     text: 'Log-out'
 }
 
 // Corner menu configuration values
-Wat.I.cornerMenuOriginal = {
+Up.I.cornerMenuOriginal = {
         help: {
             text: 'Help',
             link: '#/documentation',
             icon: CLASS_ICON_HELP,
-            subMenu: _.extend({}, Wat.I.menuHelpOriginal)
+            subMenu: _.extend({}, Up.I.menuHelpOriginal)
         },
         
         platform: {
             text: 'Platform',
             link: '#',
             icon: CLASS_ICON_PLATFORM,
-            subMenu: _.extend({}, Wat.I.menuOriginal)
+            subMenu: _.extend({}, Up.I.menuOriginal)
         },
     
         wat: {
             text: 'WAT Management',
             link: '#',
             icon: CLASS_ICON_WATMANAGE,
-            subMenu: _.extend({}, Wat.I.menuSetupOriginal)
+            subMenu: _.extend({}, Up.I.menuSetupOriginal)
         },
     
         config: {
             text: 'QVD Management',
             link: '#/config',
             icon: CLASS_ICON_QVDMANAGE,
-            subMenu: _.extend({}, Wat.I.menuConfigOriginal)
+            subMenu: _.extend({}, Up.I.menuConfigOriginal)
         },
         
         user: {
@@ -145,6 +145,6 @@ Wat.I.cornerMenuOriginal = {
             link: '#/profile',
             icon: CLASS_ICON_USER,
             textClass: 'js-login',
-            subMenu: _.extend({}, Wat.I.menuUserOriginal)
+            subMenu: _.extend({}, Up.I.menuUserOriginal)
         }
 };

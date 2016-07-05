@@ -1,4 +1,4 @@
-Wat.WS.changeWebsocketUser = function (id, field, data) {
+Up.WS.changeWebsocketUser = function (id, field, data) {
     switch (field) {
         case 'number_of_vms_connected':
             $('[data-wsupdate="' + field + '"][data-id="' + id + '"]').html(data);  

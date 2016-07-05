@@ -17,15 +17,15 @@ function adminTestReal () {
 
             expect(assertions);
 
-            Wat.Router.watRouter.trigger('route:listAdmin');
+            Up.Router.watRouter.trigger('route:listAdmin');
 
-            Wat.CurrentView.model = new Wat.Models.Admin();
+            Up.CurrentView.model = new Up.Models.Admin();
             delete WatTests.values.administrator.id;
 
             //////////////////////////////////////////////////////////////////
             // Create Admin
             //////////////////////////////////////////////////////////////////
-            Wat.CurrentView.createModel(WatTests.values.administrator, function (e) { 
+            Up.CurrentView.createModel(WatTests.values.administrator, function (e) { 
                 equal(e.retrievedData.status, STATUS_SUCCESS, "Admin created succesfully (" + JSON.stringify(WatTests.values.administrator) + ")");
 
                 if(e.retrievedData.status == STATUS_SUCCESS) {
@@ -39,7 +39,7 @@ function adminTestReal () {
                 //////////////////////////////////////////////////////////////////
                 // After create, get list of users matching by the created name
                 //////////////////////////////////////////////////////////////////
-                WatTests.models.admin = new Wat.Models.Admin({
+                WatTests.models.admin = new Up.Models.Admin({
                     id: WatTests.values.administrator.id
                 });            
 
@@ -66,7 +66,7 @@ function adminTestReal () {
                         //////////////////////////////////////////////////////////////////
                         // After get list of admins, update it
                         //////////////////////////////////////////////////////////////////
-                        Wat.CurrentView.updateModel(WatTests.updateValues.administrator, {'id': WatTests.values.administrator.id}, function (e) { 
+                        Up.CurrentView.updateModel(WatTests.updateValues.administrator, {'id': WatTests.values.administrator.id}, function (e) { 
                             equal(e.retrievedData.status, 0, "Admin updated succesfully (" + JSON.stringify(WatTests.updateValues.administrator) + ")");
 
                             //////////////////////////////////////////////////////////////////
@@ -95,15 +95,15 @@ function adminTestReal () {
                                     //////////////////////////////////////////////////////////////////
                                     // After match the updated user, delete it
                                     //////////////////////////////////////////////////////////////////
-                                    Wat.CurrentView.deleteModel({'id': WatTests.values.administrator.id}, function (e) { 
+                                    Up.CurrentView.deleteModel({'id': WatTests.values.administrator.id}, function (e) { 
                                         equal(e.retrievedData.status, 0, "Admin deleted succesfully (ID: " + JSON.stringify(WatTests.values.administrator.id) + ")");
 
                                         // Unblock task runner
                                         start();
-                                    }, Wat.CurrentView.model);
+                                    }, Up.CurrentView.model);
                                 }
                             });
-                        }, Wat.CurrentView.model);
+                        }, Up.CurrentView.model);
                     }
                 });
             });

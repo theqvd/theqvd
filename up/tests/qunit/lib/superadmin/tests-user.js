@@ -29,7 +29,7 @@ function userTestFake () {
 
             this.server.respondWith(
                 "POST", 
-                Wat.C.apiUrl + '?sid=' + Wat.C.sid  + '&action=user_get_details&filters={"id":' + fakeValues.id + '}',
+                Up.C.apiUrl + '?sid=' + Up.C.sid  + '&action=user_get_details&filters={"id":' + fakeValues.id + '}',
                 [
                     200, 
                     { "Content-Type": "application/json" },
@@ -37,10 +37,10 @@ function userTestFake () {
                 ]
            );
             
-            Wat.Router.watRouter.trigger('route:detailsUser', [fakeValues.id]);
+            Up.Router.watRouter.trigger('route:detailsUser', [fakeValues.id]);
 
             // Bind to the change event on the model
-            Wat.CurrentView.model.bind('change', callback);
+            Up.CurrentView.model.bind('change', callback);
 
             this.server.respond();
 
@@ -55,7 +55,7 @@ function userTestFake () {
                 }
             });
 
-            deepEqual(callback.getCall(0).args[0], Wat.CurrentView.model, "Spied result and Backbone model should be equal");
+            deepEqual(callback.getCall(0).args[0], Up.CurrentView.model, "Spied result and Backbone model should be equal");
         });
 }
 
@@ -77,16 +77,16 @@ function userTestReal () {
 
             expect(assertions);
 
-            Wat.Router.watRouter.trigger('route:listUser');
+            Up.Router.watRouter.trigger('route:listUser');
 
-            Wat.CurrentView.model = new Wat.Models.User();
+            Up.CurrentView.model = new Up.Models.User();
 
             delete WatTests.values.user.id;
             
             //////////////////////////////////////////////////////////////////
             // Create User
             //////////////////////////////////////////////////////////////////
-            Wat.CurrentView.createModel(WatTests.values.user, function (e) { 
+            Up.CurrentView.createModel(WatTests.values.user, function (e) { 
                 equal(e.retrievedData.status, STATUS_SUCCESS, "User created succesfully (" + JSON.stringify(WatTests.values.user) + ")");
 
                 if(e.retrievedData.status == STATUS_SUCCESS) {
@@ -100,7 +100,7 @@ function userTestReal () {
                 //////////////////////////////////////////////////////////////////
                 // After create, get list of users matching by the created name
                 //////////////////////////////////////////////////////////////////
-                WatTests.models.user = new Wat.Models.User({
+                WatTests.models.user = new Up.Models.User({
                     id: WatTests.values.user.id
                 });            
 
@@ -127,7 +127,7 @@ function userTestReal () {
                         //////////////////////////////////////////////////////////////////
                         // After get list of users, update it
                         //////////////////////////////////////////////////////////////////
-                        Wat.CurrentView.updateModel(WatTests.updateValues.user, {'id': WatTests.values.user.id}, function (e) { 
+                        Up.CurrentView.updateModel(WatTests.updateValues.user, {'id': WatTests.values.user.id}, function (e) { 
                             equal(e.retrievedData.status, STATUS_SUCCESS, "User updated succesfully (" + JSON.stringify(WatTests.updateValues.user) + ")");
 
                             //////////////////////////////////////////////////////////////////
@@ -153,15 +153,15 @@ function userTestReal () {
                                     //////////////////////////////////////////////////////////////////
                                     // After match the updated user, delete it
                                     //////////////////////////////////////////////////////////////////
-                                    Wat.CurrentView.deleteModel({'id': WatTests.values.user.id}, function (e) { 
+                                    Up.CurrentView.deleteModel({'id': WatTests.values.user.id}, function (e) { 
                                         equal(e.retrievedData.status, 0, "User deleted succesfully (ID: " + JSON.stringify(WatTests.values.user.id) + ")");
 
                                         // Unblock task runner
                                         start();
-                                    }, Wat.CurrentView.model);
+                                    }, Up.CurrentView.model);
                                 }
                             });
-                        }, Wat.CurrentView.model);
+                        }, Up.CurrentView.model);
                     }
                 });
             });
@@ -193,7 +193,7 @@ function userTestReal () {
                     'tenant_id': 0
                 };
                 
-                Wat.A.performAction(createAction, createArguments, {}, {}, function (that) {
+                Up.A.performAction(createAction, createArguments, {}, {}, function (that) {
                     var id = that.retrievedData.rows[0].id;
 
                     equal(that.retrievedData.status, STATUS_SUCCESS, "User '" + that.name + "' created successfully with ID " + id);
@@ -207,7 +207,7 @@ function userTestReal () {
                         id: id
                     }
                     
-                    Wat.A.performAction(updateAction, updateArguments, updateFilters, {}, function (that) {
+                    Up.A.performAction(updateAction, updateArguments, updateFilters, {}, function (that) {
                         equal(that.retrievedData.status, STATUS_SUCCESS, "User '" + that.id + "' update successfully (" + that.retrievedData.message + ")");
                     
                         var updateArguments = {
@@ -220,7 +220,7 @@ function userTestReal () {
                         
                         start();
 
-                        Wat.A.performAction(updateAction, updateArguments, updateFilters, {}, function (that) {
+                        Up.A.performAction(updateAction, updateArguments, updateFilters, {}, function (that) {
                             equal(that.retrievedData.status, STATUS_SUCCESS, "User '" + that.id + "' update successfully (" + that.retrievedData.message + ")");
                             start();
                             
@@ -229,7 +229,7 @@ function userTestReal () {
                             }
                             
                             // Delete another custom key
-                            Wat.A.performAction(deleteAction, {}, deleteFilters, {}, function (that) {
+                            Up.A.performAction(deleteAction, {}, deleteFilters, {}, function (that) {
                                 equal(that.retrievedData.status, STATUS_SUCCESS, "Deleted user '" + that.id + "' successfully (" + that.retrievedData.message + ")");
                                 start();
                             }, deleteFilters);

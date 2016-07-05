@@ -1,36 +1,36 @@
-Wat.Views.LoginView = Wat.Views.MainView.extend({
+Up.Views.LoginView = Up.Views.MainView.extend({
     qvdObj: 'login',
 
     initialize: function (params) {
-        Wat.Views.MainView.prototype.initialize.apply(this, [params]);
+        Up.Views.MainView.prototype.initialize.apply(this, [params]);
         
-        Wat.B.bindLoginEvents();
+        Up.B.bindLoginEvents();
                 
-        Wat.C.language = 'auto';
+        Up.C.language = 'auto';
         
         $('.js-super-wrapper').addClass('super-wrapper--login');
         $('body').css('background',$('.super-wrapper--login').css('background-color'));
 
-        var templates = Wat.I.T.getTemplateList('login');
+        var templates = Up.I.T.getTemplateList('login');
 
-        Wat.A.getTemplates(templates,  this.getApiInfo, this);
+        Up.A.getTemplates(templates,  this.getApiInfo, this);
     },
     
     getApiInfo: function (that) {
-        Wat.A.apiInfo(that.render, that);
+        Up.A.apiInfo(that.render, that);
     },
     
     events: {
     },
     
     render: function () {  
-        Wat.C.multitenant = this.retrievedData.multitenant || true;
-        Wat.C.authSeparators = this.retrievedData.auth ? this.retrievedData.auth.separators : SEPARATORS_DEFAULT;
+        Up.C.multitenant = this.retrievedData.multitenant || true;
+        Up.C.authSeparators = this.retrievedData.auth ? this.retrievedData.auth.separators : SEPARATORS_DEFAULT;
         
-        var template = Wat.TPL.login;
+        var template = Up.TPL.login;
         
         if (this.retrievedData.readyState == 0 || this.retrievedData.status == STATUS_NOT_FOUND) {
-            template = Wat.TPL.errorRefresh;
+            template = Up.TPL.errorRefresh;
         }
         
         // Retrieve public configuration 
@@ -41,7 +41,7 @@ Wat.Views.LoginView = Wat.Views.MainView.extend({
         publicConfig.login.link = publicConfig.login.link || {};
         this.template = _.template(
             template, {
-                multitenant: Wat.C.multitenant,
+                multitenant: Up.C.multitenant,
                 loginLinkSrc: publicConfig.login.link.src,
                 loginLinkLabel: publicConfig.login.link.label
             }
@@ -49,6 +49,6 @@ Wat.Views.LoginView = Wat.Views.MainView.extend({
         
         $(this.el).html(this.template);
         
-        Wat.T.translateAndShow();
+        Up.T.translateAndShow();
     }
 });

@@ -1,6 +1,6 @@
 <div class="wrapper-content <%= cid %> sec-qvd-config"> 
     <div class="menu secondary-menu setup-side">
-    <% if (Wat.C.isMultitenant() && Wat.C.isSuperadmin()) { %>
+    <% if (Up.C.isMultitenant() && Up.C.isSuperadmin()) { %>
         <div class="config-search-box">
             <label for="tenant_search" data-i18n="Tenant"></label>
             <select class="" name="tenant_id" id="tenant_search"></select>

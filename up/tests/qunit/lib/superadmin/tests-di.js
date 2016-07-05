@@ -42,7 +42,7 @@ function diTestFake () {
 
             this.server.respondWith(
                 "POST", 
-                Wat.C.apiUrl + '?sid=' + Wat.C.sid  + '&action=di_get_details&filters={"id":' + fakeValues.id + '}',
+                Up.C.apiUrl + '?sid=' + Up.C.sid  + '&action=di_get_details&filters={"id":' + fakeValues.id + '}',
                 [
                     200, 
                     { "Content-Type": "application/json" },
@@ -50,10 +50,10 @@ function diTestFake () {
                 ]
            );
 
-            Wat.Router.watRouter.trigger('route:detailsDI', [fakeValues.id]);        
+            Up.Router.watRouter.trigger('route:detailsDI', [fakeValues.id]);        
 
             // Bind to the change event on the model
-            Wat.CurrentView.model.bind('change', callback);
+            Up.CurrentView.model.bind('change', callback);
 
             this.server.respond();
 
@@ -68,7 +68,7 @@ function diTestFake () {
                 }
             });
 
-            deepEqual(callback.getCall(0).args[0], Wat.CurrentView.model, "Spied result and Backbone model should be equal");
+            deepEqual(callback.getCall(0).args[0], Up.CurrentView.model, "Spied result and Backbone model should be equal");
         });
 }
 
@@ -91,16 +91,16 @@ function diTestReal () {
 
             expect(assertions);
 
-            Wat.Router.watRouter.trigger('route:listOSF');
+            Up.Router.watRouter.trigger('route:listOSF');
 
-            Wat.CurrentView.model = new Wat.Models.OSF();
+            Up.CurrentView.model = new Up.Models.OSF();
                         
             delete WatTests.values.osf.id;
 
             //////////////////////////////////////////////////////////////////
             // Create dependency OSF
             //////////////////////////////////////////////////////////////////
-            Wat.CurrentView.createModel(WatTests.values.osf, function (e) { 
+            Up.CurrentView.createModel(WatTests.values.osf, function (e) { 
                 equal(e.retrievedData.status, STATUS_SUCCESS, "OSF created succesfully (" + JSON.stringify(WatTests.values.osf) + ")");
 
                 if(e.retrievedData.status == STATUS_SUCCESS) {
@@ -111,9 +111,9 @@ function diTestReal () {
                     return;
                 }
 
-                Wat.Router.watRouter.trigger('route:listDI');
+                Up.Router.watRouter.trigger('route:listDI');
 
-                Wat.CurrentView.model = new Wat.Models.DI();
+                Up.CurrentView.model = new Up.Models.DI();
 
                 // Create DI associated to the created OSF
                 WatTests.values.di.osf_id = WatTests.values.osf.id;
@@ -122,7 +122,7 @@ function diTestReal () {
                 //////////////////////////////////////////////////////////////////
                 // Create DI
                 //////////////////////////////////////////////////////////////////
-                Wat.CurrentView.createModel(WatTests.values.di, function (e) { 
+                Up.CurrentView.createModel(WatTests.values.di, function (e) { 
                     equal(e.retrievedData.status, STATUS_SUCCESS, "DI created succesfully (" + JSON.stringify(WatTests.values.di) + ")");
 
                     if(e.retrievedData.status == STATUS_SUCCESS) {
@@ -136,7 +136,7 @@ function diTestReal () {
                     //////////////////////////////////////////////////////////////////
                     // After create, get list of dis matching by the created name
                     //////////////////////////////////////////////////////////////////
-                    WatTests.models.di = new Wat.Models.DI({
+                    WatTests.models.di = new Up.Models.DI({
                         id: WatTests.values.di.id
                     });            
                     
@@ -170,7 +170,7 @@ function diTestReal () {
                             //////////////////////////////////////////////////////////////////
                             // After get list of DIs, update it
                             //////////////////////////////////////////////////////////////////
-                            Wat.CurrentView.updateModel(WatTests.updateValues.di, {'id': WatTests.values.di.id}, function (e) { 
+                            Up.CurrentView.updateModel(WatTests.updateValues.di, {'id': WatTests.values.di.id}, function (e) { 
                                 equal(e.retrievedData.status, 0, "DI updated succesfully (" + JSON.stringify(WatTests.updateValues.di) + ")");
 
                                 //////////////////////////////////////////////////////////////////
@@ -203,27 +203,27 @@ function diTestReal () {
                                         //////////////////////////////////////////////////////////////////
                                         // After match the updated di, delete it
                                         //////////////////////////////////////////////////////////////////
-                                        Wat.CurrentView.deleteModel({'id': WatTests.values.di.id}, function (e) { 
+                                        Up.CurrentView.deleteModel({'id': WatTests.values.di.id}, function (e) { 
                                             equal(e.retrievedData.status, 0, "DI deleted succesfully (ID: " + JSON.stringify(WatTests.values.di.id) + ")");
 
                                             //////////////////////////////////////////////////////////////////
                                             // After delete di, delete the dependency osf
                                             //////////////////////////////////////////////////////////////////
 
-                                            Wat.Router.watRouter.trigger('route:listOSF');
+                                            Up.Router.watRouter.trigger('route:listOSF');
 
-                                            Wat.CurrentView.model = new Wat.Models.OSF();
+                                            Up.CurrentView.model = new Up.Models.OSF();
 
-                                            Wat.CurrentView.deleteModel({'id': WatTests.values.di.osf_id}, function (e) { 
+                                            Up.CurrentView.deleteModel({'id': WatTests.values.di.osf_id}, function (e) { 
                                                 equal(e.retrievedData.status, 0, "OSF deleted succesfully (ID: " + JSON.stringify(WatTests.values.osf.id) + ")");
 
                                                 // Unblock task runner
                                                 start();
-                                            }, Wat.CurrentView.model);
-                                        }, Wat.CurrentView.model);
+                                            }, Up.CurrentView.model);
+                                        }, Up.CurrentView.model);
                                     }
                                 });
-                            }, Wat.CurrentView.model);
+                            }, Up.CurrentView.model);
                         }
                     });
                 });

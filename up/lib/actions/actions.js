@@ -1,4 +1,4 @@
-Wat.A = {
+Up.A = {
     // Get templates from template files caching if specified to avoid future loadings
     // Params:
     //      templateName: name of the template file to be loaded without extension.
@@ -35,7 +35,7 @@ Wat.A = {
                             $('head').append('<script id="' + templateNameHash + '" type="text/template">' + tmplString + '<\/script>');
                         }
                         
-                        Wat.TPL[storing] = tmplString;
+                        Up.TPL[storing] = tmplString;
                             
                         templatesCount++;
                         if (templatesCount >= templatesMax) {
@@ -46,10 +46,10 @@ Wat.A = {
             }
             else {
                 if (cache) {
-                    Wat.TPL[storing] = $(templateNameHashSelector).html();
+                    Up.TPL[storing] = $(templateNameHashSelector).html();
                 }
                 else {
-                    Wat.TPL[storing] = tmplString;
+                    Up.TPL[storing] = tmplString;
                 }
                 
                 templatesCount++;
@@ -85,7 +85,7 @@ Wat.A = {
     performAction: function (action, arguments, filters, messages, successCallback, that, fields, orderBy) {
         var that = that || {};
         
-        var url = Wat.C.getBaseUrl() + 
+        var url = Up.C.getBaseUrl() + 
             '&action=' + action;
         
         if (filters && !$.isEmptyObject(filters)) {
@@ -105,7 +105,7 @@ Wat.A = {
         }
         
         // Add source argument to all queries to be stored by API log
-        url += '&parameters=' + JSON.stringify({source: Wat.C.source});
+        url += '&parameters=' + JSON.stringify({source: Up.C.source});
 
         messages = messages || {};
 
@@ -137,11 +137,11 @@ Wat.A = {
                         messageType: that.messageType
                     };
 
-                    Wat.I.M.showMessage(messageParams, response);
+                    Up.I.M.showMessage(messageParams, response);
                 }                   
             },
             success: function (response, result, raw) {
-                if (Wat.A.isExpirableAction() && Wat.C.sessionExpired(response)) {
+                if (Up.A.isExpirableAction() && Up.C.sessionExpired(response)) {
                     return;
                 }
                 
@@ -151,7 +151,7 @@ Wat.A = {
                 }
                 
                 if (response['sid']) {
-                    Wat.C.sid = response['sid'];
+                    Up.C.sid = response['sid'];
                 }
                 
                 if (that) {
@@ -175,14 +175,14 @@ Wat.A = {
                         messageType: that.messageType
                     };
 
-                    Wat.I.M.showMessage(messageParams, response);
+                    Up.I.M.showMessage(messageParams, response);
                 }                
             }
         };
         
         var request = $.ajax(params);
         
-        Wat.C.requests.push(request);
+        Up.C.requests.push(request);
     },
         
     // Get API info calling un-auth 'info' url
@@ -190,7 +190,7 @@ Wat.A = {
     //      successCallback: function that will be executed after action execution.
     //      that: current context where will be stored retrieved response and passed as parameter to successCallback function.
     apiInfo: function (successCallback, that) {
-        var url = Wat.C.getApiUrl() + 'info';
+        var url = Up.C.getApiUrl() + 'info';
 
         messages = {};
 
@@ -217,7 +217,7 @@ Wat.A = {
                         messageType: that.messageType
                     };
 
-                    Wat.I.M.showMessage(messageParams, response);
+                    Up.I.M.showMessage(messageParams, response);
                 }                   
             },
             success: function (response, result, raw) {
@@ -242,7 +242,7 @@ Wat.A = {
                         messageType: that.messageType
                     };
 
-                    Wat.I.M.showMessage(messageParams, response);
+                    Up.I.M.showMessage(messageParams, response);
                 }                
             }
         };
@@ -255,17 +255,13 @@ Wat.A = {
     //      successCallback: function that will be executed after action execution.
     //      that: current context where will be stored retrieved response and passed as parameter to successCallback function.
     apiLogIn: function (successCallback, that) {
-        var url = Wat.C.getApiUrl() + 'login';
-        if (Wat.C.crossOrigin) {
-            if (Wat.C.sid) {
-                url += '?sid=' + Wat.C.sid;
+        var url = Up.C.getApiUrl() + 'login';
+        if (Up.C.crossOrigin) {
+            if (Up.C.sid) {
+                url += '?sid=' + Up.C.sid;
             }
             else {
-                url +=  "?user=" + Wat.C.login + "&password=" + Wat.C.password;
-                
-                if (Wat.C.multitenant) {
-                    url += "&tenant=" + Wat.C.tenant;
-                }
+                url +=  "?login=" + Up.C.login + "&password=" + Up.C.password;
             }
         }
         
@@ -277,11 +273,13 @@ Wat.A = {
             parse: true,
             success: function (response, result, raw) {
                 that.retrievedStatus = 0 ? raw.status == 200 : -1;
-                successCallback(that);    
+                
+                Up.Router.watRouter.trigger('route:defaultRoute');
+                //successCallback(that);    
             },
             error: function (response, result, raw) {
                 var responseMsg = JSON.parse(response.responseText).message;
-                Wat.I.M.showMessage({message: i18n.t('Error logging in') + ": " + responseMsg, messageType: 'error'});
+                Up.I.M.showMessage({message: i18n.t('Error logging in') + ": " + responseMsg, messageType: 'error'});
             }
         };
         
@@ -293,9 +291,9 @@ Wat.A = {
     //      successCallback: function that will be executed after action execution.
     //      that: current context where will be stored retrieved response and passed as parameter to successCallback function.
     apiLogOut: function (successCallback, that) {
-        var url = Wat.C.getApiUrl() + 'logout';
-        if (Wat.C.crossOrigin) {
-            url += '?sid=' + Wat.C.sid;
+        var url = Up.C.getApiUrl() + 'logout';
+        if (Up.C.crossOrigin) {
+            url += '?sid=' + Up.C.sid;
         }
         
         var params = {
@@ -308,7 +306,7 @@ Wat.A = {
                 successCallback(that);    
             },
             error: function (response, result, raw) {
-                Wat.I.M.showMessage({message: i18n.t('Error logging out'), messageType: 'error'});
+                Up.I.M.showMessage({message: i18n.t('Error logging out'), messageType: 'error'});
             }
         };
         
@@ -345,7 +343,7 @@ Wat.A = {
         }
         
         if (params.chosenType) {
-            Wat.I.chosenElement(controlSelector, params.chosenType);
+            Up.I.chosenElement(controlSelector, params.chosenType);
         }
         
         // Some starting options can be added as first options
@@ -379,7 +377,7 @@ Wat.A = {
 
         // If action is defined, add retrieved items from ajax to select
         if (params.action) {
-            var jsonUrl = Wat.C.getBaseUrl() + '&action=' + params.action;
+            var jsonUrl = Up.C.getBaseUrl() + '&action=' + params.action;
 
             if (params.filters) {
                 jsonUrl += '&filters=' + JSON.stringify(params.filters);
@@ -389,7 +387,7 @@ Wat.A = {
                 jsonUrl += '&order_by=' + JSON.stringify(params.order_by);
             }
             
-            Wat.I.disableChosenControls(controlSelector);
+            Up.I.disableChosenControls(controlSelector);
             
             // Change content of chosen combo to Loading while data is loaded
             $(controlSelector + '+.chosen-container span').html($.i18n.t('Loading'));
@@ -402,7 +400,7 @@ Wat.A = {
                 processData: false,
                 parse: true,
                 success: function (data) {
-                    if (Wat.C.sessionExpired(data)) {
+                    if (Up.C.sessionExpired(data)) {
                         return;
                     }
                     
@@ -482,17 +480,17 @@ Wat.A = {
                     });
 
                     // Enable again control if isn't tenant filter or current admin is not a superadmin
-                    if (!Wat.C.isSuperadmin() || $('[data-waiting-loading]').length == 0 || ($('[data-waiting-loading]').length > 0 && $(controlSelector).attr('name') != 'tenant')) {
-                        Wat.I.enableChosenControls(controlSelector);
+                    if (!Up.C.isSuperadmin() || $('[data-waiting-loading]').length == 0 || ($('[data-waiting-loading]').length > 0 && $(controlSelector).attr('name') != 'tenant')) {
+                        Up.I.enableChosenControls(controlSelector);
                     }
 
                     // If there are any control waiting loading and there arent any loading element more, enable tenant filter
                     if ($('[data-waiting-loading]').length > 0 && $('[data-loading]').length == 0) {
-                        Wat.I.enableChosenControls('[name="tenant"]');
+                        Up.I.enableChosenControls('[name="tenant"]');
                     }
                     
                     if (params.chosenType) {
-                        Wat.I.updateChosenControls(controlSelector);
+                        Up.I.updateChosenControls(controlSelector);
                     }
                     
                     if (afterCallBack != undefined) {
@@ -501,11 +499,11 @@ Wat.A = {
                 }
             });
                     
-            Wat.C.requests.push(request);
+            Up.C.requests.push(request);
         }
         else {
             if (params.chosenType) {
-                Wat.I.updateChosenControls(controlSelector);
+                Up.I.updateChosenControls(controlSelector);
             }
                     
             if (afterCallBack != undefined) {

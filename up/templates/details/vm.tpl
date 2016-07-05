@@ -3,7 +3,7 @@
 var mainTableClass = '';
 var stateTableClass = 'hidden';
 
-if (Wat.C.checkACL('vm.see.state')) {
+if (Up.C.checkACL('vm.see.state')) {
     stateTableClass = 'details-right';
 }
 %>
@@ -13,17 +13,17 @@ if (Wat.C.checkACL('vm.see.state')) {
     <div class="clear mobile"></div>
     <a class="button2 fright fa fa-eye js-show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>
     
-    <% if(Wat.C.checkACL('vm.delete.')) { %>
+    <% if(Up.C.checkACL('vm.delete.')) { %>
     <a class="button fleft button-icon--desktop js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"><span data-i18n="Delete" class="mobile"></span></a>
     <% } %>
     
-    <% if(Wat.C.checkGroupACL('vmEdit')) { %>
+    <% if(Up.C.checkGroupACL('vmEdit')) { %>
     <a class="button fright button-icon--desktop js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"><span data-i18n="Edit" class="mobile"></span></a>
     <% } %>
     
     <% 
     // Start-stop button only will be shown here if state table is hidden
-    if (Wat.C.checkACL('vm.update.state') && stateTableClass == 'hidden') {
+    if (Up.C.checkACL('vm.update.state') && stateTableClass == 'hidden') {
         if (model.get('state') != 'stopped') { 
     %>
         <a class="button fright button-icon--desktop js-button-stop-vm <%= CLASS_ICON_STATUS_STOPPED %> fright" href="javascript:" data-i18n="[title]Stop" data-wsupdate="state-button" data-id="<%= model.get('id') %>"><span data-i18n="Stop" class="mobile"></span></a>
@@ -38,7 +38,7 @@ if (Wat.C.checkACL('vm.see.state')) {
     %>
     
     <% 
-    if (Wat.C.checkACL('vm.update.block')) {
+    if (Up.C.checkACL('vm.update.block')) {
         if(model.get('blocked')) {
     %>
             <a class="button button-icon--desktop js-button-unblock fa fa-unlock-alt fright" href="javascript:" data-i18n="[title]Unblock"><span data-i18n="Unblock" class="mobile"></span></a>
@@ -53,7 +53,7 @@ if (Wat.C.checkACL('vm.see.state')) {
     %>
     
     <% 
-    if (Wat.C.checkACL('vm.update.disconnect-user') && model.get('user_state') == 'connected') {
+    if (Up.C.checkACL('vm.update.disconnect-user') && model.get('user_state') == 'connected') {
     %>
         <a class="button button-icon js-button-disconnect-user fa fa-plug fright" href="javascript:" data-i18n="[title]Disconnect user"></a>
     <%
@@ -61,7 +61,7 @@ if (Wat.C.checkACL('vm.see.state')) {
     %>
     
     <% 
-    if (Wat.C.checkACL('vm.update.state')) {
+    if (Up.C.checkACL('vm.update.state')) {
         if (model.get('state') != 'stopped') { 
     %>
             <a class="button fright button-icon--desktop js-button-stop-vm fa fa-stop fright mobile" href="javascript:" data-i18n="[title]Stop" data-wsupdate="state-button" data-id="<%= model.get('id') %>"><span data-i18n="Stop" class="mobile"></span></a>
@@ -82,7 +82,7 @@ if (Wat.C.checkACL('vm.see.state')) {
 // Show state info fields if is granted any of contained fields. Hide it otherwise
 var showStateInfo = false;
 
-if (Wat.C.checkGroupACL('vmStateInfoDetails')) {
+if (Up.C.checkGroupACL('vmStateInfoDetails')) {
     showStateInfo = true;
 }
 
@@ -111,19 +111,19 @@ switch (model.get('state')) {
 
 <table class="details details-list <%= mainTableClass %>">
     <%   
-    if (Wat.C.isSuperadmin()) { 
+    if (Up.C.isSuperadmin()) { 
     %>
         <tr>
             <td><i class="<%= CLASS_ICON_TENANTS %>"></i><span data-i18n="Tenant"></span></td>
             <td>
-                <%= Wat.C.ifACL('<a href="#/tenant/' + model.get('tenant_id') + '">', 'tenant.see-details.') %>
+                <%= Up.C.ifACL('<a href="#/tenant/' + model.get('tenant_id') + '">', 'tenant.see-details.') %>
                 <%= model.get('tenant_name') %>
-                <%= Wat.C.ifACL('</a>', 'tenant.see-details.') %>
+                <%= Up.C.ifACL('</a>', 'tenant.see-details.') %>
             </td>
         </tr>
     <%   
     }
-    if (Wat.C.checkACL('vm.see.id')) { 
+    if (Up.C.checkACL('vm.see.id')) { 
     %>
         <tr>
             <td><i class="fa fa-asterisk"></i><span data-i18n="Id"></span></td>
@@ -133,7 +133,7 @@ switch (model.get('state')) {
         </tr>
     <% 
     }  
-    if (Wat.C.checkACL('vm.see.description')) { 
+    if (Up.C.checkACL('vm.see.description')) { 
     %>
         <tr>
             <td><i class="fa fa-align-justify"></i><span data-i18n="Description"></span></td>
@@ -154,17 +154,17 @@ switch (model.get('state')) {
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('vm.see.user')) {
+    if (Up.C.checkACL('vm.see.user')) {
     %>
         <tr>
             <td><i class="<%= CLASS_ICON_USERS %>"></i><span data-i18n="User"></span></td>
             <td>
-                <%= Wat.C.ifACL('<a href="#/user/' + model.get('user_id') + '" data-i18n="[title]Click for details">', 'user.see-details.') %>
+                <%= Up.C.ifACL('<a href="#/user/' + model.get('user_id') + '" data-i18n="[title]Click for details">', 'user.see-details.') %>
                     <%= model.get('user_name') %>
-                <%= Wat.C.ifACL('</a>', 'user.see-details.') %>
+                <%= Up.C.ifACL('</a>', 'user.see-details.') %>
                 
                 <% 
-                if (Wat.C.checkACL('vm.see.user-state')) { 
+                if (Up.C.checkACL('vm.see.user-state')) { 
                     if (model.get('user_state') == 'connected') {
                 %>
                         (<span data-i18n data-wsupdate="user_state-text" data-id="<%= model.get('id') %>">Connected</span>)
@@ -181,7 +181,7 @@ switch (model.get('state')) {
         </tr>  
     <% 
     } 
-    if (Wat.C.checkACL('vm.see.state')) {
+    if (Up.C.checkACL('vm.see.state')) {
     %>
         <tr class="mobile">
             <td><i class="fa fa-heart"></i><span data-i18n="State"></span></td>
@@ -191,7 +191,7 @@ switch (model.get('state')) {
         </tr>  
     <% 
     }
-    if (!Wat.C.checkACL('vm.see.user') && Wat.C.checkACL('vm.see.user-state')) {
+    if (!Up.C.checkACL('vm.see.user') && Up.C.checkACL('vm.see.user-state')) {
     %>
         <tr>
             <td><i class="fa fa-plug"></i><span data-i18n="User state"></span></td>
@@ -212,7 +212,7 @@ switch (model.get('state')) {
         </tr>  
     <% 
     }
-    if (Wat.C.checkACL('vm.see.ip')) {
+    if (Up.C.checkACL('vm.see.ip')) {
     %>
         <tr>
             <td><i class="fa fa-ellipsis-h"></i><span data-i18n="IP address"></span></td>
@@ -222,7 +222,7 @@ switch (model.get('state')) {
         </tr>  
     <% 
     }
-    if (Wat.C.checkACL('vm.see.mac')) {
+    if (Up.C.checkACL('vm.see.mac')) {
     %>
         <tr>
             <td><i class="fa fa-ellipsis-h"></i><span data-i18n="MAC address"></span></td>
@@ -232,19 +232,19 @@ switch (model.get('state')) {
         </tr>  
     <% 
     }
-    if (Wat.C.checkACL('vm.see.osf')) {
+    if (Up.C.checkACL('vm.see.osf')) {
     %>
         <tr>
             <td><i class="<%= CLASS_ICON_OSFS %>"></i><span data-i18n="OS Flavour"></span></td>
             <td>
-                <%= Wat.C.ifACL('<a href="#/osf/' + model.get('osf_id') + '" data-i18n="[title]Click for details">', 'osf.see-details.') %>
+                <%= Up.C.ifACL('<a href="#/osf/' + model.get('osf_id') + '" data-i18n="[title]Click for details">', 'osf.see-details.') %>
                     <%= model.get('osf_name') %>
-                <%= Wat.C.ifACL('</a>', 'osf.see-details.') %>
+                <%= Up.C.ifACL('</a>', 'osf.see-details.') %>
             </td>
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('vm.see.di-tag')) {
+    if (Up.C.checkACL('vm.see.di-tag')) {
     %>
         <tr>
             <td><i class="fa fa-tag"></i><span data-i18n="Image tag"></span></td>
@@ -254,14 +254,14 @@ switch (model.get('state')) {
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('vm.see.di')) {
+    if (Up.C.checkACL('vm.see.di')) {
     %>
         <tr>
             <td><i class="<%= CLASS_ICON_DIS %>"></i><span data-i18n="Disk image"></span></td>
             <td>
-                <%= Wat.C.ifACL('<a href="#/di/' + model.get('di_id') + '" data-i18n="[title]Click for details">', 'di.see-details.') %>
+                <%= Up.C.ifACL('<a href="#/di/' + model.get('di_id') + '" data-i18n="[title]Click for details">', 'di.see-details.') %>
                     <%= model.get('di_name') %>
-                <%= Wat.C.ifACL('</a>', 'di.see-details.') %>
+                <%= Up.C.ifACL('</a>', 'di.see-details.') %>
                 <%
                     if (model.get('state') == 'running' && model.get('di_id') != model.get('di_id_in_use')) {
                 %>
@@ -274,7 +274,7 @@ switch (model.get('state')) {
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('vm.see.expiration')) {
+    if (Up.C.checkACL('vm.see.expiration')) {
     %>
         <tr>
             <td><i class="fa fa-warning"></i><span data-i18n="Expiration"></span></td>
@@ -290,8 +290,8 @@ switch (model.get('state')) {
                     }
                     else {
                         var remainingTimes = {
-                            soft: Wat.U.processRemainingTime(model.get('time_until_expiration_soft')),
-                            hard: Wat.U.processRemainingTime(model.get('time_until_expiration_hard'))
+                            soft: Up.U.processRemainingTime(model.get('time_until_expiration_soft')),
+                            hard: Up.U.processRemainingTime(model.get('time_until_expiration_hard'))
                         };
                         
                         if (remainingTimes.hard.expired) {
@@ -310,7 +310,7 @@ switch (model.get('state')) {
                                             <tr>
                                                 <td class="<%= remainingTimes.soft.priorityClass %>" data-i18n="Soft"></td>
                                                 <td class="<%= remainingTimes.soft.priorityClass %>"><%= model.get('expiration_soft').replace('T',' ') %></td>
-                                                <td class="<%= remainingTimes.soft.priorityClass %>" <%= remainingTimes.soft.remainingTimeAttr %> data-countdown data-raw="<%= Wat.U.base64.encodeObj(model.get('time_until_expiration_soft')) %>"><%= remainingTimes.soft.remainingTime %></td>
+                                                <td class="<%= remainingTimes.soft.priorityClass %>" <%= remainingTimes.soft.remainingTimeAttr %> data-countdown data-raw="<%= Up.U.base64.encodeObj(model.get('time_until_expiration_soft')) %>"><%= remainingTimes.soft.remainingTime %></td>
                                             </tr>
                                         <%
                                             }
@@ -319,7 +319,7 @@ switch (model.get('state')) {
                                             <tr>
                                                 <td class="<%= remainingTimes.hard.priorityClass %>" data-i18n="Hard"></td>
                                                 <td class="<%= remainingTimes.hard.priorityClass %>"><%= model.get('expiration_hard').replace('T',' ') %></td>
-                                                <td class="<%= remainingTimes.hard.priorityClass %>" <%= remainingTimes.hard.remainingTimeAttr %> data-countdown data-raw="<%= Wat.U.base64.encodeObj(model.get('time_until_expiration_hard')) %>"><%= remainingTimes.hard.remainingTime %></td>
+                                                <td class="<%= remainingTimes.hard.priorityClass %>" <%= remainingTimes.hard.remainingTimeAttr %> data-countdown data-raw="<%= Up.U.base64.encodeObj(model.get('time_until_expiration_hard')) %>"><%= remainingTimes.hard.remainingTime %></td>
                                             </tr>
                                         <%
                                             }
@@ -334,7 +334,7 @@ switch (model.get('state')) {
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('vm.see.block')) {
+    if (Up.C.checkACL('vm.see.block')) {
     %>
         <tr>
             <td><i class="fa fa-lock"></i><span data-i18n="Blocking"></span></td>
@@ -361,7 +361,7 @@ switch (model.get('state')) {
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('vm.see.created-by')) {
+    if (Up.C.checkACL('vm.see.created-by')) {
     %>
         <tr>
             <td><i class="<%= CLASS_ICON_ADMINS %>"></i><span data-i18n="Created by"></span></td>
@@ -371,7 +371,7 @@ switch (model.get('state')) {
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('vm.see.creation-date')) {
+    if (Up.C.checkACL('vm.see.creation-date')) {
     %>
         <tr>
             <td><i class="fa fa-clock-o"></i><span data-i18n="Creation date"></span></td>

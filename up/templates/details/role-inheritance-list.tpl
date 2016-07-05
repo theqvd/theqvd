@@ -25,7 +25,7 @@
             %>
                 <div>
                     <%
-                        if (Wat.C.checkACL('role.update.assign-role')) {
+                        if (Up.C.checkACL('role.update.assign-role')) {
                     %>
                             <i class="delete-role-button js-delete-role-button fa fa-times <%= classFixed %>" data-id="<%= iRole %>" data-name="<%= role.name %>" data-inherit-type="<%= inheritFilter %>" data-i18n="[title]Delete"></i>
                     <%
@@ -39,9 +39,9 @@
                     }
                     else {
                     %>
-                        <%= Wat.C.ifACL('<a href="#/role/' + iRole + '">', 'role.see-details.') %>
+                        <%= Up.C.ifACL('<a href="#/role/' + iRole + '">', 'role.see-details.') %>
                         <span class="text"><%= role.name %></span>
-                        <%= Wat.C.ifACL('</a>', 'role.see-details.') %>
+                        <%= Up.C.ifACL('</a>', 'role.see-details.') %>
                     <%
                     }
                     %>

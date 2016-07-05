@@ -12,7 +12,7 @@
         </td>
     </tr>
     <% 
-    if (Wat.C.checkACL('osf.create.memory')) { 
+    if (Up.C.checkACL('osf.create.memory')) { 
     %>
     <tr>
         <td data-i18n="Memory"></td>
@@ -27,7 +27,7 @@
     </tr>
     <% 
     }
-    if (Wat.C.checkACL('osf.create.user-storage')) { 
+    if (Up.C.checkACL('osf.create.user-storage')) { 
     %>
     <tr>
         <td data-i18n="User storage"></td>

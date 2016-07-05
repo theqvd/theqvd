@@ -3,15 +3,15 @@
     <div class="clear mobile"></div>
     <a class="button2 fright fa fa-eye js-show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>
         
-    <% if(Wat.C.checkACL('di.delete.')) { %>
+    <% if(Up.C.checkACL('di.delete.')) { %>
     <a class="button fleft button-icon--desktop js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"><span data-i18n="Delete" class="mobile"></span></a>
     <% } %>
-    <% if(Wat.C.checkGroupACL('diEdit')) { %>
+    <% if(Up.C.checkGroupACL('diEdit')) { %>
     <a class="button fright button-icon--desktop js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"><span data-i18n="Edit" class="mobile"></span></a>
     <% } %>
     
     <% 
-    if (Wat.C.checkACL('di.update.block')) {
+    if (Up.C.checkACL('di.update.block')) {
         if(model.get('blocked')) {
     %>
             <a class="button button-icon--desktop js-button-unblock fa fa-unlock-alt fright" href="javascript:" data-i18n="[title]Unblock"><span data-i18n="Unblock" class="mobile"></span></a>
@@ -25,7 +25,7 @@
     }
     %>
     
-    <% if(Wat.C.checkACL('di.update.default') && !model.get('default')) { %>
+    <% if(Up.C.checkACL('di.update.default') && !model.get('default')) { %>
     <a class="button fright button-icon--desktop js-button-default fa fa-home" href="javascript:" data-i18n="[title]Set by default"><span data-i18n="Set by default" class="mobile"></span></a>
     <% } %>
     
@@ -34,19 +34,19 @@
 
 <table class="details details-list <% if (!enabledProperties) { %> col-width-100 <% } %>">
     <%   
-    if (Wat.C.isSuperadmin()) { 
+    if (Up.C.isSuperadmin()) { 
     %>
         <tr>
             <td><i class="<%= CLASS_ICON_TENANTS %>"></i><span data-i18n="Tenant"></span></td>
             <td>
-                <%= Wat.C.ifACL('<a href="#/tenant/' + model.get('tenant_id') + '">', 'tenant.see-details.') %>
+                <%= Up.C.ifACL('<a href="#/tenant/' + model.get('tenant_id') + '">', 'tenant.see-details.') %>
                 <%= model.get('tenant_name') %>
-                <%= Wat.C.ifACL('</a>', 'tenant.see-details.') %>
+                <%= Up.C.ifACL('</a>', 'tenant.see-details.') %>
             </td>
         </tr>
     <%   
     }
-    if (Wat.C.checkACL('di.see.id')) { 
+    if (Up.C.checkACL('di.see.id')) { 
     %>
         <tr>
             <td><i class="fa fa-asterisk"></i><span data-i18n="Id"></span></td>
@@ -56,7 +56,7 @@
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('di.see.description')) { 
+    if (Up.C.checkACL('di.see.description')) { 
     %>
         <tr>
             <td><i class="fa fa-align-justify"></i><span data-i18n="Description"></span></td>
@@ -92,9 +92,9 @@
         <tr>
             <td><i class="<%= CLASS_ICON_OSFS %>"></i><span data-i18n="OS Flavour"></span></td>
             <td>
-                <%= Wat.C.ifACL('<a href="#/osf/' + model.get('osf_id') + '" data-i18n="[title]Click for details">', 'osf.see-details.') %>
+                <%= Up.C.ifACL('<a href="#/osf/' + model.get('osf_id') + '" data-i18n="[title]Click for details">', 'osf.see-details.') %>
                     <%= model.get('osf_name') %>
-                <%= Wat.C.ifACL('</a>', 'osf.see-details.') %>
+                <%= Up.C.ifACL('</a>', 'osf.see-details.') %>
             </td>
         </tr>
     <% 
@@ -167,7 +167,7 @@
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('di.see.created-by')) {
+    if (Up.C.checkACL('di.see.created-by')) {
     %>
         <tr>
             <td><i class="<%= CLASS_ICON_ADMINS %>"></i><span data-i18n="Created by"></span></td>
@@ -177,7 +177,7 @@
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('di.see.creation-date')) {
+    if (Up.C.checkACL('di.see.creation-date')) {
     %>
         <tr>
             <td><i class="fa fa-clock-o"></i><span data-i18n="Creation date"></span></td>

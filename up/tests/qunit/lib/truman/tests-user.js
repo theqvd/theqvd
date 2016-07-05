@@ -15,14 +15,14 @@ function userTestReal () {
 
             expect(assertions);
 
-            Wat.Router.watRouter.trigger('route:listUser');
+            Up.Router.watRouter.trigger('route:listUser');
             
-            Wat.CurrentView.model = new Wat.Models.User();
+            Up.CurrentView.model = new Up.Models.User();
 
             //////////////////////////////////////////////////////////////////
             // Create User
             //////////////////////////////////////////////////////////////////
-            Wat.CurrentView.createModel(WatTests.values.user, function (e) { 
+            Up.CurrentView.createModel(WatTests.values.user, function (e) { 
                 equal(e.retrievedData.status, STATUS_FORBIDDEN_ACTION, "User cannot be created due ACLs restriction (" + JSON.stringify(WatTests.values.user) + ")");
 
                 if(e.retrievedData.status == STATUS_FORBIDDEN_ACTION) {
@@ -37,7 +37,7 @@ function userTestReal () {
                 //////////////////////////////////////////////////////////////////
                 // Try to get list of users matching by the existing ID
                 //////////////////////////////////////////////////////////////////
-                WatTests.models.user = new Wat.Models.User({
+                WatTests.models.user = new Up.Models.User({
                     id: WatTests.values.user.id
                 });            
                                 
@@ -52,7 +52,7 @@ function userTestReal () {
                         //////////////////////////////////////////////////////////////////
                         // Try to update user
                         //////////////////////////////////////////////////////////////////
-                        Wat.CurrentView.updateModel(WatTests.updateValues.user, {'id': WatTests.values.user.id}, function (e) { 
+                        Up.CurrentView.updateModel(WatTests.updateValues.user, {'id': WatTests.values.user.id}, function (e) { 
                             equal(e.retrievedData.status, STATUS_FORBIDDEN_ACTION, "User cannot be updated due ACLs restriction (" + JSON.stringify(WatTests.updateValues.user) + ")");
 
                             start();

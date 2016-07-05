@@ -1,4 +1,4 @@
-Wat.I.C = {
+Up.I.C = {
     // List of the sass files excluding 'lib/_variables_custom.scss' because it will be customized
     sassFiles: [
         'style.scss',
@@ -54,10 +54,10 @@ Wat.I.C = {
             onExtOpen:function(){
                 if ($('.bb-customizer').html() == '') {
                     // Fill customizer tool layer with content
-                    $('.bb-customizer').html(Wat.TPL.viewCustomizerTool);
-                    Wat.T.translate();
-                    Wat.I.chosenConfiguration();
-                    Wat.I.chosenElement('select.js-customize-select', 'single100');
+                    $('.bb-customizer').html(Up.TPL.viewCustomizerTool);
+                    Up.T.translate();
+                    Up.I.chosenConfiguration();
+                    Up.I.chosenElement('select.js-customize-select', 'single100');
                     
                     that.events();
                     $('select.js-customize-select').trigger('change');
@@ -145,24 +145,24 @@ Wat.I.C = {
     
     preview: function () {          
         $('.js-customizer-wrapper').closeMbExtruder();
-        Wat.I.loadingBlock($.i18n.t('Generating preview') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
+        Up.I.loadingBlock($.i18n.t('Generating preview') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
         
-        var content = Wat.I.C.getCustomVarContent();
+        var content = Up.I.C.getCustomVarContent();
                 
-        var filename = Wat.I.C.customVarFilename;
+        var filename = Up.I.C.customVarFilename;
         
-        Wat.I.C.sass.writeFile(filename, content, function callback(success) {
+        Up.I.C.sass.writeFile(filename, content, function callback(success) {
             if (success) {
-                Wat.I.C.sass.compileFile('/style.scss', function (result) {
+                Up.I.C.sass.compileFile('/style.scss', function (result) {
                     if (result.status == 0) {
                         $('style[name="custom-preview-css"]').html(result.text);
-                        Wat.I.loadingUnblock();
+                        Up.I.loadingUnblock();
                         $('.js-customizer-wrapper').openMbExtruder();
                     }
                     else {
-                        Wat.I.loadingUnblock();
+                        Up.I.loadingUnblock();
                         $('.js-customizer-wrapper').openMbExtruder();
-                        Wat.I.M.showMessage({messageType: 'error', message: result.message});
+                        Up.I.M.showMessage({messageType: 'error', message: result.message});
                     }
                 });
             }
@@ -171,27 +171,27 @@ Wat.I.C = {
     
     export: function () {
         $('.js-customizer-wrapper').closeMbExtruder();
-        Wat.I.loadingBlock($.i18n.t('Generating CSS file. When downloading were finished, replace custom_style.css on server to make changes permanent.') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
+        Up.I.loadingBlock($.i18n.t('Generating CSS file. When downloading were finished, replace custom_style.css on server to make changes permanent.') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
         
-        var content = Wat.I.C.getCustomVarContent();
+        var content = Up.I.C.getCustomVarContent();
                 
-        var filename = Wat.I.C.customVarFilename;
+        var filename = Up.I.C.customVarFilename;
         
-        Wat.I.C.sass.writeFile(filename, content, function callback(success) {
+        Up.I.C.sass.writeFile(filename, content, function callback(success) {
             if (success) {
-                Wat.I.C.sass.compileFile('/style.scss', function (result) {
+                Up.I.C.sass.compileFile('/style.scss', function (result) {
                     if (result.status == 0) {
                         var blob = new Blob([result.text], {type: "text/plain;charset=utf-8"});
-                        Wat.I.loadingUnblock();
+                        Up.I.loadingUnblock();
                         $('.js-customizer-wrapper').openMbExtruder();
                         
                         saveAs(blob, "custom_style.css");
                     }
                     else {
-                        Wat.I.loadingUnblock();
+                        Up.I.loadingUnblock();
                         $('.js-customizer-wrapper').openMbExtruder();
-                        Wat.I.M.showMessage({messageType: 'error', message: result.message});
-                        Wat.I.C.sass.listFiles(function callback(list) {
+                        Up.I.M.showMessage({messageType: 'error', message: result.message});
+                        Up.I.C.sass.listFiles(function callback(list) {
                           //console.info(list);
                         });
                         
@@ -209,7 +209,7 @@ Wat.I.C = {
             $(customField).trigger('keyup');
         });
         
-        Wat.CurrentView.render();
+        Up.CurrentView.render();
     },
     
     getCustomVarContent: function () {

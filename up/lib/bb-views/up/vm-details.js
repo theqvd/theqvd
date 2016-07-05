@@ -1,4 +1,4 @@
-Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({  
+Up.Views.VMDetailsView = Up.Views.DetailsView.extend({  
     qvdObj: 'vm',
     liveFields: ['state', 'user_state', 'ip', 'ip_in_use', 'host_id', 'host_name', 'ssh_port', 'vnc_port', 'serial_port', 'di_id_in_use', 'di_name_in_use', 'di_version_in_use'],
 
@@ -7,8 +7,8 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
     },
     
     initialize: function (params) {
-        this.model = new Wat.Models.VM(params);
-        Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
+        this.model = new Up.Models.VM(params);
+        Up.Views.DetailsView.prototype.initialize.apply(this, [params]);
     },
     
     events: {
@@ -33,7 +33,7 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
         // Render Related log list on side
         var params = this.getSideLogParams(sideContainer);
 
-        this.sideViews.push(new Wat.Views.LogListView(params));
+        this.sideViews.push(new Up.Views.LogListView(params));
         
         this.renderLogGraph(params);
         }
@@ -106,7 +106,7 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
     },
     
     bindEditorEvents: function() {
-        Wat.Views.DetailsView.prototype.bindEditorEvents.apply(this);
+        Up.Views.DetailsView.prototype.bindEditorEvents.apply(this);
         
         // Toggle controls for new password
         this.bindEvent('change', 'input[name="change_password"]', this.vmEditorBinds.toggleNewPassword);
@@ -124,9 +124,9 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
             'error': 'Error starting Virtual machine'
         }
         
-        Wat.A.performAction ('vm_start', {}, {id: this.elementId}, messages, function(){
+        Up.A.performAction ('vm_start', {}, {id: this.elementId}, messages, function(){
             // After start/stop VM render side to update log
-            Wat.CurrentView.renderSide();
+            Up.CurrentView.renderSide();
         }, this);
     },
     
@@ -136,15 +136,15 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
             'error': 'Error stopping Virtual machine'
         }
         
-        Wat.A.performAction ('vm_stop', {}, {id: this.elementId}, messages, function(){
+        Up.A.performAction ('vm_stop', {}, {id: this.elementId}, messages, function(){
             // After start/stop VM render side to update log
-            Wat.CurrentView.renderSide();
+            Up.CurrentView.renderSide();
         }, this);
     },
     
     
     restartVM: function () {   
-        Wat.CurrentView.restarting = true;
-        Wat.stopVM();
+        Up.CurrentView.restarting = true;
+        Up.stopVM();
     },  
 });

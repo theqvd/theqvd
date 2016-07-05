@@ -13,12 +13,12 @@ function profileTest () {
             expect(assertions);
             
             var filters = {
-                "id": Wat.C.adminID
+                "id": Up.C.adminID
             };
                         
             var currentAttrs = {
-                language: Wat.C.language,
-                block: Wat.C.block,
+                language: Up.C.language,
+                block: Up.C.block,
                 password: password
             };
             
@@ -44,7 +44,7 @@ function profileTest () {
             
 
             // Get 'model.' branch
-            Wat.A.performAction('myadmin_update', args, filters, {}, function (that) {
+            Up.A.performAction('myadmin_update', args, filters, {}, function (that) {
                 equal(that.retrievedData.status, STATUS_SUCCESS, "Profile updated successfully (" + JSON.stringify(args) + ")");
                 start();
                 
@@ -75,7 +75,7 @@ function profileAfterUpdateTest (oldAttrs, newAttrs, callback) {
                 if (name == 'password') {
                     return;
                 }
-                equal(Wat.C[name], value, "New field '" + name + "' has setted new value '" + value + "' succesfully");
+                equal(Up.C[name], value, "New field '" + name + "' has setted new value '" + value + "' succesfully");
             });
             
             callback(oldAttrs, newAttrs);
@@ -97,7 +97,7 @@ function profileRestoreTest (oldAttrs, newAttrs) {
             expect(assertions);
             
             var filters = {
-                "id": Wat.C.adminID
+                "id": Up.C.adminID
             };
             
             var args = {
@@ -108,7 +108,7 @@ function profileRestoreTest (oldAttrs, newAttrs) {
             
 
             // Get 'model.' branch
-            Wat.A.performAction('myadmin_update', args, filters, {}, function (that) {
+            Up.A.performAction('myadmin_update', args, filters, {}, function (that) {
                 equal(that.retrievedData.status, STATUS_SUCCESS, "Profile updated successfully (" + JSON.stringify(args) + ")");
                 start();
                 

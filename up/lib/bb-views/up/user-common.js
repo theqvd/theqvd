@@ -1,5 +1,5 @@
 // Common lib for User views (list and details)
-Wat.Common.BySection.user = {
+Up.Common.BySection.user = {
     // This initialize function will be executed one time and deleted
     initializeCommon: function (that) {
         // Empty
@@ -13,7 +13,7 @@ Wat.Common.BySection.user = {
             that.id = that.selectedItems[0];
         }
         
-        var valid = Wat.Views.DetailsView.prototype.updateElement.apply(that, [dialog]);
+        var valid = Up.Views.DetailsView.prototype.updateElement.apply(that, [dialog]);
         
         if (!valid) {
             return;
@@ -31,11 +31,11 @@ Wat.Common.BySection.user = {
         var filters = {"id": that.id};
         var arguments = {};
         
-        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('user.update.properties')) {
+        if (!$.isEmptyObject(properties.set) && Up.C.checkACL('user.update.properties')) {
             arguments["__properties_changes__"] = properties;
         }
         
-        if (Wat.C.checkACL('user.update.password')) {
+        if (Up.C.checkACL('user.update.password')) {
             // If change password is checked
             if (context.find('input.js-change-password').is(':checked')) {
                 var password = context.find('input[name="password"]').val();
@@ -46,7 +46,7 @@ Wat.Common.BySection.user = {
             }
         }
         
-        if (Wat.C.checkACL('user.update.description')) {
+        if (Up.C.checkACL('user.update.description')) {
             arguments["description"] = description;
         }
         
@@ -61,6 +61,6 @@ Wat.Common.BySection.user = {
         
         this.dialogConf.title = $.i18n.t('Edit user') + ": " + this.model.get('name');
         
-        Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
+        Up.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
     },
 }
