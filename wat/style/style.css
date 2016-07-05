@@ -3313,8 +3313,10 @@ div.tagsinput span.tag a {
     cursor: pointer; }
 
 .extruder-content, .ext-wrapper, .extruder-content .text {
-  background: #333 !important;
-  overflow: visible !important; }
+  background: #333 !important; }
+  @media screen and (min-width: 41em) {
+    .extruder-content, .ext-wrapper, .extruder-content .text {
+      overflow: visible !important; } }
 
 .evo-pop {
   width: 210px !important; }

@@ -296,7 +296,9 @@ div.tagsinput span.tag a {
 
 .extruder-content, .ext-wrapper, .extruder-content .text {
     background: #333 !important;
-    overflow: visible !important;
+    @include in (desktop) {
+        overflow: visible !important;
+    }
 }
 
 
