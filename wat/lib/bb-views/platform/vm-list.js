@@ -16,8 +16,8 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         Wat.Views.ListView.prototype.initialize.apply(this, [params]);
     },
     
-    renderListBlock: function () {
-        Wat.Views.ListView.prototype.renderListBlock.apply(this, []);
+    renderList: function () {
+        Wat.Views.ListView.prototype.renderList.apply(this, []);
         
         if (Wat.C.checkACL('vm.see.expiration')) {
             $.each($('.bb-vm-list-expiration'), function (iCell, cell) {
