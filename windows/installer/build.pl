@@ -153,6 +153,7 @@ chdir($installer_dir);
 
 
 run("exetype", "NX\\nxproxy.exe", "WINDOWS");
+run("exetype", "VcxSrv\\vcxsrv.exe", "WINDOWS");
 
 my @pp_args = ("-vvv", "-x", 
     mklist('-I', 'dir', @includes),
@@ -181,6 +182,7 @@ unless( $no_debug_installer ) {
 	msg("Generating debug installer\n");
 	run("pp", @pp_args);
 	run("exetype", "NX\\nxproxy.exe", "CONSOLE");
+        run("exetype", "VcxSrv\\vcxsrv.exe", "CONSOLE");
 
 	build_installer("--suffix -debug");
 } else {
