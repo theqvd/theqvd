@@ -20,9 +20,9 @@ Wat.Views.VMSpyView = Wat.Views.MainView.extend({
     },
     
     getTemplatesAndRender: function () {
-        var templates = Wat.I.T.getTemplateList('commonVMS');
+        var templates = Wat.I.T.getTemplateList('spyVM');
         
-        Wat.A.getTemplates(this.templates, Wat.CurrentView.render); 
+        Wat.A.getTemplates(templates, Wat.CurrentView.render); 
     },
     
     render: function () {

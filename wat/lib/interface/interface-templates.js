@@ -246,16 +246,10 @@ Wat.I.T = {
                     }
                 }
                 break;
-            case 'commonVMS':
+            case 'spyVM':
                 templates = {
                     spyVM: {
                         name: 'common/vms-spy'
-                    },
-                    spyVMSettings: {
-                        name: 'common/vms-spy-settings'
-                    },
-                    spyVMDetails: {
-                        name: 'common/vms-spy-details'
                     }
                 }
                 break;

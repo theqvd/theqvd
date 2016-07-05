@@ -2,9 +2,6 @@
 Wat.Common.BySection.vm = {
     // This initialize function will be executed one time and deleted
     initializeCommon: function (that) {
-        var templates = Wat.I.T.getTemplateList('commonVMS');
-        
-        this.templates = $.extend({}, this.templates, templates);
     },
     
     updateElement: function (dialog) {
