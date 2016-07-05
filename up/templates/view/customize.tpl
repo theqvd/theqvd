@@ -25,7 +25,7 @@
     <div class="wrapper-content">
         <div class="filter js-side">
             <%
-            if (viewKind == 'tenant' && Wat.C.isSuperadmin()) {
+            if (viewKind == 'tenant' && Up.C.isSuperadmin()) {
             %>
             <span class="filter-control desktop">
                     <label for="tenant-select" data-i18n="Tenant"></label>
@@ -38,47 +38,47 @@
                 <label for="obj-qvd-select" data-i18n="Section"></label>
                 <select name="obj-qvd-select" class="chosen-single">
                     <%
-                    if (!limitByACLs || Wat.C.checkACL('user.see-main.')) {
+                    if (!limitByACLs || Up.C.checkACL('user.see-main.')) {
                     %>
                         <option data-i18n="Users" value="user" <%= selectedSection == "user" ? 'selected' : '' %>></option>
                     <%
                     }
-                    if (!limitByACLs || Wat.C.checkACL('vm.see-main.')) {
+                    if (!limitByACLs || Up.C.checkACL('vm.see-main.')) {
                     %>
                         <option data-i18n="Virtual machines" value="vm" <%= selectedSection == "vm" ? 'selected' : '' %>></option>
                     <%
                     }
-                    if (!limitByACLs || Wat.C.checkACL('host.see-main.')) {
+                    if (!limitByACLs || Up.C.checkACL('host.see-main.')) {
                     %>
                         <option data-i18n="Nodes" value="host" <%= selectedSection == "host" ? 'selected' : '' %>></option>
                     <%
                     }
-                    if (!limitByACLs || Wat.C.checkACL('osf.see-main.')) {
+                    if (!limitByACLs || Up.C.checkACL('osf.see-main.')) {
                     %>
                         <option data-i18n="OS Flavours" value="osf" <%= selectedSection == "osf" ? 'selected' : '' %>></option>
                     <%
                     }
-                    if (!limitByACLs || Wat.C.checkACL('di.see-main.')) {
+                    if (!limitByACLs || Up.C.checkACL('di.see-main.')) {
                     %>
                         <option data-i18n="Disk images" value="di" <%= selectedSection == "di" ? 'selected' : '' %>></option>
                     <%
                     }
-                    if (Wat.C.isMultitenant() && (Wat.C.isSuperadmin() || Wat.C.isRecoveradmin()) && (!limitByACLs || Wat.C.checkACL('tenant.see-main.'))) {
+                    if (Up.C.isMultitenant() && (Up.C.isSuperadmin() || Up.C.isRecoveradmin()) && (!limitByACLs || Up.C.checkACL('tenant.see-main.'))) {
                     %>
                         <option data-i18n="Tenants" value="tenant" <%= selectedSection == "tenant" ? 'selected' : '' %>></option>
                     <%
                     }
-                    if (!limitByACLs || Wat.C.checkACL('administrator.see-main.')) {
+                    if (!limitByACLs || Up.C.checkACL('administrator.see-main.')) {
                     %>
                         <option data-i18n="Administrators" value="administrator" <%= selectedSection == "administrator" ? 'selected' : '' %>></option>
                     <%
                     }
-                    if (!limitByACLs || Wat.C.checkACL('role.see-main.')) {
+                    if (!limitByACLs || Up.C.checkACL('role.see-main.')) {
                     %>
                         <option data-i18n="Roles" value="role" <%= selectedSection == "role" ? 'selected' : '' %>></option>
                     <%
                     }
-                    if (!limitByACLs || Wat.C.checkACL('log.see-main.')) {
+                    if (!limitByACLs || Up.C.checkACL('log.see-main.')) {
                     %>
                         <option data-i18n="Log" value="log" <%= selectedSection == "log" ? 'selected' : '' %>></option>
                     <%

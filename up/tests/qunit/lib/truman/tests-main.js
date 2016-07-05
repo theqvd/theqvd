@@ -9,8 +9,8 @@ var tenantHostId = 10001;
 
 var visibleViews = ['vm', 'osf', 'di'];
 
-Wat.C.setSource('TESTING truman');
-Wat.C.setAbortOldRequests(false);
+Up.C.setSource('TESTING truman');
+Up.C.setAbortOldRequests(false);
 
 // Backbone's Models and Collections instantiation
 backboneTest();

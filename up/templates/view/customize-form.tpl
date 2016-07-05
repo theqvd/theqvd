@@ -13,12 +13,12 @@
                 
                 if (limitByACLs) {                        
                     if (field.groupAcls) {
-                        if (!Wat.C.checkGroupACL(field.groupAcls)) {
+                        if (!Up.C.checkGroupACL(field.groupAcls)) {
                             return;
                         }
                     }
                     else if (field.acls) {
-                        if (!Wat.C.checkACL(field.acls)) {
+                        if (!Up.C.checkACL(field.acls)) {
                             return;
                         }
                     }
@@ -27,7 +27,7 @@
                 <tr class="<%= field.property ? 'js-is-property' : '' %>" data-name="<%= fName %>">
                     <td class="center cell-check">
                         <div class="js-field-check <%= field.property ? 'js-is-property' : '' %>" <%= field.property ? 'data-property-id="' + field.property_id  + '"' : '' %> data-name="<%= fName %>" data-fields="<%= field.fields.join(',') %>">
-                            <%= Wat.I.controls.CheckBox({checked: field.display}) %>
+                            <%= Up.I.controls.CheckBox({checked: field.display}) %>
                         </div>
                     </td>
                     <td>
@@ -58,7 +58,7 @@
             <tr class="js-is-property js-column-property-template hidden" data-name="">
                 <td class="center cell-check">
                     <div class="js-field-check js-is-property" data-name="" data-fields="">
-                        <%= Wat.I.controls.CheckBox({checked: false}) %>
+                        <%= Up.I.controls.CheckBox({checked: false}) %>
                     </div>
                 </td>
                 <td>
@@ -90,12 +90,12 @@
                 
                 if (limitByACLs) {
                     if (filter.groupAcls) {
-                        if (!Wat.C.checkGroupACL(filter.groupAcls)) {
+                        if (!Up.C.checkGroupACL(filter.groupAcls)) {
                             return;
                         }
                     }
                     else if (filter.acls) {
-                        if (!Wat.C.checkACL(filter.acls)) {
+                        if (!Up.C.checkACL(filter.acls)) {
                             return;
                         }
                     }
@@ -104,12 +104,12 @@
                 <tr class="<%= filter.property ? 'js-is-property' : '' %>" data-name="<%= fName %>">
                     <td class="center cell-check">
                         <div  data-name="<%= fName %>" data-field="<%= filter.filterField %>" class="js-desktop-fields">
-                            <%= Wat.I.controls.CheckBox({checked: filter.displayDesktop}) %>
+                            <%= Up.I.controls.CheckBox({checked: filter.displayDesktop}) %>
                         </div>
                     </td>                    
                     <td class="center cell-check">
                         <div data-name="<%= fName %>" data-field="<%= filter.filterField %>" class="js-mobile-fields">
-                            <%= Wat.I.controls.CheckBox({checked: filter.displayMobile}) %>
+                            <%= Up.I.controls.CheckBox({checked: filter.displayMobile}) %>
                         </div>
                     </td>
                     <td>
@@ -134,7 +134,7 @@
 
         <%
 
-                filterType = Wat.I.getFieldTypeName(filter.type);
+                filterType = Up.I.getFieldTypeName(filter.type);
         %>
                     <div class="second_row" data-i18n="<%= filterType %>"><%= i18n.t(filterType) %></div>
                     </td>
@@ -145,12 +145,12 @@
             <tr class="js-is-property js-filter-property-template hidden" data-name="">
                 <td class="center cell-check">
                     <div class="js-desktop-fields js-is-property" data-name="" data-fields="">
-                        <%= Wat.I.controls.CheckBox({checked: false}) %>
+                        <%= Up.I.controls.CheckBox({checked: false}) %>
                     </div>
                 </td>
                 <td class="center cell-check">
                     <div class="js-mobile-fields js-is-property" data-name="" data-field="">
-                        <%= Wat.I.controls.CheckBox({checked: false}) %>
+                        <%= Up.I.controls.CheckBox({checked: false}) %>
                     </div>
                 </td>
                 <td>                    

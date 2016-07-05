@@ -1,4 +1,4 @@
-Wat.Views.MainView = Backbone.View.extend({
+Up.Views.MainView = Backbone.View.extend({
     el: '.bb-content',
     editorContainer: '.bb-editor',
     editorPropertiesContainer: '.bb-custom-properties',
@@ -20,7 +20,7 @@ Wat.Views.MainView = Backbone.View.extend({
         _.bindAll(this, 'render');
         
         // Add common functions
-        Wat.C.addCommonFunctions (this);
+        Up.C.addCommonFunctions (this);
         
         // Add to the view events the parent class of this view to avoid collisions with other views events
         this.events = this.restrictEventsScope(this.events);
@@ -39,8 +39,8 @@ Wat.Views.MainView = Backbone.View.extend({
 		// If any message os sent from last refresh, show it and delete cookie
         if ($.cookie('messageToShow')) {
             var tInt = setInterval(function() {
-                if (Wat.T.loaded) {
-            Wat.I.M.showMessage(JSON.parse($.cookie('messageToShow')));
+                if (Up.T.loaded) {
+            Up.I.M.showMessage(JSON.parse($.cookie('messageToShow')));
             $.removeCookie('messageToShow', {path: '/'});
                     clearInterval(tInt);
                 }
@@ -55,7 +55,7 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     addCommonTemplates: function () {
-        var templates = Wat.I.T.getTemplateList('commonEditors', {qvdObj: this.qvdObj});
+        var templates = Up.I.T.getTemplateList('commonEditors', {qvdObj: this.qvdObj});
         
         this.templates = $.extend({}, this.templates, templates);
     },
@@ -82,7 +82,7 @@ Wat.Views.MainView = Backbone.View.extend({
     filterBySubstring: function(e) {
         // Store typed search to mantain the order in filter task avoiding 
         // filtering if current typed search doesnt match with stored one
-        Wat.CurrentView.typedSearch = $(e.target).val();
+        Up.CurrentView.typedSearch = $(e.target).val();
         
         this.filter(e);
     },
@@ -129,13 +129,13 @@ Wat.Views.MainView = Backbone.View.extend({
     
     // Editor
     editorElement: function (e) {
-        Wat.I.dialog(this.dialogConf, this);    
+        Up.I.dialog(this.dialogConf, this);    
     },
     
     fillEditor: function (target, that) {
-        var that = that || Wat.CurrentView;
+        var that = that || Up.CurrentView;
         
-        var isSuperadmin = Wat.C.isSuperadmin();
+        var isSuperadmin = Up.C.isSuperadmin();
                 
         if (that.viewKind == 'details' || that.viewKind == 'admin' || that.editingFromList) {
             var editorMode = 'edit';
@@ -149,7 +149,7 @@ Wat.Views.MainView = Backbone.View.extend({
         
         // Add common parts of editor to dialog
         that.template = _.template(
-                    Wat.TPL.editorCommon, {
+                    Up.TPL.editorCommon, {
                         classifiedByTenant: editorMode == 'create' ? classifiedByTenant : 0,
                         isSuperadmin: isSuperadmin,
                         editorMode: editorMode,
@@ -175,17 +175,17 @@ Wat.Views.MainView = Backbone.View.extend({
                     params['startingOptions'][COMMON_TENANT_ID] = 'None (Common)';   
             }
             
-            Wat.A.fillSelect(params, function () {
+            Up.A.fillSelect(params, function () {
                 // Remove supertenant from tenant selector
                 var existsInSupertenant = $.inArray(that.qvdObj, QVD_OBJS_EXIST_IN_SUPERTENANT) != -1;
 
                 if (!existsInSupertenant) {
                     $('select[name="tenant_id"] option[value="0"]').remove();
                     
-                    Wat.I.updateChosenControls('[name="tenant_id"]');
+                    Up.I.updateChosenControls('[name="tenant_id"]');
                 }
                                 
-                Wat.B.bindEvent('change', '.tenant-selector select[name="tenant_id"]', Wat.B.editorBinds.updatePropertyRows);
+                Up.B.bindEvent('change', '.tenant-selector select[name="tenant_id"]', Up.B.editorBinds.updatePropertyRows);
                 $('[name="tenant_id"]').trigger('change');
             });
         }
@@ -204,7 +204,7 @@ Wat.Views.MainView = Backbone.View.extend({
         
         // Custom Properties
         
-        if (!Wat.C.checkACL(Wat.CurrentView.qvdObj + '.update.properties')) {
+        if (!Up.C.checkACL(Up.CurrentView.qvdObj + '.update.properties')) {
             var enabledProperties = false;
         }
         // Get enabled properties value from constant. Properties could be disabled by variable
@@ -219,10 +219,10 @@ Wat.Views.MainView = Backbone.View.extend({
         
         switch (editorMode) {
             case 'create':
-                var enabledEditProperties = Wat.C.checkACL(that.qvdObj + '.create.properties');
+                var enabledEditProperties = Up.C.checkACL(that.qvdObj + '.create.properties');
                 break;
             case 'edit':
-                var enabledEditProperties = Wat.C.checkACL(that.qvdObj + '.update.properties');
+                var enabledEditProperties = Up.C.checkACL(that.qvdObj + '.update.properties');
                 break;
         }
         
@@ -232,7 +232,7 @@ Wat.Views.MainView = Backbone.View.extend({
             var classifiedByTenant = $.inArray(that.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
 
             if (editorMode == 'edit' && classifiedByTenant) {
-                if (Wat.C.isMultitenant() && Wat.C.isSuperadmin()) {
+                if (Up.C.isMultitenant() && Up.C.isSuperadmin()) {
                     filters['-or'] = ['tenant_id', that.model.get('tenant_id'), 'tenant_id', SUPERTENANT_ID];
                 }
                 else {
@@ -242,11 +242,11 @@ Wat.Views.MainView = Backbone.View.extend({
             
             that.editorMode = editorMode;
                 
-            Wat.A.performAction(that.qvdObj + '_get_property_list', {}, filters, {}, that.fillEditorProperties, that, undefined, {"field":"key","order":"-asc"});
+            Up.A.performAction(that.qvdObj + '_get_property_list', {}, filters, {}, that.fillEditorProperties, that, undefined, {"field":"key","order":"-asc"});
         }
         
         // Store scrollHeight of the dialog container
-        Wat.I.dialogScrollHeight = $('.ui-dialog .js-dialog-container')[0].scrollHeight;
+        Up.I.dialogScrollHeight = $('.ui-dialog .js-dialog-container')[0].scrollHeight;
     },
     
     fillEditorProperties: function (that) {
@@ -275,31 +275,31 @@ Wat.Views.MainView = Backbone.View.extend({
         that.model.set({properties: properties});
         
         that.template = _.template(
-                    Wat.TPL.editorCommonProperties, {
+                    Up.TPL.editorCommonProperties, {
                         properties: that.model && that.model.attributes.properties ? that.model.attributes.properties : {}
                     }
                 );
         
         $(that.editorPropertiesContainer).html(that.template);
         
-        Wat.T.translate();
+        Up.T.translate();
 
-        if (that.editorMode != 'create' || !Wat.C.isSuperadmin()) {
+        if (that.editorMode != 'create' || !Up.C.isSuperadmin()) {
             $('.js-editor-property-row').show();
         }
-        else if (Wat.C.isMultitenant() && Wat.C.isSuperadmin() && $('[name="tenant_id"]').val() != undefined) {
+        else if (Up.C.isMultitenant() && Up.C.isSuperadmin() && $('[name="tenant_id"]').val() != undefined) {
             $('.js-editor-property-row[data-tenant-id="' + $('[name="tenant_id"]').val() + '"]').show();
             $('.js-editor-property-row[data-tenant-id="' + SUPERTENANT_ID + '"]').show();
         }
         else {
             var existsInSupertenant = $.inArray(that.qvdObj, QVD_OBJS_EXIST_IN_SUPERTENANT) != -1;
             if (!existsInSupertenant) {
-                $('.js-editor-property-row[data-tenant-id="' + Wat.C.tenantID + '"]').show();
+                $('.js-editor-property-row[data-tenant-id="' + Up.C.tenantID + '"]').show();
             }
         }
 
         // Store scrollHeight of the dialog container
-        Wat.I.dialogScrollHeight = $('.ui-dialog .js-dialog-container')[0].scrollHeight;
+        Up.I.dialogScrollHeight = $('.ui-dialog .js-dialog-container')[0].scrollHeight;
         
         delete that.editorMode;
     },
@@ -309,7 +309,7 @@ Wat.Views.MainView = Backbone.View.extend({
         
         var context = '.editor-container.' + this.cid;
         
-        return Wat.I.validateForm(context);
+        return Up.I.validateForm(context);
     },  
     
     createElement: function () {
@@ -317,7 +317,7 @@ Wat.Views.MainView = Backbone.View.extend({
         
         var context = '.editor-container.' + this.cid;
         
-        return Wat.I.validateForm(context);
+        return Up.I.validateForm(context);
     },
     
     // Parse properties from create/edit forms
@@ -412,7 +412,7 @@ Wat.Views.MainView = Backbone.View.extend({
         
         var that = this;
         model.save(arguments, {filters: filters}).complete(function(e, a, b) {
-            Wat.I.loadingUnblock();
+            Up.I.loadingUnblock();
 
             var callResponse = e.status;
             var response = {status: e.status};
@@ -436,7 +436,7 @@ Wat.Views.MainView = Backbone.View.extend({
             }
 
             if (that.dialog) {
-                Wat.I.closeDialog(that.dialog);
+                Up.I.closeDialog(that.dialog);
             }
                         
             var messageParams = {
@@ -447,18 +447,18 @@ Wat.Views.MainView = Backbone.View.extend({
             that.retrievedData = response;
             successCallback(that);
             
-            Wat.I.M.showMessage(messageParams, response);
+            Up.I.M.showMessage(messageParams, response);
         });
     },
     
     openNewElementDialog: function (e) {
         var that = this;
         
-        this.templateEditor = Wat.TPL['editorNew_' + that.qvdObj];
+        this.templateEditor = Up.TPL['editorNew_' + that.qvdObj];
         
         this.dialogConf.buttons = {
             Cancel: function (e) {
-                Wat.I.closeDialog($(this));
+                Up.I.closeDialog($(this));
             },
             Create: function (e) {
                 that.dialog = $(this);
@@ -477,11 +477,11 @@ Wat.Views.MainView = Backbone.View.extend({
     openEditElementDialog: function (e) {
         var that = this;
         
-        this.templateEditor = Wat.TPL['editor_' + that.qvdObj];
+        this.templateEditor = Up.TPL['editor_' + that.qvdObj];
         
         this.dialogConf.buttons = {
             Cancel: function () {
-                Wat.I.closeDialog($(this));
+                Up.I.closeDialog($(this));
             },
             Update: function () {
                 that.dialog = $(this);
@@ -503,7 +503,7 @@ Wat.Views.MainView = Backbone.View.extend({
             'error': 'Error stopping Virtual machine'
         };
         
-        Wat.A.performAction ('vm_stop', {}, filters, messages, function(){}, this);
+        Up.A.performAction ('vm_stop', {}, filters, messages, function(){}, this);
     },
     
     disconnectVMUser: function (filters, messages) {        
@@ -512,7 +512,7 @@ Wat.Views.MainView = Backbone.View.extend({
             'error': 'Error disconnecting user from Virtual machine'
         };
         
-        Wat.A.performAction ('vm_user_disconnect', {}, filters, messages, this.fetchList, this);
+        Up.A.performAction ('vm_user_disconnect', {}, filters, messages, this.fetchList, this);
     },
     
     openRelatedDocsDialog: function () {
@@ -524,11 +524,11 @@ Wat.Views.MainView = Backbone.View.extend({
 
         dialogConf.buttons = {
             "Read full documentation": function (e) {
-                Wat.I.closeDialog($(this));
+                Up.I.closeDialog($(this));
                 window.location = '#documentation';
             },
             Close: function (e) {
-                Wat.I.closeDialog($(this));
+                Up.I.closeDialog($(this));
             }
         };
 
@@ -548,7 +548,7 @@ Wat.Views.MainView = Backbone.View.extend({
                 var that = this;
 
                 that.template = _.template(
-                        Wat.TPL.relatedDoc, {
+                        Up.TPL.relatedDoc, {
                             relatedDoc: that.relatedDoc,
                         }
                     );
@@ -558,7 +558,7 @@ Wat.Views.MainView = Backbone.View.extend({
         };
 
 
-        Wat.I.dialog(dialogConf, this);          
+        Up.I.dialog(dialogConf, this);          
     },
     
     // Fetch details or list depending on the current view kind

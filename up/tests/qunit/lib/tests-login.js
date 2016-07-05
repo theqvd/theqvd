@@ -1,7 +1,7 @@
 function loginTest (login, password, tenant, callback) {
     module( "Login tests", {
         setup: function() {
-            Wat.L.logOut();
+            Up.L.logOut();
             // prepare something for all following tests
         },
         teardown: function() {
@@ -18,17 +18,17 @@ function loginTest (login, password, tenant, callback) {
             
             // Sometimes router is not ready at this point. Wait for it
             var waitingRouter = setInterval(function(){ 
-                if (Wat.Router.watRouter != undefined) {
-                    Wat.L.afterLogin = function () {
-                        if (Wat.Router.watRouter == undefined) {
+                if (Up.Router.watRouter != undefined) {
+                    Up.L.afterLogin = function () {
+                        if (Up.Router.watRouter == undefined) {
                             callback();
                             return;
                         }
-                        Wat.Router.watRouter.trigger('route:defaultRoute');        
+                        Up.Router.watRouter.trigger('route:defaultRoute');        
 
-                        equal(Wat.CurrentView.qvdObj, "home", "Home access granted after auth");
+                        equal(Up.CurrentView.qvdObj, "home", "Home access granted after auth");
 
-                        equal($.cookie('sid'), Wat.C.sid, "Session ID stored in cookies");
+                        equal($.cookie('sid'), Up.C.sid, "Session ID stored in cookies");
                         
                         start();
                         callback();
@@ -36,18 +36,18 @@ function loginTest (login, password, tenant, callback) {
 
                     afterGetApiInfo = function (ret) {  
                         if (ret.retrievedData.status == STATUS_SUCCESS) {
-                            Wat.C.multitenant = ret.retrievedData.multitenant || true;
+                            Up.C.multitenant = ret.retrievedData.multitenant || true;
                         }
 
-                        Wat.L.tryLogin(login, password, tenant);
+                        Up.L.tryLogin(login, password, tenant);
                     };
                         
 
-                    Wat.Router.watRouter.trigger('route:defaultRoute');    
+                    Up.Router.watRouter.trigger('route:defaultRoute');    
             
-                    equal(Wat.CurrentView.qvdObj, "login", "Login screen is loaded before auth");
+                    equal(Up.CurrentView.qvdObj, "login", "Login screen is loaded before auth");
                     
-                    Wat.A.apiInfo(afterGetApiInfo, {});
+                    Up.A.apiInfo(afterGetApiInfo, {});
                     clearInterval(waitingRouter);
                 }
             }, 300);

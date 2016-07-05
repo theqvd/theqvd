@@ -1,4 +1,4 @@
-Wat.Models.User = Wat.Models.Model.extend({
+Up.Models.User = Up.Models.Model.extend({
     actionPrefix: 'user',
     
     defaults: {

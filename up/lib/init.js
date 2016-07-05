@@ -1,6 +1,6 @@
 "use strict";
 
-var Wat = {
+var Up = {
     // Backbone components: Models, Collections, Views and Router
     Models: {
         // Common model with connection method
@@ -9,30 +9,13 @@ var Wat = {
         // Models
         User: {},
         VM: {},
-        Host: {},
-        OSF: {},
-        DI: {},
-        Admin: {},
-        Log: {},
-        Property: {},
-        Role: {},
-        Tenant: {},
     },
     Collections: {
         // Common collection with connection method
         Collection: {},
         
         // Collections
-        Users: {},
         VMs: {},
-        Hosts: {},
-        OSFs: {},
-        DIs: {},
-        Admins: {},
-        Logs: {},
-        Properties: {},
-        Roles: {},
-        Tenants: {},
     },
     Views: {
         // Common view with menu and breadcrumbs
@@ -46,25 +29,12 @@ var Wat = {
         
         // List views
         ListView: {},
-            UserListView: {},
             VMListView: {},
-            HostListView: {},
-            OSFListView: {},
-            DIListView: {},
-            TenantListView: {},
-            AdminListView: {},
-            RoleListView: {},
         
         // Details views
         DetailsView: {},
             UserDetailsView: {},
             VMDetailsView: {},
-            HostDetailsView: {},
-            OSFDetailsView: {},
-            DIDetailsView: {},
-            TenantDetailsView: {},
-            AdminDetailsView: {},
-            RoleDetailsView: {},
         
         // Views
         SetupCustomizeView: {},
@@ -88,13 +58,6 @@ var Wat = {
         BySection: {
             vm: {},
             user: {},
-            host: {},
-            osf: {},
-            di: {},
-            role: {},
-            administrator: {},
-            tenant: {},
-            log: {}
         },
         ListDetails: {},
     },
@@ -148,12 +111,6 @@ var Wat = {
         openListWebsockets: function () {},    
         openDetailsWebsockets: function () {},
         changeWebsocket: function () {},
-        // Web Sockets for Hosts (lib/websockets/websockets.host.js)
-        changeWebsocketHost: function () {},
-        // Web Sockets for OSFs (lib/websockets/websockets.osf.js)
-        changeWebsocketOsf: function () {},
-        // Web Sockets for Home page s  tats (lib/websockets/websockets.stats.js)
-        changeWebsocketStats: function () {},
         // Web Sockets for Users (lib/websockets/websockets.user.js)
         changeWebsocketUser: function () {},
         // Web Sockets for VMs (lib/websockets/websockets.vm.js)

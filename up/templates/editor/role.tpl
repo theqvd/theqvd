@@ -5,7 +5,7 @@
             <input type="text" class="" name="name" value="<%= model.get('name') %>" data-required>
         </td>
     </tr>
-    <% if (Wat.C.checkACL('role.update.description')) { %>
+    <% if (Up.C.checkACL('role.update.description')) { %>
     <tr>
         <td data-i18n="Description"></td>
         <td>

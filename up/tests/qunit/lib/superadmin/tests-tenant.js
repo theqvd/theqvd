@@ -16,14 +16,14 @@ function tenantTestReal () {
 
             expect(assertions);
 
-            Wat.Router.watRouter.trigger('route:listTenant');
+            Up.Router.watRouter.trigger('route:listTenant');
 
-            Wat.CurrentView.model = new Wat.Models.Tenant();
+            Up.CurrentView.model = new Up.Models.Tenant();
 
             //////////////////////////////////////////////////////////////////
             // Create Tenant
             //////////////////////////////////////////////////////////////////
-            Wat.CurrentView.createModel(WatTests.values.tenant, function (e) { 
+            Up.CurrentView.createModel(WatTests.values.tenant, function (e) { 
                 equal(e.retrievedData.status, STATUS_SUCCESS, "Tenant created succesfully (" + JSON.stringify(WatTests.values.tenant) + ")");
 
                 if(e.retrievedData.status == STATUS_SUCCESS) {
@@ -37,7 +37,7 @@ function tenantTestReal () {
                 //////////////////////////////////////////////////////////////////
                 // After create, get list of users matching by the created name
                 //////////////////////////////////////////////////////////////////
-                WatTests.models.tenant = new Wat.Models.Tenant({
+                WatTests.models.tenant = new Up.Models.Tenant({
                     id: WatTests.values.tenant.id
                 });            
 
@@ -60,7 +60,7 @@ function tenantTestReal () {
                         //////////////////////////////////////////////////////////////////
                         // After get list of tenants, update it
                         //////////////////////////////////////////////////////////////////
-                        Wat.CurrentView.updateModel(WatTests.updateValues.tenant, {'id': WatTests.values.tenant.id}, function (e) { 
+                        Up.CurrentView.updateModel(WatTests.updateValues.tenant, {'id': WatTests.values.tenant.id}, function (e) { 
                             equal(e.retrievedData.status, 0, "Tenant updated succesfully (" + JSON.stringify(WatTests.updateValues.tenant) + ")");
 
                             //////////////////////////////////////////////////////////////////
@@ -84,15 +84,15 @@ function tenantTestReal () {
                                     //////////////////////////////////////////////////////////////////
                                     // After match the updated user, delete it
                                     //////////////////////////////////////////////////////////////////
-                                    Wat.CurrentView.deleteModel({'id': WatTests.values.tenant.id}, function (e) { 
+                                    Up.CurrentView.deleteModel({'id': WatTests.values.tenant.id}, function (e) { 
                                         equal(e.retrievedData.status, 0, "Tenant deleted succesfully (ID: " + JSON.stringify(WatTests.values.tenant.id) + ")");
 
                                         // Unblock task runner
                                         start();
-                                    }, Wat.CurrentView.model);
+                                    }, Up.CurrentView.model);
                                 }
                             });
-                        }, Wat.CurrentView.model);
+                        }, Up.CurrentView.model);
                     }
                 });
             });

@@ -12,7 +12,7 @@
 
         <% 
             $.each(vms_with_expiration_date, function (iExp, exp) {
-                var processedRemainingTime = Wat.U.processRemainingTime(exp.remaining_time);
+                var processedRemainingTime = Up.U.processRemainingTime(exp.remaining_time);
                 
                 %>
                 <tr>
@@ -20,12 +20,12 @@
                         <i class="fa fa-warning <%= processedRemainingTime.priorityClass %>"></i>
                     </td>                    
                     <td>
-                        <%= Wat.C.ifACL('<a href="#/vm/' + exp.id + '">', 'vm.see-details.') %>
+                        <%= Up.C.ifACL('<a href="#/vm/' + exp.id + '">', 'vm.see-details.') %>
                             <%= exp.name %>
-                        <%= Wat.C.ifACL('</a>', 'vm.see-details.') %>
+                        <%= Up.C.ifACL('</a>', 'vm.see-details.') %>
                     </td>
                     <td>
-                        <span class="summary-data js-summary-users" <%= processedRemainingTime.remainingTimeAttr %> data-countdown data-raw="<%= Wat.U.base64.encodeObj(exp.remaining_time) %>"><%= processedRemainingTime.remainingTime %></span>
+                        <span class="summary-data js-summary-users" <%= processedRemainingTime.remainingTimeAttr %> data-countdown data-raw="<%= Up.U.base64.encodeObj(exp.remaining_time) %>"><%= processedRemainingTime.remainingTime %></span>
                     </td>
                 </tr>
                 <%

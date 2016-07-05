@@ -36,7 +36,7 @@
         </td>
     </tr>
     <% 
-    if (Wat.C.checkACL('di.create.version')) { 
+    if (Up.C.checkACL('di.create.version')) { 
     %>
     <tr>
         <td data-i18n="Version"></td>
@@ -57,7 +57,7 @@
         </td>
     </tr>
     <% 
-    if (Wat.C.checkACL('di.create.default')) { 
+    if (Up.C.checkACL('di.create.default')) { 
     %>
     <tr>
         <td>Default</td>
@@ -67,7 +67,7 @@
     </tr>
     <% 
     }
-    if (Wat.C.checkACL('di.create.tags')) { 
+    if (Up.C.checkACL('di.create.tags')) { 
     %>
     <tr>
         <td data-i18n="Tags"></td>

@@ -1,4 +1,4 @@
-Wat.Views.ProfileView = Wat.Views.DetailsView.extend({  
+Up.Views.ProfileView = Up.Views.DetailsView.extend({  
     setupOption: 'administrators',
     secondaryContainer: '.bb-setup',
     qvdObj: 'profile',
@@ -21,12 +21,12 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
     },
     
     initialize: function (params) {
-        Wat.Views.MainView.prototype.initialize.apply(this, [params]);
+        Up.Views.MainView.prototype.initialize.apply(this, [params]);
         
-        params.id = Wat.C.adminID;
-        this.id = Wat.C.adminID;
+        params.id = Up.C.adminID;
+        this.id = Up.C.adminID;
         
-        this.model = new Wat.Models.Admin(params);
+        this.model = new Up.Models.Admin(params);
         
         // The profile action to update current admin data is 'myadmin_update'
         this.model.setActionPrefix('myadmin');
@@ -34,21 +34,21 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         // Extend the common events
         this.extendEvents(this.eventsDetails);
         
-        var templates = Wat.I.T.getTemplateList('profile', {qvdObj: this.qvdObj});
+        var templates = Up.I.T.getTemplateList('profile', {qvdObj: this.qvdObj});
         
-        Wat.A.getTemplates(templates, this.render, this); 
+        Up.A.getTemplates(templates, this.render, this); 
     },
     
     render: function () {        
         this.template = _.template(
-            Wat.TPL.profile, {
+            Up.TPL.profile, {
                 cid: this.cid,
-                login: Wat.C.login,
-                language: Wat.C.language,
-                block: Wat.C.block,
-                tenantLanguage: Wat.C.tenantLanguage,
-                tenantBlock: Wat.C.tenantBlock,
-                tenantName: Wat.C.tenantName
+                login: Up.C.login,
+                language: Up.C.language,
+                block: Up.C.block,
+                tenantLanguage: Up.C.tenantLanguage,
+                tenantBlock: Up.C.tenantBlock,
+                tenantName: Up.C.tenantName
             }
         );
 
@@ -56,20 +56,20 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         
         this.printBreadcrumbs(this.breadcrumbs, '');
         
-        Wat.T.translateAndShow();
+        Up.T.translateAndShow();
     },
     
     openEditElementDialog: function(e) {     
         this.dialogConf.title = $.i18n.t('Edit profile');
-        Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
+        Up.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
 
-        Wat.I.chosenConfiguration();
-        Wat.I.chosenElement('select[name="language"]', 'single100');
-        Wat.I.chosenElement('select[name="block"]', 'single100');
+        Up.I.chosenConfiguration();
+        Up.I.chosenElement('select[name="language"]', 'single100');
+        Up.I.chosenElement('select[name="block"]', 'single100');
     },
     
     updateElement: function (dialog) {
-        var valid = Wat.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
+        var valid = Up.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
         
         if (!valid) {
             return;
@@ -107,14 +107,14 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
     afterUpdateElement: function (that) {
         // If change is made succesfully check new language to ender again and translate
         if (that.retrievedData.status == STATUS_SUCCESS) {
-            if (Wat.C.language != that.newLanguage) {
-                Wat.C.language = that.newLanguage;
+            if (Up.C.language != that.newLanguage) {
+                Up.C.language = that.newLanguage;
             }
-            if (Wat.C.block != that.newBlock) {
-                Wat.C.block = that.newBlock;
+            if (Up.C.block != that.newBlock) {
+                Up.C.block = that.newBlock;
             }
             that.render();
-            Wat.T.initTranslate();
+            Up.T.initTranslate();
         }
     }
 });

@@ -1,7 +1,7 @@
 <div class="related-doc">
     <%
     $.each(relatedDoc, function (docSection, docName) {
-        if (Wat.I.docSections[docSection] == undefined || !Wat.C.isValidDocGuide(Wat.I.docSections[docSection].guide)) {
+        if (Up.I.docSections[docSection] == undefined || !Up.C.isValidDocGuide(Up.I.docSections[docSection].guide)) {
             return;    
         }
     %>

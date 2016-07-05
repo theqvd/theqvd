@@ -1,5 +1,5 @@
 <table>
-    <% if (Wat.C.checkACL('vm.update.description')) { %>
+    <% if (Up.C.checkACL('vm.update.description')) { %>
     <tr>
         <td data-i18n="Description"></td>
         <td>
@@ -8,7 +8,7 @@
     </tr>
     <% } %>
     <% 
-    if (Wat.C.checkACL('administrator.update.password')) { 
+    if (Up.C.checkACL('administrator.update.password')) { 
     %>
         <tr>
             <td data-i18n="Change password"></td>
@@ -32,7 +32,7 @@
     }
     %>
     <% 
-    if (Wat.C.checkACL('administrator.update.language')) { 
+    if (Up.C.checkACL('administrator.update.language')) { 
     %>
         <tr>
             <td data-i18n="Language"></td>

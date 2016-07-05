@@ -77,7 +77,7 @@
                     }
                 });
                 
-                if (Wat.C.isMultitenant()) { 
+                if (Up.C.isMultitenant()) { 
             %>
                     <th class="col-width-100" data-sortby="name">
                         <span data-i18n="Global username"><%= i18n.t('Global username') %></span>
@@ -140,7 +140,7 @@
                             case 'name':
                                 var cellClass = 'js-name';
                                 var cellAttrs = '';
-                                if (Wat.C.checkACL('user.see-details.')) {
+                                if (Up.C.checkACL('user.see-details.')) {
                                     cellClass += ' cell-link';
                                     cellAttrs += 'data-i18n="[title]Click for details"';
                                 }
@@ -149,10 +149,10 @@
                                 
                 %>
                                 <td <%= cellAttrs %>>
-                                    <%= Wat.C.ifACL('<a href="#/user/' + model.get('id') + '">', 'user.see-details.') %>
-                                    <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'user.see-details.') %>
+                                    <%= Up.C.ifACL('<a href="#/user/' + model.get('id') + '">', 'user.see-details.') %>
+                                    <%= Up.C.ifACL('<i class="fa fa-search"></i>', 'user.see-details.') %>
                                         <span class="text"><%= model.get('name') %></span>
-                                    <%= Wat.C.ifACL('</a>', 'user.see-details.') %>
+                                    <%= Up.C.ifACL('</a>', 'user.see-details.') %>
                                     <div class="mobile info-in-name-cell">
                                         <%= info %>
                                     </div>
@@ -163,11 +163,11 @@
                 %>
                                 <td class="desktop">
                                     <% if (model.get('number_of_vms') > 0) { %>
-                                    <%= Wat.C.ifACL('<a href="#/vms/' + Wat.U.transformFiltersToSearchHash({user_id: model.get('id')}) + '">', 'vm.see-main.') %>
+                                    <%= Up.C.ifACL('<a href="#/vms/' + Up.U.transformFiltersToSearchHash({user_id: model.get('id')}) + '">', 'vm.see-main.') %>
                                         <span data-wsupdate="number_of_vms_connected" data-id="<%= model.get('id') %>"><%= model.get('number_of_vms_connected') %></span>
                                         /
                                         <span data-wsupdate="number_of_vms" data-id="<%= model.get('id') %>"><%= model.get('number_of_vms') %></span>
-                                    <%= Wat.C.ifACL('</a>', 'vm.see-details.') %>
+                                    <%= Up.C.ifACL('</a>', 'vm.see-details.') %>
                                     <% } else {%>
                                         <span data-wsupdate="number_of_vms_connected" data-id="<%= model.get('id') %>"><%= model.get('number_of_vms_connected') %></span>
                                         /
@@ -201,10 +201,10 @@
                         }
                     });
                 
-                    if (Wat.C.isMultitenant()) { 
+                    if (Up.C.isMultitenant()) { 
                 %>
                         <td class="desktop">
-                            <%= Wat.C.getLoginData(model.get('name'), model.get('tenant_name')) %>
+                            <%= Up.C.getLoginData(model.get('name'), model.get('tenant_name')) %>
                         </td>
                 <%
                     }

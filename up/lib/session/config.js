@@ -1,5 +1,5 @@
 // Config
-Wat.C = {
+Up.C = {
     // Version of WAT
     version: '4.0',
     
@@ -49,7 +49,7 @@ Wat.C = {
         this.apiUrl+= apiPath;
 
 		// Build websockets URL depending on the used protocol
-        if (Wat.C.apiUrl.substr(0, 5) == 'https') {
+        if (Up.C.apiUrl.substr(0, 5) == 'https') {
             this.apiWSUrl = 'wss' + this.apiUrl.substr(5);
         }
         else {
@@ -69,7 +69,7 @@ Wat.C = {
             return baseUrl;
         }
         else {
-            return this.getApiUrl() + "?" + Wat.C.getUrlSid();
+            return this.getApiUrl() + "?" + Up.C.getUrlSid();
         }
     },
     
@@ -80,12 +80,12 @@ Wat.C = {
     
     // Get the API URL for update DIs
     getUpdateDiUrl: function () {
-        return this.getApiUrl() + "di/upload?" + Wat.C.getUrlSid();
+        return this.getApiUrl() + "di/upload?" + Up.C.getUrlSid();
     }, 
     
     // Get the API URL for download DIs from URL
     getDownloadDiUrl: function (url) {
-        return this.getApiUrl() + "di/download?" + Wat.C.getUrlSid() + "&url=" + url;
+        return this.getApiUrl() + "di/download?" + Up.C.getUrlSid() + "&url=" + url;
     },
     
     // Return if current admin is superadmin
@@ -151,8 +151,8 @@ Wat.C = {
         $.each (viewsConfiguration, function (iView, view) {
             switch (view.view_type) {
                 case 'list_column':
-                    if (!Wat.I.listFields[view.qvd_object][view.field]) {
-                        Wat.I.listFields[view.qvd_object][view.field] = {
+                    if (!Up.I.listFields[view.qvd_object][view.field]) {
+                        Up.I.listFields[view.qvd_object][view.field] = {
                             'display': view.visible,
                             'noTranslatable': true,
                             'fields': [
@@ -164,12 +164,12 @@ Wat.C = {
                         };
                     }
                     
-                    Wat.I.listFields[view.qvd_object][view.field].display = view.visible;
-                    Wat.I.listFields[view.qvd_object][view.field].customized = true;
+                    Up.I.listFields[view.qvd_object][view.field].display = view.visible;
+                    Up.I.listFields[view.qvd_object][view.field].customized = true;
                     break;
                 case 'filter':
-                    if (!Wat.I.formFilters[view.qvd_object][view.field]) {
-                        Wat.I.formFilters[view.qvd_object][view.field] = {
+                    if (!Up.I.formFilters[view.qvd_object][view.field]) {
+                        Up.I.formFilters[view.qvd_object][view.field] = {
                             'filterField': view.field,
                             'type': 'text',
                             'text': view.field,
@@ -181,14 +181,14 @@ Wat.C = {
                     
                     switch (view.device_type) {
                         case 'mobile':
-                            Wat.I.formFilters[view.qvd_object][view.field].displayMobile = view.visible;
+                            Up.I.formFilters[view.qvd_object][view.field].displayMobile = view.visible;
                             break;
                         case 'desktop':
-                            Wat.I.formFilters[view.qvd_object][view.field].displayDesktop = view.visible;
+                            Up.I.formFilters[view.qvd_object][view.field].displayDesktop = view.visible;
                             break;
                     }
                     
-                    Wat.I.formFilters[view.qvd_object][view.field].customized = true;
+                    Up.I.formFilters[view.qvd_object][view.field].customized = true;
                     break;
             }
         });
@@ -311,13 +311,13 @@ Wat.C = {
     // Set different parameters to correct menu and sections visibility. 
     // These settings will be performed depending on ACL checks, mono/multi tenant configurations, or administrators tenants type
     configureVisibility: function () {        
-        Wat.I.menu = $.extend(true, {}, Wat.I.menuOriginal);
-        Wat.I.userMenu = $.extend(true, {}, Wat.I.menuUserOriginal);
-        Wat.I.helpMenu = $.extend(true, {}, Wat.I.menuHelpOriginal);
-        Wat.I.configMenu = $.extend(true, {}, Wat.I.menuConfigOriginal);
-        Wat.I.setupMenu = $.extend(true, {}, Wat.I.menuSetupOriginal);
-        Wat.I.mobileMenu = $.extend(true, {}, Wat.I.mobileMenuOriginal);
-        Wat.I.cornerMenu = $.extend(true, {}, Wat.I.cornerMenuOriginal);
+        Up.I.menu = $.extend(true, {}, Up.I.menuOriginal);
+        Up.I.userMenu = $.extend(true, {}, Up.I.menuUserOriginal);
+        Up.I.helpMenu = $.extend(true, {}, Up.I.menuHelpOriginal);
+        Up.I.configMenu = $.extend(true, {}, Up.I.menuConfigOriginal);
+        Up.I.setupMenu = $.extend(true, {}, Up.I.menuSetupOriginal);
+        Up.I.mobileMenu = $.extend(true, {}, Up.I.mobileMenuOriginal);
+        Up.I.cornerMenu = $.extend(true, {}, Up.I.cornerMenuOriginal);
 
         var that = this;
 
@@ -332,9 +332,9 @@ Wat.C = {
         
         $.each(aclMenu, function (acl, menu) {
             if (!that.checkACL(acl)) {
-                delete Wat.I.menu[menu];
-                delete Wat.I.mobileMenu[menu];
-                delete Wat.I.cornerMenu.platform.subMenu[menu];
+                delete Up.I.menu[menu];
+                delete Up.I.mobileMenu[menu];
+                delete Up.I.cornerMenu.platform.subMenu[menu];
             }
         });
         
@@ -351,57 +351,57 @@ Wat.C = {
         
         $.each(aclSetupMenu, function (acl, menu) {
             if (!that.checkACL(acl)) {
-                delete Wat.I.setupMenu[menu];
-                delete Wat.I.cornerMenu.wat.subMenu[menu];
+                delete Up.I.setupMenu[menu];
+                delete Up.I.cornerMenu.wat.subMenu[menu];
             }
         });
         
         // Recover user will has not profile section
-        if (Wat.C.isRecoveradmin()) {
-            delete Wat.I.userMenu['profile'];
-            delete Wat.I.cornerMenu.user.subMenu['profile'];
+        if (Up.C.isRecoveradmin()) {
+            delete Up.I.userMenu['profile'];
+            delete Up.I.cornerMenu.user.subMenu['profile'];
         }
         
         // Set to the menu option the link of its first sub-option link
-        if (Wat.I.cornerMenu.wat && !$.isEmptyObject(Wat.I.cornerMenu.wat.subMenu)) {
-            Wat.I.cornerMenu.wat.link = Wat.I.cornerMenu.wat.subMenu[Object.keys(Wat.I.cornerMenu.wat.subMenu)[0]].link;
+        if (Up.I.cornerMenu.wat && !$.isEmptyObject(Up.I.cornerMenu.wat.subMenu)) {
+            Up.I.cornerMenu.wat.link = Up.I.cornerMenu.wat.subMenu[Object.keys(Up.I.cornerMenu.wat.subMenu)[0]].link;
         }         
-        if (Wat.I.cornerMenu.user && !$.isEmptyObject(Wat.I.cornerMenu.user.subMenu)) {
-            Wat.I.cornerMenu.user.link = Wat.I.cornerMenu.user.subMenu[Object.keys(Wat.I.cornerMenu.user.subMenu)[0]].link;
+        if (Up.I.cornerMenu.user && !$.isEmptyObject(Up.I.cornerMenu.user.subMenu)) {
+            Up.I.cornerMenu.user.link = Up.I.cornerMenu.user.subMenu[Object.keys(Up.I.cornerMenu.user.subMenu)[0]].link;
         }        
-        if (Wat.I.cornerMenu.platform && !$.isEmptyObject(Wat.I.cornerMenu.platform.subMenu)) {
-            Wat.I.cornerMenu.platform.link = Wat.I.cornerMenu.platform.subMenu[Object.keys(Wat.I.cornerMenu.platform.subMenu)[0]].link;
+        if (Up.I.cornerMenu.platform && !$.isEmptyObject(Up.I.cornerMenu.platform.subMenu)) {
+            Up.I.cornerMenu.platform.link = Up.I.cornerMenu.platform.subMenu[Object.keys(Up.I.cornerMenu.platform.subMenu)[0]].link;
         }
         
         // Hide help option if there are not acls given (not logged)
-        if (Wat.C.acls.length == 0) {
-            delete Wat.I.cornerMenu.help;
+        if (Up.C.acls.length == 0) {
+            delete Up.I.cornerMenu.help;
         }
         
-        if ($.isEmptyObject(Wat.I.cornerMenu.platform.subMenu)) {
-            delete Wat.I.cornerMenu.platform;
+        if ($.isEmptyObject(Up.I.cornerMenu.platform.subMenu)) {
+            delete Up.I.cornerMenu.platform;
         }        
         
-        if ($.isEmptyObject(Wat.I.cornerMenu.wat.subMenu)) {
-            delete Wat.I.cornerMenu.wat;
+        if ($.isEmptyObject(Up.I.cornerMenu.wat.subMenu)) {
+            delete Up.I.cornerMenu.wat;
         }
         
         if (!that.checkACL('config.qvd.')) {
-            delete Wat.I.cornerMenu.config;
+            delete Up.I.cornerMenu.config;
         }
         
         // For tenant admins (not superadmins) and recover admin in monotenant mode the acl section tenant will not exist
         var tenantsExist = false;
         
-        if (Wat.C.isSuperadmin() && Wat.C.isMultitenant()) {
+        if (Up.C.isSuperadmin() && Up.C.isMultitenant()) {
             tenantsExist = true;
         }
         
         // For monotenant  enviroments, multitenant documentation will not be shown
-        if (!Wat.C.isMultitenant()) {
-            $.each(Wat.I.docSections, function (iSec, sec) {
+        if (!Up.C.isMultitenant()) {
+            $.each(Up.I.docSections, function (iSec, sec) {
                 if (sec.guide == 'multitenant') {
-                    delete Wat.I.docSections[iSec];
+                    delete Up.I.docSections[iSec];
                 }
             });
         }
@@ -416,14 +416,14 @@ Wat.C = {
     // Params:
     //      response: API call response
     sessionExpired: function (response) {
-        if (!Wat.Router.watRouter) {
+        if (!Up.Router.watRouter) {
             return false;
         }
         else {
             switch  (response.status) { 
                 case STATUS_TENANT_RESTRICTED:
                     // Tenant restricted control will only works when logged (sid defined)
-                    if (!Wat.C.sid) {
+                    if (!Up.C.sid) {
                         break;
                     }
                 case STATUS_SESSION_EXPIRED:
@@ -475,9 +475,9 @@ Wat.C = {
     
     // Add common functions to the view
     addCommonFunctions: function (that) {
-        if (Wat.Common.BySection[that.qvdObj] != undefined) {
-            if (!$.isEmptyObject(Wat.Common.BySection[that.qvdObj])) {
-                $.extend(that, Wat.Common.BySection[that.qvdObj]);
+        if (Up.Common.BySection[that.qvdObj] != undefined) {
+            if (!$.isEmptyObject(Up.Common.BySection[that.qvdObj])) {
+                $.extend(that, Up.Common.BySection[that.qvdObj]);
                 that.initializeCommon(that);
                 delete that.initializeCommon;
             }
@@ -514,12 +514,12 @@ Wat.C = {
                     return;
                 }
                 
-                Wat.C.requests.push(jqXHR);
+                Up.C.requests.push(jqXHR);
             },
             complete: function(jqXHR) {
-                var index = $.inArray(jqXHR, Wat.C.requests);
+                var index = $.inArray(jqXHR, Up.C.requests);
                 if (index > -1) {
-                    Wat.C.requests.splice(index, 1);
+                    Up.C.requests.splice(index, 1);
                 }
             }
         });
@@ -533,7 +533,7 @@ Wat.C = {
     // Read config file "/config.json"
     readConfigFile: function (callback) {
         $.ajax({
-            url: Wat.C.configFileName,
+            url: Up.C.configFileName,
             method: 'GET',
             async: true,
             contentType: 'json',
@@ -551,25 +551,26 @@ Wat.C = {
                 
                 if (isJSON) {
                 $.each(configTokens, function (token, value) {
-                    Wat.C.setConfigToken(token, value);
+                    Up.C.setConfigToken(token, value);
                 });
                 
                 // Check cross-origin
-                Wat.C.checkCrossOrigin();
+                Up.C.checkCrossOrigin();
                     
                 // After read configuration file, we will set API address
-                Wat.C.initApiAddress();
+                Up.C.initApiAddress();
                 }
                 
+                console.log(window.location);
                 // Remember login from cookies to recover session if was setted previously
-                Wat.L.rememberLogin();
+                Up.L.rememberLogin();
             }
         });
     },
     
     setupLibraries: function () {
         // Attach fast click events to separate tap from click
-        Wat.I.attachFastClick(); 
+        Up.I.attachFastClick(); 
     },
     
     getFirstAuthSeparator: function () {
@@ -580,17 +581,17 @@ Wat.C = {
     
     getLoginData: function (name, tenant) {        
         // If tenant not defined, get current tenant (tenant admin cases)
-        tenant = tenant || Wat.C.tenantName;
+        tenant = tenant || Up.C.tenantName;
         
         // If name not defined, get current login name
-        name = name || Wat.C.login;
+        name = name || Up.C.login;
 
         // In monotenant cases, login data is just username
         if (!this.isMultitenant()) {
             return name;
         }
         
-        return name + Wat.C.getFirstAuthSeparator() + tenant;
+        return name + Up.C.getFirstAuthSeparator() + tenant;
     },
 
     // Check if client URL hostname and API hostname is the same (CORS situation)

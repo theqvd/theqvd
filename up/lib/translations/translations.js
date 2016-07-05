@@ -1,11 +1,11 @@
 // Translation setup and utilities
-Wat.T = {
+Up.T = {
     lan: '',
     loaded: false,
     
     // Translation configuration and actions to be done when language file is loaded
     initTranslate: function(lan) {        
-        lan = lan || Wat.C.language;
+        lan = lan || Up.C.language;
         
         lan = this.getLanguage(lan);
         
@@ -28,8 +28,8 @@ Wat.T = {
         // If language is not among the WAT supported languages, check the tenant language
         if ($.inArray(lan, Object.keys(WAT_LANGUAGES)) == -1) {
             // If language is default, check if tenant language is among the WAT supported languages
-            if (lan == 'default' && $.inArray(Wat.C.tenantLanguage, Object.keys(WAT_LANGUAGES)) != -1) {
-                lan = Wat.C.tenantLanguage;
+            if (lan == 'default' && $.inArray(Up.C.tenantLanguage, Object.keys(WAT_LANGUAGES)) != -1) {
+                lan = Up.C.tenantLanguage;
             }
             else {
                 // If language is not supported, set auto mode to detect it from browser
@@ -53,9 +53,9 @@ Wat.T = {
         // Force chosen to selects that contain any option with data-i18n attribute
         $('select[data-contain-i18n]').trigger('chosen:updated');
         
-        Wat.T.translateXDays();
-        Wat.T.translateXMonths();
-        Wat.T.translateXYears();
+        Up.T.translateXDays();
+        Up.T.translateXMonths();
+        Up.T.translateXYears();
         
         // Translatable buttons
         $.each($('.js-traductable_button'), function(index, button) {
@@ -64,13 +64,13 @@ Wat.T = {
         });
         
         // Configure different chosen controls (advanced jquery select controls)
-        Wat.I.chosenConfiguration();
+        Up.I.chosenConfiguration();
 
         // Add sort icons to header
-        Wat.I.updateSortIcons();
+        Up.I.updateSortIcons();
         
         // Process tooltips
-        Wat.I.tooltipBind();
+        Up.I.tooltipBind();
         
         // Update all the chosen select controls
         $('select').trigger('chosen:updated');  
@@ -81,10 +81,10 @@ Wat.T = {
     
     // Translate and show all
     translateAndShow: function () {
-        Wat.T.translate();
+        Up.T.translate();
         
         // When all is translated and loaded, hide loading spinner and show content
-        Wat.I.showAll(); 
+        Up.I.showAll(); 
     },
     
     // Translate the content of an element passing the selector

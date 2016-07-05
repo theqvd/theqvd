@@ -1,5 +1,5 @@
 // Templates utilities
-Wat.I.T = {
+Up.I.T = {
     getTemplateList: function (code, params) {
         var templates = {};
 

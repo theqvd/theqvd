@@ -23,7 +23,7 @@
             <select class="" name="osf_id" data-any-selected></select>
         </td>
     </tr>
-    <% if (Wat.C.checkACL('vm.create.di-tag')) { %>
+    <% if (Up.C.checkACL('vm.create.di-tag')) { %>
     <tr>
         <td data-i18n="Image tag"></td>
         <td>

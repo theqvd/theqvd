@@ -141,7 +141,7 @@
                             case 'name':
                                 var cellClass = 'js-name';
                                 var cellAttrs = '';
-                                if (Wat.C.checkACL('osf.see-details.')) {
+                                if (Up.C.checkACL('osf.see-details.')) {
                                     cellClass += ' cell-link';
                                     cellAttrs += 'data-i18n="[title]Click for details"';
                                 }
@@ -150,10 +150,10 @@
                                 
                 %>
                                 <td <%= cellAttrs %>>
-                                    <%= Wat.C.ifACL('<a href="#/osf/' + model.get('id') + '" data-i18n="[title]Click for details">', 'osf.see-details.') %>
-                                    <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'osf.see-details.') %>
+                                    <%= Up.C.ifACL('<a href="#/osf/' + model.get('id') + '" data-i18n="[title]Click for details">', 'osf.see-details.') %>
+                                    <%= Up.C.ifACL('<i class="fa fa-search"></i>', 'osf.see-details.') %>
                                         <span class="text"><%= model.get('name') %></span>
-                                    <%= Wat.C.ifACL('</a>', 'osf.see-details.') %>
+                                    <%= Up.C.ifACL('</a>', 'osf.see-details.') %>
                                 </td>
                 <%
                                 break;
@@ -193,9 +193,9 @@
                 %>
                                 <td class="desktop">
                                     <% if (model.get('number_of_dis') > 0) { %>
-                                    <%= Wat.C.ifACL('<a href="#/dis/' + Wat.U.transformFiltersToSearchHash({osf_id: model.get('id')}) + '">', 'di.see-main.') %>
+                                    <%= Up.C.ifACL('<a href="#/dis/' + Up.U.transformFiltersToSearchHash({osf_id: model.get('id')}) + '">', 'di.see-main.') %>
                                         <span data-wsupdate="number_of_dis" data-id="<%= model.get('id') %>"><%= model.get('number_of_dis') %></span>
-                                    <%= Wat.C.ifACL('</a>', 'di.see-main.') %>
+                                    <%= Up.C.ifACL('</a>', 'di.see-main.') %>
                                     <% } else {
                                     %>
                                         <span data-wsupdate="number_of_dis" data-id="<%= model.get('id') %>"><%= model.get('number_of_dis') %></span>
@@ -207,9 +207,9 @@
                 %>
                                 <td class="desktop">
                                     <% if (model.get('number_of_vms') > 0) { %>
-                                    <%= Wat.C.ifACL('<a href="#/vms/' + Wat.U.transformFiltersToSearchHash({osf_id: model.get('id')}) + '">', 'vm.see-main.') %>
+                                    <%= Up.C.ifACL('<a href="#/vms/' + Up.U.transformFiltersToSearchHash({osf_id: model.get('id')}) + '">', 'vm.see-main.') %>
                                         <span data-wsupdate="number_of_vms" data-id="<%= model.get('id') %>"><%= model.get('number_of_vms') %></span>
-                                    <%= Wat.C.ifACL('</a>', 'vm.see-main.') %>
+                                    <%= Up.C.ifACL('</a>', 'vm.see-main.') %>
                                     <% } else {
                                     %>
                                         <span data-wsupdate="number_of_vms" data-id="<%= model.get('id') %>"><%= model.get('number_of_vms') %></span>

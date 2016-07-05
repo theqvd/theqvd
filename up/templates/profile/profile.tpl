@@ -47,12 +47,12 @@
         </td>
     </tr>
     <%
-    if (Wat.C.isMultitenant()) { 
+    if (Up.C.isMultitenant()) { 
     %>
         <tr>
             <td><i class="fa fa-sitemap"></i><span data-i18n="Global username">Global username</span></td>
             <td>
-                 <%= Wat.C.getLoginData() %>
+                 <%= Up.C.getLoginData() %>
             </td>
         </tr>
     <%   

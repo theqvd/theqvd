@@ -1,4 +1,4 @@
-Wat.Models.Model = Backbone.Model.extend({
+Up.Models.Model = Backbone.Model.extend({
     defaults: {},
     id: 0,
     detailsView: false,
@@ -7,7 +7,7 @@ Wat.Models.Model = Backbone.Model.extend({
     parse: function(response) {
         if (response.rows) {
             var view = 'detail';
-            if (Wat.C.sessionExpired(response)) {
+            if (Up.C.sessionExpired(response)) {
                 return;
             }
         }
@@ -22,7 +22,7 @@ Wat.Models.Model = Backbone.Model.extend({
                 return this.processResponse(response);
                 break;
             case 'error':
-                Wat.I.M.showMessage({messageType: 'error'}, response);
+                Up.I.M.showMessage({messageType: 'error'}, response);
                 break;
         }
     },
@@ -33,7 +33,7 @@ Wat.Models.Model = Backbone.Model.extend({
             // Creation date must be converted to local timezone and proper format
             if (response.creation_date) {
                 response.creation_date = response.creation_date.replace("T", " ");
-                response.creation_date = Wat.U.getLocalDatetimeFormatted(response.creation_date);
+                response.creation_date = Up.U.getLocalDatetimeFormatted(response.creation_date);
             }
         
             // Escape strings to avoid injections
@@ -54,7 +54,7 @@ Wat.Models.Model = Backbone.Model.extend({
     },
     
     url: function () {
-        var url = Wat.C.getBaseUrl();
+        var url = Up.C.getBaseUrl();
         url += "&action=" + this.actionPrefix + "_get_details";
         if (this.id != undefined) {
             url += "&filters={\"id\":" + this.id + "}";
@@ -95,11 +95,11 @@ Wat.Models.Model = Backbone.Model.extend({
     
     save: function(attributes, options) { 
         options = {
-            url: encodeURI(Wat.C.getBaseUrl() + 
+            url: encodeURI(Up.C.getBaseUrl() + 
                 "&action=" + this.operation +
                 "&filters=" + JSON.stringify(options.filters) + 
                 "&arguments=" + JSON.stringify(attributes) +
-                "&parameters=" + JSON.stringify({source: Wat.C.source}))
+                "&parameters=" + JSON.stringify({source: Up.C.source}))
         };
         
         return Backbone.Model.prototype.save.call(this, attributes, options);

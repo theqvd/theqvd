@@ -127,7 +127,7 @@
                             case 'name':
                                 var cellClass = 'js-name col-width-100';
                                 var cellAttrs = '';
-                                if (Wat.C.checkACL('role.see-details.')) {
+                                if (Up.C.checkACL('role.see-details.')) {
                                     cellClass += ' cell-link';
                                     cellAttrs += 'data-i18n="[title]Click for details"';
                                 }
@@ -136,10 +136,10 @@
                                 
                 %>
                                 <td <%= cellAttrs %>>
-                                    <%= Wat.C.ifACL('<a href="#/role/' + model.get('id') + '">', 'role.see-details.') %>
-                                    <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'role.see-details.') %>
+                                    <%= Up.C.ifACL('<a href="#/role/' + model.get('id') + '">', 'role.see-details.') %>
+                                    <%= Up.C.ifACL('<i class="fa fa-search"></i>', 'role.see-details.') %>
                                         <span class="text"><%= model.get('name') %></span>
-                                    <%= Wat.C.ifACL('</a>', 'role.see-details.') %>
+                                    <%= Up.C.ifACL('</a>', 'role.see-details.') %>
                                     <div class="mobile info-in-name-cell">
                                         <%= info %>
                                     </div>

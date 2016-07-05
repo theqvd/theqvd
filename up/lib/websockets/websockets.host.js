@@ -1,4 +1,4 @@
-Wat.WS.changeWebsocketHost = function (id, field, data) {
+Up.WS.changeWebsocketHost = function (id, field, data) {
     switch (field) {
         case 'state':               
             $('[data-wsupdate="state"][data-id="' + id + '"]').removeAttr('data-i18n');

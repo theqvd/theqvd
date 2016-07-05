@@ -24,7 +24,7 @@
                 <%
                     $.each(WAT_LANGUAGE_ADMIN_OPTIONS, function (lanCode, lanText) {
                         var selected = '';
-                        if (lanCode == Wat.C.language) {
+                        if (lanCode == Up.C.language) {
                             selected = 'selected="selected"';
                         }
                 %>
@@ -42,7 +42,7 @@
                 <%
                     $.each(WAT_BLOCK_SIZES_ADMIN, function (blockSize, blockSizeText) {
                         var selected = '';
-                        if (blockSize == Wat.C.block) {
+                        if (blockSize == Up.C.block) {
                             selected = 'selected="selected"';
                         }
                         

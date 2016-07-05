@@ -12,19 +12,19 @@ function languageDocTest() {
             // Number of Assertions we Expect
             var assertions = 0;
             
-            assertions += Object.keys(Wat.I.docSections).length * DOC_AVAILABLE_LANGUAGES.length;
+            assertions += Object.keys(Up.I.docSections).length * DOC_AVAILABLE_LANGUAGES.length;
             //expect(assertions);
             
             stop(assertions-1);
             
             $.each(DOC_AVAILABLE_LANGUAGES, function (iLan, lan) {
-                $.each (Wat.I.docSections, function (iSection, section) {
-                    Wat.D.fillTemplateString = function (string, target, toc, docParams) {
+                $.each (Up.I.docSections, function (iSection, section) {
+                    Up.D.fillTemplateString = function (string, target, toc, docParams) {
                         notEqual(string, null, 'Documentation section "' + docParams.sectionId + '" was found in guide "' + docParams.guide + '"');
                         start();
                     };
                     
-                    Wat.D.fillDocSection(section.guide, section[lan] + '', false, APP_PATH);
+                    Up.D.fillDocSection(section.guide, section[lan] + '', false, APP_PATH);
                 });
             });
         });

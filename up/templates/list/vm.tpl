@@ -206,7 +206,7 @@
                             case 'name':
                                 var cellClass = 'js-name';
                                 var cellAttrs = '';
-                                if (Wat.C.checkACL('vm.see-details.')) {
+                                if (Up.C.checkACL('vm.see-details.')) {
                                     cellClass += ' cell-link';
                                     cellAttrs += 'data-i18n="[title]Click for details"';
                                 }
@@ -216,46 +216,46 @@
                 %>
                                 <td <%= cellAttrs %>>
                                     <input type="hidden" class="selenium-field vm-state-<%= model.get('id') %>" value="<%= model.get('state') %>">
-                                    <%= Wat.C.ifACL('<a href="#/vm/' + model.get('id') + '"">', 'vm.see-details.') %>
-                                    <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'vm.see-details.') %>
+                                    <%= Up.C.ifACL('<a href="#/vm/' + model.get('id') + '"">', 'vm.see-details.') %>
+                                    <%= Up.C.ifACL('<i class="fa fa-search"></i>', 'vm.see-details.') %>
                                         <span class="text"><%= model.get('name') %></span>
-                                    <%= Wat.C.ifACL('</a>', 'vm.see-details.') %>
+                                    <%= Up.C.ifACL('</a>', 'vm.see-details.') %>
                                 </td>
                 <%
                                 break;
                             case 'host':
                 %>
                                 <td class="desktop" data-wsupdate="host" data-id="<%= model.get('id') %>">
-                                    <%= Wat.C.ifACL('<a href="#/host/' + model.get('host_id') + '">', 'host.see-details.') %>
+                                    <%= Up.C.ifACL('<a href="#/host/' + model.get('host_id') + '">', 'host.see-details.') %>
                                         <%= model.get('host_name') %>
-                                    <%= Wat.C.ifACL('</a>', 'host.see-details.') %>
+                                    <%= Up.C.ifACL('</a>', 'host.see-details.') %>
                                 </td>
                 <%
                                 break;
                             case 'user':
                 %>
                                 <td class="desktop">
-                                    <%= Wat.C.ifACL('<a href="#/user/' + model.get('user_id') + '">', 'user.see-details.') %>
+                                    <%= Up.C.ifACL('<a href="#/user/' + model.get('user_id') + '">', 'user.see-details.') %>
                                         <%= model.get('user_name') %>
-                                    <%= Wat.C.ifACL('</a>', 'user.see-details.') %>
+                                    <%= Up.C.ifACL('</a>', 'user.see-details.') %>
                                 </td>
                 <%
                                 break;
                             case 'osf':
                 %>
                                 <td class="desktop">
-                                    <%= Wat.C.ifACL('<a href="#/osf/' + model.get('osf_id') + '">', 'osf.see-details.') %>
+                                    <%= Up.C.ifACL('<a href="#/osf/' + model.get('osf_id') + '">', 'osf.see-details.') %>
                                         <%= model.get('osf_name') %>
-                                    <%= Wat.C.ifACL('</a>', 'osf.see-details.') %>
+                                    <%= Up.C.ifACL('</a>', 'osf.see-details.') %>
                                 </td>
                 <%
                                 break;
                             case 'osf/tag':
                 %>
                                 <td class="desktop">
-                                    <%= Wat.C.ifACL('<a href="#/osf/' + model.get('osf_id') + '">', 'osf.see-details.') %>
+                                    <%= Up.C.ifACL('<a href="#/osf/' + model.get('osf_id') + '">', 'osf.see-details.') %>
                                         <%= model.get('osf_name') %>
-                                    <%= Wat.C.ifACL('</a>', 'osf.see-details.') %>
+                                    <%= Up.C.ifACL('</a>', 'osf.see-details.') %>
                                     
                                     <div class="second_row">
                                         <%= model.get('di_tag') %>
@@ -281,7 +281,7 @@
                 %>
                                 <td class="desktop">
                                     <span class="" data-wsupdate="<%= name %>" data-id="<%= model.get('id') %>"><%= model.get(name) %></span>
-                                    <% if (Wat.C.checkACL('vm.see.next-boot-ip') && model.get('next_boot_ip') && model.get('next_boot_ip') != model.get('ip')) { %>
+                                    <% if (Up.C.checkACL('vm.see.next-boot-ip') && model.get('next_boot_ip') && model.get('next_boot_ip') != model.get('ip')) { %>
                                     <div class="second_row"><span data-i18n="Next"></span>: <%= model.get('next_boot_ip') %></div>
                                     <% } %>
                                 </td>
@@ -290,18 +290,18 @@
                             case 'di_name':
                 %>
                                 <td class="desktop">
-                                    <%= Wat.C.ifACL('<a href="#/di/' + model.get('di_id') + '" data-i18n="[title]Click for details">', 'di.see-details.') %>
+                                    <%= Up.C.ifACL('<a href="#/di/' + model.get('di_id') + '" data-i18n="[title]Click for details">', 'di.see-details.') %>
                                         <%= model.get('di_name') %>
-                                    <%= Wat.C.ifACL('</a>', 'di.see-details.') %>
+                                    <%= Up.C.ifACL('</a>', 'di.see-details.') %>
                                 </td>
                 <%
                                 break;
                             case 'di_version':
                 %>
                                 <td class="desktop">
-                                    <%= Wat.C.ifACL('<a href="#/di/' + model.get('di_id') + '" data-i18n="[title]Click for details">', 'di.see-details.') %>
+                                    <%= Up.C.ifACL('<a href="#/di/' + model.get('di_id') + '" data-i18n="[title]Click for details">', 'di.see-details.') %>
                                         <%= model.get('di_version') %>
-                                    <%= Wat.C.ifACL('</a>', 'di.see-details.') %>
+                                    <%= Up.C.ifACL('</a>', 'di.see-details.') %>
                                 </td>
                 <%
                                 break;
@@ -310,9 +310,9 @@
                                 <td class="desktop">
                                     <%
                                         if (model.get('time_until_expiration_soft')) {
-                                            var remainingTimeSoft = Wat.U.processRemainingTime(model.get('time_until_expiration_soft'));
+                                            var remainingTimeSoft = Up.U.processRemainingTime(model.get('time_until_expiration_soft'));
                                     %>
-                                            <div class="<%= remainingTimeSoft.priorityClass %>" <%= remainingTimeSoft.remainingTimeAttr %> data-countdown data-raw="<%= Wat.U.base64.encodeObj(model.get('time_until_expiration_soft')) %>">
+                                            <div class="<%= remainingTimeSoft.priorityClass %>" <%= remainingTimeSoft.remainingTimeAttr %> data-countdown data-raw="<%= Up.U.base64.encodeObj(model.get('time_until_expiration_soft')) %>">
                                                 <%= remainingTimeSoft.remainingTime %>
                                             </div>
                                             <div class="second_row">
@@ -329,9 +329,9 @@
                                 <td class="desktop">
                                     <%
                                         if (model.get('time_until_expiration_hard')) {
-                                            var remainingTimeHard = Wat.U.processRemainingTime(model.get('time_until_expiration_hard'));
+                                            var remainingTimeHard = Up.U.processRemainingTime(model.get('time_until_expiration_hard'));
                                     %>
-                                        <div class="<%= remainingTimeHard.priorityClass %>" <%= remainingTimeHard.remainingTimeAttr %> data-countdown data-raw="<%= Wat.U.base64.encodeObj(model.get('time_until_expiration_hard')) %>">
+                                        <div class="<%= remainingTimeHard.priorityClass %>" <%= remainingTimeHard.remainingTimeAttr %> data-countdown data-raw="<%= Up.U.base64.encodeObj(model.get('time_until_expiration_hard')) %>">
                                             <%= remainingTimeHard.remainingTime %>
                                         </div>
                                         <div class="second_row">

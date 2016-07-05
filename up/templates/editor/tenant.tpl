@@ -1,5 +1,5 @@
 <table>
-    <% if (Wat.C.checkACL('tenant.update.name')) { %>
+    <% if (Up.C.checkACL('tenant.update.name')) { %>
     <tr>
         <td data-i18n="Name"></td>
         <td>
@@ -7,7 +7,7 @@
         </td>
     </tr>
     <% } %>
-    <% if (Wat.C.checkACL('tenant.update.description')) { %>
+    <% if (Up.C.checkACL('tenant.update.description')) { %>
     <tr>
         <td data-i18n="Description"></td>
         <td>
@@ -15,7 +15,7 @@
         </td>
     </tr>
     <% } %>
-    <% if (Wat.C.checkACL('tenant.update.language')) { %>
+    <% if (Up.C.checkACL('tenant.update.language')) { %>
     <tr>
         <td data-i18n="Language"></td>
         <td>
@@ -35,7 +35,7 @@
         </td>
     </tr>
     <% } %>
-    <% if (Wat.C.checkACL('tenant.update.blocksize')) { %>
+    <% if (Up.C.checkACL('tenant.update.blocksize')) { %>
     <tr>
         <td data-i18n="Block size"></td>
         <td>

@@ -1,9 +1,9 @@
-Wat.WS.changeWebsocketStats = function (field, data) {
-    if (!Wat.CurrentView.stats || Wat.CurrentView.stats[field] == undefined) {
+Up.WS.changeWebsocketStats = function (field, data) {
+    if (!Up.CurrentView.stats || Up.CurrentView.stats[field] == undefined) {
         return;
     }
     
-    Wat.CurrentView.stats[field] = data;
+    Up.CurrentView.stats[field] = data;
     
     switch (field) {
         case 'users_count':
@@ -34,12 +34,12 @@ Wat.WS.changeWebsocketStats = function (field, data) {
                     }
                 }
             ];
-            Wat.CurrentView.stats[field] = data;*/
+            Up.CurrentView.stats[field] = data;*/
             
             
-            Wat.CurrentView.renderVmsExpire();
+            Up.CurrentView.renderVmsExpire();
             
-            Wat.T.translateXDays();
+            Up.T.translateXDays();
             break;
         case 'top_populated_hosts':
 /*            data = [
@@ -48,33 +48,33 @@ Wat.WS.changeWebsocketStats = function (field, data) {
                 {id: 4, name: "node4", number_of_vms: 5},
                 {id: 5, name: "node5", number_of_vms: 2}
             ]
-            Wat.CurrentView.stats[field] = data;*/
+            Up.CurrentView.stats[field] = data;*/
             
             var hostsMoreVMSData = [];
             
-            $.each(Wat.CurrentView.stats.top_populated_hosts, function (iPop, population) {
+            $.each(Up.CurrentView.stats.top_populated_hosts, function (iPop, population) {
                 hostsMoreVMSData.push(population);
             });
             
-            Wat.I.G.drawBarChartRunningVMsSimple('hosts-more-vms', hostsMoreVMSData);
+            Up.I.G.drawBarChartRunningVMsSimple('hosts-more-vms', hostsMoreVMSData);
             break;
     }
     
     switch (field) {
         case 'hosts_count':
         case 'running_hosts_count':
-            var runningHostsData = [Wat.CurrentView.stats.running_hosts_count, Wat.CurrentView.stats.hosts_count - Wat.CurrentView.stats.running_hosts_count];
-            Wat.I.G.drawPieChartSimple('running-hosts', runningHostsData);
+            var runningHostsData = [Up.CurrentView.stats.running_hosts_count, Up.CurrentView.stats.hosts_count - Up.CurrentView.stats.running_hosts_count];
+            Up.I.G.drawPieChartSimple('running-hosts', runningHostsData);
             break;
         case 'users_count':
         case 'connected_users_count':
-            var connectedUsersData = [Wat.CurrentView.stats.connected_users_count, Wat.CurrentView.stats.users_count - Wat.CurrentView.stats.connected_users_count];
-            Wat.I.G.drawPieChartSimple('connected-users', connectedUsersData);
+            var connectedUsersData = [Up.CurrentView.stats.connected_users_count, Up.CurrentView.stats.users_count - Up.CurrentView.stats.connected_users_count];
+            Up.I.G.drawPieChartSimple('connected-users', connectedUsersData);
             break;
         case 'vms_count':
         case 'running_vms_count':
-            var runningVMSData = [Wat.CurrentView.stats.running_vms_count, Wat.CurrentView.stats.vms_count - Wat.CurrentView.stats.running_vms_count];
-            Wat.I.G.drawPieChartSimple('running-vms', runningVMSData);
+            var runningVMSData = [Up.CurrentView.stats.running_vms_count, Up.CurrentView.stats.vms_count - Up.CurrentView.stats.running_vms_count];
+            Up.I.G.drawPieChartSimple('running-vms', runningVMSData);
             break;
     }
 }

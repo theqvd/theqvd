@@ -3,7 +3,7 @@
         // Show state info fields if is granted any of contained fields. Hide it otherwise
         var showStateInfo = false;
 
-        if (Wat.C.checkGroupACL('vmStateInfoDetails')) {
+        if (Up.C.checkGroupACL('vmStateInfoDetails')) {
             showStateInfo = true;
         }
                 
@@ -50,7 +50,7 @@
                 <td colspan=2>
                 <span class="h2" data-i18n="Execution state"></span>
                 <% 
-                if (Wat.C.checkACL('vm.update.state')) {
+                if (Up.C.checkACL('vm.update.state')) {
                     switch (model.get('state')) {
                         case 'stopped':
                             %>
@@ -81,8 +81,8 @@
                         var nDots = 15;
                         
                         var hostHtml = '';
-                        if (Wat.C.checkACL('vm.see.host')) {
-                            hostHtml = Wat.C.ifACL('<a href="#/host/' + model.get('host_id') + '">', 'host.see-details.') + model.get('host_name') ? model.get('host_name') : '' + Wat.C.ifACL('</a>', 'host.see-details.');
+                        if (Up.C.checkACL('vm.see.host')) {
+                            hostHtml = Up.C.ifACL('<a href="#/host/' + model.get('host_id') + '">', 'host.see-details.') + model.get('host_name') ? model.get('host_name') : '' + Up.C.ifACL('</a>', 'host.see-details.');
                         }
                     %>
                     <fieldset style="margin-top: 20px;">
@@ -141,7 +141,7 @@
                                             </td>
                                         </tr>
                                     <%
-                                    if (Wat.C.checkACL('vm.see.host')) { 
+                                    if (Up.C.checkACL('vm.see.host')) { 
                                     %>
                                         <tr>
                                             <td><i class="<%= CLASS_ICON_HOSTS %>"></i><span data-i18n="Node"></span></td>
@@ -151,7 +151,7 @@
                                         </tr>
                                     <%
                                     }
-                                    if (Wat.C.checkACL('vm.see.ip')) { 
+                                    if (Up.C.checkACL('vm.see.ip')) { 
                                     %>
                                         <tr>
                                             <td><i class="fa fa-ellipsis-h"></i><span data-i18n="IP address"></span></td>
@@ -161,7 +161,7 @@
                                         </tr>
                                     <%
                                     }
-                                    if (Wat.C.checkACL('vm.see.di')) { 
+                                    if (Up.C.checkACL('vm.see.di')) { 
                                     %>
                                         <tr>
                                             <td><i class="<%= CLASS_ICON_DIS %>"></i><span data-i18n="Disk image"></span></td>
@@ -178,7 +178,7 @@
                                         </tr>
                                     <% 
                                     }
-                                    if (Wat.C.checkACL('vm.see.user-state')) { 
+                                    if (Up.C.checkACL('vm.see.user-state')) { 
                                     %>
                                         <tr>
                                             <td><i class="fa fa-plug"></i><span data-i18n="User state"></span></td>
@@ -199,7 +199,7 @@
                                         </tr>
                                     <% 
                                     }
-                                    if (Wat.C.checkACL('vm.see.port-ssh')) { 
+                                    if (Up.C.checkACL('vm.see.port-ssh')) { 
                                     %>
                                         <tr>
                                             <td><i class="fa fa-angle-double-right"></i><span data-i18n="SSH port"></span></td>
@@ -207,7 +207,7 @@
                                         </tr>
                                     <% 
                                     }
-                                    if (Wat.C.checkACL('vm.see.port-vnc')) { 
+                                    if (Up.C.checkACL('vm.see.port-vnc')) { 
                                     %>
                                         <tr>
                                             <td><i class="fa fa-angle-double-right"></i><span data-i18n="VNC port"></span></td>
@@ -215,7 +215,7 @@
                                         </tr>
                                     <% 
                                     }
-                                    if (Wat.C.checkACL('vm.see.port-serial')) { 
+                                    if (Up.C.checkACL('vm.see.port-serial')) { 
                                     %>
                                         <tr>
                                             <td><i class="fa fa-angle-double-right"></i><span data-i18n="Serial port"></span></td>
@@ -238,8 +238,8 @@
 <div class="side-component js-side-component2">
     <div class="side-header">
         <span class="h2" data-i18n="Log"></span>
-        <% if (Wat.C.checkACL('log.see-main.')) { %>
-        <a class="button2 button-right fa fa-arrows-h" href="#/logs/<%= Wat.U.transformFiltersToSearchHash({qvd_object: Wat.CurrentView.qvdObj, object_id: model.get('id')}) %>" data-i18n="Extended view"></a>
+        <% if (Up.C.checkACL('log.see-main.')) { %>
+        <a class="button2 button-right fa fa-arrows-h" href="#/logs/<%= Up.U.transformFiltersToSearchHash({qvd_object: Up.CurrentView.qvdObj, object_id: model.get('id')}) %>" data-i18n="Extended view"></a>
         <% } %>
     </div>
     <div class="bb-details-side2">

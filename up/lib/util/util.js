@@ -1,4 +1,4 @@
-Wat.U = {
+Up.U = {
     processRemainingTime: function (rawRemainingTime) {
         if (!rawRemainingTime) {
             return {};
@@ -99,7 +99,7 @@ Wat.U = {
     // Get the current date plus the given diffMilliseconds
     getRelativeDate: function (diffSeconds) {
         // Obtain the relative date with the current one OF THE SERVER
-        var milliseconds = new Date().getTime() + (diffSeconds * 1000) + (Wat.C.serverClientTimeLag * 1000);
+        var milliseconds = new Date().getTime() + (diffSeconds * 1000) + (Up.C.serverClientTimeLag * 1000);
         
         return this.getDate(milliseconds);
     },
@@ -214,7 +214,7 @@ Wat.U = {
     // Get local datetime formatted
     getLocalDatetimeFormatted: function (datetime) {
         var d = this.getLocalDatetime(datetime);
-        var dFormatted = Wat.U.getDate(d.getTime());
+        var dFormatted = Up.U.getDate(d.getTime());
         
         return dFormatted;
     }

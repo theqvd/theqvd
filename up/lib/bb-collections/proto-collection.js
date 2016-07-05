@@ -1,4 +1,4 @@
-Wat.Collections.Collection = Backbone.Collection.extend({
+Up.Collections.Collection = Backbone.Collection.extend({
     model: {},
     elementsTotal: 0,
     status: 0,
@@ -11,15 +11,15 @@ Wat.Collections.Collection = Backbone.Collection.extend({
     initialize: function (params) {
         params = params || {};
         
-        this.block = params.block || Wat.C.getBlock();
+        this.block = params.block || Up.C.getBlock();
         this.offset = params.offset || this.offset;
         this.filters = params.filters || this.filters;
-        this.action = params.action || this.actionPrefix + '_get_list';
+        this.action = params.action || this.actionPrefix + '_list';
         this.sort = params.sort || this.sort;
     },
     
     getListUrl: function () {
-        var fullUrl = Wat.C.getBaseUrl()  + 
+        var fullUrl = Up.C.getBaseUrl()  + 
             "&action=" + this.action +
             "&offset=" + this.offset + 
             "&block=" + this.block + 
@@ -42,7 +42,7 @@ Wat.Collections.Collection = Backbone.Collection.extend({
     },
 
     parse: function(response) {
-        if (Wat.C.sessionExpired(response)) {
+        if (Up.C.sessionExpired(response)) {
             return;
         }
         

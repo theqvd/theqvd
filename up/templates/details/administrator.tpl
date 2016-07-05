@@ -3,15 +3,15 @@
     <div class="clear mobile"></div>
     <a class="button2 fright fa fa-eye js-show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>
     
-    <% if(Wat.C.checkACL('administrator.delete.') && Wat.C.adminID != model.get('id')) { %>
+    <% if(Up.C.checkACL('administrator.delete.') && Up.C.adminID != model.get('id')) { %>
     <a class="button fleft button-icon--desktop js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"><span data-i18n="Delete" class="mobile"></span></a>
     <% } %>
     
-    <% if(Wat.C.checkGroupACL('administratorEdit')) { %>
+    <% if(Up.C.checkGroupACL('administratorEdit')) { %>
     <a class="button fright button-icon--desktop js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"><span data-i18n="Edit" class="mobile"></span></a>
     <% } %>
     
-    <% if(Wat.C.checkACL('administrator.update.assign-role')) { %>
+    <% if(Up.C.checkACL('administrator.update.assign-role')) { %>
     <a class="button fright button-icon--desktop js-tools-roles-btn <%= CLASS_ICON_ROLES %>" href="javascript:" data-i18n="[title]Assign roles"><span data-i18n="Assign roles" class="mobile"></span></a>
     <% } %>
     
@@ -20,19 +20,19 @@
 
 <table class="details details-list col-width-100">
     <%   
-    if (Wat.C.isSuperadmin()) { 
+    if (Up.C.isSuperadmin()) { 
     %>
         <tr>
             <td><i class="<%= CLASS_ICON_TENANTS %>"></i><span data-i18n="Tenant"></span></td>
             <td>
-                <%= Wat.C.ifACL('<a href="#/tenant/' + model.get('tenant_id') + '">', 'tenant.see-details.') %>
+                <%= Up.C.ifACL('<a href="#/tenant/' + model.get('tenant_id') + '">', 'tenant.see-details.') %>
                 <%= model.get('tenant_name') %>
-                <%= Wat.C.ifACL('</a>', 'tenant.see-details.') %>
+                <%= Up.C.ifACL('</a>', 'tenant.see-details.') %>
             </td>
         </tr>
     <%   
     }
-    if (Wat.C.checkACL('administrator.see.id')) { 
+    if (Up.C.checkACL('administrator.see.id')) { 
     %>
         <tr>
             <td><i class="fa fa-asterisk"></i><span data-i18n="Id"></span></td>
@@ -42,7 +42,7 @@
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('administrator.see.description')) { 
+    if (Up.C.checkACL('administrator.see.description')) { 
     %>
         <tr>
             <td><i class="fa fa-align-justify"></i><span data-i18n="Description"></span></td>
@@ -63,7 +63,7 @@
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('administrator.see.language')) { 
+    if (Up.C.checkACL('administrator.see.language')) { 
     %>
     <tr>
         <td><i class="fa fa-globe"></i><span data-i18n="Language"></span></td>
@@ -87,7 +87,7 @@
     </tr>
     <% 
     }
-    if (Wat.C.checkACL('administrator.see.roles')) {
+    if (Up.C.checkACL('administrator.see.roles')) {
     %>
         <tr>
             <td><i class="<%= CLASS_ICON_ROLES %>"></i><span data-i18n="Assigned roles"></span></td>
@@ -100,16 +100,16 @@
                             %>
                                 <div data-role-id="<%= iRole %>">
                                     <%
-                                        if (Wat.C.checkACL('administrator.update.assign-role')) {
+                                        if (Up.C.checkACL('administrator.update.assign-role')) {
                                     %>
                                             <i class="delete-role-button js-delete-role-button fa fa-times" data-id="<%= iRole %>" data-name="<%= role %>" data-inherit-type="roles" data-i18n="[title]Delete"></i>
                                     <%
                                         }
                                     %>
 
-                                    <%= Wat.C.ifACL('<a href="#/role/' + iRole + '">', 'role.see-details.') %>
+                                    <%= Up.C.ifACL('<a href="#/role/' + iRole + '">', 'role.see-details.') %>
                                     <span class="text"><%= role %></span>
-                                    <%= Wat.C.ifACL('</a>', 'role.see-details.') %>
+                                    <%= Up.C.ifACL('</a>', 'role.see-details.') %>
                                 </div>
                             <%
                                 }); 
@@ -129,7 +129,7 @@
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('administrator.see.created-by')) {
+    if (Up.C.checkACL('administrator.see.created-by')) {
     %>
         <tr>
             <td><i class="<%= CLASS_ICON_ADMINS %>"></i><span data-i18n="Created by"></span></td>
@@ -139,7 +139,7 @@
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('administrator.see.creation-date')) {
+    if (Up.C.checkACL('administrator.see.creation-date')) {
     %>
         <tr>
             <td><i class="fa fa-clock-o"></i><span data-i18n="Creation date"></span></td>
@@ -149,12 +149,12 @@
         </tr>
     <% 
     }
-    if (Wat.C.isMultitenant()) { 
+    if (Up.C.isMultitenant()) { 
     %>
         <tr>
             <td><i class="fa fa-sitemap"></i><span data-i18n="Global username">Global username</span></td>
             <td>
-                 <%= Wat.C.getLoginData(model.get('name'), model.get('tenant_name')) %>
+                 <%= Up.C.getLoginData(model.get('name'), model.get('tenant_name')) %>
             </td>
         </tr>
     <%   

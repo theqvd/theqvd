@@ -16,14 +16,14 @@ function roleTestReal () {
 
             expect(assertions);
 
-            Wat.Router.watRouter.trigger('route:listRole');
+            Up.Router.watRouter.trigger('route:listRole');
 
-            Wat.CurrentView.model = new Wat.Models.Role();
+            Up.CurrentView.model = new Up.Models.Role();
 
             //////////////////////////////////////////////////////////////////
             // Create Role
             //////////////////////////////////////////////////////////////////
-            Wat.CurrentView.createModel(WatTests.values.role, function (e) { 
+            Up.CurrentView.createModel(WatTests.values.role, function (e) { 
                 equal(e.retrievedData.status, STATUS_SUCCESS, "Role created succesfully (" + JSON.stringify(WatTests.values.role) + ")");
 
                 if(e.retrievedData.status == STATUS_SUCCESS) {
@@ -37,7 +37,7 @@ function roleTestReal () {
                 //////////////////////////////////////////////////////////////////
                 // After create, get list of users matching by the created name
                 //////////////////////////////////////////////////////////////////
-                WatTests.models.role = new Wat.Models.Role({
+                WatTests.models.role = new Up.Models.Role({
                     id: WatTests.values.role.id
                 });            
 
@@ -71,7 +71,7 @@ function roleTestReal () {
                         //////////////////////////////////////////////////////////////////
                         // After get list of roles, update it
                         //////////////////////////////////////////////////////////////////
-                        Wat.CurrentView.updateModel(WatTests.updateValues.role, {'id': WatTests.values.role.id}, function (e) { 
+                        Up.CurrentView.updateModel(WatTests.updateValues.role, {'id': WatTests.values.role.id}, function (e) { 
                             equal(e.retrievedData.status, 0, "Role updated succesfully (" + JSON.stringify(WatTests.updateValues.role) + ")");
 
                             //////////////////////////////////////////////////////////////////
@@ -104,7 +104,7 @@ function roleTestReal () {
                                     //////////////////////////////////////////////////////////////////
                                     // After get list of roles, update it
                                     //////////////////////////////////////////////////////////////////
-                                    Wat.CurrentView.updateModel(WatTests.updateValues.role, {'id': WatTests.values.role.id}, function (e) { 
+                                    Up.CurrentView.updateModel(WatTests.updateValues.role, {'id': WatTests.values.role.id}, function (e) { 
                                         equal(e.retrievedData.status, 0, "Role updated succesfully (" + JSON.stringify(WatTests.updateValues.role) + ")");
 
                                         //////////////////////////////////////////////////////////////////
@@ -130,7 +130,7 @@ function roleTestReal () {
                                                 //////////////////////////////////////////////////////////////////
                                                 // After get role details, update it again
                                                 //////////////////////////////////////////////////////////////////
-                                                Wat.CurrentView.updateModel(WatTests.updateValues.role2, {'id': WatTests.values.role.id}, function (e) { 
+                                                Up.CurrentView.updateModel(WatTests.updateValues.role2, {'id': WatTests.values.role.id}, function (e) { 
                                                     equal(e.retrievedData.status, 0, "Role updated succesfully (" + JSON.stringify(WatTests.updateValues.role) + ")");
 
                                                     //////////////////////////////////////////////////////////////////
@@ -157,22 +157,22 @@ function roleTestReal () {
                                                 //////////////////////////////////////////////////////////////////
                                                             // After match the updated role, delete it
                                                 //////////////////////////////////////////////////////////////////
-                                                Wat.CurrentView.deleteModel({'id': WatTests.values.role.id}, function (e) { 
+                                                Up.CurrentView.deleteModel({'id': WatTests.values.role.id}, function (e) { 
                                                     equal(e.retrievedData.status, 0, "Role deleted succesfully (ID: " + JSON.stringify(WatTests.values.role.id) + ")");
 
                                                     // Unblock task runner
                                                     start();
-                                                }, Wat.CurrentView.model);
+                                                }, Up.CurrentView.model);
                                             }
                                         });
-                                    }, Wat.CurrentView.model);
+                                    }, Up.CurrentView.model);
                                                 
                                             }
                                         });
-                                    }, Wat.CurrentView.model);
+                                    }, Up.CurrentView.model);
                                 }
                             });
-                        }, Wat.CurrentView.model);
+                        }, Up.CurrentView.model);
                     }
                 });
             });

@@ -122,7 +122,7 @@
                             case 'see_details':
                                 var cellClass = 'js-name';
                                 var cellAttrs = '';
-                                if (Wat.C.checkACL('log.see-details.')) {
+                                if (Up.C.checkACL('log.see-details.')) {
                                     cellClass += ' cell-link';
                                     cellAttrs += 'data-i18n="[title]Click for details"';
                                 }
@@ -131,9 +131,9 @@
                                 
                 %>
                                 <td <%= cellAttrs %>>
-                                    <%= Wat.C.ifACL('<a href="#/log/' + model.get('id') + '">', 'log.see-details.') %>
-                                    <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'log.see-details.') %>
-                                    <%= Wat.C.ifACL('</a>', 'log.see-details.') %>
+                                    <%= Up.C.ifACL('<a href="#/log/' + model.get('id') + '">', 'log.see-details.') %>
+                                    <%= Up.C.ifACL('<i class="fa fa-search"></i>', 'log.see-details.') %>
+                                    <%= Up.C.ifACL('</a>', 'log.see-details.') %>
                                 </td>
                 <%
                                 break;
@@ -173,11 +173,11 @@
                                     <i class="<%= LOG_TYPE_OBJECTS_ICONS[model.get('qvd_object')] %>" data-i18n="[title]<%= LOG_TYPE_OBJECTS[model.get('qvd_object')] %>" title="<%=  i18n.t(LOG_TYPE_OBJECTS[model.get('qvd_object')]) %>"></i>
                                     <% if (model.get('object_name')) { %>
                                         <%= 
-                                        model.get('object_deleted') ? '' : Wat.C.ifACL('<a href="#/' + model.get('qvd_object') + '/' + model.get('object_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'log.see-details.') 
+                                        model.get('object_deleted') ? '' : Up.C.ifACL('<a href="#/' + model.get('qvd_object') + '/' + model.get('object_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'log.see-details.') 
                                         %>
                                             <span class="text"><%= model.get('object_name') %></span>
                                         <%= 
-                                        model.get('object_deleted') ? '' : Wat.C.ifACL('</a>', 'log.see-details.') 
+                                        model.get('object_deleted') ? '' : Up.C.ifACL('</a>', 'log.see-details.') 
                                         %>
                                     <% 
                                     } 
@@ -188,11 +188,11 @@
                                             case 'login':
                                                 %>
                                                 <%= 
-                                                model.get('admin_deleted') ? '' : Wat.C.ifACL('<a href="#/administrator/' + model.get('admin_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'administrator.see-details.') 
+                                                model.get('admin_deleted') ? '' : Up.C.ifACL('<a href="#/administrator/' + model.get('admin_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'administrator.see-details.') 
                                                 %>
                                                 <span class="text"><%= model.get('admin_name') %></span>
                                                 <%= 
-                                                model.get('admin_deleted') ? '' : Wat.C.ifACL('</a>', 'administrator.see-details.') 
+                                                model.get('admin_deleted') ? '' : Up.C.ifACL('</a>', 'administrator.see-details.') 
                                                 %>
                                                 <%
                                                 break;
@@ -217,11 +217,11 @@
                 %>
                                 <td class="desktop">
                                     <%
-                                        var showAdminLink = (Wat.C.isSuperadmin() || !model.get('superadmin')) && !model.get('admin_deleted') && !Wat.C.isRecoveradmin(model.get('admin_id')); 
+                                        var showAdminLink = (Up.C.isSuperadmin() || !model.get('superadmin')) && !model.get('admin_deleted') && !Up.C.isRecoveradmin(model.get('admin_id')); 
                                     %>
-                                    <%= !showAdminLink ? '' : Wat.C.ifACL('<a href="#/administrator/' + model.get('admin_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'administrator.see-details.') %>
+                                    <%= !showAdminLink ? '' : Up.C.ifACL('<a href="#/administrator/' + model.get('admin_id') + '" data-i18n="[title]Click for details" title="' + i18n.t('Click for details') + '">', 'administrator.see-details.') %>
                                         <span class="text"><%= model.get('admin_name') %></span>
-                                    <%= !showAdminLink ? '' : Wat.C.ifACL('</a>', 'administrator.see-details.') %>
+                                    <%= !showAdminLink ? '' : Up.C.ifACL('</a>', 'administrator.see-details.') %>
                                 </td>
                 <%
                                 break;

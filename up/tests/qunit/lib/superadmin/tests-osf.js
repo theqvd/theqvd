@@ -29,7 +29,7 @@ function osfTestFake () {
 
             this.server.respondWith(
                 "POST", 
-                Wat.C.apiUrl + '?sid=' + Wat.C.sid  + '&action=osf_get_details&filters={"id":' + fakeValues.id + '}',
+                Up.C.apiUrl + '?sid=' + Up.C.sid  + '&action=osf_get_details&filters={"id":' + fakeValues.id + '}',
                 [
                     200, 
                     { "Content-Type": "application/json" },
@@ -37,10 +37,10 @@ function osfTestFake () {
                 ]
            );
 
-            Wat.Router.watRouter.trigger('route:detailsOSF', [fakeValues.id]);        
+            Up.Router.watRouter.trigger('route:detailsOSF', [fakeValues.id]);        
 
             // Bind to the change event on the model
-            Wat.CurrentView.model.bind('change', callback);
+            Up.CurrentView.model.bind('change', callback);
 
             this.server.respond();
 
@@ -55,7 +55,7 @@ function osfTestFake () {
                 }
             });
 
-            deepEqual(callback.getCall(0).args[0], Wat.CurrentView.model, "Spied result and Backbone model should be equal");
+            deepEqual(callback.getCall(0).args[0], Up.CurrentView.model, "Spied result and Backbone model should be equal");
         });
 }
 
@@ -79,16 +79,16 @@ function osfTestReal () {
 
             expect(assertions);
 
-            Wat.Router.watRouter.trigger('route:listOSF');
+            Up.Router.watRouter.trigger('route:listOSF');
 
-            Wat.CurrentView.model = new Wat.Models.OSF();
+            Up.CurrentView.model = new Up.Models.OSF();
             
             delete WatTests.values.osf.id;
 
             //////////////////////////////////////////////////////////////////
             // Create OSF
             //////////////////////////////////////////////////////////////////
-            Wat.CurrentView.createModel(WatTests.values.osf, function (e) { 
+            Up.CurrentView.createModel(WatTests.values.osf, function (e) { 
                 equal(e.retrievedData.status, STATUS_SUCCESS, "OSF created succesfully (" + JSON.stringify(WatTests.values.osf) + ")");
 
                 if(e.retrievedData.status == STATUS_SUCCESS) {
@@ -102,7 +102,7 @@ function osfTestReal () {
                 //////////////////////////////////////////////////////////////////
                 // After create, get list of osfs matching by the created name
                 //////////////////////////////////////////////////////////////////
-                WatTests.models.osf = new Wat.Models.OSF({
+                WatTests.models.osf = new Up.Models.OSF({
                     id: WatTests.values.osf.id
                 });            
 
@@ -130,7 +130,7 @@ function osfTestReal () {
                         //////////////////////////////////////////////////////////////////
                         // After get list of osfs, update it
                         //////////////////////////////////////////////////////////////////
-                        Wat.CurrentView.updateModel(WatTests.updateValues.osf, {'id': WatTests.values.osf.id}, function (e) { 
+                        Up.CurrentView.updateModel(WatTests.updateValues.osf, {'id': WatTests.values.osf.id}, function (e) { 
                             equal(e.retrievedData.status, 0, "OSF updated succesfully (" + JSON.stringify(WatTests.updateValues.osf) + ")");
 
                             //////////////////////////////////////////////////////////////////
@@ -157,15 +157,15 @@ function osfTestReal () {
                                     //////////////////////////////////////////////////////////////////
                                     // After match the updated osf, delete it
                                     //////////////////////////////////////////////////////////////////
-                                    Wat.CurrentView.deleteModel({'id': WatTests.values.osf.id}, function (e) { 
+                                    Up.CurrentView.deleteModel({'id': WatTests.values.osf.id}, function (e) { 
                                         equal(e.retrievedData.status, 0, "OSF deleted succesfully (ID: " + JSON.stringify(WatTests.values.osf.id) + ")");
 
                                         // Unblock task runner
                                         start();
-                                    }, Wat.CurrentView.model);
+                                    }, Up.CurrentView.model);
                                 }
                             });
-                        }, Wat.CurrentView.model);
+                        }, Up.CurrentView.model);
                     }
                 });
             });

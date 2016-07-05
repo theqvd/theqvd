@@ -41,14 +41,14 @@ function vmTestReal () {
 
             expect(assertions);
 
-            Wat.Router.watRouter.trigger('route:listVM');
+            Up.Router.watRouter.trigger('route:listVM');
             
-            Wat.CurrentView.model = new Wat.Models.VM();
+            Up.CurrentView.model = new Up.Models.VM();
 
             //////////////////////////////////////////////////////////////////
             // Create VM
             //////////////////////////////////////////////////////////////////
-            Wat.CurrentView.createModel(WatTests.values.vm, function (e) { 
+            Up.CurrentView.createModel(WatTests.values.vm, function (e) { 
                 equal(e.retrievedData.status, STATUS_FORBIDDEN_ACTION, "VM cannot be created due ACLs restriction (" + JSON.stringify(WatTests.values.vm) + ")");
 
                 if(e.retrievedData.status == STATUS_FORBIDDEN_ACTION) {
@@ -63,7 +63,7 @@ function vmTestReal () {
                 //////////////////////////////////////////////////////////////////
                 // Try to get list of vms matching by the existing ID
                 //////////////////////////////////////////////////////////////////
-                WatTests.models.vm = new Wat.Models.VM({
+                WatTests.models.vm = new Up.Models.VM({
                     id: WatTests.values.vm.id
                 });            
                                 
@@ -84,7 +84,7 @@ function vmTestReal () {
                         //////////////////////////////////////////////////////////////////
                         // After get list of osfs, update it
                         //////////////////////////////////////////////////////////////////
-                        Wat.CurrentView.updateModel(WatTests.updateValues.vm, {'id': WatTests.values.vm.id}, function (e) { 
+                        Up.CurrentView.updateModel(WatTests.updateValues.vm, {'id': WatTests.values.vm.id}, function (e) { 
                             equal(e.retrievedData.status, STATUS_FORBIDDEN_ARGUMENT, "VM cannot be updated due ACLs restriction (" + JSON.stringify(WatTests.updateValues.vm) + ")");                        
                             // Truman will not be able to update properties 
                             delete WatTests.updateValues.vm.__properties_changes__;
@@ -95,7 +95,7 @@ function vmTestReal () {
                             //////////////////////////////////////////////////////////////////
                             // After get list of virtual machines, update it
                             //////////////////////////////////////////////////////////////////
-                            Wat.CurrentView.updateModel(WatTests.updateValues.vm, {'id': WatTests.values.vm.id}, function (e) { 
+                            Up.CurrentView.updateModel(WatTests.updateValues.vm, {'id': WatTests.values.vm.id}, function (e) { 
                                 equal(e.retrievedData.status, 0, "Virtual machine updated succesfully (" + JSON.stringify(WatTests.updateValues.vm) + ")");
 
                                 //////////////////////////////////////////////////////////////////
@@ -124,8 +124,8 @@ function vmTestReal () {
                                         start();
                                     }
                                 });
-                            }, Wat.CurrentView.model);
-                        }, Wat.CurrentView.model);
+                            }, Up.CurrentView.model);
+                        }, Up.CurrentView.model);
                     }
                 });
             });
@@ -154,14 +154,14 @@ function vmTestReal2 () {
             expect(assertions);
 
             // Move to OSFs section
-            Wat.Router.watRouter.trigger('route:listOSF');
+            Up.Router.watRouter.trigger('route:listOSF');
 
-            Wat.CurrentView.model = new Wat.Models.OSF();
+            Up.CurrentView.model = new Up.Models.OSF();
 
             //////////////////////////////////////////////////////////////////
             // Create dependency OSF
             //////////////////////////////////////////////////////////////////
-            Wat.CurrentView.createModel(WatTests.values.osf, function (e) { 
+            Up.CurrentView.createModel(WatTests.values.osf, function (e) { 
                 equal(e.retrievedData.status, STATUS_SUCCESS, "OSF created succesfully (" + JSON.stringify(WatTests.values.osf) + ")");
 
                 if(e.retrievedData.status == STATUS_SUCCESS) {
@@ -173,9 +173,9 @@ function vmTestReal2 () {
                 }
 
                 // Move to Disk images section
-                Wat.Router.watRouter.trigger('route:listDI');
+                Up.Router.watRouter.trigger('route:listDI');
 
-                Wat.CurrentView.model = new Wat.Models.DI();
+                Up.CurrentView.model = new Up.Models.DI();
 
                 // Create DI associated to the created OSF
                 WatTests.values.di.osf_id = WatTests.values.osf.id;
@@ -183,7 +183,7 @@ function vmTestReal2 () {
                 //////////////////////////////////////////////////////////////////
                 // Create dependency DI
                 //////////////////////////////////////////////////////////////////
-                Wat.CurrentView.createModel(WatTests.values.di, function (e) { 
+                Up.CurrentView.createModel(WatTests.values.di, function (e) { 
                     equal(e.retrievedData.status, STATUS_SUCCESS, "DI created succesfully (" + JSON.stringify(WatTests.values.di) + ")");
 
                     if(e.retrievedData.status == STATUS_SUCCESS) {
@@ -195,14 +195,14 @@ function vmTestReal2 () {
                     }
 
                     // Move to Users section
-                    Wat.Router.watRouter.trigger('route:listUser');
+                    Up.Router.watRouter.trigger('route:listUser');
 
-                    Wat.CurrentView.model = new Wat.Models.User();
+                    Up.CurrentView.model = new Up.Models.User();
 
                     //////////////////////////////////////////////////////////////////
                     // Create Dependency User
                     //////////////////////////////////////////////////////////////////
-                    Wat.CurrentView.createModel(WatTests.values.user, function (e) { 
+                    Up.CurrentView.createModel(WatTests.values.user, function (e) { 
                         equal(e.retrievedData.status, STATUS_SUCCESS, "User created succesfully (" + JSON.stringify(WatTests.values.user) + ")");
 
                         if(e.retrievedData.status == STATUS_SUCCESS) {
@@ -214,9 +214,9 @@ function vmTestReal2 () {
                         }
 
                         // Move to Virtual machines section
-                        Wat.Router.watRouter.trigger('route:listVM');
+                        Up.Router.watRouter.trigger('route:listVM');
 
-                        Wat.CurrentView.model = new Wat.Models.VM();
+                        Up.CurrentView.model = new Up.Models.VM();
 
                         // Create VM associated to the created User, OSF and DI
                         WatTests.values.vm.osf_id = WatTests.values.osf.id;
@@ -226,7 +226,7 @@ function vmTestReal2 () {
                         //////////////////////////////////////////////////////////////////
                         // Create Virtual machine
                         //////////////////////////////////////////////////////////////////
-                        Wat.CurrentView.createModel(WatTests.values.vm, function (e) { 
+                        Up.CurrentView.createModel(WatTests.values.vm, function (e) { 
                             equal(e.retrievedData.status, STATUS_SUCCESS, "Virtual machine created succesfully (" + JSON.stringify(WatTests.values.vm) + ")");
 
                             if(e.retrievedData.status == STATUS_SUCCESS) {
@@ -240,7 +240,7 @@ function vmTestReal2 () {
                             //////////////////////////////////////////////////////////////////
                             // After create, get list of virtual machines matching by the created name
                             //////////////////////////////////////////////////////////////////
-                            WatTests.models.vm = new Wat.Models.VM({
+                            WatTests.models.vm = new Up.Models.VM({
                                 id: WatTests.values.vm.id
                             });
 
@@ -266,7 +266,7 @@ function vmTestReal2 () {
                                     //////////////////////////////////////////////////////////////////
                                     // After get list of virtual machines, update it
                                     //////////////////////////////////////////////////////////////////
-                                    Wat.CurrentView.updateModel(WatTests.updateValues.vm, {'id': WatTests.values.vm.id}, function (e) { 
+                                    Up.CurrentView.updateModel(WatTests.updateValues.vm, {'id': WatTests.values.vm.id}, function (e) { 
                                         equal(e.retrievedData.status, 0, "Virtual machine updated succesfully (" + JSON.stringify(WatTests.updateValues.vm) + ")");
 
                                         //////////////////////////////////////////////////////////////////
@@ -293,52 +293,52 @@ function vmTestReal2 () {
                                                 //////////////////////////////////////////////////////////////////
                                                 // After tests, delete virtual machine
                                                 //////////////////////////////////////////////////////////////////
-                                                Wat.CurrentView.deleteModel({'id': WatTests.values.vm.id}, function (e) { 
+                                                Up.CurrentView.deleteModel({'id': WatTests.values.vm.id}, function (e) { 
                                                     equal(e.retrievedData.status, 0, "Virtual machine deleted succesfully (ID: " + JSON.stringify(WatTests.values.vm.id) + ")");
 
                                                     //////////////////////////////////////////////////////////////////
                                                     // After delete virtual machine, delete the dependency user
                                                     //////////////////////////////////////////////////////////////////
 
-                                                    Wat.Router.watRouter.trigger('route:listUser');
+                                                    Up.Router.watRouter.trigger('route:listUser');
 
-                                                    Wat.CurrentView.model = new Wat.Models.User();
+                                                    Up.CurrentView.model = new Up.Models.User();
 
-                                                    Wat.CurrentView.deleteModel({'id': WatTests.values.user.id}, function (e) { 
+                                                    Up.CurrentView.deleteModel({'id': WatTests.values.user.id}, function (e) { 
                                                         equal(e.retrievedData.status, 0, "User deleted succesfully (ID: " + JSON.stringify(WatTests.values.user.id) + ")");
-                                                    }, Wat.CurrentView.model);
+                                                    }, Up.CurrentView.model);
 
                                                     //////////////////////////////////////////////////////////////////
                                                     // After delete virtual machine, delete the dependency disk image
                                                     //////////////////////////////////////////////////////////////////
 
-                                                    Wat.Router.watRouter.trigger('route:listDI');
+                                                    Up.Router.watRouter.trigger('route:listDI');
 
-                                                    Wat.CurrentView.model = new Wat.Models.DI();
+                                                    Up.CurrentView.model = new Up.Models.DI();
 
-                                                    Wat.CurrentView.deleteModel({'id': WatTests.values.di.id}, function (e) { 
+                                                    Up.CurrentView.deleteModel({'id': WatTests.values.di.id}, function (e) { 
                                                         equal(e.retrievedData.status, 0, "DI deleted succesfully (ID: " + JSON.stringify(WatTests.values.di.id) + ")");
 
                                                         //////////////////////////////////////////////////////////////////
                                                         // After delete di, delete the dependency osf
                                                         //////////////////////////////////////////////////////////////////
 
-                                                        Wat.Router.watRouter.trigger('route:listOSF');
+                                                        Up.Router.watRouter.trigger('route:listOSF');
 
-                                                        Wat.CurrentView.model = new Wat.Models.OSF();
+                                                        Up.CurrentView.model = new Up.Models.OSF();
 
-                                                        Wat.CurrentView.deleteModel({'id': WatTests.values.di.osf_id}, function (e) { 
+                                                        Up.CurrentView.deleteModel({'id': WatTests.values.di.osf_id}, function (e) { 
                                                             equal(e.retrievedData.status, 0, "OSF deleted succesfully (ID: " + JSON.stringify(WatTests.values.osf.id) + ")");
 
                                                             // Unblock task runner
                                                             start();
-                                                        }, Wat.CurrentView.model);
-                                                    }, Wat.CurrentView.model);
-                                                }, Wat.CurrentView.model);
+                                                        }, Up.CurrentView.model);
+                                                    }, Up.CurrentView.model);
+                                                }, Up.CurrentView.model);
 
                                             }
                                         });
-                                    }, Wat.CurrentView.model);
+                                    }, Up.CurrentView.model);
                                 }
                             });
                         });

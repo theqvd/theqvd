@@ -1,4 +1,4 @@
-Wat.B = {
+Up.B = {
     bindCommonEvents: function () {
         this.bindMessageEvents();  
         this.bindEditorEvents();  
@@ -72,17 +72,17 @@ Wat.B = {
 
             // Delete inherited Role
             this.bindEvent('click', '.js-delete-role-button', function () {
-                switch (Wat.CurrentView.qvdObj) {
+                switch (Up.CurrentView.qvdObj) {
                     case 'administrator':
-                        if (Wat.C.adminID == Wat.CurrentView.model.get('id')) {
-                            Wat.I.confirm('dialog/confirm-admin-lost-acls', Wat.B.roleEditorBinds.deleteRole, this);
+                        if (Up.C.adminID == Up.CurrentView.model.get('id')) {
+                            Up.I.confirm('dialog/confirm-admin-lost-acls', Up.B.roleEditorBinds.deleteRole, this);
                         }
                         else {
-                            Wat.B.roleEditorBinds.deleteRole(this);
+                            Up.B.roleEditorBinds.deleteRole(this);
                         }
                         break;
                     case 'role':
-                            Wat.I.confirm('dialog/confirm-role-lost-acls', Wat.B.roleEditorBinds.deleteRole, this);
+                            Up.I.confirm('dialog/confirm-role-lost-acls', Up.B.roleEditorBinds.deleteRole, this);
                         break;
                 }
             });
@@ -203,7 +203,7 @@ Wat.B = {
     loginBinds: {
         tryLogIn: function() {
             $('.js-login-form').submit();
-            Wat.L.tryLogin();
+            Up.L.tryLogin();
         },
         
         pushKeyOnLoginInput: function (e) {
@@ -232,8 +232,8 @@ Wat.B = {
             var container = $(e.target).closest('.chosen-container');
             var containerOpen = $(container).hasClass('chosen-width-drop');
             
-            if (Wat.I.dialogScrollHeight < $('.ui-dialog .js-dialog-container')[0].scrollHeight && !containerOpen) {
-                Wat.I.dialogScrollHeight = $('.ui-dialog .js-dialog-container')[0].scrollHeight;
+            if (Up.I.dialogScrollHeight < $('.ui-dialog .js-dialog-container')[0].scrollHeight && !containerOpen) {
+                Up.I.dialogScrollHeight = $('.ui-dialog .js-dialog-container')[0].scrollHeight;
                 $('.ui-dialog .js-dialog-container')[0].scrollTop = $('.ui-dialog .js-dialog-container')[0].scrollHeight;
             }
         }
@@ -243,13 +243,13 @@ Wat.B = {
         // When click on a menu option, redirect to this section
         clickMenu: function() {
             // If in mobule mode, hide menu when click
-            if (Wat.I.isMobile()) {
+            if (Up.I.isMobile()) {
                 $('.menu').slideUp();
             }
                         
             var id = $(this).attr('data-target');
             window.location = '#/' + id;
-            Wat.I.M.closeMessage();
+            Up.I.M.closeMessage();
         }, 
         
         // When click on a corner menu option
@@ -342,7 +342,7 @@ Wat.B = {
             // Remove prefix '#_' from id
             targetId = targetId.substring(2, targetId.length+1);
             
-            var currentHash = '#documentation/' + Wat.CurrentView.selectedGuide + '/' + targetId;
+            var currentHash = '#documentation/' + Up.CurrentView.selectedGuide + '/' + targetId;
 
             // If pushState is available in browser, modify hash with current section
             if (history.pushState) {
@@ -351,13 +351,13 @@ Wat.B = {
         },
         
         goSimpleTop: function () {
-            Wat.I.goTop();
+            Up.I.goTop();
         }, 
         
         goDocTop: function () {
-            Wat.I.goTop();    
+            Up.I.goTop();    
             
-            var currentHash = '#documentation/' + Wat.CurrentView.selectedGuide;
+            var currentHash = '#documentation/' + Up.CurrentView.selectedGuide;
 
             // If pushState is available in browser, modify hash with current section
             if (history.pushState) {
@@ -429,8 +429,8 @@ Wat.B = {
         clickScreenHelp: function (e) {
             var docSection = $(e.target).attr('data-docsection');
             
-            var section = Wat.I.docSections[docSection].es;
-            var guide = Wat.I.docSections[docSection].guide;
+            var section = Up.I.docSections[docSection].es;
+            var guide = Up.I.docSections[docSection].guide;
             
             var guideSection = [
                 {
@@ -441,20 +441,20 @@ Wat.B = {
             
             var docSectionMultitenant = docSection + '_multitenant';
             
-            if (Wat.I.docSections[docSectionMultitenant] != undefined) {
+            if (Up.I.docSections[docSectionMultitenant] != undefined) {
                 guideSection.push({
-                    section: Wat.I.docSections[docSectionMultitenant].es,
-                    guide: Wat.I.docSections[docSectionMultitenant].guide
+                    section: Up.I.docSections[docSectionMultitenant].es,
+                    guide: Up.I.docSections[docSectionMultitenant].guide
                 });
             }
             
             // If doc dialog is opened from breadcrumbs link and there are not relate docs, open directly doc about current section step by step
-            if ($(e.target).hasClass('screen-help') && Wat.CurrentView.relatedDoc != undefined) {
-                Wat.CurrentView.openRelatedDocsDialog();
+            if ($(e.target).hasClass('screen-help') && Up.CurrentView.relatedDoc != undefined) {
+                Up.CurrentView.openRelatedDocsDialog();
             }
             // Otherwise, open related doc options
             else {
-                Wat.I.loadDialogDoc(guideSection);
+                Up.I.loadDialogDoc(guideSection);
             }
             
             $('html,body').animate({
@@ -468,13 +468,13 @@ Wat.B = {
             
             switch(type) {
                 case 'select':
-                    Wat.CurrentView.cleanFilter($('[name="' + name + '"]').attr('data-filter-field'));
+                    Up.CurrentView.cleanFilter($('[name="' + name + '"]').attr('data-filter-field'));
                     
                     $('[name="' + name + '"]').val(FILTER_ALL);
                     $('[name="' + name + '"]').trigger('change');
                     break;
                 case 'text':
-                    Wat.CurrentView.cleanFilter($('[name="' + name + '"]').attr('data-filter-field'));
+                    Up.CurrentView.cleanFilter($('[name="' + name + '"]').attr('data-filter-field'));
                     
                     $('[name="' + name + '"]').val('');
                     break;
@@ -483,17 +483,17 @@ Wat.B = {
                     if (name.indexOf('__') > -1) {
                         var fussionNames = name.split('__');
                         $.each(fussionNames, function (iFN, fName) {
-                            Wat.I.cleanFussionFilter(fName);
+                            Up.I.cleanFussionFilter(fName);
                         });
                     }
                     else {
-                        Wat.CurrentView.cleanFilter(name);
+                        Up.CurrentView.cleanFilter(name);
                     }
                     break;
             }
             
-            Wat.CurrentView.updateFilterNotes();
-            Wat.CurrentView.filter();
+            Up.CurrentView.updateFilterNotes();
+            Up.CurrentView.filter();
         },
         
         clickFixFilterNote: function (e) {
@@ -504,11 +504,11 @@ Wat.B = {
             
             if (enabled) {
                 $(e.target).removeClass('fix-filter-note--enabled');
-                delete Wat.I.fixedFilters[field];
+                delete Up.I.fixedFilters[field];
             }
             else {
                 $(e.target).addClass('fix-filter-note--enabled');
-                Wat.I.fixedFilters[field] = value;
+                Up.I.fixedFilters[field] = value;
             }
         }
     },
@@ -549,12 +549,12 @@ Wat.B = {
     // Callbacks of the events binded for messages system
     messageBinds: {
         closeMessage: function () {
-            Wat.I.M.closeMessage();
+            Up.I.M.closeMessage();
         },
         
         toggleExtendedMessage: function () { 
             var extendedMessage = $(this).parent().find('article');
-            Wat.I.M.clearMessageTimeout();
+            Up.I.M.clearMessageTimeout();
             
             if (extendedMessage.css('display') == 'none') {
                 $(this).removeClass('fa-plus-square-o');
@@ -569,7 +569,7 @@ Wat.B = {
         },
         
         hoverInMessage: function (e) {
-            Wat.I.M.clearMessageTimeout();
+            Up.I.M.clearMessageTimeout();
         },
         
         hoverOutMessage: function (e) {
@@ -579,7 +579,7 @@ Wat.B = {
                         
             // Error messages need to be closed manually
             if (!$(e.target).hasClass('error')) {
-                Wat.I.M.setMessageTimeout();
+                Up.I.M.setMessageTimeout();
             }
         }
     },
@@ -616,7 +616,7 @@ Wat.B = {
                 'chosenType': 'advanced100'
             };
 
-            Wat.A.fillSelect(params);
+            Up.A.fillSelect(params);
         },
         
         filterTenantOSFs: function () {
@@ -636,9 +636,9 @@ Wat.B = {
             // Remove all osf options and fill filtering with new selected tenant
             $('[name="osf_id"] option').remove();
             
-            Wat.A.fillSelect(params, function () {
+            Up.A.fillSelect(params, function () {
                 // Update chosen control for osf
-                Wat.I.updateChosenControls('[name="osf_id"]');
+                Up.I.updateChosenControls('[name="osf_id"]');
 
                 // Trigger change event to update tags
                 $('[name="osf_id"]').trigger('change');
@@ -661,9 +661,9 @@ Wat.B = {
             // Remove all osf options and fill filtering with new selected tenant
             $('[name="user_id"] option').remove();
             
-            Wat.A.fillSelect(params, function () {
+            Up.A.fillSelect(params, function () {
                 // Update chosen control for user
-                Wat.I.updateChosenControls('[name="user_id"]');
+                Up.I.updateChosenControls('[name="user_id"]');
             }); 
         },
         
@@ -693,12 +693,12 @@ Wat.B = {
             var acls = $('select[name="acl_' + type + '_on_role"]').val();
             
             if (!acls) {
-                Wat.I.M.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
+                Up.I.M.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
                 return;
             }
             
             var filters = {
-                id: Wat.CurrentView.id
+                id: Up.CurrentView.id
             };
             
             var changes = {};
@@ -708,8 +708,8 @@ Wat.B = {
                 "__acls_changes__": changes
             };
             
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.afterUpdateAcls();
+            Up.CurrentView.updateModel(arguments, filters, function() {
+                Up.CurrentView.afterUpdateAcls();
             });
         },
         addAcl: function (e) {
@@ -719,12 +719,12 @@ Wat.B = {
             var acls = $('select[name="acl_available"]').val();
             
             if (!acls) {
-                Wat.I.M.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
+                Up.I.M.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
                 return;
             }
             
             var filters = {
-                id: Wat.CurrentView.id
+                id: Up.CurrentView.id
             };
             
             var changes = {};
@@ -734,10 +734,10 @@ Wat.B = {
                 "__acls_changes__": changes
             };
             
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.model.fetch({      
+            Up.CurrentView.updateModel(arguments, filters, function() {
+                Up.CurrentView.model.fetch({      
                     complete: function () {
-                        Wat.CurrentView.afterUpdateAcls();
+                        Up.CurrentView.afterUpdateAcls();
                     }
                 });
             });
@@ -747,7 +747,7 @@ Wat.B = {
             var inheritType = $(that).attr('data-inherit-type');
             
             var filters = {
-                id: Wat.CurrentView.id
+                id: Up.CurrentView.id
             };
             var arguments = {
                 "__roles_changes__": {
@@ -756,15 +756,15 @@ Wat.B = {
             };
 
             
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.model.fetch({      
+            Up.CurrentView.updateModel(arguments, filters, function() {
+                Up.CurrentView.model.fetch({      
                     complete: function () {
                         switch (inheritType) {
                             case "roles":
-                                Wat.CurrentView.afterUpdateRoles('delete_role');
+                                Up.CurrentView.afterUpdateRoles('delete_role');
                                 break;
                             case "templates":
-                                Wat.CurrentView.afterUpdateRoles('delete_template');
+                                Up.CurrentView.afterUpdateRoles('delete_template');
                                 break;
                         }
                     }
@@ -780,7 +780,7 @@ Wat.B = {
             $(e.target).addClass('faa-flash');
             
             var filters = {
-                id: Wat.CurrentView.id
+                id: Up.CurrentView.id
             };
             var arguments = {
                 "__roles_changes__": {
@@ -794,14 +794,14 @@ Wat.B = {
                 arguments["__roles_changes__"].unassign_roles = [roleId];
             }
             
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.model.fetch({      
+            Up.CurrentView.updateModel(arguments, filters, function() {
+                Up.CurrentView.model.fetch({      
                     complete: function () {
                         $('.js-add-role-button').removeAttr('disabled');
                         $(e.target).removeClass('animated');
                         $(e.target).removeClass('faa-flash');
                         
-                        Wat.CurrentView.afterUpdateRoles('add_role');
+                        Up.CurrentView.afterUpdateRoles('add_role');
                     }
                 });
             });
@@ -816,7 +816,7 @@ Wat.B = {
             
             
             var filters = {
-                id: Wat.CurrentView.id
+                id: Up.CurrentView.id
             };
             var arguments = {
                 "__roles_changes__": {
@@ -830,14 +830,14 @@ Wat.B = {
                 arguments["__roles_changes__"].unassign_roles = [roleId];
             }
             
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.model.fetch({      
+            Up.CurrentView.updateModel(arguments, filters, function() {
+                Up.CurrentView.model.fetch({      
                     complete: function () {
                         $('.js-add-template-button').removeAttr('disabled');
                         $(e.target).removeClass('animated');
                         $(e.target).removeClass('faa-flash');
                         
-                        Wat.CurrentView.afterUpdateRoles('add_template');
+                        Up.CurrentView.afterUpdateRoles('add_template');
                     }
                 });
             });
@@ -848,13 +848,13 @@ Wat.B = {
         purgeTenantObject: function (e) {
             var qvdObj = $(e.target).attr('data-qvd-obj');
             
-            Wat.CurrentView.applyCascadeDelete(qvdObj, false);
+            Up.CurrentView.applyCascadeDelete(qvdObj, false);
         },
         purgeTenantElement: function (e) {
             var qvdObj = $(e.target).attr('data-qvd-obj');
             var elementId = $(e.target).attr('data-id');
             
-            Wat.CurrentView.applyDeleteElement(qvdObj, elementId);
+            Up.CurrentView.applyDeleteElement(qvdObj, elementId);
         }
     },
 }

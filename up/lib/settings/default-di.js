@@ -1,7 +1,7 @@
 var qvdObj = 'di';
 
 // Columns configuration on list view
-Wat.I.listFields[qvdObj] = {
+Up.I.listFields[qvdObj] = {
     'checks': {
         'display': true,
         'fields': [],
@@ -126,10 +126,10 @@ Wat.I.listFields[qvdObj] = {
     }
 };
 
-Wat.I.listDefaultFields[qvdObj] = $.extend({}, Wat.I.listFields[qvdObj]);
+Up.I.listDefaultFields[qvdObj] = $.extend({}, Up.I.listFields[qvdObj]);
 
 // Fields configuration on details view
-Wat.I.detailsFields[qvdObj] = {
+Up.I.detailsFields[qvdObj] = {
     'id': {
         'display': false,
         'fields': [
@@ -213,11 +213,11 @@ Wat.I.detailsFields[qvdObj] = {
     }
 };
 
-Wat.I.detailsDefaultFields[qvdObj] = $.extend({}, Wat.I.detailsFields[qvdObj]);
+Up.I.detailsDefaultFields[qvdObj] = $.extend({}, Up.I.detailsFields[qvdObj]);
 
 
 // Filters configuration on list view
-Wat.I.formFilters[qvdObj] = {
+Up.I.formFilters[qvdObj] = {
     'name': {
         'name': 'name',
         'filterField': 'disk_image',
@@ -322,10 +322,10 @@ Wat.I.formFilters[qvdObj] = {
     }
 };
 
-Wat.I.formDefaultFilters[qvdObj] = $.extend({}, Wat.I.formFilters[qvdObj]);
+Up.I.formDefaultFilters[qvdObj] = $.extend({}, Up.I.formFilters[qvdObj]);
 
 // Actions of the bottom of the list configuration on list view (those that will be done with selected items)
-Wat.I.selectedActions[qvdObj] = {
+Up.I.selectedActions[qvdObj] = {
     'massive_changes': {
         'text': 'Edit',
         'groupAcls': 'diMassiveEdit',
@@ -367,7 +367,7 @@ Wat.I.selectedActions[qvdObj] = {
 };
 
 // Action button (tipically New button) configuration on list view
-Wat.I.listActionButton[qvdObj] = {
+Up.I.listActionButton[qvdObj] = {
             'name': 'new_di_button',
             'value': 'New Disk image',
             'link': 'javascript:',
@@ -375,15 +375,15 @@ Wat.I.listActionButton[qvdObj] = {
         };
 
 // Breadcrumbs configuration on list view
-$.extend(Wat.I.listBreadCrumbs[qvdObj], Wat.I.homeBreadCrumbs);
-Wat.I.listBreadCrumbs[qvdObj]['next'] = {
+$.extend(Up.I.listBreadCrumbs[qvdObj], Up.I.homeBreadCrumbs);
+Up.I.listBreadCrumbs[qvdObj]['next'] = {
             'screen': 'DI list'
         };
 
 // Breadcrumbs configuration on details view
-$.extend(true, Wat.I.detailsBreadCrumbs[qvdObj], Wat.I.listBreadCrumbs[qvdObj]);
-Wat.I.detailsBreadCrumbs[qvdObj].next.link = '#/dis';
-Wat.I.detailsBreadCrumbs[qvdObj].next.linkACL = 'di.see-main.';
-Wat.I.detailsBreadCrumbs[qvdObj].next.next = {
+$.extend(true, Up.I.detailsBreadCrumbs[qvdObj], Up.I.listBreadCrumbs[qvdObj]);
+Up.I.detailsBreadCrumbs[qvdObj].next.link = '#/dis';
+Up.I.detailsBreadCrumbs[qvdObj].next.linkACL = 'di.see-main.';
+Up.I.detailsBreadCrumbs[qvdObj].next.next = {
             'screen': '' // Will be filled dinamically
         };

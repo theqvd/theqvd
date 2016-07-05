@@ -3,15 +3,15 @@
     <div class="clear mobile"></div>
     <a class="button2 fright fa fa-eye js-show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>
     
-    <% if(Wat.C.checkACL('tenant.delete.')) { %>
+    <% if(Up.C.checkACL('tenant.delete.')) { %>
     <a class="button fleft button-icon--desktop js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"><span data-i18n="Delete" class="mobile"></span></a>
     <% } %> 
-    <% if(Wat.C.checkGroupACL('tenantEdit')) { %>
+    <% if(Up.C.checkGroupACL('tenantEdit')) { %>
     <a class="button fright button-icon--desktop js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"><span data-i18n="Edit" class="mobile"></span></a>
     <% } %>
     
     <% 
-    if (Wat.C.checkACL('tenant.update.block')) {
+    if (Up.C.checkACL('tenant.update.block')) {
         if(model.get('blocked')) {
     %>
             <a class="button button-icon--desktop js-button-unblock fa fa-unlock-alt fright" href="javascript:" data-i18n="[title]Unblock"><span data-i18n="Unblock" class="mobile"></span></a>
@@ -25,7 +25,7 @@
     }
     %>
        
-    <% if(Wat.C.checkACL('tenant.purge.')) { %>
+    <% if(Up.C.checkACL('tenant.purge.')) { %>
     <a class="button fright button-icon--desktop js-button-purge fa fa-eraser" href="javascript:" data-i18n="[title]Purge"><span data-i18n="Purge" class="mobile"></span></a>
     <% } %>
     <div class="clear mobile"></div>
@@ -34,7 +34,7 @@
 
     <table class="details details-list col-width-100">
     <%   
-    if (Wat.C.checkACL('tenant.see.description')) { 
+    if (Up.C.checkACL('tenant.see.description')) { 
     %>
         <tr>
             <td><i class="fa fa-align-justify"></i><span data-i18n="Description"></span></td>
@@ -55,7 +55,7 @@
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('tenant.see.block')) { 
+    if (Up.C.checkACL('tenant.see.block')) { 
     %>
         <tr>
             <td><i class="fa fa-lock"></i><span data-i18n="Blocking"></span></td>
@@ -76,7 +76,7 @@
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('tenant.see.language')) { 
+    if (Up.C.checkACL('tenant.see.language')) { 
     %>
         <tr>
             <td><i class="fa fa-globe"></i><span data-i18n="Language"></span></td>
@@ -95,7 +95,7 @@
         </tr>
     <% 
     } 
-    if (Wat.C.checkACL('tenant.see.blocksize')) { 
+    if (Up.C.checkACL('tenant.see.blocksize')) { 
     %>
         <tr>
             <td><i class="fa fa-list"></i><span data-i18n="Block size"></span></td>
@@ -105,7 +105,7 @@
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('tenant.see.created-by')) {
+    if (Up.C.checkACL('tenant.see.created-by')) {
     %>
         <tr>
             <td><i class="<%= CLASS_ICON_ADMINS %>"></i><span data-i18n="Created by"></span></td>
@@ -115,7 +115,7 @@
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('tenant.see.creation-date')) {
+    if (Up.C.checkACL('tenant.see.creation-date')) {
     %>
         <tr>
             <td><i class="fa fa-clock-o"></i><span data-i18n="Creation date"></span></td>

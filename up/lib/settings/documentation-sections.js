@@ -1,5 +1,5 @@
 // Documentation section IDs to be retrieved for embeded help
-Wat.I.docSections = {
+Up.I.docSections = {
     home: { 
         es: '_página_principal',
         guide: 'stepbystep'

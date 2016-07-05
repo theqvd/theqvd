@@ -1,6 +1,6 @@
 <table>
     <% 
-    if (Wat.C.checkACL('host.update.name')) { 
+    if (Up.C.checkACL('host.update.name')) { 
     %>
         <tr>
             <td data-i18n="Name"></td>
@@ -10,7 +10,7 @@
         </tr>
     <% 
     }
-    if (Wat.C.checkACL('vm.update.description')) { 
+    if (Up.C.checkACL('vm.update.description')) { 
     %>
     <tr>
         <td data-i18n="Description"></td>
@@ -20,7 +20,7 @@
     </tr>
     <% 
     }
-    if (Wat.C.checkACL('host.update.address')) { 
+    if (Up.C.checkACL('host.update.address')) { 
     %>
         <tr>
             <td data-i18n="Address"></td>

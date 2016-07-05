@@ -1,7 +1,7 @@
 var qvdObj = 'role';
 
 // Columns configuration on list view
-Wat.I.listFields[qvdObj] = {
+Up.I.listFields[qvdObj] = {
     'checks': {
         'display': true,
         'fields': [],
@@ -78,10 +78,10 @@ Wat.I.listFields[qvdObj] = {
     }
 };
 
-Wat.I.listDefaultFields[qvdObj] = $.extend({}, Wat.I.listFields[qvdObj]);
+Up.I.listDefaultFields[qvdObj] = $.extend({}, Up.I.listFields[qvdObj]);
         
 // Filters configuration on list view
-Wat.I.formFilters[qvdObj] = {
+Up.I.formFilters[qvdObj] = {
     'name': {
         'filterField': 'name',
         'type': 'text',
@@ -140,10 +140,10 @@ Wat.I.formFilters[qvdObj] = {
     }
 };
 
-Wat.I.formDefaultFilters[qvdObj] = $.extend({}, Wat.I.formFilters[qvdObj]);
+Up.I.formDefaultFilters[qvdObj] = $.extend({}, Up.I.formFilters[qvdObj]);
 
 // Actions of the bottom of the list (those that will be done with selected items) configuration on list view
-Wat.I.selectedActions[qvdObj] = {
+Up.I.selectedActions[qvdObj] = {
     'massive_changes': {
         'text': 'Edit',
         'groupAcls': 'roleMassiveEdit',
@@ -159,7 +159,7 @@ Wat.I.selectedActions[qvdObj] = {
 };
 
 // Action button (tipically New button) configuration on list view
-Wat.I.listActionButton[qvdObj] = {
+Up.I.listActionButton[qvdObj] = {
             'name': 'new_role_button',
             'value': 'New Role',
             'link': 'javascript:',
@@ -167,8 +167,8 @@ Wat.I.listActionButton[qvdObj] = {
         };
 
 // Breadcrumbs configuration on list view
-$.extend(Wat.I.listBreadCrumbs[qvdObj], Wat.I.homeBreadCrumbs);
-Wat.I.listBreadCrumbs[qvdObj]['next'] = {
+$.extend(Up.I.listBreadCrumbs[qvdObj], Up.I.homeBreadCrumbs);
+Up.I.listBreadCrumbs[qvdObj]['next'] = {
             'screen': 'WAT Management',
             'next': {
                 'screen': 'Roles'
@@ -176,8 +176,8 @@ Wat.I.listBreadCrumbs[qvdObj]['next'] = {
         };
 
 // Breadcrumbs configuration on details view
-$.extend(true, Wat.I.detailsBreadCrumbs[qvdObj], Wat.I.listBreadCrumbs[qvdObj]);
-Wat.I.detailsBreadCrumbs[qvdObj].next = {
+$.extend(true, Up.I.detailsBreadCrumbs[qvdObj], Up.I.listBreadCrumbs[qvdObj]);
+Up.I.detailsBreadCrumbs[qvdObj].next = {
             'screen': 'WAT Management',
             'next': {
                 'screen': 'Roles',

@@ -1,4 +1,4 @@
-Wat.Views.DocView = Wat.Views.MainView.extend({
+Up.Views.DocView = Up.Views.MainView.extend({
     qvdObj: 'documentation',
     selectedGuide: 'introduction',
     
@@ -14,7 +14,7 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
     },
     
     initialize: function (params) {
-        Wat.Views.MainView.prototype.initialize.apply(this, [params]);
+        Up.Views.MainView.prototype.initialize.apply(this, [params]);
         
         if (params.guide) {
             this.setSelectedGuide(params.guide);
@@ -29,9 +29,9 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
             this.setSelectedGuide('');
         }
         
-        var templates = Wat.I.T.getTemplateList('doc');
+        var templates = Up.I.T.getTemplateList('doc');
         
-        Wat.A.getTemplates(templates, this.render); 
+        Up.A.getTemplates(templates, this.render); 
     },
     
     events: {
@@ -41,7 +41,7 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
     pressSearchDoc: function (e) {
         if (e.which == 13 && $(e.target).val() != '') {
             setTimeout (function () {
-            Wat.CurrentView.searchDoc($(e.target).val());
+            Up.CurrentView.searchDoc($(e.target).val());
             }, 1000);
             
             $('.lateral-menu-option').removeClass('lateral-menu-option--selected');
@@ -63,9 +63,9 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
     render: function () {        
         // Fill the html with the template
         this.template = _.template(
-            Wat.TPL.docSection, {
+            Up.TPL.docSection, {
                 selectedGuide: this.selectedGuide,
-                guides: Wat.C.getDocGuides(),
+                guides: Up.C.getDocGuides(),
                 searchKey: this.currentSearchKey,
                 cid: this.cid
             }
@@ -87,26 +87,26 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
             this.fillDocumentation();
         }
 
-        Wat.T.translateAndShow();       
+        Up.T.translateAndShow();       
     },
     
     // Fill guide doc content
     fillDocumentation: function () {    
-        Wat.D.getDocBody({
+        Up.D.getDocBody({
             guide: this.selectedGuide,
             target: $('.bb-doc-text'),
             callback: this.goSelectedSection
-        }, Wat.D.fillDocBody);
+        }, Up.D.fillDocBody);
     },
     
     // Simulate click on guide that is stored as selected
     goSelectedSection: function () {
-        var currentHash = '#documentation/' + Wat.CurrentView.selectedGuide;
+        var currentHash = '#documentation/' + Up.CurrentView.selectedGuide;
         
-        if (Wat.CurrentView.selectedSection) {
+        if (Up.CurrentView.selectedSection) {
             $('body').waitForImages(function() {
-                $('#toc [href="#_' + Wat.CurrentView.selectedSection + '"]').trigger('click');
-                currentHash += '/' + Wat.CurrentView.selectedSection;
+                $('#toc [href="#_' + Up.CurrentView.selectedSection + '"]').trigger('click');
+                currentHash += '/' + Up.CurrentView.selectedSection;
             });
         }
         
@@ -126,13 +126,13 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
         }
         
         // Get available guides
-        var guides = Wat.C.getDocGuides ();
+        var guides = Up.C.getDocGuides ();
         
         var target = $('.setup-block');
         
         // Fill the html with the general search template with layer for each guide results
         var template = _.template(
-            Wat.TPL.docSearch, {
+            Up.TPL.docSearch, {
                 guides: guides,
                 searchKey: searchKey,
             }
@@ -141,7 +141,7 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
         target.html(template);
         
         // Translate rendered strings
-        Wat.T.translate();       
+        Up.T.translate();       
 
         // Initialize counters for global search
         var totalMatches = 0;
@@ -150,14 +150,14 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
         // Go over each guide to get it and perform searching
         $.each(guides, function (guideKey, guideName) {
             // Get guide file content
-            Wat.D.getDocBody({
+            Up.D.getDocBody({
                 guide: guideKey,
                 guideName: guideName,
                 target: $('.bb-doc-text'),
             }, function (docParams) {
                 // Get body content of the guide document
                 var pattern = /<body[^>]*>((.|[\n\r])*)<\/body>/im
-                var array_matches = pattern.exec(Wat.TPL.docSection);
+                var array_matches = pattern.exec(Up.TPL.docSection);
 
                 docParams.docBody = array_matches[1];
 
@@ -391,7 +391,7 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
                 
                 // Fill the html with the template
                 var template = _.template(
-                    Wat.TPL.docSearchResult, {
+                    Up.TPL.docSearchResult, {
                         matchsTree: matchsTree,
                         matchsDictionary: matchsDictionary,
                         guide: docParams.guide,
@@ -407,7 +407,7 @@ Wat.Views.DocView = Wat.Views.MainView.extend({
                 
                 // Hide loading animation and show results
                 if (guidesCompleted == Object.keys(guides).length) {
-                    Wat.T.translate();       
+                    Up.T.translate();       
                     $('.js-search-summary').html(i18n.t('__count__ matches found for', {'count': totalMatches}));
                     target.find('.loading-mid').remove();
                     $('.js-guide-search').show();

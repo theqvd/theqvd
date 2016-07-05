@@ -24,7 +24,7 @@
         </td>
     </tr>
     <% 
-    if (Wat.C.checkACL('administrator.create.language')) { 
+    if (Up.C.checkACL('administrator.create.language')) { 
     %>
     <tr>
         <td data-i18n="Language"></td>

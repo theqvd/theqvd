@@ -175,7 +175,7 @@
                             case 'disk_image':
                                 var cellClass = 'not-break js-name';
                                 var cellAttrs = '';
-                                if (Wat.C.checkACL('di.see-details.')) {
+                                if (Up.C.checkACL('di.see-details.')) {
                                     cellClass += ' cell-link';
                                     cellAttrs += 'data-i18n="[title]Click for details"';
                                 }
@@ -184,10 +184,10 @@
                                 
                 %>
                                 <td <%= cellAttrs %>>
-                                    <%= Wat.C.ifACL('<a href="#/di/' + model.get('id') + '">', 'di.see-details.') %>
-                                    <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'di.see-details.') %>
+                                    <%= Up.C.ifACL('<a href="#/di/' + model.get('id') + '">', 'di.see-details.') %>
+                                    <%= Up.C.ifACL('<i class="fa fa-search"></i>', 'di.see-details.') %>
                                         <span class="text"><%= model.get('disk_image') %></span>
-                                    <%= Wat.C.ifACL('</a>', 'di.see-details.') %>
+                                    <%= Up.C.ifACL('</a>', 'di.see-details.') %>
                                 </td>
                 <%
                                 break;
@@ -201,9 +201,9 @@
                             case 'osf':
                 %>
                                 <td class="desktop">
-                                    <%= Wat.C.ifACL('<a href="#/osf/' + model.get('osf_id') + '">', 'osf.see-details.') %>
+                                    <%= Up.C.ifACL('<a href="#/osf/' + model.get('osf_id') + '">', 'osf.see-details.') %>
                                         <%= model.get('osf_name') %>
-                                    <%= Wat.C.ifACL('</a>', 'osf.see-details.') %>
+                                    <%= Up.C.ifACL('</a>', 'osf.see-details.') %>
                                 </td>
                 <%
                                 break;

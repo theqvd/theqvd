@@ -1,7 +1,7 @@
 <div class="editor-container">
     <div data-i18n="Select where to perform the resetting of views"></div>
     <table class="editor-table alternate col-width-100">
-        <% if (Wat.C.isSuperadmin()) { %>
+        <% if (Up.C.isSuperadmin()) { %>
         <tr>
                 <td data-i18n="Tenant">
                 </td>

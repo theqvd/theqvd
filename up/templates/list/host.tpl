@@ -168,7 +168,7 @@
                             case 'name':
                                 var cellClass = 'js-name';
                                 var cellAttrs = '';
-                                if (Wat.C.checkACL('host.see-details.')) {
+                                if (Up.C.checkACL('host.see-details.')) {
                                     cellClass += ' cell-link';
                                     cellAttrs += 'data-i18n="[title]Click for details"';
                                 }
@@ -177,10 +177,10 @@
                                 
                 %>
                                 <td <%= cellAttrs %>>
-                                    <%= Wat.C.ifACL('<a href="#/host/' + model.get('id') + '">', 'host.see-details.') %>
-                                    <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'host.see-details.') %>
+                                    <%= Up.C.ifACL('<a href="#/host/' + model.get('id') + '">', 'host.see-details.') %>
+                                    <%= Up.C.ifACL('<i class="fa fa-search"></i>', 'host.see-details.') %>
                                         <span class="text"><%= model.get('name') %></span>
-                                    <%= Wat.C.ifACL('</a>', 'host.see-details.') %>
+                                    <%= Up.C.ifACL('</a>', 'host.see-details.') %>
                                 </td>
                 <%
                                 break;
@@ -215,9 +215,9 @@
                 %>
                                 <td class="desktop">
                                     <% if (model.get('number_of_vms_connected') > 0) { %>
-                                    <%= Wat.C.ifACL('<a href="#/vms/' + Wat.U.transformFiltersToSearchHash({host_id: model.get('id')}) + '">', 'vm.see-main.') %>
+                                    <%= Up.C.ifACL('<a href="#/vms/' + Up.U.transformFiltersToSearchHash({host_id: model.get('id')}) + '">', 'vm.see-main.') %>
                                         <span data-wsupdate="number_of_vms_connected" data-id="<%= model.get('id') %>"><%= model.get('number_of_vms_connected') %></span>
-                                    <%= Wat.C.ifACL('</a>', 'vm.see-main.') %>
+                                    <%= Up.C.ifACL('</a>', 'vm.see-main.') %>
                                     <% } else {
                                     %>
                                         <span data-wsupdate="number_of_vms_connected" data-id="<%= model.get('id') %>"><%= model.get('number_of_vms_connected') %></span>

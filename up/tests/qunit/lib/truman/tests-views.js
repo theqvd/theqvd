@@ -21,11 +21,11 @@ function viewTest () {
                 // Number of Assertions we Expect     
                 expect( 1 );
 
-                Wat.Router.watRouter.trigger('route:list' + view);        
+                Up.Router.watRouter.trigger('route:list' + view);        
 
-                equal(Wat.CurrentView.qvdObj, view.toLowerCase(), view + " view rendered");
+                equal(Up.CurrentView.qvdObj, view.toLowerCase(), view + " view rendered");
 
-                WatTests.listViews[view.toLowerCase()] = _.extend({}, Wat.CurrentView);
+                WatTests.listViews[view.toLowerCase()] = _.extend({}, Up.CurrentView);
             });
         });
 }

@@ -9,7 +9,7 @@
     $.each(sections, function (branch, branchName) {
         var pattern = aclPatterns[branch];
         
-        var isEditable = Wat.C.checkACL('role.update.assign-acl') && (!model.get('fixed') || !RESTRICT_TEMPLATES);
+        var isEditable = Up.C.checkACL('role.update.assign-acl') && (!model.get('fixed') || !RESTRICT_TEMPLATES);
         
         // If there are not ACLS in system for this pattern, not draw branch
         if (branchStats[pattern].total == 0) {
@@ -51,7 +51,7 @@
     $.each(actions, function (branch, branchName) {
         var pattern = aclPatterns[branch];
         
-        var isEditable = Wat.C.checkACL('role.update.assign-acl') && (!model.get('fixed') || !RESTRICT_TEMPLATES);
+        var isEditable = Up.C.checkACL('role.update.assign-acl') && (!model.get('fixed') || !RESTRICT_TEMPLATES);
         
         // If there are not ACLS in system for this pattern, not draw branch
         if (branchStats[pattern].total == 0) {

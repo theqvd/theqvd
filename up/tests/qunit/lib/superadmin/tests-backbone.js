@@ -10,15 +10,15 @@ function backboneTest () {
         test("Models instantiation", function() {
             // Instantiate Local Contact Backbone Model Object
             WatTests.models = {
-                administrator: new Wat.Models.Admin(),
-                di: new Wat.Models.DI(),
-                host: new Wat.Models.Host(),
-                osf: new Wat.Models.OSF(),
-                log: new Wat.Models.Log(),
-                role: new Wat.Models.Role(),
-                tenant: new Wat.Models.Tenant(),
-                user: new Wat.Models.User(),
-                vm: new Wat.Models.VM()
+                administrator: new Up.Models.Admin(),
+                di: new Up.Models.DI(),
+                host: new Up.Models.Host(),
+                osf: new Up.Models.OSF(),
+                log: new Up.Models.Log(),
+                role: new Up.Models.Role(),
+                tenant: new Up.Models.Tenant(),
+                user: new Up.Models.User(),
+                vm: new Up.Models.VM()
             }
 
             // Number of Assertions we Expect
@@ -33,15 +33,15 @@ function backboneTest () {
         test("Collections instantiation", function() {
             // Instantiate Local Contact Backbone Collection Object
             WatTests.collections = {
-                administrator: new Wat.Collections.Admins(),
-                di: new Wat.Collections.DIs(),
-                host: new Wat.Collections.Hosts(),
-                osf: new Wat.Collections.OSFs(),
-                log: new Wat.Collections.Logs(),
-                role: new Wat.Collections.Roles(),
-                tenant: new Wat.Collections.Tenants(),
-                user: new Wat.Collections.Users(),
-                vm: new Wat.Collections.VMs()
+                administrator: new Up.Collections.Admins(),
+                di: new Up.Collections.DIs(),
+                host: new Up.Collections.Hosts(),
+                osf: new Up.Collections.OSFs(),
+                log: new Up.Collections.Logs(),
+                role: new Up.Collections.Roles(),
+                tenant: new Up.Collections.Tenants(),
+                user: new Up.Collections.Users(),
+                vm: new Up.Collections.VMs()
             }
 
             // Number of Assertions we Expect

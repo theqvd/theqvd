@@ -1,5 +1,5 @@
 <table>
-    <% if (Wat.C.checkACL('user.update.description')) { %>
+    <% if (Up.C.checkACL('user.update.description')) { %>
     <tr>
         <td data-i18n="Description"></td>
         <td>
@@ -8,7 +8,7 @@
     </tr>
     <% } %>
     <% 
-    if (Wat.C.checkACL('user.update.password')) { 
+    if (Up.C.checkACL('user.update.password')) { 
     %>
         <tr>
             <td data-i18n="Change password"></td>

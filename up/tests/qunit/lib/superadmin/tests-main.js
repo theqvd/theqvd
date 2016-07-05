@@ -14,8 +14,8 @@ var roleLong = {"66": {
 
 var visibleViews = ['user', 'vm', 'host', 'osf', 'di', 'tenant', 'administrator', 'role'];
 
-Wat.C.setSource('TESTING superadmin');
-Wat.C.setAbortOldRequests(false);
+Up.C.setSource('TESTING superadmin');
+Up.C.setAbortOldRequests(false);
 
 // Backbone's Models and Collections instantiation
 backboneTest();

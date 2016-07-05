@@ -1,23 +1,23 @@
 // Config
-Wat.WS = {
+Up.WS = {
     websockets: {},
     debug: 0,
     openWebsocket: function (qvdObj, action, params, callback, stream, viewType) {        
         if ("WebSocket" in window) {
-            if (Wat.WS.debug) {
+            if (Up.WS.debug) {
                 console.info("WebSocket is supported by your Browser!");
             }
             
-            var urlParams = Wat.U.objToUrl(params);
+            var urlParams = Up.U.objToUrl(params);
 
             try {
                 // Let us open a web socket
-                var wsURI = Wat.C.apiWSUrl + stream + '?' + Wat.C.getUrlSid() + '&action=' + action + urlParams + '&parameters=' + JSON.stringify({source: Wat.C.source});
+                var wsURI = Up.C.apiWSUrl + stream + '?' + Up.C.getUrlSid() + '&action=' + action + urlParams + '&parameters=' + JSON.stringify({source: Up.C.source});
                 var ws = new WebSocket(encodeURI(wsURI));
 
                 ws.onopen = function() {
                     // Web Socket is connected, send data using send()
-                    if (Wat.WS.debug) {
+                    if (Up.WS.debug) {
                         console.info("Websocket opened");
                     }
                     ws.send("HI");
@@ -32,7 +32,7 @@ Wat.WS = {
                             var id = params.filters.id
                         }
 
-                        if (Wat.WS.debug) {
+                        if (Up.WS.debug) {
                             console.info("Message is received: ");
                             console.info(action + ' : ' + id + ' : ' + JSON.stringify(data));
                         }
@@ -48,7 +48,7 @@ Wat.WS = {
 
                 ws.onclose = function() { 
                     // websocket is closed.
-                    if (Wat.WS.debug) {
+                    if (Up.WS.debug) {
                         console.info("Connection is closed...");
                     }
                 };
@@ -59,7 +59,7 @@ Wat.WS = {
 
                 this.websockets[this.cid].push(ws);
                 
-                if (Wat.WS.debug) {
+                if (Up.WS.debug) {
                     if (window.console) {
                         console.info('#WS currently opened: ' + this.websockets[this.cid].length);
                     }
@@ -67,7 +67,7 @@ Wat.WS = {
                 
             }
             catch (exception) { 
-                if (Wat.WS.debug) {
+                if (Up.WS.debug) {
                     if (window.console) {
                         console.warn(exception);
                     }
@@ -76,7 +76,7 @@ Wat.WS = {
         }
         else {
             // The browser doesn't support WebSocket
-            if (Wat.WS.debug) {
+            if (Up.WS.debug) {
                 console.error("WebSocket NOT supported by your Browser!");
             } 
         }
@@ -101,7 +101,7 @@ Wat.WS = {
                     clearInterval(closeTry);
                 }
                 else {
-                    if (Wat.WS.debug) {
+                    if (Up.WS.debug) {
                         console.error('Trying close connecting ws');
                     }
                 }
@@ -201,11 +201,11 @@ Wat.WS = {
                 var paramsChange = {};
                 paramsChange[field] = value;
                 
-                if (viewType == 'details' && Wat.CurrentView.model) {
-                    var model = Wat.CurrentView.model;
+                if (viewType == 'details' && Up.CurrentView.model) {
+                    var model = Up.CurrentView.model;
                 }
-                else if (viewType == 'list' && Wat.CurrentView.collection) {
-                    var model = Wat.CurrentView.collection.where({id: id})[0];
+                else if (viewType == 'list' && Up.CurrentView.collection) {
+                    var model = Up.CurrentView.collection.where({id: id})[0];
                 }
 
                 // Update model
@@ -214,23 +214,23 @@ Wat.WS = {
                 }
 
                 // Check visibility conditions of the selected items dialog. Usefull when this dialog is opened during websockets changes
-                Wat.I.checkVisibilityConditions();
+                Up.I.checkVisibilityConditions();
                 
             switch (qvdObj) {
                 case 'vm':
-                    Wat.WS.changeWebsocketVm(id, field, value, viewType);
+                    Up.WS.changeWebsocketVm(id, field, value, viewType);
                     break;
                 case 'user':
-                    Wat.WS.changeWebsocketUser(id, field, value);
+                    Up.WS.changeWebsocketUser(id, field, value);
                     break;
                 case 'host':
-                    Wat.WS.changeWebsocketHost(id, field, value);
+                    Up.WS.changeWebsocketHost(id, field, value);
                     break;
                 case 'osf':
-                    Wat.WS.changeWebsocketOsf(id, field, value);
+                    Up.WS.changeWebsocketOsf(id, field, value);
                     break;
                 case 'home':
-                    Wat.WS.changeWebsocketStats(field, value);
+                    Up.WS.changeWebsocketStats(field, value);
                     break;
             }
         });

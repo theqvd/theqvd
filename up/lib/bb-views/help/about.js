@@ -1,4 +1,4 @@
-Wat.Views.AboutView = Wat.Views.MainView.extend({
+Up.Views.AboutView = Up.Views.MainView.extend({
     qvdObj: 'about',
     
     breadcrumbs: {
@@ -13,11 +13,11 @@ Wat.Views.AboutView = Wat.Views.MainView.extend({
     },
     
     initialize: function (params) {
-        Wat.Views.MainView.prototype.initialize.apply(this, [params]);
+        Up.Views.MainView.prototype.initialize.apply(this, [params]);
         
-        var templates = Wat.I.T.getTemplateList('about');
+        var templates = Up.I.T.getTemplateList('about');
         
-        Wat.A.getTemplates(templates, this.render); 
+        Up.A.getTemplates(templates, this.render); 
     },
     
     events: {
@@ -26,8 +26,8 @@ Wat.Views.AboutView = Wat.Views.MainView.extend({
     render: function () {        
         // Fill the html with the template
         this.template = _.template(
-            Wat.TPL.about, { 
-                version: Wat.C.version
+            Up.TPL.about, { 
+                version: Up.C.version
             }
         );
         
@@ -35,6 +35,6 @@ Wat.Views.AboutView = Wat.Views.MainView.extend({
         
         this.printBreadcrumbs(this.breadcrumbs, '');
         
-        Wat.T.translateAndShow();       
+        Up.T.translateAndShow();       
     }
 });

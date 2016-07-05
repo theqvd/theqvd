@@ -1,6 +1,6 @@
 <table>
     <% 
-    if (Wat.C.checkACL('osf.update.name')) { 
+    if (Up.C.checkACL('osf.update.name')) { 
     %>
         <tr>
             <td data-i18n="Name"></td>
@@ -10,7 +10,7 @@
         </tr>
     <%
     }
-    if (Wat.C.checkACL('vm.update.description')) { 
+    if (Up.C.checkACL('vm.update.description')) { 
     %>
     <tr>
         <td data-i18n="Description"></td>
@@ -20,7 +20,7 @@
     </tr>
     <% 
     }
-    if (Wat.C.checkACL('osf.update.memory')) { 
+    if (Up.C.checkACL('osf.update.memory')) { 
     %>
         <tr>
             <td data-i18n="Memory"></td>
@@ -35,7 +35,7 @@
         </tr>
     <%
     }
-    if (Wat.C.checkACL('osf.update.user-storage')) { 
+    if (Up.C.checkACL('osf.update.user-storage')) { 
     %>
         <tr>
             <td data-i18n="User storage"></td>
