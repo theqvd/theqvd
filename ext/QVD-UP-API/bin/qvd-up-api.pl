@@ -13,6 +13,7 @@ BEGIN {
 
 use Mojolicious::Lite;
 use MojoX::Session;
+use QVD::Session;
 use MIME::Base64 'encode_base64';
 use Try::Tiny;
 use QVD::Config;
@@ -166,13 +167,12 @@ any [ qw(POST) ] => '/api/login' => sub {
     };
 
     my $session;
-    $session = create_up_session_handler( $c->tx, $DB->storage->dbh );
+    $session = create_up_session_handler( $c->tx, $DB );
 
     $session->create;
     $session->data( user_name => $user );
     $session->data( tenant_name => $tenant );
     $session->data( login => $login );
-    $session->data( password => $password );
     $session->data( user_id => $user_obj->id );
     $session->flush;
 
@@ -189,7 +189,7 @@ group {
     under sub {
         my $c = shift;
 
-        my $session = create_up_session_handler($c->tx, $DB->storage->dbh);
+        my $session = create_up_session_handler($c->tx, $DB);
 
         my $is_logged = 0;
         my $message = "Incorrect credentials";
@@ -249,7 +249,7 @@ group {
         return $c->render_response(code => 200, json => $json);
     };
 
-    any [qw(POST)] => '/api/vm_connect/:vm_id' => [vm_id => qr/\d+/] => sub {
+    any [qw(GET POST)] => '/api/vm_connect/:vm_id' => [vm_id => qr/\d+/] => sub {
         my $c = shift;
 
         my $vm_id = $c->param('vm_id');
@@ -259,12 +259,10 @@ group {
             ->search( { id => $vm_id, user_id => $session_up->data->{user_id} } )->first;
         return $c->render_response(message => "Invalid VM", code => 400) unless defined($vm);
 
-        my $session_l7r = create_l7r_session_handler($DB->storage->dbh);
+        my $session_l7r = create_l7r_session_handler($DB);
         $session_l7r->create;
-        $session_l7r->data->{vm_id} = $vm_id;
-        $session_l7r->data->{login} = $session_up->data->{login};
-        $session_l7r->data->{password} = $session_up->data->{password};
-        $session_l7r->flush;
+        $session_l7r->data('vm_id', $vm_id);
+        $session_l7r->data('user_id', $session_up->data->{user_id});
 
         my $file_name = $session_l7r->sid . ".qvd";
         my $file_data = $session_l7r->sid . "\n";
@@ -277,22 +275,23 @@ app->start;
 ##### FUNCTIONS #####
 
 sub create_l7r_session_handler {
-    my ($dbh) = @_;
+    my ($dbi) = @_;
 
-    my $session = MojoX::Session->new(
-        store     => [dbi => {dbh => $dbh, table => "session_l7r"}],
-        expires_delta => 3600
+    my $session = QVD::Session->new(
+        dbi => $dbi,
+        schema => "Session_L7R",
+        delta => 60
     );
 
     return $session;
 }
 
 sub create_up_session_handler {
-    my ($tx, $dbh) = @_;
+    my ($tx, $dbi) = @_;
     
     my $session = MojoX::Session->new(
         tx        => $tx,
-        store     => [dbi => {dbh => $dbh, table => "session_up"}],
+        store     => [dbi => {dbh => $dbi->storage->dbh, table => "session_up"}],
         transport => MojoX::Session::Transport::Cookie->new(name => 'up-sid', httponly => 1, secure => 1),
         ip_match  => 1
     );
