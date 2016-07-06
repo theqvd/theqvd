@@ -28,6 +28,39 @@ sub authenticate_basic {
     1;
 }
 
+sub authenticate_bearer {
+    my ($plugin, $auth, $sid, $l7r) = @_;
+
+    DEBUG "authenticating session $sid";
+
+    my $session = _create_session_handler();
+    $l7r->{session} = { };
+    if ($session->load( $sid )) {
+        if ($session->is_expired) {
+            $session->clear;
+            delete $l7r->{session};
+            ERROR "Session expired";
+        } else {
+            DEBUG "authenticated ok";
+            $l7r->{session} = $session;
+            $auth->{user_id} = $session->data('user_id');
+            $session->expire;
+            $auth->{expiration} = $session->data('expires');
+            return 1;
+        }
+    } else {
+        ERROR "Session $sid does not exist";
+    }
+    ();
+}
+
+sub _create_session_handler {
+    return QVD::Session->new(
+        dbi => db,
+        schema => "Session_L7R",
+    );
+}
+
 my %re_cache;
 
 sub find_tenant {

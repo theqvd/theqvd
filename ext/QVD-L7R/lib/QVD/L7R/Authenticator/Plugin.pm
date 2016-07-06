@@ -7,6 +7,8 @@ sub init {}
 
 sub authenticate_basic {}
 
+sub authenticate_bearer {}
+
 sub after_authenticate_basic {}
 
 sub before_connect_to_vm {}

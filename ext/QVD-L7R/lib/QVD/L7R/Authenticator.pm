@@ -118,10 +118,13 @@ sub _validate_tenant {
     ()
 }
 
-sub recheck_authentication_basic {
+sub recheck_authentication {
     my ($auth, $login, $passwd, $sid) = @_;
-    return ( (($auth->{login} eq $login and $auth->{passwd} eq $passwd) or ($auth->{sid} eq $sid)) 
-        and $auth->{authenticated} );
+    return (
+        $auth->{authenticated} 
+            and ( (defined($login) and defined($passwd) and ($auth->{login} eq $login) and ($auth->{passwd} eq $passwd) )
+            or ( defined($sid) and ($auth->{sid} eq $sid) and ($auth->{expiration} > time) ) ) 
+    );
 }
 
 sub authenticate_basic {
@@ -156,6 +159,23 @@ sub authenticate_basic {
             }
         }
     }
+    ();
+}
+
+sub authenticate_bearer {
+    my ($auth, $sid, $l7r) = @_;
+    delete $auth->{autenticated};
+    $auth->{sid} = $sid;
+
+    DEBUG "authenticate_bearer('$sid')";
+
+    for (@{$auth->{plugins}}) { 
+        if($_->authenticate_bearer($auth, $sid, $l7r)) {
+            $auth->{authenticated} = 1;
+            return 1;
+        }
+    }
+
     ();
 }
 
