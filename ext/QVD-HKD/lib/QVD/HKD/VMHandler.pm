@@ -76,8 +76,8 @@ sub _save_state {
     DEBUG "Changing database state to '$state' for VM $vm_id";
     $self->_query({n => 1,
                    log_error => "Unable to change state to $state for VM $vm_id in table vm_runtimes" },
-                  'update vm_runtimes set vm_state = $1 where vm_id = $2 and host_id = $3',
-                  $state, $vm_id, $self->{node_id});
+                  'update vm_runtimes set vm_state = $1, vm_state_ts = $2 where vm_id = $3 and host_id = $4',
+                  $state, time, $vm_id, $self->{node_id});
 }
 
 sub _load_row {
