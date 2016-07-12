@@ -167,7 +167,7 @@ sub new {
     
     my $panel = $self->{panel} = Wx::Panel->new($tab_ctl // $self, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL ); # / broken highlighter
 
-    $panel->SetBackgroundColour(Wx::Colour->new(217,217,217));
+#    $panel->SetBackgroundColour(Wx::Colour->new(217,217,217));
 
     
     if ( $tab_ctl ) {
@@ -179,7 +179,7 @@ sub new {
         
         $settings_panel = Wx::Panel->new($tab_ctl, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
         $self->{settings_panel} = $settings_panel;
-        $settings_panel->SetBackgroundColour(Wx::Colour->new(255,255,255));
+#        $settings_panel->SetBackgroundColour(Wx::Colour->new(255,255,255));
         $tab_ctl->AddPage( $settings_panel, $self->_t("Settings"));
         my $settings_sizer = Wx::BoxSizer->new(wxVERTICAL);
         $settings_panel->SetSizer($settings_sizer);
@@ -324,14 +324,14 @@ sub new {
                      0, wxTOP|wxALIGN_CENTER_HORIZONTAL, 100 );
 
 
-    my $grid_sizer = Wx::GridSizer->new(1, 1, -10, 0);
+    my $grid_sizer = Wx::GridSizer->new(1, 1, -5, 0);
     $ver_sizer->Add($grid_sizer, 1, wxALL|wxEXPAND, 20);
 
-    $self->{username} = Wx::TextCtrl->new($panel, -1, core_cfg('client.remember_username') ?  core_cfg('client.user.name') : "", wxDefaultPosition, [300,30]);
-    $grid_sizer->Add($self->{username}, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
+    $self->{username} = Wx::TextCtrl->new($panel, -1, core_cfg('client.remember_username') ?  core_cfg('client.user.name') : "", wxDefaultPosition, wxDefaultSize);
+    $grid_sizer->Add($self->{username}, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5);
 
-    $self->{password} = Wx::TextCtrl->new($panel, -1, "", wxDefaultPosition, [300,30], wxTE_PASSWORD);
-    $grid_sizer->Add($self->{password}, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
+    $self->{password} = Wx::TextCtrl->new($panel, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+    $grid_sizer->Add($self->{password}, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5);
 
     if (core_cfg('client.show.remember_password')) {
         $grid_sizer->Add(Wx::StaticText->new($panel, -1, $self->_t("Remember password")), 0, wxALL, 5);
@@ -369,10 +369,10 @@ sub new {
     }
 
     # port goes here!
-    $self->{connect_button} = Wx::Button->new($panel, -1, $self->_t("Connect"),wxDefaultPosition,[300,30]);
-    $self->{connect_button}->SetBackgroundColour(Wx::Colour->new(229,90,0));
-    $self->{connect_button}->SetForegroundColour(Wx::Colour->new(255,255,255));
-    $grid_sizer->Add($self->{connect_button}, 0, wxALIGN_TOP|wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
+    $self->{connect_button} = Wx::Button->new($panel, -1, $self->_t("Connect"),wxDefaultPosition,wxDefaultSize);
+#    $self->{connect_button}->SetBackgroundColour(Wx::Colour->new(229,90,0));
+#    $self->{connect_button}->SetForegroundColour(Wx::Colour->new(255,255,255));
+    $grid_sizer->Add($self->{connect_button}, 0, wxALIGN_TOP|wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5);
     $self->{connect_button}->SetDefault;
 
     $self->{kill_vm} = Wx::CheckBox->new ($panel, -1, $self->_t("Restart session"), wxDefaultPosition,wxDefaultSize);
