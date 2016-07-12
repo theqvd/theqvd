@@ -114,14 +114,20 @@ sub _save_ssl_config {
 
 sub _start_listener {
     my $self = shift;
-    $self->_stop_listener;
     if ($self->{configured}) {
         my $port = $self->_cfg('l7r.port');
         my $address = $self->_cfg('l7r.address');
         my $address1 = ($address eq '*' ? undef : $address);
-        $self->{server} = tcp_server $address1, $port,
-            weak_method_callback($self, '_on_new_connection');
-        INFO "L7RListener started on $address:$port";
+
+        my $new = "$address1:$port";
+        my $old = $self->{listening_address};
+        if (not defined $old or $old ne $new) {
+            $self->_stop_listener;
+            $self->{server} = tcp_server $address1, $port,
+                weak_method_callback($self, '_on_new_connection');
+            INFO "L7RListener started on $new";
+            $self->{listening_address} = $new;
+        }
     }
     else {
         ERROR "L7RListener not started because of previous errors";
@@ -138,6 +144,5 @@ sub _on_new_connection {
     my $self = shift;
     $self->_maybe_callback('on_connection', @_)
 }
-
 
 1;
