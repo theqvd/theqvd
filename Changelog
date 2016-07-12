@@ -1,33 +1,96 @@
+QVD-3.6.0
+=========
+	- Update vm_state_ts every time vm_state changes in the database
+	  table vm_runtimes.
+	- Allow setting per container cgroups limits for CPU sets and
+	  memory. The memory limit comes from the OSF, the cpuset size from
+	  the global configuration setting "vm.lxc.cpuset.size"
+	- Improve the cgroups file system layout autodetection. Now,
+	  setting "path.cgroup" is preferred over setting
+	  "path.cgroup.cpu.lxc" and the HKD would look for the cpuset, cpu
+	  and memory cgroups below.
+	- Set the right permissions for the files containing the SSL
+	  certificates.
+	- On the VMA, open log files in autoflush mode so that no logging
+	  lines are lost.
+	- Do not require having a CLR file in L7R.
+	- Allow one to set the database listening port.
+	- Add support for recent versions of overlayfs requiring a
+	  different set of parameters at mount time
+	- Add Nothing backend for performance testing.
+	- Several fixes ensuring a correct TLS usage.
+	- Allow one to pass custom options to sshfs from the VMA.
+	- Add support for USB/IP.
+	- Check kernel module br_netfilter is loaded at HKD start time.
+	- Log failures of external commands on the VMA.
+	- Improve login normalization on LDAP authentication backend.
+	- Show running DI in qvd-admin vm listing.
+	- Allow one to add a K, M or G postfix to the memory size when
+	  creating a new OSF with "qvd-admin osf add"
+
+QVD-3.5.11
+==========
+	- Fix bug #2983: There was a race condition causing HKD
+	  L7RListener to died sporadically when restarting after
+	  a configuration change.
+
+QVD-3.5.10
+==========
+	- Fix bug #2795: ClusterMonitor was skipping blocked nodes instead of
+	  marking them as lost.
+
+QVD-3.5.9
+=========
+	- Fix regresion: ClusterMonitor was not clearing L7R entries on
+	  the database correctly
+
+QVD-3.5.8
+=========
+	- HKD now updates the user_state_ts when it reaps L7R processes.
+
+QVD-3.5.7
+=========
+	- Fix symbolic link in JQuery distribution embedded in the WAT.
+
+QVD-3.5.6
+=========
+	- Fix syntax error in HKD launcher
+
+QVD-3.5.5
+=========
+	- Run "qa config ssl" internal queries in a transaction.
+
+QVD-3.5.4
+=========
+	- Improve logging in the L7RListener agent
+	- Capture and dump exceptions killing the HKD
 
 QVD-3.5.3
 =========
 	- qa checks incorrect arguments in syntax
-	- Upgrade Log::Dispatch module 
-	- Remove from login screen the checkbox to kill the VM by configuration. 
+	- Upgrade Log::Dispatch module
+	- Remove from login screen the checkbox to kill the VM by configuration.
 
-
-QVD-3.5.2 
+QVD-3.5.2
 =========
-	- Cleaning build files 
-	- Windows client Atart X server just before connecting. 
+	- Cleaning build files
+	- Windows client Atart X server just before connecting.
 	- Ensure we have a PID for the L7R before trying to cleanup in the database
 	- Remove _release_vm method and stop calling it
-	- Ensure we don't set vm_user_state to connected if it was not connecing before... trying to catch bugs here. 
-	- Improve debugging 
-	- QVD::L7R fix no-ssl connection support 
+	- Ensure we don't set vm_user_state to connected if it was not
+	  connecing before... trying to catch bugs here.
+	- Improve debugging
+	- QVD::L7R fix no-ssl connection support.
 
 
 QVD-3.5.1
 =========
-
-   - Check module br_netfilter is loaded when the HKD starts
-   - refactor stop_vm, start_and_wait_for_vm and _atop_and_wait_for_vm cleaning the logic and facotring out common code
-   - Do not require Upgrade for stop_vm method 
-   - Add support for internal.l7r.timeout.vm_stop setting
-
-
-QVD-3.5.x
-=========
+	- Check module br_netfilter is loaded when the HKD starts
+	- refactor stop_vm, start_and_wait_for_vm and
+	  top_and_wait_for_vm cleaning the logic and facotring out common
+	  de
+	- Do not require Upgrade for stop_vm method
+	- Add support for internal.l7r.timeout.vm_stop setting
 	- Client: honor $PULSE_SERVER environment variable for audio
           redirection
 	- Client: Fix error handling for file sharing on Darwin
