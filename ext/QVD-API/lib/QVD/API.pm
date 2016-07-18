@@ -1481,13 +1481,15 @@ sub config_get
 
     my $tenant_id = $request->filters->filter_value('tenant_id');
     my $operator = $request->filters->filter_operator('tenant_id');
-    my $tenant_filter = QVD::API::REST::Filter->new( filter => {id => {$operator => $tenant_id} } );
 
     my @rows = ();
-    eval {
-        my $rs = $DB->resultset('Tenant')->search($tenant_filter->hash);
-        @rows = $rs->all
-    };
+    if (defined($tenant_id) && defined($operator)){
+        my $tenant_filter = QVD::API::REST::Filter->new( filter => {id => {$operator => $tenant_id} } );
+        @rows = $DB->resultset('Tenant')->search($tenant_filter->hash)->all;
+    } else {
+        # FIXME: This is very inneficient in case the filter does not contain a tenant_id node
+        @rows = $DB->resultset('Tenant')->all;
+    }
 
     my @keys = ();
     while(@rows){
@@ -1501,6 +1503,14 @@ sub config_get
     $request->filters->add_filter("is_hidden", 0);
 
     @keys = $request->filters->cgrep(@keys);
+    
+    # FIXME: This filter is used to avoid duplicated tuples, current tenant and global tenant -1
+    # The scope of the common tenants shall be only its own tenant except for roles, that can 
+    # access to those roles that are global
+    if (!$request->administrator->is_superadmin) {
+        my $extra_filter = QVD::API::REST::Filter->new( filter => {tenant_id => {'!=' => '-1'} } );
+        @keys = $extra_filter->cgrep(@keys);
+    }
 
     return {
         total => scalar @keys,

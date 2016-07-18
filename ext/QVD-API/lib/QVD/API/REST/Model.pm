@@ -937,7 +937,7 @@ my $MANDATORY_FILTERS =
 	{
 		list => {
 			default => [qw()],
-            Config => [qw(tenant_id)],
+            Config => [qw()],
             Operative_Acls_In_Role => [qw(role_id)], 
 			Operative_Acls_In_Administrator => [qw()]
 		}, # FIX ME. HAS DEFAULT VALUE IN Request.pm. DEFAULT SYSTEM FOR FILTERS NEEDED
@@ -962,7 +962,7 @@ my $MANDATORY_FILTERS =
 
 		update=> {
 			default => [qw(id)],
-			Config => [qw(key tenant_id)],
+			Config => [qw(key)],
             My_Admin => [],
             My_Tenant => [],
 			Wat_Setups_By_Tenant => [qw()]

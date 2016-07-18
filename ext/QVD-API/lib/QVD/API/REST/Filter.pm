@@ -377,7 +377,7 @@ sub cgrep
 
 sub hash {
     my $self = shift;
-    return { @{$self->{filter}} };
+    return { @{$self->{filter}[1]} };
 }
 
 # Static private methods

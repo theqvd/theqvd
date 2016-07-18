@@ -67,21 +67,8 @@ sub usage_text {
 sub run 
 {
     my ($self, $opts, @args) = @_;
-    my $parsing = $self->parse_string('config',@args);
 
-    for my $ref_v ($parsing->filters->get_filter_ref_value('key_re'))
-    {
-	my $v = $parsing->filters->get_value($ref_v);
-
-	$v =~ s/\./[.]/g;
-	$v =~ s/%/.*/g;
-	$v = qr/^$v$/;
-	$parsing->filters->set_filter($ref_v,'key_re', $v);
-    }
-
-    my $query = $self->make_api_query($parsing); 
-
-	$self->execute_and_display_query($query,$parsing);
+    $self->SUPER::run($opts,'config',@args);
 }
 
 1;
