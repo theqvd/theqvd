@@ -38,10 +38,36 @@ my %config = ( 'log4perl.appender.LOGFILE'          => 'Log::Dispatch::FileRotat
 	       'log4perl.rootLogger'                => core_cfg('log.level') . ", LOGFILE",
 	       map { $_ => core_cfg $_ } grep /^log4perl\./, core_cfg_all );
 
-use Log::Log4perl qw(:levels :easy);
+use Log::Log4perl qw();
 Log::Log4perl::init_once(\%config);
 
+Log::Log4perl->wrapper_register(__PACKAGE__);
+
 our $logger = Log::Log4perl::get_logger;
+
+for (qw(TRACE DEBUG INFO WARN ERROR FATAL)) {
+    my $level = $_;
+    my $is_level = "is_" . lc $level;
+    Log::Log4perl::easy_closure_create(__PACKAGE__, $_,
+                                       ($logger->$is_level
+                                        ? sub {
+                                            local ($@, $SIG{__DIE__});
+                                            eval { $logger->{$level}->($logger, @_, $level) } }
+                                        : sub {}),
+                                        $logger);
+}
+
+Log::Log4perl::easy_closure_create(__PACKAGE__, 'LOGDIE',
+                                   sub {
+                                       local ($@, $SIG{__DIE__});
+                                       eval { $logger->{fatal}->($logger, @_, 'fatal') };
+                                       if (open my $fh, ">/tmp/hkd-last-breath") {
+                                           print $fh "@_\n";
+                                           close $fh;
+                                       }
+                                       exit (1)
+                                   },
+                                   $logger);
 
 use Exporter qw(import);
 our @EXPORT = qw(DEBUG WARN INFO ERROR LOGDIE $logger);
