@@ -10,7 +10,7 @@ BEGIN {
 }
 
 use Mojolicious::Lite;
-use Mojo::JSON qw(encode_json decode_json j);
+use Mojo::JSON qw(encode_json decode_json j to_json);
 use QVD::API::Exception;
 use MojoX::Session;
 use File::Copy qw(copy move);
@@ -159,6 +159,8 @@ package MojoX::Session::Transport::WAT
 # Common 
 under sub {
     my $c = shift;
+        
+    $c->app->log->debug("PARAMS: " . Mojo::JSON::to_json($c->get_input_json));
 
     my $stdout_file = $c->qvd_admin4_api->_cfg('api.stdout.filename');
     my $stderr_file = $c->qvd_admin4_api->_cfg('api.stderr.filename');
