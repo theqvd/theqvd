@@ -1,5 +1,7 @@
 QVD-3.6.0
 =========
+	- Allow setting the number of CPUs per VM when using the KVM
+	  backend.
 	- Update vm_state_ts every time vm_state changes in the database
 	  table vm_runtimes.
 	- Allow setting per container cgroups limits for CPU sets and
