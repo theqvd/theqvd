@@ -298,6 +298,9 @@ vm.kvm.virtio = 1
 ## Number of container processors
 vm.lxc.cpuset.size = 4
 
+## Virtual machines number of CPUs
+vm.kvm.cpus = 2
+
 ## these two specify the VNC availability and options for KVM's VNC support
 vm.vnc.redirect = 0
 vm.vnc.opts =

@@ -328,6 +328,9 @@ sub _start_kvm {
         push @kvm_args, -drive => $hdb;
     }
 
+    my $cpus = $self->_cfg('vm.kvm.cpus');
+    push @kvm_args, -smp => "cpus=$cpus";
+
     my $hv_out = $self->_hypervisor_output_redirection;
     DEBUG "VM lock fd is ".fileno($self->{vm_lock_fh});
     $^F = 5;
