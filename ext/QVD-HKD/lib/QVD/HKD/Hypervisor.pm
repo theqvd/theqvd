@@ -6,7 +6,7 @@ use warnings;
 use parent qw(QVD::HKD::Agent);
 
 use Class::StateMachine::Declarative
-    __any__ => { ignore => [qw(_on_done _on_error)] },
+    __any__ => { ignore => [qw(_on_done _on_error _on_config_changed)] },
     new     => { transitions => { _on_run => 'running' } },
     running => { transitions => { _on_hkd_done => 'stopped' } },
     stopped => { enter => '_on_stopped' };
