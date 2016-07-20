@@ -60,7 +60,7 @@ for (qw(TRACE DEBUG INFO WARN ERROR FATAL)) {
 Log::Log4perl::easy_closure_create(__PACKAGE__, 'LOGDIE',
                                    sub {
                                        local ($@, $SIG{__DIE__});
-                                       eval { $logger->{fatal}->($logger, @_, 'fatal') };
+                                       eval { $logger->{FATAL}->($logger, @_, 'FATAL') };
                                        if (open my $fh, ">/tmp/hkd-last-breath") {
                                            print $fh "@_\n";
                                            close $fh;
