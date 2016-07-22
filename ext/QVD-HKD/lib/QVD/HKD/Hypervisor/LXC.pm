@@ -119,7 +119,7 @@ sub _config_cgroups {
 
     $self->{cpus} //= do {
         my %cpu;
-        my $fn = "$path{cpuset}/cpuset.cpus";
+        my $fn = "$path{cpuset}/../cpuset.cpus";
         open my $fh, '<', $fn or LOGDIE "Unable to open '$fn'";
         my $line = <$fh> // LOGDIE "Unable to read cpuset from '$fn'";
         for my $range (split /\s*,\s*/, $line) {
