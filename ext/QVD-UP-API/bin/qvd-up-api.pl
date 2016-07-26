@@ -13,10 +13,10 @@ BEGIN {
 
 use Mojolicious::Lite;
 use MojoX::Session;
-use QVD::Session;
 use MIME::Base64 'encode_base64';
 use Try::Tiny;
 use QVD::Config;
+use QVD::DB::Simple qw(db rs);
 
 ##### PLUGINS #####
 
@@ -77,10 +77,6 @@ app->hook(after_render => sub {
     $c->res->headers->header('Access-Control-Allow-Origin' => '*');
 });
 
-###### DB HANDLER ######
-
-my $DB = QVD::DB::Simple::db();
-
 ###### API ######
 
 # Common actions to every API call
@@ -91,7 +87,7 @@ under sub {
     open STDOUT, ">>", cfg('up-api.stdout.filename');
     open STDERR, ">>", cfg('up-api.stderr.filename');
 
-    $c->inactivity_timeout(30000);
+    $c->inactivity_timeout(cfg('up-api.request.timeout'));
 };
 
 # This url retrieves general info about the API.
@@ -122,7 +118,6 @@ any [ qw(POST) ] => '/api/login' => sub {
     if (cfg('wat.multitenant')){
         for my $separator (split "", cfg('l7r.auth.plugin.default.separators')){
             ($user, $tenant) = split $separator, $login;
-            print "$separator $login $user $tenant\n";
             last if (defined($user) && defined($tenant));
         }
     } else {
@@ -143,31 +138,20 @@ any [ qw(POST) ] => '/api/login' => sub {
     return $c->render_response(message => $http_message, code => $http_code)
         unless $http_code == 200;
 
-    my $user_obj;
-    try {
-        my $user_filter = {
-            login => $user,
-            password => $password
-        };
+    my $user_rs = rs('User')->search( { login => $user, password => password_to_token($password) } );
 
-        if (cfg( 'wat.multitenant' )) {
-            $user_filter->{ tenant_id } = $DB->resultset( "Tenant" )->search( { name => $tenant } )->first->id;
-            return $c->render_response(message => "Invalid credentials", code => 401) 
-                unless defined $user_filter->{ tenant_id };
-        }
+    if (cfg( 'wat.multitenant' )) {
+        my $tenant_obj = rs('Tenant')->search( { name => $tenant } )->first;
+        my $tenant_id = defined($tenant_obj) ? $tenant_obj->id : undef;
+        $user_rs = $user_rs->search( { tenant_id => $tenant_id } );
+    }
 
-        $user_obj = $DB->resultset( "User" )->first( $user_filter );
+    my $user_obj = $user_rs->first;
 
-        return $c->render_response(message => "Invalid credentials", code => 401)
-            unless defined $user_obj;
+    return $c->render_response(message => "Unauthorized", code => 401)
+        unless defined $user_obj;
 
-    } catch {
-        print $_;
-        return $c->render_response(message => "Database related issue", code => 502);
-    };
-
-    my $session;
-    $session = create_up_session_handler( $c->tx, $DB );
+    my $session = create_up_session_handler( $c->tx, db );
 
     $session->create;
     $session->data( user_name => $user );
@@ -189,7 +173,7 @@ group {
     under sub {
         my $c = shift;
 
-        my $session = create_up_session_handler($c->tx, $DB);
+        my $session = create_up_session_handler($c->tx, db);
 
         my $is_logged = 0;
         my $message = "Incorrect credentials";
@@ -199,6 +183,7 @@ group {
                 $is_logged = 0;
                 $message = "Session expired";
             }else{
+                $session->extend_expires;
                 $c->stash({session => $session});
                 $is_logged = 1;
             }
@@ -224,7 +209,7 @@ group {
         return $c->render_response(message => "Logged out", code => 200);
     };
 
-    any [qw(GET)] => '/api/vm_list' => sub {
+    any [qw(GET)] => '/api/vm' => sub {
         my $c = shift;
 
         my $vm_list = [];
@@ -236,7 +221,7 @@ group {
                     id => $_->id, 
                     state => $_->vm_runtime->vm_state 
                 },
-                $DB->resultset( "VM" )->search( { user_id => $c->stash('session')->data('user_id') } )->all ];
+                rs( "VM" )->search( { user_id => $c->stash('session')->data('user_id') } )->all ];
         } catch {
             print $_;
             return $c->render_respone(message => "Database related issue", code => 502);
@@ -249,23 +234,24 @@ group {
         return $c->render_response(code => 200, json => $json);
     };
 
-    any [qw(GET POST)] => '/api/vm_connect/:vm_id' => [vm_id => qr/\d+/] => sub {
+    any [qw(GET)] => '/api/vm_connect/:vm_id' => [vm_id => qr/\d+/] => sub {
         my $c = shift;
 
         my $vm_id = $c->param('vm_id');
         my $session_up = $c->stash->{session};
 
-        my $vm = $DB->resultset( "VM" )
-            ->search( { id => $vm_id, user_id => $session_up->data->{user_id} } )->first;
+        my $vm = rs( "VM" )->search( { id => $vm_id, user_id => $session_up->data->{user_id} } )->first;
         return $c->render_response(message => "Invalid VM", code => 400) unless defined($vm);
 
-        my $session_l7r = create_l7r_session_handler($DB);
-        $session_l7r->create;
-        $session_l7r->data('vm_id', $vm_id);
-        $session_l7r->data('user_id', $session_up->data->{user_id});
-
-        my $file_name = $session_l7r->sid . ".qvd";
-        my $file_data = $session_l7r->sid . "\n";
+        my $session_l7r = rs('User_Token')->create( { 
+            token => generate_sid(),
+            expiration => time + cfg('up-api.l7r.expiration'),
+            user_id => $session_up->data->{user_id},
+            vm_id =>  $vm_id
+        } );
+            
+        my $file_name = "desktop_${vm_id}.qvd";
+        my $file_data = encode_base64($session_l7r->token);
         return $c->render_file(data => $file_data, filename => $file_name, format => 'qvd');
     };
 };
@@ -274,26 +260,19 @@ app->start;
 
 ##### FUNCTIONS #####
 
-sub create_l7r_session_handler {
-    my ($dbi) = @_;
-
-    my $session = QVD::Session->new(
-        dbi => $dbi,
-        schema => "Session_L7R",
-        delta => 60
-    );
-
-    return $session;
+sub generate_sid {
+    return Session::Token->new(entropy => 256)->get;
 }
 
 sub create_up_session_handler {
     my ($tx, $dbi) = @_;
     
     my $session = MojoX::Session->new(
-        tx        => $tx,
-        store     => [dbi => {dbh => $dbi->storage->dbh, table => "session_up"}],
-        transport => MojoX::Session::Transport::Cookie->new(name => 'up-sid', httponly => 1, secure => 1),
-        ip_match  => 1
+        tx            => $tx,
+        store         => [dbi => {dbh => $dbi->storage->dbh, table => "session_up"}],
+        transport     => MojoX::Session::Transport::Cookie->new(name => 'up-sid', httponly => 1, secure => 1),
+        ip_match      => 1,
+        expires_delta => cfg('up-api.session.timeout')
     );
     
     return $session;
@@ -312,4 +291,11 @@ sub render_response {
     $c->render(json => $json, status => $code);
     
     return 1;
+}
+
+sub password_to_token
+{
+    my ($password) = @_;
+    require Digest::SHA;
+    return Digest::SHA::sha256_base64(cfg('l7r.auth.plugin.default.salt') . $password);
 }

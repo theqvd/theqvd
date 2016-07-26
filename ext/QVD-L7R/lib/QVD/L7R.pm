@@ -9,7 +9,6 @@ use Carp;
 use feature 'switch';
 use URI::Split qw(uri_split);
 use MIME::Base64 'decode_base64';
-use QVD::Session;
 use IO::Socket::Forwarder qw(forward_sockets);
 
 use QVD::Config;
@@ -165,12 +164,10 @@ sub connect_to_vm_processor {
 
     my $query = (uri_split $url)[3];
     my %params = uri_query_split  $query;
-
-    my $vm_id;
+    my $vm_id = delete $params{id};
     if (defined $l7r->{session}) {
-        $vm_id = $l7r->{session}->data('vm_id');
-    } else {
-        $vm_id = delete $params{id};
+        $l7r->throw_http_error(HTTP_FORBIDDEN, "vm_id does not match with provided token")
+            unless $vm_id == $l7r->{session}->vm_id;
     }
     
     unless (defined $vm_id)  {
@@ -248,13 +245,12 @@ sub stop_vm_processor {
         $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Server is blocked");
     }
 
-    my $vm_id;
+    my $query = (uri_split $url)[3];
+    my %params = uri_query_split  $query;
+    my $vm_id = delete $params{id};
     if (defined $l7r->{session}) {
-        $vm_id = $l7r->{session}->data('vm_id');
-    } else {
-        my $query = (uri_split $url)[3];
-        my %params = uri_query_split  $query;
-        $vm_id = delete $params{id};
+        $l7r->throw_http_error(HTTP_FORBIDDEN, "vm_id does not match with provided token") 
+            unless $vm_id == $l7r->{session}->vm_id;
     }
 
     unless (defined $vm_id) {
@@ -281,10 +277,11 @@ sub _authenticate_user {
     my ($l7r, $headers) = @_;
     my $this_host = this_host; $this_host // $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, 'Host is not registered in the database');
 
-    my ($login, $passwd, $sid);
+    my ($login, $passwd, $token);
     if (my ($credentials) = header_lookup($headers, 'Authorization')) {
-        if (my ($token) = $credentials =~ /^Bearer (.*)$/) {
-            $sid = $token;
+        if (my ($bearer) = $credentials =~ /^Bearer (.*)$/) {
+            ERROR "Unable to decode authentication credentials"
+                unless ( ($token) = decode_base64($bearer) );
         } elsif (my ($basic) = $credentials =~ /^Basic (.*)$/) {
             ERROR "Unable to decode authentication credentials"
                 unless ( ($login, $passwd) = decode_base64($basic) =~ /^([^:]+):(.*)$/ );
@@ -297,7 +294,8 @@ sub _authenticate_user {
 
     my $auth = $l7r->{_auth};
     if (defined $auth and
-        $auth->recheck_authentication($login, $passwd, $sid)) {
+        $auth->recheck_authentication($login, $passwd, $token)) 
+    {
         return $auth;
     } else {
         $auth = QVD::L7R::Authenticator->new;
@@ -307,9 +305,9 @@ sub _authenticate_user {
         if (defined($login) && defined($passwd)) {
             $is_authenticated = $auth->authenticate_basic( $login, $passwd, $l7r );
             ERROR "Failed login attempt from user $login" unless $is_authenticated;
-        } elsif (defined($sid)){
-            $is_authenticated = $auth->authenticate_bearer( $sid, $l7r );
-            ERROR "Failed login attempt with sid $sid" unless $is_authenticated;
+        } elsif (defined($token)){
+            $is_authenticated = $auth->authenticate_bearer( $token, $l7r );
+            ERROR "Failed login attempt with token $token" unless $is_authenticated;
         }
         
         if($is_authenticated) {

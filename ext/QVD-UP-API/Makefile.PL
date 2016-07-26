@@ -16,6 +16,6 @@ WriteMakefile(
         'MIME::Base64' => 0,
         'Try::Tiny' => 0,
         'QVD::Config' => 0,
-        'QVD::Session' => 0,
+        'Digest::SHA' => 0,
     },
 );

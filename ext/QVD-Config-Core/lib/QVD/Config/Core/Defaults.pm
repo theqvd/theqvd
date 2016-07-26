@@ -359,6 +359,9 @@ up-api.stdout.filename = /dev/null
 up-api.stderr.filename = /dev/null
 
 up-api.l7r.address = localhost
+up-api.request.timeout = 3000
+up-api.session.timeout = 3600
+up-api.l7r.expiration = 20
 
 # QVD-Admin parameters
 # url of the API
