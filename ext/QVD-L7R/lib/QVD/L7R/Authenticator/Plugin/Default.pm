@@ -3,7 +3,7 @@ package QVD::L7R::Authenticator::Plugin::Default;
 use strict;
 use warnings;
 
-use QVD::DB::Simple;
+use QVD::DB::Simple qw(rs);
 use QVD::Log;
 use QVD::Config;
 use Digest::SHA qw(sha256_base64);
@@ -29,36 +29,26 @@ sub authenticate_basic {
 }
 
 sub authenticate_bearer {
-    my ($plugin, $auth, $sid, $l7r) = @_;
+    my ($plugin, $auth, $token, $l7r) = @_;
 
-    DEBUG "authenticating session $sid";
-
-    my $session = _create_session_handler();
-    $l7r->{session} = { };
-    if ($session->load( $sid )) {
-        if ($session->is_expired) {
-            $session->clear;
-            delete $l7r->{session};
+    DEBUG "authenticating session with $token";
+    
+    $auth->{session} = undef;
+    if ($auth->{session} = rs('User_Token')->find( $token )) {
+        if ($auth->{session}->is_expired) {
+            $auth->{session}->delete;
+            delete $auth->{session};
             ERROR "Session expired";
         } else {
             DEBUG "authenticated ok";
-            $l7r->{session} = $session;
-            $auth->{user_id} = $session->data('user_id');
-            $session->expire;
-            $auth->{expiration} = $session->data('expires');
+            $auth->{user_id} = $auth->{session}->user_id;
+            $auth->{session}->expire;
             return 1;
         }
     } else {
-        ERROR "Session $sid does not exist";
+        ERROR "Session $token does not exist";
     }
     ();
-}
-
-sub _create_session_handler {
-    return QVD::Session->new(
-        dbi => db,
-        schema => "Session_L7R",
-    );
 }
 
 my %re_cache;
