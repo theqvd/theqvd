@@ -12,7 +12,8 @@ use QVD::HKD::Helpers qw(mkpath);
 use parent 'QVD::HKD::Agent';
 
 use Class::StateMachine::Declarative
-    __any__ => { delay => [qw(on_config_changed)],
+    __any__ => { delay => [qw(on_config_changed
+                              on_hkd_stop)],
                  on => { _on_error => '_on_done' } },
 
     new      => { transitions => { _on_run => 'config' } },
