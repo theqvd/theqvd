@@ -396,9 +396,9 @@ sub _start_hypervisor {
     my $hypervisor = $self->_cfg('vm.hypervisor');
     my $hypervisor_class = $hypervisor_class{$hypervisor} // croak "unsupported hypervisor $hypervisor";
     eval "require $hypervisor_class; 1" or LOGDIE "unable to load module $hypervisor_class:\n$@";
-    $self->{hypervisor} = $hypervisor_class->new(config => $self->{config},
-                                                 db     => $self->{db});
-
+    $self->{hypervisor} = $hypervisor_class->new(config     => $self->{config},
+                                                 db         => $self->{db},
+                                                 on_stopped => weak_method_callback($self, '_on_agent_stopped'));
     DEBUG 'Starting hypervisor';
     $self->{hypervisor}->run;
     return $self->_on_done;
