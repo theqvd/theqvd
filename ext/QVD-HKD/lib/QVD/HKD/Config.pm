@@ -17,17 +17,18 @@ use parent qw(QVD::HKD::Agent);
 use Class::StateMachine::Declarative
 
     __any__ => { advance => '_on_done',
-                 transitions => {  _on_qvd_config_changed_notify => 'reloading',
-                                   on_hkd_stop => 'stopped' } },
+                 delay => [qw(_on_qvd_config_changed_notify on_hkd_stop)] },
 
     reloading => { enter => '_reload',
                    before => { _on_done => '_send_config_reloaded' },
                    transitions => { _on_error => 'delay' } },
 
     '(delay)' => { enter => '_set_timer',
-                   transitions => { _on_timeout => 'reloading' } },
+                   transitions => { _on_timeout => 'reloading',
+                                    on_hkd_stop => 'stopped' } },
 
-    idle      => {},
+    idle      => { transitions => { _on_qvd_config_changed_notify => 'reloading',
+                                    on_hkd_stop => 'stopped' } },
 
     stopped   => { enter => '_on_stopped' };
 
