@@ -467,13 +467,26 @@ sub connect_to_vm {
     my $httpc = $self->_get_httpc($host, $port) or return;
 
     use MIME::Base64 qw(encode_base64);
-    my $auth = encode_base64("$user:$passwd", '');
 
-    INFO("Sending auth");
+    my $auth;
+    my $auth_type;
+
+    if ( ! $opts->{token} eq '' ){
+        $auth = $opts->{token};
+        $auth_type = "Bearer";
+    }else{
+        $auth = encode_base64("$user:$passwd", '');
+        $auth_type = "Basic";
+    }
+
+print "auth: ".$auth."\n";
+print "auth-type: ".$auth_type."\n";
+    
+    INFO("Sending $auth_type auth");
     $httpc->send_http_request(
         GET => '/qvd/list_of_vm?'.$q,
         headers => [
-            "Authorization: Basic $auth",
+            "Authorization: $auth_type $auth",
             "Accept: application/json"
         ],
     );
@@ -509,7 +522,13 @@ sub connect_to_vm {
         die "Failed to parse VM list";
     }
 
-    my $vm_id = $cli->proxy_list_of_vm_loaded($vm_list);
+    my $vm_id;
+    if ( ! $opts->{vm_id} eq '' ){
+        $vm_id = $opts->{vm_id};
+    }else{
+        my $vm_list = JSON->new->decode($body);
+        $vm_id = $cli->proxy_list_of_vm_loaded($vm_list);
+    }
 
     if (!defined $vm_id) {
         INFO("VM not selected, closing coonection");
@@ -527,7 +546,7 @@ sub connect_to_vm {
         $httpc->send_http_request(
             GET => "/qvd/stop_vm?$q",
             headers => [
-                "Authorization: Basic $auth",
+                "Authorization: $auth_type $auth",
                 'Connection: Upgrade',
                 'Upgrade: QVD/1.0',
             ],
@@ -584,7 +603,7 @@ sub connect_to_vm {
     $httpc->send_http_request(
         GET => "/qvd/connect_to_vm?$q",
         headers => [
-            "Authorization: Basic $auth",
+            "Authorization: $auth_type $auth",
             'Connection: Upgrade',
             'Upgrade: QVD/1.0',
         ],
