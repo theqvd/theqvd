@@ -42,7 +42,6 @@ sub authenticate_bearer {
         } else {
             DEBUG "authenticated ok";
             $auth->{user_id} = $auth->{session}->user_id;
-            $auth->{session}->expire;
             return 1;
         }
     } else {
