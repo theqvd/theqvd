@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: QVD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-05 16:04+0200\n"
-"PO-Revision-Date: 2015-10-05 16:09+0200\n"
+"POT-Creation-Date: 2016-03-31 15:38+0200\n"
+"PO-Revision-Date: 2016-03-31 15:38+0200\n"
 "Last-Translator: Vadim Troshchinskiy <vadim@qindel.es>\n"
 "Language-Team: QVD Team <qvd@qindel.com>\n"
 "Language: es\n"
@@ -20,183 +20,326 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.8.4\n"
+"X-Generator: Poedit 1.8.7.1\n"
 "X-Poedit-Basepath: ../lib/QVD/Client\n"
 "X-Poedit-KeywordsList: _t\n"
 "X-Poedit-SearchPath-0: Frame.pm\n"
 
-#: Frame.pm:135 Frame.pm:283
+#: Frame.pm:170 Frame.pm:318
 msgid "Connect"
 msgstr "Conectar"
 
-#: Frame.pm:142
+#: Frame.pm:177
 msgid "Settings"
 msgstr "Ajustes"
 
-#: Frame.pm:148
+#: Frame.pm:183
 msgid "Connection"
 msgstr "Conexión"
 
-#: Frame.pm:152
+#: Frame.pm:187
 msgid "Enable audio"
 msgstr "Habilitar sonido"
 
-#: Frame.pm:156
+#: Frame.pm:191
 msgid "Enable printing"
 msgstr "Habilitar impresión"
 
-#: Frame.pm:160
+#: Frame.pm:195
 msgid "Enable port forwarding"
 msgstr "Habilitar reenvío de puertos"
 
-#: Frame.pm:165
+#: Frame.pm:200
 msgid "Enable USB redirection"
 msgstr "Habilitar redirección USB"
 
-#: Frame.pm:172
+#: Frame.pm:207
 msgid "Select devices"
 msgstr "Seleccionar dispositivos"
 
-#: Frame.pm:187
+#: Frame.pm:222
 msgid "Screen"
 msgstr "Pantalla"
 
-#: Frame.pm:190
+#: Frame.pm:225
 msgid "Full screen"
 msgstr "Pantalla completa"
 
-#: Frame.pm:206
+#: Frame.pm:241
 msgid "User"
 msgstr "Usuario"
 
-#: Frame.pm:210
+#: Frame.pm:245
 msgid "Password"
 msgstr "Contraseña"
 
-#: Frame.pm:215
+#: Frame.pm:250
 msgid "Remember password"
 msgstr "Recordar contraseña"
 
-#: Frame.pm:222
+#: Frame.pm:257
 msgid "Server"
 msgstr "Servidor"
 
-#: Frame.pm:228
+#: Frame.pm:263
 msgid "Connection type"
 msgstr "Tipo de enlace"
 
-#: Frame.pm:250
+#: Frame.pm:285
 msgid "Kill current VM"
 msgstr "Reinicio de sesión"
 
-#: Frame.pm:383
+#: Frame.pm:418
 msgid "You don't have any virtual machine available"
 msgstr "No tiene ninguna máquina virtual disponible"
 
-#: Frame.pm:483
+#: Frame.pm:518
 msgid "Connection error"
 msgstr "Error de conexión"
 
-#: Frame.pm:496
+#: Frame.pm:531
 msgid "Select virtual machine:"
 msgstr "Seleccione la máquina virtual:"
 
-#: Frame.pm:497
+#: Frame.pm:532
 msgid "Select virtual machine"
 msgstr "Seleccione la máquina virtual"
 
-#: Frame.pm:501
+#: Frame.pm:536
 msgid " (blocked)"
 msgstr " (bloqueada)"
 
-#: Frame.pm:560
-msgid ""
-"Unrecognized Certificate Authority. See the documentation for instructions "
-"on how to use your own CA."
-msgstr ""
-"Autoridad de certificación (CA) no reconocida. Vea la documentación para "
-"instrucciones sobre como usar su propia CA."
+#: Frame.pm:587
+msgid "Invalid certificate"
+msgstr "Certificado invalido"
 
-#: Frame.pm:562
-msgid ""
-"The certificate is not yet valid. Make sure your clock is set correctly."
-msgstr ""
-"El certificado todavía no es válido. Compruebe que su reloj esté puesto "
-"correctamente."
+#: Frame.pm:617
+msgid "Problems"
+msgstr "Problemas"
 
-#: Frame.pm:564
+#: Frame.pm:624
+msgid "Details"
+msgstr "Detalles"
+
+#: Frame.pm:630
+msgid "Results of the certificate check"
+msgstr "Resultados de la comprobación del certificado"
+
+#: Frame.pm:652
+#, perl-format
+msgid "Error #%s:"
+msgstr "Error #%s:"
+
+#: Frame.pm:655 Frame.pm:659
+msgid "Unable to find issuer's certificate."
+msgstr "No se ha podido encontrar el certificado de la entidad"
+
+#: Frame.pm:656 Frame.pm:660 Frame.pm:664
+msgid ""
+"If you are using your own CA, see the documentation on how to make the "
+"client use your certificate."
+msgstr ""
+"Si esta usando su propia CA, vea la documentación sobre como hacer que el "
+"cliente use su certificado."
+
+#: Frame.pm:663
+msgid "Unable to verify the first certificate"
+msgstr "No se ha podido comprobar el primer certificado"
+
+#: Frame.pm:667
+msgid "Root certificate not trusted."
+msgstr "No hay confianza en el certificado raíz."
+
+#: Frame.pm:670
+msgid "The certificate is not yet valid."
+msgstr "El certificado todavía no es válido."
+
+#: Frame.pm:671
+msgid "Make sure your clock is set correctly."
+msgstr "Asegúrese de que su reloj tiene la hora correcta."
+
+#: Frame.pm:674
 msgid "The certificate has expired."
 msgstr "El certificado ha expirado."
 
-#: Frame.pm:566
+#: Frame.pm:675
+#, perl-format
+msgid "Remind %s (%s) to renew the certificate"
+msgstr "Recuerde a %s (%s) que renueve el certificado."
+
+#: Frame.pm:678
 msgid "The certificate has been revoked."
 msgstr "El certificado ha sido revocado."
 
-#: Frame.pm:569
+#: Frame.pm:703
+msgid "and"
+msgstr "y"
+
+#: Frame.pm:710
 #, perl-format
 msgid ""
-"Unrecognized SSL error #%s. See the certificate information below for "
-"details."
+"Hostname verification failed.\n"
+"The cert is only valid for %s"
 msgstr ""
-"Error de SSL #%s no reconocido. Vea la información detallada que sigue para "
-"mas detalles."
+"Error de comprobación del dominio.\n"
+"El certificado solo es valido para %s"
 
-#: Frame.pm:576
-msgid "Certificate information:"
-msgstr "Información del certificado:"
-
-#: Frame.pm:577
+#: Frame.pm:711
 msgid ""
-"Certificate not found, maybe HKD component is not runnning at server side."
+"This certificate belongs to another host. This is a sign of either "
+"misconfiguration or an ongoing attempt to compromise security."
 msgstr ""
-"Certificado no encontrado. Es posible que el componente HKD no está "
-"corriendo en el servidor."
+"Este certificado pertenece a otro dominio. Esto indica un problema de "
+"configuración o un intento de comprometer la seguridad."
 
-#: Frame.pm:592
-msgid "Ok"
-msgstr "Aceptar"
+#: Frame.pm:715
+msgid "The certificate has been revoked"
+msgstr "El certificado ha sido revocado."
 
-#: Frame.pm:597
+#: Frame.pm:716
+msgid ""
+"The certificate has been revoked by its issuing authority. A new certificate "
+"is required."
+msgstr ""
+"El certificado ha sido revocado por su autoridad. Es necesario un nuevo "
+"certificado."
+
+#: Frame.pm:719
+msgid "Unrecognized SSL error."
+msgstr "Error SSL no reconocido."
+
+#: Frame.pm:740
+msgid "Certificate for"
+msgstr "Certificado para"
+
+#: Frame.pm:741
+msgid "Issued by"
+msgstr "Emitido por"
+
+#: Frame.pm:744
+msgid "Alternative names"
+msgstr "Nombres alternativos"
+
+#: Frame.pm:749
+msgid "Uses"
+msgstr "Usos"
+
+#: Frame.pm:752
+msgid "Bit length"
+msgstr "Longitud en bits"
+
+#: Frame.pm:753
+msgid "Signature algorithm"
+msgstr "Algoritmo de firma"
+
+#: Frame.pm:756
+msgid "Fingerprint"
+msgstr "Huella digital"
+
+#: Frame.pm:758
+msgid "Hash"
+msgstr "Hash"
+
+#: Frame.pm:759
+msgid "Serial"
+msgstr "Número de serie"
+
+#: Frame.pm:760
+msgid "Valid from"
+msgstr "Valido desde"
+
+#: Frame.pm:761
+msgid "Valid until"
+msgstr "Valido hasta"
+
+#: Frame.pm:768
+msgid "Recommendations:"
+msgstr "Recomendaciones:"
+
+#: Frame.pm:796
+msgid "Accept temporarily"
+msgstr "Aceptar temporalmente"
+
+#: Frame.pm:800
+msgid "Accept permanently"
+msgstr "Aceptar permanentemente"
+
+#: Frame.pm:807
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: Frame.pm:677
+#: Frame.pm:936
 msgid "Select the USB devices to share:"
 msgstr "Seleccione los dispositivos USB a redirigir:"
 
-#: Frame.pm:678
+#: Frame.pm:937
 msgid "USB sharing"
 msgstr "Redirigir dispositivos USB"
 
-#: Frame.pm:799
+#: Frame.pm:1059
 msgid "Error saving configuration"
 msgstr "Error al guardar la configuración"
 
-#: Frame.pm:877
+#: Frame.pm:1137
 #, perl-format
 msgid "Failed to mount remote folder %s at %s:"
 msgstr "Error al montar carpeta remota %s en %s:"
 
-#: Frame.pm:879
+#: Frame.pm:1139
 #, perl-format
 msgid "Path %s was not found on the VM"
 msgstr "La ruta %s no ha sido encontrada en la máquina virtual"
 
-#: Frame.pm:881
+#: Frame.pm:1141
 #, perl-format
 msgid "Path %s is forbidden on the VM"
 msgstr "La ruta %s está prohibida en la máquina virtual"
 
-#: Frame.pm:883
+#: Frame.pm:1143
 msgid "VM lacks file sharing support. Please install the qvd-sshfs package."
 msgstr ""
 "La máquina virtual no tiene soporte para compartir archivos. Por favor "
 "instale el paquete qvd-sshfs."
 
-#: Frame.pm:885
+#: Frame.pm:1145
 msgid "Unrecognized error, full error message follows:"
 msgstr "Error no reconocido. El mensaje de error completo sigue:"
 
-#: Frame.pm:888
+#: Frame.pm:1148
 msgid "File sharing error."
 msgstr "Error al compartir archivos"
+
+#~ msgid "Hostname verification failed."
+#~ msgstr "Error de comprobación del dominio."
+
+#~ msgid ""
+#~ "Unrecognized Certificate Authority. See the documentation for "
+#~ "instructions on how to use your own CA."
+#~ msgstr ""
+#~ "Autoridad de certificación (CA) no reconocida. Vea la documentación para "
+#~ "instrucciones sobre como usar su propia CA."
+
+#~ msgid ""
+#~ "The certificate is not yet valid. Make sure your clock is set correctly."
+#~ msgstr ""
+#~ "El certificado todavía no es válido. Compruebe que su reloj esté puesto "
+#~ "correctamente."
+
+#~ msgid ""
+#~ "Unrecognized SSL error #%s. See the certificate information below for "
+#~ "details."
+#~ msgstr ""
+#~ "Error de SSL #%s no reconocido. Vea la información detallada que sigue "
+#~ "para mas detalles."
+
+#~ msgid "Certificate information:"
+#~ msgstr "Información del certificado:"
+
+#~ msgid ""
+#~ "Certificate not found, maybe HKD component is not runnning at server side."
+#~ msgstr ""
+#~ "Certificado no encontrado. Es posible que el componente HKD no está "
+#~ "corriendo en el servidor."
+
+#~ msgid "Ok"
+#~ msgstr "Aceptar"

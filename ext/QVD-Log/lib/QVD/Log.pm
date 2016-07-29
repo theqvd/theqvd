@@ -1,7 +1,7 @@
 package QVD::Log;
 
 use QVD::Config::Core;
-
+use Carp qw(cluck);
 use warnings;
 use strict;
 use 5.010;
@@ -17,9 +17,61 @@ my $logfile = core_cfg(defined $DAEMON_NAME ? "$DAEMON_NAME.log.filename" : "log
 
 unless (open my $fd, '>>', $logfile) {
     warn "Can't open $logfile: $!\n";
-    $logfile = (defined $DAEMON_NAME ? "/tmp/qvd-$DAEMON_NAME.log" : '/tmp/qvd.log');
-    if (not open my $fd, '>>', $logfile) {
-        warn "Can't open '$logfile': $!";
+
+    # We failed to open the normal log file. Try really hard to log SOMEWHERE,
+    # because Log::Log4perl will cause an abort if logging can't be done.
+
+    my @tempdirs;
+    my $fd;
+
+    if ( $^O =~ /Win32/ ) {
+        # On Win32, first of all, try the temp path.
+
+        require Win32::API;
+        my $gettemppath = Win32::API->new('kernel32', 'GetTempPath', [qw(N P)], 'N');
+        my $path = " " x 256;
+        my $len = $gettemppath->Call(length($path), $path);
+        if ( $len > 0 ) {
+            $path = substr($path,0,$len);
+            push @tempdirs, $path if (-d $path);
+        } else {
+            warn "Call to GetTempPath failed: $^E";
+        }
+    }
+
+    # Variables that indicate a temp directory
+    foreach my $var ("TEMP", "TMP", "TMPDIR") {
+        push @tempdirs, $ENV{$var} if ($ENV{$var} && -d $ENV{$var});
+    }
+
+    # Finally, if all else failed, try hardcoded paths
+    foreach my $dir (qw(/tmp c:\\temp c:\\windows\\temp)) {
+        push @tempdirs, $dir if (-d $dir);
+    }
+
+    # Try to open a log file
+    foreach my $dir (@tempdirs) {
+        $logfile = File::Spec->join($dir, defined $DAEMON_NAME ? "qvd-$DAEMON_NAME.log" : "qvd-$0.log");
+
+        if (not open $fd, '>>', $logfile) {
+            warn "Can't open '$logfile': $!";
+        } else {
+            close $fd;
+            last;
+        }
+    }
+
+    if (!$fd) {
+        my $errmsg = "Failed at all attempts to open a log file.\n" .
+                     "The program will probably fail at the first attempt to log a message.\n\n" .
+                     "Found temp directories: " . join(', ', @tempdirs);
+
+        if ( $^O =~ /Win32/ ) {
+             require Win32;
+             Win32::MsgBox($errmsg, 0, "QVD");
+        }
+
+        cluck($errmsg);
     }
 }
 

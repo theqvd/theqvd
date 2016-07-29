@@ -51,7 +51,9 @@ sub new {
 
         push @args, ( SSL           => 1,
                       SSL_key_file  => $path_key,
-                      SSL_cert_file => $path_cert );
+                      SSL_cert_file => $path_cert,
+                      SSL_version       => cfg('l7r.ssl.options.SSL_version'),
+                      SSL_cipher_list   => cfg('l7r.ssl.options.SSL_cipher_list'));
 
         # Handle the case where we require the client to have a valid certificate:
         if (cfg('l7r.client.cert.require')) {

@@ -184,6 +184,65 @@ client.auto_connect = 0
 ## whether to use SSL in the client↔server communication or not
 client.use_ssl = 1
 client.ssl.use_cert = 0
+
+### Internal SSL options. These get passed directly to QVD::HTTPC.
+### See the full list in HTTPC.pm and the documentation in 
+### IO::Socket::SSL.
+###
+### Using these is discouraged. Most are internal SSL options, and
+### some are overriden by the client. This functionality exists to
+### allow tweaking parameters that weren't intentionally exposed in
+### the QVD client.
+###
+### Specifically, the client overrides hostname verification, so use
+### the client.ssl.allow_bad_host option instead.
+client.ssl.options.SSL_version = TLSv1_1:!SSLv3:!SSLv2:!TLSv1
+
+
+##########################################################################
+## Configurable security options
+##########################################################################
+
+## In this context, "allow" means "allow the user to decide".
+##
+## If set to 1, the user gets an error dialog that allows to continue
+## If set to 0, the user gets an error dialog that is fatal.
+
+
+## Allow certs that fail hostname verification. This is a serious
+## error and a correct installation will not have it.
+client.ssl.allow_bad_host=1
+
+## Allow revoked certificates. EXTREMELY bad idea.
+client.ssl.allow_revoked=0
+
+## Allow untrusted certificates, such as those signed by unknown CAs
+client.ssl.allow_untrusted=1
+
+## Allow expired certificates
+client.ssl.allow_expired=1
+
+## Allow certificates that are not yet valid. Generally indicates a 
+## local clock problem.
+client.ssl.allow_not_yet_valid=1
+
+## Allow certificates that use old, insecure signature algorithms:
+## MD2, MD4, MD5 and SHA1
+client.ssl.allow_insecure_sign_algo=1
+
+## Allow certificates with a bit length <= 1024 bits.
+## They're obsolete and shouldn't be used.
+client.ssl.allow_weak_key=0
+
+## Allow continuing in case of an unrecognized SSL error
+client.ssl.allow_unknown_error=1
+
+## Force user to wait this many seconds before allowing to accept
+## the certificate. Set to 0 to disable.
+client.ssl.error_timeout=5
+
+
+
 ## slave shell
 client.slave.command = bin/qvd-client-slaveserver
 client.slave.client = bin/qvd-slaveclient
@@ -249,6 +308,9 @@ l7r.loadbalancer.plugin.default.weight.cpu = 1
 l7r.loadbalancer.plugin.default.weight.random = 1
 
 l7r.client.cert.require = 0
+
+l7r.ssl.options.SSL_version = TLSv1_2:!SSLv3:!SSLv2:!TLSv1
+l7r.ssl.options.SSL_cipher_list = HIGH:!aNULL:!MD5:!RC4:!3DES:!DES:!MEDIUM:!LOW:!EXPORT
 
 ## umask for the HKD process
 hkd.user.umask = 0022

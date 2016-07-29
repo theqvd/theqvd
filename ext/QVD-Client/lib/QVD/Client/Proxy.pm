@@ -20,6 +20,7 @@ use QVD::Client::USB;
 use QVD::Client::USB::USBIP;
 use QVD::Client::USB::IncentivesPro;
 use Time::HiRes qw(sleep);
+use Carp;
 
 
 my $LINUX = ($^O eq 'linux');
@@ -140,7 +141,7 @@ sub _ssl_verify_callback {
             $ci->{extensions}->{cert_type} = { $ext->hash_bit_string };
         }
 
-        print STDERR $oid, " ", $ext->object()->name(), ": ", $ext->value(), "\n";
+        #print STDERR $oid, " ", $ext->object()->name(), ": ", $ext->value(), "\n";
     }
 
 
@@ -178,17 +179,19 @@ sub _ssl_verify_callback {
 }
 
 sub _split_dn {
-    my ($str) = @_;
+    my ($dn) = @_;
     my $ret = {};
     my $buf = "";
     my ($k,$v) = ("", "");
 
-    print STDERR "STR: $str\n";
+    #print STDERR "STR: $dn\n";
 
+    my $str = $dn;
     while($str) {
         my ($match, $rest) = ($str =~ m/^(.*?)[,=](.*)$/);
+
         $str = $rest;
-        $buf .= $match;
+        $buf .= $match if (defined $match);
 
         if ( $buf =~ /\\$/ ) {
             $buf =~ s/\\$//;
@@ -268,10 +271,20 @@ sub _load_accepted_certs {
         my $data = <$fd>;
         close $fd;
 
-        $self->{accepted_certs} = from_json( $data, { utf8 => 1 } );
+        eval {
+            $self->{accepted_certs} = from_json( $data, { utf8 => 1 } );
+        };
+        if ( $@ ) {
+            ERROR "Failed to load accepted certificates: $@\nData:\n$data";
+        }
     } else {
         WARN "Can't open $file: $!";
     }
+
+    if (!$self->{accepted_certs} || ref($self->{accepted_certs} ne "HASH")) {
+        $self->{accepted_certs} = {};
+    }
+
 }
 
 sub _save_accepted_certs {
@@ -279,9 +292,14 @@ sub _save_accepted_certs {
     my $file = File::Spec->join($QVD::Client::App::user_dir, "accepted_certs.json");
 
     DEBUG "Saving accepted certificates";
-    open(my $fd, '>', $file) or die "Can't create $file: $!";
-    print $fd to_json( $self->{accepted_certs}, { utf8 => 1, pretty => 1 } );
-    close $fd;
+    eval {
+        open(my $fd, '>', $file) or die "Can't create $file: $!";
+        print $fd to_json( $self->{accepted_certs}, { utf8 => 1, pretty => 1 } );
+        close $fd;
+    };
+    if ( $@ ) {
+        ERROR "Failed to save accepted certificates: $@\nData:\n$self->{accepted_certs}";
+    }
 }
 
 
@@ -378,6 +396,22 @@ sub _get_httpc {
             $self->_add_ssl_error(0, 1001, 0, $herr);
         }
 
+        my $depth=0;
+        foreach my $cert ( @{ $self->{cert_info} } ) {
+            my $algo = $cert->{sig_algo};
+            my $bits = $cert->{bit_length};
+
+            if ( $algo =~ /^(md2|md4||md5|sha1)/i ) {
+                $self->_add_ssl_error($depth, 1002, 0, "Insecure hash algorithm: $1");
+            }
+
+            if ( $bits && $bits <= 1024 ) {
+                $self->_add_ssl_error($depth, 1003, 0, "Weak key: $bits bits");
+            }
+
+            $depth++;
+        }
+
         if ( (my $oerr = $httpc->get_ocsp_errors()) ) {
             $self->_add_ssl_error(0, 2001, 0, $oerr);
         }
@@ -393,7 +427,7 @@ sub _get_httpc {
             DEBUG "$errcount SSL errors ( $self->{ssl_errors} total, $self->{ssl_ignored_errors} ignored ) while logging in, asking user";
 
             my $accept = $self->{client_delegate}->proxy_unknown_cert($self->{cert_info});
-            print STDERR "ACCEPT: $accept\n";
+            #print STDERR "ACCEPT: $accept\n";
             if (!$accept) {
                 INFO("User rejected certificate. Closing connection.");
                 $cli->proxy_connection_status('CLOSED');
@@ -463,8 +497,17 @@ sub connect_to_vm {
         return;
     }
     INFO("Authentication successful");
+    my $vm_list;
 
-    my $vm_list = JSON->new->decode($body);
+    eval {
+        $vm_list = JSON->new->decode($body);
+    };
+
+    if ( $@ ) {
+        ERROR "Failed to parse JSON: $@";
+        ERROR "Body: $body";
+        die "Failed to parse VM list";
+    }
 
     my $vm_id = $cli->proxy_list_of_vm_loaded($vm_list);
 
@@ -532,7 +575,10 @@ sub connect_to_vm {
 		$o{'qvd.client.hostname'}   = Win32::NodeName();
 	}
 
-    $q = join '&', map { uri_escape($_) .'='. uri_escape($o{$_}) } keys %o;
+    $q = join '&', map { 
+        warn "Undefined value for option $_" unless defined $o{$_};
+        uri_escape($_) .'='. uri_escape($o{$_}) 
+    } keys %o;
 
     DEBUG("Sending parameters: $q");
     $httpc->send_http_request(
