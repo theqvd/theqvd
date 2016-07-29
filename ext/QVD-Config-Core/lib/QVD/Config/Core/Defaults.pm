@@ -191,6 +191,10 @@ client.user.name =
 client.user.password =
 ## Auto connect when the client is invoked
 client.auto_connect = 0
+## Connect to previously selected vm (only makes sense with auto_connect)
+client.auto_connect.vm_id = 
+## Connect with Bearer auth
+client.auto_connect.token = 
 ## whether to use SSL in the client↔server communication or not
 client.use_ssl = 1
 client.ssl.use_cert = 0
@@ -236,7 +240,6 @@ client.usb.share_list =
 
 ## display kill vm session checkbox
 client.kill_vm.display = 0
-
 
 ## umask for the L7R process
 l7r.user.umask = 0022

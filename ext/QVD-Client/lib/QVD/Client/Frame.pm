@@ -456,7 +456,7 @@ sub proxy_set_environment {
 sub OnClickConnect {
     my( $self, $event ) = @_;
     
-    $self->SaveConfiguration();
+    $self->SaveConfiguration() unless ( core_cfg('client.auto_connect',0) );
     
     $self->{state} = "";
     %connect_info = (
@@ -473,6 +473,8 @@ sub OnClickConnect {
         ssl           => $USE_SSL,
         host          => core_cfg('client.force.host.name', 0) // $self->{host}->GetValue,
         (map { $_ => $self->{$_}->GetValue } grep { defined $self->{$_} } qw(username password kill_vm)),
+        vm_id         => core_cfg('client.auto_connect.vm_id',''),
+        token           => core_cfg('client.auto_connect.token','')
     );
 
     my $u = $self->{username}->GetValue;
@@ -571,6 +573,7 @@ sub OnConnectionStatusChanged {
         $self->start_remote_mounts();
     } elsif ($status eq 'CLOSED') {
         $self->{timer}->Stop();
+        $self->Destroy() if ( core_cfg('client.auto_connect',0) ); # We don't want to let the user do anything else if this was autoconnected session (don't let him change a config that won't be saved..)
         $self->{progress_bar}->SetValue(0);
         $self->{progress_bar}->SetRange(100);
         $self->EnableControls(1);
