@@ -359,6 +359,7 @@ vm.kvm.virtio = 1
 
 ## Number of container processors
 vm.lxc.cpuset.size = 4
+# vm.lxc.cpuset.available =
 
 ## Virtual machines number of CPUs
 vm.kvm.cpus = 2

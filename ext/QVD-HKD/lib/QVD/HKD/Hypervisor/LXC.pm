@@ -83,6 +83,38 @@ sub _search_cgroup_control {
     ()
 }
 
+sub _recreate_lxc_cpuset_cpus {
+    my $self = shift;
+    DEBUG "checking lxc cpuset.cpus";
+
+    my $cpuset_path = $self->{cgroup_control_paths}{cpuset};
+    my $available = $self->_cfg_optional('vm.lxc.cpuset.available');
+    my $fn = "$cpuset_path/cpuset.cpus";
+
+    unless (defined $available) {
+        # Workaround for SLES not filling /sys/fs/cgroup/cpuset/lxc/cpuset.cpus correctly:
+        if (open my $fh, '<', $fn) {
+            DEBUG "cpuset.cpus fileno: ".fileno($fh);
+            while (<$fh>) {
+                # If a specific set of cpus has not been given an the file is not empty we don't touch it!
+                if (/\d/) {
+                    close $fh;
+                    return;
+                }
+            }
+        }
+        INFO "$fn was empty, recreating it!";
+        $available = join(",", sort { $a <=> $b } keys %{$self->{cpus}});
+    }
+
+    if (open my $fh, '>', $fn) {
+        DEBUG "cpuset.cpus fileno: ".fileno($fh);
+        print $fh "$available\n";
+        close $fh and return;
+    }
+    ERROR "Unable to recreate $fn: $!";
+}
+
 sub _config_cgroups {
     my $self = shift;
 
@@ -129,6 +161,8 @@ sub _config_cgroups {
         }
         \%cpu;
     };
+
+    $self->_recreate_lxc_cpuset_cpus;
 
     1;
 }
