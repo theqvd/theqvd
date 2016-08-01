@@ -19,6 +19,8 @@ use QVD::Log;
 use QVD::Client::USB;
 use QVD::Client::USB::USBIP;
 use QVD::Client::USB::IncentivesPro;
+use Time::HiRes qw(sleep);
+use Carp;
 
 
 my $LINUX = ($^O eq 'linux');
@@ -139,7 +141,7 @@ sub _ssl_verify_callback {
             $ci->{extensions}->{cert_type} = { $ext->hash_bit_string };
         }
 
-        print STDERR $oid, " ", $ext->object()->name(), ": ", $ext->value(), "\n";
+        #print STDERR $oid, " ", $ext->object()->name(), ": ", $ext->value(), "\n";
     }
 
 
@@ -177,17 +179,19 @@ sub _ssl_verify_callback {
 }
 
 sub _split_dn {
-    my ($str) = @_;
+    my ($dn) = @_;
     my $ret = {};
     my $buf = "";
     my ($k,$v) = ("", "");
 
-    print STDERR "STR: $str\n";
+    #print STDERR "STR: $dn\n";
 
+    my $str = $dn;
     while($str) {
         my ($match, $rest) = ($str =~ m/^(.*?)[,=](.*)$/);
+
         $str = $rest;
-        $buf .= $match;
+        $buf .= $match if (defined $match);
 
         if ( $buf =~ /\\$/ ) {
             $buf =~ s/\\$//;
@@ -267,10 +271,20 @@ sub _load_accepted_certs {
         my $data = <$fd>;
         close $fd;
 
-        $self->{accepted_certs} = from_json( $data, { utf8 => 1 } );
+        eval {
+            $self->{accepted_certs} = from_json( $data, { utf8 => 1 } );
+        };
+        if ( $@ ) {
+            ERROR "Failed to load accepted certificates: $@\nData:\n$data";
+        }
     } else {
         WARN "Can't open $file: $!";
     }
+
+    if (!$self->{accepted_certs} || ref($self->{accepted_certs} ne "HASH")) {
+        $self->{accepted_certs} = {};
+    }
+
 }
 
 sub _save_accepted_certs {
@@ -278,9 +292,14 @@ sub _save_accepted_certs {
     my $file = File::Spec->join($QVD::Client::App::user_dir, "accepted_certs.json");
 
     DEBUG "Saving accepted certificates";
-    open(my $fd, '>', $file) or die "Can't create $file: $!";
-    print $fd to_json( $self->{accepted_certs}, { utf8 => 1, pretty => 1 } );
-    close $fd;
+    eval {
+        open(my $fd, '>', $file) or die "Can't create $file: $!";
+        print $fd to_json( $self->{accepted_certs}, { utf8 => 1, pretty => 1 } );
+        close $fd;
+    };
+    if ( $@ ) {
+        ERROR "Failed to save accepted certificates: $@\nData:\n$self->{accepted_certs}";
+    }
 }
 
 
@@ -377,6 +396,22 @@ sub _get_httpc {
             $self->_add_ssl_error(0, 1001, 0, $herr);
         }
 
+        my $depth=0;
+        foreach my $cert ( @{ $self->{cert_info} } ) {
+            my $algo = $cert->{sig_algo};
+            my $bits = $cert->{bit_length};
+
+            if ( $algo =~ /^(md2|md4||md5|sha1)/i ) {
+                $self->_add_ssl_error($depth, 1002, 0, "Insecure hash algorithm: $1");
+            }
+
+            if ( $bits && $bits <= 1024 ) {
+                $self->_add_ssl_error($depth, 1003, 0, "Weak key: $bits bits");
+            }
+
+            $depth++;
+        }
+
         if ( (my $oerr = $httpc->get_ocsp_errors()) ) {
             $self->_add_ssl_error(0, 2001, 0, $oerr);
         }
@@ -392,7 +427,7 @@ sub _get_httpc {
             DEBUG "$errcount SSL errors ( $self->{ssl_errors} total, $self->{ssl_ignored_errors} ignored ) while logging in, asking user";
 
             my $accept = $self->{client_delegate}->proxy_unknown_cert($self->{cert_info});
-            print STDERR "ACCEPT: $accept\n";
+            #print STDERR "ACCEPT: $accept\n";
             if (!$accept) {
                 INFO("User rejected certificate. Closing connection.");
                 $cli->proxy_connection_status('CLOSED');
@@ -462,8 +497,17 @@ sub connect_to_vm {
         return;
     }
     INFO("Authentication successful");
+    my $vm_list;
 
-    my $vm_list = JSON->new->decode($body);
+    eval {
+        $vm_list = JSON->new->decode($body);
+    };
+
+    if ( $@ ) {
+        ERROR "Failed to parse JSON: $@";
+        ERROR "Body: $body";
+        die "Failed to parse VM list";
+    }
 
     my $vm_id = $cli->proxy_list_of_vm_loaded($vm_list);
 
@@ -531,7 +575,10 @@ sub connect_to_vm {
 		$o{'qvd.client.hostname'}   = Win32::NodeName();
 	}
 
-    $q = join '&', map { uri_escape($_) .'='. uri_escape($o{$_}) } keys %o;
+    $q = join '&', map { 
+        warn "Undefined value for option $_" unless defined $o{$_};
+        uri_escape($_) .'='. uri_escape($o{$_}) 
+    } keys %o;
 
     DEBUG("Sending parameters: $q");
     $httpc->send_http_request(
@@ -564,7 +611,7 @@ sub connect_to_vm {
                     WARN "Unable to save key used for slave connections: $^E";
                 }
             }
-            $self->_run($httpc);
+            $self->_run($httpc, %$opts);
             last;
         }
         elsif ($code == HTTP_PROCESSING) {
@@ -589,9 +636,173 @@ sub connect_to_vm {
     DEBUG("Connection closed");
 }
 
+sub _stop_x11 {
+	my $self = shift;
+	
+	unless ( $self->{x11_proc} ) {
+		WARN "X11 wasn't started, not stopping";
+		return;
+	}
+	
+	if ( $self->{x11_proc}->alive ) {
+		DEBUG "X11 process alive with pid " . $self->{x11_proc}->pid . ", killing";
+		
+		if ( $self->{x11_proc}->die ) {
+			INFO "Stopped X11 server";
+		} else {
+			ERROR "Failed to stop X11 server";
+		}
+	} else {
+		WARN "X11 process is already dead";
+	}
+	
+	delete $self->{x11_proc};
+	
+
+}
+
+
+sub _start_x11 {
+	my ($self, %opts) = @_;
+	my @cmd;
+
+
+	###
+	### Checks
+	###
+	
+	$self->_stop_x11 if ( $self->{x11_proc} );
+	
+
+	# No need on Linux
+	if ( $WINDOWS ) {
+		DEBUG "Running on Windows, will start X";
+	} elsif ( $DARWIN ) {
+		DEBUG "Running on Darwin, will start X";
+	} else {
+	    DEBUG "Not running on Windows or Darwin, X is not needed";
+		return;
+	}
+
+	# No need if X11 is already running
+	if ( $QVD::Client::App::orig_display ) {
+		DEBUG "\$DISPLAY is already set, not starting X";
+		return;
+	}
+
+	# No need if we're running under a PP build
+	if ( $ENV{QVD_PP_BUILD} ) {
+		DEBUG "Running under a PP build, not starting X";
+		return;
+	}
+
+	###
+	### Create commandline
+	###
+	
+	if ($WINDOWS) {
+		DEBUG "Running on Windows, detecting X server";
+		
+		$ENV{DISPLAY} = '127.0.0.1:0';
+		my $xming_bin = File::Spec->rel2abs(core_cfg('command.windows.xming'), $QVD::Client::App::app_dir);
+		my $vcxsrv_bin = File::Spec->rel2abs(core_cfg('command.windows.vcxsrv'), $QVD::Client::App::app_dir);
+		
+		if ( -f $xming_bin ) {
+			DEBUG "Xming found at $xming_bin";
+			my @extra_args=split(/\s+/, core_cfg('client.xming.extra_args'));
+			
+			@cmd = ( $xming_bin, @extra_args, '-logfile' => File::Spec->join($QVD::Client::App::user_dir, "xserver.log") );
+		} elsif ( -f $vcxsrv_bin ) {
+			DEBUG "VcxSrv found at $vcxsrv_bin";
+			my @extra_args=split(/\s+/, core_cfg('client.vcxsrv.extra_args'));
+			
+			@cmd = ( $vcxsrv_bin, @extra_args, '-logfile' => File::Spec->join($QVD::Client::App::user_dir, "xserver.log") );
+			
+			if ( $opts{fullscreen} ) {
+				push @cmd, "-fullscreen";
+				@cmd = grep { ! /rootless|mwextwm|multiwindow/ } @cmd;
+			}
+		} else {
+			die "X server not found! Tried '$xming_bin' and '$vcxsrv_bin'";
+		}
+	} else { # DARWIN!
+		$ENV{DISPLAY} = ':0';
+		my $x11_cmd = core_cfg('command.darwin.x11');
+		@cmd = qq(open -a $x11_cmd --args true);
+	}
+
+	###
+	### Execute
+	### 
+	
+	DEBUG("DISPLAY set to $ENV{DISPLAY}");
+	DEBUG("Starting X11 server: " . join(' ', @cmd));
+
+	if ( ($self->{x11_proc} = Proc::Background->new(@cmd))  ) {
+		DEBUG("X server started");
+		if ( $DARWIN ) {
+			DEBUG("Waiting to see if X starts");
+			my $timeout=5;
+			my $all_ok;
+			while($timeout-- > 0) {
+				if (!$self->{x11_proc}->alive) {
+					if (!defined $self->{x11_proc}->wait || ($self->{x11_proc}->wait << 8) > 0 ) {
+						_osx_error("Failed to start X server. Please install XQuartz.");
+						exit(1);
+					} else {
+						$all_ok = 1;
+						last;
+					}
+				}
+				sleep(1);
+			}
+
+			if (!$all_ok) {
+				WARN("X server command still seems to be running. Can't exactly determine whether the server started");
+			}
+		}
+	} else {
+		ERROR("X server failed to start");
+		if ($DARWIN) {
+			 _osx_error("Failed to start X server. Please install XQuartz.");
+		}
+	}
+	
+	
+	###
+	### Try to wait until X11 is accepting connections
+	###
+	my $retries = 100;
+	my $x_ok;
+	
+	DEBUG "Testing whether the X server is up";
+	
+	require X11::Protocol;
+	while(!$x_ok && $retries > 0 ) {
+		eval {
+			
+			my $x = X11::Protocol->new();
+			DEBUG "Connected to X11, release " . $x->release_number;
+			$x_ok = 1;
+		};
+		if ( $@ ) {
+			DEBUG "Error connecting to X11, $retries retries left";
+			$retries--;
+		}
+		
+		sleep 0.1;
+	}
+	
+	if (!$x_ok) {
+		WARN "X11 server started, but connection test failed";
+	} else {
+		INFO "X11 server started and running";
+	}
+
+}
+
 sub _run {
-    my $self = shift;
-    my $httpc = shift;
+    my ($self, $httpc, %opts) = @_;
 
     my %o;
 
@@ -653,6 +864,9 @@ sub _run {
 
     }
 
+	
+	$self->_start_x11( fullscreen => $opts{fullscreen} );
+	
     if ($self->{audio}) {
 	if (defined(my $ps = $ENV{PULSE_SERVER})) {
 	    # FIXME: we should read /etc/pulseaudio/client.conf and
@@ -661,7 +875,7 @@ sub _run {
 	    if ($ps =~ /^(?:tcp:localhost:)?(\d+)$/) {
 		$o{media} = $1;
 	    }
-	    else {
+	    else { 
 		WARN "Unable to detect PulseAudio configuration from \$PULSE_SERVER ($ps)";
 	    }
 	}
@@ -777,6 +991,8 @@ sub _run {
         unlink $slave_port_file ;
     }
 
+	$self->_stop_x11;
+	
     DEBUG("Done.");
 
 }

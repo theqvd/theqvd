@@ -16,10 +16,15 @@ sub init_backend {
 sub _mount_root {
     my ($self, $rootfs, $basefs, $overlayfs, $subdir, $workdir) = @_;
     $basefs = File::Spec->join($basefs, $subdir) if defined $subdir;
+
+    my $overlayfs_version = $self->_cfg('command.version.mount.overlayfs');
+    my $o = "rw,upperdir=$overlayfs,lowerdir=$basefs";
+    $o .= ",workdir=$workdir" if $overlayfs_version > 1;
+
     $self->_run_cmd({log_error => "Unable to mount overlayfs mix of '$basefs' (ro) and '$overlayfs' (rw) into '$rootfs'"},
                     'mount',
                     -t => 'overlayfs',
-                    -o => "rw,upperdir=$overlayfs,lowerdir=$basefs,workdir=$workdir", "overlayfs", $rootfs);
+                    -o => $o, "overlayfs", $rootfs);
 }
 
 sub _remove_old_workdir {
@@ -28,8 +33,12 @@ sub _remove_old_workdir {
     -e $workdir or return $self->_on_done;
     return $self->_move_dir($workdir, $self->{workdir_old});
 }
+
 sub _make_workdir {
     my $self = shift;
+    my $overlayfs_version = $self->_cfg('command.version.mount.overlayfs');
+    return $self->_on_done if $overlayfs_version <= 1;
+
     my $workdir = $self->{workdir};
     if (-e $workdir) {
         ERROR "Work directory still exists at '$workdir' for VM $self->{vm_id}";

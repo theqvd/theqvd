@@ -586,13 +586,13 @@ sub OnUnknownCert {
     my $err_desc;
     my @advice;
 
-    my $dialog = Wx::Dialog->new($self, undef, $self->_t("Invalid certificate"));
+    my $dialog = Wx::Dialog->new($self, -1, $self->_t("Invalid certificate"));
     my $main_sizer = Wx::BoxSizer->new(wxVERTICAL);
     my $no_ok_button;
 
 
-    use Data::Dumper;
-    print STDERR Dumper([$data]);
+    #use Data::Dumper;
+    #print STDERR Dumper([$data]);
 
     my $tab_ctl;
     my $show_details = 1;
@@ -656,37 +656,89 @@ sub OnUnknownCert {
             if ( $e == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT ) {
                 $err_desc .= $self->_t("Unable to find issuer's certificate.");
                 _add_advice(\@advice, $self->_t("If you are using your own CA, see the documentation on how to make the client use your certificate."));
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_untrusted');
             } elsif ( $e == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY ) {
                 $err_desc .= $self->_t("Unable to find issuer's certificate.");
                 _add_advice(\@advice, $self->_t("If you are using your own CA, see the documentation on how to make the client use your certificate."));
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_untrusted');
             } elsif ( $e == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE ) {
                 $err_desc .= $self->_t("Unable to verify the first certificate");
                 _add_advice(\@advice, $self->_t("If you are using your own CA, see the documentation on how to make the client use your certificate."));
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_untrusted');
             } elsif ( $e == X509_V_ERR_CERT_UNTRUSTED ) {
                 $err_desc .= $self->_t("Root certificate not trusted.");
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_untrusted');
             } elsif ( $e == X509_V_ERR_CERT_NOT_YET_VALID ) {
                 $err_desc .= $self->_t("The certificate is not yet valid.");
                 _add_advice(\@advice, $self->_t("Make sure your clock is set correctly."));
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_not_yet_valid');
             } elsif ( $e == X509_V_ERR_CERT_HAS_EXPIRED ) {
                 $err_desc .= $self->_t("The certificate has expired.");
                 _add_advice(\@advice, sprintf($self->_t("Remind %s (%s) to renew the certificate", $cert->{subject}->{o}, $cert->{subject}->{email})));
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_expired');
             } elsif ( $e == X509_V_ERR_CERT_REVOKED ) {
                 $err_desc .= $self->_t("The certificate has been revoked.");
-                $no_ok_button = 1;
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_revoked');
             } elsif ( $e == 1001 ) {
-                $err_desc .= $self->_t("Hostname verification failed.");
+                my @hostnames = ( $cert->{subject}->{cn} );
+                my $str_hostnames = "";
+
+                # If SubjectAltName is present, the clients are supposed to ignore the Common Name.
+                #
+                # TODO: Perhaps check if SubjectAltName includes the CN, and warn if it doesn't. But
+                # this is really an improperly created certificate, so the value of telling the user
+                # that is limited.
+ 
+                if ( exists $cert->{extensions}->{altnames} ) {
+                    @hostnames = ();
+
+                    foreach my $ent ( @{ $cert->{extensions}->{altnames} } ) {
+                       push @hostnames, values(%$ent);
+                    }
+                }
+
+                while(@hostnames) {
+                    if ( $str_hostnames ) {
+                        if ( scalar @hostnames > 1 ) {
+                           $str_hostnames .= ", ";
+                        } else {
+                           $str_hostnames .= " " . $self->_t("and") . " ";
+                        }
+                    }
+  
+                    $str_hostnames .= shift(@hostnames);
+                }
+
+                $err_desc .= sprintf($self->_t("Hostname verification failed.\nThe cert is only valid for %s"), $str_hostnames);
                 _add_advice(\@advice, $self->_t("This certificate belongs to another host. ". 
                                                 "This is a sign of either misconfiguration or an ongoing attempt to compromise security."));
-                $no_ok_button = 1;
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_bad_host');
+            } elsif ( $e == 1002 ) {
+                # sig_algo contains something like: md5WithRSAEncryption. 
+                # Extract the hash part from it.
+                my $hash = $cert->{sig_algo};
+                $hash =~ m/^(\w+\d+)/;
+
+                $err_desc .= sprintf($self->_t("Insecure hash algorithm: %s"), $1);
+                _add_advice(\@advice, $self->_t("This certificate uses a deprecated and insecure hash algorithm. ".
+                                                "It should be replaced with a new one as soon as possible."));
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_insecure_sign_algo');
+            } elsif ( $e == 1003 ) {
+                $err_desc .= sprintf($self->_t("Weak key: %s bits"), $cert->{bit_length});
+                _add_advice(\@advice, $self->_t("This certificate uses a weak key and can be broken by brute force. ".
+                                                "It should be replaced with a stronger one as soon as possible."));
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_weak_key');
             } elsif ( $e == 2001 ) {
                 $err_desc .= $self->_t("The certificate has been revoked");
                 _add_advice(\@advice, $self->_t("The certificate has been revoked by its issuing authority. A new certificate is required."));
-                $no_ok_button = 1;
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_revoked');
             } else {
                 $err_desc .= sprintf($self->_t("Unrecognized SSL error."), $e);
+                $no_ok_button = 1 unless core_cfg('client.ssl.allow_unknown_error');
             }
 
             my $hsizer = Wx::BoxSizer->new(wxHORIZONTAL);
+            my $excl = Wx::StaticText->new($info_panel, -1, "    !");
             my $excl = Wx::StaticText->new($info_panel, -1, "    " . chr(0x26A0));
 
             $font = $excl->GetFont();
@@ -697,7 +749,7 @@ sub OnUnknownCert {
 
 
  
-            $hsizer->Add(Wx::StaticText->new($info_panel, -1, " $err_desc"), 0, wxALL, 5);
+            $hsizer->Add(Wx::StaticText->new($info_panel, -1, $err_desc), 0, wxALL, 5);
             $problems_sizer->Add($hsizer, 0, wxALL, 0);
          } 
          
@@ -707,12 +759,12 @@ sub OnUnknownCert {
          push @$info,  { $self->_t("Issued by") => _format_aligned( _cert_fullname($cert, $cert->{issuer}), "\t") };
 
          if ( exists $cert->{extensions}->{altnames} ) {
-             push @$info, { 'Alternative names' => _format_aligned($cert->{extensions}->{altnames}, "\t") };
+             push @$info, { $self->_t("Alternative names") => _format_aligned($cert->{extensions}->{altnames}, "\t") };
          }
 
          if ( exists $cert->{extensions}->{cert_type} ) {
              my $ct = $cert->{extensions}->{cert_type};
-             push @$info, { 'Uses' => join(", ", grep { $ct->{$_} } keys %$ct) };
+             push @$info, { $self->_t("Uses") => join(", ", grep { $ct->{$_} } keys %$ct) };
          }
 
          push @$info, { $self->_t("Bit length") => $cert->{bit_length} };
@@ -769,6 +821,7 @@ sub OnUnknownCert {
 
     }
 
+
     my $but_cancel = Wx::Button->new($dialog, -1, $self->_t('Cancel'));
     Wx::Event::EVT_BUTTON($dialog, $but_cancel->GetId, sub { $but_clicked->(0) });
     $bsizer->Add($but_cancel, 0, wxALL, 5);
@@ -786,15 +839,64 @@ sub OnUnknownCert {
          $but_cancel->SetDefault;
     }
 
+
+    if ( !$no_ok_button && core_cfg('client.ssl.error_timeout') > 0 ) {
+        my $timeout = core_cfg('client.ssl.error_timeout');
+
+        $but_ok->Enable(0);
+        $but_ok_permanent->Enable(0);
+
+        Wx::Event::EVT_TIMER($dialog, -1, \&OnCertDialogTimer);
+        my $timer = Wx::Timer->new($dialog);
+        $dialog->{accept_countdown} = $timeout; 
+        $dialog->{ok_button} = $but_ok;
+        $dialog->{save_button} = $but_ok_permanent;
+        $dialog->{ok_orig_text} = $but_ok->GetLabel();
+        $dialog->{save_orig_text} = $but_ok_permanent->GetLabel();
+        $dialog->{timer} = $timer;
+        $but_ok->SetLabel( $dialog->{ok_orig_text} . " ($timeout)" );
+        $but_ok_permanent->SetLabel( $dialog->{save_orig_text} . " ($timeout)" );
+
+
+
+        $timer->Start(1000,0);
+    }
+
+
+
     $dialog->SetEscapeId( $but_cancel->GetId );
 
     $dialog->ShowModal();
+
+    if ( $dialog->{timer} ) {
+       $dialog->{timer}->Stop();
+    }
 
     $self->{timer}->Start();
 
     { lock $accept_cert; cond_signal $accept_cert; }
 }
 
+sub OnCertDialogTimer {
+    my $self = shift;
+
+    $self->{accept_countdown}--;
+
+    if ( $self->{accept_countdown} <= 0 ) {
+        $self->{ok_button}->Enable(1) if ($self->{ok_button});
+        $self->{save_button}->Enable(1) if ($self->{save_button});
+
+        $self->{ok_button}->SetLabel( $self->{ok_orig_text} );
+        $self->{save_button}->SetLabel( $self->{save_orig_text} );
+        $self->{timer}->Stop();
+
+    } else {
+        $self->{ok_button}->SetLabel( $self->{ok_orig_text} . " ($self->{accept_countdown})" );
+        $self->{save_button}->SetLabel( $self->{save_orig_text} . " ($self->{accept_countdown})" );
+    }
+
+
+}
 sub OnTimer {
     my $self = shift;
     $self->{progress_bar}->Pulse;

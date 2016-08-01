@@ -59,11 +59,12 @@ EOQ
 sub _load_start_cmds {
     my $self = shift;
     $self->_query( { save_to => 'vms_to_be_started' },
-                   <<'EOQ', $self->{node_id});
+                   <<'EOQ', time, $self->{node_id});
 update vm_runtimes
     set vm_cmd=NULL,
-        vm_state='starting'
-    where host_id=$1 and
+        vm_state='starting',
+        vm_state_ts=$1
+    where host_id=$2 and
           vm_cmd='start' and
           vm_state='stopped'
     returning vm_id

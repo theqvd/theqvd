@@ -38,6 +38,7 @@ use Class::StateMachine::Declarative
                    substates => [ db              => { transitions => { _on_error   => 'stopping/db' },
                                                        substates => [ loading_row        => { enter => '_load_row' },
                                                                       searching_di       => { enter => '_search_di' },
+                                                                      checking_hypervisor=> { enter => '_check_hypervisor' },
                                                                       calculating_attrs  => { enter => '_calculate_attrs' },
                                                                       saving_runtime_row => { enter => '_save_runtime_row' },
                                                                       updating_stats     => { enter => '_incr_run_attempts' } ] },
@@ -126,6 +127,7 @@ use Class::StateMachine::Declarative
                                                                checking_dirty         => { enter => '_check_dirty_flag' },
                                                                heavy                  => { enter => '_heavy_down' },
                                                                killing_lxc            => { enter => '_kill_lxc' },
+                                                               releasing_cpuset       => { enter => '_release_cpuset' },
                                                                unlinking_iface        => { enter => '_unlink_iface' },
                                                                removing_fw_rules      => { enter => '_remove_fw_rules' },
                                                                running_poststop_hook  => { enter => '_run_poststop_hook',
@@ -166,6 +168,7 @@ use Class::StateMachine::Declarative
                                                                                        transitions => { _on_lxc_done      => 'killing_lxc',
                                                                                                         _on_state_timeout => 'killing_lxc'} },
                                                            killing_lxc            => { enter => '_kill_lxc' },
+                                                           releasing_cpuset       => { enter => '_release_cpuset' },
                                                            unlinking_iface        => { enter => '_unlink_iface' },
                                                            removing_fw_rules      => { enter => '_remove_fw_rules' },
                                                            destroying_lxc         => { enter => '_destroy_lxc',
@@ -343,9 +346,21 @@ sub _create_lxc {
     my $lxc_version = $self->_cfg('command.version.lxc');
     my $qvd_lxc_autodev = $self->_cfg('command.qvd-lxc-autodev');
 
+    my $memory = $self->{memory};
+    my $memory_limits = <<EOML;
+lxc.cgroup.memory.limit_in_bytes=${memory}M
+lxc.cgroup.memory.memsw.limit_in_bytes=${memory}M
+EOML
+    $memory_limits =~ s/^/# /mg unless $self->{hypervisor}->swapcount_enabled;
+
+    my $cpuset_size = $self->_cfg('vm.lxc.cpuset.size');
+    my @cpus = $self->{hypervisor}->reserve_cpuset($cpuset_size);
+    $self->{cpus} = \@cpus;
+
+    my $cpuset_cpus = join ',', @cpus;
+
     # FIXME: make this template-able or configurable in some way
     print $cfg_fh <<EOC;
-lxc.aa_profile=unconfined
 lxc.autodev=1
 lxc.hook.autodev=$qvd_lxc_autodev
 lxc.utsname=$self->{name}
@@ -362,7 +377,8 @@ lxc.rootfs=$self->{os_rootfs}
 lxc.mount.entry=$self->{home_fstab}
 lxc.pivotdir=qvd-pivot
 lxc.cgroup.cpu.shares=1024
-
+lxc.cgroup.cpuset.cpus=$cpuset_cpus
+$memory_limits
 #lxc.cap.drop=sys_module audit_control audit_write linux_immutable mknod net_admin net_raw sys_admin sys_boot sys_resource sys_time
 
 # Deny access to all devices, except...
@@ -478,7 +494,12 @@ sub _check_dirty_flag {
 sub _kill_lxc {
     my $self = shift;
     my @pids;
-    my $cgroup_cpu_lxc = $self->_cfg('path.cgroup.cpu.lxc');
+    my $cgroup_cpu_lxc = $self->{hypervisor}->cgroup_control_path('cpu');
+    unless (defined $cgroup_cpu_lxc) {
+        ERROR "Can't clean container processes because cgroup is missconfigured";
+        return $self->_on_error;
+    }
+
     my $fn = "$cgroup_cpu_lxc/$self->{lxc_name}/cgroup.procs";
     if (open my $fh, '<', $fn) {
         chomp(@pids = <$fh>);
@@ -506,6 +527,14 @@ sub _kill_lxc {
         DEBUG "All processes killed";
         return $self->_on_done;
     }
+}
+
+sub _release_cpuset {
+    my $self = shift;
+    if (my $cpus = delete $self->{cpus}) {
+        $self->{hypervisor}->release_cpuset(@$cpus);
+    }
+    return $self->_on_done
 }
 
 sub _destroy_lxc {

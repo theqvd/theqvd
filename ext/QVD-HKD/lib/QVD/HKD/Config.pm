@@ -17,17 +17,18 @@ use parent qw(QVD::HKD::Agent);
 use Class::StateMachine::Declarative
 
     __any__ => { advance => '_on_done',
-                 transitions => {  _on_qvd_config_changed_notify => 'reloading',
-                                   on_hkd_stop => 'stopped' } },
+                 delay => [qw(_on_qvd_config_changed_notify on_hkd_stop)] },
 
     reloading => { enter => '_reload',
                    before => { _on_done => '_send_config_reloaded' },
                    transitions => { _on_error => 'delay' } },
 
     '(delay)' => { enter => '_set_timer',
-                   transitions => { _on_timeout => 'reloading' } },
+                   transitions => { _on_timeout => 'reloading',
+                                    on_hkd_stop => 'stopped' } },
 
-    idle      => {},
+    idle      => { transitions => { _on_qvd_config_changed_notify => 'reloading',
+                                    on_hkd_stop => 'stopped' } },
 
     stopped   => { enter => '_on_stopped' };
 
@@ -62,14 +63,20 @@ sub _load_base_config {
 
 sub _cfg {
     my $self = shift;
+    $self->_cfg_optional(@_) // LOGDIE "configuration entry $_[0] missing";
+}
+
+sub _cfg_optional {
+    my $self = shift;
     my $value = $self->{props}->getProperty(@_);
-    unless (defined $value) {
-        $debug and $self->_debug("configuration entry for key $_[0] missing");
-        LOGDIE "configuration entry $_[0] missing";
+    if (defined $value) {
+        $value =~ s/\${(.*?)}/$1 eq '{' ? '${' : $self->_cfg($1)/ge;
+        $debug and $self->_debug("config: $_[0] = $value");
     }
-    $value =~ s/\${(.*?)}/$1 eq '{' ? '${' : $self->_cfg($1)/ge;
-    $debug and $self->_debug("config: $_[0] = $value");
-    $value;
+    else {
+        $debug and $self->_debug("config: $_[0] is undef");
+    }
+    $value
 }
 
 sub set_db {

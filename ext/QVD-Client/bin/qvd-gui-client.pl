@@ -10,7 +10,7 @@ use Cwd;
 use File::Spec;
 use Proc::Background;
 
-our ($WINDOWS, $DARWIN, $user_dir, $app_dir, $user_config_filename, $user_certs_dir, $pixmaps_dir);
+our ($WINDOWS, $DARWIN, $user_dir, $app_dir, $user_config_filename, $user_certs_dir, $pixmaps_dir, $orig_display);
 
 my $prev_bad_log_level;
 
@@ -34,6 +34,8 @@ BEGIN {
     $QVD::Config::USE_DB = 0;
     @QVD::Config::Core::FILES = ( ($WINDOWS ? () : ('/etc/qvd/client.conf')),
                                   $user_config_filename );
+								  
+	$orig_display = $ENV{DISPLAY};
 }
 
 use QVD::Config::Core qw(set_core_cfg core_cfg);
@@ -96,78 +98,7 @@ sub OnInit {
     my $self = shift;
     DEBUG("OnInit called");
 
-    if ($WINDOWS or $DARWIN) {
-        unless( $ENV{DISPLAY} || $ENV{QVD_PP_BUILD} ) {
-            my @cmd;
-            my $proc;
 
-            if ($WINDOWS) {
-			    DEBUG "Running on Windows, detecting X server";
-				
-                $ENV{DISPLAY} = '127.0.0.1:0';
-				my $xming_bin = File::Spec->rel2abs(core_cfg('command.windows.xming'), $app_dir);
-				my $vcxsrv_bin = File::Spec->rel2abs(core_cfg('command.windows.vcxsrv'), $app_dir);
-				
-				if ( -f $xming_bin ) {
-				    DEBUG "Xming found at $xming_bin";
-					my @extra_args=split(/\s+/, core_cfg('client.xming.extra_args'));
-					
-					@cmd = ( $xming_bin, @extra_args, '-logfile' => File::Spec->join($user_dir, "xserver.log") );
-				} elsif ( -f $vcxsrv_bin ) {
-				    DEBUG "VcxSrv found at $vcxsrv_bin";
-					my @extra_args=split(/\s+/, core_cfg('client.vcxsrv.extra_args'));
-					
-				    @cmd = ( $vcxsrv_bin, @extra_args, '-logfile' => File::Spec->join($user_dir, "xserver.log") );
-				} else {
-				    die "X server not found! Tried '$xming_bin' and '$vcxsrv_bin'";
-				}
-            }
-            else { # DARWIN!
-                $ENV{DISPLAY} = ':0';
-                my $x11_cmd = core_cfg('command.darwin.x11');
-                @cmd = qq(open -a $x11_cmd --args true);
-            }
-
-            DEBUG("DISPLAY set to $ENV{DISPLAY}");
-            DEBUG("Starting X11 server: " . join(' ', @cmd));
-
-            if ( ($proc = Proc::Background->new(@cmd))  ) {
-                DEBUG("X server started");
-                if ( $DARWIN ) {
-                    DEBUG("Waiting to see if X starts");
-                    my $timeout=5;
-                    my $all_ok;
-                    while($timeout-- > 0) {
-                        if (!$proc->alive) {
-                            if (!defined $proc->wait || ($proc->wait << 8) > 0 ) {
-                                _osx_error("Failed to start X server. Please install XQuartz.");
-                                exit(1);
-                            } else {
-                                $all_ok = 1;
-                                last;
-                            }
-                        }
-                        sleep(1);
-                    }
-
-                    if (!$all_ok) {
-                        WARN("X server command still seems to be running. Can't exactly determine whether the server started");
-                    }
-                }
-            } else {
-                ERROR("X server failed to start");
-                if ($DARWIN) {
-                     _osx_error("Failed to start X server. Please install XQuartz.");
-                }
-            }
-        } else {
-			if (  $ENV{QVD_PP_BUILD} ) {
-				DEBUG("Running under a PP build, not starting X");
-			} else {
-				DEBUG("X11 server already running on display $ENV{DISPLAY}, using that.");
-			}
-        }
-    }
 
     DEBUG("Showing frame");
     my $frame = QVD::Client::Frame->new();

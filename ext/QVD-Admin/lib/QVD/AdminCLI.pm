@@ -141,6 +141,8 @@ sub _syntax_check {
     my $cmd  = shift;
     my %args = _split_on_equals(@_);
     $self->{errors} = 0;
+    
+    $self->_check_arguments_syntax(%args);
 
     $self->_check_arguments_syntax(%args);
 

@@ -61,5 +61,5 @@ my $ok = eval {
     1;
 };
 
-$ok or ERROR "Exception: $@";
+$ok or LOGDIE "Exception: $@";
 
