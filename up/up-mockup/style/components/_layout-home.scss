@@ -1,0 +1,110 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                @LAYOUT HOME: Layout of home
+                components/_layout-home.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+.home-wrapper {
+    @include table-base;
+    table-layout: fixed;
+    margin-top: 30px;
+    width: 100%;
+    padding-bottom: 20px;
+    .home-row {
+        display: table;
+        table-layout: fixed;
+        width: 100%;   
+        
+        .home-cell {
+            display: block;
+            padding: 0px;
+            padding-bottom: 10px;
+            @include in(desktop) {
+                display: table-cell;
+                padding: 15px;
+            }
+
+            text-align: center;
+
+            &>div {
+                margin: 0 auto;
+                display: block;
+            }
+
+            .home-title {
+                text-align: center;
+                margin: 20px;
+            }
+
+            .summary-table {
+                @include table-base;
+                text-align: left;
+                width: 95%;
+                margin: 20px auto;
+
+                i {
+                    width: 20px;
+                    text-align: center;
+                }
+
+                td:last-child {
+                    font-weight: bold;
+                    font-size: 1em;
+                }
+            }
+                           
+            .bar-chart {
+                .flot-base, .flot-text, .flot-overlay {
+                    top: -6px !important;
+                }
+            }
+            
+            .home-percent-wrapper {
+                position: relative;
+                width: 200px;
+                height: 200px;
+
+                .pie-chart {
+                    width: 200px;
+                    height: 200px;
+                    position: absolute;
+                    cursor: pointer;
+                }
+
+                .home-percent {
+                    margin: 0;
+                    margin-top: 80px;
+                    position: absolute;
+                    width: 200px;
+                    padding: 0px;
+                    color: darken($col_whiter, 40);
+                    opacity: 0.5;
+                }
+            }
+        }
+    }
+    
+    .log-table {
+        @include table-base;
+        text-align: left;
+        width: 95%;
+        margin: 20px auto;
+
+        i {
+            width: 20px;
+            text-align: center;
+        }
+
+        td:last-child a {
+            padding-left: 10px;
+            @include in(desktop) {
+                padding-left: 50px;
+            }
+        }
+    }
+}

@@ -1,0 +1,514 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                @LAYOUT: Grids, Wrappers...
+                components/_layout.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+
+/* Layout */
+
+body {
+    position: relative;
+    background: url($body_background_img) no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    overflow-x: hidden;
+}
+
+* {
+    @include in(mobile) {
+        min-width: 0 !important;
+    }
+}
+
+.super-wrapper {
+    padding-top: 60px;
+    &.super-wrapper--login {
+        background: $login_bg;
+        padding: 0; 
+        height: 100vh;
+        .wrapper {
+            background: $login_bg;
+            margin: 0px;
+        }
+        
+        .loading {
+            color: $col_whiter;
+        }
+    }
+    
+    .wrapper {
+        margin-left: $menu_lat_width;
+    }
+}
+
+.header-wrapper {
+    @extend %invisible;
+
+    height: 60px;
+    background: $header_bg;
+    position: fixed;
+    top: 0px;
+    
+    width: 100%;
+
+    @include in(desktop) {
+        width: auto;
+        min-width: 100%;
+    }
+    
+    z-index: 100;
+    
+    &.header-wrapper--mini {
+        height: 40px;
+        
+        div.logo {
+            height: 35px;
+            width: 80px;
+        }
+        
+        opacity: 0.90;
+    }
+    
+    .header {
+        position: relative;    
+                
+        @include width-wrapper;
+
+        padding-left: 5px;
+        padding-right: 5px;
+
+        @include in(desktop) {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+        
+        .logo {
+            height: 55px;
+            width: 125px;
+            margin: 5px 0px;
+            background-image: url($header_logo);
+            background-repeat: no-repeat;
+            background-size: 100%;
+        }
+        
+        .superadmin-select {
+            margin: 10px 3px;
+        }
+        
+    }
+}
+
+.message-container {
+    position: fixed;
+    top: 0px;
+
+    left: 5%;
+    width: 90%;
+    @include in(desktop) {
+        left: 20px;
+        width: 40%;
+    }
+
+    padding: 12px 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    border-top: 0px;
+    color: $col_whiter;
+    font-weight: bold;
+    z-index: 1001;
+    display: none;
+
+    &.success {
+        background: darken($col_green, 5);
+    }
+
+    &.error {
+        background: darken($col_red, 5);
+    }
+
+    &.info {
+        background: darken($col_blue, 5);
+    }
+
+    &.warning {
+        background: darken($col_yellow, 5);
+    }
+
+    .message-close {
+        float:right;
+        //position: absolute;
+        top: 6px;
+        right: 8px;
+        @include icon-size(20px);
+        cursor: pointer;
+    }
+
+    .message {
+        padding-top: 10px;
+
+        summary {
+            line-height: 20px;
+        }
+
+        article.expandedMessage {
+            display: none;
+            @include font-size(1);
+            padding: 14px 30px;
+            margin-top: 10px;
+
+            background: darken($col_whiter, 8);
+            color: $col_blacker;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+
+            font-weight: normal;
+
+            ul {
+                margin-top: 5px;
+                margin-left: 8px;
+                li {
+                    margin-top: 4px;
+                    display: list-item;
+
+                    &:before, i:before {
+                        margin-right: 5px;
+                    }
+                }
+            }
+        }
+
+        .expand-message {
+            cursor: pointer;
+            @include icon-size(20px);
+            float:left;
+            margin-right: 15px;
+        }
+    }
+}
+
+.loading, .loading-mid {
+    width: 75px;
+    top: 25vh;
+    @include in(desktop) {
+        @include icon-size(200px);
+        width: 200px;
+        top: 25vh;
+    }
+    color: darken($col_whiter, 10);
+    
+    margin: 50px auto;
+}
+
+.loading {
+    @include icon-size(75px);
+    @include in(desktop) {
+        @include icon-size(200px);
+    }
+}
+
+.loading-mid {
+    text-align: center;
+    width: 100%;
+    @include icon-size(45px);
+    @include in(desktop) {
+        @include icon-size(150px);
+    }
+}
+
+.mini-loading {
+    @include icon-size(45px);
+    width: 100%;
+    margin-top: 40px;
+    text-align: center;
+    color: darken($col_whiter, 10);
+}
+
+.side-component {
+    .mini-loading {
+        color: darken($col_whiter, 20);
+    }
+}
+
+.wrapper {
+    @extend %invisible;
+        
+    margin: 0 auto;
+    display: block;
+    
+    padding-left: 5px;
+    padding-right: 5px;
+    
+    @include in(desktop) {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+    
+    @include width-wrapper;
+
+    margin-bottom: 50px;
+    margin-left: 5px;
+    
+    position: relative;
+    
+    .menu {
+        @extend %invisible;
+
+        margin-bottom: 10px;
+        
+        margin-top: 5px;
+        @include in(desktop) {
+            margin-top: 15px;
+        }
+    }
+    
+    .content {
+        @extend %invisible;
+
+        @extend %clearfix;
+        
+        margin: 0 auto;
+                
+        width: 96%;
+
+        @include in(desktop) {
+            width: 100%;
+        }
+        
+        // Different view layouts
+        @import "layout-home";
+        @import "layout-list";
+        @import "layout-details";
+        @import "layout-setup";
+        @import "layout-login";
+        
+        .wrapper-content {
+            //width: 95vw;
+        }
+    }
+}
+
+@import "layout-roles";
+@import "layout-editor";
+
+.responsive-switch {
+    margin-bottom: 45px; 
+    width: 100%;
+    
+    @include in(desktop) {
+        position: absolute;
+        margin-left: auto;
+        margin-right: auto;
+        left: 0;
+        right: 0;
+        bottom: 0px;
+    }
+    
+    a {
+        display: table;
+        margin: 0 auto;
+    }
+}
+
+.footer {
+    @extend %invisible;
+
+    z-index: 1000;
+    
+    height: 65px;
+    margin-top: 50px;
+    text-align: center;
+    color: $footer_text;
+    @extend %clearfix;
+    
+    width: $menu_lat_width;
+    
+    position: fixed;
+    bottom: 0px;
+    padding: 7px;
+    
+    display: none;
+    
+    @include in(desktop) {
+        display: block;
+    }
+    
+    vertical-align: top;
+    
+    a {
+        line-height: 14px;
+    }
+    
+    .logo {
+        height: 27px;
+        width: 68px;
+        margin: 5px 0px;
+        background-image: url($header_logo);
+        background-repeat: no-repeat;
+        background-size: 100%;
+        margin: 0 auto;
+    }
+}
+
+.separator {
+    width: 100%;
+    margin-top: 15px;
+    margin-bottom: 20px;
+    border-bottom: dotted 1px darken($col_whiter, 15);
+}
+
+/* Responsive generic layout */
+.desktop, .desktop-row {
+    display: none;
+}
+
+@include in(desktop) {
+    .desktop {
+        display: block;
+    }
+    .desktop-row {
+        display: table-row;
+    }
+    
+    td.desktop, th.desktop {
+        display: table-cell;
+    }    
+    span.desktop, a.desktop {
+        display: inline;
+    }    
+    
+    .mobile {
+        display: none;
+    }
+}
+
+.inline {
+    display: inline;
+}
+
+.clear {
+    @extend %clearfix;
+}
+
+span.text {
+    line-height: 1.4;
+}
+
+.related-doc {
+    display: inline-table;
+    margin-top: 20px;
+    margin-bottom: 80px;
+    padding-left: 20px;
+    width: 100%;
+
+    a.button2 {
+        margin-bottom: 15px;
+        display: block;
+    }
+}
+
+.search-matchs {
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+
+.info-header {
+    height: auto;
+    padding: 10px;
+    .fa:before {
+        margin-right: 5px;    
+    }
+}
+
+.server-datetime-wrapper {
+    position: fixed;
+    right: 0;
+    top: 60px;
+    font-size: 12px;
+    padding: 7px 15px 4px 5px;
+    background: #eee;
+    border-bottom-left-radius: 8px;
+    z-index: 2;
+    opacity: 0.8;
+    
+    &.server-datetime-wrapper--mini {
+        top: 40px;
+    }
+}
+
+.menu-lat {
+    @extend %invisible;
+    
+    background: $header_bg;
+    height: 100vh;
+    width: $menu_lat_width;
+    padding-top: 60px;
+    position: fixed;
+    top: 0px;
+    display: none;
+    
+    a {
+        color: $col_whiter;
+    }
+    
+    .menu-option {
+        height: 70px;
+        vertical-align: middle;
+        padding-left: 3px;
+        padding-top: 10px;
+        &:hover, &.menu-option--current {
+            background: $col_brand;
+            cursor: pointer;
+            
+            i {
+                &:before {    
+                    font-size: 35px;
+                    text-align: center;
+                    display: block;
+                    color: $col_whiter;
+                    background: transparent;
+                    border-radius: 0;
+                    padding: 6px;
+                    width: 48px;
+                    height: 46px;
+                }
+            }
+        }
+        
+        font-size: 12px;
+        color: $col_whiter;
+        
+        i {
+            &:before {    
+                font-size: 30px;
+                text-align: center;
+                display: block;
+                color: $header_bg;
+                background: $col_whiter;
+                border-radius: 100%;
+                padding: 8px;
+                width: 48px;
+                height: 46px;
+            }
+            
+            width: 45px;
+            float: left;
+        }
+        
+        span {
+            height: 40px;
+            float: left;
+            padding-left: 10px;
+            padding-top: 10px;
+            width: 145px;
+        }
+    }
+}
