@@ -14,7 +14,7 @@ Up.Collections.Collection = Backbone.Collection.extend({
         this.block = params.block || Up.C.getBlock();
         this.offset = params.offset || this.offset;
         this.filters = params.filters || this.filters;
-        this.action = params.action || this.actionPrefix + '_list';
+        this.action = params.action || this.actionPrefix;
         this.sort = params.sort || this.sort;
     },
     
@@ -54,7 +54,7 @@ Up.Collections.Collection = Backbone.Collection.extend({
         var that = this;
         
         var params = _.extend({
-            type: 'POST',
+            type: 'GET',
             dataType: 'json',
             url: encodeURI(that.getListUrl()),
             processData: false

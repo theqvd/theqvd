@@ -49,7 +49,7 @@ Up.L = {
     rememberLogin: function () { 
         Up.C.loggedIn = true;
         
-        Up.A.performAction('vm_list', {}, function (that) {
+        Up.A.performAction('vm', {}, function (that) {
             // Configure visability
             Up.C.configureVisibility();
 

@@ -17,68 +17,6 @@
     }
     
     &>ul {    
-        .menu-option, .lateral-menu-option, .lateral-menu-option-discrete {
-            @extend %not-selectable;
-            display: block;
-
-            @include in(desktop) {
-                display: inline;
-            }
-
-            min-width: 100px;
-            padding: 8px 12px 8px 12px;
-            background: $menu_bg;
-            color: $menu_text;
-            border: 1px solid $menu_border;
-            cursor: pointer;
-
-            &:last-child {
-                border-bottom-left-radius: $menu_radius;
-                border-bottom-right-radius: $menu_radius;
-            }    
-
-            &:first-child {
-                border-top-left-radius: $menu_radius;
-                border-top-right-radius: $menu_radius;
-            }
-
-            @include in(desktop) {
-                &:last-child {
-                    border-bottom-left-radius: 0;
-                    border-top-right-radius: $menu_radius;
-                    border-bottom-right-radius: $menu_radius;
-                }    
-
-                &:first-child {
-                    border-top-right-radius: 0;
-                    border-top-left-radius: $menu_radius;
-                    border-bottom-left-radius: $menu_radius;
-                }  
-
-                &:first-child:last-child {
-                    border-radius: $menu_radius;
-                }
-            }
-
-            // Icon
-            .fa {
-                @include icon-size(18px);
-                margin-right: 10px;
-
-            }
-
-            span {
-                vertical-align: bottom;
-            }
-
-            &:active {
-                @include in(desktop) {
-                    margin-bottom: -2px;
-                    margin-top: 1px;
-                }
-            }
-        }
-        
         .lateral-menu-option, .lateral-menu-option:active, .lateral-menu-option-discrete {
             float: left;
             margin-bottom: 10px;
