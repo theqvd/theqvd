@@ -1,0 +1,222 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                @GENERAL: Styles that affect general group of elements
+                components/_general.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+html {
+    overflow: -moz-scrollbars-vertical; 
+    overflow-y: scroll;
+}
+
+body {
+    background: #fdfdfd;
+    height: 100vh !important;
+}
+
+a {
+    color: $col_links;
+    text-decoration: none;
+    font-weight: bold;
+    
+    i.hover {
+        color: $col_blacker;
+    }
+}
+
+a:hover {
+    i:before {
+        color: $col_blacker;
+    }
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.relative {
+    position: relative;
+}
+
+.center {
+    text-align: center;
+}
+
+
+fieldset {
+    padding: 8px;
+    border: 1px solid lighten($col_brand, 40);
+    border-radius: 6px;
+    
+    legend {
+        color: lighten($col_blacker, 43);
+        text-align: right;
+    }
+    
+    &.dialog-form {
+        margin-top: 15px;
+    }
+}
+
+// Titles
+.h1 {
+    position: relative;
+    margin-bottom: 15px;
+    
+    .subtitle {
+        color: lighten($col_blacker, 50);
+    }
+    
+    .fa:before {
+        margin-right: 5px;
+    }
+}
+
+.h2 {
+    margin-bottom: 14px;
+}
+
+// States
+.ok {
+    color: darken($col_green, 10);
+}
+.warning {
+    color: darken($col_yellow, 10);
+}
+.error {
+    color: darken($col_red, 10);
+}
+.not-notify {
+    color: #CCC;
+}
+
+.error-404, .error-refresh {
+    text-align: center;
+    i.fa {
+        font-size: 90px;
+        color: lighten($col_blacker, 50);
+    }    
+    div {
+        font-size: 50px;
+        color: lighten($col_blacker, 50);
+    }
+}
+
+.error-refresh {
+    margin-top: 30px;
+    
+    a {
+        margin-top: 20px;
+    }
+}
+
+.no-elements {
+    font-style: italic;
+    font-weight: normal;
+    color: lighten($col_blacker, 20);
+    margin-top: 6px;
+}
+
+.dialog-advice {
+    padding: 10px;
+    
+    div {
+        margin-bottom: 12px;
+        line-height: 1.3em;
+    }
+}
+
+.loading-big {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: darken($col_whiter, 20);
+    opacity: 0.8;
+    z-index: 2000;
+    
+    i {
+        font-size: 150px;
+        color: $col_whiter;
+    }
+    
+    .loading-big-message {
+        font-size: 24px;
+        color: $col_whiter;
+        margin-bottom: 20px;
+    }
+    
+    .loading-little-message {
+        color: $col_whiter;
+        margin-top: 20px;
+    }
+    
+    .loading-block {
+        width: 150px;
+        height: 150px;
+        margin: 0 auto;
+    }
+    
+    .loading-big-box {
+        background: black;
+        border-radius: 15px;
+        width: 70vw;
+        height: 70vh;
+        min-height: 400px;
+        margin: 70px auto;
+        text-align: center;
+        padding: 50px;
+    }
+}
+
+.filter-notes {
+    border: 1px rgb(182, 182, 0) solid;
+    padding: 8px;
+    border-radius: 4px;
+    background: rgb(246, 247, 175);
+    margin-top: -20px;
+    margin-bottom: 15px;
+    min-height: 40px;
+    
+    .fa:before {
+        margin-right: 4px;
+    }
+    
+    .filter-notes-list {
+        display: block;
+        margin-top: 15px;
+        margin-bottom: 10px;
+        li {
+            display: inline;
+            margin-right: 15px;
+            border: 1px solid #666;
+            padding: 5px;
+            background: #FFF;
+            border-radius: 3px;
+        }
+    }
+}
+
+.screen-help {
+    margin-left: 5px;
+    height: 1.2em;
+    
+    &:before {
+        margin: 0 !important;
+        font-size: 1.2em;
+    }
+}
+
+.underselect-option {
+    margin-top: 3px;
+    padding-top: 3px;
+    height: 14px;
+    font-size: 10px;
+}
+

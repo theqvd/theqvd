@@ -1,0 +1,277 @@
+/* INCLUDED: mixins */
+
+// Tables
+@mixin alternate($col : #FFFFFF){
+    &:nth-child(even) {
+        background-color: $col;
+    }    
+    &:nth-child(odd) {
+        background-color: darken($col, 4%);
+    }
+}
+
+@mixin alternate-cols($col : #FFFFFF){
+    &>td:nth-child(even) {
+        background-color: $col;
+    }    
+    &>td:nth-child(odd) {
+        background-color: darken($col, 4%);
+    }
+}
+
+@mixin first-col($col : #FFFFFF){
+    &>td {
+        background-color: $col;
+    }    
+    &>td:nth-child(1) {
+        background-color: darken($col, 4%);
+    }
+}
+
+// Layout
+@mixin width-wrapper {
+    min-width: $min_width_mobile;
+    //max-width: $max_width_mobile;
+
+    @include in(desktop) {
+        min-width: $min_width_wrapper;
+        //max-width: $max_width_wrapper;
+    }
+}
+
+// Media queries
+@mixin in($media) {
+    @if $media == desktop {
+        //@media screen and (min-width: $max_width_mobile) {
+        @media screen and (min-width : $max_width_mobile) {
+            @content;
+        }
+    }
+    @else if $media == mobile {
+        //@media screen and (max-width: $max_width_mobile) {
+        @media only screen and (max-width : $max_width_mobile) {
+            @content;
+        }
+    }
+}
+
+@mixin linear-gradient($col, $mode : normal) {
+    $col_a : lighten($col, 5);
+    $col_b : darken($col, 5);
+    
+    @if $mode == inverse {
+        $col_bb: $col_b; //Aux
+        $col_b: $col_a;
+        $col_a: $col_bb;
+    }
+    
+    background-color: darken($col, 5);
+    background-image: -moz-linear-gradient(top, $col_a, $col_b);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from($col_a), to($col_b));
+    background-image: -webkit-linear-gradient(top, $col_a, $col_b);
+    background-image: -o-linear-gradient(top, $col_a, $col_b);
+    background-image: linear-gradient(to bottom, $col_a, $col_b);
+}
+
+// Button
+
+@mixin button ($col, $col_back, $col_hover, $col_back_hover) {
+    @extend %not-selectable;
+    z-index: 2;
+    
+    color: $col;
+    
+    background-color: $col_back;
+
+    background-repeat: repeat-x;
+    
+    -webkit-box-shadow: none;
+       -moz-box-shadow: none;
+            box-shadow: none;
+
+    &:hover {
+        cursor: pointer;
+        border-color: darken($col_back_hover, 10);
+        
+        &:before {
+            color: $col_hover;
+        }
+    }    
+
+    &:active {
+        color: darken($col, 5);
+        @include linear-gradient($col_back, inverse);
+    }    
+
+    &:focus {
+         outline: 0;
+    }
+
+    &:before {
+        margin-right: 10px;
+        color: $col;
+    }
+    
+    white-space: nowrap;
+}
+
+@mixin button--disabled () {
+    $col: $col_brand;
+    $col_back: $col_whiter;
+    
+    @extend %not-selectable;
+
+    color: darken($col_whiter, 20);
+    @include linear-gradient(lighten($col_back, 30));
+
+    background-repeat: repeat-x;
+    
+    border: solid 1px darken($col_whiter, 10);
+
+    -webkit-box-shadow: none;
+       -moz-box-shadow: none;
+            box-shadow: none;
+
+    &:hover {
+        cursor: default;
+        font-weight: normal;
+        
+        &:before {
+            color: darken($col_whiter, 20);
+        }
+    }    
+
+    &:active {
+        color: darken($col_whiter, 20);
+        @include linear-gradient(lighten($col_back, 30));
+    }    
+
+    &:focus {
+         outline: 0;
+    }
+
+    &:before {
+        color: darken($col_whiter, 20);
+    }
+}
+
+@mixin font-size($size_index) {
+    $size: nth($font-sizes-mobile, $size_index);
+    $height: $size;
+    font-size: $size * 1em;
+    line-height: $height * 1em;
+    
+    @include in(desktop) {
+        $size: nth($font-sizes, $size_index);
+        $height: $size;
+        font-size: $size * 1em;
+        line-height: ($height + 0.3) * 1em;
+    }
+}
+
+// Not responsive version of font-size mixin
+@mixin font-size-static($size_index) {
+    $size: nth($font-sizes, $size_index);
+    $height: $size;
+    font-size: $size * 1em;
+    line-height: ($height + 0.3) * 1em;
+}
+
+@mixin icon-size($size) {
+    font-size: $size;
+}
+
+@mixin table-base ($alternate: alternate-rows) {
+    width: 100%;
+    background-color: $col_whiter;
+    border: 1px solid #ddd;
+    border-radius: $table_radius;
+    border-collapse: separate;
+
+    th {
+        font-weight: bold;
+        text-align: left;
+        border-bottom: #ccc solid 1px;
+        color: $table_header_text;
+        background: $table_header_bg; 
+        
+        .sort-icon {
+            float: right;
+            width: auto;
+        }
+        
+        &.sortable {
+            cursor: pointer;
+        }
+        
+        @extend %not-selectable;
+    
+        &.sorted {
+            background-color: $table_sorted_header_bg;
+            color: $table_sorted_header_text;
+        }
+        
+        i {
+            &.sort-icon:before {
+                float: right;
+                margin-left: 5px;
+                font-weight: normal;
+            }
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            
+            font-weight: bold;
+        }
+    }
+
+    tr {
+        td, th {
+            padding: 6px 4px 4px 6px;
+            vertical-align: middle;
+            height: 45px;
+            
+            border-right: dotted 1px darken($col_whiter, 10);
+            border-bottom: dotted 1px darken($col_whiter, 10);
+
+            &:last-child {
+                border-right: 0px;
+            }
+        }
+    }
+    
+    >tbody:nth-child(2) tr:first-child {
+        td: first-child {
+            //border-right: dotted 1px darken($col_whiter, 10);
+        }
+        
+        td {
+            //border-top: dotted 1px darken($col_whiter, 10);
+        }
+    }
+
+    >tbody>tr {
+        @if $alternate == alternate-rows {
+            @include alternate($col_whiter);
+        } @else if $alternate == alternate-cols {
+            @include alternate-cols($col_whiter);
+        } @else if $alternate == first-col {
+            @include first-col($col_whiter);
+        }
+    }
+    
+    tr:last-child {
+        td:first-child {
+            border-bottom-left-radius: $table_radius;
+        }        
+        td:last-child {
+            border-bottom-right-radius: $table_radius;
+        }
+    }
+    
+    .info-in-name-cell {
+        margin-top: 8px;
+        float: right;
+    }
+}

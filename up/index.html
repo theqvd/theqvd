@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>QVD | WAT</title> 
+        <meta charset='utf-8' />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+        <link rel="icon" href="images/favicon.ico" type="image/x-icon" />
+        <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
+        
+        <!-- Third party JS libraries -->
+            <!-- jQuery -->
+            <script type='text/javascript' src='lib/thirds/jquery/jquery.min.js'></script>
+            
+            <!-- jQuery UI -->
+            <script type='text/javascript' src='lib/thirds/jquery-ui/jquery-ui.min.js'></script>
+            <link rel="stylesheet" href="lib/thirds/jquery-ui/jquery-ui.min.css">            
+            
+            <!-- jQuery DateTimePicker -->
+            <script type='text/javascript' src='lib/thirds/jquery-datetimepicker/jquery.datetimepicker.js'></script>
+            <link rel="stylesheet" href="lib/thirds/jquery-datetimepicker/jquery.datetimepicker.css">
+            
+            <!-- jQuery Tags Input -->
+            <script type='text/javascript' src='lib/thirds/jquery-tags-input/jquery.tagsinput.min.js'></script>
+            <link rel="stylesheet" href="lib/thirds/jquery-tags-input/jquery.tagsinput.css">
+            
+            <!-- jQuery Cookie -->
+            <script type='text/javascript' src='lib/thirds/jquery-cookie/jquery.cookie.js'></script>    
+                    
+            <!-- jQuery TableScroll -->
+            <script type='text/javascript' src='lib/thirds/jquery-tablescroll/jquery.tablescroll.js'></script>
+                               
+            <!-- jQuery mbExtruder -->
+            <script type='text/javascript' src='lib/thirds/jquery-mbExtruder/mbExtruder.js'></script>
+            <link rel="stylesheet" href="lib/thirds/jquery-mbExtruder/css/mbExtruder.css">
+
+            <!-- jQuery mbFlipText -->
+            <script type='text/javascript' src='lib/thirds/jquery-mbFlipText/jquery.mb.flipText.js'></script>
+                               
+            <!-- jQuery hoverIntent -->
+            <script type='text/javascript' src='lib/thirds/jquery-hoverIntent/jquery.hoverIntent.min.js'></script>
+                               
+            <!-- jQuery waitForImages -->
+            <script type='text/javascript' src='lib/thirds/waitForImages/jquery.waitforimages.js'></script>
+
+            <!-- jQuery qtip -->
+            <script src="lib/thirds/jquery-qtip/jquery.qtip.min.js"></script>
+            <script src="lib/thirds/jquery-qtip/imagesloaded.pkg.min.js"></script>
+            <link rel="stylesheet" href="lib/thirds/jquery-qtip/jquery.qtip.min.css">
+            
+            <!-- Underscore -->
+            <script type='text/javascript' src='lib/thirds/underscore/underscore.js'></script>
+                        
+            <!-- Expanding textareas -->
+            <script type='text/javascript' src='lib/thirds/expanding-textareas/expanding.js'></script>
+            
+            <!-- Backbone.js -->
+            <script type='text/javascript' src='lib/thirds/backbone/backbone.js'></script>
+            
+            <!-- i18next -->
+            <script type='text/javascript' src='lib/thirds/i18next/i18next-1.7.3.min.js'></script>
+            
+            <!-- ASCII Doc -->     
+            <script type='text/javascript' src='lib/thirds/asciidoc/asciidoc.js'></script>
+            
+            <!-- Font awesome -->
+            <link rel="stylesheet" href="lib/thirds/font-awesome/css/font-awesome.min.css">
+            
+            <!-- Font awesome animation -->
+            <link rel="stylesheet" href="lib/thirds/font-awesome-animation/font-awesome-animation.min.css">
+            
+            <!-- Fast Click -->
+            <script src="lib/thirds/fastclick/fastclick.js"></script>       
+                 
+            <!-- Device/Browser/OS detect -->
+            <script src="lib/thirds/detect/detect.min.js"></script>
+            
+            <!-- sass.js -->
+            <script src="lib/thirds/sass.js/sass.js"></script>
+            
+            <!-- Colorpicker -->
+            <script src="lib/thirds/evol.colorpicker/evol.colorpicker.min.js"></script> 
+            <link href="lib/thirds/evol.colorpicker/evol.colorpicker.min.css" rel="stylesheet" />
+            
+            <!-- jsPDF -->
+            <script src="lib/thirds/jsPDF/jspdf.js"></script>
+            <script src="lib/thirds/jsPDF/jspdf.plugin.addimage.js"></script>
+            
+            <!-- html2canvas -->
+            <script src="lib/thirds/html2canvas/html2canvas4.js"></script>
+            
+            <!-- FileSaver -->
+            <script src="lib/thirds/FileSaver/FileSaver.js"></script>
+            
+            <!-- Chosen -->
+            <script src="lib/thirds/chosen/chosen.jquery.min.js"></script>
+            <link rel="stylesheet" href="lib/thirds/chosen/chosen.min.css">
+                        
+            <!-- Flot charts -->
+            <script src="lib/thirds/flot/jquery.flot.min.js"></script>
+            <script src="lib/thirds/flot/jquery.flot.pie.min.js"></script>
+            <script src="lib/thirds/flot/jquery.flot.resize.min.js"></script>
+            <script src="lib/thirds/flot/jquery.flot.selection.min.js"></script>
+            
+             <!-- Flot axis labels (Flot charts plugin) -->
+            <script src="lib/thirds/flot-axislabels/jquery.flot.axislabels.js"></script>
+            
+            <!-- Fonts -->
+            <link rel="stylesheet" href="lib/thirds/google-fonts/google-fonts.css">
+
+        <!-- Own libraries -->
+            <!-- Constants -->
+            <script type='text/javascript' src='lib/constants/constants-icons.js'></script>
+            <script type='text/javascript' src='lib/constants/constants.js'></script>
+            <script type='text/javascript' src='lib/constants/constants-status.js'></script>
+            <script type='text/javascript' src='lib/constants/constants-acls.js'></script>
+            <script type='text/javascript' src='lib/constants/constants-qvd-config.js'></script>
+            
+            <!-- Main -->
+            <script type='text/javascript' src='lib/init.js'></script>
+            <script type='text/javascript' src='lib/start.js'></script>
+            
+            <!-- Backbone Router -->
+            <script type='text/javascript' src='lib/bb-router/router.js'></script>
+            
+            <!-- Libraries -->
+            <script type='text/javascript' src='lib/actions/actions.js'></script>
+            <script type='text/javascript' src='lib/util/util.js'></script>
+            <script type='text/javascript' src='lib/binds/binds.js'></script>
+            <script type='text/javascript' src='lib/session/config.js'></script>
+            <script type='text/javascript' src='lib/session/login.js'></script>
+            <script type='text/javascript' src='lib/doc/doc.js'></script>
+            <script type='text/javascript' src='lib/interface/interface.js'></script>
+            <script type='text/javascript' src='lib/interface/interface-messages.js'></script>
+            <script type='text/javascript' src='lib/interface/interface-graphs.js'></script>
+            <script type='text/javascript' src='lib/interface/interface-customize.js'></script>
+            <script type='text/javascript' src='lib/interface/interface-templates.js'></script>
+            <script type='text/javascript' src='lib/interface/interface-live.js'></script>
+            <script type='text/javascript' src='lib/settings/default-vm.js'></script>
+            <script type='text/javascript' src='lib/settings/menu.js'></script>
+            <script type='text/javascript' src='lib/settings/documentation-sections.js'></script>
+            <script type='text/javascript' src='lib/settings/acl-groups.js'></script>
+            <script type='text/javascript' src='lib/translations/translations.js'></script>
+        
+            <!-- Backbone Models -->
+            <script type='text/javascript' src='lib/bb-models/proto-model.js'></script>
+            <script type='text/javascript' src='lib/bb-models/vm.js'></script>
+            <script type='text/javascript' src='lib/bb-models/user.js'></script>
+
+            <!-- Backbone Collections -->
+            <script type='text/javascript' src='lib/bb-collections/proto-collection.js'></script>
+            <script type='text/javascript' src='lib/bb-collections/vms.js'></script>
+
+            <!-- Backbone Views --> 
+            <script type='text/javascript' src='lib/bb-views/proto-main.js'></script>
+            <script type='text/javascript' src='lib/bb-views/proto-list.js'></script>
+            
+            <script type='text/javascript' src='lib/bb-views/up/proto-settings.js'></script>
+            
+            <script type='text/javascript' src='lib/bb-views/up/vm-list.js'></script>
+            
+            <!-- Settings -->
+            <script type='text/javascript' src='lib/bb-views/up/settings.js'></script>
+            
+            <!-- Downloads -->
+            <script type='text/javascript' src='lib/bb-views/up/downloads.js'></script>
+            
+            <!-- Connection info -->
+            <script type='text/javascript' src='lib/bb-views/up/info-connection.js'></script>
+            
+            <!-- Help -->
+            <script type='text/javascript' src='lib/bb-views/up/help.js'></script>
+            
+            <!-- Login -->
+            <script type='text/javascript' src='lib/bb-views/login/login.js'></script>
+            
+            <!-- Help -->
+            <script type='text/javascript' src='lib/bb-views/help/documentation.js'></script>
+            
+            <!-- Current user -->
+            <script type='text/javascript' src='lib/bb-views/profile/profile.js'></script>
+            
+            <!-- WebSockets -->
+            <script type='text/javascript' src='lib/websockets/websockets.js'></script>
+            <script type='text/javascript' src='lib/websockets/websockets.vm.js'></script>
+        
+        <!-- Own CSS -->
+        <link name="wat-stylesheet" rel="stylesheet" type="text/css" href="style/style.css"> 
+        <link name="wat-custom-stylesheet" rel="stylesheet" type="text/css" href="style/custom_style.css"> 
+        <style name="custom-preview-css"></style> 
+    </head>
+    <body>   
+        <div class="bb-super-wrapper js-super-wrapper super-wrapper">         
+        </div>
+        <div class="bb-menu-lat menu-lat"></div>
+        
+        <!-- Loading layer -->
+        <div class="loading-big hidden">
+            <div class="loading-big-box">
+                <div class="loading-big-message"></div>
+                <div class="loading-block" id="loading-block">
+                <i class="fa fa-gear fa-spin"></i>
+                <span class=".js-loading-block-percent"></span>
+                </div>
+                <div class="loading-little-message"></div>
+            </div>
+        </div>
+        
+        <!-- Customizer tool layer -->
+        <div class="js-customizer-wrapper {title:'Customizer'}"><div class="customizer bb-customizer"></div></div>
+    </body>
+</html>

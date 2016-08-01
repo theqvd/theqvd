@@ -1,0 +1,119 @@
+.setup-side {
+    width: 100%;
+    @include in(desktop) {
+        width: ($width_setup_side - 2) * 1%;
+        height: auto;
+
+        @if $setup_side == left {
+            float: left;
+            padding-right: 2%;
+            margin-right: 2%;
+            border-right: 1px dotted darken($col_whiter, 15);
+        }
+        @else if $setup_side == right {
+            float: right;
+            padding-left: 2%;
+            margin-left: 2%;
+            border-left: 1px dotted darken($col_whiter, 15);
+        }
+    }
+}
+
+
+.setup-block {
+    width: 90%;
+    
+    @include in(desktop) {
+        width: ($width_setup_content - 2) * 1%;
+        width: 95%;
+    }
+    
+    height: auto;
+
+    @if $setup_side == left {
+        float: right;
+        padding-right: 2%;
+        margin-right: 2%;
+    }
+    @else if $setup_side == right {
+        float: left;
+        padding-left: 2%;
+        margin-left: 2%;
+    }
+    
+    margin-bottom: 60px;
+    
+    .sect2, .sect3 {
+        @include in(mobile) {
+            overflow: scroll;
+        }
+    }
+}
+
+.customize-options {
+    margin-top: 20px; 
+    margin-bottom: 50px; 
+        
+    .customize-block {
+        width: 42%;
+        display: inline-block;
+        vertical-align: top;
+        
+        &:first-child {
+            padding-right: 10px;
+        }     
+        
+        &:last-child {
+            padding-left: 10px;
+            float: right;
+        }
+    }
+}
+
+a.button-update-customize {
+    float: right;
+    margin-top: 20px;
+}
+
+.config-table {
+    margin-bottom: 3px;
+    
+    td {
+        text-align: left; 
+        vertical-align: middle;
+        
+        &:last-child {
+            text-align: center;
+        }
+    }
+    
+    th {
+        cursor: pointer;
+    }
+    
+    .fa:before {
+        margin-right: 5px;
+    }
+    
+    .token_description {
+        white-space: normal;
+    }
+}
+
+.action-new-token {
+    margin-bottom: 10px;
+}
+
+.config-search-box, .doc-search-box { 
+    padding-bottom: 10px; 
+    margin-bottom: 10px; 
+    border-bottom: 1px dotted darken($col_whiter, 15);
+
+    input {
+        width: 100%;
+    }
+}
+
+.token-action-select {
+    width: auto;
+}
