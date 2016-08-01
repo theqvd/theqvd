@@ -1,5 +1,0 @@
-Jörn Zaefferer <joern.zaefferer@gmail.com>
-Johan Sörlin <spocke@moxiecode.com>
-Jonathan Sanchez <jsanchezpando@cirb.irisnet.be>
-Timo Tijhof <krinklemail@gmail.com>
-James M. Greene <james.m.greene@gmail.com>
