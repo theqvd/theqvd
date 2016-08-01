@@ -43,6 +43,8 @@ EOIN
 				   "$args->{foreign_alias}.id" => { -in => \$in } };
 
 			});
+__PACKAGE__->might_have(desktops => 'QVD::DB::Result::Desktop', 'vm_id');
+
 
 ######### FOR LOG ##############################################################################
 
