@@ -92,6 +92,7 @@ command.groupdel = /usr/sbin/groupdel
 command.tar = tar
 command.umount = umount
 command.mount = mount
+command.version.mount.overlayfs = 2
 command.rm = rm
 command.unionfs-fuse = ${path.qvd.bin}/unionfs
 command.lxc-destroy = ${path.qvd.bin}/lxc-destroy

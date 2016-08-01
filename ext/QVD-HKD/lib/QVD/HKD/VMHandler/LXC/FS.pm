@@ -66,11 +66,6 @@ sub new {
     $self
 }
 
-sub run {
-    my $self = shift;
-    $self->_on_run;
-}
-
 sub init_backend {
     my ($hkd, $on_done) = @_;
     $hkd->$on_done;
