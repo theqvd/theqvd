@@ -5,6 +5,7 @@ use warnings;
 use TryCatch;
 use Getopt::Long;
 use QVD::DB::Simple;
+use QVD::DB::Common qw(ENUMERATES INITIAL_VALUES);
 
 ### FUNCTIONS ###
 
@@ -40,27 +41,6 @@ sub display_error {
 	my $description = error_description($error);
 	print "[ERROR] Code $code: $description. Message:\n $message\n";
 }
-
-# Enumarate types
-my %enumerates = (
-	administrator_and_tenant_views_setups_device_type_enum => [qw(mobile desktop)],
-	administrator_and_tenant_views_setups_qvd_object_enum => [qw(user vm log host osf di role administrator tenant)],
-	administrator_and_tenant_views_setups_view_type_enum => [qw(filter list_column)],
-	log_qvd_object_enum =>
-	[qw(user vm log host osf di role administrator tenant acl config tenant_view admin_view)],
-	log_type_of_action_enum => [qw(create create_or_update delete see update exec login)],
-	wat_setups_by_administrator_and_tenant_language_enum => [qw(es en auto default)],
-);
-
-# Initial single values
-my %initial_values = (
-	VM_State   => [qw(stopped starting running stopping zombie debugging )],
-	VM_Cmd     => [qw(start stop busy)],
-	User_State => [qw(disconnected connecting connected)],
-	User_Cmd   => [qw(abort)],
-	Host_State => [qw(stopped starting running stopping lost)],
-	Host_Cmd   => [qw(stop)]
-);
 
 # Throws an exception if something fails
 sub initData {
@@ -197,7 +177,11 @@ try {
 
 	# Generate database
 	try{
-		db->deploy({add_drop_table => 1, add_enums => \%enumerates, add_init_vars => \%initial_values});
+		db->deploy( {
+				add_drop_table => 1, 
+				add_enums      => ENUMERATES(), 
+				add_init_vars  => INITIAL_VALUES(),
+			} );
 	}catch ($exception) {
 		$error = "ERROR_DB_DEPLOY_FAILED"; die "$exception";
 	}
