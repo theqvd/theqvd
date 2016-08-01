@@ -19,7 +19,7 @@ sub ENUMERATES {
         [ qw(user vm log host osf di role administrator tenant acl config tenant_view admin_view) ],
         log_type_of_action_enum                                =>
         [ qw(create create_or_update delete see update exec login) ],
-        wat_setups_by_administrator_and_tenant_language_enum   =>
+        language_enum                                          =>
         [ qw(es en auto default) ],
         user_portal_parameters_enum                            =>
         [ qw(connection audio printers fullscreen share_folders folders_list share_usb usb_list) ],
