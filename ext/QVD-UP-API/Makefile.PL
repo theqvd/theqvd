@@ -11,7 +11,6 @@ WriteMakefile(
     EXE_FILES         => [ 'bin/qvd-up-api.pl' ],
     PREREQ_PM         => {
         'Mojolicious::Lite' => 0,
-        'Mojolicious::Plugin::RenderFile' => 0,
         'MojoX::Session' => 0,
         'MIME::Base64' => 0,
         'Try::Tiny' => 0,
