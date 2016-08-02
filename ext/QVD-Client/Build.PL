@@ -65,6 +65,7 @@ my $build = $mod->new (
 #				  'QVD::HTTPD' => 0,
 				  'QVD::Log' => 0,
 				  'Test::More' => 0,
+				  'URI::Encode' => 0,
 				  'URI::Escape' => 0,
 				  'Wx' => 0,
 				  'X11::Protocol' => 0,
