@@ -9,6 +9,7 @@ use 5.010;
 use Cwd;
 use File::Spec;
 use Proc::Background;
+use URI::Encode qw(uri_decode);
 
 our ($WINDOWS, $DARWIN, $user_dir, $app_dir, $user_config_filename, $user_certs_dir, $pixmaps_dir, $orig_display);
 
@@ -42,9 +43,15 @@ use QVD::Config::Core qw(set_core_cfg core_cfg);
 
 # change defaults for log configuration before loading it
 BEGIN {
-    for (@ARGV) {
-        if (my ($k, $v) = /^\s*([\w\.]+)\s*[:=\s]\s*(.*?)\s*$/) {
-            set_core_cfg($k, $v);
+    for $ARGV (@ARGV) {
+        my @args = ($ARGV);
+        if( $ARGV =~ /^qvd:(.*)$/ ) {
+            @args = split(/\s+/, uri_decode($1));
+        }
+        for my $arg (@args) {
+            if (my ($k, $v) = $arg =~ /^\s*([\w\.]+)\s*[:=\s]\s*(.*?)\s*$/) {
+                set_core_cfg($k, $v);
+            }
         }
     }
 
