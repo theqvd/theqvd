@@ -1,5 +1,5 @@
 Up.Models.VM = Up.Models.Model.extend({
-    actionPrefix: 'vm',
+    actionPrefix: 'desktops',
     
     defaults: {
     }

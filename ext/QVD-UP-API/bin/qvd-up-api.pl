@@ -258,7 +258,7 @@ group {
                 disabled_settings => 1,
                 settings => {},
             },
-            rs( "VM" )->search( { user_id => $c->stash('session')->data('user_id') } )->all // () ];
+            rs( "VM" )->search( { user_id => $c->stash('session')->data('user_id') } )->all ];
 
         return $c->render_response(json => $desktop_list, code => 200);
     };
