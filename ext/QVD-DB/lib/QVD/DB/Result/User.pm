@@ -22,6 +22,7 @@ __PACKAGE__->belongs_to(tenant => 'QVD::DB::Result::Tenant',  'tenant_id', { cas
 __PACKAGE__->has_many(vms => 'QVD::DB::Result::VM', 'user_id', { cascade_delete => 0 } );
 __PACKAGE__->has_many(properties => 'QVD::DB::Result::User_Property', 'user_id', {join_type => 'LEFT', order_by => {'-asc' => 'property_id'}});
 __PACKAGE__->might_have(workspaces => 'QVD::DB::Result::Workspace', 'user_id');
+__PACKAGE__->might_have(token => 'QVD::DB::Result::User_Token', 'user_id');
 __PACKAGE__->has_one(connection => 'QVD::DB::Result::User_Connection', 'id');
 
 ######### FOR LOG ###########################################################################

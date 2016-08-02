@@ -44,7 +44,7 @@ EOIN
 
 			});
 __PACKAGE__->might_have(desktops => 'QVD::DB::Result::Desktop', 'vm_id');
-
+__PACKAGE__->might_have(token => 'QVD::DB::Result::User_Token', 'vm_id');
 
 ######### FOR LOG ##############################################################################
 
