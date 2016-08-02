@@ -1,4 +1,7 @@
-<table class="details details-list col-width-50">
+<table class="details col-width-60">
+    <tr>
+        <th><span data-i18n="Parameter"></th>
+        <th><span data-i18n="Value"></th>
     <tr>
         <td><i class="<%= CLASS_ICON_LANGUAGE %>"></i><span data-i18n="Language"></span></td>
         <td>
@@ -6,7 +9,7 @@
                 <% 
                 $.each(UP_LANGUAGE_OPTIONS, function (lanCode, lanName) {
                 %>
-                    <option value="<%= lanCode %>"><%= lanName %></option>
+                    <option value="<%= lanCode %>" data-i18n="<%= lanName %>"><%= lanName %></option>
                 <%
                 }) 
                 %>

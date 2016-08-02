@@ -99,7 +99,7 @@ Up.Views.VMListView = Up.Views.SettingsProtoView.extend({
             that.startConnectionTimeout(selectedId);
             window.location = Up.C.getBaseUrl('vm_connect/' + selectedId);
             
-        }, this, 'POST');
+        }, this, 'GET');
     },
     
     setDesktopState: function (id, state) {

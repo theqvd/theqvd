@@ -139,8 +139,13 @@ Up.B = {
             if (firstLink) {
                 $(firstLink).trigger('mouseenter');
             }            
-            
+
             $(e.target).find('.show-when-hover').show();
+            
+            var bgcolor = $(e.target).css('background-color');
+            var color = $(e.target).css('color');
+            $(e.target).parent().children().css('background-color', bgcolor).css('color', color);
+            $(e.target).parent().children().find('*').css('color', color);
         });
         this.bindEvent('mouseleave', 'td.cell-link', function (e) { 
             var firstLink = $(e.target).find('a')[0];
@@ -149,6 +154,8 @@ Up.B = {
             }
             
             $(e.target).find('.show-when-hover').hide();
+            $(e.target).parent().children().css('background-color', '').css('color', '');
+            $(e.target).parent().children().find('*').css('color', '');
         });
         this.bindEvent('click', 'td.cell-link', function (e) { 
             var firstLink = $(e.target).find('a')[0];
@@ -156,6 +163,7 @@ Up.B = {
                 location = $(firstLink).attr('href');
                 $(firstLink).trigger('click');
             }
+            
         });
         this.bindEvent('click', 'td.cell-check, th.cell-check', function (e) { 
             var firstCheckbox = $(e.target).find('input[type="checkbox"]')[0];

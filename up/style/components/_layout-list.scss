@@ -58,7 +58,7 @@
     }
 }
 
-.list-block, .details-side {        
+.list-block {        
     @include in(desktop) {
         float: left;
         width: ($width_list_content) * 1%;

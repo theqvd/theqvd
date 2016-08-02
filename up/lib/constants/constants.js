@@ -55,21 +55,12 @@ HTML_SORT_ICON = '<i class="fa fa-sort sort-icon"></i>';
 // Languages
 UP_LANGUAGES = {
     "en": "English",
-    "es": "Spanish"
+    "es": "Español"
 };
 
 UP_LANGUAGE_OPTIONS = $.extend({
-    "auto": "Auto"
+    "auto": "Auto-detected by browser"
 }, UP_LANGUAGES);
-
-WAT_LANGUAGE_TENANT_OPTIONS = $.extend({
-    "auto": "Auto"
-}, UP_LANGUAGES);
-
-WAT_LANGUAGE_ADMIN_OPTIONS = $.extend({
-    "default": "Default",
-}, WAT_LANGUAGE_TENANT_OPTIONS);
-
 
 // Block sizes
 WAT_BLOCK_SIZES = {

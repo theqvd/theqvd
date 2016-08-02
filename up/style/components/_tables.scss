@@ -12,12 +12,8 @@
 
 /* Table list */
 
-table.list, table.customize-fields {    
+table.list {    
     @include table-base (alternate-rows);
-}
-
-table.custom-props, table.details {    
-    @include table-base (first-col);
 }
 
 table.manage-roles, table.manage-acls {
@@ -28,13 +24,9 @@ table.manage-roles, table.manage-acls {
     }
 }
 
-table.custom-props {
-    @include in(desktop) {
-        table-layout: fixed;
-    }
-}
-
-table.details, table.custom-props {
+table.details {
+    @include table-base (first-col);
+    
     td:first-child {
         vertical-align: top;
         white-space: nowrap;
@@ -48,50 +40,7 @@ table.details, table.custom-props {
 
     td:last-child {
         font-weight: bold;
-        width: 100%;
-    }
-}
-
-table.expiration-table, table.state-table {
-    table-layout: auto;
-    white-space: nowrap;
-    
-    td:nth-child(2) {
-        width: 100%;
-    }
-}
-
-table.state-table tr {
-    @include first-col ($col_whiter);
-    
-    &:first-child th {
-        text-align: center;
-    }
-    
-    td {
-        font-weight: bold;
-        
-        &:first-child {
-            font-weight: normal;
-        }
-    }
-    
-    
-}
-
-table.roles-inherit-table {
-    td {
-        padding-left: 0px !important;
-    }
-}
-
-table.roles-inherit-tools-table {
-    width: 100%;
-    tr:first-child>td>div {
-        padding-bottom: 4px;
-    }
-    td {
-        padding: 6px;
+        width: 75%;
     }
 }
 
@@ -204,13 +153,13 @@ table.list {
     
     td.cell-link:hover {
         cursor: pointer;
-    }     
-    td.cell-link.odd:hover {
-        background: darken($col_whiter, 12);
-    }    
-    td.cell-link.even:hover {
-        background: darken($col_whiter, 8);
-    }
+        background: $col_brand_main;
+        color: $col_whiter;
+
+        * { 
+            color: $col_whiter;
+        }
+    } 
     
     &.cascade-data-list {
         margin-top: 20px;

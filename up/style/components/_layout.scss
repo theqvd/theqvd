@@ -259,17 +259,6 @@ body {
     
     position: relative;
     
-    .menu {
-        @extend %invisible;
-
-        margin-bottom: 10px;
-        
-        margin-top: 5px;
-        @include in(desktop) {
-            margin-top: 15px;
-        }
-    }
-    
     .content {
         @extend %invisible;
 
@@ -296,7 +285,6 @@ body {
     }
 }
 
-@import "layout-roles";
 @import "layout-editor";
 
 .responsive-switch {
@@ -320,6 +308,7 @@ body {
 
 .footer {
     @extend %invisible;
+    background: $header_bg;
 
     z-index: 1000;
     
@@ -402,46 +391,9 @@ span.text {
     line-height: 1.4;
 }
 
-.related-doc {
-    display: inline-table;
-    margin-top: 20px;
-    margin-bottom: 80px;
-    padding-left: 20px;
-    width: 100%;
-
-    a.button2 {
-        margin-bottom: 15px;
-        display: block;
-    }
-}
-
 .search-matchs {
     margin-left: 20px;
     margin-bottom: 20px;
-}
-
-.info-header {
-    height: auto;
-    padding: 10px;
-    .fa:before {
-        margin-right: 5px;    
-    }
-}
-
-.server-datetime-wrapper {
-    position: fixed;
-    right: 0;
-    top: 60px;
-    font-size: 12px;
-    padding: 7px 15px 4px 5px;
-    background: #eee;
-    border-bottom-left-radius: 8px;
-    z-index: 2;
-    opacity: 0.8;
-    
-    &.server-datetime-wrapper--mini {
-        top: 40px;
-    }
 }
 
 .menu-lat {

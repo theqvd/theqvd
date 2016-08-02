@@ -18,7 +18,7 @@
                         <div class="grid-cell-area js-grid-cell-area js-connect-btn" data-id="<%= model.get('id') %>" <%= connected ? '' : 'data-i18n="[title]Connect"' %>>
                             <i class="<%= CLASS_ICON_DESKTOP_CONNECTED %> grid-cell-icon js-grid-cell-icon js-grid-cell-hiddeable" data-id="<%= model.get('id') %>"></i>
                             <div class="corner-image"><img src="images/ladybird_white.png" data-id="<%= model.get('id') %>"></div>
-                            <div class="bigtext bold vm-name" data-id="<%= model.get('id') %>"><%= model.get('name') %></div>                            
+                            <div class="bigtext bold vm-name" data-id="<%= model.get('id') %>"><%= model.get('name') %> <br>id: <%= model.get('id') %></div>                            
 
                             <div class="<%= Math.floor( Math.random() * 2 ) ? "vm-screenshot" : "vm-screenshot-off" %> js-vm-screenshot" data-id="<%= model.get('id') %>">
                             </div>

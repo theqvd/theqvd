@@ -37,19 +37,5 @@
         td.fa:before {
             margin-right: 10px;
         }
-
-        .custom-properties {
-            td {
-                position: relative;            
-                
-                .property-help {
-                    position: absolute;
-                    left: 12px;
-                    top: 11px;
-                    color: lighten($col_blacker, 50);
-                    font-weight: normal;
-                }
-            }
-        }
     }
 }

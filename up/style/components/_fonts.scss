@@ -88,28 +88,9 @@ input {
     line-height: 20px;
 }
 
-// Layout
-
-.details-block .details-item  {
-    font-size: 15px;
-    
-    @include in(desktop) {
-        @include font-size(3);
-    }
-}
-
-.details-block .details-item {
-    font-weight: normal;
-}
-
 // Menu
 .menu-option {
     @include font-size(3);
-}
-
-// Navigation
-.breadcrumbs * {
-    @include font-size(1);
 }
 
 // Pagination
