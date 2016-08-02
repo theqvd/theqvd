@@ -34,9 +34,6 @@ plugin 'Directory' => {
     dir_index => [qw/index.html index.htm/],
 };
 
-# Plugin to render QVD Client configuration files
-plugin 'RenderFile';
-
 ##### HELPERS #####
 
 # Query finishes and returns a response with a message and httpcode
@@ -60,10 +57,6 @@ app->config(
         pid_file => '/var/lib/qvd/qvd-up-api.pid'
     }
 );
-
-# Set custom MIME types for QVD Client
-
-app->types->type(qvd => 'application/qvd');
 
 # Intended to store log info about the API
 
@@ -197,7 +190,7 @@ group {
         return $is_logged;
     };
 
-        # Session logout
+    # Session logout
     any [ qw(POST) ] => '/api/logout' => sub {
         my $c = shift;
 
@@ -209,38 +202,109 @@ group {
         return $c->render_response(message => "Logged out", code => 200);
     };
 
-    any [qw(GET)] => '/api/vm' => sub {
+    # Account settings
+    any [qw(GET)] => '/api/account' => sub {
+        my $c = shift;
+        
+        my $user = rs('User')->find($c->stash('session')->{user_id});
+
+        my $json = {};
+        $json->{language} = $user->language;
+        $json->{username} = $user->login;
+        $json->{acls} = [];
+
+        return $c->render_response(json => $json, code => 200);
+    };
+    
+    any [qw(PUT)] => '/api/account' => sub {
         my $c = shift;
 
-        my $vm_list = [];
-
-        try {
-            $vm_list = [ map { 
-                    blocked => $_->vm_runtime->blocked, 
-                    name => $_->name, 
-                    id => $_->id, 
-                    state => $_->vm_runtime->vm_state 
-                },
-                rs( "VM" )->search( { user_id => $c->stash('session')->data('user_id') } )->all ];
-        } catch {
-            print $_;
-            return $c->render_respone(message => "Database related issue", code => 502);
-        };
-
-        my $json = {
-            vms => $vm_list
-        };
-
-        return $c->render_response(code => 200, json => $json);
+        my $parameters = { language => $c->params->{language} };
+        
+        my $user = rs('User')->find($c->stash('session')->{user_id});
+        $user->update( { language => $parameters->{language} } );
+        
+        my $json = {};
+        $json->{language} = $user->language;
+        $json->{username} = $user->login;
+        $json->{acls} = [];
+        
+        return $c->render_response(json => $json, code => 200);
     };
 
-    any [qw(GET)] => '/api/vm_connect/:vm_id' => [vm_id => qr/\d+/] => sub {
+    any [qw(GET)] => '/api/account/last_connection' => sub {
         my $c = shift;
 
-        my $vm_id = $c->param('vm_id');
+        my $json = {};
+        $json->{location} = "location";
+        $json->{datetime} = "datetime";
+        $json->{browser} = "browser";
+        $json->{os} = "os";
+        $json->{device} = "device";
+
+        return $c->render_response(json => $json, code => 200);
+    };
+
+        # Desktops
+    any [qw(GET)] => '/api/desktops' => sub {
+        my $c = shift;
+
+        my $desktop_list = [ map {
+                id => $_->id,
+                blocked => $_->vm_runtime->blocked,
+                name => $_->name,
+                alias => $_->name,
+                state => $_->vm_runtime->vm_state,
+                disabled_settings => 1,
+                settings => {},
+            },
+            rs( "VM" )->search( { user_id => $c->stash('session')->data('user_id') } )->all // () ];
+
+        return $c->render_response(json => $desktop_list, code => 200);
+    };
+
+    any [qw(GET)] => '/api/desktops/:id' => [id => qr/\d+/] => sub {
+        my $c = shift;
+
+        my $vm_id = $c->param('id');
+        my $user_id = $c->stash('session')->data('user_id');
+        my $vm = rs( "VM" )->search( { id => $vm_id, user_id => $user_id } );
+        return $c->render_response(message => "Invalid VM", code => 400) unless defined($vm);
+
+        my $desktop = {
+            id => $vm->id,
+            blocked => $vm->vm_runtime->blocked,
+            name => $vm->name,
+            alias => $vm->name,
+            state => $vm->vm_runtime->vm_state,
+            disabled_settings => 1,
+            settings => {},
+        };
+        
+        return $c->render_response(json => $desktop, code => 200);
+    };
+    
+    any [qw(PUT)] => '/api/desktops/:id' => [id => qr/\d+/] => sub {
+        my $c = shift;
+
+        return $c->render_response(message => "TODO", code => 200);
+    };
+    
+    any [qw(DELETE)] => '/api/desktops/:id' => [id => qr/\d+/] => sub {
+        my $c = shift;
+
+        return $c->render_response(message => "TODO", code => 200);
+    };
+
+    any [qw(GET)] => '/api/desktops/:id/token' => [id => qr/\d+/] => sub {
+        my $c = shift;
+
         my $session_up = $c->stash->{session};
 
-        my $vm = rs( "VM" )->search( { id => $vm_id, user_id => $session_up->data->{user_id} } )->first;
+        my $vm_id = $c->param('id');
+        my $user_id = $session_up->data->{user_id};
+
+        my $vm = rs( "VM" )->search( { id => $vm_id, user_id => $user_id } )->first;
         return $c->render_response(message => "Invalid VM", code => 400) unless defined($vm);
 
         my $session_l7r = rs('User_Token')->create( { 
@@ -249,10 +313,68 @@ group {
             user_id => $session_up->data->{user_id},
             vm_id =>  $vm_id
         } );
+        my $token = encode_base64($session_l7r->token);
+        chomp($token);
             
-        my $file_name = "desktop_${vm_id}.qvd";
-        my $file_data = encode_base64($session_l7r->token);
-        return $c->render_file(data => $file_data, filename => $file_name, format => 'qvd');
+        return $c->render_response(json => { token => $token }, code => 200 );
+    };
+
+    # Workspaces
+    any [qw(GET)] => '/api/workspaces' => sub {
+        my $c = shift;
+
+        my $user = rs('User')->find($c->stash('session')->data->{user_id});
+
+        my $workspaces = [ map {
+                id       => $_->id,
+                name     => $_->name,
+                active   => $_->active,
+                fixed    => $_->fixed,
+                settings => undef,
+            },
+            $user->workspaces // () ];
+        
+        return $c->render_response(json => $workspaces, code => 200);
+    };
+
+    any [qw(GET)] => '/api/workspaces/:id' => [id => qr/\d+/] => sub {
+        my $c = shift;
+
+        my $vm_id = $c->param('id');
+
+        my $workspace_settings = {
+            id       => "$vm_id",
+            name     => "name",
+            active   => "1",
+            fixed    => "1",
+            settings => undef,
+            };
+        return $c->render_response(json => $workspace_settings, message => "TODO", code => 200);
+    };
+
+    any [qw(POST)] => '/api/workspaces/' => sub {
+        my $c = shift;
+
+        return $c->render_response(message => "TODO", code => 200);
+    };
+
+    any [qw(PUT)] => '/api/workspaces/:id' => [id => qr/\d+/] => sub {
+        my $c = shift;
+
+        return $c->render_response(message => "TODO", code => 200);
+    };
+
+    any [qw(DELETE)] => '/api/workspaces/:id' => [id => qr/\d+/] => sub {
+        my $c = shift;
+
+        return $c->render_response(message => "TODO", code => 200);
+    };
+
+    # Other
+    any [qw(PUT)] => '/api/geo_locate' => sub {
+        my $c = shift;
+        
+        return $c->render_response(message => "TODO", code => 200);
     };
 };
 
