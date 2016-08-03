@@ -206,7 +206,7 @@ group {
     any [qw(GET)] => '/api/account' => sub {
         my $c = shift;
         
-        my $user = rs('User')->find($c->stash('session')->{user_id});
+        my $user = rs('User')->find($c->stash('session')->data('user_id'));
 
         my $json = {};
         $json->{language} = $user->language;
@@ -219,9 +219,9 @@ group {
     any [qw(PUT)] => '/api/account' => sub {
         my $c = shift;
 
-        my $parameters = { language => $c->params->{language} };
+        my $parameters = { language => $c->param('language') };
         
-        my $user = rs('User')->find($c->stash('session')->{user_id});
+        my $user = rs('User')->find($c->stash('session')->data('user_id'));
         $user->update( { language => $parameters->{language} } );
         
         my $json = {};
@@ -254,7 +254,7 @@ group {
                 blocked => $_->vm_runtime->blocked,
                 name => $_->name,
                 alias => $_->name,
-                state => $_->vm_runtime->vm_state,
+                state => $_->vm_runtime->user_state,
                 disabled_settings => 1,
                 settings => {},
             },
@@ -268,7 +268,7 @@ group {
 
         my $vm_id = $c->param('id');
         my $user_id = $c->stash('session')->data('user_id');
-        my $vm = rs( "VM" )->search( { id => $vm_id, user_id => $user_id } );
+        my $vm = rs( "VM" )->search( { id => $vm_id, user_id => $user_id } )->first;
         return $c->render_response(message => "Invalid VM", code => 400) unless defined($vm);
 
         my $desktop = {
