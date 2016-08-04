@@ -17,6 +17,7 @@ use MIME::Base64 'encode_base64';
 use Try::Tiny;
 use QVD::Config;
 use QVD::DB::Simple qw(db rs);
+use QVD::DB::Common qw(ENUMERATES);
 
 ##### PLUGINS #####
 
@@ -249,15 +250,7 @@ group {
     any [qw(GET)] => '/api/desktops' => sub {
         my $c = shift;
 
-        my $desktop_list = [ map {
-                id => $_->id,
-                blocked => $_->vm_runtime->blocked,
-                name => $_->name,
-                alias => $_->name,
-                state => $_->vm_runtime->user_state,
-                disabled_settings => 1,
-                settings => {},
-            },
+        my $desktop_list = [ map vm_to_desktop_hash($_),
             rs( "VM" )->search( { user_id => $c->stash('session')->data('user_id') } )->all ];
 
         return $c->render_response(json => $desktop_list, code => 200);
@@ -268,32 +261,83 @@ group {
 
         my $vm_id = $c->param('id');
         my $user_id = $c->stash('session')->data('user_id');
-        my $vm = rs( "VM" )->search( { id => $vm_id, user_id => $user_id } )->first;
-        return $c->render_response(message => "Invalid VM", code => 400) unless defined($vm);
+        my $vm = rs( "VM" )->single( { id => $vm_id, user_id => $user_id } );
+        return $c->render_response(message => "Invalid Desktop", code => 400) unless defined($vm);
 
-        my $desktop = {
-            id => $vm->id,
-            blocked => $vm->vm_runtime->blocked,
-            name => $vm->name,
-            alias => $vm->name,
-            state => $vm->vm_runtime->vm_state,
-            disabled_settings => 1,
-            settings => {},
-        };
+        my $desktop = vm_to_desktop_hash($vm);
         
         return $c->render_response(json => $desktop, code => 200);
     };
     
     any [qw(PUT)] => '/api/desktops/:id' => [id => qr/\d+/] => sub {
         my $c = shift;
+            
+        my $vm_id = $c->param('id');
+        my $user_id = $c->stash('session')->data('user_id');
+        my $vm = rs( "VM" )->single( { id => $vm_id, user_id => $user_id } );
+        return $c->render_response(message => "Invalid Desktop", code => 400) unless defined($vm);
 
-        return $c->render_response(message => "TODO", code => 200);
+        my $params = {};
+        $params->{alias} =  $_ if $_ = $c->param('alias');
+        $params->{active} = $_ if $_ = $c->param('active');
+        
+        my $desktop = $vm->desktop;
+            
+        if( $desktop ) {
+            $desktop->update($params);
+        } else {
+            $desktop = rs('Desktop')->create({
+                vm_id => $vm_id,
+                %$params
+            });
+        }
+            
+        for my $enum (@{ ENUMERATES()->{user_portal_parameters_enum} }) {
+            my $setting = rs('Desktop_Setting')->single({
+                    desktop_id => $desktop->id,
+                    parameter => $enum,
+                });
+            if ($setting) {
+                $setting->update({ value => $_ }) if $_ = $c->param($enum);
+                $setting->collection->delete();
+            } else {
+                $setting = rs('Desktop_Setting')->create({
+                        desktop_id => $desktop->id,
+                        parameter => $enum,
+                        value => $c->param($enum),
+                    });
+            }
+
+            if(my $str_item_list = $c->param("${enum}_list")) {
+                for my $item (split(";",$str_item_list)) {
+                    rs('Desktop_Setting_Collection')->create({
+                            setting_id => $setting->id,
+                            item_value => $item
+                        });
+                }
+            }
+        }
+
+        return $c->render_response(json => vm_to_desktop_hash($vm), code => 200);
     };
     
     any [qw(DELETE)] => '/api/desktops/:id' => [id => qr/\d+/] => sub {
         my $c = shift;
 
-        return $c->render_response(message => "TODO", code => 200);
+        my $vm_id = $c->param('id');
+        my $user_id = $c->stash('session')->data('user_id');
+        my $vm = rs( "VM" )->single( { id => $vm_id, user_id => $user_id } );
+        return $c->render_response(message => "Invalid Desktop", code => 400) unless defined($vm);
+
+        if( my $desktop = $vm->desktop ) {
+            if($c->param('settings_only')){
+                $desktop->settings->delete();
+            } else {
+                $desktop->delete();
+            }
+        }
+
+        return $c->render_response(message => "OK", code => 200);
     };
 
     any [qw(GET)] => '/api/desktops/:id/token' => [id => qr/\d+/] => sub {
@@ -420,4 +464,33 @@ sub password_to_token
     my ($password) = @_;
     require Digest::SHA;
     return Digest::SHA::sha256_base64(cfg('l7r.auth.plugin.default.salt') . $password);
+}
+
+sub vm_to_desktop_hash {
+    my $vm = shift;
+    my $desktop = $vm->desktop;
+    my $hash = {
+        id => $vm->id,
+        blocked => $vm->vm_runtime->blocked,
+        name => $vm->name,
+        alias => defined($desktop) ? $desktop->alias : undef,
+        state => $vm->vm_runtime->user_state,
+        settings_enabled => defined($desktop) ? $desktop->active : 0,
+        settings => element_settings($desktop),
+    };
+    return $hash;
+}
+
+sub element_settings {
+    my $element = shift;
+    my $settings = undef;
+
+    if (defined($element) && $element->settings->all){
+        $settings = { map { $_ => {} } @{ ENUMERATES()->{user_portal_parameters_enum} } };
+        for my $enum (keys %$settings) {
+            $settings->{$enum}->{value} = $element->settings->single({parameter => $enum})->value;
+            $settings->{$enum}->{list} = [ map { $_->item_value } ($element->settings->single({parameter => $enum})->collection->all) ];
+        }
+    }
+    return $settings;
 }

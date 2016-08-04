@@ -22,7 +22,7 @@ sub ENUMERATES {
         language_enum                                          =>
         [ qw(es en auto default) ],
         user_portal_parameters_enum                            =>
-        [ qw(connection audio printers fullscreen share_folders folders_list share_usb usb_list) ],
+        [ qw(connection audio printers fullscreen share_folders share_usb) ],
     };
 }
 
