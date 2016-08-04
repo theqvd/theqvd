@@ -16,5 +16,6 @@ WriteMakefile(
         'Try::Tiny' => 0,
         'QVD::Config' => 0,
         'Digest::SHA' => 0,
+        'Switch' => 0,
     },
 );

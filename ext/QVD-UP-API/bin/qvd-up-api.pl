@@ -277,44 +277,55 @@ group {
         my $vm = rs( "VM" )->single( { id => $vm_id, user_id => $user_id } );
         return $c->render_response(message => "Invalid Desktop", code => 400) unless defined($vm);
 
-        my $params = {};
-        $params->{alias} =  $_ if $_ = $c->param('alias');
-        $params->{active} = $_ if $_ = $c->param('active');
-        
+        my $json = $c->req->json // {};
+
         my $desktop = $vm->desktop;
+        my @settings = $desktop ? $desktop->settings->all : ();
+
+        return $c->render_response(message => "Invalid parameter", parameter => $_, code => 400)
+            if $_ = find_invalid_parameter ( 
+                $json,
+                {
+                    alias            => { mandatory => 0, type => 'STRING' },
+                    settings_enabled => { mandatory => 0, type => 'STRING' },
+                    settings         => { mandatory => (@settings) ? 0 : 1, type => (@settings) ? 'SOME_PARAMETERS' : 'ALL_PARAMETERS'},
+                }
+            );
             
+        my $args = {};
+        $args->{alias} =  $_ if $_ = $json->{alias};
+        $args->{active} = $_ if $_ = $json->{active};
+
         if( $desktop ) {
-            $desktop->update($params);
+            $desktop->update($args);
         } else {
             $desktop = rs('Desktop')->create({
                 vm_id => $vm_id,
-                %$params
+                %$args
             });
         }
             
-        for my $enum (@{ ENUMERATES()->{user_portal_parameters_enum} }) {
+        for my $param (keys %{$json->{settings}}) {
             my $setting = rs('Desktop_Setting')->single({
                     desktop_id => $desktop->id,
-                    parameter => $enum,
+                    parameter => $param,
                 });
             if ($setting) {
-                $setting->update({ value => $_ }) if $_ = $c->param($enum);
+                $setting->update({ value => $_ }) if $_ = $json->{settings}->{$param}->{value};
                 $setting->collection->delete();
             } else {
                 $setting = rs('Desktop_Setting')->create({
                         desktop_id => $desktop->id,
-                        parameter => $enum,
-                        value => $c->param($enum),
+                        parameter => $param,
+                        value => $json->{settings}->{$param}->{value},
                     });
             }
 
-            if(my $str_item_list = $c->param("${enum}_list")) {
-                for my $item (split(";",$str_item_list)) {
-                    rs('Desktop_Setting_Collection')->create({
-                            setting_id => $setting->id,
-                            item_value => $item
-                        });
-                }
+            for my $item (@{$json->{settings}->{$param}->{list} // []}) {
+                rs('Desktop_Setting_Collection')->create({
+                        setting_id => $setting->id,
+                        item_value => $item
+                    });
             }
         }
 
@@ -329,6 +340,16 @@ group {
         my $vm = rs( "VM" )->single( { id => $vm_id, user_id => $user_id } );
         return $c->render_response(message => "Invalid Desktop", code => 400) unless defined($vm);
 
+        my $json = $c->req->json // {};
+
+        return $c->render_response(message => "Invalid parameter", parameter => $_, code => 400)
+            if $_ = find_invalid_parameter (
+                $json,
+                {
+                    settings_only => { mandatory => 0, type => 'BOOL' },
+                }
+            );
+    
         if( my $desktop = $vm->desktop ) {
             if($c->param('settings_only')){
                 $desktop->settings->delete();
@@ -449,11 +470,14 @@ sub render_response {
     my %args = @_;
 
     my $json = $args{json} // {};
+    my $param = $args{parameter};
     my $message = $args{message};
     my $code = $args{code} // 200;
     
     $json->{message} = $message if defined($message);
-    
+    $json->{message} = ($message // "") . " (" . join(", ", map {"$_: $param->{$_}"} keys(%$param)) . ")"
+        if defined($param);
+
     $c->render(json => $json, status => $code);
     
     return 1;
@@ -464,6 +488,74 @@ sub password_to_token
     my ($password) = @_;
     require Digest::SHA;
     return Digest::SHA::sha256_base64(cfg('l7r.auth.plugin.default.salt') . $password);
+}
+
+sub find_invalid_parameter {
+    my ($params, $syntax) = @_;
+
+    for my $param (keys %$syntax) {
+        my $mandatory = $syntax->{$param}->{mandatory} // 1;
+        my $type = $syntax->{$param}->{type} // 'STRING';
+        
+        if( (!defined($params->{$param}) && $mandatory) ||
+            (defined($params->{$param}) && !check_type($params->{$param}, $type))
+        ) {
+            return { parameter => $param, mandatory => $mandatory, type => $type };
+        }
+    }
+
+    return undef;
+}
+
+sub check_type {
+    my ($value, $type) = @_;
+    
+    return 0 unless defined($value);
+
+    my $is_correct = 0;
+    use Switch;
+    switch ($type) {
+        case 'BOOL' {
+            $is_correct = ($value == 1 || $value == 0);
+        }
+        case 'INTEGER' {
+            $is_correct = ($value =~ /^\d+$/);
+        }
+        case 'STRING' {
+            $is_correct = ($value =~ /^\w*$/);
+        }
+        case 'ARRAY_OF_STRING' {
+            $is_correct = ref($value) eq 'ARRAY' && ((@$value == 0) || !grep(0, map {check_type($_, 'STRING')} @$value));
+        }
+        case 'SETTING' {
+            $is_correct = ref($value) eq 'HASH' &&
+                defined($value->{value}) &&
+                check_type($value->{list} // [], 'ARRAY_OF_STRING');
+        }
+        case 'ALL_PARAMETERS' {
+            for my $param (@{ENUMERATES()->{user_portal_parameters_enum}}) {
+                unless(defined($value->{$param}) and check_type($value->{$param}, 'SETTING')){
+                    $is_correct = 0;
+                    last;
+                }
+                $is_correct = 1;
+            }
+        }
+        case 'SOME_PARAMETERS' {
+            for my $param (keys(%$value)) {
+                unless (grep($param, @{ENUMERATES()->{user_portal_parameters_enum}}) and check_type($value->{$param}, 'SETTING')) {
+                    $is_correct = 0;
+                    last;
+                }
+                $is_correct = 1;
+            }
+        }
+        else {
+            $is_correct = 1;
+        }
+    }
+
+    return $is_correct;
 }
 
 sub vm_to_desktop_hash {
