@@ -12,7 +12,7 @@
                 }
                 else {
                     $.each(models, function (iModel, model) {
-                        var connected = model.get('state') == 'running';
+                        var connected = model.get('state') == 'connected';
                 %>
                     <div class="grid-cell js-grid-cell <%= connected ? 'grid-connected js-grid-connected' : 'grid-disconnected js-grid-disconnected' %>" data-state="<%= connected ? 'connected' : 'disconnected' %>"" data-id="<%= model.get('id') %>">
                         <div class="grid-cell-area js-grid-cell-area js-connect-btn" data-id="<%= model.get('id') %>" <%= connected ? '' : 'data-i18n="[title]Connect"' %>>

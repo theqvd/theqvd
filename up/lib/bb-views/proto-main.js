@@ -52,7 +52,9 @@ Up.Views.MainView = Backbone.View.extend({
         
         $('.js-super-wrapper').removeClass('super-wrapper--login');
         $('body').css('background','');
-        $('.header-wrapper, .menu-lat').show();        
+        $('.header-wrapper, .menu-lat').show();  
+        
+        Up.I.setMenuOptionSelected(this.qvdObj);
     },
     
     addCommonTemplates: function () {
@@ -146,14 +148,6 @@ Up.Views.MainView = Backbone.View.extend({
         var context = '.editor-container.' + this.cid;
         
         return Up.I.validateForm(context);
-    },  
-    
-    createElement: function () {
-        this.parseProperties('create');
-        
-        var context = '.editor-container.' + this.cid;
-        
-        return Up.I.validateForm(context);
     },
     
     // Parse properties from create/edit forms
@@ -214,11 +208,6 @@ Up.Views.MainView = Backbone.View.extend({
         // If not model is passed, use this.model
         var model = model || this.model;
         
-        // If we are updating an element from list view, reset selected items
-        if (this.viewKind == 'list') {
-            this.resetSelectedItems();
-        }
-        
         model.setOperation('update');
         
         var messages = {
@@ -247,7 +236,7 @@ Up.Views.MainView = Backbone.View.extend({
         var model = model || this.model;
         
         var that = this;
-        model.save(arguments, {filters: filters}).complete(function(e, a, b) {
+        model.save(arguments, {filters: filters}).complete(function(e, status) {
             Up.I.loadingUnblock();
 
             var callResponse = e.status;
@@ -261,8 +250,8 @@ Up.Views.MainView = Backbone.View.extend({
                     //console.log (e.responseText);
                 }
             }
-
-            if (callResponse == 200 && response.status == STATUS_SUCCESS) {
+            
+            if (callResponse == 200 && status == 'success') {
                 that.message = messages.success;
                 that.messageType = 'success';
             }
@@ -365,8 +354,8 @@ Up.Views.MainView = Backbone.View.extend({
     
     loadFakeData: function () {        
         // Workspaces rows
-        this.collectionWorkspaces = new Up.Collections.Collection();
-        this.collectionWorkspaces.models.push(new Up.Models.Model({
+        this.collectionWorkspaces = new Up.Collections.Workspaces();
+        this.collectionWorkspaces.models.push(new Up.Models.Workspace({
             id: 0,
             name: "Default",
             clonable: true,
@@ -381,7 +370,7 @@ Up.Views.MainView = Backbone.View.extend({
                 share_usb: false
             }
         }));
-        this.collectionWorkspaces.models.push(new Up.Models.Model({
+        this.collectionWorkspaces.models.push(new Up.Models.Workspace({
             id: 1,
             name: "Office",
             clonable: true,
@@ -397,7 +386,7 @@ Up.Views.MainView = Backbone.View.extend({
                 share_usb: true
             }
         }));
-        this.collectionWorkspaces.models.push(new Up.Models.Model({
+        this.collectionWorkspaces.models.push(new Up.Models.Workspace({
             id: 2,
             name: "Home",
             clonable: true,
@@ -405,7 +394,7 @@ Up.Views.MainView = Backbone.View.extend({
             active: false,
             settings: null
         }));
-        this.collectionWorkspaces.models.push(new Up.Models.Model({
+        this.collectionWorkspaces.models.push(new Up.Models.Workspace({
             id: 10000,
             name: "New",
             clonable: true,
@@ -421,7 +410,7 @@ Up.Views.MainView = Backbone.View.extend({
             }
         }));
         
-        this.emptyWorkspace = new Up.Models.Model({
+        this.emptyWorkspace = new Up.Models.Workspace({
             name: "New Workspace",
             clonable: true,
             systemWS: false,

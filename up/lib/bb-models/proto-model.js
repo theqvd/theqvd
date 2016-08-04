@@ -16,12 +16,12 @@ Up.Models.Model = Backbone.Model.extend({
         }
         
         response.settings = {
-            connection: 'modem',
+            connection_type: 'modem',
             audio: true,
-            print: true,
-            fullscreen: false,
-            folders: false,
-            usb: false,
+            printing: true,
+            full_screen: false,
+            share_folders: false,
+            share_usb: false,
         };
         
         response.systemWS = true;
@@ -80,17 +80,8 @@ Up.Models.Model = Backbone.Model.extend({
     },
     
     setOperation: function (operation) {
-        switch (operation) {
-            case 'create':
-                this.operation = this.actionPrefix + "_create";
-                break;
-            case 'update':
-                this.operation = this.actionPrefix + "_update";
-                break;
-            case 'delete':
-                this.operation = this.actionPrefix + "_delete";
-                break;
-        }
+        // TODO or DELETE
+        this.operation = this.actionPrefix;
     },
     
     sync: function(method, model, options) {        
@@ -105,13 +96,10 @@ Up.Models.Model = Backbone.Model.extend({
         return $.ajax(params);
     },
     
-    save: function(attributes, options) { 
+    save: function(attributes, options) {
         options = {
-            url: encodeURI(Up.C.getBaseUrl() + 
-                "?action=" + this.operation +
-                "&filters=" + JSON.stringify(options || options.filters) + 
-                "&arguments=" + JSON.stringify(attributes) +
-                "&parameters=" + JSON.stringify({source: Up.C.source}))
+            url: encodeURI(Up.C.getBaseUrl(this.actionPrefix) + '/' + attributes.id),
+            type: 'PUT'
         };
         
         return Backbone.Model.prototype.save.call(this, attributes, options);

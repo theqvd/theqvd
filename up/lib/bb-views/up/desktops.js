@@ -1,7 +1,7 @@
-Up.Views.VMListView = Up.Views.SettingsProtoView.extend({  
-    qvdObj: 'vm',
+Up.Views.DesktopListView = Up.Views.ListView.extend({  
+    qvdObj: 'desktops',
     viewMode: 'grid',
-    liveFields: ['state', 'user_state', 'ip', 'host_id', 'host_name', 'ssh_port', 'vnc_port', 'serial_port'],
+    liveFields: ['state'],
     connectionTimeouts: [],
     
     relatedDoc: {
@@ -10,32 +10,44 @@ Up.Views.VMListView = Up.Views.SettingsProtoView.extend({
     },
     
     initialize: function (params) {
-        this.collection = new Up.Collections.VMs(params);
+        this.collection = new Up.Collections.Desktops(params)
         
-        $('.menu-option').removeClass('menu-option--current');
-        $('[data-target="virtualdesktops"]').addClass('menu-option--current');
+        // Spy mouse over elements to avoid fails with mouseleave events
+        Up.I.L.spyMouseOver('.js-grid-cell-area', this.hideGridIcon);
         
-        Up.B.bindEvent('mouseover', '.js-grid-cell-area', function (e) {
-            $('.js-grid-disconnected .js-grid-cell-icon.js-grid-cell-hiddeable[data-id="' + $(e.target).attr('data-id') + '"]').show();
-        });        
-        Up.B.bindEvent('mouseout', '.js-grid-cell-area', function (e) {
-            $('.js-grid-disconnected .js-grid-cell-icon.js-grid-cell-hiddeable[data-id="' + $(e.target).attr('data-id') + '"]').hide();
-        });
-        
-        setInterval(function() {
-            // If mouse is not over hoverable div, trigger mouseleave event as hack to avoid fails on native HTML event
-            if ($('.js-grid-cell-area:hover').length == 0) {
-                $('.js-grid-cell-area').trigger('mouseleave');
-            }
-        }, 500);
-
         Up.Views.ListView.prototype.initialize.apply(this, [params]);
     },
     
+    addListTemplates: function () {
+        Up.Views.ListView.prototype.addListTemplates.apply(this, []);
+
+        var templates = {};
+        
+        templates["list-grid_" + this.qvdObj] = {
+            name: 'desktops/' + this.qvdObj + '-grid'
+        };  
+
+        templates["list-list_" + this.qvdObj] = {
+            name: 'desktops/' + this.qvdObj + '-list'
+        };
+        
+        this.templates = $.extend({}, this.templates, templates);
+    },
+    
+    showGridIcon: function (e) {
+        $('.js-grid-disconnected .js-grid-cell-icon.js-grid-cell-hiddeable[data-id="' + $(e.target).attr('data-id') + '"]').show();
+    },  
+    
+    hideGridIcon: function (e) {
+        $('.js-grid-disconnected .js-grid-cell-icon.js-grid-cell-hiddeable[data-id="' + $(e.target).attr('data-id') + '"]').hide();
+    },
+    
+    // Extend renderListBlock to fill active configuration select
     renderListBlock: function (params) {  
         Up.Views.ListView.prototype.renderListBlock.apply(this, []);
         
         this.loadFakeData();
+
         $.each(this.collectionWorkspaces.models, function (modId, model) {
             var selectedHTML = '';
             if (model.get('active')) {
@@ -44,7 +56,33 @@ Up.Views.VMListView = Up.Views.SettingsProtoView.extend({
             $('select[name="active_configuration_select"]').append('<option value="' + model.get('id') + '" ' + selectedHTML + '>' + model.get('name') + '</option>');
         });
         
-        Up.I.chosenElement('select[name="active_configuration_select"]', 'single');
+        Up.I.chosenElement('select[name="active_configuration_select"]', 'single');    
+    },
+    
+    // Render only the list. Usefull to functions such as pagination, sorting and filtering where is not necessary render controls
+    renderList: function () {
+        // Fill the list
+        var template = _.template(
+            Up.TPL['list-' + this.viewMode + '_' + this.qvdObj], {
+                models: this.collection.models,
+                checkBox: false
+            }
+        );
+        
+        $(this.listContainer).html(template);
+        this.paginationUpdate();
+        this.shownElementsLabelUpdate();
+        
+        // Open websockets for live fields
+        if (this.liveFields) {
+            Up.WS.openListWebsockets(this.qvdObj, this.collection, this.liveFields, this.cid);
+        }
+        
+        Up.T.translateAndShow();
+                
+        Up.I.addSortIcons(this.cid);
+                
+        Up.I.addOddEvenRowClass(this.listContainer);
     },
     
     // This events will be added to view events
@@ -53,7 +91,9 @@ Up.Views.VMListView = Up.Views.SettingsProtoView.extend({
         'click .js-vm-settings': 'editDesktopSettings',
         'click .js-grid-disconnected .js-connect-btn': 'connectDesktop',
         'click .js-list-disconnected .js-connect-btn': 'connectDesktop',
-        'change select[name="active_configuration_select"]': 'changeActiveConf'
+        'change select[name="active_configuration_select"]': 'changeActiveConf',
+        'mouseover .js-grid-cell-area': 'showGridIcon',
+        'mouseout .js-grid-cell-area': 'hideGridIcon'
     },
     
     changeActiveConf: function (e) {
@@ -81,8 +121,7 @@ Up.Views.VMListView = Up.Views.SettingsProtoView.extend({
             },
             button1Class : 'fa fa-save',
             fillCallback : function (target) { 
-                Up.CurrentView.renderEditionMode(model, target);
-                $('.js-settings-details-bracket').hide();
+                Up.I.renderEditionMode(model, target);
             },
         }
 
@@ -94,11 +133,13 @@ Up.Views.VMListView = Up.Views.SettingsProtoView.extend({
         
         var selectedId = $(e.target).attr('data-id');
 
-        Up.A.performAction('vm_connect/' + selectedId, {}, function (e) {
+        Up.A.performAction('desktops/' + selectedId + '/token', {}, function (e) {
             that.setDesktopState(selectedId, 'connecting');
             that.startConnectionTimeout(selectedId);
-            window.location = Up.C.getBaseUrl('vm_connect/' + selectedId);
             
+            var token = e.retrievedData.token;
+            console.log("window.open('qvd:client.ssl.options.SSL_version=TLSv1_2 client.host.name=" + window.location.hostname + " client.auto_connect=1 client.auto_connect.vm_id=" + selectedId + " client.auto_connect.token=" + token + "', '_self');");
+            window.open('qvd:client.ssl.options.SSL_version=TLSv1_2 client.host.name=' + window.location.hostname + ' client.auto_connect=1 client.auto_connect.vm_id=' + selectedId + ' client.auto_connect.token=' + token, '_self');
         }, this, 'GET');
     },
     
@@ -155,49 +196,6 @@ Up.Views.VMListView = Up.Views.SettingsProtoView.extend({
         }, 1000);
     },
     
-    createElement: function () {
-        var valid = Up.Views.ListView.prototype.createElement.apply(this);
-        
-        if (!valid) {
-            return;
-        }
-        
-        // Properties to create, update and delete obtained from parent view
-        var properties = this.properties;
-                
-        var context = $('.' + this.cid + '.editor-container');
-
-        var user_id = context.find('[name="user_id"]').val();
-        var osf_id = context.find('select[name="osf_id"]').val();
-        
-        var arguments = {
-            "user_id": user_id,
-            "osf_id": osf_id
-        };
-        
-        if (!$.isEmptyObject(properties.set) && Up.C.checkACL('vm.create.properties')) {
-            arguments["__properties__"] = properties.set;
-        }
-        
-        var di_tag = context.find('select[name="di_tag"]').val();
-        
-        if (di_tag && Up.C.checkACL('vm.create.di-tag')) {
-            arguments.di_tag = di_tag;
-        }
-        
-        var name = context.find('input[name="name"]').val();
-        if (name) {
-            arguments["name"] = name;
-        }
-        
-        var description = context.find('textarea[name="description"]').val();
-        if (description) {
-            arguments["description"] = description;
-        }
-        
-        this.createModel(arguments, this.fetchList);
-    },
-    
     firstEditWorkspace: function (e) {
         var selectedId = $(e.target).val();
 
@@ -228,7 +226,7 @@ Up.Views.VMListView = Up.Views.SettingsProtoView.extend({
             button1Class : 'fa fa-ban',
             button2Class : 'fa fa-save',
             fillCallback : function (target) { 
-                that.renderEditionMode(model, target);
+                Up.I.renderEditionMode(model, target);
             },
         }
 

@@ -71,7 +71,7 @@ Up.I.menuSetupOriginal = {
 };
 
 Up.I.menuOriginal = {
-    virtualdesktops: {
+    desktops: {
         icon: CLASS_ICON_VIRTUAL_DESKTOP,
         text: 'Virtual desktops',
         link: '#/desktops',
@@ -81,10 +81,10 @@ Up.I.menuOriginal = {
         text: 'Settings',
         link: '#/settings',
     },
-    clients: {
+    downloads: {
         icon: CLASS_ICON_CLIENT_DOWNLOAD,
         text: 'Clients download',
-        link: '#/clients',
+        link: '#/downloads',
     },
     info: {
         icon: CLASS_ICON_INFO_CONNECTION,

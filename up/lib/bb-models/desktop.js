@@ -1,4 +1,4 @@
-Up.Models.VM = Up.Models.Model.extend({
+Up.Models.Desktop = Up.Models.Model.extend({
     actionPrefix: 'desktops',
     
     defaults: {

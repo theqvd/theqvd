@@ -5,8 +5,6 @@ Up.Views.ListView = Up.Views.MainView.extend({
     formFilters: {},
     columns: [],
     listContainer: '.bb-list',
-    listBlockContainer: '.bb-list-block',
-    whatRender: 'all',
     filters: {},
     selectedItems: [],
     selectedAll: false,
@@ -18,10 +16,7 @@ Up.Views.ListView = Up.Views.MainView.extend({
     
     /*
     ** params:
-    **  whatRender (string): What part of view render (all/list). Default 'all'
     **  listContainer (string): Selector of list container. Default '.bb-list'
-    **  forceListColumns (object): List of columns that will be shown on list ignoring configuration. Format {checks: true, id: true, ...}
-    **  forceListActionButton (object): Override list action button with other button or with null value to not show it. Format {name: 'name of the button', value: 'text into button', link: 'href value'}
     **  filters (object): Conditions under the list will be filtered. Format {user: 23, ...}
     */
     
@@ -30,11 +25,6 @@ Up.Views.ListView = Up.Views.MainView.extend({
         if (!$.isEmptyObject(Up.I.fixedFilters)) {
             params.filters = $.extend({}, params.filters, Up.I.fixedFilters);
             this.collection.filters = $.extend({}, this.collection.filters, Up.I.fixedFilters);
-            
-            var classifiedByTenant = $.inArray(this.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
-            if (!classifiedByTenant && this.collection.filters['tenant_id']) {
-                delete this.collection.filters['tenant_id'];
-            }
         }
         
         Up.Views.MainView.prototype.initialize.apply(this);
@@ -54,14 +44,6 @@ Up.Views.ListView = Up.Views.MainView.extend({
     addListTemplates: function () {
         var templates = Up.I.T.getTemplateList('list', {qvdObj: this.qvdObj});
         
-        templates["list-grid_" + this.qvdObj] = {
-            name: 'list/' + this.qvdObj + '-grid'
-        };  
-        
-        templates["list-list_" + this.qvdObj] = {
-            name: 'list/' + this.qvdObj + '-list'
-        };
-        
         this.templates = $.extend({}, this.templates, templates);
     },
     
@@ -73,35 +55,6 @@ Up.Views.ListView = Up.Views.MainView.extend({
         
         this.block = params.block || this.block;
         this.offset = params.offset || {};
-              
-        if (params.autoRender !== undefined) {
-            this.autoRender = params.autoRender;
-        }            
-        if (params.whatRender !== undefined) {
-            this.whatRender = params.whatRender;
-        }            
-        if (params.listContainer !== undefined) {
-            this.listBlockContainer = params.listContainer;
-            this.listContainer = this.listBlockContainer + ' ' + this.listContainer;
-        }                  
-        if (params.forceInfoRestrictions !== undefined) {
-            this.infoRestrictions = params.forceInfoRestrictions;
-        }
-        if (params.forceListActionButton !== undefined) {
-            this.listActionButton = params.forceListActionButton;
-        }            
-        if (params.forceListColumns !== undefined) {
-            var that = this;
-            
-            $.each(this.columns, function(cName, column) {
-                if (params.forceListColumns[cName] !== undefined && params.forceListColumns[cName]) {
-                    that.columns[cName].display = true;
-                }
-                else {
-                    that.columns[cName].display = false;
-                }
-            });
-        }
     },
     
     commonListEvents: {
@@ -114,8 +67,7 @@ Up.Views.ListView = Up.Views.MainView.extend({
         'change .filter-control select': 'filter',
         'input .filter-control input.date-filter': 'filter',
         'input .pagination input.js-current-page': 'typePage',
-        'keypress .pagination input.js-current-page': 'pressPage',
-        'click .js-unckeck-all': 'resetSelectedItems'
+        'keypress .pagination input.js-current-page': 'pressPage'
     },
     
     // Get filter parameters of the form, set in collection, fetch list and render it
@@ -238,8 +190,6 @@ Up.Views.ListView = Up.Views.MainView.extend({
 
         // When we came from a view without elements pagination doesnt exist
         var existsPagination = $('.' + this.cid + ' .pagination .first').length > 0;
-
-        this.resetSelectedItems ();
         
         var searchHash = Up.U.transformFiltersToSearchHash(filters);
         var currentHash = '#' + this.qvdObj + 's/' + searchHash;
@@ -336,63 +286,20 @@ Up.Views.ListView = Up.Views.MainView.extend({
     render: function () {
         var that = this;
         
-        var embeddedView = that.cid != Up.CurrentView.cid;
-        
-        // If user have not access to main section, redirect to home
-        if (!embeddedView && that.whatRender && !Up.C.checkACL(that.qvdObj + '.see-main.')) {
-            Up.Router.upRouter.trigger('route:defaultRoute');
-            return;
-        }
-        
         this.collection.fetch({      
             success: function () {
-                switch(that.whatRender) {
-                    case 'all':
-                        that.renderAll();
-                        break;
-                    case 'list':
-                        that.renderListBlock();
-                        break;
-                }
+                that.renderListBlock();
             }
         });
     },
     
-    // Render common elements of lists and then render list with controls (list block)
-    renderAll: function () {
-        // Fill the html with the template and the collection
-        var template = _.template(
-            Up.TPL.listCommonList, {
-                formFilters: this.formFilters,
-                currentFilters: this.collection.filters,
-                cid: this.cid
-            });
-        
-        $(this.el).html(template);
-
-        this.printBreadcrumbs(this.breadcrumbs, '');
-        
-        this.renderListBlock();
-    },
-    
     //Render list with controls (list block)
     renderListBlock: function (that) {
-        var that = that || this;
-
-        var targetReady = $(that.listBlockContainer).length != 0;
-        
-        // Target is not ready
-        if (!targetReady) {
-            return;
-        }
-        
-        clearInterval(that.interval);
-        
         // Fill the list
         var template = _.template(
-            Up.TPL.listCommonBlock, {
-                formFilters: that.formFilters,
-                listActionButton: that.listActionButton,
+            Up.TPL[this.qvdObj + 'CommonBlock'], {
+                formFilters: this.formFilters,
+                listActionButton: this.listActionButton,
                 cid: this.cid,
                 qvdObj: this.qvdObj,
                 pagination: false,
@@ -400,9 +307,7 @@ Up.Views.ListView = Up.Views.MainView.extend({
             }
         );
         
-        $(that.listBlockContainer).html(template);
-
-        that.renderList();
+        $(this.el).html(template);
                 
         // Translate the strings rendered. 
         // This translation is only done here, in the first charge. 
@@ -410,35 +315,8 @@ Up.Views.ListView = Up.Views.MainView.extend({
         // the strings will be individually translated
         
         Up.T.translate();
-        Up.I.enableDataPickers();
-    },    
-    
-    // Render only the list. Usefull to functions such as pagination, sorting and filtering where is not necessary render controls
-    renderList: function () {
-        // Fill the list
-        var template = _.template(
-            Up.TPL['list-' + this.viewMode + '_' + this.qvdObj], {
-                models: this.collection.models,
-                checkBox: false
-            }
-        );
         
-        $(this.listContainer).html(template);
-        this.paginationUpdate();
-        this.shownElementsLabelUpdate();
-        
-        Up.I.updateSelectedItems(this.selectedItems.length);
-        
-        // Open websockets for live fields
-        if (this.liveFields) {
-            Up.WS.openListWebsockets(this.qvdObj, this.collection, this.liveFields, this.cid);
-        }
-        
-        Up.T.translateAndShow();
-                
-        Up.I.addSortIcons(this.cid);
-                
-        Up.I.addOddEvenRowClass(this.listContainer);
+        this.renderList();
     },
     
     shownElementsLabelUpdate: function () {
@@ -572,6 +450,7 @@ Up.Views.ListView = Up.Views.MainView.extend({
         this.viewMode = $(e.target).attr('data-viewmode');
         $('.js-change-viewmode').removeClass('disabled');
         $(e.target).addClass('disabled');
+        
         this.renderList();
     },
 });

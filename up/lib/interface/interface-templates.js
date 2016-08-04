@@ -14,25 +14,16 @@ Up.I.T = {
                     },
                     relatedDoc: {
                         name: 'doc/related-links'
-                    },
-                    viewCustomizerTool: {
-                        name: 'config/customizer-tool'
                     }
                 };
                 break;
             case 'settings':
                 templates = {
-                    settings: {
-                        name: 'config/settings'
-                    },
                     settingsRow: {
-                        name: 'config/settings-row'
+                        name: 'settings/settings-row'
                     },
                     settingsList: {
-                        name: 'config/settings-list'
-                    },
-                    settingsDetails: {
-                        name: 'config/settings-details'
+                        name: 'settings/settings-list'
                     }
                 }
                 break;
@@ -98,22 +89,13 @@ Up.I.T = {
                 break;
             case 'list':
                 templates = {
-                    listCommonList: {
-                        name: 'list/common'
-                    },
-                    listCommonBlock: {
-                        name: 'list/common-block'
-                    },
-                    settingsDetails: {
-                        name: 'config/settings-details'
+                    settingsEditor: {
+                        name: 'settings/settings-editor'
                     }
                 }
-                break; 
-            case 'about':
-                templates = {
-                    about: {
-                        name: 'doc/about'
-                    }
+
+                templates[params.qvdObj + 'CommonBlock'] = {
+                    name: params.qvdObj + '/' + params.qvdObj + '-block'
                 }
                 break;
             case 'profile':

@@ -203,7 +203,7 @@ body {
         width: 200px;
         top: 25vh;
     }
-    color: darken($col_whiter, 10);
+    color: $col_grey1;
     
     margin: 50px auto;
 }
@@ -278,10 +278,6 @@ body {
         @import "layout-details";
         @import "layout-setup";
         @import "layout-login";
-        
-        .wrapper-content {
-            //width: 95vw;
-        }
     }
 }
 

@@ -1,4 +1,4 @@
-Up.Views.SettingsView = Up.Views.SettingsProtoView.extend({  
+Up.Views.SettingsView = Up.Views.ListView.extend({  
     qvdObj: 'settings',
     
     relatedDoc: {
@@ -12,32 +12,26 @@ Up.Views.SettingsView = Up.Views.SettingsProtoView.extend({
     },
     
     initialize: function (params) {
-        $('.js-platform-menu').hide();
-
-        Up.Views.MainView.prototype.initialize.apply(this, [params]);
-        this.extendEvents(this.settingsEvents);
-
-        $('.menu-option').removeClass('menu-option--current');
-        $('[data-target="settings"]').addClass('menu-option--current');
-
-        var templates = Up.I.T.getTemplateList('settings');
+        this.collection = new Up.Collections.Workspaces(params)
         this.loadFakeData();
 
-        Up.A.getTemplates(templates, this.render, this); 
+        Up.Views.ListView.prototype.initialize.apply(this, [params]);        
+        
+        this.extendEvents(this.settingsEvents);
     },
     
-    render: function () {        
+    addListTemplates: function () {
+        Up.Views.ListView.prototype.addListTemplates.apply(this, []);
+        
+        var templates = Up.I.T.getTemplateList('settings');
+        this.templates = $.extend({}, this.templates, templates);        
+    },
+    
+    renderList: function () {
+        // When data were real, use this.collection instead this.collectionWorkspaces
+        
         // Get actived model to know what model render
         this.activeModel = this.collectionWorkspaces.where({active: true})[0];
-        
-        // Fill the html with the template and the model
-        this.template = _.template(
-            Up.TPL.settings, {
-                cid: this.cid
-            }
-        );
-        
-        $(this.el).html(this.template);
         
         // List of settings
         this.template = _.template(
@@ -78,9 +72,9 @@ Up.Views.SettingsView = Up.Views.SettingsProtoView.extend({
     },
     
     editWorkspace: function (e) {
-        var selectedId = $(e.target).attr('data-id');
-
-        var model = this.collectionWorkspaces.where({id: parseInt(selectedId)})[0];
+        var selectedId = parseInt($(e.target).attr('data-id'));
+        
+        var model = this.collectionWorkspaces.where({id: selectedId})[0];
 
         var that = this;
         var dialogConf = {
@@ -89,14 +83,15 @@ Up.Views.SettingsView = Up.Views.SettingsProtoView.extend({
                 "Save": function () {
                     var params = Up.I.parseForm(this);
                     model.set(params);
-                    model.save();
+                    
+                    Up.CurrentView.saveModel({id: selectedId}, {}, {}, function(){}, model);
                     
                     Up.I.closeDialog($(this));
                 }
             },
             button1Class : 'fa fa-save',
             fillCallback : function (target) { 
-                that.renderEditionMode(model, target);
+                Up.I.renderEditionMode(model, target);
             },
         }
 
@@ -126,7 +121,7 @@ Up.Views.SettingsView = Up.Views.SettingsProtoView.extend({
             },
             button1Class : 'fa fa-save',
             fillCallback : function (target) { 
-                that.renderEditionMode(model, target);
+                Up.I.renderEditionMode(model, target);
             },
         }
 
@@ -163,7 +158,7 @@ Up.Views.SettingsView = Up.Views.SettingsProtoView.extend({
             },
             button1Class : 'fa fa-save',
             fillCallback : function (target) { 
-                that.renderEditionMode(model, target);
+                Up.I.renderEditionMode(model, target);
             },
         }
 

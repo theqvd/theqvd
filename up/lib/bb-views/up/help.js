@@ -8,9 +8,6 @@ Up.Views.HelpView = Up.Views.MainView.extend({
         $('.js-platform-menu').hide();
 
         Up.Views.MainView.prototype.initialize.apply(this, [params]);
-        
-        $('.menu-option').removeClass('menu-option--current');
-        $('[data-target="help"]').addClass('menu-option--current');
 
         var templates = Up.I.T.getTemplateList('help');
         

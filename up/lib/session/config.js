@@ -500,7 +500,7 @@ Up.C = {
                     Up.L.loadLogin();
                 },
                 // Not authorized
-                404: function () {
+                405: function () {
                     Up.L.loadLogin();
                 }
             }
@@ -560,20 +560,5 @@ Up.C = {
         var firstSeparator = this.authSeparators ? this.authSeparators[0] : '';
         
         return firstSeparator;
-    },
-    
-    getLoginData: function (name, tenant) {        
-        // If tenant not defined, get current tenant (tenant admin cases)
-        tenant = tenant || Up.C.tenantName;
-        
-        // If name not defined, get current login name
-        name = name || Up.C.login;
-
-        // In monotenant cases, login data is just username
-        if (!this.isMultitenant()) {
-            return name;
-        }
-        
-        return name + Up.C.getFirstAuthSeparator() + tenant;
     },
 }

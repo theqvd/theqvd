@@ -14,7 +14,7 @@
         }
         else {
             $.each(models, function (iModel, model) {
-                var connected = model.get('state') == 'running';
+                var connected = model.get('state') == 'connected';
         %>
             <tr class="row-<%= model.get('id') %>">
                 <td class="js-name col-width-100">

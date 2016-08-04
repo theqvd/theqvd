@@ -10,7 +10,6 @@ Up.L = {
         Up.C.sid = '';
         Up.C.login = '';
         Up.C.acls = [];
-        Up.I.C.hideCustomizer();
         
         Up.I.stopServerClock();
     },
@@ -49,7 +48,12 @@ Up.L = {
     rememberLogin: function () { 
         Up.C.loggedIn = true;
         
-        Up.A.performAction('vm', {}, function (that) {
+        Up.A.performAction('account', {}, function (that) {
+            // Store account settings
+            Up.C.username = that.retrievedData.username;
+            Up.C.acls = that.retrievedData.acls;
+            Up.C.language = that.retrievedData.language;
+            
             // Configure visability
             Up.C.configureVisibility();
 
@@ -196,14 +200,6 @@ Up.L = {
 
         // Interface configuration
         Up.I.renderMain();
-        
-        // Hide customizer to show only if is necessary
-        Up.I.C.hideCustomizer();
-        
-        // If customizer is enabled, show it
-        if ((Up.C.isSuperadmin() || Up.C.isMultitenant() === 0) && $.cookie('styleCustomizer')) {
-            Up.I.C.initCustomizer();
-        }
 
         if (Up.C.showServerClock) {
             // Start server clock

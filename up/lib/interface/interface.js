@@ -515,9 +515,7 @@ Up.I = {
     },
     
     updateLoginOnMenu: function () {
-        //var userName = Up.C.getLoginData();
-        var userName = 'Juan';
-        $('.js-menu-corner').find('.js-login-welcome').html($.i18n.t('Welcome, __name__', {name: userName}));
+        $('.js-menu-corner').find('.js-login-welcome').html($.i18n.t('Welcome, __name__', {name: Up.C.username}));
     },
     
     controls: {
@@ -848,48 +846,6 @@ Up.I = {
         delete Up.CurrentView.dialog;
     },
     
-    fixTableScrollStyles: function () {
-        // Add table styles to header
-        $('.tablescroll .tablescroll_head').addClass('role-template-tools');
-
-        // Reduce the wrapper layer because header will be increased due class application
-        var currentHeight = $('.tablescroll .tablescroll_wrapper').height();
-        $('.tablescroll .tablescroll_wrapper').css('height', (currentHeight - 50) + 'px');
-        $('.tablescroll .tablescroll_wrapper').css('min-height', '200px');
-
-        // Remove horizontal scroll to wrapper layer
-        $('.tablescroll .tablescroll_wrapper').css('overflow-x', 'hidden');
-
-        // Get max width of each column and apply it on header cells
-        var maxWidths = [];
-        $.each($('.tablescroll .tablescroll_body tr').eq(0).children(), function (i, cell) {
-            var cellWidth = $(cell).css('width');
-            var head = $('.tablescroll .tablescroll_head tr').eq(0).children().eq(i);
-            var headWidth = $(head).css('width');
-
-            if (cellWidth > headWidth) {
-                maxWidths[i] = cellWidth;
-            }
-            else {
-                maxWidths[i] = headWidth;
-            }
-
-            $(head).css('width', maxWidths[i]);
-            $(head).css('min-width', maxWidths[i]);
-            $(head).css('max-width', maxWidths[i]);
-        });
-
-        // Apply max widths on each row within body
-        $.each($('.tablescroll .tablescroll_body tr'), function (i, row) {
-            $.each(maxWidths, function (imw, mw) {
-                var cell = $(row).children().eq(imw);
-                $(cell).css('width', mw);
-                $(cell).css('min-width', mw);
-                $(cell).css('max-width', mw);
-            });
-        });
-    },
-    
     addOddEvenRowClass: function (listContainer) {
         $.each($(listContainer).find('table.list tr'), function (i, row) {
             if ($(row).children().eq(0).prop("tagName") != 'TD') {
@@ -1031,5 +987,26 @@ Up.I = {
         })
 
         return params;
-    }
+    },
+    
+    setMenuOptionSelected: function (dataTarget) {
+        $('.menu-option').removeClass('menu-option--current');
+        $('[data-target="' + dataTarget + '"]').addClass('menu-option--current');
+    },
+    
+    // Render edition
+    renderEditionMode: function (model, target) {
+        // List of settings
+        var template = _.template(
+            Up.TPL.settingsEditor, {
+                name: model.get('name'),
+                settings: model.get('settings'),
+                nameEditable: !model.get('systemWS')
+            }
+        );
+        
+        target.html(template);
+        
+        Up.I.chosenElement($('select[name="connection_type"]'), 'single100');
+    },
 }

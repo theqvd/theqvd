@@ -70,15 +70,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             changePassword: {
                 name: 'editor/change-password'
             }
-        }     
-        
-        templates["list-grid_" + this.qvdObj] = {
-            name: 'list/' + this.qvdObj + '-grid'
-        };  
-        
-        templates["list-list_" + this.qvdObj] = {
-            name: 'list/' + this.qvdObj + '-list'
-        };
+        }
         
         templates["details_" + this.qvdObj] = {
             name: 'details/' + this.qvdObj

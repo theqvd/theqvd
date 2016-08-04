@@ -45,9 +45,7 @@ Up.Collections.Collection = Backbone.Collection.extend({
             return;
         }
         
-        this.status = response.status;
-        this.elementsTotal = response.total || 0;
-        return response.vms;
+        return response;
     },
 
     sync: function(method, model, options) {

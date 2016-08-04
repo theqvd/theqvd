@@ -1,4 +1,4 @@
-<table class="list settings-details-table js-settings-details-table">
+<table class="list settings-editor-table js-settings-editor-table">
     <tbody>
         <% if (nameEditable) { %>
             <tr>

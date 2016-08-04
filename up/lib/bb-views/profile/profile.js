@@ -16,9 +16,7 @@ Up.Views.ProfileView = Up.Views.MainView.extend({
         Up.Views.MainView.prototype.initialize.apply(this, [params]);
                 
         Up.I.chosenConfiguration();
-
-        $('.menu-option').removeClass('menu-option--current');
-
+        
         params.id = Up.C.adminID;
         this.id = Up.C.adminID;
         

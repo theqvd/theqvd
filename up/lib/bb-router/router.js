@@ -2,10 +2,10 @@ Up.Router = Backbone.Router.extend({
     routes: {
         "logout": "logout",
 
-        "virtualdesktops": "desktops",
+        "desktops": "desktops",
         
         "settings": "settings",
-        "clients": "clients",
+        "downloads": "downloads",
         "info": "info",
         "help": "help",
         
@@ -24,7 +24,7 @@ Up.Router = Backbone.Router.extend({
         
         // ------- List sections ------- //
         that.on('route:desktops', function (searchHash) {
-            that.performRoute('vm', Up.Views.VMListView);
+            that.performRoute('vm', Up.Views.DesktopListView);
         });        
         
         // ------- Settings sections ------- //
@@ -35,8 +35,8 @@ Up.Router = Backbone.Router.extend({
         
         // ------- Downloads sections ------- //
         
-        that.on('route:clients', function (searchHash) {
-            that.performRoute('clients', Up.Views.DownloadsView);
+        that.on('route:downloads', function (searchHash) {
+            that.performRoute('downloads', Up.Views.DownloadsView);
         });       
         
         // ------- Info sections ------- //
@@ -84,7 +84,7 @@ Up.Router = Backbone.Router.extend({
 
         // ------- Default load ------- //
         that.on('route:defaultRoute', function (actions) {
-            that.performRoute('vm', Up.Views.VMListView);
+            that.performRoute('vm', Up.Views.DesktopListView);
         });
 
         // Start Backbone history
@@ -109,6 +109,7 @@ Up.Router = Backbone.Router.extend({
         if (!$.isEmptyObject(Up.CurrentView)) {
             Up.CurrentView.undelegateEvents();
             Up.WS.closeAllWebsockets();
+            Up.I.L.clearSpies();
         }
         
 		// Abort pending requests

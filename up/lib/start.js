@@ -18,8 +18,5 @@
         
         // Get templates and after that read config file
         Up.A.getTemplates(templates, Up.C.readConfigFile);
-        
-        // Start countdown
-        Up.I.L.countdown();
 	});
 })(window, document, jQuery)

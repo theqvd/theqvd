@@ -9,9 +9,6 @@ Up.Views.DownloadsView = Up.Views.MainView.extend({
 
         Up.Views.MainView.prototype.initialize.apply(this, [params]);
         
-        $('.menu-option').removeClass('menu-option--current');
-        $('[data-target="clients"]').addClass('menu-option--current');
-
         var templates = Up.I.T.getTemplateList('downloads');
         
         Up.A.getTemplates(templates, this.render, this); 
