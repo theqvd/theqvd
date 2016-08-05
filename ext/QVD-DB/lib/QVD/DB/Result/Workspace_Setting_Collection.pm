@@ -12,7 +12,6 @@ __PACKAGE__->add_columns(
 );
 
 __PACKAGE__->set_primary_key('id');
-__PACKAGE__->add_unique_constraint(['item_value']);
 
 __PACKAGE__->belongs_to(setting => 'QVD::DB::Result::Workspace_Setting',  'setting_id');
 

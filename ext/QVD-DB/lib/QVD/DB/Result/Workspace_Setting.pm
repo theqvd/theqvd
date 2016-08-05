@@ -13,9 +13,9 @@ __PACKAGE__->add_columns(
 );
 
 __PACKAGE__->set_primary_key('id');
-__PACKAGE__->add_unique_constraint(['parameter']);
+__PACKAGE__->add_unique_constraint(['workspace_id','parameter']);
 
 __PACKAGE__->belongs_to(workspace => 'QVD::DB::Result::Workspace',  'workspace_id');
-__PACKAGE__->might_have(collection => 'QVD::DB::Result::Workspace_Setting_Collection',  'setting_id');
+__PACKAGE__->has_many(collection => 'QVD::DB::Result::Workspace_Setting_Collection',  'setting_id');
 
 1;

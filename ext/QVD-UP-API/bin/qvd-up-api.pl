@@ -395,14 +395,7 @@ group {
 
         my $user = rs('User')->find($c->stash('session')->data->{user_id});
 
-        my $workspaces = [ map {
-                id       => $_->id,
-                name     => $_->name,
-                active   => $_->active,
-                fixed    => $_->fixed,
-                settings => undef,
-            },
-            $user->workspaces // () ];
+        my $workspaces = [ map { workspace_to_hash($_) } ($user->workspaces) ];
         
         return $c->render_response(json => $workspaces, code => 200);
     };
@@ -410,34 +403,135 @@ group {
     any [qw(GET)] => '/api/workspaces/:id' => [id => qr/\d+/] => sub {
         my $c = shift;
 
-        my $vm_id = $c->param('id');
+        my $ws_id = $c->param('id');
+        my $user_id = $c->stash->{session}->data->{user_id};
 
-        my $workspace_settings = {
-            id       => "$vm_id",
-            name     => "name",
-            active   => "1",
-            fixed    => "1",
-            settings => undef,
-            };
-        return $c->render_response(json => $workspace_settings, message => "TODO", code => 200);
+        my $workspace = rs('Workspace')->single({id => $ws_id, user_id => $user_id});
+        return $c->render_response(message => "Invalid Workspace", code => 400) unless defined($workspace);
+
+        return $c->render_response(json => workspace_to_hash($workspace), code => 200);
     };
 
     any [qw(POST)] => '/api/workspaces/' => sub {
         my $c = shift;
 
-        return $c->render_response(message => "TODO", code => 200);
+        my $user_id = $c->stash->{session}->data->{user_id};
+
+        my $json = $c->req->json;
+
+        return $c->render_response(message => "Invalid parameter", parameter => $_, code => 400)
+            if $_ = find_invalid_parameter (
+                $json,
+                {
+                    name       => { mandatory => 1, type => 'STRING' },
+                    active     => { mandatory => 0, type => 'BOOL' },
+                    settings   => { mandatory => 1, type => 'ALL_PARAMETERS' },
+                }
+            );
+
+        my $args = {};
+        $args->{name} = $_ if defined($_ = $json->{name});
+        $args->{active} = $_ if defined($_ = $json->{active});
+            
+        if($args->{active}){
+            rs('Workspace')->search({active => 1})->update({active => 0});
+        }
+
+        my $workspace = rs('Workspace')->create({
+                user_id => $user_id,
+                %$args
+            });
+        # DBIx::Class do not assign default values in creation and have to be fetched
+        $workspace->discard_changes;
+
+        for my $param (keys %{$json->{settings}}) {
+            my $setting = rs( 'Workspace_Setting' )->create( {
+                    workspace_id => $workspace->id,
+                    parameter    => $param,
+                    value        => $json->{settings}->{$param}->{value},
+                } );
+            for my $item (@{$json->{settings}->{$param}->{list} // [ ]}) {
+                rs( 'Workspace_Setting_Collection' )->create( {
+                        setting_id => $setting->id,
+                        item_value => $item
+                    } );
+            }
+        }
+
+        return $c->render_response(json => workspace_to_hash($workspace), code => 200);
     };
 
     any [qw(PUT)] => '/api/workspaces/:id' => [id => qr/\d+/] => sub {
         my $c = shift;
 
-        return $c->render_response(message => "TODO", code => 200);
+        my $ws_id = $c->param('id');
+        my $user_id = $c->stash->{session}->data->{user_id};
+
+        my $json = $c->req->json;
+
+        return $c->render_response(message => "Invalid parameter", parameter => $_, code => 400)
+            if $_ = find_invalid_parameter (
+                $json,
+                {
+                    name       => { mandatory => 0, type => 'STRING' },
+                    active     => { mandatory => 0, type => 'FLAG' },
+                    settings   => { mandatory => 0, type => 'SOME_PARAMETERS' },
+                }
+            );
+
+        my $workspace = rs('Workspace')->single({id => $ws_id, user_id => $user_id});
+        return $c->render_response(message => "Invalid Workspace", code => 400) unless defined($workspace);
+
+        my $args = {};
+        $args->{name} = $_ if defined($_ = $json->{name});
+        $args->{active} = $_ if defined($_ = $json->{active});
+
+        if($args->{active}){
+            rs('Workspace')->search({active => 1})->update({active => 0});
+        }
+
+        $workspace->update({ %$args });
+
+        for my $param (keys %{$json->{settings}}) {
+            my $setting = rs( 'Workspace_Setting' )->single( {
+                    workspace_id => $workspace->id,
+                    parameter    => $param,
+                } );
+            $setting->update({ value => $json->{settings}->{$param}->{value} });
+            $setting->collection->delete();
+            for my $item (@{$json->{settings}->{$param}->{list} // [ ]}) {
+                rs( 'Workspace_Setting_Collection' )->create( {
+                        setting_id => $setting->id,
+                        item_value => $item
+                    } );
+            }
+        }
+
+        return $c->render_response(json => workspace_to_hash($workspace), code => 200);
     };
 
     any [qw(DELETE)] => '/api/workspaces/:id' => [id => qr/\d+/] => sub {
         my $c = shift;
+            
+        my $ws_id = $c->param('id');
+        my $user_id = $c->stash->{session}->data->{user_id};
 
-        return $c->render_response(message => "TODO", code => 200);
+        my $workspace = rs( "Workspace" )->single( { id => $ws_id, user_id => $user_id } );
+        return $c->render_response(message => "Invalid Workspace", code => 400) unless defined($workspace);
+
+        return $c->render_response(message => "Fixed Workspace cannot be deleted", code => 400)
+            if $workspace->fixed;
+
+        my $name = $workspace->name;
+            
+        if($workspace->active){
+            my $min_id = rs('Workspace')->search({user_id => $user_id})->get_column('id')->min;
+            rs( "Workspace" )->find({id => $min_id})->update({active => 1})
+        }
+
+        $workspace->delete();
+
+        return $c->render_response(message => "Workspace $name deleted", code => 200);
     };
 
     # Other
@@ -521,6 +615,9 @@ sub check_type {
     my $is_correct = 0;
     use Switch;
     switch ($type) {
+        case 'FLAG' {
+            $is_correct = $value == 1;
+        }
         case 'BOOL' {
             $is_correct = ($value == 1 || $value == 0);
         }
@@ -575,6 +672,18 @@ sub vm_to_desktop_hash {
         state => $vm->vm_runtime->user_state,
         settings_enabled => defined($desktop) ? $desktop->active : 0,
         settings => element_settings($desktop),
+    };
+    return $hash;
+}
+
+sub workspace_to_hash {
+    my $ws = shift;
+    my $hash = {
+        id => $ws->id,
+        fixed => $ws->fixed,
+        name => $ws->name,
+        active => $ws->active,
+        settings => element_settings($ws),
     };
     return $hash;
 }
