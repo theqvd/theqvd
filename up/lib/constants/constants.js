@@ -19,17 +19,21 @@ WS_CLOSED = 3;
 APP_PATH = './';
 
 
-// Classification of Qvd Objects
-QVD_OBJS_WITH_PROPERTIES = ['user', 'vm', 'host', 'osf', 'di'];
-QVD_OBJS_CLASSIFIED_BY_TENANT = ['user', 'vm', 'osf', 'di', 'administrator', 'log', 'role', 'property'];
-QVD_OBJS_MASSIVE_EDITABLE = ['user', 'vm', 'host', 'osf', 'di', 'administrator', 'role', 'tenant'];
-QVD_OBJS_EXIST_IN_SUPERTENANT = ['role', 'administrator', 'property'];
-QVD_OBJS_EXIST_OUT_TENANT = ['role'];
-QVD_OBJS_PLATFORM = ['home', 'user', 'vm', 'host', 'osf', 'di'];
-QVD_OBJS_SETUP = ['role', 'administrator', 'tenant', 'views', 'watconfig'];
-QVD_OBJS_USERAREA = ['profile', 'myviews'];
-QVD_OBJS_HELP = ['about', 'documentation'];
-QVD_OBJS_QVDCONFIG = ['config'];
+// Client settings parameters mapping with field names
+CLIENT_PARAMS_MAPPING = {
+    connection: { 
+        value: 'client.link'
+    },
+    audio: { 
+        value: 'client.audio.enable'
+    },
+    fullscreen: { 
+        value: 'client.fullscreen'
+    },
+    printers: { 
+        value: 'client.printing.enable'
+    }
+}
 
 // Filters
 FILTER_ALL = -10;

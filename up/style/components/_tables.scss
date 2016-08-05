@@ -213,24 +213,23 @@ table.role-template-tools {
     background: $col_whiter !important; 
     display: none;
 }
-
-table.vmst {
-    i.vmst-vm, i.vmst-host, i.vmst-dot {
-        width: 100%;
-        
-        &.vmst-dot {
-            font-size: 9px;
-            margin-top: 10px;
-        }        
-        
-        &.vmst-dot-branch {
-            margin-top: 0px;
-            line-height: 1px;
-        }
-    }
     
-    .vmst-vm-cell, .vmst-host-cell {
-        width: 50%; 
-        vertical-align: bottom;
+table.settings-editor-table {
+    width: 100%;
+    border-collapse: separate;
+
+    tr {
+        background: $col_grey4;
+
+        td {
+            border: 0;
+            padding: 6px 4px 4px 6px;
+            height: 25px;
+            
+            &:first-child {
+                text-align: right;
+                vertical-align: middle;
+            }
+        }
     }
 }

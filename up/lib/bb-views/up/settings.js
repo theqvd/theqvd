@@ -81,10 +81,12 @@ Up.Views.SettingsView = Up.Views.ListView.extend({
             title: $.i18n.t('Edit Workspace') + ': ' + model.get('name'),
             buttons : {
                 "Save": function () {
-                    var params = Up.I.parseForm(this);
+                    var params = Up.I.parseForm(this);                    
                     model.set(params);
                     
-                    Up.CurrentView.saveModel({id: selectedId}, {}, {}, function(){}, model);
+                    Up.CurrentView.saveModel({id: selectedId}, params, {}, function(){
+                        Up.CurrentView.render();
+                    }, model);
                     
                     Up.I.closeDialog($(this));
                 }

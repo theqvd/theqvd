@@ -6,6 +6,66 @@ Up.B = {
         this.bindFormEvents(); 
     },
     
+    bindListEvents: function () {
+        // Share folders and usb
+        this.bindEvent('change', '.js-share-folders-check', this.listBinds.clickShareFolders);
+        this.bindEvent('change', '.js-share-usb-check', this.listBinds.clickShareUsb);        
+    },    
+    
+    bindDesktopsEvents: function () {
+        // Enable-Disable settings on form
+        this.bindEvent('change', '.js-disable-settings-check', this.desktopsBinds.changeDisableSettings);      
+    },
+    
+    desktopsBinds: {
+        changeDisableSettings: function (e) {
+            var enable = $(e.target).is(':checked');
+                                 
+            if (enable) {
+                $('.js-form-field--setting').removeAttr('disabled');
+                $('.js-form-field--settingrow').removeClass('disabled-row');
+                
+                // When enable settings trigger change events on shared switchers to preserve disabled shared lists if necessary
+                $('.js-share-folders-check').trigger('change');
+                $('.js-share-usb-check').trigger('change');
+            }
+            else {
+                $('.js-form-field--setting').attr('disabled', 'disabled');
+                $('.js-form-field--settingrow').addClass('disabled-row');
+            }
+            
+            $('select.js-form-field--setting').trigger('chosen:updated');
+        }
+    },
+    
+    listBinds: {
+        clickShareFolders: function (e) {
+            var enable = $(e.target).is(':checked');
+            
+            if (enable) {
+                $('.js-form-field--folders').removeAttr('disabled');
+                $('.js-form-field--foldersrow').removeClass('disabled-row');
+            }
+            else {
+                $('.js-form-field--folders').attr('disabled', 'disabled');
+                $('.js-form-field--foldersrow').addClass('disabled-row');
+            }
+        },
+        
+        clickShareUsb: function (e) {
+            var enable = $(e.target).is(':checked');
+            
+            if (enable) {
+                $('.js-form-field--usb').removeAttr('disabled');
+                $('.js-form-field--usbrow').removeClass('disabled-row');
+            }
+            else {
+                $('.js-form-field--usb').attr('disabled', 'disabled');
+                $('.js-form-field--usbrow').addClass('disabled-row');
+            }
+        }
+    },
+    
     // Events binded in classic way to works in special places like jQueryUI dialog where Backbone events doesnt work
     bindMessageEvents: function () {         
         // Close message layer

@@ -232,11 +232,11 @@ Up.Views.MainView = Backbone.View.extend({
         this.saveModel({}, filters, messages, successCallback, model);
     },
     
-    saveModel: function (arguments, filters, messages, successCallback, model) {
+    saveModel: function (arguments, params, messages, successCallback, model) {
         var model = model || this.model;
         
         var that = this;
-        model.save(arguments, {filters: filters}).complete(function(e, status) {
+        model.save(arguments, params, 'update').complete(function(e, status) {
             Up.I.loadingUnblock();
 
             var callResponse = e.status;
@@ -251,7 +251,7 @@ Up.Views.MainView = Backbone.View.extend({
                 }
             }
             
-            if (callResponse == 200 && status == 'success') {
+            if (callResponse == STATUS_SUCCESS_HTTP && status == 'success') {
                 that.message = messages.success;
                 that.messageType = 'success';
             }
@@ -362,10 +362,10 @@ Up.Views.MainView = Backbone.View.extend({
             systemWS: true,
             active: false,
             settings: {
-                connection_type: 'modem',
+                connection: 'modem',
                 audio: true,
-                printing: true,
-                full_screen: false,
+                printers: true,
+                fullscreen: false,
                 share_folders: false,
                 share_usb: false
             }
@@ -377,11 +377,11 @@ Up.Views.MainView = Backbone.View.extend({
             systemWS: true,
             active: true,
             settings: {
-                connection_type: 'adsl',
+                connection: 'adsl',
                 audio: true,
                 audio: true,
-                printing: true,
-                full_screen: false,
+                printers: true,
+                fullscreen: false,
                 share_folders: true,
                 share_usb: true
             }
@@ -401,10 +401,10 @@ Up.Views.MainView = Backbone.View.extend({
             systemWS: false,
             active: false,
             settings: {
-                connection_type: 'local',
+                connection: 'local',
                 audio: true,
-                printing: true,
-                full_screen: true,
+                printers: true,
+                fullscreen: true,
                 share_folders: true,
                 share_usb: true
             }
@@ -416,10 +416,10 @@ Up.Views.MainView = Backbone.View.extend({
             systemWS: false,
             active: false,
             settings: {
-                connection_type: 'adsl',
+                connection: 'adsl',
                 audio: false,
-                printing: false,
-                full_screen: false,
+                printers: false,
+                fullscreen: false,
                 share_folders: false,
                 share_usb: false
             }

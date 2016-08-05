@@ -95,11 +95,11 @@ Wat.Views.MainView = Backbone.View.extend({
         this.saveModel(arguments, filters, messages, successCallback, model);
     },
     
-    saveModel: function (arguments, filters, messages, successCallback, model) {
+    saveModel: function (arguments, params, messages, successCallback, model) {
         var model = model || this.model;
         
         var that = this;
-        model.save(arguments, {filters: filters}).complete(function(e, a, b) {
+        model.save(arguments, {data: params}).complete(function(e, a, b) {
             Wat.I.loadingUnblock();
 
             var callResponse = e.status;

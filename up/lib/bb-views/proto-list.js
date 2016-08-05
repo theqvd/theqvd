@@ -27,6 +27,9 @@ Up.Views.ListView = Up.Views.MainView.extend({
             this.collection.filters = $.extend({}, this.collection.filters, Up.I.fixedFilters);
         }
         
+        // Bind events for this section that cannot be binded using backbone (dialogs, etc.)
+        Up.B.bindListEvents();
+        
         Up.Views.MainView.prototype.initialize.apply(this);
                 
         this.context = $('.' + this.cid);

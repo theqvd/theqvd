@@ -12,6 +12,9 @@ Up.Views.DesktopListView = Up.Views.ListView.extend({
     initialize: function (params) {
         this.collection = new Up.Collections.Desktops(params)
         
+        // Bind events for this section that cannot be binded using backbone (dialogs, etc.)
+        Up.B.bindDesktopsEvents();
+        
         // Spy mouse over elements to avoid fails with mouseleave events
         Up.I.L.spyMouseOver('.js-grid-cell-area', this.hideGridIcon);
         
@@ -115,11 +118,26 @@ Up.Views.DesktopListView = Up.Views.ListView.extend({
         var dialogConf = {
             title: $.i18n.t('Desktop settings') + ': ' + model.get('name'),
             buttons : {
+                "Cancel": function () {
+                    // Close dialog
+                    Up.I.closeDialog($(this));
+                },
                 "Save": function () {
+                    var params = Up.I.parseForm(this);
+                    
+                    // On desktops, editable name is alias field
+                    params.alias = params.name;
+                    delete params.name;
+                                        
+                    Up.CurrentView.saveModel({id: selectedId}, params, {}, function(){
+                        Up.CurrentView.render();
+                    }, model);
+                    
                     Up.I.closeDialog($(this));
                 }
             },
-            button1Class : 'fa fa-save',
+            button1Class : 'fa fa-ban',
+            button2Class : 'fa fa-save',
             fillCallback : function (target) { 
                 Up.I.renderEditionMode(model, target);
             },
@@ -138,8 +156,49 @@ Up.Views.DesktopListView = Up.Views.ListView.extend({
             that.startConnectionTimeout(selectedId);
             
             var token = e.retrievedData.token;
-            console.log("window.open('qvd:client.ssl.options.SSL_version=TLSv1_2 client.host.name=" + window.location.hostname + " client.auto_connect=1 client.auto_connect.vm_id=" + selectedId + " client.auto_connect.token=" + token + "', '_self');");
-            window.open('qvd:client.ssl.options.SSL_version=TLSv1_2 client.host.name=' + window.location.hostname + ' client.auto_connect=1 client.auto_connect.vm_id=' + selectedId + ' client.auto_connect.token=' + token, '_self');
+            
+            var options = {
+                "client.ssl.options.SSL_version": "TLSv1_2",
+                "client.auto_connect": "1",
+                "client.host.name": window.location.hostname,
+                "client.auto_connect.vm_id": selectedId,
+                "client.auto_connect.token": token
+            };
+            
+            var model = Up.CurrentView.collection.where({id: parseInt(selectedId)})[0];
+            
+            if (model.get('settings_enabled')) {
+                $.each(CLIENT_PARAMS_MAPPING, function (field, param) {
+                    options[param.value] = model.get('settings')[field].value;
+                });  
+                
+                var shareFolders = parseInt(model.get('settings').share_folders.value);
+                var shareUsb = parseInt(model.get('settings').share_usb.value);
+                
+                if (shareFolders) {
+                    var foldersList = model.get('settings').share_folders.list;
+                    
+                    $.each(foldersList, function (k, folder) {
+                        options['client.share.' + k] = folder;
+                    });
+                }
+                
+                options['client.usb.enable'] = parseInt(shareUsb);
+                
+                if (shareUsb) {
+                    var usbList = model.get('settings').share_usb.list;
+                    
+                    options['client.usb.share_list'] = usbList.join(',');
+                }
+            }
+                        
+            var query = '';
+            $.each(options, function (optName, optVal) {
+                query += optName + '=' + optVal + ' ';
+            });
+            
+            window.open('qvd:' + query, '_self');
+            
         }, this, 'GET');
     },
     

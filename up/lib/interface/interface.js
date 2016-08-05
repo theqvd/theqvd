@@ -966,26 +966,54 @@ Up.I = {
         $.each($(context).find('.js-form-field'), function (iField, field) {
             var fieldName = $(field).attr('name');
             var fieldType = $(field).attr('type');
-
-            if (fieldType == 'checkbox') {
-                var fieldValue = $(field).is(':checked');
+            
+            switch (fieldType) {
+                case 'checkbox':
+                    var fieldValue = $(field).is(':checked') ? 1 : 0;
+                    break;
+                default:
+                    if ($(field).prop("tagName") == "TEXTAREA") {
+                        if ($(field).val()) {
+                            var fieldValue = $(field).val().split(/\n/);
+                        }
+                        else {
+                            var fieldValue = [];
+                        }
+                    }
+                    else {
+                        var fieldValue = $(field).val();
+                    }
+                    break;
             }
-            else {
-                var fieldValue = $(field).val();
-            }
+            
+            if ($(field).attr('data-subfield')) {
+                var subfield = $(field).attr('data-subfield');
+                var fieldType = 'value';
+                
+                // If element is list of another
+                if ($(field).attr('data-listof')) {
+                    fieldName = $(field).attr('data-listof');
+                    fieldType = 'list';
+                }
 
-            if ($(field).attr('data-sub-field')) {
-                if (!params[$(field).attr('data-sub-field')]) {
-                    params[$(field).attr('data-sub-field')] = {};
+                if (!params[subfield]) {
+                    params[subfield] = {};
                 }
                 
-                params[$(field).attr('data-sub-field')][fieldName] = fieldValue;
+                if (!params[subfield][fieldName]) {
+                    params[subfield][fieldName] = {
+                        value: "",
+                        list: []
+                    };
+                }
+                
+                params[subfield][fieldName][fieldType] = fieldValue;
             }
             else {
                 params[fieldName] = fieldValue;
             }
         })
-
+        
         return params;
     },
     
@@ -999,14 +1027,14 @@ Up.I = {
         // List of settings
         var template = _.template(
             Up.TPL.settingsEditor, {
-                name: model.get('name'),
-                settings: model.get('settings'),
-                nameEditable: !model.get('systemWS')
+                model: model,
+                nameEditable: !model.get('systemWS'),
+                canBeDisabled: typeof model.get('settings_enabled') != 'undefined'
             }
         );
         
         target.html(template);
         
-        Up.I.chosenElement($('select[name="connection_type"]'), 'single100');
+        Up.I.chosenElement($('select[name="connection"]'), 'single100');
     },
 }

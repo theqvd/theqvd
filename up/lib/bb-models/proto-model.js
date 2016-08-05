@@ -14,18 +14,7 @@ Up.Models.Model = Backbone.Model.extend({
         else {
             var view = 'list';
         }
-        
-        response.settings = {
-            connection_type: 'modem',
-            audio: true,
-            printing: true,
-            full_screen: false,
-            share_folders: false,
-            share_usb: false,
-        };
-        
-        response.systemWS = true;
-        
+                
         switch (view) {
             case 'detail':
                 return this.processResponse(response.rows[0]);
@@ -96,10 +85,27 @@ Up.Models.Model = Backbone.Model.extend({
         return $.ajax(params);
     },
     
-    save: function(attributes, options) {
+    formatData: function (options) {
+        return JSON.stringify(options);
+    },
+    
+    save: function(attributes, options, action) {
+        var action = action || 'update';
+        
+        switch(action) {
+            case 'create':
+                type = 'POST';
+                break;
+            case 'update':
+                var type = 'PUT';
+                break;
+        }
+        
         options = {
             url: encodeURI(Up.C.getBaseUrl(this.actionPrefix) + '/' + attributes.id),
-            type: 'PUT'
+            data: this.formatData(options),
+            type: type,
+            contentType: 'application/json'
         };
         
         return Backbone.Model.prototype.save.call(this, attributes, options);

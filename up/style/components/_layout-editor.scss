@@ -39,3 +39,8 @@
         }
     }
 }
+
+.disabled-row * {
+    opacity: 0.7;
+    color: lighten($col_grey1, 20);
+}

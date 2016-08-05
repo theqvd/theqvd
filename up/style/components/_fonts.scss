@@ -71,10 +71,6 @@ a.button, a.button2, button {
 }
 
 // Forms
-label {
-    @include font-size(1);
-}
-
 .chosen-container {
     @include font-size(2);
 }
