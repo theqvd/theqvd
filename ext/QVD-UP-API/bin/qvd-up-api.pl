@@ -277,7 +277,7 @@ group {
         my $vm = rs( "VM" )->single( { id => $vm_id, user_id => $user_id } );
         return $c->render_response(message => "Invalid Desktop", code => 400) unless defined($vm);
 
-        my $json = $c->req->json // {};
+        my $json = $c->req->json;
 
         my $desktop = $vm->desktop;
         my @settings = $desktop ? $desktop->settings->all : ();
@@ -287,14 +287,14 @@ group {
                 $json,
                 {
                     alias            => { mandatory => 0, type => 'STRING' },
-                    settings_enabled => { mandatory => 0, type => 'STRING' },
+                    settings_enabled => { mandatory => 0, type => 'BOOL' },
                     settings         => { mandatory => (@settings) ? 0 : 1, type => (@settings) ? 'SOME_PARAMETERS' : 'ALL_PARAMETERS'},
                 }
             );
             
         my $args = {};
-        $args->{alias} =  $_ if $_ = $json->{alias};
-        $args->{active} = $_ if $_ = $json->{active};
+        $args->{alias} =  $_ if defined($_ = $json->{alias});
+        $args->{active} = $_ if defined($_ = $json->{settings_enabled});
 
         if( $desktop ) {
             $desktop->update($args);
@@ -311,7 +311,7 @@ group {
                     parameter => $param,
                 });
             if ($setting) {
-                $setting->update({ value => $_ }) if $_ = $json->{settings}->{$param}->{value};
+                $setting->update({ value => $_ }) if defined($_ = $json->{settings}->{$param}->{value});
                 $setting->collection->delete();
             } else {
                 $setting = rs('Desktop_Setting')->create({
@@ -340,7 +340,7 @@ group {
         my $vm = rs( "VM" )->single( { id => $vm_id, user_id => $user_id } );
         return $c->render_response(message => "Invalid Desktop", code => 400) unless defined($vm);
 
-        my $json = $c->req->json // {};
+        my $json = $c->req->json;
 
         return $c->render_response(message => "Invalid parameter", parameter => $_, code => 400)
             if $_ = find_invalid_parameter (
@@ -350,15 +350,20 @@ group {
                 }
             );
     
+        my $message = "";
         if( my $desktop = $vm->desktop ) {
-            if($c->param('settings_only')){
+            if($json->{settings_only}){
                 $desktop->settings->delete();
+                $message = "Desktop settings deleted from  " . $vm->name;
             } else {
                 $desktop->delete();
+                $message = "Desktop configuration deleted from " . $vm->name;
             }
+        } else {
+            $message = "There is no configuration to be deleted";
         }
 
-        return $c->render_response(message => "OK", code => 200);
+        return $c->render_response(message => $message, code => 200);
     };
 
     any [qw(GET)] => '/api/desktops/:id/token' => [id => qr/\d+/] => sub {
@@ -493,7 +498,8 @@ sub password_to_token
 sub find_invalid_parameter {
     my ($params, $syntax) = @_;
 
-    for my $param (keys %$syntax) {
+    my %union = map {$_ => 1} (keys %$params, keys %$syntax);
+    for my $param (keys %union) {
         my $mandatory = $syntax->{$param}->{mandatory} // 1;
         my $type = $syntax->{$param}->{type} // 'STRING';
         
