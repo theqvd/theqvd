@@ -379,7 +379,7 @@ group {
         my $user_id = $session_up->data->{user_id};
 
         my $vm = rs( "VM" )->search( { id => $vm_id, user_id => $user_id } )->first;
-        return $c->render_response(message => "Invalid VM", code => 400) unless defined($vm);
+        return $c->render_response(message => "Invalid Desktop", code => 400) unless defined($vm);
 
         my $session_l7r = rs('User_Token')->create( { 
             token => generate_sid(),
@@ -393,6 +393,28 @@ group {
         register_user_connection($user_id, $c->tx);
 
         return $c->render_response(json => { token => $token }, code => 200 );
+    };
+
+    any [qw(GET)] => '/api/desktops/:id/setup' => [id => qr/\d+/] => sub {
+        my $c = shift;
+
+        my $session_up = $c->stash->{session};
+
+        my $vm_id = $c->param('id');
+        my $user_id = $session_up->data->{user_id};
+        
+        my $vm = rs( "VM" )->search( { id => $vm_id, user_id => $user_id } )->first;
+        return $c->render_response(message => "Invalid Desktop", code => 400) unless defined($vm);
+
+        my $element;
+        if($vm->desktop && $vm->desktop->settings && $vm->desktop->active){
+            $element = $vm->desktop;
+        } else {
+            my $ws = rs( "Workspace" )->single( { user_id => $user_id, active => 1 } );
+            $element = $ws;
+        }
+        
+        return $c->render_response(json => element_settings($element), code => 200 );
     };
 
     # Workspaces
