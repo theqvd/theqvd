@@ -24,12 +24,17 @@ Up.Router = Backbone.Router.extend({
         
         // ------- List sections ------- //
         that.on('route:desktops', function (searchHash) {
-            that.performRoute('vm', Up.Views.DesktopListView);
+            Up.Views.DesktopsView.prototype = $.extend({}, Up.Views.DesktopsView.prototype, Up.CRUD.desktops);
+            Up.Views.DesktopsView.prototype = $.extend({}, Up.Views.DesktopsView.prototype, Up.CRUD.workspaces);
+            
+            that.performRoute('vm', Up.Views.DesktopsView);
         });        
         
         // ------- Settings sections ------- //
         
         that.on('route:settings', function (searchHash) {
+            Up.Views.SettingsView.prototype = $.extend({}, Up.Views.SettingsView.prototype, Up.CRUD.workspaces);
+            
             that.performRoute('settings', Up.Views.SettingsView);
         });       
         
@@ -84,7 +89,7 @@ Up.Router = Backbone.Router.extend({
 
         // ------- Default load ------- //
         that.on('route:defaultRoute', function (actions) {
-            that.performRoute('vm', Up.Views.DesktopListView);
+            that.performRoute('vm', Up.Views.DesktopsView);
         });
 
         // Start Backbone history

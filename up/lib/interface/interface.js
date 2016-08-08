@@ -1028,7 +1028,7 @@ Up.I = {
         var template = _.template(
             Up.TPL.settingsEditor, {
                 model: model,
-                nameEditable: !model.get('systemWS'),
+                nameEditable: !model.get('fixed'),
                 canBeDisabled: typeof model.get('settings_enabled') != 'undefined'
             }
         );

@@ -20,24 +20,45 @@ Up.Views.ProfileView = Up.Views.MainView.extend({
         params.id = Up.C.adminID;
         this.id = Up.C.adminID;
         
-        this.model = new Up.Models.User(params);
-        
-        // The profile action to update current admin data is 'myadmin_update'
-        this.model.setActionPrefix('myadmin');
+        this.model = new Up.Models.Profile(params);
         
         // Extend the common events
-        this.extendEvents(this.eventsDetails);
+        this.extendEvents(this.eventsProfiles);
+        
+        //Add profile Events to view
+        this.extendEvents(this.profileEvents);
         
         var templates = Up.I.T.getTemplateList('profile', {qvdObj: this.qvdObj});
         
-        Up.A.getTemplates(templates, this.render, this); 
+        Up.A.getTemplates(templates, this.fetchAndRender, this); 
     },
     
-    render: function () {        
+    profileEvents: {
+        'click .js-save-profile-btn': 'updateProfile'
+    },
+    
+    updateProfile: function (e) {
+        var params = Up.I.parseForm($('.content'));
+        var model = Up.CurrentView.model;
+        
+        model.set(params);
+                    
+        Up.CurrentView.updateModel({}, params, Up.CurrentView.render, model);
+    },
+    
+    fetchAndRender: function (that) {  
+        that.model.fetch({      
+            complete: function (e) {
+                that.render();
+            }
+        });
+    },
+    
+    render: function () {     
         this.template = _.template(
             Up.TPL.profile, {
                 cid: this.cid,
-                language: Up.C.language
+                model: this.model
             }
         );
 

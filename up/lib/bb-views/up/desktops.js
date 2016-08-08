@@ -1,4 +1,4 @@
-Up.Views.DesktopListView = Up.Views.ListView.extend({  
+Up.Views.DesktopsView = Up.Views.ListView.extend({  
     qvdObj: 'desktops',
     viewMode: 'grid',
     liveFields: ['state'],
@@ -11,6 +11,7 @@ Up.Views.DesktopListView = Up.Views.ListView.extend({
     
     initialize: function (params) {
         this.collection = new Up.Collections.Desktops(params)
+        this.wsCollection = new Up.Collections.Workspaces();
         
         // Bind events for this section that cannot be binded using backbone (dialogs, etc.)
         Up.B.bindDesktopsEvents();
@@ -21,20 +22,22 @@ Up.Views.DesktopListView = Up.Views.ListView.extend({
         Up.Views.ListView.prototype.initialize.apply(this, [params]);
     },
     
+    // This events will be added to view events
+    listEvents: {
+        'click .js-change-viewmode': 'changeViewMode',
+        'click .js-vm-settings': 'editDesktopSettings',
+        'click .js-grid-disconnected .js-connect-btn': 'connectDesktop',
+        'click .js-list-disconnected .js-connect-btn': 'connectDesktop',
+        'change select[name="active_configuration_select"]': 'changeActiveConf',
+        'mouseover .js-grid-cell-area': 'showGridIcon',
+        'mouseout .js-grid-cell-area': 'hideGridIcon'
+    },
+    
     addListTemplates: function () {
         Up.Views.ListView.prototype.addListTemplates.apply(this, []);
-
-        var templates = {};
         
-        templates["list-grid_" + this.qvdObj] = {
-            name: 'desktops/' + this.qvdObj + '-grid'
-        };  
-
-        templates["list-list_" + this.qvdObj] = {
-            name: 'desktops/' + this.qvdObj + '-list'
-        };
-        
-        this.templates = $.extend({}, this.templates, templates);
+        var templates = Up.I.T.getTemplateList('desktops');
+        this.templates = $.extend({}, this.templates, templates); 
     },
     
     showGridIcon: function (e) {
@@ -49,157 +52,67 @@ Up.Views.DesktopListView = Up.Views.ListView.extend({
     renderListBlock: function (params) {  
         Up.Views.ListView.prototype.renderListBlock.apply(this, []);
         
-        this.loadFakeData();
-
-        $.each(this.collectionWorkspaces.models, function (modId, model) {
-            var selectedHTML = '';
-            if (model.get('active')) {
-                selectedHTML = 'selected="selected"';
-            }
-            $('select[name="active_configuration_select"]').append('<option value="' + model.get('id') + '" ' + selectedHTML + '>' + model.get('name') + '</option>');
-        });
+        // Load Workspaces on select control
+        var that = this;
         
-        Up.I.chosenElement('select[name="active_configuration_select"]', 'single');    
+        this.wsCollection.fetch({      
+            complete: function () {
+                
+                var template = _.template(
+                    Up.TPL.workspacesSelectOption, {
+                        collection: that.wsCollection
+                    }
+                );
+                
+                $('.bb-workspaces-select').html(template);
+                
+                Up.I.chosenElement('select[name="active_configuration_select"]', 'single');
+                Up.T.translate();
+            }
+        });      
     },
     
     // Render only the list. Usefull to functions such as pagination, sorting and filtering where is not necessary render controls
-    renderList: function () {
+    renderList: function (that) {
+        var that = that || this;
+        
         // Fill the list
         var template = _.template(
-            Up.TPL['list-' + this.viewMode + '_' + this.qvdObj], {
-                models: this.collection.models,
+            Up.TPL['list-' + that.viewMode + '_' + that.qvdObj], {
+                models: that.collection.models,
                 checkBox: false
             }
         );
         
-        $(this.listContainer).html(template);
-        this.paginationUpdate();
-        this.shownElementsLabelUpdate();
+        $(that.listContainer).html(template);
+        that.paginationUpdate();
+        that.shownElementsLabelUpdate();
         
         // Open websockets for live fields
-        if (this.liveFields) {
-            Up.WS.openListWebsockets(this.qvdObj, this.collection, this.liveFields, this.cid);
+        if (that.liveFields) {
+            Up.WS.openListWebsockets(that.qvdObj, that.collection, that.liveFields, that.cid);
         }
         
         Up.T.translateAndShow();
                 
-        Up.I.addSortIcons(this.cid);
+        Up.I.addSortIcons(that.cid);
                 
-        Up.I.addOddEvenRowClass(this.listContainer);
-    },
-    
-    // This events will be added to view events
-    listEvents: {
-        'click .js-change-viewmode': 'changeViewMode',
-        'click .js-vm-settings': 'editDesktopSettings',
-        'click .js-grid-disconnected .js-connect-btn': 'connectDesktop',
-        'click .js-list-disconnected .js-connect-btn': 'connectDesktop',
-        'change select[name="active_configuration_select"]': 'changeActiveConf',
-        'mouseover .js-grid-cell-area': 'showGridIcon',
-        'mouseout .js-grid-cell-area': 'hideGridIcon'
+        Up.I.addOddEvenRowClass(that.listContainer);
     },
     
     changeActiveConf: function (e) {
-        var wsId = $('select[name="active_configuration_select"]').val();
-        var wsModel = Up.CurrentView.collectionWorkspaces.where({'id': parseInt(wsId)})[0];
+        var selectedId = $('select[name="active_configuration_select"]').val();
         
-        var wsSettings = wsModel.get('settings');
+        var model = Up.CurrentView.wsCollection.where({id: parseInt(selectedId)})[0];
         
-        if (!wsSettings) {            
-            Up.CurrentView.firstEditWorkspace(e);
+        var settings = model.get('settings');
+        
+        if (!settings) {            
+            Up.CurrentView.firstEditWorkspace(model);
         }
-    },
-    
-    editDesktopSettings: function (e) {
-        var selectedId = $(e.target).attr('data-id');
-        var model = Up.CurrentView.collection.where({id: parseInt(selectedId)})[0];
-        
-        var that = this;
-        var dialogConf = {
-            title: $.i18n.t('Desktop settings') + ': ' + model.get('name'),
-            buttons : {
-                "Cancel": function () {
-                    // Close dialog
-                    Up.I.closeDialog($(this));
-                },
-                "Save": function () {
-                    var params = Up.I.parseForm(this);
-                    
-                    // On desktops, editable name is alias field
-                    params.alias = params.name;
-                    delete params.name;
-                                        
-                    Up.CurrentView.saveModel({id: selectedId}, params, {}, function(){
-                        Up.CurrentView.render();
-                    }, model);
-                    
-                    Up.I.closeDialog($(this));
-                }
-            },
-            button1Class : 'fa fa-ban',
-            button2Class : 'fa fa-save',
-            fillCallback : function (target) { 
-                Up.I.renderEditionMode(model, target);
-            },
+        else {
+            Up.CurrentView.activeWorkspace(e, model, function() {});
         }
-
-        Up.I.dialog(dialogConf);
-    },
-    
-    connectDesktop: function (e) {
-        var that = this;
-        
-        var selectedId = $(e.target).attr('data-id');
-
-        Up.A.performAction('desktops/' + selectedId + '/token', {}, function (e) {
-            that.setDesktopState(selectedId, 'connecting');
-            that.startConnectionTimeout(selectedId);
-            
-            var token = e.retrievedData.token;
-            
-            var options = {
-                "client.ssl.options.SSL_version": "TLSv1_2",
-                "client.auto_connect": "1",
-                "client.host.name": window.location.hostname,
-                "client.auto_connect.vm_id": selectedId,
-                "client.auto_connect.token": token
-            };
-            
-            var model = Up.CurrentView.collection.where({id: parseInt(selectedId)})[0];
-            
-            if (model.get('settings_enabled')) {
-                $.each(CLIENT_PARAMS_MAPPING, function (field, param) {
-                    options[param.value] = model.get('settings')[field].value;
-                });  
-                
-                var shareFolders = parseInt(model.get('settings').share_folders.value);
-                var shareUsb = parseInt(model.get('settings').share_usb.value);
-                
-                if (shareFolders) {
-                    var foldersList = model.get('settings').share_folders.list;
-                    
-                    $.each(foldersList, function (k, folder) {
-                        options['client.share.' + k] = folder;
-                    });
-                }
-                
-                options['client.usb.enable'] = parseInt(shareUsb);
-                
-                if (shareUsb) {
-                    var usbList = model.get('settings').share_usb.list;
-                    
-                    options['client.usb.share_list'] = usbList.join(',');
-                }
-            }
-                        
-            var query = '';
-            $.each(options, function (optName, optVal) {
-                query += optName + '=' + optVal + ' ';
-            });
-            
-            window.open('qvd:' + query, '_self');
-            
-        }, this, 'GET');
     },
     
     setDesktopState: function (id, state) {
@@ -253,42 +166,5 @@ Up.Views.DesktopListView = Up.Views.ListView.extend({
                 delete(that.connectionTimeouts[id]);
             }
         }, 1000);
-    },
-    
-    firstEditWorkspace: function (e) {
-        var selectedId = $(e.target).val();
-
-        var model = this.collectionWorkspaces.where({id: parseInt(selectedId)})[0];
-
-        var that = this;
-        var dialogConf = {
-            title: $.i18n.t('First Workspace configuration') + ': ' + model.get('name'),
-            buttons : {
-                "Cancel": function () {
-                    // If cancel, check default workspace as active
-                    $('[name="active_configuration_select"]').val(0);
-                    $('[name="active_configuration_select"]').trigger('chosen:updated');
-                    $('[name="active_configuration_select"]').trigger('change');
-                    
-                    // Close dialog
-                    Up.I.closeDialog($(this));
-                },
-                "Save": function () {                    
-                    var params = Up.I.parseForm(this);
-                    
-                    // TODO: Save params
-                    console.log(model);
-                    
-                    Up.I.closeDialog($(this));
-                }
-            },
-            button1Class : 'fa fa-ban',
-            button2Class : 'fa fa-save',
-            fillCallback : function (target) { 
-                Up.I.renderEditionMode(model, target);
-            },
-        }
-
-        Up.I.dialog(dialogConf);
-    },   
+    }
 });

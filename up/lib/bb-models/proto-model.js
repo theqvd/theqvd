@@ -5,27 +5,7 @@ Up.Models.Model = Backbone.Model.extend({
     operation: '',
     
     parse: function(response) {        
-        if (response.rows) {
-            var view = 'detail';
-            if (Up.C.sessionExpired(response)) {
-                return;
-            }
-        }
-        else {
-            var view = 'list';
-        }
-                
-        switch (view) {
-            case 'detail':
-                return this.processResponse(response.rows[0]);
-                break;
-            case 'list':
-                return this.processResponse(response);
-                break;
-            case 'error':
-                Up.I.M.showMessage({messageType: 'error'}, response);
-                break;
-        }        
+        return this.processResponse(response);
     },
     
     processResponse: function (response) {
@@ -56,16 +36,8 @@ Up.Models.Model = Backbone.Model.extend({
     
     url: function () {
         var url = Up.C.getBaseUrl();
-        url += this.actionPrefix + "_get_details";
-        if (this.id != undefined) {
-            url += "&filters={\"id\":" + this.id + "}";
-        }
         
-        return url
-    },
-    
-    setActionPrefix: function (newActionPrefix) {
-        this.actionPrefix = newActionPrefix;
+        return url;
     },
     
     setOperation: function (operation) {
@@ -76,7 +48,7 @@ Up.Models.Model = Backbone.Model.extend({
     sync: function(method, model, options) {        
         var that = this;
         var params = _.extend({
-            type: 'POST',
+            type: 'GET',
             dataType: 'json',
             url: encodeURI(that.url()),
             processData: false,
@@ -95,14 +67,24 @@ Up.Models.Model = Backbone.Model.extend({
         switch(action) {
             case 'create':
                 type = 'POST';
+                url = encodeURI(Up.C.getBaseUrl(this.actionPrefix));
                 break;
             case 'update':
                 var type = 'PUT';
+                url = encodeURI(Up.C.getBaseUrl(this.actionPrefix));
+                
+                if (attributes.id) {
+                    url += '/' + attributes.id;
+                }
+                break;
+            case 'delete':
+                var type = 'DELETE';
+                url = encodeURI(Up.C.getBaseUrl(this.actionPrefix) + '/' + attributes.id);
                 break;
         }
         
         options = {
-            url: encodeURI(Up.C.getBaseUrl(this.actionPrefix) + '/' + attributes.id),
+            url: url,
             data: this.formatData(options),
             type: type,
             contentType: 'application/json'

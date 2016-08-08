@@ -31,4 +31,3 @@ Used libraries on QVD Wat and their version, licenses and source sites:
 - FileSaver v1.1.20150716 (X11/MIT License) https://github.com/eligrey/FileSaver.js
 - Colorpicker v3.2.1 (MIT License) https://github.com/evoluteur/colorpicker
 - sass.js v0.9.2 (MIT License) https://github.com/medialize/sass.js/
-- detect v2.2.2 (MIT/GPL License) https://github.com/darcyclarke/Detect.js

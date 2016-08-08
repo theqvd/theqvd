@@ -118,5 +118,11 @@ var Up = {
     
     // Templates storage
     TPL: {},
+    
+    // CRUD functions
+    CRUD: {
+        workspaces: {},
+        desktops: {}
+    }
 };
 

@@ -7,11 +7,6 @@ Up.Views.MainView = Backbone.View.extend({
     // error/success/info
     messagetype: 'error',
     dialogConf: {},
-    deleteProps: [],
-    deleteACLs: [],
-    addACLs: [],
-    deleteRoles: [],
-    addRoles: [],
     currentMenu: '', // platform-setup
     sideViews: [],
     templates: {},
@@ -201,42 +196,39 @@ Up.Views.MainView = Backbone.View.extend({
             'error': 'Error creating'
         };
         
-        this.saveModel(arguments, {}, messages, successCallback);        
+        this.saveModel(arguments, {}, messages, successCallback, null, 'create');        
     },
     
-    updateModel: function (arguments, filters, successCallback, model) {
+    updateModel: function (arguments, params, successCallback, model) {
         // If not model is passed, use this.model
         var model = model || this.model;
-        
-        model.setOperation('update');
         
         var messages = {
             'success': 'Successfully updated',
             'error': 'Error updating'
         };
         
-        this.saveModel(arguments, filters, messages, successCallback, model);
+        this.saveModel(arguments, params, messages, successCallback, model, 'update');
     },
     
     deleteModel: function (filters, successCallback, model) {
         // If not model is passed, use this.model
         var model = model || this.model;
-        
-        model.setOperation('delete');
-        
+                
         var messages = {
             'success': 'Successfully deleted',
             'error': 'Error deleting'
         };
         
-        this.saveModel({}, filters, messages, successCallback, model);
+        this.saveModel({}, filters, messages, successCallback, model, 'delete');
     },
     
-    saveModel: function (arguments, params, messages, successCallback, model) {
+    saveModel: function (arguments, params, messages, successCallback, model, action) {
+        var action = action || 'update';
         var model = model || this.model;
         
         var that = this;
-        model.save(arguments, params, 'update').complete(function(e, status) {
+        model.save(arguments, params, action).complete(function(e, status) {
             Up.I.loadingUnblock();
 
             var callResponse = e.status;
@@ -338,91 +330,5 @@ Up.Views.MainView = Backbone.View.extend({
 
 
         Up.I.dialog(dialogConf, this);          
-    },
-    
-    // Fetch details or list depending on the current view kind
-    fetchAny: function (that) {
-        switch (that.viewKind) {
-            case 'list':
-                that.fetchList();
-                break;
-            case 'details':
-                that.fetchDetails();
-                break;
-        }
-    },
-    
-    loadFakeData: function () {        
-        // Workspaces rows
-        this.collectionWorkspaces = new Up.Collections.Workspaces();
-        this.collectionWorkspaces.models.push(new Up.Models.Workspace({
-            id: 0,
-            name: "Default",
-            clonable: true,
-            systemWS: true,
-            active: false,
-            settings: {
-                connection: 'modem',
-                audio: true,
-                printers: true,
-                fullscreen: false,
-                share_folders: false,
-                share_usb: false
-            }
-        }));
-        this.collectionWorkspaces.models.push(new Up.Models.Workspace({
-            id: 1,
-            name: "Office",
-            clonable: true,
-            systemWS: true,
-            active: true,
-            settings: {
-                connection: 'adsl',
-                audio: true,
-                audio: true,
-                printers: true,
-                fullscreen: false,
-                share_folders: true,
-                share_usb: true
-            }
-        }));
-        this.collectionWorkspaces.models.push(new Up.Models.Workspace({
-            id: 2,
-            name: "Home",
-            clonable: true,
-            systemWS: true,
-            active: false,
-            settings: null
-        }));
-        this.collectionWorkspaces.models.push(new Up.Models.Workspace({
-            id: 10000,
-            name: "New",
-            clonable: true,
-            systemWS: false,
-            active: false,
-            settings: {
-                connection: 'local',
-                audio: true,
-                printers: true,
-                fullscreen: true,
-                share_folders: true,
-                share_usb: true
-            }
-        }));
-        
-        this.emptyWorkspace = new Up.Models.Workspace({
-            name: "New Workspace",
-            clonable: true,
-            systemWS: false,
-            active: false,
-            settings: {
-                connection: 'adsl',
-                audio: false,
-                printers: false,
-                fullscreen: false,
-                share_folders: false,
-                share_usb: false
-            }
-        });
-    },
+    }
 });

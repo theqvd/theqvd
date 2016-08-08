@@ -1,8 +1,6 @@
 <div class="list-block <%= cid %>">
     <div class="list-navigation">
-        <div class="fleft col-width-80 desktop">
-            <span data-i18n="Active configuration"></span>: <select style="width: 20%"; name="active_configuration_select"></select>
-        </div>
+        <div class="fleft col-width-80 desktop bb-workspaces-select"></div>
         <div class="bb-pagination"></div>
     </div>
     <div class="list bb-list js-list"></div>
