@@ -521,7 +521,7 @@ group {
         $args->{name} = $_ if defined($_ = $json->{name});
         $args->{active} = $_ if defined($_ = $json->{active});
 
-        if($args->{active}){
+        if($args->{active} && !$workspace->active){
             rs('Workspace')->search({active => 1})->update({active => 0});
         }
 
