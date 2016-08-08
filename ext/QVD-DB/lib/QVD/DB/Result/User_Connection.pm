@@ -7,12 +7,12 @@ __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('user_connections');
 __PACKAGE__->add_columns(
     id         => { data_type => 'integer'},
-    ip_address => { data_type => 'inet' },
-    location   => { data_type => 'text' },
-    datetime   => { data_type => 'datetime' },
-    browser    => { data_type => 'text' },
-    os         => { data_type => 'text' },
-    device     => { data_type => 'text' },
+    ip_address => { data_type => 'inet', is_nullable => 1},
+    location   => { data_type => 'text', is_nullable => 1 },
+    datetime   => { data_type => 'datetime', is_nullable => 1 },
+    browser    => { data_type => 'text', is_nullable => 1 },
+    os         => { data_type => 'text', is_nullable => 1 },
+    device     => { data_type => 'text', is_nullable => 1 },
 );
 
 __PACKAGE__->set_primary_key('id');

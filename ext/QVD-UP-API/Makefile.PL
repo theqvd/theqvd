@@ -10,6 +10,7 @@ WriteMakefile(
     ABSTRACT          => 'QVD::API',
     EXE_FILES         => [ 'bin/qvd-up-api.pl' ],
     PREREQ_PM         => {
+        'HTTP::BrowserDetect' => 0,
         'Mojolicious::Lite' => 0,
         'MojoX::Session' => 0,
         'MIME::Base64' => 0,

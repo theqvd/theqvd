@@ -15,6 +15,7 @@ use Mojolicious::Lite;
 use MojoX::Session;
 use MIME::Base64 'encode_base64';
 use Try::Tiny;
+use HTTP::BrowserDetect;
 use QVD::Config;
 use QVD::DB::Simple qw(db rs);
 use QVD::DB::Common qw(ENUMERATES);
@@ -236,12 +237,15 @@ group {
     any [qw(GET)] => '/api/account/last_connection' => sub {
         my $c = shift;
 
+        my $connection = rs('User_Connection')->find($c->stash('session')->data('user_id'));
+        return $c->render_response(message => 'No registered connection', code => 400) unless defined($connection);
+
         my $json = {};
-        $json->{location} = "location";
-        $json->{datetime} = "datetime";
-        $json->{browser} = "browser";
-        $json->{os} = "os";
-        $json->{device} = "device";
+        $json->{location} = $connection->location;
+        $json->{datetime} = $connection->datetime;
+        $json->{browser} = $connection->browser;
+        $json->{os} = $connection->os;
+        $json->{device} = $connection->device;
 
         return $c->render_response(json => $json, code => 200);
     };
@@ -385,7 +389,9 @@ group {
         } );
         my $token = encode_base64($session_l7r->token);
         chomp($token);
-            
+
+        register_user_connection($user_id, $c->tx);
+
         return $c->render_response(json => { token => $token }, code => 200 );
     };
 
@@ -534,12 +540,6 @@ group {
         return $c->render_response(message => "Workspace $name deleted", code => 200);
     };
 
-    # Other
-    any [qw(PUT)] => '/api/geo_locate' => sub {
-        my $c = shift;
-        
-        return $c->render_response(message => "TODO", code => 200);
-    };
 };
 
 app->start;
@@ -624,6 +624,9 @@ sub check_type {
         case 'INTEGER' {
             $is_correct = ($value =~ /^\d+$/);
         }
+        case 'DOUBLE' {
+            $is_correct = ($value =~ /^\-?\d+(.\d+)?$/);
+        }
         case 'STRING' {
             $is_correct = ($value =~ /^.*$/);
         }
@@ -700,4 +703,27 @@ sub element_settings {
         }
     }
     return $settings;
+}
+
+sub register_user_connection {
+    my ($user_id, $tx) = @_;
+    
+    my $user_agent = $tx->req->headers->user_agent;
+    my $ip_address = $tx->remote_address;
+    my $location = $tx->req->headers->header('Geo-Location');
+
+    my $browser = HTTP::BrowserDetect->new($user_agent);
+    
+    my $connection = rs('User_Connection')->single({id => $user_id});
+    $connection = rs('User_Connection')->create({id => $user_id}) unless ($connection);
+
+    my $datestring = localtime();
+    $connection->update({
+            ip_address => $ip_address,
+            location   => $location,
+            datetime   => $datestring,
+            browser    => $browser->browser,
+            os         => $browser->os,
+            device     => ( $browser->mobile ? "mobile" : ($browser->tablet ? "tablet" : "desktop") ),
+        });
 }
