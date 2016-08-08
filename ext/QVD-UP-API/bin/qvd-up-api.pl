@@ -625,7 +625,7 @@ sub check_type {
             $is_correct = ($value =~ /^\d+$/);
         }
         case 'STRING' {
-            $is_correct = ($value =~ /^\w*$/);
+            $is_correct = ($value =~ /^[\w\s]*$/);
         }
         case 'ARRAY_OF_STRING' {
             $is_correct = ref($value) eq 'ARRAY' && ((@$value == 0) || !grep(0, map {check_type($_, 'STRING')} @$value));
