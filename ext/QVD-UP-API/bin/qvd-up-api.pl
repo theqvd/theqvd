@@ -431,9 +431,12 @@ group {
                 {
                     name       => { mandatory => 1, type => 'STRING' },
                     active     => { mandatory => 0, type => 'BOOL' },
-                    settings   => { mandatory => 1, type => 'ALL_PARAMETERS' },
+                    settings   => { mandatory => 0, type => 'ALL_PARAMETERS' },
                 }
             );
+
+        return $c->render_response(message => "Cannot activate workspaces with no settings", code => 400)
+            if $json->{active} && !defined($json->{settings});
 
         my $args = {};
         $args->{name} = $_ if defined($_ = $json->{name});
@@ -473,6 +476,10 @@ group {
         my $ws_id = $c->param('id');
         my $user_id = $c->stash->{session}->data->{user_id};
 
+        my $workspace = rs('Workspace')->single({id => $ws_id, user_id => $user_id});
+        return $c->render_response(message => "Invalid Workspace", code => 400) unless defined($workspace);
+        my $settings = $workspace->settings->all;
+
         my $json = $c->req->json;
 
         return $c->render_response(message => "Invalid parameter", parameter => $_, code => 400)
@@ -481,12 +488,12 @@ group {
                 {
                     name       => { mandatory => 0, type => 'STRING' },
                     active     => { mandatory => 0, type => 'FLAG' },
-                    settings   => { mandatory => 0, type => 'SOME_PARAMETERS' },
+                    settings   => { mandatory => 0, type => ($settings) ? 'SOME_PARAMETERS' : 'ALL_PARAMETERS' },
                 }
             );
-
-        my $workspace = rs('Workspace')->single({id => $ws_id, user_id => $user_id});
-        return $c->render_response(message => "Invalid Workspace", code => 400) unless defined($workspace);
+            
+        return $c->render_response(message => "Cannot activate workspaces with no settings", code => 400)
+            if $json->{active} && !($settings || defined($json->{settings}));
 
         my $args = {};
         $args->{name} = $_ if defined($_ = $json->{name});
@@ -503,8 +510,18 @@ group {
                     workspace_id => $workspace->id,
                     parameter    => $param,
                 } );
-            $setting->update({ value => $json->{settings}->{$param}->{value} });
-            $setting->collection->delete();
+
+            if(!$setting){
+                rs( 'Workspace_Setting' )->create( {
+                        workspace_id => $workspace->id,
+                        parameter    => $param,
+                        value        => $json->{settings}->{$param}->{value},
+                    } );
+            } else {
+                $setting->update({ value => $json->{settings}->{$param}->{value} });
+                $setting->collection->delete();
+            }
+
             for my $item (@{$json->{settings}->{$param}->{list} // [ ]}) {
                 rs( 'Workspace_Setting_Collection' )->create( {
                         setting_id => $setting->id,
