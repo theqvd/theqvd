@@ -1635,6 +1635,7 @@ body {
             width: 400px;
             height: 300px; } }
         .wrapper .content .login-wrapper .login-box .login-main {
+          width: 100%;
           position: relative;
           display: table-cell;
           vertical-align: middle; }
@@ -1697,6 +1698,21 @@ body {
                 display: inline-block;
                 height: 45px;
                 padding-top: 7px; }
+        .wrapper .content .login-wrapper .login-box .login-footer {
+          background: #BFBFBF !important;
+          width: 100vw;
+          position: fixed;
+          left: 0;
+          bottom: 30px;
+          text-align: center;
+          height: 35px;
+          padding-top: 6px;
+          font-size: 0.9em;
+          line-height: 0.9em; }
+          @media screen and (min-width: 41em) {
+            .wrapper .content .login-wrapper .login-box .login-footer {
+              font-size: 0.9em;
+              line-height: 1.2em; } }
 
 .editor-container {
   margin: 0; }

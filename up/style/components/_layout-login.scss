@@ -26,6 +26,7 @@
         padding: 20px 20px;
 
         .login-main {    
+            width: 100%;
             position: relative;
             
             div.logo-login {
@@ -112,6 +113,17 @@
                     }
                 }
             }
+        }
+        .login-footer {
+            background: $col_grey2 !important;
+            width: 100vw;
+            position: fixed;
+            left: 0;
+            bottom: 30px;
+            text-align: center;
+            height: 35px;
+            padding-top: 6px;
+            @include font-size(1);
         }
     }
 }

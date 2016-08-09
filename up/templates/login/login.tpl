@@ -28,5 +28,11 @@
                 </div>
             </form>
         </div>
+        <div class="login-footer">
+            <span><a href="http://qindel.com/" target="_blank">Qindel Group © 2016</a></span> | 
+            <span><a href="http://theqvd.com/product/demo-old/terms-of-service" target="_blank">Términos de uso</a></span> | 
+            <span><a href="http://theqvd.com/cookies-policy" target="_blank">Política de cookie y protección de datos</a></span> | 
+            <span><a href="http://theqvd.com/es/contacto">Contacto</a></span>
+        </div>
     </div>
 </div>
