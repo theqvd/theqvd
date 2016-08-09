@@ -13,6 +13,9 @@ BEGIN {
 
 use Mojolicious::Lite;
 use MojoX::Session;
+use Mojo::Pg;
+use Mojo::JSON qw(encode_json);
+use Mojo::ByteStream 'b';
 use MIME::Base64 'encode_base64';
 use Try::Tiny;
 use HTTP::BrowserDetect;
@@ -40,6 +43,12 @@ plugin 'Directory' => {
 
 # Query finishes and returns a response with a message and httpcode
 helper (render_response => \&render_response);
+
+# Stores the active channels of the postgres database
+helper (pool => \&pool);
+
+# Register a callback function to several postgres channels
+helper(register_channels => \&register_channels);
 
 ##### CONFIGURATION #####
 
@@ -579,6 +588,34 @@ group {
         return $c->render_response(message => "Workspace $name deleted", code => 200);
     };
 
+    # Websockets
+        
+    group {
+        
+        under sub {
+            my $c = shift;
+
+            $c->inactivity_timeout(cfg('up-api.websocket.timeout'));
+        };
+                
+        websocket '/api/ws/desktops' => sub {
+            my $c = shift;
+
+            my $user_id = $c->stash->{session}->data->{user_id};
+
+            $c->register_channels(
+                $user_id,
+                [ 'desktop_changed' ],
+                sub {
+                    my $vm_id = shift;
+                    my $vm = rs( 'VM' )->single( { id => $vm_id } );
+                    return { id => $vm->id, user_state => $vm->vm_runtime->user_state };
+                }
+            );
+        };
+
+    }
+
 };
 
 app->start;
@@ -601,24 +638,6 @@ sub create_up_session_handler {
     );
     
     return $session;
-}
-
-sub render_response {
-    my $c = shift;
-    my %args = @_;
-
-    my $json = $args{json} // {};
-    my $param = $args{parameter};
-    my $message = $args{message};
-    my $code = $args{code} // 200;
-    
-    $json->{message} = $message if defined($message);
-    $json->{message} = ($message // "") . " (" . join(", ", map {"$_: $param->{$_}"} keys(%$param)) . ")"
-        if defined($param);
-
-    $c->render(json => $json, status => $code);
-    
-    return 1;
 }
 
 sub password_to_token
@@ -652,52 +671,49 @@ sub check_type {
     return 0 unless defined($value);
 
     my $is_correct = 0;
-    use Switch;
-    switch ($type) {
-        case 'FLAG' {
-            $is_correct = $value == 1;
-        }
-        case 'BOOL' {
-            $is_correct = ($value == 1 || $value == 0);
-        }
-        case 'INTEGER' {
-            $is_correct = ($value =~ /^\d+$/);
-        }
-        case 'DOUBLE' {
-            $is_correct = ($value =~ /^\-?\d+(.\d+)?$/);
-        }
-        case 'STRING' {
-            $is_correct = ($value =~ /^.*$/);
-        }
-        case 'ARRAY_OF_STRING' {
-            $is_correct = ref($value) eq 'ARRAY' && ((@$value == 0) || !grep(0, map {check_type($_, 'STRING')} @$value));
-        }
-        case 'SETTING' {
-            $is_correct = ref($value) eq 'HASH' &&
-                defined($value->{value}) &&
-                check_type($value->{list} // [], 'ARRAY_OF_STRING');
-        }
-        case 'ALL_PARAMETERS' {
-            for my $param (@{ENUMERATES()->{user_portal_parameters_enum}}) {
-                unless(defined($value->{$param}) and check_type($value->{$param}, 'SETTING')){
-                    $is_correct = 0;
-                    last;
-                }
-                $is_correct = 1;
+
+    if ($type eq 'FLAG') {
+        $is_correct = $value == 1;
+    } elsif ($type eq 'BOOL') {
+        $is_correct = ($value == 1 || $value == 0);
+    }
+    elsif ($type eq 'INTEGER') {
+        $is_correct = ($value =~ /^\d+$/);
+    }
+    elsif ($type eq 'DOUBLE') {
+        $is_correct = ($value =~ /^\-?\d+(.\d+)?$/);
+    }
+    elsif ($type eq 'STRING') {
+        $is_correct = ($value =~ /^.*$/);
+    }
+    elsif ($type eq 'ARRAY_OF_STRING') {
+        $is_correct = ref($value) eq 'ARRAY' && ((@$value == 0) || !grep(0, map {check_type($_, 'STRING')} @$value));
+    }
+    elsif ($type eq 'SETTING') {
+        $is_correct = ref($value) eq 'HASH' &&
+            defined($value->{value}) &&
+            check_type($value->{list} // [], 'ARRAY_OF_STRING');
+    }
+    elsif ($type eq 'ALL_PARAMETERS') {
+        for my $param (@{ENUMERATES()->{user_portal_parameters_enum}}) {
+            unless(defined($value->{$param}) and check_type($value->{$param}, 'SETTING')){
+                $is_correct = 0;
+                last;
             }
-        }
-        case 'SOME_PARAMETERS' {
-            for my $param (keys(%$value)) {
-                unless (grep($param, @{ENUMERATES()->{user_portal_parameters_enum}}) and check_type($value->{$param}, 'SETTING')) {
-                    $is_correct = 0;
-                    last;
-                }
-                $is_correct = 1;
-            }
-        }
-        else {
             $is_correct = 1;
         }
+    }
+    elsif ($type eq 'SOME_PARAMETERS') {
+        for my $param (keys(%$value)) {
+            unless (grep($param, @{ENUMERATES()->{user_portal_parameters_enum}}) and check_type($value->{$param}, 'SETTING')) {
+                $is_correct = 0;
+                last;
+            }
+            $is_correct = 1;
+        }
+    }
+    else {
+        $is_correct = 1;
     }
 
     return $is_correct;
@@ -766,3 +782,86 @@ sub register_user_connection {
             device     => ( $browser->mobile ? "mobile" : ($browser->tablet ? "tablet" : "desktop") ),
         });
 }
+    
+# Helpers
+
+sub render_response {
+    my $c = shift;
+    my %args = @_;
+
+    my $json = $args{json} // {};
+    my $param = $args{parameter};
+    my $message = $args{message};
+    my $code = $args{code} // 200;
+
+    $json->{message} = $message if defined($message);
+    $json->{message} = ($message // "") . " (" . join(", ", map {"$_: $param->{$_}"} keys(%$param)) . ")"
+        if defined($param);
+
+    $c->render(json => $json, status => $code);
+
+    return 1;
+}
+    
+sub pool
+{
+    my $c = shift;
+
+    unless(defined($c->stash('pg_db'))){
+        my $host     = cfg('database.host');
+        my $dbname   = cfg('database.name');
+        my $user     = cfg('database.user');
+        my $password = cfg('database.password');
+        my $pg = Mojo::Pg->new("postgresql://${user}:${password}\@${host}/${dbname}");
+
+        $c->stash({pg_db => $pg});
+    }
+
+    return $c->stash('pg_db')->pubsub;
+}
+
+sub register_channels {
+    my $c = shift;
+
+    my $user_id = shift;
+    my $channels = shift;
+    my $function = shift;
+
+    my @queue = ();
+
+    for my $channel (@$channels)
+    {
+        $c->pool->listen($channel => sub {
+                my ($pool, $payload) = @_;
+                my %payload_hash = split(/[=;]/, $payload);
+                $payload_hash{channel} = eval { "$channel" };
+                push @queue, \%payload_hash;
+            });
+    }
+
+    my $recurring = Mojo::IOLoop->recurring(
+        2 => sub {
+            while(@queue){
+                my $payload = shift @queue;
+                my $received_user_id = $payload->{user_id} // -1;
+                if ($received_user_id == $user_id) {
+                    $c->app->log->debug( "WebSocket refreshing information" );
+                    my $res = $function->( $payload->{vm_id} );
+                    $c->send( b( encode_json( $res ) )->decode( 'UTF-8' ) );
+                }
+            }
+            return 1;
+        }
+    );
+
+    $c->on(message => sub {
+            my ($c, $msg) = @_;
+            $c->app->log->debug("WebSocket $msg signal received");
+        });
+
+    $c->on(finish => sub {
+            my ($c, $code) = @_;
+            Mojo::IOLoop->remove($recurring) if $recurring;
+            $c->app->log->debug("WebSocket closed with status $code");
+        });
+};
