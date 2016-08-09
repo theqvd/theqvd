@@ -264,7 +264,10 @@ group {
         my $c = shift;
 
         my $desktop_list = [ map vm_to_desktop_hash($_),
-            rs( "VM" )->search( { user_id => $c->stash('session')->data('user_id') } )->all ];
+            rs( "VM" )->search( 
+                { user_id => $c->stash('session')->data('user_id') },
+                { order_by => { -asc => 'id' } } 
+            )->all ];
 
         return $c->render_response(json => $desktop_list, code => 200);
     };
@@ -432,7 +435,9 @@ group {
 
         my $user = rs('User')->find($c->stash('session')->data->{user_id});
 
-        my $workspaces = [ map { workspace_to_hash($_) } ($user->workspaces) ];
+        my $workspaces = [ map { workspace_to_hash($_) } 
+            ($user->workspaces->search({}, { order_by => { -asc => 'id' } })->all) 
+        ];
         
         return $c->render_response(json => $workspaces, code => 200);
     };
