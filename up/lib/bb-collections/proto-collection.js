@@ -3,6 +3,7 @@ Up.Collections.Collection = Backbone.Collection.extend({
     elementsTotal: 0,
     status: 0,
     offset: 1,
+    block: 10,
 
     filters: {},
     // Order by id by default
@@ -11,7 +12,7 @@ Up.Collections.Collection = Backbone.Collection.extend({
     initialize: function (params) {
         params = params || {};
         
-        this.block = params.block || Up.C.getBlock();
+        this.block = params.block || this.block;
         this.offset = params.offset || this.offset;
         this.filters = params.filters || this.filters;
         this.action = params.action || this.actionPrefix;

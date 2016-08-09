@@ -50,14 +50,12 @@ Up.L = {
         
         Up.A.performAction('account', {}, function (that) {
             // Store account settings
-            Up.C.username = that.retrievedData.username;
-            Up.C.acls = that.retrievedData.acls;
-            Up.C.language = that.retrievedData.language;
+            Up.C.account = that.retrievedData;
             
             // Configure visability
             Up.C.configureVisibility();
 
-            Up.L.afterLogin ();
+            Up.L.afterLogin ();            
         });
     },
     
@@ -91,9 +89,6 @@ Up.L = {
         
         // Store tenant mode
         Up.C.multitenant = parseInt(that.retrievedData.multitenant) || 1;
-        
-        // Store authentication separators
-        Up.C.authSeparators = that.retrievedData.auth ? that.retrievedData.auth.separators : SEPARATORS_DEFAULT;
         
         Up.A.apiLogIn(Up.L.checkLogin, Up.C);
     },
@@ -150,11 +145,7 @@ Up.L = {
         Up.C.acls = that.retrievedData.acls;
         
         // Store login
-        Up.C.login = that.retrievedData.admin_name;       
-        
-        // Store language
-        Up.C.language = that.retrievedData.admin_language;
-        Up.C.tenantLanguage = that.retrievedData.tenant_language;
+        Up.C.login = that.retrievedData.admin_name
         
         // Store block
         Up.C.block = that.retrievedData.admin_block;
@@ -164,9 +155,6 @@ Up.L = {
         // Restore possible residous views configuration to default values
         Up.I.restoreListColumns();
         Up.I.restoreFormFilters();
-        
-        // Store views configuration
-        ///Up.C.storeViewsConfiguration(that.retrievedData.views);
         
         // Store tenant ID and Name
         Up.C.tenantID = that.retrievedData.tenant_id;

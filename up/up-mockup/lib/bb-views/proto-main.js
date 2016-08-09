@@ -84,9 +84,7 @@ Wat.Views.MainView = Backbone.View.extend({
         if (this.viewKind == 'list') {
             this.resetSelectedItems();
         }
-        
-        model.setOperation('update');
-        
+                
         var messages = {
             'success': 'Successfully updated',
             'error': 'Error updating'

@@ -80,47 +80,9 @@ Up.C = {
         return this.apiUrl;
     },   
     
-    // Get the API URL for update DIs
-    getUpdateDiUrl: function () {
-        return this.getApiUrl() + "di/upload";
-    }, 
-    
-    // Get the API URL for download DIs from URL
-    getDownloadDiUrl: function (url) {
-        return this.getApiUrl() + "di/download?url=" + url;
-    },
-    
-    // Return if current admin is superadmin
-    isSuperadmin: function () {
-        return this.tenantID == SUPERTENANT_ID;
-    },    
-    
-    // Return if current admin is recover admin
-    isRecoveradmin: function (idToCheck) {
-        if (idToCheck == undefined) {
-            idToCheck = this.adminID;
-        }
-        return idToCheck == RECOVER_USER_ID;
-    },
-    
-    // Return if system is configured as multitenant WAT
-    isMultitenant: function () {
-        return this.multitenant;
-    },
-    
-    // Set calls source
-    setSource: function (newSource) {
-        this.source = newSource;
-    },
-    
     // Set aborting old requests flag
     setAbortOldRequests: function (newValue) {
         this.abortOldRequests = newValue;
-    },
-    
-    // Return if WAT administrator should know about multitenant enviroment
-    knowMultitenant: function () {
-        return this.isMultitenant() && (this.isRecoveradmin() || this.isSuperadmin());
     },
     
     getDocGuides: function () {
@@ -129,10 +91,6 @@ Up.C = {
             'stepbystep': 'WAT Step by step', 
             'user': 'User guide'
         };
-        
-        if (this.knowMultitenant()) {
-            guides.multitenant = 'Multitenant guide'
-        }
         
         return guides;
     },
@@ -144,57 +102,6 @@ Up.C = {
         var guides = this.getDocGuides ();
         
         return $.inArray(guide, Object.keys(guides)) != -1;
-    },
-    
-    // Stored views configuration retrieved from database to the inner data structure
-    // Params:
-    //      viewsConfiguration: Hash with each view configured on DB for current admin.
-    storeViewsConfiguration: function (viewsConfiguration) {
-        return;
-        $.each (viewsConfiguration, function (iView, view) {
-            switch (view.view_type) {
-                case 'list_column':
-                    if (!Up.I.listFields[view.qvd_object][view.field]) {
-                        Up.I.listFields[view.qvd_object][view.field] = {
-                            'display': view.visible,
-                            'noTranslatable': true,
-                            'fields': [
-                                view.field
-                            ],
-                            'acls': view.qvd_object + '.see.properties',
-                            'property': true,
-                            'text': view.field
-                        };
-                    }
-                    
-                    Up.I.listFields[view.qvd_object][view.field].display = view.visible;
-                    Up.I.listFields[view.qvd_object][view.field].customized = true;
-                    break;
-                case 'filter':
-                    if (!Up.I.formFilters[view.qvd_object][view.field]) {
-                        Up.I.formFilters[view.qvd_object][view.field] = {
-                            'filterField': view.field,
-                            'type': 'text',
-                            'text': view.field,
-                            'noTranslatable': true,
-                            'property': true,
-                            'acls': view.qvd_object + '.filter.properties',
-                        };
-                    }
-                    
-                    switch (view.device_type) {
-                        case 'mobile':
-                            Up.I.formFilters[view.qvd_object][view.field].displayMobile = view.visible;
-                            break;
-                        case 'desktop':
-                            Up.I.formFilters[view.qvd_object][view.field].displayDesktop = view.visible;
-                            break;
-                    }
-                    
-                    Up.I.formFilters[view.qvd_object][view.field].customized = true;
-                    break;
-            }
-        });
     },
     
     // Given an ACL or an array of ACLs, check if the current admin is granted to it
@@ -235,36 +142,6 @@ Up.C = {
         }
 
         return false;
-    },
-    
-    // Check all the ACLs of predifened groups. If any of them is available, return true
-    // Params:
-    //      group: ACls group or groups name associted to groups of ACLs defined on configuration file
-    checkGroupACL: function (group) {
-        var aclGranted = false;
-        
-        // Convert to array if is not an array yet
-        if (typeof group == 'string') {
-            var groups = [group];
-        }
-        else {
-            var groups = group;
-        }
-        
-        var that = this;
-        $.each(groups, function (iGroup, group) {
-            if (aclGranted) {
-                return false;
-            }
-            $.each(that.aclGroups[group], function (iAcl, acl) {
-                if (that.checkACL(acl)) {
-                    aclGranted = true;
-                    return false;
-                }
-            });
-        });
-        
-        return aclGranted;
     },
     
     // Return a given string if an acl is granted. Empty string will be returned otherwise
@@ -357,26 +234,8 @@ Up.C = {
             }
         });
         
-        // Recover user will has not profile section
-        if (Up.C.isRecoveradmin()) {
-            delete Up.I.userMenu['profile'];
-        }     
-        
         // For tenant admins (not superadmins) and recover admin in monotenant mode the acl section tenant will not exist
         var tenantsExist = false;
-        
-        if (Up.C.isSuperadmin() && Up.C.isMultitenant()) {
-            tenantsExist = true;
-        }
-        
-        // For monotenant  enviroments, multitenant documentation will not be shown
-        if (!Up.C.isMultitenant()) {
-            $.each(Up.I.docSections, function (iSec, sec) {
-                if (sec.guide == 'multitenant') {
-                    delete Up.I.docSections[iSec];
-                }
-            });
-        }
         
         if (!tenantsExist) {
             delete ACL_SECTIONS['tenant'];
@@ -413,16 +272,6 @@ Up.C = {
         }
         
         return false;
-    },
-    
-    // Retrieve the block size for this administrator
-    getBlock: function () {
-        if (this.block == 0) {
-            return this.tenantBlock;
-        }
-        else {
-            return this.block;
-        }
     },
     
     // Abort stored ajax requests
@@ -499,10 +348,6 @@ Up.C = {
                 401: function () {
                     Up.L.loadLogin();
                 },
-                // Not authorized
-                405: function () {
-                    Up.L.loadLogin();
-                }
             }
         });
         
@@ -554,11 +399,5 @@ Up.C = {
     setupLibraries: function () {
         // Attach fast click events to separate tap from click
         Up.I.attachFastClick(); 
-    },
-    
-    getFirstAuthSeparator: function () {
-        var firstSeparator = this.authSeparators ? this.authSeparators[0] : '';
-        
-        return firstSeparator;
     },
 }

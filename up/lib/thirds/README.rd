@@ -1,4 +1,4 @@
-Used libraries on QVD Wat and their version, licenses and source sites:
+Used libraries on QVD UP and their version, licenses and source sites:
 
 - Backbone.js v1.1.2 (MIT License) http://backbonejs.org
 - Underscore.js v1.6.0 (MIT License) http://underscorejs.org
@@ -31,3 +31,4 @@ Used libraries on QVD Wat and their version, licenses and source sites:
 - FileSaver v1.1.20150716 (X11/MIT License) https://github.com/eligrey/FileSaver.js
 - Colorpicker v3.2.1 (MIT License) https://github.com/evoluteur/colorpicker
 - sass.js v0.9.2 (MIT License) https://github.com/medialize/sass.js/
+- Custom Protocol Detection (MIT License) https://github.com/ismailhabib/custom-protocol-detection

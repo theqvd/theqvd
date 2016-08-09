@@ -6,7 +6,7 @@ Up.Views.SettingsView = Up.Views.ListView.extend({
     
     settingsEvents: {
         'click .js-delete-workspace-btn': 'deleteWorkspace',
-        'click .js-active-workspace-btn': 'activeWorkspace',
+        'click .js-active-workspace-btn.js-button-activable': 'activeWorkspace',
         'click .js-button-settings-conf': 'editWorkspace',
         'click .js-new-workspace-btn': 'newWorkspace',
         'click .js-clone-workspace-btn': 'cloneWorkspace'

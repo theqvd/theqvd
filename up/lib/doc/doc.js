@@ -65,11 +65,6 @@ Up.D = {
             target: target
         };
         
-        if (guide == 'multitenant' && !Up.C.isSuperadmin()) {
-            this.fillTemplateString (null, target, toc, docParams);
-            return;
-        }
-        
         this.getDocBody(docParams, this.processDocBody);
     },
     

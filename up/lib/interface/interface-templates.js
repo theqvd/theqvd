@@ -31,6 +31,9 @@ Up.I.T = {
                 templates = {
                     workspacesSelectOption: {
                         name: 'desktops/workspaces-select-option'
+                    },
+                    dialogClientNotInstalled: {
+                        name: 'dialog/client-not-installed'
                     }
                 };
 
@@ -38,6 +41,10 @@ Up.I.T = {
                     name: 'desktops/desktops-grid'
                 };  
 
+                templates["list-list_desktops"] = {
+                    name: 'desktops/desktops-list'
+                };
+                
                 templates["list-list_desktops"] = {
                     name: 'desktops/desktops-list'
                 };

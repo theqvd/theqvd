@@ -17,7 +17,7 @@ function profileTest () {
             };
                         
             var currentAttrs = {
-                language: Up.C.language,
+                language: Up.C.account.language,
                 block: Up.C.block,
                 password: password
             };

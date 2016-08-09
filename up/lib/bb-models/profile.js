@@ -1,5 +1,5 @@
 Up.Models.Profile = Up.Models.Model.extend({
-    actionPrefix: 'profile',
+    actionPrefix: 'account',
     
     defaults: {
     },
@@ -9,4 +9,11 @@ Up.Models.Profile = Up.Models.Model.extend({
         
         return url;
     },
+    
+    parse: function (response) {
+        // Store account settings
+        Up.C.account = response;
+        
+        return this.processResponse(response);
+    }
 });

@@ -755,7 +755,8 @@ a.button.disabled, a.button2.disabled, button.button.disabled, button.button2.di
   font-size: 20px !important; }
 
 .button-active {
-  background: #6dad3c !important; }
+  background: #6dad3c !important;
+  cursor: auto !important; }
 
 .button-activatable:hover:before {
   color: #6dad3c !important; }

@@ -147,7 +147,7 @@ Up.A = {
                 }
                 
                 if (raw.status == STATUS_SUCCESS_HTTP) {
-                    //response.status = STATUS_SUCCESS;
+                    response.status = STATUS_SUCCESS;
                 }
                 
                 if (that) {

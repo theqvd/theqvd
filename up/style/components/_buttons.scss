@@ -71,6 +71,7 @@ a, button {
 
 .button-active {
     background: $col_enabled !important;
+    cursor: auto !important;
 }
 
 .button-activatable:hover:before {

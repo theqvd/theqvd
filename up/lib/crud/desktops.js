@@ -19,7 +19,7 @@ Up.CRUD.desktops = {
                     params.alias = params.name;
                     delete params.name;
                                         
-                    Up.CurrentView.saveModel({id: model.get('id')}, params, {}, Up.CurrentView.render, model, 'update');
+                    Up.CurrentView.updateModel({id: model.get('id')}, params, Up.CurrentView.render, model);
                     
                     Up.I.closeDialog($(this));
                 }
@@ -54,7 +54,7 @@ Up.CRUD.desktops = {
             };
             
             // Retrieve effective desktop setup to make the client call
-            Up.A.performAction('desktops/' + selectedId + '/setup', {}, function (e) {                
+            Up.A.performAction('desktops/' + selectedId + '/setup', {}, function (e) {
                 $.each(CLIENT_PARAMS_MAPPING, function (field, param) {
                     options[param.value] = e.retrievedData[field].value;
                 });  
@@ -83,8 +83,46 @@ Up.CRUD.desktops = {
                     query += optName + '=' + optVal + ' ';
                 });
 
-                window.open('qvd:' + query, '_self');
+                // Store ID of the desktop we are trying to connect with to use it if fails
+                that.connectingDesktopId = selectedId;
+                
+                window.protocolCheck('qvd:' + query, that.connectDesktopFail)
             });
         }, this, 'GET');
     },
+    
+    connectDesktopFail: function () {        
+        // Set selected desktop as disconnected
+        var model = Up.CurrentView.collection.where({id: parseInt(Up.CurrentView.connectingDesktopId)})[0];
+        Up.CurrentView.setDesktopState(model.get('id'), 'disconnected');
+        
+        var dialogConf = {
+            title: $.i18n.t('QVD client not installed'),
+            buttons : {
+                "Cancel": function () {
+                    // Close dialog
+                    Up.I.closeDialog($(this));
+                },
+                "Download": function () {
+                    // Go to download section
+                    window.location = '#/downloads';
+
+                    // Close dialog
+                    Up.I.closeDialog($(this));
+                }
+            },
+            button1Class : 'fa fa-ban',
+            button2Class : CLASS_ICON_CLIENT_DOWNLOAD,
+            fillCallback : function (target) { 
+                var template = _.template(
+                    Up.TPL.dialogClientNotInstalled, {
+                    }
+                );
+                
+                $(target).html(template);
+            },
+        }
+
+        Up.I.dialog(dialogConf);
+    },  
 }

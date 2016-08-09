@@ -71,7 +71,9 @@ var Up = {
     B: {},
     
     // Configuration functions (lib/session/config.js)
-    C: {}, 
+    C: {
+        account: {}
+    }, 
     
     // Documentation utilities (lib/doc/doc.js)
     D: {},

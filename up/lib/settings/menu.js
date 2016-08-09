@@ -1,75 +1,3 @@
-Up.I.menuUserOriginal = {
-    profile: {
-        text: 'Profile',
-        link: '#/profile',
-        icon: CLASS_ICON_PERSONALAREA 
-    },
-    logout: {
-        text: 'Log-out',
-        link: '#/logout',
-        icon: CLASS_ICON_LOGOUT 
-    }
-};
-
-Up.I.menuConfigOriginal = {
-    config: {
-        text: 'QVD Config',
-        link: '#/config',
-        icon: CLASS_ICON_QVDCONFIG
-    }
-};
-
-Up.I.menuHelpOriginal = {
-    documentation: {
-        text: 'Documentation',
-        link: '#/documentation',
-        icon: 'fa fa-book' 
-    },
-    about: {
-        text: 'About',
-        link: '#/about',
-        icon: 'fa fa-asterisk' 
-    }
-};
-
-Up.I.menuSetupOriginal = {
-    watconfig: {
-        text: 'WAT Config',
-        link: '#/watconfig',
-        icon: CLASS_ICON_WATCONFIG
-    },
-    administrators: {
-        text: 'Administrators',
-        link: '#/administrators',
-        icon: CLASS_ICON_ADMINS
-    },
-    roles: {
-        text: 'Roles',
-        link: '#/roles',
-        icon: CLASS_ICON_ROLES
-    },
-    tenants: {
-        text: 'Tenants',
-        link: '#/tenants',
-        icon: CLASS_ICON_TENANTS 
-    },
-    views: {
-        text: 'Views',
-        link: '#/views',
-        icon: CLASS_ICON_VIEWS
-    },
-    properties: {
-        text: 'Properties',
-        link: '#/properties',
-        icon: CLASS_ICON_PROPERTIES
-    },
-    logs: {
-        text: 'Log',
-        link: '#/logs',
-        icon: CLASS_ICON_LOG
-    }
-};
-
 Up.I.menuOriginal = {
     desktops: {
         icon: CLASS_ICON_VIRTUAL_DESKTOP,
@@ -101,14 +29,21 @@ Up.I.menuOriginal = {
 Up.I.mobileMenuOriginal = _.extend({}, Up.I.menuOriginal);
 
 // Corner menu configuration values
-Up.I.cornerMenuOriginal = {/*
-        help: {
-            text: 'Help',
-            link: '#/documentation',
-            icon: CLASS_ICON_HELP,
-            subMenu: _.extend({}, Up.I.menuHelpOriginal)
-        },*/
-        
+
+Up.I.menuUserOriginal = {
+    profile: {
+        text: 'Profile',
+        link: '#/profile',
+        icon: CLASS_ICON_PERSONALAREA 
+    },
+    logout: {
+        text: 'Log-out',
+        link: '#/logout',
+        icon: CLASS_ICON_LOGOUT 
+    }
+};
+
+Up.I.cornerMenuOriginal = {
         welcome: {
             text: '',
             textClass: 'js-login-welcome login-welcome',

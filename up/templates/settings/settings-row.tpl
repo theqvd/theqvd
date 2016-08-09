@@ -14,7 +14,7 @@
             <td>
                 <a class="button2 button-icon button-rounded js-clone-workspace-btn <%= CLASS_ICON_CLONE %>" data-id="<%= model.get('id') %>" data-i18n="[title]Clone"></a>
             </td>
-            <td><a class="button-icon button-rounded js-active-workspace-btn <%= model.get('active') ? 'button button-active' : 'button2 button-activatable' %> <%= CLASS_ICON_ACTIVE %>" data-id="<%= model.get('id') %>" data-i18n="[title]Set as current configuration"></a></td>
+            <td><a class="button-icon button-rounded js-active-workspace-btn <%= model.get('active') ? 'button button-active js-button-active' : 'button2 button-activatable js-button-activable' %> <%= CLASS_ICON_ACTIVE %>" data-id="<%= model.get('id') %>" data-i18n="[title]<%= model.get('active') ? 'Active configuration' : 'Set as current configuration' %>"></a></td>
             <td>
                 <% if(!model.get('fixed')) { %>
                     <a class="button2 button-icon button-rounded js-delete-workspace-btn <%= CLASS_ICON_DELETE %>" data-id="<%= model.get('id') %>" data-i18n="[title]Delete"></a>

@@ -10,8 +10,13 @@ Up.CRUD.workspaces = {
         
         var params = {'active': true};
         model.set(params);
+        
+        var messages = {
+            'success': 'Workspace activated successfully',
+            'error': 'Error activating Workspace'
+        };
                     
-        Up.CurrentView.saveModel({id: model.get('id')}, params, {}, afterCallback, model, 'update');
+        Up.CurrentView.saveModel({id: model.get('id')}, params, messages, afterCallback, model, 'update');
     },  
     
     deleteWorkspace: function (e) {
@@ -19,7 +24,7 @@ Up.CRUD.workspaces = {
         
         var model = this.collection.where({id: selectedId})[0];
         
-        Up.CurrentView.saveModel({id: model.get('id')}, {}, {}, Up.CurrentView.render, model, 'delete');
+        Up.CurrentView.deleteModel({id: model.get('id')}, Up.CurrentView.render, model);
     },
     
     editWorkspace: function (e) {
@@ -62,7 +67,7 @@ Up.CRUD.workspaces = {
                     
                     model.set(params);
                     
-                    Up.CurrentView.saveModel({}, params, {}, Up.CurrentView.render, model, 'create');
+                    Up.CurrentView.createModel({id: model.get('id')}, Up.CurrentView.render, model);
                     
                     Up.I.closeDialog($(this));
                 }
@@ -97,7 +102,6 @@ Up.CRUD.workspaces = {
                     
                     $('[name="active_configuration_select"]').val(modelActive.get('id'));
                     $('[name="active_configuration_select"]').trigger('chosen:updated');
-                    $('[name="active_configuration_select"]').trigger('change');
                     
                     // Close dialog
                     Up.I.closeDialog($(this));

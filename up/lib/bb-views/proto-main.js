@@ -188,15 +188,13 @@ Up.Views.MainView = Backbone.View.extend({
         };
     },
     
-    createModel: function (arguments, successCallback) {
-        this.model.setOperation('create');
-        
+    createModel: function (arguments, successCallback, model) {
         var messages = {
             'success': 'Successfully created',
             'error': 'Error creating'
         };
         
-        this.saveModel(arguments, {}, messages, successCallback, null, 'create');        
+        this.saveModel(arguments, model.attributes, messages, successCallback, model, 'create');        
     },
     
     updateModel: function (arguments, params, successCallback, model) {
@@ -211,7 +209,7 @@ Up.Views.MainView = Backbone.View.extend({
         this.saveModel(arguments, params, messages, successCallback, model, 'update');
     },
     
-    deleteModel: function (filters, successCallback, model) {
+    deleteModel: function (arguments, successCallback, model) {
         // If not model is passed, use this.model
         var model = model || this.model;
                 
@@ -220,7 +218,7 @@ Up.Views.MainView = Backbone.View.extend({
             'error': 'Error deleting'
         };
         
-        this.saveModel({}, filters, messages, successCallback, model, 'delete');
+        this.saveModel(arguments, {}, messages, successCallback, model, 'delete');
     },
     
     saveModel: function (arguments, params, messages, successCallback, model, action) {

@@ -6,8 +6,6 @@ Up.Views.LoginView = Up.Views.MainView.extend({
         
         Up.B.bindLoginEvents();
                 
-        Up.C.language = 'auto';
-        
         $('.js-super-wrapper').addClass('super-wrapper--login');
         $('body').css('background',$('.super-wrapper--login').css('background-color'));
         $('.header-wrapper, .menu-lat').hide();
@@ -26,7 +24,6 @@ Up.Views.LoginView = Up.Views.MainView.extend({
     
     render: function () {  
         Up.C.multitenant = this.retrievedData.multitenant || true;
-        Up.C.authSeparators = this.retrievedData.auth ? this.retrievedData.auth.separators : SEPARATORS_DEFAULT;
         
         var template = Up.TPL.login;
         

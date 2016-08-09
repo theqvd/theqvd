@@ -5,7 +5,7 @@ Up.T = {
     
     // Translation configuration and actions to be done when language file is loaded
     initTranslate: function(lan) {        
-        lan = lan || Up.C.language;
+        lan = lan || Up.C.account.language;
         
         lan = this.getLanguage(lan);
         
@@ -26,15 +26,9 @@ Up.T = {
     
     getLanguage: function (lan) {
         // If language is not among the WAT supported languages, check the tenant language
-        if ($.inArray(lan, Object.keys(UP_LANGUAGES)) == -1) {
-            // If language is default, check if tenant language is among the WAT supported languages
-            if (lan == 'default' && $.inArray(Up.C.tenantLanguage, Object.keys(UP_LANGUAGES)) != -1) {
-                lan = Up.C.tenantLanguage;
-            }
-            else {
-                // If language is not supported, set auto mode to detect it from browser
-                lan = '__lng__';
-            }
+        if (lan == 'auto' || $.inArray(lan, Object.keys(UP_LANGUAGES)) == -1) {
+            // If language is not supported, set auto mode to detect it from browser
+            lan = '__lng__';
         }
 
         return lan;

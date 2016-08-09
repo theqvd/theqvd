@@ -27,7 +27,7 @@ Up.Router = Backbone.Router.extend({
             Up.Views.DesktopsView.prototype = $.extend({}, Up.Views.DesktopsView.prototype, Up.CRUD.desktops);
             Up.Views.DesktopsView.prototype = $.extend({}, Up.Views.DesktopsView.prototype, Up.CRUD.workspaces);
             
-            that.performRoute('vm', Up.Views.DesktopsView);
+            that.performRoute('desktops', Up.Views.DesktopsView);
         });        
         
         // ------- Settings sections ------- //
@@ -89,7 +89,10 @@ Up.Router = Backbone.Router.extend({
 
         // ------- Default load ------- //
         that.on('route:defaultRoute', function (actions) {
-            that.performRoute('vm', Up.Views.DesktopsView);
+            Up.Views.DesktopsView.prototype = $.extend({}, Up.Views.DesktopsView.prototype, Up.CRUD.desktops);
+            Up.Views.DesktopsView.prototype = $.extend({}, Up.Views.DesktopsView.prototype, Up.CRUD.workspaces);
+            
+            that.performRoute('desktops', Up.Views.DesktopsView);
         });
 
         // Start Backbone history
@@ -103,10 +106,6 @@ Up.Router = Backbone.Router.extend({
         $('.js-filter-notes').hide();
         
         params = params || {};
-        if (!Up.L.isLogged()) {
-            /*Up.I.renderMain();
-            view = Up.Views.LoginView;*/
-        }
 
         Up.I.showLoading();
         Up.I.setMenuOpt(menuOpt);

@@ -260,7 +260,7 @@ Up.I = {
         
         var optionsPast = {
             dayOfWeekStart: 1,
-            lang: Up.C.language,
+            lang: Up.C.account.language,
             format:'Y-m-d',
             maxDate: 0,
             timepicker: false,
@@ -270,8 +270,8 @@ Up.I = {
             closeOnDateSelect: true
         };
         
-        if (Up.C.language != 'auto') {
-            var lan = Up.T.getLanguage(Up.C.language);
+        if (Up.C.account.language != 'auto') {
+            var lan = Up.T.getLanguage(Up.C.account.language);
             
             // If lan is auto, change i18next macro by navigator language
             if (lan == '__lng__') {
@@ -515,7 +515,7 @@ Up.I = {
     },
     
     updateLoginOnMenu: function () {
-        $('.js-menu-corner').find('.js-login-welcome').html($.i18n.t('Welcome, __name__', {name: Up.C.username}));
+        $('.js-menu-corner').find('.js-login-welcome').html($.i18n.t('Welcome, __name__', {name: Up.C.account.username}));
     },
     
     controls: {
