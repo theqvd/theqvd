@@ -22,12 +22,16 @@ Up.Models.Model = Backbone.Model.extend({
         return response;
     },
     
+    url: function () {
+        return Up.C.getBaseUrl();
+    },
+    
     sync: function(method, model, options) {        
         var that = this;
         var params = _.extend({
             type: 'GET',
             dataType: 'json',
-            url: encodeURI(Up.C.getBaseUrl()),
+            url: encodeURI(that.url()),
             processData: false,
         }, options);
         
