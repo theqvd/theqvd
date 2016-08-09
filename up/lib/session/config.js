@@ -61,18 +61,7 @@ Up.C = {
     getBaseUrl: function (action) {
         action = action || "";
         
-        if (this.login && this.password) {
-            var baseUrl = this.getApiUrl() + action + "?login=" + this.login + "&password=" + this.password;
-            
-            if (this.multitenant && this.tenant != undefined) {
-                baseUrl += "&tenant=" + this.tenant;
-            }
-            
-            return baseUrl;
-        }
-        else {
-            return this.getApiUrl() + action;
-        }
+        return this.getApiUrl() + action;
     },
     
     // Get the API URL

@@ -54,12 +54,22 @@ Up.L = {
             
             // Configure visability
             Up.C.configureVisibility();
-
-            Up.L.afterLogin ();            
+            
+            if (that.retrievedData.status == STATUS_UNAUTHORIZED) {
+                Up.L.loadLogin();           
+            }
+            else {
+                Up.L.afterLogin (); 
+            }
         });
     },
     
     loadLogin: function () {
+        Up.T.initTranslate();
+
+        // Interface configuration
+        Up.I.renderMain();
+        
         Up.CurrentView = new Up.Views.LoginView({});
     },
     
@@ -84,12 +94,6 @@ Up.L = {
     },
     
     Login: function (that) {
-        // Store server datetime
-        Up.C.serverDatetime = that.retrievedData.server_datetime;
-        
-        // Store tenant mode
-        Up.C.multitenant = parseInt(that.retrievedData.multitenant) || 1;
-        
         Up.A.apiLogIn(Up.L.checkLogin, Up.C);
     },
     
@@ -176,7 +180,7 @@ Up.L = {
                 
             Up.I.renderMain();
 
-            Up.Router.upRouter.performRoute('', Up.Views.HomeView);
+            //Up.Router.upRouter.performRoute('', Up.Views.DesktopsView);
         }
                 
         Up.L.afterLogin ();

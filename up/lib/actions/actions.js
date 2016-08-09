@@ -146,10 +146,6 @@ Up.A = {
                     Up.C.sid = response['sid'];
                 }
                 
-                if (raw.status == STATUS_SUCCESS_HTTP) {
-                    response.status = STATUS_SUCCESS;
-                }
-                
                 if (that) {
                     that.retrievedData = response;
                 }
@@ -262,9 +258,16 @@ Up.A = {
             parse: true,
             success: function (response, result, raw) {
                 that.retrievedData = response;
-                raw.status == 200 ? that.retrievedData.status = STATUS_SUCCESS : that.retrievedData.status = raw.status;
+                raw.status == STATUS_SUCCESS_HTTP ? that.retrievedData.status = STATUS_SUCCESS : that.retrievedData.status = raw.status;
                 
-                successCallback(that);    
+                // Retrieve account data
+                var accountModel = new Up.Models.Profile();
+                
+                accountModel.fetch({      
+                    complete: function (e) {
+                        successCallback(that);    
+                    }
+                });
             },
             error: function (response, result, raw) {
                 var responseMsg = JSON.parse(response.responseText).message;
