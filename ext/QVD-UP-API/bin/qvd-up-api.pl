@@ -247,7 +247,7 @@ group {
         my $c = shift;
 
         my $connection = rs('User_Connection')->find($c->stash('session')->data('user_id'));
-        return $c->render_response(message => 'No registered connection', code => 400) unless defined($connection);
+        return $c->render_response(message => 'No registered connection', code => 200) unless defined($connection);
 
         my $json = {};
         $json->{location} = $connection->location;
