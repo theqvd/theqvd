@@ -230,7 +230,17 @@ group {
     any [qw(PUT)] => '/api/account' => sub {
         my $c = shift;
 
-        my $parameters = { language => $c->param('language') };
+        my $input_json = $c->req->json;
+
+        return $c->render_response(message => "Invalid parameter", parameter => $_, code => 400)
+            if $_ = find_invalid_parameter (
+                $input_json,
+                {
+                    language         => { mandatory => 0, type => 'LANGUAGE' },
+                }
+            );
+
+        my $parameters = { language => $input_json->{'language'} };
         
         my $user = rs('User')->find($c->stash('session')->data('user_id'));
         $user->update( { language => $parameters->{language} } );
@@ -693,6 +703,9 @@ sub check_type {
     }
     elsif ($type eq 'ARRAY_OF_STRING') {
         $is_correct = ref($value) eq 'ARRAY' && ((@$value == 0) || !grep(0, map {check_type($_, 'STRING')} @$value));
+    }
+    elsif ($type eq 'LANGUAGE') {
+        $is_correct = (grep { $_ eq $value } @{ENUMERATES()->{language_enum}}) ? 1 : 0;
     }
     elsif ($type eq 'SETTING') {
         $is_correct = ref($value) eq 'HASH' &&
