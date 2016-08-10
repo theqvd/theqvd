@@ -109,24 +109,26 @@ any [qw(GET)] => '/api/info' => sub {
 any [ qw(POST) ] => '/api/login' => sub {
     my $c = shift;
 
-    my $data = $c->req->params->to_hash;
+    my $input_json = $c->req->json;
 
-    my $login = $data->{login};
-    my $password = $data->{password} // "";
-        
-    if (!defined($login)){
-        return $c->render_response(message => 'Query parameter <login> is missing', code => 400);
-    }
+    return $c->render_response(message => "Invalid parameter", parameter => $_, code => 400)
+        if $_ = find_invalid_parameter (
+            $input_json,
+            {
+                login         => { mandatory => 1, type => 'STRING' },
+                password      => { mandatory => 0, type => 'STRING' },
+            }
+        );
+
+    my $login = $input_json->{login};
+    my $password = $input_json->{password} // "";
 
     my ($user, $tenant);
-    if (cfg('wat.multitenant')){
-        for my $separator (split "", cfg('l7r.auth.plugin.default.separators')){
-            ($user, $tenant) = split $separator, $login;
-            last if (defined($user) && defined($tenant));
-        }
-    } else {
-        $user = $login;
+    for my $separator (split "", cfg('l7r.auth.plugin.default.separators')){
+        ($user, $tenant) = split $separator, $login;
+        last if (defined($user) && defined($tenant));
     }
+    $tenant //= cfg('l7r.auth.plugin.default.tenant');
 
     my $authorization = "Basic " . encode_base64($login . ":". $password);
 
