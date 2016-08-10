@@ -48,22 +48,23 @@ Up.CRUD.desktops = {
             var options = {
                 "client.ssl.options.SSL_version": "TLSv1_2",
                 "client.auto_connect": "1",
-                "client.host.name": window.location.hostname,
                 "client.auto_connect.vm_id": selectedId,
                 "client.auto_connect.token": token
             };
             
             // Retrieve effective desktop setup to make the client call
             Up.A.performAction('desktops/' + selectedId + '/setup', {}, function (e) {
+                options['client.host.name'] = e.retrievedData.hostname;
+
                 $.each(CLIENT_PARAMS_MAPPING, function (field, param) {
-                    options[param.value] = e.retrievedData[field].value;
+                    options[param.value] = e.retrievedData.settings[field].value;
                 });  
 
-                var shareFolders = parseInt(e.retrievedData.share_folders.value);
-                var shareUsb = parseInt(e.retrievedData.share_usb.value);
+                var shareFolders = parseInt(e.retrievedData.settings.share_folders.value);
+                var shareUsb = parseInt(e.retrievedData.settings.share_usb.value);
 
                 if (shareFolders) {
-                    var foldersList = e.retrievedData.share_folders.list;
+                    var foldersList = e.retrievedData.settings.share_folders.list;
 
                     $.each(foldersList, function (k, folder) {
                         options['client.share.' + k] = folder;
@@ -73,7 +74,7 @@ Up.CRUD.desktops = {
                 options['client.usb.enable'] = parseInt(shareUsb);
 
                 if (shareUsb) {
-                    var usbList = e.retrievedData.share_usb.list;
+                    var usbList = e.retrievedData.settings.share_usb.list;
 
                     options['client.usb.share_list'] = usbList.join(',');
                 }

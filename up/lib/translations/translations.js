@@ -18,10 +18,10 @@ Up.T = {
             fallbackLng: 'en',
         }, function () {
             that.loaded = true;
-            //that.translateAndShow();
         });
         
         this.lan = lan;
+        $.cookie('i18next', lan);
     },
     
     getLanguage: function (lan) {

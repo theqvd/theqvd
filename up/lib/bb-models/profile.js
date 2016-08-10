@@ -6,7 +6,6 @@ Up.Models.Profile = Up.Models.Model.extend({
         
     url: function () {
         var url = Up.C.getBaseUrl() + 'account';
-        console.log(url);
         return url;
     },
     

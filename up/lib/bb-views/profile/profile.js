@@ -41,20 +41,35 @@ Up.Views.ProfileView = Up.Views.MainView.extend({
         var params = Up.I.parseForm($('.content'));
         var model = Up.CurrentView.model;
         
+        var oldLan = model.get('language');
         model.set(params);
-                    
-        Up.CurrentView.updateModel({}, params, Up.CurrentView.render, model);
+        var newLan = model.get('language');
+
+        
+        if (oldLan != newLan) {
+            var updateCallback = function () {
+                $.cookie('messageToShow', JSON.stringify({'message': "Successfully updated", 'messageType': 'success'}), {expires: 1, path: '/'});
+                window.location.reload();
+            };
+        }
+        else {
+            var updateCallback = Up.CurrentView.fetchAndRender;
+        }
+        
+        Up.CurrentView.updateModel({}, params, updateCallback, model);
     },
     
     fetchAndRender: function (that) {  
         that.model.fetch({      
             complete: function (e) {
+                Up.T.initTranslate();
                 that.render();
+                Up.T.initTranslate();
             }
         });
     },
     
-    render: function () {     
+    render: function () {         
         this.template = _.template(
             Up.TPL.profile, {
                 cid: this.cid,
@@ -65,7 +80,7 @@ Up.Views.ProfileView = Up.Views.MainView.extend({
         $('.bb-content').html(this.template);
                 
         Up.I.chosenElement($('select[name="language"]'), 'single100');
-
+        
         Up.T.translateAndShow();
     }
 });

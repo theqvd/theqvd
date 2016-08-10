@@ -12,10 +12,10 @@
         <td><i class="<%= CLASS_ICON_LANGUAGE %>"></i><span data-i18n="Language"></span></td>
         <td>
             <select name="language" class="js-form-field">
-                <% 
+                <%
                 $.each(UP_LANGUAGE_OPTIONS, function (lanCode, lanName) {
                 %>
-                    <option value="<%= lanCode %>" data-i18n="<%= lanName %>" <%= lanCode == model.get('lan') ? 'selected' : '' %>><%= lanName %></option>
+                    <option value="<%= lanCode %>" data-i18n="<%= lanName %>" <%= lanCode == model.get('language') ? 'selected' : '' %>><%= lanName %></option>
                 <%
                 }) 
                 %>

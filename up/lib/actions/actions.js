@@ -248,7 +248,10 @@ Up.A = {
     //      that: current context where will be stored retrieved response and passed as parameter to successCallback function.
     apiLogIn: function (successCallback, that) {
         var url = Up.C.getApiUrl() + 'login';
-        url +=  "?login=" + Up.C.login + "&password=" + Up.C.password;
+        var credentials = {
+            login: Up.C.login,
+            password: Up.C.password
+        };
         
         var params = {
             url: encodeURI(url),
@@ -256,6 +259,7 @@ Up.A = {
             dataType: 'json',
             processData: false,
             parse: true,
+            data: JSON.stringify(credentials),
             success: function (response, result, raw) {
                 that.retrievedData = response;
                 raw.status == STATUS_SUCCESS_HTTP ? that.retrievedData.status = STATUS_SUCCESS : that.retrievedData.status = raw.status;
