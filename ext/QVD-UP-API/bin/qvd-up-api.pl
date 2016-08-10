@@ -782,8 +782,8 @@ sub register_user_connection {
             ip_address => $ip_address,
             location   => $location,
             datetime   => $datestring,
-            browser    => $browser->browser,
-            os         => $browser->os,
+            browser    => sprintf("%s%s", $browser->browser_string // "Unknown", defined($_ = $browser->browser_version) ? " $_" : ""),
+            os         => sprintf("%s%s", $browser->os_string // "Unknown", defined($_ = $browser->os_version) ? " $_" : ""),
             device     => ( $browser->mobile ? "mobile" : ($browser->tablet ? "tablet" : "desktop") ),
         });
 }
