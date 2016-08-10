@@ -108,14 +108,10 @@ var Up = {
         debug: false,
         openWebsocket: function () {},
         closeAllWebsockets: function () {},
-        openStatsWebsockets: function () {},
-        openListWebsockets: function () {},    
-        openDetailsWebsockets: function () {},
+        openDesktopsWebsockets: function () {},    
         changeWebsocket: function () {},
-        // Web Sockets for Users (lib/websockets/websockets.user.js)
-        changeWebsocketUser: function () {},
-        // Web Sockets for VMs (lib/websockets/websockets.vm.js)
-        changeWebsocketVm: function () {},
+        // Web Sockets for Desktops (lib/websockets/websockets-desktops.js)
+        changeWebsocketDesktops: function () {},
     },
     
     // Templates storage

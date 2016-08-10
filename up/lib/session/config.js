@@ -55,6 +55,8 @@ Up.C = {
         else {
             this.apiWSUrl = 'ws' + this.apiUrl.substr(4);
         }
+        
+        this.apiWSUrl += 'ws/';
     },
 
     // Get the base URL for API calls using credentials or session ID

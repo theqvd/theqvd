@@ -19,7 +19,7 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
         // Spy mouse over elements to avoid fails with mouseleave events
         Up.I.L.spyMouseOver('.js-grid-cell-area', this.hideGridIcon);
         
-        Up.Views.ListView.prototype.initialize.apply(this, [params]);
+        Up.Views.ListView.prototype.initialize.apply(this, [params]);        
     },
     
     // This events will be added to view events
@@ -88,16 +88,16 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
         that.paginationUpdate();
         that.shownElementsLabelUpdate();
         
-        // Open websockets for live fields
-        if (that.liveFields) {
-            Up.WS.openListWebsockets(that.qvdObj, that.collection, that.liveFields, that.cid);
-        }
-        
         Up.T.translateAndShow();
                 
         Up.I.addSortIcons(that.cid);
                 
         Up.I.addOddEvenRowClass(that.listContainer);
+    },
+    
+    afterRender: function () {
+        Up.Views.ListView.prototype.afterRender.apply(this, []);        
+        Up.WS.openWebsocket('desktops', Up.WS.changeWebsocketDesktops);
     },
     
     changeActiveConf: function (e) {
