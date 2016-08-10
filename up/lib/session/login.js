@@ -48,19 +48,22 @@ Up.L = {
     rememberLogin: function () { 
         Up.C.loggedIn = true;
         
-        Up.A.performAction('account', {}, function (that) {
-            // Store account settings
-            Up.C.account = that.retrievedData;
-            
-            // Configure visability
-            Up.C.configureVisibility();
-            
-            if (that.retrievedData.status == STATUS_UNAUTHORIZED) {
-                Up.L.loadLogin();           
-            }
-            else {
-                Up.L.afterLogin (); 
-            }
+        // Store geolocation if user agree before make first API call
+        Up.C.storeGeolocation(function () {
+            Up.A.performAction('account', {}, function (that) {
+                // Store account settings
+                Up.C.account = that.retrievedData;
+
+                // Configure visability
+                Up.C.configureVisibility();
+
+                if (that.retrievedData.status == STATUS_UNAUTHORIZED) {
+                    Up.L.loadLogin();           
+                }
+                else {
+                    Up.L.afterLogin (); 
+                }
+            });        
         });
     },
     

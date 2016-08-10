@@ -339,7 +339,7 @@ Up.C = {
                 401: function () {
                     Up.L.loadLogin();
                 },
-            }
+            },
         });
         
 		// Attach request url to ajax data
@@ -391,4 +391,35 @@ Up.C = {
         // Attach fast click events to separate tap from click
         Up.I.attachFastClick(); 
     },
+    
+    storeGeolocation: function (callback) {
+        var that = this;
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function (geolocation) {
+                    that.geolocation = geolocation
+                    if (callback) {
+                        callback(that);
+                    }
+                }, 
+                function (error) {
+                    delete that.geolocation;
+                    
+                    // if error do nothing. Just call callback
+                    if (callback) {
+                        callback(that);
+                    }
+                }
+            );
+        }
+    },
+    
+    getGeolocation: function () {
+        if (this.geolocation) {
+            return this.geolocation.coords.latitude + ',' + this.geolocation.coords.longitude;
+        }
+        else {
+            return undefined;
+        }
+    }
 }

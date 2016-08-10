@@ -87,10 +87,13 @@ Up.A = {
         var url = Up.C.getBaseUrl(action);
 
         messages = messages || {};
-
+        
         successCallback = successCallback || function () {};   
         var params = {
             url: encodeURI(url),
+            headers: {
+                "Geo-Location": Up.C.getGeolocation()
+            },
             type: method,
             dataType: 'json',
             processData: false,
@@ -255,6 +258,9 @@ Up.A = {
         
         var params = {
             url: encodeURI(url),
+            headers: {
+                "Geo-Location": Up.C.getGeolocation()
+            },
             type: 'POST',
             dataType: 'json',
             processData: false,
@@ -291,6 +297,9 @@ Up.A = {
         
         var params = {
             url: encodeURI(url),
+            headers: {
+                "Geo-Location": Up.C.getGeolocation()
+            },
             type: 'POST',
             dataType: 'json',
             processData: false,

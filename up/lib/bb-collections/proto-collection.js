@@ -56,6 +56,9 @@ Up.Collections.Collection = Backbone.Collection.extend({
             type: 'GET',
             dataType: 'json',
             url: encodeURI(that.getListUrl()),
+            headers: {
+                "Geo-Location": Up.C.getGeolocation()
+            },
             processData: false
         }, options);
         

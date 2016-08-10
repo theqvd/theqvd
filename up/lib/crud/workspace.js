@@ -81,8 +81,8 @@ Up.CRUD.workspaces = {
                     Up.I.closeDialog($(this));
                 }
             },
-            button1Class : 'fa fa-save',
-            button2Class : 'fa fa-ban',
+            button1Class : 'fa fa-ban',
+            button2Class : 'fa fa-save',
             fillCallback : function (target) { 
                 Up.I.renderEditionMode(model, target);
             },

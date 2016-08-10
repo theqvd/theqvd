@@ -31,6 +31,9 @@ Up.Models.Model = Backbone.Model.extend({
             type: 'GET',
             dataType: 'json',
             url: encodeURI(this.url()),
+            headers: {
+                "Geo-Location": Up.C.getGeolocation()
+            },
             processData: false,
         }, options);
         
@@ -78,6 +81,9 @@ Up.Models.Model = Backbone.Model.extend({
         
         options = {
             url: this.getActionUrl(action, attributes.id),
+            headers: {
+                "Geo-Location": Up.C.getGeolocation()
+            },
             data: JSON.stringify(options),
             type: this.getActionType(action),
             contentType: 'application/json'
