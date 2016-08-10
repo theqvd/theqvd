@@ -80,6 +80,11 @@ sub get_procedures
             sql  => '$function$ BEGIN listen vm_changed; PERFORM pg_notify(\'vm_changed\', \'tenant_id=\' || (SELECT tenant_id FROM users WHERE id = (SELECT user_id FROM vms WHERE id = NEW.vm_id))::text); RETURN NULL; END; $function$',
             parameters => [],
         },
+        {
+            name => 'vm_runtime_desktop_changed_notify',
+            sql  => '$function$ BEGIN listen vm_changed; PERFORM pg_notify(\'desktop_changed\', \'user_id=\' || ((SELECT user_id FROM vms WHERE id = NEW.vm_id)::text) || \';vm_id=\' || ((NEW.vm_id)::text)); RETURN NULL; END; $function$',
+            parameters => [],
+        },
     );
 
     for my $proc (@notify_procs_array){
@@ -118,6 +123,17 @@ sub get_triggers
             on_table  => 'vm_runtimes',
             condition => undef,
             procedure => 'vm_runtime_notify',
+            parameters => [],
+            scope  => 'ROW',
+        },
+        {
+            name => 'vm_desktop_changed_trigger',
+            when => 'AFTER',
+            events => [qw/UPDATE/],
+            fields    => [qw/user_state/],
+            on_table  => 'vm_runtimes',
+            condition => undef,
+            procedure => 'vm_runtime_desktop_changed_notify',
             parameters => [],
             scope  => 'ROW',
         }
