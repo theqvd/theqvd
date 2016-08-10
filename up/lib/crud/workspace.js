@@ -36,6 +36,10 @@ Up.CRUD.workspaces = {
         var dialogConf = {
             title: $.i18n.t('Edit Workspace') + ': ' + model.get('name'),
             buttons : {
+                "Cancel": function () {
+                    // Close dialog
+                    Up.I.closeDialog($(this));
+                },
                 "Save": function () {
                     var params = Up.I.parseForm(this);
                     
@@ -46,7 +50,8 @@ Up.CRUD.workspaces = {
                     Up.I.closeDialog($(this));
                 }
             },
-            button1Class : 'fa fa-save',
+            button1Class : 'fa fa-ban',
+            button2Class : 'fa fa-save',
             fillCallback : function (target) { 
                 Up.I.renderEditionMode(model, target);
             },
@@ -62,6 +67,10 @@ Up.CRUD.workspaces = {
         var dialogConf = {
             title: $.i18n.t('New Workspace'),
             buttons : {
+                "Cancel": function () {
+                    // Close dialog
+                    Up.I.closeDialog($(this));
+                },
                 "Save": function () {
                     var params = Up.I.parseForm(this);
                     
@@ -73,6 +82,7 @@ Up.CRUD.workspaces = {
                 }
             },
             button1Class : 'fa fa-save',
+            button2Class : 'fa fa-ban',
             fillCallback : function (target) { 
                 Up.I.renderEditionMode(model, target);
             },
