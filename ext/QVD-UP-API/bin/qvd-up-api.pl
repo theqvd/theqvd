@@ -437,8 +437,12 @@ group {
             my $ws = rs( "Workspace" )->single( { user_id => $user_id, active => 1 } );
             $element = $ws;
         }
+
+        my $json = {};
+        $json->{settings} = element_settings($element);
+        $json->{hostname} = cfg('up-api.l7r.address');
         
-        return $c->render_response(json => element_settings($element), code => 200 );
+        return $c->render_response(json => $json, code => 200 );
     };
 
     # Workspaces
