@@ -13,7 +13,7 @@ __PACKAGE__->add_columns(
                           # FIXME: get passwords out of this table!
                           # FIXME: omg encrypt passwords!!
 	password    => { data_type  => 'varchar(64)', is_nullable => 1 },
-    language    => { data_type  => 'language_enum', default_value => 'default' },
+    language    => { data_type  => 'language_enum', default_value => 'auto' },
 );
 
 __PACKAGE__->set_primary_key('id');
