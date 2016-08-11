@@ -75,6 +75,38 @@ app->log( Mojo::Log->new( path => cfg('log.up-api.filename'), level => 'debug' )
 
 # Response hooks
 
+app->hook(before_render => sub {
+    my ($c, $args) = @_;
+
+    # Control known exceptions and return readable messages
+    if(defined($args->{template}) && $args->{template} eq 'exception') {
+
+        my $error_messages = [
+            {
+                exception => 'duplicate key value violates unique constraint "(.*)"',
+                message   => sub {
+                    my $constraint = shift;
+                    my $constraint_to_column = {
+                        workspaces_user_id_name => 'name',
+                    };
+                    return sprintf( 'Another element with the same %s already exists',
+                        $constraint_to_column->{$constraint} );
+                }
+            }
+        ];
+
+        for my $error (@$error_messages) {
+            if (my @matches = ($args->{exception} =~ /$error->{exception}/)) {
+                $args->{json} = { message => $error->{message}->(@matches) };
+                $args->{status} = 400;
+                last;
+            }
+        }
+        
+        return;
+    }
+});
+
 app->hook(after_render => sub {
     my ($c, $output, $format) = @_;
 
