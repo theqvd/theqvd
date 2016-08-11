@@ -32,14 +32,4 @@ sub expire {
     return $self;
 }
 
-sub extend_expiration {
-    my $self = shift;
-    my $delta = shift;
-    my $expire_date = time + $delta;
-
-    $self->update({expiration => $expire_date});
-
-    return $expire_date;
-}
-
 1;

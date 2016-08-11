@@ -23,6 +23,9 @@ use QVD::Config;
 use QVD::DB::Simple qw(db rs);
 use QVD::DB::Common qw(ENUMERATES);
 
+##### GLOBAL VARIABLES #####
+my $MOJO_DB;
+
 ##### PLUGINS #####
 
 # Plugin for dropping privileges
@@ -74,6 +77,38 @@ app->config(
 app->log( Mojo::Log->new( path => cfg('log.up-api.filename'), level => 'debug' ) );
 
 # Response hooks
+
+app->hook(before_render => sub {
+    my ($c, $args) = @_;
+
+    # Control known exceptions and return readable messages
+    if(defined($args->{template}) && $args->{template} eq 'exception') {
+
+        my $error_messages = [
+            {
+                exception => 'duplicate key value violates unique constraint "(.*)"',
+                message   => sub {
+                    my $constraint = shift;
+                    my $constraint_to_column = {
+                        workspaces_user_id_name => 'name',
+                    };
+                    return sprintf( 'Another element with the same %s already exists',
+                        $constraint_to_column->{$constraint} );
+                }
+            }
+        ];
+
+        for my $error (@$error_messages) {
+            if (my @matches = ($args->{exception} =~ /$error->{exception}/)) {
+                $args->{json} = { message => $error->{message}->(@matches) };
+                $args->{status} = 400;
+                last;
+            }
+        }
+        
+        return;
+    }
+});
 
 app->hook(after_render => sub {
     my ($c, $output, $format) = @_;
@@ -146,11 +181,9 @@ any [ qw(POST) ] => '/api/login' => sub {
 
     my $user_rs = rs('User')->search( { login => $user, password => password_to_token($password) } );
 
-    if (cfg( 'wat.multitenant' )) {
-        my $tenant_obj = rs('Tenant')->search( { name => $tenant } )->first;
-        my $tenant_id = defined($tenant_obj) ? $tenant_obj->id : undef;
-        $user_rs = $user_rs->search( { tenant_id => $tenant_id } );
-    }
+    my $tenant_obj = rs('Tenant')->search( { name => $tenant } )->first;
+    my $tenant_id = defined($tenant_obj) ? $tenant_obj->id : undef;
+    $user_rs = $user_rs->search( { tenant_id => $tenant_id } );
 
     my $user_obj = $user_rs->first;
 
@@ -831,17 +864,15 @@ sub pool
 {
     my $c = shift;
 
-    unless(defined($c->stash('pg_db'))){
+    unless($MOJO_DB){
         my $host     = cfg('database.host');
         my $dbname   = cfg('database.name');
         my $user     = cfg('database.user');
         my $password = cfg('database.password');
-        my $pg = Mojo::Pg->new("postgresql://${user}:${password}\@${host}/${dbname}");
-
-        $c->stash({pg_db => $pg});
+        $MOJO_DB = Mojo::Pg->new("postgresql://${user}:${password}\@${host}/${dbname}");
     }
 
-    return $c->stash('pg_db')->pubsub;
+    return $MOJO_DB->pubsub;
 }
 
 sub register_channels {

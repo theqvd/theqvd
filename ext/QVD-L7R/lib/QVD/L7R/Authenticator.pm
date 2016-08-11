@@ -123,7 +123,7 @@ sub recheck_authentication {
     return (
         $auth->{authenticated} 
             and ( (defined($login) and defined($passwd) and ($auth->{login} eq $login) and ($auth->{passwd} eq $passwd) )
-            or ( defined($token) and ($auth->{session}->token eq $token) and (not $auth->{session}->is_expired) ) ) 
+            or ( defined($token) and ($auth->{session}->token eq $token) ) ) 
     );
 }
 
