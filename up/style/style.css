@@ -1287,7 +1287,7 @@ body {
     .wrapper .content .filter {
       display: none;
       margin-bottom: 15px;
-      width: 8%;
+      width: -2%;
       height: auto;
       background: #e3e3e3;
       border: 2px solid #d9d9d9;
@@ -1315,7 +1315,7 @@ body {
     @media screen and (min-width: 41em) {
       .wrapper .content .list-block {
         float: left;
-        width: 90%; } }
+        width: 98%; } }
     .wrapper .content .list-block .filter-mobile {
       margin-bottom: 15px; }
       .wrapper .content .list-block .filter-mobile .filter-control {
@@ -1560,9 +1560,10 @@ body {
         .wrapper .content .profile-select {
           width: 35%; } }
     .wrapper .content div.list {
+      padding-right: 10px;
       margin-left: 55px; }
     .wrapper .content .section-container {
-      padding: 55px 65px 0px 65px;
+      padding: 35px 65px 0px 65px;
       width: 100%; }
     .wrapper .content .setup-side {
       width: 100%; }

@@ -306,7 +306,6 @@ Up.Views.ListView = Up.Views.MainView.extend({
                 cid: this.cid,
                 qvdObj: this.qvdObj,
                 pagination: false,
-                viewMode: this.viewMode,
             }
         );
         

@@ -59,7 +59,8 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
                 
                 var template = _.template(
                     Up.TPL.workspacesSelectOption, {
-                        collection: that.wsCollection
+                        collection: that.wsCollection,
+                        viewMode: that.viewMode
                     }
                 );
                 
@@ -193,7 +194,7 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
             // If desktop has connected status, break timeout countdown
             if ($('.js-grid-cell[data-id="' + id + '"]').attr('data-state') == 'connected') {
                 clearInterval(that.connectionTimeouts[id].timeout);
-                return false;
+                return;
             };
             
             // Increase counter
@@ -205,6 +206,7 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
                 clearInterval(that.connectionTimeouts[id].timeout);
                 
                 delete(that.connectionTimeouts[id]);
+                return;
             }
         }, 1000);
     }

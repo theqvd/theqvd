@@ -61,7 +61,7 @@
 .list-block {        
     @include in(desktop) {
         float: left;
-        width: ($width_list_content) * 1%;
+        width: 98%;
     }
 
     .filter-mobile {
@@ -442,11 +442,12 @@ fieldset {
 }
 
 div.list {
+    padding-right: 10px;
     margin-left: 55px;
 }
 
 .section-container {
-    padding: 55px 65px 0px 65px;
+    padding: 35px 65px 0px 65px;
     width: 100%;
     // Mockups version
     //padding: 0px;
