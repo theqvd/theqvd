@@ -23,6 +23,9 @@ use QVD::Config;
 use QVD::DB::Simple qw(db rs);
 use QVD::DB::Common qw(ENUMERATES);
 
+##### GLOBAL VARIABLES #####
+my $MOJO_DB;
+
 ##### PLUGINS #####
 
 # Plugin for dropping privileges
@@ -861,17 +864,15 @@ sub pool
 {
     my $c = shift;
 
-    unless(defined($c->stash('pg_db'))){
+    unless($MOJO_DB){
         my $host     = cfg('database.host');
         my $dbname   = cfg('database.name');
         my $user     = cfg('database.user');
         my $password = cfg('database.password');
-        my $pg = Mojo::Pg->new("postgresql://${user}:${password}\@${host}/${dbname}");
-
-        $c->stash({pg_db => $pg});
+        $MOJO_DB = Mojo::Pg->new("postgresql://${user}:${password}\@${host}/${dbname}");
     }
 
-    return $c->stash('pg_db')->pubsub;
+    return $MOJO_DB->pubsub;
 }
 
 sub register_channels {
