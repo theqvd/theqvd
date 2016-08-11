@@ -1037,4 +1037,23 @@ Up.I = {
         
         Up.I.chosenElement($('select[name="connection"]'), 'single100');
     },
+    
+    getStateString: function (state) {
+        switch (state) {
+            case 'connected':
+                var stateString = 'Connected';
+                break;
+            case 'disconnected':
+                var stateString = 'Disconnected';
+                break;
+            case 'connecting':
+                var stateString = 'Connecting';
+                break;
+            case 'reconnecting':
+                var stateString = 'Reconnecting';
+                break;
+        }
+        
+        return stateString;
+    }
 }

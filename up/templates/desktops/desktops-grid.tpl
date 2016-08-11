@@ -12,10 +12,10 @@
                 }
                 else {
                     $.each(models, function (iModel, model) {
-                        var connected = model.get('state') == 'connected';
+                        var stateString = Up.I.getStateString(model.get('state'));
                 %>
-                    <div class="grid-cell js-grid-cell <%= connected ? 'grid-connected js-grid-connected' : 'grid-disconnected js-grid-disconnected' %>" data-state="<%= connected ? 'connected' : 'disconnected' %>"" data-id="<%= model.get('id') %>">
-                        <div class="grid-cell-area js-grid-cell-area js-connect-btn" data-id="<%= model.get('id') %>" <%= connected ? '' : 'data-i18n="[title]Connect"' %>>
+                    <div class="grid-cell js-grid-cell" data-state="<%= model.get('state') %>" data-id="<%= model.get('id') %>">
+                        <div class="grid-cell-area js-grid-cell-area js-connect-btn" data-id="<%= model.get('id') %>">
                             <i class="<%= CLASS_ICON_DESKTOP_CONNECTED %> grid-cell-icon js-grid-cell-icon js-grid-cell-hiddeable" data-id="<%= model.get('id') %>"></i>
                             <div class="corner-image"><img src="images/ladybird_white.png" data-id="<%= model.get('id') %>"></div>
                             <div class="bigtext bold vm-name" data-id="<%= model.get('id') %>"><%= model.get('alias') ? model.get('alias') : model.get('name') %> <br>id: <%= model.get('id') %></div>                            
@@ -26,7 +26,7 @@
 
                         <div class="grid-cell-buttonset">
                             <a href="javascript:" data-id="<%= model.get('id') %>" class="<%= CLASS_ICON_CONF_SPECIFIC %> <%= model.get('settings') && model.get('settings_enabled') ? 'button' : 'button2' %> js-vm-settings vm-link-button button-icon" data-i18n="[title]Configure connection settings"></a>
-                            <i class="desktop-state js-desktop-state" data-i18n="<%= connected ? 'Connected' : 'Disconnected' %>" data-id="<%= model.get('id') %>" style="position: absolute; bottom: 10px; right: 10px;"></i>
+                            <i class="desktop-state js-desktop-state" data-i18n="<%= stateString %>" data-id="<%= model.get('id') %>" style="position: absolute; bottom: 10px; right: 10px;"></i>
                         </div>
                     </div>
                 <%

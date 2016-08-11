@@ -206,7 +206,7 @@ fieldset {
     border-radius: 2px;
     border: $col_grey3 solid 2px;
     
-    &.grid-connected {
+    &.grid-connected, &.grid-reconnecting {
         border-color: $col_enabled;
         
         .grid-cell-buttonset {
@@ -265,8 +265,10 @@ fieldset {
         padding: 10px;
     }
     
-    &.grid-disconnected .grid-cell-area {
-        cursor: pointer;
+    &.grid-disconnected, &.grid-connected {
+        .grid-cell-area {
+            cursor: pointer;
+        }
     }
     
     .grid-cell-buttonset {
@@ -421,6 +423,15 @@ fieldset {
     }
 }
 
+.row-desktop {
+    &.row-connected, &.row-reconnecting {
+        td:first-child {
+            background: $col_enabled;
+            color: $col_whiter;
+        }
+    }
+}
+
 .profile-select {
     clear: none;
     padding: 4px;
@@ -432,4 +443,12 @@ fieldset {
 
 div.list {
     margin-left: 55px;
+}
+
+.section-container {
+    padding: 55px 65px 0px 65px;
+    width: 100%;
+    // Mockups version
+    //padding: 0px;
+    //width: 60%;
 }

@@ -26,8 +26,7 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
     listEvents: {
         'click .js-change-viewmode': 'changeViewMode',
         'click .js-vm-settings': 'editDesktopSettings',
-        'click .js-grid-disconnected .js-connect-btn': 'connectDesktop',
-        'click .js-list-disconnected .js-connect-btn': 'connectDesktop',
+        'click .js-connect-btn': 'connectDesktop',
         'change select[name="active_configuration_select"]': 'changeActiveConf',
         'mouseover .js-grid-cell-area': 'showGridIcon',
         'mouseout .js-grid-cell-area': 'hideGridIcon'
@@ -41,11 +40,11 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
     },
     
     showGridIcon: function (e) {
-        $('.js-grid-disconnected .js-grid-cell-icon.js-grid-cell-hiddeable[data-id="' + $(e.target).attr('data-id') + '"]').show();
+        $('.js-grid-cell-icon.js-grid-cell-hiddeable[data-id="' + $(e.target).attr('data-id') + '"]').show();
     },  
     
     hideGridIcon: function (e) {
-        $('.js-grid-disconnected .js-grid-cell-icon.js-grid-cell-hiddeable[data-id="' + $(e.target).attr('data-id') + '"]').hide();
+        $('.js-grid-cell-icon.js-grid-cell-hiddeable[data-id="' + $(e.target).attr('data-id') + '"]').hide();
     },
     
     // Extend renderListBlock to fill active configuration select
@@ -85,6 +84,10 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
         );
         
         $(that.listContainer).html(template);
+        
+        // Update status
+        Up.CurrentView.setAllDesktopsState(that.collection.models);
+        
         that.paginationUpdate();
         that.shownElementsLabelUpdate();
         
@@ -98,6 +101,15 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
     afterRender: function () {
         Up.Views.ListView.prototype.afterRender.apply(this, []);        
         Up.WS.openWebsocket('desktops', Up.WS.changeWebsocketDesktops);
+    },
+    
+    // Change view mode when click on the view mode button and render list
+    changeViewMode: function (e) {
+        this.viewMode = $(e.target).attr('data-viewmode');
+        $('.js-change-viewmode').removeClass('disabled');
+        $(e.target).addClass('disabled');
+        
+        this.renderList();
     },
     
     changeActiveConf: function (e) {
@@ -115,31 +127,60 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
         }
     },
     
-    setDesktopState: function (id, state) {
-        var cellDiv = $('.js-grid-cell[data-id="' + id + '"]');
+    setAllDesktopsState: function (models) {
+        var that = this;
+        $.each(models, function (iModel, model) {
+            that.setDesktopState(model.get('id'), model.get('state'));
+        });
+    },
+    
+    setDesktopState: function (id, newState) {
+        // Grid view
         var iconDiv = $('.js-grid-cell-icon[data-id="' + id + '"]');
         var stateDiv = $('.js-desktop-state[data-id="' + id + '"]');
         
-        $(cellDiv).removeClass('grid-disconnected js-grid-disconnected grid-connected js-grid-connected');
-        $(cellDiv).attr('data-state', state);
+        var cellDiv = $('.js-grid-cell[data-id="' + id + '"]');
+        var cellCurrentState = $(cellDiv).attr('data-state');
+        $(cellDiv).removeClass('grid-disconnected js-grid-disconnected grid-connected js-grid-connected grid-connecting js-grid-connecting grid-reconnecting js-grid-reconnecting');
 
-        switch(state) {
+        // List view
+        var cellRow = $('.js-row-desktop[data-id="' + id + '"]');
+        var rowCurrentState = $(cellRow).attr('data-state');
+        $(cellRow).removeClass('row-disconnected js-row-disconnected row-connected js-row-connected row-connecting js-row-connecting row-reconnecting js-row-reconnecting');
+        
+        // Depending on the current view, state will be retrieved from one or another
+        var currentState = cellCurrentState || rowCurrentState;
+        
+        // When try to connect to connected desktop, establish "fake ui state" reconnecting 
+        if (newState == 'connecting' && (currentState == 'connected' || currentState == 'reconnecting')) {
+            newState = 'reconnecting';
+        }
+        
+        // Update DOM new state
+        $(cellDiv).attr('data-state', newState);
+        $(cellRow).attr('data-state', newState);
+        
+        // Change Interfce with style and animations
+        switch(newState) {
             case 'connected':
-                $(iconDiv).removeClass('js-grid-cell-hiddeable').addClass('animated faa-flash').hide();
-                $(stateDiv).html($.i18n.t('Connected'));
-                $(cellDiv).addClass('grid-connected js-grid-connected');
-                break;
             case 'disconnected':
                 $(iconDiv).addClass('js-grid-cell-hiddeable').removeClass('animated faa-flash').hide();
-                $(stateDiv).html($.i18n.t('Disconnected'));
-                $(cellDiv).addClass('grid-disconnected js-grid-disconnected');
+                $(stateDiv).removeClass('animated faa-flash');
                 break;
             case 'connecting':
+            case 'reconnecting':
                 $(iconDiv).removeClass('js-grid-cell-hiddeable').addClass('animated faa-flash').show();
-                $(stateDiv).html($.i18n.t('Connecting') + '...');
-                $(cellDiv).addClass('grid-connecting js-grid-connecting');
+                $(stateDiv).addClass('animated faa-flash');
                 break;
         }
+        
+        $(cellRow).addClass('row-' + newState + ' js-row-' + newState);
+        $(cellDiv).addClass('grid-' + newState + ' js-grid-' + newState);
+        $(stateDiv).attr('data-i18n', Up.I.getStateString(newState)).html($.i18n.t(Up.I.getStateString(newState)));
+        
+        // Store new state in model
+        var model = Up.CurrentView.collection.where({id: parseInt(id)})[0];
+        model.set('state', newState);
     },
     
     startConnectionTimeout: function (id) {
@@ -152,7 +193,7 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
             // If desktop has connected status, break timeout countdown
             if ($('.js-grid-cell[data-id="' + id + '"]').attr('data-state') == 'connected') {
                 clearInterval(that.connectionTimeouts[id].timeout);
-                return;
+                return false;
             };
             
             // Increase counter

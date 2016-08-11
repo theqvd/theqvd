@@ -447,13 +447,4 @@ Up.Views.ListView = Up.Views.MainView.extend({
             $(e.target).val(this.collection.offset);
         }
     },
-    
-    // Change view mode when click on the view mode button and render list
-    changeViewMode: function (e) {
-        this.viewMode = $(e.target).attr('data-viewmode');
-        $('.js-change-viewmode').removeClass('disabled');
-        $(e.target).addClass('disabled');
-        
-        this.renderList();
-    },
 });
