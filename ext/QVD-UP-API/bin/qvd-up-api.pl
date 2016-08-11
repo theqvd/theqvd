@@ -178,11 +178,9 @@ any [ qw(POST) ] => '/api/login' => sub {
 
     my $user_rs = rs('User')->search( { login => $user, password => password_to_token($password) } );
 
-    if (cfg( 'wat.multitenant' )) {
-        my $tenant_obj = rs('Tenant')->search( { name => $tenant } )->first;
-        my $tenant_id = defined($tenant_obj) ? $tenant_obj->id : undef;
-        $user_rs = $user_rs->search( { tenant_id => $tenant_id } );
-    }
+    my $tenant_obj = rs('Tenant')->search( { name => $tenant } )->first;
+    my $tenant_id = defined($tenant_obj) ? $tenant_obj->id : undef;
+    $user_rs = $user_rs->search( { tenant_id => $tenant_id } );
 
     my $user_obj = $user_rs->first;
 
