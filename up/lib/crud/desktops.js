@@ -86,7 +86,7 @@ Up.CRUD.desktops = {
 
                 // Store ID of the desktop we are trying to connect with to use it if fails
                 that.connectingDesktopId = selectedId;
-                
+                console.log('qvd:' + query);
                 window.protocolCheck('qvd:' + query, that.connectDesktopFail)
             });
         }, this, 'GET');

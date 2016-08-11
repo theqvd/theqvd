@@ -24,10 +24,10 @@
                         </div>
                     </td>
                     <td>
-                        <a class="<%= CLASS_ICON_CONF_SPECIFIC %> <%= model.get('settings') && model.get('settings_enabled') ? 'button' : 'button2' %> js-vm-settings connect-btn js-connect-btn" data-id="<%= model.get('id') %>" data-i18n="Configure"></a>
+                        <a class="<%= CLASS_ICON_CONF_SPECIFIC %> <%= model.get('settings') && model.get('settings_enabled') ? 'button' : 'button2' %> js-desktop-settings-btn desktop-settings-btn" data-id="<%= model.get('id') %>" data-i18n="Configure"></a>
                     </td>
                     <td class="js-list-<%= model.get('state') %>">
-                        <a class="<%= CLASS_ICON_DESKTOP_CONNECTED %> button2 js-connect-btn connect-btn js-connect-btn" data-id="<%= model.get('id') %>" data-i18n="Connect"></a>
+                        <a class="<%= CLASS_ICON_DESKTOP_CONNECTED %> button2 js-desktop-connect-btn desktop-connect-btn" data-id="<%= model.get('id') %>" data-i18n="Connect"></a>
                     </td>
                 </tr>
         <%

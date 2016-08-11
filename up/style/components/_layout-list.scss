@@ -201,7 +201,11 @@ fieldset {
     }
     
     color: $col_whiter;
-    background: $col_grey_desktop;
+    background: $col_grey2;
+    
+    @include in(desktop) {
+        background: $col_grey_desktop;
+    }
     
     border-radius: 2px;
     border: $col_grey3 solid 2px;
@@ -210,10 +214,15 @@ fieldset {
         border-color: $col_enabled;
         
         .grid-cell-buttonset {
-            background: $col_enabled;
+            @include in(desktop) {
+                background: $col_enabled;
+            }
             
             .desktop-state {
-                color: $col_whiter;
+                color: $col_enabled;
+                @include in(desktop) {
+                    color: $col_whiter;
+                }
                 font-weight: bold;
             }
         }
@@ -249,15 +258,30 @@ fieldset {
     a {
         &.button, &.button2 {
             text-align: center;
-            font-size: 24px;
-            
-            margin-right: 10px;
-            width: 40px;
-            height: 40px;
+            font-size: 51px;
+            margin-right: 0px;
+            margin-top: 7px;
+            width: 63px;
+            height: 63px;
             border-radius: 100%;
-            position: absolute;
-            bottom: 5px;
-            left: 5px;
+            
+            @include in(desktop) {
+                font-size: 24px;
+                
+                width: 40px;
+                height: 40px;
+                margin-top: 0px;
+                margin-right: 160px;
+            }
+            
+            &.desktop-connect-btn {
+            }            
+            
+            &.desktop-settings-btn {
+                @include in(mobile) {
+                    margin-left: 15px;
+                }
+            }
         }
     }
     
@@ -272,27 +296,45 @@ fieldset {
     }
     
     .grid-cell-buttonset {
-        padding: 10px;
+        padding: 5px;
         width: 100%; 
         height: 50px;
         background: $col_grey2;
         color: $col_grey1;
+        
+        
+        .desktop-state {
+            position: absolute; 
+            bottom: 10px;
+            right: 10px;
+        }
     }
     
-    .vm-link {
-        float: left;
-        margin-left: 10px;
-        @include in(desktop) {
-            float: none;
-            margin: inherit;
+    @include in(mobile) {
+        .grid-cell-area {        
+            float: left;
+            width: 50%;
+            height: 90px;
         }
+        
+        .grid-cell-buttonset {       
+            float: left;
+            width: 50%;
+            height: 90px;
+            
+            .desktop-state {
+                left: 10px;
+            }
+        } 
     }
     
     .vm-name {
         width: 100%;
+        color: $col_blacker;
         
         @include in(desktop) {
             width: 100%;
+            color: $col_whiter;
         }
     }
     
@@ -382,45 +424,6 @@ fieldset {
             }
         }
     }
-    
-    .vm-link {
-        width: 60%;
-        float: right;
-        position: relative;
-        height: 37px;
-        
-        @include in(desktop) {
-            height: 25px;
-            float: none;
-            width: 100%;
-            position: relative;
-
-            a {
-                width: 100%;
-            }
-        }
-    }
-    
-    .vm-link-button {
-        width: 60%;
-        float: right;
-        padding-left: 6px;
-        
-        @include in(desktop) {
-            width: 100%;
-            float: none;
-        }
-        
-        &.desktop {
-            @include in(desktop) {
-                display: block;
-            }
-        }
-        
-        &:before {
-            font-size: 31px;
-        }
-    }
 }
 
 .row-desktop {
@@ -443,11 +446,18 @@ fieldset {
 
 div.list {
     padding-right: 10px;
-    margin-left: 55px;
+    
+    @include in(desktop) {
+        margin-left: 55px;
+    }
 }
 
 .section-container {
-    padding: 35px 65px 0px 65px;
+    
+    padding: 0px;
+    @include in(desktop) {
+        padding: 35px 65px 0px 65px;
+    }
     width: 100%;
     // Mockups version
     //padding: 0px;

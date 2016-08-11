@@ -956,7 +956,7 @@ Up.I = {
     },  
     
     isMobile: function () {
-        return $('.js-mobile-menu-hamburger').css('display') != 'none';
+        return !$('.js-header-logo-desktop') || $('.js-header-logo-desktop').css('display') == 'none';
     },
     
     

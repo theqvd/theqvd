@@ -224,10 +224,18 @@ table.settings-editor-table {
         td {
             border: 0;
             padding: 6px 4px 4px 6px;
-            height: 25px;
+            height: 40px;
             
-            &:first-child {
-                text-align: right;
+            @include in(desktop) {                
+            height: 25px;
+            }
+
+            &:first-child {               
+                text-align: left;
+                
+                @include in(desktop) {                
+                    text-align: right;
+                }
                 vertical-align: middle;
             }
         }

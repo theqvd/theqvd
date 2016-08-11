@@ -81,7 +81,7 @@ Up.Views.MainView = Backbone.View.extend({
         'input .filter-control>input': 'filterBySubstring',
         'ajaxError': 'handleAjaxError'
     },
-    
+
     handleAjaxError: function (event, request, settings, thrownError) {
         alert('error');
     },

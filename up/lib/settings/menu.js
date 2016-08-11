@@ -47,6 +47,7 @@ Up.I.cornerMenuOriginal = {
         welcome: {
             text: '',
             textClass: 'js-login-welcome login-welcome',
+            liClass: 'desktop',
             subMenu: _.extend({}, Up.I.menuUserOriginal)
         },      
     

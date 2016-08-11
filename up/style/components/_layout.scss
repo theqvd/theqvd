@@ -46,6 +46,9 @@ body {
     
     .wrapper {
         margin-left: $menu_lat_width;
+        @include in(mobile) {
+            margin-left: 0;
+        }
     }
 }
 
@@ -97,6 +100,7 @@ body {
             background-image: url($header_logo);
             background-repeat: no-repeat;
             background-size: 100%;
+            cursor: pointer;
         }
         
         .superadmin-select {
@@ -316,6 +320,11 @@ body {
     
     width: $menu_lat_width;
     
+    @include in(mobile) {
+        width: 100%;
+        height: 40px;
+    }
+    
     position: fixed;
     bottom: 0px;
     padding: 7px;
@@ -340,6 +349,11 @@ body {
         background-repeat: no-repeat;
         background-size: 100%;
         margin: 0 auto;
+        
+        @include in(mobile) {
+            height: 15px;
+            width: 35px;
+        }
     }
 }
 
@@ -398,6 +412,19 @@ span.text {
     background: $header_bg;
     height: 100vh;
     width: $menu_lat_width;
+    
+    @include in(mobile) {
+        width: 100%;
+        background: $col_grey3;
+    }
+    
+    &--hidden {
+        @include in(mobile) {
+            position: absolute;
+            left: -1000px;
+        }
+    }
+    
     padding-top: 60px;
     position: fixed;
     top: 0px;
@@ -412,10 +439,12 @@ span.text {
         vertical-align: middle;
         padding-left: 3px;
         padding-top: 10px;
+        
         &:hover, &.menu-option--current {
             background: $col_brand;
             cursor: pointer;
-            
+            color: $col_whiter;
+
             i {
                 &:before {    
                     font-size: 35px;
@@ -427,14 +456,39 @@ span.text {
                     padding: 6px;
                     width: 48px;
                     height: 46px;
+                
+                    @include in(mobile) {
+                        font-size: 18px;
+                        width: 28px;
+                        height: 28px;
+                        padding: 5px 4px;
+                        display: block;
+                    }
                 }
             }
         }
         
         font-size: 12px;
+        @include in(mobile) {
+            font-size: 14px;
+            padding-top: 5px;
+        }
+        
         color: $col_whiter;
         
+        @include in(mobile) {
+            color: $col_blacker;
+            border: 2px $col_whiter solid;
+            margin: 2px;
+        }
+        
         i {
+            @include in(mobile) {
+                text-align: center;
+                width: 28px;
+                margin-left: 47%;
+            }
+            
             &:before {    
                 font-size: 30px;
                 text-align: center;
@@ -445,6 +499,13 @@ span.text {
                 padding: 8px;
                 width: 48px;
                 height: 46px;
+                
+                @include in(mobile) {
+                    font-size: 12px;
+                    width: 28px;
+                    height: 26px;
+                    display: block;
+                }
             }
             
             width: 45px;
@@ -457,6 +518,12 @@ span.text {
             padding-left: 10px;
             padding-top: 10px;
             width: 145px;
+            
+            @include in(mobile) {
+                width: 100%;
+                padding-top: 0;
+                text-align: center;
+            }
         }
     }
 }

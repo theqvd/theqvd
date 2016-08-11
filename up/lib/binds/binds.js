@@ -136,6 +136,10 @@ Up.B = {
         this.bindEvent('click', '#toc a', this.navigationBinds.clickToc);
         
         // Screen help button
+        this.bindEvent('click', '.js-header-logo-desktop', this.navigationBinds.clickLogoDesktop);  
+        this.bindEvent('click', '.js-header-logo-mobile', this.navigationBinds.clickLogoMobile);  
+        
+        // Screen help button
         this.bindEvent('click', 'a[data-docsection]', this.navigationBinds.clickScreenHelp);
         
         // Back to top button
@@ -266,6 +270,10 @@ Up.B = {
                 $('.menu').slideUp();
             }
                         
+            setTimeout(function () {
+                $('.js-menu-lat').addClass('menu-lat--hidden');
+            }, 200);
+            
             var id = $(this).attr('data-target');
             window.location = '#/' + id;
             Up.I.M.closeMessage();
@@ -479,6 +487,17 @@ Up.B = {
             $('html,body').animate({
                 scrollTop: 0
             }, 'fast');
+        },
+        
+        clickLogoDesktop: function () {
+            window.location = '#';
+        }, 
+        
+        clickLogoMobile: function () {
+            setTimeout(function () {
+                $('.js-menu-lat').removeClass('menu-lat--hidden');
+                $('.menu-option').removeClass('menu-option--current');
+            }, 200);
         },
     },
     

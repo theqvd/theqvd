@@ -1,6 +1,10 @@
 Up.I.L = {
     spies: {},
     spyMouseOver: function (selector, leaveCallback) {
+        if (Up.I.isMobile()) {
+            return;
+        }
+        
         // Only create spy when it is not defined yet
         if (typeof this.spies[selector] == 'undefined') {
             this.spies[selector] = setInterval(function() {

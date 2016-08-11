@@ -25,8 +25,8 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
     // This events will be added to view events
     listEvents: {
         'click .js-change-viewmode': 'changeViewMode',
-        'click .js-vm-settings': 'editDesktopSettings',
-        'click .js-connect-btn': 'connectDesktop',
+        'click .js-desktop-settings-btn': 'editDesktopSettings',
+        'click .js-desktop-connect-btn': 'connectDesktop',
         'change select[name="active_configuration_select"]': 'changeActiveConf',
         'mouseover .js-grid-cell-area': 'showGridIcon',
         'mouseout .js-grid-cell-area': 'hideGridIcon'
@@ -137,7 +137,12 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
     
     setDesktopState: function (id, newState) {
         // Grid view
-        var iconDiv = $('.js-grid-cell-icon[data-id="' + id + '"]');
+        if (Up.I.isMobile()) {
+            var iconDivMobile = $('.js-desktop-connect-btn[data-id="' + id + '"]');
+        }
+        else {
+            var iconDiv = $('.js-grid-cell-icon[data-id="' + id + '"]');
+        }
         var stateDiv = $('.js-desktop-state[data-id="' + id + '"]');
         
         var cellDiv = $('.js-grid-cell[data-id="' + id + '"]');
@@ -165,12 +170,22 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
         switch(newState) {
             case 'connected':
             case 'disconnected':
-                $(iconDiv).addClass('js-grid-cell-hiddeable').removeClass('animated faa-flash').hide();
+                if (Up.I.isMobile()) {
+                    $(iconDivMobile).removeClass('animated faa-flash');
+                }
+                else {
+                    $(iconDiv).addClass('js-grid-cell-hiddeable').removeClass('animated faa-flash').hide();
+                }
                 $(stateDiv).removeClass('animated faa-flash');
                 break;
             case 'connecting':
             case 'reconnecting':
-                $(iconDiv).removeClass('js-grid-cell-hiddeable').addClass('animated faa-flash').show();
+                if (Up.I.isMobile()) {
+                    $(iconDivMobile).addClass('animated faa-flash');
+                }
+                else {
+                    $(iconDiv).removeClass('js-grid-cell-hiddeable').addClass('animated faa-flash').show();
+                }
                 $(stateDiv).addClass('animated faa-flash');
                 break;
         }

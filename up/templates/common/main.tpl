@@ -1,22 +1,16 @@
 <div class="header-wrapper js-header-wrapper">
     <div class="header">
-        <a href="#">
-            <!--<img src="images/logo-header.png" class="logo">-->
-            <div class="logo"></div>
-        </a>
-        <a href="javascript:" class="fa fa-bars mobile-menu js-mobile-menu-hamburger" id="mobile-menu"></a>
+        <div class="logo mobile js-header-logo-mobile"></div>
+        <div class="logo desktop js-header-logo-desktop"></div>
         <% 
             var cornerMenuPrint = $.extend(true, {}, cornerMenu);
+            var cornerMenuPrintMobile = $.extend(true, {}, cornerMenu);
 
-            if (!loggedIn) {
-                delete cornerMenuPrint.wat;
-                delete cornerMenuPrint.user;
-                //delete cornerMenuPrint.help.subMenu.about;
-            } 
+            delete cornerMenuPrintMobile.welcome;
         %>
 
         <div class="js-menu-corner menu-corner">
-            <ul class="nav-collapse-corner needsclick">
+            <ul class="nav-collapse-corner needsclick desktop">
                 <% $.each(cornerMenuPrint, function (iMenu, menuOpt) { %>
                     <li class="menu-option needsclick js-menu-option-<%= iMenu %> <%= menuOpt.liClass %>">
                         <% 
@@ -35,6 +29,27 @@
                                     </li>
                                 <% }); %>
                             </ul>
+                        <% 
+                        }
+                        else { 
+                        %> 
+                            <span class="<%= menuOpt.textClass %>" data-i18n="<%= menuOpt.text %>"></span>
+                        <% 
+                        }
+                        %>
+                    </li>
+                <% }); %>
+            </ul>
+            <ul class="nav-collapse-corner needsclick mobile">
+                <% $.each(cornerMenuPrintMobile, function (iMenu, menuOpt) { %>
+                    <li class="menu-option needsclick js-menu-option-<%= iMenu %> <%= menuOpt.liClass %>">
+                        <% 
+                        if (menuOpt.link) { 
+                        %>
+                            <a href="<%= menuOpt.link %>" class="needsclick">
+                                <i class="<%= menuOpt.icon %> needsclick2"></i>
+                                <span class="<%= menuOpt.textClass %> needsclick2" data-i18n="<%= menuOpt.text %>"></span>
+                            </a>
                         <% 
                         }
                         else { 
