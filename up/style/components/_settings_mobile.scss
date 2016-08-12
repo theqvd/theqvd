@@ -1,0 +1,39 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                @SETTINGS
+                components/_settings.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+.settings-list-table {
+    border-collapse: separate;
+    border-spacing: 5px;
+    background: transparent !important;
+    border: 0 !important;
+    
+    tbody:last-child {
+        tr, td {
+            background: transparent !important;
+            border: 0;
+            position: relative;
+            
+            a.new-workspace-btn {
+                width: 100%;
+                position: absolute;
+                left: 0;
+                height: 50px;
+                padding-top: 17px;
+            }
+        }
+    }
+    
+    td {
+        text-align: center;
+        height: 65px !important;
+        @include font-size(3);
+    }
+}

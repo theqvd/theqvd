@@ -77,7 +77,6 @@
 
 @mixin button ($col, $col_back, $col_hover, $col_back_hover) {
     @extend %not-selectable;
-    z-index: 2;
     
     color: $col;
     

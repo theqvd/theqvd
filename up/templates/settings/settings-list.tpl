@@ -1,14 +1,14 @@
 <table class="list settings-list-table col-width-99">
-    <tbody>
-        <tr>
+    <tbody >
+        <tr class="desktop-row">
             <th data-i18n="Workspaces configuration"></th>
-            <th colspan=4 class="col-width-10" data-i18n="Options"></th>
+            <th colspan=3 class="col-width-10" data-i18n="Options"></th>
         </tr>
     </tbody>
     <tbody class="bb-settings-workspaces"></tbody>
     <tbody>
         <tr>
-            <td colspan=5><a class="button js-new-workspace-btn" data-i18n="Create new Workspace"></a></td>
+            <td colspan=<%= Up.I.isMobile() ? '1' : '4' %>><a class="button2 js-new-workspace-btn new-workspace-btn" data-i18n="Create new Workspace"></a></td>
         </tr>
     </tbody>
 </table>

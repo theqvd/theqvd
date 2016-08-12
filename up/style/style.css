@@ -601,7 +601,6 @@ input[type="checkbox"], input[type="radio"] {
   cursor: pointer; }
 
 a.button, button.button {
-  z-index: 2;
   color: #EBEBEB;
   background-color: #FF5C00;
   background-repeat: repeat-x;
@@ -628,7 +627,6 @@ a.button, button.button {
     margin-right: 10px;
     color: #EBEBEB; }
 a.button2, button.button2 {
-  z-index: 2;
   color: #666;
   background-color: #EBEBEB;
   background-repeat: repeat-x;
@@ -655,7 +653,6 @@ a.button2, button.button2 {
     margin-right: 10px;
     color: #666; }
 a.button--green, button.button--green {
-  z-index: 2;
   color: #EBEBEB;
   background-color: #006600;
   background-repeat: repeat-x;
@@ -682,7 +679,6 @@ a.button--green, button.button--green {
     margin-right: 10px;
     color: #EBEBEB; }
 a.button--red, button.button--red {
-  z-index: 2;
   color: #EBEBEB;
   background-color: #990000;
   background-repeat: repeat-x;
@@ -1575,7 +1571,7 @@ body {
         .wrapper .content div.list {
           margin-left: 55px; } }
     .wrapper .content .section-container {
-      padding: 0px;
+      padding: 10px;
       width: 100%; }
       @media screen and (min-width: 41em) {
         .wrapper .content .section-container {
@@ -3056,7 +3052,6 @@ table.settings-editor-table {
     .ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-close {
       display: none; }
   .ui-dialog .ui-state-hover, .ui-dialog .ui-state-focus {
-    z-index: 2;
     color: #EBEBEB;
     background-color: #FF5C00;
     background-repeat: repeat-x;
@@ -3940,5 +3935,41 @@ td {
   @media print {
     .doc-text body.manpage div#toc {
       display: none; } }
+
+@media only screen and (max-width: 41em) {
+  /********************************************************************
+*********************************************************************
+*********************************************************************
+
+                @SETTINGS
+                components/_settings.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+  .settings-list-table {
+    border-collapse: separate;
+    border-spacing: 5px;
+    background: transparent !important;
+    border: 0 !important; }
+    .settings-list-table tbody:last-child tr, .settings-list-table tbody:last-child td {
+      background: transparent !important;
+      border: 0;
+      position: relative; }
+      .settings-list-table tbody:last-child tr a.new-workspace-btn, .settings-list-table tbody:last-child td a.new-workspace-btn {
+        width: 100%;
+        position: absolute;
+        left: 0;
+        height: 50px;
+        padding-top: 17px; }
+    .settings-list-table td {
+      text-align: center;
+      height: 65px !important;
+      font-size: 1.2em;
+      line-height: 1.2em; }
+      @media screen and (min-width: 41em) {
+        .settings-list-table td {
+          font-size: 1.1em;
+          line-height: 1.4em; } } }
 
 /*# sourceMappingURL=style.css.map */

@@ -55,3 +55,7 @@
 @import "components/forced";
 
 @import "components/documentation";
+
+@include in(mobile) {
+    @import "components/settings_mobile";
+}

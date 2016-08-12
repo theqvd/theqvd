@@ -30,12 +30,7 @@ Up.Views.InfoView = Up.Views.MainView.extend({
         this.template = _.template(
             Up.TPL.infoConnection, {
                 cid: this.cid,
-                os: this.model.get('os'),
-                browser: this.model.get('browser'),
-                device: this.model.get('device'),
-                location: this.model.get('location'),
-                lastConnection: this.model.get('datetime'),
-                message: this.model.get('message')
+                model: this.model
             }
         );
         
