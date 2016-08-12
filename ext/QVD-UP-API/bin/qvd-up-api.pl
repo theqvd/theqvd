@@ -836,7 +836,7 @@ sub register_user_connection {
             datetime   => $datestring,
             browser    => sprintf("%s%s", $browser->browser_string // "Unknown", defined($_ = $browser->browser_version) ? " $_" : ""),
             os         => sprintf("%s%s", $browser->os_string // "Unknown", defined($_ = $browser->os_version) ? " $_" : ""),
-            device     => ( $browser->mobile ? "mobile" : ($browser->tablet ? "tablet" : "desktop") ),
+            device     => ( $browser->mobile ? "Mobile" : ($browser->tablet ? "Tablet" : "Desktop") ),
         });
 }
     
