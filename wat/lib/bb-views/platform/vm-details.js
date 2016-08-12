@@ -21,8 +21,8 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
         if (Wat.C.checkACL('vm.see.expiration')) {
             var template = _.template(
                         Wat.TPL.vmDetailsExpiration, {
-                            expiration_soft: this.model.get('expiration_soft'),
-                            expiration_hard: this.model.get('expiration_hard'),
+                            expiration_soft: Wat.U.jsonDateToString(model.get('expiration_soft')),
+                            expiration_hard: Wat.U.jsonDateToString(model.get('expiration_hard')),
                             remainingTimeSoft: Wat.U.processRemainingTime(this.model.get('time_until_expiration_soft')),
                             remainingTimeHard: Wat.U.processRemainingTime(this.model.get('time_until_expiration_hard')),
                             time_until_expiration_soft_raw: Wat.U.base64.encodeObj(this.model.get('time_until_expiration_soft')),

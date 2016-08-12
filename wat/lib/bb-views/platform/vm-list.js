@@ -28,7 +28,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
                 if (model.get('expiration_' + expirationType)) {
                     var template = _.template(
                             Wat.TPL.vmListExpiration, {
-                                expiration: model.get('expiration_' + expirationType),
+                                expiration: Wat.U.jsonDateToString(model.get('expiration_' + expirationType)),
                                 remainingTime: Wat.U.processRemainingTime(model.get('time_until_expiration_' + expirationType)),
                                 time_until_expiration_raw: Wat.U.base64.encodeObj(model.get('time_until_expiration_' + expirationType)),
                             }

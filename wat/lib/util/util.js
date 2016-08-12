@@ -79,21 +79,38 @@ Wat.U = {
         
         var dt = new Date(milliseconds);
         
-        var year = dt.getFullYear();
-        var month = this.padNumber(dt.getMonth()+1);
-        var day = this.padNumber(dt.getDate());
-        var hour = this.padNumber(dt.getHours());
-        var minute = this.padNumber(dt.getMinutes());
-        var second = this.padNumber(dt.getSeconds());
-        
-        var dtstring = year
-            + '-' + month
-            + '-' + day
-            + ' ' + hour
-            + ':' + minute
-            + ':' + second;
-        
-        return dtstring;
+        return this.dateToString(dt);
+    },
+    
+    dateToString: function (date) {
+        if (date != null) {
+            var year = date.getFullYear();
+            var month = this.padNumber(date.getMonth()+1);
+            var day = this.padNumber(date.getDate());
+            var hour = this.padNumber(date.getHours());
+            var minute = this.padNumber(date.getMinutes());
+            var second = this.padNumber(date.getSeconds());
+            
+            var dtstring = year
+                + '-' + month
+                + '-' + day
+                + ' ' + hour
+                + ':' + minute
+                + ':' + second;
+            
+            return dtstring;
+        } else  {
+            return '';
+        }
+    },
+    
+    jsonDateToString : function (string) {
+        if (string) {
+            var dt = new Date(string);
+            return this.dateToString(dt);
+        } else {
+            return '';
+        }
     },
     
     // Get the current date plus the given diffMilliseconds

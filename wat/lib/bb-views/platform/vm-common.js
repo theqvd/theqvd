@@ -53,11 +53,11 @@ Wat.Common.BySection.vm = {
                 var expiration_hard = context.find('input[name="expiration_hard"]').val();
 
                 if (expiration_soft != undefined) {
-                    arguments['expiration_soft'] = expiration_soft;
+                    arguments['expiration_soft'] = new Date(expiration_soft).toJSON();
                 }
 
                 if (expiration_hard != undefined) {
-                    arguments['expiration_hard'] = expiration_hard;
+                    arguments['expiration_hard'] = new Date(expiration_hard).toJSON();
                 }
             }
             else {

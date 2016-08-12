@@ -254,7 +254,7 @@ sub remaining_time_until
     my ($self,$then) = @_;
     my @TIME_UNITS = qw(months days hours minutes seconds);
     my %time_difference;
-    @time_difference{@TIME_UNITS} = $then->subtract_datetime(DateTime->now())->in_units(@TIME_UNITS);
+    @time_difference{@TIME_UNITS} = $then->subtract_datetime(DateTime->now( time_zone => 'UTC' ))->in_units(@TIME_UNITS);
     $time_difference{expired} = sum(values %time_difference) > 0 ? 0 : 1;
 
     \%time_difference;

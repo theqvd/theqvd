@@ -204,11 +204,11 @@ Wat.Common.BySection.di = {
                     var expiration_hard = that.dialog.find('input[name="expiration_hard"]').val();
 
                     if (expiration_soft != undefined) {
-                        args['expiration_soft'] = expiration_soft;
+                        args['expiration_soft'] = new Date(expiration_soft).toJSON();
                     }
 
                     if (expiration_hard != undefined) {
-                        args['expiration_hard'] = expiration_hard;
+                        args['expiration_hard'] = new Date(expiration_hard).toJSON();
                     }
                 }
                 
