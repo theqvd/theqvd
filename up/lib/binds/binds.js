@@ -281,6 +281,9 @@ Up.B = {
         
         // When click on a corner menu option
         clickCornerMenu: function(e) {
+            setTimeout(function () {
+                $('.js-menu-lat').addClass('menu-lat--hidden');
+            }, 200);
         },        
         
         // When click on a submenu option, show properly subsection
@@ -496,7 +499,7 @@ Up.B = {
         clickLogoMobile: function () {
             setTimeout(function () {
                 $('.js-menu-lat').removeClass('menu-lat--hidden');
-                $('.menu-option').removeClass('menu-option--current');
+                $('.menu-option').removeClass('menu-option--current menu-option-current');
             }, 200);
         },
     },
