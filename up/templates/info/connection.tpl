@@ -46,7 +46,7 @@
                 </tr>
                 <tr>
                     <td data-i18n="Device"></td>
-                    <td><i class="<%= model.get('deviceIcon') %>"></i><%= model.get('device') ? model.get('device') : '-' %></td>
+                    <td><i class="<%= model.get('deviceIcon') %>"></i><span data-i18n="<%= model.get('device') %>"><%= model.get('device') ? model.get('device') : '-' %></span></td>
                 </tr>
             <% } %>
         </tbody>
