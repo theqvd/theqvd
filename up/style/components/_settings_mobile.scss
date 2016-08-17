@@ -15,7 +15,7 @@
     background: transparent !important;
     border: 0 !important;
     
-    tbody:last-child {
+    tbody.buttonset {
         tr, td {
             background: transparent !important;
             border: 0;
@@ -35,5 +35,18 @@
         text-align: center;
         height: 65px !important;
         @include font-size(3);
+        color: 2px solid $col_grey2;
+        border: 2px solid $col_grey3;
+    }
+    
+    .activated-label {
+        font-size: 12px;
+        margin-top: 10px;
+        color: $col_enabled;
+        font-weight: bold;
+    }
+    
+    .activated-cell {
+        border: 2px solid $col_enabled;
     }
 }

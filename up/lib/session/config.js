@@ -6,7 +6,6 @@ Up.C = {
     // Login parameters
     login: '',
     password: '',
-    loggedIn: false,
     
     // API parameters
     apiUrl: '', // Will be loaded from external file config.json

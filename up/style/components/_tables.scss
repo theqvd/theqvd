@@ -224,7 +224,7 @@ table.settings-editor-table {
         td {
             border: 0;
             padding: 6px 4px 4px 6px;
-            height: 40px;
+            height: 50px;
             
             @include in(desktop) {                
             height: 25px;
@@ -237,6 +237,13 @@ table.settings-editor-table {
                     text-align: right;
                 }
                 vertical-align: middle;
+            }
+            
+            &:last-child {
+                @include in(mobile) {  
+                    text-align: center;
+                    width: 50%;
+                }
             }
         }
     }

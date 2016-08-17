@@ -6,7 +6,7 @@ Up.L = {
     
     // Process log out including cookies removement
     logOut: function () {
-        Up.C.loggedIn = false;
+        Up.L.loggedIn = false;
         Up.C.sid = '';
         Up.C.login = '';
         Up.C.acls = [];
@@ -19,12 +19,12 @@ Up.L = {
     //      sid: session ID
     //      login: administrator username
     logIn: function (sid, login) {
-        Up.C.loggedIn = true;
+        Up.L.loggedIn = true;
         
         // Reload screen after login
         var locationHash = window.location.hash;
         
-        if (locationHash == '#/login' || locationHash == '#/logout' || typeof WatTests != 'undefined') {
+        if (locationHash == '#/login' || locationHash == '#/logout' || locationHash == '#logout' || typeof WatTests != 'undefined') {
             window.location = '#';
         }
         else {
@@ -35,7 +35,7 @@ Up.L = {
     
     // Check if current admin is properly logged in
     isLogged: function () {
-        if (Up.C.loggedIn && Up.C.sid != '' && Up.C.login != '') {
+        if (Up.L.loggedIn) {
             return true;
         }
         else {
@@ -45,9 +45,7 @@ Up.L = {
     },
     
     // Recover login cookies if exist and call to API to check if credentials are correct
-    rememberLogin: function () { 
-        Up.C.loggedIn = true;
-        
+    rememberLogin: function () {         
         // Store geolocation if user agree before make first API call
         Up.C.storeGeolocation(function () {
             Up.A.performAction('account', {}, function (that) {
@@ -61,6 +59,7 @@ Up.L = {
                     Up.L.loadLogin();           
                 }
                 else {
+                    Up.L.loggedIn = true;
                     Up.L.afterLogin (); 
                 }
             });        

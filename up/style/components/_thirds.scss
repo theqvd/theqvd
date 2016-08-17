@@ -13,6 +13,7 @@
 
 .ui-dialog {
     z-index: 1002;
+    
     .ui-dialog-titlebar {
         background: $col_brand;
         text-align: center;
@@ -24,6 +25,10 @@
         
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
+        
+        @include in(mobile) {
+            display: none;
+        }
     }
     
     .ui-state-hover, .ui-state-focus  {
@@ -41,6 +46,17 @@
                 margin-right: 10px;
             }
         }
+        
+        @include in(mobile) {
+            width: 100%;
+            margin: 0px;
+            padding: 0px;
+
+            .button {
+                width: 48%;
+                margin: 0px 1% 5px 1%;;
+            }
+        }
     }
     
     .dialog-container {
@@ -55,6 +71,9 @@
 .ui-widget-overlay {
     position: fixed;
     top: 0;
+    @include in(mobile) {
+        top: 60px;
+    }
     left: 0;
     width: 100vw;
     height: 100vh;
@@ -92,7 +111,7 @@
     @include in(mobile) {
         position: absolute;
         left: auto !important;
-        top: 0 !important;
+        top: 60px !important;
     }
     
     width: $dialog_mobile_width !important;
@@ -106,7 +125,6 @@
     }
     
     td {
-        display: block;
         padding-bottom: 5px;
 
         @include in(desktop) {

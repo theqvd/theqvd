@@ -58,6 +58,43 @@ Up.CRUD.workspaces = {
         }
 
         Up.I.dialog(dialogConf);
+    }, 
+    
+    optionsWorkspace2: function (e) {
+        var selectedId = parseInt($(e.target).attr('data-id'));
+        
+        var model = this.collection.where({id: selectedId})[0];
+        
+        Up.CurrentView.renderWorkspaceOptions(model, $('.bb-content'));
+        Up.T.translate();
+        return;
+
+        var that = this;
+        var dialogConf = {
+            title: $.i18n.t('Workspace options') + ': ' + model.get('name'),
+            buttons : {
+                "Cancel": function () {
+                    // Close dialog
+                    Up.I.closeDialog($(this));
+                },
+                "Save": function () {
+                    var params = Up.I.parseForm(this);
+                    
+                    model.set(params);
+                    
+                    Up.CurrentView.updateModel({id: model.get('id')}, params, Up.CurrentView.render, model);
+                    
+                    Up.I.closeDialog($(this));
+                }
+            },
+            button1Class : 'fa fa-ban',
+            button2Class : 'fa fa-save',
+            fillCallback : function (target) { 
+                Up.CurrentView.renderWorkspaceOptions(model, target);
+            },
+        }
+
+        Up.I.dialog(dialogConf);
     },   
     
     newWorkspace: function (e, model) {
@@ -98,7 +135,7 @@ Up.CRUD.workspaces = {
         var model = Up.CurrentView.collection.where({id: parseInt(selectedId)})[0].clone();
         model.set({name: model.get('name') + ' (copy)', fixed: false});
         
-        Up.CurrentView.newWorkspace(e, model) 
+        Up.CurrentView.newWorkspace(e, model);
     },
     
     firstEditWorkspace: function (model) {

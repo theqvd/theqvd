@@ -6,11 +6,11 @@
         Up.I.forceDesktop();     
         
         if (Up.C.setupLibraries) {
-        // Setup JS libraries
-        Up.C.setupLibraries(); 
-        
-        // Setup jquery addons
-        Up.C.setupJQuery();       
+            // Setup JS libraries
+            Up.C.setupLibraries(); 
+
+            // Setup jquery addons
+            Up.C.setupJQuery();       
         }
 
         // Get list of the necessary templates on starting

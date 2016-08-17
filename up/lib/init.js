@@ -88,6 +88,8 @@ var Up = {
         L: {},
         // Messages (lib/interface/interface-messages.js)
         M: {},
+        // Mobile (lib/interface/interface-mobile.js)
+        Mobile: {},
         // Templates (lib/interface/interface-templates.js)
         T: {},
     },

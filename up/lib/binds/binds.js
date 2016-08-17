@@ -137,7 +137,7 @@ Up.B = {
         
         // Screen help button
         this.bindEvent('click', '.js-header-logo-desktop', this.navigationBinds.clickLogoDesktop);  
-        this.bindEvent('click', '.js-header-logo-mobile', this.navigationBinds.clickLogoMobile);  
+        this.bindEvent('click', '.js-back-button', this.navigationBinds.clickLoadBack);  
         
         // Screen help button
         this.bindEvent('click', 'a[data-docsection]', this.navigationBinds.clickScreenHelp);
@@ -186,6 +186,11 @@ Up.B = {
             if (firstLink) {
                 location = $(firstLink).attr('href');
                 $(firstLink).trigger('click');
+            }
+            
+            var firstCheckbox = $(e.target).find('input[type="checkbox"]')[0];
+            if (firstCheckbox) {
+                $(firstCheckbox).trigger('click');
             }
             
         });
@@ -264,15 +269,14 @@ Up.B = {
     
     navigationBinds: {
         // When click on a menu option, redirect to this section
-        clickMenu: function() {
+        clickMenu: function(e) {
             // If in mobule mode, hide menu when click
             if (Up.I.isMobile()) {
                 $('.menu').slideUp();
             }
-                        
-            setTimeout(function () {
-                $('.js-menu-lat').addClass('menu-lat--hidden');
-            }, 200);
+            
+            var dataTarget = $(e.target).attr('data-target') || $(e.target).parent().attr('data-target');
+            Up.I.Mobile.loadSection(dataTarget);
             
             var id = $(this).attr('data-target');
             window.location = '#/' + id;
@@ -281,9 +285,7 @@ Up.B = {
         
         // When click on a corner menu option
         clickCornerMenu: function(e) {
-            setTimeout(function () {
-                $('.js-menu-lat').addClass('menu-lat--hidden');
-            }, 200);
+            Up.I.Mobile.loadSection('profile');
         },        
         
         // When click on a submenu option, show properly subsection
@@ -437,22 +439,6 @@ Up.B = {
                 }
             }
             
-            // When move scroll, minify header
-/*            if ($(window).scrollTop() > 0) {
-                $('.js-header-wrapper').addClass('header-wrapper--mini');
-                $('.js-mobile-menu-hamburger').addClass('mobile-menu--mini');
-                $('.js-server-datetime-wrapper').addClass('server-datetime-wrapper--mini');
-                $('.js-menu-corner').css('top', '5px');
-                $('.js-customizer-wrapper').css('top', '40px');
-            }
-            else {
-                $('.js-header-wrapper').removeClass('header-wrapper--mini');
-                $('.js-mobile-menu-hamburger').removeClass('mobile-menu--mini');
-                $('.js-server-datetime-wrapper').removeClass('server-datetime-wrapper--mini');
-                $('.js-menu-corner').css('top', '20px');
-                $('.js-customizer-wrapper').css('top', '60px');
-            }*/
-            
             $('.js-header-wrapper').css('left', -$(window).scrollLeft());
         },
         
@@ -496,11 +482,15 @@ Up.B = {
             window.location = '#';
         }, 
         
-        clickLogoMobile: function () {
-            setTimeout(function () {
-                $('.js-menu-lat').removeClass('menu-lat--hidden');
-                $('.menu-option').removeClass('menu-option--current menu-option-current');
-            }, 200);
+        clickLoadBack: function () {
+            if (Up.I.isDialogOpen()) {
+                Up.I.closeLastDialog();
+            }
+            else {
+                Up.I.Mobile.loadSection(Up.CurrentView.backLink);
+                
+                Up.CurrentView.backLink = 'menu';
+            }
         },
     },
     

@@ -30,14 +30,15 @@
             position: relative;
             
             div.logo-login {
-                width: 100px;
-                height: 95px;
+                width: 80px;
+                height: 80px;
+                @include in(desktop) {
+                    width: 100px;
+                    height: 100px;
+                }
                 position: absolute;
                 right: 0px;
-                top: 3px;
-                @include in(desktop) {
-                    top: 45px;
-                }
+                top: 45px;
                 background-image: url($login_logo);
                 background-repeat: no-repeat;
                 background-size: 100%;
@@ -108,7 +109,10 @@
                             text-align: center;
                             display: inline-block;
                             height: 45px;
-                            padding-top: 7px;
+                            padding-top: 13px;
+                            @include in(desktop) {
+                                padding-top: 7px;
+                            }
                         }
                     }
                 }
@@ -119,7 +123,7 @@
             width: 100vw;
             position: fixed;
             left: 0;
-            bottom: 30px;
+            top: 90vh;
             text-align: center;
             height: 35px;
             padding-top: 6px;

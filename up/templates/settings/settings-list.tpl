@@ -6,7 +6,7 @@
         </tr>
     </tbody>
     <tbody class="bb-settings-workspaces"></tbody>
-    <tbody>
+    <tbody class="buttonset">
         <tr>
             <td colspan=<%= Up.I.isMobile() ? '1' : '4' %>><a class="button2 js-new-workspace-btn new-workspace-btn" data-i18n="Create new Workspace"></a></td>
         </tr>

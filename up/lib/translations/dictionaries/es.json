@@ -1,5 +1,7 @@
 {
     "About": "A cerca de",
+    "Activate": "Activar",
+    "Activated": "Activado",
     "Active configuration": "Configuración activa",
     "Add": "Añadir",
     "ADSL": "ADSL",
@@ -61,7 +63,6 @@
     "One USB ID per line": "Un ID de USB por línea",
     "Operative system": "Sistema operativo",
     "Options": "Opciones",
-    "Parameter": "Parámetro",
     "Password": "Contraseña",
     "Profile": "Perfil",
     "Portal version": "Versión del portal",
@@ -85,6 +86,7 @@
     "Virtual desktops": "Escritorios virtuales",
     "Welcome, __name__": "Bienvenido, __name__",
     "Workspace activated successfully": "Workspace activado con éxito",
+    "Workspace options": "Opciones del workspace",
     "Workspaces configuration": "Configuración de Workspaces",
     "You must download the last version and install it on your computer": "Debes descargar la última versión e instalarla en tu ordenador"
 }

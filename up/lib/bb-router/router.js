@@ -122,6 +122,11 @@ Up.Router = Backbone.Router.extend({
             clearInterval(Up.CurrentView.executionAnimationInterval);
         }
         
+        if (Up.I.isMobile()) {
+            var currentNav = Backbone.history.getFragment() || 'menu';
+            params['currentNav'] = currentNav;
+        }
+        
         Up.CurrentView = new view(params);
     }
 });

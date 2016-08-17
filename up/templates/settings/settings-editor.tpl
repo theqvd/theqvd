@@ -4,7 +4,7 @@
 
 <table class="settings-editor-table js-settings-editor-table">
     <tbody>
-        <% if (nameEditable) { %>
+        <% if (!model.get('fixed')) { %>
             <tr>
                 <td><label data-i18n="Name" for="name"></label></td>
                 <td><input type="text" name="name" id="name" value="<%= model.get('alias') ? model.get('alias') : model.get('name') %>" class="js-form-field"></td>
@@ -13,7 +13,7 @@
         <% if (canBeDisabled) { %>
             <tr>
                 <td><label data-i18n="Enable settings" for="settings_enabled"></label></td>
-                <td><input type="checkbox" name="settings_enabled" id="settings_enabled" <%= model.get('settings_enabled') ? 'checked' : '' %> class="js-form-field js-disable-settings-check"></td>
+                <td class="cell-link"><input type="checkbox" name="settings_enabled" id="settings_enabled" <%= model.get('settings_enabled') ? 'checked' : '' %> class="js-form-field js-disable-settings-check"></td>
             </tr>
         <% } %>
         <tr class="js-form-field--settingrow <%= settingsDisabled ? 'disabled-row' : '' %>">
@@ -27,20 +27,20 @@
         </tr>
         <tr class="js-form-field--settingrow <%= settingsDisabled ? 'disabled-row' : '' %>">
             <td><label data-i18n="Enable audio" for="audio"></label></td>
-            <td><input type="checkbox" name="audio" id="audio" <%= model.get('settings') && parseInt(model.get('settings').audio.value) ? 'checked' : '' %> class="js-form-field js-form-field--setting" <%= settingsDisabled ? 'disabled="disabled"' : '' %> data-subfield="settings"></td>
+            <td class="cell-link"><input type="checkbox" name="audio" id="audio" <%= model.get('settings') && parseInt(model.get('settings').audio.value) ? 'checked' : '' %> class="js-form-field js-form-field--setting" <%= settingsDisabled ? 'disabled="disabled"' : '' %> data-subfield="settings"></td>
         </tr>
         <tr class="js-form-field--settingrow <%= settingsDisabled ? 'disabled-row' : '' %>">
             <td><label data-i18n="Enable printing" for="printers"></label></td>
-            <td><input type="checkbox" name="printers" id="printers" <%= model.get('settings') && parseInt(model.get('settings').printers.value) ? 'checked' : '' %> class="js-form-field js-form-field--setting" <%= settingsDisabled ? 'disabled="disabled"' : '' %> data-subfield="settings"></td>
+            <td class="cell-link"><input type="checkbox" name="printers" id="printers" <%= model.get('settings') && parseInt(model.get('settings').printers.value) ? 'checked' : '' %> class="js-form-field js-form-field--setting" <%= settingsDisabled ? 'disabled="disabled"' : '' %> data-subfield="settings"></td>
         </tr>
         <tr class="js-form-field--settingrow <%= settingsDisabled ? 'disabled-row' : '' %>">
             <td><label data-i18n="Full screen visualization" for="fullscreen"></label></td>
-            <td><input type="checkbox" name="fullscreen" id="fullscreen" <%= model.get('settings') && parseInt(model.get('settings').fullscreen.value) ? 'checked' : '' %> class="js-form-field js-form-field--setting" <%= settingsDisabled ? 'disabled="disabled"' : '' %> data-subfield="settings"></td>
+            <td class="cell-link"><input type="checkbox" name="fullscreen" id="fullscreen" <%= model.get('settings') && parseInt(model.get('settings').fullscreen.value) ? 'checked' : '' %> class="js-form-field js-form-field--setting" <%= settingsDisabled ? 'disabled="disabled"' : '' %> data-subfield="settings"></td>
         </tr>
         
         <tr class="js-form-field--settingrow <%= settingsDisabled ? 'disabled-row' : '' %>">
             <td><label data-i18n="Share folders" for="share_folders"></label></td>
-            <td><input type="checkbox" name="share_folders" id="share_folders" <%= model.get('settings') && parseInt(model.get('settings').share_folders.value) ? 'checked' : '' %> class="js-form-field js-form-field--setting js-share-folders-check" <%= settingsDisabled ? 'disabled="disabled"' : '' %> data-subfield="settings"></td>
+            <td class="cell-link"><input type="checkbox" name="share_folders" id="share_folders" <%= model.get('settings') && parseInt(model.get('settings').share_folders.value) ? 'checked' : '' %> class="js-form-field js-form-field--setting js-share-folders-check" <%= settingsDisabled ? 'disabled="disabled"' : '' %> data-subfield="settings"></td>
         </tr>
         <tr class="js-form-field--settingrow js-form-field--foldersrow <%= settingsDisabled ? 'disabled-row' : '' %> <%= model.get('settings') && parseInt(model.get('settings').share_folders.value) ? '' : 'disabled-row' %>">
             <td colspan=2>                
@@ -51,7 +51,7 @@
         
         <tr class="js-form-field--settingrow <%= settingsDisabled ? 'disabled-row' : '' %>">
             <td><label data-i18n="Share USB" for="share_usb"></label></td>
-            <td><input type="checkbox" name="share_usb" id="share_usb" <%= model.get('settings') && parseInt(model.get('settings').share_usb.value) ? 'checked' : '' %> class="js-form-field js-form-field--setting js-share-usb-check" <%= settingsDisabled ? 'disabled="disabled"' : '' %> data-subfield="settings"></td>
+            <td class="cell-link"><input type="checkbox" name="share_usb" id="share_usb" <%= model.get('settings') && parseInt(model.get('settings').share_usb.value) ? 'checked' : '' %> class="js-form-field js-form-field--setting js-share-usb-check" <%= settingsDisabled ? 'disabled="disabled"' : '' %> data-subfield="settings"></td>
         </tr>
         <tr class="js-form-field--settingrow js-form-field--usbrow <%= settingsDisabled ? 'disabled-row' : '' %> <%= model.get('settings') && parseInt(model.get('settings').share_usb.value) ? '' : 'disabled-row' %>">
             <td colspan=2>                

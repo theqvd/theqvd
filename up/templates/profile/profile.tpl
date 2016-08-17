@@ -1,9 +1,5 @@
 <div class="<%= cid %> section-container">
     <table class="details">
-        <tr>
-            <th><span data-i18n="Parameter"></th>
-            <th><span data-i18n="Value"></th>
-        <tr>
             <td><i class="<%= CLASS_ICON_USER %>"></i><span data-i18n="Username"></span></td>
             <td>
                 <%= model.get('username') %>

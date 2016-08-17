@@ -47,6 +47,6 @@ Up.Views.LoginView = Up.Views.MainView.extend({
         
         $(this.el).html(this.template);
         
-        Up.T.translateAndShow();
-    }
+        Up.T.translateAndShow();                
+    },
 });

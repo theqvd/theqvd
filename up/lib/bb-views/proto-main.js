@@ -10,8 +10,10 @@ Up.Views.MainView = Backbone.View.extend({
     currentMenu: '', // platform-setup
     sideViews: [],
     templates: {},
+    dialogs: [],
+    backLink: 'menu',
     
-    initialize: function () {
+    initialize: function (params) {
         _.bindAll(this, 'render');
         
         Up.C.storeGeolocation();
@@ -30,6 +32,8 @@ Up.Views.MainView = Backbone.View.extend({
             that.beforeRender(); 
             render(); 
             that.afterRender(); 
+                
+            Up.I.Mobile.loadSection(params.currentNav);
             return that; 
         }); 
 

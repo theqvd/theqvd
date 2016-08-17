@@ -1,5 +1,7 @@
 Up.Views.SettingsView = Up.Views.ListView.extend({  
     qvdObj: 'settings',
+    loadSectionCallback: {
+    },
     
     relatedDoc: {
     },
@@ -8,6 +10,7 @@ Up.Views.SettingsView = Up.Views.ListView.extend({
         'click .js-delete-workspace-btn': 'deleteWorkspace',
         'click .js-active-workspace-btn.js-button-activable': 'activeWorkspace',
         'click .js-button-settings-conf': 'editWorkspace',
+        'click .js-button-settings-options': 'optionsWorkspace',
         'click .js-new-workspace-btn': 'newWorkspace',
         'click .js-clone-workspace-btn': 'cloneWorkspace'
     },
@@ -27,27 +30,31 @@ Up.Views.SettingsView = Up.Views.ListView.extend({
         this.templates = $.extend({}, this.templates, templates);        
     },
     
-    renderList: function () {        
+    renderList: function (that) {  
+        var that = that || this;
+        
         // Get actived model to know what model render
-        this.activeModel = this.collection.where({active: true})[0];
+        that.activeModel = that.collection.where({active: true})[0];
         
         // List of settings
-        this.template = _.template(
+        var template = _.template(
             Up.TPL.settingsList, {
-                cid: this.cid
+                cid: that.cid
             }
         );
         
-        $('.bb-settings-list').html(this.template); 
+        $('.bb-settings-list').html(template); 
 
-        this.renderWorkspacesConfig();
+        that.renderWorkspacesConfig();
         
         // Load edition mode on active model
-        if (this.activeModel) {
-            var activeId = this.activeModel.get('id');
+        if (that.activeModel) {
+            var activeId = that.activeModel.get('id');
         }
                 
         Up.T.translateAndShow();
+        
+        this.backLink = 'menu';
     },
         
     renderWorkspacesConfig: function () {
@@ -62,4 +69,34 @@ Up.Views.SettingsView = Up.Views.ListView.extend({
         
         Up.I.addOddEvenRowClass('.bb-settings-list');
     },
+    
+    // Workspace options
+    renderWorkspaceOptions: function (model) {
+        // List of settings
+        var template = _.template(
+            Up.TPL.settingsOptions, {
+                model: model,
+                canBeDisabled: typeof model.get('settings_enabled') != 'undefined'
+            }
+        );
+        
+        $('.bb-settings-list').html(template);
+        
+        Up.I.chosenElement($('select[name="connection"]'), 'single100');
+        
+        Up.T.translate();
+    },
+    
+    optionsWorkspace: function (e) {
+        var selectedId = parseInt($(e.target).attr('data-id'));
+        
+        var model = this.collection.where({id: selectedId})[0];
+        
+        // Set backlink with settings section to back to the main screen of the section when click on back button from options screen
+        this.backLink = 'settings';
+        this.loadSectionCallback[this.backLink] = this.renderList;
+        $('.js-section-sub-title').html(model.get('name'));
+
+        this.renderWorkspaceOptions(model);
+    }
 });

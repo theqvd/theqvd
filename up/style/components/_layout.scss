@@ -14,11 +14,20 @@
 
 body {
     position: relative;
-    background: url($body_background_img) no-repeat center center fixed; 
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
+    background: url($body_background_img_mobile) no-repeat top right fixed;         
+    -webkit-background-size: auto 100%;
+    -moz-background-size: auto 100%;
+    -o-background-size: auto 100%;
+    background-size: auto 100%;
+    
+    @include in(desktop) {
+        background: url($body_background_img) no-repeat center right fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+
     overflow-x: hidden;
 }
 
@@ -78,6 +87,42 @@ body {
         }
         
         opacity: 0.90;
+    }   
+    
+    &.header-wrapper--section {
+        background: $col_brand;
+        
+        .back-button {
+            height: 60px;
+            width: 60px;
+            padding: 8px 10px;
+            cursor: pointer;
+            font-size: 40px;
+            color: $col_whiter;
+            background: $col_grey1;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 2;
+        }
+        
+        .section-title, .section-sub-title {
+            color: $col_whiter;
+            position: absolute;
+            left: 0px;
+            width: 100%;
+            text-align: center;
+            padding-left: 60px;
+        }
+            
+        .section-title {
+            top: 13px;
+            font-size: 18px;
+        }  
+        
+        .section-sub-title {
+            top: 37px;
+        }
     }
     
     .header {
@@ -415,7 +460,11 @@ span.text {
     
     @include in(mobile) {
         width: 100%;
-        background: $col_grey3;
+        background: $col_grey3 url($body_background_img_mobile) no-repeat center right fixed;     
+        -webkit-background-size: auto 100%;
+        -moz-background-size: auto 100%;
+        -o-background-size: auto 100%;
+        background-size: auto 100%;
     }
     
     &--hidden {
@@ -439,6 +488,11 @@ span.text {
         vertical-align: middle;
         padding-left: 3px;
         padding-top: 10px;
+        
+        @include in(mobile) {
+            background: $col_grey2;
+            opacity: 0.8;
+        }
         
         &:hover, &.menu-option--current {
             background: $col_brand;
@@ -525,5 +579,12 @@ span.text {
                 text-align: center;
             }
         }
+    }
+}
+
+@include in(mobile) {
+    .geolocation-title {
+        display: block;
+        margin-bottom: 5px;
     }
 }

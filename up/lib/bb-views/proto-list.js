@@ -20,7 +20,7 @@ Up.Views.ListView = Up.Views.MainView.extend({
     **  filters (object): Conditions under the list will be filtered. Format {user: 23, ...}
     */
     
-    initialize: function (params) {    
+    initialize: function (params) {   
 		// If there are fixed filters, add them to collection
         if (!$.isEmptyObject(Up.I.fixedFilters)) {
             params.filters = $.extend({}, params.filters, Up.I.fixedFilters);
@@ -30,7 +30,7 @@ Up.Views.ListView = Up.Views.MainView.extend({
         // Bind events for this section that cannot be binded using backbone (dialogs, etc.)
         Up.B.bindListEvents();
         
-        Up.Views.MainView.prototype.initialize.apply(this);
+        Up.Views.MainView.prototype.initialize.apply(this, [params]);
                 
         this.context = $('.' + this.cid);
         

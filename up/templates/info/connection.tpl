@@ -18,8 +18,13 @@
                     </tr>
                     <tr>
                         <td>
-                            <div><i data-i18n="Latitude"></i>: <%= model.get('latitude') %></div>
-                            <div><i data-i18n="Longitude"></i>: <%= model.get('longitude') %></div>
+                            <div>
+                                <span class="geolocation-title"><i data-i18n="Latitude"></i>: </span><%= model.get('latitude') %>
+                            </div>
+                            <br>
+                            <div>
+                                <span class="geolocation-title"><i data-i18n="Longitude"></i>: </span><%= model.get('longitude') %>
+                            </div>
                         </td>
                     </tr>
                     <tr class="desktop-row">

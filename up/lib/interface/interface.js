@@ -180,14 +180,16 @@ Up.I = {
     showAll: function () {
         this.showContent();
 
-        $('.wrapper ').css('visibility','visible').hide().fadeIn('fast');
+        $('.wrapper').css('visibility','visible').hide().fadeIn('fast');
         $('.js-header-wrapper').css('visibility','visible');
         $('.js-menu-lat').css('visibility','visible');
         $('.js-content').css('visibility','visible').hide().fadeIn('fast');
         $('.js-menu-corner').css('visibility','visible');
         $('.js-mobile-menu-hamburger').css('visibility','visible');
         $('.js-server-datetime-wrapper').css('visibility','visible');
-        $('.related-doc').css('visibility','visible');                
+        $('.related-doc').css('visibility','visible');       
+        $('.js-force-desktop, .js-unforce-desktop').css('visibility','visible').hide().fadeIn('fast');
+        
         $('.loading').hide();
     },
     
@@ -370,19 +372,18 @@ Up.I = {
     renderMain: function () { 
         var that = this;
         
-        // Fill the html with the template and the collection
         var template = _.template(
             Up.TPL.main, {
-                loggedIn: Up.C.loggedIn,
-                cornerMenu: this.cornerMenu,
                 forceDesktop: $.cookie('forceDesktop')
             });
         
         $('.bb-super-wrapper').html(template);
+        
+        this.renderHeader();
                 
         Up.I.updateLoginOnMenu();
 
-        if (Up.C.loggedIn) {
+        if (Up.L.loggedIn) {
             this.renderMenu();
         }
         else {
@@ -390,6 +391,30 @@ Up.I = {
             $('.js-mobile-menu-hamburger').hide();
             $('.js-server-datetime-wrapper').hide();
         }
+    },
+    
+    renderHeader: function () {
+        var template = _.template(
+            Up.TPL.header, {
+                cornerMenu: this.cornerMenu
+            });
+        
+        $('.bb-header').html(template);
+        
+        Up.I.showAll();
+    },  
+    
+    renderHeaderSection: function (section, subTitle) {
+        var template = _.template(
+            Up.TPL.headerSection, {
+                sectionTitle: Up.I.menuOriginal[section] ? Up.I.menuOriginal[section].text : 'Profile',
+                sectionSubTitle: subTitle
+            });
+        
+        $('.bb-header').html(template);
+        
+        Up.T.translate();
+        Up.I.showAll();
     },
     
     renderMenu: function () {
@@ -422,7 +447,7 @@ Up.I = {
                 footerLinks: footerLinks,
                 qvdObj: this.qvdObj
             });
-        $('.bb-menu-lat').html(template);        
+        $('.bb-menu-lat').html(template);   
     },
     
     tooltipBind: function () {
@@ -450,7 +475,7 @@ Up.I = {
         $(div).addClass('js-dialog-container');
         document.body.appendChild(div);
         
-        $(div).dialog({
+        var dialog = $(div).dialog({
             dialogClass: "loadingScreenWindow",
             resizable: false,
             resize: true,
@@ -507,11 +532,13 @@ Up.I = {
             
             close: function () {
                 // Enable scrolling in window when close
-                    $('html, body').attr('style', '');
+                $('html, body').attr('style', '');
             }
         });  
         
-        return $(div);
+        Up.CurrentView.dialogs.push(dialog);
+        
+        Up.I.Mobile.afterOpenDialog();
     },
     
     updateLoginOnMenu: function () {
@@ -843,7 +870,13 @@ Up.I = {
     
     closeDialog: function (dialog) {
         dialog.dialog('close').remove();
-        delete Up.CurrentView.dialog;
+        Up.CurrentView.dialogs.pop();
+    },
+    
+    closeLastDialog: function () {
+        var nDialogs = Up.CurrentView.dialogs.length;
+        
+        this.closeDialog(Up.CurrentView.dialogs[nDialogs-1]);
     },
     
     addOddEvenRowClass: function (listContainer) {
@@ -956,7 +989,7 @@ Up.I = {
     },  
     
     isMobile: function () {
-        return !$('.js-header-logo-desktop') || $('.js-header-logo-desktop').css('display') == 'none';
+        return !$('.js-header-logo-desktop').length || $('.js-header-logo-desktop').css('display') == 'none';
     },
     
     
@@ -1028,7 +1061,6 @@ Up.I = {
         var template = _.template(
             Up.TPL.settingsEditor, {
                 model: model,
-                nameEditable: !model.get('fixed'),
                 canBeDisabled: typeof model.get('settings_enabled') != 'undefined'
             }
         );
@@ -1055,5 +1087,9 @@ Up.I = {
         }
         
         return stateString;
+    },
+    
+    isDialogOpen: function () {
+        return Up.CurrentView.dialogs.length ? true : false;
     }
 }

@@ -12,6 +12,12 @@ Up.I.T = {
                     menu: {
                         name: 'common/menu'
                     },
+                    header: {
+                        name: 'common/header'
+                    },
+                    headerSection: {
+                        name: 'common/header-section'
+                    },
                     relatedDoc: {
                         name: 'doc/related-links'
                     }
@@ -24,6 +30,9 @@ Up.I.T = {
                     },
                     settingsList: {
                         name: 'settings/settings-list'
+                    },
+                    settingsOptions: {
+                        name: 'settings/settings-options'
                     }
                 }
                 break;
