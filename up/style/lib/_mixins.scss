@@ -23,8 +23,9 @@
     &>td {
         background-color: $col;
     }    
-    &>td:nth-child(1) {
+    &>td:first-child {
         background-color: darken($col, 4%);
+        vertical-align: middle;
     }
 }
 

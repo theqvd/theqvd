@@ -24,7 +24,7 @@ Up.Views.DownloadsView = Up.Views.MainView.extend({
             'ios': 'https://itunes.apple.com/us/app/qvd-client/id892328999?mt=8',
         };
         
-        var currentLan = window.i18n.lng();
+        var currentLan = window.i18n.lng() == '__lng__' ? window.navigator.language : window.i18n.lng();
         switch (currentLan) {
             case 'es':
                 downloadsLinks.linux = "http://theqvd.com/es/producto/descargas#_linux";

@@ -425,7 +425,7 @@ Up.I = {
             'contact': 'javascript:',
         };
         
-        var currentLan = window.i18n.lng();
+        var currentLan = window.i18n.lng() == '__lng__' ? window.navigator.language : window.i18n.lng();
         switch (currentLan) {
             case 'es':
                 footerLinks.contact = "http://theqvd.com/es/contacto";

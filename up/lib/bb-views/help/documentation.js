@@ -128,7 +128,7 @@ Up.Views.DocView = Up.Views.MainView.extend({
         // Get available guides
         var guides = Up.C.getDocGuides ();
         
-        var target = $('.setup-block');
+        var target = $('.doc-block');
         
         // Fill the html with the general search template with layer for each guide results
         var template = _.template(

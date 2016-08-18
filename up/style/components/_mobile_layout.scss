@@ -1,0 +1,155 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                @MOBILE LAYOUT: Grids, Wrappers...
+                components/_mobile_layout.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+
+/* Layout */
+
+body {
+    background: url($body_background_img_mobile) no-repeat top right fixed;         
+    -webkit-background-size: auto 100%;
+    -moz-background-size: auto 100%;
+    -o-background-size: auto 100%;
+    background-size: auto 100%;
+}
+
+* {
+    min-width: 0 !important;
+}
+
+.super-wrapper {
+    .wrapper {
+        margin-left: 0;
+    }
+}
+
+.header-wrapper {
+    width: 100%;
+    min-width: auto;
+    
+    .header {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+}
+
+.message-container {
+    left: 5%;
+    width: 90%;
+}
+
+.loading, .loading-mid {
+    width: 75px;
+    top: 25vh;
+}
+
+.loading {
+    @include icon-size(75px);
+}
+
+.loading-mid {
+    @include icon-size(45px);
+}
+
+
+.wrapper {
+    .content {
+        // Different view layouts
+        //@import "mobile_layout-home";
+        @import "mobile_layout-list";
+        //@import "mobile_layout-details";
+        //@import "mobile_layout-doc";
+        //@import "mobile_layout-login";
+    }
+}
+
+//@import "mobile_layout-editor";
+
+
+.footer {
+    width: 100%;
+    height: 40px;
+    display: none;
+    
+    .logo {
+        height: 15px;
+        width: 35px;
+    }
+}
+
+.menu-lat {
+    width: 100%;
+    background: $col_grey3 url($body_background_img_mobile) no-repeat center right fixed;     
+    -webkit-background-size: auto 100%;
+    -moz-background-size: auto 100%;
+    -o-background-size: auto 100%;
+    background-size: auto 100%;
+    
+    &--hidden {
+        position: absolute;
+        left: -1000px;
+    }
+    
+    .menu-option {
+        background: $col_grey2;
+        opacity: 0.8;
+        
+        &:hover, &.menu-option--current {
+            i {
+                &:before {  
+                    font-size: 18px;
+                    width: 28px;
+                    height: 28px;
+                    padding: 5px 4px;
+                    display: block;
+                }
+            }
+        }
+
+        font-size: 14px;
+        padding-top: 5px;
+        color: $col_blacker;
+        border: 2px $col_whiter solid;
+        margin: 2px;
+        
+        i {
+            text-align: center;
+            width: 28px;
+            margin-left: 47%;
+            
+            &:before {
+                font-size: 12px;
+                width: 28px;
+                height: 26px;
+                display: block;
+            }
+        }
+        
+        span {
+            width: 100%;
+            padding-top: 0;
+            text-align: center;
+        }
+    }
+}
+
+.geolocation-title {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.mobile-logout-button {
+    display: block;
+    width: 90%; 
+    margin: 30px auto; 
+    text-align: center; 
+    height: 40px; 
+    padding-top: 10px;
+}

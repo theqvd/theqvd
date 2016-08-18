@@ -1,0 +1,51 @@
+.doc-side {
+    width: 100%;
+    @include in(desktop) {
+        width: ($width_doc_side - 2) * 1%;
+        height: auto;
+
+        @if $doc_side == left {
+            float: left;
+            padding-right: 2%;
+            margin-right: 2%;
+            border-right: 1px dotted darken($col_whiter, 15);
+        }
+        @else if $doc_side == right {
+            float: right;
+            padding-left: 2%;
+            margin-left: 2%;
+            border-left: 1px dotted darken($col_whiter, 15);
+        }
+    }
+}
+
+
+.doc-block {
+    width: 90%;
+    
+    @include in(desktop) {
+        width: ($width_doc_content - 2) * 1%;
+        width: 95%;
+    }
+    
+    height: auto;
+
+    @if $doc_side == left {
+        float: right;
+        padding-right: 2%;
+        margin-right: 2%;
+    }
+    @else if $doc_side == right {
+        float: left;
+        padding-left: 2%;
+        margin-left: 2%;
+    }
+    
+    margin-bottom: 60px;
+    
+    .sect2, .sect3 {
+        @include in(mobile) {
+            overflow: scroll;
+        }
+    }
+}

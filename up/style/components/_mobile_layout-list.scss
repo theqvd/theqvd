@@ -1,0 +1,97 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                @MOBILE LAYOUT LIST: Layout of list view
+                components/_layout-list.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+
+.filter {
+    display: none;
+}
+
+.list-block {        
+    float: none;
+    width: auto;
+
+    .list-navigation {
+        .pagination {
+            text-align: center;
+            
+            a {
+                line-height: 30px;
+            }
+        }
+    }
+}
+
+/* Grid styles */
+
+.grid-cell {
+    width: 100%;
+    margin: 0px 0px 15px 0px;
+    
+    background: $col_grey2;
+    
+    &.grid-connected, &.grid-reconnecting {        
+        .grid-cell-buttonset {
+            .desktop-state {
+                color: $col_enabled;
+            }
+        }
+    }
+    
+    a {
+        &.button, &.button2 {
+            font-size: 51px;
+            margin-right: 0px;
+            margin-top: 7px;
+            width: 63px;
+            height: 63px;
+            
+            &.desktop-settings-btn {
+                margin-left: 15px;
+            }
+        }
+    }
+    
+    .grid-cell-area {        
+        float: left;
+        width: 50%;
+        height: 90px;
+    }
+
+    .grid-cell-buttonset {       
+        float: left;
+        width: 50%;
+        height: 90px;
+
+        .desktop-state {
+            left: 10px;
+        }
+    }
+    
+    .vm-name {
+        width: 100%;
+        color: $col_blacker;
+        
+    }
+
+    .vm-screenshot, .vm-screenshot-off {
+        width: 35%;
+        height: 75px;
+        float: left;
+    }
+}
+
+div.list {
+    padding-right: 0px;
+}
+
+.section-container {
+    padding: 0px;
+}

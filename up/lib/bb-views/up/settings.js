@@ -94,6 +94,7 @@ Up.Views.SettingsView = Up.Views.ListView.extend({
         
         // Set backlink with settings section to back to the main screen of the section when click on back button from options screen
         this.backLink = 'settings';
+        this.backSubtitle = model.get('name');
         this.loadSectionCallback[this.backLink] = this.renderList;
         $('.js-section-sub-title').html(model.get('name'));
 

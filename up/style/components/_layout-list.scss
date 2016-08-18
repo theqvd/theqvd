@@ -11,11 +11,8 @@
 
 
 .filter {
-    display: none;
-    @include in(desktop) {
-        display: block;
-    }
-
+    display: block;
+    
     margin-bottom: 15px;
 
     width: ($width_list_side - 2) * 1%;
@@ -59,19 +56,8 @@
 }
 
 .list-block {        
-    @include in(desktop) {
-        float: left;
-        width: 98%;
-    }
-
-    .filter-mobile {
-        margin-bottom: 15px;
-
-        .filter-control {
-            margin-bottom: 10px;
-            display: block;
-        }
-    }
+    float: left;
+    width: 98%;
 
     .list-navigation {
         position: relative;
@@ -85,106 +71,26 @@
 
         .pagination {
             margin-bottom: 10px;
-            text-align: center;
+            text-align: right;
             
             @include in(desktop) {
-                margin-bottom: 10px;
                 padding: 0px;
                 height: auto;
-                //width: 49%;
                 float: right;
-                text-align: right;
                 margin-top: 6px;
             }
             
             a {
                 padding: 3px 10px;
-                line-height: 30px;
-                @include in(desktop) {
-                    line-height: 18px;
-                }
-
+                line-height: 18px;
             }
         }
-
-        .action-new-item {
-            @extend %clearfix;
-            margin-bottom: 10px;
-            margin-top: -10px;
-            @include in(desktop) {
-                float: left;
-            }
-        }
-
     }
     
     .shown-elements {
         margin-top: 9px;
         float: right;
     }    
-    
-    .selected-elements {
-        margin-top: 9px;
-        float: left;
-        color: $col_whiter;
-    }
-}
-
-.more-tags {
-    margin-top: 8px;
-}
-
-fieldset {
-    @extend %clearfix;
-    width: 100%;
-    clear: both;
-
-    background: darken($col_whiter, 3);
-    border: 2px solid darken($col_whiter, 7);
-    padding: 20px;
-    
-    &.action-select {
-        margin-top: 60px;
-    }  
-    
-    &.action-selected {
-        margin-top: 35px;
-        display: none;
-        position: fixed;
-        top: 50px;
-        right: 10px;
-
-        width: 100px;
-
-        @include in(desktop) {
-        width: 250px;
-        }        
-        
-        a.button, a.button2 {
-            @include in(mobile) {
-                text-align: center;
-            }
-        }
-        min-height: 100px;
-        background: lighten($col_blacker, 10);
-
-        .title {
-            color: $col_whiter;
-            margin-bottom: 20px;
-            font-weight: bold;
-            line-height: 20px;
-        }
-    } 
-
-    .chosen-container {
-        margin-top: -6px;
-    }       
-
-    legend {
-        text-align: left;
-        color: $col_blacker;
-        padding: 0px 10px;
-    }
 }
 
 /* Grid styles */
@@ -192,20 +98,12 @@ fieldset {
 .grid-cell {
     float: left;
     
-    width: 100%;
-    margin: 0px 0px 15px 0px;
-
-    @include in(desktop) {
-        width: 215px;
-        margin: 10px;
-    }
-    
+    width: 215px;
+    margin: 10px;
+        
     color: $col_whiter;
-    background: $col_grey2;
     
-    @include in(desktop) {
-        background: $col_grey_desktop;
-    }
+    background: $col_grey_desktop;
     
     border-radius: 2px;
     border: $col_grey3 solid 2px;
@@ -219,10 +117,7 @@ fieldset {
             }
             
             .desktop-state {
-                color: $col_enabled;
-                @include in(desktop) {
-                    color: $col_whiter;
-                }
+                color: $col_whiter;
                 font-weight: bold;
             }
         }
@@ -258,29 +153,18 @@ fieldset {
     a {
         &.button, &.button2 {
             text-align: center;
-            font-size: 51px;
-            margin-right: 0px;
-            margin-top: 7px;
-            width: 63px;
-            height: 63px;
             border-radius: 100%;
-            
-            @include in(desktop) {
-                font-size: 24px;
-                
-                width: 40px;
-                height: 40px;
-                margin-top: 0px;
-                margin-right: 160px;
-            }
-            
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            margin-top: 0px;
+            margin-right: 160px;
+                        
             &.desktop-connect-btn {
             }            
             
             &.desktop-settings-btn {
-                @include in(mobile) {
-                    margin-left: 15px;
-                }
+                margin-left: 15px;
             }
         }
     }
@@ -310,32 +194,9 @@ fieldset {
         }
     }
     
-    @include in(mobile) {
-        .grid-cell-area {        
-            float: left;
-            width: 50%;
-            height: 90px;
-        }
-        
-        .grid-cell-buttonset {       
-            float: left;
-            width: 50%;
-            height: 90px;
-            
-            .desktop-state {
-                left: 10px;
-            }
-        } 
-    }
-    
     .vm-name {
         width: 100%;
-        color: $col_blacker;
-        
-        @include in(desktop) {
-            width: 100%;
-            color: $col_whiter;
-        }
+        color: $col_whiter;
     }
     
     .vm-screenshot {
@@ -352,77 +213,16 @@ fieldset {
         background-position: center; 
         background-repeat: no-repeat;
         
-        width: 35%;
-        height: 75px;
-        float: left;
+        width: 100%;
+        height: 100px;
+        float: none;
         
-        @include in(desktop) {
-            width: 100%;
-            height: 100px;
-            float: none;
+        @include in(desktop) { 
             margin-top: 5px;
             margin-bottom: 5px;
         }
         
         position: relative;
-        
-        
-        .state-icon, .warning-icon, .vm-warn-buttons {
-            position: absolute;
-        }
-        
-        .vm-warn-buttons {
-            background: $col-blacker;
-            opacity: 0.8;
-            position: absolute;
-            left: 0;
-            
-            width: 100%;
-            height: 33px;
-            bottom: -38px;
-            border-radius: 6px;
-            
-            @include in(desktop) {
-                width: 60px;
-                top: 0;
-                border-radius: 0px;
-                border-bottom-right-radius: 10px;
-                height: 30px;
-                bottom: -35px;
-                border-radius: 10px;
-            }
-        }
-        
-        .state-icon, .warning-icon {
-            bottom: -36px;
-            width: 28px;
-            height: 28px;
-            padding: 5px;
-            
-            @include in(desktop) {
-                top: 3px;
-                width: 24px;
-                height: 24px;
-                padding: 3px;
-            }
-            
-            background: $col-whiter;
-            border-radius: 100%;
-        }
-        
-        .state-icon {
-            left: 14px;
-            @include in(desktop) {
-                left: 3px;
-            }
-        }
-        
-        .warning-icon {
-            right: 10px;
-            @include in(desktop) {
-                left: 32px;
-            }
-        }
     }
 }
 
@@ -435,15 +235,6 @@ fieldset {
     }
 }
 
-.profile-select {
-    clear: none;
-    padding: 4px;
-    width: 100%;
-    @include in(desktop) {
-        width: 35%;
-    }
-}
-
 div.list {
     padding-right: 10px;
     
@@ -453,11 +244,7 @@ div.list {
 }
 
 .section-container {
-    
-    padding: 10px;
-    @include in(desktop) {
-        padding: 35px 65px 0px 65px;
-    }
+    padding: 35px 65px 0px 65px;
     width: 100%;
     // Mockups version
     //padding: 0px;

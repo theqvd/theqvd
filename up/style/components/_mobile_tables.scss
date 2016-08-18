@@ -1,0 +1,57 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                @MOBILE TABLES
+                components/_mobile_tables.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+
+
+table.details {
+    td:first-child {
+        i.fa {
+            display: none;
+        }
+    }
+}
+
+// Different sizes for cells with different amount of icons
+$table_icons_size_mobile: 20;
+$table_icons_margin: 6;
+$cell_padding: 8;
+$security_margin: 5;
+@for $i from 1 through 6 {
+    $width_for_icons_mobile: ($i * ($table_icons_size_mobile + $table_icons_margin)) + $security_margin + (2 * $cell_padding);
+    .max-#{$i}-icons {
+        width: $width_for_icons_mobile * 1px;
+        min-width: $width_for_icons_mobile * 1px;
+    }
+}
+
+@for $i from 1 through 100 {
+    .mob-col-width-#{$i} {
+        width: $i * 1% !important;
+    }
+}
+
+    
+table.settings-editor-table {
+    tr {
+        td {
+            height: 50px;
+            
+            &:first-child {               
+                text-align: left;
+            }
+            
+            &:last-child {
+                text-align: center;
+                width: 50%;
+            }
+        }
+    }
+}

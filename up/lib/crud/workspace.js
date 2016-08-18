@@ -20,9 +20,13 @@ Up.CRUD.workspaces = {
     },  
     
     deleteWorkspace: function (e) {
+        Up.I.confirm('dialog/confirm-undone', this.applyDeleteWorkspace, e);
+    },
+    
+    applyDeleteWorkspace: function (e) {
         var selectedId = parseInt($(e.target).attr('data-id'));
         
-        var model = this.collection.where({id: selectedId})[0];
+        var model = Up.CurrentView.collection.where({id: selectedId})[0];
         
         Up.CurrentView.deleteModel({id: model.get('id')}, Up.CurrentView.render, model);
     },

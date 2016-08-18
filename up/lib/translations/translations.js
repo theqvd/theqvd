@@ -8,7 +8,6 @@ Up.T = {
         lan = lan || Up.C.account.language;
         
         lan = this.getLanguage(lan);
-        
         var that = this;
         
         $.i18n.init({

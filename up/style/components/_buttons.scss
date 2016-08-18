@@ -78,18 +78,6 @@ a, button {
     color: $col_enabled !important;
 }
 
-.button-icon--desktop:before {
-    @include in(desktop) {
-        margin: 0px !important;
-    }
-}
-
-.button-icon--mobile:before {
-    @include in(mobile) {
-        margin: 0px !important;
-    }
-}
-
 .button-transparent {
 	cursor: pointer;
     

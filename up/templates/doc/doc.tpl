@@ -1,6 +1,6 @@
 <div class="wrapper-content <%= cid %> sec-documentation"> 
     <% /* %>
-    <div class="menu secondary-menu setup-side">
+    <div class="menu secondary-menu doc-side">
         <div class="doc-search-box">
             <label for="doc_search" data-i18n="Search"></label>
             <input name="doc_search" class="js-doc-search" value="<%= searchKey %>"/>
@@ -31,7 +31,7 @@
     </div>
     <% */ %>
 
-    <div class="setup-block">
+    <div class="doc-block">
         <div class="bb-doc-text doc-text js-doc-text"></div>
     </div>
 

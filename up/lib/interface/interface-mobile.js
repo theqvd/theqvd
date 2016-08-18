@@ -41,7 +41,8 @@ Up.I.Mobile = {
         $('.js-section-sub-title').html(actionString);
         
         $('.js-dialog-container').on('dialogclose', function(event) {
-             $('.js-section-sub-title').html('');
+            // Restore subtitle
+            $('.js-section-sub-title').html(Up.CurrentView.backSubtitle || '');
         });
     }
 }

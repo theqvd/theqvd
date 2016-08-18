@@ -12,7 +12,7 @@
 
 /* Table list */
 
-table.list {    
+table.list {
     @include table-base (alternate-rows);
 }
 
@@ -30,12 +30,6 @@ table.details {
     td:first-child {
         vertical-align: top;
         white-space: nowrap;
-        
-        i.fa {
-            @include in(mobile) {                
-                display: none;
-            }
-        }
     }
 
     td:last-child {
@@ -70,8 +64,8 @@ td.inner-table {
     table-layout: fixed;
 }
 
-.not-break {
-    @include in(desktop) {
+@include in(desktop) {
+    .not-break {
         white-space: nowrap;
         overflow-x: hidden;
         text-overflow: ellipsis;
@@ -80,21 +74,14 @@ td.inner-table {
 
 // Different sizes for cells with different amount of icons
 $table_icons_size: 18;
-$table_icons_size_mobile: 20;
 $table_icons_margin: 6;
 $cell_padding: 8;
 $security_margin: 5;
 @for $i from 1 through 6 {
     $width_for_icons: ($i * ($table_icons_size + $table_icons_margin)) + $security_margin + (2 * $cell_padding);
-    $width_for_icons_mobile: ($i * ($table_icons_size_mobile + $table_icons_margin)) + $security_margin + (2 * $cell_padding);
     .max-#{$i}-icons {
         width: $width_for_icons * 1px;
         min-width: $width_for_icons * 1px;
-        
-        @include in(desktop) {
-            width: $width_for_icons_mobile * 1px;
-            min-width: $width_for_icons_mobile * 1px;
-        }
     }
 }
 
@@ -104,23 +91,10 @@ $security_margin: 5;
     }
 }
 
-@for $i from 1 through 100 {
-    @include in(mobile) {
-        .mob-col-width-#{$i} {
-            width: $i * 1% !important;
-        }
-    }
-}
-
 /* Table scroll */
 
 div.list-block div:first-child {
     width: 100%;
-    
-    .list-navigation, div.list {
-        @include in(desktop) {
-        }
-    }
     
     .list {
         overflow-x: auto;
@@ -174,45 +148,6 @@ table.list {
     }
 }
 
-
-table.role-template-tools {
-    @include table-base (alternate-rows);
-    
-    width: 100%;
-    font-size: 14px;
-    margin: 0 0;
-
-    td {
-        text-align: center;
-        padding: 5px !important;
-        
-        input[type="checkbox"] {
-            /* Trick for make checkboxes resizable on firefox */
-            -moz-appearance: none;
-
-            width: 20px;
-            height: 20px;
-        }
-        
-        a.no-text-button {
-            text-align: center;
-            &:before {
-                margin: 0px;
-                text-align: center;
-            }
-        }
-    }
-    
-    td:first-child {
-        text-align: left;
-    }
-}
-
-
-.tools-roles, .tools-templates {
-    background: $col_whiter !important; 
-    display: none;
-}
     
 table.settings-editor-table {
     width: 100%;
@@ -224,26 +159,12 @@ table.settings-editor-table {
         td {
             border: 0;
             padding: 6px 4px 4px 6px;
-            height: 50px;
-            
-            @include in(desktop) {                
             height: 25px;
-            }
-
-            &:first-child {               
-                text-align: left;
-                
-                @include in(desktop) {                
-                    text-align: right;
-                }
-                vertical-align: middle;
-            }
             
-            &:last-child {
-                @include in(mobile) {  
-                    text-align: center;
-                    width: 50%;
-                }
+            &:first-child {                  
+                text-align: right;
+                
+                vertical-align: middle;
             }
         }
     }

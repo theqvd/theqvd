@@ -29,6 +29,7 @@ CLASS_ICON_STATUS_LOST = 'fa fa-map-o faa-flash animated';
 
 // UP Icons
 CLASS_ICON_ACTIVE = 'fa fa-check-circle';
+CLASS_ICON_NEW = 'fa fa-plus-circle';
 CLASS_ICON_DELETE = 'fa fa-trash';
 CLASS_ICON_CLONE = 'fa fa-clone';
 CLASS_ICON_USER_CONNECTED = 'fa fa-user';
