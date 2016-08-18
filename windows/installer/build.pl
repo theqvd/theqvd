@@ -181,6 +181,7 @@ mkdir "..\\archive";
 # Sign the executables before packing
 sign_file("qvd-client.exe");
 sign_file("NX\\nxproxy.exe");
+sign_file("c:\\VcxSrv\\vcxsrv.exe");
 
 build_installer();
 
