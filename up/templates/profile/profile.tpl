@@ -21,7 +21,7 @@
             </td>
         </tr>
         <tr>
-            <td colspan=2><a class="button js-save-profile-btn fa fa-save fright" data-i18n="Save"></a></td>
+            <td colspan=2><a class="button js-save-profile-btn <%= CLASS_ICON_SAVE %> fright" data-i18n="Save"></a></td>
         </tr>
     </table>
 

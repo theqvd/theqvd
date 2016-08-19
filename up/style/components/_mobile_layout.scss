@@ -41,8 +41,25 @@ body {
 }
 
 .message-container {
-    left: 5%;
-    width: 90%;
+    left: 0;
+    top: initial;
+    bottom: 0px;
+    width: 100%;
+    border-radius: 0;
+    
+    .message-close {
+        font-size: 40px;
+    }
+    
+    .message {
+        summary {
+            line-height: 45px;
+        }
+        
+        .expand-message {
+            font-size: 40px;
+        }
+    }
 }
 
 .loading, .loading-mid {

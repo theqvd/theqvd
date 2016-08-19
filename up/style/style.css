@@ -3225,8 +3225,17 @@ td {
       padding-left: 5px;
       padding-right: 5px; }
   .message-container {
-    left: 5%;
-    width: 90%; }
+    left: 0;
+    top: initial;
+    bottom: 0px;
+    width: 100%;
+    border-radius: 0; }
+    .message-container .message-close {
+      font-size: 40px; }
+    .message-container .message summary {
+      line-height: 45px; }
+    .message-container .message .expand-message {
+      font-size: 40px; }
   .loading, .loading-mid {
     width: 75px;
     top: 25vh; }

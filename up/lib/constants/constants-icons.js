@@ -29,6 +29,7 @@ CLASS_ICON_STATUS_LOST = 'fa fa-map-o faa-flash animated';
 
 // UP Icons
 CLASS_ICON_ACTIVE = 'fa fa-check-circle';
+CLASS_ICON_ACCEPT = 'fa fa-check';
 CLASS_ICON_NEW = 'fa fa-plus-circle';
 CLASS_ICON_DELETE = 'fa fa-trash';
 CLASS_ICON_CLONE = 'fa fa-clone';
@@ -50,3 +51,7 @@ CLASS_ICON_APPLE = 'fa fa-apple';
 CLASS_ICON_ANDROID = 'fa fa-android';
 CLASS_ICON_DOCUMENTATION = 'fa fa-book';
 CLASS_ICON_LOGOUT = 'fa fa-power-off';
+CLASS_ICON_SAVE = 'fa fa-save';
+CLASS_ICON_CANCEL = 'fa fa-ban';
+CLASS_ICON_DOC = 'fa fa-book';
+CLASS_ICON_CLOSE = 'fa fa-times-circle';

@@ -733,8 +733,8 @@ Up.I = {
                     successCallback(that);
                 }
             },
-            button1Class : 'fa fa-ban js-button-cancel',
-            button2Class : 'fa fa-check js-button-accept',
+            button1Class : CLASS_ICON_CANCEL + ' js-button-cancel',
+            button2Class : CLASS_ICON_ACCEPT + ' js-button-accept',
             fillCallback : function(target) { 
                 var templates = Up.I.T.getTemplateList('confirm', {templateName: templateName});
 
@@ -778,8 +778,8 @@ Up.I = {
             }
         };
 
-        dialogConf.button1Class = 'fa fa-book js-button-read-full-doc';
-        dialogConf.button2Class = 'fa fa-check js-button-close';
+        dialogConf.button1Class = CLASS_ICON_DOC + ' js-button-read-full-doc';
+        dialogConf.button2Class = CLASS_ICON_CLOSE + ' js-button-close';
 
         dialogConf.fillCallback = function (target, that) {
             // Back scroll of the div to top position

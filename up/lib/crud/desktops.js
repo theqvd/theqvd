@@ -24,8 +24,8 @@ Up.CRUD.desktops = {
                     Up.I.closeDialog($(this));
                 }
             },
-            button1Class : 'fa fa-ban',
-            button2Class : 'fa fa-save',
+            button1Class : CLASS_ICON_CANCEL,
+            button2Class : CLASS_ICON_SAVE,
             fillCallback : function (target) { 
                 Up.I.renderEditionMode(model, target);
             },
@@ -113,7 +113,7 @@ Up.CRUD.desktops = {
                     Up.I.closeDialog($(this));
                 }
             },
-            button1Class : 'fa fa-ban',
+            button1Class : CLASS_ICON_CANCEL,
             button2Class : CLASS_ICON_CLIENT_DOWNLOAD,
             fillCallback : function (target) { 
                 var template = _.template(

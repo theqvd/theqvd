@@ -54,8 +54,8 @@ Up.CRUD.workspaces = {
                     Up.I.closeDialog($(this));
                 }
             },
-            button1Class : 'fa fa-ban',
-            button2Class : 'fa fa-save',
+            button1Class : CLASS_ICON_CANCEL,
+            button2Class : CLASS_ICON_SAVE,
             fillCallback : function (target) { 
                 Up.I.renderEditionMode(model, target);
             },
@@ -91,8 +91,8 @@ Up.CRUD.workspaces = {
                     Up.I.closeDialog($(this));
                 }
             },
-            button1Class : 'fa fa-ban',
-            button2Class : 'fa fa-save',
+            button1Class : CLASS_ICON_CANCEL,
+            button2Class : CLASS_ICON_SAVE,
             fillCallback : function (target) { 
                 Up.CurrentView.renderWorkspaceOptions(model, target);
             },
@@ -122,8 +122,8 @@ Up.CRUD.workspaces = {
                     Up.I.closeDialog($(this));
                 }
             },
-            button1Class : 'fa fa-ban',
-            button2Class : 'fa fa-save',
+            button1Class : CLASS_ICON_CANCEL,
+            button2Class : CLASS_ICON_SAVE,
             fillCallback : function (target) { 
                 Up.I.renderEditionMode(model, target);
             },
@@ -169,8 +169,8 @@ Up.CRUD.workspaces = {
                     Up.I.closeDialog($(this));
                 }
             },
-            button1Class : 'fa fa-ban',
-            button2Class : 'fa fa-save',
+            button1Class : CLASS_ICON_CANCEL,
+            button2Class : CLASS_ICON_SAVE,
             fillCallback : function (target) { 
                 Up.I.renderEditionMode(model, target);
             },

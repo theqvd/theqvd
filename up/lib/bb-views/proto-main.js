@@ -307,8 +307,8 @@ Up.Views.MainView = Backbone.View.extend({
             }
         };
 
-        dialogConf.button1Class = 'fa fa-book js-button-read-full-doc';
-        dialogConf.button2Class = 'fa fa-check js-button-close';
+        dialogConf.button1Class = CLASS_ICON_DOC + ' js-button-read-full-doc';
+        dialogConf.button2Class = CLASS_ICON_CLOSE + ' js-button-close';
 
         dialogConf.fillCallback = function (target, that) {
             // Back scroll of the div to top position
