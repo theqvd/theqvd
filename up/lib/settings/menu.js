@@ -51,7 +51,7 @@ Up.I.cornerMenuOriginal = {
             subMenu: _.extend({}, Up.I.menuUserOriginal)
         },      
     
-        user: {
+        profile: {
             text: '',
             link: '#/profile',
             icon: CLASS_ICON_USER,

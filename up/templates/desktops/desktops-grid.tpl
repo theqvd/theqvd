@@ -16,7 +16,10 @@
                 %>
                     <div class="grid-cell js-grid-cell" data-state="<%= model.get('state') %>" data-id="<%= model.get('id') %>">
                         <div class="grid-cell-area js-grid-cell-area js-desktop-connect-btn" data-id="<%= model.get('id') %>">
-                            <i class="<%= CLASS_ICON_DESKTOP_CONNECTED %> grid-cell-icon js-grid-cell-icon js-grid-cell-hiddeable" data-id="<%= model.get('id') %>"></i>
+                            <% if (!Up.I.isMobile()) { %>
+                                <i class="<%= CLASS_ICON_DESKTOP_CONNECTED %> grid-cell-icon js-grid-cell-icon js-grid-cell-hiddeable desktop" data-id="<%= model.get('id') %>"></i>
+                            <% } %>
+                            
                             <div class="corner-image desktop"><img src="images/ladybird_white.png" data-id="<%= model.get('id') %>"></div>
                             <div class="bigtext bold vm-name" data-id="<%= model.get('id') %>"><%= model.get('alias') ? model.get('alias') : model.get('name') %> <br>id: <%= model.get('id') %></div>                            
 

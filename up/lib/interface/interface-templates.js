@@ -15,8 +15,8 @@ Up.I.T = {
                     header: {
                         name: 'common/header'
                     },
-                    headerSection: {
-                        name: 'common/header-section'
+                    headerMobile: {
+                        name: 'common/header-mobile'
                     },
                     relatedDoc: {
                         name: 'doc/related-links'

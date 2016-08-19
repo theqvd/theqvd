@@ -12,7 +12,8 @@ Up.Views.SettingsView = Up.Views.ListView.extend({
         'click .js-button-settings-conf': 'editWorkspace',
         'click .js-button-settings-options': 'optionsWorkspace',
         'click .js-new-workspace-btn': 'newWorkspace',
-        'click .js-clone-workspace-btn': 'cloneWorkspace'
+        'click .js-clone-workspace-btn': 'cloneWorkspace',
+        'click .js-back-settings-button': 'loadSettingsSection'
     },
     
     initialize: function (params) {
@@ -53,8 +54,6 @@ Up.Views.SettingsView = Up.Views.ListView.extend({
         }
                 
         Up.T.translateAndShow();
-        
-        this.backLink = 'menu';
     },
         
     renderWorkspacesConfig: function () {
@@ -92,12 +91,12 @@ Up.Views.SettingsView = Up.Views.ListView.extend({
         
         var model = this.collection.where({id: selectedId})[0];
         
-        // Set backlink with settings section to back to the main screen of the section when click on back button from options screen
-        this.backLink = 'settings';
-        this.backSubtitle = model.get('name');
-        this.loadSectionCallback[this.backLink] = this.renderList;
         $('.js-section-sub-title').html(model.get('name'));
 
         this.renderWorkspaceOptions(model);
+    },
+    
+    loadSettingsSection: function (e) {
+        this.renderList();
     }
 });

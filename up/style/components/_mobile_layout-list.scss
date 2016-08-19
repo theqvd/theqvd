@@ -34,16 +34,9 @@
 .grid-cell {
     width: 100%;
     margin: 0px 0px 15px 0px;
-    
-    background: $col_grey2;
-    
-    &.grid-connected, &.grid-reconnecting {        
-        .grid-cell-buttonset {
-            .desktop-state {
-                color: $col_enabled;
-            }
-        }
-    }
+    opacity: $mobile_buttons_opacity;
+    background: $mobile_buttons_bg_col;
+    border: 2px solid $mobile_buttons_border_col;
     
     a {
         &.button, &.button2 {
@@ -54,7 +47,7 @@
             height: 63px;
             
             &.desktop-settings-btn {
-                margin-left: 15px;
+                margin-left: 20px;
             }
         }
     }
@@ -69,15 +62,30 @@
         float: left;
         width: 50%;
         height: 90px;
-
+        background: $mobile_buttons_bg_col;
+        
+        a.button:before {
+            color: white;
+        }        
+        a.button2 {
+            background: white;
+        }
+        
         .desktop-state {
             left: 10px;
         }
     }
     
+    &.grid-connected, &.grid-reconnecting {        
+        .grid-cell-buttonset {
+            .desktop-state {
+                color: $col_enabled;
+            }
+        }
+    }
     .vm-name {
         width: 100%;
-        color: $col_blacker;
+        color: $mobile_buttons_text_color;
         
     }
 

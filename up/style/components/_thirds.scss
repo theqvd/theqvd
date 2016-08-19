@@ -129,14 +129,10 @@
 
         @include in(desktop) {
             display: table-cell;
-            //padding-bottom: 0px;
         }
         
         input[type="text"], input[type="password"], textarea {
             width: 100%;
-            @include in(desktop) {
-                //width: auto;
-            }
         }
         
 

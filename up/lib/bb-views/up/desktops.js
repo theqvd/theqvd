@@ -138,7 +138,7 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
     setDesktopState: function (id, newState) {
         // Grid view
         if (Up.I.isMobile()) {
-            var iconDivMobile = $('.js-desktop-connect-btn[data-id="' + id + '"]');
+            var iconDivMobile = $('.js-desktop-connect-btn.mobile[data-id="' + id + '"]');
         }
         else {
             var iconDiv = $('.js-grid-cell-icon[data-id="' + id + '"]');

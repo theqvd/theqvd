@@ -182,7 +182,9 @@ Up.I = {
 
         $('.wrapper').css('visibility','visible').hide().fadeIn('fast');
         $('.js-header-wrapper').css('visibility','visible');
-        $('.js-menu-lat').css('visibility','visible');
+        if (!Up.I.isMobile()) {
+            $('.js-menu-lat').css('visibility','visible');
+        }
         $('.js-content').css('visibility','visible').hide().fadeIn('fast');
         $('.js-menu-corner').css('visibility','visible');
         $('.js-mobile-menu-hamburger').css('visibility','visible');
@@ -378,7 +380,7 @@ Up.I = {
             });
         
         $('.bb-super-wrapper').html(template);
-        
+
         this.renderHeader();
                 
         Up.I.updateLoginOnMenu();
@@ -404,11 +406,13 @@ Up.I = {
         Up.I.showAll();
     },  
     
-    renderHeaderSection: function (section, subTitle) {
+    renderHeaderMobile: function (section, subTitle) {
         var template = _.template(
-            Up.TPL.headerSection, {
+            Up.TPL.headerMobile, {
                 sectionTitle: Up.I.menuOriginal[section] ? Up.I.menuOriginal[section].text : 'Profile',
-                sectionSubTitle: subTitle
+                sectionSubTitle: subTitle,
+                cornerMenu: this.cornerMenu,
+                section: section
             });
         
         $('.bb-header').html(template);

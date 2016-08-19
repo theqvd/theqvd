@@ -123,7 +123,7 @@ Up.Router = Backbone.Router.extend({
         }
         
         if (Up.I.isMobile()) {
-            var currentNav = Backbone.history.getFragment() || 'menu';
+            var currentNav = Backbone.history.getFragment() || 'desktops';
             params['currentNav'] = currentNav;
         }
         

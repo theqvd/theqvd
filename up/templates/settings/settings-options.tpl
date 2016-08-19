@@ -26,3 +26,5 @@
         <% } %>
     </tbody>
 </table>
+
+<a class="button2 <%= CLASS_ICON_BACK %> mobile mobile-action-button js-back-settings-button" data-i18n="Back">

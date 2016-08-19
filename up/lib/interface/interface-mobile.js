@@ -7,27 +7,15 @@ Up.I.Mobile = {
         // If there are open dialogs, close latest
         if (Up.CurrentView.dialogs.length) {
             Up.I.closeDialog(Up.CurrentView.dialogs.slice(-1)[0]);
-            return;
         }
         
         switch (section) {
             case 'menu':
-                $('.js-menu-lat').removeClass('menu-lat--hidden');
-                $('.menu-option').removeClass('menu-option--current menu-option-current');
-                Up.I.renderHeader();
-                
-                window.location.hash = '#'
-                if (history.pushState) {
-                    history.pushState(null, null, "");
-                }
+                $('.js-menu-lat').css('visibility', 'visible').slideToggle();
                 break;
             default:
-                $('.js-menu-lat').addClass('menu-lat--hidden');
-                Up.I.renderHeaderSection(section);
-
-                if (Up.CurrentView.loadSectionCallback && Up.CurrentView.loadSectionCallback[section]) {
-                    Up.CurrentView.loadSectionCallback[section](Up.CurrentView);
-                }
+                $('.js-menu-lat').css('visibility', 'visible').slideUp();
+                Up.I.renderHeaderMobile(section);
         }
     },
     

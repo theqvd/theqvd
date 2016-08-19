@@ -483,17 +483,7 @@ Up.B = {
         }, 
         
         clickLoadBack: function () {
-            if (Up.I.isDialogOpen()) {
-                Up.I.closeLastDialog();
-                
-                // Restore subtitle
-                $('.js-section-sub-title').html(Up.CurrentView.backSubtitle);
-            }
-            else {
-                Up.I.Mobile.loadSection(Up.CurrentView.backLink);
-                
-                Up.CurrentView.backLink = 'menu';
-            }
+            Up.I.Mobile.loadSection('menu');
         },
     },
     

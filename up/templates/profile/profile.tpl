@@ -25,6 +25,6 @@
         </tr>
     </table>
 
-    <a href="#/logout" class="button2 <%= CLASS_ICON_LOGOUT %> mobile mobile-logout-button" data-i18n="Log-out">
+    <a href="#/logout" class="button2 <%= CLASS_ICON_LOGOUT %> mobile mobile-action-button" data-i18n="Log-out">
 
 </div>

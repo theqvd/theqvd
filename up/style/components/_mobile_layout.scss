@@ -103,56 +103,25 @@ body {
 
 .menu-lat {
     width: 100%;
-    background: $col_grey3 url($body_background_img_mobile) no-repeat center right fixed;     
-    -webkit-background-size: auto 100%;
-    -moz-background-size: auto 100%;
-    -o-background-size: auto 100%;
-    background-size: auto 100%;
-    
-    &--hidden {
-        position: absolute;
-        left: -1000px;
-    }
-    
+    background: $col_grey1;
+    height: auto;
+    display: none;
+    padding-bottom: 2px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+        
     .menu-option {
-        background: $col_grey2;
-        opacity: 0.8;
-        
-        &:hover, &.menu-option--current {
-            i {
-                &:before {  
-                    font-size: 18px;
-                    width: 28px;
-                    height: 28px;
-                    padding: 5px 4px;
-                    display: block;
-                }
-            }
-        }
+        background: $mobile_buttons_bg_col;
 
-        font-size: 14px;
         padding-top: 5px;
-        color: $col_blacker;
-        border: 2px $col_whiter solid;
+        color: $mobile_buttons_text_color;
+        border: 2px solid $mobile_buttons_border_col;
         margin: 2px;
-        
-        i {
-            text-align: center;
-            width: 28px;
-            margin-left: 47%;
-            
-            &:before {
-                font-size: 12px;
-                width: 28px;
-                height: 26px;
-                display: block;
-            }
-        }
+        font-size: 16px;
         
         span {
-            width: 100%;
-            padding-top: 0;
-            text-align: center;
+            width: auto;
+            padding-top: 13px;
         }
     }
 }
@@ -162,7 +131,7 @@ body {
     margin-bottom: 5px;
 }
 
-.mobile-logout-button {
+.mobile-action-button {
     display: block;
     width: 90%; 
     margin: 30px auto; 

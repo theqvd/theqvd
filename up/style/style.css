@@ -325,7 +325,7 @@ fieldset {
 .menu-corner {
   z-index: 1000;
   position: absolute;
-  top: 15px;
+  top: 20px;
   right: 10px; }
   @media screen and (min-width: 41em) {
     .menu-corner {
@@ -818,32 +818,29 @@ body {
     .header-wrapper.header-wrapper--mini div.logo {
       height: 35px;
       width: 80px; }
-  .header-wrapper.header-wrapper--section {
-    background: #e35e0c; }
-    .header-wrapper.header-wrapper--section .back-button {
-      height: 60px;
-      width: 60px;
-      padding: 8px 10px;
-      cursor: pointer;
-      font-size: 40px;
-      color: #EBEBEB;
-      background: #595959;
-      position: absolute;
-      left: 0;
-      top: 0;
-      z-index: 2; }
-    .header-wrapper.header-wrapper--section .section-title, .header-wrapper.header-wrapper--section .section-sub-title {
-      color: #EBEBEB;
-      position: absolute;
-      left: 0px;
-      width: 100%;
-      text-align: center;
-      padding-left: 60px; }
-    .header-wrapper.header-wrapper--section .section-title {
-      top: 13px;
-      font-size: 18px; }
-    .header-wrapper.header-wrapper--section .section-sub-title {
-      top: 37px; }
+  .header-wrapper.header-wrapper--section .back-button {
+    height: 60px;
+    width: 60px;
+    padding: 8px 10px;
+    cursor: pointer;
+    font-size: 40px;
+    color: #EBEBEB;
+    background: #595959;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 2; }
+  .header-wrapper.header-wrapper--section .section-title, .header-wrapper.header-wrapper--section .section-sub-title {
+    color: #EBEBEB;
+    position: absolute;
+    left: 0px;
+    width: 100%;
+    text-align: center; }
+  .header-wrapper.header-wrapper--section .section-title {
+    top: 13px;
+    font-size: 18px; }
+  .header-wrapper.header-wrapper--section .section-sub-title {
+    top: 37px; }
   .header-wrapper .header {
     position: relative;
     min-width: 0px;
@@ -2382,7 +2379,6 @@ table.settings-editor-table {
         display: table-cell; } }
     .ui-dialog td input[type="text"], .ui-dialog td input[type="password"], .ui-dialog td textarea {
       width: 100%; }
-      @media screen and (min-width: 41em) { }
     @media screen and (min-width: 41em) {
       .ui-dialog td:first-child {
         width: 120px;
@@ -3267,9 +3263,9 @@ td {
     .wrapper .content .grid-cell {
       width: 100%;
       margin: 0px 0px 15px 0px;
-      background: #BFBFBF; }
-      .wrapper .content .grid-cell.grid-connected .grid-cell-buttonset .desktop-state, .wrapper .content .grid-cell.grid-reconnecting .grid-cell-buttonset .desktop-state {
-        color: #6dad3c; }
+      opacity: 0.7;
+      background: #EBEBEB;
+      border: 2px solid white; }
       .wrapper .content .grid-cell a.button, .wrapper .content .grid-cell a.button2 {
         font-size: 51px;
         margin-right: 0px;
@@ -3277,7 +3273,7 @@ td {
         width: 63px;
         height: 63px; }
         .wrapper .content .grid-cell a.button.desktop-settings-btn, .wrapper .content .grid-cell a.button2.desktop-settings-btn {
-          margin-left: 15px; }
+          margin-left: 20px; }
       .wrapper .content .grid-cell .grid-cell-area {
         float: left;
         width: 50%;
@@ -3285,9 +3281,16 @@ td {
       .wrapper .content .grid-cell .grid-cell-buttonset {
         float: left;
         width: 50%;
-        height: 90px; }
+        height: 90px;
+        background: #EBEBEB; }
+        .wrapper .content .grid-cell .grid-cell-buttonset a.button:before {
+          color: white; }
+        .wrapper .content .grid-cell .grid-cell-buttonset a.button2 {
+          background: white; }
         .wrapper .content .grid-cell .grid-cell-buttonset .desktop-state {
           left: 10px; }
+      .wrapper .content .grid-cell.grid-connected .grid-cell-buttonset .desktop-state, .wrapper .content .grid-cell.grid-reconnecting .grid-cell-buttonset .desktop-state {
+        color: #6dad3c; }
       .wrapper .content .grid-cell .vm-name {
         width: 100%;
         color: #333; }
@@ -3308,45 +3311,26 @@ td {
       width: 35px; }
   .menu-lat {
     width: 100%;
-    background: #D9D9D9 url('../images/up-bg-720.gif') no-repeat center right fixed;
-    -webkit-background-size: auto 100%;
-    -moz-background-size: auto 100%;
-    -o-background-size: auto 100%;
-    background-size: auto 100%; }
-    .menu-lat--hidden {
-      position: absolute;
-      left: -1000px; }
+    background: #595959;
+    height: auto;
+    display: none;
+    padding-bottom: 2px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px; }
     .menu-lat .menu-option {
-      background: #BFBFBF;
-      opacity: 0.8;
-      font-size: 14px;
+      background: #EBEBEB;
       padding-top: 5px;
       color: #333;
-      border: 2px #EBEBEB solid;
-      margin: 2px; }
-      .menu-lat .menu-option:hover i:before, .menu-lat .menu-option.menu-option--current i:before {
-        font-size: 18px;
-        width: 28px;
-        height: 28px;
-        padding: 5px 4px;
-        display: block; }
-      .menu-lat .menu-option i {
-        text-align: center;
-        width: 28px;
-        margin-left: 47%; }
-        .menu-lat .menu-option i:before {
-          font-size: 12px;
-          width: 28px;
-          height: 26px;
-          display: block; }
+      border: 2px solid white;
+      margin: 2px;
+      font-size: 16px; }
       .menu-lat .menu-option span {
-        width: 100%;
-        padding-top: 0;
-        text-align: center; }
+        width: auto;
+        padding-top: 13px; }
   .geolocation-title {
     display: block;
     margin-bottom: 5px; }
-  .mobile-logout-button {
+  .mobile-action-button {
     display: block;
     width: 90%;
     margin: 30px auto;
@@ -3582,9 +3566,11 @@ td {
       width: 50%; }
   .settings-list-table {
     border-collapse: separate;
-    border-spacing: 5px;
+    border-spacing: 0px 5px;
     background: transparent !important;
-    border: 0 !important; }
+    border: 0 !important;
+    opacity: 0.7;
+    width: 100%; }
     .settings-list-table tbody.buttonset tr, .settings-list-table tbody.buttonset td {
       background: transparent !important;
       border: 0;
@@ -3600,12 +3586,15 @@ td {
       height: 65px !important;
       font-size: 1.2em;
       line-height: 1.2em;
-      color: 2px solid #BFBFBF;
-      border: 2px solid #D9D9D9; }
+      color: 2px solid #333;
+      border: 2px solid white;
+      background: #EBEBEB; }
       @media screen and (min-width: 41em) {
         .settings-list-table td {
           font-size: 1.1em;
           line-height: 1.4em; } }
+      .settings-list-table td a {
+        color: #333; }
     .settings-list-table .activated-label {
       font-size: 12px;
       margin-top: 10px;

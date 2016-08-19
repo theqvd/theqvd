@@ -11,7 +11,6 @@ Up.Views.MainView = Backbone.View.extend({
     sideViews: [],
     templates: {},
     dialogs: [],
-    backLink: 'menu',
     
     initialize: function (params) {
         _.bindAll(this, 'render');
@@ -23,6 +22,7 @@ Up.Views.MainView = Backbone.View.extend({
         
         // Add to the view events the parent class of this view to avoid collisions with other views events
         this.events = this.restrictEventsScope(this.events);
+        this.currentNav = params.currentNav;
         
         // Add the commonly used templates
         this.addCommonTemplates();
@@ -33,8 +33,8 @@ Up.Views.MainView = Backbone.View.extend({
             render(); 
             that.afterRender(); 
                 
-            Up.I.Mobile.loadSection(params.currentNav);
-            return that; 
+            Up.I.Mobile.loadSection(that.currentNav);
+            return that;
         }); 
 
 		// If any message os sent from last refresh, show it and delete cookie
@@ -53,7 +53,9 @@ Up.Views.MainView = Backbone.View.extend({
         
         $('.js-super-wrapper').removeClass('super-wrapper--login');
         $('body').css('background','');
-        $('.header-wrapper, .menu-lat').show();  
+        if (!Up.I.isMobile()) {
+            $('.header-wrapper, .js-menu-lat').show(); 
+        }
         
         Up.I.setMenuOptionSelected(this.qvdObj);
     },

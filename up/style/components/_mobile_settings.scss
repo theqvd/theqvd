@@ -11,10 +11,12 @@
 
 .settings-list-table {
     border-collapse: separate;
-    border-spacing: 5px;
+    border-spacing: 0px 5px;
     background: transparent !important;
     border: 0 !important;
-    
+    opacity: $mobile_buttons_opacity;
+    width: 100%;
+
     tbody.buttonset {
         tr, td {
             background: transparent !important;
@@ -35,8 +37,14 @@
         text-align: center;
         height: 65px !important;
         @include font-size(3);
-        color: 2px solid $col_grey2;
-        border: 2px solid $col_grey3;
+        
+        color: 2px solid $mobile_buttons_text_color;
+        border: 2px solid $mobile_buttons_border_col;
+        background: $mobile_buttons_bg_col;
+        
+        a {
+            color: $mobile_buttons_text_color;
+        }
     }
     
     .activated-label {
