@@ -1086,6 +1086,20 @@ Up.I = {
         Up.I.chosenElement($('select[name="connection"]'), 'single100');
     },
     
+    getDesktopTitleString: function (model) {
+        var state = model.get('state');
+        var blocked = model.get('blocked');
+        
+        if (blocked) {
+            return "Blocked";
+        }
+        else if (state == 'disconnected') {
+            return "Connect";
+        }
+        
+        return "";
+    },
+    
     getStateString: function (state) {
         switch (state) {
             case 'connected':

@@ -38,17 +38,16 @@
     background: $mobile_buttons_bg_col;
     border: 2px solid $mobile_buttons_border_col;
     
-    a {
-        &.button, &.button2 {
-            font-size: 51px;
-            margin-right: 0px;
-            margin-top: 7px;
-            width: 63px;
-            height: 63px;
-            
-            &.desktop-settings-btn {
-                margin-left: 20px;
-            }
+    a.button, a.button2, .grid-cell-blocked-icon {
+        position: static;
+        font-size: 51px;
+        margin-right: 0px;
+        margin-top: 7px;
+        width: 63px;
+        height: 63px;
+
+        &.desktop-settings-btn {
+            margin-left: 20px;
         }
     }
     

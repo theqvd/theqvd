@@ -26,9 +26,9 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
     listEvents: {
         'click .js-change-viewmode': 'changeViewMode',
         'click .js-desktop-settings-btn': 'editDesktopSettings',
-        'click .js-desktop-connect-btn': 'connectDesktop',
+        'click .js-unblocked .js-desktop-connect-btn': 'connectDesktop',
         'change select[name="active_configuration_select"]': 'changeActiveConf',
-        'mouseover .js-grid-cell-area': 'showGridIcon',
+        'mouseover .js-unblocked .js-grid-cell-area': 'showGridIcon',
         'mouseout .js-grid-cell-area': 'hideGridIcon'
     },
     

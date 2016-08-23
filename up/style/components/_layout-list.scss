@@ -108,6 +108,10 @@
     border-radius: 2px;
     border: $col_grey3 solid 2px;
     
+    &.blocked {
+        opacity: 0.5;
+    }
+    
     &.grid-connected, &.grid-reconnecting {
         border-color: $col_enabled;
         
@@ -123,18 +127,26 @@
         }
     }
     
-    .grid-cell-icon {
-        display: none;
+    .grid-cell-icon, .grid-cell-blocked-icon {
         position: absolute;
         font-size: 54px;
         top: 50px;
         left: 67px;
-        background: $col_grey4;
         width: 80px;
         height: 80px;
         border-radius: 100%;
         padding-top: 28px;
+    }    
+    
+    .grid-cell-icon {
+        display: none;
+        background: $col_grey4;
         color: $col_enabled;
+    }    
+    
+    .grid-cell-blocked-icon {
+        background: transparent;
+        color: $col_blacker;
     }
     
     position: relative;
@@ -173,9 +185,11 @@
         padding: 10px;
     }
     
-    &.grid-disconnected, &.grid-connected {
-        .grid-cell-area {
-            cursor: pointer;
+    &.unblocked {
+        &.grid-disconnected, &.grid-connected {
+            .grid-cell-area {
+                cursor: pointer;
+            }
         }
     }
     
@@ -235,6 +249,10 @@
             color: $col_whiter;
         }
     }
+    
+    &.blocked {
+        opacity: 0.5;
+    }
 }
 
 div.list {
@@ -248,7 +266,4 @@ div.list {
 .section-container {
     padding: 35px 65px 0px 65px;
     width: 100%;
-    // Mockups version
-    //padding: 0px;
-    //width: 60%;
 }

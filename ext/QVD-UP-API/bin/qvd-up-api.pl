@@ -781,7 +781,7 @@ sub vm_to_desktop_hash {
     my $desktop = $vm->desktop;
     my $hash = {
         id => $vm->id,
-        blocked => $vm->vm_runtime->blocked,
+        blocked => $vm->vm_runtime->blocked || $vm->di->blocked,
         name => $vm->name,
         alias => defined($desktop) ? $desktop->alias : undef,
         state => $vm->vm_runtime->user_state,

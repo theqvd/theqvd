@@ -1325,6 +1325,8 @@ body {
       border-radius: 2px;
       border: #D9D9D9 solid 2px;
       position: relative; }
+      .wrapper .content .grid-cell.blocked {
+        opacity: 0.5; }
       .wrapper .content .grid-cell.grid-connected, .wrapper .content .grid-cell.grid-reconnecting {
         border-color: #6dad3c; }
         @media screen and (min-width: 41em) {
@@ -1333,18 +1335,22 @@ body {
         .wrapper .content .grid-cell.grid-connected .grid-cell-buttonset .desktop-state, .wrapper .content .grid-cell.grid-reconnecting .grid-cell-buttonset .desktop-state {
           color: #EBEBEB;
           font-weight: bold; }
-      .wrapper .content .grid-cell .grid-cell-icon {
-        display: none;
+      .wrapper .content .grid-cell .grid-cell-icon, .wrapper .content .grid-cell .grid-cell-blocked-icon {
         position: absolute;
         font-size: 54px;
         top: 50px;
         left: 67px;
-        background: #EBEBEB;
         width: 80px;
         height: 80px;
         border-radius: 100%;
-        padding-top: 28px;
+        padding-top: 28px; }
+      .wrapper .content .grid-cell .grid-cell-icon {
+        display: none;
+        background: #EBEBEB;
         color: #6dad3c; }
+      .wrapper .content .grid-cell .grid-cell-blocked-icon {
+        background: transparent;
+        color: #333; }
       .wrapper .content .grid-cell .corner-image {
         position: absolute;
         top: 5px;
@@ -1364,7 +1370,7 @@ body {
           margin-left: 15px; }
       .wrapper .content .grid-cell .grid-cell-area {
         padding: 10px; }
-      .wrapper .content .grid-cell.grid-disconnected .grid-cell-area, .wrapper .content .grid-cell.grid-connected .grid-cell-area {
+      .wrapper .content .grid-cell.unblocked.grid-disconnected .grid-cell-area, .wrapper .content .grid-cell.unblocked.grid-connected .grid-cell-area {
         cursor: pointer; }
       .wrapper .content .grid-cell .grid-cell-buttonset {
         padding: 5px;
@@ -1396,6 +1402,8 @@ body {
     .wrapper .content .row-desktop.row-connected td:first-child, .wrapper .content .row-desktop.row-reconnecting td:first-child {
       background: #6dad3c;
       color: #EBEBEB; }
+    .wrapper .content .row-desktop.blocked {
+      opacity: 0.5; }
     .wrapper .content div.list {
       padding-right: 10px; }
       @media screen and (min-width: 41em) {
@@ -3268,13 +3276,14 @@ td {
       opacity: 0.7;
       background: #EBEBEB;
       border: 2px solid white; }
-      .wrapper .content .grid-cell a.button, .wrapper .content .grid-cell a.button2 {
+      .wrapper .content .grid-cell a.button, .wrapper .content .grid-cell a.button2, .wrapper .content .grid-cell .grid-cell-blocked-icon {
+        position: static;
         font-size: 51px;
         margin-right: 0px;
         margin-top: 7px;
         width: 63px;
         height: 63px; }
-        .wrapper .content .grid-cell a.button.desktop-settings-btn, .wrapper .content .grid-cell a.button2.desktop-settings-btn {
+        .wrapper .content .grid-cell a.button.desktop-settings-btn, .wrapper .content .grid-cell a.button2.desktop-settings-btn, .wrapper .content .grid-cell .grid-cell-blocked-icon.desktop-settings-btn {
           margin-left: 20px; }
       .wrapper .content .grid-cell .grid-cell-area {
         float: left;

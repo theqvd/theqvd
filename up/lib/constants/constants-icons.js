@@ -44,6 +44,7 @@ CLASS_ICON_INFO_CONNECTION = 'fa fa-globe';
 CLASS_ICON_HELP = 'fa fa-question-circle';
 CLASS_ICON_VIRTUAL_DESKTOP = 'fa fa-desktop';
 CLASS_ICON_DESKTOP_CONNECTED = 'fa fa-sign-in';
+CLASS_ICON_DESKTOP_BLOCKED = 'fa fa-lock';
 CLASS_ICON_LANGUAGE = 'fa fa-language';
 CLASS_ICON_WINDOWS = 'fa fa-windows';
 CLASS_ICON_LINUX = 'fa fa-linux';
