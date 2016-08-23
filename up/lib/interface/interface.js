@@ -301,7 +301,7 @@ Up.I = {
 
             var chosenOptionsSingle = jQuery.extend({}, chosenOptions);
             chosenOptionsSingle.disable_search = true;
-            chosenOptionsSingle.width = "150px";
+            chosenOptionsSingle.width = "250px";
 
             var chosenOptionsSingle100 = jQuery.extend({}, chosenOptionsSingle);
             chosenOptionsSingle100.width = "100%"; 

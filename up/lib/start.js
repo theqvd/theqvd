@@ -16,6 +16,9 @@
         // Get list of the necessary templates on starting
         var templates = Up.I.T.getTemplateList('starting');
         
+        // Enable coordinates watcher
+        Up.C.watchGeolocation();
+        
         // Get templates and after that read config file
         Up.A.getTemplates(templates, Up.C.readConfigFile);
 	});

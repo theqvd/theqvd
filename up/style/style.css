@@ -1377,8 +1377,10 @@ body {
           bottom: 10px;
           right: 10px; }
       .wrapper .content .grid-cell .vm-name {
-        width: 100%;
-        color: #EBEBEB; }
+        width: 80%;
+        color: #EBEBEB;
+        word-break: break-all;
+        height: 36px; }
       .wrapper .content .grid-cell .vm-screenshot, .wrapper .content .grid-cell .vm-screenshot-off {
         background-size: auto 100%;
         background-position: center;

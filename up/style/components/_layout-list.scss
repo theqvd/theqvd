@@ -195,8 +195,10 @@
     }
     
     .vm-name {
-        width: 100%;
+        width: 80%;
         color: $col_whiter;
+        word-break: break-all;
+        height: 36px;
     }
     
     .vm-screenshot {

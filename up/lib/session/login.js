@@ -45,25 +45,22 @@ Up.L = {
     },
     
     // Recover login cookies if exist and call to API to check if credentials are correct
-    rememberLogin: function () {         
-        // Store geolocation if user agree before make first API call
-        Up.C.storeGeolocation(function () {
-            Up.A.performAction('account', {}, function (that) {
-                // Store account settings
-                Up.C.account = that.retrievedData;
+    rememberLogin: function () {
+        Up.A.performAction('account', {}, function (that) {
+            // Store account settings
+            Up.C.account = that.retrievedData;
 
-                // Configure visability
-                Up.C.configureVisibility();
+            // Configure visability
+            Up.C.configureVisibility();
 
-                if (that.retrievedData.status == STATUS_UNAUTHORIZED) {
-                    Up.L.loadLogin();           
-                }
-                else {
-                    Up.L.loggedIn = true;
-                    Up.L.afterLogin (); 
-                }
-            });        
-        });
+            if (that.retrievedData.status == STATUS_UNAUTHORIZED) {
+                Up.L.loadLogin();           
+            }
+            else {
+                Up.L.loggedIn = true;
+                Up.L.afterLogin (); 
+            }
+        });        
     },
     
     loadLogin: function () {

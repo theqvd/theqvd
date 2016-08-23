@@ -391,25 +391,16 @@ Up.C = {
         Up.I.attachFastClick(); 
     },
     
-    storeGeolocation: function (callback) {
+    watchGeolocation: function () {
         var that = this;
+                
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                function (geolocation) {
-                    that.geolocation = geolocation
-                    if (callback) {
-                        callback(that);
-                    }
-                }, 
-                function (error) {
-                    delete that.geolocation;
-                    
-                    // if error do nothing. Just call callback
-                    if (callback) {
-                        callback(that);
-                    }
-                }
-            );
+            that.idWhatch = navigator.geolocation.watchPosition(function(geolocation) {
+                that.geolocation = geolocation
+            },
+            function (error) {                  
+                delete that.geolocation;
+            });
         }
     },
     

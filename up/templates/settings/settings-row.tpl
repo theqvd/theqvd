@@ -2,8 +2,8 @@
     <tr class="desktop-row">
         <td class="cell-link <%= model.get('active') ? 'activated-cell' : '' %>">
             <a href="javascript:" class="js-button-settings-conf" data-id="<%= model.get('id') %>" data-i18n="[title]Edit">
-                <%= model.get('name') %>
                 <i class="<%= CLASS_ICON_EDIT %> fleft"></i>
+                <span class="fleft"><%= model.get('name') %></span>
             </a>
             <% if (model.get('active')) { %>
                 <div class="mobile activated-label">

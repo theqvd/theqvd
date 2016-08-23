@@ -6,8 +6,8 @@
         </tr>
     </tbody>
     <tbody class="bb-settings-workspaces"></tbody>
-    <tbody class="buttonset desktop">
-        <tr>
+    <tbody class="buttonset">
+        <tr class="desktop-row">
             <td colspan=<%= Up.I.isMobile() ? '1' : '4' %>><a class="button2 js-new-workspace-btn new-workspace-btn <%= CLASS_ICON_NEW %>" data-i18n="Create new Workspace"></a></td>
         </tr>
     </tbody>

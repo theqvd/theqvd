@@ -14,9 +14,7 @@ Up.Views.MainView = Backbone.View.extend({
     
     initialize: function (params) {
         _.bindAll(this, 'render');
-        
-        Up.C.storeGeolocation();
-        
+                
         // Add common functions
         Up.C.addCommonFunctions (this);
         
