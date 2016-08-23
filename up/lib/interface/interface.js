@@ -1096,6 +1096,9 @@ Up.I = {
         else if (state == 'disconnected') {
             return "Connect";
         }
+        else if (state == 'connected') {
+            return "Reconnect";
+        }
         
         return "";
     },
