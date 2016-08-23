@@ -8,6 +8,9 @@ Up.CRUD.desktops = {
         var dialogConf = {
             title: $.i18n.t('Desktop settings') + ': ' + model.get('name'),
             buttons : {
+                "Reset form": function () {
+                    Up.I.resetForm(this);
+                },
                 "Cancel": function () {
                     // Close dialog
                     Up.I.closeDialog($(this));
@@ -24,8 +27,7 @@ Up.CRUD.desktops = {
                     Up.I.closeDialog($(this));
                 }
             },
-            button1Class : CLASS_ICON_CANCEL,
-            button2Class : CLASS_ICON_SAVE,
+            buttonClasses : [CLASS_ICON_RESET, CLASS_ICON_CANCEL, CLASS_ICON_SAVE],
             fillCallback : function (target) { 
                 Up.I.renderEditionMode(model, target);
             },
@@ -113,8 +115,7 @@ Up.CRUD.desktops = {
                     Up.I.closeDialog($(this));
                 }
             },
-            button1Class : CLASS_ICON_CANCEL,
-            button2Class : CLASS_ICON_CLIENT_DOWNLOAD,
+            buttonClasses : [CLASS_ICON_CANCEL, CLASS_ICON_CLIENT_DOWNLOAD],
             fillCallback : function (target) { 
                 var template = _.template(
                     Up.TPL.dialogClientNotInstalled, {

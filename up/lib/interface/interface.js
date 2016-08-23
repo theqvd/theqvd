@@ -499,24 +499,16 @@ Up.I = {
                 
                 // Buttons style
                     var buttons = $(e.target).next().find('button');
-                    var buttonsText = $(".ui-dialog-buttonset .ui-button .ui-button-text");
-
-                    buttons.attr('class', '');
-                    buttons.addClass("button");
-
-                    var button1 = buttonsText[0];
-                    var button2 = buttonsText[1];
-
-                    Up.T.translateElementContain($(button1));
-                    Up.T.translateElementContain($(button2));
-
+                    
                     // Delete jQuery UI default classes
                     buttons.attr("class", "");
                     // Add our button class
                     buttons.addClass("button");
-
-                    $(button1).addClass(dialogConf.button1Class);
-                    $(button2).addClass(dialogConf.button2Class);
+                
+                    $.each(buttons, function (iButton, button) {
+                        Up.T.translateElementContain($(button));
+                        $(button).addClass(dialogConf.buttonClasses[iButton]);
+                    });
                 
                 // Call to the callback function that will fill the dialog
                     dialogConf.fillCallback($(this), that);
@@ -737,8 +729,7 @@ Up.I = {
                     successCallback(that);
                 }
             },
-            button1Class : CLASS_ICON_CANCEL + ' js-button-cancel',
-            button2Class : CLASS_ICON_ACCEPT + ' js-button-accept',
+            buttonClasses : [CLASS_ICON_CANCEL + ' js-button-cancel', CLASS_ICON_ACCEPT + ' js-button-accept'],
             fillCallback : function(target) { 
                 var templates = Up.I.T.getTemplateList('confirm', {templateName: templateName});
 
@@ -782,8 +773,7 @@ Up.I = {
             }
         };
 
-        dialogConf.button1Class = CLASS_ICON_DOC + ' js-button-read-full-doc';
-        dialogConf.button2Class = CLASS_ICON_CLOSE + ' js-button-close';
+        dialogConf.buttonClasses = [CLASS_ICON_DOC + ' js-button-read-full-doc', CLASS_ICON_CLOSE + ' js-button-close'];
 
         dialogConf.fillCallback = function (target, that) {
             // Back scroll of the div to top position
@@ -1052,6 +1042,28 @@ Up.I = {
         })
         
         return params;
+    },  
+    
+    resetForm: function (context) {
+        $.each($(context).find('.js-form-field'), function (iField, field) {
+            var fieldName = $(field).attr('name');
+            var fieldType = $(field).attr('type');
+            console.info(fieldType);
+            switch (fieldType) {
+                case 'checkbox':
+                    if ($(field).is(':checked')) {
+                        $(field).prop('checked', '');
+                        $(field).trigger('change');
+                    }
+                    break;
+                default:
+                    $(field).val('');
+                    if ($(field).prop('tagName')) {
+                        $(field).trigger('chosen:updated');
+                    }
+                    break;
+            }
+        })
     },
     
     setMenuOptionSelected: function (dataTarget) {

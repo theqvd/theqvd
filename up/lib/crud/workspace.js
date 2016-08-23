@@ -40,6 +40,9 @@ Up.CRUD.workspaces = {
         var dialogConf = {
             title: $.i18n.t('Edit Workspace') + ': ' + model.get('name'),
             buttons : {
+                "Reset form": function () {
+                    Up.I.resetForm(this);
+                },
                 "Cancel": function () {
                     // Close dialog
                     Up.I.closeDialog($(this));
@@ -54,8 +57,7 @@ Up.CRUD.workspaces = {
                     Up.I.closeDialog($(this));
                 }
             },
-            button1Class : CLASS_ICON_CANCEL,
-            button2Class : CLASS_ICON_SAVE,
+            buttonClasses : [CLASS_ICON_RESET, CLASS_ICON_CANCEL, CLASS_ICON_SAVE],
             fillCallback : function (target) { 
                 Up.I.renderEditionMode(model, target);
             },
@@ -64,43 +66,6 @@ Up.CRUD.workspaces = {
         Up.I.dialog(dialogConf);
     }, 
     
-    optionsWorkspace2: function (e) {
-        var selectedId = parseInt($(e.target).attr('data-id'));
-        
-        var model = this.collection.where({id: selectedId})[0];
-        
-        Up.CurrentView.renderWorkspaceOptions(model, $('.bb-content'));
-        Up.T.translate();
-        return;
-
-        var that = this;
-        var dialogConf = {
-            title: $.i18n.t('Workspace options') + ': ' + model.get('name'),
-            buttons : {
-                "Cancel": function () {
-                    // Close dialog
-                    Up.I.closeDialog($(this));
-                },
-                "Save": function () {
-                    var params = Up.I.parseForm(this);
-                    
-                    model.set(params);
-                    
-                    Up.CurrentView.updateModel({id: model.get('id')}, params, Up.CurrentView.render, model);
-                    
-                    Up.I.closeDialog($(this));
-                }
-            },
-            button1Class : CLASS_ICON_CANCEL,
-            button2Class : CLASS_ICON_SAVE,
-            fillCallback : function (target) { 
-                Up.CurrentView.renderWorkspaceOptions(model, target);
-            },
-        }
-
-        Up.I.dialog(dialogConf);
-    },   
-    
     newWorkspace: function (e, model) {
         var model = model || new Up.Models.Workspace();
         
@@ -108,6 +73,9 @@ Up.CRUD.workspaces = {
         var dialogConf = {
             title: $.i18n.t('New Workspace'),
             buttons : {
+                "Reset form": function () {
+                    Up.I.resetForm(this);
+                },
                 "Cancel": function () {
                     // Close dialog
                     Up.I.closeDialog($(this));
@@ -122,8 +90,7 @@ Up.CRUD.workspaces = {
                     Up.I.closeDialog($(this));
                 }
             },
-            button1Class : CLASS_ICON_CANCEL,
-            button2Class : CLASS_ICON_SAVE,
+            buttonClasses : [CLASS_ICON_RESET, CLASS_ICON_CANCEL, CLASS_ICON_SAVE],
             fillCallback : function (target) { 
                 Up.I.renderEditionMode(model, target);
             },
@@ -147,6 +114,9 @@ Up.CRUD.workspaces = {
         var dialogConf = {
             title: $.i18n.t('First Workspace configuration') + ': ' + model.get('name'),
             buttons : {
+                "Reset form": function () {
+                    Up.I.resetForm(this);
+                },
                 "Cancel": function () {
                     // If cancel, check previous workspace active as actived
                     var modelActive = Up.CurrentView.wsCollection.where({active: 1})[0];
@@ -169,8 +139,7 @@ Up.CRUD.workspaces = {
                     Up.I.closeDialog($(this));
                 }
             },
-            button1Class : CLASS_ICON_CANCEL,
-            button2Class : CLASS_ICON_SAVE,
+            buttonClasses : [CLASS_ICON_RESET, CLASS_ICON_CANCEL, CLASS_ICON_SAVE],
             fillCallback : function (target) { 
                 Up.I.renderEditionMode(model, target);
             },

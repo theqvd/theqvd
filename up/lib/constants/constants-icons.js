@@ -57,3 +57,4 @@ CLASS_ICON_DOC = 'fa fa-book';
 CLASS_ICON_CLOSE = 'fa fa-times-circle';
 CLASS_ICON_HAMBURGER_MENU = 'fa fa-navicon';
 CLASS_ICON_BACK = 'fa fa-arrow-left';
+CLASS_ICON_RESET = 'fa fa-repeat';
