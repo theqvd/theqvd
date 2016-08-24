@@ -13,7 +13,7 @@
                 else {
                     $.each(models, function (iModel, model) {
                         var stateString = Up.I.getStateString(model.get('state'));
-                        var titleString = Up.I.getDesktopTitleString(model);
+                        var titleString = Up.I.getDesktopTitleString(model.get('state'), model.get('blocked'));
                 %>
                     <div class="grid-cell js-grid-cell <%= model.get('blocked') ? 'blocked js-blocked' : 'unblocked js-unblocked' %>" data-state="<%= model.get('state') %>" data-id="<%= model.get('id') %>">
                         <div class="grid-cell-area js-grid-cell-area js-desktop-connect-btn" data-id="<%= model.get('id') %>" data-i18n="[title]<%= titleString %>">

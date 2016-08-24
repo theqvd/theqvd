@@ -1086,10 +1086,7 @@ Up.I = {
         Up.I.chosenElement($('select[name="connection"]'), 'single100');
     },
     
-    getDesktopTitleString: function (model) {
-        var state = model.get('state');
-        var blocked = model.get('blocked');
-        
+    getDesktopTitleString: function (state, blocked) {
         if (blocked) {
             return "Blocked";
         }

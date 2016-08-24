@@ -142,6 +142,7 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
         }
         else {
             var iconDiv = $('.js-grid-cell-icon[data-id="' + id + '"]');
+            var areaDiv = $('.js-unblocked .js-grid-cell-area[data-id="' + id + '"]');
         }
         var stateDiv = $('.js-desktop-state[data-id="' + id + '"]');
         
@@ -190,6 +191,18 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
                 break;
         }
         
+        if (!Up.I.isMobile()) {
+            var areaTitle = Up.I.getDesktopTitleString(newState, false);
+            if (areaTitle) {
+                $(areaDiv).attr('data-i18n', '[title]' + Up.I.getDesktopTitleString(newState, false));
+            }
+            else {
+                $(areaDiv).removeAttr('title');
+            }
+            
+            Up.T.translate();
+        }
+
         $(cellRow).addClass('row-' + newState + ' js-row-' + newState);
         $(cellDiv).addClass('grid-' + newState + ' js-grid-' + newState);
         $(stateDiv).attr('data-i18n', Up.I.getStateString(newState)).html($.i18n.t(Up.I.getStateString(newState)));
