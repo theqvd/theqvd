@@ -1,0 +1,12 @@
+{
+    "Another element with the same __field__ already exists": "Another element with the same __field__ already exists",
+    "Cannot activate workspaces with no settings": "Cannot activate workspaces with no settings",
+    "Fixed Workspace cannot be deleted": "Fixed Workspace cannot be deleted",
+    "Invalid Desktop": "Invalid Desktop",
+    "Invalid parameter": "Invalid parameter",
+    "Invalid Workspace": "Invalid Workspace",
+    "Logged in correctly": "Logged in correctly",
+    "Logged out": "Logged out",
+    "Unauthorized": "Unauthorized",
+    "Workspace __name__ deleted": "Workspace __name__ deleted"
+}

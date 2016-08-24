@@ -1,0 +1,12 @@
+{
+    "Another element with the same name already exists": "Ya existe un elemento con el mismo nombre",
+    "Cannot activate workspaces with no settings": "Los workspaces sin configuración no pueden ser activados",
+    "Fixed Workspace cannot be deleted": "Los Workspaces fijos no se pueden eliminar",
+    "Invalid Desktop": "Escritorio no válido",
+    "Invalid parameter": "Parámetro no válido",
+    "Invalid Workspace": "Workspace no válido",
+    "Logged in correctly": "Sesión iniciada correctamente",
+    "Logged out": "Sesión cerrada",
+    "Unauthorized": "Sin autorización",
+    "Workspace __name__ deleted": "Workspace __name__ eliminado"
+}

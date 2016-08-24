@@ -11,7 +11,15 @@ Up.T = {
         var that = this;
         
         $.i18n.init({
-            resGetPath: APP_PATH + 'lib/translations/dictionaries/' + lan + '.json',
+            ns: {
+                namespaces: [
+                    'main',
+                    'api-responses'
+                ],
+                defaultNs: 'main',
+                fallbackNs: 'main'
+            },
+            resGetPath: APP_PATH + 'lib/translations/dictionaries/' + lan + '/__ns__.json',
             useLocalStorage: false,
             debug: false,
             fallbackLng: 'en',
