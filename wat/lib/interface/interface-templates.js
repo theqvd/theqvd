@@ -246,6 +246,13 @@ Wat.I.T = {
                     }
                 }
                 break;
+            case 'spyVM':
+                templates = {
+                    spyVM: {
+                        name: 'common/vms-spy'
+                    }
+                }
+                break;
             case 'vmDetails':
                 templates = {
                     vmDetailsExpiration: {

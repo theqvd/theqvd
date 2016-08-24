@@ -17,6 +17,7 @@ Wat.Router = Backbone.Router.extend({
         "vms": "listVM",
         "vms/:searchHash": "listVM",
         "vm/:id": "detailsVM",
+        "vm/:id/spy": "spyVM",
         
         "users": "listUser",
         "users/:searchHash": "listUser",
@@ -117,6 +118,10 @@ Wat.Router = Backbone.Router.extend({
 
         that.on('route:detailsVM', function (id) {
             that.performRoute('vms', Wat.Views.VMDetailsView, {"id": id});
+        });
+        
+        that.on('route:spyVM', function (id) {
+            that.performRoute('vms', Wat.Views.VMSpyView, {"id": id});
         });
 
         that.on('route:detailsHost', function (id) {

@@ -20,6 +20,7 @@ use Mojo::ByteStream 'b';
 use Deep::Encode;
 use File::Copy qw(copy move);
 use QVD::Config;
+use QVD::VMProxy;
 use Try::Tiny;
 use Data::Rmap qw(rmap_ref);
 
@@ -579,6 +580,37 @@ group {
         $c->send(encode_json({ status => 1000,
                 total_size => $len,
                 copy_size => $size }));
+    };
+
+    websocket '/vmproxy' => sub {
+        my $c = shift;
+        $c->inactivity_timeout(10);
+
+        $c->app->log->debug("VM Proxy WebSocket opened");
+        $c->render_later->on(finish => sub { $c->app->log->debug("VM Proxy WebSocket closed"); });
+
+        my $json = $c->get_input_json;
+        my $vm_id = $json->{arguments}->{vm_id};
+        die QVD::API::Exception->new(code => 6240, object => "vm_id")->message unless (defined($vm_id));
+
+        my $vm = $c->qvd_admin4_api->_db->resultset('VM_Runtime')->find($vm_id);
+        if (defined($vm) && (my $vm_ip = $vm->vm_address) && (my $vm_port = $vm->vm_vma_port) 
+            && ($vm->vm_state eq 'running')) 
+        {
+            my $tx = $c->tx;
+            $tx->with_protocols( 'binary' );
+
+            my $ws = QVD::VMProxy->new( address => $vm_ip, port => $vm_port );
+            $ws->on( error => sub {
+                $c->app->log->error( "Error in ws: ".$_[1] );
+                $tx->finish( 1011, $_[1] )
+            } );
+            $ws->open($tx, 30000);
+        }
+        else 
+        {
+            die QVD::API::Exception->new(code => 6310, object => $vm_id)->message;
+        }
     };
 };
 

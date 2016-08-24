@@ -564,8 +564,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                             Wat.A.performAction(that.qvdObj + '_all_ids', {}, that.collection.filters, {}, that.storeAllSelectedIds, that);
                         }
                     },
-                    button1Class : 'fa fa-eye',
-                    button2Class : 'fa fa-th',
+                    buttonClasses : ['fa fa-eye', 'fa fa-th'],
                     fillCallback : this.fillCheckSelector
                 }
 
@@ -1099,8 +1098,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             }
         };
         
-        that.dialogConf.button1Class = 'fa fa-ban js-button-cancel';
-        that.dialogConf.button2Class = 'fa fa-save js-button-update';
+        that.dialogConf.buttonClasses = ['fa fa-ban js-button-cancel', 'fa fa-save js-button-update'];
         
         that.dialogConf.fillCallback = that.fillMassiveEditor;
         that.dialogConf.title = i18n.t('Massive changes over __counter__ elements', {counter: that.selectedItems.length}) + '<i class="fa fa-warning" title="' + i18n.t('Some fields could not be able in the massive editor') + '"></i>';
@@ -1258,6 +1256,10 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 else {
                     that.applyDisconnect(that);
                 }
+                break;
+            case 'spy':
+                var model = that.collection.where({id: that.selectedItems[0]})[0];
+                that.spyVM(model);
                 break;
             // Used in Hosts
             case 'stop_all':

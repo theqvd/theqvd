@@ -466,8 +466,7 @@ Wat.Views.MainView = Backbone.View.extend({
             }
         };
 
-        this.dialogConf.button1Class = 'fa fa-ban js-button-cancel';
-        this.dialogConf.button2Class = 'fa fa-plus-circle js-button-create';
+        this.dialogConf.buttonClasses = ['fa fa-ban js-button-cancel', 'fa fa-plus-circle js-button-create'];
         
         this.dialogConf.fillCallback = this.fillEditor;
 
@@ -489,8 +488,7 @@ Wat.Views.MainView = Backbone.View.extend({
             }
         };
         
-        this.dialogConf.button1Class = 'fa fa-ban js-button-cancel';
-        this.dialogConf.button2Class = 'fa fa-save js-button-update';
+        this.dialogConf.buttonClasses = ['fa fa-ban js-button-cancel', 'fa fa-save js-button-update'];
         
         this.dialogConf.fillCallback = this.fillEditor;
         
@@ -532,8 +530,7 @@ Wat.Views.MainView = Backbone.View.extend({
             }
         };
 
-        dialogConf.button1Class = 'fa fa-book js-button-read-full-doc';
-        dialogConf.button2Class = 'fa fa-check js-button-close';
+        dialogConf.buttonClasses = ['fa fa-book js-button-read-full-doc', 'fa fa-check js-button-close'];
 
         dialogConf.fillCallback = function (target, that) {
             // Back scroll of the div to top position

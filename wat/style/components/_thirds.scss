@@ -45,8 +45,8 @@
     
     .dialog-container {
         overflow-y: auto;
-        padding-left: 30px;
-        padding-right: 30px;
+        padding-left: 0px;
+        padding-right: 0px;
         max-height: 70vh !important;
         height: auto;
     }
@@ -145,6 +145,55 @@
     }
     
     @extend %no-outline;
+}
+
+.ui-dialog--fullscreen {
+    width: 100vw !important;
+    height: 100vh !important;
+    overflow-y: hidden;
+    left: 0 !important;
+    top: 0 !important;
+    background: #444;
+    
+    .dialog-container {
+        background: #222;
+
+        @include in(desktop) {
+            height: 96vh !important;
+            max-height: 100vh !important;
+            float: right;
+            width: 85% !important;
+        }
+    }
+    
+    .ui-dialog-buttonpane {
+        @include in(desktop) {
+            float: left;
+            width: 15%;
+        }
+        background: #444;
+        border: 0;
+        margin-left: 0px;
+    }
+    
+    .ui-dialog-buttonset {
+        width: 100%;
+        padding: 0px;
+        text-align: left;
+        margin: 0px;
+        background: #444;
+        
+        .button {
+            margin-left: 0px;
+            
+            @include in(desktop) {
+                width: 100%;
+            }
+            @include in(mobile) {
+                float: right;
+            }
+        }
+    }
 }
 
 // jQuery DateTimePicker styles
@@ -247,6 +296,9 @@ div.tagsinput span.tag a {
 
 .extruder-content, .ext-wrapper, .extruder-content .text {
     background: #333 !important;
+    @include in (desktop) {
+        overflow: visible !important;
+    }
 }
 
 
@@ -340,4 +392,91 @@ div.tagsinput span.tag a {
     border:1px solid #222;
     background-color:#444;
     color:#FEFEFE
+}
+
+.noVNC_screen {
+    text-align: center;
+    position: relative;
+}
+
+.noVNC_controls, .noVNC_settings, .noVNC_xvp, .noVNC_status {
+    display: none !important;
+}
+
+.noVNC_canvas--interactive {
+    cursor: none !important;
+}
+
+.noVNC_canvas--viewonly {
+    cursor: auto !important;
+}
+
+.vms-spy-log {
+    display: none;
+    width: 100%;
+
+    .log-registers {
+        overflow-y: scroll;
+        font-size: x-small;
+        line-height: 13px;
+        background: #222;
+        color: #eee;
+        text-align: left;
+        padding: 4px;
+        height: 200px;
+        border: 1px solid #eee;
+        
+        .log-line-debug, .log-line-info, .log-line-warn, .log-line-error {
+            display: none;
+        }
+        
+        .log-line-info {
+            color: aqua;
+        }    
+        
+        .log-line-warn {
+            color: yellow;
+        }   
+        
+        .log-line-error {
+            color: red;
+        }
+    }
+    
+    .drag-title {
+        width: 100%;
+        height: 20px;
+        background-color: #666;
+        color: #eee;
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+        padding: 3px;
+        cursor: pointer;
+        text-align: left;
+    }
+}
+
+.vms-spy-settings, .vms-spy-details, .vms-spy-log {
+    //display: none;
+    color: #eee;
+    background: #555;
+    padding: 8px;
+    font-size: small;
+    border: 1px solid #eee;
+    margin-top: 10px;
+        
+    div {
+        margin-bottom: 5px;
+    }
+    
+    legend {
+        color: #eee;
+        text-align: left;
+    }
+    
+    .details-data {
+        padding-left: 8px;
+        margin-bottom: 8px;
+        font-size: 10px;
+    }
 }

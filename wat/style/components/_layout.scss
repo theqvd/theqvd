@@ -186,7 +186,7 @@ body {
     }
 }
 
-.loading, .loading-mid {
+.loading, .loading-mid, .error-loading {
     width: 75px;
     top: 25vh;
     @include in(desktop) {
@@ -199,7 +199,7 @@ body {
     margin: 50px auto;
 }
 
-.loading {
+.loading, .error-loading {
     @include icon-size(75px);
     @include in(desktop) {
         @include icon-size(200px);
@@ -441,4 +441,19 @@ span.text {
     &.server-datetime-wrapper--mini {
         top: 40px;
     }
+}
+
+.out-of-borders {
+    position: absolute;
+    left: -20px;
+    top: -20px;
+}
+    
+.invisible-box {
+    outline: none;
+    box-shadow: none;
+    border: 0px solid;
+    background: transparent;
+    font-size: 0px;
+    line-height: 0px;
 }

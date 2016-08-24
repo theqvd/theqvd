@@ -6,6 +6,11 @@ RESTRICT_TEMPLATES = true;
 // Debug constants
 DEBUG_ACL_FAILS = false;
 
+// noVNC include URI
+INCLUDE_URI = "lib/thirds/noVNC/include/";
+VNC_MIN_HEIGHT = 400;
+VNC_MIN_WIDTH = 600;
+
 // Status codes returned by the API
 ALL_STATUS = {
     0000: 'Successful completion',
@@ -224,6 +229,7 @@ HTML_MINI_LOADING = '<div class="mini-loading"><i class="fa fa-gear fa-spin"></i
 HTML_LOADING = '<div class="loading"><i class="fa fa-gear fa-spin"></i></div>';
 HTML_MID_LOADING = '<div class="loading-mid"><i class="fa fa-gear fa-spin"></i></div>';
 HTML_MID_LOADING_DELETE = '<div class="loading-mid"><i class="fa fa-trash fa-spin"></i></div>';
+HTML_ERROR = '<div class="error-loading"><i class="fa fa-warning"></i></div>';
 HTML_SORT_ICON = '<i class="fa fa-sort sort-icon"></i>';
 
 // Languages

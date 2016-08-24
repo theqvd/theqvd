@@ -224,10 +224,9 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
                     that.applyCascadeDelete();
                 }
             },
-            button1Class : 'fa fa-ban',
-            button2Class : 'fa fa-trash',
+            buttonClasses: ['fa fa-ban', 'fa fa-trash'],
             
-            fillCallback : function (target) {
+            fillCallback: function (target) {
                 // Hide delete all button until all data were retrieved
                 $('.ui-dialog-buttonset .button').eq(1).hide();
                 

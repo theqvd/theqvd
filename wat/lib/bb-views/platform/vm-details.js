@@ -37,7 +37,8 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
     
     events: {
         'click .js-execution-params-button': 'showExecutionParams',
-        'click .js-button-disconnect-user': 'applyDisconnectVMUser'
+        'click .js-button-disconnect-user': 'applyDisconnectVMUser',
+        'click .js-button-spy-vm': 'spyVM'
     },
     
     applyDisconnectVMUser: function (that) {

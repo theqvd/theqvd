@@ -576,22 +576,15 @@ Wat.I = {
                     var buttons = $(e.target).next().find('button');
                     var buttonsText = $(".ui-dialog-buttonset .ui-button .ui-button-text");
 
-                    buttons.attr('class', '');
-                    buttons.addClass("button");
-
-                    var button1 = buttonsText[0];
-                    var button2 = buttonsText[1];
-
-                    Wat.T.translateElementContain($(button1));
-                    Wat.T.translateElementContain($(button2));
-
                     // Delete jQuery UI default classes
-                    buttons.attr("class", "");
+                    buttons.attr('class', '');
                     // Add our button class
-                    buttons.addClass("button");
-
-                    $(button1).addClass(dialogConf.button1Class);
-                    $(button2).addClass(dialogConf.button2Class);
+                    buttons.addClass('button');
+                
+                    $.each (buttonsText, function (iBT, button) {
+                        Wat.T.translateElementContain($(button));
+                        $(button).addClass(dialogConf.buttonClasses[iBT]);
+                    });
                 
                 // Call to the callback function that will fill the dialog
                     dialogConf.fillCallback($(this), that);
@@ -705,14 +698,12 @@ Wat.I = {
         }
         else {
             this.showSelectedItemsMenu();
-                this.checkVisibilityConditions();
+            this.checkVisibilityConditions();
                 
             if (selectedItems == 1) {
-                $('.js-only-one').show();
                 $('.js-only-massive').hide();
             }
             else {
-                $('.js-only-massive').show();
                 $('.js-only-one').hide();
             }
         }
@@ -810,8 +801,7 @@ Wat.I = {
                     successCallback(that);
                 }
             },
-            button1Class : 'fa fa-ban js-button-cancel',
-            button2Class : 'fa fa-check js-button-accept',
+            buttonClasses : ['fa fa-ban js-button-cancel', 'fa fa-check js-button-accept'],
             fillCallback : function(target) { 
                 var templates = Wat.I.T.getTemplateList('confirm', {templateName: templateName});
 
@@ -855,8 +845,7 @@ Wat.I = {
             }
         };
 
-        dialogConf.button1Class = 'fa fa-book js-button-read-full-doc';
-        dialogConf.button2Class = 'fa fa-check js-button-close';
+        dialogConf.buttonClasses = ['fa fa-book js-button-read-full-doc', 'fa fa-check js-button-close'];
 
         dialogConf.fillCallback = function (target, that) {
             // Back scroll of the div to top position

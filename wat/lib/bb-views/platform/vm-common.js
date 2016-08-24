@@ -2,7 +2,6 @@
 Wat.Common.BySection.vm = {
     // This initialize function will be executed one time and deleted
     initializeCommon: function (that) {
-        // Empty
     },
     
     updateElement: function (dialog) {
@@ -99,5 +98,12 @@ Wat.Common.BySection.vm = {
         };
 
         Wat.A.fillSelect(params);
+    },
+    
+    spyVM: function (vmModel) {      
+        var vmModel = vmModel instanceof Backbone.Model ? vmModel : this.model;
+        
+        var target = window.location.origin + window.location.pathname + "#/vm/" + vmModel.get('id') + "/spy";
+        window.open(target);
     },
 }

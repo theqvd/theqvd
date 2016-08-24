@@ -936,21 +936,21 @@ body {
       float: left;
       margin-right: 15px; }
 
-.loading, .loading-mid {
+.loading, .loading-mid, .error-loading {
   width: 75px;
   top: 25vh;
   color: #e4e4e4;
   margin: 50px auto; }
   @media screen and (min-width: 41em) {
-    .loading, .loading-mid {
+    .loading, .loading-mid, .error-loading {
       font-size: 200px;
       width: 200px;
       top: 25vh; } }
 
-.loading {
+.loading, .error-loading {
   font-size: 75px; }
   @media screen and (min-width: 41em) {
-    .loading {
+    .loading, .error-loading {
       font-size: 200px; } }
 
 .loading-mid {
@@ -1976,6 +1976,19 @@ span.text {
   opacity: 0.8; }
   .server-datetime-wrapper.server-datetime-wrapper--mini {
     top: 40px; }
+
+.out-of-borders {
+  position: absolute;
+  left: -20px;
+  top: -20px; }
+
+.invisible-box {
+  outline: none;
+  box-shadow: none;
+  border: 0px solid;
+  background: transparent;
+  font-size: 0px;
+  line-height: 0px; }
 
 /********************************************************************
 *********************************************************************
@@ -3148,8 +3161,8 @@ table.vmst .vmst-vm-cell, table.vmst .vmst-host-cell {
         margin-right: 10px; }
   .ui-dialog .dialog-container {
     overflow-y: auto;
-    padding-left: 30px;
-    padding-right: 30px;
+    padding-left: 0px;
+    padding-right: 0px;
     max-height: 70vh !important;
     height: auto; }
 
@@ -3215,6 +3228,44 @@ table.vmst .vmst-vm-cell, table.vmst .vmst-host-cell {
       width: 50%;
       max-width: 100px; }
 
+.ui-dialog--fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow-y: hidden;
+  left: 0 !important;
+  top: 0 !important;
+  background: #444; }
+  .ui-dialog--fullscreen .dialog-container {
+    background: #222; }
+    @media screen and (min-width: 41em) {
+      .ui-dialog--fullscreen .dialog-container {
+        height: 96vh !important;
+        max-height: 100vh !important;
+        float: right;
+        width: 85% !important; } }
+  .ui-dialog--fullscreen .ui-dialog-buttonpane {
+    background: #444;
+    border: 0;
+    margin-left: 0px; }
+    @media screen and (min-width: 41em) {
+      .ui-dialog--fullscreen .ui-dialog-buttonpane {
+        float: left;
+        width: 15%; } }
+  .ui-dialog--fullscreen .ui-dialog-buttonset {
+    width: 100%;
+    padding: 0px;
+    text-align: left;
+    margin: 0px;
+    background: #444; }
+    .ui-dialog--fullscreen .ui-dialog-buttonset .button {
+      margin-left: 0px; }
+      @media screen and (min-width: 41em) {
+        .ui-dialog--fullscreen .ui-dialog-buttonset .button {
+          width: 100%; } }
+      @media only screen and (max-width: 41em) {
+        .ui-dialog--fullscreen .ui-dialog-buttonset .button {
+          float: right; } }
+
 .xdsoft_datetimepicker .xdsoft_calendar td > div {
   padding: 6px; }
 .xdsoft_datetimepicker .xdsoft_calendar th {
@@ -3276,6 +3327,9 @@ div.tagsinput span.tag a {
 
 .extruder-content, .ext-wrapper, .extruder-content .text {
   background: #333 !important; }
+  @media screen and (min-width: 41em) {
+    .extruder-content, .ext-wrapper, .extruder-content .text {
+      overflow: visible !important; } }
 
 .evo-pop {
   width: 210px !important; }
@@ -3328,6 +3382,68 @@ div.tagsinput span.tag a {
   border: 1px solid #222;
   background-color: #444;
   color: #FEFEFE; }
+
+.noVNC_screen {
+  text-align: center;
+  position: relative; }
+
+.noVNC_controls, .noVNC_settings, .noVNC_xvp, .noVNC_status {
+  display: none !important; }
+
+.noVNC_canvas--interactive {
+  cursor: none !important; }
+
+.noVNC_canvas--viewonly {
+  cursor: auto !important; }
+
+.vms-spy-log {
+  display: none;
+  width: 100%; }
+  .vms-spy-log .log-registers {
+    overflow-y: scroll;
+    font-size: x-small;
+    line-height: 13px;
+    background: #222;
+    color: #eee;
+    text-align: left;
+    padding: 4px;
+    height: 200px;
+    border: 1px solid #eee; }
+    .vms-spy-log .log-registers .log-line-debug, .vms-spy-log .log-registers .log-line-info, .vms-spy-log .log-registers .log-line-warn, .vms-spy-log .log-registers .log-line-error {
+      display: none; }
+    .vms-spy-log .log-registers .log-line-info {
+      color: aqua; }
+    .vms-spy-log .log-registers .log-line-warn {
+      color: yellow; }
+    .vms-spy-log .log-registers .log-line-error {
+      color: red; }
+  .vms-spy-log .drag-title {
+    width: 100%;
+    height: 20px;
+    background-color: #666;
+    color: #eee;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    padding: 3px;
+    cursor: pointer;
+    text-align: left; }
+
+.vms-spy-settings, .vms-spy-details, .vms-spy-log {
+  color: #eee;
+  background: #555;
+  padding: 8px;
+  font-size: small;
+  border: 1px solid #eee;
+  margin-top: 10px; }
+  .vms-spy-settings div, .vms-spy-details div, .vms-spy-log div {
+    margin-bottom: 5px; }
+  .vms-spy-settings legend, .vms-spy-details legend, .vms-spy-log legend {
+    color: #eee;
+    text-align: left; }
+  .vms-spy-settings .details-data, .vms-spy-details .details-data, .vms-spy-log .details-data {
+    padding-left: 8px;
+    margin-bottom: 8px;
+    font-size: 10px; }
 
 /********************************************************************
 *********************************************************************
@@ -3580,6 +3696,9 @@ td {
 
 .nopadding {
   padding: 0px; }
+
+* {
+  text-shadow: 0 0; }
 
 .doc-text {
   /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
