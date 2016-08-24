@@ -237,8 +237,8 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
                 filter['tenant_id'] = this.selectedTenant;
             }
             
-            filter['key'] = search;
-
+            filter['key'] = {'~': '%' + search + '%'};
+            
             // Pass typed search with context to avoid concurrency problems 
             Wat.A.performAction('config_get', {}, filter, {}, this.processTokensRenderTokens, $.extend({}, this, {typedSearch: $('input[name="config_search"]').val()}));
         }
@@ -427,7 +427,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         }
         else if ($.inArray(that.currentTokensPrefix, that.prefixes) != -1) {
             if (!$.isEmptyObject(Wat.C.currentSearch)) {
-                filter['key'] = Wat.C.currentSearch;
+                filter['key'] = {'~': '%' + Wat.C.currentSearch + '%'};
             }
             else {
                 // If there is a current search, filter by it. Otherwise filter by current selected prefix    
