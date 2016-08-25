@@ -28,7 +28,6 @@ Up.T = {
         });
         
         this.lan = lan;
-        $.cookie('i18next', lan);
     },
     
     getLanguage: function (lan) {
