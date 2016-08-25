@@ -82,6 +82,7 @@ my $build = $mod->new (
 		png_files    => {
 		                  'pixmaps/qvd-small.png' => 'pixmaps/qvd-small.png',
 		                  'pixmaps/qvd-big.png' => 'pixmaps/qvd-big.png' ,
+		                  'pixmaps/client.png' => 'pixmaps/client.png' ,
 		                },
 		desktop_files => {
 				  'desktop/qvd.desktop' => 'desktop/qvd.desktop'
