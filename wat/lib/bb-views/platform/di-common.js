@@ -238,5 +238,7 @@ Wat.Common.BySection.di = {
                 );
 
         $('.bb-affected-vms-list').html(template);
+        
+        Wat.I.enableDataPickers();
     },
 }
