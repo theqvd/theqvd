@@ -1035,7 +1035,7 @@ sub load_usb_devices {
         my $dev = $d->{vendor} . " " . $d->{product} 
             .  " (" . $d->{vid} . ":" . $d->{pid} 
             . ( $d->{serial} ? '@' . $d->{serial} : "") . ")";
-        push $self->{usb_devices} , $dev;
+        push @{$self->{usb_devices}} , $dev;
     }
 
     $self->{usbip_device_list}->InsertItems( $self->{usb_devices}, 0 ) if ( defined $self->{tab_ctl} );
@@ -1065,7 +1065,7 @@ sub load_usb_devices {
 		}
                 if ( ! $is_connected ) {
                     # Make sure we don't forget about devices although they're not connected now
-                    push $self->{disconnected_usb_devices}, $v.":".$p.( defined $id ? "@".$id : '');
+                    push @{$self->{disconnected_usb_devices}}, $v.":".$p.( defined $id ? "@".$id : '');
                 }
 	}
 
@@ -1444,12 +1444,12 @@ sub _format_aligned {
         $indent //= "";
 
         foreach my $row (@$data) {
-            my ($k) = keys($row);
+            my ($k) = keys(%{$row});
             $maxlen = length($k) if ( $maxlen < length($k));
         }
 
         foreach my $row (@$data) {
-            my ($k) = keys($row);
+            my ($k) = keys(%{$row});
             my $v = $row->{$k};
 
             $ret .= $indent . $k . (" " x ($maxlen-length($k))) . ": ";
