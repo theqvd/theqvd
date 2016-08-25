@@ -1254,12 +1254,12 @@ sub _format_aligned {
         $indent //= "";
 
         foreach my $row (@$data) {
-            my ($k) = keys($row);
+            my ($k) = keys(%{$row});
             $maxlen = length($k) if ( $maxlen < length($k));
         }
 
         foreach my $row (@$data) {
-            my ($k) = keys($row);
+            my ($k) = keys(%{$row});
             my $v = $row->{$k};
 
             $ret .= $indent . $k . (" " x ($maxlen-length($k))) . ": ";
