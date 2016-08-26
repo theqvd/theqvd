@@ -211,7 +211,7 @@ client.ssl.use_cert = 0
 ###
 ### Specifically, the client overrides hostname verification, so use
 ### the client.ssl.allow_bad_host option instead.
-client.ssl.options.SSL_version = !SSLv3:!SSLv2:!TLSv1
+client.ssl.options.SSL_version = TLSv1_1:!SSLv3:!SSLv2:!TLSv1
 
 
 ##########################################################################

@@ -184,7 +184,7 @@ Up.B = {
         this.bindEvent('click', 'td.cell-link', function (e) { 
             var firstLink = $(e.target).find('a')[0];
             if (firstLink) {
-                open($(firstLink).attr('href'), $(firstLink).attr('target'));
+                location = $(firstLink).attr('href');
                 $(firstLink).trigger('click');
             }
             
