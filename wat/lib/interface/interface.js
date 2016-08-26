@@ -374,17 +374,8 @@ Wat.I = {
             closeOnDateSelect: true
         };
         
-        if (Wat.C.language != 'auto') {
-            var lan = Wat.T.getLanguage(Wat.C.language);
-            
-            // If lan is auto, change i18next macro by navigator language
-            if (lan == '__lng__') {
-                lan = navigator.language;
-            }
-            
-            options['lang'] = lan;
-            optionsPast['lang'] = lan;
-        }
+        options['lang'] = Wat.C.getEffectiveLan();
+        optionsPast['lang'] = Wat.C.getEffectiveLan();
         
         $('.datetimepicker').datetimepicker(options);
         

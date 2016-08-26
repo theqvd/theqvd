@@ -429,7 +429,7 @@ Wat.B = {
         clickScreenHelp: function (e) {
             var docSection = $(e.target).attr('data-docsection');
             
-            var lan = Wat.C.language == "default" ? Wat.C.tenantLanguage : Wat.C.language;
+            var lan = Wat.C.getEffectiveLan();
             
             var section = Wat.I.docSections[docSection][lan];
             var guide = Wat.I.docSections[docSection].guide;

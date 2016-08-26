@@ -616,5 +616,12 @@ Wat.C = {
         }
         
         return urlSid;
+    },
+    
+    // Get effective lan calculating if administrator language is default or auto
+    getEffectiveLan: function () {
+        var lan = this.language == "default" ? this.tenantLanguage : this.language;
+        
+        return lan == "auto" ? window.i18n.lng() : lan;
     }
 }
