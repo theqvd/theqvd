@@ -147,16 +147,14 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
         var stateDiv = $('.js-desktop-state[data-id="' + id + '"]');
         
         var cellDiv = $('.js-grid-cell[data-id="' + id + '"]');
-        var cellCurrentState = $(cellDiv).attr('data-state');
         $(cellDiv).removeClass('grid-disconnected js-grid-disconnected grid-connected js-grid-connected grid-connecting js-grid-connecting grid-reconnecting js-grid-reconnecting');
 
         // List view
         var cellRow = $('.js-row-desktop[data-id="' + id + '"]');
-        var rowCurrentState = $(cellRow).attr('data-state');
         $(cellRow).removeClass('row-disconnected js-row-disconnected row-connected js-row-connected row-connecting js-row-connecting row-reconnecting js-row-reconnecting');
         
         // Depending on the current view, state will be retrieved from one or another
-        var currentState = cellCurrentState || rowCurrentState;
+        var currentState = this.getDesktopStateFromDom(id);
         
         // When try to connect to connected desktop, establish "fake ui state" reconnecting 
         if (newState == 'connecting' && (currentState == 'connected' || currentState == 'reconnecting')) {
@@ -193,12 +191,7 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
         
         if (!Up.I.isMobile()) {
             var areaTitle = Up.I.getDesktopTitleString(newState, false);
-            if (areaTitle) {
-                $(areaDiv).attr('data-i18n', '[title]' + Up.I.getDesktopTitleString(newState, false));
-            }
-            else {
-                $(areaDiv).removeAttr('title');
-            }
+            $(areaDiv).attr('data-i18n', '[title]' + areaTitle);
             
             Up.T.translate();
         }
@@ -212,8 +205,23 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
         model.set('state', newState);
     },
     
+    getDesktopStateFromDom: function (id) {
+        var cellDiv = $('.js-grid-cell[data-id="' + id + '"]');
+        var cellRow = $('.js-row-desktop[data-id="' + id + '"]');
+        
+        var cellCurrentState = $(cellDiv).attr('data-state');
+        var rowCurrentState = $(cellRow).attr('data-state');
+        
+        return cellCurrentState || rowCurrentState;
+    },
+    
     startConnectionTimeout: function (id) {
         var that = this;
+        
+        // If exists previous timeout with this desktop, clear it
+        if (that.connectionTimeouts[id]) {
+            clearInterval(that.connectionTimeouts[id].timeout);        
+        }
         
         that.connectionTimeouts[id] = {};
         
@@ -230,7 +238,14 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
             
             // If counter reach timeout set disconnected status and breack timeout countdown
             if (that.connectionTimeouts[id].count >= CONNECTION_TIMEOUT) {
-                that.setDesktopState(id, 'disconnected');                
+                switch (that.getDesktopStateFromDom(id)) {
+                    case 'connecting':
+                        that.setDesktopState(id, 'disconnected'); 
+                        break;
+                    case 'reconnecting':
+                        that.setDesktopState(id, 'connected'); 
+                        break;
+                }
                 clearInterval(that.connectionTimeouts[id].timeout);
                 
                 delete(that.connectionTimeouts[id]);

@@ -5,7 +5,10 @@ Up.WS.changeWebsocketDesktops = function (data) {
     $.each(data, function (field, value) {
         switch (field) {
             case 'user_state':
-                Up.CurrentView.setDesktopState(id, value);
+                // Check if function exists to avoid fail when change section just before websocket push
+                if (typeof Up.CurrentView.setDesktopState == 'function') {
+                    Up.CurrentView.setDesktopState(id, value);
+                }
                 break;
         }
     });

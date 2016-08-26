@@ -40,6 +40,15 @@ Up.CRUD.desktops = {
         var that = this;
         
         var selectedId = $(e.target).attr('data-id');
+        
+        // If desktop is already in connecting state, abort connection action
+        var currentState = this.getDesktopStateFromDom(selectedId);
+        switch (currentState) {
+            case  "connecting":
+            case  "reconnecting":
+                return;
+                break;
+        }
 
         Up.A.performAction('desktops/' + selectedId + '/token', {}, function (e) {
             that.setDesktopState(selectedId, 'connecting');
