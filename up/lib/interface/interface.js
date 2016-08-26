@@ -1048,7 +1048,7 @@ Up.I = {
         $.each($(context).find('.js-form-field'), function (iField, field) {
             var fieldName = $(field).attr('name');
             var fieldType = $(field).attr('type');
-            console.info(fieldType);
+            
             switch (fieldType) {
                 case 'checkbox':
                     if ($(field).is(':checked')) {
@@ -1090,11 +1090,21 @@ Up.I = {
         if (blocked) {
             return "Blocked";
         }
-        else if (state == 'disconnected') {
-            return "Connect";
-        }
-        else if (state == 'connected') {
-            return "Reconnect";
+        else {
+            switch (state) {
+                case 'disconnected':
+                    return "Connect";
+                    break;
+                case 'connected':
+                    return "Reconnect";
+                    break;
+                case 'connecting':
+                    return "Connecting";
+                    break;
+                case 'reconnecting':
+                    return "Reconnecting";
+                    break;
+            }
         }
         
         return "";
