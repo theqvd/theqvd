@@ -429,7 +429,7 @@ id	name	description
 328	vm.update.state	Start-Stop virtual machines
 329	tenant.purge.	Delete all the elements of a tenant
 330	vm.spy.	Spy QVD option to see the VM activity via VNC
-331	vm.spy.interactive	Interactive mode option on Spy QVD feature to take desktop control
+331	vm.spy.interactive	Interactive mode on Spy QVD feature to take desktop control
 
 ### ACL_Role_Relation ###
 id	acl_id	role_id	positive
