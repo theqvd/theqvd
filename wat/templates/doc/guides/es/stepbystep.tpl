@@ -354,7 +354,7 @@ Widgets de estadísticas
 <img src="images/doc_images/menu_help.png" alt="menu_help.png" width="600px" />
 </span></p></div>
 <div class="sect2">
-<h3 id="_a_cerca_de">3.1. A cerca de</h3>
+<h3 id="_acerca_de">3.1. Acerca de</h3>
 <div class="paragraph"><p>Sección donde se muestra información de la versión de QVD que se está utilizando así como revisión del WAT.</p></div>
 </div>
 <div class="sect2">
@@ -2333,7 +2333,7 @@ Ambos parámetros se pueden definir como <em>por defecto</em> adoptando así la 
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-02-29 11:31:32 CET
+Last updated 2016-08-26 13:24:08 CEST
 </div>
 </div>
 </body>

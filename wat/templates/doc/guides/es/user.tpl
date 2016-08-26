@@ -4680,7 +4680,7 @@ Color de texto de la caja de login
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-03-17 09:27:41 CET
+Last updated 2016-08-26 13:23:20 CEST
 </div>
 </div>
 </body>

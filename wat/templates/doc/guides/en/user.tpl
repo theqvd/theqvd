@@ -4639,7 +4639,7 @@ Login Box text colour
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-08 11:08:13 CEST
+Last updated 2016-08-26 13:23:20 CEST
 </div>
 </div>
 </body>

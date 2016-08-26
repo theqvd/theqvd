@@ -87,7 +87,7 @@ Wat.I.docSections = {
     },
     about: { 
         en: '_about',
-        es: '_a_cerca_de',
+        es: '_acerca_de',
         guide: 'stepbystep'
     },
     documentation: { 

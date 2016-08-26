@@ -884,7 +884,7 @@ Gestionar sus propios ACLs, pudiendo llegar a tener permisos totales o incluso p
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-21 10:25:20 CEST
+Last updated 2016-08-26 13:23:20 CEST
 </div>
 </div>
 </body>

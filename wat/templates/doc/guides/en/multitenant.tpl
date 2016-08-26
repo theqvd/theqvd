@@ -887,7 +887,7 @@ In this case, there will be small differences in comparison with the one there i
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-21 16:19:45 CEST
+Last updated 2016-08-26 13:23:20 CEST
 </div>
 </div>
 </body>
