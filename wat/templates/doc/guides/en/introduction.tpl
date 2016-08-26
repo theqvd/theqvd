@@ -244,9 +244,9 @@ cellspacing="0" cellpadding="4">
 <col width="25%" />
 <thead>
 <tr>
-<th align="left" valign="top">Chrome </th>
-<th align="left" valign="top">Firefox        </th>
-<th align="left" valign="top">Internet Explorer </th>
+<th align="left" valign="top">Chrome</th>
+<th align="left" valign="top">Firefox</th>
+<th align="left" valign="top">Internet Explorer</th>
 <th align="left" valign="top">Opera</th>
 </tr>
 </thead>
@@ -278,9 +278,9 @@ cellspacing="0" cellpadding="4">
 <col width="25%" />
 <thead>
 <tr>
-<th align="left" valign="top">iOS Safari     </th>
-<th align="left" valign="top">iOS Chrome     </th>
-<th align="left" valign="top">Android Browser    </th>
+<th align="left" valign="top">iOS Safari</th>
+<th align="left" valign="top">iOS Chrome</th>
+<th align="left" valign="top">Android Browser</th>
 <th align="left" valign="top">Android Chrome</th>
 </tr>
 </thead>
@@ -882,7 +882,7 @@ Manage his own ACLs, in this way being able to get total permits or even lose th
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-08-26 13:23:20 CEST
+Last updated 2016-08-26 14:32:29 CEST
 </div>
 </div>
 </body>
