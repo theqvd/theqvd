@@ -2,9 +2,11 @@
 
 use strict;
 use warnings;
-use TryCatch;
+use Try::Tiny;
 use Getopt::Long;
+use File::Basename;
 use QVD::DB::Simple;
+use QVD::DB::Upgrade qw(qvd_upgrade_db_data qvd_version_upgrade_available);
 
 ### FUNCTIONS ###
 
@@ -21,6 +23,7 @@ my %error_hash = (
 	ERROR_DB_ALREADY_DEPLOYED => [2, "DB already deployed"],
 	ERROR_DB_DEPLOY_FAILED => [3, "DB deployment failed"],
 	ERROR_DB_POPULATE_FAILED => [4, "Populate database failed"],
+	ERROR_DATA_FILE_INVALID => [5, "Data file invalid"],
 );
 
 sub error_description {
@@ -63,54 +66,79 @@ my %initial_values = (
 );
 
 # Throws an exception if something fails
-sub initData {
+sub get_data_from_file {
+
+	my $data = [];
 
 	# Check flags
 	my %args = %{$_[0]};
 	my $filepath = $args{filepath};
-	my $checkData = (defined $args{check} and $args{check} > 0) ? 1 : 0;
 	my $verbose = (defined $args{verbose} and $args{verbose} > 0) ? 1 : 0;
 
-	print "- Checking initialisation data...\n" if $checkData;
-	print "- Populating database...\n" if not $checkData;
+	print "- Checking $filepath ...\n";
 
 	# Variables
 	open FILE, "<", $filepath or die "Cannot open file $filepath";
 	my @lines = <FILE>;
-	chomp(@lines);
+
 	my $currTableName = '';
 	my @currAttribNames = ();
 	my @currAttribValues = ();
-	my %currAttribHash = ();
 
 	# Check each line of data
-	for my $line (@lines) {
-		# Remove empty lines
-		if (not $line =~ /^\s*$/) {
+	my $multiline = 0;
+	while (@lines) {
+		my $line = shift @lines;
+		chomp($line);
 
-			# Table reference
-			if ($line =~ /^#+\s*(\w+)\s*#+$/) {
-				$currTableName = $1;
-				@currAttribNames = ();
-				%currAttribHash = ();
+		# Remove empty lines
+		next if ($line =~ /^\s*$/ && !$multiline);
+
+		# Table reference
+		if ($line =~ /^#+\s*(\w+)\s*#+$/) {
+			$currTableName = $1;
+			push (@{$data}, $currTableName);
+			push (@{$data}, []);
+			@currAttribNames = ();
+		} else {
+			# Attributes list
+			if (@currAttribNames == 0) {
+				@currAttribNames = split(/\t/, $line, -1);
+				print "\n### $currTableName ###\n". join(', ', @currAttribNames) . "\n" if $verbose;
 			} else {
-				# Attributes list
-				if (@currAttribNames == 0) {
-					@currAttribNames = split('\t+', $line);
-					print "\n### $currTableName ###\n". join(', ', @currAttribNames) . "\n" if $verbose;
+				if(!$multiline) {
+					push ( @currAttribValues, map {apply_function( $_ )} split( /\t/, $line, -1 ) );
+				}
+
+				# Multiline value
+				if($multiline){
+					if($line =~ /(.*)\"(.*)/){
+						$multiline = 0;
+						$currAttribValues[-1] .= $1;
+						$line = $2;
+					} else {
+						$currAttribValues[-1] .= "$line\n";
+					}
 				} else {
-					my @auxAttribValues = split('\t+', $line);
-					@currAttribValues = map {applyFunction($_)} @auxAttribValues;
+					if($currAttribValues[-1] =~ /^\"(.*)(?<!\")$/) {
+						$currAttribValues[-1] = "$1\n";
+						$multiline = 1;
+					}
+				}
+
+				if(!$multiline) {
 					# Check number of attributes of each row
 					if (@currAttribValues != @currAttribNames) {
 						die "Number of attributes is different to number of values in line:\n$line";
-					} else { # Add values to the db
-						print(join(" | ", @currAttribValues) . "\n") if $verbose;
+					} else {
+						print( join( " | ", @currAttribValues )."\n" ) if $verbose;
+						my %currAttribHash = ();
 						@currAttribHash{@currAttribNames} = @currAttribValues;
 						while ( my ( $key, $val ) = each %currAttribHash ) {
-							delete $currAttribHash{$key} if $val eq '\N';
+							delete $currAttribHash{$key} if ($val eq '\N' || $val eq '');
 						}
-						rs($currTableName)->create(\%currAttribHash) unless $checkData;
+						@currAttribValues = ();
+						push (@{$data->[-1]}, \%currAttribHash);
 					}
 				}
 			}
@@ -118,10 +146,24 @@ sub initData {
 
 	}
 
-	return 1;
+	print "[OK]\n";
+
+	return $data;
 }
 
-sub updateSeqs() {
+sub populate_from_data {
+	my $data_list = shift;
+	while(@$data_list) {
+		my $schema = shift @$data_list;
+		my $data = shift @$data_list;
+		for my $tuple (@{$data}) {
+			# Assumes the constraints in the database are in deferred mode
+			rs( $schema )->create( $tuple );
+		}
+	}
+}
+
+sub update_seqs() {
 	my $dbh = db->storage->dbh;
 	for my $source (db->sources()){
 		for my $col_name (db->source($source)->columns){
@@ -134,7 +176,7 @@ sub updateSeqs() {
 	}
 }
 
-sub applyFunction {
+sub apply_function {
 	my $value = shift;
 
 	if($value =~ /^\&(\w+)\((.*)\)$/){
@@ -164,17 +206,67 @@ sub get_current_time {
 	return sprintf("%04d-%02d-%02d %02d:%02d:%02d+00", $year+1900, $month+1, $day, $hour, $minute, $second);
 }
 
+sub create_tuples_file {
+	my $output_file = shift;
+	open my $fh, ">", $output_file or die "Cannot open $output_file";
+
+	my $dbh = db->storage->dbh;
+	for my $table (get_table_list($dbh)) {
+		my ($schema) = grep { db->class($_)->table eq $table } db->sources;
+
+		$dbh->do("COPY $table TO STDOUT WITH DELIMITER AS E'\t' csv header");
+		my $data;
+		my @rows = ();
+		while ($dbh->pg_getcopydata($data) >= 0){
+			push(@rows, $data);
+		}
+
+		if(@rows > 1){
+			print $fh "#### $schema ####\n";
+			print $fh join("", @rows);
+			print $fh "\n";
+		}
+	}
+
+	close $fh;
+}
+
+sub get_table_list {
+	my $dbh = shift;
+
+	my $sth = $dbh->table_info('', 'public', undef, "TABLE");
+	my @tables = map {$_->{TABLE_NAME}} @{$sth->fetchall_arrayref({})};
+
+	return @tables;
+}
+
 ### MAIN ###
 
 my $error = "NO_ERROR";
-my $force;
+my $force = 0;
+my $update_schema = 0;
+my $update_from_version = undef;
 my $verbose = 0;
-my $datafile = "qvd-init-data.dat";
-GetOptions("force|f" => \$force, "file=s" => \$datafile, "verbose|v" => \$verbose) or exit (1);
+my $dirname = dirname(__FILE__);
+my @datafiles = ();
+
+GetOptions(
+	"force|f"         => \$force,
+	"file=s"          => \@datafiles,
+	"update-from=s"   => \$update_from_version,
+	"update-schema"   => sub { $update_schema = 1; $update_from_version = 'latest'; },
+	"verbose|v"       => \$verbose,
+) or exit (1);
+
+push @datafiles, "$dirname/qvd-init-data.dat" if !$update_schema;
+
+if ($update_from_version && !qvd_version_upgrade_available($update_from_version)){
+	print("Cannot update from version $update_from_version\n") && exit(1);
+}
+
 
 try {
-
-	### Check IF DB IS DEPLOYED ###
+	### CHECK IF DB IS DEPLOYED ###
 	unless ($force) {
 		eval {
 			db->storage->dbh->do("select count(*) from configs;");
@@ -185,36 +277,65 @@ try {
 		}
 	}
 
-	### DATA DEFINITION ###
+	### PARSE AND CHECK INPUT DATA ###
 
-	# Check if data file exists
-	unless(-e $datafile){
-		$error = "ERROR_MISSING_FILE";
-		die "$datafile does not exist. Use -file option to select the correct file";
-	}
+	my @data_parsed = ();
+
+	try{
+
+		# Parse data from data files
+		for my $db_file (@datafiles) {
+			my $data = get_data_from_file( { filepath => $db_file, verbose => $verbose } );
+			push @data_parsed, $data;
+		}
+
+		# Check if update is needed to get tuple file
+		if($update_from_version || $update_schema) {
+			my $old_tuples_file = "$dirname/qvd-old-tuples.dat";
+			create_tuples_file($old_tuples_file);
+			my $data = get_data_from_file( { filepath => $old_tuples_file, verbose => $verbose } );
+			$data = qvd_upgrade_db_data($data, $update_from_version);
+			push @data_parsed, $data;
+		}
+
+	} catch {
+		my $exception = $_;
+		$error = "ERROR_DATA_FILE_INVALID"; die "$exception";
+	};
 
 	### DATABASE DEPLOYMENT ###
 
+	db->txn_begin();
+
 	# Generate database
-	try{
-		db->deploy({add_drop_table => 1, add_enums => \%enumerates, add_init_vars => \%initial_values});
-	}catch ($exception) {
+	try {
+	db->deploy({
+		add_drop_table => 1,
+		add_enums => \%enumerates,
+		add_init_vars => ($update_schema ? {} : \%initial_values)});
+	} catch {
+		db->txn_rollback();
+		my $exception = $_;
 		$error = "ERROR_DB_DEPLOY_FAILED"; die "$exception";
-	}
+	};
 
 	# Populate database if DATA is valid
-	try{
-		if (initData({ filepath => $datafile, check => 1, verbose => $verbose })) {
-			initData({ filepath => $datafile });
-			updateSeqs();
-		} else {
-			$error = "ERROR_DB_POPULATE_FAILED"; die "Minor error populating database.";
+	try {
+		for my $data (@data_parsed) {
+			populate_from_data($data);
 		}
-	} catch ($exception) {
+		update_seqs();
+	} catch {
+		db->txn_rollback();
+		my $exception = $_;
 		$error = "ERROR_DB_POPULATE_FAILED"; die "$exception";
-	}
-} catch ($exception) {
+	};
+
+	db->txn_commit();
+
+} catch {
+	my $exception = $_;
 	display_error($error, $exception);
-}
+};
 
 exit(error_code($error));

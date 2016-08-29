@@ -76,7 +76,8 @@ sub deploy {
 
     # Ensure the default transaction isolation is "serializable" (see #1210)
     my $dbh = $db->storage->dbh;
-    $dbh->do("ALTER DATABASE $db_name SET default_transaction_isolation TO serializable");
+	$dbh->do("ALTER DATABASE $db_name SET default_transaction_isolation TO serializable");
+	$dbh->do("SET CONSTRAINTS ALL DEFERRED");
 
 	# Get arguments
 	my %args_as_hash = %{$_[0]};

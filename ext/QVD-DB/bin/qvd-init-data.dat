@@ -885,13 +885,6 @@ id	inheritor_id	inherited_id
 85	23	36
 86	46	47
 
-### SSL_Config ###
-key	value
-
-l7r.ssl.cert	&FILE_CONTENT(/etc/qvd/certs/server-certificate.pem)
-l7r.ssl.key	&FILE_CONTENT(/etc/qvd/certs/server-private-key.pem)
-
-
 ### Log ###
 id	administrator_id	administrator_name	tenant_id	tenant_name	action	type_of_action	arguments	qvd_object	object_id	object_name	time	status	source	ip	superadmin
 0	1	superadmin	-1	Invalid	tenant_create	create	\N	tenant	1	default	&CURRENT_TIME()	0	\N	\N	\N
