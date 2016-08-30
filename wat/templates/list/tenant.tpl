@@ -139,13 +139,12 @@
                 %>
                                 <td class="desktop" data-wsupdate="<%= name %>" data-id="<%= model.get('id') %>">
                                     <% 
-                                        if (model.get(name) !== undefined) {
+                                        if (!col.property) {
                                             print(model.get(name));
                                         }
-                                        else if (model.get('properties') !== undefined && model.get('properties')[name] !== undefined) {
-                                            print(model.get('properties')[name]);
+                                        else if (model.get('properties') && model.get('properties')[col.property]) {
+                                            print(model.get('properties')[col.property].value);
                                         }
-                                    
                                     %>
                                 </td>
                 <%

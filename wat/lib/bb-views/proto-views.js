@@ -257,7 +257,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             else {
                 args.qvd_object = qvdObj;
                 args.field = fieldName;
-            this.addIDToArgs(args);
+                this.addIDToArgs(args);
             }
             
 

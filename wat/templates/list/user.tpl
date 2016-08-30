@@ -190,10 +190,9 @@
                                         if (!col.property) {
                                             print(model.get(name));
                                         }
-                                        else {
-                                            print(model.get('properties')[name]);
+                                        else if (model.get('properties') && model.get('properties')[col.property]) {
+                                            print(model.get('properties')[col.property].value);
                                         }
-                                    
                                     %>
                                 </td>
                 <%

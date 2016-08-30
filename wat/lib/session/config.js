@@ -159,7 +159,7 @@ Wat.C = {
                                 view.field
                             ],
                             'acls': view.qvd_object + '.see.properties',
-                            'property': true,
+                            'property': view.property,
                             'text': view.field
                         };
                     }
@@ -174,7 +174,7 @@ Wat.C = {
                             'type': 'text',
                             'text': view.field,
                             'noTranslatable': true,
-                            'property': true,
+                            'property': view.property,
                             'acls': view.qvd_object + '.filter.properties',
                         };
                     }
