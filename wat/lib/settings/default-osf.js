@@ -301,7 +301,15 @@ Wat.I.selectedActions[qvdObj] = {
         'text': 'Edit',
         'groupAcls': 'osfMassiveEdit',
         'aclsLogic': 'OR',
-        'iconClass': 'fa fa-pencil'
+        'iconClass': 'fa fa-pencil',
+        'otherClass': 'js-only-massive'
+    },
+    'changes': {
+        'text': 'Edit',
+        'groupAcls': 'osfEdit',
+        'aclsLogic': 'OR',
+        'iconClass': 'fa fa-pencil',
+        'otherClass': 'js-only-one'
     },
     'delete': {
         'text': 'Delete',

@@ -693,9 +693,11 @@ Wat.I = {
                 
             if (selectedItems == 1) {
                 $('.js-only-massive').hide();
+                $('.js-only-one').show();
             }
             else {
                 $('.js-only-one').hide();
+                $('.js-only-massive').show();
             }
         }
     },
