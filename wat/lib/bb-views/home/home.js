@@ -200,21 +200,25 @@ Wat.Views.HomeView = Wat.Views.MainView.extend({
         delete homeStats.sid;
         delete homeStats.status;
         
-        // Convert top populated hosts structure to a simple string
-        var topPopulatedHosts = [];
-        $.each(homeStats.top_populated_hosts, function (i, host) {
-            topPopulatedHosts.push(host.id + ',' + host.name + ',' + host.number_of_vms);
-        });
-        
-        homeStats.top_populated_hosts = '"' + topPopulatedHosts.join('|') + '"';  
-        
-        // Convert vms with expiration date structure to a simple string
-        var vmsWithExpirationDate = [];
-        $.each(homeStats.vms_with_expiration_date, function (i, exp) {
-            vmsWithExpirationDate.push(exp.id + ',' + exp.name + ',' + exp.expiration.replace('T',''));
-        });
-        
-        homeStats.vms_with_expiration_date = '"' + vmsWithExpirationDate.join('|') + '"';
+        if (Wat.C.checkACL('host.stats.top-hosts-most-vms')) {
+            // Convert top populated hosts structure to a simple string
+            var topPopulatedHosts = [];
+            $.each(homeStats.top_populated_hosts, function (i, host) {
+                topPopulatedHosts.push(host.id + ',' + host.name + ',' + host.number_of_vms);
+            });
+
+            homeStats.top_populated_hosts = '"' + topPopulatedHosts.join('|') + '"';  
+        }
+            
+        if (Wat.C.checkACL('vm.stats.close-to-expire')) {
+            // Convert vms with expiration date structure to a simple string
+            var vmsWithExpirationDate = [];
+            $.each(homeStats.vms_with_expiration_date, function (i, exp) {
+                vmsWithExpirationDate.push(exp.id + ',' + exp.name + ',' + exp.expiration.replace('T',''));
+            });
+
+            homeStats.vms_with_expiration_date = '"' + vmsWithExpirationDate.join('|') + '"';
+        }
         
         var keys = Object.keys(homeStats);
         keys.sort();
