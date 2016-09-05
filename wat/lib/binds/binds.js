@@ -72,26 +72,11 @@ Wat.B = {
             // Add negative ACL
             this.bindEvent('click', '.js-add-negative-acl-button', this.roleEditorBinds.addAcl, 'negative');
 
-            // Add inherited Role
-            this.bindEvent('change', '.js-add-role-button', this.roleEditorBinds.addRole);
-            this.bindEvent('click', '.js-add-template-button', this.roleEditorBinds.addTemplate);
-
-            // Delete inherited Role
-            this.bindEvent('click', '.js-delete-role-button', function () {
-                switch (Wat.CurrentView.qvdObj) {
-                    case 'administrator':
-                        if (Wat.C.adminID == Wat.CurrentView.model.get('id')) {
-                            Wat.I.confirm('dialog/confirm-admin-lost-acls', Wat.B.roleEditorBinds.deleteRole, this);
-                        }
-                        else {
-                            Wat.B.roleEditorBinds.deleteRole(this);
-                        }
-                        break;
-                    case 'role':
-                            Wat.I.confirm('dialog/confirm-role-lost-acls', Wat.B.roleEditorBinds.deleteRole, this);
-                        break;
-                }
-            });
+            // Add/Delete inherited Role
+            this.bindEvent('click', '.js-assign-role-button', this.roleEditorBinds.addRole);
+            this.bindEvent('click', '.js-delete-role-button', this.roleEditorBinds.deleteRole);
+            this.bindEvent('click', '.js-assign-template-button', this.roleEditorBinds.addTemplate);
+            this.bindEvent('click', '.js-delete-template-button', this.roleEditorBinds.deleteTemplate);
     },
     
     bindHomeEvents: function () {
@@ -818,105 +803,29 @@ Wat.B = {
                 });
             });
         },
-        deleteRole: function (that) {
-            var roleId = $(that).attr('data-id');
-            var inheritType = $(that).attr('data-inherit-type');
-            
-            var filters = {
-                id: Wat.CurrentView.id
-            };
-            var arguments = {
-                "__roles_changes__": {
-                    unassign_roles: [roleId]
-                }
-            };
-
-            
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.model.fetch({      
-                    complete: function () {
-                        switch (inheritType) {
-                            case "roles":
-                                Wat.CurrentView.afterUpdateRoles('delete_role');
-                                break;
-                            case "templates":
-                                Wat.CurrentView.afterUpdateRoles('delete_template');
-                                break;
-                        }
-                    }
-                });
-            });
-        },
+        
         addRole: function (e) {
-            var roleId = $(e.target).attr('data-role-template-id');
+            var roleId = $('select[name="role_to_be_assigned"]').val();
             
-            // Disable checks to avoid current petitions and add animation to current checked
-            $('.js-add-role-button').attr('disabled', 'disabled');
-            $(e.target).addClass('animated');
-            $(e.target).addClass('faa-flash');
-            
-            var filters = {
-                id: Wat.CurrentView.id
-            };
-            var arguments = {
-                "__roles_changes__": {
-                }
-            };
-            
-            if ($(e.target).is(':checked')) {
-                arguments["__roles_changes__"].assign_roles = [roleId];
-            }
-            else {
-                arguments["__roles_changes__"].unassign_roles = [roleId];
-            }
-            
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.model.fetch({      
-                    complete: function () {
-                        $('.js-add-role-button').removeAttr('disabled');
-                        $(e.target).removeClass('animated');
-                        $(e.target).removeClass('faa-flash');
-                        
-                        Wat.CurrentView.afterUpdateRoles('add_role');
-                    }
-                });
-            });
+            Wat.CurrentView.editorAssignRole(roleId);
         },
+        
+        deleteRole: function (e) {
+            var roleId = $(e.target).attr('data-id');
+            
+            Wat.CurrentView.editorDeleteRole(roleId);
+        },
+        
         addTemplate: function (e) {
-            var roleId = $(e.target).attr('data-role-template-id');
-
-            // Disable checks to avoid current petitions and add animation to current checked
-            $('.js-add-template-button').attr('disabled', 'disabled');
-            $(e.target).addClass('animated');
-            $(e.target).addClass('faa-flash')
+            var templateId = $('select[name="template_to_be_assigned"]').val();
             
+            Wat.CurrentView.editorAssignTemplate(templateId);
+        },
+        
+        deleteTemplate: function (e) {
+            var templateId = $(e.target).attr('data-id');
             
-            var filters = {
-                id: Wat.CurrentView.id
-            };
-            var arguments = {
-                "__roles_changes__": {
-                }
-            }
-            
-            if ($(e.target).is(':checked')) {
-                arguments["__roles_changes__"].assign_roles = [roleId];
-            }
-            else {
-                arguments["__roles_changes__"].unassign_roles = [roleId];
-            }
-            
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.model.fetch({      
-                    complete: function () {
-                        $('.js-add-template-button').removeAttr('disabled');
-                        $(e.target).removeClass('animated');
-                        $(e.target).removeClass('faa-flash');
-                        
-                        Wat.CurrentView.afterUpdateRoles('add_template');
-                    }
-                });
-            });
+            Wat.CurrentView.editorDeleteTemplate(templateId);
         },
     },
     

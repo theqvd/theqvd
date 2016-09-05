@@ -551,6 +551,9 @@ input, textarea, .button, .button2 {
 input {
   line-height: 20px; }
 
+textarea, input[type="text"], input[type="password"] {
+  border: 1px solid #bbb !important; }
+
 select, input, textarea, .button, .button2 {
   border-radius: 4px;
   border-style: solid;
@@ -1848,6 +1851,19 @@ select[name="acl_positive_on_role"] option, .acls_positive {
 
 select[name="role"] {
   min-width: 200px; }
+
+.template-inherited-list, .role-inherited-list {
+  max-height: 150px;
+  overflow-y: auto; }
+
+.assign-roles .assign-template-control a, .assign-roles .assign-template-control div, .assign-roles .assign-role-control a, .assign-roles .assign-role-control div, .assign-templates .assign-template-control a, .assign-templates .assign-template-control div, .assign-templates .assign-role-control a, .assign-templates .assign-role-control div {
+  vertical-align: bottom; }
+.assign-roles .loading-mid, .assign-templates .loading-mid {
+  padding: 0;
+  margin: 0;
+  font-size: initial;
+  width: 100%;
+  text-align: center; }
 
 .editor-container {
   margin: 0; }

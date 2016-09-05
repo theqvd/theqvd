@@ -1,54 +1,58 @@
-<table class="role-template-tools">
-    <thead>
-        <tr>
-            <th class="center">
-            </th>
+<fieldset class="template-inherited-list">
+    <table class="col-width-100">
+        <tbody>
             <%
-            $.each(ROLE_TEMPLATE_ACTIONS, function (iRTA, rTA) {
-            %>
-                <th><%= rTA %></th>
-            <%
-            });
-            %>
-        </tr>
-    </thead>
-    <tbody>
-    <%
-    $.each(ROLE_TEMPLATE_SCOPE, function (iRTS, rTS) {
-    %>
-        <tr>
-            <th><%= rTS %></th>
-            <%
-            $.each(ROLE_TEMPLATE_ACTIONS, function (iRTA, rTA) {
-                var template = templates[rTS + " " + rTA];
+                var inheritedTemplates = 0;
+                $.each(templates, function (iRole, template) {
+                    if (!template.inherited) {
+                        return;
+                    }
                     
-                if (!template) {
+                    inheritedTemplates++;
                     %>
-                        <td></td>
+                        <tr>
+                            <td class="col-width-10">
+                                <a class="button2 button-icon js-delete-template-button fa fa-times" data-id="<%= template.id %>" data-name="<%= template.name %>" data-inherit-type="templates" data-i18n="[title]Delete"></a>
+                            </td>
+                            <td class="left col-width-90">
+                                <%= template.name %>
+                            </td>
+                        </tr>
                     <%
-                    return;
+                });
+                
+                if (inheritedTemplates == 0) {
+                    %>
+                        <tr>
+                            <td><span class="second_row" data-i18n="No elements found"></span></td>
+                        </tr>
+                    <%
                 }
             %>
-                <td data-role-template-cell="<%= rTS %> <%= rTA %>" class="cell-check">
-                    <input type="checkbox" class="add-template-button js-add-template-button" <%= template.inherited ? 'checked="checked"' : '' %> data-i18n="[title]<%= rTS %> <%= rTA %>" data-role-template-id="<%= template.id %>">
-                </td>
-            <%
-            });
-            %>
-        </tr>
-    <%
-    });
-    %>
+        </tbody>
+    </table>
+</fieldset>
+<table class="col-width-100">
+    <tbody class="js-assign-template-control assign-template-control">
         <tr>
-            <th>Master</th>
-            <td colspan=7 data-role-template-cell="Master" class="cell-check">
-            <input type="checkbox" class="add-template-button js-add-template-button" <%= templates["Master"].inherited ? 'checked="checked"' : '' %> title="Master" data-role-template-id="<%= templates["Master"].id %>">
+            <td class="col-width-10">
+                <a class="button button-icon fa fa-plus-circle js-assign-template-button" data-i18n="[title]Assign"></a>
             </td>
-        </tr>
-        <tr>
-            <th>Total Master</th>
-            <td colspan=7 data-role-template-cell="Total Master" class="cell-check">
-                <input type="checkbox" class="add-template-button js-add-template-button" <%= templates["Total Master"].inherited ? 'checked="checked"' : '' %> title="Total Master" data-role-template-id="<%= templates["Total Master"].id %>">
+            <td class="col-width-90">
+                <select name="template_to_be_assigned">
+                    <%
+                    $.each(templates, function (iRole, template) {
+                        if (template.inherited) {
+                            return;
+                        }
+                    %>
+                        <option value="<%= template.id %>">
+                            <%= template.name %>
+                        </option>
+                    <%
+                    });
+                    %>
+                </select>
             </td>
         </tr>
     </tbody>

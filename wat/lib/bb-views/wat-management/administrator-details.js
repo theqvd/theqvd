@@ -88,72 +88,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     events: {
         'click .js-branch-button': 'toggleBranch',
         'click .js-branch-text': 'triggerToggleBranch',
-        'change .js-acl-tree-selector': 'toggleTree',
-        'click .js-tools-roles-btn': 'openRoleToolsDialog',
-    },
-    
-    openRoleToolsDialog: function () {
-        var that = this;
-        
-        var dialogConf = {
-            title: 'Assign roles',
-            buttons : {
-                "Close": function () {
-                    Wat.I.closeDialog($(this));
-                }
-            },
-            buttonClasses : ['fa fa-check js-button-close'],
-            fillCallback : function(target) {
-                $(target).html(HTML_MID_LOADING);
-                $(target).css('padding', '0px');
-
-                Wat.A.performAction('role_tiny_list', {}, {
-                        internal: "0",
-                        "-or": [
-                            "tenant_id",
-                            that.model.get('tenant_id'), 
-                            "tenant_id",
-                            COMMON_TENANT_ID,    
-                        ]
-                    }, {}, function (that) {
-                    
-                    var currentRoles = that.model.get('roles');
-                    var roles = that.retrievedData.rows;
-
-                    // Add inherted flag to roles object 
-                    $.each (roles, function (i, role) {
-                        if (currentRoles[role.id]) {
-                            roles[i].inherited = 1;   
-                        }
-                        else {
-                            roles[i].inherited = 0;   
-                        }
-                    });                
-
-                    // Render template and fill dialog
-                    var template = _.template(
-                        Wat.TPL.inheritanceToolsRoles, {
-                            model: this.model,
-                            roles: roles
-                        }
-                    );
-                    
-                    $(target).html(template);
-                    
-                    $('.role-template-tools').tableScroll({
-                        height: 400
-                    });
-                    
-                    Wat.I.fixTableScrollStyles();
-                    
-                    Wat.T.translate();
-
-                }, that);
-            }
-        }
-        
-        $("html, body").animate({ scrollTop: 0 }, 200);
-        Wat.I.dialog(dialogConf);
+        'change .js-acl-tree-selector': 'toggleTree'
     },
     
     toggleTree: function (e) {

@@ -11,14 +11,6 @@
         <a class="button fright button-icon--desktop js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"><span data-i18n="Edit" class="mobile"></span></a>
     <% } %>
     
-    <% if(Wat.C.checkACL('administrator.update.assign-role')) { %>
-        <a class="button fright button-icon--desktop js-tools-roles-btn <%= CLASS_ICON_ROLES %>" href="javascript:" data-i18n="[title]Assign roles"><span data-i18n="Assign roles" class="mobile"></span></a>
-    <% } %>
-    
-    <% if(Wat.C.adminID == model.get('id')) { %>
-        <a class="button fright button-icon--desktop <%= CLASS_ICON_PERSONALAREA %>" href="#/profile" data-i18n="[title]Profile"><span data-i18n="Profile" class="mobile"></span></a>
-    <% } %>
-    
     <div class="clear mobile"></div>
 </div>
 
@@ -103,14 +95,6 @@
                                 $.each(model.get('roles'), function (iRole, role) {
                             %>
                                 <div data-role-id="<%= iRole %>">
-                                    <%
-                                        if (Wat.C.checkACL('administrator.update.assign-role')) {
-                                    %>
-                                            <i class="delete-role-button js-delete-role-button fa fa-times" data-id="<%= iRole %>" data-name="<%= role %>" data-inherit-type="roles" data-i18n="[title]Delete"></i>
-                                    <%
-                                        }
-                                    %>
-
                                     <%= Wat.C.ifACL('<a href="#/role/' + iRole + '">', 'role.see-details.') %>
                                     <span class="text"><%= role %></span>
                                     <%= Wat.C.ifACL('</a>', 'role.see-details.') %>

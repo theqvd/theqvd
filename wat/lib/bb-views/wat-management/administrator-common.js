@@ -2,7 +2,12 @@
 Wat.Common.BySection.administrator = {
     // This initialize function will be executed one time and deleted
     initializeCommon: function (that) {
-        // Empty
+        var templates = Wat.I.T.getTemplateList('commonAdministrator');
+        
+        this.templates = $.extend({}, this.templates, templates);
+        
+        // Extend view with common methods with Role views
+        $.extend(that, Wat.Common.BySection.administratorRole);
     },
     
     updateElement: function (dialog) {
@@ -20,7 +25,7 @@ Wat.Common.BySection.administrator = {
         }
         
         var filters = {"id": this.id};
-        var arguments = {};
+        var args = {};
         
         var context = $('.' + this.cid + '.editor-container');
 
@@ -30,22 +35,36 @@ Wat.Common.BySection.administrator = {
                 var password = context.find('input[name="password"]').val();
                 var password2 = context.find('input[name="password2"]').val();
                 if (password && password2 && password == password2) {
-                    arguments['password'] = password;
+                    args['password'] = password;
                 }
             }
         }
         
         if (Wat.C.checkACL('administrator.update.language')) {
             var language = context.find('select[name="language"]').val();
-            arguments['language'] = language;
+            args['language'] = language;
         }
         
         if (Wat.C.checkACL('administrator.update.description')) {
             var description = context.find('textarea[name="description"]').val();
-            arguments["description"] = description;
+            args["description"] = description;
         }
         
-        this.updateModel(arguments, filters, this.fetchAny);
+        if (Wat.C.checkACL('administrator.update.assign-role')) {
+            if (that.assignRoles.length > 0 || that.unassignRoles.length > 0) {
+                args["__roles_changes__"] = {};
+                
+                if (that.assignRoles.length > 0) {
+                    args["__roles_changes__"].assign_roles = that.assignRoles;
+                }
+                
+                if (that.unassignRoles.length > 0) {
+                    args["__roles_changes__"].unassign_roles = that.unassignRoles;
+                }
+            }
+        }
+        
+        this.updateModel(args, filters, this.fetchAny);
     },
     
     openEditElementDialog: function(e) {
@@ -58,5 +77,10 @@ Wat.Common.BySection.administrator = {
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
         
         Wat.I.chosenElement('[name="language"]', 'single100');
+    },
+    
+    fillEditor: function (target, that) {
+        Wat.Views.MainView.prototype.fillEditor.apply(this, [target, that]);
+        that.fetchAndRenderRoles();
     },
 }

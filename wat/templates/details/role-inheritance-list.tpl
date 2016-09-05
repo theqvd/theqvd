@@ -25,12 +25,6 @@
             %>
                 <div>
                     <%
-                        if (Wat.C.checkACL('role.update.assign-role')) {
-                    %>
-                            <i class="delete-role-button js-delete-role-button fa fa-times <%= classFixed %>" data-id="<%= iRole %>" data-name="<%= role.name %>" data-inherit-type="<%= inheritFilter %>" data-i18n="[title]Delete"></i>
-                    <%
-                        }
-
                     // If restrict templates flag is disabled, show templates with link like roles
                     if (role.internal && RESTRICT_TEMPLATES) {
                     %>

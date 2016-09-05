@@ -11,12 +11,34 @@ Wat.Views.AdminListView = Wat.Views.ListView.extend({
     },
     
     openNewElementDialog: function (e) {
-        this.model = new Wat.Models.Admin();
+        var that = this;
         
-        this.dialogConf.title = $.i18n.t('New Administrator');
-        Wat.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
+        that.model = new Wat.Models.Admin();
         
+        that.dialogConf.title = $.i18n.t('New Administrator');
+        Wat.Views.ListView.prototype.openNewElementDialog.apply(that, [e]);
+        
+
         Wat.I.chosenElement('[name="language"]', 'single100');
+        
+        if ($('[name="tenant_id"]').length > 0) {
+            // When tenant id is present attach change events. Roles will be filled once the events were triggered
+            Wat.B.bindEvent('change', 'select[name="tenant_id"]', function () {
+                that.fetchAndRenderRoles({
+                    forcedTenantId: $('select[name="tenant_id"]').val()
+                });
+            });
+        }
+        else {
+            that.fetchAndRenderRoles({
+                forcedTenantId: Wat.C.tenantID
+            });
+        }
+    },
+    
+    fillMassiveEditor: function (target, that) {
+        Wat.Views.ListView.prototype.fillMassiveEditor.apply(this, [target, that]);
+        that.fetchAndRenderRoles();
     },
     
     createElement: function () {
@@ -31,25 +53,63 @@ Wat.Views.AdminListView = Wat.Views.ListView.extend({
         var name = context.find('input[name="name"]').val();
         var password = context.find('input[name="password"]').val();
 
-        var arguments = {
+        var args = {
             "name": name,
             "password": password,
         };
         
         var description = context.find('textarea[name="description"]').val();
         if (description) {
-            arguments["description"] = description;
+            args["description"] = description;
         }
         
         if (Wat.C.checkACL('administrator.create.language')) { 
             var language = context.find('select[name="language"]').val();
-            arguments["language"] = language;
+            args["language"] = language;
         }           
         
         if (Wat.C.isSuperadmin()) {
             var tenant_id = context.find('select[name="tenant_id"]').val();
-            arguments['tenant_id'] = tenant_id;
+            args['tenant_id'] = tenant_id;
         }
-        this.createModel(arguments, this.fetchList);
+        
+        if (Wat.C.checkACL('administrator.update.assign-role')) {
+            if (this.assignRoles.length > 0) {
+                args["__roles__"] = this.assignRoles;
+            }
+        }
+        
+        this.createModel(args, this.fetchList);
+    },
+    
+    updateMassiveElement: function (dialog, id) {
+        var valid = Wat.Views.ListView.prototype.updateElement.apply(this, [dialog]);
+        
+        if (!valid) {
+            return;
+        }
+        
+        var args = {};
+        
+        if (Wat.C.checkACL('administrator.update.description')) { 
+            var description = $('textarea[name="description"]').val();
+            args["description"] = description;
+        }      
+        
+        if (Wat.C.checkACL('administrator.update.assign-role')) {
+            if (this.assignRoles.length > 0) {
+                args["__roles_changes__"] = {
+                    assign_roles: this.assignRoles
+                }
+            }
+        }
+        
+        this.resetSelectedItems();
+        
+        var filters = {id: id};
+        
+        var auxModel = new Wat.Models.Admin();
+        
+        this.updateModel(args, filters, this.fetchAny, auxModel);
     },
 });

@@ -183,3 +183,24 @@ select[name="acl_positive_on_role"] option, .acls_positive {
 select[name="role"] { 
     min-width: 200px;
 }
+
+.template-inherited-list, .role-inherited-list {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.assign-roles, .assign-templates {
+    .assign-template-control, .assign-role-control {
+        a, div {
+            vertical-align: bottom;
+        }
+    }
+    
+    .loading-mid {
+        padding: 0;
+        margin: 0;
+        font-size: initial;
+        width: 100%;
+        text-align: center;
+    }
+}

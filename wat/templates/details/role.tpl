@@ -9,12 +9,6 @@
     <% if(Wat.C.checkGroupACL('roleEdit') && (!model.get('fixed') || !RESTRICT_TEMPLATES)) { %>
     <a class="button fright button-icon--desktop js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"><span data-i18n="Edit" class="mobile"></span></a>
     <% } %>
-    <% if(Wat.C.checkACL('role.update.assign-role') && (!model.get('fixed') || !RESTRICT_TEMPLATES)) { %>
-    <a class="button fright button-icon--desktop js-tools-templates-btn <%= CLASS_ICON_TEMPLATES %>" href="javascript:" data-i18n="[title]Inherit templates"><span data-i18n="Inherit templates" class="mobile"></span></a>
-    <% } %>
-    <% if(Wat.C.checkACL('role.update.assign-role') && (!model.get('fixed') || !RESTRICT_TEMPLATES)) { %>
-    <a class="button fright button-icon--desktop js-tools-roles-btn <%= CLASS_ICON_ROLES %>" href="javascript:" data-i18n="[title]Inherit roles"><span data-i18n="Inherit roles" class="mobile"></span></a>
-    <% } %>
     
     <div class="clear mobile"></div>
 </div>
@@ -74,18 +68,18 @@
         </tr>
         <tr>
             <td colspan=2  class="tools-roles js-tools-roles">
-                <div class="bb-role-inherited-tools-roles"></div>
+                <div class="bb-role-inherited-tools-roles role-inherited-tools-roles"></div>
             </td>
         </tr>
         <tr>
             <td><i class="<%= CLASS_ICON_TEMPLATES %>"></i><span data-i18n="Inherited templates"></span></td>
             <td>
-                <div class="bb-template-inherited-list"></div>
+                <div class="bb-template-inherited-list template-inherited-list"></div>
             </td>
         </tr>
         <tr>
             <td colspan=2 class="tools-templates js-tools-templates">
-                <div class="bb-role-inherited-tools-templates"></div>
+                <div class="bb-role-inherited-tools-templates role-inherited-tools-templates"></div>
             </td>
         </tr>
     <% 

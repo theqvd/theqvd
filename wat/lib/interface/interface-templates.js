@@ -198,11 +198,15 @@ Wat.I.T = {
                     }
                 }
                 break;
-            case 'detailsAdministrator':
+            case 'commonAdministrator':
                 templates = {
                     inheritanceToolsRoles: {
                         name: 'details/role-inheritance-tools-roles'
-                    },
+                    }
+                }
+                break;
+            case 'detailsAdministrator':
+                templates = {
                     aclsAdmins: {
                         name: 'details/administrator-acls-tree'
                     },
@@ -224,14 +228,18 @@ Wat.I.T = {
                     }
                 }
                 break;
-            case 'detailsRole':
+            case 'commonRole':
                 templates = {
                     inheritanceToolsRoles: {
                         name: 'details/role-inheritance-tools-roles'
                     },
                     inheritanceToolsTemplates: {
                         name: 'details/role-inheritance-tools-templates'
-                    },
+                    }
+                }
+                break;
+            case 'detailsRole':
+                templates = {
                     inheritanceList: {
                         name: 'details/role-inheritance-list'
                     },

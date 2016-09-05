@@ -51,6 +51,10 @@ input {
     line-height: $height_input;
 }
 
+textarea, input[type="text"], input[type="password"] {
+    border: 1px solid #bbb !important;
+}
+
 select, input, textarea, .button, .button2 {
     border-radius: $form_elements_radius;
     border-style: solid;
