@@ -55,7 +55,7 @@ Wat.Views.MyViewsView = Wat.Views.ViewsView.extend({
     
     // Perform the reset action on DB and update interface
     performResetViews: function () {
-        var sectionReset = $('[name="section_reset"]:checked').val();
+        var sectionReset = $('[name="section_reset"]').val();
         
         var filter = {};
         
@@ -94,9 +94,11 @@ Wat.Views.MyViewsView = Wat.Views.ViewsView.extend({
                         qvdObjName: qvdObjName,
                     }
                 );
-        
+
         target.html(template);  
         
+        Wat.I.chosenElement('select[name="section_reset"]', 'single100');
+
         Wat.T.translate();
     },
 });

@@ -19,7 +19,7 @@
      }
      %>
         <div class="clear mobile"></div>
-        <a href="javascript:" class="button fright fa fa-eraser js-reset-views" data-i18n="Reset views to default configuration"></a>
+        <a href="javascript:" class="button2 fright fa fa-sitemap js-reset-views" data-i18n="Reset"></a>
     </div>
      
     <div class="wrapper-content">

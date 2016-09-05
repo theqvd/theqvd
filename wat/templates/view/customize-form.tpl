@@ -3,6 +3,7 @@
     <table class="customize-fields">
         <tr>
             <th class="center max-1-icons" data-i18n="[title]A column in list view"><i class="fa fa-columns auto"></i></th>
+            <th class="center max-1-icons" data-i18n="[title]Info"><i class="fa fa-info-circle"></i></th>
             <th data-i18n="Column"></th>
         </tr>
         <%
@@ -30,6 +31,10 @@
                             <%= Wat.I.controls.CheckBox({checked: field.display}) %>
                         </div>
                     </td>
+                    <td class="center">
+                        <span class="fa fa-sitemap js-default-info-default" style="<%= field.customized ? 'display: none;' : '' %>" data-i18n="[title]Default value"></span>
+                        <span class="fa fa-file-text-o js-default-info-overwritten" style="<%= field.customized ? '': 'display: none;' %>" data-i18n="[title]Overwritten value"></span>
+                    </td>
                     <td>
         <%
 
@@ -49,7 +54,6 @@
                 }
         %>
         
-                    <span class="fa fa-info-circle js-default-info" style="<%= field.customized ? 'display: none;' : '' %>" data-i18n="[title]Default value"></span>
                     </td>
                 </tr>
         <%
@@ -80,6 +84,7 @@
         <tr>
             <th class="center max-1-icons" data-i18n="[title]Desktop version"><i class="fa fa-desktop auto"></i></th>
             <th class="center max-1-icons" data-i18n="[title]Mobile version"><i class="fa fa-mobile auto"></i></th>
+            <th class="center max-1-icons" data-i18n="[title]Info"><i class="fa fa-info-circle"></i></th>
             <th data-i18n="Filter control"></th>
         </tr>
         <%
@@ -112,6 +117,10 @@
                             <%= Wat.I.controls.CheckBox({checked: filter.displayMobile}) %>
                         </div>
                     </td>
+                    <td class="center">
+                        <span class="fa fa-sitemap js-default-info-default" style="<%= filter.customized ? 'display: none;' : '' %>" data-i18n="[title]Default value"></span>
+                        <span class="fa fa-file-text-o js-default-info-overwritten" style="<%= filter.customized ? '': 'display: none;' %>" data-i18n="[title]Overwritten value"></span>
+                    </td>
                     <td>
         <%
 
@@ -129,10 +138,6 @@
                     </span>
         <%
                 }
-        %>
-                    <span class="fa fa-info-circle js-default-info" style="<%= filter.customized ? 'display: none;' : '' %>" data-i18n="[title]Default value"></span>
-
-        <%
 
                 filterType = Wat.I.getFieldTypeName(filter.type);
         %>

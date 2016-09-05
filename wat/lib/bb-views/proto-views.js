@@ -34,7 +34,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         
         var dialogConf = {};
 
-        dialogConf.title = "Reset views to default configuration";
+        dialogConf.title = $.i18n.t("Reset views to default configuration");
 
         dialogConf.buttons = {
             Cancel: function (e) {
@@ -46,7 +46,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             }
         };
         
-        dialogConf.buttonClasses = ['fa fa-ban js-button-cancel', 'fa fa-eraser js-button-reset'];
+        dialogConf.buttonClasses = ['fa fa-ban js-button-cancel', 'fa fa-sitemap js-button-reset'];
 
         dialogConf.fillCallback = that.fillResetViewsEditor;
 
@@ -119,7 +119,8 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
 
         if (that.retrievedData.status == STATUS_SUCCESS) {
             // If update is performed successfuly, hide default info icon
-            $(that.targetClicked).parent().parent().parent().find('.js-default-info').hide();
+            $(that.targetClicked).parent().parent().parent().find('.js-default-info-default').hide();
+            $(that.targetClicked).parent().parent().parent().find('.js-default-info-overwritten').show();
             
             // If update is performed successfuly, update in memory
             if (that.currentFilters[fieldName]) {
@@ -195,7 +196,8 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
 
         if (that.retrievedData.status == STATUS_SUCCESS) {
             // If update is performed successfuly, hide default info icon
-            $(that.targetClicked).parent().parent().parent().find('.js-default-info').hide();
+            $(that.targetClicked).parent().parent().parent().find('.js-default-info-default').hide();
+            $(that.targetClicked).parent().parent().parent().find('.js-default-info-overwritten').show();
             
             // If update is perfermed successfuly, update in memory
             if (that.currentFilters[fieldName]) {
@@ -272,7 +274,8 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
 
         if (that.retrievedData.status == STATUS_SUCCESS) {
             // If update is performed successfuly, hide default info icon
-            $(that.targetClicked).parent().parent().parent().find('.js-default-info').hide();
+            $(that.targetClicked).parent().parent().parent().find('.js-default-info-default').hide();
+            $(that.targetClicked).parent().parent().parent().find('.js-default-info-overwritten').show();
 
             // If update is performed successfuly, update in memory
             if (that.currentColumns[fieldName]) {

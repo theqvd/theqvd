@@ -1475,7 +1475,7 @@ body {
       text-align: center; }
       @media screen and (min-width: 41em) {
         .wrapper .content .details-header a.button2 {
-          display: none; } }
+          width: auto; } }
     @media only screen and (max-width: 41em) {
       .wrapper .content .details-header a.button {
         width: 100%;
