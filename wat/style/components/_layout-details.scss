@@ -82,8 +82,13 @@
         text-align: center;
 
         @include in(desktop) {
-            //display: none;
             width: auto;
+        }
+        
+        &.show-details-actions {
+            @include in(desktop) {
+                display: none;
+            }
         }
     }
     a.button {
