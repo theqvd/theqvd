@@ -785,3 +785,12 @@ sub report_di_problem_in_log
 	)->report;
 }
 
+__END__
+
+=pod
+
+=head1 PURPOSE
+
+Script intended to run an instance of the QVD API
+
+=cut
