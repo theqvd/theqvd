@@ -50,7 +50,7 @@
     if (Wat.C.isMultitenant()) { 
     %>
         <tr>
-            <td><i class="fa fa-sitemap"></i><span data-i18n="Global username">Global username</span></td>
+            <td><i class="fa fa-sitemap"></i><span data-i18n="Global username"></span></td>
             <td>
                  <%= Wat.C.getLoginData() %>
             </td>
@@ -58,4 +58,13 @@
     <%   
     }
     %>
+    <tr>
+        <td><i class="<%= CLASS_ICON_VIEWS %>"></i><span data-i18n="My views"></span></td>
+        <td>
+            <span class="second_row " data-i18n="Here you can define what columns and filters are shown on each section overriding default views"></span>
+            <span class="fright">
+                <a href="#/myviews" class="button2 fa fa-pencil" data-i18n="Configure my views"></a>
+            </span>
+        </td>
+    </tr>
 </table>

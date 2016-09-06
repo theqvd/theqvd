@@ -125,6 +125,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             // If update is performed successfuly, update in memory
             if (that.currentFilters[fieldName]) {
                 that.currentFilters[fieldName].displayDesktop = checked;
+                that.currentFilters[fieldName].customized = true;
             }
             else {
                 that.currentFilters[fieldName] = {
@@ -135,7 +136,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
                     noTranslatable: true,
                     property: true,
                     text: fieldName,
-                    type: "text",
+                    type: "text"
                 };
             }
 
@@ -202,6 +203,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             // If update is perfermed successfuly, update in memory
             if (that.currentFilters[fieldName]) {
                 that.currentFilters[fieldName].displayMobile = checked;
+                that.currentFilters[fieldName].customized = true;
             }
             else {
                 that.currentFilters[fieldName] = {
@@ -280,6 +282,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             // If update is performed successfuly, update in memory
             if (that.currentColumns[fieldName]) {
                 that.currentColumns[fieldName].display = checked;
+                that.currentColumns[fieldName].customized = true;
             }
             else {
                 that.currentColumns[fieldName] = {

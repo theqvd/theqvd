@@ -4,11 +4,6 @@ Wat.I.menuUserOriginal = {
         link: '#/profile',
         icon: CLASS_ICON_PERSONALAREA 
     },
-    myviews: {
-        text: 'My views',
-        link: '#/myviews',
-        icon: CLASS_ICON_VIEWS 
-    },
     logout: {
         text: 'Log-out',
         link: '#/logout',
@@ -59,7 +54,7 @@ Wat.I.menuSetupOriginal = {
         icon: CLASS_ICON_TENANTS 
     },
     views: {
-        text: 'Views',
+        text: 'Default views',
         link: '#/views',
         icon: CLASS_ICON_VIEWS
     },

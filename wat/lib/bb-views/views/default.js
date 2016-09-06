@@ -15,7 +15,7 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
         'next': {
             'screen': 'WAT Management',
             'next': {
-                'screen': 'Views'
+                'screen': 'Default views'
             }
         }
     },
@@ -148,6 +148,7 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
                     defaultFormFilters[register.field].displayDesktop = register.visible;
                     break;
             }
+            
             defaultFormFilters[register.field].customized = true;
         });
         

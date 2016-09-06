@@ -3167,7 +3167,8 @@ table.vmst .vmst-vm-cell, table.vmst .vmst-host-cell {
     padding-left: 0px;
     padding-right: 0px;
     max-height: 70vh !important;
-    height: auto; }
+    height: auto;
+    padding: 10px; }
 
 .ui-widget-overlay {
   position: fixed;

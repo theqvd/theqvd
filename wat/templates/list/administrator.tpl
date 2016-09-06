@@ -119,6 +119,10 @@
                             case 'info':
                 %>
                                 <td>
+                                    <% if(Wat.C.adminID == model.get('id')) { %>
+                                        <i class="<%= CLASS_ICON_PERSONALAREA %>" title="<%= i18n.t('This administrator is me') %>" data-i18n="[title]This administrator is me"></i>
+                                    <% } %>
+                                    
                                     <%
                                     if (Object.keys(model.get('roles')).length == 0) {
                                     %>

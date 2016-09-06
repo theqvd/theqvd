@@ -14,7 +14,11 @@ Wat.Views.MyViewsView = Wat.Views.ViewsView.extend({
         'screen': 'Home',
         'link': '#',
         'next': {
-            'screen': 'My views'
+            'screen': 'Profile',
+            'link': '#/profile',
+            'next': {
+                'screen': 'My views'
+            }
         }
     },
     

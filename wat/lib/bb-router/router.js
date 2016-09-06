@@ -255,7 +255,7 @@ Wat.Router = Backbone.Router.extend({
             that.performRoute('profile', Wat.Views.ProfileView);
         });             
         that.on('route:myviews', function (actions) {
-            that.performRoute('myviews', Wat.Views.MyViewsView);
+            that.performRoute('profile', Wat.Views.MyViewsView);
         });       
 
 

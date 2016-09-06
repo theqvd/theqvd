@@ -3,7 +3,7 @@
         <%
         if (viewKind == 'tenant') {
         %>
-            <span class="<%= CLASS_ICON_VIEWS %> h1" data-i18n="Views"></span>
+            <span class="<%= CLASS_ICON_VIEWS %> h1" data-i18n="Default views"></span>
         <%
         } else {
         %>            

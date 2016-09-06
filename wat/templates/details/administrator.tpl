@@ -4,15 +4,19 @@
     <a class="button2 fright fa fa-eye js-show-details-actions show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>
     
     <% if(Wat.C.checkACL('administrator.delete.') && Wat.C.adminID != model.get('id')) { %>
-    <a class="button fleft button-icon--desktop js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"><span data-i18n="Delete" class="mobile"></span></a>
+        <a class="button fleft button-icon--desktop js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"><span data-i18n="Delete" class="mobile"></span></a>
     <% } %>
     
     <% if(Wat.C.checkGroupACL('administratorEdit')) { %>
-    <a class="button fright button-icon--desktop js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"><span data-i18n="Edit" class="mobile"></span></a>
+        <a class="button fright button-icon--desktop js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit"><span data-i18n="Edit" class="mobile"></span></a>
     <% } %>
     
     <% if(Wat.C.checkACL('administrator.update.assign-role')) { %>
-    <a class="button fright button-icon--desktop js-tools-roles-btn <%= CLASS_ICON_ROLES %>" href="javascript:" data-i18n="[title]Assign roles"><span data-i18n="Assign roles" class="mobile"></span></a>
+        <a class="button fright button-icon--desktop js-tools-roles-btn <%= CLASS_ICON_ROLES %>" href="javascript:" data-i18n="[title]Assign roles"><span data-i18n="Assign roles" class="mobile"></span></a>
+    <% } %>
+    
+    <% if(Wat.C.adminID == model.get('id')) { %>
+        <a class="button fright button-icon--desktop <%= CLASS_ICON_PERSONALAREA %>" href="#/profile" data-i18n="[title]Profile"><span data-i18n="Profile" class="mobile"></span></a>
     <% } %>
     
     <div class="clear mobile"></div>
