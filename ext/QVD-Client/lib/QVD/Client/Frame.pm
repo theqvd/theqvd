@@ -1004,6 +1004,11 @@ sub OnExit {
         $self->{worker_thread}->join();
     }
     $self->SaveConfiguration();
+    if ( $self->{worker_thread} && $self->{worker_thread}->is_running() ){
+        undef %connect_info ;
+        cond_signal(%connect_info);
+        $self->{worker_thread}->join();
+    }
     $self->Destroy();
 }
 
