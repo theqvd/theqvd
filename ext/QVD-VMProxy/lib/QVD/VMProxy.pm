@@ -83,3 +83,33 @@ sub open {
 
 1;
 
+__END__
+
+=head1 NAME
+
+QVD::VMProxy - Forwards x11 protocol data from QVD-VMA
+
+=head1 SYNOPSIS
+
+    my $connection = QVD::VMProxy->new( address => $ip, port => $port );
+    $connection->on( error => sub {
+        print "Error " . $_[1] );
+        $tx->finish();
+    } );
+    $connection->open($tx, 60);
+
+=head1 AUTHOR
+
+Francisco Trapero, E<lt>ftrapero@qindel.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 Qindel Formacion y Servicios S.L.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU GPL version 3 as published by the Free
+Software Foundation.
+
+=cut
+
+
