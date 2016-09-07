@@ -448,7 +448,7 @@ sub RunWorkerThread {
 
 sub proxy_unknown_cert {
     my $self = shift;
-    my $msg :shared = $self->_shared_clone(shift);
+    my $msg :shared = $self->shared_clone(shift);
     my $evt = new Wx::PlThreadEvent(-1, EVT_UNKNOWN_CERT, $msg);
     Wx::PostEvent($self, $evt);
 
@@ -458,7 +458,7 @@ sub proxy_unknown_cert {
 
 sub proxy_list_of_vm_loaded {
     my $self = shift;
-    my $vm_data :shared = $self->_shared_clone(shift);
+    my $vm_data :shared = $self->shared_clone(shift);
     if (@$vm_data > 1) {
         lock($vm_id);
         my $evt = new Wx::PlThreadEvent(-1, EVT_LIST_OF_VM_LOADED, $vm_data);
@@ -488,7 +488,7 @@ sub proxy_connection_error {
 sub proxy_set_environment {
     my $self = shift;
     my %args = @_;
-    my $shared_args :shared = $self->_shared_clone(\%args);
+    my $shared_args :shared = $self->shared_clone(\%args);
 
     lock($set_env);
     Wx::PostEvent($self, new Wx::PlThreadEvent(-1, EVT_SET_ENVIRONMENT, $shared_args));
@@ -1372,25 +1372,6 @@ sub start_remote_mounts {
 	
 		$num++;
 	}
-}
-
-
-# threads::shared doesn't have shared_clone on Ubuntu 9.10
-sub _shared_clone {
-    my ($self, $ref) = @_;
-    my $type = ref $ref;
-    if ($type eq 'ARRAY') {
-        my @arr :shared = map { $self->_shared_clone($_); } @$ref;
-        return \@arr;
-    } elsif ($type eq 'HASH') {
-        my %hash :shared;
-        while (my ($k, $v) = each %$ref) {
-            $hash{$k} = $self->_shared_clone($v);
-        }
-        return \%hash;
-    } else {
-        return ${share $ref};
-    }
 }
 
 sub get_osx_resolutions {
