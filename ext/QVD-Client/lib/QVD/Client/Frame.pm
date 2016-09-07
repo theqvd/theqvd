@@ -376,6 +376,7 @@ sub RunWorkerThread {
     my $self = shift;
     my @args = @_;
     while (1) {
+        unless ( %connect_info ){ DEBUG "Ending connection thread\n"; threads->exit(0) ; }
         lock(%connect_info);
         local $@;
         eval { 
@@ -503,7 +504,6 @@ sub OnClickConnect {
     if (!$self->{worker_thread} || !$self->{worker_thread}->is_running()) {
         @_ = (); # necessary to avoid "Scalars leaked," see perldoc Wx::Thread
         my $thr = threads->create(\&RunWorkerThread, $self);
-        $thr->detach();
         $self->{worker_thread} = $thr;
     } else {
         lock(%connect_info);
@@ -904,6 +904,11 @@ sub OnTimer {
 
 sub OnExit {
     my $self = shift;
+    if ( $self->{worker_thread} && $self->{worker_thread}->is_running() ){
+        undef %connect_info ;
+        cond_signal(%connect_info);
+        $self->{worker_thread}->join();
+    }
     $self->Destroy();
 }
 
