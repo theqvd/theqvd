@@ -141,6 +141,9 @@ DEBUG("Starting main loop");
 $app->MainLoop();
 INFO("Exiting");
 
+# TODO: Investigate why ordered exit from within Frame.pm ends up in SEGFAULT.
+use POSIX;
+POSIX::_exit(0);
 __END__
 
 =head1 NAME
