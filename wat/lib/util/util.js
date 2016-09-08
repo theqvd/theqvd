@@ -230,5 +230,37 @@ Wat.U = {
         }
         
         return params[parameter];
+    },
+    
+    // Get instanciated model from qvdObj as user, vm, osf...
+    getModelFromQvdObj: function (qvdObj) {
+        switch (qvdObj) {
+            case 'user':
+                    var model = new Wat.Models.User();
+                break;
+            case 'osf':
+                    var model = new Wat.Models.OSF();
+                break;
+            case 'vm':
+                    var model = new Wat.Models.VM();
+                break;
+            case 'di':
+                    var model = new Wat.Models.DI();
+                break;
+        }
+        
+        return model;
+    },
+    
+    // Get the field name used for the element name depending on the qvd object
+    getNameFieldFromQvdObj: function (qvdObj) {
+        switch (qvdObj) {
+            case 'di':
+                return 'disk_image';
+                break;
+            default:
+                return 'name';
+                break;
+        }
     }
 }

@@ -80,19 +80,23 @@ Wat.I.M = {
     
     getTextFromFailures: function (failures) {
         // Group failures by text
-        var failuresByText = {};
+        var failuresText = {};
+        var failuresByStatus = {};
+        
         $.each(failures, function(id, text) {
-            failuresByText[text.message] = failuresByText[text.message] || [];
-            failuresByText[text.message].push(id);
+            failuresByStatus[text.status] = failuresByStatus[text.status] || [];
+            failuresByStatus[text.status].push(id);
+            
+            failuresText[text.status] = text.message;
         });
         
         // Get class from the icon of the selected item from menu to use it in list
         var elementClass = $('.menu-option--selected').find('i').attr('class');
         
         var failuresList = '<ul>';
-        $.each(failuresByText, function(text, ids) {
+        $.each(failuresByStatus, function(status, ids) {
             failuresList += '<li>';
-            failuresList += '<i class="fa fa-angle-double-right strong" data-i18n="' + text + '">' + text + '</i>';
+            failuresList += '<i class="fa fa-angle-double-right strong" data-i18n="' + failuresText[status] + '">' + failuresText[status] + '</i>';
             failuresList += '<ul>';
             $.each(ids, function(iId, id) {
                 if ($('.list')) {

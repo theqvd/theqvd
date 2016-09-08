@@ -882,7 +882,7 @@ body {
   border-top: 0px;
   color: #fdfdfd;
   font-weight: bold;
-  z-index: 1001;
+  z-index: 10001;
   display: none; }
   @media screen and (min-width: 41em) {
     .message-container {
@@ -3254,6 +3254,8 @@ table.vmst .vmst-vm-cell, table.vmst .vmst-host-cell {
       .ui-dialog--fullscreen .ui-dialog-buttonpane {
         float: left;
         width: 15%; } }
+    .ui-dialog--fullscreen .ui-dialog-buttonpane button {
+      height: 27px; }
   .ui-dialog--fullscreen .ui-dialog-buttonset {
     width: 100%;
     padding: 0px;

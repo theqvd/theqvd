@@ -870,7 +870,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                     filter.fillAction = filter.fillAction || name + '_tiny_list';
                     filter.nameAsId = filter.nameAsId || false;
                     
-                    var nameField = name == 'di' ? 'disk_image' : 'name';
+                    var nameField = Wat.U.getNameFieldFromQvdObj(name);
                     if (classifiedByTenant) {
                         var orderFields = ['tenant_name', nameField];
                         }

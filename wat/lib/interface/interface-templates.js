@@ -32,6 +32,13 @@ Wat.I.T = {
                     }
                 };
                 break;
+            case 'conflict':
+                templates = {
+                    deleteDependency: {
+                        name: 'dialog/conflict-delete-dependency'
+                    },
+                };
+                break;
             case 'home':
                 templates = {
                     home: {

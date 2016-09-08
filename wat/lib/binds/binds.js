@@ -3,7 +3,13 @@ Wat.B = {
         this.bindMessageEvents();  
         this.bindEditorEvents();  
         this.bindNavigationEvents();  
-        this.bindFormEvents(); 
+        this.bindFormEvents();
+        this.bindDeleteConflicts();
+    },
+    
+    bindDeleteConflicts: function () {
+        // Close message layer
+        this.bindEvent('click', '.js-button-force-delete', this.conflictBinds.forceDelete);
     },
     
     // Events binded in classic way to works in special places like jQueryUI dialog where Backbone events doesnt work
@@ -546,6 +552,74 @@ Wat.B = {
         // First unbind event to avoid duplicated bindings
         $(document).off(event, selector);
         $(document).on(event, selector, params, callback);
+    },
+    
+    // Functions to bind events on conflict resolution
+    conflictBinds: {
+        forceDelete: function (e) {
+            var id = $(e.target).attr('data-id');
+            var qvdObj = $('.js-elements-list').attr('data-qvd-obj');
+            var qvdObjDependency = QVD_OBJ_DEPENDENCIES[qvdObj];
+            
+            // Link field is user_id, osf_id, etc.
+            var filters = {};
+            filters[qvdObj + '_id'] = id;
+            
+            var auxModel = Wat.U.getModelFromQvdObj(qvdObj);            
+            var auxModelDependency = Wat.U.getModelFromQvdObj(qvdObjDependency);
+            
+            // Get all the dependent items
+            Wat.A.performAction(qvdObjDependency + '_get_list', {}, filters, {}, function (response) {
+                var filterIds = [];
+                
+                var elementsDependency = {};
+                $.each (response.retrievedData.rows, function (i, data) {
+                    filterIds.push(data.id);
+                    elementsDependency[data.id] = data[Wat.U.getNameFieldFromQvdObj(qvdObjDependency)];
+                });
+                
+                
+                Wat.CurrentView.deleteModel({id: filterIds}, function (response) {
+                    if (response.retrievedData.status != STATUS_SUCCESS) {
+                        // When some element deletion fails, continue deleting pending elements
+                        var warningIcon = Wat.I.getWarningIcon(qvdObjDependency, response.retrievedData, elementsDependency);
+                        
+                        $('.js-notifications[data-id="' + id + '"]').html(warningIcon);
+                        
+                        Wat.A.deletePending('.js-button-force-delete');
+                        return;
+                    }
+                    
+                    Wat.CurrentView.deleteModel({id: id}, function (response) {
+                        if (response.retrievedData.status != STATUS_SUCCESS) {
+                            // When some element deletion fails, continue deleting pending elements
+                            Wat.A.deletePending('.js-button-force-delete');
+                            return;
+                        }
+                        
+                        // Delete row
+                        $('.js-force-delete-row[data-id="' + id + '"]').remove();
+                        
+                        // Delete removed id from DOM list
+                        var allIds = $('.js-elements-list').attr('data-all-ids').split(',');
+                        
+                        // Fetch and render behind view
+                        Wat.CurrentView.fetchAny();
+
+                        allIds.splice(allIds.indexOf(id), 1);
+
+                        if (allIds == 0) {
+                            Wat.I.closeDialog(Wat.CurrentView.dependencyDialog);
+                        }
+
+                        $('.js-elements-list').attr('data-all-ids', allIds.join(','));
+                        
+                        // If some other element is marked to be deleted, trigger button
+                        Wat.A.deletePending('.js-button-force-delete');
+                    }, auxModel);
+                }, auxModelDependency);
+            }, undefined, ['id', Wat.U.getNameFieldFromQvdObj(qvdObjDependency)]);
+        }
     },
 
     // Callbacks of the events binded for messages system

@@ -14,6 +14,7 @@ Wat.Models.Model = Backbone.Model.extend({
         else {
             var view = 'list';
         }
+        
         switch (view) {
             case 'detail':
                 return this.processResponse(response.rows[0]);

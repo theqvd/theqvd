@@ -475,4 +475,71 @@ Wat.A = {
             }
         }
     },
+    
+    // Analyze API response to detect special situations to do addition actions like detection of related elements to offer cascade delete
+    // Params:
+    //      operation: [qvdObj]_[action] i.e.: user_delete, vm_create, osf_update, etc.
+    //      response: Retrieved data from API
+    interceptSavingModelResponse: function (operation, response) {
+        var intercepted = true;
+        
+        var operationSplit = operation.split('_');
+        var qvdObj = operationSplit[0];
+        var operation = operationSplit[1];
+        
+        switch(operation) {
+            case 'delete':
+                if (QVD_OBJ_DEPENDENCIES[qvdObj]) {
+                    intercepted = this.interceptSMRDelete(response, qvdObj);
+                }
+                else {
+                    intercepted = false;
+                }
+                break;
+            default:
+                intercepted = false;
+                break;
+        }
+        
+        return intercepted;
+    },
+    
+    // Manage interception of deletion problems.
+    interceptSMRDelete: function (response, qvdObj) {
+        switch (response.status) {
+            case STATUS_NOT_ALL_DONE:
+                var dependencyIds = [];
+                $.each(response.failures, function (elementId, failure) {
+                    switch (failure.status) {
+                        case STATUS_NOT_REMOVED_DUE_DEPENDENCY:
+                            dependencyIds.push(elementId);
+                            break;
+                    }
+                });
+                
+                if (dependencyIds.length) {
+                    Wat.CurrentView.openDependenciesDialog(dependencyIds, qvdObj);
+                    intercepted = true;
+                }
+                else {
+                    intercepted = false;
+                }
+                break;
+            default:
+                intercepted = false;
+                break;
+        }
+        
+        return intercepted;
+    },
+    
+    // Search first element with deleteme attribute, trigger click event and reset attribute
+    deletePending: function (selector) {
+        var deleteMe = $(selector + '[data-deleteme]')[0];
+
+        if (deleteMe) {
+            $(deleteMe).removeAttr('data-deleteme');
+            $(deleteMe).trigger('click');
+        }
+    }
 };

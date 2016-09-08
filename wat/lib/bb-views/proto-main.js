@@ -55,9 +55,10 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     addCommonTemplates: function () {
-        var templates = Wat.I.T.getTemplateList('commonEditors', {qvdObj: this.qvdObj});
+        var editorTemplates = Wat.I.T.getTemplateList('commonEditors', {qvdObj: this.qvdObj});
+        var confilctTemplates = Wat.I.T.getTemplateList('conflict');
         
-        this.templates = $.extend({}, this.templates, templates);
+        this.templates = $.extend({}, this.templates, editorTemplates, confilctTemplates);
     },
     
     beforeRender: function () {
@@ -447,10 +448,68 @@ Wat.Views.MainView = Backbone.View.extend({
             that.retrievedData = response;
             successCallback(that);
             
-            Wat.I.M.showMessage(messageParams, response);
+            var intercepted = false;
+            
+            if (messageParams.messageType == 'error') {
+                intercepted = Wat.A.interceptSavingModelResponse(model.operation, response);
+            }
+            
+            if (!intercepted) {
+                Wat.I.M.showMessage(messageParams, response);
+            }
         });
     },
     
+    // Open dialog to resolve dependency problems
+    openDependenciesDialog: function (dependencyIds, qvdObj) {
+        var that = this;
+        
+        // Retrieve names
+        var dependencyElements = {};
+        
+        if (this.collection) {
+            $.each(dependencyIds, function (i, id) {
+                var model = that.collection.where({id: parseInt(id)})[0];
+                dependencyElements[id] = model.get('name');
+            });
+        }
+        else if (that.model && dependencyIds.length == 1) {
+            dependencyElements[dependencyIds[0]] = that.model.get('name');
+        }
+        
+        var dialogConf = {
+            title: $.i18n.t('Action not accomplished for all elements'),
+            buttons : {
+                "Cancel": function () {
+                    Wat.I.closeDialog($(this));
+                },
+                "Enforce deletion for all": function () {
+                    var allIds = $('.js-elements-list').attr('data-all-ids').split(',');
+                    var qvdObj = $('.js-elements-list').attr('data-qvd-obj');
+                                
+                    // Mark all buttons pending to be deleted
+                    $('.js-button-force-delete').attr('data-deleteme', '1');
+                    
+                    Wat.A.deletePending('.js-button-force-delete');
+                }
+            },
+            buttonClasses : ['fa fa-ban js-button-cancel', 'fa fa-bomb js-button-force-delete-all'],
+            fillCallback : function(target) { 
+                that.template = _.template(
+                    Wat.TPL.deleteDependency, {
+                        dependencyElements: dependencyElements,
+                        qvdObj: qvdObj
+                    }
+                );
+
+                target.html(that.template);
+            }
+        }
+        
+        this.dependencyDialog = Wat.I.dialog(dialogConf);
+    },
+    
+    // Open element for creation forms
     openNewElementDialog: function (e) {
         var that = this;
         
@@ -560,6 +619,8 @@ Wat.Views.MainView = Backbone.View.extend({
     
     // Fetch details or list depending on the current view kind
     fetchAny: function (that) {
+        that = that || this;
+        
         switch (that.viewKind) {
             case 'list':
                 that.fetchList();

@@ -1081,7 +1081,31 @@ Wat.I = {
         }
     },  
     
+    // Return bool value to indicate if we are in a mobile or not
     isMobile: function () {
         return $('.js-mobile-menu-hamburger').css('display') != 'none';
+    },
+    
+    // Get warning icon from API retrieved data
+    getWarningIcon: function (qvdObj, retrievedData, names) {      
+        var errorMessage = retrievedData.message;
+        var qvdObjName = LOG_TYPE_OBJECTS[qvdObj];
+
+        var warningMessage = '';
+        warningMessage += '<div>' + $.i18n.t(errorMessage) + "</div>";
+        warningMessage += '<br>';
+
+        $.each(retrievedData.failures, function (elementId, failure) {
+            var failureMessage = failure.message;
+            var elementName = names[elementId];
+
+            warningMessage += '<div>' + $.i18n.t(qvdObjName) + ': ' + elementName + "</div>";
+            warningMessage += '<div>' + $.i18n.t(failureMessage) + "</div>";
+            warningMessage += '<br>';
+        });
+
+        var warningIcon = '<i class="fa fa-warning" title="' + warningMessage + '"></i>';
+        
+        return warningIcon;
     }
 }

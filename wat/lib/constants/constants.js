@@ -198,6 +198,17 @@ CLASS_ICON_STATUS_STOPPING = 'fa fa-stop faa-flash animated';
 CLASS_ICON_STATUS_ZOMBIE = 'fa fa-medkit';
 CLASS_ICON_STATUS_LOST = 'fa fa-map-o faa-flash animated';
 
+CLASS_ICON_BY_QVD_OBJ = {
+    user: CLASS_ICON_USERS,
+    vm: CLASS_ICON_VMS,
+    host: CLASS_ICON_HOSTS,
+    osf: CLASS_ICON_OSFS,
+    di: CLASS_ICON_DIS,
+    admin: CLASS_ICON_ADMINS,
+    role: CLASS_ICON_ROLES,
+    tenant: CLASS_ICON_TENANTS
+}
+
 // Classification of Qvd Objects
 QVD_OBJS_WITH_PROPERTIES = ['user', 'vm', 'host', 'osf', 'di'];
 QVD_OBJS_CLASSIFIED_BY_TENANT = ['user', 'vm', 'osf', 'di', 'administrator', 'log', 'role', 'property'];
@@ -265,6 +276,13 @@ DOC_DEFAULT_LANGUAGE = 'en';
 
 // Number of bytes on a KiloByte
 BYTES_ON_KB = 1000;
+
+// Objects that have dependcies with another ones
+
+QVD_OBJ_DEPENDENCIES = {
+    user: 'vm',
+    osf: 'di'
+}
 
 // Log constants
 
