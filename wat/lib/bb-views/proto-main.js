@@ -56,9 +56,9 @@ Wat.Views.MainView = Backbone.View.extend({
     
     addCommonTemplates: function () {
         var editorTemplates = Wat.I.T.getTemplateList('commonEditors', {qvdObj: this.qvdObj});
-        var confilctTemplates = Wat.I.T.getTemplateList('conflict');
+        var conflictTemplates = Wat.I.T.getTemplateList('conflict');
         
-        this.templates = $.extend({}, this.templates, editorTemplates, confilctTemplates);
+        this.templates = $.extend({}, this.templates, editorTemplates, conflictTemplates);
     },
     
     beforeRender: function () {
