@@ -11,9 +11,12 @@
                 <% if (property.description) { %>
                     <a class="fright fa fa-question-circle needsclick" data-i18n="[title]<%= property.description %>" style="margin-left: 6px;"></a>
                 <% } %>
+                <% if (editorMode == 'massive-edit') { %>
+                    <div class="second_row"><span data-i18n="No changes"></span><input type="checkbox" class="js-no-change js-no-change-prop" data-field="<%= property.property_id %>" checked="checked"></div>
+                <% } %>
             </td>
             <td>
-                <input type="text" class="custom-prop-value" data-current="<%= property.value %>" value="<%= property.value %>">
+                <input type="text" class="custom-prop-value" data-current="<%= property.value %>" value="<%= property.value %>" name="<%= property.property_id %>">
             </td>
         </tr>
 <%

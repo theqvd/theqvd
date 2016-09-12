@@ -41,6 +41,12 @@ Wat.Views.AdminListView = Wat.Views.ListView.extend({
         that.fetchAndRenderRoles();
     },
     
+    openMassiveChangesDialog: function (that) {
+        Wat.Views.ListView.prototype.openMassiveChangesDialog.apply(this, [that]);
+        
+        Wat.I.chosenElement('[name="language"]', 'single100');
+    },
+    
     createElement: function () {
         var valid = Wat.Views.ListView.prototype.createElement.apply(this);
         
@@ -112,4 +118,34 @@ Wat.Views.AdminListView = Wat.Views.ListView.extend({
         
         this.updateModel(args, filters, this.fetchAny, auxModel);
     },
+    
+    updateMassiveElement: function (dialog, id) {
+        var valid = Wat.Views.ListView.prototype.updateElement.apply(this, [dialog]);
+        
+        if (!valid) {
+            return;
+        }
+        
+        var arguments = {};
+        
+        var context = $('.' + this.cid + '.editor-container');
+        
+        var description = context.find('textarea[name="description"]').val();
+        var language = context.find('select[name="language"]').val(); 
+        
+        var filters = {"id": id};
+        
+        if (!$('.js-no-change[data-field="description"]').is(':checked') && Wat.C.checkACL('administrator.update.description')) {
+            arguments["description"] = description;
+        }
+        
+        if (!$('.js-no-change[data-field="language"]').is(':checked') && Wat.C.checkACL('administrator.update.language')) {
+            arguments["language"] = language;
+        }
+        
+        this.resetSelectedItems();
+        
+        var auxModel = new Wat.Models.Admin();
+        this.updateModel(arguments, filters, this.fetchList, auxModel);
+    }
 });

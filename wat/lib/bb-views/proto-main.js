@@ -277,7 +277,8 @@ Wat.Views.MainView = Backbone.View.extend({
         
         that.template = _.template(
                     Wat.TPL.editorCommonProperties, {
-                        properties: that.model && that.model.attributes.properties ? that.model.attributes.properties : {}
+                        properties: that.model && that.model.attributes.properties ? that.model.attributes.properties : {},
+                        editorMode: that.editorMode
                     }
                 );
         
@@ -355,7 +356,11 @@ Wat.Views.MainView = Backbone.View.extend({
         for(i=0;i<propIds.length;i++) {
             var id = propIds.eq(i);
             var value = propValues.eq(i);
-                 
+            
+            if ($('.js-no-change[data-field="' + id.val() + '"]').is(':checked')) {
+                continue;
+            }
+            
             setProps[id.val()] = value.val();
         }
         

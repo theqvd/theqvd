@@ -1318,8 +1318,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         // Overrided from specific list view if necessary
     },
     
-    configureMassiveEditor: function (that) {
-        // Overrided from specific list view if necessary
+    // Additional changes on massive editor interface after render it
+    configureMassiveEditor: function (that) {  
+        // Extended from specific list view if necessary
     },
     
     updateMassiveElement: function (dialog, id) {
@@ -1342,7 +1343,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
 
         var description = context.find('textarea[name="description"]').val();
         
-        if (description != '' && Wat.C.checkACL(this.qvdObj + '.update-massive.description')) {
+        if (!$('.js-no-change[data-field="description"]').is(':checked') && Wat.C.checkACL(this.qvdObj + '.update-massive.description')) {
             arguments["description"] = description;
         }
         

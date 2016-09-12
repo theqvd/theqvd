@@ -48,6 +48,14 @@ Wat.B = {
             // Toggle controls for expire fields (it's only needed for vm form, but it can be accesible from two views: list and details)
             this.bindEvent('change', 'input[name="expire"]', this.editorBinds.toggleExpire);
         
+        // Massive editor
+            // Clean fields when click on "no changes" checkbox
+            this.bindEvent('change', 'input[type="checkbox"].js-no-change', this.editorBinds.clickNoChangeCheckbox); 
+            
+            // Uncheck "no changes" checkbox when fields changes
+            this.bindEvent('change', '.js-massive-editor-table input[type="checkbox"], .js-massive-editor-table input[type="text"].datetimepicker', this.editorBinds.changeMassiveField);
+            this.bindEvent('input', '.js-massive-editor-table input[type="text"], .js-massive-editor-table textarea', this.editorBinds.changeMassiveField);
+        
         // Virtual Machines Editor
         
             // Toggle controls for disk images tags retrieving when select osf (it's only needed for vm form, but it can be accesible from two views: list and details)
@@ -732,6 +740,17 @@ Wat.B = {
             $('.js-editor-property-row').hide();
             $('.js-editor-property-row[data-tenant-id="' + $('[name="tenant_id"]').val() + '"]').show();
             $('.js-editor-property-row[data-tenant-id="' + SUPERTENANT_ID + '"]').show();
+        },
+        
+        changeMassiveField: function (e) {
+            $('.js-no-change[data-field="' + $(e.target).attr('name') + '"]').prop('checked', false);
+        },    
+        
+        clickNoChangeCheckbox: function (e) {
+            if ($(e.target).is(':checked')) {
+                var field = $(e.target).attr('data-field');
+                $('.js-massive-editor-table td:last-child input[name="' + field + '"], .js-editor-table td:last-child textarea[name="' + field + '"]').val('');
+            }
         },
     },
     

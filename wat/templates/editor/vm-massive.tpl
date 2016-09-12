@@ -1,14 +1,19 @@
 <table>
     <% if (Wat.C.checkACL('vm.update-massive.description')) { %>
     <tr>
-        <td data-i18n="Description"></td>
+        <td>
+            <span data-i18n="Description"></span>
+            <div class="second_row"><span data-i18n="No changes"></span><input type="checkbox" class="js-no-change" data-field="description" checked="checked"></div>
+        </td>
         <td>
             <textarea id="name" type="text" name="description"></textarea>
         </td>
     </tr>
     <% } %>
     <tr>
-        <td data-i18n="Image tag"></td>
+        <td>
+            <span data-i18n="Image tag"></span>
+        </td>
         <td>
             <select class="" name="di_tag"></select>
             <div class="second_row js-advice-various-osfs hidden">
@@ -17,20 +22,20 @@
             </div>
         </td>
     </tr>
-    <tr>
-        <td data-i18n="Expire"></td>
+    <tr class="expiration_row">
         <td>
-            <input type="checkbox" class="js-expire" name="expire" value="1">
+            <span data-i18n="Soft expiration"></span>
+            <div class="second_row"><span data-i18n="No changes"></span><input type="checkbox" class="js-no-change" data-field="expiration_soft" checked="checked"></div>
         </td>
-    </tr>
-    <tr class="hidden expiration_row">
-        <td data-i18n="Soft expiration"></td>
         <td>
             <input type="text" class="datetimepicker" name="expiration_soft" value="">
         </td>
     </tr>
-    <tr class="hidden expiration_row">
-        <td data-i18n="Hard expiration"></td>
+    <tr class="expiration_row">
+        <td>
+            <span data-i18n="Hard expiration"></span>
+            <div class="second_row"><span data-i18n="No changes"></span><input type="checkbox" class="js-no-change" data-field="expiration_hard" checked="checked"></div>
+        </td>
         <td>
             <input type="text" class="datetimepicker" name="expiration_hard" value="">
         </td>

@@ -47,23 +47,15 @@ Wat.Common.BySection.vm = {
         }
         
         if (Wat.C.checkACL('vm.update.expiration')) {
-            // If expire is checked
-            if (context.find('input.js-expire').is(':checked')) {
-                var expiration_soft = context.find('input[name="expiration_soft"]').val();
-                var expiration_hard = context.find('input[name="expiration_hard"]').val();
+            var expiration_soft = context.find('input[name="expiration_soft"]').val();
+            var expiration_hard = context.find('input[name="expiration_hard"]').val();
 
-                if (expiration_soft != undefined) {
-                    arguments['expiration_soft'] = new Date(expiration_soft).toJSON();
-                }
-
-                if (expiration_hard != undefined) {
-                    arguments['expiration_hard'] = new Date(expiration_hard).toJSON();
-                }
+            if (expiration_soft != undefined) {
+                arguments['expiration_soft'] = new Date(expiration_soft).toJSON();
             }
-            else {
-                // Delete the expiration if exist
-                arguments['expiration_soft'] = '';
-                arguments['expiration_hard'] = '';
+
+            if (expiration_hard != undefined) {
+                arguments['expiration_hard'] = new Date(expiration_hard).toJSON();
             }
         }
         
