@@ -448,7 +448,7 @@ sub RunWorkerThread {
 
 sub proxy_unknown_cert {
     my $self = shift;
-    my $msg :shared = $self->shared_clone(shift);
+    my $msg :shared = shared_clone(shift);
     my $evt = new Wx::PlThreadEvent(-1, EVT_UNKNOWN_CERT, $msg);
     Wx::PostEvent($self, $evt);
 
@@ -458,7 +458,8 @@ sub proxy_unknown_cert {
 
 sub proxy_list_of_vm_loaded {
     my $self = shift;
-    my $vm_data :shared = $self->shared_clone(shift);
+    my $list = shift;
+    my $vm_data :shared = shared_clone($list);
     if (@$vm_data > 1) {
         lock($vm_id);
         my $evt = new Wx::PlThreadEvent(-1, EVT_LIST_OF_VM_LOADED, $vm_data);
@@ -488,7 +489,7 @@ sub proxy_connection_error {
 sub proxy_set_environment {
     my $self = shift;
     my %args = @_;
-    my $shared_args :shared = $self->shared_clone(\%args);
+    my $shared_args :shared = shared_clone(\%args);
 
     lock($set_env);
     Wx::PostEvent($self, new Wx::PlThreadEvent(-1, EVT_SET_ENVIRONMENT, $shared_args));
