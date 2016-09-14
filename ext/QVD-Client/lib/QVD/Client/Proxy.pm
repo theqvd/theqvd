@@ -272,7 +272,7 @@ sub _load_accepted_certs {
         close $fd;
 
         eval {
-            $self->{accepted_certs} = from_json( $data, { utf8 => 1 } );
+            $self->{accepted_certs} = from_json( $data, { utf8 => 1, allow_nonref => 1 } );
         };
         if ( $@ ) {
             ERROR "Failed to load accepted certificates: $@\nData:\n$data";
@@ -294,7 +294,7 @@ sub _save_accepted_certs {
     DEBUG "Saving accepted certificates";
     eval {
         open(my $fd, '>', $file) or die "Can't create $file: $!";
-        print $fd to_json( $self->{accepted_certs}, { utf8 => 1, pretty => 1 } );
+        print $fd to_json( $self->{accepted_certs}, { utf8 => 1, pretty => 1, allow_nonref => 1 } );
         close $fd;
     };
     if ( $@ ) {
@@ -500,7 +500,7 @@ sub connect_to_vm {
     my $vm_list;
 
     eval {
-        $vm_list = JSON->new->decode($body);
+        $vm_list = from_json($body, { utf8 => 1, allow_nonref => 1});
     };
 
     if ( $@ ) {
