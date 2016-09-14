@@ -497,7 +497,7 @@ Editor masivo
 <img src="images/doc_images/screenshot_user_massiveeditor.png" alt="screenshot_user_massiveeditor.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>El editor masivo de usuarios solamente permite modificar propiedades porsonalizadas.</p></div>
-<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados.</p></div>
+<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados, salvo que se escoja la opción "Sin cambios".</p></div>
 <div class="paragraph"><p>Si no existen propiedades personalizadas en los usuarios, la edición masiva no estará habilitada.</p></div>
 </div></div>
 </dd>
@@ -567,7 +567,7 @@ Edición
 <td class="icon">
 <img src="images/doc_images/icons/tip.png" alt="Tip" />
 </td>
-<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas que se sitúan bajo el listado si solo seleccionamos un elemento.</td>
+<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas si solo seleccionamos un elemento.</td>
 </tr></table>
 </div>
 </div></div>
@@ -664,6 +664,11 @@ Si las máquinas virtuales tienen definida une <strong>fecha de expiración</str
 </li>
 <li>
 <p>
+<strong>Deteniéndose</strong>: Icono de stop parpadeando.
+</p>
+</li>
+<li>
+<p>
 <strong>Corriendo</strong>: Icono de play.
 </p>
 <div class="openblock">
@@ -675,14 +680,8 @@ Si las máquinas virtuales tienen definida une <strong>fecha de expiración</str
 </li>
 <li>
 <p>
-Arrancando/Deteniéndose*: Icono animado de carga.
+<strong>Arrancando</strong>: Icono de play parpadeando.
 </p>
-<div class="openblock">
-<div class="content">
-<div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_startingstopping.png" alt="icon_startingstopping.png" />
-</span></p></div>
-</div></div>
 </li>
 </ul></div>
 </li>
@@ -749,6 +748,11 @@ Desconectar usuario de máquinas virtuales
 </li>
 <li>
 <p>
+Espiar sesión del usuario
+</p>
+</li>
+<li>
+<p>
 Eliminar máquinas virtuales
 </p>
 </li>
@@ -778,7 +782,7 @@ Editor masivo
 <img src="images/doc_images/screenshot_vm_massiveeditor_properties.png" alt="screenshot_vm_massiveeditor_properties.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>El editor masivo de máquinas virtuales permite cambiar el tag de imagen utilizado, asignar una fecha de expiración y modificar propiedades personalizadas.</p></div>
-<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados.</p></div>
+<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados, salvo que se escoja la opción "Sin cambios".</p></div>
 <div class="paragraph"><p>El control de expiración se verá en el apartado de Edición de máquinas virtuales.</p></div>
 <div class="paragraph"><p>Respecto al tag de imagen, cuando editamos masivamente máquinas virtuales existen dos posibilidades:</p></div>
 </div></div>
@@ -846,6 +850,11 @@ Vista detalle
 <li>
 <p>
 Desconectar al usuario de la máquina virtual. Este botón solo estará disponible si el usuario está conectado.
+</p>
+</li>
+<li>
+<p>
+Espiar sesión del usuario. Este botón solo estará disponible si la máquina virtual está corriendo.
 </p>
 </li>
 <li>
@@ -1033,7 +1042,7 @@ Edición
 <td class="icon">
 <img src="images/doc_images/icons/tip.png" alt="Tip" />
 </td>
-<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas que se sitúan bajo el listado si solo seleccionamos un elemento.</td>
+<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas si solo seleccionamos un elemento.</td>
 </tr></table>
 </div>
 </div></div>
@@ -1180,7 +1189,7 @@ Editor masivo
 <img src="images/doc_images/screenshot_host_massiveeditor.png" alt="screenshot_host_massiveeditor.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>El editor masivo de nodos solamente permite modificar propiedades porsonalizadas.</p></div>
-<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados.</p></div>
+<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados, salvo que se escoja la opción "Sin cambios".</p></div>
 <div class="paragraph"><p>Si no existen propiedades personalizadas en los nodos, la edición masiva no estará habilitada.</p></div>
 </div></div>
 </dd>
@@ -1249,7 +1258,7 @@ Edición
 <td class="icon">
 <img src="images/doc_images/icons/tip.png" alt="Tip" />
 </td>
-<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas que se sitúan bajo el listado si solo seleccionamos un elemento.</td>
+<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas si solo seleccionamos un elemento.</td>
 </tr></table>
 </div>
 </div></div>
@@ -1323,7 +1332,7 @@ Editor masivo
 </span></p></div>
 <div class="paragraph"><p>El editor masivo de OSFs permite modificar la memoria, el almacenamiento de usuario y las propiedades personalizadas.</p></div>
 <div class="paragraph"><p><strong>Si dejamos la caja de memoria y almacenamiento de usuario en blanco no se modificarán</strong>.</p></div>
-<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados.</p></div>
+<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados, salvo que se escoja la opción "Sin cambios".</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1385,7 +1394,7 @@ Edición
 <td class="icon">
 <img src="images/doc_images/icons/tip.png" alt="Tip" />
 </td>
-<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas que se sitúan bajo el listado si solo seleccionamos un elemento.</td>
+<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas si solo seleccionamos un elemento.</td>
 </tr></table>
 </div>
 </div></div>
@@ -1530,7 +1539,7 @@ Editor masivo
 <img src="images/doc_images/screenshot_di_massiveeditor.png" alt="screenshot_di_massiveeditor.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>El editor masivo de imágenes de disco solamente permite modificar propiedades porsonalizadas.</p></div>
-<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados.</p></div>
+<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados, salvo que se escoja la opción "Sin cambios". salvo que se escoja la opción "Sin cambios".</p></div>
 <div class="paragraph"><p>Si no existen propiedades personalizadas en las imágenes de disco, la edición masiva no estará habilitada.</p></div>
 </div></div>
 </dd>
@@ -1644,7 +1653,7 @@ Edición
 <td class="icon">
 <img src="images/doc_images/icons/tip.png" alt="Tip" />
 </td>
-<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas que se sitúan bajo el listado si solo seleccionamos un elemento.</td>
+<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas si solo seleccionamos un elemento.</td>
 </tr></table>
 </div>
 </div></div>
@@ -1827,6 +1836,18 @@ El <strong>estado de bloqueo</strong> de los usuarios:
 <img src="images/doc_images/icon_warning.png" alt="icon_warning.png" />
 </span></p></div>
 <div class="paragraph"><p>Si el administrador no tiene roles asociados, aparecerá un icono de advertencia, ya que un administrador sin roles no tiene sentido.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Administrador logueado</strong>: Icono de archivador.
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/icon_archiver.png" alt="icon_archiver.png" />
+</span></p></div>
+<div class="paragraph"><p>Si el administrador es el administrador logueado, llevará este identificador con el aviso <em>Este administrador soy yo</em>.</p></div>
 </div></div>
 </li>
 </ul></div>
@@ -2158,7 +2179,7 @@ Edición
 </dl></div>
 </div>
 <div class="sect2">
-<h3 id="_vistas">5.4. Vistas</h3>
+<h3 id="_vistas_por_defecto">5.4. Vistas por defecto</h3>
 <div class="paragraph"><p>Como hemos visto en el análisis de cada sección, las vistas listado muestran varias columnas con diferentes datos de los elementos existentes y además disponen de algunos controles de filtrado.</p></div>
 <div class="paragraph"><p>Estas columnas y filtros se puede configurar globalmente en el sistema, y luego cada administrador podrá personalizar estos valores sólamente para él.</p></div>
 <div class="paragraph"><p><span class="image">
@@ -2285,11 +2306,11 @@ Eliminado y restauración de parámetros
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_userarea_profile.png" alt="screenshot_userarea_profile.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Se pueden configurar el idioma  de la interfaz del WAT así como el tamaño de bloque, que corresponde al número de elementos mostrados en cada página en las vistas listado.
+<div class="paragraph"><p>Se pueden configurar el <strong>idioma</strong> de la interfaz del WAT así como el <strong>tamaño de bloque</strong>, que corresponde al número de elementos mostrados en cada página en las vistas listado.
 Ambos parámetros se pueden definir como <em>por defecto</em> adoptando así la configuración general del WAT, o bien definir un valor fijo para el administrador actual.</p></div>
-</div>
-<div class="sect2">
-<h3 id="_personalizar_vistas">7.2. Personalizar vistas</h3>
+<div class="paragraph"><p>Además, desde esta sección se puede acceder a la configuración de las vistas del administrador logueado en la sección <strong>Mis vistas</strong>.</p></div>
+<div class="sect3">
+<h4 id="_mis_vistas">7.1.1. Mis vistas</h4>
 <div class="paragraph"><p>Como vimos en la sección de gestión del WAT, se pueden personalizar qué columnas o filtros se muestran en las diferentes vistas del WAT. Esa es una configuración global del sistema.</p></div>
 <div class="paragraph"><p>En base a esta configuración, cada administrador puede personalizar sus vistas de un modo muy similar, adaptándolas a sus preferencias.</p></div>
 <div class="admonitionblock">
@@ -2323,8 +2344,9 @@ Ambos parámetros se pueden definir como <em>por defecto</em> adoptando así la 
 <img src="images/doc_images/screenshot_userarea_customize_reset.png" alt="screenshot_userarea_customize_reset.png" width="960px" />
 </span></p></div>
 </div>
+</div>
 <div class="sect2">
-<h3 id="_cerrar_sesión">7.3. Cerrar sesión</h3>
+<h3 id="_cerrar_sesión">7.2. Cerrar sesión</h3>
 <div class="paragraph"><p>Con esta opción se cierra la sesión del administrador actual y aparecerá el login.</p></div>
 </div>
 </div>
@@ -2333,7 +2355,7 @@ Ambos parámetros se pueden definir como <em>por defecto</em> adoptando así la 
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-08-26 13:24:08 CEST
+Last updated 2016-09-12 16:03:42 CEST
 </div>
 </div>
 </body>

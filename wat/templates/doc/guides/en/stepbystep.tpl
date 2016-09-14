@@ -478,7 +478,7 @@ Massive editor
 <img src="images/doc_images/screenshot_user_massiveeditor.png" alt="screenshot_user_massiveeditor.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>The massive editor of the users only let us modify the custom properties.</p></div>
-<div class="paragraph"><p>As any other massive editor the value that is defined will overwrite the one that can exist in all the edited elements.</p></div>
+<div class="paragraph"><p>As any other massive editor, the value which will be defined, it would rewrite the one that could exist in all the edited elements unless "No changes" option were selected.</p></div>
 <div class="paragraph"><p>If custom properties do not exist in the users the massive edition will not be authorised.</p></div>
 </div></div>
 </dd>
@@ -538,7 +538,7 @@ Edition
 <td class="icon">
 <img src="images/doc_images/icons/tip.png" alt="Tip" />
 </td>
-<td class="content">We can also access to the edition of the element from the list view with the massive actions that are situated under the list only if we select one element.</td>
+<td class="content">We can also access to the edition of the element from the list view with the massive actions only if we select one element.</td>
 </tr></table>
 </div>
 </div></div>
@@ -567,6 +567,10 @@ Information column
 <dd>
 <p>
 The information column will indicate us:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
 The <strong>blocking stauts</strong> of the virtual machines:
 </p>
 <div class="ulist"><ul>
@@ -586,14 +590,14 @@ The <strong>blocking stauts</strong> of the virtual machines:
 <p>
 <strong>Unlocked</strong> If the lock icon does not appear.
 </p>
-<div class="ulist"><ul>
+</li>
+</ul></div>
+</li>
 <li>
 <p>
 If the virtual machines have defined an <strong>expiration date</strong>
 </p>
-</li>
-</ul></div>
-</li>
+<div class="ulist"><ul>
 <li>
 <p>
 <strong>With expiration date</strong> Clock icon.
@@ -610,14 +614,14 @@ If the virtual machines have defined an <strong>expiration date</strong>
 <p>
 <strong>Without expiration date</strong>. If the clock icon does not appear.
 </p>
-<div class="ulist"><ul>
+</li>
+</ul></div>
+</li>
 <li>
 <p>
 <strong>Executing State</strong> of the virtual machines.
 </p>
-</li>
-</ul></div>
-</li>
+<div class="ulist"><ul>
 <li>
 <p>
 <strong>Stopped</strong>. Stop icon.
@@ -628,6 +632,11 @@ If the virtual machines have defined an <strong>expiration date</strong>
 <img src="images/doc_images/icon_stopped.png" alt="icon_stopped.png" />
 </span></p></div>
 </div></div>
+</li>
+<li>
+<p>
+<strong>Stopping</strong>. Blinking stop icon.
+</p>
 </li>
 <li>
 <p>
@@ -642,22 +651,16 @@ If the virtual machines have defined an <strong>expiration date</strong>
 </li>
 <li>
 <p>
-<strong>Starting/Stopping</strong>. Animated charge icon.
-</p>
-<div class="openblock">
-<div class="content">
-<div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_startingstopping.png" alt="icon_startingstopping.png" />
-</span></p></div>
-</div></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<strong>Connection status of the user</strong> of the virtual machines
+<strong>Starting</strong>. Blinking play icon.
 </p>
 </li>
 </ul></div>
 </li>
+<li>
+<p>
+<strong>Connection status of the user</strong> of the virtual machines
+</p>
+<div class="ulist"><ul>
 <li>
 <p>
 <strong>User connected</strong>. User icon.
@@ -673,6 +676,8 @@ If the virtual machines have defined an <strong>expiration date</strong>
 <p>
 <strong>User not connected</strong>. If the user icon does not appear.
 </p>
+</li>
+</ul></div>
 </li>
 </ul></div>
 </dd>
@@ -714,6 +719,11 @@ Disconnect the user of the virtual machines
 </li>
 <li>
 <p>
+Delete user session
+</p>
+</li>
+<li>
+<p>
 Delete virtual machines
 </p>
 </li>
@@ -743,7 +753,7 @@ Massive editor
 <img src="images/doc_images/screenshot_vm_massiveeditor_properties.png" alt="screenshot_vm_massiveeditor_properties.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>The massive editor of the virtual machines let us change the tag of the image used, assign an expiration date and modify custom properties.</p></div>
-<div class="paragraph"><p>As any other massive editor the value that is defined will overwrite the one that can exist in all the edited elements.</p></div>
+<div class="paragraph"><p>As any other massive editor, the value which will be defined, it would rewrite the one that could exist in all the edited elements unless "No changes" option were selected.</p></div>
 <div class="paragraph"><p>The expiration control will be seen in the part of the Edition of the virtual machines.</p></div>
 <div class="paragraph"><p>Regarding the tag of the image, when we edit massively virtual machines we have two posibilities:</p></div>
 </div></div>
@@ -808,6 +818,7 @@ Detail view
 <div class="paragraph"><p>We observe a small <strong>head top</strong> next to the <strong>name of the virtual machine</strong> where <strong>the buttom to delete it and the action buttoms</strong> are.</p></div>
 <div class="paragraph"><p>The available buttoms in the detail view of the virtual machine are:
 * Disconnecting the user from the virtual machine. This buttom will only be available if the user in connected.
+* Spy the user session. This buttom will only be available if the virtual machine is running.
 * Locking/Unlocking the virtual machine
 * Editing the virtual machine</p></div>
 <div class="paragraph"><p>Below this head top there is a <strong>table with the attributes of the virtual machine</strong> including the properties, if there were.</p></div>
@@ -959,7 +970,7 @@ Edition
 <td class="icon">
 <img src="images/doc_images/icons/tip.png" alt="Tip" />
 </td>
-<td class="content">We can also access to the edition of the element from the list view with the massive actions that are situated under the list only if we select one element.</td>
+<td class="content">We can also access to the edition of the element from the list view with the massive actions only if we select one element.</td>
 </tr></table>
 </div>
 </div></div>
@@ -1106,7 +1117,7 @@ Massive editor
 <img src="images/doc_images/screenshot_host_massiveeditor.png" alt="screenshot_host_massiveeditor.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>The massive editor of nodes only let us modify custom properties.</p></div>
-<div class="paragraph"><p>As any other massive editor the value that is defined will overwrite the one that can exist in all the edited elements.</p></div>
+<div class="paragraph"><p>As any other massive editor, the value which will be defined, it would rewrite the one that could exist in all the edited elements unless "No changes" option were selected.</p></div>
 <div class="paragraph"><p>If custom properties do not exist in the nodes the massive edition will not be authorised.</p></div>
 </div></div>
 </dd>
@@ -1175,7 +1186,7 @@ Edition
 <td class="icon">
 <img src="images/doc_images/icons/tip.png" alt="Tip" />
 </td>
-<td class="content">We can also access to the edition of the element from the list view with the massive actions that are situated under the list only if we select one element.</td>
+<td class="content">We can also access to the edition of the element from the list view with the massive actions only if we select one element.</td>
 </tr></table>
 </div>
 </div></div>
@@ -1249,7 +1260,7 @@ Massive editor
 </span></p></div>
 <div class="paragraph"><p>The massive editor of OSFs let us modify the memory, the user storage and the custom properties.</p></div>
 <div class="paragraph"><p>*If we leave the memory box and the user storage in blank they will not be modified.</p></div>
-<div class="paragraph"><p>As any other massive editor the value that is defined will overwrite the one that can exist in all the edited elements.</p></div>
+<div class="paragraph"><p>As any other massive editor, the value which will be defined, it would rewrite the one that could exist in all the edited elements unless "No changes" option were selected.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1310,7 +1321,7 @@ Edition
 <td class="icon">
 <img src="images/doc_images/icons/tip.png" alt="Tip" />
 </td>
-<td class="content">We can also access to the edition of the element from the list view with the massive actions that are situated under the list only if we select one element.</td>
+<td class="content">We can also access to the edition of the element from the list view with the massive actions only if we select one element.</td>
 </tr></table>
 </div>
 </div></div>
@@ -1457,7 +1468,7 @@ Massive editor
 <img src="images/doc_images/screenshot_di_massiveeditor.png" alt="screenshot_di_massiveeditor.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>The massive editor of disk images only allows us to modify custom properties.</p></div>
-<div class="paragraph"><p>As any other massive editor, the value which will be defined, it would rewrite the one that could exist in all the edited elements.</p></div>
+<div class="paragraph"><p>As any other massive editor, the value which will be defined, it would rewrite the one that could exist in all the edited elements unless "No changes" option were selected.</p></div>
 <div class="paragraph"><p>If there are not custom properties in the disk images, the massive edition will not be enabled.</p></div>
 </div></div>
 </dd>
@@ -1571,7 +1582,7 @@ Edition
 <td class="icon">
 <img src="images/doc_images/icons/tip.png" alt="Tip" />
 </td>
-<td class="content">An element edition can also be accessed from the list view with the massive actions which are located below the list if we only select an element.</td>
+<td class="content">An element edition can also be accessed from the list view with the massive actions if we only select an element.</td>
 </tr></table>
 </div>
 </div></div>
@@ -1754,6 +1765,18 @@ The <strong>blocking status</strong> of the users:
 <img src="images/doc_images/icon_warning.png" alt="icon_warning.png" />
 </span></p></div>
 <div class="paragraph"><p>If the administrator does not have asociated roles, a warning icon will appear since an administrator without roles does not make sense.</p></div>
+</div></div>
+</li>
+<li>
+<p>
+<strong>Logged administrator</strong>: Archiver icon.
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/icon_archiver.png" alt="icon_archiver.png" />
+</span></p></div>
+<div class="paragraph"><p>If the administrator is the logged administrator, it will have this identifier with the warning <em>This administrator is me</em>.</p></div>
 </div></div>
 </li>
 </ul></div>
@@ -2085,7 +2108,7 @@ Edition
 </dl></div>
 </div>
 <div class="sect2">
-<h3 id="_views">5.4. Views</h3>
+<h3 id="_default_views">5.4. Default views</h3>
 <div class="paragraph"><p>As we have seen in the analysis of every section, the list view displays several columns with different data of the existing elements as well as some filter controls.</p></div>
 <div class="paragraph"><p>These columns and filters can be set up globally in the system, and then each administrator will be able to customize these values only for himself.</p></div>
 <div class="paragraph"><p><span class="image">
@@ -2217,6 +2240,42 @@ Deleting and restoring parameters
 </span></p></div>
 <div class="paragraph"><p>The  WAT interface language can be set up as well as the block size, the one which corresponds to the number of elements shown in each page in the list views.
 Both parameters can be defined as <em>by default</em> thus adopting the WAT general set-up, or a fix value for the current administrator.</p></div>
+<div class="paragraph"><p>In addition, from this section is possible to access to the views configuration of the logged administrator in the section <strong>My views</strong>.</p></div>
+<div class="sect3">
+<h4 id="_my_views">7.1.1. My views</h4>
+<div class="paragraph"><p>As we saw in the part of the management of WAT, we can customize which columns or filters are shown in the different views of WAT. That is a global configuration of the system.</p></div>
+<div class="paragraph"><p>On the basis of this configuration, each administrator can customize his or her views in a very similar way, adapting them to his or her preferences.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/important.png" alt="Important" />
+</td>
+<td class="content">If an administrator does not change the configuration of his or her views, these could vary if the global configuration were modified. On the other hand, if an administrator changes a parameter, it will be fixed in the stablished value, without being altered by the changes in the global configuration.</td>
+</tr></table>
+</div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_userarea_customize.png" alt="screenshot_userarea_customize.png" width="960px" />
+</span></p></div>
+<div class="paragraph"><p>In this part it will be done a configuration for the current administrator of these parameters by ticking a series of check-boxes. On the one hand the shown columns are configured and on the other hand the available filters.</p></div>
+<div class="paragraph"><p>In the case of the <strong>columns</strong>, it is a valid configuration for the <strong>desktop version</strong> since in the mobile version, the version will always be simplified. On the other hand the <strong>filters</strong> are configured independently for the <strong>desktop and mobile</strong> This difference is made in order to do the mobile version more or less simple according to our neccesities.</p></div>
+<div class="paragraph"><p>In the section we will find a drop down menu with the section that we want to customize and a buttom to restore the default views.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_watconfig_defaultviews_sections.png" alt="screenshot_watconfig_defaultviews_sections.png" width="960px" />
+</span></p></div>
+<div class="paragraph"><p>When we select one or another section, the columns and filters of that section will be charged. Only by clicking on the different check-boxes, the change will be saved.</p></div>
+<div class="paragraph"><p>If we want to <strong>revert to the system configuration</strong> we will use the buttom to <strong>restore the default views</strong>. This action can be done over the current loaded section or over all the system, choosing one or the other option in the dialogue that appears before doing the restoration.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/important.png" alt="Important" />
+</td>
+<td class="content">The views that we reset to the system configuration will be again subject to the changes that the global configuration may suffer.</td>
+</tr></table>
+</div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_userarea_customize_reset.png" alt="screenshot_userarea_customize_reset.png" width="960px" />
+</span></p></div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_customize_views">7.2. Customize Views</h3>
@@ -2263,7 +2322,7 @@ Both parameters can be defined as <em>by default</em> thus adopting the WAT gene
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-08-26 13:23:20 CEST
+Last updated 2016-09-12 16:03:29 CEST
 </div>
 </div>
 </body>

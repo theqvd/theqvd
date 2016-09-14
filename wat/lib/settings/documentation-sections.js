@@ -46,8 +46,8 @@ Wat.I.docSections = {
         guide: 'stepbystep'
     },
     views: { 
-        en: '_views',
-        es: '_vistas',
+        en: '_default_views',
+        es: '_vistas_por_defecto',
         guide: 'stepbystep'
     },
     log: { 
@@ -61,8 +61,8 @@ Wat.I.docSections = {
         guide: 'stepbystep'
     },
     views_multitenant: { 
-        en: '_views_multitenant',
-        es: '_vistas_multitenant',
+        en: '_default_views_multitenant',
+        es: '_vistas_por_defecto_multitenant',
         guide: 'multitenant'
     },
     property_multitenant: { 
@@ -81,8 +81,8 @@ Wat.I.docSections = {
         guide: 'stepbystep'
     },
     myviews: { 
-        en: '_customize_views',
-        es: '_personalizar_vistas',
+        en: '_my_views',
+        es: '_mis_vistas',
         guide: 'stepbystep'
     },
     about: { 

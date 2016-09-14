@@ -455,8 +455,41 @@ Vista detalle
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_tenant_details.png" alt="screenshot_tenant_details.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Observamos una <strong>cabecera</strong> donde junto al <strong>nombre del tenant</strong> están los <strong>botones para eliminarlo y editarlo</strong>.</p></div>
+<div class="paragraph"><p>Observamos una <strong>cabecera</strong> donde junto al <strong>nombre del tenant</strong> están los <strong>botones para eliminarlo, bloquearlo, editarlo y limpiarlo</strong>.</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+El <strong>eliminado</strong> de tenants es como el de otros elementos. En este caso <strong>si un tenant tiene elementos, no se podrá eliminar</strong>. Será necesario vaciarlo manualmente o con la herramienta de limpieza.
+</p>
+</li>
+<li>
+<p>
+El <strong>bloqueo</strong> de tenants restringe a los administradores y usuarios acceder al WAT y a sus máquinas virtuales respectivamente.
+</p>
+</li>
+<li>
+<p>
+En la <strong>edición</strong> se puede cambiar el nombre, la descripción, el idioma y el tamaño de bloque por defecto del tenant. El tamaño de bloque e idioma serán efectivos para administradores de ese tenant en cuya configuración personal tengan establecido <em>Por defecto</em>.
+</p>
+</li>
+</ul></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/warning.png" alt="Warning" />
+</td>
+<td class="content">Es importante saber que el nombre del tenant se utiliza en las credenciales de los administradores y usuarios, por lo que su cambio debe ser controlado e informado.</td>
+</tr></table>
+</div>
+<div class="ulist"><ul>
+<li>
+<p>
+La herramienta de <strong>limpieza</strong> muestra en una sola pantalla todos los elementos dependientes de un Tenant ofreciendo diversas opciones de eliminado: De uno en uno, por categorías (todas las máquinas virtuales, usuarios etc.), o bien eliminar todo lo que ese tenant contienga.
+</p>
+</li>
+</ul></div>
 <div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos del tenant</strong>.</p></div>
+<div class="paragraph"><p>En la parte derecha encontramos cuadros que contienen los listados de elementos relevantes del Tenant: Máquinas virtuales, Usuarios e Imágenes de disco. Todos ellos con controles de paginación y un botón para ir a la vista correspondiente filtrada por el tenant actual.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -474,8 +507,8 @@ Edición
 </dl></div>
 </div>
 <div class="sect2">
-<h3 id="_vistas_multitenant">5.3. Vistas (multitenant)</h3>
-<div class="paragraph"><p>Si estamos en modo multitenant y somos superadministrador, en <em>Vistas</em> podremos no solo configurar estos elementos en el supertenant, sino que también podremos hacerlo para cada uno de los tenants del sistema.</p></div>
+<h3 id="_vistas_por_defecto_multitenant">5.3. Vistas por defecto (multitenant)</h3>
+<div class="paragraph"><p>Si estamos en modo multitenant y somos superadministrador, en <em>Vistas por defecto</em> podremos no solo configurar estos elementos en el supertenant, sino que también podremos hacerlo para cada uno de los tenants del sistema.</p></div>
 <div class="paragraph"><p>Para ello, además de un combo selector con la sección que queremos personalizar, aparecerá otro combo de selección con el tenant al que afectará esta configuración.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/default_views_multitenant.png" alt="default_views_multitenant.png" width="960px" />
@@ -899,7 +932,7 @@ Contraseña: to the rescue</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-08-26 13:23:20 CEST
+Last updated 2016-09-12 16:12:04 CEST
 </div>
 </div>
 </body>

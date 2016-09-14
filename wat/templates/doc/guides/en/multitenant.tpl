@@ -468,8 +468,8 @@ Edition
 </dl></div>
 </div>
 <div class="sect2">
-<h3 id="_views_multitenant">5.3. Views (multitenant)</h3>
-<div class="paragraph"><p>If we are in a multitenant mode and we are a super administrator, in <em>Views</em> we will be able not only to set up these elements in the supertenant, but also to do it for each tenant in the system.</p></div>
+<h3 id="_default_views_multitenant">5.3. Default views (multitenant)</h3>
+<div class="paragraph"><p>If we are in a multitenant mode and we are a super administrator, in <em>Default views</em> we will be able not only to set up these elements in the supertenant, but also to do it for each tenant in the system.</p></div>
 <div class="paragraph"><p>That is the reason why, besides having a selecting combo with the section we want to customize, it will appear another combo with the tenant that will be altered by this set-up.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/default_views_multitenant.png" alt="default_views_multitenant.png" width="960px" />
@@ -887,7 +887,7 @@ In this case, there will be small differences in comparison with the one there i
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-08-26 13:23:20 CEST
+Last updated 2016-09-12 16:12:18 CEST
 </div>
 </div>
 </body>

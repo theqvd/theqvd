@@ -4676,11 +4676,58 @@ Color de texto de la caja de login
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_espía_de_sesión">11. Espía de sesión</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Desde el WAT es posible <em>espiar</em> la sesión de un usuario conectado a una máquina virtual. Gracias al protocolo de compartición de escritorios <strong>VNC</strong>, se puede acceder en <strong>tiempo real</strong> al escritorio dónde un usuario se encuentre conectado, llegando incluso a <strong>tomar el control</strong>.</p></div>
+<div class="paragraph"><p>Si el administrador de QVD tiene los <em>permisos suficientes</em>, cuando una máquina virtual está arrancada, la oción <em>Espiar</em> aparecerá tanto en la vista detalle como en las opciones masivas en la vista listado (en este caso la opción solamente aparece si se selecciona un solo elemento).</p></div>
+<div class="paragraph"><p>Al hacer click en <em>Espiar</em>, se abrirá una pestaña nueva del navegador donde se cargará el escritorio de la sesión actual.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_vmspy.png" alt="screenshot_vmspy.png" width="960px" />
+</span></p></div>
+<div class="paragraph"><p>Si el usuario está haciendo cosas, veremos en tiempo real lo que él ve incluído su cursor.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Ajustes
+</dt>
+<dd>
+<p>
+En el lado izquierdo hay una pestaña de <em>Ajustes</em> que despliega un menú lateral con un cuadro con información a cerca de la máquina virtual y el usuario seguido las opciones de configuración:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Resolución</strong>: Se puede configurar para que la resolución del escritorio QVD en el navegador esté <em>adaptada</em> al tamaño de la ventana o que aparezca en la resolución <em>original</em> del cliente. En el segundo caso, si la resolución fuese mayor que la ventana del navegador aparecerán barras de desplazamiento.
+</p>
+</li>
+<li>
+<p>
+<strong>Modo</strong>: Por defecto está establecido el modo <em>Solo ver</em> con el cual no podremos interactuar con el escritorio remoto. Con el modo <em>Interactivo</em> se podrá tomar el control del cursor tan solo pasando por encima además de poder escribir con nuestro teclado.
+</p>
+</li>
+<li>
+<p>
+<strong>Log</strong>: Para poder detectar disfunciones en la conexión VNC se pueden mostrar con diferentes niveles de <em>verbosidad</em>, los registros del log de la conexión. El log permanece oculto por defecto, pero se puede mostrar absolutamente todo (nivel Debug), solamente a partir de los registros que tengan cierta relevancia (Info), las que se consideren importantes (Warning) o solo los errores (Error).
+</p>
+</li>
+</ul></div>
+</dd>
+</dl></div>
+<div class="paragraph"><p><em>Resolución adaptada y log mostrado</em>
+<span class="image">
+<img src="images/doc_images/screenshot_vmspy_options.png" alt="screenshot_vmspy_options.png" width="960px" />
+</span></p></div>
+<div class="paragraph"><p><em>Resolución original y log oculto</em>
+<span class="image">
+<img src="images/doc_images/screenshot_vmspy_options2.png" alt="screenshot_vmspy_options2.png" width="960px" />
+</span></p></div>
+</div>
+</div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-08-26 13:23:20 CEST
+Last updated 2016-08-29 15:50:24 CEST
 </div>
 </div>
 </body>
