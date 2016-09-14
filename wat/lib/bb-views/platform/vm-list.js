@@ -237,7 +237,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         var params = {
             'action': 'tag_tiny_list',
             'startingOptions': {
-                'no-change' : $.i18n.t('No changes'),
+                '' : $.i18n.t('No changes'),
                 'default' : 'default',
                 'head' : 'head'
             },
@@ -276,11 +276,11 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         
         var filters = {"id": id};
         
-        if (!$('.js-no-change[data-field="description"]').is(':checked') && Wat.C.checkACL('vm.update-massive.description')) {
+        if (Wat.I.isMassiveFieldChanging("description") && Wat.C.checkACL('vm.update-massive.description')) {
             arguments["description"] = description;
         }
         
-        if (di_tag != 'no-change' && Wat.C.checkACL('vm.update-massive.di-tag')) {
+        if (Wat.I.isMassiveFieldChanging("di_tag") && Wat.C.checkACL('vm.update-massive.di-tag')) {
             arguments["di_tag"] = di_tag;
         }
         
@@ -288,11 +288,11 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             var expiration_soft = context.find('input[name="expiration_soft"]').val();
             var expiration_hard = context.find('input[name="expiration_hard"]').val();
 
-            if (expiration_soft != undefined && !$('.js-no-change[data-field="expiration_soft"]').is(':checked')) {
+            if (expiration_soft != undefined && Wat.I.isMassiveFieldChanging("expiration_soft")) {
                 arguments['expiration_soft'] = expiration_soft;
             }
 
-            if (expiration_hard != undefined && !$('.js-no-change[data-field="expiration_hard"]').is(':checked')) {
+            if (expiration_hard != undefined && Wat.I.isMassiveFieldChanging("expiration_hard")) {
                 arguments['expiration_hard'] = expiration_hard;
             }
         }

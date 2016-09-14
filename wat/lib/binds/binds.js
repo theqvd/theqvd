@@ -53,8 +53,10 @@ Wat.B = {
             this.bindEvent('change', 'input[type="checkbox"].js-no-change', this.editorBinds.clickNoChangeCheckbox); 
             
             // Uncheck "no changes" checkbox when fields changes
+            this.bindEvent('change', '.js-massive-editor-table select', this.editorBinds.changeMassiveFieldSelect);
             this.bindEvent('change', '.js-massive-editor-table input[type="checkbox"], .js-massive-editor-table input[type="text"].datetimepicker', this.editorBinds.changeMassiveField);
             this.bindEvent('input', '.js-massive-editor-table input[type="text"], .js-massive-editor-table textarea', this.editorBinds.changeMassiveField);
+            this.bindEvent('click', '.js-no-change-reset', this.editorBinds.resetMassiveField);
         
         // Virtual Machines Editor
         
@@ -743,8 +745,33 @@ Wat.B = {
         },
         
         changeMassiveField: function (e) {
-            $('.js-no-change[data-field="' + $(e.target).attr('name') + '"]').prop('checked', false);
-        },    
+            var name = $(e.target).attr('name');
+            $(e.target).removeAttr('placeholder');
+            $('.js-no-change-reset[data-field="' + name + '"]').removeClass('invisible');
+        },   
+        
+        changeMassiveFieldSelect: function (e) {
+            var name = $(e.target).attr('name');
+            if ($(e.target).val() != '') {
+                $('.js-no-change-reset[data-field="' + name + '"]').removeClass('invisible');
+            }
+            else {
+                $('.js-no-change-reset[data-field="' + name + '"]').addClass('invisible');
+            }
+        },
+        
+        resetMassiveField: function (e) {
+            var name = $(e.target).attr('data-field');
+            $(e.target).addClass('invisible');
+            
+            if ($('select[name="' + name + '"]').length) {
+                $('select[name="' + name + '"]').find('option[value=""]').prop('selected', true);
+                $('select[name="' + name + '"]').trigger('chosen:updated');
+            }
+            else {
+                $('input[name="' + name + '"], textarea[name="' + name + '"]').val('').attr('placeholder', $.i18n.t('No changes'));
+            }
+        },
         
         clickNoChangeCheckbox: function (e) {
             if ($(e.target).is(':checked')) {

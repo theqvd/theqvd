@@ -1343,7 +1343,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
 
         var description = context.find('textarea[name="description"]').val();
         
-        if (!$('.js-no-change[data-field="description"]').is(':checked') && Wat.C.checkACL(this.qvdObj + '.update-massive.description')) {
+        if (Wat.I.isMassiveFieldChanging("description") && Wat.C.checkACL(this.qvdObj + '.update-massive.description')) {
             arguments["description"] = description;
         }
         

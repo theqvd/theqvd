@@ -135,11 +135,11 @@ Wat.Views.AdminListView = Wat.Views.ListView.extend({
         
         var filters = {"id": id};
         
-        if (!$('.js-no-change[data-field="description"]').is(':checked') && Wat.C.checkACL('administrator.update.description')) {
+        if (Wat.I.isMassiveFieldChanging("description") && Wat.C.checkACL('administrator.update.description')) {
             arguments["description"] = description;
         }
         
-        if (!$('.js-no-change[data-field="language"]').is(':checked') && Wat.C.checkACL('administrator.update.language')) {
+        if (Wat.I.isMassiveFieldChanging("language") && Wat.C.checkACL('administrator.update.language')) {
             arguments["language"] = language;
         }
         

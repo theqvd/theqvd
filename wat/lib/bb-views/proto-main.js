@@ -357,7 +357,7 @@ Wat.Views.MainView = Backbone.View.extend({
             var id = propIds.eq(i);
             var value = propValues.eq(i);
             
-            if ($('.js-no-change[data-field="' + id.val() + '"]').is(':checked')) {
+            if (!Wat.I.isMassiveFieldChanging(id.val())) {
                 continue;
             }
             

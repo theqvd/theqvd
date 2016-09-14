@@ -12,11 +12,11 @@
                     <a class="fright fa fa-question-circle needsclick" data-i18n="[title]<%= property.description %>" style="margin-left: 6px;"></a>
                 <% } %>
                 <% if (editorMode == 'massive-edit') { %>
-                    <div class="second_row"><span data-i18n="No changes"></span><input type="checkbox" class="js-no-change js-no-change-prop" data-field="<%= property.property_id %>" checked="checked"></div>
+                    <a class="button fa fa-rotate-left js-no-change-reset no-change-reset invisible js-no-change-prop" data-i18n="Reset" data-field="<%= property.property_id %>"></a>
                 <% } %>
             </td>
             <td>
-                <input type="text" class="custom-prop-value" data-current="<%= property.value %>" value="<%= property.value %>" name="<%= property.property_id %>">
+                <input type="text" class="custom-prop-value" data-current="<%= property.value %>" value="<%= property.value %>" name="<%= property.property_id %>" <%= editorMode == 'massive-edit' ? 'data-i18n="[placeholder]No changes"' : '' %>>
             </td>
         </tr>
 <%

@@ -1109,5 +1109,11 @@ Wat.I = {
         var warningIcon = '<i class="fa fa-warning" title="' + warningMessage + '"></i>';
         
         return warningIcon;
+    },
+    
+    // Return boolean giving a form field name on massive editor to know if this field is changing or must be ignored
+    isMassiveFieldChanging: function (fieldName) {
+        // Invisible class of no change reset button means avoid field updating
+        return !$('.js-no-change-reset[data-field="' + fieldName + '"]').hasClass('invisible');
     }
 }
