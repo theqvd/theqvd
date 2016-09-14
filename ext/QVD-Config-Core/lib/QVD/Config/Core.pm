@@ -10,8 +10,9 @@ use QVD::Config::Core::Defaults;
 my $core_cfg = Config::Properties->new($QVD::Config::Core::defaults);
 
 use Exporter qw(import);
-our @EXPORT = qw(core_cfg core_cfg_all core_cfg_keys save_core_cfg set_core_cfg);
+our @EXPORT = qw(core_cfg core_cfg_all core_cfg_keys save_core_cfg set_core_cfg delete_core_cfg);
 our @EXPORT_OK = qw(core_cfg_unmangled);
+
 
 our @FILES;
 @FILES = '/etc/qvd/node.conf' unless @FILES;
@@ -49,6 +50,11 @@ sub core_cfg_keys { $core_cfg->propertyNames }
 
 sub set_core_cfg {
     $core_cfg->changeProperty(@_);
+}
+
+sub delete_core_cfg {
+    my $key = shift;
+    $core_cfg->deleteProperty($key);
 }
 
 sub save_core_cfg {
