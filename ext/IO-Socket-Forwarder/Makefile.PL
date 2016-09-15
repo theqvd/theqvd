@@ -14,7 +14,7 @@ WriteMakefile(
     ABSTRACT_FROM       => 'lib/IO/Socket/Forwarder.pm',
     PL_FILES            => {},
     PREREQ_PM => {
-        'Test::More' => 0,
+        'IO::Socket::SSL' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'IO-Socket-Forwarder-*' },

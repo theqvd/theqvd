@@ -21,8 +21,6 @@ my $builder = Module::Build->new(
     requires => {
         'QVD::Admin'      => 0,
         'Log::Log4perl'   => 0,
-        'Pod::Usage'      => 0,
-        'Log::Log4perl'   => 0,
         'Term::ReadKey'   => 0,
     },
     add_to_cleanup     => [ 'QVD-EasyCustomize-*' ],

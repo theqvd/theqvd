@@ -15,5 +15,14 @@ WriteMakefile(
     ABSTRACT      => 'QVD::StressTester',
     EXE_FILES     => [ 'bin/qvd-stresstester.pl'],
     PL_FILES      => {},
-    PREREQ_PM     => {},
+    PREREQ_PM     => {
+        'AnyEvent' => 0,
+                   'AnyEvent::Handle' => 0,
+                   'AnyEvent::Socket' => 0,
+                   'AnyEvent::Util' => 0,
+                   'common::sense' => 0,
+                   'JSON' => 0,
+        'URI::Encode' => 0,
+        'Text::CSV_XS' => 0,
+    },
 );
