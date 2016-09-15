@@ -10,7 +10,7 @@ use AnyEvent 5.0 ();
 use AnyEvent::Util ();
 use AnyEvent::Handle ();
 
-use base Exporter::;
+use base 'Exporter';
 
 our $VERSION = 2.22;
 
