@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/perl 
 
 package QVD::Client::App;
 
@@ -17,6 +17,9 @@ my $prev_bad_log_level;
 BEGIN {
     $WINDOWS = ($^O eq 'MSWin32');
     $DARWIN = ($^O eq 'darwin');
+
+# Make sure cups service is online (in El Capitan , cups is not running until used)
+    if ( $DARWIN ){ system('/usr/sbin/cupsctl >/dev/null 2>&1'); }
 
     $user_dir = File::Spec->rel2abs($WINDOWS
                                     ? File::Spec->join($ENV{APPDATA}, 'QVD')
