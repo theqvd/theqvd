@@ -88,7 +88,6 @@ sub _add_ssl_error {
 # 1 or 0, depending on whether it thinks the certificate is valid or invalid.
 sub _ssl_verify_callback {
     my ($self, $ssl_thinks, $mem_addr, $attrs, $errs, $peer_cert, $ssl_depth) = @_;
-    return 1 if $ssl_thinks;
 
     DEBUG("_ssl_verify_callback called: " . join(' ', @_));
 
@@ -112,13 +111,13 @@ sub _ssl_verify_callback {
         err_no    => $err_no,
         err_depth => $err_depth,
         err_str   => $err_str 
-    };
+    } unless  $ssl_thinks ;
  
     $ci->{ssl_ok}           = $ssl_thinks;  
     $ci->{hash}             = $x509->hash;
-    $ci->{subject}          = _split_dn( $x509->subject );
+    $ci->{subject}          = { map { lc $_->type, $_->value } @{$x509->subject_name->entries} };
     $ci->{serial}           = $x509->serial;
-    $ci->{issuer}           = _split_dn( $x509->issuer );
+    $ci->{issuer}           = { map { lc $_->type, $_->value } @{$x509->issuer_name->entries} };
     $ci->{not_before}       = $x509->notBefore;
     $ci->{not_after}        = $x509->notAfter;
     $ci->{pem}              = $cert_pem_str;
@@ -176,61 +175,6 @@ sub _ssl_verify_callback {
 
 
     return 1;
-}
-
-# _split_dn addapted from Net::LDAP::Util::ldap_explode_dn
-# Copyright (c) 1997-2004 Graham Barr.
-# Redistributable and/or modifycable under the same terms as Perl itself.
-sub _split_dn {
-    my $dn = shift;
-    return undef unless defined $dn;
-    return {}  if $dn eq '';
-
-    my $pair = qr/\\(?:[\\"+,;<> #=]|[0-9A-F]{2})/i;
-
-    my (@dn, %rdn);
-    while (
-           $dn =~ /\G(?:
-                       \s*
-                       ((?i)[A-Z][-A-Z0-9]*|(?:oid\.)?\d+(?:\.\d+)*)       # attribute type
-                       \s*
-                       =
-                       [ ]*
-                       (                                                   # attribute value
-                           (?:(?:[^\x00 "\#+,;<>\\\x80-\xBF]|$pair)        # string
-                               (?:(?:[^\x00"+,;<>\\]|$pair)*
-                                   (?:[^\x00 "+,;<>\\]|$pair))?)?
-                       |
-                           \#(?:[0-9a-fA-F]{2})+                           # hex string
-                       |
-                           "(?:[^\\"]+|$pair)*"                            # "-quoted string, only for v2
-                       )
-                       [ ]*
-                       (?:([;,+])\s*(?=\S)|$)                              # separator
-                   )\s*/gcx) {
-        my($type, $val, $sep) = ($1, $2, $3);
-
-        $type =~ s/^oid\.//i;       #remove leading "oid."
-        $type = lc($type);
-
-        if ( $val =~ s/^#// ) {
-            # decode hex-encoded BER value
-            my $tmp = pack('H*', $val);
-            $val = \$tmp;
-        }
-        else {
-            # remove quotes
-            $val =~ s/^"(.*)"$/$1/;
-            # unescape characters
-            $val =~ s/\\([\\ ",=+<>#;]|[0-9a-fA-F]{2})
-                     /length($1)==1 ? $1 : chr(hex($1))
-                         /xeg;
-        }
-
-        $rdn{$type} = $val;
-    }
-
-    return \%rdn;
 }
 
 sub accept_cert {
@@ -411,7 +355,7 @@ sub _get_httpc {
             my $algo = $cert->{sig_algo};
             my $bits = $cert->{bit_length};
 
-            if ( $algo =~ /^(md2|md4||md5|sha1)/i ) {
+            if ( $algo =~ /^(md2|md4|md5|sha1)/i ) {
                 $self->_add_ssl_error($depth, 1002, 0, "Insecure hash algorithm: $1");
             }
 

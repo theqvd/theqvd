@@ -634,122 +634,123 @@ sub OnUnknownCert {
     my $cert_data;
 
     foreach my $cert (@$data) {
-        my $infoline = _cert_name($cert, $cert->{subject});
-        my $infotext = Wx::StaticText->new($info_panel, -1, $infoline);
-        my $font = $infotext->GetFont();
-        $font->SetWeight(wxFONTWEIGHT_BOLD);
-        $infotext->SetFont($font);
-        $problems_sizer->Add($infotext, 0, wxALL, 5);
+        if ( @{ $cert->{errors} } ){
+            my $infoline = _cert_name($cert, $cert->{subject});
+            my $infotext = Wx::StaticText->new($info_panel, -1, $infoline);
+            my $font = $infotext->GetFont();
+            $font->SetWeight(wxFONTWEIGHT_BOLD);
+            $infotext->SetFont($font);
+            $problems_sizer->Add($infotext, 0, wxALL, 5);
 
-        
 
-        foreach my $error (@{ $cert->{errors} }) {
-            my $e = $error->{err_no};
-
-            # Net::SSLeay doesn't seem to have error constants. Values taken from:
-            # http://www.openssl.org/docs/apps/verify.html#
-   
-            $err_desc = sprintf($self->_t("Error #%s:"), $e) . " ";
-
-            if ( $e == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT ) {
-                $err_desc .= $self->_t("Unable to find issuer's certificate.");
-                _add_advice(\@advice, $self->_t("If you are using your own CA, see the documentation on how to make the client use your certificate."));
-                $no_ok_button = 1 unless core_cfg('client.ssl.allow_untrusted');
-            } elsif ( $e == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY ) {
-                $err_desc .= $self->_t("Unable to find issuer's certificate.");
-                _add_advice(\@advice, $self->_t("If you are using your own CA, see the documentation on how to make the client use your certificate."));
-                $no_ok_button = 1 unless core_cfg('client.ssl.allow_untrusted');
-            } elsif ( $e == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE ) {
-                $err_desc .= $self->_t("Unable to verify the first certificate");
-                _add_advice(\@advice, $self->_t("If you are using your own CA, see the documentation on how to make the client use your certificate."));
-                $no_ok_button = 1 unless core_cfg('client.ssl.allow_untrusted');
-            } elsif ( $e == X509_V_ERR_CERT_UNTRUSTED ) {
-                $err_desc .= $self->_t("Root certificate not trusted.");
-                $no_ok_button = 1 unless core_cfg('client.ssl.allow_untrusted');
-            } elsif ( $e == X509_V_ERR_CERT_NOT_YET_VALID ) {
-                $err_desc .= $self->_t("The certificate is not yet valid.");
-                _add_advice(\@advice, $self->_t("Make sure your clock is set correctly."));
-                $no_ok_button = 1 unless core_cfg('client.ssl.allow_not_yet_valid');
-            } elsif ( $e == X509_V_ERR_CERT_HAS_EXPIRED ) {
-                $err_desc .= $self->_t("The certificate has expired.");
-                _add_advice(\@advice, sprintf($self->_t("Remind %s (%s) to renew the certificate", $cert->{subject}->{o}, $cert->{subject}->{email})));
-                $no_ok_button = 1 unless core_cfg('client.ssl.allow_expired');
-            } elsif ( $e == X509_V_ERR_CERT_REVOKED ) {
-                $err_desc .= $self->_t("The certificate has been revoked.");
-                $no_ok_button = 1 unless core_cfg('client.ssl.allow_revoked');
-            } elsif ( $e == 1001 ) {
-                my @hostnames = ( $cert->{subject}->{cn} );
-                my $str_hostnames = "";
-
-                # If SubjectAltName is present, the clients are supposed to ignore the Common Name.
-                #
-                # TODO: Perhaps check if SubjectAltName includes the CN, and warn if it doesn't. But
-                # this is really an improperly created certificate, so the value of telling the user
-                # that is limited.
- 
-                if ( exists $cert->{extensions}->{altnames} ) {
-                    @hostnames = ();
-
-                    foreach my $ent ( @{ $cert->{extensions}->{altnames} } ) {
-                       push @hostnames, values(%$ent);
-                    }
-                }
-
-                while(@hostnames) {
-                    if ( $str_hostnames ) {
-                        if ( scalar @hostnames > 1 ) {
-                           $str_hostnames .= ", ";
-                        } else {
-                           $str_hostnames .= " " . $self->_t("and") . " ";
+            foreach my $error (@{ $cert->{errors} }) {
+                my $e = $error->{err_no};
+    
+                # Net::SSLeay doesn't seem to have error constants. Values taken from:
+                # http://www.openssl.org/docs/apps/verify.html#
+       
+                $err_desc = sprintf($self->_t("Error #%s:"), $e) . " ";
+    
+                if ( $e == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT ) {
+                    $err_desc .= $self->_t("Unable to find issuer's certificate.");
+                    _add_advice(\@advice, $self->_t("If you are using your own CA, see the documentation on how to make the client use your certificate."));
+                    $no_ok_button = 1 unless core_cfg('client.ssl.allow_untrusted');
+                } elsif ( $e == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY ) {
+                    $err_desc .= $self->_t("Unable to find issuer's certificate.");
+                    _add_advice(\@advice, $self->_t("If you are using your own CA, see the documentation on how to make the client use your certificate."));
+                    $no_ok_button = 1 unless core_cfg('client.ssl.allow_untrusted');
+                } elsif ( $e == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE ) {
+                    $err_desc .= $self->_t("Unable to verify the first certificate");
+                    _add_advice(\@advice, $self->_t("If you are using your own CA, see the documentation on how to make the client use your certificate."));
+                    $no_ok_button = 1 unless core_cfg('client.ssl.allow_untrusted');
+                } elsif ( $e == X509_V_ERR_CERT_UNTRUSTED ) {
+                    $err_desc .= $self->_t("Root certificate not trusted.");
+                    $no_ok_button = 1 unless core_cfg('client.ssl.allow_untrusted');
+                } elsif ( $e == X509_V_ERR_CERT_NOT_YET_VALID ) {
+                    $err_desc .= $self->_t("The certificate is not yet valid.");
+                    _add_advice(\@advice, $self->_t("Make sure your clock is set correctly."));
+                    $no_ok_button = 1 unless core_cfg('client.ssl.allow_not_yet_valid');
+                } elsif ( $e == X509_V_ERR_CERT_HAS_EXPIRED ) {
+                    $err_desc .= $self->_t("The certificate has expired.");
+                    _add_advice(\@advice, sprintf($self->_t("Remind %s (%s) to renew the certificate", $cert->{subject}->{o}, $cert->{subject}->{email})));
+                    $no_ok_button = 1 unless core_cfg('client.ssl.allow_expired');
+                } elsif ( $e == X509_V_ERR_CERT_REVOKED ) {
+                    $err_desc .= $self->_t("The certificate has been revoked.");
+                    $no_ok_button = 1 unless core_cfg('client.ssl.allow_revoked');
+                } elsif ( $e == 1001 ) {
+                    my @hostnames = ( $cert->{subject}->{cn} );
+                    my $str_hostnames = "";
+    
+                    # If SubjectAltName is present, the clients are supposed to ignore the Common Name.
+                    #
+                    # TODO: Perhaps check if SubjectAltName includes the CN, and warn if it doesn't. But
+                    # this is really an improperly created certificate, so the value of telling the user
+                    # that is limited.
+     
+                    if ( exists $cert->{extensions}->{altnames} ) {
+                        @hostnames = ();
+    
+                        foreach my $ent ( @{ $cert->{extensions}->{altnames} } ) {
+                           push @hostnames, values(%$ent);
                         }
                     }
-  
-                    $str_hostnames .= shift(@hostnames);
+    
+                    while(@hostnames) {
+                        if ( $str_hostnames ) {
+                            if ( scalar @hostnames > 1 ) {
+                               $str_hostnames .= ", ";
+                            } else {
+                               $str_hostnames .= " " . $self->_t("and") . " ";
+                            }
+                        }
+      
+                        $str_hostnames .= shift(@hostnames);
+                    }
+    
+                    $err_desc .= sprintf($self->_t("Hostname verification failed.\nThe cert is only valid for %s"), $str_hostnames);
+                    _add_advice(\@advice, $self->_t("This certificate belongs to another host. ". 
+                                                    "This is a sign of either misconfiguration or an ongoing attempt to compromise security."));
+                    $no_ok_button = 1 unless core_cfg('client.ssl.allow_bad_host');
+                } elsif ( $e == 1002 ) {
+                    # sig_algo contains something like: md5WithRSAEncryption. 
+                    # Extract the hash part from it.
+                    my $hash = $cert->{sig_algo};
+                    $hash =~ m/^(\w+\d+)/;
+    
+                    $err_desc .= sprintf($self->_t("Insecure hash algorithm: %s"), $1);
+                    _add_advice(\@advice, $self->_t("This certificate uses a deprecated and insecure hash algorithm. ".
+                                                    "It should be replaced with a new one as soon as possible."));
+                    $no_ok_button = 1 unless core_cfg('client.ssl.allow_insecure_sign_algo');
+                } elsif ( $e == 1003 ) {
+                    $err_desc .= sprintf($self->_t("Weak key: %s bits"), $cert->{bit_length});
+                    _add_advice(\@advice, $self->_t("This certificate uses a weak key and can be broken by brute force. ".
+                                                    "It should be replaced with a stronger one as soon as possible."));
+                    $no_ok_button = 1 unless core_cfg('client.ssl.allow_weak_key');
+                } elsif ( $e == 2001 ) {
+                    $err_desc .= $self->_t("The certificate has been revoked");
+                    _add_advice(\@advice, $self->_t("The certificate has been revoked by its issuing authority. A new certificate is required."));
+                    $no_ok_button = 1 unless core_cfg('client.ssl.allow_revoked');
+                } else {
+                    $err_desc .= sprintf($self->_t("Unrecognized SSL error."), $e);
+                    $no_ok_button = 1 unless core_cfg('client.ssl.allow_unknown_error');
                 }
-
-                $err_desc .= sprintf($self->_t("Hostname verification failed.\nThe cert is only valid for %s"), $str_hostnames);
-                _add_advice(\@advice, $self->_t("This certificate belongs to another host. ". 
-                                                "This is a sign of either misconfiguration or an ongoing attempt to compromise security."));
-                $no_ok_button = 1 unless core_cfg('client.ssl.allow_bad_host');
-            } elsif ( $e == 1002 ) {
-                # sig_algo contains something like: md5WithRSAEncryption. 
-                # Extract the hash part from it.
-                my $hash = $cert->{sig_algo};
-                $hash =~ m/^(\w+\d+)/;
-
-                $err_desc .= sprintf($self->_t("Insecure hash algorithm: %s"), $1);
-                _add_advice(\@advice, $self->_t("This certificate uses a deprecated and insecure hash algorithm. ".
-                                                "It should be replaced with a new one as soon as possible."));
-                $no_ok_button = 1 unless core_cfg('client.ssl.allow_insecure_sign_algo');
-            } elsif ( $e == 1003 ) {
-                $err_desc .= sprintf($self->_t("Weak key: %s bits"), $cert->{bit_length});
-                _add_advice(\@advice, $self->_t("This certificate uses a weak key and can be broken by brute force. ".
-                                                "It should be replaced with a stronger one as soon as possible."));
-                $no_ok_button = 1 unless core_cfg('client.ssl.allow_weak_key');
-            } elsif ( $e == 2001 ) {
-                $err_desc .= $self->_t("The certificate has been revoked");
-                _add_advice(\@advice, $self->_t("The certificate has been revoked by its issuing authority. A new certificate is required."));
-                $no_ok_button = 1 unless core_cfg('client.ssl.allow_revoked');
-            } else {
-                $err_desc .= sprintf($self->_t("Unrecognized SSL error."), $e);
-                $no_ok_button = 1 unless core_cfg('client.ssl.allow_unknown_error');
-            }
-
-            my $hsizer = Wx::BoxSizer->new(wxHORIZONTAL);
-            my $excl = Wx::StaticText->new($info_panel, -1, "    !");
-            my $excl = Wx::StaticText->new($info_panel, -1, "    " . chr(0x26A0));
-
-            $font = $excl->GetFont();
-            $font->SetWeight(wxFONTWEIGHT_BOLD);
-            $excl->SetFont($font);
-            $excl->SetForegroundColour(wxRED);
-            $hsizer->Add($excl, 0, wxALL, 5);
-
-
- 
-            $hsizer->Add(Wx::StaticText->new($info_panel, -1, $err_desc), 0, wxALL, 5);
-            $problems_sizer->Add($hsizer, 0, wxALL, 0);
-         } 
+    
+                my $hsizer = Wx::BoxSizer->new(wxHORIZONTAL);
+                my $excl = Wx::StaticText->new($info_panel, -1, "    !");
+                my $excl = Wx::StaticText->new($info_panel, -1, "    " . chr(0x26A0));
+    
+                $font = $excl->GetFont();
+                $font->SetWeight(wxFONTWEIGHT_BOLD);
+                $excl->SetFont($font);
+                $excl->SetForegroundColour(wxRED);
+                $hsizer->Add($excl, 0, wxALL, 5);
+    
+    
+     
+                $hsizer->Add(Wx::StaticText->new($info_panel, -1, $err_desc), 0, wxALL, 5);
+                $problems_sizer->Add($hsizer, 0, wxALL, 0);
+             }
+        }
          
 
          my $info = [];
@@ -776,6 +777,9 @@ sub OnUnknownCert {
          push @$info,  { $self->_t("Valid from")  => $cert->{not_before} };
          push @$info,  { $self->_t("Valid until") => $cert->{not_after} };
 
+         if ( $cert_data ){
+             $cert_data .= "\n---\n\n";
+         }
          $cert_data .= _format_aligned($info);
 
     }
