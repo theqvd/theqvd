@@ -178,49 +178,59 @@ sub _ssl_verify_callback {
     return 1;
 }
 
+# _split_dn addapted from Net::LDAP::Util::ldap_explode_dn
+# Copyright (c) 1997-2004 Graham Barr.
+# Redistributable and/or modifycable under the same terms as Perl itself.
 sub _split_dn {
-    my ($dn) = @_;
-    my $ret = {};
-    my $buf = "";
-    my ($k,$v) = ("", "");
+    my $dn = shift;
+    return undef unless defined $dn;
+    return {}  if $dn eq '';
 
-    #print STDERR "STR: $dn\n";
+    my $pair = qr/\\(?:[\\"+,;<> #=]|[0-9A-F]{2})/i;
 
-    my $str = $dn;
-    while($str) {
-        my ($match, $rest) = ($str =~ m/^(.*?)[,=](.*)$/);
+    my (@dn, %rdn);
+    while (
+           $dn =~ /\G(?:
+                       \s*
+                       ((?i)[A-Z][-A-Z0-9]*|(?:oid\.)?\d+(?:\.\d+)*)       # attribute type
+                       \s*
+                       =
+                       [ ]*
+                       (                                                   # attribute value
+                           (?:(?:[^\x00 "\#+,;<>\\\x80-\xBF]|$pair)        # string
+                               (?:(?:[^\x00"+,;<>\\]|$pair)*
+                                   (?:[^\x00 "+,;<>\\]|$pair))?)?
+                       |
+                           \#(?:[0-9a-fA-F]{2})+                           # hex string
+                       |
+                           "(?:[^\\"]+|$pair)*"                            # "-quoted string, only for v2
+                       )
+                       [ ]*
+                       (?:([;,+])\s*(?=\S)|$)                              # separator
+                   )\s*/gcx) {
+        my($type, $val, $sep) = ($1, $2, $3);
 
-        $str = $rest;
-        $buf .= $match if (defined $match);
+        $type =~ s/^oid\.//i;       #remove leading "oid."
+        $type = lc($type);
 
-        if ( $buf =~ /\\$/ ) {
-            $buf =~ s/\\$//;
-            $buf .= $k eq "" ? "=" : ",";
-        } else {
-            if ($k eq "") {
-                $k = $buf;
-                $buf = "";
-            } else {
-                $v = $buf;
-                $buf = "";
-            } 
-
-            if ( $k ne "" && $v ne "" ) {
-                for($k, $v) {
-                    s/^\s+//;
-                    s/\s+$//;
-                }
-                $k = lc($k);
-
-                $ret->{$k} = $v;
-                $buf = "";
-                $k = "";
-                $v = "";
-            }
+        if ( $val =~ s/^#// ) {
+            # decode hex-encoded BER value
+            my $tmp = pack('H*', $val);
+            $val = \$tmp;
         }
+        else {
+            # remove quotes
+            $val =~ s/^"(.*)"$/$1/;
+            # unescape characters
+            $val =~ s/\\([\\ ",=+<>#;]|[0-9a-fA-F]{2})
+                     /length($1)==1 ? $1 : chr(hex($1))
+                         /xeg;
+        }
+
+        $rdn{$type} = $val;
     }
 
-    return $ret;
+    return \%rdn;
 }
 
 sub accept_cert {
