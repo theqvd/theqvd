@@ -235,6 +235,9 @@ Wat.I.T = {
                     },
                     inheritanceToolsTemplates: {
                         name: 'details/role-inheritance-tools-templates'
+                    },
+                    inheritanceToolsTemplatesMatrix: {
+                        name: 'details/role-inheritance-tools-templates-matrix'
                     }
                 }
                 break;

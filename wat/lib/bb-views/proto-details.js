@@ -248,7 +248,6 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     },
     
     toggleActions: function (e) {
-        
         switch ($(e.target).attr('data-options-state')) {
             case 'hidden':
                 $(e.target).attr('data-options-state', 'shown');

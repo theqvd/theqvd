@@ -69,18 +69,11 @@ Wat.B = {
             this.bindEvent('change', 'input[name="change_password"]', this.userEditorBinds.toggleNewPassword);
         
         // Roles editor
-        
             // Delete positive ACL
-            this.bindEvent('click', '.js-delete-positive-acl-button', this.roleEditorBinds.deleteAcl, 'positive');
-
-            // Add positive ACL
-            this.bindEvent('click', '.js-add-positive-acl-button', this.roleEditorBinds.addAcl, 'positive'); 
+            this.bindEvent('click', '.js-templates-matrix-mode-btn', this.roleEditorBinds.openMatrixMode);
         
-            // Delete negative ACL
-            this.bindEvent('click', '.js-delete-negative-acl-button', this.roleEditorBinds.deleteAcl, 'negative');
-
-            // Add negative ACL
-            this.bindEvent('click', '.js-add-negative-acl-button', this.roleEditorBinds.addAcl, 'negative');
+            // Change ACL check from matrix view
+            this.bindEvent('change', '.js-add-template-button', this.roleEditorBinds.changeMatrixACL);
 
             // Add/Delete inherited Role
             this.bindEvent('click', '.js-assign-role-button', this.roleEditorBinds.addRole);
@@ -788,66 +781,42 @@ Wat.B = {
     },
     
     roleEditorBinds: {
-        deleteAcl: function (e) {
-            // Disabled buttons have no effect
-            if ($(this).hasClass('disabled')) {
-                return;
-            }
-            
-            // type can be 'positive' or 'negative'
-            var type = e.data;
-            
-            var acls = $('select[name="acl_' + type + '_on_role"]').val();
-            
-            if (!acls) {
-                Wat.I.M.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
-                return;
-            }
-            
-            var filters = {
-                id: Wat.CurrentView.id
-            };
-            
-            var changes = {};
-            changes["unassign_acls"] = acls;
-            
-            var arguments = {
-                "__acls_changes__": changes
-            };
-            
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.afterUpdateAcls();
-            });
-        },
-        addAcl: function (e) {
-            // type can be 'positive' or 'negative'
-            var type = e.data;
-            
-            var acls = $('select[name="acl_available"]').val();
-            
-            if (!acls) {
-                Wat.I.M.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
-                return;
-            }
-            
-            var filters = {
-                id: Wat.CurrentView.id
-            };
-            
-            var changes = {};
-            changes["assign_acls"] = acls;
-            
-            var arguments = {
-                "__acls_changes__": changes
-            };
-            
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.model.fetch({      
-                    complete: function () {
-                        Wat.CurrentView.afterUpdateAcls();
+        openMatrixMode: function (e) {            
+            var dialogConf = {
+                title: $.i18n.t('Matrix mode'),
+                buttons : {
+                    "Close": function () {                    
+                        Wat.I.closeDialog($(this));
                     }
-                });
-            });
+                },
+                buttonClasses: ['fa fa-ban'],
+
+                fillCallback: function (target) {
+                    // Add common parts of editor to dialog
+                    var template = _.template(
+                        Wat.TPL.inheritanceToolsTemplatesMatrix, {
+                            templates: Wat.CurrentView.editorTemplates
+                        }
+                    );
+
+                    target.html(template);
+                }
+            }
+
+            Wat.CurrentView.matrixDialog = Wat.I.dialog(dialogConf);
+        },
+        
+        changeMatrixACL: function (e) {
+            var templateId = $(e.target).attr('data-role-template-id');
+            var checked = $(e.target).is(':checked');
+            
+            if (checked) {
+                $('select[name="template_to_be_assigned"]').val(templateId);
+                $('.js-assign-template-button').trigger('click');
+            }
+            else {
+                $('.js-delete-template-button[data-id="' + templateId + '"]').trigger('click');
+            }
         },
         
         addRole: function (e) {

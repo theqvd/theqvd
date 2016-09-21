@@ -146,7 +146,7 @@ Wat.Common.BySection.role = {
     },
     
 
-    renderTemplates: function () {         
+    renderTemplates: function () {    
         var template = _.template(
             Wat.TPL.inheritanceToolsTemplates, {
                 templates: this.editorTemplates

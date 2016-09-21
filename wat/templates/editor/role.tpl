@@ -21,7 +21,12 @@
             </td>
         </tr>
         <tr>
-            <td data-i18n="Inherit templates"></td>
+            <td>
+                <span data-i18n="Inherited templates"></span>
+                <div>
+                    <a class="button2 fa fa-th js-templates-matrix-mode-btn" data-i18n="Matrix mode"></a>
+                </div>
+            </td>
             <td>
                 <div class="bb-assign-templates assign-templates"></div>
             </td>

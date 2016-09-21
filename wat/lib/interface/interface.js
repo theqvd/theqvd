@@ -562,11 +562,11 @@ Wat.I = {
                     $('.message-close').trigger('click');
 
                 // Set title content manually to support HTML
-                    $('.ui-dialog-titlebar').html(dialogConf.title);
+                    $(e.target).prev().html(dialogConf.title);
                 
                 // Buttons style
                     var buttons = $(e.target).next().find('button');
-                    var buttonsText = $(".ui-dialog-buttonset .ui-button .ui-button-text");
+                    var buttonsText = $(e.target).next().find(".ui-dialog-buttonset .ui-button .ui-button-text");
 
                     // Delete jQuery UI default classes
                     buttons.attr('class', '');
