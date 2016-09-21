@@ -22,7 +22,7 @@
         </tr>
         <tr>
             <td>
-                <span data-i18n="Inherited templates"></span>
+                <span data-i18n="Inherit templates"></span>
                 <div>
                     <a class="button2 fa fa-th js-templates-matrix-mode-btn" data-i18n="Matrix mode"></a>
                 </div>
