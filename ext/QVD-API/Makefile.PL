@@ -34,6 +34,7 @@ WriteMakefile(
         'QVD::Config' => 0,
         'QVD::Config::Core' => 0,
         'QVD::Config::Network' => 0,
+        'QVD::DB::AclsOverwriteList' => 0,
         'QVD::DB::Simple' => 0,
         'QVD::L7R::LoadBalancer' => 0,
         'QVD::VMProxy' => 0,

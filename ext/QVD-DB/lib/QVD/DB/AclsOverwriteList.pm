@@ -1,4 +1,4 @@
-package QVD::API::AclsOverwriteList;
+package QVD::DB::AclsOverwriteList;
 use Moo;
 use  5.010;
 use strict;

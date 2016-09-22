@@ -16,6 +16,7 @@ WriteMakefile(
     ABSTRACT      => 'lib/QVD/DB.pm',
     EXE_FILES     => [
         'bin/qvd-deploy-db.pl',
+        'bin/qvd-init-data.dat',
         'bin/qvd-upgrade-db'
     ],
     PL_FILES      => {},
@@ -28,9 +29,7 @@ WriteMakefile(
         'DBIx::Class::Schema'         => 0,
         'DBIx::Error'                 => 0,
         'Mojo::JSON'                  => 0,
-        'QVD::API::Exception'         => 0,
-        'QVD::API::VMExpiration'      => 0,
-        'QVD::API::AclsOverwriteList' => 0,
+        'Moo'                         => 0,
         'QVD::Config'                 => 0,
         'QVD::Config::Core'           => 0,
         'QVD::Log'                    => 0,
