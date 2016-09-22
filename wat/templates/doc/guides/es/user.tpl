@@ -1240,7 +1240,7 @@ Crear un administrador que hayamos podido eliminar
 <div class="paragraph"><p>QVD cuenta por defecto con algunos <strong>roles predefinidos</strong> que nos pueden ser útiles si no necesitamos permisos muy específicos.</p></div>
 <div class="sect2">
 <h3 id="_gestión_de_administradores">6.1. Gestión de administradores</h3>
-<div class="paragraph"><p>La acción de crear un administrador solamente nos permitirá asignarle un nombre de usuario y una contraseña. Para que pueda acceder al WAT será necesario asignarle al menos un rol.</p></div>
+<div class="paragraph"><p>La acción de crear un administrador nos permitirá asignarle un nombre de usuario, una contraseña, una descripción, el idioma en el que visualizará el WAT y los roles con los que obtendrá permiso para ver y hacer diferentes cosas. Para que pueda acceder al WAT será necesario asignarle al menos un rol.</p></div>
 <div class="paragraph"><p>El proceso será:</p></div>
 <div class="ulist"><ul>
 <li>
@@ -1250,21 +1250,16 @@ Crear un administrador que hayamos podido eliminar
 </li>
 <li>
 <p>
-<strong>Tras la creación</strong>, el administrador aparecerá en la lista. En la columna de información del administrador recién creado aparecerá un icono de advertencia al no tener ningún rol asociado. <strong>Haremos click en el nombre</strong> para acceder a la vista detalle.
+<strong>Tras la creación</strong>, el administrador aparecerá en la lista. En la columna de información del administrador recién creado aparecerá un icono que nos indicará qué roles tiene asignados o un icono de advertencia si no tenemos ningún rol asociado. <strong>Haremos click en el nombre</strong> para acceder a la vista detalle para una configuración más profunda.
 </p>
 </li>
 <li>
 <p>
-En la vista detalle encontraremos un bloque con los roles asignados. Aparecerá vacío.
+En la vista detalle encontraremos una lista con los roles asignados. Tendremos como apoyo un árbol de ACLs que tiene asignados el administrador en cada momento. Éste árbol tiene dos modalidades que analizaremos en la gestión de roles.
 </p>
-<div class="openblock">
-<div class="content">
-<div class="paragraph"><p><strong>Asignaremos los roles que consideremos necesarios</strong>. Veremos como aparecen en la lista de roles asignados.</p></div>
-<div class="paragraph"><p>Además, tendremos como apoyo un árbol de ACLs que tiene asignados el administrador en cada momento. Éste árbol tiene dos modalidades que analizaremos en la gestión de roles.</p></div>
-<div class="paragraph"><p>Observando como aparecen/desaparecen ACLs en el árbol al asignar/desasignar roles, veremos exactamente qué permisos estamos dándole al administrador.</p></div>
-</div></div>
 </li>
 </ul></div>
+<div class="paragraph"><p>Observando como aparecen/desaparecen ACLs en el árbol al asignar/desasignar roles, veremos exactamente qué permisos estamos dándole al administrador.</p></div>
 <div class="paragraph"><p>Para nuestros primeros administradores podemos utilizar los roles disponibles por defecto en el sistema.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
@@ -1309,7 +1304,7 @@ Operator L3
 <div class="sect2">
 <h3 id="_gestión_de_roles">6.2. Gestión de roles</h3>
 <div class="paragraph"><p>En la búsqueda de administradores con permisos personalizados, crearemos aquellos roles que necesitemos. Para facilitar nuestra labor, una buena estrategia será crear roles reutilizables, buscando que tengan los ACLs comunes que queremos para un conjunto de administradores.</p></div>
-<div class="paragraph"><p>Al igual que con los administradores, al crear un rol, se creará vacío y tendremos que editarlo para asignarle ACLs.</p></div>
+<div class="paragraph"><p>Al igual que con los administradores, al crear un rol, podremos asignarle ACLs al crearlo o crearlo vacío, en cuyo caso tendremos que editarlo para asignarle ACLs.</p></div>
 <div class="paragraph"><p>El proceso será:</p></div>
 <div class="ulist"><ul>
 <li>
@@ -1320,7 +1315,7 @@ Operator L3
 <div class="content">
 <div class="literalblock">
 <div class="content">
-<pre><code>Por ejemplo: Provisionador de usuarios</code></pre>
+<pre><code>Por ejemplo: Provisionador de usuarios base</code></pre>
 </div></div>
 </div></div>
 </li>
@@ -4727,7 +4722,7 @@ En el lado izquierdo hay una pestaña de <em>Ajustes</em> que despliega un menú
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-08-29 15:50:24 CEST
+Last updated 2016-09-22 09:59:56 CEST
 </div>
 </div>
 </body>

@@ -1883,6 +1883,7 @@ Creación
 <img src="images/doc_images/screenshot_admin_create.png" alt="screenshot_admin_create.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>Al crear un administrador estableceremos su nombre, password y su idioma. Si dejamos el idioma por defecto, el administrador tendrá el idioma general del sistema aunque podrá cambiarlo.</p></div>
+<div class="paragraph"><p>Además, podemos asignar roles de privilegios, dependiendo de qué permisos queremos que tenga el administrador. Si asignamos más de un rol, el administrador tendrá la suma de los privilegios de cada rol. Si no le asignamos ningún rol, el administrador no podrá ni entrar en el Panel de administración.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1946,7 +1947,8 @@ Edición
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_admin_edit.png" alt="screenshot_admin_edit.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Al editar un administrador podremos escoger si cambiarle la <strong>contraseña</strong> (si no marchamos la casilla de verificación,  permanecerá inalterada) y el <strong>idioma</strong>, recordando que son valores que él mismo puede cambiar.</p></div>
+<div class="paragraph"><p>Al editar un administrador podremos escoger si cambiarle la <strong>contraseña</strong> (si no marchamos la casilla de verificación, permanecerá inalterada) y el <strong>idioma</strong>, recordando que son valores que él mismo puede cambiar.</p></div>
+<div class="paragraph"><p>Además, podemos asignar/desasignar roles de privilegios.</p></div>
 </div></div>
 </dd>
 </dl></div>
@@ -1988,6 +1990,11 @@ Acciones masivas
 <div class="ulist"><ul>
 <li>
 <p>
+Editar roles
+</p>
+</li>
+<li>
+<p>
 Eliminar roles
 </p>
 </li>
@@ -2003,7 +2010,37 @@ Creación
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_role_create.png" alt="screenshot_role_create.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Al crear un rol estableceremos solamente su nombre. Lo importante será asociarle permisos, cosa que haremos desde la vista detalle.</p></div>
+<div class="paragraph"><p>Al crear un rol estableceremos su nombre, descripción y le asignaremos permisos heredando ACLs.</p></div>
+<div class="paragraph"><p>La herencia de ACLs tiene dos modos:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Heredar ACLs de otros roles</strong>: En este modo se escoge qué rol se desea heredar con un selector de roles. Una vez heredado un rol, desaparecerá de este selector. Igualmente si se elimina de la lista de roles heredados, volverá a aparecer entre los roles heredados disponibles.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_role_inherit_roles.png" alt="screenshot_role_inherit_roles.png" width="600px" />
+</span></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Heredar ACLs de plantillas</strong>: En este modo se escogen las plantillas de las que se deseen heredar los ACLs. Se pueden escoger de un selector como el de los roles o bien usando una matriz de botones donde se distribuyen las diferentes plantillas según los objetos o nivel de privilegios de cada una. Por ejemplo, la plantilla con los ACLs de actualización de un Nodo estará en la intersección de la fila de Nodos y la columna de Actualizado.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_role_inherit_templates.png" alt="screenshot_role_inherit_templates.png" width="600px" />
+</span></p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/tip.png" alt="Tip" />
+</td>
+<td class="content">Si se hereda de uno o más roles/plantillas, se heredará la suma de sus ACLs sin importar los ACLs comunes. Tras esta herencia, se pueden quitar o agregar ACLs sueltos manualmente desde el Árbol de ACLs para personalizar las credenciales obtenidas por ellos según las necesidades del administrador. De este modo, si nos interesan todos los ACLs de un rol o plantilla excepto uno, será tan fácil como heredar el rol/plantilla y quitar a mano el ACL sobrante.</td>
+</tr></table>
+</div>
+<div class="paragraph"><p>Para una personalización más específica podremos añadir o quitar ACLs desde la vista detalle.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -2016,12 +2053,11 @@ Vista detalle
 <img src="images/doc_images/screenshot_role_details.png" alt="screenshot_role_details.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>En esta vista muy similar a la de administradores, observamos una pequeña <strong>cabecera</strong> donde junto al <strong>nombre del rol</strong> está el <strong>botón para eliminarlo, y el botón de edición</strong>.</p></div>
-<div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos del rol</strong>. Entre los atributos se encuentra la lista de <strong>roles heredados</strong> con un enlace para eliminarlos.</p></div>
-<div class="paragraph"><p>En el listado de roles heredados pueden aparecer <strong>dos tipos de elementos</strong>:</p></div>
+<div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos del rol</strong>. Entre los atributos se encuentra la lista de <strong>roles y plantillas heredados</strong>.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>Rol</strong>: Se trata de un rol de los definidos en el sistema. El nombre de este rol, será un enlace a su vista detalle.
+<strong>Rol</strong>: Se trata de un rol de los definidos en el sistema. El nombre de este rol será un enlace a su vista detalle.
 </p>
 </li>
 <li>
@@ -2089,35 +2125,6 @@ Total Master: Esta plantilla engloba la plantilla Master, Gestión de Tenants y 
 </div></div>
 </li>
 </ul></div>
-<div class="paragraph"><p>Debajo se encuentra un cuadro de controles de herencia de ACLs. La herencia de ACLs tiene dos modos:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<strong>Heredar ACLs de otros roles</strong>: En este modo se escoge qué rol se desea heredar con un selector de roles. Una vez heredado un rol, desaparecerá de este selector. Igualmente si se elimina de la lista de roles heredados, volverá a aparecer entre los roles heredados disponibles.
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_inherit_roles.png" alt="screenshot_role_inherit_roles.png" width="600px" />
-</span></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<strong>Heredar ACLs de plantillas</strong>: En este modo se escogen las plantillas de las que se deseen heredar los ACLs de una matriz de botones donde se distribuyen las diferentes plantillas según los objetos o nivel de privilegios de cada una. Por ejemplo, la plantilla con los ACLs de actualización de un Nodo estará en la intersección de la fila de Nodos y la columna de Actualizado.
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_inherit_templates.png" alt="screenshot_role_inherit_templates.png" width="600px" />
-</span></p></div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
-</td>
-<td class="content">Si se hereda de uno o más roles/plantillas, se heredará la suma de sus ACLs sin importar los ACLs comunes. Tras esta herencia, se pueden quitar o agregar ACLs sueltos manualmente desde el Árbol de ACLs para personalizar las credenciales obtenidas por ellos según las necesidades del administrador. De este modo, si nos interesan todos los ACLs de un rol o plantilla excepto uno, será tan fácil como heredar el rol/plantilla y quitar a mano el ACL sobrante.</td>
-</tr></table>
-</div>
 <div class="paragraph"><p>En la parte derecha encontramos:</p></div>
 <div class="ulist"><ul>
 <li>
@@ -2156,7 +2163,7 @@ Por tipo de <strong>acciones</strong>:
 </div></div>
 </li>
 </ul></div>
-<div class="paragraph"><p>Cada rama tiene una casilla de verificación. Si está activada, significa que todos los ACLs de la rama están asignados, bien directamente o por herencia de uno o varios roles.</p></div>
+<div class="paragraph"><p>Cada rama tiene una casilla de verificación. Si está activada, significa que todos los ACLs de la rama están asignados, bien directamente o por herencia de uno o varios roles o templates.</p></div>
 <div class="paragraph"><p><strong>Si activamos la casilla de una rama</strong>, incluiremos en el rol todos los ACLs de esa rama. Del mismo modo, <strong>si desactivamos la casilla de una rama</strong>, estaremos quitando sus ACLs.</p></div>
 <div class="paragraph"><p>Las ramas, también tienen adosada, entre paréntesis, información de los ACLs incluídos en el rol frente a los ACLs totales en la rama.</p></div>
 <div class="paragraph"><p>Al abrir una rama, vemos que <strong>cada ACL tiene una casilla de verificación</strong> con la que asociarlo o desasociarlo del rol.</p></div>
@@ -2173,7 +2180,8 @@ Edición
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_role_edit.png" alt="screenshot_role_edit.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Al editar un rol podremos cambiarle solamente el nombre.</p></div>
+<div class="paragraph"><p>Al editar un rol podremos cambiarle el nombre y la descripción, además de configurar la herencia de roles y plantillas de ACLs.</p></div>
+<div class="paragraph"><p>Ver sección de Creación de roles para más detalles acerca de la configuración de roles y plantillas.</p></div>
 </div></div>
 </dd>
 </dl></div>
@@ -2355,7 +2363,7 @@ Ambos parámetros se pueden definir como <em>por defecto</em> adoptando así la 
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-09-12 16:03:42 CEST
+Last updated 2016-09-21 15:44:26 CEST
 </div>
 </div>
 </body>

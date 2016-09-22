@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
@@ -1199,7 +1199,7 @@ Create an administrator we might have deleted
 <div class="paragraph"><p>QVD has by default some <strong>predetermined roles</strong> that can be useful if we do not need very specific permissions.</p></div>
 <div class="sect2">
 <h3 id="_administrators_management">6.1. Administrators management</h3>
-<div class="paragraph"><p>The action of creating an administrator will only allow us to assign it a user name and a password. To give it access to the WAT it will be necessary to assign at least one role.</p></div>
+<div class="paragraph"><p>The action of creating an administrator will allow us to assign it a user name, a password, a description, the language in which the WAT will be shown to him and the roles which give to him permission to view and do different things. To give it access to the WAT it will be necessary to assign at least one role.</p></div>
 <div class="paragraph"><p>The process will be:</p></div>
 <div class="ulist"><ul>
 <li>
@@ -1209,21 +1209,17 @@ Create an administrator we might have deleted
 </li>
 <li>
 <p>
-<strong>After creation</strong>, the administrator will appear on the list. On the information column of the just created administrator will appear a warning icon because it has no assigned role.
-<strong>Click on the name</strong> to access the detail view.
+<strong>After creation</strong>, the administrator will appear on the list. On the information column of the just created administrator will appear an icon that will indicate us the assigned roles or a warning icon if it has no assigned role.
+<strong>Click on the name</strong> to access the detail view for a deeper configuration.
 </p>
 </li>
 <li>
 <p>
-In the detail view we find a block with the assigned roles. It will appear empty.
+In the detail view we find a list with the assigned roles. We will have as support an ACLs tree that has assigned the administrator at any moment. This tree has two modes that we will analyse in the roles management.
 </p>
-<div class="openblock">
-<div class="content">
-<div class="paragraph"><p><strong>Assign the roles we consider necessary</strong>. We will see how they appear on the assigned roles list.</p></div>
-<div class="paragraph"><p>Furthermore, we will have as support an ACLs tree that has assigned the administrator at any moment. This tree has two modes that we will analyse in the roles management.</p></div>
-</div></div>
 </li>
 </ul></div>
+<div class="paragraph"><p>Watching how appear/dissapear ACLs on the tree when we assign/unassign roles, we will see exactly what licenses we are giving to the administrator.</p></div>
 <div class="paragraph"><p>For our first administrators we can use the available default roles in the system.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
@@ -1268,7 +1264,7 @@ Operator L3
 <div class="sect2">
 <h3 id="_roles_management">6.2. Roles management</h3>
 <div class="paragraph"><p>In the search for administrators with customised permissions, we will create the roles we need. To make our work easier, a good strategy will be creating reusable roles, seeking they have the common ACLs we want for an administration group.</p></div>
-<div class="paragraph"><p>As with the administrators, when creating a role, it will be created empty and we will have to edit it to assign it ACLs.</p></div>
+<div class="paragraph"><p>As with the administrators, when creating a role, we can assign it ACLs in the creation process or create it empty, in which case we will have to edit it to assign it ACLs.</p></div>
 <div class="paragraph"><p>The process will be:</p></div>
 <div class="ulist"><ul>
 <li>
@@ -1279,7 +1275,7 @@ Operator L3
 <div class="content">
 <div class="literalblock">
 <div class="content">
-<pre><code>For example: Users provider</code></pre>
+<pre><code>For example: Basic users provider</code></pre>
 </div></div>
 </div></div>
 </li>
@@ -4629,7 +4625,8 @@ Login Box text colour
 <td class="icon">
 <img src="images/doc_images/icons/warning.png" alt="Warning" />
 </td>
-<td class="content">Qindel Group is not responsible for aesthetic disasters caused by daltonic administrators using this tool or by administrators suffering of any other visual dysfunction.</td>
+<td class="content">Qindel Group is not responsible for aesthetic disasters caused by daltonic administrators using this tool or by administrators suffering of any other visual dysfunction.
+   </td>
 </tr></table>
 </div>
 </div>
@@ -4639,7 +4636,7 @@ Login Box text colour
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-09-12 13:42:58 CEST
+Last updated 2016-09-22 10:00:30 CEST
 </div>
 </div>
 </body>

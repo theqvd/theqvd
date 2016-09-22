@@ -1812,6 +1812,7 @@ Creation
 <img src="images/doc_images/screenshot_admin_create.png" alt="screenshot_admin_create.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>When creating an administrator we will stablish its name, password and its language. If we leave the default language, the administrator will have the general language of the system although it can be changed.</p></div>
+<div class="paragraph"><p>Además, podemos asignar roles de privilegios, dependiendo de qué permisos queremos que tenga el administrador. Si asignamos más de un rol, el administrador tendrá la suma de los privilegios de cada rol. Si no le asignamos ningún rol, el administrador no podrá ni entrar en el Panel de administración.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1876,6 +1877,7 @@ Edition
 <img src="images/doc_images/screenshot_admin_edit.png" alt="screenshot_admin_edit.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>When editing an administrator, we can choose if changing the <strong>password</strong> (if we do not click on the check-box, it will remain the same) and the <strong>language</strong>, remembering that they are values that the administrator itself can change.</p></div>
+<div class="paragraph"><p>In addition, we can assign/unasign roles of privileges.</p></div>
 </div></div>
 </dd>
 </dl></div>
@@ -1917,6 +1919,11 @@ Massive actions
 <div class="ulist"><ul>
 <li>
 <p>
+Edit roles
+</p>
+</li>
+<li>
+<p>
 Remove roles
 </p>
 </li>
@@ -1932,7 +1939,37 @@ Creation
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_role_create.png" alt="screenshot_role_create.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>When creating a role we will only set its name. The important thing will be to associate licenses to it, which will be done from the detail view.</p></div>
+<div class="paragraph"><p>When creating a role we will set its name, description and will assign licenses inheriting ACLs.</p></div>
+<div class="paragraph"><p>The inheritance of ACLs has got two modes:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Inherit ACLs from other roles</strong>: In this mode, it is chosen the role which you want to inherit with a roles selector. Once the role is inherited, it will disappear from this selector. Likewise if it is removed from the list of inherited roles, it will appear among the available inherited roles.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_role_inherit_roles.png" alt="screenshot_role_inherit_roles.png" width="600px" />
+</span></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Inherit ACLs from the templates</strong>: In this mode the templates are chosen from which you want to inherit the ACLs. Is possible select the templates from a selector like roles or use a matrix of buttons where the different templates are distributed according to the objects or level of privileges of each one. For example, the template with the update ACLs of a Node will be in the intersection of Nodes rows and the Up-to-date column.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_role_inherit_templates.png" alt="screenshot_role_inherit_templates.png" width="600px" />
+</span></p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/tip.png" alt="Tip" />
+</td>
+<td class="content">If it is inherited from one or more roles/templates, it will be inherited the sum of its ACLs regardless the common ACLs.  After this inheritance, you can remove or add single ACLs manually from the Tree of ACLs to customize the references obtained by them according to the needs of the administrator. In this way, if we are interested in all the ACLs of a role or template except one, it will be as easy as inheriting the role/template and remove manually the remaining ACL.</td>
+</tr></table>
+</div>
+<div class="paragraph"><p>For a more specific customization we will can add or remove ACLs from details view.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1945,8 +1982,7 @@ Detail view
 <img src="images/doc_images/screenshot_role_details.png" alt="screenshot_role_details.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>In this view which is very similar to that of administrators, we can see a small <strong>header</strong> where next to the <strong>role name</strong> is <strong>button to delete it, and the button of edition</strong>.</p></div>
-<div class="paragraph"><p>Under this header there is a <strong>table with role attributes</strong>. Among the attributes we can find the list of <strong>inheritance roles</strong> with a link to delete them.</p></div>
-<div class="paragraph"><p>In this inheritance roles list we can find <strong>two types of elements</strong>:</p></div>
+<div class="paragraph"><p>Under this header there is a <strong>table with role attributes</strong>. Among the attributes we can find the list of <strong>inheritance roles and templates</strong>.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -2018,35 +2054,6 @@ Total Master: This template covers the Master template, Management of Tenants an
 </div></div>
 </li>
 </ul></div>
-<div class="paragraph"><p>Below there is a control box of ACLs inheritance. The inheritance of ACLs has got two modes:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<strong>Inherit ACLs from other roles</strong>: In this mode, it is chosen the role which you want to inherit with a roles selector. Once the role is inherited, it will disappear from this selector. Likewise if it is removed from the list of inherited roles, it will appear among the available inherited roles.
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_inherit_roles.png" alt="screenshot_role_inherit_roles.png" width="600px" />
-</span></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<strong>Inherit ACLs from the templates</strong>: In this mode the templates are chosen from which you want to inherit the ACLs of a matrix of buttons where the different templates are distributed according to the objects or level of privileges of each one. For example, the template with the update ACLs of a Node will be in the intersection of Nodes rows and the Up-to-date column.
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_inherit_templates.png" alt="screenshot_role_inherit_templates.png" width="600px" />
-</span></p></div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
-</td>
-<td class="content">If it is inherited from one or more roles/templates, it will be inherited the sum of its ACLs regardless the common ACLs.  After this inheritance, you can remove or add single ACLs manually from the Tree of ACLs to customize the references obtained by them according to the needs of the administrator. In this way, if we are interested in all the ACLs of a role or template except one, it will be as easy as inheriting the role/template and remove manually the remaining ACL.</td>
-</tr></table>
-</div>
 <div class="paragraph"><p>On the right side we find:</p></div>
 <div class="ulist"><ul>
 <li>
@@ -2085,7 +2092,7 @@ By types of <strong>actions</strong>:
 </div></div>
 </li>
 </ul></div>
-<div class="paragraph"><p>Each branch has a checkbox. If it is activated, it means that all the ACLs of the branch are assigned, either directly or by inheritance of one o more roles.</p></div>
+<div class="paragraph"><p>Each branch has a checkbox. If it is activated, it means that all the ACLs of the branch are assigned, either directly or by inheritance of one o more roles or templates.</p></div>
 <div class="paragraph"><p>*If we activate the box of a branch *, we will include in the role all the ACLs of this branch. In the same way, *if we deactivate the box of a branch *, we will be removing its ACLs.</p></div>
 <div class="paragraph"><p>The branches, have also attached, between brackets, information of the ACLs included in the role as opposed to the total ACLs in the branch.</p></div>
 <div class="paragraph"><p>When opening a branch, we can see that <strong>each ACL has a checkbox</strong> with which it can be associated or disassociated from the role.</p></div>
@@ -2102,7 +2109,8 @@ Edition
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_role_edit.png" alt="screenshot_role_edit.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>When editing a role we will be able to change only the name.</p></div>
+<div class="paragraph"><p>When editing a role we will be able to change name and description, in addition to configure the roles and ACL templates inheritance.</p></div>
+<div class="paragraph"><p>See Roles creation section for more details about roles and templates configuration.</p></div>
 </div></div>
 </dd>
 </dl></div>
@@ -2322,7 +2330,7 @@ Both parameters can be defined as <em>by default</em> thus adopting the WAT gene
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-09-12 16:03:29 CEST
+Last updated 2016-09-21 15:44:26 CEST
 </div>
 </div>
 </body>
