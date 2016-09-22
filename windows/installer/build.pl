@@ -380,7 +380,7 @@ sub set_git_info {
 	msg("\n");
 
 	if ( $GIT_TAG !~ /undefined/ ) {
-		if ( $GIT_TAG =~ /^QVD-(\d+)\.(\d+)\.(\d+)$/ ) {
+		if ( $GIT_TAG =~ /^QVD-(\d+)\.(\d+)\.(\d+)(\^.*)?$/ ) {
 			($VER_MAJOR, $VER_MINOR, $VER_REVISION) = ($1, $2, $3);
 			$no_build = 1; 
 			msg("\tWe're currently on a tag\n");
