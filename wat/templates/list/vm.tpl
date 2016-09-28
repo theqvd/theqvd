@@ -20,63 +20,63 @@
                         case 'checks':
                             var checkedAttr = selectedAll ? 'checked' : '';
             %>
-                            <th class="<%= sortAttr %> max-1-icons cell-check">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> max-1-icons cell-check">
                                 <input type="checkbox" class="check_all" <%= checkedAttr %>>
                             </th>
             <%
                             break;
                         case 'info':
             %>
-                            <th class="<%= sortAttr %>">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %>">
                                 <i class="fa fa-info-circle normal" data-i18n="[title]Info" title="<%= i18n.t('Info') %>"></i>
                             </th>
             <%
                             break;
                         case 'id':
             %>
-                            <th class="<%= sortAttr %> desktop" data-sortby="id">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop" data-sortby="id">
                                 <span data-i18n="<%= col.text %>"><%= col.text %></span>
                             </th>
             <%
                             break;
                         case 'name':
             %>
-                            <th class="<%= sortAttr %> col-width-100" data-sortby="name">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> col-width-100" data-sortby="name">
                                 <span data-i18n="<%= col.text %>"><%= col.text %></span>
                             </th>
             <%
                             break;
                         case 'host':
             %>
-                            <th class="<%= sortAttr %> desktop" data-sortby="host_id">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop" data-sortby="host_id">
                                 <span data-i18n="<%= col.text %>"><%= col.text %></span>
                             </th>
             <%
                             break;
                         case 'user':
             %>
-                            <th class="<%= sortAttr %> desktop" data-sortby="user_name">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop" data-sortby="user_name">
                                 <span data-i18n="<%= col.text %>"><%= col.text %></span>
                             </th>
             <%
                             break;
                         case 'osf/tag':
             %>
-                            <th class="<%= sortAttr %> desktop" data-sortby="osf_name">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop" data-sortby="osf_name">
                                 <span data-i18n="<%= col.text %>"><%= col.text %></span>
                             </th>
             <%
                             break;
                         case 'tag':
             %>
-                            <th class="<%= sortAttr %> desktop col-width-20" data-sortby="di_tag">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop col-width-20" data-sortby="di_tag">
                                 <span data-i18n="<%= col.text %>"><%= col.text %></span>
                             </th>
             <%
                             break;
                         case 'tenant':
             %>
-                            <th class="<%= sortAttr %> desktop" data-sortby="tenant_name">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop" data-sortby="tenant_name">
                                 <span data-i18n="<%= col.text %>"><%= col.text %></span>
                             </th>
             <%
@@ -91,7 +91,7 @@
                             }
                     
             %>
-                            <th class="<%= sortAttr %> desktop" data-sortby="<%= name %>">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop" data-sortby="<%= name %>">
                                 <span <%= translationAttr %>><%= colText %></span>
                             </th>
             <%
@@ -116,7 +116,7 @@
         <%
         }
         _.each(models, function(model) { %>
-            <tr class="row-<%= model.get('id') %>">
+            <tr class="row-<%= model.get('id') %>" data-id="<%= model.get('id') %>" data-name="<%= model.get('name') %>">
                 <% 
                     $.each(columns, function(name, col) {
                         if (col.display == false) {

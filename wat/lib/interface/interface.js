@@ -291,6 +291,7 @@ Wat.I = {
         $('.footer').css('visibility','visible').hide().show();
         $('.loading').hide();
         $('.related-doc').css('visibility','visible').hide().show();
+        $('.js-shown-elements').hide().show();
         
         this.adaptSideSize();
     },

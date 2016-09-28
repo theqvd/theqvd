@@ -19,42 +19,42 @@
                         case 'checks':
                             var checkedAttr = selectedAll ? 'checked' : '';
             %>
-                            <th class="<%= sortAttr %> max-1-icons cell-check">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> max-1-icons cell-check">
                                 <input type="checkbox" class="check_all" <%= checkedAttr %>>
                             </th>
             <%
                             break;
                         case 'info':
             %>
-                            <th class="<%= sortAttr %> desktop max-1-icons ">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop max-1-icons ">
                                 <i class="fa fa-info-circle normal" data-i18n="[title]Info" title="<%= i18n.t('Info') %>"></i>
                             </th>
             <%
                             break;
                         case 'id':
             %>
-                            <th class="<%= sortAttr %> desktop" data-sortby="id">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop" data-sortby="id">
                                 <span data-i18n="Id"><%= i18n.t('Id') %></span>
                             </th>
             <%
                             break;
                         case 'name':
             %>
-                            <th class="<%= sortAttr %> col-width-100" data-sortby="name">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> col-width-100" data-sortby="name">
                                 <span data-i18n="Name"><%= i18n.t('Name') %></span>
                             </th>
             <%
                             break;
                         case 'connected_vms':
             %>
-                            <th class="<%= sortAttr %> desktop">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop">
                                 <span data-i18n="Connected VMs"><%= i18n.t('Connected VMs') %></span>
                             </th>
             <%
                             break;
                         case 'tenant':
             %>
-                            <th class="<%= sortAttr %> desktop" data-sortby="tenant_name">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop" data-sortby="tenant_name">
                                 <span data-i18n="Tenant"><%= i18n.t('Tenant') %></span>
                             </th>
             <%
@@ -69,7 +69,7 @@
                             }
                     
             %>
-                            <th class="<%= sortAttr %> desktop" data-sortby="<%= name %>">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop" data-sortby="<%= name %>">
                                 <span <%= translationAttr %>><%= colText %></span>
                             </th>
             <%
@@ -79,7 +79,7 @@
                 
                 if (Wat.C.isMultitenant()) { 
             %>
-                    <th class="col-width-100" data-sortby="name">
+                    <th data-fieldname="<%= name %>" class="col-width-100" data-sortby="name">
                         <span data-i18n="Global username"><%= i18n.t('Global username') %></span>
                     </th>
             <%
@@ -101,7 +101,7 @@
         <%
         }
         _.each(models, function(model) { %>
-            <tr class="row-<%= model.get('id') %>">
+            <tr class="row-<%= model.get('id') %>" data-id="<%= model.get('id') %>" data-name="<%= model.get('name') %>">
                 <% 
                     var info = '';
                     

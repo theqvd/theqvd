@@ -18,70 +18,70 @@
                     switch(name) {
                         case 'see_details':
             %>
-                            <th class="<%= sortAttr %> center">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> center">
                                 <i class="fa fa-search"></i>
                             </th>
             <%
                             break;
                         case 'id':
             %>
-                            <th class="<%= sortAttr %> desktop" data-sortby="id">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop" data-sortby="id">
                                 <span data-i18n="Id"><%= i18n.t('Id') %></span>
                             </th>
             <%
                             break;
                         case 'action':
             %>
-                            <th class="<%= sortAttr %>" data-sortby="type_of_action">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %>" data-sortby="type_of_action">
                                 <span data-i18n="Action"><%= i18n.t('Action') %></span>
                             </th>
             <%
                             break;
                         case 'qvd_object':
             %>
-                            <th class="<%= sortAttr %> desktop" data-sortby="qvd_object">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop" data-sortby="qvd_object">
                                 <span data-i18n="Object type"><%= i18n.t('Object type') %></span>
                             </th>
             <%
                             break;
                         case 'object_name':
             %>
-                            <th class="<%= sortAttr %>" data-sortby="object_name">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %>" data-sortby="object_name">
                                 <span data-i18n="Object"><%= i18n.t('Object') %></span>
                             </th>
             <%
                             break;
                         case 'administrator':
             %>
-                            <th class="<%= sortAttr %> desktop" data-sortby="admin_name">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop" data-sortby="admin_name">
                                 <span data-i18n="Administrator"><%= i18n.t('Administrator') %></span>
                             </th>
             <%
                             break;
                         case 'datetime':
             %>
-                            <th class="<%= sortAttr %> desktop" data-sortby="time">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop" data-sortby="time">
                                 <span data-i18n="Elapsed time"><%= i18n.t('Elapsed time') %></span>
                             </th>
             <%
                             break;
                         case 'source':
             %>
-                            <th class="<%= sortAttr %> desktop" data-sortby="time">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop" data-sortby="time">
                                 <span data-i18n="Source"><%= i18n.t('Source') %></span>
                             </th>
             <%
                             break;
                         case 'address':
             %>
-                            <th class="<%= sortAttr %> desktop" data-sortby="ip">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop" data-sortby="ip">
                                 <span data-i18n="Address"><%= i18n.t('Address') %></span>
                             </th>
             <%
                             break;
                         case 'tenant':
             %>
-                            <th class="<%= sortAttr %> desktop" data-sortby="tenant_name">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop" data-sortby="tenant_name">
                                 <span data-i18n="Tenant"><%= i18n.t('Tenant') %></span>
                             </th>
             <%
@@ -106,7 +106,7 @@
         }
         
         _.each(models, function(model) { %>
-            <tr class="row-<%= model.get('id') %>">
+            <tr class="row-<%= model.get('id') %>" data-id="<%= model.get('id') %>" data-name="<%= model.get('name') %>">
                 <% 
                     var info = '';
                     

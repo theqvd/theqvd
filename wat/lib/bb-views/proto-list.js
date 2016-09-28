@@ -210,6 +210,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         var that = this;
         
         $('.list').html(HTML_MID_LOADING);
+        $('.js-shown-elements').hide();
 
         if (e && $(e.target).hasClass('mobile-filter')) {
             var filtersContainer = '.' + this.cid + ' .filter-mobile';

@@ -63,7 +63,7 @@
         <td>
             <span class="second_row " data-i18n="Here you can define what columns and filters are shown on each section overriding default views"></span>
             <span class="fright">
-                <a href="#/myviews" class="button2 fa fa-pencil" data-i18n="Configure my views"></a>
+                <a href="#/myviews" class="button2 fa fa-pencil js-button-configure-my-views" data-i18n="Configure my views"></a>
             </span>
         </td>
     </tr>
