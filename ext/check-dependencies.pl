@@ -16,8 +16,8 @@ for my $dir (grep {-d $_} readdir($dh)) {
     my $makefile_path = "$dir/Makefile.PL";
     my $build_path = "$dir/Build.PL";
 
+    print_msg("Processing $module_folder", "INFO");
     if (-e $makefile_path || -e $build_path) {
-        print_msg("$module_folder", "INFO");
 
         my $module_name = undef;
         my %builder_deps = ();
@@ -26,7 +26,7 @@ for my $dir (grep {-d $_} readdir($dh)) {
             %builder_deps = map {$_ => 1} get_deps_from_build( $build_path );
         } else {
             $module_name = get_module_name_from_makefile( $makefile_path );
-            %builder_deps = map {$_ => 1} get_deps_from_makefile( $makefile_path );
+            %builder_deps = get_deps_from_makefile( $makefile_path );
         }
 
         my %module_deps = map {$_ => 1} get_deps_from_module($dir);
@@ -46,11 +46,18 @@ for my $dir (grep {-d $_} readdir($dh)) {
 
         for my $dep (keys %builder_deps) {
             if(module_is_core($dep)){
-                print_msg("$dep is not required as dependency cause it is core", "WARNING");
+                my $version = $builder_deps{$dep};
+                $version = undef if $version == 0;
+                if(module_is_core($dep, $version)) {
+                    print_msg("$dep is not required as dependency cause it is core", "WARN");
+                    $dependencies_ok = 0;
+                } else {
+                    print_msg("Module $dep is core but $version is not included", "INFO");
+                }
             } else {
-                print_msg("$dep is not used in module $module_folder", "WARNING");
+                print_msg("$dep is not used in module $module_folder", "WARN");
+                $dependencies_ok = 0;
             }
-            $dependencies_ok = 0;
         }
 
         print_msg("Dependencies are correct for $module_folder", "OK") if $dependencies_ok;
@@ -73,7 +80,7 @@ sub print_msg {
         $color = "green";
     } elsif($type eq 'INFO') {
         $color = "blue";
-    } elsif ($type eq 'WARNING') {
+    } elsif ($type eq 'WARN') {
         $color = "yellow";
     } elsif ($type eq 'ERROR') {
         $color = "red";
@@ -89,20 +96,20 @@ sub print_msg {
 
 sub get_deps_from_makefile {
     my $makefile_path = shift;
-    my @dep_list = ();
+    my %hash = ();
 
     my $string = read_file($makefile_path);
 
     if($string =~ /WriteMakefile\((.*)\)/s){
         no strict;
         no warnings;
-        my %hash = %{eval "{$1}"};
-        push @dep_list, keys ($hash{PREREQ_PM} // {});
+        %hash = %{eval "{$1}"};
+        %hash = %{$hash{PREREQ_PM} // {}};
     } else {
         print_msg("Cannot detect format of the makefile: $makefile_path", "ERROR");
     }
     
-    return @dep_list;
+    return %hash;
 }
 
 sub get_module_name_from_makefile {
@@ -196,7 +203,8 @@ sub get_deps_from_module {
             return [ (($plugin =~ /QVD/)? "" : "Mojolicious::Plugin::") . "$plugin" ];
         },
     );
-    my @exceptions = ("5.010", "Win32::API", "Win32::Process", "Wx::Frame", "QVD::HTTPD::.+");
+    my @exceptions = ("5.010", "Win32::API", "Win32::Process", "Wx::Frame", "QVD::HTTPD::.+",
+        "QVD::Config::Core::Defaults");
     for my $file (@file_list) {
         open FILE, $file or print_msg("Couldn't open file: $!", "FATAL");
         while (my $line = <FILE>) {
@@ -226,7 +234,8 @@ sub get_deps_from_module {
 
 sub module_is_core {
     my $module = shift;
-    return Module::CoreList::is_core($module, undef, '5.14.3');
+    my $version = shift;
+    return Module::CoreList::is_core($module, $version, '5.14.3');
 }
 
 sub read_file {
