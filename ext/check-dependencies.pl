@@ -196,7 +196,7 @@ sub get_deps_from_module {
             return [ (($plugin =~ /QVD/)? "" : "Mojolicious::Plugin::") . "$plugin" ];
         },
     );
-    my @exceptions = ("5.010", "Win32::API", "Win32::Process");
+    my @exceptions = ("5.010", "Win32::API", "Win32::Process", "Wx::Frame", "QVD::HTTPD::.+");
     for my $file (@file_list) {
         open FILE, $file or print_msg("Couldn't open file: $!", "FATAL");
         while (my $line = <FILE>) {
@@ -212,7 +212,9 @@ sub get_deps_from_module {
     }
     
     for my $exception (@exceptions) {
-        delete $dep_hash{$exception};
+        for my $module (grep {$_ =~ /$exception/} keys %dep_hash) {
+            delete $dep_hash{$module};
+        }
     }
     
     for my $dep (keys %dep_hash) {

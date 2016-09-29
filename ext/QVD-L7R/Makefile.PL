@@ -20,7 +20,6 @@ WriteMakefile(
         'QVD::HTTP::Headers'     => 0,
         'QVD::HTTP::StatusCodes' => 0,
         'QVD::HTTPD'             => 0,
-        'QVD::HTTPD::INET'       => 0,
         'QVD::L7R::LoadBalancer' => 0,
         'QVD::Log'               => 0,
         'QVD::SimpleRPC::Client' => 0,
