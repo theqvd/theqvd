@@ -195,13 +195,13 @@ client.auto_connect = 0
 ## Connect to previously selected vm (only makes sense with auto_connect)
 client.auto_connect.vm_id = 
 ## Connect with Bearer auth
-client.auto_connect.token = 
+client.auto_connect.token =
 ## whether to use SSL in the client↔server communication or not
 client.use_ssl = 1
 client.ssl.use_cert = 0
 
 ### Internal SSL options. These get passed directly to QVD::HTTPC.
-### See the full list in HTTPC.pm and the documentation in 
+### See the full list in HTTPC.pm and the documentation in
 ### IO::Socket::SSL.
 ###
 ### Using these is discouraged. Most are internal SSL options, and
@@ -211,7 +211,7 @@ client.ssl.use_cert = 0
 ###
 ### Specifically, the client overrides hostname verification, so use
 ### the client.ssl.allow_bad_host option instead.
-client.ssl.options.SSL_version = TLSv1_1:!SSLv3:!SSLv2:!TLSv1
+client.ssl.options.SSL_version = !SSLv3:!SSLv2:!TLSv1
 
 
 ##########################################################################
@@ -237,7 +237,7 @@ client.ssl.allow_untrusted=1
 ## Allow expired certificates
 client.ssl.allow_expired=1
 
-## Allow certificates that are not yet valid. Generally indicates a 
+## Allow certificates that are not yet valid. Generally indicates a
 ## local clock problem.
 client.ssl.allow_not_yet_valid=1
 
@@ -293,7 +293,7 @@ client.usb.usbip.log = 0
 # Share all USB devices automatically (most of the time not a good idea)
 client.usb.share_all = 0
 
-# List of USB devices to share with the VM. 
+# List of USB devices to share with the VM.
 # Syntax: VID:PID@serial, comma separated. Spaces are allowed. For example:
 # 0441:0012, 1234:5678@12345678
 client.usb.share_list =
