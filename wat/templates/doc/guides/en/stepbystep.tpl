@@ -1812,7 +1812,7 @@ Creation
 <img src="images/doc_images/screenshot_admin_create.png" alt="screenshot_admin_create.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>When creating an administrator we will stablish its name, password and its language. If we leave the default language, the administrator will have the general language of the system although it can be changed.</p></div>
-<div class="paragraph"><p>Además, podemos asignar roles de privilegios, dependiendo de qué permisos queremos que tenga el administrador. Si asignamos más de un rol, el administrador tendrá la suma de los privilegios de cada rol. Si no le asignamos ningún rol, el administrador no podrá ni entrar en el Panel de administración.</p></div>
+<div class="paragraph"><p>Besides, we can assign roles of privileges, depending on the permits we want that the administrator has. If we assign more than one role, the administrator will have the addition of the privileges of each role. If we do not assign any role, the administrator will not be able to enter in the Administration panel.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">

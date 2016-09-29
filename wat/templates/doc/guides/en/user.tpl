@@ -4625,18 +4625,64 @@ Login Box text colour
 <td class="icon">
 <img src="images/doc_images/icons/warning.png" alt="Warning" />
 </td>
-<td class="content">Qindel Group is not responsible for aesthetic disasters caused by daltonic administrators using this tool or by administrators suffering of any other visual dysfunction.
-   </td>
+<td class="content">Qindel Group is not responsible for aesthetic disasters caused by daltonic administrators using this tool or by administrators suffering of any other visual dysfunction.</td>
 </tr></table>
 </div>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_session_spy">11. Session spy</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>From the WAT, it is possible to <em>spy on</em> a user who is logged in and connected to a virtual machine. Thanks to the protocol of sharing desktops <strong>VNC</strong>, you can access in <strong>real time</strong> to the desktop where the user is connected, and even <strong>take control</strong> of it.</p></div>
+<div class="paragraph"><p>If the administrator of QVD has <strong>enough permissions</strong>, when the virtual machine is started, the option <strong>Spy</strong> will appear both in the detail view and in the massive options in the list view (in this case the option will only appear if an only element is selected).</p></div>
+<div class="paragraph"><p>When clicking on <strong>Spy</strong>, a new tab in the browser will open where the desktop with the current session will be loaded.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_vmspy.png" alt="screenshot_vmspy.png" width="960px" />
+</span></p></div>
+<div class="paragraph"><p>If the user is doing things, we will see in real time what he sees including his cursor.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Settings
+</dt>
+<dd>
+<p>
+On the left side there is a <em>settings</em> tab that displays a lateral menu with a chart with information about the virtual machine and the user followed by the configuration options:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Resolution</strong>: it can be configured so the resolution of the desktop QVD in the browser is <em>adapted</em> to the size of the window or appears in the <em>original</em> resolution of the client. In the second case, if the resolution is higher than the window of the browser, scroll bars will appear.
+</p>
+</li>
+<li>
+<p>
+<strong>Mode</strong>: <em>Only see</em> mode is established by default with which we could not interact with the remote desktop. With the <em>interactive</em> mode we could take control of the cursor only by passing over it apart from being able to write with our keyboard.
+</p>
+</li>
+<li>
+<p>
+<strong>Log</strong>: To be able to detect dysfunctions in the VNC connection they can be shown with different levels of <em>verbosity</em>, the registers of the log in the connection. The log remains hidden by default, but everything can be shown (Debug level), only through the registers that have some relevance (Info), the ones that are considered important (Warning) or only the mistakes (Mistake).
+</p>
+</li>
+</ul></div>
+</dd>
+</dl></div>
+<div class="paragraph"><p><em>Adapted resolution and log shown</em>
+<span class="image">
+<img src="images/doc_images/screenshot_vmspy_options.png" alt="screenshot_vmspy_options.png" width="960px" />
+</span></p></div>
+<div class="paragraph"><p><em>Original resolution and log hidden</em>
+<span class="image">
+<img src="images/doc_images/screenshot_vmspy_options2.png" alt="screenshot_vmspy_options2.png" width="960px" />
+</span></p></div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-09-22 10:00:30 CEST
+Last updated 2016-09-29 13:22:36 CEST
 </div>
 </div>
 </body>

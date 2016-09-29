@@ -449,8 +449,41 @@ Detail view
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_tenant_details.png" alt="screenshot_tenant_details.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>See a <strong>header</strong> next to <strong>tenant name</strong> where there are <strong>buttons to delete or edit it</strong>.</p></div>
-<div class="paragraph"><p>Below the header there is a *table with the attributes of a tenant *.</p></div>
+<div class="paragraph"><p>See a <strong>header</strong> next to <strong>tenant name</strong> where there are <strong>buttons to delete, edit, block or clean up it</strong>.</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+The <strong>elimination</strong> of tenants is like the one of other elements. In this case <strong>if a tenant has elements, it cannot be eliminated</strong>. You will need to empty it manually or with the cleaning tool.
+</p>
+</li>
+<li>
+<p>
+The <strong>block</strong> of tenants restricts the administrators and the users to access the WAT and its virtual machines respectively.
+</p>
+</li>
+<li>
+<p>
+In the <strong>edition</strong> you can change the name, the description, the language and the block size of the tenant by default. The block size and language will be effective for administrators of this tenant whose personal settings they have established <em>by default</em>.
+</p>
+</li>
+</ul></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/warning.png" alt="Warning" />
+</td>
+<td class="content">It is important to know that the name of the tenant is used in the credentials of the administrators and users, so its change must be controlled and informed.</td>
+</tr></table>
+</div>
+<div class="ulist"><ul>
+<li>
+<p>
+The <strong>cleaning</strong> tool shows in one screen all the dependent elements of a Tenant offering various options of elimination. One by one, by categories (all the virtual machines, users, etc), or eliminate all that this tenant has.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Under this heading there is a <strong>table with the attributes of the tenant</strong>.</p></div>
+<div class="paragraph"><p>On the right part we find charts that contain the list of relevant elements of the Tenant: Virtual machines, Users and Disc images. All these come with paging controls and a button to go to the correspondent view filtered by the current tenant.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
