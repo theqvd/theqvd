@@ -4,7 +4,6 @@ bin/hkd-states.pl
 bin/qvd-hkd
 bin/qvd-hkd.debrc.pl
 bin/qvd-hkd.initrc.pl
-bin/qvd-killer-lxc
 Changes
 QVD-HKD/lib/QVD/HKD.pm
 QVD-HKD/lib/QVD/HKD/L7R.pm
@@ -22,7 +21,6 @@ QVD-HKD/lib/QVD/HKD/L7RKiller.pm
 QVD-HKD/lib/QVD/HKD/CommandHandler.pm
 QVD-HKD/lib/QVD/HKD/Helpers.pm
 QVD-HKD/lib/QVD/HKD/Config/Network.pm
-QVD-HKD/lib/QVD/HKD/VMHandler/LXC/Killer.pm
 QVD-HKD/lib/QVD/HKD/VMHandler/LXC/FS.pm
 QVD-HKD/lib/QVD/HKD/VMHandler/LXC/FS/unionfs_fuse.pm
 QVD-HKD/lib/QVD/HKD/VMHandler/LXC/FS/overlayfs.pm
