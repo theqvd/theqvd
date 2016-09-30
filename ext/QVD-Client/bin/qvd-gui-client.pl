@@ -110,10 +110,11 @@ sub OnInit {
     DEBUG("Showing frame");
     my $frame = QVD::Client::Frame->new();
     $self->SetTopWindow($frame);
-    $frame->Show();
     if ($self->should_autoconnect()) {
 	INFO("Launching autoconnect");
 	$frame->OnClickConnect;
+    }else{
+        $frame->Show();
     }
 
     return 1;

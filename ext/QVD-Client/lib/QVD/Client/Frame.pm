@@ -343,7 +343,7 @@ sub new {
     }
 
     $self->Center;
-    $self->Show(1);
+    $self->Show(1) unless core_cfg('client.auto_connect','');
     (core_cfg('client.remember_username') && length core_cfg('client.user.name')) ? $self->{password}->SetFocus() : $self->{username}->SetFocus();
 
     Wx::Event::EVT_BUTTON($self, $self->{connect_button}->GetId, \&OnClickConnect);
