@@ -375,9 +375,10 @@ sub cgrep
     return (grep {$self->_satisfy($_, $root_key, $self->{filter}[1])} @list);
 }
 
+# Returns the filter structure as a hash, including the root operator
 sub hash {
     my $self = shift;
-    return { @{$self->{filter}[1]} };
+    return { @{$self->{filter}} };
 }
 
 # Static private methods
