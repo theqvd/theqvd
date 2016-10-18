@@ -7,13 +7,12 @@ use warnings;
 
 my $trendsurl = "http://172.26.9.168:9000/printer";
 my @printers = get_printers($trendsurl);
-write_driver($printers[0]);
+ppd_create($printers[0]);
 
-#write_driver();
 sub get_printers {
-    my @variables = @_;
+    my ($url) = (@_);
 
-    my $json = get( $variables[0] );
+    my $json = get( $url );
     die "Could not get $trendsurl!" unless defined $json;
 
     # Decode the entire JSON
@@ -23,25 +22,36 @@ sub get_printers {
 }
 
 # It recieves a driver and wr
-sub write_driver {
-    my @variables = @_;
-    my $id = $variables[0]->{'Id'};
-    my $name = $variables[0]->{'Name'};
+sub ppd_create {
+    my ($printer) = (@_);
+    my $id = $printer->{'Id'};
+    my $name = $printer->{'Name'};
     
     my $filename = "print_".$id."_driver.drv";
     open(my $fh, '>', $filename) or die "Could not open file '$filename' $!";
 
     # Write file
-    print $fh "#include <fonts.defs>\n";
-    print $fh "#include <media.defs>\n";
-    print $fh "Font *\n";
-    # print $fh "Manufacturer ";
-    print $fh "ModelName \"".$name."\"\n";
-    print $fh "Version 1.0\n";
-    print $fh "PCFileName \"print_".$id."_.ppd\"\n";
-    
+    ppd_write_line($fh, ppd_line("FormatVersion", "4.3"));
     close $fh;
     return;
 }
 
+# Write into a file handler for a ppd file
+## Side effect
+sub ppd_write_line() {
+    my ($fh, $line) = (@_);
+    print $fh $line."\n"; 
+    return;
+}
 
+# Create a ppd line
+sub ppd_line() {
+    my ($first, $second) = (@_);
+    return "*".$first.": ".$second;
+}
+
+# Create a comment line in a ppd file
+sub ppd_comment() {
+    my ($comment) = (@_);
+    return "*%%%%".$comment.".";
+}
