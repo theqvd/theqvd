@@ -2,6 +2,6 @@
 use strict;
 use warnings; 
 
-system("sh", "cp", "tea4cups/tea4cups.conf", "/etc/cups");
-system("sh", "cp", "tea4cups/tea4cups", "/usr/lib/cups/backend");
-system("sh", "/etc/init.d/cups", "restart");
+system("cp", "tea4cups/tea4cups.conf", "/etc/cups");
+system("cp", "tea4cups/tea4cups", "/usr/lib/cups/backend");
+system("/etc/init.d/cups", "restart");
