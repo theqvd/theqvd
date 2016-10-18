@@ -1,0 +1,6 @@
+#include <fonts.defs>
+#include <media.defs>
+Font *
+ModelName "HP Color LaserJet 4600 PCL6"
+Version 1.0
+PCFileName "print_0_.ppd"
