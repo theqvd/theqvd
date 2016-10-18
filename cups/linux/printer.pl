@@ -5,13 +5,14 @@ use Data::Dumper;
 use strict;                     
 use warnings;                 
 
-my @printers = get_printers();
+my $trendsurl = "http://172.26.9.168:9000/printer";
+my @printers = get_printers($trendsurl);
 print Dumper $printers[0];
 
 sub get_printers {
-    my $trendsurl = "http://172.26.9.168:9000/printer";
+    my @variables = @_;
 
-    my $json = get( $trendsurl );
+    my $json = get( $variables[0] );
     die "Could not get $trendsurl!" unless defined $json;
 
     # Decode the entire JSON
