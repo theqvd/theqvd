@@ -497,7 +497,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 var note = '<li><a href="javascript:" class="js-delete-filter-note delete-filter-note fa fa-times" data-filter-name="' + fNoteName + '" data-filter-type="' + fNote.type + '"></a>';
                 note += '<span class="note-label">' + fNote.label + '</span>';
                 if (fNote.value != undefined) {
-                    note += ': <span class="note-value">' + fNote.value + '</span>';
+                    note += ': <span class="note-value">' + Wat.U.htmlEncode(fNote.value) + '</span>';
                 }
                 
                 // If filter field is fixable, add fix icon. Field can be fixable only with positive values.
