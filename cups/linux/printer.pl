@@ -36,41 +36,22 @@ sub read_json {
     return ($id, $name, $filename, $color);
 }
 
-# Write into a file handler for a ppd file
-## Side effects
-sub ppd_write_line() {
-    my ($fh, $line) = (@_);
-    print $fh $line."\n"; 
-    return;
-}
-
-# Create a ppd line
-sub ppd_line() {
-    my ($first, $second) = (@_);
-    return "*".$first.": ".$second;
-}
-
-# Create a comment line in a ppd file
-sub ppd_comm() {
-    my ($comment) = (@_);
-    return "*%%%% ".$comment.".";
-}
-
 # It recieves a driver and wr
 sub ppd_create {
     # Open file
     my ($id, $name, $filename, $color) = (@_);    
     open(my $fh, '>', $filename) or die "Could not open file '$filename' $!";
-
+    
     # Write file
-    ppd_write_line($fh, ppd_line("PPD-Adobe", "\"4.3\""));
+   
+    ppd_write_line($fh, ppd_line("PPD-Adobe", "3"));
     ppd_write_line($fh, ppd_comm("PPD file for FooJet 2000 with CUPS"));
     ppd_write_line($fh, ppd_comm("Created by the CUPS PPD Compiler CUPS v2.1.4"));
     ppd_write_line($fh, ppd_line("FormatVersion", "\"4.3\""));
     ppd_write_line($fh, ppd_line("FileVersion", "\"1.0\""));
     ppd_write_line($fh, ppd_line("LanguageVersion", "English"));
     ppd_write_line($fh, ppd_line("LanguageEncoding", "ISOLatin1"));
-    ppd_write_line($fh, ppd_line("PCFileName", "\"printer_".$id.".ppd\""));
+    ppd_write_line($fh, ppd_line("PCFileName", "\"".$filename."\""));
     ppd_write_line($fh, ppd_line("Product", "\"(".$name.")\""));
     ppd_write_line($fh, ppd_line("Manufacturer", "\"Foo\""));
     ppd_write_line($fh, ppd_line("ModelName", "\"FooJet 2000\""));
@@ -147,10 +128,31 @@ sub ppd_create {
     ppd_write_line($fh, ppd_line("Font Times-Roman", "Standard \"(1.05)\" Standard ROM"));
     ppd_write_line($fh, ppd_line("Font ZapfChancery-MediumItalic", "Standard \"(1.05)\" Standard ROM"));
     ppd_write_line($fh, ppd_line("Font ZapfDingbats", "Special \"(001.005)\" Special ROM"));
-    ppd_write_line($fh, ppd_comm("End of foojet2k.ppd, 03714 bytes"));
+    ppd_write_line($fh, ppd_comm("End of ".$filename.", 03714 bytes"));
     
     close $fh;
     return;
 }
+
+# Write into a file handler for a ppd file
+## Side effects
+sub ppd_write_line() {
+    my ($fh, $line) = (@_);
+    print $fh $line."\n"; 
+    return;
+}
+
+# Create a ppd line
+sub ppd_line() {
+    my ($first, $second) = (@_);
+    return "*".$first.": ".$second;
+}
+
+# Create a comment line in a ppd file
+sub ppd_comm() {
+    my ($comment) = (@_);
+    return "*%%%% ".$comment.".";
+}
+
 
 
