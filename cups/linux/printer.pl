@@ -26,6 +26,10 @@ sub ppd_create {
     my ($printer) = (@_);
     my $id = $printer->{'Id'};
     my $name = $printer->{'Name'};
+    my $color = 'False'; 
+    if($printer->{'IsSupportColor'} eq 'true'){
+      $color = 'True';   
+    }
     
     my $filename = "print_".$id."_driver.ppd";
     open(my $fh, '>', $filename) or die "Could not open file '$filename' $!";
@@ -38,15 +42,15 @@ sub ppd_create {
     ppd_write_line($fh, ppd_line("FileVersion", "\"1.0\""));
     ppd_write_line($fh, ppd_line("LanguageVersion", "English"));
     ppd_write_line($fh, ppd_line("LanguageEncoding", "ISOLatin1"));
-    ppd_write_line($fh, ppd_line("PCFileName", "\"foojet2k.ppd\""));
-    ppd_write_line($fh, ppd_line("Product", "\"(FooJet 2000)\""));
+    ppd_write_line($fh, ppd_line("PCFileName", "\"printer_".$id.".ppd\""));
+    ppd_write_line($fh, ppd_line("Product", "\"(".$name.")\""));
     ppd_write_line($fh, ppd_line("Manufacturer", "\"Foo\""));
     ppd_write_line($fh, ppd_line("ModelName", "\"FooJet 2000\""));
-    ppd_write_line($fh, ppd_line("ShortNickName", "\"FooJet 2000\""));
-    ppd_write_line($fh, ppd_line("NickName", "\"FooJet 2000, 1.0\""));
+    ppd_write_line($fh, ppd_line("ShortNickName", "\"".$name."\""));
+    ppd_write_line($fh, ppd_line("NickName", "\"".$name.", 1.0\""));
     ppd_write_line($fh, ppd_line("PSVersion", "\"(3010.000) 0\""));
     ppd_write_line($fh, ppd_line("LanguageLevel", "\"3\""));
-    ppd_write_line($fh, ppd_line("ColorDevice", "False"));
+    ppd_write_line($fh, ppd_line("ColorDevice", $color ));
     ppd_write_line($fh, ppd_line("DefaultColorSpace", "Gray"));
     ppd_write_line($fh, ppd_line("FileSystem", "False"));
     ppd_write_line($fh, ppd_line("Throughput", "\"1\""));
