@@ -1116,5 +1116,12 @@ Wat.I = {
     isMassiveFieldChanging: function (fieldName) {
         // Invisible class of no change reset button means avoid field updating
         return !$('.js-no-change-reset[data-field="' + fieldName + '"]').hasClass('invisible');
+    },
+    
+    // Show an error template given template code as parameter
+    showErrorTemplate: function (template) {
+        $(Wat.CurrentView.el).html(Wat.TPL[template]);
+        Wat.I.showAll();
+        Wat.T.translate();
     }
 }

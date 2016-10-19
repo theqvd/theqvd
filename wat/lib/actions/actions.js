@@ -41,7 +41,8 @@ Wat.A = {
                         if (templatesCount >= templatesMax) {
                             afterCallback(that);
                         }                    
-                    }
+                    },
+                    error: Wat.A.processResponseError
                 });
             }
             else {
@@ -201,30 +202,12 @@ Wat.A = {
             dataType: 'json',
             processData: false,
             parse: true,
-            error: function (response) {
-                if (that) {
-                    that.retrievedData = response;
-                }
-                
-                successCallback(that);
-
-                if (!$.isEmptyObject(messages)) {
-                    that.message = messages.error;
-                    that.messageType = 'error';
-
-                    var messageParams = {
-                        message: that.message,
-                        messageType: that.messageType
-                    };
-
-                    Wat.I.M.showMessage(messageParams, response);
-                }                   
-            },
+            error:  Wat.A.processResponseError,
             success: function (response, result, raw) {
                 if (that) {
                     that.retrievedData = response;
                 }
-
+                
                 successCallback(that);
                 
                 if (!$.isEmptyObject(messages)) {
@@ -271,6 +254,7 @@ Wat.A = {
             },
             error: function (response, result, raw) {
                 Wat.I.M.showMessage({message: i18n.t('Error logging out'), messageType: 'error'});
+                Wat.A.processResponseError(err);
             }
         };
         
@@ -460,7 +444,8 @@ Wat.A = {
                     if (afterCallBack != undefined) {
                         afterCallBack ();
                     }
-                }
+                },
+                error: Wat.A.processResponseError
             });
                     
             Wat.C.requests.push(request);
@@ -540,6 +525,15 @@ Wat.A = {
         if (deleteMe) {
             $(deleteMe).removeAttr('data-deleteme');
             $(deleteMe).trigger('click');
+        }
+    },
+    
+    // Process response error to show feedback
+    processResponseError: function (response) {
+        switch (response.statusText) {
+            case 'error':
+            case 'timeout':
+                Wat.I.showErrorTemplate('errorRefresh');
         }
     }
 };

@@ -29,6 +29,12 @@ Wat.I.T = {
                     },
                     viewFormCustomize: {
                         name: 'view/customize-form'
+                    },
+                    errorRefresh: {
+                        name: 'error/refresh'
+                    },
+                    warn404: {
+                        name: 'error/404'
                     }
                 };
                 break;
@@ -53,9 +59,6 @@ Wat.I.T = {
                 templates = {
                     login: {
                         name: 'login/login'
-                    },
-                    errorRefresh: {
-                        name: 'error/refresh'
                     }
                 }
                 break;
@@ -72,9 +75,6 @@ Wat.I.T = {
                     },
                     detailsSide: {
                         name: 'details/' + params.qvdObj + '-side'
-                    },
-                    warn404: {
-                        name: 'error/404'
                     }
                 }
                 break;
