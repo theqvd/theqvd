@@ -36,6 +36,26 @@ sub read_json {
     return ($id, $name, $filename, $color);
 }
 
+# Write into a file handler for a ppd file
+## Side effects
+sub ppd_write_line() {
+    my ($fh, $line) = (@_);
+    print $fh $line."\n"; 
+    return;
+}
+
+# Create a ppd line
+sub ppd_line() {
+    my ($first, $second) = (@_);
+    return "*".$first.": ".$second;
+}
+
+# Create a comment line in a ppd file
+sub ppd_comm() {
+    my ($comment) = (@_);
+    return "*%%%% ".$comment.".";
+}
+
 # It recieves a driver and wr
 sub ppd_create {
     # Open file
@@ -133,22 +153,4 @@ sub ppd_create {
     return;
 }
 
-# Write into a file handler for a ppd file
-## Side effects
-sub ppd_write_line() {
-    my ($fh, $line) = (@_);
-    print $fh $line."\n"; 
-    return;
-}
 
-# Create a ppd line
-sub ppd_line() {
-    my ($first, $second) = (@_);
-    return "*".$first.": ".$second;
-}
-
-# Create a comment line in a ppd file
-sub ppd_comm() {
-    my ($comment) = (@_);
-    return "*%%%% ".$comment.".";
-}
