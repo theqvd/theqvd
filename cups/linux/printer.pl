@@ -5,20 +5,34 @@ use Data::Dumper;
 use strict;                     
 use warnings;                 
 
-my $trendsurl = "http://172.26.9.168:9000/printer";
-my @printers = get_printers($trendsurl);
-ppd_create(read_json($printers[0]));
+create_printers("http://172.26.9.168:9000/printer");
 
+# Create and add to CUPS all the printers
+sub create_printers {
+    my ($url) = (@_);
+    my @printers = get_printers($url);
+
+    foreach my $printer (@printers){
+	print Dumper $printer;
+
+	ppd_create(read_json($printer));
+    }
+    return;
+}
+
+# Make a get call to obtain the printer info
 sub get_printers {
     my ($url) = (@_);
 
     my $json = get( $url );
-    die "Could not get $trendsurl!" unless defined $json;
+    die "Could not get $url!" unless defined $json;
 
     # Decode the entire JSON
-    my @decoded_json = decode_json( $json );
+    my $decoded_json = decode_json( $json );
+    my @printers = @{$decoded_json->{'Printers'}};
 
-    return $decoded_json[0]->{'Printers'}[0];
+    # print Dumper $printers[1];
+    return @printers; 
 }
 
 # Process json
@@ -93,6 +107,17 @@ sub ppd_create {
     ppd_write_line($fh, ppd_line("Resolution 600dpi/600 DPI", "\"<</HWResolution[600 600]/cupsBitsPerColor 8/cupsRowCount 0/cupsRowFeed 0/cupsRowStep 0/cupsColorSpace 3>>setpagedevice\""));
     ppd_write_line($fh, ppd_line("CloseUI", "*Resolution"));
     ppd_write_line($fh, ppd_line("DefaultFont", "Courier"));
+    ppd_fonts($fh);
+    ppd_write_line($fh, ppd_comm("End of ".$filename.", 03714 bytes"));
+    
+    close $fh;
+    return;
+}
+
+# Create fonts
+## Side effects
+sub ppd_fonts() {
+    my ($fh) = (@_);
     ppd_write_line($fh, ppd_line("Font AvantGarde-Book", "Standard \"(1.05)\" Standard ROM"));
     ppd_write_line($fh, ppd_line("Font AvantGarde-BookOblique", "Standard \"(1.05)\" Standard ROM"));
     ppd_write_line($fh, ppd_line("Font AvantGarde-Demi", "Standard \"(1.05)\" Standard ROM"));
@@ -128,12 +153,8 @@ sub ppd_create {
     ppd_write_line($fh, ppd_line("Font Times-Roman", "Standard \"(1.05)\" Standard ROM"));
     ppd_write_line($fh, ppd_line("Font ZapfChancery-MediumItalic", "Standard \"(1.05)\" Standard ROM"));
     ppd_write_line($fh, ppd_line("Font ZapfDingbats", "Special \"(001.005)\" Special ROM"));
-    ppd_write_line($fh, ppd_comm("End of ".$filename.", 03714 bytes"));
-    
-    close $fh;
-    return;
 }
-
+    
 # Write into a file handler for a ppd file
 ## Side effects
 sub ppd_write_line() {
@@ -153,6 +174,7 @@ sub ppd_comm() {
     my ($comment) = (@_);
     return "*%%%% ".$comment.".";
 }
+
 
 
 
