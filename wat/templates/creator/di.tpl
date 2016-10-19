@@ -2,7 +2,7 @@
     <tr>
         <td data-i18n="Description"></td>
         <td>
-            <textarea id="name" type="text" name="description" data-i18n="[placeholder]No changes"></textarea>
+            <textarea id="name" type="text" name="description"></textarea>
         </td>
     </tr>
     <tr>
