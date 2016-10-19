@@ -7,7 +7,7 @@ use warnings;
 
 my $trendsurl = "http://172.26.9.168:9000/printer";
 my @printers = get_printers($trendsurl);
-ppd_create($printers[0]);
+ppd_create(read_json($printers[0]));
 
 sub get_printers {
     my ($url) = (@_);
@@ -21,8 +21,8 @@ sub get_printers {
     return $decoded_json[0]->{'Printers'}[0];
 }
 
-# It recieves a driver and wr
-sub ppd_create {
+# Process json
+sub read_json {
     my ($printer) = (@_);
     my $id = $printer->{'Id'};
     my $name = $printer->{'Name'};
@@ -32,6 +32,14 @@ sub ppd_create {
     }
     
     my $filename = "print_".$id."_driver.ppd";
+
+    return ($id, $name, $filename, $color);
+}
+
+# It recieves a driver and wr
+sub ppd_create {
+    # Open file
+    my ($id, $name, $filename, $color) = (@_);    
     open(my $fh, '>', $filename) or die "Could not open file '$filename' $!";
 
     # Write file
