@@ -5,7 +5,13 @@ use Data::Dumper;
 use strict;                     
 use warnings;                 
 
-create_printers("http://172.26.9.168:9000/printer");
+use constant URL_WIN = "http://172.26.9.168:9000";
+use constant PRINTER_PATH = "printer";
+use constant PRINTER_JOB_PATH = "printerjob";
+ 
+create_printers(URL_WIN."/".PRINTER_PATH);
+
+# Copy to cups
 
 # Create and add to CUPS all the printers
 sub create_printers {
