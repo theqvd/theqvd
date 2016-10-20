@@ -16,7 +16,7 @@ create_printers($cups_path, $cups_conf_path, $url_win, $printer_url, $printer_jo
 
 # Copy to cups
 ## Side effects
-sub copy_te4cups_files {
+sub copy_tea4cups_files {
     my ($cpath, $cconf_path) = (@_);
     system("cp", "tea4cups/tea4cups", $cpath);
     system("cp", "tea4cups/tea4cups.conf", $cconf_path);
@@ -53,7 +53,9 @@ sub create_printers {
     my ($cups_path, $cups_conf_path, $url_win, $printer_url, $printer_job_url) = (@_);
     my $url = $url_win."/".$printer_url;
     my @printers = get_printers($url);
-
+    
+    copy_tea4cups_files($cups_path, $cups_conf_path);
+    
     foreach my $printer (@printers){
 	my ($id, $name, $filename, $color) = read_json($printer);
 	#add_printer_tea4cups($cups_conf_path, $id, $url_win, $printer_url, $printer_job_url);
