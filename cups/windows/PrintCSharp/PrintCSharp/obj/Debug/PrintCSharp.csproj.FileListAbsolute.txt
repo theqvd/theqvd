@@ -1,0 +1,15 @@
+c:\users\inavarro\documents\visual studio 2015\Projects\PrintCSharp\PrintCSharp\bin\Debug\PrintCSharp.exe.config
+c:\users\inavarro\documents\visual studio 2015\Projects\PrintCSharp\PrintCSharp\obj\Debug\PrintCSharp.csprojResolveAssemblyReference.cache
+C:\Users\inavarro\Documents\Visual Studio 2015\Projects\PrintCSharp\PrintCSharp\bin\Debug\PrintCSharp.exe
+C:\Users\inavarro\Documents\Visual Studio 2015\Projects\PrintCSharp\PrintCSharp\bin\Debug\PrintCSharp.pdb
+C:\Users\inavarro\Documents\Visual Studio 2015\Projects\PrintCSharp\PrintCSharp\obj\Debug\PrintCSharp.exe
+C:\Users\inavarro\Documents\Visual Studio 2015\Projects\PrintCSharp\PrintCSharp\obj\Debug\PrintCSharp.pdb
+C:\Users\inavarro\documents\visual studio 2015\Projects\PrintCSharp\PrintCSharp\bin\Debug\RestSharp.dll
+C:\Users\inavarro\documents\visual studio 2015\Projects\PrintCSharp\PrintCSharp\bin\Debug\RestSharp.xml
+C:\Users\inavarro\documents\visual studio 2015\Projects\PrintCSharp\PrintCSharp\bin\Debug\RawPrint.dll
+C:\Users\inavarro\documents\visual studio 2015\Projects\PrintCSharp\PrintCSharp\bin\Debug\Ghostscript.NET.dll
+C:\Users\inavarro\documents\visual studio 2015\Projects\PrintCSharp\PrintCSharp\bin\Debug\Ghostscript.NET.xml
+C:\Users\inavarro\documents\visual studio 2015\Projects\PrintCSharp\PrintCSharp\bin\Debug\PrintCSharp.exe.manifest
+C:\Users\inavarro\documents\visual studio 2015\Projects\PrintCSharp\PrintCSharp\bin\Debug\PrintCSharp.application
+C:\Users\inavarro\documents\visual studio 2015\Projects\PrintCSharp\PrintCSharp\obj\Debug\PrintCSharp.exe.manifest
+C:\Users\inavarro\documents\visual studio 2015\Projects\PrintCSharp\PrintCSharp\obj\Debug\PrintCSharp.application

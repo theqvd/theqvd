@@ -1,0 +1,1316 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Ghostscript.NET</name>
+    </assembly>
+    <members>
+        <member name="T:Ghostscript.NET.GhostscriptDisplayDeviceHandler">
+            <summary>
+            Represents a base Ghostscript Display Device handler.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptDisplayDeviceHandler.#ctor">
+            <summary>
+            Initializes a new instance of the Ghostscript.NET.GhostscriptDisplayDeviceHandler class.
+            </summary>
+        </member>
+        <member name="T:Ghostscript.NET.GhostscriptLibrary">
+            <summary>
+            Represents a native Ghostscript library.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptLibrary.#ctor(System.Byte[])">
+            <summary>
+            Initializes a new instance of the Ghostscript.NET.GhostscriptLibrary class
+            from the native library represented as the memory buffer.
+            </summary>
+            <param name="library">Memory buffer representing native Ghostscript library.</param>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptLibrary.#ctor(Ghostscript.NET.GhostscriptVersionInfo)">
+            <summary>
+            Initializes a new instance of the Ghostscript.NET.GhostscriptLibrary class
+            from the GhostscriptVersionInfo object.
+            </summary>
+            <param name="version">GhostscriptVersionInfo instance that tells which Ghostscript library to use.</param>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptLibrary.#ctor(Ghostscript.NET.GhostscriptVersionInfo,System.Boolean)">
+            <summary>
+            Initializes a new instance of the Ghostscript.NET.GhostscriptLibrary class
+            from the GhostscriptVersionInfo object.
+            </summary>
+            <param name="version">GhostscriptVersionInfo instance that tells which Ghostscript library to use.</param>
+            <param name="fromMemory">Tells if the Ghostscript should be loaded from the memory or directly from the disk.</param>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptLibrary.Dispose">
+            <summary>
+            Releases all resources used by the Ghostscript.NET.GhostscriptLibrary instance.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptLibrary.Dispose(System.Boolean)">
+            <summary>
+            Releases all resources used by the Ghostscript.NET.GhostscriptLibrary instance.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptLibrary.Initialize">
+            <summary>
+            Get the native library symbols and map them to the appropriate functions/delegates.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptLibrary.ThrowIncompatibileNativeGhostscriptLibraryException">
+            <summary>
+            Throws friendly gsdll incompatibility message.
+            </summary>
+        </member>
+        <member name="T:Ghostscript.NET.GhostscriptLicense">
+            <summary>
+            Ghostscript license type.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.GhostscriptLicense.GPL">
+            <summary>
+            Open source releases.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.GhostscriptLicense.AFPL">
+            <summary>
+            Old open source releases.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.GhostscriptLicense.Artifex">
+            <summary>
+            Commercially licensed release.
+            </summary>
+        </member>
+        <member name="T:Ghostscript.NET.GhostscriptPdfInfo">
+            <summary>
+            Class that helps us to get various information about the PDF file.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptPdfInfo.GetInkCoverage(System.IO.Stream)">
+            <summary>
+            Returns Ink coverage for all pages.
+            The result is ink coverage for the CMYK inks, separately for each single page (for RGB colors, it does a silent conversion to CMYK color space internally).
+            This function is supported only in Ghostscript v9.05 or newer.
+            </summary>
+            <param name="stream">Stream representing PDF document.</param>
+            <returns>A dictionary of a page numbers with the ink coverage.</returns>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptPdfInfo.GetInkCoverage(System.IO.Stream,Ghostscript.NET.GhostscriptVersionInfo)">
+            <summary>
+            Returns Ink coverage for all pages.
+            The result is ink coverage for the CMYK inks, separately for each single page (for RGB colors, it does a silent conversion to CMYK color space internally).
+            This function is supported only in Ghostscript v9.05 or newer.
+            </summary>
+            <param name="stream">Stream representing PDF document.</param>
+            <param name="versionInfo">GhostscriptVersionInfo instance that tells which Ghostscript library to use.</param>
+            <returns>A dictionary of a page numbers with the ink coverage.</returns>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptPdfInfo.GetInkCoverage(System.IO.Stream,System.Int32,System.Int32)">
+            <summary>
+            Returns Ink coverage for specified page range.
+            The result is ink coverage for the CMYK inks, separately for each single page (for RGB colors, it does a silent conversion to CMYK color space internally).
+            This function is supported only in Ghostscript v9.05 or newer.
+            </summary>
+            <param name="stream">Stream representing PDF document.</param>
+            <param name="firstPage">Designated start page of the document. Pages of all documents in PDF collections are numbered sequentionally.</param>
+            <param name="lastPage">Designated end page of the document. Pages of all documents in PDF collections are numbered sequentionally.</param>
+            <returns>Dictionary of page numbers with ink coverage.</returns>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptPdfInfo.GetInkCoverage(System.IO.Stream,System.Int32,System.Int32,Ghostscript.NET.GhostscriptVersionInfo)">
+            <summary>
+            Returns Ink coverage for specified page range.
+            The result is ink coverage for the CMYK inks, separately for each single page (for RGB colors, it does a silent conversion to CMYK color space internally).
+            This function is supported only in Ghostscript v9.05 or newer.
+            </summary>
+            <param name="stream">Stream representing PDF document.</param>
+            <param name="firstPage">Designated start page of the document. Pages of all documents in PDF collections are numbered sequentionally.</param>
+            <param name="lastPage">Designated end page of the document. Pages of all documents in PDF collections are numbered sequentionally.</param>
+            <param name="versionInfo">GhostscriptVersionInfo instance that tells which Ghostscript library to use.</param>
+            <returns>A dictionary of a page numbers with the ink coverage.</returns>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptPdfInfo.GetInkCoverage(System.String)">
+            <summary>
+            Returns Ink coverage for all pages.
+            The result is ink coverage for the CMYK inks, separately for each single page (for RGB colors, it does a silent conversion to CMYK color space internally).
+            This function is supported only in Ghostscript v9.05 or newer.
+            </summary>
+            <param name="path">PDF file path.</param>
+            <returns>A dictionary of a page numbers with the ink coverage.</returns>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptPdfInfo.GetInkCoverage(System.String,Ghostscript.NET.GhostscriptVersionInfo)">
+            <summary>
+            Returns Ink coverage for all pages.
+            The result is ink coverage for the CMYK inks, separately for each single page (for RGB colors, it does a silent conversion to CMYK color space internally).
+            This function is supported only in Ghostscript v9.05 or newer.
+            </summary>
+            <param name="path"></param>
+            <param name="versionInfo">GhostscriptVersionInfo instance that tells which Ghostscript library to use.</param>
+            <returns>A dictionary of a page numbers with the ink coverage.</returns>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptPdfInfo.GetInkCoverage(System.String,System.Int32,System.Int32)">
+            <summary>
+            Returns Ink coverage for specified page range.
+            The result is ink coverage for the CMYK inks, separately for each single page (for RGB colors, it does a silent conversion to CMYK color space internally).
+            This function is supported only in Ghostscript v9.05 or newer.
+            </summary>
+            <param name="path">PDF file path.</param>
+            <param name="firstPage">Designated start page of the document. Pages of all documents in PDF collections are numbered sequentionally.</param>
+            <param name="lastPage">Designated end page of the document. Pages of all documents in PDF collections are numbered sequentionally.</param>
+            <returns>A dictionary of a page numbers with the ink coverage.</returns>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptPdfInfo.GetInkCoverage(System.String,System.Int32,System.Int32,Ghostscript.NET.GhostscriptVersionInfo)">
+            <summary>
+            Returns Ink coverage for specified page range.
+            The result is ink coverage for the CMYK inks, separately for each single page (for RGB colors, it does a silent conversion to CMYK color space internally).
+            This function is supported only in Ghostscript v9.05 or newer.
+            </summary>
+            <param name="path">PDF file path.</param>
+            <param name="firstPage">Designated start page of the document. Pages of all documents in PDF collections are numbered sequentionally.</param>
+            <param name="lastPage">Designated end page of the document. Pages of all documents in PDF collections are numbered sequentionally.</param>
+            <param name="versionInfo">GhostscriptVersionInfo instance that tells which Ghostscript library to use.</param>
+            <returns>A dictionary of a page numbers with the ink coverage.</returns>
+        </member>
+        <member name="T:Ghostscript.NET.GhostscriptPageInkCoverage">
+            <summary>
+            Ink coverage.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptPageInkCoverage.Page">
+            <summary>
+            Gets page number.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptPageInkCoverage.C">
+            <summary>
+            Gets percentage of Cyan color coverage.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptPageInkCoverage.M">
+            <summary>
+            Gets percentage of Magenta color coverage.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptPageInkCoverage.Y">
+            <summary>
+            Gets percentage of Yellow color coverage.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptPageInkCoverage.K">
+            <summary>
+            Gets percentage of Black color coverage.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptPageInkCoverage.IsValid">
+            <summary>
+            Gets if the ink coverage values are valid.
+            </summary>
+        </member>
+        <member name="T:Ghostscript.NET.GhostscriptPipedOutput">
+            <summary>
+            Represents a Ghostscript piped output.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptPipedOutput.#ctor">
+            <summary>
+            Initializes a new instance of the Ghostscript.NET.GhostscriptPipedOutput class.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptPipedOutput.Dispose">
+            <summary>
+            Releases all resources used by the Ghostscript.NET.GhostscriptPipedOutput instance.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptPipedOutput.Dispose(System.Boolean)">
+            <summary>
+            Releases all resources used by the Ghostscript.NET.GhostscriptPipedOutput instance.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptPipedOutput.ReadGhostscriptPipeOutput(System.Object)">
+            <summary>
+            Reads Ghostscript output.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptPipedOutput.ClientHandle">
+            <summary>
+            Gets pipes client handle as string. 
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptPipedOutput.Data">
+            <summary>
+            Gets the Ghostscript output.
+            </summary>
+        </member>
+        <member name="T:Ghostscript.NET.GhostscriptRectangle">
+            <summary>
+            Stores a set of four float values that represent lower-left and upper-right corner of rectangle.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptRectangle.#ctor">
+            <summary>
+            Initializes a new instance of the Ghostscript.NET.GhostscriptRectangle class.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptRectangle.#ctor(System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Initializes a new instance of the Ghostscript.NET.GhostscriptRectangle class.
+            </summary>
+            <param name="llx">Lower-left x.</param>
+            <param name="lly">Lower-left y.</param>
+            <param name="urx">Upper-right x.</param>
+            <param name="ury">Upper-right y.</param>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptRectangle.llx">
+            <summary>
+            Gets lower-left x.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptRectangle.lly">
+            <summary>
+            Gets lower-left y.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptRectangle.urx">
+            <summary>
+            Gets upper-right x.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptRectangle.ury">
+            <summary>
+            Gets upper-right y.
+            </summary>
+        </member>
+        <member name="T:Ghostscript.NET.GhostscriptStdIO">
+            <summary>
+            Represents a base Ghostscript standard input output handler.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptStdIO.#ctor(System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Initializes a new instance of the Ghostscript.NET.GhostscriptStdIO class.
+            </summary>
+            <param name="handleStdIn">Whether or not to handle Ghostscript standard input.</param>
+            <param name="handleStdOut">Whether or not to handle Ghostscript standard output.</param>
+            <param name="handleStdErr">Whether or not to handle Ghostscript standard errors.</param>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptStdIO.gs_std_in(System.IntPtr,System.IntPtr,System.Int32)">
+            <summary>
+            Standard input handler.
+            </summary>
+            <param name="handle">Standard input handle.</param>
+            <param name="pointer">Pointer to a memroy block.</param>
+            <param name="count">Number of bytes that standard input expects.</param>
+            <returns>Number of bytes returned.</returns>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptStdIO.gs_std_out(System.IntPtr,System.IntPtr,System.Int32)">
+            <summary>
+            Handles standard output.
+            </summary>
+            <param name="handle">Standard output handle.</param>
+            <param name="pointer">Pointer to a memroy block.</param>
+            <param name="count">Number of bytes that standard output writes.</param>
+            <returns>Number of bytes read.</returns>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptStdIO.gs_std_err(System.IntPtr,System.IntPtr,System.Int32)">
+            <summary>
+            Handles errors.
+            </summary>
+            <param name="handle">Errors handle.</param>
+            <param name="pointer">Pointer to a memory block.</param>
+            <param name="count">Number of bytes standard error writes.</param>
+            <returns>Number of bytes read.</returns>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptStdIO.StdIn(System.String@,System.Int32)">
+            <summary>
+            Abstract standard input method.
+            </summary>
+            <param name="input">Input data.</param>
+            <param name="count">Expected size of the input data.</param>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptStdIO.StdOut(System.String)">
+            <summary>
+            Abstract standard output method.
+            </summary>
+            <param name="output">Output data.</param>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptStdIO.StdError(System.String)">
+            <summary>
+            Abstract standard error method.
+            </summary>
+            <param name="error">Error data.</param>
+        </member>
+        <member name="T:Ghostscript.NET.GhostscriptSwitchAttribute">
+            <summary>
+            Represents a GhostscriptSwitch attribute.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptSwitchAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the Ghostscript.NET.GhostscriptSwitchAttribute class.
+            </summary>
+            <param name="name">The Switch name.</param>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptSwitchAttribute.Name">
+            <summary>
+            Gets the switch name.
+            </summary>
+        </member>
+        <member name="T:Ghostscript.NET.GhostscriptSwitchValueAttribute">
+            <summary>
+            Represents a GhostscriptSwitchValue attribute.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptSwitchValueAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the Ghostscript.NET.GhostscriptSwitchValueAttribute class.
+            </summary>
+            <param name="value"></param>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptSwitchValueAttribute.Value">
+            <summary>
+            Gets the switch value.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.ierrors.e_Fatal">
+            <summary>
+            Internal code for a fatal error.
+            gs_interpret also returns this for a .quit with a positive exit code.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.ierrors.e_Quit">
+            <summary>
+            Internal code for the .quit operator.
+            The real quit code is an integer on the operand stack.
+            gs_interpret returns this only for a .quit with a zero exit code.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.ierrors.e_InterpreterExit">
+            <summary>
+            Internal code for a normal exit from the interpreter.
+            Do not use outside of interp.c.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.ierrors.e_RemapColor">
+            <summary>
+            Internal code that indicates that a procedure has been stored in the
+            remap_proc of the graphics state, and should be called before retrying
+            the current token.  This is used for color remapping involving a call
+            back into the interpreter -- inelegant, but effective.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.ierrors.e_ExecStackUnderflow">
+            <summary>
+            Internal code to indicate we have underflowed the top block
+            of the e-stack.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.ierrors.e_VMreclaim">
+            <summary>
+            Internal code for the vmreclaim operator with a positive operand.
+            We need to handle this as an error because otherwise the interpreter
+            won't reload enough of its state when the operator returns.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.ierrors.e_NeedInput">
+            <summary>
+            Internal code for requesting more input from run_string.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.ierrors.e_Info">
+            <summary>
+            Internal code for a normal exit when usage info is displayed.
+            This allows Window versions of Ghostscript to pause until
+            the message can be read.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.ierrors.GetErrorName(System.Int32)">
+            <summary>
+            Returns error name.
+            </summary>
+            <param name="returnCode">Return code from the Ghostscript.</param>
+            <returns>Error name.</returns>
+        </member>
+        <member name="M:Ghostscript.NET.BufferHelper.IndexOf(System.Byte[],System.Byte[])">
+            <summary>
+            The Knuth-Morris-Pratt Pattern Matching Algorithm.
+            </summary>
+        </member>
+        <member name="T:Ghostscript.NET.NativeLibraryHelper">
+            <summary>
+            Class that helps us to get various information about native libraries.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.NativeLibraryHelper.GetImageFileMachineType(System.String)">
+            <summary>
+            Gets the image file machine type.
+            </summary>
+            <param name="path">Native library path.</param>
+            <returns>Image file machine type.</returns>
+        </member>
+        <member name="M:Ghostscript.NET.NativeLibraryHelper.GetImageFileMachineType(System.Byte[])">
+            <summary>
+            Gets the image file machine type.
+            </summary>
+            <param name="buffer">Memory buffer representing native library.</param>
+            <returns>Image file machine type.</returns>
+        </member>
+        <member name="M:Ghostscript.NET.NativeLibraryHelper.GetImageFileMachineType(System.IO.Stream)">
+            <summary>
+            Gets the image file machine type.
+            </summary>
+            <param name="srm">Stream representing native library.</param>
+            <returns>Image file machine type.</returns>
+        </member>
+        <member name="M:Ghostscript.NET.NativeLibraryHelper.Is64BitLibrary(System.String)">
+            <summary>
+            Gets if native library is compiled as 64bit library.
+            </summary>
+            <param name="path">Native library path.</param>
+            <returns>True if native library is compiled as 64 bit library.</returns>
+        </member>
+        <member name="M:Ghostscript.NET.NativeLibraryHelper.Is64BitLibrary(System.Byte[])">
+            <summary>
+            Gets if native library is compiled as 64bit library.
+            </summary>
+            <param name="buffer">Memory buffer representing native library.</param>
+            <returns>True if native library is compiled as 64 bit library.</returns>
+        </member>
+        <member name="M:Ghostscript.NET.NativeLibraryHelper.Is64BitMachineValue(System.UInt16)">
+            <summary>
+            Gets if machine value represents 64 bit machine.
+            </summary>
+            <param name="machine">IMAGE_FILE_HEADER->Machine value.</param>
+        </member>
+        <member name="T:Ghostscript.NET.Interpreter.GhostscriptInterpreter">
+            <summary>
+            Represents a Ghostscript interpreter.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.Interpreter.GhostscriptInterpreter.#ctor">
+            <summary>
+            Initializes a new instance of the Ghostscript.NET.GhostscriptInterpreter class.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.Interpreter.GhostscriptInterpreter.#ctor(System.Byte[])">
+            <summary>
+            Initializes a new instance of the Ghostscript.NET.GhostscriptInterpreter class.
+            </summary>
+            <param name="library">Memory buffer representing native Ghostscript library.</param>
+        </member>
+        <member name="M:Ghostscript.NET.Interpreter.GhostscriptInterpreter.#ctor(Ghostscript.NET.GhostscriptVersionInfo)">
+            <summary>
+            Initializes a new instance of the Ghostscript.NET.GhostscriptInterpreter class.
+            </summary>
+            <param name="version">GhostscriptVersionInfo instance that tells which Ghostscript library to use.</param>
+        </member>
+        <member name="M:Ghostscript.NET.Interpreter.GhostscriptInterpreter.#ctor(Ghostscript.NET.GhostscriptVersionInfo,System.Boolean)">
+            <summary>
+            Initializes a new instance of the Ghostscript.NET.GhostscriptInterpreter class.
+            </summary>
+            <param name="version">GhostscriptVersionInfo instance that tells which Ghostscript library to use.</param>
+            <param name="fromMemory">Tells if the Ghostscript should be loaded from the memory or directly from the disk.</param>
+        </member>
+        <member name="M:Ghostscript.NET.Interpreter.GhostscriptInterpreter.Dispose">
+            <summary>
+            Releases all resources used by the Ghostscript.NET.GhostscriptInterpreter instance.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.Interpreter.GhostscriptInterpreter.Dispose(System.Boolean)">
+            <summary>
+            Releases all resources used by the Ghostscript.NET.GhostscriptInterpreter instance.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.Interpreter.GhostscriptInterpreter.Initialize">
+            <summary>
+            Initializes a new instance of Ghostscript interpreter.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.Interpreter.GhostscriptInterpreter.Setup(Ghostscript.NET.GhostscriptStdIO,Ghostscript.NET.GhostscriptDisplayDeviceHandler)">
+            <summary>
+            Sets the stdio and display device callback handlers.
+            </summary>
+            <param name="stdIO">Stdio callback handler.</param>
+            <param name="displayDevice">DisplayDevice callback handler.</param>
+        </member>
+        <member name="M:Ghostscript.NET.Interpreter.GhostscriptInterpreter.InitArgs(System.String[])">
+            <summary>
+            Initializes the interpreter.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.Interpreter.GhostscriptInterpreter.Run(System.String)">
+            <summary>
+            Runs a string.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.Interpreter.GhostscriptInterpreter.RunFile(System.String)">
+            <summary>
+            Runs a PostScript file.
+            </summary>
+        </member>
+        <member name="T:Microsoft.WinAny.Interop.DynamicNativeLibrary">
+            <summary>
+            Class that helps you to load and use native/unmanaged dynamic-link libraries dinamically.
+            It provides ability to load libraries from the memory or disk. 
+            It's compatibile with x86 and x64 libraries.
+            </summary>
+        </member>
+        <member name="M:Microsoft.WinAny.Interop.DynamicNativeLibrary.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the NativeLibrary class from a native module stored on disk.
+            </summary>
+            <param name="lpLibFileName">Native module file name.</param>
+        </member>
+        <member name="M:Microsoft.WinAny.Interop.DynamicNativeLibrary.#ctor(System.Byte[])">
+            <summary>
+            Initializes a new instance of the NativeLibrary class from a native module byte array.
+            </summary>
+            <param name="buffer">Native module byte array.</param>
+        </member>
+        <member name="M:Microsoft.WinAny.Interop.DynamicNativeLibrary.MemoryLoadLibrary(System.Byte[])">
+            <summary>
+            Loads the specified native module from a byte array into the address space of the calling process.
+            </summary>
+            <param name="data">Native module byte array.</param>
+            <returns>If the function succeeds, the return value is a handle to the module.</returns>
+        </member>
+        <member name="M:Microsoft.WinAny.Interop.DynamicNativeLibrary.CopySections(System.Byte*,System.Byte*,Microsoft.WinAny.Interop.DynamicNativeLibrary.MEMORY_MODULE*)">
+            <summary>
+            Copies sections from a native module file block to the new memory location.
+            </summary>
+            <param name="ptr_data">Pointer to a native module byte array.</param>
+            <param name="ptr_old_headers">Pointer to a source native module headers.</param>
+            <param name="memory_module">Pointer to a memory module.</param>
+        </member>
+        <member name="M:Microsoft.WinAny.Interop.DynamicNativeLibrary.PerformBaseRelocation(Microsoft.WinAny.Interop.DynamicNativeLibrary.MEMORY_MODULE*,System.UInt64)">
+            <summary>
+            Adjusts base address of the imported data.
+            </summary>
+            <param name="memory_module">Pointer to a memory module.</param>
+            <param name="delta">Adjustment delta value.</param>
+        </member>
+        <member name="M:Microsoft.WinAny.Interop.DynamicNativeLibrary.BuildImportTable(Microsoft.WinAny.Interop.DynamicNativeLibrary.MEMORY_MODULE*)">
+            <summary>
+            Loads required dlls and adjust function table of the imports.
+            </summary>
+            <param name="memory_module">Pointer to a memory module.</param>
+            <returns>If the function succeeds, the return value is true.</returns>
+        </member>
+        <member name="M:Microsoft.WinAny.Interop.DynamicNativeLibrary.FinalizeSections(Microsoft.WinAny.Interop.DynamicNativeLibrary.MEMORY_MODULE*)">
+            <summary>
+            Marks memory pages depending on section headers and release sections that are marked as "discardable".
+            </summary>
+            <param name="memory_module">Pointer to a memory module.</param>
+        </member>
+        <member name="M:Microsoft.WinAny.Interop.DynamicNativeLibrary.CallDllEntryPoint(Microsoft.WinAny.Interop.DynamicNativeLibrary.MEMORY_MODULE*,System.UInt32)">
+            <summary>
+            Calls module entry point.
+            </summary>
+            <param name="memory_module">Pointer to a memory module.</param>
+            <param name="fdwReason"></param>
+            <returns>If the function succeeds or if there is no entry point, the return value is true.</returns>
+        </member>
+        <member name="M:Microsoft.WinAny.Interop.DynamicNativeLibrary.MemoryFreeLibrary(System.IntPtr)">
+            <summary>
+            Deattach from the process and do a cleanup.
+            </summary>
+            <param name="hModule">Pointer to a memory module.</param>
+        </member>
+        <member name="M:Microsoft.WinAny.Interop.DynamicNativeLibrary.GetDelegateForFunction(System.String,System.Type)">
+            <summary>
+            Retrieves a delegate of an exported function or variable from loaded module.
+            </summary>
+            <param name="procName">The function or variable name.</param>
+            <param name="delegateType">The type of the delegate to be returned.</param>
+            <returns>A function instance.</returns>
+        </member>
+        <member name="M:Microsoft.WinAny.Interop.DynamicNativeLibrary.GetDelegateForFunction``1(System.String)">
+            <summary>
+            Retrieves a delegate of an exported function or variable from loaded module.
+            </summary>
+            <typeparam name="T">Delegate type.</typeparam>
+            <param name="procName">The function or variable name.</param>
+            <returns>A function instance.</returns>
+        </member>
+        <member name="M:Microsoft.WinAny.Interop.DynamicNativeLibrary.GetProcAddress(System.String)">
+            <summary>
+            Retrieves the address of an exported function or variable from loaded module.
+            </summary>
+            <param name="procName">The function or variable name.</param>
+            <returns>
+            If the function succeeds, the return value is the address of the exported function or variable.
+            If the function fails, the return value is IntPtr.Zero.
+            </returns>
+        </member>
+        <member name="M:Microsoft.WinAny.memory.memcpy(System.Byte*,System.Byte*,System.UInt32)">
+            <summary>
+            Copies bytes between buffers.
+            </summary>
+            <param name="dest">New buffer.</param>
+            <param name="src">Buffer to copy from.</param>
+            <param name="size">Number of characters to copy.</param>
+        </member>
+        <member name="M:Microsoft.WinAny.memory.memset(System.Byte*,System.Byte,System.UInt32)">
+            <summary>
+            Sets buffers to a specified character.
+            </summary>
+            <param name="dest">Pointer to destination.</param>
+            <param name="c">Character to set.</param>
+            <param name="count">Number of characters.</param>
+        </member>
+        <member name="M:Microsoft.WinAny.memory.realloc(System.Byte*,System.UInt32,System.UInt32)">
+            <summary>
+            Reallocate memory blocks.
+            </summary>
+            <param name="memblock">Pointer to previously allocated memory block.</param>
+            <param name="size">Previously allocated memory block size.</param>
+            <param name="newsize">New size in bytes.</param>
+            <returns></returns>
+        </member>
+        <member name="F:Ghostscript.NET.GhostscriptJpegDeviceType.Jpeg">
+            <summary>
+            Produce color JPEG files.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.GhostscriptJpegDeviceType.JpegGray">
+            <summary>
+            Produce grayscale JPEG files.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptImageDevice.Resolution">
+            <summary>
+            This option sets the resolution of the output file in dots per inch. The default value if you don't specify this options is usually 72 dpi.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptImageDevice.ResolutionXY">
+            <summary>
+            This option sets the resolution of the output file in dots per inch. The default value if you don't specify this options is usually 72 dpi.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptImageDevice.TextAlphaBits">
+            <summary>
+            These option control the use of subsample antialiasing. 
+            Their use is highly recommended for producing high quality rasterizations of the input files. 
+            The size of the subsampling box n should be 4 for optimum output, but smaller values can be used for faster rendering. 
+            Antialiasing is enabled separately for text and graphics content.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptImageDevice.GraphicsAlphaBits">
+            <summary>
+            These option control the use of subsample antialiasing. 
+            Their use is highly recommended for producing high quality rasterizations of the input files. 
+            The size of the subsampling box n should be 4 for optimum output, but smaller values can be used for faster rendering. 
+            Antialiasing is enabled separately for text and graphics content.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptJpegDevice.JpegQuality">
+            <summary>
+            (integer from 0 to 100, default 75)
+            Set the quality level value according to the widely used IJG quality scale, which balances the extent of compression 
+            against the fidelity of the image when reconstituted. Lower values drop more information from the image to achieve 
+            higher compression, and therefore have lower quality when reconstituted.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptJpegDevice.QualityFactor">
+            <summary>
+            (float from 0.0 to 1.0).
+            Adobe's QFactor quality scale, which you may use in place of JPEGQ above. The QFactor scale is used by PostScript's
+            DCTEncode filter but is nearly unheard-of elsewhere.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDevicePageSwitches.FixedMedia">
+            <summary>
+            Causes the media size to be fixed after initialization, forcing pages of other sizes or orientations
+            to be clipped. This may be useful when printing documents on a printer that can handle their requested
+            paper size but whose default is some other size. Note that -g automatically sets -dFIXEDMEDIA, 
+            but -sPAPERSIZE= does not.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDevicePageSwitches.FixedResolution">
+            <summary>
+            Causes the media resolution to be fixed similarly. -r automatically sets -dFIXEDRESOLUTION.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDevicePageSwitches.PSFitPage">
+            <summary>
+            The page size from the PostScript file setpagedevice operator, or one of the older statusdict page size 
+            operators (such as letter or a4) will be rotated, scaled and centered on the "best fit" page size from 
+            those availiable in the InputAttributes list. The -dPSFitPage is most easily used to fit pages when used
+            with the -dFIXEDMEDIA option. This option is also set by the -dFitPage option.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDevicePageSwitches.Orient1">
+            <summary>
+            Defines the meaning of the 0 and 1 orientation values for the setpage[params] compatibility operators. 
+            The default value of ORIENT1 is true (set in gs_init.ps), which is the correct value for most files that
+            use setpage[params] at all, namely, files produced by badly designed applications that "know" that the 
+            output will be printed on certain roll-media printers: these applications use 0 to mean landscape and 1 
+            to mean portrait. -dORIENT1=false declares that 0 means portrait and 1 means landscape, which is the 
+            convention used by a smaller number of files produced by properly written applications.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDevicePageSwitches.DeviceWidthPoints">
+            <summary>
+            Sets the initial page width to desired value respectively, specified in 1/72" units.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDevicePageSwitches.DeviceHeightPoints">
+            <summary>
+            Sets the initial page height to desired value respectively, specified in 1/72" units.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDevicePageSwitches.DefaultPaperSize">
+            <summary>
+            This value will be used to replace the device default papersize ONLY if the default papersize for the device
+            is 'letter' or 'a4' serving to insulate users of A4 or 8.5x11 from particular device defaults (the collection
+            of contributed drivers in Ghostscript vary as to the default size).
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDevicePageSwitches.FitPage">
+            <summary>
+            This is a "convenience" operator that sets the various options to perform page fitting for specific file types.
+            This option sets the -dEPSFitPage, -dPDFFitPage, and the -dFitPage options.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDevicePdfSwitches.FirstPage">
+            <summary>
+            Begins interpreting on the designated page of the document. Pages of all documents in PDF collections are numbered sequentionally.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDevicePdfSwitches.LastPage">
+            <summary>
+            Stops interpreting after the designated page of the document. Pages of all documents in PDF collections are numbered sequentionally.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDeviceInteractionSwitches.Batch">
+            <summary>
+            Causes Ghostscript to exit after processing all files named on the command line, rather than going into an 
+            interactive loop reading PostScript commands. Equivalent to putting -c quit at the end of the command line.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDeviceInteractionSwitches.NoPagePrompt">
+            <summary>
+            Disables only the prompt, but not the pause, at the end of each page. This may be useful on PC displays that
+            get confused if a program attempts to write text to the console while the display is in a graphics mode.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDeviceInteractionSwitches.NoPause">
+            <summary>
+            Disables the prompt and pause at the end of each page. Normally one should use this (along with -dBATCH) when
+            producing output on a printer or to a file; it also may be desirable for applications where another program is
+            "driving" Ghostscript.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDeviceInteractionSwitches.NoPrompt">
+            <summary>
+            Disables the prompt printed by Ghostscript when it expects interactive input, as well as the end-of-page prompt
+            (-dNOPAGEPROMPT). This allows piping input directly into Ghostscript, as long as the data doesn't refer to currentfile.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDeviceInteractionSwitches.Quiet">
+            <summary>
+            Suppresses routine information comments on standard output. This is currently necessary when redirecting 
+            device output to standard output.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDeviceInteractionSwitches.ShortErrors">
+            <summary>
+            Makes certain error and information messages more Adobe-compatible.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDeviceOtherSwitches.DelayBind">
+            <summary>
+            Causes bind to remember all its invocations, but not actually execute them until the .bindnow procedure is 
+            called. Useful only for certain specialized packages like pstotext that redefine operators. See the documentation
+            for .bindnow for more information on using this feature.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDeviceOtherSwitches.DoPdfMarks">
+            <summary>
+            Causes pdfmark to be called for bookmarks, annotations, links and cropbox when processing PDF files. Normally, 
+            pdfmark is only called for these types for PostScript files or when the output device requests it (e.g. pdfwrite device).
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDeviceOtherSwitches.NoBind">
+            <summary>
+            Disables the bind operator. Useful only for debugging.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDeviceOtherSwitches.NoCache">
+            <summary>
+            Disables character caching. Useful only for debugging.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDeviceOtherSwitches.NoGC">
+            <summary>
+            Suppresses the initial automatic enabling of the garbage collector in Level 2 systems. 
+            (The vmreclaim operator is not disabled.) Useful only for debugging.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDeviceOtherSwitches.NoOuterSave">
+            <summary>
+            Suppresses the initial save that is used for compatibility with Adobe PS Interpreters that ordinarily 
+            run under a job server. If a job server is going to be used to set up the outermost save level, then 
+            -dNOOUTERSAVE should be used so that the restore between jobs will restore global VM as expected.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDeviceOtherSwitches.NoSafer">
+            <summary>
+            (equivalent to -dDELAYSAFER). 
+            This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts 
+            that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript 
+            programs are allowed to read, write, rename or delete any files in the system that are not protected by 
+            operating system permissions. This mode should be used with caution, and .setsafe should be run prior to 
+            running any PostScript file with unknown contents.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDeviceOtherSwitches.Safer">
+            <summary>
+            Disables the deletefile and renamefile operators, and the ability to open piped commands (%pipe%cmd) at all.
+            Only %stdout and %stderr can be opened for writing. Disables reading of files other than %stdin, those given 
+            as a command line argument, or those contained on one of the paths given by LIBPATH and FONTPATH and specified
+            by the system params /FontResourceDir and /GenericResourceDir.
+            This mode also sets the .LockSafetyParams parameter of the default device, or the device specified with the 
+            -sDEVICE= switch to protect against programs that attempt to write to files using the OutputFile device parameter.
+            Note that since the device parameters specified on the command line (including OutputFile) are set prior to SAFER
+            mode, the -sOutputFile=... on the command line is unrestricted.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDeviceOtherSwitches.Strict">
+            <summary>
+            Disables as many Ghostscript extensions as feasible, to be more helpful in debugging applications that produce 
+            output for Adobe and other RIPs.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptDeviceOtherSwitches.WriteSystemDict">
+            <summary>
+            Leaves systemdict writable. This is necessary when running special utility programs such as font2c and pcharstr, 
+            which must bypass normal PostScript access protection.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.GhostscriptImageDeviceAlphaBits.V_1">
+            <summary>
+            1.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.GhostscriptImageDeviceAlphaBits.V_2">
+            <summary>
+            2.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.GhostscriptImageDeviceAlphaBits.V_4">
+            <summary>
+            4.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.GhostscriptPngDeviceType.Png16m">
+            <summary>
+            24bit RGB color.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.GhostscriptPngDeviceType.PngAlpha">
+            <summary>
+            Transparency support.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.GhostscriptPngDeviceType.PngGray">
+            <summary>
+            Grayscale output.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.GhostscriptPngDeviceType.Png256">
+            <summary>
+            8-bit color.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.GhostscriptPngDeviceType.Png16">
+            <summary>
+            4-bit color.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.GhostscriptPngDeviceType.PngMono">
+            <summary>
+            Black-and-white only.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.GhostscriptPngDeviceType.PngMonoD">
+            <summary>
+            Black-and-white, but the output is formed from an internal 8 bit grayscale rendering which is then error diffused and converted down to 1bpp.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.Processor.GhostscriptProcessor.StartProcessing(System.String[],Ghostscript.NET.GhostscriptStdIO)">
+            <summary>
+            Run Ghostscript.
+            </summary>
+            <param name="args">Command arguments</param>
+            <param name="stdIO_callback">StdIO callback, can be set to null if you dont want to handle it.</param>
+        </member>
+        <member name="T:Ghostscript.NET.DISPLAY_FORMAT_COLOR">
+            <summary>
+            Define the color space alternatives.
+            </summary>
+        </member>
+        <member name="T:Ghostscript.NET.DISPLAY_FORMAT_ALPHA">
+            <summary>
+            Define whether alpha information, or an extra unused bytes is included
+            DISPLAY_ALPHA_FIRST and DISPLAY_ALPHA_LAST are not implemented
+            </summary>
+        </member>
+        <member name="T:Ghostscript.NET.DISPLAY_FORMAT_DEPTH">
+            <summary>
+            Define the depth per component for DISPLAY_COLORS_GRAY,
+            DISPLAY_COLORS_RGB and DISPLAY_COLORS_CMYK,
+            or the depth per pixel for DISPLAY_COLORS_NATIVE
+            DISPLAY_DEPTH_2 and DISPLAY_DEPTH_12 have not been tested.
+            </summary>
+        </member>
+        <member name="T:Ghostscript.NET.DISPLAY_FORMAT_ENDIAN">
+            <summary>
+            Define whether Red/Cyan should come first,
+            or whether Blue/Black should come first
+            </summary>
+        </member>
+        <member name="T:Ghostscript.NET.DISPLAY_FORMAT_FIRSTROW">
+            <summary>
+            Define whether the raster starts at the top or bottom of the bitmap
+            </summary>
+        </member>
+        <member name="T:Ghostscript.NET.DISPLAY_FORMAT_555">
+            <summary>
+            Define whether packing RGB in 16-bits should use 555
+            or 565 (extra bit for green)
+            </summary>
+        </member>
+        <member name="T:Ghostscript.NET.DISPLAY_FORMAT_ROW_ALIGN">
+            <summary>
+            Define the row alignment, which must be equal to or greater than
+            the size of a pointer.
+            The default (DISPLAY_ROW_ALIGN_DEFAULT) is the size of a pointer,
+            4 bytes (DISPLAY_ROW_ALIGN_4) on 32-bit systems or 8 bytes
+            (DISPLAY_ROW_ALIGN_8) on 64-bit systems.
+            </summary>
+        </member>
+        <member name="T:Ghostscript.NET.display_callback">
+            <summary>
+            Display device callback structure.
+            
+            Note that for Windows, the display callback functions are
+            cdecl, not stdcall.  This differs from those in iapi.h.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.display_callback.size">
+            <summary>
+            Size of this structure
+            Used for checking if we have been handed a valid structure
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.display_callback.version_major">
+            <summary>
+            Major version of this structure
+            The major version number will change if this structure changes.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.display_callback.version_minor">
+            <summary>
+            Minor version of this structure 
+            The minor version number will change if new features are added
+            without changes to this structure.  For example, a new color
+            format.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.display_callback.display_open">
+            <summary>
+            New device has been opened 
+            This is the first event from this device.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.display_callback.display_preclose">
+            <summary>
+            Device is about to be closed. 
+            Device will not be closed until this function returns. 
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.display_callback.display_close">
+            <summary>
+            Device has been closed. 
+            This is the last event from this device. 
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.display_callback.display_presize">
+            <summary>
+            Device is about to be resized. 
+            Resize will only occur if this function returns 0. 
+            raster is byte count of a row.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.display_callback.display_size">
+            <summary>
+            Device has been resized. 
+            New pointer to raster returned in pimage
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.display_callback.display_sync">
+            <summary>
+            flushpage
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.display_callback.display_page">
+            <summary>
+            showpage 
+            If you want to pause on showpage, then don't return immediately
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.display_callback.display_update">
+            <summary>
+            Notify the caller whenever a portion of the raster is updated.
+            This can be used for cooperative multitasking or for
+            progressive update of the display.
+            This function pointer may be set to NULL if not required.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.display_callback.display_memalloc">
+            <summary>
+            Allocate memory for bitmap 
+            This is provided in case you need to create memory in a special
+            way, e.g. shared.  If this is NULL, the Ghostscript memory device
+            allocates the bitmap. This will only called to allocate the
+            image buffer. The first row will be placed at the address
+            returned by display_memalloc.
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.display_callback.display_memfree">
+            <summary>
+            Free memory for bitmap 
+            If this is NULL, the Ghostscript memory device will free the bitmap
+            </summary>
+        </member>
+        <member name="F:Ghostscript.NET.display_callback.display_separation">
+            <summary>
+            Added in V2 
+            When using separation color space (DISPLAY_COLORS_SEPARATION),
+            give a mapping for one separation component.
+            This is called for each new component found.
+            It may be called multiple times for each component.
+            It may be called at any time between display_size
+            and display_close.
+            The client uses this to map from the separations to CMYK
+            and hence to RGB for display.
+            GS must only use this callback if version_major >= 2.
+            The unsigned short c,m,y,k values are 65535 = 1.0.
+            This function pointer may be set to NULL if not required.
+            </summary>
+        </member>
+        <member name="T:Ghostscript.NET.GhostscriptVersionInfo">
+            <summary>
+            Represents a Ghostscript version information.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptVersionInfo.#ctor(System.Version,System.String,System.String,Ghostscript.NET.GhostscriptLicense)">
+            <summary>
+            Initializes a new instance of the Ghostscript.NET.GhostscriptVersionInfo class.
+            </summary>
+            <param name="version">Ghostscript version.</param>
+            <param name="dllPath">Ghostscript native library path.</param>
+            <param name="libPath">Ghostscript lib path.</param>
+            <param name="licenseType">Ghostscript license type.</param>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptVersionInfo.ToString">
+            <summary>
+            Returns GhostscriptVersionInfo string.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptVersionInfo.GetInstalledVersions">
+            <summary>
+            Gets installed Ghostscript versions list.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptVersionInfo.GetInstalledVersions(Ghostscript.NET.GhostscriptLicense)">
+            <summary>
+            Gets installed Ghostscript versions list.
+            </summary>
+            <returns>A GhostscriptVersionInfo list of the Ghostscript installations found on the local system.</returns>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptVersionInfo.GetLastInstalledVersion">
+            <summary>
+            Gets top installed Ghostscript version.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.GhostscriptVersionInfo.GetLastInstalledVersion(Ghostscript.NET.GhostscriptLicense,Ghostscript.NET.GhostscriptLicense)">
+            <summary>
+            Gets top installed Ghostscript version.
+            </summary>
+            <param name="licenseType">Serch for the specific Ghostscript version based on the Ghostscript license.</param>
+            <param name="licensePriority">If there are both license types installed, which one should have the prilorty.</param>
+            <returns>GhostscriptVersionInfo object of the last installed Ghostscript version based on priority license.</returns>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptVersionInfo.Version">
+            <summary>
+            Gets Ghostscript version.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptVersionInfo.DllPath">
+            <summary>
+            Gets Ghostscript native library path.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptVersionInfo.LibPath">
+            <summary>
+            Gets Ghostscrip lib path.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptVersionInfo.LicenseType">
+            <summary>
+            Gets Ghostscript license type.
+            </summary>
+        </member>
+        <member name="P:Ghostscript.NET.GhostscriptVersionInfo.IsGhostscriptInstalled">
+            <summary>
+            Gets if the Ghostscript is installed on the local system.
+            </summary>
+        </member>
+        <member name="T:Ghostscript.NET.gsapi_revision">
+            <summary>
+            Get version numbers and strings.
+            This is safe to call at any time.
+            You should call this first to make sure that the correct version
+            of the Ghostscript is being used.
+            pr is a pointer to a revision structure.
+            len is the size of this structure in bytes.
+            Returns 0 if OK, or if len too small (additional parameters
+            have been added to the structure) it will return the required
+            size of the structure.
+            </summary>
+            <param name="pr"></param>
+            <param name="len"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Ghostscript.NET.gsapi_new_instance">
+            <summary>
+            Create a new instance of Ghostscript.
+            This instance is passed to most other API functions.
+            The caller_handle will be provided to callback functions.
+            </summary>
+            <param name="pinstance"></param>
+            <param name="caller_handle"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Ghostscript.NET.gsapi_delete_instance">
+            <summary>
+            Destroy an instance of Ghostscript
+            Before you call this, Ghostscript must have finished.
+            If Ghostscript has been initialised, you must call gsapi_exit()
+            before gsapi_delete_instance.
+            </summary>
+            <param name="instance"></param>
+        </member>
+        <member name="T:Ghostscript.NET.gsapi_set_stdio">
+            <summary>
+            Set the callback functions for stdio
+            The stdin callback function should return the number of
+            characters read, 0 for EOF, or -1 for error.
+            The stdout and stderr callback functions should return
+            the number of characters written.
+            If a callback address is NULL, the real stdio will be used.
+            </summary>
+            <param name="instance"></param>
+            <param name="stdin_fn"></param>
+            <param name="stdout_fn"></param>
+            <param name="stderr_fn"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Ghostscript.NET.gsapi_set_poll">
+            <summary>
+            Set the callback function for polling.
+            This is used for handling window events or cooperative
+            multitasking.  This function will only be called if
+            Ghostscript was compiled with CHECK_INTERRUPTS
+            as described in gpcheck.h.
+            </summary>
+            <param name="instance"></param>
+            <param name="poll_fn"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Ghostscript.NET.gsapi_set_display_callback">
+            <summary>
+            Set the display device callback structure.
+            If the display device is used, this must be called
+            after gsapi_new_instance() and before gsapi_init_with_args().
+            See gdevdisp.h for more details.
+            </summary>
+            <param name="instance"></param>
+            <param name="callback"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Ghostscript.NET.gsapi_set_arg_encoding">
+            <summary>
+            Set the encoding used for the args. By default we assume
+            'local' encoding. For windows this equates to whatever the current
+            codepage is. For linux this is utf8.
+            
+            Use of this API (gsapi) with 'local' encodings (and hence without calling
+            this function) is now deprecated!
+            </summary>
+        </member>
+        <member name="T:Ghostscript.NET.gsapi_init_with_args">
+            <summary>
+            Initialise the interpreter.
+            This calls gs_main_init_with_args() in imainarg.c
+            1. If quit or EOF occur during gsapi_init_with_args(), 
+               the return value will be e_Quit.  This is not an error. 
+               You must call gsapi_exit() and must not call any other
+               gsapi_XXX functions.
+            2. If usage info should be displayed, the return value will be e_Info
+               which is not an error.  Do not call gsapi_exit().
+            3. Under normal conditions this returns 0.  You would then 
+               call one or more gsapi_run_*() functions and then finish
+               with gsapi_exit().
+            </summary>
+            <param name="instance"></param>
+            <param name="argc"></param>
+            <param name="argv"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Ghostscript.NET.gsapi_exit">
+            <summary>
+            Exit the interpreter.
+            This must be called on shutdown if gsapi_init_with_args()
+            has been called, and just before gsapi_delete_instance().
+            </summary>
+            <param name="instance"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Ghostscript.NET.gsapi_stdio_callback">
+            <summary>
+            Callback function for stdio.
+            </summary>
+            <param name="handle"></param>
+            <param name="pointer"></param>
+            <param name="count"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Ghostscript.NET.gsapi_pool_callback">
+            <summary>
+            Callback function for gsapi_set_poll function.
+            </summary>
+            <param name="handle"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Ghostscript.NET.Rasterizer.GhostscriptRasterizer.Close">
+            <summary>
+            Close the GhostscriptRasterizer.
+            </summary>
+        </member>
+        <member name="M:Ghostscript.NET.Rasterizer.GhostscriptRasterizer.GetPage(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Gets PDF page as System.Drawing.Image.
+            </summary>
+            <param name="xDpi">Desired x DPI.</param>
+            <param name="yDpi">Desired y DPI.</param>
+            <param name="pageNumber">The page number.</param>
+            <returns>PDF page represented as System.Drawing.Image.</returns>
+        </member>
+        <member name="P:Ghostscript.NET.Rasterizer.GhostscriptRasterizer.PageCount">
+            <summary>
+            Gets PDF page count.
+            </summary>
+        </member>
+    </members>
+</doc>
