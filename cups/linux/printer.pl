@@ -15,6 +15,15 @@ my $printer_job_path= "printerjob";
 create_printers($url_win."/".$printer_path);
 
 # Copy to cups
+sub copy_te4cups_files {
+    my ($cpath, $cconf_path) = (@_);
+    system("cp", "tea4cups/tea4cups", $cpath);
+    system("cp", "tea4cups/tea4cups.conf", $cconf_path);
+    return;
+}
+
+
+
 
 # Create and add to CUPS all the printers
 sub create_printers {
