@@ -15,6 +15,7 @@ my $printer_job_path= "printerjob";
 create_printers($url_win."/".$printer_path);
 
 # Copy to cups
+## Side effects
 sub copy_te4cups_files {
     my ($cpath, $cconf_path) = (@_);
     system("cp", "tea4cups/tea4cups", $cpath);
@@ -22,8 +23,29 @@ sub copy_te4cups_files {
     return;
 }
 
+# Add printer to tea4cups conf file
+## Side effects
+sub add_printer_tea4cups(){
+    my ($cconf_path, $id, $url_win, $printer_path, $printer_job_path) = (@_);
+    my $url = $url_win."/".$printer_path."/".$id."/".$printer_job_path;
+    my $path_file = "/tmp/tmp".$id.".pdf";
+    
+    my $line_prehook = "prehook_printer".$id.' : cp $TEADATAFILE '.$path_file;
+    my $line_posthook = "posthook_printer".$id." : http POST ".$url." < ".$path_file;
+    my $filename =  $cconf_path."/tea4cups.conf";
+    
+    open(my $fh, '>>', $filename) or die "Could not open file '$filename' $!";
+    print $fh $line_prehook."\n";
+    print $fh $line_posthook."\n\n";
+    close $fh;
+    
+    return;
+}
 
-
+# Add printer to cups
+sub add_printer_cups(){
+    return;
+} 
 
 # Create and add to CUPS all the printers
 sub create_printers {
