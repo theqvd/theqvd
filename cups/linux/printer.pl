@@ -9,10 +9,10 @@ my $cups_path = "/usr/lib/cups/backend";
 my $cups_conf_path = "/etc/cups";
     
 my $url_win  = "http://172.26.9.168:9000";
-my $printer_path = "printer";
-my $printer_job_path= "printerjob";
+my $printer_url = "printer";
+my $printer_job_url = "printerjob";
  
-create_printers($url_win."/".$printer_path);
+create_printers($cups_path, $cups_conf_path, $url_win, $printer_url, $printer_job_url);
 
 # Copy to cups
 ## Side effects
@@ -26,8 +26,8 @@ sub copy_te4cups_files {
 # Add printer to tea4cups conf file
 ## Side effects
 sub add_printer_tea4cups(){
-    my ($cconf_path, $id, $url_win, $printer_path, $printer_job_path) = (@_);
-    my $url = $url_win."/".$printer_path."/".$id."/".$printer_job_path;
+    my ($cconf_path, $id, $url_win, $printer_url, $printer_job_url) = (@_);
+    my $url = $url_win."/".$printer_url."/".$id."/".$printer_job_url;
     my $path_file = "/tmp/tmp".$id.".pdf";
     
     my $line_prehook = "prehook_printer".$id.' : cp $TEADATAFILE '.$path_file;
@@ -48,12 +48,16 @@ sub add_printer_cups(){
 } 
 
 # Create and add to CUPS all the printers
+## Side effects
 sub create_printers {
-    my ($url) = (@_);
+    my ($cups_path, $cups_conf_path, $url_win, $printer_url, $printer_job_url) = (@_);
+    my $url = $url_win."/".$printer_url;
     my @printers = get_printers($url);
 
     foreach my $printer (@printers){
-	ppd_create(read_json($printer));
+	my ($id, $name, $filename, $color) = read_json($printer);
+	#add_printer_tea4cups($cups_conf_path, $id, $url_win, $printer_url, $printer_job_url);
+	ppd_create($id, $name, $filename, $color);
     }
     return;
 }
