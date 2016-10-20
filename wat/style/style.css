@@ -2945,19 +2945,19 @@ td.inner-table {
     width: 100% !important; } }
 
 /* Table scroll */
-div.list-block div:first-child {
+div.list-block div:first-child, div.details-side {
   width: 100%; }
   @media screen and (min-width: 41em) { }
-  div.list-block div:first-child .list {
+  div.list-block div:first-child .list, div.details-side .list {
     overflow-x: auto;
     overflow-y: hidden;
     margin-top: 3px; }
-  div.list-block div:first-child table.list {
+  div.list-block div:first-child table.list, div.details-side table.list {
     width: 100%; }
-    div.list-block div:first-child table.list th {
+    div.list-block div:first-child table.list th, div.details-side table.list th {
       position: relative;
       padding-right: 20px; }
-      div.list-block div:first-child table.list th i {
+      div.list-block div:first-child table.list th i, div.details-side table.list th i {
         position: absolute;
         right: 5px;
         padding-left: 10px; }
