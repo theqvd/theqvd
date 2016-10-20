@@ -5,11 +5,14 @@ use Data::Dumper;
 use strict;                     
 use warnings;                 
 
-use constant URL_WIN = "http://172.26.9.168:9000";
-use constant PRINTER_PATH = "printer";
-use constant PRINTER_JOB_PATH = "printerjob";
+my $cups_path = "/usr/lib/cups/backend";
+my $cups_conf_path = "/etc/cups";
+    
+my $url_win  = "http://172.26.9.168:9000";
+my $printer_path = "printer";
+my $printer_job_path= "printerjob";
  
-create_printers(URL_WIN."/".PRINTER_PATH);
+create_printers($url_win."/".$printer_path);
 
 # Copy to cups
 
@@ -19,8 +22,6 @@ sub create_printers {
     my @printers = get_printers($url);
 
     foreach my $printer (@printers){
-	print Dumper $printer;
-
 	ppd_create(read_json($printer));
     }
     return;
