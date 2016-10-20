@@ -25,7 +25,7 @@ sub copy_tea4cups_files {
 
 # Add printer to tea4cups conf file
 ## Side effects
-sub add_printer_tea4cups(){
+sub add_printer_tea4cups {
     my ($cconf_path, $id, $url_win, $printer_url, $printer_job_url) = (@_);
     my $url = $url_win."/".$printer_url."/".$id."/".$printer_job_url;
     my $path_file = "/tmp/tmp".$id.".pdf";
@@ -43,7 +43,7 @@ sub add_printer_tea4cups(){
 }
 
 # Add printer to cups
-sub add_printer_cups(){
+sub add_printer_cups {
     return;
 } 
 
@@ -58,7 +58,7 @@ sub create_printers {
     
     foreach my $printer (@printers){
 	my ($id, $name, $filename, $color) = read_json($printer);
-	#add_printer_tea4cups($cups_conf_path, $id, $url_win, $printer_url, $printer_job_url);
+	add_printer_tea4cups($cups_conf_path, $id, $url_win, $printer_url, $printer_job_url);
 	ppd_create($id, $name, $filename, $color);
     }
     return;
