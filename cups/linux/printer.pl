@@ -42,25 +42,35 @@ sub add_printer_tea4cups {
     return;
 }
 
-# Add printer to cups
-sub add_printer_cups {
-    return;
-} 
-
 # Create and add to CUPS all the printers
 ## Side effects
 sub create_printers {
     my ($cups_path, $cups_conf_path, $url_win, $printer_url, $printer_job_url) = (@_);
     my $url = $url_win."/".$printer_url;
     my @printers = get_printers($url);
-    
+
+    # Copy tea4cups files 
     copy_tea4cups_files($cups_path, $cups_conf_path);
-    
+
+    # Remove printers
+    #system("lpadmin", "-r", "tea4");
+
+    # Add new printers
     foreach my $printer (@printers){
 	my ($id, $name, $filename, $color) = read_json($printer);
+	
 	add_printer_tea4cups($cups_conf_path, $id, $url_win, $printer_url, $printer_job_url);
 	ppd_create($id, $name, $filename, $color);
+	
+	$name =~s/ /_/g;
+	system("lpadmin", "-p", $name, "-v", "tea4cups://", "-P", $filename);
+	system("cupsenable", $name);
+	system("cupsaccept", $name);
     }
+
+    # Reeboot cups
+    system("/etc/init.d/cups", "restart");
+    
     return;
 }
 
@@ -102,7 +112,7 @@ sub ppd_create {
     
     # Write file
    
-    ppd_write_line($fh, ppd_line("PPD-Adobe", "3"));
+    ppd_write_line($fh, ppd_line("PPD-Adobe", "4.3"));
     ppd_write_line($fh, ppd_comm("PPD file for FooJet 2000 with CUPS"));
     ppd_write_line($fh, ppd_comm("Created by the CUPS PPD Compiler CUPS v2.1.4"));
     ppd_write_line($fh, ppd_line("FormatVersion", "\"4.3\""));
