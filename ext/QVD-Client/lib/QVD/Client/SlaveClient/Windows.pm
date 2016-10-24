@@ -9,6 +9,7 @@ use QVD::Config::Core qw(core_cfg);
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use Win32::API;
 use Win32::Process;
+use Win32::LongPath;
 use Win32API::File qw(FdGetOsFHandle WriteFile);
 use File::Temp qw(tempfile);
 use QVD::Log;
@@ -99,7 +100,7 @@ sub handle_share {
         $cmdline,
         1,              # inherit handles
         NORMAL_PRIORITY_CLASS | CREATE_NO_WINDOW | CREATE_SUSPENDED,       # creation flags
-        $path			# current working directory
+        shortpathL($path)			# current working directory
     ) or die "Unable to start sftp-server: $^E";
 	
     # Duplicate socket
