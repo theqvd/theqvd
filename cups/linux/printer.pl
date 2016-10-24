@@ -10,7 +10,7 @@ my $cups_conf_path = "/etc/cups";
     
 my $url_win  = "http://172.26.9.168:9000";
 my $printer_url = "printer";
-my $printer_job_url = "printerjob";
+my $printer_job_url = "printjob";
  
 create_printers($cups_path, $cups_conf_path, $url_win, $printer_url, $printer_job_url);
 
@@ -31,7 +31,7 @@ sub add_printer_tea4cups {
     my $path_file = "/tmp/tmp".$id.".pdf";
     
     my $line_prehook = "prehook_printer".$id.' : cp $TEADATAFILE '.$path_file;
-    my $line_posthook = "posthook_printer".$id." : http POST ".$url." < ".$path_file;
+    my $line_posthook = "posthook_printer".$id." : curl -X POST -d @".$path_file." ".$url;
     my $filename =  $cconf_path."/tea4cups.conf";
     
     open(my $fh, '>>', $filename) or die "Could not open file '$filename' $!";
