@@ -5,6 +5,7 @@ use warnings;
 
 use parent 'QVD::Client::SlaveClient::Base';
 
+use Encode qw/encode/;
 use QVD::Config::Core qw(core_cfg);
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use Win32::API;
@@ -59,7 +60,7 @@ sub handle_share {
     DEBUG "Making a PUT request to /shares/$path";
 	
     my ($code, $msg, $headers, $data) =
-    $self->{httpc}->make_http_request(PUT => '/shares/'.$path,
+    $self->{httpc}->make_http_request(PUT => '/shares/'.encode('utf8',$path),
         headers => [
             "Authorization: Basic $self->{auth_key}",
             'Connection: Upgrade',
