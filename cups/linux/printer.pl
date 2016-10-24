@@ -53,7 +53,7 @@ sub create_printers {
     copy_tea4cups_files($cups_path, $cups_conf_path);
 
     # Remove printers
-    #system("lpadmin", "-r", "tea4");
+    remove_printers();
 
     # Add new printers
     foreach my $printer (@printers){
@@ -72,6 +72,19 @@ sub create_printers {
     system("/etc/init.d/cups", "restart");
     
     return;
+}
+
+# Remove printers
+## Side effects 
+sub remove_printers {
+    my @printers = qx{lpstat -s};
+    my @filtered = grep(/device/, @printers);
+    
+    foreach my $line (@filtered) {
+	my @fields = split / /, $line;
+	my $printer =  substr $fields[2], 0, -1;
+	system("lpadmin", "-x", $printer);
+    } 
 }
 
 # Make a get call to obtain the printer info
