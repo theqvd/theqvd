@@ -1,2 +1,2 @@
 #!/bin/bash
-touch /tmp/miau
+touch /tmp/$TEAPRINTERNAME
