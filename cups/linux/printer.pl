@@ -7,7 +7,7 @@ use warnings;
 
 my $cups_path = "/usr/lib/cups/backend";
 my $cups_conf_path = "/etc/cups";
-my $cups_post_path = "/usr/local"; 
+my $cups_post_path = "/usr/local/bin"; 
     
 my $url_win  = "http://172.26.9.168:9000";
 my $printer_url = "printer";
