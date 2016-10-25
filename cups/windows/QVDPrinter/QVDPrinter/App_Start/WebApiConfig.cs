@@ -28,7 +28,7 @@ namespace QVDPrinter
 
             config.Routes.MapHttpRoute(
                 name: "PrinterJob",
-                routeTemplate: "printer/{id}/printjob",
+                routeTemplate: "printer/{name}/printjob",
                 defaults: new { controller = "printer", action = "CreatePrintJob" }
             );
         }
