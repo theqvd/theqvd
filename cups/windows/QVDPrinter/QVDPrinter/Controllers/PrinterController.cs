@@ -19,11 +19,10 @@ namespace QVDPrinter.Controllers
         public PrinterInfo GetAllPrinters()
         {
             Printer[] printers = new Printer[PrinterSettings.InstalledPrinters.Count];
-
             for (int i = 0; i < PrinterSettings.InstalledPrinters.Count; i++)
-            {
-                printers[i] = MakePrinter(i, PrinterSettings.InstalledPrinters[i]);
-            }
+             {
+                 printers[i] = MakePrinter(i, PrinterSettings.InstalledPrinters[i]);
+             }
 
             PrinterInfo printerInfo = new PrinterInfo();
             printerInfo.Printers = printers;
@@ -32,28 +31,20 @@ namespace QVDPrinter.Controllers
         }
 
         [HttpPost]
-        public async void CreatePrintJob(int id)
+        public void CreatePrintJob(string name)
         {
             string a = Request.GetRouteData().Route.ToString();
             PrintHelper pe = new PrintHelper();
-
-
-            //using (Stream output = File.OpenWrite("aux.pdf"))
             var readStream = this.Request.Content.ReadAsStreamAsync().Result;
-            //string path = "C:\\tmp\\auxiliar.pdf";
             string path = @"C:\tmp\pdf-sample.pdf";
-            //string path = @"C:\Users\inavarro\Downloads\pdf-sample.pdf";
 
 
             using (var outputStream = File.OpenWrite(path))
             {
-
                 readStream.CopyTo(outputStream);
             }
 
-            string col = PrinterSettings.InstalledPrinters[id];
-
-            pe.StartPrint(col, path);
+            pe.StartPrint(name.Replace("_", " "), path);
 
         }
 
