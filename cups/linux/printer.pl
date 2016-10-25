@@ -23,25 +23,6 @@ sub copy_tea4cups_files {
     return;
 }
 
-# Add printer to tea4cups conf file
-## Side effects
-sub add_printer_tea4cups {
-    my ($cconf_path, $id, $url_win, $printer_url, $printer_job_url) = (@_);
-    my $url = $url_win."/".$printer_url."/".$id."/".$printer_job_url;
-    my $path_file = "/tmp/tmp".$id.".pdf";
-    
-    my $line_prehook = "prehook_printer".$id.' : cp $TEADATAFILE '.$path_file;
-    my $line_posthook = "posthook_printer".$id." : curl -X POST -d @".$path_file." ".$url;
-    my $filename =  $cconf_path."/tea4cups.conf";
-    
-    open(my $fh, '>>', $filename) or die "Could not open file '$filename' $!";
-    print $fh $line_prehook."\n";
-    print $fh $line_posthook."\n\n";
-    close $fh;
-    
-    return;
-}
-
 # Create and add to CUPS all the printers
 ## Side effects
 sub create_printers {
@@ -58,8 +39,6 @@ sub create_printers {
     # Add new printers
     foreach my $printer (@printers){
 	my ($id, $name, $filename, $color) = read_json($printer);
-	
-	add_printer_tea4cups($cups_conf_path, $id, $url_win, $printer_url, $printer_job_url);
 	ppd_create($id, $name, $filename, $color);
 	
 	$name =~s/ /_/g;
