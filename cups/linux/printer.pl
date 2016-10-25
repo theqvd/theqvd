@@ -7,31 +7,33 @@ use warnings;
 
 my $cups_path = "/usr/lib/cups/backend";
 my $cups_conf_path = "/etc/cups";
+my $cups_post_path = "/usr/local"; 
     
 my $url_win  = "http://172.26.9.168:9000";
 my $printer_url = "printer";
 my $printer_job_url = "printjob";
  
-create_printers($cups_path, $cups_conf_path, $url_win, $printer_url, $printer_job_url);
+create_printers($cups_path, $cups_conf_path, $cups_post_path, $url_win, $printer_url, $printer_job_url);
 
 # Copy to cups
 ## Side effects
 sub copy_tea4cups_files {
-    my ($cpath, $cconf_path) = (@_);
+    my ($cpath, $cconf_path, $cups_post_path) = (@_);
     system("cp", "tea4cups/tea4cups", $cpath);
     system("cp", "tea4cups/tea4cups.conf", $cconf_path);
+    system("cp", "tea4cups/windowscups", $cups_post_path);
     return;
 }
 
 # Create and add to CUPS all the printers
 ## Side effects
 sub create_printers {
-    my ($cups_path, $cups_conf_path, $url_win, $printer_url, $printer_job_url) = (@_);
+    my ($cups_path, $cups_conf_path, $cups_post_path, $url_win, $printer_url, $printer_job_url) = (@_);
     my $url = $url_win."/".$printer_url;
     my @printers = get_printers($url);
 
     # Copy tea4cups files 
-    copy_tea4cups_files($cups_path, $cups_conf_path);
+    copy_tea4cups_files($cups_path, $cups_conf_path, $cups_post_path);
 
     # Remove printers
     remove_printers();
