@@ -1338,7 +1338,7 @@ sub users_count
 {
     my ($self,$admin) = @_;
     $DB->resultset('User')->search(
-	{'me.tenant_id' => $admin->tenants_scoop})->count;
+	{'me.tenant_id' => $admin->tenants_scope})->count;
 }
 
 sub blocked_users_count
@@ -1346,7 +1346,7 @@ sub blocked_users_count
     my ($self,$admin) = @_;
     $DB->resultset('User')->search(
 	{ 'me.blocked' => 'true',
-	  'me.tenant_id' => $admin->tenants_scoop})->count;
+	  'me.tenant_id' => $admin->tenants_scope})->count;
 }
 
 sub connected_users_count
@@ -1354,7 +1354,7 @@ sub connected_users_count
     my ($self,$admin) = @_;
     $DB->resultset('VM')->search(
 	{ 'vm_runtime.user_state' => 'connected',
-	  'user.tenant_id' => $admin->tenants_scoop }, 
+	  'user.tenant_id' => $admin->tenants_scope }, 
 	{ columns => [ qw/user.id/ ],
 	distinct => 1, 
 	join => [qw(vm_runtime user)] })->count;
@@ -1364,7 +1364,7 @@ sub vms_count
 {
     my ($self,$admin) = @_;
     $DB->resultset('VM')->search(
-	{'user.tenant_id' => $admin->tenants_scoop},
+	{'user.tenant_id' => $admin->tenants_scope},
 	{ join => [qw(user)] })->count;
 }
 
@@ -1373,7 +1373,7 @@ sub blocked_vms_count
     my ($self,$admin) = @_;
     $DB->resultset('VM')->search(
 	{ 'vm_runtime.blocked' => 'true',
-	  'user.tenant_id' => $admin->tenants_scoop }, 
+	  'user.tenant_id' => $admin->tenants_scope }, 
 	{ join => [qw(vm_runtime user)] })->count;
 }
 
@@ -1382,7 +1382,7 @@ sub running_vms_count
     my ($self,$admin) = @_;
     $DB->resultset('VM')->search(
 	{ 'vm_runtime.vm_state' => 'running',
-	  'user.tenant_id' => $admin->tenants_scoop }, 
+	  'user.tenant_id' => $admin->tenants_scope }, 
 	{ join => [qw(vm_runtime user)] })->count;
 }
 
@@ -1413,14 +1413,14 @@ sub osfs_count
 {
     my ($self,$admin) = @_;
     $DB->resultset('OSF')->search(
-	{'me.tenant_id' => $admin->tenants_scoop})->count;
+	{'me.tenant_id' => $admin->tenants_scope})->count;
 }
 
 sub dis_count
 {
     my ($self,$admin) = @_;
     $DB->resultset('DI')->search(
-	{ 'osf.tenant_id' => $admin->tenants_scoop }, 
+	{ 'osf.tenant_id' => $admin->tenants_scope }, 
 	{ join => [qw(osf)] })->count;
 }
 
@@ -1428,7 +1428,7 @@ sub blocked_dis_count
 {
     my ($self,$admin) = @_;
     $DB->resultset('DI')->search(
-	{ 'osf.tenant_id' => $admin->tenants_scoop,
+	{ 'osf.tenant_id' => $admin->tenants_scope,
 	  'me.blocked' => 'true' }, 
 	{ join => [qw(osf)] })->count;
 }
@@ -1439,7 +1439,7 @@ sub vms_with_expiration_date
 
     my $is_not_null = 'IS NOT NULL';
     my $rs = $DB->resultset('VM')->search(
-	{ 'osf.tenant_id' => $admin->tenants_scoop,
+	{ 'osf.tenant_id' => $admin->tenants_scope,
 	  'vm_runtime.vm_expiration_hard'  => \$is_not_null },
 	{ join => [qw(vm_runtime osf)],
 	  prefetch => [qw(vm_runtime)]});

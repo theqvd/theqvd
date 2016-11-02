@@ -87,11 +87,12 @@ my $QVD_OBJECT_TO_DBIX_TABLE = {
 sub BUILD 
 {
     my $self = shift;
-    my $qvd_object = $self->qvd_object_model->qvd_object;
-    my $type_of_action = $self->qvd_object_model->type_of_action;
+    my $qvd_model = $self->qvd_object_model;
+    my $qvd_object = $qvd_model->qvd_object;
+    my $type_of_action = $qvd_model->type_of_action;
 
     # Store the administrator that generates the request
-    $self->{administrator} = $self->qvd_object_model->current_qvd_administrator;
+    $self->{administrator} = $qvd_model->current_qvd_administrator;
 
     # Set the DBIx table the request will be executed against by default
     $self->{table} = $self->qvd_obj_to_table($qvd_object);
@@ -191,7 +192,8 @@ sub BUILD
 # tenant. The corresponding filters to filtering by tenant
 # are added in here
 
-    $self->forze_filtering_by_tenant;
+    $self->forze_filtering_by_tenant
+        if $qvd_model->available_filter('tenant_id');
 
 # Actions 'admin_view_set' and 'admin_view_reset' are supposed to operate
 # over the current admin. The correspondig filters are added in here
@@ -453,8 +455,6 @@ sub forze_filtering_by_tenant
 {
     my $self = shift;
 
-    return unless $self->qvd_object_model->available_filter('tenant_id');
-
     if ($self->json_wrapper->has_filter('tenant_id'))
     {
         QVD::API::Exception->throw(code => 4220, object => 'tenant_id') 
@@ -466,7 +466,7 @@ sub forze_filtering_by_tenant
     }
     else
     {
-        $self->filters->add_filter('tenant_id', $self->administrator->tenants_scoop);
+        $self->filters->add_filter('tenant_id', $self->administrator->tenants_scope);
     }
 }
 
@@ -474,14 +474,13 @@ sub forze_filtering_tenants_by_tenant
 {
     my $self = shift;
 
-    my @ids = @{$self->administrator->tenants_scoop}; # All tenants available for the admin
+    my @ids = @{$self->administrator->tenants_scope(0)}; # All tenants available for the admin
 
-# By convention, tenant 0 is the special tenant of superadmins 
-# Tenant 0 is special. It cannot be deleted and when listing
-# tenants it is not it doesn't appear
+    # By convention, tenant 0 is the special tenant of superadmins 
+    # Tenant 0 is special. It cannot be deleted and when listing
+    # tenants it doesn't appear
+    @ids = grep { $_ != 0 } @ids;
 
-    @ids = grep { $_ ne 0 } @ids if 
-	$self->qvd_object_model->type_of_action =~ /^delete|list$/;
     $self->filters->add_filter('id', \@ids);
 }
 

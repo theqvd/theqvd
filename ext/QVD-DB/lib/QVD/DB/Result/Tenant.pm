@@ -4,6 +4,8 @@ use base qw/DBIx::Class/;
 use strict;
 use warnings;
 
+use constant COMMON_TENANT_ID => -1;
+
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('tenants');
 __PACKAGE__->add_columns(
