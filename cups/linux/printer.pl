@@ -21,7 +21,6 @@ sub copy_tea4cups_files {
     my ($cpath, $cconf_path, $cups_post_path) = (@_);
     system("cp", "tea4cups/tea4cups", $cpath);
     system("cp", "tea4cups/tea4cups.conf", $cconf_path);
-<<<<<<< HEAD
     return;
 }
 
@@ -41,9 +40,7 @@ sub add_printer_tea4cups {
     print $fh $line_posthook."\n\n";
     close $fh;
     
-=======
     system("cp", "tea4cups/windowscups", $cups_post_path);
->>>>>>> ef15fb5f8d1649f58cded52d01e5636b365c5d53
     return;
 }
 
