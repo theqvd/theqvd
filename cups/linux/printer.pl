@@ -176,7 +176,7 @@ sub ppd_create {
 
 # Create general info
 ## Side effects
-sub ppf_general_info() {
+sub ppd_general_info() {
     my ($fh, $filename) = (@_);
     
     ppd_write_line($fh, ppd_line("PPD-Adobe", "4.3"));
