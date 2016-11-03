@@ -124,15 +124,8 @@ sub ppd_create {
     open(my $fh, '>', $filename) or die "Could not open file '$filename' $!";
     
     # Write file
-   
-    ppd_write_line($fh, ppd_line("PPD-Adobe", "4.3"));
-    ppd_write_line($fh, ppd_comm("PPD file for FooJet 2000 with CUPS"));
-    ppd_write_line($fh, ppd_comm("Created by the CUPS PPD Compiler CUPS v2.1.4"));
-    ppd_write_line($fh, ppd_line("FormatVersion", "\"4.3\""));
-    ppd_write_line($fh, ppd_line("FileVersion", "\"1.0\""));
-    ppd_write_line($fh, ppd_line("LanguageVersion", "English"));
-    ppd_write_line($fh, ppd_line("LanguageEncoding", "ISOLatin1"));
-    ppd_write_line($fh, ppd_line("PCFileName", "\"".$filename."\""));
+    ppd_general_info($fh, $filename);
+
     ppd_write_line($fh, ppd_line("Product", "\"(".$name.")\""));
     ppd_write_line($fh, ppd_line("Manufacturer", "\"Foo\""));
     ppd_write_line($fh, ppd_line("ModelName", "\"FooJet 2000\""));
@@ -178,6 +171,25 @@ sub ppd_create {
     ppd_write_line($fh, ppd_comm("End of ".$filename.", 03714 bytes"));
     
     close $fh;
+    return;
+}
+
+# Create general info
+## Side effects
+sub ppf_general_info() {
+    my ($fh, $filename) = (@_);
+    
+    ppd_write_line($fh, ppd_line("PPD-Adobe", "4.3"));
+    
+    ppd_write_line($fh, ppd_comm("Created by the CUPS PPD Compiler CUPS v2.1.4"));
+    
+    ppd_write_line($fh, ppd_line("FormatVersion", "\"4.3\""));
+    ppd_write_line($fh, ppd_line("FileVersion", "\"1.0\""));
+    ppd_write_line($fh, ppd_line("LanguageVersion", "English"));
+    ## Add multiple idiom in the future
+    ppd_write_line($fh, ppd_line("LanguageEncoding", "ISOLatin1"));
+    ppd_write_line($fh, ppd_line("PCFileName", "\"".$filename."\""));
+
     return;
 }
 
