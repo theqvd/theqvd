@@ -215,7 +215,7 @@ sub get_acls_in_roles
 # over the regular assignation of acls for the administrator.
 
     eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
-        %{$request->get_dbi_format_filters()}, $request->modifiers);
+        $request->get_dbi_format_filters(), $request->modifiers);
         @rows = $rs->all };
     QVD::API::Exception->throw(exception => $@, query => 'select') if $@;
 
