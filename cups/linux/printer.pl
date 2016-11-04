@@ -108,7 +108,8 @@ sub read_json {
     my $id = $printer->{'Id'};
     my $name = $printer->{'Name'};
     my $color = 'False'; 
-    if($printer->{'IsSupportColor'} eq 'true'){
+
+    if($printer->{'IsSupportColor'}){
       $color = 'True';   
     }
     
@@ -133,8 +134,9 @@ sub ppd_create {
     ppd_write_line($fh, ppd_line("NickName", "\"".$name.", 1.0\""));
     ppd_write_line($fh, ppd_line("PSVersion", "\"(3010.000) 0\""));
     ppd_write_line($fh, ppd_line("LanguageLevel", "\"3\""));
-    ppd_write_line($fh, ppd_line("ColorDevice", $color ));
-    ppd_write_line($fh, ppd_line("DefaultColorSpace", "Gray"));
+
+    ppd_color($fh, $color);
+
     ppd_write_line($fh, ppd_line("FileSystem", "False"));
     ppd_write_line($fh, ppd_line("Throughput", "\"1\""));
     ppd_write_line($fh, ppd_line("LandscapeOrientation", "Plus90"));
@@ -171,6 +173,24 @@ sub ppd_create {
     ppd_write_line($fh, ppd_comm("End of ".$filename.", 03714 bytes"));
     
     close $fh;
+    return;
+}
+
+# Create color config
+## Side effects
+sub ppd_color() {
+    my ($fh, $color) = (@_);
+
+    ppd_write_line($fh, ppd_comm("Color config"));
+
+    if($color eq 'True'){
+     ppd_write_line($fh, ppd_line("ColorDevice", 'True' ));
+     ppd_write_line($fh, ppd_line("DefaultColorSpace", "CMYK"));
+
+    }else{
+     ppd_write_line($fh, ppd_line("ColorDevice", 'False' ));
+     ppd_write_line($fh, ppd_line("DefaultColorSpace", "Gray"));
+    }
     return;
 }
 
