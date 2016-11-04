@@ -89,7 +89,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
                 // Fill Users select on virtual machines creation form. 
                 // This filling has sense when the view is the VM view and tenant filter is not present
                 var params = {
-                    'action': 'user_tiny_list',
+                    'actionAuto': 'user',
                     'selectedId': '',
                     'controlName': 'user_id',
                     'chosenType': 'advanced100'
@@ -100,7 +100,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
 
             // Fill OSF select on virtual machines creation form
             var params = {
-                'action': 'osf_tiny_list',
+                'actionAuto': 'osf',
                 'selectedId': '',
                 'controlName': 'osf_id',
                 'chosenType': 'advanced100'
@@ -120,7 +120,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             Wat.A.fillSelect(params, function () {
                 // Fill DI Tags select on virtual machines creation form after fill OSF combo
                 var params = {
-                    'action': 'tag_tiny_list',
+                    'actionAuto': 'tag',
                     'selectedId': 'default',
                     'controlName': 'di_tag',
                     'filters': {
@@ -235,7 +235,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         }
         
         var params = {
-            'action': 'tag_tiny_list',
+            'actionAuto': 'tag',
             'startingOptions': {
                 '' : $.i18n.t('No changes'),
                 'default' : 'default',

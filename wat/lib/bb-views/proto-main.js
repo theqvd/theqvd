@@ -163,7 +163,7 @@ Wat.Views.MainView = Backbone.View.extend({
         
         if (editorMode == 'create' && isSuperadmin && classifiedByTenant) { 
             var params = {
-                'action': 'tenant_tiny_list',
+                'actionAuto': 'tenant',
                 'selectedId': that.selectedTenant || 0,
                 'controlId': 'tenant_editor',
                 'chosenType': 'advanced100'

@@ -125,7 +125,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         
         if (Wat.C.isSuperadmin()) { 
             var params = {
-                'action': 'tenant_tiny_list',
+                'actionAuto': 'tenant',
                 'selectedId': this.selectedTenant,
                 'controlId': 'tenant_search',
                 'chosenType': 'advanced100',

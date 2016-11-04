@@ -79,7 +79,7 @@ Wat.Common.BySection.vm = {
         Wat.I.enableDataPickers();
                 
         var params = {
-            'action': 'tag_tiny_list',
+            'actionAuto': 'tag',
             'selectedId': this.model.get('di_tag'),
             'controlName': 'di_tag',
             'filters': {

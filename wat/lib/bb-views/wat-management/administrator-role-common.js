@@ -66,11 +66,10 @@ Wat.Common.BySection.administratorRole = {
             var currentRoles = that.model.get('roles');
         }
         
-        Wat.A.performAction('role_tiny_list', {}, {
+        Wat.A.performAction('role_get_list', {}, {
                 internal: "0",
                 "-or": roleListConditions
             }, {}, function (that) {
-
             that.editorRoles = that.retrievedData.rows;
             
             // If avoid tenant is defined, delete it
@@ -98,7 +97,7 @@ Wat.Common.BySection.administratorRole = {
             that.unassignRoles = [];
             
             that.renderRoles();
-        }, that);
+        }, that, ['id', 'name']);
     },
     
     renderRoles: function () {
