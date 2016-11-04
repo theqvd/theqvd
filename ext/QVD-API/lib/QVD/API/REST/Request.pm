@@ -466,7 +466,9 @@ sub forze_filtering_by_tenant
     }
     else
     {
-        $self->filters->add_filter('tenant_id', $self->administrator->tenants_scope);
+        my $read_only = $self->qvd_object_model->type_of_action =~ /^(list|details)$/;
+        my $scope =  $self->administrator->tenants_scope($read_only ? 1 : 0);
+        $self->filters->add_filter('tenant_id', $scope);
     }
 }
 
