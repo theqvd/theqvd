@@ -99,18 +99,6 @@ sub BUILD
 
 # CHECKS OR DIE
 
-# Operative acls must be asked just for one role
-# Otherwise the request doesn't make sense 
-
-    $self->check_unique_role_in_acls_search
-        if $qvd_object eq 'Operative_Acls_In_Role';
-
-# Operative acls must be asked just for one admin
-# Otherwise the request doesn't make sense 
-
-    $self->check_unique_admin_in_acls_search 
-        if $qvd_object eq 'Operative_Acls_In_Administrator';
-
 # It checks if the requested fields to retrieve 
 # are available
 
@@ -170,6 +158,22 @@ sub BUILD
     $self->set_order_by_in_request;
     $self->set_tables_to_join_in_request;
 
+    # REQUEST CHECKS
+
+    # Operative acls must be asked just for one role
+    # Otherwise the request doesn't make sense 
+
+    $self->check_unique_role_in_acls_search
+        if $qvd_object eq 'Operative_Acls_In_Role';
+
+    # Operative acls must be asked just for one admin
+    # Otherwise the request doesn't make sense 
+
+    if ($qvd_object eq 'Operative_Acls_In_Administrator') {
+        $self->set_default_admin_id_in_acls_search;
+        $self->check_unique_admin_in_acls_search;
+    }
+
 # AD HOC SETTING OF OBLIGATORY ELEMENTS 
 
 # The recovery administrator is stored in the database
@@ -179,13 +183,6 @@ sub BUILD
 
     $self->hide_recovery_mode_administrator 
         if $qvd_object eq 'Administrator';
-
-# The accion 'get_acls_in_admins' without an admin_id filter 
-# is supposed to ask for the operative acls in the current admin.
-# This methods adds the corresponding filter if needed 
-
-    $self->set_default_admin_id_in_acls_search 
-        if $qvd_object eq 'Operative_Acls_In_Administrator';
 
 # Requests must include a proper filter by tenant, cause
 # non-superadmin admins can only operate over its own
@@ -235,17 +232,17 @@ sub BUILD
 sub check_unique_admin_in_acls_search
 {
     my $self = shift;
-    my @admin_id = ($self->json_wrapper->get_filter_value('admin_id'));
-    QVD::API::Exception->throw(code => 6322, object => 'admin_id') 
-	if scalar @admin_id > 1;     
+    my @admin_id = @{$self->filters->filter_value('admin_id')};
+    QVD::API::Exception->throw(code => 6322, object => 'admin_id')
+        if scalar @admin_id != 1;
 }
 
 sub check_unique_role_in_acls_search
 {
     my $self = shift;
-    my @role_id = ($self->json_wrapper->get_filter_value('role_id'));
-    QVD::API::Exception->throw(code => 6322, object => 'role_id') 
-	if scalar @role_id > 1; 
+    my @role_id = @{$self->filters->filter_value('role_id')};
+    QVD::API::Exception->throw(code => 6322, object => 'role_id')
+        if scalar @role_id != 1;
 }
 
 sub check_filters_validity_in_json
@@ -427,7 +424,7 @@ sub set_default_admin_id_in_acls_search
 {
     my $self = shift;
     $self->filters->add_filter('admin_id', { '=' => $self->administrator->id}) 
-        unless $self->filters->get_filter_value('admin_id');
+        unless $self->filters->filter_value('admin_id');
 }
 
 sub hide_recovery_mode_administrator
