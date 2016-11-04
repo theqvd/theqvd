@@ -66,10 +66,15 @@ Wat.Common.BySection.administratorRole = {
             var currentRoles = that.model.get('roles');
         }
         
-        Wat.A.performAction('role_get_list', {}, {
-                internal: "0",
-                "-or": roleListConditions
-            }, {}, function (that) {
+        var filter = {
+            internal: "0"
+        }
+        
+        if (Wat.C.isSuperadmin()) {
+            filter["-or"] = roleListConditions;
+        }
+        
+        Wat.A.performAction('role_get_list', {}, filter, {}, function (that) {
             that.editorRoles = that.retrievedData.rows;
             
             // If avoid tenant is defined, delete it
