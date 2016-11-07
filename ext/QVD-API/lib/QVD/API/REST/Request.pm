@@ -475,11 +475,6 @@ sub forze_filtering_tenants_by_tenant
 
     my @ids = @{$self->administrator->tenants_scope(0)}; # All tenants available for the admin
 
-    # By convention, tenant 0 is the special tenant of superadmins 
-    # Tenant 0 is special. It cannot be deleted and when listing
-    # tenants it doesn't appear
-    @ids = grep { $_ != 0 } @ids;
-
     $self->filters->add_filter('id', \@ids);
 }
 
