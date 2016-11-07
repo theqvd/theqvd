@@ -10,9 +10,7 @@ Wat.Common.BySection.administratorRole = {
         var avoidRoleId = options.avoidRoleId;
             
         var that = Wat.CurrentView;
-            
-        var currentRoles = {};
-
+        
         if (forcedTenantId) {
             var roleListConditions = [
                 "tenant_id",
@@ -61,10 +59,10 @@ Wat.Common.BySection.administratorRole = {
                 "tenant_id",
                 COMMON_TENANT_ID,    
             ];
-            
-            // Store administrator roles to fill editor
-            var currentRoles = that.model.get('roles');
         }
+        
+        // Store administrator roles to fill editor
+        var currentRoles = that.model ? that.model.get('roles') : {};
         
         var filter = {
             internal: "0"
