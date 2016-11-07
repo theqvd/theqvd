@@ -584,6 +584,12 @@ group {
 
     websocket '/vmproxy' => sub {
         my $c = shift;
+
+        my $admin = $c->qvd_admin4_api->administrator;
+        unless ($admin->re_is_allowed_to( qr/^vm\.spy\.$/ )) {
+            die QVD::API::Exception->new(code => 4210)->message;
+        }
+
         $c->inactivity_timeout(10);
 
         $c->app->log->debug("VM Proxy WebSocket opened");
