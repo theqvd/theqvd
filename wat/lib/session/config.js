@@ -622,6 +622,8 @@ Wat.C = {
     getEffectiveLan: function () {
         var lan = this.language == "default" ? this.tenantLanguage : this.language;
         
-        return lan == "auto" ? window.i18n.lng() : lan;
+        // if auto get first two characters from i18n language to get ISO 639-1 format. 
+        // Example: Convert 'en_US' to 'en'
+        return lan == "auto" ? window.i18n.lng().substr(0, 2) : lan;
     }
 }
