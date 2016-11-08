@@ -351,26 +351,14 @@ sub check_nested_queries_validity_in_json
     {
 	$method = 'get_acls_for_nested_query_in_creation';
     }
-    elsif ($type_of_action eq 'update')
-    {
-# An operation is considered massive if it is applied over more than one 
-# object. For this kind of action, the 'id' is a mandatory filter
-# and it is the only filter available. So it can be known the amount of objects
-# will be involved by using that filter.
-
-	my $id = $self->json_wrapper->get_filter_value('id');
-	($method,$code) = ref($id) && scalar @$id > 1 ? 
-	    ('get_acls_for_nested_query_in_massive_update',4240) : 
-	    ('get_acls_for_nested_query_in_update',4230) ;
-    }
 
 	for my $nested_query ($self->json_wrapper->nested_queries_list) {
 		$self->qvd_object_model->available_nested_query($nested_query) ||
 			QVD::API::Exception->throw(code => 6230, object => $nested_query);
 
-		$admin->re_is_allowed_to($self->qvd_object_model->$method($nested_query)) ||
-			QVD::API::Exception->throw(code => $code, object => $nested_query);
-	}
+		$admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_nested_query_in_update($nested_query)) ||
+			QVD::API::Exception->throw(code => 4230, object => $nested_query);
+    }
 }
 
 sub check_order_by_validity_in_json

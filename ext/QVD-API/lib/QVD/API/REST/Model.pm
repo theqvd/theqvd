@@ -1620,7 +1620,7 @@ my $DBIX_JOIN_VALUE = {
   
     Host => ['runtime', 'vms', qw(creation_log_entry)],
 
-    OSF => [ qw(tenant vms), { dis => 'tags' }, qw(creation_log_entry)],
+    OSF => [ qw(tenant vms), qw(creation_log_entry)],
 
     DI => [qw(vm_runtimes tags), {osf => 'tenant'}, qw(creation_log_entry)],
 
