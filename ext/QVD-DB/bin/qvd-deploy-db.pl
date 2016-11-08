@@ -271,7 +271,7 @@ try {
 		eval {
 			db->storage->dbh->do("select count(*) from configs;");
 		};
-		if (defined $@) {
+		unless ($@ ne '') {
 			$error = "ERROR_DB_ALREADY_DEPLOYED";
 			die "Database already contains QVD tables, use '--force' to redeploy the database";
 		}
