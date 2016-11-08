@@ -87,28 +87,17 @@ my $QVD_OBJECT_TO_DBIX_TABLE = {
 sub BUILD 
 {
     my $self = shift;
-    my $qvd_object = $self->qvd_object_model->qvd_object;
-    my $type_of_action = $self->qvd_object_model->type_of_action;
+    my $qvd_model = $self->qvd_object_model;
+    my $qvd_object = $qvd_model->qvd_object;
+    my $type_of_action = $qvd_model->type_of_action;
 
     # Store the administrator that generates the request
-    $self->{administrator} = $self->qvd_object_model->current_qvd_administrator;
+    $self->{administrator} = $qvd_model->current_qvd_administrator;
 
     # Set the DBIx table the request will be executed against by default
     $self->{table} = $self->qvd_obj_to_table($qvd_object);
 
 # CHECKS OR DIE
-
-# Operative acls must be asked just for one role
-# Otherwise the request doesn't make sense 
-
-    $self->check_unique_role_in_acls_search
-        if $qvd_object eq 'Operative_Acls_In_Role';
-
-# Operative acls must be asked just for one admin
-# Otherwise the request doesn't make sense 
-
-    $self->check_unique_admin_in_acls_search 
-        if $qvd_object eq 'Operative_Acls_In_Administrator';
 
 # It checks if the requested fields to retrieve 
 # are available
@@ -169,6 +158,22 @@ sub BUILD
     $self->set_order_by_in_request;
     $self->set_tables_to_join_in_request;
 
+    # REQUEST CHECKS
+
+    # Operative acls must be asked just for one role
+    # Otherwise the request doesn't make sense 
+
+    $self->check_unique_role_in_acls_search
+        if $qvd_object eq 'Operative_Acls_In_Role';
+
+    # Operative acls must be asked just for one admin
+    # Otherwise the request doesn't make sense 
+
+    if ($qvd_object eq 'Operative_Acls_In_Administrator') {
+        $self->set_default_admin_id_in_acls_search;
+        $self->check_unique_admin_in_acls_search;
+    }
+
 # AD HOC SETTING OF OBLIGATORY ELEMENTS 
 
 # The recovery administrator is stored in the database
@@ -179,19 +184,13 @@ sub BUILD
     $self->hide_recovery_mode_administrator 
         if $qvd_object eq 'Administrator';
 
-# The accion 'get_acls_in_admins' without an admin_id filter 
-# is supposed to ask for the operative acls in the current admin.
-# This methods adds the corresponding filter if needed 
-
-    $self->set_default_admin_id_in_acls_search 
-        if $qvd_object eq 'Operative_Acls_In_Administrator';
-
 # Requests must include a proper filter by tenant, cause
 # non-superadmin admins can only operate over its own
 # tenant. The corresponding filters to filtering by tenant
 # are added in here
 
-    $self->forze_filtering_by_tenant;
+    $self->forze_filtering_by_tenant
+        if $qvd_model->available_filter('tenant_id');
 
 # Actions 'admin_view_set' and 'admin_view_reset' are supposed to operate
 # over the current admin. The correspondig filters are added in here
@@ -233,17 +232,17 @@ sub BUILD
 sub check_unique_admin_in_acls_search
 {
     my $self = shift;
-    my @admin_id = ($self->json_wrapper->get_filter_value('admin_id'));
-    QVD::API::Exception->throw(code => 6322, object => 'admin_id') 
-	if scalar @admin_id > 1;     
+    my @admin_id = @{$self->filters->filter_value('admin_id')};
+    QVD::API::Exception->throw(code => 6322, object => 'admin_id')
+        if scalar @admin_id != 1;
 }
 
 sub check_unique_role_in_acls_search
 {
     my $self = shift;
-    my @role_id = ($self->json_wrapper->get_filter_value('role_id'));
-    QVD::API::Exception->throw(code => 6322, object => 'role_id') 
-	if scalar @role_id > 1; 
+    my @role_id = @{$self->filters->filter_value('role_id')};
+    QVD::API::Exception->throw(code => 6322, object => 'role_id')
+        if scalar @role_id != 1;
 }
 
 sub check_filters_validity_in_json
@@ -425,7 +424,7 @@ sub set_default_admin_id_in_acls_search
 {
     my $self = shift;
     $self->filters->add_filter('admin_id', { '=' => $self->administrator->id}) 
-        unless $self->filters->get_filter_value('admin_id');
+        unless $self->filters->filter_value('admin_id');
 }
 
 sub hide_recovery_mode_administrator
@@ -453,8 +452,6 @@ sub forze_filtering_by_tenant
 {
     my $self = shift;
 
-    return unless $self->qvd_object_model->available_filter('tenant_id');
-
     if ($self->json_wrapper->has_filter('tenant_id'))
     {
         QVD::API::Exception->throw(code => 4220, object => 'tenant_id') 
@@ -466,7 +463,9 @@ sub forze_filtering_by_tenant
     }
     else
     {
-        $self->filters->add_filter('tenant_id', $self->administrator->tenants_scoop);
+        my $read_only = $self->qvd_object_model->type_of_action =~ /^(list|details)$/;
+        my $scope =  $self->administrator->tenants_scope($read_only ? 1 : 0);
+        $self->filters->add_filter('tenant_id', $scope);
     }
 }
 
@@ -474,14 +473,8 @@ sub forze_filtering_tenants_by_tenant
 {
     my $self = shift;
 
-    my @ids = @{$self->administrator->tenants_scoop}; # All tenants available for the admin
+    my @ids = @{$self->administrator->tenants_scope(0)}; # All tenants available for the admin
 
-# By convention, tenant 0 is the special tenant of superadmins 
-# Tenant 0 is special. It cannot be deleted and when listing
-# tenants it is not it doesn't appear
-
-    @ids = grep { $_ ne 0 } @ids if 
-	$self->qvd_object_model->type_of_action =~ /^delete|list$/;
     $self->filters->add_filter('id', \@ids);
 }
 

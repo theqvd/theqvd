@@ -602,13 +602,6 @@ my $ACTIONS = {
 		qvd_object => 'Tenant'
 	},
 
-	role_tiny_list => {
-		type_of_action => 'tiny',
-		    admin4method => 'select',
-		   acls => [qr/^(administrator\.see\.|role\.see\.inherited-)roles$/,qr/^tenant\.purge\.$/],
-		qvd_object => 'Role'
-	},
-
 	role_get_list => {
 		type_of_action => 'list',
 		   admin4method => 'select',

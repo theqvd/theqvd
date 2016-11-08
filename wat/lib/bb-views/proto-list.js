@@ -868,7 +868,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             
             if (filter.fillable) {
                 if (filter.type == 'select') {
-                    filter.fillAction = filter.fillAction || name + '_tiny_list';
                     filter.nameAsId = filter.nameAsId || false;
                     
                     var nameField = Wat.U.getNameFieldFromQvdObj(name);
@@ -879,18 +878,24 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                         var orderFields = [nameField];
                     }
                             
-                            var params = {
-                        'action': filter.fillAction,
+                    var params = {
                         'selectedId': that.filters[filter.filterField] || Wat.I.getFilterSelectedId(filter.options),
-                                'controlName': name,
-                                'startingOptions': Wat.I.getFilterStartingOptions(filter.options),
+                        'controlName': name,
+                        'startingOptions': Wat.I.getFilterStartingOptions(filter.options),
                         'nameAsId': filter.nameAsId,
-                                'order_by': {
+                        'order_by': {
                             "field": orderFields,
-                                    "order": "-asc"
-                                },
-                            };
-
+                            "order": "-asc"
+                        },
+                    };
+                    
+                    if (filter.fillAction) {
+                        params.action = filter.fillAction;
+                    }
+                    else {
+                        params.actionAuto = name;
+                    }
+                    
                     if (currentExistsOutTenant) {
                         var paramGlobal = {};
                         paramGlobal[COMMON_TENANT_ID] = 'None (Common)';

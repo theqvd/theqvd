@@ -270,6 +270,7 @@ Wat.A = {
     //          - params.startingOptions: hash with pairs id-name of elements to fill the select combo
     //          - params.selectedId: Id of the element that will be selected
     //          - params.translateOptions: Array of ids of those elements that will be translated
+    //          - params.actionAuto: QVD Object that defines action with predefined get_list call
     //          - params.action: API action that will be used to fill select combo
     //          - params.filters: API filters that will be used to fill select combo
     //          - params.order_by: API order by that will be used to fill select combo
@@ -322,9 +323,28 @@ Wat.A = {
                 });
             });
         }
-
+        
         // If action is defined, add retrieved items from ajax to select
-        if (params.action) {
+        if (params.actionAuto || params.action) {
+            if (params.actionAuto) {
+                params.action = params.actionAuto + '_get_list';
+                
+                switch (params.actionAuto) {
+                    case 'di':
+                        var nameField = 'disk_image';
+                        break;
+                    default:
+                        var nameField = 'name';
+                        break;
+                }
+                
+                params.fields = ['id', nameField];
+                params.order_by = {
+                    field: nameField,
+                    order: '-asc'
+                };
+            }
+            
             var jsonUrl = Wat.C.getBaseUrl() + '&action=' + params.action;
 
             if (params.filters) {
@@ -333,6 +353,10 @@ Wat.A = {
             
             if (params.order_by) {
                 jsonUrl += '&order_by=' + JSON.stringify(params.order_by);
+            }
+            
+            if (params.fields) {
+                jsonUrl += '&fields=' + JSON.stringify(params.fields);
             }
             
             Wat.I.disableChosenControls(controlSelector);
@@ -365,7 +389,7 @@ Wat.A = {
                             var selected = '';
 
                             var id = option.id;
-                            if (params.action == 'di_tiny_list') {
+                            if (option.disk_image) {
                                 var name = option.disk_image;
                             }
                             else {

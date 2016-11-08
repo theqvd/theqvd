@@ -20,20 +20,6 @@ Wat.Views.AdminListView = Wat.Views.ListView.extend({
         
 
         Wat.I.chosenElement('[name="language"]', 'single100');
-        
-        if ($('[name="tenant_id"]').length > 0) {
-            // When tenant id is present attach change events. Roles will be filled once the events were triggered
-            Wat.B.bindEvent('change', 'select[name="tenant_id"]', function () {
-                that.fetchAndRenderRoles({
-                    forcedTenantId: $('select[name="tenant_id"]').val()
-                });
-            });
-        }
-        else {
-            that.fetchAndRenderRoles({
-                forcedTenantId: Wat.C.tenantID
-            });
-        }
     },
     
     fillMassiveEditor: function (target, that) {

@@ -670,7 +670,7 @@ Wat.B = {
             
             // Fill DI Tags select on virtual machines creation form
             var params = {
-                'action': 'tag_tiny_list',
+                'actionAuto': 'tag',
                 'selectedId': '',
                 'controlName': 'di_tag',
                 'filters': {
@@ -685,7 +685,7 @@ Wat.B = {
         
         filterTenantOSFs: function () {
             var params = {
-                'action': 'osf_tiny_list',
+                'actionAuto': 'osf',
                 'selectedId': '',
                 'controlName': 'osf_id',
                 
@@ -711,7 +711,7 @@ Wat.B = {
         
         filterTenantUsers: function () {
             var params = {
-                'action': 'user_tiny_list',
+                'actionAuto': 'user',
                 'selectedId': '',
                 'controlName': 'user_id'
             };

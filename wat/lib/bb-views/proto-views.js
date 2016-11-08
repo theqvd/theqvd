@@ -355,7 +355,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         if (Wat.C.isSuperadmin()) {
             // Fill Tenant select on viees customization view
             var params = {
-                'action': 'tenant_tiny_list',
+                'actionAuto': 'tenant',
                 'controlName': 'tenant-select',
                 'chosenType': 'advanced100'
             };

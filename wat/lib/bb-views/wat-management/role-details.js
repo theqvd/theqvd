@@ -215,7 +215,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
         }
                 
         // Retrieve acls of a branch to change them
-        Wat.A.performAction('acl_tiny_list', {}, filters, {}, this.performACLGroupCheck, this);
+        Wat.A.performAction('acl_get_list', {}, filters, {}, this.performACLGroupCheck, this, ['id', 'name']);
     },
     
     // Assign-unassign acls of a branch
@@ -388,7 +388,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     
     fillInheritedTemplatesMatrix: function () {
         // Fill templates matrix
-        Wat.A.performAction('role_tiny_list', {}, {internal: "1"}, {}, function (that) {
+        Wat.A.performAction('role_get_list', {}, {internal: "1"}, {}, function (that) {
             var currentRoles = that.model.get('roles');
             
             $.each(that.retrievedData.rows, function (iTemplate, template) {
@@ -405,7 +405,7 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
                     checkbox.removeAttr('checked');
                 }
             });
-        }, this);
+        }, this, ['id', 'name']);
     },    
     
     renderACLsTree: function (that) {

@@ -327,8 +327,8 @@ l7r.loadbalancer.plugin.default.weight.random = 1
 
 l7r.client.cert.require = 0
 
-l7r.ssl.options.SSL_version = TLSv1_2:!SSLv3:!SSLv2:!TLSv1
-l7r.ssl.options.SSL_cipher_list = HIGH:!aNULL:!MD5:!RC4:!3DES:!DES:!MEDIUM:!LOW:!EXPORT
+l7r.options.SSL_version = TLSv1_2:!SSLv3:!SSLv2:!TLSv1
+l7r.options.SSL_cipher_list = HIGH:!aNULL:!MD5:!RC4:!3DES:!DES:!MEDIUM:!LOW:!EXPORT
 
 ## umask for the HKD process
 hkd.user.umask = 0022
