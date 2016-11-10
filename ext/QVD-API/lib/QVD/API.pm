@@ -1249,7 +1249,7 @@ sub current_admin_setup
         acls => [ $administrator->acls ],
         views => [ map { { $_->get_columns } }
             $DB->resultset('Operative_Views_In_Administrator')->search(
-                {administrator_id => $administrator->id})->all ]
+                {tenant_id => $administrator->tenant_id, administrator_id => [ undef, $administrator->id ]})->all ]
     };
 }
 
