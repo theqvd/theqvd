@@ -335,24 +335,24 @@ sub config_delete
 
 sub reset_views
 {
-    my ($self, $request, $modifiers, $tables) = @_;
-    my $result;
-
-    my $request_copy = clone $request;
-
+    my ($request, $tables) = @_;
+    my $count = 0;
     for my $table (@$tables) {
-        $request_copy->{table} = $table;
-        try {
-                $self->delete( $request, $modifiers );
-        }
-        catch {
-            my $exception = $_;
-            QVD::API::Exception->throw({exception => $exception}) unless $exception->code == 1300;
+        my @rows = $DB->resultset($table)->search()->all;
+        @rows = $request->filters->cgrep(@rows);
+        for my $row (@rows) {
+            try {
+                $row->delete;
+                $count++;
+            }
+            catch {
+                my $exception = $_;
+                QVD::API::Exception->throw({exception => $exception});
+            }
         }
     }
 
-    $result->{rows} = [];
-    return $result;
+    return { rows => [], total => $count };
 }
 
 sub reset_tenant_views
@@ -360,8 +360,7 @@ sub reset_tenant_views
     my ($self, $request, $modifiers) = @_;
 
     my $tables = [ qw(Views_Setup_Attributes_Tenant Views_Setup_Properties_Tenant) ];
-
-    return $self->reset_views($request, $modifiers, $tables);
+    return reset_views($request, $tables);
 }
 
 sub reset_admin_views
@@ -369,8 +368,7 @@ sub reset_admin_views
     my ($self, $request, $modifiers) = @_;
 
     my $tables = [ qw(Views_Setup_Attributes_Administrator Views_Setup_Properties_Administrator) ];
-    
-    return $self->reset_views($request, $modifiers, $tables);
+    return reset_views($request, $tables);
 }
 
 ### Manage properties ###
