@@ -165,7 +165,12 @@ Wat.C = {
                     }
                     
                     Wat.I.listFields[view.qvd_object][view.field].display = view.visible;
-                    Wat.I.listFields[view.qvd_object][view.field].customized = true;
+                    
+                    // Check as customized only if the field is setted by an administrator. 
+                    // If administrator_id is null, it will be setted in tenant, not by admin
+                    if (view.administrator_id != null) {
+                        Wat.I.listFields[view.qvd_object][view.field].customized = true;
+                    }
                     break;
                 case 'filter':
                     if (!Wat.I.formFilters[view.qvd_object][view.field]) {
@@ -188,7 +193,11 @@ Wat.C = {
                             break;
                     }
                     
-                    Wat.I.formFilters[view.qvd_object][view.field].customized = true;
+                    // Check as customized only if the field is setted by an administrator. 
+                    // If administrator_id is null, it will be setted in tenant, not by admin
+                    if (view.administrator_id != null) {
+                        Wat.I.formFilters[view.qvd_object][view.field].customized = true;
+                    }
                     break;
             }
         });
