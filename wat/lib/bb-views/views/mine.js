@@ -36,7 +36,11 @@ Wat.Views.MyViewsView = Wat.Views.ViewsView.extend({
         this.currentColumns = Wat.I.getListColumns(this.selectedSection);
         
         // Get system properties to complete the dababase data
-        this.properties = new Wat.Collections.Properties({filters: {'tenant_id': Wat.C.tenantID}});
+        var params = {};
+        if (Wat.C.isSuperadmin()) {
+            params = {filters: {'tenant_id': Wat.C.tenantID}};
+        }
+        this.properties = new Wat.Collections.Properties(params);
         
         var that = this;
         
