@@ -9,12 +9,12 @@ __PACKAGE__->add_columns( host_id => { data_type => 'integer' },
 
 __PACKAGE__->set_primary_key('host_id', 'property_id');
 __PACKAGE__->belongs_to(host => 'QVD::DB::Result::Host', 'host_id');
-__PACKAGE__->belongs_to(host_properties_list => 'QVD::DB::Result::QVD_Object_Property_List', 'property_id');
+__PACKAGE__->belongs_to(qvd_properties_list => 'QVD::DB::Result::QVD_Object_Property_List', 'property_id');
 
 sub key
 {
 	my $self = shift;
-	return $self->host_properties_list->properties_list->key;
+	return $self->qvd_properties_list->properties_list->key;
 }
 
 1;

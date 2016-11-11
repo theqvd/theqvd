@@ -554,7 +554,7 @@ sub get_dbi_format_filters {
     my $filters_dbi = clone $self->filters;
     
     my $found_properties = 0; # number of custom properties found
-
+    my $prop_suffix = "";
     for my $filter_path (@{$filters_dbi->filter_list()})
     {
         my $key = QVD::API::REST::Filter::filter_name_from_path($filter_path);
@@ -566,10 +566,15 @@ sub get_dbi_format_filters {
         if ($is_property)
         {
             # To filter by a property, the corresponding properties table must be joined.
+            # FIXME: Adding the same join several times drives to an exponential increment of tuples,
+            # this approach to filter by properties shall be changed
+            # FIXME: Collateral changes to the Request object shall be removed
+            my $join = {'properties' => { 'qvd_properties_list' => 'properties_list'} };
+            $self->add_to_join( $join );
             # This code uses the aliases system for multiple joins of the same table in DBIC
-            $self->add_to_join( 'properties' );
             $found_properties++;
-            $key_dbix = $found_properties > 1 ? "properties_$found_properties" : 'properties';
+            $prop_suffix = $found_properties > 1 ? "_$found_properties" : "";
+            $key_dbix = "properties" . "$prop_suffix";
         } else {
             $key_dbix = $self->qvd_object_model->map_filter_to_dbix_format( $key );
         }
@@ -590,13 +595,18 @@ sub get_dbi_format_filters {
         $op = $self->qvd_object_model->normalize_operator($op);
 
         # This is according DBIC format
-        my $value_normalized = $is_property ?
-            [$key_dbix.".key" => { $op => $key }, $key_dbix.".value" => { $op => $value } ] :
-            { $op => $value };
+        my $value_normalized = { $op => $value };
 
         if ($is_property)
         {
             $filters_dbi->set_filter_value($filter_path, $value_normalized);
+            $filters_dbi->set_filter_key($filter_path, $key_dbix.".value");
+            my $value_path = QVD::API::REST::Filter::filter_basedir_from_path($filter_path);
+            $filters_dbi->add_filter($value_path, { '=' => $key }, "properties_list$prop_suffix.key");
+            # In case there are other properties with the same name in other tenants, the tenant_id
+            # is required to be specified
+            $filters_dbi->add_filter($value_path, { '=' => $self->administrator->tenant_id },
+                "properties_list$prop_suffix.tenant_id");
         }
         else
         {
