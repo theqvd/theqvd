@@ -9,7 +9,7 @@ my $cups_path = "/usr/lib/cups/backend";
 my $cups_conf_path = "/etc/cups";
 my $cups_post_path = "/usr/local/bin"; 
     
-my $url_win  = "http://172.26.9.168:9000";
+my $url_win  = "http://192.168.1.53:9000";
 my $printer_url = "printer";
 my $printer_job_url = "printjob";
  
@@ -136,6 +136,8 @@ sub ppd_create {
     ppd_write_line($fh, ppd_line("LanguageLevel", "\"3\""));
 
     ppd_color($fh, $color);
+    
+    ppd_duplex($fh);
 
     ppd_write_line($fh, ppd_line("FileSystem", "False"));
     ppd_write_line($fh, ppd_line("Throughput", "\"1\""));
@@ -212,6 +214,22 @@ sub ppd_general_info() {
 
     return;
 }
+
+# Create Duplex
+## Side effects
+sub ppd_duplex() {
+   my ($fh) = (@_);
+   ppd_write_line($fh, ppd_comm("%====Duplex==="));
+   ppd_write_line($fh, ppd_line("OpenUI *Duplex", "PickOne"));
+   ppd_write_line($fh, ppd_line("OrderDependency", "25 AnySetup *Duplex"));
+   ppd_write_line($fh, ppd_line("DefaultDuplex", "None"));
+   ppd_write_line($fh, ppd_line("Duplex DuplexTumble", "\"<</Duplex true /Tumble true>>setpagedevice\""));
+   ppd_write_line($fh, ppd_line("Duplex DuplexNoTumble", "\"<</Duplex false /Tumble false>>setpagedevice\""));
+   ppd_write_line($fh, ppd_line("Duplex None", "\"<</Duplex false /Tumble false>>setpagedevice\""));
+   ppd_write_line($fh, ppd_line("CloseUI", "*Duplex"));
+   return;
+}
+
 
 # Create fonts
 ## Side effects
