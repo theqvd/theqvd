@@ -789,7 +789,7 @@ Wat.B = {
                         Wat.I.closeDialog($(this));
                     }
                 },
-                buttonClasses: ['fa fa-ban'],
+                buttonClasses: ['fa fa-ban js-button-close'],
 
                 fillCallback: function (target) {
                     // Add common parts of editor to dialog
