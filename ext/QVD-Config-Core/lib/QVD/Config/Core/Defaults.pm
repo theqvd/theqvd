@@ -1,9 +1,61 @@
 package QVD::Config::Core;
 
+use strict;
+use warnings;
+
 use Config::Properties;
+use IO::Scalar;
+
 
 our $defaults = Config::Properties->new;
-$defaults->load(*DATA);
+
+my ($os, $version);
+
+if ($^O =~ /^linux/i) {
+    if (open my $fh, "/etc/os-release") {
+        while (<$fh>) {
+            if (my ($k, $v, $v1) = /^(\w+)\s*=\s*(?:"([^"]*)"|(\S+))/) {
+                #warn "k: $k, v: $v, v1: $v1, matched line: $_";
+                my $k = uc $k;
+                my $v = lc ($v // $v1);
+                if ($k eq 'NAME') {
+                    $os = $v;
+                }
+                if ($k eq 'VERSION_ID') {
+                    $version = $v;
+                }
+            }
+        }
+    }
+}
+elsif ($^O =~ /^mswin/) {
+    $os = 'mswin';
+    require Win32;
+    if (my (undef, $major, $minor) = Win32::GetOSVersion()) {
+        $version = "$major.$minor";
+    }
+}
+
+unless (defined $os and defined $version) {
+    warn "Operating system not detected correctly";
+    $os //= 'unknown';
+    $version //= 'unknown';
+}
+
+my @data;
+while (<DATA>) {
+    if (s/^\@[\w\-+\.]+\@\s+//) {
+        next if $1 ne $os and $1 ne "$os-$version";
+    }
+    push @data, $_;
+}
+
+my $data = join('', @data);
+my $fh = IO::Scalar->new(\$data);
+$defaults->load($fh);
+
+$defaults->setProperty('config.os', $os);
+$defaults->setProperty('config.os_version', $version);
 
 1;
 
