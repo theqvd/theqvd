@@ -4722,7 +4722,7 @@ En el lado izquierdo hay una pestaña de <em>Ajustes</em> que despliega un menú
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-09-22 09:59:56 CEST
+Last updated 2016-11-14 12:42:19 CET
 </div>
 </div>
 </body>
