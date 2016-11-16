@@ -20,6 +20,12 @@ __PACKAGE__->add_unique_constraint([qw(qvd_obj_prop_id view_type device_type)]);
 __PACKAGE__->belongs_to(qvd_obj_prop => 'QVD::DB::Result::QVD_Object_Property_List', 'qvd_obj_prop_id');
 __PACKAGE__->belongs_to(administrator => 'QVD::DB::Result::Administrator', 'administrator_id');
 
+sub admin_id
+{
+	my $self = shift;
+	return $self->administrator_id;
+}
+
 sub tenant_id
 {
 	my $self = shift;
