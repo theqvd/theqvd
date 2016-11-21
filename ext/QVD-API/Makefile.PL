@@ -8,7 +8,11 @@ WriteMakefile(
     AUTHOR            => 'QVD Team <qvd@qindel.es>',
     VERSION	          => '4.0'.$ENV{BUILD_NUMBER},
     ABSTRACT          => 'QVD::API',
-    EXE_FILES         => [ 'bin/qvd-api.pl' ],
+    EXE_FILES         => [
+        'bin/qvd-api.debrc.pl',
+        'bin/qvd-api.initrc.pl',
+        'bin/qvd-api.pl'
+    ],
     PREREQ_PM         => {
         'Clone' => 0,
         'Config::Properties' => 0,
