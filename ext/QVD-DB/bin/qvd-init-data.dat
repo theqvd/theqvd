@@ -12,6 +12,11 @@ id	name	description
 key	value	tenant_id
 
 wat.multitenant	1	-1
+api.public.footer.link.1.label.default	Qindel Group © 2016	-1
+api.public.footer.link.1.src.default	http://qindel.com/	-1
+api.public.footer.link.2.label.default	Contact	-1
+api.public.footer.link.2.src.default	http://theqvd.com/contact	-1
+api.public.footer.link.2.src.es	http://theqvd.com/es/contacto	-1
 
 
 ### Administrator ###

@@ -9,6 +9,9 @@ Wat.I.T = {
                     main: {
                         name: 'common/main'
                     },
+                    footer: {
+                        name: 'common/footer'
+                    },
                     menu: {
                         name: 'common/menu'
                     },

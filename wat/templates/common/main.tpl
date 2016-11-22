@@ -72,4 +72,4 @@
         <% } %>
     </div>
 
-<div class="footer"><a href="<%= footerLinks.copyright %>" target="_blank">Qindel Group &copy; <%= new Date().getFullYear() %></a> | <a href="<%= footerLinks.terms %>" data-i18n="Terms of use" target="_blank"></a> | <a href="<%= footerLinks.policy %>" data-i18n="Cookie privacy and data protection" target="_blank"></a> | <a href="<%= footerLinks.contact %>" data-i18n="Contact" target="_blank"></a></div>
+<div class="footer bb-footer"></div>

@@ -466,33 +466,17 @@ Wat.I = {
     renderMain: function () { 
         var that = this;
         
-        var footerLinks = {
-            'copyright': 'http://qindel.com/',
-            'terms': 'http://qindel.com/',
-            'policy': 'http://qindel.com/',
-            'contact': 'javascript:',
-        };
-        
-        var currentLan = window.i18n.lng();
-        switch (currentLan) {
-            case 'es':
-                footerLinks.contact = "http://theqvd.com/es/contacto";
-                break;
-            default:
-                footerLinks.contact = "http://theqvd.com/contact";
-                break;
-        }
-        
         // Fill the html with the template and the collection
         var template = _.template(
             Wat.TPL.main, {
                 loggedIn: Wat.C.loggedIn,
                 cornerMenu: this.cornerMenu,
-                forceDesktop: $.cookie('forceDesktop'),
-                footerLinks: footerLinks
+                forceDesktop: $.cookie('forceDesktop')
             });
         
         $('.bb-super-wrapper').html(template);
+        
+        that.renderFooter();
         
         if (Wat.C.loggedIn) {
             this.renderMenu();
@@ -504,6 +488,16 @@ Wat.I = {
         }
         
         this.updateLoginOnMenu();
+    },
+    
+    renderFooter: function () {
+        var template = _.template(
+            Wat.TPL.footer, {
+                footerLinks: Wat.C.publicConfig.footer && Wat.C.publicConfig.footer.link ? Wat.C.publicConfig.footer.link : {},
+                lan: Wat.C.getEffectiveLan()
+            });
+        
+        $('.bb-footer').html(template);
     },
     
     renderMenu: function () {
