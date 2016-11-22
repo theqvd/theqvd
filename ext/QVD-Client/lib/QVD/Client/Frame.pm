@@ -278,7 +278,7 @@ sub new {
             $self->{usb_redirection}->SetValue( core_cfg("client.usb.enable" ) );
             $settings_sizer->Add($self->{usb_redirection},Wx::GBPosition->new(10,1), Wx::GBSpan->new(1,1),wxALL,0);
         
-            $self->{usbip_device_list} = Wx::CheckListBox->new($settings_panel, -1, wxDefaultPosition, [400,130] ,  [] , wxLB_EXTENDED|wxLB_NEEDED_SB|wxLB_SORT , wxDefaultValidator, "usbip_devices");
+            $self->{usbip_device_list} = Wx::CheckListBox->new($settings_panel, -1, wxDefaultPosition, [400,130] ,  [] , wxLB_EXTENDED|wxLB_NEEDED_SB , wxDefaultValidator, "usbip_devices");
             $settings_sizer->Add($self->{usbip_device_list},Wx::GBPosition->new(11,0), Wx::GBSpan->new(1,4), wxLEFT|wxRIGHT|wxEXPAND , 10);
 
         
