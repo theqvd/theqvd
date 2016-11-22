@@ -48,6 +48,16 @@ Wat.B = {
             // Toggle controls for expire fields (it's only needed for vm form, but it can be accesible from two views: list and details)
             this.bindEvent('change', 'input[name="expire"]', this.editorBinds.toggleExpire);
         
+        // Massive editor
+            // Clean fields when click on "no changes" checkbox
+            this.bindEvent('change', 'input[type="checkbox"].js-no-change', this.editorBinds.clickNoChangeCheckbox); 
+            
+            // Uncheck "no changes" checkbox when fields changes
+            this.bindEvent('change', '.js-massive-editor-table select', this.editorBinds.changeMassiveFieldSelect);
+            this.bindEvent('change', '.js-massive-editor-table input[type="checkbox"], .js-massive-editor-table input[type="text"].datetimepicker', this.editorBinds.changeMassiveField);
+            this.bindEvent('input', '.js-massive-editor-table input[type="text"], .js-massive-editor-table textarea', this.editorBinds.changeMassiveField);
+            this.bindEvent('click', '.js-no-change-reset', this.editorBinds.resetMassiveField);
+        
         // Virtual Machines Editor
         
             // Toggle controls for disk images tags retrieving when select osf (it's only needed for vm form, but it can be accesible from two views: list and details)
@@ -59,18 +69,11 @@ Wat.B = {
             this.bindEvent('change', 'input[name="change_password"]', this.userEditorBinds.toggleNewPassword);
         
         // Roles editor
-        
             // Delete positive ACL
-            this.bindEvent('click', '.js-delete-positive-acl-button', this.roleEditorBinds.deleteAcl, 'positive');
-
-            // Add positive ACL
-            this.bindEvent('click', '.js-add-positive-acl-button', this.roleEditorBinds.addAcl, 'positive'); 
+            this.bindEvent('click', '.js-templates-matrix-mode-btn', this.roleEditorBinds.openMatrixMode);
         
-            // Delete negative ACL
-            this.bindEvent('click', '.js-delete-negative-acl-button', this.roleEditorBinds.deleteAcl, 'negative');
-
-            // Add negative ACL
-            this.bindEvent('click', '.js-add-negative-acl-button', this.roleEditorBinds.addAcl, 'negative');
+            // Change ACL check from matrix view
+            this.bindEvent('change', '.js-add-template-button', this.roleEditorBinds.changeMatrixACL);
 
             // Add/Delete inherited Role
             this.bindEvent('click', '.js-assign-role-button', this.roleEditorBinds.addRole);
@@ -667,7 +670,7 @@ Wat.B = {
             
             // Fill DI Tags select on virtual machines creation form
             var params = {
-                'action': 'tag_tiny_list',
+                'actionAuto': 'tag',
                 'selectedId': '',
                 'controlName': 'di_tag',
                 'filters': {
@@ -682,7 +685,7 @@ Wat.B = {
         
         filterTenantOSFs: function () {
             var params = {
-                'action': 'osf_tiny_list',
+                'actionAuto': 'osf',
                 'selectedId': '',
                 'controlName': 'osf_id',
                 
@@ -708,7 +711,7 @@ Wat.B = {
         
         filterTenantUsers: function () {
             var params = {
-                'action': 'user_tiny_list',
+                'actionAuto': 'user',
                 'selectedId': '',
                 'controlName': 'user_id'
             };
@@ -733,6 +736,42 @@ Wat.B = {
             $('.js-editor-property-row[data-tenant-id="' + $('[name="tenant_id"]').val() + '"]').show();
             $('.js-editor-property-row[data-tenant-id="' + SUPERTENANT_ID + '"]').show();
         },
+        
+        changeMassiveField: function (e) {
+            var name = $(e.target).attr('name');
+            $(e.target).removeAttr('placeholder');
+            $('.js-no-change-reset[data-field="' + name + '"]').removeClass('invisible');
+        },   
+        
+        changeMassiveFieldSelect: function (e) {
+            var name = $(e.target).attr('name');
+            if ($(e.target).val() != '') {
+                $('.js-no-change-reset[data-field="' + name + '"]').removeClass('invisible');
+            }
+            else {
+                $('.js-no-change-reset[data-field="' + name + '"]').addClass('invisible');
+            }
+        },
+        
+        resetMassiveField: function (e) {
+            var name = $(e.target).attr('data-field');
+            $(e.target).addClass('invisible');
+            
+            if ($('select[name="' + name + '"]').length) {
+                $('select[name="' + name + '"]').find('option[value=""]').prop('selected', true);
+                $('select[name="' + name + '"]').trigger('chosen:updated');
+            }
+            else {
+                $('input[name="' + name + '"], textarea[name="' + name + '"]').val('').attr('placeholder', $.i18n.t('No changes'));
+            }
+        },
+        
+        clickNoChangeCheckbox: function (e) {
+            if ($(e.target).is(':checked')) {
+                var field = $(e.target).attr('data-field');
+                $('.js-massive-editor-table td:last-child input[name="' + field + '"], .js-editor-table td:last-child textarea[name="' + field + '"]').val('');
+            }
+        },
     },
     
     userEditorBinds: {
@@ -742,66 +781,42 @@ Wat.B = {
     },
     
     roleEditorBinds: {
-        deleteAcl: function (e) {
-            // Disabled buttons have no effect
-            if ($(this).hasClass('disabled')) {
-                return;
-            }
-            
-            // type can be 'positive' or 'negative'
-            var type = e.data;
-            
-            var acls = $('select[name="acl_' + type + '_on_role"]').val();
-            
-            if (!acls) {
-                Wat.I.M.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
-                return;
-            }
-            
-            var filters = {
-                id: Wat.CurrentView.id
-            };
-            
-            var changes = {};
-            changes["unassign_acls"] = acls;
-            
-            var arguments = {
-                "__acls_changes__": changes
-            };
-            
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.afterUpdateAcls();
-            });
-        },
-        addAcl: function (e) {
-            // type can be 'positive' or 'negative'
-            var type = e.data;
-            
-            var acls = $('select[name="acl_available"]').val();
-            
-            if (!acls) {
-                Wat.I.M.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
-                return;
-            }
-            
-            var filters = {
-                id: Wat.CurrentView.id
-            };
-            
-            var changes = {};
-            changes["assign_acls"] = acls;
-            
-            var arguments = {
-                "__acls_changes__": changes
-            };
-            
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.model.fetch({      
-                    complete: function () {
-                        Wat.CurrentView.afterUpdateAcls();
+        openMatrixMode: function (e) {            
+            var dialogConf = {
+                title: $.i18n.t('Matrix mode'),
+                buttons : {
+                    "Close": function () {                    
+                        Wat.I.closeDialog($(this));
                     }
-                });
-            });
+                },
+                buttonClasses: ['fa fa-ban js-button-close'],
+
+                fillCallback: function (target) {
+                    // Add common parts of editor to dialog
+                    var template = _.template(
+                        Wat.TPL.inheritanceToolsTemplatesMatrix, {
+                            templates: Wat.CurrentView.editorTemplates
+                        }
+                    );
+
+                    target.html(template);
+                }
+            }
+
+            Wat.CurrentView.matrixDialog = Wat.I.dialog(dialogConf);
+        },
+        
+        changeMatrixACL: function (e) {
+            var templateId = $(e.target).attr('data-role-template-id');
+            var checked = $(e.target).is(':checked');
+            
+            if (checked) {
+                $('select[name="template_to_be_assigned"]').val(templateId);
+                $('.js-assign-template-button').trigger('click');
+            }
+            else {
+                $('.js-delete-template-button[data-id="' + templateId + '"]').trigger('click');
+            }
         },
         
         addRole: function (e) {

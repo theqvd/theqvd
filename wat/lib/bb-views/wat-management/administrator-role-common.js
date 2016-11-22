@@ -10,9 +10,7 @@ Wat.Common.BySection.administratorRole = {
         var avoidRoleId = options.avoidRoleId;
             
         var that = Wat.CurrentView;
-            
-        var currentRoles = {};
-
+        
         if (forcedTenantId) {
             var roleListConditions = [
                 "tenant_id",
@@ -61,16 +59,20 @@ Wat.Common.BySection.administratorRole = {
                 "tenant_id",
                 COMMON_TENANT_ID,    
             ];
-            
-            // Store administrator roles to fill editor
-            var currentRoles = that.model.get('roles');
         }
         
-        Wat.A.performAction('role_tiny_list', {}, {
-                internal: "0",
-                "-or": roleListConditions
-            }, {}, function (that) {
-
+        // Store administrator roles to fill editor
+        var currentRoles = that.model ? that.model.get('roles') : {};
+        
+        var filter = {
+            internal: "0"
+        }
+        
+        if (Wat.C.isSuperadmin()) {
+            filter["-or"] = roleListConditions;
+        }
+        
+        Wat.A.performAction('role_get_list', {}, filter, {}, function (that) {
             that.editorRoles = that.retrievedData.rows;
             
             // If avoid tenant is defined, delete it
@@ -98,7 +100,7 @@ Wat.Common.BySection.administratorRole = {
             that.unassignRoles = [];
             
             that.renderRoles();
-        }, that);
+        }, that, ['id', 'name']);
     },
     
     renderRoles: function () {

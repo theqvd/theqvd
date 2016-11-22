@@ -135,9 +135,9 @@ my $ACLS_FOR_FILTERS = {
         osf_id => [qr/^vm\.filter\.osf|osf\.see\.vm-list$/],
         osf_name => [qr/^vm\.filter\.osf$/],
         osf => [qr/^vm\.filter\.osf$/],
-        di_id => [qr/^vm\.filter\.di|di\.see\.vm-list$/],
-        di_name => [qr/^vm\.filter\.di$/],
-        di_id_in_use => [qr/^vm\.filter\.di$/],
+        di_id => [qr/^vm\.see\.di|di\.see\.vm-list$/],
+        di_name => [qr/^vm\.see\.di$/],
+        di_id_in_use => [qr/^vm\.see\.di$/],
         host_id => [qr/^vm\.filter\.host|host\.see\.vm-list$/],
         host_name => [qr/^vm\.filter\.host$/],
         host => [qr/^vm\.filter\.host$/],
@@ -744,7 +744,7 @@ my $AVAILABLE_FILTERS = {
 		Host => [qw(id)],
 		Role => [qw(id)],
 		Tenant => [qw(id)],
-		Views_Setup_Properties_Tenant => [qw(qvd_object)],
+		Views_Setup_Properties_Tenant => [qw(tenant_id qvd_object)],
 		Views_Setup_Attributes_Tenant => [qw(tenant_id qvd_object)],
 		Views_Setup_Properties_Administrator => [qw(qvd_object)],
 		Views_Setup_Attributes_Administrator => [qw(qvd_object)]
@@ -1620,7 +1620,7 @@ my $DBIX_JOIN_VALUE = {
   
     Host => ['runtime', 'vms', qw(creation_log_entry)],
 
-    OSF => [ qw(tenant vms), { dis => 'tags' }, qw(creation_log_entry)],
+    OSF => [ qw(tenant vms), qw(creation_log_entry)],
 
     DI => [qw(vm_runtimes tags), {osf => 'tenant'}, qw(creation_log_entry)],
 

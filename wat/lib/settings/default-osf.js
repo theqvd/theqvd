@@ -99,7 +99,7 @@ Wat.I.listFields[qvdObj] = {
         'display': false,
         'sortable': false,
     },
-    'creation_admin': {
+    'creation_admin_name': {
         'text': 'Created by',
         'fields': [
             'creation_admin'

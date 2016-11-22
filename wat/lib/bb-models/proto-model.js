@@ -91,6 +91,8 @@ Wat.Models.Model = Backbone.Model.extend({
             processData: false
         }, options);
         
+        params.error = Wat.A.processResponseError;
+        
         return $.ajax(params);
     },
     

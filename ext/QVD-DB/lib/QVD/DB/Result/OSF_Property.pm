@@ -9,12 +9,12 @@ __PACKAGE__->add_columns( osf_id => { data_type => 'integer' },
 
 __PACKAGE__->set_primary_key('osf_id', 'property_id');
 __PACKAGE__->belongs_to(osf => 'QVD::DB::Result::OSF', 'osf_id');
-__PACKAGE__->belongs_to(osf_properties_list => 'QVD::DB::Result::QVD_Object_Property_List', 'property_id');
+__PACKAGE__->belongs_to(qvd_properties_list => 'QVD::DB::Result::QVD_Object_Property_List', 'property_id');
 
 sub key
 {
 	my $self = shift;
-	return $self->osf_properties_list->properties_list->key;
+	return $self->qvd_properties_list->properties_list->key;
 }
 
 1;

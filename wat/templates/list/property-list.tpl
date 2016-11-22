@@ -39,7 +39,7 @@
                 }
             });
         %>
-        <tr class="<%= rowClass %>" style="<%= rowStyle %>">
+        <tr class="<%= rowClass %>" style="<%= rowStyle %>" data-key="<%= prop.get('key') %>">
             <td><a class="button button-icon js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete" data-property-id="<%= prop.get('property_id') %>"></a></td>
             <td><a class="button button-icon js-button-edit fa fa-pencil" href="javascript:" data-i18n="[title]Edit" data-property-id="<%= prop.get('property_id') %>"></a></td>
             <td><%= prop.get('key') %></td>

@@ -291,6 +291,7 @@ Wat.I = {
         $('.footer').css('visibility','visible').hide().show();
         $('.loading').hide();
         $('.related-doc').css('visibility','visible').hide().show();
+        $('.js-shown-elements').hide().show();
         
         this.adaptSideSize();
     },
@@ -561,11 +562,11 @@ Wat.I = {
                     $('.message-close').trigger('click');
 
                 // Set title content manually to support HTML
-                    $('.ui-dialog-titlebar').html(dialogConf.title);
+                    $(e.target).prev().html(dialogConf.title);
                 
                 // Buttons style
                     var buttons = $(e.target).next().find('button');
-                    var buttonsText = $(".ui-dialog-buttonset .ui-button .ui-button-text");
+                    var buttonsText = $(e.target).next().find(".ui-dialog-buttonset .ui-button .ui-button-text");
 
                     // Delete jQuery UI default classes
                     buttons.attr('class', '');
@@ -1109,5 +1110,18 @@ Wat.I = {
         var warningIcon = '<i class="fa fa-warning" title="' + warningMessage + '"></i>';
         
         return warningIcon;
+    },
+    
+    // Return boolean giving a form field name on massive editor to know if this field is changing or must be ignored
+    isMassiveFieldChanging: function (fieldName) {
+        // Invisible class of no change reset button means avoid field updating
+        return !$('.js-no-change-reset[data-field="' + fieldName + '"]').hasClass('invisible');
+    },
+    
+    // Show an error template given template code as parameter
+    showErrorTemplate: function (template) {
+        $(Wat.CurrentView.el).html(Wat.TPL[template]);
+        Wat.I.showAll();
+        Wat.T.translate();
     }
 }

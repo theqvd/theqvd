@@ -165,7 +165,7 @@ $security_margin: 5;
 
 /* Table scroll */
 
-div.list-block div:first-child {
+div.list-block div:first-child, div.details-side {
     width: 100%;
     
     .list-navigation, div.list {

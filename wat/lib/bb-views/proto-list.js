@@ -210,6 +210,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         var that = this;
         
         $('.list').html(HTML_MID_LOADING);
+        $('.js-shown-elements').hide();
 
         if (e && $(e.target).hasClass('mobile-filter')) {
             var filtersContainer = '.' + this.cid + ' .filter-mobile';
@@ -496,7 +497,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 var note = '<li><a href="javascript:" class="js-delete-filter-note delete-filter-note fa fa-times" data-filter-name="' + fNoteName + '" data-filter-type="' + fNote.type + '"></a>';
                 note += '<span class="note-label">' + fNote.label + '</span>';
                 if (fNote.value != undefined) {
-                    note += ': <span class="note-value">' + fNote.value + '</span>';
+                    note += ': <span class="note-value">' + Wat.U.htmlEncode(fNote.value) + '</span>';
                 }
                 
                 // If filter field is fixable, add fix icon. Field can be fixable only with positive values.
@@ -867,7 +868,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             
             if (filter.fillable) {
                 if (filter.type == 'select') {
-                    filter.fillAction = filter.fillAction || name + '_tiny_list';
                     filter.nameAsId = filter.nameAsId || false;
                     
                     var nameField = Wat.U.getNameFieldFromQvdObj(name);
@@ -878,18 +878,24 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                         var orderFields = [nameField];
                     }
                             
-                            var params = {
-                        'action': filter.fillAction,
+                    var params = {
                         'selectedId': that.filters[filter.filterField] || Wat.I.getFilterSelectedId(filter.options),
-                                'controlName': name,
-                                'startingOptions': Wat.I.getFilterStartingOptions(filter.options),
+                        'controlName': name,
+                        'startingOptions': Wat.I.getFilterStartingOptions(filter.options),
                         'nameAsId': filter.nameAsId,
-                                'order_by': {
+                        'order_by': {
                             "field": orderFields,
-                                    "order": "-asc"
-                                },
-                            };
-
+                            "order": "-asc"
+                        },
+                    };
+                    
+                    if (filter.fillAction) {
+                        params.action = filter.fillAction;
+                    }
+                    else {
+                        params.actionAuto = name;
+                    }
+                    
                     if (currentExistsOutTenant) {
                         var paramGlobal = {};
                         paramGlobal[COMMON_TENANT_ID] = 'None (Common)';
@@ -1318,8 +1324,9 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         // Overrided from specific list view if necessary
     },
     
-    configureMassiveEditor: function (that) {
-        // Overrided from specific list view if necessary
+    // Additional changes on massive editor interface after render it
+    configureMassiveEditor: function (that) {  
+        // Extended from specific list view if necessary
     },
     
     updateMassiveElement: function (dialog, id) {
@@ -1342,7 +1349,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
 
         var description = context.find('textarea[name="description"]').val();
         
-        if (description != '' && Wat.C.checkACL(this.qvdObj + '.update-massive.description')) {
+        if (Wat.I.isMassiveFieldChanging("description") && Wat.C.checkACL(this.qvdObj + '.update-massive.description')) {
             arguments["description"] = description;
         }
         

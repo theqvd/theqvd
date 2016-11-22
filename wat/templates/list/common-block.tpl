@@ -15,7 +15,7 @@
                     switch(filter.type) {
                         case 'text':
                             %>
-                                <span class="filter-control">
+                                <span class="filter-control" data-fieldname="<%= name %>">
                                 <label for="<%= name %>" data-i18n="<%= filter.text %>"></label>
                                 <input type="text" name="<%= name %>" class="mobile-filter" data-filter-field="<%= name %>"/>
                                 </span>
@@ -23,7 +23,7 @@
                             break;
                         case 'select':
                             %>
-                                <span class="filter-control desktop">
+                                <span class="filter-control desktop" data-fieldname="<%= name %>">
                                     <label for="<%= name %>" <%= translationAttr %>><%= filter.text %></label>
                                     <select name="<%= name %>" class="<%= filter.class %> mobile-filter" data-filter-field="<%= filter.filterField %>">
                                         <% 

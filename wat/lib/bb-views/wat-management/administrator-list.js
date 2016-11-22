@@ -20,25 +20,17 @@ Wat.Views.AdminListView = Wat.Views.ListView.extend({
         
 
         Wat.I.chosenElement('[name="language"]', 'single100');
-        
-        if ($('[name="tenant_id"]').length > 0) {
-            // When tenant id is present attach change events. Roles will be filled once the events were triggered
-            Wat.B.bindEvent('change', 'select[name="tenant_id"]', function () {
-                that.fetchAndRenderRoles({
-                    forcedTenantId: $('select[name="tenant_id"]').val()
-                });
-            });
-        }
-        else {
-            that.fetchAndRenderRoles({
-                forcedTenantId: Wat.C.tenantID
-            });
-        }
     },
     
     fillMassiveEditor: function (target, that) {
         Wat.Views.ListView.prototype.fillMassiveEditor.apply(this, [target, that]);
         that.fetchAndRenderRoles();
+    },
+    
+    openMassiveChangesDialog: function (that) {
+        Wat.Views.ListView.prototype.openMassiveChangesDialog.apply(this, [that]);
+        
+        Wat.I.chosenElement('[name="language"]', 'single100');
     },
     
     createElement: function () {
@@ -112,4 +104,34 @@ Wat.Views.AdminListView = Wat.Views.ListView.extend({
         
         this.updateModel(args, filters, this.fetchAny, auxModel);
     },
+    
+    updateMassiveElement: function (dialog, id) {
+        var valid = Wat.Views.ListView.prototype.updateElement.apply(this, [dialog]);
+        
+        if (!valid) {
+            return;
+        }
+        
+        var arguments = {};
+        
+        var context = $('.' + this.cid + '.editor-container');
+        
+        var description = context.find('textarea[name="description"]').val();
+        var language = context.find('select[name="language"]').val(); 
+        
+        var filters = {"id": id};
+        
+        if (Wat.I.isMassiveFieldChanging("description") && Wat.C.checkACL('administrator.update.description')) {
+            arguments["description"] = description;
+        }
+        
+        if (Wat.I.isMassiveFieldChanging("language") && Wat.C.checkACL('administrator.update.language')) {
+            arguments["language"] = language;
+        }
+        
+        this.resetSelectedItems();
+        
+        var auxModel = new Wat.Models.Admin();
+        this.updateModel(arguments, filters, this.fetchList, auxModel);
+    }
 });

@@ -27,14 +27,14 @@
             <%
             if (viewKind == 'tenant' && Wat.C.isSuperadmin()) {
             %>
-            <span class="filter-control desktop">
+            <span class="filter-control desktop" data-fieldname="tenant">
                     <label for="tenant-select" data-i18n="Tenant"></label>
                     <select name="tenant-select" class="chosen-single"></select>
             </span>
             <%
             }
             %>
-            <span class="filter-control desktop">
+            <span class="filter-control desktop" data-fieldname="qvd-obj">
                 <label for="obj-qvd-select" data-i18n="Section"></label>
                 <select name="obj-qvd-select" class="chosen-single">
                     <%
@@ -87,7 +87,7 @@
                 </select>
             </span>
 
-                <span class="filter-control desktop">
+                <span class="filter-control desktop" data-fieldname="element">
                 <label for="element-select" data-i18n="Element"></label>
                 <select name="element-select" class="chosen-single">
                     <option value="columns" data-i18n="Columns"></option>

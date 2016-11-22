@@ -94,15 +94,15 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
         var filters = {"id": id};
         
         
-        if (description != '' && Wat.C.checkACL(this.qvdObj + '.update-massive.description')) {
+        if (Wat.I.isMassiveFieldChanging("description") && Wat.C.checkACL(this.qvdObj + '.update-massive.description')) {
             arguments["description"] = description;
         }
         
-        if (memory != '' && Wat.C.checkACL('osf.update-massive.memory')) {
+        if (Wat.I.isMassiveFieldChanging("memory") && Wat.C.checkACL('osf.update-massive.memory')) {
             arguments["memory"] = memory;
         }
         
-        if (user_storage != '' && Wat.C.checkACL('osf.update-massive.user-storage')) {
+        if (Wat.I.isMassiveFieldChanging("user_storage") && Wat.C.checkACL('osf.update-massive.user-storage')) {
             arguments["user_storage"] = user_storage;
         }
         

@@ -422,7 +422,7 @@ Acciones masivas
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_tenant_massiveactions.png" alt="screenshot_tenant_massiveactions.png" width="600px" />
+<img src="images/doc_images/screenshot_tenant_massiveactions.png" alt="screenshot_tenant_massiveactions.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>Las acciones masivas nos dan las siguientes opciones a realizar sobre los tenants seleccionados:</p></div>
 <div class="ulist"><ul>
@@ -932,7 +932,7 @@ Contraseña: to the rescue</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-09-21 15:44:26 CEST
+Last updated 2016-11-14 12:42:19 CET
 </div>
 </div>
 </body>

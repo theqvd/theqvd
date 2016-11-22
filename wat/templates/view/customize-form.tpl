@@ -27,7 +27,7 @@
         %>  
                 <tr class="<%= field.property ? 'js-is-property' : '' %>" data-name="<%= fName %>">
                     <td class="center cell-check">
-                        <div class="js-field-check <%= field.property ? 'js-is-property' : '' %>" <%= field.property ? 'data-property-id="' + field.property_id  + '"' : '' %> data-name="<%= fName %>" data-fields="<%= field.fields.join(',') %>">
+                        <div class="js-field-check <%= field.property ? 'js-is-property' : '' %>" <%= field.property ? 'data-property-id="' + field.property_id  + '"' : '' %> data-name="<%= fName %>" data-field="<%= field.fields.join(',') %>">
                             <%= Wat.I.controls.CheckBox({checked: field.display}) %>
                         </div>
                     </td>
@@ -61,7 +61,7 @@
         %>
             <tr class="js-is-property js-column-property-template hidden" data-name="">
                 <td class="center cell-check">
-                    <div class="js-field-check js-is-property" data-name="" data-fields="">
+                    <div class="js-field-check js-is-property" data-name="" data-field="">
                         <%= Wat.I.controls.CheckBox({checked: false}) %>
                     </div>
                 </td>
@@ -149,7 +149,7 @@
         %>
             <tr class="js-is-property js-filter-property-template hidden" data-name="">
                 <td class="center cell-check">
-                    <div class="js-desktop-fields js-is-property" data-name="" data-fields="">
+                    <div class="js-desktop-fields js-is-property" data-name="" data-field="">
                         <%= Wat.I.controls.CheckBox({checked: false}) %>
                     </div>
                 </td>

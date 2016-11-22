@@ -11,9 +11,12 @@
                 <% if (property.description) { %>
                     <a class="fright fa fa-question-circle needsclick" data-i18n="[title]<%= property.description %>" style="margin-left: 6px;"></a>
                 <% } %>
+                <% if (editorMode == 'massive-edit') { %>
+                    <a class="button fa fa-rotate-left js-no-change-reset no-change-reset invisible js-no-change-prop" data-i18n="Reset" data-field="<%= property.property_id %>"></a>
+                <% } %>
             </td>
             <td>
-                <input type="text" class="custom-prop-value" data-current="<%= property.value %>" value="<%= property.value %>">
+                <input type="text" class="custom-prop-value" data-current="<%= property.value %>" value="<%= property.value %>" name="<%= property.property_id %>" <%= editorMode == 'massive-edit' ? 'data-i18n="[placeholder]No changes"' : '' %>>
             </td>
         </tr>
 <%

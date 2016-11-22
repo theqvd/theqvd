@@ -1,12 +1,14 @@
 Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({  
     qvdObj: 'tenant',
     
-    // vm_tiny_list
-    // user_tiny_list
-    // di_tiny_list
-    // osf_tiny_list
-    // role_tiny_list
-    // administrator_tiny_list
+    // API actions used in cascade deletion
+    
+    // vm_get_list
+    // user_get_list
+    // di_get_list
+    // osf_get_list
+    // role_get_list
+    // administrator_get_list
     // property_get_list
     // config_get
     
@@ -55,7 +57,10 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
                 elementName: 'Configuration tokens',
                 nameField: 'key',
                 idField: 'key',
-                retrievingAction: 'config_get'
+                retrievingAction: 'config_get',
+                filter: {
+                    is_default: 0
+                }
              }
     },
 
@@ -123,7 +128,7 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
             params.filters = {"tenant_id": this.elementId};
 
             this.sideViews.push(new Wat.Views.VMListView(params));
-        }    
+        }
         
         if (sideCheck['tenant.see.user-list']) { 
             var sideContainer = '.' + this.cid + ' .bb-details-side2';
@@ -252,11 +257,15 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
         
         var that = this;
         
-        var retrievingAction = that.cascadeTenantElements[qvdObj]['retrievingAction'] || qvdObj + '_tiny_list';
+        var retrievingAction = that.cascadeTenantElements[qvdObj]['retrievingAction'] || qvdObj + '_get_list';
         
-        Wat.A.performAction(retrievingAction, {}, {
-            tenant_id: that.elementId
-            }, {}, function (that) {
+        var idField = that.cascadeTenantElements[qvdObj]['idField'] || 'id';
+        var nameField = that.cascadeTenantElements[qvdObj]['nameField'] || 'name';
+        
+        var filter = that.cascadeTenantElements[qvdObj]['filter'] || {};
+        filter.tenant_id = that.elementId;
+        
+        Wat.A.performAction(retrievingAction, {}, filter, {}, function (that) {
                 // If purge indicator is enabled, disable
                 that.disablePurgeIndicator(qvdObj);
 
@@ -290,7 +299,7 @@ Wat.Views.TenantDetailsView = Wat.Views.DetailsView.extend({
                         $('.ui-dialog-buttonset .button').eq(1).show(); 
                     }
                 }
-            }, that);
+            }, that, [idField, nameField]);
     },
     
     getTotalElementsCount: function () {

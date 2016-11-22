@@ -87,28 +87,17 @@ my $QVD_OBJECT_TO_DBIX_TABLE = {
 sub BUILD 
 {
     my $self = shift;
-    my $qvd_object = $self->qvd_object_model->qvd_object;
-    my $type_of_action = $self->qvd_object_model->type_of_action;
+    my $qvd_model = $self->qvd_object_model;
+    my $qvd_object = $qvd_model->qvd_object;
+    my $type_of_action = $qvd_model->type_of_action;
 
     # Store the administrator that generates the request
-    $self->{administrator} = $self->qvd_object_model->current_qvd_administrator;
+    $self->{administrator} = $qvd_model->current_qvd_administrator;
 
     # Set the DBIx table the request will be executed against by default
     $self->{table} = $self->qvd_obj_to_table($qvd_object);
 
 # CHECKS OR DIE
-
-# Operative acls must be asked just for one role
-# Otherwise the request doesn't make sense 
-
-    $self->check_unique_role_in_acls_search
-        if $qvd_object eq 'Operative_Acls_In_Role';
-
-# Operative acls must be asked just for one admin
-# Otherwise the request doesn't make sense 
-
-    $self->check_unique_admin_in_acls_search 
-        if $qvd_object eq 'Operative_Acls_In_Administrator';
 
 # It checks if the requested fields to retrieve 
 # are available
@@ -169,6 +158,22 @@ sub BUILD
     $self->set_order_by_in_request;
     $self->set_tables_to_join_in_request;
 
+    # REQUEST CHECKS
+
+    # Operative acls must be asked just for one role
+    # Otherwise the request doesn't make sense 
+
+    $self->check_unique_role_in_acls_search
+        if $qvd_object eq 'Operative_Acls_In_Role';
+
+    # Operative acls must be asked just for one admin
+    # Otherwise the request doesn't make sense 
+
+    if ($qvd_object eq 'Operative_Acls_In_Administrator') {
+        $self->set_default_admin_id_in_acls_search;
+        $self->check_unique_admin_in_acls_search;
+    }
+
 # AD HOC SETTING OF OBLIGATORY ELEMENTS 
 
 # The recovery administrator is stored in the database
@@ -179,19 +184,13 @@ sub BUILD
     $self->hide_recovery_mode_administrator 
         if $qvd_object eq 'Administrator';
 
-# The accion 'get_acls_in_admins' without an admin_id filter 
-# is supposed to ask for the operative acls in the current admin.
-# This methods adds the corresponding filter if needed 
-
-    $self->set_default_admin_id_in_acls_search 
-        if $qvd_object eq 'Operative_Acls_In_Administrator';
-
 # Requests must include a proper filter by tenant, cause
 # non-superadmin admins can only operate over its own
 # tenant. The corresponding filters to filtering by tenant
 # are added in here
 
-    $self->forze_filtering_by_tenant;
+    $self->forze_filtering_by_tenant
+        if $qvd_model->available_filter('tenant_id');
 
 # Actions 'admin_view_set' and 'admin_view_reset' are supposed to operate
 # over the current admin. The correspondig filters are added in here
@@ -233,17 +232,17 @@ sub BUILD
 sub check_unique_admin_in_acls_search
 {
     my $self = shift;
-    my @admin_id = ($self->json_wrapper->get_filter_value('admin_id'));
-    QVD::API::Exception->throw(code => 6322, object => 'admin_id') 
-	if scalar @admin_id > 1;     
+    my @admin_id = @{$self->filters->filter_value('admin_id')};
+    QVD::API::Exception->throw(code => 6322, object => 'admin_id')
+        if scalar @admin_id != 1;
 }
 
 sub check_unique_role_in_acls_search
 {
     my $self = shift;
-    my @role_id = ($self->json_wrapper->get_filter_value('role_id'));
-    QVD::API::Exception->throw(code => 6322, object => 'role_id') 
-	if scalar @role_id > 1; 
+    my @role_id = @{$self->filters->filter_value('role_id')};
+    QVD::API::Exception->throw(code => 6322, object => 'role_id')
+        if scalar @role_id != 1;
 }
 
 sub check_filters_validity_in_json
@@ -352,26 +351,14 @@ sub check_nested_queries_validity_in_json
     {
 	$method = 'get_acls_for_nested_query_in_creation';
     }
-    elsif ($type_of_action eq 'update')
-    {
-# An operation is considered massive if it is applied over more than one 
-# object. For this kind of action, the 'id' is a mandatory filter
-# and it is the only filter available. So it can be known the amount of objects
-# will be involved by using that filter.
-
-	my $id = $self->json_wrapper->get_filter_value('id');
-	($method,$code) = ref($id) && scalar @$id > 1 ? 
-	    ('get_acls_for_nested_query_in_massive_update',4240) : 
-	    ('get_acls_for_nested_query_in_update',4230) ;
-    }
 
 	for my $nested_query ($self->json_wrapper->nested_queries_list) {
 		$self->qvd_object_model->available_nested_query($nested_query) ||
 			QVD::API::Exception->throw(code => 6230, object => $nested_query);
 
-		$admin->re_is_allowed_to($self->qvd_object_model->$method($nested_query)) ||
-			QVD::API::Exception->throw(code => $code, object => $nested_query);
-	}
+		$admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_nested_query_in_update($nested_query)) ||
+			QVD::API::Exception->throw(code => 4230, object => $nested_query);
+    }
 }
 
 sub check_order_by_validity_in_json
@@ -425,7 +412,7 @@ sub set_default_admin_id_in_acls_search
 {
     my $self = shift;
     $self->filters->add_filter('admin_id', { '=' => $self->administrator->id}) 
-        unless $self->filters->get_filter_value('admin_id');
+        unless $self->filters->filter_value('admin_id');
 }
 
 sub hide_recovery_mode_administrator
@@ -453,8 +440,6 @@ sub forze_filtering_by_tenant
 {
     my $self = shift;
 
-    return unless $self->qvd_object_model->available_filter('tenant_id');
-
     if ($self->json_wrapper->has_filter('tenant_id'))
     {
         QVD::API::Exception->throw(code => 4220, object => 'tenant_id') 
@@ -466,7 +451,9 @@ sub forze_filtering_by_tenant
     }
     else
     {
-        $self->filters->add_filter('tenant_id', $self->administrator->tenants_scoop);
+        my $read_only = $self->qvd_object_model->type_of_action =~ /^(list|details)$/;
+        my $scope =  $self->administrator->tenants_scope($read_only ? 1 : 0);
+        $self->filters->add_filter('tenant_id', $scope);
     }
 }
 
@@ -474,14 +461,8 @@ sub forze_filtering_tenants_by_tenant
 {
     my $self = shift;
 
-    my @ids = @{$self->administrator->tenants_scoop}; # All tenants available for the admin
+    my @ids = @{$self->administrator->tenants_scope(0)}; # All tenants available for the admin
 
-# By convention, tenant 0 is the special tenant of superadmins 
-# Tenant 0 is special. It cannot be deleted and when listing
-# tenants it is not it doesn't appear
-
-    @ids = grep { $_ ne 0 } @ids if 
-	$self->qvd_object_model->type_of_action =~ /^delete|list$/;
     $self->filters->add_filter('id', \@ids);
 }
 
@@ -573,7 +554,7 @@ sub get_dbi_format_filters {
     my $filters_dbi = clone $self->filters;
     
     my $found_properties = 0; # number of custom properties found
-
+    my $prop_suffix = "";
     for my $filter_path (@{$filters_dbi->filter_list()})
     {
         my $key = QVD::API::REST::Filter::filter_name_from_path($filter_path);
@@ -585,10 +566,15 @@ sub get_dbi_format_filters {
         if ($is_property)
         {
             # To filter by a property, the corresponding properties table must be joined.
+            # FIXME: Adding the same join several times drives to an exponential increment of tuples,
+            # this approach to filter by properties shall be changed
+            # FIXME: Collateral changes to the Request object shall be removed
+            my $join = {'properties' => { 'qvd_properties_list' => 'properties_list'} };
+            $self->add_to_join( $join );
             # This code uses the aliases system for multiple joins of the same table in DBIC
-            $self->add_to_join( 'properties' );
             $found_properties++;
-            $key_dbix = $found_properties > 1 ? "properties_$found_properties" : 'properties';
+            $prop_suffix = $found_properties > 1 ? "_$found_properties" : "";
+            $key_dbix = "properties" . "$prop_suffix";
         } else {
             $key_dbix = $self->qvd_object_model->map_filter_to_dbix_format( $key );
         }
@@ -609,13 +595,18 @@ sub get_dbi_format_filters {
         $op = $self->qvd_object_model->normalize_operator($op);
 
         # This is according DBIC format
-        my $value_normalized = $is_property ?
-            [$key_dbix.".key" => { $op => $key }, $key_dbix.".value" => { $op => $value } ] :
-            { $op => $value };
+        my $value_normalized = { $op => $value };
 
         if ($is_property)
         {
             $filters_dbi->set_filter_value($filter_path, $value_normalized);
+            $filters_dbi->set_filter_key($filter_path, $key_dbix.".value");
+            my $value_path = QVD::API::REST::Filter::filter_basedir_from_path($filter_path);
+            $filters_dbi->add_filter($value_path, { '=' => $key }, "properties_list$prop_suffix.key");
+            # In case there are other properties with the same name in other tenants, the tenant_id
+            # is required to be specified
+            $filters_dbi->add_filter($value_path, { '=' => $self->administrator->tenant_id },
+                "properties_list$prop_suffix.tenant_id");
         }
         else
         {

@@ -116,7 +116,7 @@ Wat.Common.BySection.role = {
         var that = this;
         
         // Render templates matrix
-        Wat.A.performAction('role_tiny_list', {}, {internal: "1"}, {}, function (that) {
+        Wat.A.performAction('role_get_list', {}, {internal: "1"}, {}, function (that) {
             var currentTemplates = [];
             
             if (that.model && that.model.get('roles')) {
@@ -142,11 +142,11 @@ Wat.Common.BySection.role = {
             that.unassignTemplates = [];
             
             that.renderTemplates();
-        }, that);
+        }, that, ['id', 'name']);
     },
     
 
-    renderTemplates: function () {         
+    renderTemplates: function () {    
         var template = _.template(
             Wat.TPL.inheritanceToolsTemplates, {
                 templates: this.editorTemplates

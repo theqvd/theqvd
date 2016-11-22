@@ -89,7 +89,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
                 // Fill Users select on virtual machines creation form. 
                 // This filling has sense when the view is the VM view and tenant filter is not present
                 var params = {
-                    'action': 'user_tiny_list',
+                    'actionAuto': 'user',
                     'selectedId': '',
                     'controlName': 'user_id',
                     'chosenType': 'advanced100'
@@ -100,7 +100,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
 
             // Fill OSF select on virtual machines creation form
             var params = {
-                'action': 'osf_tiny_list',
+                'actionAuto': 'osf',
                 'selectedId': '',
                 'controlName': 'osf_id',
                 'chosenType': 'advanced100'
@@ -120,7 +120,7 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
             Wat.A.fillSelect(params, function () {
                 // Fill DI Tags select on virtual machines creation form after fill OSF combo
                 var params = {
-                    'action': 'tag_tiny_list',
+                    'actionAuto': 'tag',
                     'selectedId': 'default',
                     'controlName': 'di_tag',
                     'filters': {
@@ -217,7 +217,10 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         Wat.A.performAction('osf_all_ids', {}, {"vm_id": that.selectedItems}, {}, that.openMassiveChangesDialog, that);
     },
     
+    // Extend massive configurator to fill Tag select on virtual machines
     configureMassiveEditor: function (that) {
+        Wat.Views.ListView.prototype.configureMassiveEditor.apply(this, [that]);
+        
         // Virtual machine form include a date time picker control, so we need enable it
         Wat.I.enableDataPickers();
         
@@ -232,9 +235,9 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         }
         
         var params = {
-            'action': 'tag_tiny_list',
+            'actionAuto': 'tag',
             'startingOptions': {
-                '' : 'No changes',
+                '' : $.i18n.t('No changes'),
                 'default' : 'default',
                 'head' : 'head'
             },
@@ -273,27 +276,24 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         
         var filters = {"id": id};
         
-        if (description != '' && Wat.C.checkACL('vm.update-massive.description')) {
+        if (Wat.I.isMassiveFieldChanging("description") && Wat.C.checkACL('vm.update-massive.description')) {
             arguments["description"] = description;
         }
         
-        if (di_tag != '' && Wat.C.checkACL('vm.update-massive.di-tag')) {
+        if (Wat.I.isMassiveFieldChanging("di_tag") && Wat.C.checkACL('vm.update-massive.di-tag')) {
             arguments["di_tag"] = di_tag;
         }
         
         if (Wat.C.checkACL('vm.update-massive.expiration')) {
-            // If expire is checked
-            if (context.find('input.js-expire').is(':checked')) {
-                var expiration_soft = context.find('input[name="expiration_soft"]').val();
-                var expiration_hard = context.find('input[name="expiration_hard"]').val();
+            var expiration_soft = context.find('input[name="expiration_soft"]').val();
+            var expiration_hard = context.find('input[name="expiration_hard"]').val();
 
-                if (expiration_soft != undefined) {
-                    arguments['expiration_soft'] = expiration_soft;
-                }
+            if (expiration_soft != undefined && Wat.I.isMassiveFieldChanging("expiration_soft")) {
+                arguments['expiration_soft'] = expiration_soft;
+            }
 
-                if (expiration_hard != undefined) {
-                    arguments['expiration_hard'] = expiration_hard;
-                }
+            if (expiration_hard != undefined && Wat.I.isMassiveFieldChanging("expiration_hard")) {
+                arguments['expiration_hard'] = expiration_hard;
             }
         }
         

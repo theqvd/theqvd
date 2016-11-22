@@ -355,7 +355,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         if (Wat.C.isSuperadmin()) {
             // Fill Tenant select on viees customization view
             var params = {
-                'action': 'tenant_tiny_list',
+                'actionAuto': 'tenant',
                 'controlName': 'tenant-select',
                 'chosenType': 'advanced100'
             };
@@ -400,7 +400,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
     completeColumnListWithProperties: function (columnList, properties, qvdObj) {
         $.each(properties, function (iProp, prop) {
             if (columnList[prop.get('key')]) {
-                columnList[prop.get('key')].property = true;
+                columnList[prop.get('key')].property = prop.get('property_id');
                 columnList[prop.get('key')].property_id = prop.get('in_' + qvdObj);
                 return;
             }
@@ -422,7 +422,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
     completeFilterListWithProperties: function (filterList, properties, qvdObj) {
         $.each(properties, function (iProp, prop) {
             if (filterList[prop.get('key')]) {
-                filterList[prop.get('key')].property = true;
+                filterList[prop.get('key')].property = prop.get('property_id');
                 filterList[prop.get('key')].property_id = prop.get('in_' + qvdObj);
                 return;
             }
