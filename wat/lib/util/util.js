@@ -291,5 +291,12 @@ Wat.U = {
     // HTML strings dencode function
     htmlDecode: function (value) {
       return $('<div/>').html(value).text();
+    },
+    
+    // Sort a given object by the key of one of its fields
+    sortObjectByField: function (obj, field) {
+        return obj.sort(function(a,b) {
+            return (a[field] > b[field]) ? 1 : ((b[field] > a[field]) ? -1 : 0);
+        });
     }
 }

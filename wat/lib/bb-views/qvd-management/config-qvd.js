@@ -107,7 +107,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     },
     
     processTokensRender: function (that) {
-        that.configTokens = that.retrievedData.rows
+        that.configTokens = Wat.U.sortObjectByField(that.retrievedData.rows, 'key');
         that.render();
     },  
     
@@ -153,7 +153,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
             return;
         }
         
-        that.configTokens = that.retrievedData.rows
+        that.configTokens = Wat.U.sortObjectByField(that.retrievedData.rows, 'key');
         
         // If there are not tokens in this prefix, render everything again selecting first prefix
         if (that.configTokens.length == 0 && $('input[name="config_search"]').val() == '') {
@@ -170,7 +170,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         }
     },
     
-    renderConfigurationTokens: function () {        
+    renderConfigurationTokens: function () {
         this.template = _.template(
             Wat.TPL.qvdConfigTokens, {
                 configTokens: this.configTokens,
@@ -440,6 +440,16 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         else {
 			// If the prefix of the changed token doesnt exist, render all to create this new prefix in side menu
             Wat.A.performAction('config_get', {}, filter, {}, that.processPrefixes, that);
+        }
+
+        // Any time one token were deleted or any api.pulblic.* token were created/updated, refresh public configuration from API and render footer
+        if (!that.retrievedData.rows[0] || that.retrievedData.rows[0].key.substring(0,11) == 'api.public.') {
+            Wat.A.apiInfo(function (that) {
+                // Store public configuration 
+                Wat.C.publicConfig = that.retrievedData.public_configuration || {};
+
+                Wat.I.renderFooter();
+            }, that);
         }
     }
 });
