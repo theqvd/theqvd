@@ -166,11 +166,12 @@ sub populate_from_data {
 sub update_seqs() {
 	my $dbh = db->storage->dbh;
 	for my $source (db->sources()){
+		my $table_name = db->source($source)->name;
 		for my $col_name (db->source($source)->columns){
 			my $col_info = db->source($source)->column_info($col_name);
-			my $table_name = db->source($source)->name;
 			if(($col_info->{is_auto_increment}) and ((db->source($source)->{is_virtual} // 0) == 0)){
-				$dbh->do("SELECT setval('${table_name}_${col_name}_seq', 10000, false)");
+				my $val = (rs($source)->get_column($col_name)->max // 9999) + 1;
+				$dbh->do("SELECT setval('${table_name}_${col_name}_seq', $val, false)");
 			}
 		}
 	}
@@ -254,7 +255,7 @@ GetOptions(
 	"force|f"         => \$force,
 	"file=s"          => \@datafiles,
 	"update-from=s"   => \$update_from_version,
-	"update-schema"   => sub { $update_schema = 1; $update_from_version = 'latest'; },
+	"update-schema"   => sub { $force = 1; $update_schema = 1; $update_from_version = 'latest'; },
 	"verbose|v"       => \$verbose,
 ) or exit (1);
 
