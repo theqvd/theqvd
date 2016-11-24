@@ -203,8 +203,11 @@ sub get_deps_from_module {
             return [ (($plugin =~ /QVD/)? "" : "Mojolicious::Plugin::") . "$plugin" ];
         },
     );
-    my @exceptions = ("5.010", "Win32::API", "Win32::Process", "Wx::Frame", "QVD::HTTPD::.+",
-        "QVD::Config::Core::Defaults");
+    my @exceptions = (
+        "5.010",
+        "Win32::API", "Win32::Process", "Win32::LongPath",
+        "Wx::Frame",
+        "QVD::HTTPD::.+", "QVD::Config::Core::Defaults");
     for my $file (@file_list) {
         open FILE, $file or print_msg("Couldn't open file: $!", "FATAL");
         while (my $line = <FILE>) {
