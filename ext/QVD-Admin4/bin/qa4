@@ -8,7 +8,7 @@ BEGIN {
 	@QVD::Config::Core::FILES = (
 		'/etc/qvd/qa.conf',
 		($ENV{HOME} || $ENV{APPDATA}).'/.qvd/qa.conf',
-		'qvd-qa.conf',
+		'qa.conf',
 	);
 }
 
