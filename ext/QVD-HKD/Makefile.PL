@@ -13,7 +13,7 @@ WriteMakefile(
         'AnyEvent' => '5.34',
         'AnyEvent::Debug' => 0,
         'AnyEvent::HTTP' => '2.13',
-        'AnyEvent::Impl::Perl' => 0,
+        'AnyEvent::Impl::EV' => 0,
         'AnyEvent::Pg::Pool' => 0,
         'AnyEvent::Util' => 0,
         'AnyEvent::Semaphore' => '0.01',
