@@ -248,7 +248,7 @@ sub _allocate_os_disk {
 sub _allocate_user_disk {
     my $self = shift;
     my $size = $self->{user_storage_size};
-    unless (defined $size) {
+    unless ($size) {
         DEBUG 'Not allocating user storage';
         return $self->_on_done;
     }
