@@ -1186,41 +1186,18 @@ sub check_api_result
 {
     my ($self,$res) = @_;
 
-    return 1 unless $res->json('/status'); # Successful response
+    return 1 if $res->json('/status') == 0; # Successful response
 
-    # All API internal errors are translated to the same generic 
-    # message in CLI responde
+    my $message = $res->json('/message');
+    chomp($message);
+    my $failures = $res->json('/failures');
+    if (defined($failures)) {
+        $message .= ":\n";
+        while (my ($id,$failure) = each %$failures) {
+            $message .= "\t$id : " . $failure->{message} . "\n";
+        }
+    }
 
-    my $API_INTERNAL_PROBLEMS_MSG = 'Internal problems in API';
-    my %SERVER_INTERNAL_ERRORS = qw(1100 1 4100 1 4110 1 6100 1);
-
-    CLI::Framework::Exception->throw($API_INTERNAL_PROBLEMS_MSG) if 
-	$SERVER_INTERNAL_ERRORS{$res->json('/status')};
-
-   # Well typified error messages in API are displayed via console
-   # in CLI 
-
-    CLI::Framework::Exception->throw($res->json('/message')) unless 
-	$res->json('/status') eq 1200; 
-
-  # For 1200 error in API (That means that one or more of the objects
-  # involved in a query couldn't be edited because of some problem):
-
-    my ($message,$failures) = ($res->json('/message') . ":\n",$res->json('/failures'));
-
-    my %seen_msgs;
-
-    while (my ($id,$failure) = each %$failures)
-    {
-	my $msg = $SERVER_INTERNAL_ERRORS{$failure->{status}} ? 
-	    $API_INTERNAL_PROBLEMS_MSG : 
-	    $failure->{message};
-	next if exists $seen_msgs{$msg};
-	$seen_msgs{$msg} = 1;
-	$message .= "$msg\n"; 
-    } 
-
-    $message =~ s/\n$//;
     CLI::Framework::Exception->throw($message);
 }
 
