@@ -45,18 +45,17 @@ sub is_hidden {
 # Private methods
 
 sub _get_default_cfg_value {
-    
     my $key = shift;
     my $tenant = shift // -1;
-    
-    my $value = core_cfg_unmangled($key);
-    return $value if defined($value);
-    
+
     if ($tenant != -1) {
         my $row = QVD::DB::Simple::rs( 'Config' )->search( { tenant_id => -1, key => $key } )->first();
         return $row->value if defined( $row );
     }
-    
+
+    my $value = core_cfg_unmangled($key);
+    return $value if defined($value);
+
     return undef;
 }
 

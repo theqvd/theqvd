@@ -167,7 +167,7 @@ my $RULES =
 		right_side => [
 			{ label => 'default', saturated => 1, order => 0, of => 0, to => 0, with => 0 },
 		],
-		meaning   => sub { 'default' }
+		meaning   => sub { 'delete' }
 	},
 
 	{
