@@ -48,6 +48,16 @@ sub recheck_authentication_basic {
     $auth->{login} eq $login and $auth->{passwd} eq $passwd;
 }
 
+sub authenticate_basic_2f_split {
+    my ($auth, $passwd, $l7r) = @_;
+    for (@{$auth->{modules}}) {
+        if (my ($passwd, $token) = $_->authenticate_basic_2f_split($auth, $passwd, $l7r)) {
+            return ($passwd, $token);
+        }
+    }
+    return $passwd; # by default, no 2FA.
+}
+
 sub authenticate_basic {
     my ($auth, $login, $passwd, $l7r) = @_;
     if (defined (my $normalized_login = $auth->_normalize_login($login))) {
@@ -55,12 +65,28 @@ sub authenticate_basic {
         $auth->{login} = $login;
         $auth->{normalized_login} = $normalized_login;
         $auth->{passwd} = $passwd;
+        my ($passwd, $token) = $auth->authenticate_basic_2f_split($passwd);
         for (@{$auth->{modules}}) {
             if ($_->authenticate_basic($auth, $normalized_login, $passwd, $l7r)) {
                 # note that some backend (i.e. LDAP) may have changed
                 # $auth->{normalized_login} so we can not use our
                 # cached copy in $normalized_login
                 $auth->{params}{'qvd.vm.user.name'} = $auth->{normalized_login};
+
+                if (defined $token) { # Some module is implementing 2FA, check the token!
+                    my $ok;
+                    for (@{$auth->{modules}}) {
+                        if ($_->authenticate_basic_2f($auth, $normalized_login, $token, $l7r)) {
+                            $ok = 1;
+                            last;
+                        }
+                    }
+                    unless ($ok) {
+                        DEBUG "Password authentication succeeded but 2F failed (token: $token)";
+                        return;
+                    }
+                }
+
                 $auth->after_authenticate_basic($auth->{normalized_login}, $l7r);
                 return 1;
             }
