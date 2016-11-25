@@ -393,15 +393,13 @@ sub check_fields_validity_in_json # Fields to retrieve
     my $self = shift;
     my $admin = $self->qvd_object_model->current_qvd_administrator;
 
-    $self->qvd_object_model->available_field($_) || $self->qvd_object_model->has_property($_) ||
-	QVD::API::Exception->throw(code => 6250, object => $_)
-	for $self->json_wrapper->fields_list;
+    for my $field ($self->json_wrapper->fields_list) {
+        QVD::API::Exception->throw(code => 6250, object => $field)
+            unless $self->qvd_object_model->available_field($field);
 
-    $admin->re_is_allowed_to(
-	$self->qvd_object_model->get_acls_for_field(
-	    $self->qvd_object_model->has_property($_) ? 'properties' : $_)) || # custom properties 
-	QVD::API::Exception->throw(code => 4250, object => $_)
-	for $self->json_wrapper->fields_list;
+        QVD::API::Exception->throw(code => 4250, object => $field)
+            unless $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_field($field));
+    }
 }
 
 #####################
