@@ -567,7 +567,6 @@ my $ARGUMENTS = {
 	    tag => 'di_tag', 
 	    user => 'user_id', 
 	    osf => 'osf_id', 
-		__properties_changes__ => '__properties_changes__'
 	}, # For nested queries in API
 
 	user => {
@@ -575,7 +574,6 @@ my $ARGUMENTS = {
 	      password => 'password', 
 	      blocked => 'blocked', 
 	      tenant => 'tenant_id',
-		__properties_changes__ => '__properties_changes__', # For nested queries in API
 	},
 
 	host => {
@@ -584,7 +582,6 @@ my $ARGUMENTS = {
 	      frontend => 'frontend', 
 	      backend => 'backend', 
 	      blocked => 'blocked',
-		__properties_changes__ => '__properties_changes__', # For nested queries in API
 	},
 
 	osf => {
@@ -593,7 +590,6 @@ my $ARGUMENTS = {
 	     user_storage => 'user_storage', 
 	     overlay => 'overlay', 
 	     tenant => 'tenant_id',
-		__properties_changes__ => '__properties_changes__', # For nested queries in API
 	},
 
 	di => {
@@ -601,7 +597,6 @@ my $ARGUMENTS = {
 	    name => 'disk_image',  
 	    version => 'version', 
 	    osf => 'osf_id',
-	    __properties_changes__ => '__properties_changes__', # For nested queries in API
 		__tags_changes__ => '__tags_changes__',  # For nested queries in API
 	},
 

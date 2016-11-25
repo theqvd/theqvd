@@ -83,7 +83,6 @@ sub command_map {
 		acl      => 'QVD::Admin4::Command::ACL',
 		admin    => 'QVD::Admin4::Command::Admin',
 		tag      => 'QVD::Admin4::Command::Tag',
-		property => 'QVD::Admin4::Command::Property',
 		vm       => 'QVD::Admin4::Command::VM',
 		user     => 'QVD::Admin4::Command::User',
 		host     => 'QVD::Admin4::Command::Host',

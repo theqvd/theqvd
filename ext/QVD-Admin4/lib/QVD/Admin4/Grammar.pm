@@ -30,7 +30,7 @@ my $RULES =
 
 # All key words are defined as  ambiguous in the grammar.
 # They can be either the reserved word or a free value
-# (i.e. vm property=vm get name).
+# (i.e. user name=user get id).
 
 # So these are the rules that create the free versions of the key
 # words
@@ -124,10 +124,6 @@ my $RULES =
  { left_side => { label => $UNKNOWN_TAG, saturated => 1 } ,
    right_side => [ { label => 'admin', saturated => 1 } ],
    meaning   => sub { 'admin' }},
-
- { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
-   right_side => [ { label => 'property', saturated => 1 } ],
-   meaning   => sub { 'property' }},
 
  { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'vm', saturated => 1 } ],
@@ -464,20 +460,6 @@ my $RULES =
    right_side => [ { label => "QVD_OBJECT", saturated => 1 },
 		   { label => 'unblock', saturated => 1 } ],
    meaning => sub { my $c0 = shift; { command => 'update', obj1 => $c0, arguments => { blocked => 0 }}}},
-
- { left_side => { label => 'ROOT', saturated => 1 }, 
-   right_side => [ { label => "QVD_OBJECT", saturated => 1 },
-		   { label => 'set', saturated => 1 },
-		   { label => "property", saturated => 1 },
-                   { label => "ITEM", saturated => 1, feature => 1 }],
-   meaning => sub { my ($c0,$c1,$c2,$c3) = @_; { command => 'update', obj1 => $c0, arguments => { __properties_changes__ => { set => { arguments($c3,'-and','=') } }}}}},
-
- { left_side => { label => 'ROOT', saturated => 1 }, 
-   right_side => [ { label => "QVD_OBJECT", saturated => 1 },
-		   { label => 'del', saturated => 1 },
-		   { label => "property", saturated => 1 },
-                   { label => "ITEM", saturated => 1, feature => 0 }],
-   meaning => sub { my ($c0,$c1,$c2,$c3) = @_; { command => 'update', obj1 => $c0, arguments => { __properties_changes__ => { delete => [ fields($c3,'-and') ] }}}}},
 
  { left_side => { label => 'ROOT', saturated => 1 }, 
    right_side => [ { label => "QVD_OBJECT", saturated => 1 },
