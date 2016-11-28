@@ -87,7 +87,9 @@ The password is then handled by any other configured plugin and the
 token checked using the TOTP algorithm.
 
 The user secret must be stored as the user property
-C<l7r.auth.plugin.totp.secret32> encoded in base32.
+C<l7r.auth.plugin.totp.secret32> encoded in base32. The companion
+program L<qvd-make-totp-secret> can be used to create the secret and
+to send it to the user as a QR-code by e-mail.
 
 =head2 OPTIONS
 
@@ -127,6 +129,8 @@ Note that the default options are those used by common services as
 Google Authenticator.
 
 =head1 SEE ALSO
+
+L<qvd-make-totp-secret>.
 
 The L<TOTP Algorithm|https://en.wikipedia.org/wiki/Time-based_One-time_Password_Algorithm>.
 
