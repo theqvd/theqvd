@@ -854,7 +854,9 @@ sub execute_and_display_query
 
 		if ($is_pagination_mode_enabled) {
 			my $total_pages = ceil($res->json('/total') / $query->{block});
-			print STDOUT "--- page $query->{offset} / $total_pages ('n' for next, 'b' for back, 'q' for quit) ---\n";
+			print STDOUT "--- page $query->{offset} / $total_pages\n";
+            $app->set_help_message("Press ('n' for next, 'b' for back, 'q' for quit) ---");
+			print STDOUT $app->help_message . "\n";
 
 			$char = ReadKey($pause_time);
             
@@ -864,6 +866,8 @@ sub execute_and_display_query
     }
 
 	} while ($is_pagination_mode_enabled && (defined($char)) && ($char ne 'q'));
+
+    $app->set_help_message(undef);
 
     ReadMode(0); # Return to normal mode in console 
 }

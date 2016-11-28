@@ -245,4 +245,17 @@ sub exit_status {
 	return $self->cache->get('exit_code');
 }
 
+sub set_help_message {
+	my $self = shift;
+	my $message = shift;
+	$self->cache->set('help_message', $message);
+}
+
+sub help_message {
+	my $self = shift;
+	my $message = $self->cache->get('help_message') //
+		"Insert any string: " . join(", ", map( {"\"$_\""} $self->quit_signals())) . " to exit from CLI";
+	return $message;
+}
+
 1;

@@ -3,6 +3,9 @@ use strict;
 use 5.010;
 use warnings;
 
+my $app;
+$SIG{INT} = sub { print $app->help_message . "\n" };
+
 BEGIN {
 	$QVD::Config::USE_DB = 0;
 	@QVD::Config::Core::FILES = (
@@ -16,7 +19,7 @@ use QVD::Admin4;
 
 # Script intended to create and run an instance of the CLI.
 
-my $app = QVD::Admin4->new();
+$app = QVD::Admin4->new();
 if(@ARGV > 0) {
 	require Text::ParseWords;
 	my @processed_args = ();
