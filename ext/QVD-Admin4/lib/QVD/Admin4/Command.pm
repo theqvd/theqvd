@@ -4,6 +4,7 @@ use warnings;
 use base qw( CLI::Framework::Command::Meta );
 use Text::SimpleTable::AutoWidth;
 use Text::UnicodeTable::Simple;
+use Mojo::URL;
 use Mojo::JSON qw(encode_json decode_json j);
 use Mojo::IOLoop;
 use Mojo::Message::Response;
@@ -798,7 +799,7 @@ sub _create
     }
 
     my $query = $self->make_api_query($parsing);# Creates a JSON query in API format 
-    my $res = $self->ask_api($query);
+    my $res = $self->ask_api($self->get_app->cache->get('api_default_path'), $query);
     $self->print_table($res,$parsing);
 }
 
@@ -849,7 +850,7 @@ sub execute_and_display_query
 	do {
 
     # It asks the API for the first page and prints that first page
-    my $res = $self->ask_api($query); 
+    my $res = $self->ask_api($self->get_app->cache->get('api_default_path'), $query); 
     $self->print_table($res,$parsing); 
 
 		if ($is_pagination_mode_enabled) {
@@ -892,6 +893,7 @@ sub _cmd
     # It performs the update/delete over the objects with those ids
 
     my $res = $self->ask_api(
+        $self->get_app->cache->get('api_default_path'),
         {
             action => $self->get_action($parsing),
             filters => $filters,
@@ -1022,7 +1024,7 @@ sub ambiguous
 
 sub ask_api
 {
-    my ($self,$query) = @_;
+    my ($self, $path, $query) = @_;
 
 	# Get arguments
     my $app = $self->get_app;
@@ -1043,7 +1045,7 @@ sub ask_api
  
 	# Ask API depending on the command
 	my $res;
-	if ($query->{action} eq 'di_create') {
+	if ($path eq $app->cache->get('api_staging_path')) {
 
 		# TODO:
 		# There is no way to select the kind of di creation system that
@@ -1051,20 +1053,9 @@ sub ask_api
 		# a) Copy an image from staging
 		# b) Upload an inmage from local
 		# c) Download an image from url
-
-		# But here just one method can be used (di_upload):
-		# This can be changed to 'ask_api_staging'.
-		# One more method must be implemented: 'ask_api_di_download'
-
-		my $url = $app->cache->get('api_staging_url');
-		$res = $self->ask_api_staging($query, $user_agent, $url, \%credentials);
-
-		#my $url = $app->cache->get('api_di_upload_url');
-		#$res = $self->ask_api_di_upload($query, $user_agent, $url, \%credentials);
-
+		$res = $self->ask_api_staging($path, $query, $user_agent, \%credentials);
 	} else {
-		my $url = $app->cache->get('api_url');
-		$res = $self->ask_api_standard($query, $user_agent, $url, \%credentials);
+		$res = $self->ask_api_standard($path, $query, $user_agent, \%credentials);
 	}
 
 	return $res;
@@ -1073,7 +1064,11 @@ sub ask_api
 # Method for standard queries to the API
 
 sub ask_api_standard {
-	my ($self, $query, $ua, $url, $credentials) = @_;
+	my ($self, $path, $query, $ua, $credentials) = @_;
+
+    my $url = Mojo::URL->new($self->get_app->cache->get('api_url'));
+    $url->path($path // $self->get_app->cache->get('api_default_path'));
+    $query //= {};
 
 	my $res = $ua->post(
 		"$url",
@@ -1095,8 +1090,10 @@ sub ask_api_standard {
 
 sub ask_api_staging
 {
-    my ($self, $query, $ua, $url, $credentials) = @_;
-
+    my ($self, $path, $query, $ua, $credentials) = @_;
+    my $url = Mojo::URL->new($self->get_app->cache->get('ws_url'));
+    $url = $url->path($path // $self->get_app->cache->get('api_staging_path'));
+    
     for my $k (keys %$query)
     {
         my $v = $query->{$k};
@@ -1184,10 +1181,11 @@ sub ask_api_di_upload
 sub check_api_result
 {
     my ($self,$res) = @_;
+    
+    my $status =  $res->json('/status') // -1;
+    return 1 if $status == 0; # Successful response
 
-    return 1 if $res->json('/status') == 0; # Successful response
-
-    my $message = $res->json('/message');
+    my $message = $res->json('/message') // "Unknown";
     chomp($message);
     my $failures = $res->json('/failures');
     if (defined($failures)) {
@@ -1208,6 +1206,7 @@ sub ask_for_ids
 
     if (my $action = $CLI_CMD2API_ACTION->{$qvd_object}->{'ids'}) {
         my $ids = [ map { $_->{id} } @{ $self->ask_api(
+            $self->get_app->cache->get('api_default_path'),
             {
                 action => $action,
                 filters => $filter,

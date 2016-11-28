@@ -20,12 +20,10 @@ sub run
     my ($self, $opts, @args) = @_;
 
     my $app = $self->get_app;
-    my $ua  = $app->cache->get('user_agent');
-    my $url  = $app->cache->get('api_info_url');
-
-    my $multitenant = eval {
-        $ua->get("$url")->res->json('/multitenant')
-    };
+    my $multitenant = $self->ask_api(
+        $app->cache->get('api_info_path'),
+        { }
+    )->json('/multitenant');
 
     my $login = $self->_read('Name');
     my $tenant = $multitenant ? $self->_read('Tenant') : undef;
@@ -37,7 +35,9 @@ sub run
     $app->cache->set( sid => undef );
 
     my $res = $self->ask_api(
-        { action => 'current_admin_setup'});
+        $app->cache->get('api_default_path'),
+        { action => 'current_admin_setup' }
+    );
 
     my $sid = $res->json('/sid');
     my $admin_id = $res->json('/admin_id');
