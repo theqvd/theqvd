@@ -379,13 +379,13 @@ group {
         my $staging_path = $c->qvd_admin4_api->_cfg('path.storage.staging');
         my $staging_file = eval { $json->{arguments}->{disk_image} } // ''; 
         my $images_file = $staging_file . '-tmp'. rand;
+        my $sf_size = eval { -s "$staging_path/$staging_file" } // 0;
 
         my $accomplished=0;
 
         $c->on(message => sub { 
             my ($c,$msg) = @_;
             unless ($accomplished) {
-                my $sf_size = eval { -s "$staging_path/$staging_file" } // 0;
                 my $if_size = eval { -s "$images_path/$images_file" } // 0;
                 $c->send( b( encode_json( {
                         status     => 1000,
@@ -397,7 +397,22 @@ group {
         });
 
         my $tx = $c->tx;
-        my $fc = Mojo::IOLoop::ForkCall->new;
+        my $fc = Mojo::IOLoop::ForkCall->new();
+        $fc->on( finish => sub {
+                my ($fc, $err, $response) = @_;
+                $accomplished=1;
+                if($response->{status} == 0000) {
+                    $c->send( b( encode_json( {
+                        status         => 1000,
+                        total_size => $sf_size,
+                        copy_size  => $sf_size } )
+                    )->decode( 'UTF-8' ) );
+                }
+                my $code = $response->{status};
+                my $msg = $response->{message};
+                $c->app->log->debug("Copy finished ($code): $msg");
+                $c->send(b(encode_json($response))->decode('UTF-8'));
+            } );
         $fc->run(
             sub {
                 my $response = {};
@@ -446,17 +461,11 @@ group {
                 } catch {
                     my $exception = $_;
                     $response = $exception->json;
+                } finally {
+                    eval { unlink( "$images_path/$images_file" ); };
                 };
 
                 return $response; 
-            },
-            sub {
-                my ($fc, $err, $response) = @_;
-                my $code = $response->{status};
-                my $msg = $response->{message};
-                $c->app->log->debug("Copy finished ($code): $msg");
-                $accomplished=1;
-                $c->send(b(encode_json($response))->decode('UTF-8')); 
             }
         );
     };

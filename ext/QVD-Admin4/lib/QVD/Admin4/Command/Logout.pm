@@ -17,7 +17,7 @@ sub run
 {
     my ($self, $opts, @args) = @_;
 
-    $self->ask_api(
+    $self->ask_api_standard(
         $self->get_app->cache->get('api_default_path') . '/logout',
         { }
     );

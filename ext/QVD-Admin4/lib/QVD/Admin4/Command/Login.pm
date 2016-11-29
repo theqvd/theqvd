@@ -20,7 +20,7 @@ sub run
     my ($self, $opts, @args) = @_;
 
     my $app = $self->get_app;
-    my $multitenant = $self->ask_api(
+    my $multitenant = $self->ask_api_standard(
         $app->cache->get('api_info_path'),
         { }
     )->json('/multitenant');
@@ -34,7 +34,7 @@ sub run
     $app->cache->set( password => $password );
     $app->cache->set( sid => undef );
 
-    my $res = $self->ask_api(
+    my $res = $self->ask_api_standard(
         $app->cache->get('api_default_path'),
         { action => 'current_admin_setup' }
     );

@@ -20,7 +20,7 @@ sub run
 
     my $password = $self->read_password;
 
-    $self->ask_api(
+    $self->ask_api_standard(
         $self->get_app->cache->get('api_default_path'),
         {
             action => 'myadmin_update', arguments => { password => $password }
