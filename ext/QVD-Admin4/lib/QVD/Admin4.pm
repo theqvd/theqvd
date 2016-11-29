@@ -127,6 +127,7 @@ sub init {
 		$ws_url->scheme('wss');
 	}
 
+	# FIXME: The default path shall be defined in the configuration file and read from there
 	my $api_default_path = "api";
 	my $api_info_path = "$api_default_path/info";
 	my $api_di_upload_path = "$api_default_path/di/upload";
