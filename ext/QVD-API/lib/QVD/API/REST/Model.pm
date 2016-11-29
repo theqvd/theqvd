@@ -2445,7 +2445,8 @@ sub get_default_di_version
     my $self = shift;
     my $json_wrapper = shift;
 
-    my $osf_id = $json_wrapper->get_argument_value('osf_id') // return;
+    my $osf_id = $json_wrapper->get_argument_value('osf_id') // 
+        QVD::API::Exception->throw(code => 7100, object => 'osf_id');
     my ($y, $m, $d) = (gmtime)[5, 4, 3]; $m ++; $y += 1900;
     my $osf = $DB->resultset('OSF')->search({id => $osf_id})->first;
     QVD::API::Exception->throw(code => 7100, object => 'osf_id') unless $osf; 

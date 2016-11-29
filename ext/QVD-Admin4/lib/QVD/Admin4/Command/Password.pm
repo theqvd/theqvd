@@ -18,15 +18,14 @@ sub run
 {
     my ($self, $opts, @args) = @_;
 
-    my $app = $self->get_app;
-    my $id = $app->cache->get('admin_id'); 
-
     my $password = $self->read_password;
 
-    my $res = $self->ask_api(
-	{ action => 'myadmin_update',
-	  arguments => { password => $password }});
-
+    $self->ask_api_standard(
+        $self->get_app->cache->get('api_default_path'),
+        {
+            action => 'myadmin_update', arguments => { password => $password }
+        }
+    );
 }
 
 1;

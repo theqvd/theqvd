@@ -83,7 +83,6 @@ sub command_map {
 		acl      => 'QVD::Admin4::Command::ACL',
 		admin    => 'QVD::Admin4::Command::Admin',
 		tag      => 'QVD::Admin4::Command::Tag',
-		property => 'QVD::Admin4::Command::Property',
 		vm       => 'QVD::Admin4::Command::VM',
 		user     => 'QVD::Admin4::Command::User',
 		host     => 'QVD::Admin4::Command::Host',
@@ -120,19 +119,20 @@ sub init {
 
 	# Created as objects all addresses in API
 
-	my $api_url = Mojo::URL->new($url . 'api');
-
-	my $api_info_url = Mojo::URL->new($url . 'api/info');
-
-	my $api_di_upload_url = Mojo::URL->new($url . 'api/di/upload');
-
-	my $api_staging_url = Mojo::URL->new($url . 'api/staging');
-	if ($api_staging_url->scheme() eq "http"){
-		$api_staging_url->scheme('ws');
+	my $api_url = Mojo::URL->new($url);
+	my $ws_url = Mojo::URL->new($url);
+	if ($ws_url->scheme() eq "http"){
+		$ws_url->scheme('ws');
 	} else {
-		$api_staging_url->scheme('wss');
+		$ws_url->scheme('wss');
 	}
 
+	# FIXME: The default path shall be defined in the configuration file and read from there
+	my $api_default_path = "api";
+	my $api_info_path = "$api_default_path/info";
+	my $api_di_upload_path = "$api_default_path/di/upload";
+	my $api_staging_path = "$api_default_path/staging";
+	
 	# Created a web client
 	my $user_agent = Mojo::UserAgent->new();
 	unless($insecure){
@@ -156,9 +156,11 @@ sub init {
 	$self->cache->set( parser => $parser);
 	$self->cache->set( tokenizer => $tokenizer );
 	$self->cache->set( api_url => $api_url );
-	$self->cache->set( api_info_url => $api_info_url );
-	$self->cache->set( api_di_upload_url => $api_di_upload_url );
-	$self->cache->set( api_staging_url => $api_staging_url );
+	$self->cache->set( ws_url => $ws_url );
+	$self->cache->set( api_default_path => $api_default_path );
+	$self->cache->set( api_info_path => $api_info_path );
+	$self->cache->set( api_di_upload_path => $api_di_upload_path );
+	$self->cache->set( api_staging_path => $api_staging_path );
 	$self->cache->set( login => undef ); # No default credentials provided
 	$self->cache->set( tenant_name => undef );
 	$self->cache->set( password => undef );
@@ -244,6 +246,19 @@ sub is_interactive_mode_enabled {
 sub exit_status {
 	my $self = shift;
 	return $self->cache->get('exit_code');
+}
+
+sub set_help_message {
+	my $self = shift;
+	my $message = shift;
+	$self->cache->set('help_message', $message);
+}
+
+sub help_message {
+	my $self = shift;
+	my $message = $self->cache->get('help_message') //
+		"Insert any string: " . join(", ", map( {"\"$_\""} $self->quit_signals())) . " to exit from CLI";
+	return $message;
 }
 
 1;

@@ -107,7 +107,29 @@ sub run
 {
     my ($self, $opts, @args) = @_;
 
-    $self->SUPER::run($opts,'di',@args);
+    unshift @args, 'di';
+    my $parsing = $self->parse_string(@args);
+
+    if ($parsing->command eq 'get')
+    {
+        $self->_get($parsing);
+    }
+    elsif ($parsing->command eq 'create')
+    {
+        my $res = $self->ask_api_staging(
+            $self->get_app->cache->get('api_staging_path'),
+            $self->make_api_query($parsing)
+        );
+        $self->print_table($res,$parsing);
+    }
+    elsif ($parsing->command eq 'can')
+    {
+        $self->_can($parsing);
+    }
+    else
+    {
+        $self->_cmd($parsing);
+    }
 }
 
 

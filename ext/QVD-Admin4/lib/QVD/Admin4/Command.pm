@@ -4,6 +4,7 @@ use warnings;
 use base qw( CLI::Framework::Command::Meta );
 use Text::SimpleTable::AutoWidth;
 use Text::UnicodeTable::Simple;
+use Mojo::URL;
 use Mojo::JSON qw(encode_json decode_json j);
 use Mojo::IOLoop;
 use Mojo::Message::Response;
@@ -567,7 +568,6 @@ my $ARGUMENTS = {
 	    tag => 'di_tag', 
 	    user => 'user_id', 
 	    osf => 'osf_id', 
-		__properties_changes__ => '__properties_changes__'
 	}, # For nested queries in API
 
 	user => {
@@ -575,7 +575,6 @@ my $ARGUMENTS = {
 	      password => 'password', 
 	      blocked => 'blocked', 
 	      tenant => 'tenant_id',
-		__properties_changes__ => '__properties_changes__', # For nested queries in API
 	},
 
 	host => {
@@ -584,7 +583,6 @@ my $ARGUMENTS = {
 	      frontend => 'frontend', 
 	      backend => 'backend', 
 	      blocked => 'blocked',
-		__properties_changes__ => '__properties_changes__', # For nested queries in API
 	},
 
 	osf => {
@@ -593,15 +591,12 @@ my $ARGUMENTS = {
 	     user_storage => 'user_storage', 
 	     overlay => 'overlay', 
 	     tenant => 'tenant_id',
-		__properties_changes__ => '__properties_changes__', # For nested queries in API
 	},
 
 	di => {
 		blocked => 'blocked',
 	    name => 'disk_image',  
 	    version => 'version', 
-	    osf => 'osf_id',
-	    __properties_changes__ => '__properties_changes__', # For nested queries in API
 		__tags_changes__ => '__tags_changes__',  # For nested queries in API
 	},
 
@@ -792,18 +787,18 @@ sub _create
 {
     my ($self,$parsing) = @_; # Takes parsed query
 
+    # FIXME: This change shall be done by the API
     # If needed, it switchs from tenant name to tenant id
     if (my $tenant_name = $parsing->arguments->{tenant})
     {
         my $tenant_ids = $self->ask_for_ids('tenant', { name => $tenant_name });
         my $tenant_id = shift @$tenant_ids //
             CLI::Framework::Exception->throw("Unknows Tenant called $tenant_name");
-        $self->tenant_scope($tenant_id);
-        $parsing->arguments->{tenant} = $self->tenant_scope;
+        $parsing->arguments->{tenant} = $tenant_id;
     }
 
     my $query = $self->make_api_query($parsing);# Creates a JSON query in API format 
-    my $res = $self->ask_api($query);
+    my $res = $self->ask_api_standard($self->get_app->cache->get('api_default_path'), $query);
     $self->print_table($res,$parsing);
 }
 
@@ -854,12 +849,14 @@ sub execute_and_display_query
 	do {
 
     # It asks the API for the first page and prints that first page
-    my $res = $self->ask_api($query); 
+    my $res = $self->ask_api_standard($self->get_app->cache->get('api_default_path'), $query); 
     $self->print_table($res,$parsing); 
 
 		if ($is_pagination_mode_enabled) {
 			my $total_pages = ceil($res->json('/total') / $query->{block});
-			print STDOUT "--- page $query->{offset} / $total_pages ('n' for next, 'b' for back, 'q' for quit) ---\n";
+			print STDOUT "--- page $query->{offset} / $total_pages\n";
+            $app->set_help_message("Press ('n' for next, 'b' for back, 'q' for quit) ---");
+			print STDOUT $app->help_message . "\n";
 
 			$char = ReadKey($pause_time);
             
@@ -869,6 +866,8 @@ sub execute_and_display_query
     }
 
 	} while ($is_pagination_mode_enabled && (defined($char)) && ($char ne 'q'));
+
+    $app->set_help_message(undef);
 
     ReadMode(0); # Return to normal mode in console 
 }
@@ -892,7 +891,8 @@ sub _cmd
 
     # It performs the update/delete over the objects with those ids
 
-    my $res = $self->ask_api(
+    my $res = $self->ask_api_standard(
+        $self->get_app->cache->get('api_default_path'),
         {
             action => $self->get_action($parsing),
             filters => $filters,
@@ -1019,62 +1019,17 @@ sub ambiguous
 ## METHODS TO PERFORM A REQUEST AGAINST THE API ##
 ##################################################
 
-# Main method
-
-sub ask_api
-{
-    my ($self,$query) = @_;
-
-	# Get arguments
-    my $app = $self->get_app;
-
-	my $login = $app->cache->get('login');
-	my $password = $app->cache->get('password');
-	my $tenant = $app->cache->get('tenant_name');
-	my $sid = $app->cache->get('sid');
-
-	my $user_agent = $app->cache->get('user_agent');
-
-    # Added credentials to the JSON query
-
-    my %credentials = defined $sid ? (sid => $sid) : 
-	( login => $login, password => $password);
-    $credentials{tenant} = $tenant if 
-	defined $tenant && defined $credentials{login};
- 
-	# Ask API depending on the command
-	my $res;
-	if ($query->{action} eq 'di_create') {
-
-		# TODO:
-		# There is no way to select the kind of di creation system that
-		# must be used. The API privides three different systems:
-		# a) Copy an image from staging
-		# b) Upload an inmage from local
-		# c) Download an image from url
-
-		# But here just one method can be used (di_upload):
-		# This can be changed to 'ask_api_staging'.
-		# One more method must be implemented: 'ask_api_di_download'
-
-		my $url = $app->cache->get('api_staging_url');
-		$res = $self->ask_api_staging($query, $user_agent, $url, \%credentials);
-
-		#my $url = $app->cache->get('api_di_upload_url');
-		#$res = $self->ask_api_di_upload($query, $user_agent, $url, \%credentials);
-
-	} else {
-		my $url = $app->cache->get('api_url');
-		$res = $self->ask_api_standard($query, $user_agent, $url, \%credentials);
-	}
-
-	return $res;
-}
-
 # Method for standard queries to the API
 
-sub ask_api_standard {
-	my ($self, $query, $ua, $url, $credentials) = @_;
+sub ask_api_standard
+{
+    my ($self, $path, $query) = @_;
+
+    my $ua = $self->get_app->cache->get('user_agent');
+    my $credentials = $self->get_credentials();
+    my $url = Mojo::URL->new($self->get_app->cache->get('api_url'));
+    $url->path($path // $self->get_app->cache->get('api_default_path'));
+    $query //= {};
 
 	my $res = $ua->post(
 		"$url",
@@ -1096,8 +1051,13 @@ sub ask_api_standard {
 
 sub ask_api_staging
 {
-    my ($self, $query, $ua, $url, $credentials) = @_;
-
+    my ($self, $path, $query) = @_;
+    
+    my $ua = $self->get_app->cache->get('user_agent');
+    my $credentials = $self->get_credentials();
+    my $url = Mojo::URL->new($self->get_app->cache->get('ws_url'));
+    $url = $url->path($path // $self->get_app->cache->get('api_staging_path'));
+    
     for my $k (keys %$query)
     {
         my $v = $query->{$k};
@@ -1108,24 +1068,26 @@ sub ask_api_staging
 
     my $res = {};
     my $msg_data = {};
+    my $accomplished = 0;
     my $on_message_cb = sub {
 
         my ($tx, $msg) = @_;
 
-        $res = $tx->res;
         $msg_data = decode_json($msg);
-        if ($msg_data->{status} == 1000)
+        if ($msg_data->{status} == 1000 && $accomplished == 0)
         {
             my $total = $msg_data->{total_size} // 0;
             my $partial = $msg_data->{copy_size} // 0;
             my $percentage = ($total > 0 ? $partial / $total : 1) * 100 ;
-            printf STDERR "\r%06.2f%%", $percentage;
+            printf STDERR "\rFile Upload Progress: %06.2f%%", $percentage;
             $tx->send('ECHO Request');
         }
         else
         {
             print STDERR sprintf("\nUpload finished (%s) : %s\n", $msg_data->{status}, $msg_data->{message});
             $tx->finish;
+            $accomplished = 1;
+            $res = $tx->res;
         }
     };
 
@@ -1136,13 +1098,6 @@ sub ask_api_staging
         } );
 
     Mojo::IOLoop->start;
-
-    CLI::Framework::Exception->throw($res->error->{message})
-        unless $res->code;
-    CLI::Framework::Exception->throw($msg_data->{message})
-        unless $msg_data->{status} == 0000;
-    
-    $self->check_api_result($res);
 
     return $res;
 }
@@ -1185,42 +1140,20 @@ sub ask_api_di_upload
 sub check_api_result
 {
     my ($self,$res) = @_;
+    
+    my $status =  $res->json('/status') // -1;
+    return 1 if $status == 0; # Successful response
 
-    return 1 unless $res->json('/status'); # Successful response
+    my $message = $res->json('/message') // "Unknown";
+    chomp($message);
+    my $failures = $res->json('/failures');
+    if (defined($failures)) {
+        $message .= ":\n";
+        while (my ($id,$failure) = each %$failures) {
+            $message .= "\t$id : " . $failure->{message} . "\n";
+        }
+    }
 
-    # All API internal errors are translated to the same generic 
-    # message in CLI responde
-
-    my $API_INTERNAL_PROBLEMS_MSG = 'Internal problems in API';
-    my %SERVER_INTERNAL_ERRORS = qw(1100 1 4100 1 4110 1 6100 1);
-
-    CLI::Framework::Exception->throw($API_INTERNAL_PROBLEMS_MSG) if 
-	$SERVER_INTERNAL_ERRORS{$res->json('/status')};
-
-   # Well typified error messages in API are displayed via console
-   # in CLI 
-
-    CLI::Framework::Exception->throw($res->json('/message')) unless 
-	$res->json('/status') eq 1200; 
-
-  # For 1200 error in API (That means that one or more of the objects
-  # involved in a query couldn't be edited because of some problem):
-
-    my ($message,$failures) = ($res->json('/message') . ":\n",$res->json('/failures'));
-
-    my %seen_msgs;
-
-    while (my ($id,$failure) = each %$failures)
-    {
-	my $msg = $SERVER_INTERNAL_ERRORS{$failure->{status}} ? 
-	    $API_INTERNAL_PROBLEMS_MSG : 
-	    $failure->{message};
-	next if exists $seen_msgs{$msg};
-	$seen_msgs{$msg} = 1;
-	$message .= "$msg\n"; 
-    } 
-
-    $message =~ s/\n$//;
     CLI::Framework::Exception->throw($message);
 }
 
@@ -1231,7 +1164,8 @@ sub ask_for_ids
     my ($self, $qvd_object, $filter) = @_;
 
     if (my $action = $CLI_CMD2API_ACTION->{$qvd_object}->{'ids'}) {
-        my $ids = [ map { $_->{id} } @{ $self->ask_api(
+        my $ids = [ map { $_->{id} } @{ $self->ask_api_standard(
+            $self->get_app->cache->get('api_default_path'),
             {
                 action => $action,
                 filters => $filter,
@@ -1392,19 +1326,6 @@ sub make_api_query
 
 # Other auxiliar functions
 
-sub tenant_scope
-{
-    my ($self, $scope) = @_;
-
-    if($scope) {
-        $self->{tenant_scope} = $scope;
-    }
-    $self->{tenant_scope} //= $self->get_app->cache->get( 'tenant_id' );
-
-    return $self->{tenant_scope};
-}
-
-
 sub read_password
 {
     my $self = shift;
@@ -1434,6 +1355,28 @@ sub superadmin
     my $self = shift;
     my $app = $self->get_app;
     $app->cache->get('tenant_id') ? return 1 : return 0;
+}
+
+sub get_credentials
+{
+    my $self = shift;
+
+    my $app = $self->get_app;
+
+    my $login = $app->cache->get('login');
+    my $password = $app->cache->get('password');
+    my $tenant = $app->cache->get('tenant_name');
+    my $sid = $app->cache->get('sid');
+    
+    # Added credentials to the JSON query
+
+    my $credentials = defined $sid ?
+        { sid => $sid } :
+        { login => $login, password => $password };
+    $credentials->{tenant} = $tenant if
+        defined $tenant && defined $credentials->{login};
+    
+    return $credentials;
 }
 
 1;
