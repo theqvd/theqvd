@@ -279,8 +279,8 @@ client.ssl.error_timeout=5
 
 
 ## slave shell
-client.slave.command = bin/qvd-client-slaveserver
-client.slave.client = bin/qvd-slaveclient
+client.slave.command = ${path.qvd.bin}/qvd-client-slaveserver
+client.slave.client = ${path.qvd.bin}/qvd-slaveclient
 # enable commands used for benchmarking and testing the functionality
 # of the slave channel
 client.slave.debug_commands = 0
