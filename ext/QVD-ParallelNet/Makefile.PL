@@ -15,8 +15,7 @@ WriteMakefile(
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT  => 'lib/QVD/ParallelNet.pm', # retrieve abstract from module
        AUTHOR         => 'Salvador Fandino <salva@>') : ()),
-    PREREQ_PM => {
-	'Time::HiRes' => 0,
-	'QVD::Log' => 0,
+    PREREQ_PM => { 
+        'QVD::Log' => 0,
     },
 );

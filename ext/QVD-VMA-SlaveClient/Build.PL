@@ -14,8 +14,14 @@ my $builder = Module::Build->new(
     dist_version        => '3.5' .  $SUF_VERSION,
     dist_abstract    	=> 'QVD::VMA::SlaveClient',
     configure_requires => { 'Module::Build' => 0.38  },
-    build_requires => {
-        'Test::More'       => 0,
+    requires => {
+        'JSON' => 0,
+        'Net::Server::Fork' => 0,
+        'QVD::HTTP::StatusCodes' => 0,
+        'QVD::Config::Core' => 0,
+        'QVD::HTTPC' => 0,
+        'QVD::SlaveClient' => 0,
+        'QVD::SlaveServer' => 0,
     },
     add_to_cleanup      => [ 'QVD-VMA-SlaveClient-*' ],
     create_makefile_pl => 'traditional',

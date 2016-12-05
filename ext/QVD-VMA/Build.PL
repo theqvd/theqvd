@@ -34,11 +34,15 @@ my $build = new Module::Build(
 	},
 
 	requires => {
+		'App::Daemon' => 0,
+		'Config::Properties' => 0,
+		'QVD::Config' => 0,
+		'QVD::Config::Core' => 0,
 		'QVD::Log' => 0,
-                'QVD::SimpleRPC' => 0,
-                'App::Daemon' => 0,
-                'Config::Properties' => 0,
-                'Test::More' => 0 
+		'QVD::HTTP::Headers' => 0,
+		'QVD::HTTP::StatusCodes' => 0,
+		'QVD::HTTPD' => 0,
+		'QVD::SimpleRPC::Server' => 0,
 	}, 
 	etc_files=> {
         "etc/vma_defaults.conf"  => "$vma_dst/qvd-vma",

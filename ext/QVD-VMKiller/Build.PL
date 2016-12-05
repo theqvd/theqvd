@@ -24,10 +24,9 @@ my $build = new Module::Build(
 	},
 
 	requires => {
-		'Linux::Fuser' => 0, 
-		'Proc::ProcessTable' => 0,
-        	'QVD::Config' => '0',
-                'QVD::Log' => '0',
+		'Linux::Fuser' => 0,
+		'QVD::Config::Core' => '0',
+		'QVD::Log' => '0',
 	}, 
 	
 	etc_files=> { 'etc/cron.d/qvd-vm-killer' => '/etc/cron.d/qvd-vm-killer'},
