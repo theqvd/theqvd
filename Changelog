@@ -1,5 +1,6 @@
 QVD-3.6.0
 =========
+	- Add TOTP plugin for 2 Factor Authentication (2FA).
 	- Allow setting the number of CPUs per VM when using the KVM
 	  backend.
 	- Update vm_state_ts every time vm_state changes in the database

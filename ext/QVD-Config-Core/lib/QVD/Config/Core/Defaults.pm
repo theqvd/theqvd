@@ -5,57 +5,29 @@ use warnings;
 
 use Config::Properties;
 use IO::Scalar;
+use QVD::Config::Core::OS;
 
-
-our $defaults = Config::Properties->new;
-
-my ($os, $version);
-
-if ($^O =~ /^linux/i) {
-    if (open my $fh, "/etc/os-release") {
-        while (<$fh>) {
-            if (my ($k, $v, $v1) = /^(\w+)\s*=\s*(?:"([^"]*)"|(\S+))/) {
-                #warn "k: $k, v: $v, v1: $v1, matched line: $_";
-                my $k = uc $k;
-                my $v = lc ($v // $v1);
-                if ($k eq 'NAME') {
-                    $os = $v;
-                }
-                if ($k eq 'VERSION_ID') {
-                    $version = $v;
-                }
-            }
-        }
-    }
-}
-elsif ($^O =~ /^mswin/) {
-    $os = 'mswin';
-    require Win32;
-    if (my (undef, $major, $minor) = Win32::GetOSVersion()) {
-        $version = "$major.$minor";
-    }
-}
-
-unless (defined $os and defined $version) {
-    warn "Operating system not detected correctly";
-    $os //= 'unknown';
-    $version //= 'unknown';
-}
+my %os = QVD::Config::Core::OS::detect_os;
+my @tags = ("$os{os}",
+            "$os{os}-$os{version}",
+            "$os{os}-$os{version}.$os{revision}");
 
 my @data;
 while (<DATA>) {
-    if (s/^\@[\w\-+\.]+\@\s+//) {
-        next if $1 ne $os and $1 ne "$os-$version";
+    if (s/^\@([\w\-+\.]+)\@\s*//) {
+        next unless grep $1 eq $_, @tags;
     }
     push @data, $_;
 }
 
 my $data = join('', @data);
 my $fh = IO::Scalar->new(\$data);
+our $defaults = Config::Properties->new;
 $defaults->load($fh);
 
-$defaults->setProperty('config.os', $os);
-$defaults->setProperty('config.os_version', $version);
+$defaults->setProperty('config.os', $os{os});
+$defaults->setProperty('config.os.version', $os{version});
+$defaults->setProperty('config.os.revision', $os{revision});
 
 1;
 

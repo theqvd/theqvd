@@ -123,8 +123,19 @@ sub recheck_authentication_basic {
     $auth->{login} eq $login and $auth->{passwd} eq $passwd and $auth->{authenticated}
 }
 
+sub authenticate_basic_2f_split {
+    my ($auth, $passwd, $l7r) = @_;
+    for (@{$auth->{modules}}) {
+        if (my ($passwd, $token) = $_->authenticate_basic_2f_split($auth, $passwd, $l7r)) {
+            return ($passwd, $token);
+        }
+    }
+    return $passwd; # by default, no 2FA.
+}
+
 sub authenticate_basic {
     my ($auth, $login, $passwd, $l7r) = @_;
+
     delete $auth->{autenticated};
     $auth->{login} = $login;
     $auth->{passwd} = $passwd;
@@ -140,12 +151,29 @@ sub authenticate_basic {
                 if ($auth->_normalize_login($login1)) {
                     DEBUG "authenticating user $login1 ($auth->{normalized_login}) at $tenant ($auth->{normalized_tenant}) ".
                         " with plugins @{$auth->{plugins}}";
+
+                    my ($passwd, $token) = $auth->authenticate_basic_2f_split($passwd);
                     for (@{$auth->{plugins}}) {
                         if ($_->authenticate_basic($auth, $auth->{normalized_login}, $passwd, $l7r)) {
                             # note that some backend (i.e. LDAP) may have changed
                             # $auth->{normalized_login} so we can not use our
                             # cached copy in $normalized_login
                             $auth->{params}{'qvd.vm.user.name'} = $auth->{normalized_login};
+
+                            if (defined $token) { # Some module is implementing 2FA, check the token!
+                                my $ok;
+                                for (@{$auth->{plugins}}) {
+                                    if ($_->authenticate_basic_2f($auth, $auth->{normalized_login}, $token, $l7r)) {
+                                        $ok = 1;
+                                        last;
+                                    }
+                                }
+                                unless ($ok) {
+                                    DEBUG "Password authentication succeeded but 2F failed (token: $token)";
+                                    return;
+                                }
+                            }
+
                             $auth->after_authenticate_basic($auth->{normalized_login}, $l7r);
                             $auth->{authenticated} = 1;
                             return 1;
