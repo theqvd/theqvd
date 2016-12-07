@@ -23,7 +23,6 @@ my $builder = Module::Build->new(
         'QVD::Config::Core' => 0,
         'QVD::HTTPC' => 0,
         'QVD::HTTP::StatusCodes' => 0,
-        'QVD::SlaveClient' => 0,
         'QVD::SlaveServer' => 0,
     },
     add_to_cleanup      => [ 'QVD-VMA-SlaveClient-*' ],

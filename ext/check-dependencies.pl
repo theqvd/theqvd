@@ -207,7 +207,8 @@ sub get_deps_from_module {
         "5.010",
         "Win32::API", "Win32::Process", "Win32::LongPath",
         "Wx::Frame",
-        "QVD::HTTPD::.+", "QVD::Config::Core::Defaults");
+        "QVD::HTTPD::.+", "QVD::Config::Core::Defaults",
+        "QVD::SlaveClient");
     for my $file (@file_list) {
         open FILE, $file or print_msg("Couldn't open file: $!", "FATAL");
         while (my $line = <FILE>) {

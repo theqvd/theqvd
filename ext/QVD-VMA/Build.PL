@@ -40,7 +40,6 @@ my $build = Module::Build->new(
         'QVD::HTTP::Headers' => 0,
         'QVD::HTTPD' => 0,
         'QVD::HTTP::StatusCodes' => 0,
-        'QVD::SlaveClient' => 0,
         'QVD::SimpleRPC::Server' => 0,
         'App::Daemon' => 0,
         'Config::Properties' => 0,
