@@ -3,7 +3,6 @@ use base qw/DBIx::Class/;
 
 use strict;
 use warnings;
-use QVD::API::VMExpiration;
 use DateTime;
 use List::Util qw(sum);
 

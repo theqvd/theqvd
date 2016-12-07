@@ -17,9 +17,9 @@ use DBIx::Error;
 use Try::Tiny;
 use Data::Page;
 use Clone qw(clone);
-use QVD::API::AclsOverwriteList;
 use QVD::API::ConfigClassifier;
 use QVD::API::REST::Request::Config_Field;
+use QVD::DB::AclsOverwriteList;
 use Mojo::JSON qw(encode_json);
 use QVD::Config;
 use QVD::Config::Core qw(core_cfg_unmangled);
@@ -147,7 +147,7 @@ sub acl_get_list
 # over the regular assignation of acls for the administrator.
 
     my $admin = $request->get_parameter_value('administrator');
-    my $aol = QVD::API::AclsOverwriteList->new(admin_id => $admin->id);
+    my $aol = QVD::DB::AclsOverwriteList->new(admin_id => $admin->id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
 
     eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
@@ -180,7 +180,7 @@ sub get_acls_in_admins
     my $admin_id = $request->json_wrapper->get_filter_value('admin_id')
 	// $request->get_parameter_value('administrator')->id;
 
-    my $aol = QVD::API::AclsOverwriteList->new(admin_id => $admin_id);
+    my $aol = QVD::DB::AclsOverwriteList->new(admin_id => $admin_id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
 
     eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
@@ -200,7 +200,7 @@ sub get_acls_in_roles
     my (@rows, $rs);
 
     my $admin = $request->get_parameter_value('administrator');
-    my $aol = QVD::API::AclsOverwriteList->new(admin => $admin, admin_id => $admin->id);
+    my $aol = QVD::DB::AclsOverwriteList->new(admin => $admin, admin_id => $admin->id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_hide_re];
 
 # The table provided by $request is supposed to be a view
@@ -1264,7 +1264,7 @@ sub get_number_of_acls_in_admin
     $acl_patterns = ref($acl_patterns) ? $acl_patterns : [$acl_patterns];
     my $admin_id = $json_wrapper->get_filter_value('admin_id') //
 	QVD::API::Exception->throw(code=>'6220', object => 'admin_id');
-    my $aol = QVD::API::AclsOverwriteList->new(admin_id => $admin_id);
+    my $aol = QVD::DB::AclsOverwriteList->new(admin_id => $admin_id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
 
     my $rs = $DB->resultset('Operative_Acls_In_Administrator')->search(
@@ -1291,7 +1291,7 @@ sub get_number_of_acls_in_role
 # Those lists of acls are the acls that should be overwritten 
 # over the regular assignation of acls for the administrator.
 
-    my $aol = QVD::API::AclsOverwriteList->new(admin => $administrator,admin_id => $administrator->id);
+    my $aol = QVD::DB::AclsOverwriteList->new(admin => $administrator,admin_id => $administrator->id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_hide_re];
 
     my $rs = $DB->resultset('Operative_Acls_In_Role')->search(

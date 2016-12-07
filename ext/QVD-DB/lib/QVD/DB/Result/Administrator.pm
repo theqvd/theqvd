@@ -1,7 +1,7 @@
 package QVD::DB::Result::Administrator;
 use base qw/DBIx::Class/;
 use QVD::DB;
-use QVD::API::AclsOverwriteList;
+use QVD::DB::AclsOverwriteList;
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('administrators');
@@ -73,7 +73,7 @@ sub acls
 
     $DB //= QVD::DB->new();
  
-    my $acls_overwrite_list = QVD::API::AclsOverwriteList->new(admin => $self,admin_id => $self->id);
+    my $acls_overwrite_list = QVD::DB::AclsOverwriteList->new(admin => $self,admin_id => $self->id);
     my $bind = [$acls_overwrite_list->acls_to_close_re,
 		$acls_overwrite_list->acls_to_open_re,
 		$acls_overwrite_list->acls_to_hide_re];
