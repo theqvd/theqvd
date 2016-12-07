@@ -1,6 +1,6 @@
 Name:           qvd-wat
-Version:        4.0
-Release:        1%{?dist}
+Version:        %{qvd_version}
+Release:        %{release}
 Summary:        Pruebas de empaquetado para SLES12
 
 Group:        	Productivity/Networking/Web/Utilities
