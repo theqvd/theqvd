@@ -88,7 +88,7 @@ app->config(
         accepts => 1000,
         clients => 1000,
         workers => 4,
-        pid_file => '/var/lib/qvd/qvd-api.pid'
+        pid_file => '/var/run/qvd/qvd-api.pid'
     }
 );
 
