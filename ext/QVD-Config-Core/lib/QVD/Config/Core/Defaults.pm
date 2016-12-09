@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Config::Properties;
-use IO::Scalar;
 use QVD::Config::Core::OS;
 
 my %os = QVD::Config::Core::OS::detect_os;
@@ -21,9 +20,10 @@ while (<DATA>) {
 }
 
 my $data = join('', @data);
-my $fh = IO::Scalar->new(\$data);
+open my $fh, "<", \$data;
 our $defaults = Config::Properties->new;
 $defaults->load($fh);
+close($fh);
 
 $defaults->setProperty('config.os', $os{os});
 $defaults->setProperty('config.os.version', $os{version});
