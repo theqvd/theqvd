@@ -111,7 +111,7 @@ path.usb.database = /usr/share/hwdata/usb.ids
 command.kvm-img = qemu-img
 command.sshfs = ${path.qvd.bin}/sshfs
 command.open_file = xdg-open
-@ubutu@command.sftp-server = /usr/lib/openssh/sftp-server
+@ubuntu@command.sftp-server = /usr/lib/openssh/sftp-server
 @sles-11@command.sftp-server = /usr/lib64/ssh/sftp-server
 @sles-12@command.sftp-server = /usr/lib/ssh/sftp-server
 command.nxagent = /usr/bin/nxagent
@@ -138,8 +138,7 @@ command.lxc-create = ${path.qvd.bin}/lxc-create
 command.lxc-start = ${path.qvd.bin}/lxc-start
 command.lxc-stop = ${path.qvd.bin}/lxc-stop
 command.lxc-wait = ${path.qvd.bin}/lxc-wait
-@ubuntu-16.04@command.version.lxc = 1.0
-@ubuntu-14.04@command.version.lxc = 1.0
+@ubuntu@command.version.lxc = 1.0
 @sles-11@command.version.lxc = 0.7
 @sles-12@command.version.lxc = 1.0
 command.ebtables = ebtables
@@ -321,7 +320,7 @@ client.usb.usbip.log = 0
 # Share all USB devices automatically (most of the time not a good idea)
 client.usb.share_all = 0
 
-# List of USB devices to share with the VM.
+# List of USB devices to share with the VM.  
 # Syntax: VID:PID@serial, comma separated. Spaces are allowed. For example:
 # 0441:0012, 1234:5678@12345678
 client.usb.share_list =
