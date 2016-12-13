@@ -106,11 +106,14 @@ path.qvd.bin = /usr/lib/qvd/bin
 path.usb.database = /usr/share/hwdata/usb.ids
 
 ## paths to external executables
-command.kvm = kvm
+@sles@command.kvm = qemu-kvm
+@ubuntu@command.kvm = kvm
 command.kvm-img = qemu-img
 command.sshfs = ${path.qvd.bin}/sshfs
-command.open_file = /usr/bin/xdg-open
-command.sftp-server = /usr/lib/openssh/sftp-server
+command.open_file = xdg-open
+@ubutu@command.sftp-server = /usr/lib/openssh/sftp-server
+@sles-11@command.sftp-server = /usr/lib64/ssh/sftp-server
+@sles-12@command.sftp-server = /usr/lib/ssh/sftp-server
 command.nxagent = /usr/bin/nxagent
 command.nxdiag = ${path.qvd.bin}/nxdiag.pl
 command.x-session = /etc/X11/Xsession
@@ -137,8 +140,8 @@ command.version.lxc = 0.7
 command.ebtables = ebtables
 command.iptables = iptables
 command.modprobe = /sbin/modprobe
-command.xinit = /usr/bin/xinit
-command.xhost = /usr/bin/xhost
+command.xinit = xinit
+command.xhost = xhost
 command.xhost.family = si
 command.nxproxy = /usr/bin/nxproxy
 command.btrfs = /sbin/btrfs
@@ -221,7 +224,7 @@ client.use_ssl = 1
 client.ssl.use_cert = 0
 
 ### Internal SSL options. These get passed directly to QVD::HTTPC.
-### See the full list in HTTPC.pm and the documentation in 
+### See the full list in HTTPC.pm and the documentation in
 ### IO::Socket::SSL.
 ###
 ### Using these is discouraged. Most are internal SSL options, and
@@ -257,7 +260,7 @@ client.ssl.allow_untrusted=1
 ## Allow expired certificates
 client.ssl.allow_expired=1
 
-## Allow certificates that are not yet valid. Generally indicates a 
+## Allow certificates that are not yet valid. Generally indicates a
 ## local clock problem.
 client.ssl.allow_not_yet_valid=1
 
@@ -313,7 +316,7 @@ client.usb.usbip.log = 0
 # Share all USB devices automatically (most of the time not a good idea)
 client.usb.share_all = 0
 
-# List of USB devices to share with the VM. 
+# List of USB devices to share with the VM.
 # Syntax: VID:PID@serial, comma separated. Spaces are allowed. For example:
 # 0441:0012, 1234:5678@12345678
 client.usb.share_list =
@@ -407,11 +410,12 @@ admin.ssh.opt.StrictHostKeyChecking = no
 admin.ssh.opt.UserKnownHostsFile = /dev/null
 
 ## virtualization engine to use, either kvm or lxc
-vm.hypervisor = kvm
+vm.hypervisor = lxc
 
 ## COW fs to use with LXC
-vm.lxc.unionfs.type = overlayfs
-# vm.lxc.unionfs.type = unionfs-fuse
+@ubuntu@vm.lxc.unionfs.type = overlayfs
+@sles-12@vm.lxc.unionfs.type = overlayfs
+@sles-11@vm.lxc.unionfs.type = unionfs-fuse
 vm.lxc.unionfs.bind.ro = 1
 
 # allow LXC DIs to have hooks for customization - disabled by default
@@ -683,4 +687,4 @@ internal.l7r.nothing.timeout.run_forwarder = 5
 
 internal.untar-dis.lock.path = ${path.run}/untar-dis.lock
 
-wat.multitenant = 0
+wat.multitenant = 1
