@@ -14,7 +14,7 @@
 
 PATH=/usr/lib/qvd/bin:/bin:/usr/bin
 
-DAEMON=/usr/lib/qvd/bin/qvd-hypnotoad
+DAEMON=/usr/lib/qvd/bin/hypnotoad
 DAEMON_OPTS=/usr/lib/qvd/bin/qvd-api.pl
 PERL=/usr/lib/qvd/bin/perl
 NAME=qvd-api
