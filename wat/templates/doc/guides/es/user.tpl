@@ -510,40 +510,33 @@ Comprobaremos que el OSF se ha creado correctamente viendo que aparece en la vis
 </div>
 <div class="sect2">
 <h3 id="_creación_de_una_imagen_de_disco">2.3. Creación de una imagen de disco</h3>
-<div class="paragraph"><p>La creación de las imágenes de disco que serán montadas por QVD se realiza en dos partes:</p></div>
+<div class="paragraph"><p>La creación de las imágenes de disco que serán montadas por QVD se puede realizar de <strong>3 formas</strong>:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-La subida de la imagen al servidor del WAT.
+Seleccionando una imagen de entre las disponibles en el <strong>directorio <em>staging</em></strong> del servidor
 </p>
 </li>
 <li>
 <p>
-La creación de la imagen en el WAT seleccionando una imagen de entre las subidas.
+Subiendo una imagen desde <strong>nuestra computadora</strong>
+</p>
+</li>
+<li>
+<p>
+Proporcionando la <strong>URL</strong> de una imagen, que se descargará y alojará en el servidor
+</p>
+</li>
+<li>
+<p>
+Proporcionando la <strong>URL</strong> de una imagen, que se descargará y alojará en el servidor
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>Uniendo estos dos pasos, deberemos seguir los siguientes pasos:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Subir, utilizando scp o cualquier otro método válido, la imagen que deseemeos al directorio <em>staging</em> del servidor del WAT. Las imágenes de este directorio serán las seleccionables en el proceso de creación desde el WAT.
-</p>
-</li>
-<li>
-<p>
-Nos situaremos en la <em>sección Plataforma</em>. Esta es la sección activa por defecto tras iniciar sesión.
-</p>
-</li>
-<li>
-<p>
-La creación de la imagen se puede realizar por <em>dos vias</em>:
-</p>
-<div class="openblock">
-<div class="content">
+<div class="paragraph"><p>En este caso <strong>optaremos por subir la imagen desde nuestra computadora</strong>.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-Desde la sección <em>Imágenes de disco</em>
+La creación de la imagen se puede realizar desde <em>2 secciones</em>
 </dt>
 <dd>
 <div class="openblock">
@@ -551,7 +544,12 @@ Desde la sección <em>Imágenes de disco</em>
 <div class="ulist"><ul>
 <li>
 <p>
-Accederemos al <em>apartado Imágenes de disco del menú</em>.
+Desde la sección <em>Imágenes de disco</em>.
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Accederemos al <em>apartado Imágenes de disco del menú</em> desde la <em>sección Plataforma</em>.
 </p>
 </li>
 <li>
@@ -559,61 +557,16 @@ Accederemos al <em>apartado Imágenes de disco del menú</em>.
 Haremos click en el botón <em>Nueva Imagen de disco</em>.
 </p>
 </li>
-<li>
-<p>
-Rellenaremos el formulario de creación.
-</p>
-<div class="ulist"><ul>
-<li>
-<p>
-Seleccionaremos <em>la imagen de disco</em>. En este menú desplegable aparecerán las imágenes previamente subidas al directorio <em>staging</em> del servidor del WAT.
-</p>
-</li>
-<li>
-<p>
-Podemos definir una <em>versión de la imagen</em>. Si dejamos este campo en blanco se generará una versión automática basada en la fecha de creación (Ej.: 2015-05-03-000).
-</p>
-</li>
-<li>
-<p>
-Seleccionamos el <em>OSF</em> al que se asociará la imagen.
-</p>
-</li>
-<li>
-<p>
-Se puede definir que la imagen sea la <em>imagen por defecto</em> del OSF. Si es la primera imagen que se crea en un OSF, este campo no tendrá relevancia, ya que si solo hay una imagen en un OSF, ésta será la imagen por defecto.
-</p>
-</li>
-<li>
-<p>
-Opcionalmente se le pueden asignar <em>tags</em> a la imagen para poder identificarla desde el gestor de máquinas virtuales. Estos tags son únicos por OSF. Si asignamos un tag que ya tiene otra imagen del mismo OSF, el tag será cambiado de imagen, evitando la duplicidad.
-</p>
-</li>
-<li>
-<p>
-Opcionalmente podremos crearle <em>otras propiedades</em> a la imagen para gestión interna de nuestros scripts o simplemente añadir información.
-</p>
-</li>
 </ul></div>
 </li>
 <li>
 <p>
-Comprobaremos que la imagen se ha creado correctamente viendo que aparece en la vista listado.
+Desde la sección <em>OS Flavours</em>.
 </p>
-</li>
-</ul></div>
-</div></div>
-</dd>
-<dt class="hdlist1">
-Desde la sección <em>OS Flavours</em>
-</dt>
-<dd>
-<div class="openblock">
-<div class="content">
 <div class="ulist"><ul>
 <li>
 <p>
-Accederemos al <em>apartado OS Flavours del menú</em>.
+Accederemos al <em>apartado OS Flavours del menú</em> desde la <em>sección Plataforma</em>.
 </p>
 </li>
 <li>
@@ -626,14 +579,21 @@ Escogemos el OSF al que queremos asociar la nueva imagen de disco y hacemos clic
 En la parte derecha de la vista, encontramos un cuadro con las imágenes de disco asociadas al OS Flavour. Haremos click en el botón Nueva Imagen de disco situado en ese cuadro.
 </p>
 </li>
-<li>
-<p>
-Rellenaremos el formulario de creación.
-</p>
+</ul></div>
+</li>
+</ul></div>
+</div></div>
+</dd>
+<dt class="hdlist1">
+Rellenaremos el formulario de creación
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
 <div class="ulist"><ul>
 <li>
 <p>
-Seleccionaremos <em>la imagen de disco</em>. En este menú desplegable aparecerán las imágenes previamente subidas al directorio <em>staging</em> del servidor del WAT.
+Seleccionaremos <em>la imagen de disco</em> navegando por nuestro sistema de ficheros.
 </p>
 </li>
 <li>
@@ -657,19 +617,17 @@ Opcionalmente podremos crearle <em>otras propiedades</em> a la imagen para gesti
 </p>
 </li>
 </ul></div>
-</li>
-<li>
-<p>
-Comprobaremos que la imagen se ha creado correctamente viendo que aparece en el cuadro de Imágenes de disco dentro de la vista detalle en la que nos encontramos.
-</p>
-</li>
-</ul></div>
+</div></div>
+</dd>
+<dt class="hdlist1">
+Comprobaremos que la imagen se ha creado correctamente
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
 </div></div>
 </dd>
 </dl></div>
-</div></div>
-</li>
-</ul></div>
 </div>
 <div class="sect2">
 <h3 id="_creación_de_un_usuario">2.4. Creación de un usuario</h3>
@@ -2423,7 +2381,7 @@ cellspacing="0" cellpadding="4">
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><strong>Establecer imágenes del disco por defecto en la creación de imágenes del disco</strong></p></td>
-<td align="left" valign="top"><p class="table">di.create.defaul</p></td>
+<td align="left" valign="top"><p class="table">di.create.default</p></td>
 <td align="left" valign="top"><p class="table">Establecer imágenes del disco por defecto en el proceso de creación de imágenes del disco.</p></td>
 </tr>
 <tr>
@@ -4722,7 +4680,7 @@ En el lado izquierdo hay una pestaña de <em>Ajustes</em> que despliega un menú
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-11-14 12:42:19 CET
+Last updated 2016-12-13 14:48:14 CET
 </div>
 </div>
 </body>

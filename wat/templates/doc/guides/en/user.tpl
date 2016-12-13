@@ -510,40 +510,28 @@ We will check the OSF has been created correctly if we see it appears on the lis
 </div>
 <div class="sect2">
 <h3 id="_creation_of_a_disk_image">2.3. Creation of a disk image</h3>
-<div class="paragraph"><p>The creation of the disk images that will be loaded by QVD is performed in two parts:</p></div>
+<div class="paragraph"><p>The creation of the disk images that will be loaded by QVD can be performed in <strong>3 ways</strong>:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-The upload of the image to the server of the WAT.
+By selecting an image among the ones available in the <strong><em>staging</em> directory</strong> in the server.
 </p>
 </li>
 <li>
 <p>
-The creation of the image in the WAT choosing an image among the uploaded ones.
+By uploading an image from <strong>our computer</strong>.
+</p>
+</li>
+<li>
+<p>
+By providing an image <strong>URL</strong> which will be downloaded and hosted on the server.
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>Regrouping this two steps, we will need to follow the next steps:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Upload, using scp or any other valid method, the image we wish to the file directory <em>staging</em> in the WAT server. The images in this directory will be selectable in the creation process from the WAT.
-</p>
-</li>
-<li>
-<p>
-Go to <em>Platform section</em>. This session is active by default after logging in.
-</p>
-</li>
-<li>
-<p>
-The image creation can be performed in <em>two ways</em>:
-</p>
-<div class="openblock">
-<div class="content">
+<div class="paragraph"><p>In this case, <strong>we choose uploading the image from our computer</strong>.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-From the section <em>Disk Image</em>
+The image creation can be performed from <em>2 sections</em>
 </dt>
 <dd>
 <div class="openblock">
@@ -551,7 +539,12 @@ From the section <em>Disk Image</em>
 <div class="ulist"><ul>
 <li>
 <p>
-Access the <em>Disk Image menu section</em>
+From the section <em>Disk Image</em>.
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Access the <em>Disk Image menu section</em> from <em>Platform section</em>.
 </p>
 </li>
 <li>
@@ -559,14 +552,43 @@ Access the <em>Disk Image menu section</em>
 Click on <em>New disk image</em>.
 </p>
 </li>
+</ul></div>
+</li>
 <li>
 <p>
-Fill in the creation form.
+From section <em>OS Flavours</em>
 </p>
 <div class="ulist"><ul>
 <li>
 <p>
-Select <em>the disk image</em>. This drop-down menu will show the images previously uploaded to the directory <em>staging</em> in the WAT server.
+We access the <em>menu OS Flavours section</em> from <em>Platform section</em>.
+</p>
+</li>
+<li>
+<p>
+Choose the OSF we want to associate with the new disk image and click on its name to access its detail view.
+</p>
+</li>
+<li>
+<p>
+On the right part of the view, we find a box with all the associated disk images with the OS Flavour. We click on the button New Disk image placed in this box.
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
+</div></div>
+</dd>
+<dt class="hdlist1">
+Fill in the creation form
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="ulist"><ul>
+<li>
+<p>
+Select <em>the disk image</em> browsing our file system.
 </p>
 </li>
 <li>
@@ -595,81 +617,14 @@ Optionally, we could create <em>other properties</em> for the image for internal
 </p>
 </li>
 </ul></div>
-</li>
-<li>
-<p>
-We can check if the image has been correctly created if we see it appears on the list view.
-</p>
-</li>
-</ul></div>
-</div></div>
-</dd>
-<dt class="hdlist1">
-From section <em>OS Flavours</em>
-</dt>
-<dd>
-<div class="openblock">
-<div class="content">
-<div class="ulist"><ul>
-<li>
-<p>
-We access the <em>menu OS Flavours section</em>
-</p>
-</li>
-<li>
-<p>
-Choose the OSF we want to associate with the new disk image and click on its name to access its detail view.
-</p>
-</li>
-<li>
-<p>
-On the right part of the view, we find a box with all the associated disk images with the OS Flavour. We click on the button New Disk image placed in this box.
-</p>
-</li>
-<li>
-<p>
-Fill in the creation form.
-</p>
-<div class="ulist"><ul>
-<li>
-<p>
-We select the <em>disk image</em>. In this drop-down menu the previously uploaded images to the directory <em>staging</em> in the WAT server will be displayed.
-</p>
-</li>
-<li>
-<p>
-We can define an <em>image version</em>. If we leave this field blank an automatic version will be generated based on the creation date (E.g.: 2015-05-03-000).
-</p>
-</li>
-<li>
-<p>
-We can define an image as <em>default image</em> in the OSF. If it is the first image created in an OSF, this field will be irrelevant, since if there is only one image in one OSF, this image will be the default image
-</p>
-</li>
-<li>
-<p>
-Optionally we can add <em>tags</em> to the image to be able to identify it from the virtual machine manager. This tags are unique per OSF. If we assign a tag that another image already contains in the same OSF, the tag will be moved from one image to the other, avoiding duplicity.
-</p>
-</li>
-<li>
-<p>
-Optionally, we could create <em>other properties</em> for the image for internal management of our scripts or simply to add information.
-</p>
-</li>
-</ul></div>
-</li>
-<li>
-<p>
-We can check if the image has been correctly created if we see it appears on the Disk images box inside the detail view where we are positioned.
-</p>
-</li>
-</ul></div>
 </div></div>
 </dd>
 </dl></div>
+<div class="paragraph"><p>We will check if the image has been correctly created</p></div>
+<div class="paragraph"><p>+</p></div>
+<div class="openblock">
+<div class="content">
 </div></div>
-</li>
-</ul></div>
 </div>
 <div class="sect2">
 <h3 id="_user_creation">2.4. User creation</h3>
@@ -4682,7 +4637,7 @@ On the left side there is a <em>settings</em> tab that displays a lateral menu w
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-11-14 12:42:19 CET
+Last updated 2016-12-13 14:50:14 CET
 </div>
 </div>
 </body>

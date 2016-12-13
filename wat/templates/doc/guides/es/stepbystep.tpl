@@ -2373,7 +2373,7 @@ Ambos parámetros se pueden definir como <em>por defecto</em> adoptando así la 
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-11-14 12:42:19 CET
+Last updated 2016-12-13 14:08:52 CET
 </div>
 </div>
 </body>
