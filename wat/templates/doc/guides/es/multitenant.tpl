@@ -922,7 +922,7 @@ Tenants Eraser
 <div class="literalblock">
 <div class="content">
 <pre><code>Usuario: batman
-Contraseña: to the rescue</code></pre>
+Contraseña: (Consulte al equipo de soporte)</code></pre>
 </div></div>
 <div class="paragraph"><p>En este caso tendrá ligeras diferencias con el que tendremos en modo monotenant.</p></div>
 <div class="paragraph"><p>Básicamente <strong>la diferencia será</strong>, que en este modo, <strong>el administrador de recuperación tendrá</strong>, además de los que tiene en modo monotenant, <strong>acceso a gestión de Tenants</strong>.</p></div>
@@ -932,7 +932,7 @@ Contraseña: to the rescue</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-12-13 14:08:52 CET
+Last updated 2016-12-15 09:05:15 CET
 </div>
 </div>
 </body>

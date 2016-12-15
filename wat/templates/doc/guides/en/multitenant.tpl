@@ -910,9 +910,12 @@ Tenants Eraser
 <h2 id="_recovery_mode_multitenant">9. Recovery mode (multitenant)</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>In the multitenant set-up there is also the recovery administrator with the same credential that the multitenant one:</p></div>
-<div class="paragraph"><p>User: batman
-Password: to the rescue
-In this case, there will be small differences in comparison with the one there is in the monotenant mode.</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>User: batman
+Password: (Consult the support team)</code></pre>
+</div></div>
+<div class="paragraph"><p>In this case, there will be small differences in comparison with the one there is in the monotenant mode.</p></div>
 <div class="paragraph"><p>Basically <strong>the difference will be</strong>, that in this mode, <strong>the recovery administrator will also have</strong>, apart from the ones the monotenant mode has, <strong>access to the Tenants management</strong>.</p></div>
 </div>
 </div>
@@ -920,7 +923,7 @@ In this case, there will be small differences in comparison with the one there i
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-12-13 14:08:52 CET
+Last updated 2016-12-15 08:58:10 CET
 </div>
 </div>
 </body>

@@ -1121,7 +1121,7 @@ Solución
 <div class="literalblock">
 <div class="content">
 <pre><code>Usuario: batman
-Contraseña: to the rescue</code></pre>
+Contraseña: (Consulte al equipo de soporte)</code></pre>
 </div></div>
 <div class="paragraph"><p>Este administrador tiene las siguientes características:</p></div>
 <div class="ulist"><ul>
@@ -4680,7 +4680,7 @@ En el lado izquierdo hay una pestaña de <em>Ajustes</em> que despliega un menú
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-12-13 14:48:14 CET
+Last updated 2016-12-15 08:58:39 CET
 </div>
 </div>
 </body>

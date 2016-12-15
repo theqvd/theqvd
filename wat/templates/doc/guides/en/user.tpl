@@ -1077,7 +1077,7 @@ Solution
 <div class="literalblock">
 <div class="content">
 <pre><code>User: batman
-Password: to the rescue</code></pre>
+Password: (Consult the support team)</code></pre>
 </div></div>
 <div class="paragraph"><p>This administrator has the following characteristics:</p></div>
 <div class="ulist"><ul>
@@ -4637,7 +4637,7 @@ On the left side there is a <em>settings</em> tab that displays a lateral menu w
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-12-13 14:50:14 CET
+Last updated 2016-12-15 08:58:13 CET
 </div>
 </div>
 </body>

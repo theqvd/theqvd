@@ -1538,7 +1538,7 @@ Editor masivo
 <img src="images/doc_images/screenshot_di_massiveeditor.png" alt="screenshot_di_massiveeditor.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>El editor masivo de imágenes de disco solamente permite modificar propiedades porsonalizadas.</p></div>
-<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados, salvo que se escoja la opción "Sin cambios". salvo que se escoja la opción "Sin cambios".</p></div>
+<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados, salvo que se escoja la opción "Sin cambios".</p></div>
 <div class="paragraph"><p>Si no existen propiedades personalizadas en las imágenes de disco, la edición masiva no estará habilitada.</p></div>
 </div></div>
 </dd>
@@ -2373,7 +2373,7 @@ Ambos parámetros se pueden definir como <em>por defecto</em> adoptando así la 
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-12-13 14:08:52 CET
+Last updated 2016-12-14 08:21:47 CET
 </div>
 </div>
 </body>
