@@ -80,6 +80,13 @@ our $COMMON_USAGE_TEXT = "
   !key1=value (This expresion means: NOT key1)
   !key1=value, key2=value, key3=value (NOT ( key1 AND key2 AND key3))
   (! key1=value), key2=value, key3=value ((NOT key1) AND key2 AND key3))
+  
+  ORDER CRITERIA
+  asc  (Orders in ascendent order)
+  desc (Orders in descendent order)
+  
+  For example:
+  asc key1
 
 ======================================================================================================
 ";

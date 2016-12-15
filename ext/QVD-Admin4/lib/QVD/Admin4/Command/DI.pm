@@ -15,7 +15,7 @@ sub usage_text {
   di new <ARGUMENTS>
   
   For example: 
-  di disk_image=/path/to/disk/image, osf=myosf (Creates a DI with disk_image 'mydi', address '10.3.15.1') 
+  di new disk_image=image.tgz, osf_id=10000 (Creates a DI with disk_image 'image.tgz' for osf with id 10000) 
 
 == GETTING DIs
 
@@ -45,24 +45,6 @@ sub usage_text {
 
   For example: 
   di disk_image=mydi set disk_image=yourdi (Sets new values for disk_image in DI with disk_image mydi)
-
-  Adding custom properties:
-
-  di <FILTERS> set property key=value  
-  di <FILTERS> set property key=value, key=value, ...  
-
-  For example: 
-  di set property mykey=myvalue (Sets property mykey in all DIs)
-  di disk_image=mydi set property mykey=myvalue, yourkey=yourvalue (Sets properties mykey and yourkey in DI with disk_image mydi)
-
-  Deleting custom properties:
-
-  di <FILTERS> del property key
-  di <FILTERS> del property key, key, ...
-
-  For example: 
-  di del property mykey (Deletes property mykey in all DIs)
-  di disk_image=mydi del property mykey, yourkey (Deletes properties mykey and yourkey in DI with disk_image mydi)
 
   Adding tags:
 
@@ -97,6 +79,21 @@ sub usage_text {
   For example: 
   di del (Removes all DIs) 
   di disk_image=mydi del (Removes DI with disk_image mydi)
+
+== AVAILABLE PARAMETERS
+
+  The following parameters can be used as <FILTERS>, <ARGUMENTS>, <FIELDS TO RETRIEVE> or <ORDER CRITERIA>,
+  although some combinations may not be allowed and an error will be prompted:
+  
+  id            (ID of the Disk Image)
+  tenant_name   (Name of the tenant the Disk Image belongs to)
+  tenant_id     (ID of the tenant the Disk Image belongs to)
+  name          (Name of the Disk Image)
+  version       (Version of the Disk Image)
+  blocked       (Flag that indicates whether the Disk Image is blocked for users to access)
+  osf_name      (Name of the OSF the Disk Image is linked to)
+  osf_id        (ID of the OSF the Disk Image is linked to)
+  tags          (List of tags the Disk Image is tagged with)
 
 $QVD::Admin4::Command::COMMON_USAGE_TEXT
 "

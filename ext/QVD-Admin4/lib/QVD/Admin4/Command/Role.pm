@@ -91,6 +91,17 @@ sub usage_text {
   role del (Removes all ROLEs) 
   role name=myrole del (Removes ROLE with name myrole)
 
+== AVAILABLE PARAMETERS
+
+  The following parameters can be used as <FILTERS>, <ARGUMENTS>, <FIELDS TO RETRIEVE> or <ORDER CRITERIA>,
+  although some combinations may not be allowed and an error will be prompted:
+  
+  id            (ID of the Role)
+  tenant_name   (Name of the tenant the OSF belongs to)
+  tenant_id     (ID of the tenant the OSF belongs to)
+  fixed         (Flag to indicate whether the role is read only)
+  internal      (Flag to indicate whether the role is a template)
+
 $QVD::Admin4::Command::COMMON_USAGE_TEXT
 "
 

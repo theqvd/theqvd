@@ -57,6 +57,17 @@ sub usage_text {
   tenant del (Removes all TENANTs) 
   tenant name=mytenant del (Removes TENANT with name mytenant)
 
+== AVAILABLE PARAMETERS
+
+  The following parameters can be used as <FILTERS>, <ARGUMENTS>, <FIELDS TO RETRIEVE> or <ORDER CRITERIA>,
+  although some combinations may not be allowed and an error will be prompted:
+  
+  id        (ID of the Tenant)
+  name      (Name of the Tenant)
+  language  (Default language for all Administrator in the Tenant)
+  block     (Default block size for paginated queries for all Administrator in the Tenant)
+  blocked   (Flag that indicates whether the Tenant is blocked for administrators and users to access)
+
 $QVD::Admin4::Command::COMMON_USAGE_TEXT
 "
 

@@ -49,24 +49,6 @@ sub usage_text {
   vm set di_tag=default (Sets new value for di_tag in all VMs)
   vm name=myvm set name=yourvm, di_tag=default (Sets new values for name and di_tag in VM with name myvm)
 
-  Adding custom properties:
-
-  vm <FILTERS> set property key=value  
-  vm <FILTERS> set property key=value, key=value, ...  
-
-  For example: 
-  vm set property mykey=myvalue (Sets property mykey in all VMs)
-  vm name=myvm set property mykey=myvalue, yourkey=yourvalue (Sets properties mykey and yourkey in VM with name myvm)
-
-  Deleting custom properties:
-
-  vm <FILTERS> del property key
-  vm <FILTERS> del property key, key, ...
-
-  For example: 
-  vm del property mykey (Deletes property mykey in all VMs)
-  vm name=myvm del property mykey, yourkey (Deletes properties mykey and yourkey in VM with name myvm)
-
   Blocking/Unblocking VMs
 
   vm <FILTERS> block
@@ -94,6 +76,28 @@ sub usage_text {
   For example: 
   vm start (Starts all VMs)
   vm name=myvm stop (Stop VM with name myvm)
+
+== AVAILABLE PARAMETERS
+
+  The following parameters can be used as <FILTERS>, <ARGUMENTS>, <FIELDS TO RETRIEVE> or <ORDER CRITERIA>,
+  although some combinations may not be allowed and an error will be prompted:
+  
+  id            (ID of the VM)
+  tenant_name   (Name of the VM the OSF belongs to)
+  tenant_id     (ID of the VM the OSF belongs to)
+  name          (Name of the VM)
+  blocked       (Flag that indicates whether the VM is blocked for users to access)
+  user_name     (Name of the User associated to the VM)
+  user_id       (ID of the User associated to the VM)
+  user_state    (State of the User respect to the VM)
+  host_name     (Name of Host the VM is running in)
+  host_id       (ID of Host the VM is running in)
+  di_id         (ID of the Disk Image associated to the VM)
+  di_name       (Name of the Disk Image associated to the VM)
+  di_id_in_use  (ID of the Disk Image the VM is using while in running state)
+  ip            (IP address of the VM)
+  ip_in_use     (IP address the VM is using while in running state)
+  state         (Current state of the VM)
 
 $QVD::Admin4::Command::COMMON_USAGE_TEXT
 "

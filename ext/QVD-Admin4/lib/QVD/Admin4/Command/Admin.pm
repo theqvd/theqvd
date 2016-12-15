@@ -84,6 +84,18 @@ sub usage_text {
   admin del (Removes all ADMINs) 
   admin name=myadmin del (Removes ADMIN with name myadmin)
 
+== AVAILABLE PARAMETERS
+
+  The following parameters can be used as <FILTERS>, <ARGUMENTS>, <FIELDS TO RETRIEVE> or <ORDER CRITERIA>,
+  although some combinations may not be allowed and an error will be prompted:
+  
+  id            (ID of the Administrator)
+  tenant_name   (Name of tenant the Administrator belongs to)
+  tenant_id     (ID of tenant the Administrator belongs to)
+  name          (Name of the Administrator)
+  language      (Default language for the Administrator)
+  block         (Default block size for paginated queries for the Administrator)
+
 $QVD::Admin4::Command::COMMON_USAGE_TEXT
 "
 
