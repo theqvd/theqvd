@@ -35,6 +35,7 @@ WriteMakefile(
         'Linux::Proc::Net::UDP' => 0,
         'Method::WeakCallback' => 0,
         'URI::Escape' => 0,
+        'BSD::Resource' => '1.2910'
     },
     ABSTRACT      => 'lib/QVD/HKD.pm',
     EXE_FILES     => [ qw(bin/qvd-hkd
