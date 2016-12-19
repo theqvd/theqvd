@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 my $SUF_VERSION = "";
 if  ( defined $ENV{BUILD_NUMBER} ) {
-  $SUF_VERSION = '.' . $ENV{BUILD_NUMBER} ;
+    $SUF_VERSION = '.' . $ENV{BUILD_NUMBER} ;
 }
 
 

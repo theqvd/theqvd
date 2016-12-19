@@ -19,6 +19,7 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key('host_id');
 __PACKAGE__->belongs_to(host => 'QVD::DB::Result::Host', 'host_id');
 
+
 sub _incr_field {
     my ($host, $field) = @_;
 

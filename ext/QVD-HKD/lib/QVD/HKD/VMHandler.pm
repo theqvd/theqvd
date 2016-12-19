@@ -156,6 +156,7 @@ select dis.id, dis.path, osfs.use_overlay, osfs.user_storage_size, memory
     where
         dis.osf_id = osfs.id    and
         di_tags.di_id = dis.id  and
+        dis.blocked = false     and
         osfs.id = $1            and
         di_tags.tag = $2
 SQL

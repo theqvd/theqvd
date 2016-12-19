@@ -149,3 +149,12 @@ sub connect_to_vm {
         });
 }
 
+__END__
+
+=pod
+
+=head1 PURPOSE
+
+Script intended to perform a stress test of the QVD environment
+
+=cut

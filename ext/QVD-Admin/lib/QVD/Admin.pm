@@ -25,6 +25,7 @@ sub new {
     my $quiet = shift;
     my $self = { filter => {},
                  quiet => $quiet,
+                 tenant_id => undef,
                  objects => { host => 'Host',
                               vm => 'VM',
                               user => 'User',
@@ -52,8 +53,25 @@ sub set_filter {
     }
 }
 
+my %tenant_aware = map { $_ => 1 } qw(osf user config);
+my %tenant_zero  = map { $_ => 1 } qw(config);
+
+sub set_tenant_id {
+    my ($self, $tenant_id) = @_;
+    $self->{tenant_id} = $tenant_id;
+}
+
+sub _tenant_id {
+    my ($self, $obj) = @_;
+    $self->{tenant_id} // ($tenant_zero{$obj} ? 0 : 1);
+}
+
 sub reset_filter {
     shift->{filter} = {}
+}
+
+sub debug {
+    db->storage->debug(1);
 }
 
 sub get_resultset {
@@ -67,6 +85,9 @@ sub get_resultset {
         return $self->$method;
     }
     my $rs = rs($db_object);
+    if ($tenant_aware{$obj}) {
+        $self->{filter}{tenant_id} //= $self->_tenant_id($obj);
+    }
     $rs = $rs->search($self->{filter})
         if defined $self->{filter};
 
@@ -90,6 +111,7 @@ sub get_result_set_for_vm {
                      host => 'host.name',
                      state => 'vm_runtime.vm_state' );
     my $filter = $self->_filter_obj(\%term_map);
+    $filter->{'osf.tenant_id'} //= $self->_tenant_id('vm');
 
     # Be able to filter VMs by properties - #1354
     my @joins = ('osf', 'user', { vm_runtime => 'host'});
@@ -113,6 +135,7 @@ sub get_result_set_for_di {
                      osf => 'osf.name',
 		     tag => 'tags.tag' );
     my $filter = $self->_filter_obj(\%term_map);
+    $filter->{'osf.tenant_id'} //= $self->_tenant_id('di');
 
     # Be able to filter VMs by properties - #1354
     my @joins = ('osf', 'tags');
@@ -162,6 +185,9 @@ sub _obj_add {
         die "The required parameters are: ",
             join(", ", @$required_params), " (you supplied ",
             join(", ", keys %$params), ")";
+    }
+    if ($tenant_aware{$obj}) {
+        $params->{tenant_id} = $self->_tenant_id($obj);
     }
     my $rs = $self->get_resultset($obj);
     $rs->create($params);
@@ -293,6 +319,7 @@ sub cmd_config_set {
             }
             else {
                 $rs->update_or_create({ key => $key,
+                                        tenant_id => $self->_tenant_id('config'),
                                         value => $args{$key}
                                       });
                 notify(qvd_config_changed);
@@ -600,6 +627,7 @@ sub cmd_osf_add {
     # FIXME: detect type of image and set use_overlay accordingly, iso => no overlay
     $params{memory}      //= $osf_default_memory;
     $params{use_overlay} //= $osf_default_overlay;
+    $params{tenant_id}   //= $self->_tenant_id('osf');
 
     #die "The required parameters are ".join(", ", @required_params)
     #    unless _set_equals([keys %params], \@required_params);
@@ -618,6 +646,8 @@ sub cmd_osf_add {
     my $id;
     txn_do {
         my $rs = $self->get_resultset('osf');
+        # use Data::Dumper;
+        # print Dumper $self;
         my $row = $rs->create(\%params);
         $id = $row->id;
     };

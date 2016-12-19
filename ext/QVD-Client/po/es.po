@@ -65,7 +65,12 @@ msgstr "Pantalla"
 msgid "Full screen"
 msgstr "Pantalla completa"
 
-#: Frame.pm:241
+
+#: Frame.pm:190
+msgid "Options"
+msgstr "Opciones"
+
+#: Frame.pm:206
 msgid "User"
 msgstr "Usuario"
 
@@ -77,7 +82,11 @@ msgstr "Contraseña"
 msgid "Remember password"
 msgstr "Recordar contraseña"
 
-#: Frame.pm:257
+#: Frame.pm:218
+msgid "Connectivity"
+msgstr "Conectividad"
+
+#: Frame.pm:222
 msgid "Server"
 msgstr "Servidor"
 
@@ -85,15 +94,35 @@ msgstr "Servidor"
 msgid "Connection type"
 msgstr "Tipo de enlace"
 
-#: Frame.pm:285
-msgid "Kill current VM"
+#: Frame.pm:259
+msgid "Share"
+msgstr "Compartir"
+
+#: Frame.pm:266
+msgid "Enable shared folders"
+msgstr "Compartir carpetas"
+
+#: Frame.pm:271
+msgid "Add"
+msgstr "Añadir"
+
+#: Frame.pm:275
+msgid "Remove"
+msgstr "Quitar"
+
+#: Frame.pm:378
+msgid "Restart session"
 msgstr "Reinicio de sesión"
 
 #: Frame.pm:418
 msgid "You don't have any virtual machine available"
 msgstr "No tiene ninguna máquina virtual disponible"
 
-#: Frame.pm:518
+#: Frame.pm:387
+msgid "Terms of use"
+msgstr "Condiciones del servicio"
+
+#: Frame.pm:483
 msgid "Connection error"
 msgstr "Error de conexión"
 

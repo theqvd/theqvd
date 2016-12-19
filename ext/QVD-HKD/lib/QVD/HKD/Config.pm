@@ -90,7 +90,7 @@ sub set_db {
 
 sub _reload {
     my $self = shift;
-    $self->_query('select key, value from configs');
+    $self->_query('select key, value from configs where tenant_id = -1');
 }
 
 sub _on_reload_result {

@@ -15,9 +15,9 @@ WriteMakefile(
     PL_FILES            => {},
     PREREQ_PM => {
         'JSON' => 0,
+        'QVD::HTTP::StatusCodes' => 0,
         'QVD::HTTPC' => 0,
         'QVD::HTTPC::Parallel' => 0,
-        'QVD::HTTP::StatusCodes' => 0,
         'QVD::Log' => 0,
         'QVD::URI' => 0,
         'URI::Escape' => 0,

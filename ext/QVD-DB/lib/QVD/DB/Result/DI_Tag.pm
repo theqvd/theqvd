@@ -18,6 +18,17 @@ __PACKAGE__->belongs_to(di => 'QVD::DB::Result::DI', 'di_id');
 
 # __PACKAGE__->add_unique_constraint(['di.osf.osf_id', 'tag']);
 
+sub tenant_id
+{
+    my $self = shift;
+    $self->di->osf->tenant_id;
+}
+
+sub tenant_name
+{
+    my $self = shift;
+    $self->di->osf->tenant_name;
+}
 
 
 1;

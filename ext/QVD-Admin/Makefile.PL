@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 my $SUF_VERSION = "";
 if  ( defined $ENV{BUILD_NUMBER} ) {
-  $SUF_VERSION = '.' . $ENV{BUILD_NUMBER} ;
+    $SUF_VERSION = '.' . $ENV{BUILD_NUMBER} ;
 }
 
 
@@ -18,12 +18,10 @@ WriteMakefile(
     PL_FILES      => {},
     PREREQ_PM     => {
         'DateTime' => 0,
-        'DateTime::Format::GnuAt' => '0.03',
         'DateTime::Format::Pg' => '0.16007',
+        'DateTime::Format::GnuAt' => '0.03',
         'File::Slurp' => 0,
         'Gtk3' => 0,
-        'Net::OpenSSH' => 0,
-        'Net::OpenSSH::Parallel' => 0,
         'QVD::AdminCLI' => 0,
         'QVD::Config' => 0,
         'QVD::Config::Core' => 0,
@@ -33,6 +31,8 @@ WriteMakefile(
         'QVD::Log' => 0,
         'Text::Table' => 0,
         'Term::ReadKey' => 0,
+        'Net::OpenSSH' => 0,
+        'Net::OpenSSH::Parallel' => 0,
     },
 );
 

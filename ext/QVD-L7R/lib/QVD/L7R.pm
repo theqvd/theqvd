@@ -52,8 +52,8 @@ sub new {
         push @args, ( SSL           => 1,
                       SSL_key_file  => $path_key,
                       SSL_cert_file => $path_cert,
-                      SSL_version       => cfg('l7r.ssl.options.SSL_version'),
-                      SSL_cipher_list   => cfg('l7r.ssl.options.SSL_cipher_list'));
+                      SSL_version       => cfg('l7r.options.SSL_version'),
+                      SSL_cipher_list   => cfg('l7r.options.SSL_cipher_list'));
 
         # Handle the case where we require the client to have a valid certificate:
         if (cfg('l7r.client.cert.require')) {
@@ -284,14 +284,23 @@ sub _authenticate_user {
                     my $peerport = eval { $client->peerport() } // 'unknown';
 		    INFO "Accepted connection from user $login from ip:port ${peerhost}:$peerport";
 		    $l7r->{_auth} = $auth;
-		    txn_do { $this_host->counters->incr_auth_ok; };
-                    return $auth;
+                    my $user = rs(User)->find($auth->user_id);
+                    unless ($user->blocked) {
+                        txn_do { $this_host->counters->incr_auth_ok };
+                        return $auth
+                    }
+                    ERROR "User $login is blocked";
                 }
-                INFO "Failed login attempt from user $login";
+                else {
+                    ERROR "Failed login attempt from user $login";
+                }
+            }
+            else {
+                ERROR "Unable to decode authentication credentials";
             }
         }
         else {
-            WARN "unimplemented authentication mechanism";
+            ERROR "unimplemented authentication mechanism";
         }
     }
     $l7r->throw_http_error(HTTP_UNAUTHORIZED, ['WWW-Authenticate: Basic realm="QVD"']);

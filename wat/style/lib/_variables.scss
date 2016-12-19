@@ -1,0 +1,60 @@
+/* INCLUDED: variables */
+
+// Colors
+$col_whiter : #fdfdfd;
+$col_blacker: #333;
+$col_brand: darken(#f36d15, 5);
+$col_green : #00CC00;
+$col_red : #FF0000;
+$col_yellow : #FFD600;
+$col_blue : #6e8aff;
+
+$bg_body : $col_whiter;
+
+// Wrapper
+$min_width_wrapper : 960px;
+$max_width_wrapper : 2048px;
+$min_width_mobile : 0px;
+$max_width_mobile : 41em;
+
+// Radius
+$form_elements_radius : 4px;
+$menu_radius : 7px;
+$table_radius : 4px;
+
+// Icons
+$table_icons_size : 16;
+$table_icons_size_mobile : 20;
+
+// Buttons
+$height_button: 25px;
+$height_input: 20px;
+
+// Form controls
+$input_height_mobile: 35px;
+$input_height: 28px;
+
+// Layout
+$width_list_side: 15;
+$width_list_content: 100 - $width_list_side;
+$list_side: left;
+
+$width_setup_side: 18;
+$width_setup_content: 100 - $width_setup_side;
+$setup_side: left;
+
+$width_details_side: 40;
+$width_details_content: 100 - $width_details_side;
+$details_side: right;
+
+$other_properties_width: 40;
+
+// Dialog
+$dialog_width: 650px;
+$dialog_height: 550px;
+$dialog_mobile_width: 100%;
+$dialog_mobile_height: 100vh;
+
+// Fonts
+$font-sizes: 0.9 1 1.1 1.4;
+$font-sizes-mobile: 0.9 1.3 1.5 1.8;

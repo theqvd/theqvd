@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>WAT tests with QUnit and Sinon</title>
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+
+        <!-- Third party JS libraries -->
+            <!-- Testing libraries -->
+                <!-- QUnit -->
+                <script src="lib/thirds/qunit/qunit-1.11.0.js"></script>
+                <link rel="stylesheet" href="lib/thirds/qunit/qunit-1.11.0.css">
+
+                <script src="lib/thirds/qunit-reporter-junit/qunit-reporter-junit.js"></script>
+
+                <!-- SinonJS -->
+                <script type='text/javascript' src='lib/thirds/sinonjs/sinon-1.10.3.js'></script>
+                <script type='text/javascript' src='lib/thirds/sinonjs/sinon-qunit-1.0.0.js'></script>
+           
+            <!-- jQuery -->
+            <script type='text/javascript' src='../../lib/thirds/jquery/jquery.min.js'></script>
+            
+            <!-- jQuery UI -->
+            <script type='text/javascript' src='../../lib/thirds/jquery-ui/jquery-ui.min.js'></script>
+            <link rel="stylesheet" href="../../lib/thirds/jquery-ui/jquery-ui.min.css">            
+            
+            <!-- jQuery DateTimePicker -->
+            <script type='text/javascript' src='../../lib/thirds/jquery-datetimepicker/jquery.datetimepicker.js'></script>
+            <link rel="stylesheet" href="../../lib/thirds/jquery-datetimepicker/jquery.datetimepicker.css">
+            
+            <!-- jQuery Tags Input -->
+            <script type='text/javascript' src='../../lib/thirds/jquery-tags-input/jquery.tagsinput.min.js'></script>
+            <link rel="stylesheet" href="../../lib/thirds/jquery-tags-input/jquery.tagsinput.css">
+            
+            <!-- jQuery Cookie -->
+            <script type='text/javascript' src='../../lib/thirds/jquery-cookie/jquery.cookie.js'></script>    
+                    
+            <!-- jQuery TableScroll -->
+            <script type='text/javascript' src='../../lib/thirds/jquery-tablescroll/jquery.tablescroll.js'></script>
+                               
+            <!-- jQuery mbExtruder -->
+            <script type='text/javascript' src='../../lib/thirds/jquery-mbExtruder/mbExtruder.js'></script>
+                               
+            <!-- jQuery mbFlipText -->
+            <script type='text/javascript' src='../../lib/thirds/jquery-mbFlipText/jquery.mb.flipText.js'></script>
+                               
+            <!-- jQuery hoverIntent -->
+            <script type='text/javascript' src='../../lib/thirds/jquery-hoverIntent/jquery.hoverIntent.min.js'></script>
+                               
+            <!-- jQuery waitForImages -->
+            <script type='text/javascript' src='../../lib/thirds/waitForImages/jquery.waitforimages.js'></script>
+            
+            <!-- jQuery qtip -->
+            <script src="../../lib/thirds/jquery-qtip/jquery.qtip.min.js"></script>
+            <script src="../../lib/thirds/jquery-qtip/imagesloaded.pkg.min.js"></script>
+            <link rel="stylesheet" href="../../lib/thirds/jquery-qtip/jquery.qtip.min.css">
+            
+            <!-- Underscore -->
+            <script type='text/javascript' src='../../lib/thirds/underscore/underscore.js'></script>
+            
+            <!-- Backbone.js -->
+            <script type='text/javascript' src='../../lib/thirds/backbone/backbone.js'></script>
+            
+            <!-- i18next -->
+            <script type='text/javascript' src='../../lib/thirds/i18next/i18next-1.7.3.min.js'></script>
+            
+            <!-- ASCII Doc -->     
+            <script type='text/javascript' src='../../lib/thirds/asciidoc/asciidoc.js'></script>
+            
+            <!-- Font awesome -->
+            <link rel="stylesheet" href="../../lib/thirds/font-awesome/css/font-awesome.min.css">
+            
+            <!-- Font awesome animation -->
+            <link rel="stylesheet" href="../../lib/thirds/font-awesome-animation/font-awesome-animation.min.css">
+            
+            <!-- Fast Click -->
+            <script src="../../lib/thirds/fastclick/fastclick.js"></script>
+            
+            <!-- sass.js -->
+            <script src="../../lib/thirds/sass.js/sass.js"></script>
+            
+            <!-- Colorpicker -->
+            <script src="../../lib/thirds/evol.colorpicker/evol.colorpicker.min.js"></script> 
+            <link href="../../lib/thirds/evol.colorpicker/evol.colorpicker.min.css" rel="stylesheet" />
+            
+            <!-- jsPDF -->
+            <script src="../../lib/thirds/jsPDF/jspdf.js"></script>
+            <script src="../../lib/thirds/jsPDF/jspdf.plugin.addimage.js"></script>
+            
+            <!-- html2canvas -->
+            <script src="../../lib/thirds/html2canvas/html2canvas4.js"></script>
+            
+            <!-- FileSaver -->
+            <script src="../../lib/thirds/FileSaver/FileSaver.js"></script>
+            
+            <!-- Chosen -->
+            <script src="../../lib/thirds/chosen/chosen.jquery.min.js"></script>
+            <link rel="stylesheet" href="../../lib/thirds/chosen/chosen.min.css">
+            
+            <!-- Flot charts -->
+            <script src="../../lib/thirds/flot/jquery.flot.min.js"></script>
+            <script src="../../lib/thirds/flot/jquery.flot.pie.min.js"></script>
+            <script src="../../lib/thirds/flot/jquery.flot.resize.min.js"></script>
+            
+             <!-- Flot axis labels (Flot charts plugin) -->
+            <script src="../../lib/thirds/flot-axislabels/jquery.flot.axislabels.js"></script>
+            
+            <!-- Fonts -->
+            <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
+            <link href='http://fonts.googleapis.com/css?family=Lato:400,700,900' rel='stylesheet' type='text/css'>
+            <link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'>
+            
+        <!-- Own libraries -->
+            <!-- Constants -->
+            <script type='text/javascript' src='../../lib/constants/constants.js'></script>
+            <script type='text/javascript' src='../../lib/constants/constants-acls.js'></script>
+            <script type='text/javascript' src='../../lib/constants/constants-qvd-config.js'></script>
+            
+            <!-- Main -->
+            <script type='text/javascript' src='../../lib/init.js'></script>
+            <script type='text/javascript' src='../../lib/start.js'></script>
+            
+            <!-- Libraries -->
+            <script type='text/javascript' src='../../lib/actions/actions.js'></script>
+            <script type='text/javascript' src='../../lib/util/util.js'></script>
+            <script type='text/javascript' src='../../lib/binds/binds.js'></script>
+            <script type='text/javascript' src='../../lib/session/config.js'></script>
+            <script type='text/javascript' src='../../lib/session/login.js'></script>
+            <script type='text/javascript' src='../../lib/doc/doc.js'></script>
+            <script type='text/javascript' src='../../lib/interface/interface.js'></script>
+            <script type='text/javascript' src='../../lib/interface/interface-messages.js'></script>
+            <script type='text/javascript' src='../../lib/interface/interface-graphs.js'></script>
+            <script type='text/javascript' src='../../lib/interface/interface-customize.js'></script>
+            <script type='text/javascript' src='../../lib/interface/interface-templates.js'></script>
+            <script type='text/javascript' src='../../lib/settings/default-role.js'></script>
+            <script type='text/javascript' src='../../lib/settings/default-administrator.js'></script>
+            <script type='text/javascript' src='../../lib/settings/default-tenant.js'></script>
+            <script type='text/javascript' src='../../lib/settings/default-user.js'></script>
+            <script type='text/javascript' src='../../lib/settings/default-vm.js'></script>
+            <script type='text/javascript' src='../../lib/settings/default-host.js'></script>
+            <script type='text/javascript' src='../../lib/settings/default-osf.js'></script>
+            <script type='text/javascript' src='../../lib/settings/default-di.js'></script>
+            <script type='text/javascript' src='../../lib/settings/default-log.js'></script>
+            <script type='text/javascript' src='../../lib/settings/menu.js'></script>
+            <script type='text/javascript' src='../../lib/settings/documentation-sections.js'></script>
+            <script type='text/javascript' src='../../lib/settings/acl-groups.js'></script>
+            <script type='text/javascript' src='../../lib/translations/translations.js'></script>
+           
+            <!-- Backbone Router -->
+            <script type='text/javascript' src='../../lib/bb-router/router.js'></script>
+        
+            <!-- Backbone Models -->
+            <script type='text/javascript' src='../../lib/bb-models/proto-model.js'></script>
+            <script type='text/javascript' src='../../lib/bb-models/platform/vm.js'></script>
+            <script type='text/javascript' src='../../lib/bb-models/platform/user.js'></script>
+            <script type='text/javascript' src='../../lib/bb-models/platform/host.js'></script>
+            <script type='text/javascript' src='../../lib/bb-models/platform/osf.js'></script>
+            <script type='text/javascript' src='../../lib/bb-models/platform/di.js'></script>
+            <script type='text/javascript' src='../../lib/bb-models/wat-management/administrator.js'></script>
+            <script type='text/javascript' src='../../lib/bb-models/wat-management/tenant.js'></script>
+            <script type='text/javascript' src='../../lib/bb-models/wat-management/role.js'></script>
+            <script type='text/javascript' src='../../lib/bb-models/wat-management/log.js'></script>
+            <script type='text/javascript' src='../../lib/bb-models/wat-management/property.js'></script>
+            <script type='text/javascript' src='../../lib/bb-models/wat-management/config_wat.js'></script>
+
+            <!-- Backbone Collections -->
+            <script type='text/javascript' src='../../lib/bb-collections/proto-collection.js'></script>
+            <script type='text/javascript' src='../../lib/bb-collections/platform/vms.js'></script>
+            <script type='text/javascript' src='../../lib/bb-collections/platform/users.js'></script>
+            <script type='text/javascript' src='../../lib/bb-collections/platform/hosts.js'></script>
+            <script type='text/javascript' src='../../lib/bb-collections/platform/osfs.js'></script>
+            <script type='text/javascript' src='../../lib/bb-collections/platform/dis.js'></script>
+            <script type='text/javascript' src='../../lib/bb-collections/wat-management/administrators.js'></script>
+            <script type='text/javascript' src='../../lib/bb-collections/wat-management/tenants.js'></script>
+            <script type='text/javascript' src='../../lib/bb-collections/wat-management/roles.js'></script>
+            <script type='text/javascript' src='../../lib/bb-collections/wat-management/logs.js'></script>
+            <script type='text/javascript' src='../../lib/bb-collections/wat-management/properties.js'></script>
+            
+            
+            <!-- Backbone Views -->
+            <script type='text/javascript' src='../../lib/bb-views/platform/user-common.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/platform/vm-common.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/platform/host-common.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/platform/osf-common.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/platform/di-common.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/wat-management/administrator-common.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/wat-management/role-common.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/wat-management/tenant-common.js'></script>
+            
+            <script type='text/javascript' src='../../lib/bb-views/proto-main.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/proto-list.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/proto-details.js'></script>
+            
+            <script type='text/javascript' src='../../lib/bb-views/platform/vm-list.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/platform/user-list.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/platform/host-list.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/platform/osf-list.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/platform/di-list.js'></script>
+            
+            <script type='text/javascript' src='../../lib/bb-views/platform/user-details.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/platform/vm-details.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/platform/host-details.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/platform/osf-details.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/platform/di-details.js'></script>
+            
+            <!-- Views management -->
+            <script type='text/javascript' src='../../lib/bb-views/proto-views.js'></script>
+            
+            <!-- Views -->
+            <script type='text/javascript' src='../../lib/bb-views/views/default.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/views/mine.js'></script>
+
+            <!-- QVD Setup -->
+            <script type='text/javascript' src='../../lib/bb-views/qvd-management/config-qvd.js'></script>
+            
+            <!-- WAT Setup -->
+            <script type='text/javascript' src='../../lib/bb-views/wat-management/config-wat.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/wat-management/tenant-list.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/wat-management/tenant-details.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/wat-management/administrator-list.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/wat-management/administrator-details.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/wat-management/role-list.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/wat-management/role-details.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/wat-management/log-list.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/wat-management/log-details.js'></script>
+
+            <!-- Login -->
+            <script type='text/javascript' src='../../lib/bb-views/login/login.js'></script>
+            
+            <!-- Home -->
+            <script type='text/javascript' src='../../lib/bb-views/home/home.js'></script>
+            
+            <!-- Help -->
+            <script type='text/javascript' src='../../lib/bb-views/help/about.js'></script>
+            <script type='text/javascript' src='../../lib/bb-views/help/documentation.js'></script>
+            
+            <!-- Current administrator -->
+            <script type='text/javascript' src='../../lib/bb-views/profile/profile.js'></script>
+                        
+            <!-- Tests -->
+            <script src="./lib/tests-lib.js"></script>
+            <script src="./lib/tests-setup.js"></script>
+            <script src="./lib/tests-login.js"></script>
+            <script src="./lib/superadmin/tests-backbone.js"></script>
+            <script src="./lib/superadmin/tests-views.js"></script>
+            <script src="./lib/superadmin/tests-user.js"></script>
+            <script src="./lib/superadmin/tests-osf.js"></script>
+            <script src="./lib/superadmin/tests-di.js"></script>
+            <script src="./lib/superadmin/tests-host.js"></script>
+            <script src="./lib/superadmin/tests-vm.js"></script>
+            <script src="./lib/superadmin/tests-doc.js"></script>
+            <script src="./lib/superadmin/tests-tenant.js"></script>
+            <script src="./lib/superadmin/tests-admin.js"></script>
+            <script src="./lib/superadmin/tests-role.js"></script>
+            <script src="./lib/superadmin/tests-qvdconf.js"></script>
+            <script src="./lib/tests-viewsadmin.js"></script>
+
+            <script src="./lib/superadmin/tests-main.js"></script>
+    </body>
+</html>

@@ -1,0 +1,55 @@
+.editor-container {
+    margin: 0;
+    
+    @include in(desktop) {
+        margin: 10px 20px;
+    }
+    
+    .editor-table {
+        width: 100%;
+        
+        @include in(desktop) {
+            border-spacing: 20px;
+        }
+        
+        border-collapse: separate;
+        
+        td {
+            padding-top: 4px;
+        }
+        
+        td.colspanned {
+            text-align: left !important;
+            white-space: normal;
+            font-weight: normal !important;
+        }
+        
+        &>tbody>tr>td:first-child {
+            font-weight: bold;
+            min-width: 50%;
+            @include in(desktop) {
+                text-align: right;
+            }
+            vertical-align: top;
+            padding-top: 5px;
+        }
+        
+        td.fa:before {
+            margin-right: 10px;
+        }
+
+        .custom-properties {
+            td {
+                position: relative;            
+                
+                .property-help {
+                    position: absolute;
+                    left: 12px;
+                    top: 11px;
+                    color: lighten($col_blacker, 50);
+                    font-weight: normal;
+                }
+            }
+        }
+    }
+}

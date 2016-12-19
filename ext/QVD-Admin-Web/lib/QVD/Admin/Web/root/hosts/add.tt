@@ -1,3 +1,0 @@
-[% META title = "Adding Node" %]
-<h1><a href="[% c.uri_for('/hosts') %]">Nodes</a> &raquo; New</h1>
-[% FormBuilder.render %]
