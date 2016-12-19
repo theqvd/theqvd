@@ -7,4 +7,5 @@ __PACKAGE__->add_columns( name => { data_type => 'varchar(20)' } );
 __PACKAGE__->set_primary_key('name');
 __PACKAGE__->has_many(runtime => 'QVD::DB::Result::Host_Runtime', 'cmd');
 
+
 1;

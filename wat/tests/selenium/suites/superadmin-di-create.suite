@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+  <title>Test Suite</title>
+</head>
+<body>
+<table id="suiteTable" cellpadding="1" cellspacing="1" border="1" class="selenium"><tbody>
+<tr><td><b>Test Suite</b></td></tr>
+<tr><td><a href="../cases/load_wat_home">load_wat_home</a></td></tr>
+<tr><td><a href="../cases/login_fill_superadmin">login_fill_superadmin</a></td></tr>
+<tr><td><a href="../cases/login_click">login_click</a></td></tr>
+<tr><td><a href="../cases/load_topmenu_sec_dis">load_topmenu_sec_dis</a></td></tr>
+<tr><td><a href="../cases/new_button_click">new_button_click</a></td></tr>
+<tr><td><a href="../cases/fill_form_di_creation_staging">fill_form_di_creation_staging</a></td></tr>
+<tr><td><a href="../cases/store_di_id_ubuntu">store_di_id_ubuntu</a></td></tr>
+<tr><td><a href="../cases/di_check_box">di_check_box</a></td></tr>
+<tr><td><a href="../cases/selected_actions_click_delete">selected_actions_click_delete</a></td></tr>
+<tr><td><a href="../cases/di_wait_not_present_ubuntu">di_wait_not_present_ubuntu</a></td></tr>
+<tr><td><a href="../cases/new_button_click">new_button_click</a></td></tr>
+<tr><td><a href="../cases/fill_form_di_creation_url">fill_form_di_creation_url</a></td></tr>
+<tr><td><a href="../cases/store_di_id_suse">store_di_id_suse</a></td></tr>
+<tr><td><a href="../cases/di_check_box">di_check_box</a></td></tr>
+<tr><td><a href="../cases/selected_actions_click_delete">selected_actions_click_delete</a></td></tr>
+<tr><td><a href="../cases/di_wait_not_present_suse">di_wait_not_present_suse</a></td></tr>
+</tbody></table>
+</body>
+</html>

@@ -7,7 +7,7 @@ if  ( defined $ENV{BUILD_NUMBER} ) {
 	$SUF_VERSION = '.' . $ENV{BUILD_NUMBER} ;
 }
 
-my $build = new Module::Build(
+my $build = Module::Build->new(
 	module_name      => 'QVD::Config::Core',
 	dist_author       => 'QVD Team <qvd@qindel.com',
 	dist_version     => '3.5'.$SUF_VERSION,
@@ -20,7 +20,6 @@ my $build = new Module::Build(
 
 	requires => {
 		'Config::Properties' => 0,
-		'IO::Scalar' => 0,
 	}, 
 	usr_files => { 'usr/lib/qvd/config/sample-node.conf' => "/usr/lib/qvd/config/sample-node.conf", 'usr/lib/qvd/config/sample-vma.conf' => "/usr/lib/qvd/config/sample-vma.conf" },
 	install_path => { 'usr' => '/usr' },

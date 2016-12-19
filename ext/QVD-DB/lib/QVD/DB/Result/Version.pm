@@ -7,4 +7,6 @@ __PACKAGE__->add_columns( component => { data_type => 'varchar(100)' },
                           version   => { data_type => 'varchar(100)' } );
 __PACKAGE__->set_primary_key('component');
 
+
+
 1;

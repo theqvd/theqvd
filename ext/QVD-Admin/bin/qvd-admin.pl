@@ -10,11 +10,18 @@ use QVD::AdminCLI;
 use QVD::Log;
 
 my $filter = '';
+my $tenant_id = '';
 my $force = 0;
 my $quiet = '';
 my $help = '';
+my $debug = '';
 
-my $ret = GetOptions('filter|f=s' => \$filter, 'force' => \$force, 'quiet|q' => \$quiet, 'help|h' => \$help);
+my $ret = GetOptions('filter|f=s' => \$filter,
+                     'tenant|t=s' => \$tenant_id,
+                     'force' => \$force,
+                     'quiet|q' => \$quiet,
+                     'debug|d' => \$debug,
+                     'help|h' => \$help);
 $help = 1 unless $ret;
 
 my $object = shift @ARGV;
@@ -23,6 +30,8 @@ my @args = @ARGV;
 
 my $admin = QVD::AdminCLI->new($quiet, $force);
 $admin->set_filter($filter) if $filter;
+$admin->debug if $debug;
+$admin->set_tenant_id($tenant_id) if length $tenant_id;
 $admin->dispatch_command($object, $command, $help, @args);
 
 __END__

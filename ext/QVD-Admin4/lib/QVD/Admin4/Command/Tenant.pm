@@ -1,0 +1,88 @@
+package QVD::Admin4::Command::Tenant;
+use base qw( QVD::Admin4::Command );
+use strict;
+use warnings;
+use QVD::Admin4::Command;
+
+
+sub usage_text { 
+
+"======================================================================================================
+                                             TENANT COMMAND USAGE
+======================================================================================================
+
+== CREATING A NEW TENANT
+
+  tenant new <ARGUMENTS>
+  
+  For example: 
+  tenant name=mytenant (Creates a TENANT with name 'mytenant') 
+
+== GETTING TENANTs
+
+  tenant get
+  tenant <FILTERS> get
+  tenant <FILTERS> get <FIELDS TO RETRIEVE>
+
+  For example: 
+  tenant get (retrieves default fields of all TENANTs)
+  tenant name=mytenant get (retrieves default fields of all TENANTs with name 'mytenant')
+  tenant name=mytenant get name, id (retrieves 'name', 'id' of TENANTs with name 'mytenant') 
+
+  Ordering:
+
+  tenant ... order <ORDER CRITERIA>
+  tenant ... order <ORDER DIRECTION> <ORDER CRITERIA>
+
+  For example: 
+  tenant get order name (Ordering by 'name' in default ascendent order)
+  tenant get order asc name, id (Ordering by 'name' and 'id' in ascendent order)
+  tenant get order desc name, id (Ordering by 'name' and 'id' in descendent order)
+
+== UPDATING TENANTs
+
+  tenant set <ARGUMENTS>
+  tenant <FILTERS> set <ARGUMENTS>
+
+  For example: 
+  tenant set language=en (Sets new value for language in all TENANTs)
+  tenant name=mytenant set language=en, block=10 (Sets new values for language and block in TENANT with name mytenant)
+
+== REMOVING TENANTs
+  
+  tenant del
+  tenant <FILTERS> del
+
+  For example: 
+  tenant del (Removes all TENANTs) 
+  tenant name=mytenant del (Removes TENANT with name mytenant)
+
+== AVAILABLE PARAMETERS
+
+  The following parameters can be used as <FILTERS>, <ARGUMENTS>, <FIELDS TO RETRIEVE> or <ORDER CRITERIA>,
+  although some combinations may not be allowed and an error will be prompted:
+  
+  id        (ID of the Tenant)
+  name      (Name of the Tenant)
+  language  (Default language for all Administrator in the Tenant)
+  block     (Default block size for paginated queries for all Administrator in the Tenant)
+  blocked   (Flag that indicates whether the Tenant is blocked for administrators and users to access)
+
+$QVD::Admin4::Command::COMMON_USAGE_TEXT
+"
+
+}
+
+
+
+sub run 
+{
+    my ($self, $opts, @args) = @_;
+
+    $self->SUPER::run($opts,'tenant',@args);
+}
+
+
+1;
+
+

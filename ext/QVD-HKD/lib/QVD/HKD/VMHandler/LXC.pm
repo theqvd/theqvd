@@ -608,22 +608,24 @@ sub _run_hook {
     if (defined $meta) {
         my $hook = "$meta/hooks/$name";
         if (-f $hook) {
+            if ($self->_cfg("vm.lxc.hooks.allow")) {
             my @args = ( id      => $self->{vm_id},
                          hook    => $name,
                          state   => $self->_main_state,
                          os_meta => $meta,
                          $self->_hook_args );
 
-            $debug and $self->_debug("running hook $hook< for $name");
+            $debug and $self->_debug("running hook $hook for $name");
             DEBUG "Running hook '$hook' for '$name'";
             $self->_run_cmd( { skip_cmd_lookup => 1 },
                              $hook => @args);
             return;
-        } else {
-            WARN "Hook '$hook' for '$name' not found";
+            }
+            else {
+                WARN "Hook execution administratively disabled. Skipping hook '$hook' for '$name'";
+            }
         }
     }
-    $debug and $self->_debug("no hooks for $name");
     DEBUG "No hooks for '$name'";
     $self->_on_done;
 }

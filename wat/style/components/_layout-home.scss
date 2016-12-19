@@ -1,0 +1,187 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                @LAYOUT HOME: Layout of home
+                components/_layout-home.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+.home-wrapper {
+    @include table-base;
+    border: 0px;
+    table-layout: fixed;
+    margin-top: 20px;
+    width: 100%;
+    padding-bottom: 20px;
+    border-spacing: 10px;
+    border-collapse: separate;
+    
+    .home-row {
+        display: table;
+        table-layout: fixed;
+        width: 100%;   
+        
+        .home-cell {
+            .summary-element, &.home-pie {
+                cursor: pointer;
+            }
+            
+            display: block;
+            padding: 0px;
+            padding-bottom: 10px;
+            vertical-align: top;
+            
+            border: 1px solid lighten($menu_border, 10);
+            
+            &:hover {
+                border: 1px solid $menu_border;
+                background: darken($col_whiter, 2);
+                
+                .summary-element i:before {
+                    color: $menu_hover_bg;
+                }
+            }
+            
+            border-radius: 6px;
+            margin-top: 10px;
+            
+            @include in(desktop) {
+                margin-top: 0px;
+                display: table-cell;
+                padding: 15px;
+            }
+
+            text-align: center;
+
+            &>div {
+                margin: 0 auto;
+                display: block;
+            }
+
+            .home-title {
+                text-align: center;
+                margin: 10px 20px 30px 10px;
+            }
+
+            .summary-table {
+                @include table-base;
+                text-align: left;
+                width: 95%;
+                margin: 0px auto;
+
+                i {
+                    width: 20px;
+                    text-align: center;
+                }
+
+                td:last-child {
+                    font-weight: bold;
+                    font-size: 1em;
+                }
+            }
+                           
+            .bar-chart {
+                .flot-base, .flot-text, .flot-overlay {
+                    top: -6px !important;
+                }
+            }
+            
+            .home-percent-wrapper {
+                position: relative;
+                width: 200px;
+                height: 200px;
+
+                .pie-chart {
+                    width: 200px;
+                    height: 200px;
+                    position: absolute;
+                    cursor: pointer;
+                }
+
+                .home-percent {
+                    margin: 0;
+                    margin-top: 80px;
+                    position: absolute;
+                    width: 200px;
+                    padding: 0px;
+                    color: darken($col_whiter, 40);
+                    opacity: 0.5;
+                }
+            }
+            
+            .summary-element {
+                .summary-element-title {
+                    @include font-size(3);
+                    height: 2.5em;
+                    padding: 6px 2px;
+                }
+
+                .summary-element-icon {
+                    
+                    a {
+                        color: $col_blacker;
+                        
+                        &:hover i:before, &.hover i:before {
+                            color: $menu_hover_bg;
+                        }
+                    }
+                    
+                    i {
+                        font-size: 35px;
+                        width: 60px;
+                    }
+                    width: 60px;
+                    height: 60px;
+                    margin: 3px auto;
+                    background: darken($col_whiter, 5);
+                    border: darken($col_whiter, 10) 1px solid;
+                    border-radius: 100%;
+                    padding-top: 11px;
+                }
+
+                .summary-element-count {
+                    @include font-size(4);
+                    
+                    .summary-data {
+                        font-weight: bold;
+                    }
+                }
+                
+                .summary-element-subtable {
+                    width: auto;
+                    margin: 0 auto;
+                }
+            }
+        }
+    }
+    
+    .log-table {
+        @include table-base;
+        text-align: left;
+        width: 95%;
+        margin: 20px auto;
+
+        i {
+            width: 20px;
+            text-align: center;
+        }
+
+        td:last-child a {
+            padding-left: 10px;
+            @include in(desktop) {
+                padding-left: 50px;
+            }
+        }
+    }
+    
+    .summary-container {
+        margin: 0 auto;
+        @extend %clearfix;
+        width: 100%;
+        table-layout: fixed;
+        
+    }
+}

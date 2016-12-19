@@ -1,0 +1,187 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                @LAYOUT LIST: Layout of list view
+                components/_layout-list.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+
+.filter {
+    display: none;
+    @include in(desktop) {
+        display: block;
+    }
+
+    margin-bottom: 15px;
+
+    width: ($width_list_side - 2) * 1%;
+    height: auto;
+    background: darken($col_whiter, 3);
+    border: 2px solid darken($col_whiter, 7);
+    padding: 9px;
+    border-radius: 6px;
+    
+    i.fa {
+        margin-right: 8px;
+    }
+
+    .filter-control {
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    @if $list_side == left {
+        float: left;
+        padding-right: 1%;
+        margin-right: 2%;
+    }
+    @else if $list_side == right {
+        float: right;
+        padding-left: 1%;
+        margin-left: 1%;
+    }
+
+    hr {
+        border: 0px;
+        height: 1px;
+        background: darken($col_whiter, 15);
+        width: 100%;
+    }
+    
+    .chosen-results li {
+        line-height: 1.4em;
+        font-size: 12px;
+    }
+}
+
+.list-block, .details-side {        
+    @include in(desktop) {
+        float: left;
+        width: ($width_list_content) * 1%;
+    }
+
+    .filter-mobile {
+        margin-bottom: 15px;
+
+        .filter-control {
+            margin-bottom: 10px;
+            display: block;
+        }
+    }
+
+    .list-navigation {
+        position: relative;
+        width: 100%;
+        @extend %clearfix;
+
+        @include in(desktop) {
+            margin-bottom: 0px;
+        }
+
+        .pagination {
+            margin-bottom: 10px;
+            text-align: center;
+            
+            @include in(desktop) {
+                margin-bottom: 10px;
+                padding: 0px;
+                height: auto;
+                //width: 49%;
+                float: right;
+                text-align: right;
+                margin-top: 6px;
+            }
+            
+            a {
+                padding: 3px 10px;
+                line-height: 30px;
+                @include in(desktop) {
+                    line-height: 18px;
+                }
+
+            }
+        }
+
+        .action-new-item {
+            @extend %clearfix;
+            margin-bottom: 10px;
+            margin-top: -10px;
+            @include in(desktop) {
+                float: left;
+            }
+        }
+
+    }
+    
+    .shown-elements {
+        margin-top: 9px;
+        float: right;
+    }    
+    
+    .selected-elements {
+        margin-top: 9px;
+        float: left;
+        color: $col_whiter;
+    }
+}
+
+.more-tags {
+    margin-top: 8px;
+}
+
+fieldset {
+    @extend %clearfix;
+    width: 100%;
+    clear: both;
+
+    background: darken($col_whiter, 3);
+    border: 2px solid darken($col_whiter, 7);
+    padding: 20px;
+    
+    &.action-select {
+        margin-top: 60px;
+    }  
+    
+    &.action-selected {
+        margin-top: 35px;
+        display: none;
+        position: fixed;
+        top: 50px;
+        right: 10px;
+
+        width: 100px;
+
+        @include in(desktop) {
+        width: 250px;
+        }        
+        
+        a.button, a.button2 {
+            @include in(mobile) {
+                text-align: center;
+            }
+        }
+        min-height: 100px;
+        background: lighten($col_blacker, 10);
+
+        .title {
+            color: $col_whiter;
+            margin-bottom: 20px;
+            font-weight: bold;
+            line-height: 20px;
+    }
+    } 
+
+    .chosen-container {
+        margin-top: -6px;
+    }       
+
+    legend {
+        text-align: left;
+        color: $col_blacker;
+        padding: 0px 10px;
+    }
+}

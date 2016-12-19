@@ -162,9 +162,13 @@ sub new {
 	
     if ( core_cfg('client.show.settings') ) {
         $tab_ctl = Wx::Notebook->new($self, -1, wxDefaultPosition, wxDefaultSize, 0, "tab");
+        $self->{tab_ctl} = $tab_ctl;
     }
     
     my $panel = $self->{panel} = Wx::Panel->new($tab_ctl // $self, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL ); # / broken highlighter
+
+    $panel->SetBackgroundColour(Wx::Colour->new(217,217,217));
+
     
     if ( $tab_ctl ) {
         $tab_ctl->AddPage( $panel, $self->_t("Connect") );
@@ -174,58 +178,122 @@ sub new {
         
         
         $settings_panel = Wx::Panel->new($tab_ctl, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+        $self->{settings_panel} = $settings_panel;
+        $settings_panel->SetBackgroundColour(Wx::Colour->new(255,255,255));
         $tab_ctl->AddPage( $settings_panel, $self->_t("Settings"));
-        my $settings_sizer = Wx::BoxSizer->new(wxVERTICAL);
+        my $settings_sizer = Wx::GridBagSizer->new(0,0);
         $settings_panel->SetSizer($settings_sizer);
         
+        ###############################
+
+        my $this_text = Wx::StaticText->new($settings_panel, -1, $self->_t("Options"));
+        $this_text->SetFont(Wx::Font->new(10,wxDEFAULT,wxDEFAULT,wxBOLD,0,""));
+        $settings_sizer->Add( $this_text , Wx::GBPosition->new(0,0), Wx::GBSpan->new(1,1) , wxTOP|wxLEFT|wxEXPAND, 10);
+
+        $settings_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Enable audio")),Wx::GBPosition->new(1,0), Wx::GBSpan->new(1,1), wxLEFT, 10);
+        $self->{audio} = Wx::CheckBox->new($settings_panel, -1, "" , wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, wxDefaultValidator, "checkBox");
+        $self->{audio}->SetValue( core_cfg("client.audio.enable" ) );
+        $settings_sizer->Add($self->{audio},Wx::GBPosition->new(1,1), Wx::GBSpan->new(1,1), wxALL, 0);
+
+        $settings_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Enable printing")),Wx::GBPosition->new(2,0), Wx::GBSpan->new(1,1), wxLEFT, 10);
+        $self->{printing} = Wx::CheckBox->new($settings_panel, -1, "", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, wxDefaultValidator, "checkBox");
+        $self->{printing}->SetValue( core_cfg("client.printing.enable" ) );
+        $settings_sizer->Add($self->{printing},Wx::GBPosition->new(2,1), Wx::GBSpan->new(1,1), wxALL, 0);
+
+        $settings_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Full screen")),Wx::GBPosition->new(3,0), Wx::GBSpan->new(1,1), wxLEFT, 10);
+        $self->{fullscreen} = Wx::CheckBox->new($settings_panel, -1, "", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, wxDefaultValidator, "checkBox");
+        $self->{fullscreen}->SetValue( core_cfg("client.fullscreen" ) );
+        $settings_sizer->Add($self->{fullscreen},Wx::GBPosition->new(3,1), Wx::GBSpan->new(1,1), wxALL, 0);
 
         ###############################
-        $settings_sizer->Add( Wx::StaticText->new($settings_panel, -1, $self->_t("Connection")), 0, wxALL, 5);
-        $settings_sizer->Add( Wx::StaticLine->new($settings_panel, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL, "line"), 0, wxEXPAND | wxLEFT | wxRIGHT, 5 );
+
+        if (!core_cfg('client.force.host.name', 0) or !core_cfg('client.force.link', 0) ) {
+        my $this_text = Wx::StaticText->new($settings_panel, -1, $self->_t("Connectivity"));
+        $this_text->SetFont(Wx::Font->new(10,wxDEFAULT,wxDEFAULT,wxBOLD,0,""));
+        $settings_sizer->Add( $this_text ,Wx::GBPosition->new(4,0), Wx::GBSpan->new(1,1), wxTOP|wxLEFT|wxEXPAND, 10);
+        }
+
+        if (!core_cfg('client.force.host.name', 0)) {
+            $settings_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Server")),Wx::GBPosition->new(5,0), Wx::GBSpan->new(1,1), wxLEFT, 10);
+            $self->{host} = Wx::TextCtrl->new($settings_panel, -1, core_cfg('client.host.name'),wxDefaultPosition,[160,30]);
+            $settings_sizer->Add($self->{host},Wx::GBPosition->new(5,1), Wx::GBSpan->new(1,3), wxLEFT|wxRIGHT, 10);
+        }
+
+        if (!core_cfg('client.force.link', 0)) {
+            $settings_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Connection type")),Wx::GBPosition->new(6,0), Wx::GBSpan->new(1,1), wxLEFT, 10);
+            my @link_options = ("Local", "ADSL", "Modem");
+            $self->{link} = Wx::Choice->new($settings_panel, -1, wxDefaultPosition, [160,30]);
+            $settings_sizer->Add($self->{link},Wx::GBPosition->new(6,1), Wx::GBSpan->new(1,3), wxLEFT|wxRIGHT, 10);
+            $self->{link}->AppendItems(\@link_options);
+
+        my $link_select;
+        if ( core_cfg('client.link') eq "lan" || core_cfg('client.link') eq "local") {
+                $link_select = 0 ;
+        }
+        elsif ( core_cfg('client.link') eq "adsl" || core_cfg('client.link') eq "wan" ) {
+                $link_select = 1 ;
+        }
+        elsif ( core_cfg('client.link') eq "modem" || core_cfg('client.link') eq "isdn") {
+                $link_select = 2;
+        }
+        else {
+                $link_select = 1;
+        }
+            $self->{link}->Select($link_select);
+        }
 
 
-        $self->{audio} = Wx::CheckBox->new($settings_panel, -1, $self->_t("Enable audio"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
-        $self->{audio}->SetValue( core_cfg("client.audio.enable" ) );
-        $settings_sizer->Add($self->{audio});
+        #######################
+        # Sharing
+        ########################
 
-        $self->{printing} = Wx::CheckBox->new($settings_panel, -1, $self->_t("Enable printing"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
-        $self->{printing}->SetValue( core_cfg("client.printing.enable" ) );
-        $settings_sizer->Add($self->{printing});
+        my $this_text = Wx::StaticText->new($settings_panel, -1, $self->_t("Share"));
+        $this_text->SetFont(Wx::Font->new(10,wxDEFAULT,wxDEFAULT,wxBOLD,0,""));
+        $settings_sizer->Add( $this_text ,Wx::GBPosition->new(7,0), Wx::GBSpan->new(1,1), wxTOP|wxLEFT|wxEXPAND, 10);
 
-        $self->{forwarding} = Wx::CheckBox->new($settings_panel, -1, $self->_t("Enable port forwarding"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
-        $self->{forwarding}->SetValue( core_cfg("client.slave.enable" ) );
-        $settings_sizer->Add($self->{forwarding});
+        $settings_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Enable shared folders")),Wx::GBPosition->new(8,0), Wx::GBSpan->new(1,1), wxLEFT, 10);
+        $self->{share_enable} = Wx::CheckBox->new($settings_panel, -1, "", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, wxDefaultValidator, "checkBox");
+        $self->{share_enable}->SetValue( core_cfg("client.file_sharing.enable" ) );
+        $settings_sizer->Add($self->{share_enable},Wx::GBPosition->new(8,1), Wx::GBSpan->new(1,1), wxALL, 0 );
+
+        $self->{share_add} = Wx::Button->new($settings_panel, -1, $self->_t("Add"));
+        $settings_sizer->Add($self->{share_add},Wx::GBPosition->new(8,2), Wx::GBSpan->new(1,1), wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 10);
+        $self->{share_add}->SetDefault;
+
+        $self->{share_del} = Wx::Button->new($settings_panel, -1, $self->_t("Remove"));
+        $settings_sizer->Add($self->{share_del},Wx::GBPosition->new(8,3), Wx::GBSpan->new(1,1), wxRIGHT|wxBOTTOM|wxEXPAND, 10);
+        $self->{share_del}->SetDefault;
+
+        $self->{share_list} = Wx::ListBox->new($settings_panel, -1, wxDefaultPosition, [400,130] ,  [] , wxLB_EXTENDED|wxLB_NEEDED_SB|wxLB_SORT , wxDefaultValidator, "sharedFoldersList");
+        $settings_sizer->Add($self->{share_list},Wx::GBPosition->new(9,0), Wx::GBSpan->new(1,4), wxLEFT|wxRIGHT|wxEXPAND , 10);
+
+
+        #######################
+        # USB
+        ########################
 
         if ( !$WINDOWS && !$DARWIN ) {
-            $self->{usb_redirection} = Wx::CheckBox->new($settings_panel, -1, $self->_t("Enable USB redirection"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "checkBox");
+            $settings_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Enable USB redirection")),Wx::GBPosition->new(10,0), Wx::GBSpan->new(1,1), wxLEFT, 10);
+            $self->{usb_redirection} = Wx::CheckBox->new($settings_panel, -1, "", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, wxDefaultValidator, "checkBox");
             $self->{usb_redirection}->SetValue( core_cfg("client.usb.enable" ) );
-            $settings_sizer->Add($self->{usb_redirection});
+            $settings_sizer->Add($self->{usb_redirection},Wx::GBPosition->new(10,1), Wx::GBSpan->new(1,1),wxALL,0);
         
-            $self->{usbip_devices} = Wx::TextCtrl->new($settings_panel, -1, core_cfg('client.usb.share_list') ?  core_cfg('client.usb.share_list') : "");
-            $settings_sizer->Add($self->{usbip_devices}, 0, wxEXPAND);
-        
-            $self->{usbip_list_button} = Wx::Button->new($settings_panel, -1, $self->_t("Select devices"));
-            $settings_sizer->Add($self->{usbip_list_button});            
-            Wx::Event::EVT_BUTTON($settings_panel, $self->{usbip_list_button}->GetId, sub { select_usb_devices($self); });
-            
-            
+            $self->{usbip_device_list} = Wx::CheckListBox->new($settings_panel, -1, wxDefaultPosition, [400,130] ,  [] , wxLB_EXTENDED|wxLB_NEEDED_SB , wxDefaultValidator, "usbip_devices");
+            $settings_sizer->Add($self->{usbip_device_list},Wx::GBPosition->new(11,0), Wx::GBSpan->new(1,4), wxLEFT|wxRIGHT|wxEXPAND , 10);
 
-    
-            
-            
+        
         }
-        
-        
-        $settings_sizer->AddSpacer(5);
 
-        ###############################
-        $settings_sizer->Add( Wx::StaticText->new($settings_panel, -1, $self->_t("Screen")), 0, wxALL, 5);
-        $settings_sizer->Add( Wx::StaticLine->new($settings_panel, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL, "line"), 0, wxEXPAND | wxLEFT | wxRIGHT, 5 );
+        # Register all events related to settings tab
+        Wx::Event::EVT_BUTTON($self, $self->{share_add}->GetId, \&share_add);
+        Wx::Event::EVT_BUTTON($self, $self->{share_del}->GetId, \&share_del);
+    
+        Wx::Event::EVT_CHECKBOX($self, $self->{share_enable}->GetId, \&OnClickSharedFolders);
+        Wx::Event::EVT_CHECKBOX($self, $self->{usb_redirection}->GetId, \&OnClickUSBShare) if defined($self->{usb_redirection});
+    
+        Wx::Event::EVT_NOTEBOOK_PAGE_CHANGED($self, $self->{tab_ctl}->GetId, \&OnTabChange);
 
-        $self->{fullscreen} = Wx::CheckBox->new($settings_panel, -1, $self->_t("Full screen"));
-        $self->{fullscreen}->SetValue( core_cfg("client.fullscreen" ) );
-        $settings_sizer->Add($self->{fullscreen}, 0, wxALL, 5);
-        
+
     }
 
     my $ver_sizer  = Wx::BoxSizer->new(wxVERTICAL);
@@ -233,18 +301,17 @@ sub new {
     my $bm_logo_big = Wx::Bitmap->new(File::Spec->join($QVD::Client::App::pixmaps_dir, 'qvd-big.png'),
                                       wxBITMAP_TYPE_ANY);
     $ver_sizer->Add( Wx::StaticBitmap->new($panel, -1, $bm_logo_big),
-                     0, wxLEFT|wxRIGHT|wxTOP|wxALIGN_CENTER_HORIZONTAL, 20 );
+                     0, wxTOP|wxALIGN_CENTER_HORIZONTAL, 100 );
 
-    my $grid_sizer = Wx::GridSizer->new(1, 2, 0, 0);
+
+    my $grid_sizer = Wx::GridSizer->new(1, 1, -5, 0);
     $ver_sizer->Add($grid_sizer, 1, wxALL|wxEXPAND, 20);
 
-    $grid_sizer->Add(Wx::StaticText->new($panel, -1, $self->_t("User")), 0, wxALL, 5);
-    $self->{username} = Wx::TextCtrl->new($panel, -1, core_cfg('client.remember_username') ?  core_cfg('client.user.name') : "");
-    $grid_sizer->Add($self->{username}, 1, wxALL|wxEXPAND, 5);
+    $self->{username} = Wx::TextCtrl->new($panel, -1, core_cfg('client.remember_username') ?  core_cfg('client.user.name') : "", wxDefaultPosition, wxDefaultSize);
+    $grid_sizer->Add($self->{username}, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5);
 
-    $grid_sizer->Add(Wx::StaticText->new($panel, -1, $self->_t("Password")), 0, wxALL, 5);
-    $self->{password} = Wx::TextCtrl->new($panel, -1, core_cfg('client.user.password') ?  core_cfg('client.user.password') : '', wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
-    $grid_sizer->Add($self->{password}, 0, wxALL|wxEXPAND, 5);
+    $self->{password} = Wx::TextCtrl->new($panel, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+    $grid_sizer->Add($self->{password}, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5);
 
     if (core_cfg('client.show.remember_password')) {
         $grid_sizer->Add(Wx::StaticText->new($panel, -1, $self->_t("Remember password")), 0, wxALL, 5);
@@ -252,39 +319,6 @@ sub new {
         $self->{remember_pass}->SetValue(core_cfg('client.remember_password') ? 1 : 0);
         $grid_sizer->Add($self->{remember_pass}, 1, wxALL, 5);
     }
-
-    if (!core_cfg('client.force.host.name', 0)) {
-        $grid_sizer->Add(Wx::StaticText->new($panel, -1, $self->_t("Server")), 0, wxALL, 5);
-        $self->{host} = Wx::TextCtrl->new($panel, -1, core_cfg('client.host.name'));
-        $grid_sizer->Add($self->{host}, 1, wxALL|wxEXPAND, 5);
-    }
-
-    if (!core_cfg('client.force.link', 0)) {
-        $grid_sizer->Add(Wx::StaticText->new($panel, -1, $self->_t("Connection type")), 0, wxALL, 5);             
-        my @link_options = ("Local", "ADSL", "Modem");
-        $self->{link} = Wx::Choice->new($panel, -1);
-        $grid_sizer->Add($self->{link}, 1, wxALL|wxEXPAND, 5);
-        $self->{link}->AppendItems(\@link_options);
-
-	my $link_select; 
-	if ( core_cfg('client.link') eq "lan" || core_cfg('client.link') eq "local") {
-		$link_select = 0 ; 
-	}
-	elsif ( core_cfg('client.link') eq "adsl" || core_cfg('client.link') eq "wan" ) {
-		$link_select = 1 ; 
-	}
-	elsif ( core_cfg('client.link') eq "modem" || core_cfg('client.link') eq "isdn") {
-		$link_select = 2; 
-	}
-	else {
-		$link_select = 1; 
-	}	
-        $self->{link}->Select($link_select);
-    }
-
-    $grid_sizer->Add(Wx::StaticText->new($panel, -1, $self->_t("Kill current VM")), 0, wxALL, 5);
-    $self->{kill_vm} = Wx::CheckBox->new ($panel, -1, '', wxDefaultPosition);
-    $grid_sizer->Add($self->{kill_vm});
 
     if ($DARWIN && !core_cfg('client.darwin.screen_resolution.verified')) {
 	my @min_res = split(/x/, core_cfg('client.darwin.screen_resolution.min'));
@@ -315,13 +349,22 @@ sub new {
     }
 
     # port goes here!
-    $self->{connect_button} = Wx::Button->new($panel, -1, $self->_t("Connect"));
-    $ver_sizer->Add($self->{connect_button}, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 20);
+    $self->{connect_button} = Wx::Button->new($panel, -1, $self->_t("Connect"),wxDefaultPosition,wxDefaultSize);
+    $self->{connect_button}->SetBackgroundColour(Wx::Colour->new(229,90,0));
+    $self->{connect_button}->SetForegroundColour(Wx::Colour->new(255,255,255));
+    $grid_sizer->Add($self->{connect_button}, 0, wxALIGN_TOP|wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5);
     $self->{connect_button}->SetDefault;
+
+    $self->{kill_vm} = Wx::CheckBox->new ($panel, -1, $self->_t("Restart session"), wxDefaultPosition,wxDefaultSize);
+    $grid_sizer->Add($self->{kill_vm},0,wxALIGN_LEFT|wxALIGN_TOP|wxALL,5);
+
+    $ver_sizer->AddSpacer(100);
 
     $self->{progress_bar} = Wx::Gauge->new($panel, -1, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL|wxGA_SMOOTH);
     $self->{progress_bar}->SetValue(0);
     $ver_sizer->Add($self->{progress_bar}, 0, wxEXPAND, 0);
+
+    $ver_sizer->Add( Wx::HyperlinkCtrl->new( $panel , -1, 'Qindel Group '.chr(169).' 2016 | '.$self->_t('Terms of use'),'http://theqvd.com/product/demo-old/terms-of-service',wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL , ''), 0 , wxALIGN_CENTER_HORIZONTAL, 5 );
 
     $self->SetTitle("QVD");
     my $icon = Wx::Icon->new();
@@ -334,8 +377,9 @@ sub new {
 
     if ( $tab_ctl ) {
          $ver_sizer->Fit($tab_ctl);
-         $self->SetSizer($tab_sizer);
          $tab_sizer->Fit($self);
+         $self->OnClickSharedFolders();
+         $self->OnClickUSBShare() if defined($self->{usb_redirection});
     } else {
          $ver_sizer->Fit($self);
     }
@@ -359,6 +403,13 @@ sub new {
     $self->{proc} = undef;
     $self->{proc_pid} = undef;
     $self->{log} = "";
+    $self->{shares} = [];
+    $self->{usb_devices} = [];
+    $self->{disconnected_usb_devices} = [];
+
+
+    $self->load_share_list();
+    $self->load_usb_devices() if defined($self->{usb_redirection});
 
 	if( $ENV{QVD_PP_BUILD} ) {
 		INFO "Being called from PP build. Exiting.";
@@ -397,7 +448,7 @@ sub RunWorkerThread {
 
 sub proxy_unknown_cert {
     my $self = shift;
-    my $msg :shared = $self->_shared_clone(shift);
+    my $msg :shared = shared_clone(shift);
     my $evt = new Wx::PlThreadEvent(-1, EVT_UNKNOWN_CERT, $msg);
     Wx::PostEvent($self, $evt);
 
@@ -407,7 +458,8 @@ sub proxy_unknown_cert {
 
 sub proxy_list_of_vm_loaded {
     my $self = shift;
-    my $vm_data :shared = $self->_shared_clone(shift);
+    my $list = shift;
+    my $vm_data :shared = shared_clone($list);
     if (@$vm_data > 1) {
         lock($vm_id);
         my $evt = new Wx::PlThreadEvent(-1, EVT_LIST_OF_VM_LOADED, $vm_data);
@@ -437,7 +489,7 @@ sub proxy_connection_error {
 sub proxy_set_environment {
     my $self = shift;
     my %args = @_;
-    my $shared_args :shared = $self->_shared_clone(\%args);
+    my $shared_args :shared = shared_clone(\%args);
 
     lock($set_env);
     Wx::PostEvent($self, new Wx::PlThreadEvent(-1, EVT_SET_ENVIRONMENT, $shared_args));
@@ -470,7 +522,7 @@ sub OnClickConnect {
         keyboard      => $self->DetectKeyboard,
         port          => $DEFAULT_PORT,
         ssl           => $USE_SSL,
-        host          => core_cfg('client.force.host.name', 0) // $self->{host}->GetValue,
+        host          => core_cfg('client.force.host.name', 0) // core_cfg('client.host.name'),
         (map { $_ => $self->{$_}->GetValue } grep { defined $self->{$_} } qw(username password kill_vm)),
     );
 
@@ -507,6 +559,51 @@ sub OnClickConnect {
         lock(%connect_info);
         cond_signal(%connect_info);
     }
+}
+
+
+sub OnClickSharedFolders {
+    my( $self, $event ) = @_;
+
+    if ( $self->{share_enable}->GetValue() ){
+        # Enable picking
+        $self->{share_add}->Show(1);
+        $self->{share_del}->Show(1);
+        $self->{share_list}->Show(1);
+    }else{
+        # Disable picking
+        $self->{share_add}->Show(0);
+        $self->{share_del}->Show(0);
+        $self->{share_list}->Show(0);
+    }
+
+    $self->{settings_panel}->Layout();
+
+}
+
+sub OnClickUSBShare {
+    my( $self, $event ) = @_;
+
+    if ( $self->{usb_redirection}->GetValue() ){
+        # Enable device list
+        $self->{usbip_device_list}->Show(1);
+    }else{
+        # Disable device list
+        $self->{usbip_device_list}->Show(0);
+    }
+
+    $self->{settings_panel}->Layout();
+
+}
+
+sub OnTabChange {
+    my( $self, $event ) = @_;
+
+    # We only save settings when we're leaving the settings tab
+    if ( $self->{tab_ctl}->GetPageText($event->GetOldSelection()) eq 'Settings' ){
+        $self->SaveConfiguration();
+    } 
+
 }
 
 sub OnConnectionError {
@@ -911,6 +1008,14 @@ sub OnExit {
         cond_signal(%connect_info);
         $self->{worker_thread}->join();
     }
+
+    $self->SaveConfiguration();
+    if ( $self->{worker_thread} && $self->{worker_thread}->is_running() ){
+        undef %connect_info ;
+        cond_signal(%connect_info);
+        $self->{worker_thread}->join();
+    }
+
     $self->Destroy();
 }
 
@@ -930,16 +1035,30 @@ sub OnSetEnvironment {
     cond_signal $set_env;
 }
 
-sub select_usb_devices {
-	my ($self) = @_;
+sub load_usb_devices {
+    my ($self) = shift;
+    
+    my $usb = QVD::Client::USB::instantiate( core_cfg('client.usb.implementation') );
+    my @devices = @{ $usb->list_devices };
+    my @selected;
+    
+    foreach my $d ( @devices ){
+    	
+        my $dev = $d->{vendor} . " " . $d->{product} 
+            .  " (" . $d->{vid} . ":" . $d->{pid} 
+            . ( $d->{serial} ? '@' . $d->{serial} : "") . ")";
+        push @{$self->{usb_devices}} , $dev;
+    }
 
-	my $usb = QVD::Client::USB::instantiate( core_cfg('client.usb.implementation') );
-	my @devices = @{ $usb->list_devices };
-	my @selected;
-	my $cursel = $self->{usbip_devices}->GetValue();
+    $self->{usbip_device_list}->InsertItems( $self->{usb_devices}, 0 ) if ( defined $self->{tab_ctl} );
+
+
+
+	# Build selection list from our saved config
+
+	my $cursel = core_cfg('client.usb.share_list', '');
 	my @parts = split(/,/, $cursel);
 
-	# Build selection list from the contents of the textbox
 	foreach my $part (@parts) {
 		my ($v, $p, $id);
 		$part =~ s/^\s+//;
@@ -948,43 +1067,52 @@ sub select_usb_devices {
 		($v, $p) = split(/:/, $part);
 		($p, $id) = split(/@/, $p) if ( $p =~ /@/ );
 
+                my $is_connected=0;
 		for(my $i=0;$i<=scalar @devices;$i++) {
 			my $d = $devices[$i];
 			if ( $d->{vid} eq $v && $d->{pid} eq $p && (!defined $id || $d->{serial} eq $id)) {
 				push @selected, $i;
+                                $is_connected=1;
 			}
 		}
+                if ( ! $is_connected ) {
+                    # Make sure we don't forget about devices although they're not connected now
+                    push @{$self->{disconnected_usb_devices}}, $v.":".$p.( defined $id ? "@".$id : '');
+                }
 	}
+
+	foreach my $i (@selected){
+		$self->{usbip_device_list}->Check($i,1);
+	}
+
+}
+
+sub share_del {
+    my ($self) = @_;
+
+    my ($first_selection) = $self->{share_list}->GetSelections();
+    $self->{share_list}->Delete($first_selection);
+    splice @{$self->{shares}}, $first_selection,1;
+}
+
+sub share_add {
+    my ($self) = @_;
+    my $dialog = Wx::DirDialog->new($self, $self->_t("Select the folder to share"), "");  
+    $dialog->ShowModal();
+    my $selected = $dialog->GetPath();
     
-	my $dialog = new Wx::MultiChoiceDialog(
-		$self, 
-		$self->_t("Select the USB devices to share:"), 
-		$self->_t("USB sharing"), 
-		[
-		map {
-			$_->{vendor} . " " . $_->{product} . 
-			" (" . $_->{vid} . ":" . $_->{pid} . ( $_->{serial} ? '@' . $_->{serial} : "") . ")";
-		} @devices
-		],
-	);
+    if ( $selected ) {
+        push @{ $self->{shares} }, $selected;
+        $self->update_share_list();
+    }
+}
 
-	$dialog->SetSelections(@selected);
+sub share_del {
+    my ($self) = @_;
 
-        if ( $dialog->ShowModal() == wxID_OK ) {
-		my @selected = $dialog->GetSelections();
-		
-		my $devs = "";
-		foreach my $sel (@selected) {
-			my $d = $devices[$sel];
-			
-			$devs .= ", " if ( $devs ne "" );
-			$devs .= $d->{vid} . ":" . $d->{pid};
-			$devs .= '@' . $d->{serial} if ( $d->{serial} );
-		}
-		
-		$self->{usbip_devices}->SetValue( $devs );
-	}
-
+    my ($first_selection) = $self->{share_list}->GetSelections();
+    $self->{share_list}->Delete($first_selection);
+    splice @{$self->{shares}}, $first_selection,1;
 }
 
 
@@ -993,6 +1121,19 @@ sub select_usb_devices {
 # Helpers
 #
 ################################################################################
+
+
+sub update_share_list() {
+    my ($self) = @_;
+
+    $self->{shares} //= [];
+    my %tmp = map { $_ => 1 } @{$self->{shares}};
+    $self->{shares} = [ sort keys %tmp ];
+    $self->{share_list}->Clear();
+    $self->{share_list}->InsertItems( $self->{shares}, 0 );
+
+}
+
 
 sub DetectKeyboard {
 
@@ -1039,8 +1180,8 @@ sub DetectKeyboard {
 sub EnableControls {
     my ($self, $enabled) = @_;
     $self->{$_}->Enable($enabled) for qw(connect_button username password);
-    if (!core_cfg('client.force.link',      0)) { $self->{link}->Enable($enabled); }
-    if (!core_cfg('client.force.host.name', 0)) { $self->{host}->Enable($enabled); }
+    if (!core_cfg('client.force.link',      0)) { $self->{link}->Enable($enabled) if( $self->{tab_ctl}); }
+    if (!core_cfg('client.force.host.name', 0)) { $self->{host}->Enable($enabled) if( $self->{tab_ctl}); }
 }
 
 sub SaveConfiguration {
@@ -1051,11 +1192,11 @@ sub SaveConfiguration {
         # If remembering the username is disabled, erase any previously stored value
         set_core_cfg('client.user.name', "");
     }
-    if (!core_cfg('client.force.host.name', 0)) {
+    if (!core_cfg('client.force.host.name', 0) and $self->{host}) {
         set_core_cfg('client.host.name', $self->{host}->GetValue());
     }
     #set_core_cfg('client.host.port', $self->{port}->GetValue());
-    if (!core_cfg('client.force.link', 0)) {
+    if (!core_cfg('client.force.link', 0) and $self->{link}) {
         set_core_cfg('client.link', lc($self->{link}->GetStringSelection()));
     }
 
@@ -1063,8 +1204,23 @@ sub SaveConfiguration {
         set_core_cfg('client.remember_password', ($self->{remember_pass}->IsChecked() ? 1 : 0));
     }
 
-    if ($self->{usbip_devices}) {
-        set_core_cfg('client.usb.share_list', $self->{usbip_devices}->GetValue());
+    if ($self->{usbip_device_list}) {
+        my $usb_list;
+        # If it was checked, save it
+        foreach my $usb_t ( @{ $self->{usb_devices} } ){
+            if ( $self->{usbip_device_list}->IsChecked( $self->{usbip_device_list}->FindString($usb_t) ) ){
+                my $usb = $usb_t;  # Do not modify the original contents of usb_devices
+                $usb =~ s/.*\((.*)\)/$1/;
+                $usb_list .= "," if ( $usb_list );
+                $usb_list .= $usb ;
+            }
+	}
+        # If it is in the disconnected list, it was checked before. Don't forget about it
+        foreach my $disconnected ( @{ $self->{disconnected_usb_devices} } ){
+            $usb_list .= "," if ( $usb_list );
+            $usb_list .= $disconnected;
+        }
+	set_core_cfg('client.usb.share_list', ($usb_list ? $usb_list : "") );
         set_core_cfg('client.usb.enable', $self->{usb_redirection}->GetValue()); 
     }
     
@@ -1075,6 +1231,18 @@ sub SaveConfiguration {
     set_core_cfg('client.slave.enable', $self->{forwarding}->GetValue())  if ( $self->{forwarding} );
     
     #set_core_cfg('client.geometry', $self->{geometry}->GetValue());
+
+    set_core_cfg('client.file_sharing.enable', $self->{share_enable}->IsChecked() ? 1 : 0) if ($self->{share_enable});
+
+    my $share_num=0;
+    foreach my $share (@{ $self->{shares} }) {
+        set_core_cfg("client.share.$share_num", $share);
+        $share_num++;
+    }
+
+    set_core_cfg("client.share.$share_num", "");
+
+
 
     local $@;
     eval { save_core_cfg($QVD::Client::App::user_config_filename) };
@@ -1087,27 +1255,61 @@ sub SaveConfiguration {
     }
 }
 
-sub start_file_sharing {
-    my $slave_client_proc;
-    if (core_cfg('client.slave.enable', 1) && core_cfg('client.file_sharing.enable', 1)) {
-        #my $slave_client_cmd = $QVD::Client::App::app_dir . '/bin/qvd-slaveclient';
-        my @shares;
+
+sub load_share_list {
+    my ($self) = @_;
+    $self->{shares} = [];
+
+ 
+    if ( core_cfg("client.share.0", 0) ne "" ) {
+        my $num = 0;
+        my $dir;
+        while( ($dir = core_cfg("client.share.$num", 0)) ne "" ) {
+            push @{$self->{shares}}, $dir;
+            $num++;
+        }
+    } else {
         if ($WINDOWS) {
             # User's home + all drives
-            push @shares, $ENV{USERPROFILE};
+            push @{ $self->{shares} }, $ENV{USERPROFILE};
+            DEBUG "Sharing user profile: $ENV{USERPROFILE}";
+
             eval "use Win32API::File";
             for my $drive (Win32API::File::getLogicalDrives()) {
-            	push @shares, $drive if -d $drive;
+                my $dt = Win32API::File::GetDriveType($drive);
+                if (!-d $drive) {
+                    DEBUG "Not sharing $drive: not a directory";
+                    next;
+                }
+
+                unless($dt == Win32API::File::DRIVE_REMOVABLE() || $dt == Win32API::File::DRIVE_CDROM()) {
+                    DEBUG "Not sharing $drive: not removable nor CD-ROM. Type: $dt";
+                    next;
+                }
+                
+                push @{$self->{shares}}, $drive;
             }
         } else {
             # User's home + /media
-            push @shares, $ENV{HOME};
-            push @shares, '/media' if -e '/media';
-            push @shares, '/Volumes' if -e '/Volumes'; # For OS X
+            push @{$self->{shares}}, $ENV{HOME};
+            push @{$self->{shares}}, '/media' if -e '/media';
+            push @{$self->{shares}}, '/Volumes' if -e '/Volumes'; # For OS X
         }
+    }
+ 
+    $self->update_share_list() if ( defined $self->{tab_ctl} );
+
+}
+
+
+sub start_file_sharing {
+    my ($self) = @_;
+
+    my $slave_client_proc;
+    if (core_cfg('client.slave.enable', 1) && core_cfg('client.file_sharing.enable', 1)) {
 
         use QVD::Client::SlaveClient;
-        for my $share (@shares) {
+        for my $share (@{ $self->{shares} }) {
             INFO("Starting folder sharing for $share");
             for (my $conn_attempt = 0; $conn_attempt < 10; $conn_attempt++) {
                 local $@;
@@ -1182,25 +1384,6 @@ sub start_remote_mounts {
 	
 		$num++;
 	}
-}
-
-
-# threads::shared doesn't have shared_clone on Ubuntu 9.10
-sub _shared_clone {
-    my ($self, $ref) = @_;
-    my $type = ref $ref;
-    if ($type eq 'ARRAY') {
-        my @arr :shared = map { $self->_shared_clone($_); } @$ref;
-        return \@arr;
-    } elsif ($type eq 'HASH') {
-        my %hash :shared;
-        while (my ($k, $v) = each %$ref) {
-            $hash{$k} = $self->_shared_clone($v);
-        }
-        return \%hash;
-    } else {
-        return ${share $ref};
-    }
 }
 
 sub get_osx_resolutions {

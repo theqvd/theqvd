@@ -13,8 +13,7 @@ WriteMakefile(
     VERSION	            => '3.5'.$SUF_VERSION,
     ABSTRACT            => 'lib/QVD/HTTP.pm',
     PL_FILES            => {},
-    PREREQ_PM => {
-    },
+    PREREQ_PM           => {},
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'QVD-HTTP-*' },
 );

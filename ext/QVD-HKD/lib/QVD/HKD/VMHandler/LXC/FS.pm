@@ -155,20 +155,42 @@ sub _place_os_image {
 
 sub _analyze_os_image {
     my $self = shift;
+    for my $follow (1, 0) {
     my $basefs = $self->{basefs};
     if (-d "$basefs/sbin/") {
         DEBUG 'OS image is of type basic';
+            return $self->_on_done;
+        }
+        elsif (defined (my $redirect = readlink "$basefs/redirect")) {
+            if ($self->_cfg("vm.lxc.redirect.allow")) {
+                if ($follow) {
+                    $self->{basefs} = $redirect;
+                    next;
+                }
+                else {
+                    ERROR "Too many redirects for base filesystem";
+                }
+            }
+            else {
+                ERROR "DI redirection administratively forbidden";
+            }
     }
     elsif (-d "$basefs/rootfs/sbin/") {
+        if (-l "$basefs/rootfs") {
+            ERROR "rootfs inside DI is a symbolic link";
+        }
+        else {
         $self->{meta} = $basefs;
         $self->{basefs_subdir} = 'rootfs';
         DEBUG 'OS image is of type extended';
+                return $self->_on_done;
+    }
     }
     else {
         ERROR "sbin not found at $basefs/sbin or at $basefs/rootfs/sbin for VM $self->{vm_id}";
+        }
         return $self->_on_error;
     }
-    $self->_on_done;
 }
 
 sub image_metadata_dir { shift->{meta} }

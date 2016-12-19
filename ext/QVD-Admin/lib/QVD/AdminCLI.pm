@@ -89,12 +89,14 @@ my %syntax_check_cbs = (
 sub new {
     my ($class, $quiet, $force) = @_;
     my $admin = QVD::Admin->new;
-    my $self = {
-        admin => $admin,
-        quiet => $quiet,
-        force => $force,
-    };
+    my $self = { admin => $admin,
+                 quiet => $quiet,
+                 force => $force };
     bless $self, $class;
+}
+
+sub set_tenant_id {
+    shift->{admin}->set_tenant_id(@_);
 }
 
 sub _split_on_equals {
@@ -110,9 +112,14 @@ sub set_filter {
     $self->{admin}->set_filter(%conditions);
 }
 
+sub debug {
+    shift->{admin}->debug;
+}
+
 sub get_resultset {
     shift->{admin}->get_resultset(@_);
 }
+
 
 sub dispatch_command {
     my ($self, $object, $command, $help, @args) = @_;
@@ -135,6 +142,8 @@ sub _syntax_check {
     my %args = _split_on_equals(@_);
     $self->{errors} = 0;
     
+    $self->_check_arguments_syntax(%args);
+
     $self->_check_arguments_syntax(%args);
 
     if (exists $syntax_check_cbs{$obj}{$cmd}) {
@@ -1519,7 +1528,7 @@ sub cmd_vm_list {
                 (defined $current_di ? $current_di->version : undef),
                 (defined $vmr->host ? $vmr->host->name : undef),
                 $vmr->vm_state,
-                (defined $vmr->l7r_host ? $vmr->l7r_host->name : undef),
+                undef, # (defined $vmr->l7r_host ? $vmr->l7r_host->name : undef), # FIXME: COMMENTED BECAUSE TRIGGERS ERROR WHEN ASKING DB
                 $vmr->user_state,
                 $vmr->blocked,
                 _utc2localtime($vmr->vm_expiration_soft),

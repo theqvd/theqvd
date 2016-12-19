@@ -1,0 +1,255 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                @LAYOUT DETAILS: Layout of details view
+                components/_layout-details.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+.details-side {
+    display: none;
+    @include in(desktop) {
+       display: block;
+    }
+    
+    margin-bottom: 15px;
+
+    width: ($width_details_side - 2) * 1%;
+    height: auto;
+    
+    @if $details_side == left {
+        float: left;
+        margin-right: 2%;
+    }
+    @else if $details_side == right {
+        float: right;
+        margin-left: 2%;
+    }
+    
+    .side-component {
+        padding: 15px;
+        border: 1px solid darken($col_whiter, 7);
+        border-radius: 2px;
+        background: darken($col_whiter, 5);
+        box-shadow: 2px 2px 8px darken($col_whiter, 4);
+        
+        margin-bottom: 15px;
+    }
+}
+
+.details-header, .side-header {
+    position: relative;
+    
+    @include in(desktop) {
+        height: 40px;
+    }
+    
+    span:before {
+        margin-right: 8px;
+        margin-left: 6px;
+    }
+    
+    margin-top: 0px;
+    @include in(desktop) {
+        margin-top: 0px;
+    }
+    
+    .button.fright {
+        margin-left: 4px;
+    }
+}
+
+.details-header, .info-header {
+    border: 1px solid darken($col_whiter, 7);
+    border-radius: 2px;
+    background: darken($col_whiter, 5);
+    box-shadow: 2px 2px 8px darken($col_whiter, 4);
+    margin-bottom: 10px;
+    min-height: 50px;
+    padding-top: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+    line-height: 1.2em;
+}
+
+.details-header {
+    a.button2 {
+        margin-bottom: 10px;
+        width: 100%;
+        text-align: center;
+
+        @include in(desktop) {
+            width: auto;
+        }
+        
+        &.show-details-actions {
+            @include in(desktop) {
+                display: none;
+            }
+        }
+    }
+    a.button {
+        @include in(mobile) {
+            width: 100%;
+            margin-bottom: 10px;
+            text-align: center;
+            display: none;
+        }
+    }
+}
+
+.details-list, .custom-props-container {
+    .details-item {
+        margin-bottom: 5px;
+        &:before, i:before {
+            margin-right: 5px;
+        }
+    }
+}
+
+.details-block {
+    @include in(desktop) {
+        float: right;
+        width: ($width_details_content) * 1%;
+    }        
+    
+    .details-list {
+        @include in(desktop) {
+            width: 100%;
+            margin: 0;
+            margin-bottom: 25px;
+        }
+    }
+    
+    .details-left, .details-right {
+        width: 100%;
+        margin-bottom: 20px;
+
+        @include in(desktop) {
+            width: 49%;
+        }
+    }    
+    
+    .details-left {
+        @include in(desktop) {
+            float: left;
+        }
+    }
+    
+    .details-right {
+        @include in(desktop) {
+            float: right;
+        }
+    }
+    
+    display: table;
+    width: 100%;
+        
+    .custom-props-container {
+        @include in(desktop) {
+            margin-top: -25px;
+            position: absolute;
+            top: 85px;
+            right: 0;
+            width: $other_properties_width * 1%;
+            padding-left: 20px;
+        }
+
+        table.custom-props {
+            width: auto;
+            margin-top: 10px;
+            td:first-child {
+                font-weight: normal;
+                white-space: nowrap;
+                width: 1%;
+                padding-right: 15px;
+            }
+        }
+        
+        .details-item {
+            border: 0;
+            display: block;
+            
+            &> span {
+                width: 100%;
+                display: block;
+                background: transparent;
+            }
+        }
+    }
+    
+    position: relative;
+}
+
+td.padded {
+    padding: 10px;
+}
+// Virtual machines
+
+.remote-administration-wrapper {
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    
+    .remote-administration-state {
+        width: 49%;
+        text-align: center;
+        display: inline-block;
+            
+        @include font-size(3);
+
+        div {        
+            &.fa {
+                @include icon-size(40px);
+            }
+            
+            margin-bottom: 15px;       
+            
+            &:last-child {
+                margin-bottom: 0px;
+            }
+        }
+    }
+    
+    .remote-administration-buttons {
+        //margin: 25px auto;
+        width: 49%;
+        display: inline-block;
+        vertical-align: bottom;
+        
+        a {
+            width: 100%;
+            display: block;
+            margin-bottom: 12px;
+            
+            &:last-child {
+                margin-bottom: 0px;
+            }
+        }
+    }
+    
+}
+
+// Tags
+
+ul.tags li {
+    line-height: 20px;
+    display: list-item;
+    
+    &:before {
+        margin-right: 5px;
+    }
+}
+
+// Virtual machine's execution params
+.execution-params {
+    display: none;
+}
+
+.vmst-vm-name {
+    overflow: visible;
+    max-width: 100px;
+}

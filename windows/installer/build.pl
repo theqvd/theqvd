@@ -93,6 +93,12 @@ my $pp_bin        = find_binary_path("pp", "$swperl/perl/site/bin/",dirname($per
 my $reshacker_bin = find_binary_path(["reshacker.exe", "ResourceHacker.exe"], "$prog/Resource Hacker", $ENV{PATH});
 my $git_bin       = find_binary_path("git.exe", "$prog/git", "c:\\cygwin\\bin", $ENV{PATH});
 my $gorc_bin      = find_binary_path("GoRC.exe", "$prog/GoRC", $ENV{PATH});
+my $sign_bin = find_binary_path(["signtool.exe", "signtool.exe"], "$prog\\Windows Kits\\10\\bin\\x86", $ENV{PATH});
+my $sign_cert = "c:\\signing\\comodo.p12";
+open( my $pass_fh, "<", "c:\\signing\\pass.txt" ) || die "Can't open pass file: c:\signing\pass.txt";
+my $sign_pass = <$pass_fh>;
+chomp $sign_pass;
+my $sign_tsServer="http://timestamp.comodoca.com/?td=sha256";
 
 
 msg("Adding $swperl\\c\\lib to PATH\n");
@@ -153,6 +159,7 @@ chdir($installer_dir);
 
 
 run("exetype", "NX\\nxproxy.exe", "WINDOWS");
+run("exetype", "c:\\VcxSrv\\vcxsrv.exe", "WINDOWS");
 
 my @pp_args = ("-vvv", "-x", 
     mklist('-I', 'dir', @includes),
@@ -171,8 +178,13 @@ unlink('qvd-client-2.exe');
 unlink glob('..\Output\*');
 mkdir "..\\archive";
 
+# Sign the executables before packing
+sign_file("qvd-client.exe");
+sign_file("NX\\nxproxy.exe");
+sign_file("c:\\VcxSrv\\vcxsrv.exe");
 
 build_installer();
+
 
 msg("Preparing debug version\n");
 
@@ -181,6 +193,7 @@ unless( $no_debug_installer ) {
 	msg("Generating debug installer\n");
 	run("pp", @pp_args);
 	run("exetype", "NX\\nxproxy.exe", "CONSOLE");
+        run("exetype", "c:\\VcxSrv\\vcxsrv.exe", "CONSOLE");
 
 	build_installer("--suffix -debug");
 } else {
@@ -199,6 +212,8 @@ sub build_installer {
 	
 	run($perl_bin, "..\\script.pl", "--version=$VER_STRING_COMPACT", "--output=..\\script.iss");
 	run("ISCC.exe", "..\\script.iss");
+
+        sign_file( "..\\Output\\*.exe");
 	
 	my ($filename) = glob("..\\Output\\*");
 	$filename = basename($filename);
@@ -451,4 +466,10 @@ sub msg {
 	print color 'bold green' if ($color);
 	print $msg;
 	print color 'reset';
+}
+
+sub sign_file {
+	my ($file) = @_;
+        msg ("Signing $file \n");
+        run($sign_bin, "sign", "/f" , $sign_cert , "/p" , $sign_pass , "/fd" , "SHA256", "/a" , "/tr" , $sign_tsServer , $file);
 }

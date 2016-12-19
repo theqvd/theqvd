@@ -1,0 +1,34 @@
+Used libraries on QVD Wat and their version, licenses and source sites:
+
+- Backbone.js v1.1.2 (MIT License) http://backbonejs.org
+- Underscore.js v1.6.0 (MIT License) http://underscorejs.org
+- jQuery v1.9.1 (MIT License) https://jquery.org
+- jQuery DateTimePicker plugin v2.3.4 (MIT License) http://plugins.jquery.com/datetimepicker/
+- jQuery Tags Input Plugin v1.3.3 (MIT License) http://xoxco.com/projects/code/tagsinput/
+- jQuery UI v1.11.0 (MIT License) http://jqueryui.com
+- jQuery Cookie v1.4.1 (MIT License) http://plugins.jquery.com/cookie/
+- jQuery TableScroll (MIT License) https://github.com/farinspace/jquery.tableScroll
+- jQuery SideBar v1.0.2 (MIT License) https://github.com/sideroad/jquery.sidebar
+- jQuery mbExtruder (MIT/GPL License) https://github.com/pupunzi/jquery.mb.extruder
+- jQuery mbFlipText (MIT/GPL License) https://github.com/pupunzi/jquery.mb.fliptext
+- jQuery hoverIntent (MIT/GPL License) http://pupunzi.com
+- jQuery waitForImages (MIT License) https://github.com/alexanderdickson/waitForImages
+- jQuery qTip2 v2.2.1 (MIT/GPLv2 License) http://qtip2.com/
+- jQuery Chosen v1.5.1 (MIT License) https://github.com/theqvd/chosen/
+- ExpandingTextareas v0.2.0 (MIT License) https://github.com/bgrins/ExpandingTextareas
+- Font Awesome v4.4.0 (Font: SIL OFL 1.1, CSS: MIT License) http://fortawesome.github.io/Font-Awesome/
+- Font Awesome Animation v0.0.7 (MIT License) http://l-lin.github.io/font-awesome-animation/
+- i18next v1.7.3 (MIT License) http://i18next.com/
+- Flot charts v0.8.3 (Unrestricted license explained at README.txt) http://www.flotcharts.org/
+- Flot axislabels v2.0.1 (GPLv3) http://people.mozilla.org/~mcote/flot-axislabels/
+- ASCII Doc - Tabe Of Content generator v0.4 (GPL) http://students.infoiasi.ro/~mishoo
+- Lato font v11 (SIL Open Font License, 1.1) https://www.google.com/fonts/attribution
+- Droid Sans font v6 (Apache License, version 2.0) https://www.google.com/fonts/attribution
+- Open Sans font v10 (Apache License, version 2.0) https://www.google.com/fonts/attribution
+- FastClick v1.0.6 (MIT License) https://github.com/ftlabs/fastclick
+- html2canvas v0.4.1 (MIT License) http://html2canvas.hertzen.com
+- jsPDF v0.9.0rc2 (MIT License) https://github.com/MrRio/jsPDF
+- FileSaver v1.1.20150716 (X11/MIT License) https://github.com/eligrey/FileSaver.js
+- Colorpicker v3.2.1 (MIT License) https://github.com/evoluteur/colorpicker
+- sass.js v0.9.2 (MIT License) https://github.com/medialize/sass.js/
+- noVNC (MPL-2.0) https://github.com/kanaka/noVNC

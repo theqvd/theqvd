@@ -1,0 +1,64 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                @BUTTONS
+                components/_buttons.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+
+/* Events */
+.event {
+	cursor: pointer;
+}
+
+a, button {
+    &.button {
+        @include button($col_whiter, $col_brand);
+    }    
+    
+    &.button2 {
+        @include button($col_brand, $col_whiter);
+    }    
+    
+    &.button--green {
+        @include button($col_whiter, darken($col_green, 20));
+    }
+    
+    &.button--red {
+        @include button($col_whiter, darken($col_red, 20));
+    }
+    
+    &.disabled {
+        cursor: default;
+    }
+    
+    &.button-right {
+        position: absolute;
+                    
+        right: 0px;
+        top: -40px;
+        width: 100%;
+        
+        @include in(desktop) {
+            top: 0px;
+            width: auto;
+        }
+    }
+
+    &.button.disabled, &.button2.disabled {
+        @include button--disabled();
+    }
+}
+
+.button-under-floating-box {
+    position: relative;
+    width: 100%;
+}
+
+.button-icon:before {
+    margin: 0px !important;
+}

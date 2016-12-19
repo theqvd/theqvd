@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Config::Properties;
-use IO::Scalar;
 use QVD::Config::Core::OS;
 
 my %os = QVD::Config::Core::OS::detect_os;
@@ -21,9 +20,10 @@ while (<DATA>) {
 }
 
 my $data = join('', @data);
-my $fh = IO::Scalar->new(\$data);
+open my $fh, "<", \$data;
 our $defaults = Config::Properties->new;
 $defaults->load($fh);
+close($fh);
 
 $defaults->setProperty('config.os', $os{os});
 $defaults->setProperty('config.os.version', $os{version});
@@ -50,6 +50,10 @@ path.run = /var/run/qvd
 path.log = /var/log
 ## temporary files
 path.tmp = /var/tmp
+## directory for API files
+path.api = ${path.run}/api
+## path to index WAT file
+path.wat = /usr/lib/qvd/wat
 ## main storage location for OS images (both KVM and LXC)
 path.storage.root = /var/lib/qvd/storage
 ## OS images ready to be used
@@ -84,6 +88,10 @@ path.ssl.ca.personal = certs
 
 path.darwin.ssl.ca.system = /System/Library/OpenSSL/certs/
 
+path.api.ssl = /etc/qvd/api/certs
+path.api.ssl.key = ${path.api.ssl}/key.pem
+path.api.ssl.cert = ${path.api.ssl}/cert.pem
+
 ## KVM serial port captures or LXC console output
 path.serial.captures = ${path.tmp}/qvd
 path.hypervisor.captures = ${path.tmp}/qvd
@@ -98,11 +106,14 @@ path.qvd.bin = /usr/lib/qvd/bin
 path.usb.database = /usr/share/hwdata/usb.ids
 
 ## paths to external executables
-command.kvm = kvm
+@sles@command.kvm = qemu-kvm
+@ubuntu@command.kvm = kvm
 command.kvm-img = qemu-img
 command.sshfs = ${path.qvd.bin}/sshfs
-command.open_file = /usr/bin/xdg-open
-command.sftp-server = /usr/lib/openssh/sftp-server
+command.open_file = xdg-open
+@ubuntu@command.sftp-server = /usr/lib/openssh/sftp-server
+@sles-11@command.sftp-server = /usr/lib64/ssh/sftp-server
+@sles-12@command.sftp-server = /usr/lib/ssh/sftp-server
 command.nxagent = /usr/bin/nxagent
 command.nxdiag = ${path.qvd.bin}/nxdiag.pl
 command.x-session = /etc/X11/Xsession
@@ -116,7 +127,9 @@ command.groupdel = /usr/sbin/groupdel
 command.tar = tar
 command.umount = umount
 command.mount = mount
-command.version.mount.overlayfs = 2
+@ubuntu-14.04@command.version.mount.overlayfs = 2
+@ubuntu-16.04@command.version.mount.overlayfs = 1
+@sles@command.version.mount.overlayfs = 1
 command.rm = rm
 command.unionfs-fuse = ${path.qvd.bin}/unionfs
 command.lxc-destroy = ${path.qvd.bin}/lxc-destroy
@@ -125,12 +138,14 @@ command.lxc-create = ${path.qvd.bin}/lxc-create
 command.lxc-start = ${path.qvd.bin}/lxc-start
 command.lxc-stop = ${path.qvd.bin}/lxc-stop
 command.lxc-wait = ${path.qvd.bin}/lxc-wait
-command.version.lxc = 0.7
+@ubuntu@command.version.lxc = 1.0
+@sles-11@command.version.lxc = 0.7
+@sles-12@command.version.lxc = 1.0
 command.ebtables = ebtables
 command.iptables = iptables
 command.modprobe = /sbin/modprobe
-command.xinit = /usr/bin/xinit
-command.xhost = /usr/bin/xhost
+command.xinit = xinit
+command.xhost = xhost
 command.xhost.family = si
 command.nxproxy = /usr/bin/nxproxy
 command.btrfs = /sbin/btrfs
@@ -186,7 +201,7 @@ client.sshfs.extra_args=-o atomic_o_trunc -o idmap=user
 
 ## Extra arguments for Windows X servers
 client.xming.extra_args=-multiwindow -notrayicon -nowinkill -clipboard +bs -wm
-client.vcxsrv.extra_args=-rootless -notrayicon -nowinkill -clipboard +bs -wm -listen tcp -silent-dup-error -ac -nomultimonitors
+client.vcxsrv.extra_args=-multiwindow -notrayicon -nowinkill -clipboard +bs -wm -listen tcp -silent-dup-error -ac -nomultimonitors
 
 ## nxproxy's geometry parameter
 client.geometry = 1024x768
@@ -196,6 +211,8 @@ client.fullscreen =
 client.audio.enable =
 ## something regarding an NX channel
 client.printing.enable = 1
+## Enable sharing client-side folders towards the VM
+client.file_sharing.enable = 1
 ## L7R port the client should connect to
 client.host.port = 8443
 ## L7R host the client should connect to
@@ -211,7 +228,7 @@ client.use_ssl = 1
 client.ssl.use_cert = 0
 
 ### Internal SSL options. These get passed directly to QVD::HTTPC.
-### See the full list in HTTPC.pm and the documentation in 
+### See the full list in HTTPC.pm and the documentation in
 ### IO::Socket::SSL.
 ###
 ### Using these is discouraged. Most are internal SSL options, and
@@ -247,7 +264,7 @@ client.ssl.allow_untrusted=1
 ## Allow expired certificates
 client.ssl.allow_expired=1
 
-## Allow certificates that are not yet valid. Generally indicates a 
+## Allow certificates that are not yet valid. Generally indicates a
 ## local clock problem.
 client.ssl.allow_not_yet_valid=1
 
@@ -269,8 +286,8 @@ client.ssl.error_timeout=5
 
 
 ## slave shell
-client.slave.command = bin/qvd-client-slaveserver
-client.slave.client = bin/qvd-slaveclient
+client.slave.command = ${path.qvd.bin}/qvd-client-slaveserver
+client.slave.client = ${path.qvd.bin}/qvd-slaveclient
 # enable commands used for benchmarking and testing the functionality
 # of the slave channel
 client.slave.debug_commands = 0
@@ -303,10 +320,13 @@ client.usb.usbip.log = 0
 # Share all USB devices automatically (most of the time not a good idea)
 client.usb.share_all = 0
 
-# List of USB devices to share with the VM. 
+# List of USB devices to share with the VM.  
 # Syntax: VID:PID@serial, comma separated. Spaces are allowed. For example:
 # 0441:0012, 1234:5678@12345678
 client.usb.share_list =
+
+## display kill vm session checkbox
+client.kill_vm.display = 0
 
 
 ## umask for the L7R process
@@ -322,8 +342,12 @@ l7r.address = *
 ## unused!
 l7r.pid_file = ${path.run}/l7r.pid
 ## authentication plugins to use. Comma-separated list of alphanumeric words. Example: "ldap, foo_43,default"
-l7r.auth.plugins = default
+l7r.auth.plugins=
+l7r.auth.plugins.head=
+l7r.auth.plugins.tail=default
 l7r.auth.plugin.default.salt=qvd1234
+l7r.auth.plugin.default.separators=@\#
+l7r.auth.plugin.default.tenant=default
 
 ## load balancing plugins to use. Similar to auth plugins
 l7r.loadbalancer.plugin = default
@@ -334,8 +358,8 @@ l7r.loadbalancer.plugin.default.weight.random = 1
 
 l7r.client.cert.require = 0
 
-l7r.ssl.options.SSL_version = TLSv1_2:!SSLv3:!SSLv2:!TLSv1
-l7r.ssl.options.SSL_cipher_list = HIGH:!aNULL:!MD5:!RC4:!3DES:!DES:!MEDIUM:!LOW:!EXPORT
+l7r.options.SSL_version = TLSv1_2:!SSLv3:!SSLv2:!TLSv1
+l7r.options.SSL_cipher_list = HIGH:!aNULL:!MD5:!RC4:!3DES:!DES:!MEDIUM:!LOW:!EXPORT
 
 ## umask for the HKD process
 hkd.user.umask = 0022
@@ -349,6 +373,28 @@ l7r.as_user = root
 ## path to the l7r PID file
 l7r.pid_file = ${path.run}/qvd-l7r.pid
 
+# URL API is running
+# Example: https://*:443/
+api.url = https://*:443/
+api.user = root
+api.group = root
+
+api.stdout.filename = /dev/null
+api.stderr.filename = /dev/null
+
+# QVD-Admin parameters
+# url of the API
+qa.url = https://demo.theqvd.com:443/
+# Credentials for qa
+qa.tenant = *
+qa.login = superadmin
+qa.password = superadmin
+# Format options: TABLE, CSV
+qa.format = TABLE
+# Flag to verify the certificate in qa
+qa.insecure = 0
+# Path to the certification authority certificate
+qa.ca =
 
 ## username of the WAT administrator
 wat.admin.login = admin
@@ -368,12 +414,21 @@ admin.ssh.opt.StrictHostKeyChecking = no
 admin.ssh.opt.UserKnownHostsFile = /dev/null
 
 ## virtualization engine to use, either kvm or lxc
-vm.hypervisor = kvm
+vm.hypervisor = lxc
 
 ## COW fs to use with LXC
-vm.lxc.unionfs.type = overlayfs
-# vm.lxc.unionfs.type = unionfs-fuse
+@ubuntu@vm.lxc.unionfs.type = overlayfs
+@sles-12@vm.lxc.unionfs.type = overlayfs
+@sles-11@vm.lxc.unionfs.type = unionfs-fuse
 vm.lxc.unionfs.bind.ro = 1
+
+# allow LXC DIs to have hooks for customization - disabled by default
+# because they run as root and can do anything on the host
+vm.lxc.hooks.allow = 0
+
+# allow DI redirection - disabled by default as it allows to take
+# control of the host
+vm.lxc.redirect.allow = 0
 
 internal.vm.lxc.conf.extra=
 
@@ -411,11 +466,11 @@ vm.network.domain=
 ## for LXC's lxc.network.veth.pair parameter
 internal.vm.network.device.prefix = qvd
 ## start of DHCP range. There's no sensible default value
-# vm.network.ip.start=10.0.0.100
-
+#vm.network.ip.start=10.0.0.100
+vm.network.ip.start=10.0.0.100
 ## QVD private network netmask. There's no sensible default value
-# vm.network.ip.netmask=255.255.0.0
-
+#vm.network.ip.netmask=255.255.0.0
+vm.network.netmask=255.255.0.0
 vm.network.use_dhcp = 1
 
 # high bytes of the MAC address, the IP is used for the low bytes.
@@ -636,3 +691,4 @@ internal.l7r.nothing.timeout.run_forwarder = 5
 
 internal.untar-dis.lock.path = ${path.run}/untar-dis.lock
 
+wat.multitenant = 1
