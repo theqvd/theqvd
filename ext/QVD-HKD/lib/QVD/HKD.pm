@@ -301,7 +301,7 @@ sub _start_db {
 
 sub _check_db_version {
     my $self = shift;
-    my $schema_version = '3.3.0';
+    my $schema_version = '4.0.0';
     $self->_query( { n => 1,
                      log_error => "Bad database schema. Upgrade it to version $schema_version" },
                    <<'EOQ', $schema_version);
