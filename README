@@ -9,6 +9,7 @@ We keep a copy of our source code in github for your benefit, while our main dev
 Structure
 =========
 
+ +- doc     - Documentation
  +- ext     - Perl Modules for the core of QVD and the client
  +- nx      - Patches done to the NX protocol
  +- windows - Windows client
