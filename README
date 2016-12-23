@@ -12,6 +12,7 @@ Structure
  +- ext     - Perl Modules for the core of QVD and the client
  +- nx      - Patches done to the NX protocol
  +- windows - Windows client
+ +- wat     - Web Administration Tool
  +- libqvdclient - C library for QVD client, this is not required for QVD
   +- android - Android client
   +- c - Main C libqvdclient library
