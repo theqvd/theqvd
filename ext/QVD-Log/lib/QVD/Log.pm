@@ -5,6 +5,7 @@ use Carp qw(cluck);
 use warnings;
 use strict;
 use 5.010;
+use File::Basename qw(basename);
 
 our $VERSION = '0.01';
 
@@ -51,7 +52,7 @@ unless (open my $fd, '>>', $logfile) {
 
     # Try to open a log file
     foreach my $dir (@tempdirs) {
-        $logfile = File::Spec->join($dir, defined $DAEMON_NAME ? "qvd-$DAEMON_NAME.log" : "qvd-$0.log");
+        $logfile = File::Spec->join($dir, defined $DAEMON_NAME ? "qvd-$DAEMON_NAME.log" : "qvd-" . basename($0) . ".log");
 
         if (not open $fd, '>>', $logfile) {
             warn "Can't open '$logfile': $!";
