@@ -1,15 +1,15 @@
 #!/bin/sh
 #
 ### BEGIN INIT INFO
-# Provides:          qvd-hkd
-# Required-Start:    $network $local_fs $remote_fs
-# Required-Stop:     $null
-# Should-Start:      $named
-# Should-Stop:       $null
-# Default-Start:     2 3 5
+# Provides:          qvd-api
+# Required-Start:    
+# Required-Stop:     
+# Should-Start:      
+# Should-Stop:       
+# Default-Start:     2 3
 # Default-Stop:      0 1 6
-# Short-Description: QVD Layer7 Router
-# Description:       QVD L7R service
+# Short-Description: QVD API Daemon
+# Description:       QVD API Daemon
 ### END INIT INFO
 
 PATH=/usr/lib/qvd/bin:/bin:/usr/bin
@@ -76,15 +76,9 @@ fi
 set -e
 
 running_pid() {
-# Check if a given process pid's cmdline matches a given name
     pid=$1
-    name=$2
     [ -z "$pid" ] && return 1
     [ ! -d /proc/$pid ] &&  return 1
-    # The first entry in cmdline is perl, the second one the name of the script
-    cmd=`cat /proc/$pid/cmdline | tr '\000' '' | cut -d '' -f 2`
-    # Is this the expected server
-    [ "$cmd" != "$name" ] &&  return 1
     return 0
 }
 
@@ -95,14 +89,11 @@ running() {
     # No pidfile, probably no daemon present
     [ ! -f "$PIDFILE" ] && return 1
     pid=`cat $PIDFILE`
-    running_pid $pid $DAEMON || return 1
+    running_pid $pid || return 1
     return 0
 }
 
 start_server() {
-	# Check for dnsmasq and kill it
-	/sbin/sysctl -w fs.inotify.max_user_instances="65000" &> /dev/null
-	/sbin/sysctl -w fs.inotify.max_user_watches="81920" &> /dev/null
 # Start the process using the wrapper
         if [ -z "$DAEMONUSER" ] ; then
             start_daemon -p $PIDFILE $DAEMON $DAEMON_OPTS
@@ -131,7 +122,6 @@ stop_server() {
 		errcode=$?
 	fi
 	
-	kill_dnsmasq
         return $errcode
 }
 
