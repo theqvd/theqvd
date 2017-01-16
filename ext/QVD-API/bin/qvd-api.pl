@@ -2,7 +2,8 @@
 
 BEGIN {
 	$QVD::Config::USE_DB = 1;
-	@QVD::Config::FILES = (
+	@QVD::Config::Core::FILES = (
+		'/etc/qvd/node.conf',
 		'/etc/qvd/api.conf',
 		($ENV{HOME} || $ENV{APPDATA}).'/.qvd/api.conf',
 		'qvd-api.conf',
