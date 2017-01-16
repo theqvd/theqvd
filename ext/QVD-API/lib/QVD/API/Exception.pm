@@ -17,7 +17,11 @@ with 'Throwable';
 #              can be built from this multiple report
 
 has 'code', is => 'ro', isa => sub { die "Invalid type for attribute code" if ref(+shift); };
-has 'exception', is => 'ro', isa => sub {};
+has 'exception', is => 'ro', isa => sub {
+    my $type = ref(+shift);
+    die "Invalid type for attribute exception" 
+        unless $type eq 'QVD::API::Exception' || $type eq 'SCALAR';
+};
 has 'failures', is => 'ro', isa => sub {
 	die "Invalid type for attribute failures" unless ref(+shift) eq 'HASH';
 };
@@ -159,51 +163,42 @@ sub BUILD
     my $exception_defined = defined($self->exception);
     my $failures_defined = defined($self->failures);
 
-    # At least one of these parameters must be  provided
-    # in order to build a proper exception
+    # This object is recursive if a QVD::API::Exception object was
+    # provided via the exception parameter. In that case, this object
+    # is built from that one
 
-    die "needed either code, exception or failures attribute" unless
-        $code_defined || $exception_defined || $failures_defined;
-
-	# This object is recursive if a QVD::API::Exception object was
-	# provided via the exception parameter. In that case, this object
-	# is built from that one
- 
-    $self->rebuild_recursively if $self->recursive;
-
-    $self->figure_out_code_from_exception
-        unless $code_defined || $failures_defined;
-
-    $self->figure_out_code_from_failures
-        if $failures_defined;
-
-    # prints useful error messages via console
-
-    $self->print_unknown_exception
-        if $exception_defined;
+    if($code_defined){
+        $self->set_default_code("Unknown code ".$self->code)
+            unless code_exists($self->code);
+    } elsif($exception_defined) {
+        if(ref($self->exception) eq 'QVD::API::Exception') {
+            $self->rebuild_recursively;
+        } else {
+            $self->figure_out_code_from_exception;
+        }
+    } elsif($failures_defined) {
+        $self->figure_out_code_from_failures;
+    } else {
+        # At least one of these parameters must be  provided
+        # in order to build a proper exception
+        die "needed either code, exception or failures attribute";
+    }
 }
 
-sub print_unknown_exception
+# Check if exception code is defined
+sub code_exists
 {
-    my $self = shift;
-    return unless $self->code eq
-	$exception2code_mapper->{default}->{default};
-    my $e = $self->exception; print "$e";
+    my $code = shift;
+    return defined($code2message_mapper->{$code});
 }
 
-# Checks if this exception object 
-# has been built (or must be built)
-# from another exception object of the same class
-
-sub recursive
+# Set the default code to the exception and additional message optionally
+sub set_default_code
 {
     my $self = shift;
-	my $is_recursive = 0;
-	if (($self->exception) && ref($self->exception) &&
-		$self->exception->isa('QVD::API::Exception')){
-		$is_recursive = 1;
-	}
-	return $is_recursive;
+    my $info = shift;
+    $self->{additional_info} = $info;
+    $self->{code} = get_default_code_number();
 }
 
 # Sets object info from the info of another 
@@ -215,6 +210,9 @@ sub rebuild_recursively
     $self->{code} = $self->exception->code;
     $self->{query} = $self->exception->query;
     $self->{object} = $self->exception->object;
+    $self->{additional_info} = $self->exception->additional_info;
+
+    # This replacement shall be the last one, because others variables depends on it
     $self->{exception} = $self->exception->exception;
 }
 
@@ -229,13 +227,17 @@ sub message
 }
 
 sub get_default_additional_info_text {
-	my $self = shift;
 	return "No additional information";
+}
+
+sub get_default_code_number
+{
+    return $exception2code_mapper->{default}->{default};
 }
 
 sub get_additional_info {
 	my $self = shift;
-	my $text = (defined $self->additional_info) ? $self->additional_info : $self->get_default_additional_info_text();
+	my $text = (defined $self->additional_info) ? $self->additional_info : get_default_additional_info_text();
 	return $text;
 }
 
