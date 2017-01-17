@@ -114,6 +114,10 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
                 Wat.C.block = that.newBlock;
             }
             that.render();
+            
+            // Render footer to update translations if necessary
+            Wat.I.renderFooter();
+            
             Wat.T.initTranslate();
         }
     }

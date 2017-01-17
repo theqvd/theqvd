@@ -166,7 +166,7 @@ Wat.WS.changeWebsocketVm = function (id, field, data, viewType) {
                                 var template = _.template(
                                     Wat.TPL.vmListExpiration, {
                                         remainingTime: remainingTime,
-                                        expiration: model.get(field),
+                                        expiration: Wat.U.jsonDateToString(model.get(field)),
                                         time_until_expiration_raw: Wat.U.base64.encodeObj(model.get('time_until_' + field)),
                                     }
                                 );
@@ -191,8 +191,8 @@ Wat.WS.changeWebsocketVm = function (id, field, data, viewType) {
 
                         var template = _.template(
                             Wat.TPL.vmDetailsExpiration, {
-                                expiration_soft: model.get('expiration_soft'),
-                                expiration_hard: model.get('expiration_hard'),
+                                expiration_soft: Wat.U.jsonDateToString(model.get('expiration_soft')),
+                                expiration_hard: Wat.U.jsonDateToString(model.get('expiration_hard')),
                                 remainingTimeSoft: Wat.U.processRemainingTime(model.get('time_until_expiration_soft')),
                                 remainingTimeHard: Wat.U.processRemainingTime(model.get('time_until_expiration_hard')),
                                 time_until_expiration_soft_raw: Wat.U.base64.encodeObj(model.get('time_until_expiration_soft')),

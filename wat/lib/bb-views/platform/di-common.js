@@ -204,11 +204,11 @@ Wat.Common.BySection.di = {
                     var expiration_hard = that.dialog.find('input[name="expiration_hard"]').val();
 
                     if (expiration_soft != undefined) {
-                        args['expiration_soft'] = expiration_soft;
+                        args['expiration_soft'] = new Date(expiration_soft).toJSON();
                     }
 
                     if (expiration_hard != undefined) {
-                        args['expiration_hard'] = expiration_hard;
+                        args['expiration_hard'] = new Date(expiration_hard).toJSON();
                     }
                 }
                 
@@ -223,8 +223,7 @@ Wat.Common.BySection.di = {
             }
         };
         
-        this.dialogConf.button1Class = 'fa fa-ban js-button-cancel';
-        this.dialogConf.button2Class = 'fa fa-save js-button-update';
+        this.dialogConf.buttonClasses = ['fa fa-ban js-button-cancel', 'fa fa-save js-button-update'];
         
         this.enabledProperties = false;
         this.dialogConf.fillCallback = this.fillEditor;
@@ -239,5 +238,7 @@ Wat.Common.BySection.di = {
                 );
 
         $('.bb-affected-vms-list').html(template);
+        
+        Wat.I.enableDataPickers();
     },
 }

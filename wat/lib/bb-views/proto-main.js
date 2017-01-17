@@ -55,9 +55,10 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     addCommonTemplates: function () {
-        var templates = Wat.I.T.getTemplateList('commonEditors', {qvdObj: this.qvdObj});
+        var editorTemplates = Wat.I.T.getTemplateList('commonEditors', {qvdObj: this.qvdObj});
+        var conflictTemplates = Wat.I.T.getTemplateList('conflict');
         
-        this.templates = $.extend({}, this.templates, templates);
+        this.templates = $.extend({}, this.templates, editorTemplates, conflictTemplates);
     },
     
     beforeRender: function () {
@@ -162,7 +163,7 @@ Wat.Views.MainView = Backbone.View.extend({
         
         if (editorMode == 'create' && isSuperadmin && classifiedByTenant) { 
             var params = {
-                'action': 'tenant_tiny_list',
+                'actionAuto': 'tenant',
                 'selectedId': that.selectedTenant || 0,
                 'controlId': 'tenant_editor',
                 'chosenType': 'advanced100'
@@ -276,7 +277,8 @@ Wat.Views.MainView = Backbone.View.extend({
         
         that.template = _.template(
                     Wat.TPL.editorCommonProperties, {
-                        properties: that.model && that.model.attributes.properties ? that.model.attributes.properties : {}
+                        properties: that.model && that.model.attributes.properties ? that.model.attributes.properties : {},
+                        editorMode: that.editorMode
                     }
                 );
         
@@ -354,7 +356,11 @@ Wat.Views.MainView = Backbone.View.extend({
         for(i=0;i<propIds.length;i++) {
             var id = propIds.eq(i);
             var value = propValues.eq(i);
-                 
+            
+            if (!Wat.I.isMassiveFieldChanging(id.val())) {
+                continue;
+            }
+            
             setProps[id.val()] = value.val();
         }
         
@@ -447,10 +453,68 @@ Wat.Views.MainView = Backbone.View.extend({
             that.retrievedData = response;
             successCallback(that);
             
-            Wat.I.M.showMessage(messageParams, response);
+            var intercepted = false;
+            
+            if (messageParams.messageType == 'error') {
+                intercepted = Wat.A.interceptSavingModelResponse(model.operation, response);
+            }
+            
+            if (!intercepted) {
+                Wat.I.M.showMessage(messageParams, response);
+            }
         });
     },
     
+    // Open dialog to resolve dependency problems
+    openDependenciesDialog: function (dependencyIds, qvdObj) {
+        var that = this;
+        
+        // Retrieve names
+        var dependencyElements = {};
+        
+        if (this.collection) {
+            $.each(dependencyIds, function (i, id) {
+                var model = that.collection.where({id: parseInt(id)})[0];
+                dependencyElements[id] = model.get('name');
+            });
+        }
+        else if (that.model && dependencyIds.length == 1) {
+            dependencyElements[dependencyIds[0]] = that.model.get('name');
+        }
+        
+        var dialogConf = {
+            title: $.i18n.t('Action not accomplished for all elements'),
+            buttons : {
+                "Cancel": function () {
+                    Wat.I.closeDialog($(this));
+                },
+                "Enforce deletion for all": function () {
+                    var allIds = $('.js-elements-list').attr('data-all-ids').split(',');
+                    var qvdObj = $('.js-elements-list').attr('data-qvd-obj');
+                                
+                    // Mark all buttons pending to be deleted
+                    $('.js-button-force-delete').attr('data-deleteme', '1');
+                    
+                    Wat.A.deletePending('.js-button-force-delete');
+                }
+            },
+            buttonClasses : ['fa fa-ban js-button-cancel', 'fa fa-bomb js-button-force-delete-all'],
+            fillCallback : function(target) { 
+                that.template = _.template(
+                    Wat.TPL.deleteDependency, {
+                        dependencyElements: dependencyElements,
+                        qvdObj: qvdObj
+                    }
+                );
+
+                target.html(that.template);
+            }
+        }
+        
+        this.dependencyDialog = Wat.I.dialog(dialogConf);
+    },
+    
+    // Open element for creation forms
     openNewElementDialog: function (e) {
         var that = this;
         
@@ -466,8 +530,7 @@ Wat.Views.MainView = Backbone.View.extend({
             }
         };
 
-        this.dialogConf.button1Class = 'fa fa-ban js-button-cancel';
-        this.dialogConf.button2Class = 'fa fa-plus-circle js-button-create';
+        this.dialogConf.buttonClasses = ['fa fa-ban js-button-cancel', 'fa fa-plus-circle js-button-create'];
         
         this.dialogConf.fillCallback = this.fillEditor;
 
@@ -489,8 +552,7 @@ Wat.Views.MainView = Backbone.View.extend({
             }
         };
         
-        this.dialogConf.button1Class = 'fa fa-ban js-button-cancel';
-        this.dialogConf.button2Class = 'fa fa-save js-button-update';
+        this.dialogConf.buttonClasses = ['fa fa-ban js-button-cancel', 'fa fa-save js-button-update'];
         
         this.dialogConf.fillCallback = this.fillEditor;
         
@@ -532,8 +594,7 @@ Wat.Views.MainView = Backbone.View.extend({
             }
         };
 
-        dialogConf.button1Class = 'fa fa-book js-button-read-full-doc';
-        dialogConf.button2Class = 'fa fa-check js-button-close';
+        dialogConf.buttonClasses = ['fa fa-book js-button-read-full-doc', 'fa fa-check js-button-close'];
 
         dialogConf.fillCallback = function (target, that) {
             // Back scroll of the div to top position
@@ -563,6 +624,8 @@ Wat.Views.MainView = Backbone.View.extend({
     
     // Fetch details or list depending on the current view kind
     fetchAny: function (that) {
+        that = that || this;
+        
         switch (that.viewKind) {
             case 'list':
                 that.fetchList();

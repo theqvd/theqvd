@@ -4,6 +4,7 @@ use warnings;
 use base qw( CLI::Framework::Command::Meta );
 use Text::SimpleTable::AutoWidth;
 use Text::UnicodeTable::Simple;
+use Mojo::URL;
 use Mojo::JSON qw(encode_json decode_json j);
 use Mojo::IOLoop;
 use Mojo::Message::Response;
@@ -79,6 +80,13 @@ our $COMMON_USAGE_TEXT = "
   !key1=value (This expresion means: NOT key1)
   !key1=value, key2=value, key3=value (NOT ( key1 AND key2 AND key3))
   (! key1=value), key2=value, key3=value ((NOT key1) AND key2 AND key3))
+  
+  ORDER CRITERIA
+  asc  (Orders in ascendent order)
+  desc (Orders in descendent order)
+  
+  For example:
+  asc key1
 
 ======================================================================================================
 ";
@@ -567,7 +575,6 @@ my $ARGUMENTS = {
 	    tag => 'di_tag', 
 	    user => 'user_id', 
 	    osf => 'osf_id', 
-		__properties_changes__ => '__properties_changes__'
 	}, # For nested queries in API
 
 	user => {
@@ -575,7 +582,6 @@ my $ARGUMENTS = {
 	      password => 'password', 
 	      blocked => 'blocked', 
 	      tenant => 'tenant_id',
-		__properties_changes__ => '__properties_changes__', # For nested queries in API
 	},
 
 	host => {
@@ -584,7 +590,6 @@ my $ARGUMENTS = {
 	      frontend => 'frontend', 
 	      backend => 'backend', 
 	      blocked => 'blocked',
-		__properties_changes__ => '__properties_changes__', # For nested queries in API
 	},
 
 	osf => {
@@ -593,15 +598,12 @@ my $ARGUMENTS = {
 	     user_storage => 'user_storage', 
 	     overlay => 'overlay', 
 	     tenant => 'tenant_id',
-		__properties_changes__ => '__properties_changes__', # For nested queries in API
 	},
 
 	di => {
 		blocked => 'blocked',
 	    name => 'disk_image',  
 	    version => 'version', 
-	    osf => 'osf_id',
-	    __properties_changes__ => '__properties_changes__', # For nested queries in API
 		__tags_changes__ => '__tags_changes__',  # For nested queries in API
 	},
 
@@ -636,124 +638,13 @@ my $ARGUMENTS = {
 	},
 };
 
-
-# These callbacks are intended to ask the API for
-# the list of ids corresponding a certain set of objects.
-# These cbs are intended to solve a problem regarding a general
-# difference between CLI syntax and API syntax:
-# A certain query to API about a QVD object can include
-# references to related objects (i.e. vms have a related
-# user and a related osf). These related objects are referenced
-# in the API by id, but in the CLI syntax they are referenced
-# by name. So these functions are intended to take a name, ask for the object
-# id corresponding to that name in API and retrieve the id: are intended
-# to switch from name to id.
-
-my $related_tenant_cb = sub { 
-    my ($self,$name) = @_; 
-	$self->ask_api(
-		{
-			action => 'tenant_all_ids',
-			filters =>  { name => $name }
-		}
-	)->json('/rows');
-};
-
-my $related_user_cb = sub { 
-    my ($self,$name,$tenant_id) = @_; 
-    my $filters = { name => $name };
-    $filters->{tenant_id} = $tenant_id if $tenant_id;
-	$self->ask_api(
-		{
-			action => 'user_all_ids',
-			filters =>  $filters
-		}
-	)->json('/rows');
-};
-
-my $related_host_cb = sub { 
-    my ($self,$name) = @_; 
-	$self->ask_api(
-		{
-			action => 'host_all_ids',
-			filters =>  { name => $name }
-		}
-	)->json('/rows');
-};
-
-my $related_osf_cb = sub { 
-    my ($self,$name,$tenant_id) = @_; 
-    my $filters = { name => $name };
-    $filters->{tenant_id} = $tenant_id if $tenant_id;
-	$self->ask_api(
-		{
-			action => 'osf_all_ids',
-			filters =>  $filters
-		}
-	)->json('/rows');
-};
-
-my $related_di_cb = sub { 
-    my ($self,$name,$tenant_id) = @_; 
-    my $filters = { name => $name };
-    $filters->{tenant_id} = $tenant_id if $tenant_id;
-	$self->ask_api(
-		{
-			action => 'di_all_ids',
-			filters =>  $filters
-		}
-	)->json('/rows');
-};
-
-my $related_admin_cb = sub { 
-    my ($self,$name,$tenant_id) = @_; 
-    my $filters = { name => $name };
-    $filters->{tenant_id} = $tenant_id if $tenant_id;
-	$self->ask_api(
-		{
-			action => 'administrator_all_ids',
-			filters =>  $filters
-		}
-	)->json('/rows');
-};
-
-my $related_role_cb = sub { 
-    my ($self,$name) = @_; 
-	$self->ask_api(
-		{
-			action => 'role_all_ids',
-			filters =>  { name => $name }
-		}
-	)->json('/rows');
-};
-
-# The previous callbacks are stored in this variable
-
-my $CBS_TO_GET_RELATED_OBJECTS_IDS =
-	{
-		vm => {
-			argument =>  {
-				user => $related_user_cb,
-			   host => $related_host_cb,
-			   osf => $related_osf_cb, 
-				di => $related_di_cb
-			}
-		},
-
-		di => {
-			argument => {
-				osf => $related_osf_cb
-			}
-		}
-	};
-
 # This variable stores the relation between CLI queries
 # and the corresponding actions in API
 
 my $CLI_CMD2API_ACTION = {
 	# qvd_object => kind_of_action => API action
 	vm => {
-		ids => 'vm_all_ids',
+		ids => 'vm_get_list',
 	    get => 'vm_get_list', 
 	    update => 'vm_update', 
 	    create => 'vm_create', 
@@ -764,7 +655,7 @@ my $CLI_CMD2API_ACTION = {
 	},
 
 	user => {
-		ids => 'user_all_ids',
+		ids => 'user_get_list',
 	      get => 'user_get_list', 
 	      update => 'user_update', 
 	      create => 'user_create', 
@@ -772,7 +663,7 @@ my $CLI_CMD2API_ACTION = {
 	},
 
 	host => {
-		ids => 'host_all_ids',
+		ids => 'host_get_list',
 	      get => 'host_get_list', 
 	      update => 'host_update', 
 	      create => 'host_create', 
@@ -780,7 +671,7 @@ my $CLI_CMD2API_ACTION = {
 	},
 
 	osf => {
-		ids => 'osf_all_ids',
+		ids => 'osf_get_list',
 	     get => 'osf_get_list', 
 	     update => 'osf_update', 
 	     create => 'osf_create', 
@@ -788,7 +679,7 @@ my $CLI_CMD2API_ACTION = {
 	},
 
 	di => {
-		ids => 'di_all_ids',
+		ids => 'di_get_list',
 	    get => 'di_get_list', 
 	    update => 'di_update', 
 	    create => 'di_create', 
@@ -796,7 +687,7 @@ my $CLI_CMD2API_ACTION = {
 	},
 
 	tenant => {
-		ids => 'tenant_all_ids',
+		ids => 'tenant_get_list',
 		get => 'tenant_get_list', 
 		update => 'tenant_update', 
 		create => 'tenant_create', 
@@ -811,7 +702,7 @@ my $CLI_CMD2API_ACTION = {
 	},
 
 	admin => {
-		ids => 'administrator_all_ids',
+		ids => 'administrator_get_list',
 	       get => 'administrator_get_list', 
 	       update => 'administrator_update', 
 	       create => 'administrator_create', 
@@ -819,7 +710,7 @@ my $CLI_CMD2API_ACTION = {
 	},
 
 	role => {
-		ids => 'role_all_ids',
+		ids => 'role_get_list',
 	      get => 'role_get_list', 
 	      update => 'role_update', 
 	      create => 'role_create', 
@@ -903,19 +794,19 @@ sub _create
 {
     my ($self,$parsing) = @_; # Takes parsed query
 
+    # FIXME: This change shall be done by the API
     # If needed, it switchs from tenant name to tenant id
     if (my $tenant_name = $parsing->arguments->{tenant})
     {
-	my $tenant_ids = $related_tenant_cb->($self,$tenant_name);
-	my $tenant_id = shift @$tenant_ids //
-	    CLI::Framework::Exception->throw("Unknown related object tenant in filters");
-	$self->tenant_scoop($tenant_id);
-	$parsing->arguments->{tenant} = $self->tenant_scoop; 
+        my $tenant_ids = $self->ask_for_ids('tenant', { name => $tenant_name });
+        my $tenant_id = shift @$tenant_ids //
+            CLI::Framework::Exception->throw("Unknows Tenant called $tenant_name");
+        $parsing->arguments->{tenant} = $tenant_id;
     }
-  
+
     my $query = $self->make_api_query($parsing);# Creates a JSON query in API format 
-	my $res = $self->ask_api($query);
-	$self->print_table($res,$parsing);
+    my $res = $self->ask_api_standard($self->get_app->cache->get('api_default_path'), $query);
+    $self->print_table($res,$parsing);
 }
 
 # Function executed for queries that check the acls of an admin or role
@@ -925,10 +816,7 @@ sub _can
     my ($self,$parsing) = @_;
 
     # It gets the id of the involved role or admin
-	my $ids = $self->ask_api({
-		action => $self->get_all_ids_action($parsing),
-		filters => $self->get_filters($parsing)
-	})->json('/rows');
+    my $ids = $self->ask_for_ids($parsing->qvd_object, $self->get_filters($parsing));
 
     # It created an ad hoc JSON query
     my $acl_name = $parsing->parameters->{acl_name}; 
@@ -968,12 +856,14 @@ sub execute_and_display_query
 	do {
 
     # It asks the API for the first page and prints that first page
-    my $res = $self->ask_api($query); 
+    my $res = $self->ask_api_standard($self->get_app->cache->get('api_default_path'), $query); 
     $self->print_table($res,$parsing); 
 
 		if ($is_pagination_mode_enabled) {
 			my $total_pages = ceil($res->json('/total') / $query->{block});
-			print STDOUT "--- page $query->{offset} / $total_pages ('n' for next, 'b' for back, 'q' for quit) ---\n";
+			print STDOUT "--- page $query->{offset} / $total_pages\n";
+            $app->set_help_message("Press ('n' for next, 'b' for back, 'q' for quit) ---");
+			print STDOUT $app->help_message . "\n";
 
 			$char = ReadKey($pause_time);
             
@@ -983,6 +873,8 @@ sub execute_and_display_query
     }
 
 	} while ($is_pagination_mode_enabled && (defined($char)) && ($char ne 'q'));
+
+    $app->set_help_message(undef);
 
     ReadMode(0); # Return to normal mode in console 
 }
@@ -997,47 +889,29 @@ sub _cmd
 {
     my ($self,$parsing) = @_;
 
-	# It gets all the ids correspondig the objects that must
-	# be deleted/updated
+    # It gets all the ids correspondig the objects that must
+    # be deleted/updated
 
-    my $ids = $self->ask_api(
-		{
-			action => $self->get_all_ids_action($parsing),
-			filters => $self->get_filters($parsing)
-		}
-	)->json('/rows');
-    
-	# It performs the update/delete over the objects with those ids
+    my $filters = $self->get_filters($parsing);
+    my $ids = eval { $self->ask_for_ids($parsing->qvd_object, $filters) };
+    $filters = { id => { '=' => $ids }} if defined $ids;
 
-    my $res = $self->ask_api(
-		{
-			action => $self->get_action($parsing),
-	  filters => { id => { '=' => $ids }}, 
-	  order_by => $self->get_order($parsing), 
-			arguments => $self->get_arguments($parsing)
-		}
-	);
+    # It performs the update/delete over the objects with those ids
 
-	# The API response is printed
+    my $res = $self->ask_api_standard(
+        $self->get_app->cache->get('api_default_path'),
+        {
+            action => $self->get_action($parsing),
+            filters => $filters,
+            order_by => $self->get_order($parsing),
+            arguments => $self->get_arguments($parsing)
+        }
+    );
+
+    # The API response is printed
 
     $self->print_table($res,$parsing);
 }
-
-# Regular function to create a JSON query in the API format
-
-sub make_api_query
-{
-    my ($self,$parsing) = @_;
-
-	return {
-		action => $self->get_action($parsing),
-	     filters => $self->get_filters($parsing), 
-	     fields => $self->get_fields_for_api($parsing), 
-	     order_by => $self->get_order($parsing), 
-		arguments => $self->get_arguments($parsing)
-	};
-}
-
 
 ###############################################
 ## METHODS TO PRINT RESPONSES IN CONSOLE RUN ##
@@ -1152,62 +1026,17 @@ sub ambiguous
 ## METHODS TO PERFORM A REQUEST AGAINST THE API ##
 ##################################################
 
-# Main method
-
-sub ask_api
-{
-    my ($self,$query) = @_;
-
-	# Get arguments
-    my $app = $self->get_app;
-
-	my $login = $app->cache->get('login');
-	my $password = $app->cache->get('password');
-	my $tenant = $app->cache->get('tenant_name');
-	my $sid = $app->cache->get('sid');
-
-	my $user_agent = $app->cache->get('user_agent');
-
-    # Added credentials to the JSON query
-
-    my %credentials = defined $sid ? (sid => $sid) : 
-	( login => $login, password => $password);
-    $credentials{tenant} = $tenant if 
-	defined $tenant && defined $credentials{login};
- 
-	# Ask API depending on the command
-	my $res;
-	if ($query->{action} eq 'di_create') {
-
-		# TODO:
-		# There is no way to select the kind of di creation system that
-		# must be used. The API privides three different systems:
-		# a) Copy an image from staging
-		# b) Upload an inmage from local
-		# c) Download an image from url
-
-		# But here just one method can be used (di_upload):
-		# This can be changed to 'ask_api_staging'.
-		# One more method must be implemented: 'ask_api_di_download'
-
-		my $url = $app->cache->get('api_staging_url');
-		$res = $self->ask_api_staging($query, $user_agent, $url, \%credentials);
-
-		#my $url = $app->cache->get('api_di_upload_url');
-		#$res = $self->ask_api_di_upload($query, $user_agent, $url, \%credentials);
-
-	} else {
-		my $url = $app->cache->get('api_url');
-		$res = $self->ask_api_standard($query, $user_agent, $url, \%credentials);
-	}
-
-	return $res;
-}
-
 # Method for standard queries to the API
 
-sub ask_api_standard {
-	my ($self, $query, $ua, $url, $credentials) = @_;
+sub ask_api_standard
+{
+    my ($self, $path, $query) = @_;
+
+    my $ua = $self->get_app->cache->get('user_agent');
+    my $credentials = $self->get_credentials();
+    my $url = Mojo::URL->new($self->get_app->cache->get('api_url'));
+    $url->path($path // $self->get_app->cache->get('api_default_path'));
+    $query //= {};
 
 	my $res = $ua->post(
 		"$url",
@@ -1229,8 +1058,13 @@ sub ask_api_standard {
 
 sub ask_api_staging
 {
-    my ($self, $query, $ua, $url, $credentials) = @_;
-
+    my ($self, $path, $query) = @_;
+    
+    my $ua = $self->get_app->cache->get('user_agent');
+    my $credentials = $self->get_credentials();
+    my $url = Mojo::URL->new($self->get_app->cache->get('ws_url'));
+    $url = $url->path($path // $self->get_app->cache->get('api_staging_path'));
+    
     for my $k (keys %$query)
     {
         my $v = $query->{$k};
@@ -1241,24 +1075,26 @@ sub ask_api_staging
 
     my $res = {};
     my $msg_data = {};
+    my $accomplished = 0;
     my $on_message_cb = sub {
 
         my ($tx, $msg) = @_;
 
-        $res = $tx->res;
         $msg_data = decode_json($msg);
-        if ($msg_data->{status} == 1000)
+        if ($msg_data->{status} == 1000 && $accomplished == 0)
         {
             my $total = $msg_data->{total_size} // 0;
             my $partial = $msg_data->{copy_size} // 0;
             my $percentage = ($total > 0 ? $partial / $total : 1) * 100 ;
-            printf STDERR "\r%06.2f%%", $percentage;
+            printf STDERR "\rFile Upload Progress: %06.2f%%", $percentage;
             $tx->send('ECHO Request');
         }
         else
         {
             print STDERR sprintf("\nUpload finished (%s) : %s\n", $msg_data->{status}, $msg_data->{message});
             $tx->finish;
+            $accomplished = 1;
+            $res = $tx->res;
         }
     };
 
@@ -1269,13 +1105,6 @@ sub ask_api_staging
         } );
 
     Mojo::IOLoop->start;
-
-    CLI::Framework::Exception->throw($res->error->{message})
-        unless $res->code;
-    CLI::Framework::Exception->throw($msg_data->{message})
-        unless $msg_data->{status} == 0000;
-    
-    $self->check_api_result($res);
 
     return $res;
 }
@@ -1318,45 +1147,44 @@ sub ask_api_di_upload
 sub check_api_result
 {
     my ($self,$res) = @_;
+    
+    my $status =  $res->json('/status') // -1;
+    return 1 if $status == 0; # Successful response
 
-    return 1 unless $res->json('/status'); # Successful response
+    my $message = $res->json('/message') // "Unknown";
+    chomp($message);
+    my $failures = $res->json('/failures');
+    if (defined($failures)) {
+        $message .= ":\n";
+        while (my ($id,$failure) = each %$failures) {
+            $message .= "\t$id : " . $failure->{message} . "\n";
+        }
+    }
 
-    # All API internal errors are translated to the same generic 
-    # message in CLI responde
-
-    my $API_INTERNAL_PROBLEMS_MSG = 'Internal problems in API';
-    my %SERVER_INTERNAL_ERRORS = qw(1100 1 4100 1 4110 1 6100 1);
-
-    CLI::Framework::Exception->throw($API_INTERNAL_PROBLEMS_MSG) if 
-	$SERVER_INTERNAL_ERRORS{$res->json('/status')};
-
-   # Well typified error messages in API are displayed via console
-   # in CLI 
-
-    CLI::Framework::Exception->throw($res->json('/message')) unless 
-	$res->json('/status') eq 1200; 
-
-  # For 1200 error in API (That means that one or more of the objects
-  # involved in a query couldn't be edited because of some problem):
-
-    my ($message,$failures) = ($res->json('/message') . ":\n",$res->json('/failures'));
-
-    my %seen_msgs;
-
-    while (my ($id,$failure) = each %$failures)
-    {
-	my $msg = $SERVER_INTERNAL_ERRORS{$failure->{status}} ? 
-	    $API_INTERNAL_PROBLEMS_MSG : 
-	    $failure->{message};
-	next if exists $seen_msgs{$msg};
-	$seen_msgs{$msg} = 1;
-	$message .= "$msg\n"; 
-    } 
-
-    $message =~ s/\n$//;
     CLI::Framework::Exception->throw($message);
 }
 
+# Returns a list of IDs for a specific request or throws an exepction in case the IDs are not
+# available or it is an invalid field
+sub ask_for_ids
+{
+    my ($self, $qvd_object, $filter) = @_;
+
+    if (my $action = $CLI_CMD2API_ACTION->{$qvd_object}->{'ids'}) {
+        my $ids = [ map { $_->{id} } @{ $self->ask_api_standard(
+            $self->get_app->cache->get('api_default_path'),
+            {
+                action => $action,
+                filters => $filter,
+                fields => ['id']
+            }
+        )->json('/rows') } ];
+        
+        return $ids;
+    } else {
+        CLI::Framework::Exception->throw("No API action can retrieve IDs for object ($qvd_object)");
+    }
+}
 
 ###################################################
 ## AUXILIAR METHODS TO CREATE THE JSON API QUERY ##
@@ -1373,15 +1201,6 @@ sub get_action
     } // CLI::Framework::Exception->throw("No API action available for request"); 
 }
 
-# Returns a function that asks the API for the id of an object
-sub get_all_ids_action
-{
-    my ($self,$parsing) = @_;
-    return eval { 
-	$CLI_CMD2API_ACTION->{$parsing->qvd_object}->{'ids'} 
-    } // CLI::Framework::Exception->throw("No API action available for getting related object"); 
-}
-
 # Normalizes the filters in a request according the
 # info in the class variables of this class. Returns the
 # hash of normalized  filters
@@ -1389,6 +1208,7 @@ sub get_filters
 {
     my ($self,$parsing) = @_;
 
+    # FIXME: Replace keywords with the API ones
     return $parsing->filters->hash // {};
 }
 
@@ -1403,9 +1223,8 @@ sub get_arguments
 
     while (my ($k,$v) = each %$arguments)
     {
-	my $normalized_k = $ARGUMENTS->{$parsing->qvd_object}->{$k} // $k;
-	$v = $self->get_value($parsing,$k,$v,'argument');
-	$out->{$normalized_k} = $v;
+        my $normalized_k = $ARGUMENTS->{$parsing->qvd_object}->{$k} // $k;
+        $out->{$normalized_k} = $v;
     }
 
     $out;
@@ -1497,49 +1316,22 @@ sub get_field_value
     return $v;
 }
 
-# This function gets a filter or argument and normalizes it 
-# according to a callback intended to normalize it (if any).
-# Typically, that normalizations means switch from the name
-# of an object provided by the CLI to the corresponding id that
-# the API ask for. And that's for related objects (i.e., the user
-# or osf of a vm)
-sub get_value
+# Regular function to create a JSON query in the API format
+
+sub make_api_query
 {
-    my ($self,$parsing,$key,$value,$filter_or_argument) = @_;
+    my ($self,$parsing) = @_;
 
-    if ( my $cb = eval { $CBS_TO_GET_RELATED_OBJECTS_IDS->{$parsing->qvd_object}->{$filter_or_argument}->{$key}})
-    {
-	$value = $cb->($self,$value,$self->tenant_scoop);
-	CLI::Framework::Exception->throw("Unknown related object $key in filters") unless defined $$value[0];
-
-	if ($filter_or_argument eq 'argument')
-	{ 
-			CLI::Framework::Exception->throw('Ambiguous reference to object in filters') if
-		defined $$value[1];	    
-	    $value = shift @$value;
-	}
-    }
-    $value;
+    return {
+        action => $self->get_action($parsing),
+        filters => $self->get_filters($parsing),
+        fields => $self->get_fields_for_api($parsing),
+        order_by => $self->get_order($parsing),
+        arguments => $self->get_arguments($parsing)
+    };
 }
 
 # Other auxiliar functions
-
-sub tenant_scoop
-{
-    my ($self,$tenant_scoop) = @_;
-
-    $self->{tenant_scoop} = $tenant_scoop
-	if $tenant_scoop;
-
-    unless ($self->{tenant_scoop})
-    {
-	my $app = $self->get_app;
-	$self->{tenant_scoop} = $app->cache->get('tenant_id');
-    }
-
-    $self->{tenant_scoop};
-}
-
 
 sub read_password
 {
@@ -1570,6 +1362,28 @@ sub superadmin
     my $self = shift;
     my $app = $self->get_app;
     $app->cache->get('tenant_id') ? return 1 : return 0;
+}
+
+sub get_credentials
+{
+    my $self = shift;
+
+    my $app = $self->get_app;
+
+    my $login = $app->cache->get('login');
+    my $password = $app->cache->get('password');
+    my $tenant = $app->cache->get('tenant_name');
+    my $sid = $app->cache->get('sid');
+    
+    # Added credentials to the JSON query
+
+    my $credentials = defined $sid ?
+        { sid => $sid } :
+        { login => $login, password => $password };
+    $credentials->{tenant} = $tenant if
+        defined $tenant && defined $credentials->{login};
+    
+    return $credentials;
 }
 
 1;

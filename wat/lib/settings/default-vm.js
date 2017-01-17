@@ -602,7 +602,15 @@ Wat.I.selectedActions[qvdObj] = {
         'text': 'Edit',
         'groupAcls': 'vmMassiveEdit',
         'aclsLogic': 'OR',
-        'iconClass': 'fa fa-pencil'
+        'iconClass': 'fa fa-pencil',
+        'otherClass': 'js-only-massive'
+    },
+    'changes': {
+        'text': 'Edit',
+        'groupAcls': 'vmEdit',
+        'aclsLogic': 'OR',
+        'iconClass': 'fa fa-pencil',
+        'otherClass': 'js-only-one'
     },
     'start': {
         'text': 'Start',
@@ -652,6 +660,17 @@ Wat.I.selectedActions[qvdObj] = {
             'type': 'eq',
             'field': 'user_state',
             'value': 'connected'
+        }
+    },
+    'spy': {
+        'text': 'Spy',
+        'acls': 'vm.spy.',
+        'iconClass': 'fa fa-user-secret',
+        'otherClass': 'js-only-one',
+        'visibilityCondition': {
+            'type': 'eq',
+            'field': 'state',
+            'value': 'running'
         }
     },
     'delete': {

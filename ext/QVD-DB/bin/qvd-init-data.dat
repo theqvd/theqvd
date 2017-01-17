@@ -12,6 +12,11 @@ id	name	description
 key	value	tenant_id
 
 wat.multitenant	1	-1
+api.public.footer.link.1.label.default	Qindel Group © 2016	-1
+api.public.footer.link.1.src.default	http://qindel.com/	-1
+api.public.footer.link.2.label.default	Contact	-1
+api.public.footer.link.2.src.default	http://theqvd.com/contact	-1
+api.public.footer.link.2.src.es	http://theqvd.com/es/contacto	-1
 
 
 ### Administrator ###
@@ -428,6 +433,8 @@ id	name	description
 327	vm.update.properties	Update properties when update virtual machines
 328	vm.update.state	Start-Stop virtual machines
 329	tenant.purge.	Delete all the elements of a tenant
+330	vm.spy.	Spy QVD option to see the VM activity via VNC
+331	vm.spy.interactive	Interactive mode on Spy QVD feature to take desktop control
 
 ### ACL_Role_Relation ###
 id	acl_id	role_id	positive
@@ -767,6 +774,8 @@ id	acl_id	role_id	positive
 333	200	48	t
 334	204	48	t
 335	329	45	t
+336	331	63	t
+337	330	63	t
 
 
 ### Role_Administrator_Relation ###
@@ -880,13 +889,6 @@ id	inheritor_id	inherited_id
 84	23	31
 85	23	36
 86	46	47
-
-### SSL_Config ###
-key	value
-
-l7r.ssl.cert	&FILE_CONTENT(/etc/qvd/certs/server-certificate.pem)
-l7r.ssl.key	&FILE_CONTENT(/etc/qvd/certs/server-private-key.pem)
-
 
 ### Log ###
 id	administrator_id	administrator_name	tenant_id	tenant_name	action	type_of_action	arguments	qvd_object	object_id	object_name	time	status	source	ip	superadmin

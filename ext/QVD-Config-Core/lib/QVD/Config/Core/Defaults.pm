@@ -1,9 +1,33 @@
 package QVD::Config::Core;
 
-use Config::Properties;
+use strict;
+use warnings;
 
+use Config::Properties;
+use QVD::Config::Core::OS;
+
+my %os = QVD::Config::Core::OS::detect_os;
+my @tags = ("$os{os}",
+            "$os{os}-$os{version}",
+            "$os{os}-$os{version}.$os{revision}");
+
+my @data;
+while (<DATA>) {
+    if (s/^\@([\w\-+\.]+)\@\s*//) {
+        next unless grep $1 eq $_, @tags;
+    }
+    push @data, $_;
+}
+
+my $data = join('', @data);
+open my $fh, "<", \$data;
 our $defaults = Config::Properties->new;
-$defaults->load(*DATA);
+$defaults->load($fh);
+close($fh);
+
+$defaults->setProperty('config.os', $os{os});
+$defaults->setProperty('config.os.version', $os{version});
+$defaults->setProperty('config.os.revision', $os{revision});
 
 1;
 
@@ -84,11 +108,14 @@ path.qvd.bin = /usr/lib/qvd/bin
 path.usb.database = /usr/share/hwdata/usb.ids
 
 ## paths to external executables
-command.kvm = kvm
+@sles@command.kvm = qemu-kvm
+@ubuntu@command.kvm = kvm
 command.kvm-img = qemu-img
 command.sshfs = ${path.qvd.bin}/sshfs
-command.open_file = /usr/bin/xdg-open
-command.sftp-server = /usr/lib/openssh/sftp-server
+command.open_file = xdg-open
+@ubuntu@command.sftp-server = /usr/lib/openssh/sftp-server
+@sles-11@command.sftp-server = /usr/lib64/ssh/sftp-server
+@sles-12@command.sftp-server = /usr/lib/ssh/sftp-server
 command.nxagent = /usr/bin/nxagent
 command.nxdiag = ${path.qvd.bin}/nxdiag.pl
 command.x-session = /etc/X11/Xsession
@@ -102,7 +129,9 @@ command.groupdel = /usr/sbin/groupdel
 command.tar = tar
 command.umount = umount
 command.mount = mount
-command.version.mount.overlayfs = 2
+@ubuntu-14.04@command.version.mount.overlayfs = 2
+@ubuntu-16.04@command.version.mount.overlayfs = 1
+@sles@command.version.mount.overlayfs = 1
 command.rm = rm
 command.unionfs-fuse = ${path.qvd.bin}/unionfs
 command.lxc-destroy = ${path.qvd.bin}/lxc-destroy
@@ -111,12 +140,14 @@ command.lxc-create = ${path.qvd.bin}/lxc-create
 command.lxc-start = ${path.qvd.bin}/lxc-start
 command.lxc-stop = ${path.qvd.bin}/lxc-stop
 command.lxc-wait = ${path.qvd.bin}/lxc-wait
-command.version.lxc = 0.7
+@ubuntu@command.version.lxc = 1.0
+@sles-11@command.version.lxc = 0.7
+@sles-12@command.version.lxc = 1.0
 command.ebtables = ebtables
 command.iptables = iptables
 command.modprobe = /sbin/modprobe
-command.xinit = /usr/bin/xinit
-command.xhost = /usr/bin/xhost
+command.xinit = xinit
+command.xhost = xhost
 command.xhost.family = si
 command.nxproxy = /usr/bin/nxproxy
 command.btrfs = /sbin/btrfs
@@ -172,7 +203,7 @@ client.sshfs.extra_args=-o atomic_o_trunc -o idmap=user
 
 ## Extra arguments for Windows X servers
 client.xming.extra_args=-multiwindow -notrayicon -nowinkill -clipboard +bs -wm
-client.vcxsrv.extra_args=-rootless -notrayicon -nowinkill -clipboard +bs -wm -listen tcp -silent-dup-error -ac -nomultimonitors
+client.vcxsrv.extra_args=-multiwindow -notrayicon -nowinkill -clipboard +bs -wm -listen tcp -silent-dup-error -ac -nomultimonitors
 
 ## nxproxy's geometry parameter
 client.geometry = 1024x768
@@ -182,6 +213,8 @@ client.fullscreen =
 client.audio.enable =
 ## something regarding an NX channel
 client.printing.enable = 1
+## Enable sharing client-side folders towards the VM
+client.file_sharing.enable = 1
 ## L7R port the client should connect to
 client.host.port = 8443
 ## L7R host the client should connect to
@@ -259,8 +292,8 @@ client.ssl.error_timeout=5
 
 
 ## slave shell
-client.slave.command = bin/qvd-client-slaveserver
-client.slave.client = bin/qvd-slaveclient
+client.slave.command = ${path.qvd.bin}/qvd-client-slaveserver
+client.slave.client = ${path.qvd.bin}/qvd-slaveclient
 # enable commands used for benchmarking and testing the functionality
 # of the slave channel
 client.slave.debug_commands = 0
@@ -330,8 +363,8 @@ l7r.loadbalancer.plugin.default.weight.random = 1
 
 l7r.client.cert.require = 0
 
-l7r.ssl.options.SSL_version = TLSv1_2:!SSLv3:!SSLv2:!TLSv1
-l7r.ssl.options.SSL_cipher_list = HIGH:!aNULL:!MD5:!RC4:!3DES:!DES:!MEDIUM:!LOW:!EXPORT
+l7r.options.SSL_version = TLSv1_2:!SSLv3:!SSLv2:!TLSv1
+l7r.options.SSL_cipher_list = HIGH:!aNULL:!MD5:!RC4:!3DES:!DES:!MEDIUM:!LOW:!EXPORT
 
 ## umask for the HKD process
 hkd.user.umask = 0022
@@ -400,11 +433,12 @@ admin.ssh.opt.StrictHostKeyChecking = no
 admin.ssh.opt.UserKnownHostsFile = /dev/null
 
 ## virtualization engine to use, either kvm or lxc
-vm.hypervisor = kvm
+vm.hypervisor = lxc
 
 ## COW fs to use with LXC
-vm.lxc.unionfs.type = overlayfs
-# vm.lxc.unionfs.type = unionfs-fuse
+@ubuntu@vm.lxc.unionfs.type = overlayfs
+@sles-12@vm.lxc.unionfs.type = overlayfs
+@sles-11@vm.lxc.unionfs.type = unionfs-fuse
 vm.lxc.unionfs.bind.ro = 1
 
 # allow LXC DIs to have hooks for customization - disabled by default
@@ -676,4 +710,4 @@ internal.l7r.nothing.timeout.run_forwarder = 5
 
 internal.untar-dis.lock.path = ${path.run}/untar-dis.lock
 
-wat.multitenant = 0
+wat.multitenant = 1

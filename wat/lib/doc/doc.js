@@ -3,13 +3,8 @@ Wat.D = {
     // Params:
     //      selectedGuide: guide name.
     getDocBody: function (docParams, callBack) {        
-        // Load language
-        var lan = $.i18n.options.lng;
-        
-        if ($.inArray(lan, DOC_AVAILABLE_LANGUAGES) === -1) {
-            lan = DOC_DEFAULT_LANGUAGE;
-        }
-        
+        var lan = Wat.C.getEffectiveLan();
+
         var templates = Wat.I.T.getTemplateList('docSection', {lan: lan, guide: docParams.guide});
         
         Wat.A.getTemplates(templates, callBack, docParams);

@@ -162,7 +162,7 @@ sub unshare_busid {
 	my ($self, $busid) = @_;
 
 	$self->{needs_refresh} = 1;
-	return $self->_run_usbip("bind", "-b", $busid) == 0;
+	return $self->_run_usbip("unbind", "-b", $busid) == 0;
 }
 
 sub _run_usbip {

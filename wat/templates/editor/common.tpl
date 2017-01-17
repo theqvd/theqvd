@@ -1,5 +1,5 @@
 <div class="editor-container <%= cid %> js-editor-container-<%= editorMode %>">
-    <table class="editor-table alternate">
+    <table class="editor-table js-editor-table <%= editorMode == "massive_edit" ? 'massive-editor-table js-massive-editor-table' : '' %> alternate">
          <%
          if (editorMode == "massive_edit") {
          %>

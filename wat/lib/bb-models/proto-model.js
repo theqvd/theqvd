@@ -14,6 +14,7 @@ Wat.Models.Model = Backbone.Model.extend({
         else {
             var view = 'list';
         }
+        
         switch (view) {
             case 'detail':
                 return this.processResponse(response.rows[0]);
@@ -89,6 +90,8 @@ Wat.Models.Model = Backbone.Model.extend({
             url: encodeURI(that.url()),
             processData: false
         }, options);
+        
+        params.error = Wat.A.processResponseError;
         
         return $.ajax(params);
     },

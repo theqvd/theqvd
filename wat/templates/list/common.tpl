@@ -20,7 +20,7 @@
         <div class="h2"><i class="fa fa-filter"></i><span data-i18n="Search by"></span></div>
         
         <!-- ADVANCED FILTERS
-        <span class="filter-control">
+        <span class="filter-control" data-fieldname="filter_mode">
             <label for="filter_mode" data-i18n="Filter mode"></label>
             <select class="chosen-single" name="filter_mode">
                 <option value="simple" selected="selected" data-i18n="Simple"></option>
@@ -43,7 +43,7 @@
                 switch(filter.type) {
                     case 'text':
                         %>
-                            <span class="filter-control">
+                            <span class="filter-control" data-fieldname="<%= name %>">
                                 <% 
                                     var textValue = '';
                                     if (currentFilters[filter.filterField] != undefined) {
@@ -68,7 +68,7 @@
                         break;            
                     case 'select':
                         %>
-                            <span class="filter-control desktop">
+                            <span class="filter-control desktop" data-fieldname="<%= name %>">
                                 <label for="<%= name %>" <%= translationAttr %>><%= filter.text %></label>
                                 <select name="<%= name %>" id="filter_<%= name %>" class="desktop-filter <%= filter.class %>" data-filter-field="<%= filter.filterField %>" <%= filter.tenantDepent ? 'data-tenant-depent="1"' : '' %> <%= filter.waitLoading ? 'disabled="disabled" data-waiting-loading="1"' : '' %>>
                                     <% 

@@ -200,7 +200,7 @@ install: function(toclevels) {
 }
 
 }
-asciidoc.install(2);
+asciidoc.install(3);
 /*]]>*/
 </script>
 </head>
@@ -354,7 +354,7 @@ Widgets de estadísticas
 <img src="images/doc_images/menu_help.png" alt="menu_help.png" width="600px" />
 </span></p></div>
 <div class="sect2">
-<h3 id="_a_cerca_de">3.1. A cerca de</h3>
+<h3 id="_acerca_de">3.1. Acerca de</h3>
 <div class="paragraph"><p>Sección donde se muestra información de la versión de QVD que se está utilizando así como revisión del WAT.</p></div>
 </div>
 <div class="sect2">
@@ -447,7 +447,7 @@ Acciones masivas
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_user_massiveactions.png" alt="screenshot_user_massiveactions.png" width="600px" />
+<img src="images/doc_images/screenshot_user_massiveactions.png" alt="screenshot_user_massiveactions.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>Las acciones masivas nos dan las siguientes opciones a realizar sobre los usuarios seleccionados:</p></div>
 <div class="ulist"><ul>
@@ -497,7 +497,7 @@ Editor masivo
 <img src="images/doc_images/screenshot_user_massiveeditor.png" alt="screenshot_user_massiveeditor.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>El editor masivo de usuarios solamente permite modificar propiedades porsonalizadas.</p></div>
-<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados.</p></div>
+<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados, salvo que se escoja la opción "Sin cambios".</p></div>
 <div class="paragraph"><p>Si no existen propiedades personalizadas en los usuarios, la edición masiva no estará habilitada.</p></div>
 </div></div>
 </dd>
@@ -510,7 +510,7 @@ Creación
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_user_create.png" alt="screenshot_user_create.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Al crear un usuario estableceremos su nombre, password y de forma opcional podemos crearle propiedades.</p></div>
+<div class="paragraph"><p>Al crear un usuario estableceremos su nombre, password y sus propiedades.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -545,7 +545,7 @@ Editar el usuario
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>Si quisiéramos más acciones sobre ellas, con el botón de vista extendida iremos a la vista listado de las máquinas virtuales filtradas por este nodo.</p></div>
+<div class="paragraph"><p>Si quisiéramos más acciones sobre ellas, con el botón de vista extendida iremos a la vista listado de las máquinas virtuales filtradas por este usuario.</p></div>
 <div class="paragraph"><p>En este caso, a diferencia de otras vistas detalle, también disponemos de un <strong>botón para crear una máquina virtual asociada al usuario</strong> actual, donde aparecerá el mismo formulario de creación de máquinas virtuales salvo el usuario al que se asociará la máquina, que va implícito al estar creándola desde aquí.</p></div>
 </div></div>
 </li>
@@ -561,13 +561,13 @@ Edición
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_user_edit.png" alt="screenshot_user_edit.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Al editar un usuario podremos escoger si cambiarle la <strong>contraseña</strong> (si no marchamos la casilla de verificación,  permanecerá inalterada) y <strong>crear, editar o añadir propiedades</strong>.</p></div>
+<div class="paragraph"><p>Al editar un usuario podremos escoger si cambiarle la <strong>contraseña</strong> (si no marchamos la casilla de verificación,  permanecerá inalterada) y <strong>editar propiedades</strong>.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
 <img src="images/doc_images/icons/tip.png" alt="Tip" />
 </td>
-<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas que se sitúan bajo el listado si solo seleccionamos un elemento.</td>
+<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas si solo seleccionamos un elemento.</td>
 </tr></table>
 </div>
 </div></div>
@@ -586,7 +586,7 @@ Vista listado
 <div class="content">
 <div class="paragraph"><p>La vista principal es un listado con las máquinas virtuales de QVD.
 <span class="image">
-<img src="images/doc_images/screenshot_vm_list2.png" alt="screenshot_vm_list2.png" width="960px" />
+<img src="images/doc_images/screenshot_vm_list.png" alt="screenshot_vm_list.png" width="960px" />
 </span></p></div>
 </div></div>
 </dd>
@@ -664,6 +664,11 @@ Si las máquinas virtuales tienen definida une <strong>fecha de expiración</str
 </li>
 <li>
 <p>
+<strong>Deteniéndose</strong>: Icono de stop parpadeando.
+</p>
+</li>
+<li>
+<p>
 <strong>Corriendo</strong>: Icono de play.
 </p>
 <div class="openblock">
@@ -675,14 +680,8 @@ Si las máquinas virtuales tienen definida une <strong>fecha de expiración</str
 </li>
 <li>
 <p>
-Arrancando/Deteniéndose*: Icono animado de carga.
+<strong>Arrancando</strong>: Icono de play parpadeando.
 </p>
-<div class="openblock">
-<div class="content">
-<div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_startingstopping.png" alt="icon_startingstopping.png" />
-</span></p></div>
-</div></div>
 </li>
 </ul></div>
 </li>
@@ -718,7 +717,7 @@ Acciones masivas
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_massiveactions.png" alt="screenshot_vm_massiveactions.png" width="600px" />
+<img src="images/doc_images/screenshot_vm_massiveactions.png" alt="screenshot_vm_massiveactions.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>Las acciones masivas nos dan las siguientes opciones a realizar sobre las máquinas virtuales seleccionadas:</p></div>
 <div class="ulist"><ul>
@@ -749,6 +748,11 @@ Desconectar usuario de máquinas virtuales
 </li>
 <li>
 <p>
+Espiar sesión del usuario
+</p>
+</li>
+<li>
+<p>
 Eliminar máquinas virtuales
 </p>
 </li>
@@ -775,10 +779,10 @@ Editor masivo
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_massiveeditor_properties.png" alt="screenshot_vm_massiveeditor_properties.png" width="960px" />
+<img src="images/doc_images/screenshot_vm_massiveeditor.png" alt="screenshot_vm_massiveeditor.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>El editor masivo de máquinas virtuales permite cambiar el tag de imagen utilizado, asignar una fecha de expiración y modificar propiedades personalizadas.</p></div>
-<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados.</p></div>
+<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados, salvo que se escoja la opción "Sin cambios".</p></div>
 <div class="paragraph"><p>El control de expiración se verá en el apartado de Edición de máquinas virtuales.</p></div>
 <div class="paragraph"><p>Respecto al tag de imagen, cuando editamos masivamente máquinas virtuales existen dos posibilidades:</p></div>
 </div></div>
@@ -790,7 +794,7 @@ Que las máquinas virtuales tengan asignado el mismo OSF: En este caso el select
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_massiveeditor_sameOSF.png" alt="screenshot_vm_massiveeditor_sameOSF.png" width="960px" />
+<img src="images/doc_images/screenshot_vm_massiveeditor_opencombo.png" alt="screenshot_vm_massiveeditor_opencombo.png" width="960px" />
 </span></p></div>
 </div></div>
 </li>
@@ -805,7 +809,7 @@ Que la máquinas virtuales tengan asignados OSFs distintos: En este caso, se mos
 </span></p></div>
 <div class="paragraph"><p>Al no poder obtener una lista de tags real para todas las máquinas virtuales seleccionadas, solamente se podrá escoger entre <em>default</em> y <em>head</em>.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_massiveeditor_sameOSF_opencombo.png" alt="screenshot_vm_massiveeditor_sameOSF_opencombo.png" width="960px" />
+<img src="images/doc_images/screenshot_vm_massiveeditor_differentOSF_opencombo.png" alt="screenshot_vm_massiveeditor_differentOSF_opencombo.png" width="960px" />
 </span></p></div>
 </div></div>
 </li>
@@ -828,7 +832,6 @@ Creación
 <div class="paragraph"><p>Al crear una máquina virtual estableceremos su <strong>nombre</strong>, el <strong>usuario</strong> al que pertenece (salvo si la creamos desde la vista detalle del usuario) y la <strong>imagen</strong> que utilizará.</p></div>
 <div class="paragraph"><p>La imagen la seleccionaremos escogiendo un OSF, y el tag de imagen deseado. Al seleccionar el OSF, los tags de las imágenes asociadas a dicho OSF se cargarán en el siguiente combo, pudiendo escoger uno de ellos así como los tags especiales <em>default</em> y <em>head</em>, con los que se cargará la imagen por defecto o la última imagen creada en el OSF respectivamente.</p></div>
 <div class="paragraph"><p>El OSF es el único dato que no podremos editar más adelante en una máquina virtual.</p></div>
-<div class="paragraph"><p>De forma opcional podemos crearle otras propiedades.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -846,6 +849,11 @@ Vista detalle
 <li>
 <p>
 Desconectar al usuario de la máquina virtual. Este botón solo estará disponible si el usuario está conectado.
+</p>
+</li>
+<li>
+<p>
+Espiar sesión del usuario. Este botón solo estará disponible si la máquina virtual está corriendo.
 </p>
 </li>
 <li>
@@ -928,7 +936,7 @@ Fechas de expiración
 </li>
 </ul></div>
 </div></div>
-</dd>
+<div class="dlist"><dl>
 <dt class="hdlist1">
 Estado de ejecución
 </dt>
@@ -956,7 +964,7 @@ Si la imagen por defecto del OSF cambia, observamos que en los atributos aparece
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/vm_execution_state_running.png" alt="vm_execution_state_running.png" width="960px" />
+<img src="images/doc_images/vm_execution_state_running.png" alt="vm_execution_state_running.png" width="600px" />
 </span></p></div>
 </div></div>
 </li>
@@ -978,7 +986,7 @@ Si la imagen por defecto del OSF cambia, observamos que en los atributos aparece
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/vm_execution_state_stopped.png" alt="vm_execution_state_stopped.png" width="600px" />
+<img src="images/doc_images/vm_execution_state_starting.png" alt="vm_execution_state_starting.png" width="600px" />
 </span></p></div>
 </div></div>
 </li>
@@ -997,6 +1005,8 @@ Si la imagen por defecto del OSF cambia, observamos que en los atributos aparece
 </div></div>
 </dd>
 </dl></div>
+</dd>
+</dl></div>
 </div></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
@@ -1008,7 +1018,7 @@ Edición
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_vm_edit.png" alt="screenshot_vm_edit.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Al editar una máquina virtual podremos cambiarle el <strong>nombre</strong>, el <strong>tag</strong> de imagen, las <strong>fechas de expiración</strong> y <strong>crear, editar o añadir propiedades</strong>.</p></div>
+<div class="paragraph"><p>Al editar una máquina virtual podremos cambiarle el <strong>nombre</strong>, el <strong>tag</strong> de imagen, las <strong>fechas de expiración</strong> y <strong>editar propiedades</strong>.</p></div>
 <div class="paragraph"><p>Se pueden configurar dos fechas de expiración:</p></div>
 <div class="ulist"><ul>
 <li>
@@ -1031,7 +1041,7 @@ Edición
 <td class="icon">
 <img src="images/doc_images/icons/tip.png" alt="Tip" />
 </td>
-<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas que se sitúan bajo el listado si solo seleccionamos un elemento.</td>
+<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas si solo seleccionamos un elemento.</td>
 </tr></table>
 </div>
 </div></div>
@@ -1128,7 +1138,7 @@ Acciones masivas
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_host_massiveactions.png" alt="screenshot_host_massiveactions.png" width="600px" />
+<img src="images/doc_images/screenshot_host_massiveactions.png" alt="screenshot_host_massiveactions.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>Las acciones masivas nos dan las siguientes opciones a realizar sobre los nodos seleccionados:</p></div>
 <div class="ulist"><ul>
@@ -1178,7 +1188,7 @@ Editor masivo
 <img src="images/doc_images/screenshot_host_massiveeditor.png" alt="screenshot_host_massiveeditor.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>El editor masivo de nodos solamente permite modificar propiedades porsonalizadas.</p></div>
-<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados.</p></div>
+<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados, salvo que se escoja la opción "Sin cambios".</p></div>
 <div class="paragraph"><p>Si no existen propiedades personalizadas en los nodos, la edición masiva no estará habilitada.</p></div>
 </div></div>
 </dd>
@@ -1191,7 +1201,7 @@ Creación
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_host_create.png" alt="screenshot_host_create.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Al crear un nodo estableceremos su nombre, dirección IP y de forma opcional podemos crearle propiedades.</p></div>
+<div class="paragraph"><p>Al crear un nodo estableceremos su nombre, dirección IP y sus propiedades.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1241,13 +1251,13 @@ Edición
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_host_edit.png" alt="screenshot_host_edit.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Al editar un nodo podremos editar su <strong>nombre, dirección IP y crear, editar o añadir propiedades</strong>.</p></div>
+<div class="paragraph"><p>Al editar un nodo podremos editar su <strong>nombre, dirección IP y editar propiedades</strong>.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
 <img src="images/doc_images/icons/tip.png" alt="Tip" />
 </td>
-<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas que se sitúan bajo el listado si solo seleccionamos un elemento.</td>
+<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas si solo seleccionamos un elemento.</td>
 </tr></table>
 </div>
 </div></div>
@@ -1285,7 +1295,7 @@ Acciones masivas
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_osf_massiveactions.png" alt="screenshot_osf_massiveactions.png" width="600px" />
+<img src="images/doc_images/screenshot_osf_massiveactions.png" alt="screenshot_osf_massiveactions.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>Las acciones masivas nos dan las siguientes opciones a realizar sobre los OSFs seleccionados:</p></div>
 <div class="ulist"><ul>
@@ -1321,7 +1331,7 @@ Editor masivo
 </span></p></div>
 <div class="paragraph"><p>El editor masivo de OSFs permite modificar la memoria, el almacenamiento de usuario y las propiedades personalizadas.</p></div>
 <div class="paragraph"><p><strong>Si dejamos la caja de memoria y almacenamiento de usuario en blanco no se modificarán</strong>.</p></div>
-<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados.</p></div>
+<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados, salvo que se escoja la opción "Sin cambios".</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1333,7 +1343,7 @@ Creación
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_osf_create.png" alt="screenshot_osf_create.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Al crear un OSF estableceremos su nombre, memoria, almacenamiento de usuario y de forma opcional podemos crearle propiedades.</p></div>
+<div class="paragraph"><p>Al crear un OSF estableceremos su nombre, memoria, almacenamiento de usuario y sus propiedades.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1377,13 +1387,13 @@ Edición
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_osf_edit.png" alt="screenshot_osf_edit.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Al editar un OSF podremos editar su <strong>nombre, memoria, almacenamiento de usuario y crear, editar o añadir propiedades</strong>.</p></div>
+<div class="paragraph"><p>Al editar un OSF podremos editar su <strong>nombre, memoria, almacenamiento de usuario y editar propiedades</strong>.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
 <img src="images/doc_images/icons/tip.png" alt="Tip" />
 </td>
-<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas que se sitúan bajo el listado si solo seleccionamos un elemento.</td>
+<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas si solo seleccionamos un elemento.</td>
 </tr></table>
 </div>
 </div></div>
@@ -1483,7 +1493,7 @@ Acciones masivas
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_di_massiveactions.png" alt="screenshot_di_massiveactions.png" width="600px" />
+<img src="images/doc_images/screenshot_di_massiveactions.png" alt="screenshot_di_massiveactions.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>Las acciones masivas nos dan las siguientes opciones a realizar sobre las imágenes de disco seleccionados:</p></div>
 <div class="ulist"><ul>
@@ -1528,7 +1538,7 @@ Editor masivo
 <img src="images/doc_images/screenshot_di_massiveeditor.png" alt="screenshot_di_massiveeditor.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>El editor masivo de imágenes de disco solamente permite modificar propiedades porsonalizadas.</p></div>
-<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados.</p></div>
+<div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados, salvo que se escoja la opción "Sin cambios".</p></div>
 <div class="paragraph"><p>Si no existen propiedades personalizadas en las imágenes de disco, la edición masiva no estará habilitada.</p></div>
 </div></div>
 </dd>
@@ -1635,14 +1645,14 @@ Edición
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_di_edit.png" alt="screenshot_di_edit.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Al editar una imagen podremos gestionar sus <strong>tags y crear, editar o añadir propiedades</strong>. Ademas podremos establecerla como imagen por defecto de su OSF, en el caso de no serlo ya. Si lo es, nos saldrá un aviso.</p></div>
+<div class="paragraph"><p>Al editar una imagen podremos gestionar sus <strong>tags y editar propiedades</strong>. Ademas podremos establecerla como imagen por defecto de su OSF, en el caso de no serlo ya. Si lo es, nos saldrá un aviso.</p></div>
 <div class="paragraph"><p><strong>Los tags de una Imagen de disco no se pueden repetir en las Imágenes asociadas a un mismo OSF</strong>. <strong>Si añadimos un tag a una Imagen de disco que ya existe</strong> en otra Imagen de su mismo OSF el sistema nos lo permitirá, pero lo que estaremos haciendo en realidad es <strong>mover el tag entre las dos Imágenes</strong>, desapareciendo de la que lo tenía en un inicio para establecerse en la Imagen que estemos editando.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
 <img src="images/doc_images/icons/tip.png" alt="Tip" />
 </td>
-<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas que se sitúan bajo el listado si solo seleccionamos un elemento.</td>
+<td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas si solo seleccionamos un elemento.</td>
 </tr></table>
 </div>
 </div></div>
@@ -1786,7 +1796,7 @@ Vista listado
 <div class="content">
 <div class="paragraph"><p>La vista principal es un listado con los administradores del WAT.
 <span class="image">
-<img src="images/doc_images/screenshot_admin_list.png" alt="screenshot_admin_list.png" width="960px" />
+<img src="images/doc_images/screenshot_administrator_list.png" alt="screenshot_administrator_list.png" width="960px" />
 </span></p></div>
 </div></div>
 </dd>
@@ -1827,6 +1837,18 @@ El <strong>estado de bloqueo</strong> de los usuarios:
 <div class="paragraph"><p>Si el administrador no tiene roles asociados, aparecerá un icono de advertencia, ya que un administrador sin roles no tiene sentido.</p></div>
 </div></div>
 </li>
+<li>
+<p>
+<strong>Administrador logueado</strong>: Icono de archivador.
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/icon_archiver.png" alt="icon_archiver.png" />
+</span></p></div>
+<div class="paragraph"><p>Si el administrador es el administrador logueado, llevará este identificador con el aviso <em>Este administrador soy yo</em>.</p></div>
+</div></div>
+</li>
 </ul></div>
 </li>
 </ul></div>
@@ -1838,7 +1860,7 @@ Acciones masivas
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_admin_massiveactions.png" alt="screenshot_admin_massiveactions.png" width="600px" />
+<img src="images/doc_images/screenshot_administrator_massiveactions.png" alt="screenshot_administrator_massiveactions.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>Las acciones masivas nos dan las siguientes opciones a realizar sobre los administradores seleccionados:</p></div>
 <div class="ulist"><ul>
@@ -1857,9 +1879,10 @@ Creación
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_admin_create.png" alt="screenshot_admin_create.png" width="960px" />
+<img src="images/doc_images/screenshot_administrator_create.png" alt="screenshot_administrator_create.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>Al crear un administrador estableceremos su nombre, password y su idioma. Si dejamos el idioma por defecto, el administrador tendrá el idioma general del sistema aunque podrá cambiarlo.</p></div>
+<div class="paragraph"><p>Además, podemos asignar roles de privilegios, dependiendo de qué permisos queremos que tenga el administrador. Si asignamos más de un rol, el administrador tendrá la suma de los privilegios de cada rol. Si no le asignamos ningún rol, el administrador no podrá ni entrar en el Panel de administración.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1869,7 +1892,7 @@ Vista detalle
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_admin_details.png" alt="screenshot_admin_details.png" width="960px" />
+<img src="images/doc_images/screenshot_administrator_details.png" alt="screenshot_administrator_details.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>Observamos una pequeña <strong>cabecera</strong> donde junto al <strong>nombre del administrador</strong> están los <strong>botones para eliminarlo y editarlo</strong>.</p></div>
 <div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos del administrador</strong>. Entre ellos se encuentran los roles asociados al administrador con un control de borrado junto a cada uno. Haciendo click en el nombre de los roles, se irá a la vista detalle de cada rol.</p></div>
@@ -1921,9 +1944,10 @@ Edición
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_admin_edit.png" alt="screenshot_admin_edit.png" width="960px" />
+<img src="images/doc_images/screenshot_administrator_edit.png" alt="screenshot_administrator_edit.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Al editar un administrador podremos escoger si cambiarle la <strong>contraseña</strong> (si no marchamos la casilla de verificación,  permanecerá inalterada) y el <strong>idioma</strong>, recordando que son valores que él mismo puede cambiar.</p></div>
+<div class="paragraph"><p>Al editar un administrador podremos escoger si cambiarle la <strong>contraseña</strong> (si no marchamos la casilla de verificación, permanecerá inalterada) y el <strong>idioma</strong>, recordando que son valores que él mismo puede cambiar.</p></div>
+<div class="paragraph"><p>Además, podemos asignar/desasignar roles de privilegios.</p></div>
 </div></div>
 </dd>
 </dl></div>
@@ -1959,10 +1983,15 @@ Acciones masivas
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_massiveactions.png" alt="screenshot_role_massiveactions.png" width="600px" />
+<img src="images/doc_images/screenshot_role_massiveactions.png" alt="screenshot_role_massiveactions.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>Las acciones masivas nos dan las siguientes opciones a realizar sobre los roles seleccionados:</p></div>
 <div class="ulist"><ul>
+<li>
+<p>
+Editar roles
+</p>
+</li>
 <li>
 <p>
 Eliminar roles
@@ -1980,7 +2009,40 @@ Creación
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_role_create.png" alt="screenshot_role_create.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Al crear un rol estableceremos solamente su nombre. Lo importante será asociarle permisos, cosa que haremos desde la vista detalle.</p></div>
+<div class="paragraph"><p>Al crear un rol estableceremos su nombre, descripción y le asignaremos permisos heredando ACLs.</p></div>
+<div class="paragraph"><p>La herencia de ACLs tiene dos modos:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Heredar ACLs de otros roles</strong>: En este modo se escoge qué rol se desea heredar con un selector de roles. Una vez heredado un rol, desaparecerá de este selector. Igualmente si se elimina de la lista de roles heredados, volverá a aparecer entre los roles heredados disponibles.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_role_inherit_roles.png" alt="screenshot_role_inherit_roles.png" width="600px" />
+</span></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Heredar ACLs de plantillas</strong>: En este modo se escogen las plantillas de las que se deseen heredar los ACLs. Se pueden escoger de un selector como el de los roles o bien usando una matriz de botones donde se distribuyen las diferentes plantillas según los objetos o nivel de privilegios de cada una. Por ejemplo, la plantilla con los ACLs de actualización de un Nodo estará en la intersección de la fila de Nodos y la columna de Actualizado.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_role_inherit_templates.png" alt="screenshot_role_inherit_templates.png" width="600px" />
+</span></p></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_role_inherit_templates_matrix.png" alt="screenshot_role_inherit_templates_matrix.png" width="600px" />
+</span></p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="images/doc_images/icons/tip.png" alt="Tip" />
+</td>
+<td class="content">Si se hereda de uno o más roles/plantillas, se heredará la suma de sus ACLs sin importar los ACLs comunes. Tras esta herencia, se pueden quitar o agregar ACLs sueltos manualmente desde el Árbol de ACLs para personalizar las credenciales obtenidas por ellos según las necesidades del administrador. De este modo, si nos interesan todos los ACLs de un rol o plantilla excepto uno, será tan fácil como heredar el rol/plantilla y quitar a mano el ACL sobrante.</td>
+</tr></table>
+</div>
+<div class="paragraph"><p>Para una personalización más específica podremos añadir o quitar ACLs desde la vista detalle.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1993,12 +2055,11 @@ Vista detalle
 <img src="images/doc_images/screenshot_role_details.png" alt="screenshot_role_details.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>En esta vista muy similar a la de administradores, observamos una pequeña <strong>cabecera</strong> donde junto al <strong>nombre del rol</strong> está el <strong>botón para eliminarlo, y el botón de edición</strong>.</p></div>
-<div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos del rol</strong>. Entre los atributos se encuentra la lista de <strong>roles heredados</strong> con un enlace para eliminarlos.</p></div>
-<div class="paragraph"><p>En el listado de roles heredados pueden aparecer <strong>dos tipos de elementos</strong>:</p></div>
+<div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos del rol</strong>. Entre los atributos se encuentra la lista de <strong>roles y plantillas heredados</strong>.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>Rol</strong>: Se trata de un rol de los definidos en el sistema. El nombre de este rol, será un enlace a su vista detalle.
+<strong>Rol</strong>: Se trata de un rol de los definidos en el sistema. El nombre de este rol será un enlace a su vista detalle.
 </p>
 </li>
 <li>
@@ -2066,35 +2127,6 @@ Total Master: Esta plantilla engloba la plantilla Master, Gestión de Tenants y 
 </div></div>
 </li>
 </ul></div>
-<div class="paragraph"><p>Debajo se encuentra un cuadro de controles de herencia de ACLs. La herencia de ACLs tiene dos modos:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<strong>Heredar ACLs de otros roles</strong>: En este modo se escoge qué rol se desea heredar con un selector de roles. Una vez heredado un rol, desaparecerá de este selector. Igualmente si se elimina de la lista de roles heredados, volverá a aparecer entre los roles heredados disponibles.
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_inherit_roles.png" alt="screenshot_role_inherit_roles.png" width="600px" />
-</span></p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<strong>Heredar ACLs de plantillas</strong>: En este modo se escogen las plantillas de las que se deseen heredar los ACLs de una matriz de botones donde se distribuyen las diferentes plantillas según los objetos o nivel de privilegios de cada una. Por ejemplo, la plantilla con los ACLs de actualización de un Nodo estará en la intersección de la fila de Nodos y la columna de Actualizado.
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_inherit_templates.png" alt="screenshot_role_inherit_templates.png" width="600px" />
-</span></p></div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
-</td>
-<td class="content">Si se hereda de uno o más roles/plantillas, se heredará la suma de sus ACLs sin importar los ACLs comunes. Tras esta herencia, se pueden quitar o agregar ACLs sueltos manualmente desde el Árbol de ACLs para personalizar las credenciales obtenidas por ellos según las necesidades del administrador. De este modo, si nos interesan todos los ACLs de un rol o plantilla excepto uno, será tan fácil como heredar el rol/plantilla y quitar a mano el ACL sobrante.</td>
-</tr></table>
-</div>
 <div class="paragraph"><p>En la parte derecha encontramos:</p></div>
 <div class="ulist"><ul>
 <li>
@@ -2133,7 +2165,7 @@ Por tipo de <strong>acciones</strong>:
 </div></div>
 </li>
 </ul></div>
-<div class="paragraph"><p>Cada rama tiene una casilla de verificación. Si está activada, significa que todos los ACLs de la rama están asignados, bien directamente o por herencia de uno o varios roles.</p></div>
+<div class="paragraph"><p>Cada rama tiene una casilla de verificación. Si está activada, significa que todos los ACLs de la rama están asignados, bien directamente o por herencia de uno o varios roles o templates.</p></div>
 <div class="paragraph"><p><strong>Si activamos la casilla de una rama</strong>, incluiremos en el rol todos los ACLs de esa rama. Del mismo modo, <strong>si desactivamos la casilla de una rama</strong>, estaremos quitando sus ACLs.</p></div>
 <div class="paragraph"><p>Las ramas, también tienen adosada, entre paréntesis, información de los ACLs incluídos en el rol frente a los ACLs totales en la rama.</p></div>
 <div class="paragraph"><p>Al abrir una rama, vemos que <strong>cada ACL tiene una casilla de verificación</strong> con la que asociarlo o desasociarlo del rol.</p></div>
@@ -2150,17 +2182,22 @@ Edición
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_role_edit.png" alt="screenshot_role_edit.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Al editar un rol podremos cambiarle solamente el nombre.</p></div>
+<div class="paragraph"><p>Al editar un rol podremos cambiarle el nombre y la descripción, además de configurar la herencia de roles y plantillas de ACLs.</p></div>
+<div class="paragraph"><p>Ver sección de Creación de roles para más detalles acerca de la configuración de roles y plantillas.</p></div>
 </div></div>
 </dd>
 </dl></div>
 </div>
 <div class="sect2">
-<h3 id="_vistas">5.4. Vistas</h3>
+<h3 id="_vistas_por_defecto">5.4. Vistas por defecto</h3>
 <div class="paragraph"><p>Como hemos visto en el análisis de cada sección, las vistas listado muestran varias columnas con diferentes datos de los elementos existentes y además disponen de algunos controles de filtrado.</p></div>
 <div class="paragraph"><p>Estas columnas y filtros se puede configurar globalmente en el sistema, y luego cada administrador podrá personalizar estos valores sólamente para él.</p></div>
+<div class="paragraph"><p>Con un combo de selección podremos cambiar entre columnas y filtros.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_watconfig_defaultviews.png" alt="screenshot_watconfig_defaultviews.png" width="960px" />
+<img src="images/doc_images/screenshot_watconfig_defaultviews_columns.png" alt="screenshot_watconfig_defaultviews_columns.png" width="960px" />
+</span></p></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_watconfig_defaultviews_filters.png" alt="screenshot_watconfig_defaultviews_filters.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>En este apartado se realizará la configuración general de estos parámetros marcando una serie de casillas de verificación. Por un lado se configuran las columnas mostradas y por otro los filtros disponibles.</p></div>
 <div class="paragraph"><p>En el caso de las <strong>columnas</strong> es una configuración válida para la <strong>versión escritorio</strong>, ya que en la versión móvil se mostrará una versión siempre simplificada. Por otro lado, los <strong>filtros</strong> se configuran independientemente para <strong>escritorio y móvil</strong>. Esta diferenciación se hace para poder hacer la versión móvil más o menos simple según nuestras necesidades.</p></div>
@@ -2283,11 +2320,11 @@ Eliminado y restauración de parámetros
 <div class="paragraph"><p><span class="image">
 <img src="images/doc_images/screenshot_userarea_profile.png" alt="screenshot_userarea_profile.png" width="960px" />
 </span></p></div>
-<div class="paragraph"><p>Se pueden configurar el idioma  de la interfaz del WAT así como el tamaño de bloque, que corresponde al número de elementos mostrados en cada página en las vistas listado.
+<div class="paragraph"><p>Se pueden configurar el <strong>idioma</strong> de la interfaz del WAT así como el <strong>tamaño de bloque</strong>, que corresponde al número de elementos mostrados en cada página en las vistas listado.
 Ambos parámetros se pueden definir como <em>por defecto</em> adoptando así la configuración general del WAT, o bien definir un valor fijo para el administrador actual.</p></div>
-</div>
-<div class="sect2">
-<h3 id="_personalizar_vistas">7.2. Personalizar vistas</h3>
+<div class="paragraph"><p>Además, desde esta sección se puede acceder a la configuración de las vistas del administrador logueado en la sección <strong>Mis vistas</strong>.</p></div>
+<div class="sect3">
+<h4 id="_mis_vistas">7.1.1. Mis vistas</h4>
 <div class="paragraph"><p>Como vimos en la sección de gestión del WAT, se pueden personalizar qué columnas o filtros se muestran en las diferentes vistas del WAT. Esa es una configuración global del sistema.</p></div>
 <div class="paragraph"><p>En base a esta configuración, cada administrador puede personalizar sus vistas de un modo muy similar, adaptándolas a sus preferencias.</p></div>
 <div class="admonitionblock">
@@ -2298,14 +2335,18 @@ Ambos parámetros se pueden definir como <em>por defecto</em> adoptando así la 
 <td class="content">Si un administrador no cambia la configuración de sus vistas, estas podrían variar si la configuración global fuese modificada. Por otro lado, si un administrador cambia un parámetro, éste quedará fijado en el valor establecido, sin ser alterado por los cambios en la configuración global.</td>
 </tr></table>
 </div>
+<div class="paragraph"><p>Con un combo de selección podremos cambiar entre columnas y filtros.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_userarea_customize.png" alt="screenshot_userarea_customize.png" width="960px" />
+<img src="images/doc_images/screenshot_userarea_customize_columns.png" alt="screenshot_userarea_customize_columns.png" width="960px" />
+</span></p></div>
+<div class="paragraph"><p><span class="image">
+<img src="images/doc_images/screenshot_userarea_customize_filters.png" alt="screenshot_userarea_customize_filters.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>En este apartado se realizará la configuración <strong>para el administrador actual</strong> de estos parámetros marcando una serie de casillas de verificación. Por un lado se configuran las columnas mostradas y por otro los filtros disponibles.</p></div>
 <div class="paragraph"><p>En el caso de las <strong>columnas</strong> es una configuración válida para la <strong>versión escritorio</strong>, ya que en la versión móvil se mostrará una versión siempre simplificada. Por otro lado, los <strong>filtros</strong> se configuran independientemente para <strong>escritorio y móvil</strong>. Esta diferenciación se hace para poder hacer la versión móvil más o menos simple según nuestras necesidades.</p></div>
 <div class="paragraph"><p>En la sección encontramos un menú desplegable con la sección que queremos personalizar y un botón para restaurar las vistas por defecto.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_watconfig_defaultviews_sections.png" alt="screenshot_watconfig_defaultviews_sections.png" width="960px" />
+<img src="images/doc_images/screenshot_userarea_customize_sections.png" alt="screenshot_userarea_customize_sections.png" width="960px" />
 </span></p></div>
 <div class="paragraph"><p>Según seleccionemos una u otra sección se cargarán las columnas y filtros de dicha sección. Solamente con hacer click sobre las diferentes casillas de verificación, se guardará el cambio.</p></div>
 <div class="paragraph"><p>Si deseamos <strong>volver a la configuración del sistema</strong> utilizaremos el botón de <strong>restaurar vistas por defecto</strong>. Esta acción puede realizarse sobre la sección cargada actualmente o sobre todo el sistema, escogiendo una u otra opción en el diálogo que aparece antes de llevarse a cabo la restauración.</p></div>
@@ -2321,8 +2362,9 @@ Ambos parámetros se pueden definir como <em>por defecto</em> adoptando así la 
 <img src="images/doc_images/screenshot_userarea_customize_reset.png" alt="screenshot_userarea_customize_reset.png" width="960px" />
 </span></p></div>
 </div>
+</div>
 <div class="sect2">
-<h3 id="_cerrar_sesión">7.3. Cerrar sesión</h3>
+<h3 id="_cerrar_sesión">7.2. Cerrar sesión</h3>
 <div class="paragraph"><p>Con esta opción se cierra la sesión del administrador actual y aparecerá el login.</p></div>
 </div>
 </div>
@@ -2331,7 +2373,7 @@ Ambos parámetros se pueden definir como <em>por defecto</em> adoptando así la 
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-28 12:46:48 CEST
+Last updated 2016-12-14 08:21:47 CET
 </div>
 </div>
 </body>

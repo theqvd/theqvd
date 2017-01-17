@@ -45,24 +45,6 @@ sub usage_text {
   For example: 
   host name=myhost set name=yourhost, address=10.3.15.1 (Sets new values for name and address in HOST with name myhost)
 
-  Adding custom properties:
-
-  host <FILTERS> set property key=value  
-  host <FILTERS> set property key=value, key=value, ...  
-
-  For example: 
-  host set property mykey=myvalue (Sets property mykey in all HOSTs)
-  host name=myhost set property mykey=myvalue, yourkey=yourvalue (Sets properties mykey and yourkey in HOST with name myhost)
-
-  Deleting custom properties:
-
-  host <FILTERS> del property key
-  host <FILTERS> del property key, key, ...
-
-  For example: 
-  host del property mykey (Deletes property mykey in all HOSTs)
-  host name=myhost del property mykey, yourkey (Deletes properties mykey and yourkey in HOST with name myhost)
-
   Blocking/Unblocking HOSTs
 
   host <FILTERS> block
@@ -80,6 +62,20 @@ sub usage_text {
   For example: 
   host del (Removes all HOSTs) 
   host name=myhost del (Removes HOST with name myhost)
+
+== AVAILABLE PARAMETERS
+
+  The following parameters can be used as <FILTERS>, <ARGUMENTS>, <FIELDS TO RETRIEVE> or <ORDER CRITERIA>,
+  although some combinations may not be allowed and an error will be prompted:
+  
+  id                        (ID of the Host)
+  name                      (Name of the Host)
+  blocked                   (Flag to indicate whether the Host is blocked for the user to access)
+  address                   (IP address of the Host in format X.X.X.X)
+  frontend                  (Flag to indicate whether the L7R must run)
+  backend                   (Flag to indicate whether the HKD must run)
+  state                     (Current state of the Host)
+  number_of_vms_connected   (Number of VMs that are running in the Host)
 
 $QVD::Admin4::Command::COMMON_USAGE_TEXT
 "

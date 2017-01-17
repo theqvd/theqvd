@@ -6,6 +6,11 @@ RESTRICT_TEMPLATES = true;
 // Debug constants
 DEBUG_ACL_FAILS = false;
 
+// noVNC include URI
+INCLUDE_URI = "lib/thirds/noVNC/include/";
+VNC_MIN_HEIGHT = 400;
+VNC_MIN_WIDTH = 600;
+
 // Status codes returned by the API
 ALL_STATUS = {
     0000: 'Successful completion',
@@ -193,6 +198,17 @@ CLASS_ICON_STATUS_STOPPING = 'fa fa-stop faa-flash animated';
 CLASS_ICON_STATUS_ZOMBIE = 'fa fa-medkit';
 CLASS_ICON_STATUS_LOST = 'fa fa-map-o faa-flash animated';
 
+CLASS_ICON_BY_QVD_OBJ = {
+    user: CLASS_ICON_USERS,
+    vm: CLASS_ICON_VMS,
+    host: CLASS_ICON_HOSTS,
+    osf: CLASS_ICON_OSFS,
+    di: CLASS_ICON_DIS,
+    admin: CLASS_ICON_ADMINS,
+    role: CLASS_ICON_ROLES,
+    tenant: CLASS_ICON_TENANTS
+}
+
 // Classification of Qvd Objects
 QVD_OBJS_WITH_PROPERTIES = ['user', 'vm', 'host', 'osf', 'di'];
 QVD_OBJS_CLASSIFIED_BY_TENANT = ['user', 'vm', 'osf', 'di', 'administrator', 'log', 'role', 'property'];
@@ -224,6 +240,7 @@ HTML_MINI_LOADING = '<div class="mini-loading"><i class="fa fa-gear fa-spin"></i
 HTML_LOADING = '<div class="loading"><i class="fa fa-gear fa-spin"></i></div>';
 HTML_MID_LOADING = '<div class="loading-mid"><i class="fa fa-gear fa-spin"></i></div>';
 HTML_MID_LOADING_DELETE = '<div class="loading-mid"><i class="fa fa-trash fa-spin"></i></div>';
+HTML_ERROR = '<div class="error-loading"><i class="fa fa-warning"></i></div>';
 HTML_SORT_ICON = '<i class="fa fa-sort sort-icon"></i>';
 
 // Languages
@@ -254,11 +271,18 @@ WAT_BLOCK_SIZES_ADMIN = $.extend({
 
 
 // Documentation
-DOC_AVAILABLE_LANGUAGES = ['es'];
-DOC_DEFAULT_LANGUAGE = 'es';
+DOC_AVAILABLE_LANGUAGES = ['es', 'en'];
+DOC_DEFAULT_LANGUAGE = 'en';
 
 // Number of bytes on a KiloByte
 BYTES_ON_KB = 1000;
+
+// Objects that have dependcies with another ones
+
+QVD_OBJ_DEPENDENCIES = {
+    user: 'vm',
+    osf: 'di'
+}
 
 // Log constants
 

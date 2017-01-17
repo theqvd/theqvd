@@ -104,11 +104,18 @@ sub load_user
 	unless ref($admin);
 
     $self->{administrator} = $admin;
-    $admin->set_tenants_scoop(
-	[ map { $_->id } 
-	  $QVD_ADMIN->_db->resultset('Tenant')->search()->all ])
-	if $admin->is_superadmin; # This is the scope (set of tenants) 
-                                  # in which the admin is able to operate
+
+    # This is the scope (set of tenants) 
+    # in which the admin is able to operate
+    if ($admin->is_superadmin) {
+        $admin->set_tenants_scope( [
+            grep { $_ != QVD::DB::Result::Tenant::COMMON_TENANT_ID }
+                map { $_->id } $QVD_ADMIN->_db->resultset('Tenant')->search()->all
+        ] );
+    } else {
+        $admin->set_tenants_scope( [$admin->tenant_id] );
+    }
+
 }
 
 ########################################

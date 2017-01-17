@@ -19,35 +19,35 @@
                         case 'checks':
                             var checkedAttr = selectedAll ? 'checked' : '';
             %>
-                            <th class="<%= sortAttr %> max-1-icons cell-check">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> max-1-icons cell-check">
                                 <input type="checkbox" class="check_all" <%= checkedAttr %>>
                             </th>
             <%
                             break;
                         case 'info':
             %>
-                            <th class="<%= sortAttr %> max-1-icons">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> max-1-icons">
                                 <i class="fa fa-info-circle normal" data-i18n="[title]Info" title="<%= i18n.t('Info') %>"></i>
                             </th>
             <%
                             break;
                         case 'id':
             %>
-                            <th class="<%= sortAttr %> desktop" data-sortby="id">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop" data-sortby="id">
                                 <span data-i18n="Id"><%= i18n.t('Id') %></span>
                             </th>
             <%
                             break;
                         case 'name':
             %>
-                            <th class="<%= sortAttr %> col-width-100" data-sortby="name">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> col-width-100" data-sortby="name">
                                 <span data-i18n="Name"><%= i18n.t('Name') %></span>
                             </th>
             <%
                             break;
                         case 'tenant':
             %>
-                            <th class="<%= sortAttr %> desktop" data-sortby="tenant_name">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop" data-sortby="tenant_name">
                                 <span data-i18n="Tenant"><%= i18n.t('Tenant') %></span>
                             </th>
             <%
@@ -62,7 +62,7 @@
                             }
 
             %>
-                            <th class="<%= sortAttr %> desktop" data-sortby="<%= name %>">
+                            <th data-fieldname="<%= name %>" class="<%= sortAttr %> desktop" data-sortby="<%= name %>">
                                 <span <%= translationAttr %>><%= colText %></span>
                             </th>
             <%
@@ -72,7 +72,7 @@
                 
                 if (Wat.C.isMultitenant()) { 
             %>
-                    <th class="col-width-100" data-sortby="name">
+                    <th data-fieldname="<%= name %>" class="col-width-100" data-sortby="name">
                         <span data-i18n="Global username"><%= i18n.t('Global username') %></span>
                     </th>
             <%
@@ -119,6 +119,10 @@
                             case 'info':
                 %>
                                 <td>
+                                    <% if(Wat.C.adminID == model.get('id')) { %>
+                                        <i class="<%= CLASS_ICON_PERSONALAREA %>" title="<%= i18n.t('This administrator is me') %>" data-i18n="[title]This administrator is me"></i>
+                                    <% } %>
+                                    
                                     <%
                                     if (Object.keys(model.get('roles')).length == 0) {
                                     %>
@@ -178,13 +182,12 @@
                 %>
                                 <td class="desktop" data-wsupdate="<%= name %>" data-id="<%= model.get('id') %>">
                                     <% 
-                                        if (model.get(name) !== undefined) {
+                                        if (!col.property) {
                                             print(model.get(name));
                                         }
-                                        else if (model.get('properties') !== undefined && model.get('properties')[name] !== undefined) {
-                                            print(model.get('properties')[name]);
+                                        else if (model.get('properties') && model.get('properties')[col.property]) {
+                                            print(model.get('properties')[col.property].value);
                                         }
-                                    
                                     %>
                                 </td>
                 <%

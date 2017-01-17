@@ -17,9 +17,9 @@ use DBIx::Error;
 use Try::Tiny;
 use Data::Page;
 use Clone qw(clone);
-use QVD::API::AclsOverwriteList;
 use QVD::API::ConfigClassifier;
 use QVD::API::REST::Request::Config_Field;
+use QVD::DB::AclsOverwriteList;
 use Mojo::JSON qw(encode_json);
 use QVD::Config;
 use QVD::Config::Core qw(core_cfg_unmangled);
@@ -147,11 +147,11 @@ sub acl_get_list
 # over the regular assignation of acls for the administrator.
 
     my $admin = $request->get_parameter_value('administrator');
-    my $aol = QVD::API::AclsOverwriteList->new(admin_id => $admin->id);
+    my $aol = QVD::DB::AclsOverwriteList->new(admin_id => $admin->id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
 
     eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
-        %{$request->get_dbi_format_filters()}, $request->modifiers);
+        $request->get_dbi_format_filters(), $request->modifiers);
         @rows = $rs->all };
     QVD::API::Exception->throw(exception => $@, query => 'select') if $@;
 
@@ -180,11 +180,11 @@ sub get_acls_in_admins
     my $admin_id = $request->json_wrapper->get_filter_value('admin_id')
 	// $request->get_parameter_value('administrator')->id;
 
-    my $aol = QVD::API::AclsOverwriteList->new(admin_id => $admin_id);
+    my $aol = QVD::DB::AclsOverwriteList->new(admin_id => $admin_id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
 
     eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
-        %{$request->get_dbi_format_filters()}, $request->modifiers);
+        $request->get_dbi_format_filters(), $request->modifiers);
         @rows = $rs->all };
     QVD::API::Exception->throw(exception => $@, query => 'select') if $@;
 
@@ -200,7 +200,7 @@ sub get_acls_in_roles
     my (@rows, $rs);
 
     my $admin = $request->get_parameter_value('administrator');
-    my $aol = QVD::API::AclsOverwriteList->new(admin => $admin, admin_id => $admin->id);
+    my $aol = QVD::DB::AclsOverwriteList->new(admin => $admin, admin_id => $admin->id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_hide_re];
 
 # The table provided by $request is supposed to be a view
@@ -215,7 +215,7 @@ sub get_acls_in_roles
 # over the regular assignation of acls for the administrator.
 
     eval { $rs = $DB->resultset($request->table)->search({},{bind => $bind})->search(
-        %{$request->get_dbi_format_filters()}, $request->modifiers);
+        $request->get_dbi_format_filters(), $request->modifiers);
         @rows = $rs->all };
     QVD::API::Exception->throw(exception => $@, query => 'select') if $@;
 
@@ -335,24 +335,24 @@ sub config_delete
 
 sub reset_views
 {
-    my ($self, $request, $modifiers, $tables) = @_;
-    my $result;
-
-    my $request_copy = clone $request;
-
+    my ($request, $tables) = @_;
+    my $count = 0;
     for my $table (@$tables) {
-        $request_copy->{table} = $table;
-        try {
-                $self->delete( $request, $modifiers );
-        }
-        catch {
-            my $exception = $_;
-            QVD::API::Exception->throw({exception => $exception}) unless $exception->code == 1300;
+        my @rows = $DB->resultset($table)->search()->all;
+        @rows = $request->filters->cgrep(@rows);
+        for my $row (@rows) {
+            try {
+                $row->delete;
+                $count++;
+            }
+            catch {
+                my $exception = $_;
+                QVD::API::Exception->throw({exception => $exception});
+            }
         }
     }
 
-    $result->{rows} = [];
-    return $result;
+    return { rows => [], total => $count };
 }
 
 sub reset_tenant_views
@@ -360,8 +360,7 @@ sub reset_tenant_views
     my ($self, $request, $modifiers) = @_;
 
     my $tables = [ qw(Views_Setup_Attributes_Tenant Views_Setup_Properties_Tenant) ];
-
-    return $self->reset_views($request, $modifiers, $tables);
+    return reset_views($request, $tables);
 }
 
 sub reset_admin_views
@@ -369,8 +368,7 @@ sub reset_admin_views
     my ($self, $request, $modifiers) = @_;
 
     my $tables = [ qw(Views_Setup_Attributes_Administrator Views_Setup_Properties_Administrator) ];
-    
-    return $self->reset_views($request, $modifiers, $tables);
+    return reset_views($request, $tables);
 }
 
 ### Manage properties ###
@@ -1251,7 +1249,7 @@ sub current_admin_setup
         acls => [ $administrator->acls ],
         views => [ map { { $_->get_columns } }
             $DB->resultset('Operative_Views_In_Administrator')->search(
-                {administrator_id => $administrator->id})->all ]
+                {tenant_id => $administrator->tenant_id, administrator_id => [ undef, $administrator->id ]})->all ]
     };
 }
 
@@ -1266,7 +1264,7 @@ sub get_number_of_acls_in_admin
     $acl_patterns = ref($acl_patterns) ? $acl_patterns : [$acl_patterns];
     my $admin_id = $json_wrapper->get_filter_value('admin_id') //
 	QVD::API::Exception->throw(code=>'6220', object => 'admin_id');
-    my $aol = QVD::API::AclsOverwriteList->new(admin_id => $admin_id);
+    my $aol = QVD::DB::AclsOverwriteList->new(admin_id => $admin_id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_open_re,$aol->acls_to_hide_re];
 
     my $rs = $DB->resultset('Operative_Acls_In_Administrator')->search(
@@ -1293,7 +1291,7 @@ sub get_number_of_acls_in_role
 # Those lists of acls are the acls that should be overwritten 
 # over the regular assignation of acls for the administrator.
 
-    my $aol = QVD::API::AclsOverwriteList->new(admin => $administrator,admin_id => $administrator->id);
+    my $aol = QVD::DB::AclsOverwriteList->new(admin => $administrator,admin_id => $administrator->id);
     my $bind = [$aol->acls_to_close_re,$aol->acls_to_hide_re];
 
     my $rs = $DB->resultset('Operative_Acls_In_Role')->search(
@@ -1338,7 +1336,7 @@ sub users_count
 {
     my ($self,$admin) = @_;
     $DB->resultset('User')->search(
-	{'me.tenant_id' => $admin->tenants_scoop})->count;
+	{'me.tenant_id' => $admin->tenants_scope})->count;
 }
 
 sub blocked_users_count
@@ -1346,7 +1344,7 @@ sub blocked_users_count
     my ($self,$admin) = @_;
     $DB->resultset('User')->search(
 	{ 'me.blocked' => 'true',
-	  'me.tenant_id' => $admin->tenants_scoop})->count;
+	  'me.tenant_id' => $admin->tenants_scope})->count;
 }
 
 sub connected_users_count
@@ -1354,7 +1352,7 @@ sub connected_users_count
     my ($self,$admin) = @_;
     $DB->resultset('VM')->search(
 	{ 'vm_runtime.user_state' => 'connected',
-	  'user.tenant_id' => $admin->tenants_scoop }, 
+	  'user.tenant_id' => $admin->tenants_scope }, 
 	{ columns => [ qw/user.id/ ],
 	distinct => 1, 
 	join => [qw(vm_runtime user)] })->count;
@@ -1364,7 +1362,7 @@ sub vms_count
 {
     my ($self,$admin) = @_;
     $DB->resultset('VM')->search(
-	{'user.tenant_id' => $admin->tenants_scoop},
+	{'user.tenant_id' => $admin->tenants_scope},
 	{ join => [qw(user)] })->count;
 }
 
@@ -1373,7 +1371,7 @@ sub blocked_vms_count
     my ($self,$admin) = @_;
     $DB->resultset('VM')->search(
 	{ 'vm_runtime.blocked' => 'true',
-	  'user.tenant_id' => $admin->tenants_scoop }, 
+	  'user.tenant_id' => $admin->tenants_scope }, 
 	{ join => [qw(vm_runtime user)] })->count;
 }
 
@@ -1382,7 +1380,7 @@ sub running_vms_count
     my ($self,$admin) = @_;
     $DB->resultset('VM')->search(
 	{ 'vm_runtime.vm_state' => 'running',
-	  'user.tenant_id' => $admin->tenants_scoop }, 
+	  'user.tenant_id' => $admin->tenants_scope }, 
 	{ join => [qw(vm_runtime user)] })->count;
 }
 
@@ -1413,14 +1411,14 @@ sub osfs_count
 {
     my ($self,$admin) = @_;
     $DB->resultset('OSF')->search(
-	{'me.tenant_id' => $admin->tenants_scoop})->count;
+	{'me.tenant_id' => $admin->tenants_scope})->count;
 }
 
 sub dis_count
 {
     my ($self,$admin) = @_;
     $DB->resultset('DI')->search(
-	{ 'osf.tenant_id' => $admin->tenants_scoop }, 
+	{ 'osf.tenant_id' => $admin->tenants_scope }, 
 	{ join => [qw(osf)] })->count;
 }
 
@@ -1428,7 +1426,7 @@ sub blocked_dis_count
 {
     my ($self,$admin) = @_;
     $DB->resultset('DI')->search(
-	{ 'osf.tenant_id' => $admin->tenants_scoop,
+	{ 'osf.tenant_id' => $admin->tenants_scope,
 	  'me.blocked' => 'true' }, 
 	{ join => [qw(osf)] })->count;
 }
@@ -1439,7 +1437,7 @@ sub vms_with_expiration_date
 
     my $is_not_null = 'IS NOT NULL';
     my $rs = $DB->resultset('VM')->search(
-	{ 'osf.tenant_id' => $admin->tenants_scoop,
+	{ 'osf.tenant_id' => $admin->tenants_scope,
 	  'vm_runtime.vm_expiration_hard'  => \$is_not_null },
 	{ join => [qw(vm_runtime osf)],
 	  prefetch => [qw(vm_runtime)]});
@@ -1481,13 +1479,15 @@ sub config_get
 
     my $tenant_id = $request->filters->filter_value('tenant_id');
     my $operator = $request->filters->filter_operator('tenant_id');
-    my $tenant_filter = QVD::API::REST::Filter->new( filter => {id => {$operator => $tenant_id} } );
 
     my @rows = ();
-    eval {
-        my $rs = $DB->resultset('Tenant')->search($tenant_filter->hash);
-        @rows = $rs->all
-    };
+    if (defined($tenant_id) && defined($operator)){
+        my $tenant_filter = QVD::API::REST::Filter->new( filter => {id => {$operator => $tenant_id} } );
+        @rows = $DB->resultset('Tenant')->search($tenant_filter->hash)->all;
+    } else {
+        # FIXME: This is very inneficient in case the filter does not contain a tenant_id node
+        @rows = $DB->resultset('Tenant')->all;
+    }
 
     my @keys = ();
     while(@rows){
@@ -1501,6 +1501,14 @@ sub config_get
     $request->filters->add_filter("is_hidden", 0);
 
     @keys = $request->filters->cgrep(@keys);
+    
+    # FIXME: This filter is used to avoid duplicated tuples, current tenant and global tenant -1
+    # The scope of the common tenants shall be only its own tenant except for roles, that can 
+    # access to those roles that are global
+    if (!$request->administrator->is_superadmin) {
+        my $extra_filter = QVD::API::REST::Filter->new( filter => {tenant_id => {'!=' => '-1'} } );
+        @keys = $extra_filter->cgrep(@keys);
+    }
 
     return {
         total => scalar @keys,

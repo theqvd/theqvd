@@ -3,7 +3,13 @@ Wat.B = {
         this.bindMessageEvents();  
         this.bindEditorEvents();  
         this.bindNavigationEvents();  
-        this.bindFormEvents(); 
+        this.bindFormEvents();
+        this.bindDeleteConflicts();
+    },
+    
+    bindDeleteConflicts: function () {
+        // Close message layer
+        this.bindEvent('click', '.js-button-force-delete', this.conflictBinds.forceDelete);
     },
     
     // Events binded in classic way to works in special places like jQueryUI dialog where Backbone events doesnt work
@@ -42,6 +48,16 @@ Wat.B = {
             // Toggle controls for expire fields (it's only needed for vm form, but it can be accesible from two views: list and details)
             this.bindEvent('change', 'input[name="expire"]', this.editorBinds.toggleExpire);
         
+        // Massive editor
+            // Clean fields when click on "no changes" checkbox
+            this.bindEvent('change', 'input[type="checkbox"].js-no-change', this.editorBinds.clickNoChangeCheckbox); 
+            
+            // Uncheck "no changes" checkbox when fields changes
+            this.bindEvent('change', '.js-massive-editor-table select', this.editorBinds.changeMassiveFieldSelect);
+            this.bindEvent('change', '.js-massive-editor-table input[type="checkbox"], .js-massive-editor-table input[type="text"].datetimepicker', this.editorBinds.changeMassiveField);
+            this.bindEvent('input', '.js-massive-editor-table input[type="text"], .js-massive-editor-table textarea', this.editorBinds.changeMassiveField);
+            this.bindEvent('click', '.js-no-change-reset', this.editorBinds.resetMassiveField);
+        
         // Virtual Machines Editor
         
             // Toggle controls for disk images tags retrieving when select osf (it's only needed for vm form, but it can be accesible from two views: list and details)
@@ -53,39 +69,17 @@ Wat.B = {
             this.bindEvent('change', 'input[name="change_password"]', this.userEditorBinds.toggleNewPassword);
         
         // Roles editor
-        
             // Delete positive ACL
-            this.bindEvent('click', '.js-delete-positive-acl-button', this.roleEditorBinds.deleteAcl, 'positive');
-
-            // Add positive ACL
-            this.bindEvent('click', '.js-add-positive-acl-button', this.roleEditorBinds.addAcl, 'positive'); 
+            this.bindEvent('click', '.js-templates-matrix-mode-btn', this.roleEditorBinds.openMatrixMode);
         
-            // Delete negative ACL
-            this.bindEvent('click', '.js-delete-negative-acl-button', this.roleEditorBinds.deleteAcl, 'negative');
+            // Change ACL check from matrix view
+            this.bindEvent('change', '.js-add-template-button', this.roleEditorBinds.changeMatrixACL);
 
-            // Add negative ACL
-            this.bindEvent('click', '.js-add-negative-acl-button', this.roleEditorBinds.addAcl, 'negative');
-
-            // Add inherited Role
-            this.bindEvent('change', '.js-add-role-button', this.roleEditorBinds.addRole);
-            this.bindEvent('click', '.js-add-template-button', this.roleEditorBinds.addTemplate);
-
-            // Delete inherited Role
-            this.bindEvent('click', '.js-delete-role-button', function () {
-                switch (Wat.CurrentView.qvdObj) {
-                    case 'administrator':
-                        if (Wat.C.adminID == Wat.CurrentView.model.get('id')) {
-                            Wat.I.confirm('dialog/confirm-admin-lost-acls', Wat.B.roleEditorBinds.deleteRole, this);
-                        }
-                        else {
-                            Wat.B.roleEditorBinds.deleteRole(this);
-                        }
-                        break;
-                    case 'role':
-                            Wat.I.confirm('dialog/confirm-role-lost-acls', Wat.B.roleEditorBinds.deleteRole, this);
-                        break;
-                }
-            });
+            // Add/Delete inherited Role
+            this.bindEvent('click', '.js-assign-role-button', this.roleEditorBinds.addRole);
+            this.bindEvent('click', '.js-delete-role-button', this.roleEditorBinds.deleteRole);
+            this.bindEvent('click', '.js-assign-template-button', this.roleEditorBinds.addTemplate);
+            this.bindEvent('click', '.js-delete-template-button', this.roleEditorBinds.deleteTemplate);
     },
     
     bindHomeEvents: function () {
@@ -429,7 +423,9 @@ Wat.B = {
         clickScreenHelp: function (e) {
             var docSection = $(e.target).attr('data-docsection');
             
-            var section = Wat.I.docSections[docSection].es;
+            var lan = Wat.C.getEffectiveLan();
+            
+            var section = Wat.I.docSections[docSection][lan];
             var guide = Wat.I.docSections[docSection].guide;
             
             var guideSection = [
@@ -443,7 +439,7 @@ Wat.B = {
             
             if (Wat.I.docSections[docSectionMultitenant] != undefined) {
                 guideSection.push({
-                    section: Wat.I.docSections[docSectionMultitenant].es,
+                    section: Wat.I.docSections[docSectionMultitenant][lan],
                     guide: Wat.I.docSections[docSectionMultitenant].guide
                 });
             }
@@ -545,6 +541,74 @@ Wat.B = {
         $(document).off(event, selector);
         $(document).on(event, selector, params, callback);
     },
+    
+    // Functions to bind events on conflict resolution
+    conflictBinds: {
+        forceDelete: function (e) {
+            var id = $(e.target).attr('data-id');
+            var qvdObj = $('.js-elements-list').attr('data-qvd-obj');
+            var qvdObjDependency = QVD_OBJ_DEPENDENCIES[qvdObj];
+            
+            // Link field is user_id, osf_id, etc.
+            var filters = {};
+            filters[qvdObj + '_id'] = id;
+            
+            var auxModel = Wat.U.getModelFromQvdObj(qvdObj);            
+            var auxModelDependency = Wat.U.getModelFromQvdObj(qvdObjDependency);
+            
+            // Get all the dependent items
+            Wat.A.performAction(qvdObjDependency + '_get_list', {}, filters, {}, function (response) {
+                var filterIds = [];
+                
+                var elementsDependency = {};
+                $.each (response.retrievedData.rows, function (i, data) {
+                    filterIds.push(data.id);
+                    elementsDependency[data.id] = data[Wat.U.getNameFieldFromQvdObj(qvdObjDependency)];
+                });
+                
+                
+                Wat.CurrentView.deleteModel({id: filterIds}, function (response) {
+                    if (response.retrievedData.status != STATUS_SUCCESS) {
+                        // When some element deletion fails, continue deleting pending elements
+                        var warningIcon = Wat.I.getWarningIcon(qvdObjDependency, response.retrievedData, elementsDependency);
+                        
+                        $('.js-notifications[data-id="' + id + '"]').html(warningIcon);
+                        
+                        Wat.A.deletePending('.js-button-force-delete');
+                        return;
+                    }
+                    
+                    Wat.CurrentView.deleteModel({id: id}, function (response) {
+                        if (response.retrievedData.status != STATUS_SUCCESS) {
+                            // When some element deletion fails, continue deleting pending elements
+                            Wat.A.deletePending('.js-button-force-delete');
+                            return;
+                        }
+                        
+                        // Delete row
+                        $('.js-force-delete-row[data-id="' + id + '"]').remove();
+                        
+                        // Delete removed id from DOM list
+                        var allIds = $('.js-elements-list').attr('data-all-ids').split(',');
+                        
+                        // Fetch and render behind view
+                        Wat.CurrentView.fetchAny();
+
+                        allIds.splice(allIds.indexOf(id), 1);
+
+                        if (allIds == 0) {
+                            Wat.I.closeDialog(Wat.CurrentView.dependencyDialog);
+                        }
+
+                        $('.js-elements-list').attr('data-all-ids', allIds.join(','));
+                        
+                        // If some other element is marked to be deleted, trigger button
+                        Wat.A.deletePending('.js-button-force-delete');
+                    }, auxModel);
+                }, auxModelDependency);
+            }, undefined, ['id', Wat.U.getNameFieldFromQvdObj(qvdObjDependency)]);
+        }
+    },
 
     // Callbacks of the events binded for messages system
     messageBinds: {
@@ -606,7 +670,7 @@ Wat.B = {
             
             // Fill DI Tags select on virtual machines creation form
             var params = {
-                'action': 'tag_tiny_list',
+                'actionAuto': 'tag',
                 'selectedId': '',
                 'controlName': 'di_tag',
                 'filters': {
@@ -621,7 +685,7 @@ Wat.B = {
         
         filterTenantOSFs: function () {
             var params = {
-                'action': 'osf_tiny_list',
+                'actionAuto': 'osf',
                 'selectedId': '',
                 'controlName': 'osf_id',
                 
@@ -647,7 +711,7 @@ Wat.B = {
         
         filterTenantUsers: function () {
             var params = {
-                'action': 'user_tiny_list',
+                'actionAuto': 'user',
                 'selectedId': '',
                 'controlName': 'user_id'
             };
@@ -672,6 +736,42 @@ Wat.B = {
             $('.js-editor-property-row[data-tenant-id="' + $('[name="tenant_id"]').val() + '"]').show();
             $('.js-editor-property-row[data-tenant-id="' + SUPERTENANT_ID + '"]').show();
         },
+        
+        changeMassiveField: function (e) {
+            var name = $(e.target).attr('name');
+            $(e.target).removeAttr('placeholder');
+            $('.js-no-change-reset[data-field="' + name + '"]').removeClass('invisible');
+        },   
+        
+        changeMassiveFieldSelect: function (e) {
+            var name = $(e.target).attr('name');
+            if ($(e.target).val() != '') {
+                $('.js-no-change-reset[data-field="' + name + '"]').removeClass('invisible');
+            }
+            else {
+                $('.js-no-change-reset[data-field="' + name + '"]').addClass('invisible');
+            }
+        },
+        
+        resetMassiveField: function (e) {
+            var name = $(e.target).attr('data-field');
+            $(e.target).addClass('invisible');
+            
+            if ($('select[name="' + name + '"]').length) {
+                $('select[name="' + name + '"]').find('option[value=""]').prop('selected', true);
+                $('select[name="' + name + '"]').trigger('chosen:updated');
+            }
+            else {
+                $('input[name="' + name + '"], textarea[name="' + name + '"]').val('').attr('placeholder', $.i18n.t('No changes'));
+            }
+        },
+        
+        clickNoChangeCheckbox: function (e) {
+            if ($(e.target).is(':checked')) {
+                var field = $(e.target).attr('data-field');
+                $('.js-massive-editor-table td:last-child input[name="' + field + '"], .js-editor-table td:last-child textarea[name="' + field + '"]').val('');
+            }
+        },
     },
     
     userEditorBinds: {
@@ -681,166 +781,66 @@ Wat.B = {
     },
     
     roleEditorBinds: {
-        deleteAcl: function (e) {
-            // Disabled buttons have no effect
-            if ($(this).hasClass('disabled')) {
-                return;
-            }
-            
-            // type can be 'positive' or 'negative'
-            var type = e.data;
-            
-            var acls = $('select[name="acl_' + type + '_on_role"]').val();
-            
-            if (!acls) {
-                Wat.I.M.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
-                return;
-            }
-            
-            var filters = {
-                id: Wat.CurrentView.id
-            };
-            
-            var changes = {};
-            changes["unassign_acls"] = acls;
-            
-            var arguments = {
-                "__acls_changes__": changes
-            };
-            
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.afterUpdateAcls();
-            });
-        },
-        addAcl: function (e) {
-            // type can be 'positive' or 'negative'
-            var type = e.data;
-            
-            var acls = $('select[name="acl_available"]').val();
-            
-            if (!acls) {
-                Wat.I.M.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
-                return;
-            }
-            
-            var filters = {
-                id: Wat.CurrentView.id
-            };
-            
-            var changes = {};
-            changes["assign_acls"] = acls;
-            
-            var arguments = {
-                "__acls_changes__": changes
-            };
-            
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.model.fetch({      
-                    complete: function () {
-                        Wat.CurrentView.afterUpdateAcls();
+        openMatrixMode: function (e) {            
+            var dialogConf = {
+                title: $.i18n.t('Matrix mode'),
+                buttons : {
+                    "Close": function () {                    
+                        Wat.I.closeDialog($(this));
                     }
-                });
-            });
-        },
-        deleteRole: function (that) {
-            var roleId = $(that).attr('data-id');
-            var inheritType = $(that).attr('data-inherit-type');
-            
-            var filters = {
-                id: Wat.CurrentView.id
-            };
-            var arguments = {
-                "__roles_changes__": {
-                    unassign_roles: [roleId]
-                }
-            };
+                },
+                buttonClasses: ['fa fa-ban js-button-close'],
 
-            
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.model.fetch({      
-                    complete: function () {
-                        switch (inheritType) {
-                            case "roles":
-                                Wat.CurrentView.afterUpdateRoles('delete_role');
-                                break;
-                            case "templates":
-                                Wat.CurrentView.afterUpdateRoles('delete_template');
-                                break;
+                fillCallback: function (target) {
+                    // Add common parts of editor to dialog
+                    var template = _.template(
+                        Wat.TPL.inheritanceToolsTemplatesMatrix, {
+                            templates: Wat.CurrentView.editorTemplates
                         }
-                    }
-                });
-            });
-        },
-        addRole: function (e) {
-            var roleId = $(e.target).attr('data-role-template-id');
-            
-            // Disable checks to avoid current petitions and add animation to current checked
-            $('.js-add-role-button').attr('disabled', 'disabled');
-            $(e.target).addClass('animated');
-            $(e.target).addClass('faa-flash');
-            
-            var filters = {
-                id: Wat.CurrentView.id
-            };
-            var arguments = {
-                "__roles_changes__": {
-                }
-            };
-            
-            if ($(e.target).is(':checked')) {
-                arguments["__roles_changes__"].assign_roles = [roleId];
-            }
-            else {
-                arguments["__roles_changes__"].unassign_roles = [roleId];
-            }
-            
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.model.fetch({      
-                    complete: function () {
-                        $('.js-add-role-button').removeAttr('disabled');
-                        $(e.target).removeClass('animated');
-                        $(e.target).removeClass('faa-flash');
-                        
-                        Wat.CurrentView.afterUpdateRoles('add_role');
-                    }
-                });
-            });
-        },
-        addTemplate: function (e) {
-            var roleId = $(e.target).attr('data-role-template-id');
+                    );
 
-            // Disable checks to avoid current petitions and add animation to current checked
-            $('.js-add-template-button').attr('disabled', 'disabled');
-            $(e.target).addClass('animated');
-            $(e.target).addClass('faa-flash')
-            
-            
-            var filters = {
-                id: Wat.CurrentView.id
-            };
-            var arguments = {
-                "__roles_changes__": {
+                    target.html(template);
                 }
             }
+
+            Wat.CurrentView.matrixDialog = Wat.I.dialog(dialogConf);
+        },
+        
+        changeMatrixACL: function (e) {
+            var templateId = $(e.target).attr('data-role-template-id');
+            var checked = $(e.target).is(':checked');
             
-            if ($(e.target).is(':checked')) {
-                arguments["__roles_changes__"].assign_roles = [roleId];
+            if (checked) {
+                $('select[name="template_to_be_assigned"]').val(templateId);
+                $('.js-assign-template-button').trigger('click');
             }
             else {
-                arguments["__roles_changes__"].unassign_roles = [roleId];
+                $('.js-delete-template-button[data-id="' + templateId + '"]').trigger('click');
             }
+        },
+        
+        addRole: function (e) {
+            var roleId = $('select[name="role_to_be_assigned"]').val();
             
-            Wat.CurrentView.updateModel(arguments, filters, function() {
-                Wat.CurrentView.model.fetch({      
-                    complete: function () {
-                        $('.js-add-template-button').removeAttr('disabled');
-                        $(e.target).removeClass('animated');
-                        $(e.target).removeClass('faa-flash');
-                        
-                        Wat.CurrentView.afterUpdateRoles('add_template');
-                    }
-                });
-            });
+            Wat.CurrentView.editorAssignRole(roleId);
+        },
+        
+        deleteRole: function (e) {
+            var roleId = $(e.target).attr('data-id');
+            
+            Wat.CurrentView.editorDeleteRole(roleId);
+        },
+        
+        addTemplate: function (e) {
+            var templateId = $('select[name="template_to_be_assigned"]').val();
+            
+            Wat.CurrentView.editorAssignTemplate(templateId);
+        },
+        
+        deleteTemplate: function (e) {
+            var templateId = $(e.target).attr('data-id');
+            
+            Wat.CurrentView.editorDeleteTemplate(templateId);
         },
     },
     

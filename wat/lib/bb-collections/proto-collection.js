@@ -61,6 +61,8 @@ Wat.Collections.Collection = Backbone.Collection.extend({
             processData: false
         }, options);
         
+        params.error = Wat.A.processResponseError;
+        
         return $.ajax(params);
     }
 });

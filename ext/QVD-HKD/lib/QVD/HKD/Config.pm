@@ -70,7 +70,7 @@ sub _cfg_optional {
     my $self = shift;
     my $value = $self->{props}->getProperty(@_);
     if (defined $value) {
-        $value =~ s/\${(.*?)}/$1 eq '{' ? '${' : $self->_cfg($1)/ge;
+        $value =~ s/\$\{(.*?)\}/$1 eq '{' ? '${' : $self->_cfg($1)/ge;
         $debug and $self->_debug("config: $_[0] = $value");
     }
     else {

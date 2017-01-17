@@ -291,6 +291,7 @@ Wat.I = {
         $('.footer').css('visibility','visible').hide().show();
         $('.loading').hide();
         $('.related-doc').css('visibility','visible').hide().show();
+        $('.js-shown-elements').hide().show();
         
         this.adaptSideSize();
     },
@@ -374,17 +375,8 @@ Wat.I = {
             closeOnDateSelect: true
         };
         
-        if (Wat.C.language != 'auto') {
-            var lan = Wat.T.getLanguage(Wat.C.language);
-            
-            // If lan is auto, change i18next macro by navigator language
-            if (lan == '__lng__') {
-                lan = navigator.language;
-            }
-            
-            options['lang'] = lan;
-            optionsPast['lang'] = lan;
-        }
+        options['lang'] = Wat.C.getEffectiveLan();
+        optionsPast['lang'] = Wat.C.getEffectiveLan();
         
         $('.datetimepicker').datetimepicker(options);
         
@@ -474,33 +466,17 @@ Wat.I = {
     renderMain: function () { 
         var that = this;
         
-        var footerLinks = {
-            'copyright': 'http://qindel.com/',
-            'terms': 'http://qindel.com/',
-            'policy': 'http://qindel.com/',
-            'contact': 'javascript:',
-        };
-        
-        var currentLan = window.i18n.lng();
-        switch (currentLan) {
-            case 'es':
-                footerLinks.contact = "http://theqvd.com/es/contacto";
-                break;
-            default:
-                footerLinks.contact = "http://theqvd.com/contact";
-                break;
-        }
-        
         // Fill the html with the template and the collection
         var template = _.template(
             Wat.TPL.main, {
                 loggedIn: Wat.C.loggedIn,
                 cornerMenu: this.cornerMenu,
-                forceDesktop: $.cookie('forceDesktop'),
-                footerLinks: footerLinks
+                forceDesktop: $.cookie('forceDesktop')
             });
         
         $('.bb-super-wrapper').html(template);
+        
+        that.renderFooter();
         
         if (Wat.C.loggedIn) {
             this.renderMenu();
@@ -512,6 +488,16 @@ Wat.I = {
         }
         
         this.updateLoginOnMenu();
+    },
+    
+    renderFooter: function () {
+        var template = _.template(
+            Wat.TPL.footer, {
+                footerLinks: Wat.C.publicConfig.footer && Wat.C.publicConfig.footer.link ? Wat.C.publicConfig.footer.link : {},
+                lan: Wat.C.getEffectiveLan()
+            });
+        
+        $('.bb-footer').html(template);
     },
     
     renderMenu: function () {
@@ -570,28 +556,21 @@ Wat.I = {
                     $('.message-close').trigger('click');
 
                 // Set title content manually to support HTML
-                    $('.ui-dialog-titlebar').html(dialogConf.title);
+                    $(e.target).prev().html(dialogConf.title);
                 
                 // Buttons style
                     var buttons = $(e.target).next().find('button');
-                    var buttonsText = $(".ui-dialog-buttonset .ui-button .ui-button-text");
-
-                    buttons.attr('class', '');
-                    buttons.addClass("button");
-
-                    var button1 = buttonsText[0];
-                    var button2 = buttonsText[1];
-
-                    Wat.T.translateElementContain($(button1));
-                    Wat.T.translateElementContain($(button2));
+                    var buttonsText = $(e.target).next().find(".ui-dialog-buttonset .ui-button .ui-button-text");
 
                     // Delete jQuery UI default classes
-                    buttons.attr("class", "");
+                    buttons.attr('class', '');
                     // Add our button class
-                    buttons.addClass("button");
-
-                    $(button1).addClass(dialogConf.button1Class);
-                    $(button2).addClass(dialogConf.button2Class);
+                    buttons.addClass('button');
+                
+                    $.each (buttonsText, function (iBT, button) {
+                        Wat.T.translateElementContain($(button));
+                        $(button).addClass(dialogConf.buttonClasses[iBT]);
+                    });
                 
                 // Call to the callback function that will fill the dialog
                     dialogConf.fillCallback($(this), that);
@@ -705,15 +684,15 @@ Wat.I = {
         }
         else {
             this.showSelectedItemsMenu();
-                this.checkVisibilityConditions();
+            this.checkVisibilityConditions();
                 
             if (selectedItems == 1) {
-                $('.js-only-one').show();
                 $('.js-only-massive').hide();
+                $('.js-only-one').show();
             }
             else {
-                $('.js-only-massive').show();
                 $('.js-only-one').hide();
+                $('.js-only-massive').show();
             }
         }
     },
@@ -810,8 +789,7 @@ Wat.I = {
                     successCallback(that);
                 }
             },
-            button1Class : 'fa fa-ban js-button-cancel',
-            button2Class : 'fa fa-check js-button-accept',
+            buttonClasses : ['fa fa-ban js-button-cancel', 'fa fa-check js-button-accept'],
             fillCallback : function(target) { 
                 var templates = Wat.I.T.getTemplateList('confirm', {templateName: templateName});
 
@@ -855,8 +833,7 @@ Wat.I = {
             }
         };
 
-        dialogConf.button1Class = 'fa fa-book js-button-read-full-doc';
-        dialogConf.button2Class = 'fa fa-check js-button-close';
+        dialogConf.buttonClasses = ['fa fa-book js-button-read-full-doc', 'fa fa-check js-button-close'];
 
         dialogConf.fillCallback = function (target, that) {
             // Back scroll of the div to top position
@@ -1101,7 +1078,44 @@ Wat.I = {
         }
     },  
     
+    // Return bool value to indicate if we are in a mobile or not
     isMobile: function () {
         return $('.js-mobile-menu-hamburger').css('display') != 'none';
+    },
+    
+    // Get warning icon from API retrieved data
+    getWarningIcon: function (qvdObj, retrievedData, names) {      
+        var errorMessage = retrievedData.message;
+        var qvdObjName = LOG_TYPE_OBJECTS[qvdObj];
+
+        var warningMessage = '';
+        warningMessage += '<div>' + $.i18n.t(errorMessage) + "</div>";
+        warningMessage += '<br>';
+
+        $.each(retrievedData.failures, function (elementId, failure) {
+            var failureMessage = failure.message;
+            var elementName = names[elementId];
+
+            warningMessage += '<div>' + $.i18n.t(qvdObjName) + ': ' + elementName + "</div>";
+            warningMessage += '<div>' + $.i18n.t(failureMessage) + "</div>";
+            warningMessage += '<br>';
+        });
+
+        var warningIcon = '<i class="fa fa-warning" title="' + warningMessage + '"></i>';
+        
+        return warningIcon;
+    },
+    
+    // Return boolean giving a form field name on massive editor to know if this field is changing or must be ignored
+    isMassiveFieldChanging: function (fieldName) {
+        // Invisible class of no change reset button means avoid field updating
+        return !$('.js-no-change-reset[data-field="' + fieldName + '"]').hasClass('invisible');
+    },
+    
+    // Show an error template given template code as parameter
+    showErrorTemplate: function (template) {
+        $(Wat.CurrentView.el).html(Wat.TPL[template]);
+        Wat.I.showAll();
+        Wat.T.translate();
     }
 }

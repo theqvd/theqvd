@@ -9,6 +9,9 @@ Wat.I.T = {
                     main: {
                         name: 'common/main'
                     },
+                    footer: {
+                        name: 'common/footer'
+                    },
                     menu: {
                         name: 'common/menu'
                     },
@@ -29,7 +32,20 @@ Wat.I.T = {
                     },
                     viewFormCustomize: {
                         name: 'view/customize-form'
+                    },
+                    errorRefresh: {
+                        name: 'error/refresh'
+                    },
+                    warn404: {
+                        name: 'error/404'
                     }
+                };
+                break;
+            case 'conflict':
+                templates = {
+                    deleteDependency: {
+                        name: 'dialog/conflict-delete-dependency'
+                    },
                 };
                 break;
             case 'home':
@@ -46,9 +62,6 @@ Wat.I.T = {
                 templates = {
                     login: {
                         name: 'login/login'
-                    },
-                    errorRefresh: {
-                        name: 'error/refresh'
                     }
                 }
                 break;
@@ -65,9 +78,6 @@ Wat.I.T = {
                     },
                     detailsSide: {
                         name: 'details/' + params.qvdObj + '-side'
-                    },
-                    warn404: {
-                        name: 'error/404'
                     }
                 }
                 break;
@@ -191,11 +201,15 @@ Wat.I.T = {
                     }
                 }
                 break;
-            case 'detailsAdministrator':
+            case 'commonAdministrator':
                 templates = {
                     inheritanceToolsRoles: {
                         name: 'details/role-inheritance-tools-roles'
-                    },
+                    }
+                }
+                break;
+            case 'detailsAdministrator':
+                templates = {
                     aclsAdmins: {
                         name: 'details/administrator-acls-tree'
                     },
@@ -217,7 +231,7 @@ Wat.I.T = {
                     }
                 }
                 break;
-            case 'detailsRole':
+            case 'commonRole':
                 templates = {
                     inheritanceToolsRoles: {
                         name: 'details/role-inheritance-tools-roles'
@@ -225,6 +239,13 @@ Wat.I.T = {
                     inheritanceToolsTemplates: {
                         name: 'details/role-inheritance-tools-templates'
                     },
+                    inheritanceToolsTemplatesMatrix: {
+                        name: 'details/role-inheritance-tools-templates-matrix'
+                    }
+                }
+                break;
+            case 'detailsRole':
+                templates = {
                     inheritanceList: {
                         name: 'details/role-inheritance-list'
                     },
@@ -243,6 +264,13 @@ Wat.I.T = {
                     },
                     deleteTenantDialogEmpty: {
                         name: 'dialog/delete-tenant-empty'
+                    }
+                }
+                break;
+            case 'spyVM':
+                templates = {
+                    spyVM: {
+                        name: 'common/vms-spy'
                     }
                 }
                 break;

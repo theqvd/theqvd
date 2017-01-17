@@ -18,8 +18,8 @@ use File::Slurp qw(slurp);
 use File::Spec;
 use Pg::PQ qw(:pgres);
 use QVD::Log;
-use AnyEvent::Impl::Perl;
-# use AnyEvent::Impl::EV;
+# use AnyEvent::Impl::Perl;
+use AnyEvent::Impl::EV;
 use AnyEvent;
 use AnyEvent::Semaphore;
 use AnyEvent::Pg::Pool;
@@ -77,6 +77,7 @@ use Class::StateMachine::Declarative
                                        setup => { transitions => { _on_error => 'stopping',
                                                                    _on_cmd_stop => 'stopping' },
                                                   substates => [ saving_state          => { enter => '_save_state' },
+                                                                 setting_process_limits=> { enter => '_set_process_limits' },
                                                                  preparing_storage     => { enter => '_prepare_storage' },
                                                                  removing_old_fw_rules => { enter => '_remove_fw_rules' },
                                                                  setting_fw_rules      => { enter => '_set_fw_rules' },
@@ -300,7 +301,7 @@ sub _start_db {
 
 sub _check_db_version {
     my $self = shift;
-    my $schema_version = '3.3.0';
+    my $schema_version = '4.0.0';
     $self->_query( { n => 1,
                      log_error => "Bad database schema. Upgrade it to version $schema_version" },
                    <<'EOQ', $schema_version);
@@ -778,6 +779,21 @@ sub _catch_zombie_vms {
     else {
         $self->_on_done;
     }
+}
+
+sub _set_process_limits {
+    my $self = shift;
+    for my $name (qw(as core data fsize memlock nice nofile stack)) {
+        if (defined (my $soft_limit = $self->_cfg_optional("hkd.process.limit.$name"))) {
+            my $hard_limit = $self->_cfg_optional("hkd.process.limit.hard.$name") // $soft_limit;
+            DEBUG "Setting limit $name to soft $soft_limit, hard $hard_limit";
+            my $resource = 'RLIMIT_' . uc($name);
+            require BSD::Resource;
+            BSD::Resource::setrlimit($resource, $soft_limit, $hard_limit) or
+                    WARN "Setting limit $name to soft $soft_limit and hard $hard_limit failed: $!";
+        }
+    }
+    $self->_on_done;
 }
 
 sub _prepare_storage {

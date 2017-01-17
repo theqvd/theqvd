@@ -11,11 +11,9 @@ WriteMakefile(
     NAME                => 'QVD::URI',
     AUTHOR              => 'Salvador Fandino <sfandino@yahoo.com>',
     VERSION             => '3.5'.$SUF_VERSION,
-    ABSTRACT       => 'lib/QVD/URI.pm',
+    ABSTRACT            => 'lib/QVD/URI.pm',
     PL_FILES            => {},
-    PREREQ_PM => {
-        'Test::More' => 0,
-    },
+    PREREQ_PM           => {},
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'QVD-URI-*' },
 );

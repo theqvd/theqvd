@@ -1,14 +1,20 @@
 <table>
     <% if (Wat.C.checkACL('vm.update-massive.description')) { %>
     <tr>
-        <td data-i18n="Description"></td>
         <td>
-            <textarea id="name" type="text" name="description"></textarea>
+            <span data-i18n="Description"></span>
+            <a class="button fa fa-rotate-left js-no-change-reset no-change-reset invisible" data-i18n="Reset" data-field="description"></a>
+        </td>
+        <td>
+            <textarea id="name" type="text" name="description" data-i18n="[placeholder]No changes"></textarea>
         </td>
     </tr>
     <% } %>
     <tr>
-        <td data-i18n="Image tag"></td>
+        <td>
+            <span data-i18n="Image tag"></span>
+            <a class="button fa fa-rotate-left js-no-change-reset no-change-reset invisible" data-i18n="Reset" data-field="di_tag"></a>
+        </td>
         <td>
             <select class="" name="di_tag"></select>
             <div class="second_row js-advice-various-osfs hidden">
@@ -17,22 +23,22 @@
             </div>
         </td>
     </tr>
-    <tr>
-        <td data-i18n="Expire"></td>
+    <tr class="expiration_row">
         <td>
-            <input type="checkbox" class="js-expire" name="expire" value="1">
+            <span data-i18n="Soft expiration"></span>
+            <a class="button fa fa-rotate-left js-no-change-reset no-change-reset invisible" data-i18n="Reset" data-field="expiration_soft"></a>
+        </td>
+        <td>
+            <input type="text" class="datetimepicker" name="expiration_soft" value="" data-i18n="[placeholder]No changes">
         </td>
     </tr>
-    <tr class="hidden expiration_row">
-        <td data-i18n="Soft expiration"></td>
+    <tr class="expiration_row">
         <td>
-            <input type="text" class="datetimepicker" name="expiration_soft" value="">
+            <span data-i18n="Hard expiration"></span>
+            <a class="button fa fa-rotate-left js-no-change-reset no-change-reset invisible" data-i18n="Reset" data-field="expiration_hard"></a>
         </td>
-    </tr>
-    <tr class="hidden expiration_row">
-        <td data-i18n="Hard expiration"></td>
         <td>
-            <input type="text" class="datetimepicker" name="expiration_hard" value="">
+            <input type="text" class="datetimepicker" name="expiration_hard" value="" data-i18n="[placeholder]No changes">
         </td>
     </tr>
 </table>

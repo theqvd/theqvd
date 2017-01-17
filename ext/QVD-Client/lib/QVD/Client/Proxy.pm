@@ -88,7 +88,6 @@ sub _add_ssl_error {
 # 1 or 0, depending on whether it thinks the certificate is valid or invalid.
 sub _ssl_verify_callback {
     my ($self, $ssl_thinks, $mem_addr, $attrs, $errs, $peer_cert, $ssl_depth) = @_;
-    return 1 if $ssl_thinks;
 
     DEBUG("_ssl_verify_callback called: " . join(' ', @_));
 
@@ -112,13 +111,13 @@ sub _ssl_verify_callback {
         err_no    => $err_no,
         err_depth => $err_depth,
         err_str   => $err_str 
-    };
+    } unless  $ssl_thinks ;
  
     $ci->{ssl_ok}           = $ssl_thinks;  
     $ci->{hash}             = $x509->hash;
-    $ci->{subject}          = _split_dn( $x509->subject );
+    $ci->{subject}          = { map { lc $_->type, $_->value } @{$x509->subject_name->entries} };
     $ci->{serial}           = $x509->serial;
-    $ci->{issuer}           = _split_dn( $x509->issuer );
+    $ci->{issuer}           = { map { lc $_->type, $_->value } @{$x509->issuer_name->entries} };
     $ci->{not_before}       = $x509->notBefore;
     $ci->{not_after}        = $x509->notAfter;
     $ci->{pem}              = $cert_pem_str;
@@ -178,51 +177,6 @@ sub _ssl_verify_callback {
     return 1;
 }
 
-sub _split_dn {
-    my ($dn) = @_;
-    my $ret = {};
-    my $buf = "";
-    my ($k,$v) = ("", "");
-
-    #print STDERR "STR: $dn\n";
-
-    my $str = $dn;
-    while($str) {
-        my ($match, $rest) = ($str =~ m/^(.*?)[,=](.*)$/);
-
-        $str = $rest;
-        $buf .= $match if (defined $match);
-
-        if ( $buf =~ /\\$/ ) {
-            $buf =~ s/\\$//;
-            $buf .= $k eq "" ? "=" : ",";
-        } else {
-            if ($k eq "") {
-                $k = $buf;
-                $buf = "";
-            } else {
-                $v = $buf;
-                $buf = "";
-            } 
-
-            if ( $k ne "" && $v ne "" ) {
-                for($k, $v) {
-                    s/^\s+//;
-                    s/\s+$//;
-                }
-                $k = lc($k);
-
-                $ret->{$k} = $v;
-                $buf = "";
-                $k = "";
-                $v = "";
-            }
-        }
-    }
-
-    return $ret;
-}
-
 sub accept_cert {
     my ($self, %data) = @_;
 
@@ -272,7 +226,7 @@ sub _load_accepted_certs {
         close $fd;
 
         eval {
-            $self->{accepted_certs} = from_json( $data, { utf8 => 1 } );
+            $self->{accepted_certs} = from_json( $data, { utf8 => 1, allow_nonref => 1 } );
         };
         if ( $@ ) {
             ERROR "Failed to load accepted certificates: $@\nData:\n$data";
@@ -294,7 +248,7 @@ sub _save_accepted_certs {
     DEBUG "Saving accepted certificates";
     eval {
         open(my $fd, '>', $file) or die "Can't create $file: $!";
-        print $fd to_json( $self->{accepted_certs}, { utf8 => 1, pretty => 1 } );
+        print $fd to_json( $self->{accepted_certs}, { utf8 => 1, pretty => 1, allow_nonref => 1 } );
         close $fd;
     };
     if ( $@ ) {
@@ -401,7 +355,7 @@ sub _get_httpc {
             my $algo = $cert->{sig_algo};
             my $bits = $cert->{bit_length};
 
-            if ( $algo =~ /^(md2|md4||md5|sha1)/i ) {
+            if ( $algo =~ /^(md2|md4|md5|sha1)/i ) {
                 $self->_add_ssl_error($depth, 1002, 0, "Insecure hash algorithm: $1");
             }
 
@@ -513,7 +467,7 @@ print "auth-type: ".$auth_type."\n";
     my $vm_list;
 
     eval {
-        $vm_list = JSON->new->decode($body);
+        $vm_list = from_json($body, { utf8 => 1, allow_nonref => 1});
     };
 
     if ( $@ ) {

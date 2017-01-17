@@ -159,13 +159,18 @@ Wat.C = {
                                 view.field
                             ],
                             'acls': view.qvd_object + '.see.properties',
-                            'property': true,
+                            'property': view.property,
                             'text': view.field
                         };
                     }
                     
                     Wat.I.listFields[view.qvd_object][view.field].display = view.visible;
-                    Wat.I.listFields[view.qvd_object][view.field].customized = true;
+                    
+                    // Check as customized only if the field is setted by an administrator. 
+                    // If administrator_id is null, it will be setted in tenant, not by admin
+                    if (view.administrator_id != null) {
+                        Wat.I.listFields[view.qvd_object][view.field].customized = true;
+                    }
                     break;
                 case 'filter':
                     if (!Wat.I.formFilters[view.qvd_object][view.field]) {
@@ -174,7 +179,7 @@ Wat.C = {
                             'type': 'text',
                             'text': view.field,
                             'noTranslatable': true,
-                            'property': true,
+                            'property': view.property,
                             'acls': view.qvd_object + '.filter.properties',
                         };
                     }
@@ -188,7 +193,11 @@ Wat.C = {
                             break;
                     }
                     
-                    Wat.I.formFilters[view.qvd_object][view.field].customized = true;
+                    // Check as customized only if the field is setted by an administrator. 
+                    // If administrator_id is null, it will be setted in tenant, not by admin
+                    if (view.administrator_id != null) {
+                        Wat.I.formFilters[view.qvd_object][view.field].customized = true;
+                    }
                     break;
             }
         });
@@ -616,5 +625,19 @@ Wat.C = {
         }
         
         return urlSid;
+    },
+    
+    // Get effective lan calculating if administrator language is default or auto
+    getEffectiveLan: function () {
+        var lan = this.language == "default" ? this.tenantLanguage : this.language;
+        
+        // If lan is not defined (i.e. in login screen), assume auto
+        if (!lan) {
+            lan = 'auto';
+        }
+        
+        // if auto get first two characters from i18n language to get ISO 639-1 format. 
+        // Example: Convert 'en_US' to 'en'
+        return lan == "auto" ? window.i18n.lng().substr(0, 2) : lan;
     }
 }

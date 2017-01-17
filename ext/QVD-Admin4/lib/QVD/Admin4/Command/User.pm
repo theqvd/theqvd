@@ -48,24 +48,6 @@ sub usage_text {
   user set password=samepassword (Sets new value for password in all USERs)
   user name=myuser set name=youruser, password=mypassword (Sets new values for name and password in USER with name myuser)
 
-  Adding custom properties:
-
-  user <FILTERS> set property key=value  
-  user <FILTERS> set property key=value, key=value, ...  
-
-  For example: 
-  user set property mykey=myvalue (Sets property mykey in all USERs)
-  user name=myuser set property mykey=myvalue, yourkey=yourvalue (Sets properties mykey and yourkey in USER with name myuser)
-
-  Deleting custom properties:
-
-  user <FILTERS> del property key
-  user <FILTERS> del property key, key, ...
-
-  For example: 
-  user del property mykey (Deletes property mykey in all USERs)
-  user name=myuser del property mykey, yourkey (Deletes properties mykey and yourkey in USER with name myuser)
-
   Blocking/Unblocking USERs
 
   user <FILTERS> block
@@ -83,6 +65,18 @@ sub usage_text {
   For example: 
   user del (Removes all USERs) 
   user name=myuser del (Removes USER with name myuser)
+
+== AVAILABLE PARAMETERS
+
+  The following parameters can be used as <FILTERS>, <ARGUMENTS>, <FIELDS TO RETRIEVE> or <ORDER CRITERIA>,
+  although some combinations may not be allowed and an error will be prompted:
+  
+  id                        (ID of the User)
+  tenant_name               (Name of the tenant the User belongs to)
+  tenant_id                 (ID of the tenant the User belongs to)
+  name                      (Name of the User)
+  number_of_vms             (Number of VMs associated to the User)
+  number_of_vms_connected   (Number of VMs the User is connected to)
 
 $QVD::Admin4::Command::COMMON_USAGE_TEXT
 "

@@ -11,7 +11,7 @@ if (Wat.C.checkACL('vm.see.state')) {
 <div class="details-header">
     <span class="fa fa-cloud h1"><%= model.get('name') %></span>
     <div class="clear mobile"></div>
-    <a class="button2 fright fa fa-eye js-show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>
+    <a class="button2 fright fa fa-eye js-show-details-actions show-details-actions" data-options-state="hidden" data-i18n="Actions"></a>
     
     <% if(Wat.C.checkACL('vm.delete.')) { %>
     <a class="button fleft button-icon--desktop js-button-delete fa fa-trash" href="javascript:" data-i18n="[title]Delete"><span data-i18n="Delete" class="mobile"></span></a>
@@ -55,7 +55,7 @@ if (Wat.C.checkACL('vm.see.state')) {
     <% 
     if (Wat.C.checkACL('vm.update.disconnect-user')) {
     %>
-        <a class="button button-icon js-button-disconnect-user fa fa-plug fright <%= model.get('user_state') != 'connected' ? 'hidden' : '' %>" href="javascript:" data-wsupdate="user_state-button" data-i18n="[title]Disconnect user"></a>
+        <a class="button button-icon js-button-disconnect-user fa fa-plug fright <%= model.get('user_state') != 'connected' ? 'hidden' : '' %>" href="javascript:" data-wsupdate="user_state-button" data-i18n="[title]Disconnect user"><span data-i18n="Disconnect user" class="mobile"></span></a>
     <%
     }
     %>
@@ -73,8 +73,13 @@ if (Wat.C.checkACL('vm.see.state')) {
     <% 
         }
     } 
+        if (Wat.C.checkACL('vm.spy.') && model.get('state') == 'running') { 
     %>
-    
+            <a class="button fright button-icon--desktop js-button-spy-vm fa fa-user-secret fright" href="javascript:" data-i18n="[title]Spy" data-wsupdate="spy-button" data-id="<%= model.get('id') %>"><span data-i18n="Spy" class="mobile"></span></a>
+    <% 
+        }
+    %>
+        
     <div class="clear mobile"></div>
 </div>
 

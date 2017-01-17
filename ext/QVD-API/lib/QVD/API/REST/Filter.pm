@@ -281,9 +281,10 @@ sub filter_operator
 
 sub add_filter
 {
-    my ($self,$path,$value) = @_;
+    my ($self,$path,$value,$key) = @_;
     
     my @node_names = split /$SEPARATOR/, $path;
+    push @node_names, $key if (defined $key);
     my $new_key = pop @node_names;
     my $subpath = join( $SEPARATOR, @node_names );
     my $root_subpath = join( $SEPARATOR, ($self->_root_key(), @node_names) );
@@ -375,6 +376,7 @@ sub cgrep
     return (grep {$self->_satisfy($_, $root_key, $self->{filter}[1])} @list);
 }
 
+# Returns the filter structure as a hash, including the root operator
 sub hash {
     my $self = shift;
     return { @{$self->{filter}} };
@@ -409,6 +411,13 @@ sub _include {
 }
 
 # Static public methods
+
+sub filter_basedir_from_path {
+    my $path = shift;
+    my @nodes = (split /$SEPARATOR/, $path);
+    pop @nodes;
+    return join $SEPARATOR, @nodes;
+}
 
 sub filter_name_from_path {
     my $path = shift;

@@ -1,6 +1,6 @@
 <div class="editor-container">
     <div data-i18n="Select where to perform the resetting of views"></div>
-    <table class="editor-table alternate col-width-100">
+    <table class="editor-table js-editor-table alternate col-width-100">
         <% if (Wat.C.isSuperadmin()) { %>
         <tr>
                 <td data-i18n="Tenant">
@@ -15,8 +15,10 @@
             <td data-i18n="Section">
             </td>
             <td>
-                <input type="radio" name="section_reset" checked value="<%= qvdObj %>"><span for="section_reset"><%= qvdObjName %></span>
-                <input type="radio" name="section_reset" value=""><span for="section_reset" data-i18n="All sections"></span>
+                <select name="section_reset">
+                    <option value="<%= qvdObj %>"><%= qvdObjName %></option>
+                    <option value="" data-i18n="All sections"></option>
+                </select>
             </td>
         </tr>
     </table>

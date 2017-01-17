@@ -1,5 +1,5 @@
 package QVD::Admin4::Command::Logout;
-use base qw( CLI::Framework::Command );
+use base qw( QVD::Admin4::Command );
 use strict;
 use warnings;
 
@@ -17,6 +17,11 @@ sub run
 {
     my ($self, $opts, @args) = @_;
 
+    $self->ask_api_standard(
+        $self->get_app->cache->get('api_default_path') . '/logout',
+        { }
+    );
+    
     $self->cache->set( login => undef );
     $self->cache->set( password => undef );
     $self->cache->set( sid => undef );

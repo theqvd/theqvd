@@ -9,6 +9,10 @@ sub authenticate_basic {}
 
 sub authenticate_bearer {}
 
+sub authenticate_basic_2f {}
+
+sub authenticate_basic_2f_split {}
+
 sub after_authenticate_basic {}
 
 sub before_connect_to_vm {}

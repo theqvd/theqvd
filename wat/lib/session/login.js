@@ -125,6 +125,9 @@ Wat.L = {
         
         // Store tenant mode
         Wat.C.multitenant = parseInt(that.retrievedData.multitenant);
+
+        // Store public configuration
+        Wat.C.publicConfig = that.retrievedData.public_configuration || {};
         
         // Store authentication separators
         Wat.C.authSeparators = that.retrievedData.auth.separators;

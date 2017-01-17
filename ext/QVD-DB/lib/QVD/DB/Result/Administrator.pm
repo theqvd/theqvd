@@ -1,7 +1,7 @@
 package QVD::DB::Result::Administrator;
 use base qw/DBIx::Class/;
 use QVD::DB;
-use QVD::API::AclsOverwriteList;
+use QVD::DB::AclsOverwriteList;
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('administrators');
@@ -73,7 +73,7 @@ sub acls
 
     $DB //= QVD::DB->new();
  
-    my $acls_overwrite_list = QVD::API::AclsOverwriteList->new(admin => $self,admin_id => $self->id);
+    my $acls_overwrite_list = QVD::DB::AclsOverwriteList->new(admin => $self,admin_id => $self->id);
     my $bind = [$acls_overwrite_list->acls_to_close_re,
 		$acls_overwrite_list->acls_to_open_re,
 		$acls_overwrite_list->acls_to_hide_re];
@@ -132,28 +132,27 @@ sub re_is_allowed_to
 
 # Tenants where the admin can operate
 
-sub set_tenants_scoop
+sub set_tenants_scope
 {
     my $self = shift;
     my $tenants_ids = shift;
     
-    $self->{tenants_scoop} = $tenants_ids;
+    my %ids = map { $_ => 1 } (@{ $tenants_ids });
+    $self->{tenants_scope} = [ keys (%ids) ];
 }
 
-sub tenants_scoop
+sub tenants_scope
 {
     my $self = shift;
-    my $tenants_ids = shift;
-    use constant COMMON_TENANT_ID => -1;
+    my $include_common_tenant = shift // 1;
 
-    # Common tenant is always included in the admin scoop
-    return [$self->tenant_id, COMMON_TENANT_ID]
-	unless $self->is_superadmin;
+    my @tenants = ();
+    push @tenants, @{ $self->{tenants_scope} };
+    # Common tenant is included in every admin scope
+    push @tenants, QVD::DB::Result::Tenant::COMMON_TENANT_ID
+        if ($include_common_tenant);
 
-    die "No tenants scoop assigned to superadmin"
-	unless defined $self->{tenants_scoop};
-
-    return $self->{tenants_scoop};
+    return [ @tenants ];
 }
 
 sub is_blocked

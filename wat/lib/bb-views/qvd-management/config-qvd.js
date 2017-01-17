@@ -107,7 +107,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     },
     
     processTokensRender: function (that) {
-        that.configTokens = that.retrievedData.rows
+        that.configTokens = Wat.U.sortObjectByField(that.retrievedData.rows, 'key');
         that.render();
     },  
     
@@ -125,7 +125,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         
         if (Wat.C.isSuperadmin()) { 
             var params = {
-                'action': 'tenant_tiny_list',
+                'actionAuto': 'tenant',
                 'selectedId': this.selectedTenant,
                 'controlId': 'tenant_search',
                 'chosenType': 'advanced100',
@@ -153,7 +153,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
             return;
         }
         
-        that.configTokens = that.retrievedData.rows
+        that.configTokens = Wat.U.sortObjectByField(that.retrievedData.rows, 'key');
         
         // If there are not tokens in this prefix, render everything again selecting first prefix
         if (that.configTokens.length == 0 && $('input[name="config_search"]').val() == '') {
@@ -170,7 +170,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         }
     },
     
-    renderConfigurationTokens: function () {        
+    renderConfigurationTokens: function () {
         this.template = _.template(
             Wat.TPL.qvdConfigTokens, {
                 configTokens: this.configTokens,
@@ -237,8 +237,8 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
                 filter['tenant_id'] = this.selectedTenant;
             }
             
-            filter['key'] = search;
-
+            filter['key'] = {'~': '%' + search + '%'};
+            
             // Pass typed search with context to avoid concurrency problems 
             Wat.A.performAction('config_get', {}, filter, {}, this.processTokensRenderTokens, $.extend({}, this, {typedSearch: $('input[name="config_search"]').val()}));
         }
@@ -427,7 +427,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         }
         else if ($.inArray(that.currentTokensPrefix, that.prefixes) != -1) {
             if (!$.isEmptyObject(Wat.C.currentSearch)) {
-                filter['key'] = Wat.C.currentSearch;
+                filter['key'] = {'~': '%' + Wat.C.currentSearch + '%'};
             }
             else {
                 // If there is a current search, filter by it. Otherwise filter by current selected prefix    
@@ -440,6 +440,16 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         else {
 			// If the prefix of the changed token doesnt exist, render all to create this new prefix in side menu
             Wat.A.performAction('config_get', {}, filter, {}, that.processPrefixes, that);
+        }
+
+        // Any time one token were deleted or any api.pulblic.* token were created/updated, refresh public configuration from API and render footer
+        if (!that.retrievedData.rows[0] || that.retrievedData.rows[0].key.substring(0,11) == 'api.public.') {
+            Wat.A.apiInfo(function (that) {
+                // Store public configuration 
+                Wat.C.publicConfig = that.retrievedData.public_configuration || {};
+
+                Wat.I.renderFooter();
+            }, that);
         }
     }
 });

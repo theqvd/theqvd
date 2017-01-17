@@ -15,7 +15,7 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
         'next': {
             'screen': 'WAT Management',
             'next': {
-                'screen': 'Views'
+                'screen': 'Default views'
             }
         }
     },
@@ -66,7 +66,17 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
             that.showViewsMessage(that.retrievedData);
             
             // Get admin setup configuration to get the views updated
-            that.getFilters(that);
+            Wat.A.performAction('current_admin_setup', {}, {}, {}, function () {
+                // Restore possible residous views configuration to default values
+                Wat.I.restoreListColumns();
+                Wat.I.restoreFormFilters();
+
+                // Store views configuration
+                Wat.C.storeViewsConfiguration(that.retrievedData.views);
+
+                // Get admin setup configuration to get the views updated
+                that.getFilters(that);
+            }, that);
         }, this);
     },
     
@@ -89,6 +99,8 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
                 );
         
         target.html(template); 
+        
+        Wat.I.chosenElement('select[name="section_reset"]', 'single100');
         
         Wat.T.translate();
     },
@@ -146,6 +158,7 @@ Wat.Views.SetupCustomizeView = Wat.Views.ViewsView.extend({
                     defaultFormFilters[register.field].displayDesktop = register.visible;
                     break;
             }
+            
             defaultFormFilters[register.field].customized = true;
         });
         

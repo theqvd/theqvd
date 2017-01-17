@@ -200,7 +200,7 @@ install: function(toclevels) {
 }
 
 }
-asciidoc.install(2);
+asciidoc.install(3);
 /*]]>*/
 </script>
 </head>
@@ -847,7 +847,7 @@ Filtrar máquinas virtuales por usuario
 </li>
 <li>
 <p>
-…
+&#8230;
 </p>
 </li>
 </ul></div>
@@ -884,7 +884,7 @@ Gestionar sus propios ACLs, pudiendo llegar a tener permisos totales o incluso p
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-11-26 15:51:04 CET
+Last updated 2016-12-14 08:21:47 CET
 </div>
 </div>
 </body>

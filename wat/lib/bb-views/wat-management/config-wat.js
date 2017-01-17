@@ -98,6 +98,9 @@ Wat.Views.ConfigWatView = Wat.Views.DetailsView.extend({
                     Wat.C.tenantBlock = that.newBlock;
                 }
             }
+            
+            // Render footer to update translations if necessary
+            Wat.I.renderFooter();
         }
     },
     

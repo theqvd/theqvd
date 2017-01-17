@@ -79,21 +79,38 @@ Wat.U = {
         
         var dt = new Date(milliseconds);
         
-        var year = dt.getFullYear();
-        var month = this.padNumber(dt.getMonth()+1);
-        var day = this.padNumber(dt.getDate());
-        var hour = this.padNumber(dt.getHours());
-        var minute = this.padNumber(dt.getMinutes());
-        var second = this.padNumber(dt.getSeconds());
-        
-        var dtstring = year
-            + '-' + month
-            + '-' + day
-            + ' ' + hour
-            + ':' + minute
-            + ':' + second;
-        
-        return dtstring;
+        return this.dateToString(dt);
+    },
+    
+    dateToString: function (date) {
+        if (date != null) {
+            var year = date.getFullYear();
+            var month = this.padNumber(date.getMonth()+1);
+            var day = this.padNumber(date.getDate());
+            var hour = this.padNumber(date.getHours());
+            var minute = this.padNumber(date.getMinutes());
+            var second = this.padNumber(date.getSeconds());
+            
+            var dtstring = year
+                + '-' + month
+                + '-' + day
+                + ' ' + hour
+                + ':' + minute
+                + ':' + second;
+            
+            return dtstring;
+        } else  {
+            return '';
+        }
+    },
+    
+    jsonDateToString : function (string) {
+        if (string) {
+            var dt = new Date(string);
+            return this.dateToString(dt);
+        } else {
+            return '';
+        }
     },
     
     // Get the current date plus the given diffMilliseconds
@@ -230,5 +247,56 @@ Wat.U = {
         }
         
         return params[parameter];
+    },
+    
+    // Get instanciated model from qvdObj as user, vm, osf...
+    getModelFromQvdObj: function (qvdObj) {
+        switch (qvdObj) {
+            case 'user':
+                    var model = new Wat.Models.User();
+                break;
+            case 'osf':
+                    var model = new Wat.Models.OSF();
+                break;
+            case 'vm':
+                    var model = new Wat.Models.VM();
+                break;
+            case 'di':
+                    var model = new Wat.Models.DI();
+                break;
+        }
+        
+        return model;
+    },
+    
+    // Get the field name used for the element name depending on the qvd object
+    getNameFieldFromQvdObj: function (qvdObj) {
+        switch (qvdObj) {
+            case 'di':
+                return 'disk_image';
+                break;
+            default:
+                return 'name';
+                break;
+        }
+    },
+    
+    // HTML strings encode function
+    htmlEncode: function (value) {
+      //create a in-memory div, set it's inner text(which jQuery automatically encodes)
+      //then grab the encoded contents back out. The div never exists on the page.
+      return $('<div/>').text(value).html();
+    },
+
+    // HTML strings dencode function
+    htmlDecode: function (value) {
+      return $('<div/>').html(value).text();
+    },
+    
+    // Sort a given object by the key of one of its fields
+    sortObjectByField: function (obj, field) {
+        return obj.sort(function(a,b) {
+            return (a[field] > b[field]) ? 1 : ((b[field] > a[field]) ? -1 : 0);
+        });
     }
 }

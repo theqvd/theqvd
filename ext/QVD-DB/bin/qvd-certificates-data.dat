@@ -1,0 +1,5 @@
+### SSL_Config ###
+key	value
+
+l7r.ssl.cert	&FILE_CONTENT(/etc/qvd/certs/server-certificate.pem)
+l7r.ssl.key	&FILE_CONTENT(/etc/qvd/certs/server-private-key.pem)

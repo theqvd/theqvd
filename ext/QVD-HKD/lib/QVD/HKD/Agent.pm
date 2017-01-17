@@ -305,10 +305,12 @@ sub _run_cmd {
     my @prefix = @{$opts->{prefix} // []};
     INFO "Running command " . perl_quote([@cmd, @args]);
     $opts->{outlives_state} //= $opts->{run_and_forget};
-    my @extra = map { ( defined $opts->{$_}
-                        ? ($_ => $opts->{$_})
-                        : () ) }
-                      ( qw(on_prepare), grep /^\d*[<>]$/, keys %$opts);
+
+    my @extra;
+    for my $key (qw(on_prepare), grep /^\d*[<>]$/, keys %$opts) {
+        my $val = delete $opts->{$key};
+        push @extra, $key => $val if defined $val;
+    }
 
     my $pid;
     my $w = eval { AnyEvent::Util::run_cmd([@prefix, @cmd, @args], '$$' => \$pid, @extra) };

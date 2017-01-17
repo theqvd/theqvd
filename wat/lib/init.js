@@ -59,6 +59,7 @@ var Wat = {
         DetailsView: {},
             UserDetailsView: {},
             VMDetailsView: {},
+            VMSpyView: {},
             HostDetailsView: {},
             OSFDetailsView: {},
             DIDetailsView: {},

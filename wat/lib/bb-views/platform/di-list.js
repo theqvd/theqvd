@@ -92,7 +92,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         else {
             // Fill OSF select on virtual machines creation form
             var params = {
-                'action': 'osf_tiny_list',
+                'actionAuto': 'osf',
                 'selectedId': $('.' + this.cid + ' .filter select[name="osf"]').val(),
                 'controlName': 'osf_id',
                 'chosenType': 'advanced100'

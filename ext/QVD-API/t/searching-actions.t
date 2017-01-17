@@ -605,19 +605,6 @@ $t->post_ok('/' => json => { login    => 'superadmin',
     ->json_is('/result/rows/0/',4, 'role_all_ids NO UNDERGENERATE')
     ->json_hasnt('/result/rows/1/' => 'role_all_ids NO OVERGENERATE');
 
-##################
-### role_tiny_list
-##################
-
-$t->post_ok('/' => json => { login    => 'superadmin',              
-		             password => 'superadmin',              
-		             action   => 'role_tiny_list',
-			     filters    => {}}) 
-    ->status_is(200, 'role_get_list HTTP STATUS')
-    ->json_is('/status' => '0', 'role_tiny_list API STATUS')
-    ->json_has('/result/rows/0/', 'role_tiny_list NO UNDERGENERATE')
-    ->json_hasnt('/result/rows/10/' => 'role_tiny_list NO OVERGENERATE');
-
 #################
 ### acl_get_list
 #################

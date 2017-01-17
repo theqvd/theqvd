@@ -10,13 +10,13 @@ else {
      <div class="js-custom-views-container <%= cid %> sec-properties">
              <div class="filter js-side">
                 <% if (Wat.C.isSuperadmin()) { %>
-                <div class="filter-control desktop">
+                <div class="filter-control desktop" data-fieldname="tenant">
                     <label for="obj-qvd-select" data-i18n>Tenant</label>
                     <select name="tenant-select">
                     </select>
                 </div>
                 <% } %>
-                <div class="filter-control desktop">
+                <div class="filter-control desktop" data-fieldname="qvd-obj">
                     <label for="obj-qvd-select" data-i18n="Section"></label>
                     <select name="obj-qvd-select" class="chosen-single">
                             <option data-i18n="All" value="all" <%= selectedObj == "all" ? 'selected' : '' %>></option>

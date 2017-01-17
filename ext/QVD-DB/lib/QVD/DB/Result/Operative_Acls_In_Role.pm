@@ -2,7 +2,6 @@ package QVD::DB::Result::Operative_Acls_In_Role;
 
 use base qw/DBIx::Class::Core/;
 use Mojo::JSON qw(decode_json);
-use QVD::API::AclsOverwriteList;
 
 __PACKAGE__->table_class('DBIx::Class::ResultSource::View');
 

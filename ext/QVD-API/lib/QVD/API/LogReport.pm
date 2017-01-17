@@ -102,11 +102,11 @@ sub BUILD
 
     $DB = QVD::DB::Simple::db();
     
-    my $localtime = localtime;
+    my $utctime = gmtime;
 
     $self->arguments->{password} = '**********' if defined eval { $self->arguments->{password} };
 
-    $self->{log_entry} = { time => $localtime, qvd_object => $self->qvd_object, 
+    $self->{log_entry} = { time => $utctime, qvd_object => $self->qvd_object, 
 			   ip => $self->ip, source => $self->source,
 			   arguments => encode_json($self->arguments), status => $self->status};
     

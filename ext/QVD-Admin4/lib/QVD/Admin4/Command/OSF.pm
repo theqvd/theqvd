@@ -48,24 +48,6 @@ sub usage_text {
   osf set memory=256 (Sets new value for memory in all OSFs)
   osf name=myosf set memory=256, overlay=0 (Sets new values for memory and overlay in OSF with name myosf)
 
-  Adding custom properties:
-
-  osf <FILTERS> set property key=value  
-  osf <FILTERS> set property key=value, key=value, ...  
-
-  For example: 
-  osf set property mykey=myvalue (Sets property mykey in all OSFs)
-  osf name=myosf set property mykey=myvalue, yourkey=yourvalue (Sets properties mykey and yourkey in OSF with name myosf)
-
-  Deleting custom properties:
-
-  osf <FILTERS> del property key
-  osf <FILTERS> del property key, key, ...
-
-  For example: 
-  osf del property mykey (Deletes property mykey in all OSFs)
-  osf name=myosf del property mykey, yourkey (Deletes properties mykey and yourkey in OSF with name myosf)
-
 == REMOVING OSFs
   
   osf del
@@ -74,6 +56,21 @@ sub usage_text {
   For example: 
   osf del (Removes all OSFs) 
   osf name=myosf del (Removes OSF with name myosf)
+
+== AVAILABLE PARAMETERS
+
+  The following parameters can be used as <FILTERS>, <ARGUMENTS>, <FIELDS TO RETRIEVE> or <ORDER CRITERIA>,
+  although some combinations may not be allowed and an error will be prompted:
+  
+  id            (ID of the OSF)
+  tenant_name   (Name of the tenant the OSF belongs to)
+  tenant_id     (ID of the tenant the OSF belongs to)
+  name          (Name of the OSF)
+  user_storage  (Disk allocated for this VMs associated with the OSF in MB)
+  memory        (RAM allocated for this VMs associated with the OSF in MB)
+  overlay       (Flag that indicate whether overlay is enabled)
+  number_of_vms (Number of VMs associated to the OSF)
+  number_of_dis (Number of DIs associated to the DI)
 
 $QVD::Admin4::Command::COMMON_USAGE_TEXT
 "

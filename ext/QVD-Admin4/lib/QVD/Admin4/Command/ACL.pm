@@ -33,6 +33,15 @@ sub usage_text {
   acl get order asc name, id (Ordering by 'name' and 'id' in ascendent order)
   acl get order desc name, id (Ordering by 'name' and 'id' in descendent order)
 
+
+== AVAILABLE PARAMETERS
+
+  The following parameters can be used as <FILTERS>, <FIELDS TO RETRIEVE> or <ORDER CRITERIA>,
+  although some combinations may not be allowed and an error will be prompted:
+  
+  id    (Numeric ID of the ACL)
+  name  (ACL name)
+
 $QVD::Admin4::Command::COMMON_USAGE_TEXT
 "
 

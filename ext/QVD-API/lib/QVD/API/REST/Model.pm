@@ -135,9 +135,9 @@ my $ACLS_FOR_FILTERS = {
         osf_id => [qr/^vm\.filter\.osf|osf\.see\.vm-list$/],
         osf_name => [qr/^vm\.filter\.osf$/],
         osf => [qr/^vm\.filter\.osf$/],
-        di_id => [qr/^vm\.filter\.di|di\.see\.vm-list$/],
-        di_name => [qr/^vm\.filter\.di$/],
-        di_id_in_use => [qr/^vm\.filter\.di$/],
+        di_id => [qr/^vm\.see\.di|di\.see\.vm-list$/],
+        di_name => [qr/^vm\.see\.di$/],
+        di_id_in_use => [qr/^vm\.see\.di$/],
         host_id => [qr/^vm\.filter\.host|host\.see\.vm-list$/],
         host_name => [qr/^vm\.filter\.host$/],
         host => [qr/^vm\.filter\.host$/],
@@ -744,7 +744,7 @@ my $AVAILABLE_FILTERS = {
 		Host => [qw(id)],
 		Role => [qw(id)],
 		Tenant => [qw(id)],
-		Views_Setup_Properties_Tenant => [qw(qvd_object)],
+		Views_Setup_Properties_Tenant => [qw(tenant_id qvd_object)],
 		Views_Setup_Attributes_Tenant => [qw(tenant_id qvd_object)],
 		Views_Setup_Properties_Administrator => [qw(qvd_object)],
 		Views_Setup_Attributes_Administrator => [qw(qvd_object)]
@@ -937,7 +937,7 @@ my $MANDATORY_FILTERS =
 	{
 		list => {
 			default => [qw()],
-            Config => [qw(tenant_id)],
+            Config => [qw()],
             Operative_Acls_In_Role => [qw(role_id)], 
 			Operative_Acls_In_Administrator => [qw()]
 		}, # FIX ME. HAS DEFAULT VALUE IN Request.pm. DEFAULT SYSTEM FOR FILTERS NEEDED
@@ -962,7 +962,7 @@ my $MANDATORY_FILTERS =
 
 		update=> {
 			default => [qw(id)],
-			Config => [qw(key tenant_id)],
+			Config => [qw(key)],
             My_Admin => [],
             My_Tenant => [],
 			Wat_Setups_By_Tenant => [qw()]
@@ -1620,7 +1620,7 @@ my $DBIX_JOIN_VALUE = {
   
     Host => ['runtime', 'vms', qw(creation_log_entry)],
 
-    OSF => [ qw(tenant vms), { dis => 'tags' }, qw(creation_log_entry)],
+    OSF => [ qw(tenant vms), qw(creation_log_entry)],
 
     DI => [qw(vm_runtimes tags), {osf => 'tenant'}, qw(creation_log_entry)],
 
@@ -2445,8 +2445,9 @@ sub get_default_di_version
     my $self = shift;
     my $json_wrapper = shift;
 
-    my $osf_id = $json_wrapper->get_argument_value('osf_id') // return;
-    my ($y, $m, $d) = (localtime)[5, 4, 3]; $m ++; $y += 1900;
+    my $osf_id = $json_wrapper->get_argument_value('osf_id') // 
+        QVD::API::Exception->throw(code => 7100, object => 'osf_id');
+    my ($y, $m, $d) = (gmtime)[5, 4, 3]; $m ++; $y += 1900;
     my $osf = $DB->resultset('OSF')->search({id => $osf_id})->first;
     QVD::API::Exception->throw(code => 7100, object => 'osf_id') unless $osf; 
     my $version;

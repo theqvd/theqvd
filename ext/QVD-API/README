@@ -55,7 +55,6 @@ This module requires these other modules and libraries:
     Moose
     POSIX
     QVD::API
-    QVD::API::AclsOverwriteList
     QVD::API::Action
     QVD::API::ConfigsOverwriteList
     QVD::API::Exception
@@ -69,6 +68,7 @@ This module requires these other modules and libraries:
     QVD::Config::Core
     QVD::Config::Network
     QVD::DB::Simple
+    QVD::DB::AclsOverwriteList
     QVD::L7R::LoadBalancer
     Scalar::Util
     TryCatch

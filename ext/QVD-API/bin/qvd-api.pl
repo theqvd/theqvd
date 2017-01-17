@@ -2,7 +2,8 @@
 
 BEGIN {
 	$QVD::Config::USE_DB = 1;
-	@QVD::Config::FILES = (
+	@QVD::Config::Core::FILES = (
+		'/etc/qvd/node.conf',
 		'/etc/qvd/api.conf',
 		($ENV{HOME} || $ENV{APPDATA}).'/.qvd/api.conf',
 		'qvd-api.conf',
@@ -20,6 +21,7 @@ use Mojo::ByteStream 'b';
 use Deep::Encode;
 use File::Copy qw(copy move);
 use QVD::Config;
+use QVD::VMProxy;
 use Try::Tiny;
 use Data::Rmap qw(rmap_ref);
 
@@ -87,7 +89,7 @@ app->config(
         accepts => 1000,
         clients => 1000,
         workers => 4,
-        pid_file => '/var/lib/qvd/qvd-api.pid'
+        pid_file => '/var/run/qvd/qvd-api.pid'
     }
 );
 
@@ -378,13 +380,13 @@ group {
         my $staging_path = $c->qvd_admin4_api->_cfg('path.storage.staging');
         my $staging_file = eval { $json->{arguments}->{disk_image} } // ''; 
         my $images_file = $staging_file . '-tmp'. rand;
+        my $sf_size = eval { -s "$staging_path/$staging_file" } // 0;
 
         my $accomplished=0;
 
         $c->on(message => sub { 
             my ($c,$msg) = @_;
             unless ($accomplished) {
-                my $sf_size = eval { -s "$staging_path/$staging_file" } // 0;
                 my $if_size = eval { -s "$images_path/$images_file" } // 0;
                 $c->send( b( encode_json( {
                         status     => 1000,
@@ -396,7 +398,22 @@ group {
         });
 
         my $tx = $c->tx;
-        my $fc = Mojo::IOLoop::ForkCall->new;
+        my $fc = Mojo::IOLoop::ForkCall->new();
+        $fc->on( finish => sub {
+                my ($fc, $err, $response) = @_;
+                $accomplished=1;
+                if($response->{status} == 0000) {
+                    $c->send( b( encode_json( {
+                        status         => 1000,
+                        total_size => $sf_size,
+                        copy_size  => $sf_size } )
+                    )->decode( 'UTF-8' ) );
+                }
+                my $code = $response->{status};
+                my $msg = $response->{message};
+                $c->app->log->debug("Copy finished ($code): $msg");
+                $c->send(b(encode_json($response))->decode('UTF-8'));
+            } );
         $fc->run(
             sub {
                 my $response = {};
@@ -445,17 +462,11 @@ group {
                 } catch {
                     my $exception = $_;
                     $response = $exception->json;
+                } finally {
+                    eval { unlink( "$images_path/$images_file" ); };
                 };
 
                 return $response; 
-            },
-            sub {
-                my ($fc, $err, $response) = @_;
-                my $code = $response->{status};
-                my $msg = $response->{message};
-                $c->app->log->debug("Copy finished ($code): $msg");
-                $accomplished=1;
-                $c->send(b(encode_json($response))->decode('UTF-8')); 
             }
         );
     };
@@ -579,6 +590,43 @@ group {
         $c->send(encode_json({ status => 1000,
                 total_size => $len,
                 copy_size => $size }));
+    };
+
+    websocket '/vmproxy' => sub {
+        my $c = shift;
+
+        my $admin = $c->qvd_admin4_api->administrator;
+        unless ($admin->re_is_allowed_to( qr/^vm\.spy\.$/ )) {
+            die QVD::API::Exception->new(code => 4210)->message;
+        }
+
+        $c->inactivity_timeout(10);
+
+        $c->app->log->debug("VM Proxy WebSocket opened");
+        $c->render_later->on(finish => sub { $c->app->log->debug("VM Proxy WebSocket closed"); });
+
+        my $json = $c->get_input_json;
+        my $vm_id = $json->{arguments}->{vm_id};
+        die QVD::API::Exception->new(code => 6240, object => "vm_id")->message unless (defined($vm_id));
+
+        my $vm = $c->qvd_admin4_api->_db->resultset('VM_Runtime')->find($vm_id);
+        if (defined($vm) && (my $vm_ip = $vm->vm_address) && (my $vm_port = $vm->vm_vma_port) 
+            && ($vm->vm_state eq 'running')) 
+        {
+            my $tx = $c->tx;
+            $tx->with_protocols( 'binary' );
+
+            my $ws = QVD::VMProxy->new( address => $vm_ip, port => $vm_port );
+            $ws->on( error => sub {
+                $c->app->log->error( "Error in ws: ".$_[1] );
+                $tx->finish( 1011, $_[1] )
+            } );
+            $ws->open($tx, 30000);
+        }
+        else 
+        {
+            die QVD::API::Exception->new(code => 6310, object => $vm_id)->message;
+        }
     };
 };
 
@@ -753,3 +801,12 @@ sub report_di_problem_in_log
 	)->report;
 }
 
+__END__
+
+=pod
+
+=head1 PURPOSE
+
+Script intended to run an instance of the QVD API
+
+=cut

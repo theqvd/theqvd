@@ -26,29 +26,6 @@ sub BUILD
     $self->_map;
 }
 
-
-sub get_default_version
-{ 
-    my $self = shift;
-
-    my ($y, $m, $d) = (localtime)[5, 4, 3];
-    $m ++;
-    $y += 1900;
-
-    my $osf_id = $self->json->{arguments}->{straight}->{osf_id}  //
-	QVD::API::Exception->throw(code=>'23502'); # FIX ME: PREVIOUS REVISION OF MANDATORY ARGUMENTS
-    my $osf = $self->db->resultset('OSF')->search({id => $osf_id})->first;
-    my $version;
-
-    for (0..999) 
-    {
-	$version = sprintf("%04d-%02d-%02d-%03d", $y, $m, $d, $_);
-	last unless $osf->di_by_tag($version);
-    }
-    $version;
-}
-
-
 1;
 
 # tags_get_columns is not a relationship: only available as output field 

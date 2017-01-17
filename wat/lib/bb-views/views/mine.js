@@ -14,7 +14,11 @@ Wat.Views.MyViewsView = Wat.Views.ViewsView.extend({
         'screen': 'Home',
         'link': '#',
         'next': {
-            'screen': 'My views'
+            'screen': 'Profile',
+            'link': '#/profile',
+            'next': {
+                'screen': 'My views'
+            }
         }
     },
     
@@ -32,7 +36,11 @@ Wat.Views.MyViewsView = Wat.Views.ViewsView.extend({
         this.currentColumns = Wat.I.getListColumns(this.selectedSection);
         
         // Get system properties to complete the dababase data
-        this.properties = new Wat.Collections.Properties({filters: {'tenant_id': Wat.C.tenantID}});
+        var params = {};
+        if (Wat.C.isSuperadmin()) {
+            params = {filters: {'tenant_id': Wat.C.tenantID}};
+        }
+        this.properties = new Wat.Collections.Properties(params);
         
         var that = this;
         
@@ -55,7 +63,7 @@ Wat.Views.MyViewsView = Wat.Views.ViewsView.extend({
     
     // Perform the reset action on DB and update interface
     performResetViews: function () {
-        var sectionReset = $('[name="section_reset"]:checked').val();
+        var sectionReset = $('[name="section_reset"]').val();
         
         var filter = {};
         
@@ -94,9 +102,11 @@ Wat.Views.MyViewsView = Wat.Views.ViewsView.extend({
                         qvdObjName: qvdObjName,
                     }
                 );
-        
+
         target.html(template);  
         
+        Wat.I.chosenElement('select[name="section_reset"]', 'single100');
+
         Wat.T.translate();
     },
 });

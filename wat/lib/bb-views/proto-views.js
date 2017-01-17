@@ -34,7 +34,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         
         var dialogConf = {};
 
-        dialogConf.title = "Reset views to default configuration";
+        dialogConf.title = $.i18n.t("Reset views to default configuration");
 
         dialogConf.buttons = {
             Cancel: function (e) {
@@ -46,8 +46,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             }
         };
         
-        dialogConf.button1Class = 'fa fa-ban js-button-cancel';
-        dialogConf.button2Class = 'fa fa-eraser js-button-reset';
+        dialogConf.buttonClasses = ['fa fa-ban js-button-cancel', 'fa fa-sitemap js-button-reset'];
 
         dialogConf.fillCallback = that.fillResetViewsEditor;
 
@@ -120,11 +119,13 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
 
         if (that.retrievedData.status == STATUS_SUCCESS) {
             // If update is performed successfuly, hide default info icon
-            $(that.targetClicked).parent().parent().parent().find('.js-default-info').hide();
+            $(that.targetClicked).parent().parent().parent().find('.js-default-info-default').hide();
+            $(that.targetClicked).parent().parent().parent().find('.js-default-info-overwritten').show();
             
             // If update is performed successfuly, update in memory
             if (that.currentFilters[fieldName]) {
                 that.currentFilters[fieldName].displayDesktop = checked;
+                that.currentFilters[fieldName].customized = true;
             }
             else {
                 that.currentFilters[fieldName] = {
@@ -135,7 +136,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
                     noTranslatable: true,
                     property: true,
                     text: fieldName,
-                    type: "text",
+                    type: "text"
                 };
             }
 
@@ -196,11 +197,13 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
 
         if (that.retrievedData.status == STATUS_SUCCESS) {
             // If update is performed successfuly, hide default info icon
-            $(that.targetClicked).parent().parent().parent().find('.js-default-info').hide();
+            $(that.targetClicked).parent().parent().parent().find('.js-default-info-default').hide();
+            $(that.targetClicked).parent().parent().parent().find('.js-default-info-overwritten').show();
             
             // If update is perfermed successfuly, update in memory
             if (that.currentFilters[fieldName]) {
                 that.currentFilters[fieldName].displayMobile = checked;
+                that.currentFilters[fieldName].customized = true;
             }
             else {
                 that.currentFilters[fieldName] = {
@@ -258,7 +261,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
             else {
                 args.qvd_object = qvdObj;
                 args.field = fieldName;
-            this.addIDToArgs(args);
+                this.addIDToArgs(args);
             }
             
 
@@ -273,11 +276,13 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
 
         if (that.retrievedData.status == STATUS_SUCCESS) {
             // If update is performed successfuly, hide default info icon
-            $(that.targetClicked).parent().parent().parent().find('.js-default-info').hide();
+            $(that.targetClicked).parent().parent().parent().find('.js-default-info-default').hide();
+            $(that.targetClicked).parent().parent().parent().find('.js-default-info-overwritten').show();
 
             // If update is performed successfuly, update in memory
             if (that.currentColumns[fieldName]) {
                 that.currentColumns[fieldName].display = checked;
+                that.currentColumns[fieldName].customized = true;
             }
             else {
                 that.currentColumns[fieldName] = {
@@ -350,7 +355,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
         if (Wat.C.isSuperadmin()) {
             // Fill Tenant select on viees customization view
             var params = {
-                'action': 'tenant_tiny_list',
+                'actionAuto': 'tenant',
                 'controlName': 'tenant-select',
                 'chosenType': 'advanced100'
             };
@@ -395,7 +400,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
     completeColumnListWithProperties: function (columnList, properties, qvdObj) {
         $.each(properties, function (iProp, prop) {
             if (columnList[prop.get('key')]) {
-                columnList[prop.get('key')].property = true;
+                columnList[prop.get('key')].property = prop.get('property_id');
                 columnList[prop.get('key')].property_id = prop.get('in_' + qvdObj);
                 return;
             }
@@ -417,7 +422,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
     completeFilterListWithProperties: function (filterList, properties, qvdObj) {
         $.each(properties, function (iProp, prop) {
             if (filterList[prop.get('key')]) {
-                filterList[prop.get('key')].property = true;
+                filterList[prop.get('key')].property = prop.get('property_id');
                 filterList[prop.get('key')].property_id = prop.get('in_' + qvdObj);
                 return;
             }

@@ -47,7 +47,7 @@ CONFIG=/etc/qvd/node.conf
 if [ ! -f "$CONFIG" ]; then
         echo "Configuration file $CONFIG doesn't exist."
         echo "Create it with 'cp -R /usr/lib/qvd/config/sample-node.conf $CONFIG' and edit node.conf."
-        exit 0
+        exit 150
 fi
 
 # Default options, these can be overriden by the information
@@ -108,8 +108,8 @@ running() {
 }
 
 kill_dnsmasq() {
-	#Function added to kill dnsmasq 	
-	pkill dnsmasq 
+	#Function added to kill dnsmasq
+	pkill dnsmasq
 }
 
 
@@ -145,7 +145,7 @@ stop_server() {
 				  --exec $PERL
 		errcode=$?
 	fi
-	
+
 	kill_dnsmasq
         return $errcode
 }
@@ -192,7 +192,7 @@ case "$1" in
             # NOTE: Some servers might die some time after they start,
             # this code will detect this issue if STARTTIME is set
             # to a reasonable value
-            [ -n "$STARTTIME" ] && sleep $STARTTIME # Wait some time 
+            [ -n "$STARTTIME" ] && sleep $STARTTIME # Wait some time
             if  running ;  then
                 # It's ok, the server started and is running
                 exit 0
@@ -288,4 +288,3 @@ case "$1" in
 esac
 
 exit 0
-
