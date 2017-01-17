@@ -295,7 +295,7 @@ try {
 			add_enums      => ENUMERATES(), 
 			add_init_vars  => INITIAL_VALUES(),
 		} );
-	}catch ($exception) {
+	} catch {
 		db->txn_rollback();
 		my $exception = $_;
 		$error = "ERROR_DB_DEPLOY_FAILED"; die "$exception";
