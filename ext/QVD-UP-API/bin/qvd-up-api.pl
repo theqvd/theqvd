@@ -44,8 +44,11 @@ plugin 'Directory' => {
 
 ##### HELPERS #####
 
-# Query finishes and returns a response with a message and httpcode
+# Query finishes and returns a response with a httpcode
 helper (render_response => \&render_response);
+
+# Query finishes and returns an error with a message and httpcode
+helper (render_error => \&render_error);
 
 # Stores the active channels of the postgres database
 helper (pool => \&pool);
@@ -137,7 +140,7 @@ any [qw(GET)] => '/api/info' => sub {
         status => "up",
     };
 
-    return $c->render_response(json => $json, status => 200);
+    return $c->render_response(json => $json);
 };
 
 # Generate session
@@ -146,7 +149,7 @@ any [ qw(POST) ] => '/api/login' => sub {
 
     my $input_json = $c->req->json;
 
-    return $c->render_response(message => "Invalid parameter", parameter => $_, code => 400)
+    return $c->render_error(message => $_->{message}, parameters => $_->{parameters}, code => 400)
         if $_ = find_invalid_parameter (
             $input_json,
             {
@@ -176,7 +179,7 @@ any [ qw(POST) ] => '/api/login' => sub {
     my $http_code = $auth_tx->res->code // 502;
     my $http_message = $auth_tx->res->message // "Authentication server unavailable";
 
-    return $c->render_response(message => $http_message, code => $http_code)
+    return $c->render_error(message => $http_message, code => $http_code)
         unless $http_code == 200;
 
     my $user_rs = rs('User')->search( { login => $user, password => password_to_token($password) } );
@@ -187,7 +190,7 @@ any [ qw(POST) ] => '/api/login' => sub {
 
     my $user_obj = $user_rs->first;
 
-    return $c->render_response(message => "Unauthorized", code => 401)
+    return $c->render_error(message => "Unauthorized", code => 401)
         unless defined $user_obj;
 
     my $session = create_up_session_handler( $c->tx, db );
@@ -202,7 +205,7 @@ any [ qw(POST) ] => '/api/login' => sub {
     my $json = { };
     $json->{sid} = $session->sid if defined($session);
 
-    return $c->render_response(message => "Logged in correctly", code => 200, json => $json);
+    return $c->render_response(json => $json);
 };
 
 # Authenticated actions of the API
@@ -230,7 +233,7 @@ group {
         }
         
         if(!$is_logged){
-            $c->render_response(message => $message, code => 401);
+            $c->render_error(message => $message, code => 401);
         }
 
         return $is_logged;
@@ -245,7 +248,7 @@ group {
         $session->clear;
         $session->flush;
        
-        return $c->render_response(message => "Logged out", code => 200);
+        return $c->render_response(json => {});
     };
 
     # Account settings
@@ -259,7 +262,7 @@ group {
         $json->{username} = $user->login;
         $json->{acls} = [];
 
-        return $c->render_response(json => $json, code => 200);
+        return $c->render_response(json => $json);
     };
     
     any [qw(PUT)] => '/api/account' => sub {
@@ -267,7 +270,7 @@ group {
 
         my $input_json = $c->req->json;
 
-        return $c->render_response(message => "Invalid parameter", parameter => $_, code => 400)
+        return $c->render_error(message => $_->{message}, parameters => $_->{parameters}, code => 400)
             if $_ = find_invalid_parameter (
                 $input_json,
                 {
@@ -285,14 +288,14 @@ group {
         $json->{username} = $user->login;
         $json->{acls} = [];
         
-        return $c->render_response(json => $json, code => 200);
+        return $c->render_response(json => $json);
     };
 
     any [qw(GET)] => '/api/account/last_connection' => sub {
         my $c = shift;
 
         my $connection = rs('User_Connection')->find($c->stash('session')->data('user_id'));
-        return $c->render_response(message => 'No registered connection', code => 200) unless defined($connection);
+        return $c->render_error(message => 'No registered connection', code => 200) unless defined($connection);
 
         my $json = {};
         $json->{location} = $connection->location;
@@ -301,7 +304,7 @@ group {
         $json->{os} = $connection->os;
         $json->{device} = $connection->device;
 
-        return $c->render_response(json => $json, code => 200);
+        return $c->render_response(json => $json);
     };
 
         # Desktops
@@ -314,7 +317,7 @@ group {
                 { order_by => { -asc => 'id' } } 
             )->all ];
 
-        return $c->render_response(json => $desktop_list, code => 200);
+        return $c->render_response(json => $desktop_list);
     };
 
     any [qw(GET)] => '/api/desktops/:id' => [id => qr/\d+/] => sub {
@@ -323,11 +326,11 @@ group {
         my $vm_id = $c->param('id');
         my $user_id = $c->stash('session')->data('user_id');
         my $vm = rs( "VM" )->single( { id => $vm_id, user_id => $user_id } );
-        return $c->render_response(message => "Invalid Desktop", code => 400) unless defined($vm);
+        return $c->render_error(message => "Invalid Desktop", code => 400) unless defined($vm);
 
         my $desktop = vm_to_desktop_hash($vm);
         
-        return $c->render_response(json => $desktop, code => 200);
+        return $c->render_response(json => $desktop);
     };
     
     any [qw(PUT)] => '/api/desktops/:id' => [id => qr/\d+/] => sub {
@@ -336,14 +339,14 @@ group {
         my $vm_id = $c->param('id');
         my $user_id = $c->stash('session')->data('user_id');
         my $vm = rs( "VM" )->single( { id => $vm_id, user_id => $user_id } );
-        return $c->render_response(message => "Invalid Desktop", code => 400) unless defined($vm);
+        return $c->render_error(message => "Invalid Desktop", code => 400) unless defined($vm);
 
         my $json = $c->req->json;
 
         my $desktop = $vm->desktop;
         my @settings = $desktop ? $desktop->settings->all : ();
 
-        return $c->render_response(message => "Invalid parameter", parameter => $_, code => 400)
+        return $c->render_error(message => $_->{message}, parameters => $_->{parameters}, code => 400)
             if $_ = find_invalid_parameter ( 
                 $json,
                 {
@@ -390,7 +393,7 @@ group {
             }
         }
 
-        return $c->render_response(json => vm_to_desktop_hash($vm), code => 200);
+        return $c->render_response(json => vm_to_desktop_hash($vm));
     };
     
     any [qw(DELETE)] => '/api/desktops/:id' => [id => qr/\d+/] => sub {
@@ -399,11 +402,11 @@ group {
         my $vm_id = $c->param('id');
         my $user_id = $c->stash('session')->data('user_id');
         my $vm = rs( "VM" )->single( { id => $vm_id, user_id => $user_id } );
-        return $c->render_response(message => "Invalid Desktop", code => 400) unless defined($vm);
+        return $c->render_error(message => "Invalid Desktop", code => 400) unless defined($vm);
 
         my $json = $c->req->json;
 
-        return $c->render_response(message => "Invalid parameter", parameter => $_, code => 400)
+        return $c->render_error(message => $_->{message}, parameters => $_->{parameters}, code => 400)
             if $_ = find_invalid_parameter (
                 $json,
                 {
@@ -411,20 +414,15 @@ group {
                 }
             );
     
-        my $message = "";
         if( my $desktop = $vm->desktop ) {
             if($json->{settings_only}){
                 $desktop->settings->delete();
-                $message = "Desktop settings deleted from  " . $vm->name;
             } else {
                 $desktop->delete();
-                $message = "Desktop configuration deleted from " . $vm->name;
             }
-        } else {
-            $message = "There is no configuration to be deleted";
         }
 
-        return $c->render_response(message => $message, code => 200);
+        return $c->render_response(json => {});
     };
 
     any [qw(GET)] => '/api/desktops/:id/token' => [id => qr/\d+/] => sub {
@@ -436,7 +434,7 @@ group {
         my $user_id = $session_up->data->{user_id};
 
         my $vm = rs( "VM" )->search( { id => $vm_id, user_id => $user_id } )->first;
-        return $c->render_response(message => "Invalid Desktop", code => 400) unless defined($vm);
+        return $c->render_error(message => "Invalid Desktop", code => 400) unless defined($vm);
 
         my $session_l7r = rs('User_Token')->create( { 
             token => generate_sid(),
@@ -449,7 +447,7 @@ group {
 
         register_user_connection($user_id, $c->tx);
 
-        return $c->render_response(json => { token => $token }, code => 200 );
+        return $c->render_response(json => { token => $token });
     };
 
     any [qw(GET)] => '/api/desktops/:id/setup' => [id => qr/\d+/] => sub {
@@ -461,7 +459,7 @@ group {
         my $user_id = $session_up->data->{user_id};
         
         my $vm = rs( "VM" )->search( { id => $vm_id, user_id => $user_id } )->first;
-        return $c->render_response(message => "Invalid Desktop", code => 400) unless defined($vm);
+        return $c->render_error(message => "Invalid Desktop", code => 400) unless defined($vm);
 
         my $element;
         if($vm->desktop && $vm->desktop->settings && $vm->desktop->active){
@@ -475,7 +473,7 @@ group {
         $json->{settings} = element_settings($element);
         $json->{hostname} = cfg('up-api.l7r.address');
         
-        return $c->render_response(json => $json, code => 200 );
+        return $c->render_response(json => $json);
     };
 
     # Workspaces
@@ -488,7 +486,7 @@ group {
             ($user->workspaces->search({}, { order_by => { -asc => 'id' } })->all) 
         ];
         
-        return $c->render_response(json => $workspaces, code => 200);
+        return $c->render_response(json => $workspaces);
     };
 
     any [qw(GET)] => '/api/workspaces/:id' => [id => qr/\d+/] => sub {
@@ -498,9 +496,9 @@ group {
         my $user_id = $c->stash->{session}->data->{user_id};
 
         my $workspace = rs('Workspace')->single({id => $ws_id, user_id => $user_id});
-        return $c->render_response(message => "Invalid Workspace", code => 400) unless defined($workspace);
+        return $c->render_error(message => "Invalid Workspace", code => 400) unless defined($workspace);
 
-        return $c->render_response(json => workspace_to_hash($workspace), code => 200);
+        return $c->render_response(json => workspace_to_hash($workspace));
     };
 
     any [qw(POST)] => '/api/workspaces/' => sub {
@@ -510,7 +508,7 @@ group {
 
         my $json = $c->req->json;
 
-        return $c->render_response(message => "Invalid parameter", parameter => $_, code => 400)
+        return $c->render_error(message => $_->{message}, parameters => $_->{parameters}, code => 400)
             if $_ = find_invalid_parameter (
                 $json,
                 {
@@ -520,7 +518,7 @@ group {
                 }
             );
 
-        return $c->render_response(message => "Cannot activate workspaces with no settings", code => 400)
+        return $c->render_error(message => "Cannot activate workspaces with no settings", code => 400)
             if $json->{active} && !defined($json->{settings});
 
         my $args = {};
@@ -552,7 +550,7 @@ group {
             }
         }
 
-        return $c->render_response(json => workspace_to_hash($workspace), code => 200);
+        return $c->render_response(json => workspace_to_hash($workspace));
     };
 
     any [qw(PUT)] => '/api/workspaces/:id' => [id => qr/\d+/] => sub {
@@ -562,12 +560,12 @@ group {
         my $user_id = $c->stash->{session}->data->{user_id};
 
         my $workspace = rs('Workspace')->single({id => $ws_id, user_id => $user_id});
-        return $c->render_response(message => "Invalid Workspace", code => 400) unless defined($workspace);
+        return $c->render_error(message => "Invalid Workspace", code => 400) unless defined($workspace);
         my $settings = $workspace->settings->all;
 
         my $json = $c->req->json;
 
-        return $c->render_response(message => "Invalid parameter", parameter => $_, code => 400)
+        return $c->render_error(message => $_->{message}, parameters => $_->{parameters}, code => 400)
             if $_ = find_invalid_parameter (
                 $json,
                 {
@@ -577,7 +575,7 @@ group {
                 }
             );
             
-        return $c->render_response(message => "Cannot activate workspaces with no settings", code => 400)
+        return $c->render_error(message => "Cannot activate workspaces with no settings", code => 400)
             if $json->{active} && !($settings || defined($json->{settings}));
 
         my $args = {};
@@ -615,7 +613,7 @@ group {
             }
         }
 
-        return $c->render_response(json => workspace_to_hash($workspace), code => 200);
+        return $c->render_response(json => workspace_to_hash($workspace));
     };
 
     any [qw(DELETE)] => '/api/workspaces/:id' => [id => qr/\d+/] => sub {
@@ -625,9 +623,9 @@ group {
         my $user_id = $c->stash->{session}->data->{user_id};
 
         my $workspace = rs( "Workspace" )->single( { id => $ws_id, user_id => $user_id } );
-        return $c->render_response(message => "Invalid Workspace", code => 400) unless defined($workspace);
+        return $c->render_error(message => "Invalid Workspace", code => 400) unless defined($workspace);
 
-        return $c->render_response(message => "Fixed Workspace cannot be deleted", code => 400)
+        return $c->render_error(message => "Fixed Workspace cannot be deleted", code => 400)
             if $workspace->fixed;
 
         my $name = $workspace->name;
@@ -639,7 +637,7 @@ group {
 
         $workspace->delete();
 
-        return $c->render_response(message => "Workspace $name deleted", code => 200);
+        return $c->render_response(json => {}, code => 200);
     };
 
     # Websockets
@@ -709,10 +707,10 @@ sub find_invalid_parameter {
         my $mandatory = $syntax->{$param}->{mandatory} // 1;
         my $type = $syntax->{$param}->{type} // 'STRING';
         
-        if( (!defined($params->{$param}) && $mandatory) ||
-            (defined($params->{$param}) && !check_type($params->{$param}, $type))
-        ) {
-            return { parameter => $param, mandatory => $mandatory, type => $type };
+        if(!defined($params->{$param}) && $mandatory) {
+            return { message => "Parameter __name__ is compulsory", parameters => { name => $param } };
+        } elsif ( defined($params->{$param}) && !check_type($params->{$param}, $type) ) {
+            return { message => "Parameter __name__ shall be of type __type__", parameters => { name => $param, type => $type } };
         }
     }
 
@@ -846,16 +844,20 @@ sub render_response {
     my $c = shift;
     my %args = @_;
 
-    my $json = $args{json} // {};
-    my $param = $args{parameter};
-    my $message = $args{message};
-    my $code = $args{code} // 200;
+    $c->render(json => $args{json} // {}, status => 200);
 
-    $json->{message} = $message if defined($message);
-    $json->{message} = ($message // "") . " (" . join(", ", map {"$_: $param->{$_}"} keys(%$param)) . ")"
-        if defined($param);
+    return 1;
+}
 
-    $c->render(json => $json, status => $code);
+sub render_error {
+    my $c = shift;
+    my %args = @_;
+
+    my $params = $args{parameters} // {};
+    my $message = $args{message} // "";
+    my $code = $args{code} // 400;
+
+    $c->render(json => {message => $message, parameters => $params}, status => $code);
 
     return 1;
 }
