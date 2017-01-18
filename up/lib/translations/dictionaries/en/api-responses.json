@@ -1,12 +1,14 @@
 {
-    "Another element with the same __field__ already exists": "Another element with the same __field__ already exists",
+    "Another element with the same name already exists": "Another element with the same name already exists",
+    "Authentication server unavailable": "Authentication server unavailable",
     "Cannot activate workspaces with no settings": "Cannot activate workspaces with no settings",
     "Fixed Workspace cannot be deleted": "Fixed Workspace cannot be deleted",
+    "Incorrect credentials": "Incorrect credentials",
     "Invalid Desktop": "Invalid Desktop",
-    "Invalid parameter": "Invalid parameter",
     "Invalid Workspace": "Invalid Workspace",
-    "Logged in correctly": "Logged in correctly",
-    "Logged out": "Logged out",
-    "Unauthorized": "Unauthorized",
-    "Workspace __name__ deleted": "Workspace __name__ deleted"
+    "No registered connection": "No registered connection",
+    "Parameter __name__ is compulsory": "Parameter name is compulsory",
+    "Parameter __name__ shall be of type __type__": "Parameter name shall be of type type",
+    "Session expired": "Session expired",
+    "Unauthorized": "Unauthorized"
 }

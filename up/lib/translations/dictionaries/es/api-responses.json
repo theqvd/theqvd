@@ -1,12 +1,14 @@
 {
     "Another element with the same name already exists": "Ya existe un elemento con el mismo nombre",
+    "Authentication server unavailable": "Servidor de autenticación no disponible",
     "Cannot activate workspaces with no settings": "Los workspaces sin configuración no pueden ser activados",
     "Fixed Workspace cannot be deleted": "Los Workspaces fijos no se pueden eliminar",
+    "Incorrect credentials": "Credenciales incorrectas",
     "Invalid Desktop": "Escritorio no válido",
-    "Invalid parameter": "Parámetro no válido",
     "Invalid Workspace": "Workspace no válido",
-    "Logged in correctly": "Sesión iniciada correctamente",
-    "Logged out": "Sesión cerrada",
-    "Unauthorized": "Sin autorización",
-    "Workspace __name__ deleted": "Workspace __name__ eliminado"
+    "No registered connection": "Conexión no registrada",
+    "Parameter __name__ is compulsory": "El parámetro __name__ es obligatorio",
+    "Parameter __name__ shall be of type __type__": "El parámetro __name__ debe ser de tipo __type__",
+    "Session expired": "Sesión expirada",
+    "Unauthorized": "Sin autorización"
 }
