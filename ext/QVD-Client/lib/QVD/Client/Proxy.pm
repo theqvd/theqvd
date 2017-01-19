@@ -275,7 +275,7 @@ sub _get_httpc {
             DEBUG "Checking if SSL option '$opt' is set";
 
             my $val = core_cfg("client.ssl.options.$opt", 0);
-            if ( $val ) {
+            if ( defined $val ) {
                 INFO "SSL option $opt set: $val";
                 $args{$opt} = $val;
             }
@@ -367,7 +367,32 @@ sub _get_httpc {
         }
 
         if ( (my $oerr = $httpc->get_ocsp_errors()) ) {
-            $self->_add_ssl_error(0, 2001, 0, $oerr);
+            WARN "OCSP server returned error: $oerr";
+
+            # Error codes:
+            # 20XX - OCSP worked, said the cert is not valid
+            # 21XX - OCSP failed, cert status can't be determined
+            # 2200 - OCSP failed, return code unrecognized
+
+            if ( $oerr =~ /OCSP response failed: internalerror/ ) {
+                # OCSP server returned an internal error. May happen when a nonce is used and unsupported
+                $self->_add_ssl_error(0, 2100, 0, $oerr);
+            } elsif ( $oerr =~ /request for OCSP failed/ ) {
+                # OCSP server couldn't be reached, or is not listening on the socket
+                $self->_add_ssl_error(0, 2101, 0, $oerr);
+            } elsif ( $oerr =~ /signer certificate not found/ ) {
+                $self->_add_ssl_error(0, 2102, 0, $oerr);
+            } elsif ( $oerr =~ /missing ocspsigning usage/ ) {
+                # Server OCSP cert without OCSP Signing extension
+                $self->_add_ssl_error(0, 2103, 0, $oerr);
+            } elsif ( $oerr =~ /root ca not trusted/ ) {
+                # Root CA not trusted
+                $self->_add_ssl_error(0, 2103, 0, $oerr);
+            } elsif ( $oerr =~ /certificate status is revoked/ ) {		    
+                $self->_add_ssl_error(0, 2001, 0, $oerr);
+            } else {
+                $self->_add_ssl_error(0, 2200, 0, $oerr);
+            }
         }
 
 

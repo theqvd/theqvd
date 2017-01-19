@@ -55,7 +55,7 @@ sub _create_socket {
         $self->{SSL_use_ocsp}          //= 1;
         $self->{SSL_fail_on_ocsp}      //= 1;
         $self->{SSL_fail_on_hostname}  //= 1;
-        
+       
 
         IO::Socket::SSL->import('debug3') if ($self->{SSL_debug});
 
@@ -105,13 +105,18 @@ sub _create_socket {
         }
 
         if ( $s && $self->{SSL_use_ocsp} ) {
+            print STDERR "*** OCSP ***\n" if ( $self->{SSL_debug} );
             $IO::Socket::SSL::DEBUG=3 if ( $self->{SSL_debug} );
             my $ocsp = $s->ocsp_resolver();
             $self->{ocsp_errors} = $ocsp->resolve_blocking();
 
-            #if ( $self->{ocsp_errors} ) {
-            #    print STDERR "OCSP ERR: $self->{ocsp_errors}\n";
-            #}
+            if ( $self->{SSL_debug} ) {
+                if ( $self->{ocsp_errors} ) {
+                    print STDERR "OCSP ERR: $self->{ocsp_errors}\n";
+                } else {
+                    print STDERR "OCSP OK!\n";
+                }
+            }
 
             if ( $self->{ocsp_errors} && $self->{SSL_fail_on_ocsp} ) {
                 $self->{failed_socket} = $s;
