@@ -66,7 +66,7 @@ Up.I.M = {
                 msg.expandedMessage = msg.expandedMessage || '';
                 
                 if (response.message != msg.message && response.message) {
-                    msg.expandedMessage += '<strong data-i18n="api-responses:' + response.message + '">' + response.message + '</strong> <br/><br/>';
+                    msg.expandedMessage += '<strong>' + $.i18n.t('api-responses:' + response.message, response.parameters).replace("api-responses:", "") + '</strong> <br/><br/>';
                 }
             
                 if (response.failures && !$.isEmptyObject(response.failures)) {
