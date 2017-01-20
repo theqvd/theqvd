@@ -70,14 +70,14 @@
             background: white;
         }
         
-        .desktop-state {
+        .desktop-state, .desktop-settings-state {
             left: 10px;
         }
     }
     
     &.grid-connected, &.grid-reconnecting {        
         .grid-cell-buttonset {
-            .desktop-state {
+            .desktop-state, .desktop-settings-state {
                 color: $col_enabled;
             }
         }
@@ -97,6 +97,10 @@
 
 div.list {
     padding-right: 0px;
+    
+    table {
+        width: 100%;
+    }
 }
 
 .section-container {

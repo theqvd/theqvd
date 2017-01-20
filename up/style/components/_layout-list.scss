@@ -120,7 +120,7 @@
                 background: $col_enabled;
             }
             
-            .desktop-state {
+            .desktop-state, .desktop-settings-state {
                 color: $col_whiter;
                 font-weight: bold;
             }
@@ -203,8 +203,15 @@
         
         .desktop-state {
             position: absolute; 
-            bottom: 10px;
+            bottom: 8px;
             right: 10px;
+        }        
+        
+        .desktop-settings-state {
+            position: absolute; 
+            bottom: 28px;
+            right: 10px;
+            font-size: 10px;
         }
     }
     
