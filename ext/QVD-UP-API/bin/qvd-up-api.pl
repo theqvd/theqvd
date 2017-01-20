@@ -22,6 +22,7 @@ use HTTP::BrowserDetect;
 use QVD::Config;
 use QVD::DB::Simple qw(db rs);
 use QVD::DB::Common qw(ENUMERATES);
+use QVD::VMProxy;
 
 ##### GLOBAL VARIABLES #####
 my $MOJO_DB;
@@ -664,6 +665,35 @@ group {
                     return { id => $vm->id, user_state => $vm->vm_runtime->user_state };
                 }
             );
+        };
+
+        websocket '/api/desktops/:id/connect' => sub {
+            my $c = shift;
+            $c->inactivity_timeout(10);
+
+            $c->app->log->debug("VM Proxy WebSocket opened");
+            $c->render_later->on(finish => sub { $c->app->log->debug("VM Proxy WebSocket closed"); });
+            my $vm_id = $c->param('id');
+            my $user_id = $c->stash('session')->data('user_id');
+            my $vm = rs('VM_Runtime')->find($vm_id);
+            if (defined($vm) && (my $vm_ip = $vm->vm_address) && (my $vm_port = $vm->vm_vma_port)
+                && ($vm->vm_state eq 'running') && ($vm->real_user_id == $user_id))
+            {
+                my $tx = $c->tx;
+                $tx->with_protocols( 'binary' );
+
+                my $ws = QVD::VMProxy->new( address => $vm_ip, port => $vm_port );
+
+                $ws->on( error => sub {
+                        $c->app->log->error( "Error in ws: ".$_[1] );
+                        $tx->finish( 1011, $_[1] )
+                    } );
+                $ws->open($tx, 30000);
+            }
+            else
+            {
+                return $c->render_error(message => "Invalid Desktop", code => 400);
+            }
         };
 
     }
