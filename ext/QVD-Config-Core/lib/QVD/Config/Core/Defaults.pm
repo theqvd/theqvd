@@ -285,6 +285,14 @@ client.ssl.allow_weak_key=0
 ## Allow continuing in case of an unrecognized SSL error
 client.ssl.allow_unknown_error=1
 
+## Allow continuing in cases where the OCSP server fails to answer
+## and the certificate's status can't be determined
+client.ssl.allow_ocsp_server_failure=1
+
+## Allow continuing in cases where the OCSP server answered the
+## certificate is not valid
+client.ssl.allow_ocsp_error=0
+
 ## Force user to wait this many seconds before allowing to accept
 ## the certificate. Set to 0 to disable.
 client.ssl.error_timeout=5

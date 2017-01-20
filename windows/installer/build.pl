@@ -77,7 +77,8 @@ my @dlls = (
 
 
 my @modules = (
-	"X11::Protocol::Ext::XC_MISC"
+	"X11::Protocol::Ext::XC_MISC",
+	"HTTP::Tiny"
 );
 
 foreach my $dir (@paths) {
