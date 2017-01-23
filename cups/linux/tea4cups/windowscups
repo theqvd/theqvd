@@ -1,0 +1,3 @@
+#!/bin/bash
+wget --post-file /tmp/tmp.pdf http://172.26.9.168:9000/printer/$TEAPRINTERNAME/printjob
+rm /tmp/tmp.pdf
