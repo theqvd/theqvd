@@ -318,7 +318,7 @@ sub _sysread {
                 $wv = $select_mask;
             }
             else {
-                die "internal error: unexpected SSL error: " . IO::Socket::SSL::errstr();
+                die "internal error: unexpected socket error: $!; SSL error: " . IO::Socket::SSL::errstr();
             }
         }
         else {
