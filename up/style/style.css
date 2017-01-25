@@ -1893,7 +1893,7 @@ body {
           width: 100vw;
           position: fixed;
           left: 0;
-          top: 90vh;
+          bottom: 0px;
           text-align: center;
           height: 35px;
           padding-top: 6px;
@@ -2732,35 +2732,37 @@ table.list td, table.list th {
 table.list td.cell-link:hover {
   cursor: pointer;
   background: #e35300;
-  color: #EBEBEB; }
-  /* line 133, /home/zarzuelo/code/gotham/up/style/components/_tables.scss */
+  background: #ccc;
+  color: #e35300; }
+  /* line 135, /home/zarzuelo/code/gotham/up/style/components/_tables.scss */
   table.list td.cell-link:hover * {
-    color: #EBEBEB; }
+    color: #EBEBEB;
+    color: #e35300; }
 
-/* line 138, /home/zarzuelo/code/gotham/up/style/components/_tables.scss */
+/* line 141, /home/zarzuelo/code/gotham/up/style/components/_tables.scss */
 table.list.cascade-data-list {
   margin-top: 20px; }
-  /* line 141, /home/zarzuelo/code/gotham/up/style/components/_tables.scss */
+  /* line 144, /home/zarzuelo/code/gotham/up/style/components/_tables.scss */
   table.list.cascade-data-list td, table.list.cascade-data-list th {
     white-space: normal; }
 
-/* line 146, /home/zarzuelo/code/gotham/up/style/components/_tables.scss */
+/* line 149, /home/zarzuelo/code/gotham/up/style/components/_tables.scss */
 table.list a:before {
   margin-right: 5px; }
 
-/* line 152, /home/zarzuelo/code/gotham/up/style/components/_tables.scss */
+/* line 155, /home/zarzuelo/code/gotham/up/style/components/_tables.scss */
 table.settings-editor-table {
   width: 100%;
   border-collapse: separate; }
-  /* line 156, /home/zarzuelo/code/gotham/up/style/components/_tables.scss */
+  /* line 159, /home/zarzuelo/code/gotham/up/style/components/_tables.scss */
   table.settings-editor-table tr {
     background: #EBEBEB; }
-    /* line 159, /home/zarzuelo/code/gotham/up/style/components/_tables.scss */
+    /* line 162, /home/zarzuelo/code/gotham/up/style/components/_tables.scss */
     table.settings-editor-table tr td {
       border: 0;
       padding: 6px 4px 4px 6px;
       height: 25px; }
-      /* line 164, /home/zarzuelo/code/gotham/up/style/components/_tables.scss */
+      /* line 167, /home/zarzuelo/code/gotham/up/style/components/_tables.scss */
       table.settings-editor-table tr td:first-child {
         text-align: right;
         vertical-align: middle; }
@@ -3164,6 +3166,23 @@ div.tagsinput span.tag a {
   border: 1px solid #222;
   background-color: #444;
   color: #FEFEFE; }
+
+/* line 359, /home/zarzuelo/code/gotham/up/style/components/_thirds.scss */
+.noVNC_screen {
+  text-align: center;
+  position: relative; }
+
+/* line 364, /home/zarzuelo/code/gotham/up/style/components/_thirds.scss */
+.noVNC_controls, .noVNC_settings, .noVNC_xvp, .noVNC_status {
+  display: none !important; }
+
+/* line 368, /home/zarzuelo/code/gotham/up/style/components/_thirds.scss */
+.noVNC_canvas--interactive {
+  cursor: none !important; }
+
+/* line 372, /home/zarzuelo/code/gotham/up/style/components/_thirds.scss */
+.noVNC_canvas--viewonly {
+  cursor: auto !important; }
 
 /********************************************************************
 *********************************************************************

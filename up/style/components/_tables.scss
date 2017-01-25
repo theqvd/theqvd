@@ -128,10 +128,13 @@ table.list {
     td.cell-link:hover {
         cursor: pointer;
         background: $col_brand_main;
-        color: $col_whiter;
+        background: #ccc;
+        //color: $col_whiter;
+        color: $col_brand_main;
 
         * { 
             color: $col_whiter;
+            color: $col_brand_main;
         }
     } 
     

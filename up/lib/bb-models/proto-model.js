@@ -3,6 +3,9 @@ Up.Models.Model = Backbone.Model.extend({
     id: 0,
     
     initialize: function (params) {
+        if (params && params.id) {
+            this.id = params.id;
+        }
     },
     
     parse: function(response) {
@@ -23,7 +26,7 @@ Up.Models.Model = Backbone.Model.extend({
     },
     
     url: function () {
-        return Up.C.getBaseUrl();
+        return Up.C.getBaseUrl() + this.actionPrefix;
     },
     
     sync: function(method, model, options) {
@@ -35,6 +38,7 @@ Up.Models.Model = Backbone.Model.extend({
                 "Geo-Location": Up.C.getGeolocation()
             },
             processData: false,
+            data: JSON.stringify({filters: {id: this.id}})
         }, options);
         
         return $.ajax(params);

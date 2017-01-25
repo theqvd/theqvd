@@ -538,7 +538,12 @@ Up.I = {
     },
     
     updateLoginOnMenu: function () {
-        $('.js-menu-corner').find('.js-login-welcome').html($.i18n.t('Welcome, __name__', {name: Up.C.account.username}));
+        var loop = setInterval(function () {
+            if (Up.T.loaded) {
+                $('.js-menu-corner').find('.js-login-welcome').html($.i18n.t('Welcome, __name__', {name: Up.C.account.username}));
+                clearInterval(loop);
+            }
+        }, 100);
     },
     
     controls: {
@@ -1048,7 +1053,6 @@ Up.I = {
         $.each($(context).find('.js-form-field'), function (iField, field) {
             var fieldName = $(field).attr('name');
             var fieldType = $(field).attr('type');
-            console.info(fieldType);
             switch (fieldType) {
                 case 'checkbox':
                     if ($(field).is(':checked')) {
@@ -1074,16 +1078,21 @@ Up.I = {
     // Render edition
     renderEditionMode: function (model, target) {
         // List of settings
+        var canBeDisabled = typeof model.get('settings_enabled') != 'undefined';
         var template = _.template(
             Up.TPL.settingsEditor, {
                 model: model,
-                canBeDisabled: typeof model.get('settings_enabled') != 'undefined'
+                canBeDisabled: canBeDisabled,
+                settingsDisabledList: Up.I.getSettingsDisabledList(model)
             }
         );
         
         target.html(template);
         
         Up.I.chosenElement($('select[name="connection"]'), 'single100');
+        Up.I.chosenElement($('select[name="client"]'), 'single100');
+        
+        Up.T.translate();
     },
     
     getDesktopTitleString: function (state, blocked) {
@@ -1121,5 +1130,23 @@ Up.I = {
     
     isDialogOpen: function () {
         return Up.CurrentView.dialogs.length ? true : false;
+    },
+    
+    getSettingsDisabledList: function (model) {
+        var canBeDisabled = typeof model.get('settings_enabled') != 'undefined';
+
+        var settingsDisabled = canBeDisabled && !model.get('settings_enabled');
+        var html5_client = model.get('settings') && model.get('settings').client.value == 'html5';
+        
+        var settingsDisabledList = {};
+        $.each (['connection', 'audio', 'printers', 'fullscreen', 'share_folders', 'share_usb'], function (i, v) {
+            settingsDisabledList[v] = settingsDisabled || (html5_client && $.inArray(v, HTML5_SETTINGS) == -1);
+        });
+
+        settingsDisabledList['share_folders_list'] = !model.get('settings') || !parseInt(model.get('settings').share_folders.value) || settingsDisabledList['share_folders'];
+        settingsDisabledList['share_usb_list'] = !model.get('settings') || !parseInt(model.get('settings').share_usb.value) || settingsDisabledList['share_usb'];
+        settingsDisabledList['client'] = settingsDisabled;
+
+        return settingsDisabledList;
     }
 }

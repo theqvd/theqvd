@@ -9,6 +9,11 @@ CONNECTION_TIMEOUT = 60;
 // Debug constants
 DEBUG_ACL_FAILS = false;
 
+// noVNC include URI
+INCLUDE_URI = "lib/thirds/noVNC/include/";
+VNC_MIN_HEIGHT = 400;
+VNC_MIN_WIDTH = 600;
+
 // Websockets status
 WS_CONNECTING = 0;
 WS_OPEN = 1;
@@ -55,6 +60,7 @@ HTML_LOADING = '<div class="loading"><i class="fa fa-gear fa-spin"></i></div>';
 HTML_MID_LOADING = '<div class="loading-mid"><i class="fa fa-gear fa-spin"></i></div>';
 HTML_MID_LOADING_DELETE = '<div class="loading-mid"><i class="fa fa-trash fa-spin"></i></div>';
 HTML_SORT_ICON = '<i class="fa fa-sort sort-icon"></i>';
+HTML_ERROR = '<div class="error-loading"><i class="fa fa-warning"></i></div>';
 
 // Languages
 UP_LANGUAGES = {
@@ -82,3 +88,6 @@ WAT_BLOCK_SIZES_ADMIN = $.extend({
 // Documentation
 DOC_AVAILABLE_LANGUAGES = ['es'];
 DOC_DEFAULT_LANGUAGE = 'es';
+
+// Settings available on HTML5 client
+HTML5_SETTINGS = ['client', 'fullscreen'];

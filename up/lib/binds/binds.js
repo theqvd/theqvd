@@ -12,12 +12,13 @@ Up.B = {
         this.bindEvent('change', '.js-share-usb-check', this.listBinds.clickShareUsb);        
     },    
     
-    bindDesktopsEvents: function () {
+    bindSettingsEvents: function () {
         // Enable-Disable settings on form
-        this.bindEvent('change', '.js-disable-settings-check', this.desktopsBinds.changeDisableSettings);      
+        this.bindEvent('change', '.js-disable-settings-check', this.settingsBinds.changeDisableSettings);
+        this.bindEvent('change', '.js-client-selector', this.settingsBinds.changeClientSelector);
     },
     
-    desktopsBinds: {
+    settingsBinds: {
         changeDisableSettings: function (e) {
             var enable = $(e.target).is(':checked');
                                  
@@ -28,10 +29,46 @@ Up.B = {
                 // When enable settings trigger change events on shared switchers to preserve disabled shared lists if necessary
                 $('.js-share-folders-check').trigger('change');
                 $('.js-share-usb-check').trigger('change');
+                $('select.js-client-selector').trigger('change');
             }
             else {
                 $('.js-form-field--setting').attr('disabled', 'disabled');
                 $('.js-form-field--settingrow').addClass('disabled-row');
+            }
+            
+            $('select.js-form-field--setting').trigger('chosen:updated');
+        },
+        
+        changeClientSelector: function (e) {
+            var client = $(e.target).val();
+            
+            switch (client) {
+                case 'html5':
+                    if ($('.js-disable-settings-check').length == 0 || $('.js-disable-settings-check').is(':checked')) {
+                        $('.js-form-field--setting').attr('disabled', 'disabled');
+                        $('.js-form-field--settingrow').addClass('disabled-row');
+                        
+                        $.each(HTML5_SETTINGS, function (settingIndex, settingName) {
+                            $('.js-form-field--setting[name="' + settingName + '"]').removeAttr('disabled');
+                            $('.js-form-field--settingrow[data-field-name="' + settingName + '"]').removeClass('disabled-row');
+                            
+                            // Checkbox controls will be triggered to preserve disabled associated list if exists
+                            if ($('.js-form-field--setting[name="' + settingName + '"]').attr('type') == 'checkbox') {
+                                $('.js-form-field--setting[name="' + settingName + '"]').trigger('change');
+                            }
+                        });
+                    }
+                    break;
+                case 'classic':
+                    $.each(HTML5_SETTINGS, function (settingIndex, settingName) {
+                         $('.js-form-field--setting').removeAttr('disabled');
+                         $('.js-form-field--settingrow').removeClass('disabled-row');
+
+                        // When enable settings trigger change events on shared switchers to preserve disabled shared lists if necessary
+                        $('.js-share-folders-check').trigger('change');
+                        $('.js-share-usb-check').trigger('change');
+                    });
+                    break;
             }
             
             $('select.js-form-field--setting').trigger('chosen:updated');

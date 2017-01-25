@@ -14,7 +14,7 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
         this.wsCollection = new Up.Collections.Workspaces();
         
         // Bind events for this section that cannot be binded using backbone (dialogs, etc.)
-        Up.B.bindDesktopsEvents();
+        Up.B.bindSettingsEvents();
         
         // Spy mouse over elements to avoid fails with mouseleave events
         Up.I.L.spyMouseOver('.js-grid-cell-area', this.hideGridIcon);
