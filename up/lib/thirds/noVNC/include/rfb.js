@@ -416,7 +416,6 @@ var RFB;
                 if (Util.get_logging() !== 'debug' || state === 'loaded') {
                     // Show noVNC logo on load and when disconnected, unless in
                     // debug mode
-                    console.info('_cleanupSocket before clear (state: ' + state + ')');
                     this._display.clear();
                 }
             }

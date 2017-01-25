@@ -752,7 +752,6 @@ var UI;
                 // Disable max dimensions
                 display.set_maxWidth(0);
                 display.set_maxHeight(0);
-                console.info('setViewClip !clip && cur_clip');
 
                 display.viewportChangeSize();
             }
@@ -773,7 +772,7 @@ var UI;
                     var new_w = size.w - (2 * Util.getPosition($D('noVNC_canvas')).x);
 
                     $D('noVNC_container').style.overflow = "visible";
-                    console.info('setView clip is setting');
+                    
                     display.viewportChangeSize(new_w, size.h);
                 }
             }
