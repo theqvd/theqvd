@@ -37,8 +37,9 @@
                             <% } else { %>
                                 <a href="javascript:" data-id="<%= model.get('id') %>" class="mobile <%= CLASS_ICON_DESKTOP_CONNECTED %> button2 js-desktop-connect-btn desktop-connect-btn button-icon" data-i18n="[title]Connect" data-id="<%= model.get('id') %>"></a>
                             <% } %>
-                            <a href="javascript:" data-id="<%= model.get('id') %>" class="<%= CLASS_ICON_CONF_SPECIFIC %> <%= model.get('settings') && model.get('settings_enabled') ? 'button' : 'button2' %> js-desktop-settings-btn desktop-settings-btn button-icon" data-i18n="[title]Configure connection settings"></a>
+                            <a href="javascript:" data-id="<%= model.get('id') %>" class="<%= CLASS_ICON_CONF_SPECIFIC %> button2 js-desktop-settings-btn desktop-settings-btn button-icon" data-i18n="[title]Configure connection settings"></a>
                             <i class="desktop-state js-desktop-state" data-i18n="<%= stateString %>" data-id="<%= model.get('id') %>"></i>
+                            <i class="desktop-settings-state js-desktop-settings-state <%= model.get('settings') && model.get('settings_enabled') ? '' : 'hidden' %>" data-i18n="Own settings" data-id="<%= model.get('id') %>"></i>
                         </div>
                     </div>
                 <%

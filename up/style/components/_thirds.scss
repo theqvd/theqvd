@@ -355,3 +355,22 @@ div.tagsinput span.tag a {
     background-color:#444;
     color:#FEFEFE
 }
+
+.noVNC_screen {
+    text-align: center;
+    position: relative;
+}
+
+.noVNC_controls, .noVNC_settings, .noVNC_xvp, .noVNC_status {
+    display: none !important;
+}
+
+.noVNC_canvas--interactive {
+    cursor: none !important;
+}
+
+.noVNC_canvas--viewonly {
+    cursor: auto !important;
+}
+
+

@@ -36,66 +36,83 @@ Up.CRUD.desktops = {
         Up.I.dialog(dialogConf);
     },
     
+    connectDesktopClassic: function (selectedId, desktopSetup, token) {
+        this.setDesktopState(selectedId, 'connecting');
+        this.startConnectionTimeout(selectedId);
+        
+        var options = {
+            "client.ssl.options.SSL_version": "TLSv1_2",
+            "client.auto_connect": "1",
+            "client.auto_connect.vm_id": selectedId,
+            "client.auto_connect.token": token
+        };
+
+        options['client.host.name'] = desktopSetup.hostname;
+        
+        $.each(CLIENT_PARAMS_MAPPING, function (field, param) {
+            options[param.value] = desktopSetup.settings[field].value;
+        });  
+
+        var shareFolders = parseInt(desktopSetup.settings.share_folders.value);
+        var shareUsb = parseInt(desktopSetup.settings.share_usb.value);
+
+        if (shareFolders) {
+            var foldersList = desktopSetup.settings.share_folders.list;
+
+            $.each(foldersList, function (k, folder) {
+                options['client.share.' + k] = folder;
+            });
+        }
+
+        options['client.usb.enable'] = parseInt(shareUsb);
+
+        if (shareUsb) {
+            var usbList = desktopSetup.settings.share_usb.list;
+
+            options['client.usb.share_list'] = usbList.join(',');
+        }
+
+        var query = '';
+        $.each(options, function (optName, optVal) {
+            query += optName + '=' + optVal + ' ';
+        });
+
+        // Store ID of the desktop we are trying to connect with to use it if fails
+        this.connectingDesktopId = selectedId;
+
+        window.protocolCheck('qvd:' + query, this.connectDesktopFail)
+        //open('qvd:' + query, '_self');
+    },
+    
+    connectDesktopHTML5: function (selectedId, desktopSetup, token) {
+        open('#desktops/' + selectedId + '/connect/' + token, '_blank');
+    },
+    
     connectDesktop: function (e) {
         var that = this;
         
         var selectedId = $(e.target).attr('data-id');
 
         Up.A.performAction('desktops/' + selectedId + '/token', {}, function (e) {
-            that.setDesktopState(selectedId, 'connecting');
-            that.startConnectionTimeout(selectedId);
-            
             var token = e.retrievedData.token;
-            
-            var options = {
-                "client.ssl.options.SSL_version": "TLSv1_2",
-                "client.auto_connect": "1",
-                "client.auto_connect.vm_id": selectedId,
-                "client.auto_connect.token": token
-            };
             
             // Retrieve effective desktop setup to make the client call
             Up.A.performAction('desktops/' + selectedId + '/setup', {}, function (e) {
-                options['client.host.name'] = e.retrievedData.hostname;
-
-                $.each(CLIENT_PARAMS_MAPPING, function (field, param) {
-                    options[param.value] = e.retrievedData.settings[field].value;
-                });  
-
-                var shareFolders = parseInt(e.retrievedData.settings.share_folders.value);
-                var shareUsb = parseInt(e.retrievedData.settings.share_usb.value);
-
-                if (shareFolders) {
-                    var foldersList = e.retrievedData.settings.share_folders.list;
-
-                    $.each(foldersList, function (k, folder) {
-                        options['client.share.' + k] = folder;
-                    });
-                }
-
-                options['client.usb.enable'] = parseInt(shareUsb);
-
-                if (shareUsb) {
-                    var usbList = e.retrievedData.settings.share_usb.list;
-
-                    options['client.usb.share_list'] = usbList.join(',');
-                }
-
-                var query = '';
-                $.each(options, function (optName, optVal) {
-                    query += optName + '=' + optVal + ' ';
-                });
-
-                // Store ID of the desktop we are trying to connect with to use it if fails
-                that.connectingDesktopId = selectedId;
+                var client = e.retrievedData.settings.client.value;
                 
-                window.protocolCheck('qvd:' + query, that.connectDesktopFail)
-                //open('qvd:' + query, '_self');
+                switch (client) {
+                    case 'classic':
+                        that.connectDesktopClassic(selectedId, e.retrievedData, token);
+                        break;
+                    case 'html5':
+                        that.connectDesktopHTML5(selectedId, e.retrievedData, token);
+                        break;
+                }
             });
         }, this, 'GET');
     },
     
-    connectDesktopFail: function () {        
+    connectDesktopFail: function () {
         // Set selected desktop as disconnected
         var model = Up.CurrentView.collection.where({id: parseInt(Up.CurrentView.connectingDesktopId)})[0];
         Up.CurrentView.setDesktopState(model.get('id'), 'disconnected');

@@ -58,6 +58,13 @@ Up.I.T = {
                     name: 'desktops/desktops-list'
                 };
                 break;
+            case 'spyDesktop':
+                templates = {
+                    spy_desktops: {
+                        name: 'desktops/desktops-spy'
+                    }
+                }
+                break;
             case 'downloads':
                 templates = {
                     downloads: {

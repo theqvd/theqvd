@@ -1,32 +1,3 @@
-// OLD
-CLASS_ICON_USERS = 'fa fa-users';
-CLASS_ICON_VMS = 'fa fa-cloud';
-CLASS_ICON_HOSTS = 'fa fa-hdd-o';
-CLASS_ICON_OSFS = 'fa fa-flask';
-CLASS_ICON_DIS = 'fa fa-dot-circle-o';
-CLASS_ICON_LOGOUT = 'fa fa-power-off';
-CLASS_ICON_ADMINS = 'fa fa-suitcase';
-CLASS_ICON_ROLES = 'fa fa-graduation-cap';
-CLASS_ICON_TEMPLATES = 'fa fa-cube';
-CLASS_ICON_TENANTS = 'fa fa-building-o'; 
-CLASS_ICON_QVDMANAGE = 'fa fa-sliders'; 
-CLASS_ICON_QVDCONFIG = 'fa fa-dashboard'; 
-CLASS_ICON_VIEWS = 'fa fa-columns'; 
-CLASS_ICON_HELP = 'fa fa-support';
-CLASS_ICON_PLATFORM = 'fa fa-bug';
-CLASS_ICON_WATMANAGE = 'fa fa-wrench';
-CLASS_ICON_WATCONFIG = 'fa fa-dashboard';
-CLASS_ICON_PERSONALAREA = 'fa fa-archive';
-CLASS_ICON_USER = 'fa fa-user';
-CLASS_ICON_LOG = 'fa fa-file-text-o';
-CLASS_ICON_PROPERTIES = 'fa fa-sticky-note-o';
-CLASS_ICON_STATUS_RUNNING = 'fa fa-play';
-CLASS_ICON_STATUS_STOPPED = 'fa fa-stop';
-CLASS_ICON_STATUS_STARTING = 'fa fa-play faa-flash animated';
-CLASS_ICON_STATUS_STOPPING = 'fa fa-stop faa-flash animated';
-CLASS_ICON_STATUS_ZOMBIE = 'fa fa-medkit';
-CLASS_ICON_STATUS_LOST = 'fa fa-map-o faa-flash animated';
-
 // UP Icons
 CLASS_ICON_ACTIVE = 'fa fa-check-circle';
 CLASS_ICON_ACCEPT = 'fa fa-check';
@@ -59,3 +30,5 @@ CLASS_ICON_CLOSE = 'fa fa-times-circle';
 CLASS_ICON_HAMBURGER_MENU = 'fa fa-navicon';
 CLASS_ICON_BACK = 'fa fa-arrow-left';
 CLASS_ICON_RESET = 'fa fa-repeat';
+CLASS_ICON_PERSONALAREA = 'fa fa-archive';
+CLASS_ICON_USER = 'fa fa-user';

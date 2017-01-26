@@ -6,6 +6,7 @@ Up.Models.Workspace = Up.Models.Model.extend({
         fixed: false,
         active: false,
         settings: {
+            client: 'classic',
             connection: 'adsl',
             audio: false,
             printers: false,

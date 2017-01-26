@@ -19,7 +19,10 @@ Up.Views.SettingsView = Up.Views.ListView.extend({
     initialize: function (params) {
         this.collection = new Up.Collections.Workspaces(params);
                 
-        Up.Views.ListView.prototype.initialize.apply(this, [params]);        
+        Up.Views.ListView.prototype.initialize.apply(this, [params]);
+        
+        // Bind events for this section that cannot be binded using backbone (dialogs, etc.)
+        Up.B.bindSettingsEvents();
         
         this.extendEvents(this.settingsEvents);
     },
@@ -72,10 +75,12 @@ Up.Views.SettingsView = Up.Views.ListView.extend({
     // Workspace options
     renderWorkspaceOptions: function (model) {
         // List of settings
+        var canBeDisabled = typeof model.get('settings_enabled') != 'undefined';
         var template = _.template(
             Up.TPL.settingsOptions, {
                 model: model,
-                canBeDisabled: typeof model.get('settings_enabled') != 'undefined'
+                canBeDisabled: canBeDisabled,
+                settingsDisabledList: Up.I.getSettingsDisabledList(model)
             }
         );
         
