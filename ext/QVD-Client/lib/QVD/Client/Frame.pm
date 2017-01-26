@@ -730,6 +730,34 @@ sub OnUnknownCert {
                     $err_desc .= $self->_t("The certificate has been revoked");
                     _add_advice(\@advice, $self->_t("The certificate has been revoked by its issuing authority. A new certificate is required."));
                     $no_ok_button = 1 unless core_cfg('client.ssl.allow_revoked');
+                } elsif ( $e == 2100 ) {
+                    $err_desc .= $self->_t("OCSP server internal error");
+                   _add_advice(\@advice, $self->_t("The OCSP server returned an internal error. It wasn't possible to determine whether the certificate has been revoked. This may be a temporary error, and can be ignored."));
+                    $no_ok_button = 1 unless core_cfg('client.ssl.allow_ocsp_server_failure');
+                } elsif ( $e == 2101 ) {
+                    $err_desc .= $self->_t("Failed to make OCSP request");
+                   _add_advice(\@advice, $self->_t("It wasn't possible to contact the OCSP server to determine whether the certificate has been revoked. This is likely a temporary error, and can be ignored."));
+                    $no_ok_button = 1 unless core_cfg('client.ssl.allow_ocsp_server_failure');
+                } elsif ( $e == 2102 ) {
+                    $err_desc .= $self->_t("OCSP signer certificate not found");
+                   _add_advice(\@advice, $self->_t("The OCSP server uses an unrecognized certificate. This may be a misconfiguration, and can be ignored."));
+                    $no_ok_button = 1 unless core_cfg('client.ssl.allow_ocsp_server_failure');
+                } elsif ( $e == 2103 ) {
+                    $err_desc .= $self->_t("OCSP server certificate lacks OCSP extension");
+                    _add_advice(\@advice, $self->_t("The OCSP server uses an incorrect certificate. This is likely a misconfiguration, and can be ignored."));
+                    $no_ok_button = 1 unless core_cfg('client.ssl.allow_ocsp_server_failure');
+                } elsif ( $e == 2104 ) {
+                    $err_desc .= $self->_t("OCSP CA not trusted");
+                    _add_advice(\@advice, $self->_t("The OCSP server uses a certificate signed by an untrusted CA. This may be a misconfiguration, and can be ignored."));
+                    $no_ok_button = 1 unless core_cfg('client.ssl.allow_ocsp_server_failure');
+                } elsif ( $e == 2105 ) {
+                    $err_desc .= $self->_t("OCSP answer signed with unrecognized certificate");
+                    _add_advice(\@advice, $self->_t("The OCSP server uses a certificate signed by an untrusted CA. This may be a misconfiguration, and can be ignored."));
+                    $no_ok_button = 1 unless core_cfg('client.ssl.allow_ocsp_server_failure');
+                } elsif ( $e == 2200 ) {
+                    $err_desc .= $self->_t("Unrecognized OCSP problem");
+                    _add_advice(\@advice, $self->_t("The OCSP server returned an unrecognized error code."));
+                    $no_ok_button = 1 unless core_cfg('client.ssl.allow_ocsp_server_failure');
                 } else {
                     $err_desc .= sprintf($self->_t("Unrecognized SSL error."), $e);
                     $no_ok_button = 1 unless core_cfg('client.ssl.allow_unknown_error');

@@ -281,6 +281,9 @@ sub _get_httpc {
             }
         }
 
+        DEBUG "Parsing OCSP mode";
+
+        $args{SSL_ocsp_mode}        = _parse_flags("IO::Socket::SSL", core_cfg('client.ssl.ocsp_mode'));
         $args{SSL_ca_path}          = $DARWIN ? core_cfg('path.darwin.ssl.ca.system') : core_cfg('path.ssl.ca.system');
         $args{SSL_ca_path_alt}      = $QVD::Client::App::user_certs_dir;
         $args{SSL_ca_path_alt}      =~ s|^~(?=/)|$ENV{HOME} // $ENV{APPDATA}|e;
@@ -367,7 +370,35 @@ sub _get_httpc {
         }
 
         if ( (my $oerr = $httpc->get_ocsp_errors()) ) {
-            $self->_add_ssl_error(0, 2001, 0, $oerr);
+            WARN "OCSP server returned error: $oerr";
+
+            # Error codes:
+            # 20XX - OCSP worked, said the cert is not valid
+            # 21XX - OCSP failed, cert status can't be determined
+            # 2200 - OCSP failed, return code unrecognized
+
+            if ( $oerr =~ /OCSP response failed: internalerror/ ) {
+                # OCSP server returned an internal error. May happen when a nonce is used and unsupported
+                $self->_add_ssl_error(0, 2100, 0, $oerr);
+            } elsif ( $oerr =~ /request for OCSP failed/ ) {
+                # OCSP server couldn't be reached, or is not listening on the socket
+                $self->_add_ssl_error(0, 2101, 0, $oerr);
+            } elsif ( $oerr =~ /signer certificate not found/ ) {
+                $self->_add_ssl_error(0, 2102, 0, $oerr);
+            } elsif ( $oerr =~ /missing ocspsigning usage/ ) {
+                # Server OCSP cert without OCSP Signing extension
+                $self->_add_ssl_error(0, 2103, 0, $oerr);
+            } elsif ( $oerr =~ /root ca not trusted/ ) {
+                # Root CA not trusted
+                $self->_add_ssl_error(0, 2104, 0, $oerr);
+            } elsif ( $oerr =~ /certificate verify error/ ) {
+                # Error verifying certificate on OCSP answer
+                $self->_add_ssl_error(0, 2105, 0, $oerr);
+            } elsif ( $oerr =~ /certificate status is revoked/ ) {
+                $self->_add_ssl_error(0, 2001, 0, $oerr);
+            } else {
+                $self->_add_ssl_error(0, 2200, 0, $oerr);
+            }
         }
 
 
@@ -401,6 +432,47 @@ sub _get_httpc {
     }
 
     $httpc;
+}
+
+# Parse a string containing a list of OR-ed flags by getting the values of those constants
+# Example:
+# $ret = _parse_flags("Example::Module", "FOO | BAR");
+#
+# Will set $ret to the combined values of Example::Module::FOO and Example::Module::BAR
+sub _parse_flags {
+    my ($module, $text) = @_;
+    my $result = 0;
+
+    DEBUG "Parsing flags for $module, value '$text'";
+
+    my @constants = split(/\|/, $text);
+
+    foreach my $const (@constants) {
+        $const =~ s/^\s+//;
+        $const =~ s/\s+$//;
+
+        DEBUG "Checking constant $const";
+        my $func_defined = eval "use $module; defined &$module::$const";
+        if ( $@ ) {
+            ERROR "Error when checking $module::$const: $@";
+        } else {
+            if ( $func_defined ) {
+                DEBUG "Constant found: '$const'";
+                my $ret = eval "use $module; $module::$const();";
+                if ($@) {
+                    ERROR "Error when calling $module::$const: $@";
+                } else {
+                    $result |= $ret;
+                    DEBUG "Constant's value: $ret";
+                }
+            } else {
+                ERROR "Constant '$const' not found in module $module";
+            }
+        }
+    }
+
+    DEBUG "Final result: $result";
+    return $result;
 }
 
 sub connect_to_vm {
