@@ -438,7 +438,7 @@ up-api.l7r.address = localhost
 up-api.request.timeout = 3000
 up-api.websocket.timeout = 3600
 up-api.session.timeout = 3600
-up-api.l7r.expiration = 20
+up-api.l7r.expiration = 300
 
 # QVD-Admin parameters
 # url of the API

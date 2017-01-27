@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings FATAL => 'all';
+use QVD::NxBroker;
 
 BEGIN {
     $QVD::Config::USE_DB = 1;
@@ -669,26 +670,50 @@ group {
 
         websocket '/api/desktops/:id/connect' => sub {
             my $c = shift;
-            $c->inactivity_timeout(10);
+            $c->inactivity_timeout(60);
+
+            my $json = $c->req->params->to_hash;
+            return $c->render_error(message => $_->{message}, parameters => $_->{parameters}, code => 400)
+                if $_ = find_invalid_parameter (
+                    $json,
+                    {
+                        token      => { mandatory => 1, type => 'STRING' },
+                    }
+                );
 
             $c->app->log->debug("VM Proxy WebSocket opened");
             $c->render_later->on(finish => sub { $c->app->log->debug("VM Proxy WebSocket closed"); });
             my $vm_id = $c->param('id');
             my $user_id = $c->stash('session')->data('user_id');
             my $vm = rs('VM_Runtime')->find($vm_id);
-            if (defined($vm) && (my $vm_ip = $vm->vm_address) && (my $vm_port = $vm->vm_vma_port)
-                && ($vm->vm_state eq 'running') && ($vm->real_user_id == $user_id))
+            if (defined($vm) && ($vm->real_user_id == $user_id))
             {
+                # Run tunnel to L7R
+                my $l7r_address = cfg('up-api.l7r.address');
+                my $l7r_port = cfg('l7r.port');
+                $c->app->log->debug("Create tunnel to L7R $l7r_address:$l7r_port");
+                my $broker = QVD::NxBroker->new( host => $l7r_address, port => $l7r_port );
+                unless ($broker->start_tunnel_with_token($vm_id, $json->{token})){
+                    $c->app->log->error("Error while creating the tunnel");
+                    return $c->render_error(message => "Invalid Desktop", code => 400);
+                }
+                
                 my $tx = $c->tx;
                 $tx->with_protocols( 'binary' );
-
-                my $ws = QVD::VMProxy->new( address => $vm_ip, port => $vm_port );
+                
+                my $ws = QVD::VMProxy->new( address => $broker->tunnel_address(), port => $broker->tunnel_port() );
 
                 $ws->on( error => sub {
                         $c->app->log->error( "Error in ws: ".$_[1] );
-                        $tx->finish( 1011, $_[1] )
+                        $tx->finish( 1011, $_[1] );
+                        $broker->stop_tunnel();
                     } );
-                $ws->open($tx, 30000);
+                $ws->on( finish => sub {
+                        $c->app->log->debug( "ws finished" );
+                        $broker->stop_tunnel();
+                    } );
+                $ws->open($tx, 30000, 0);
+
             }
             else
             {

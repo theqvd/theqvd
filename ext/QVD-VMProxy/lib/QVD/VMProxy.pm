@@ -10,7 +10,7 @@ has ioloop => sub { Mojo::IOLoop->singleton };
 has [qw/address port/];
 
 sub open {
-    my ($self, $tx, $timeout) = @_;
+    my ($self, $tx, $timeout, $send_qvd_header) = @_;
 
     my %args = (
         address => $self->address,
@@ -28,20 +28,24 @@ sub open {
             $self->emit(error => "TCP connection error: $err") if $err;
 
             die $err if $err;
+            if($send_qvd_header){
+                $stream->write("GET \/vma\/vnc_connect HTTP/1.1\nConnection: Upgrade\nUpgrade: VNC\n\n");
 
-            $stream->write("GET \/vma\/vnc_connect HTTP/1.1\nConnection: Upgrade\nUpgrade: VNC\n\n");
-
-            my $cb = $delay->begin(0);
-            $stream->on(read => sub {
-                my ($stream, $bytes) = @_;
-                DEBUG term_escape "-- <<< VMA ($bytes)\n";
-                if ($bytes =~ /101/){
-                    $stream->stop();
-                    $stream->unsubscribe('read');
-                    $cb->($stream);
-                }
-            });
-            $stream->start;
+                my $cb = $delay->begin(0);
+                $stream->on(read => sub {
+                        my ($stream, $bytes) = @_;
+                        DEBUG term_escape "-- <<< VMA ($bytes)\n";
+                        if ($bytes =~ /101/){
+                            $stream->stop();
+                            $stream->unsubscribe('read');
+                            $cb->($stream);
+                        }
+                    });
+                $stream->start;
+            } else {
+                my $cb = $delay->begin(0);
+                $cb->($stream);
+            }
         },
         sub {
             my ($delay, $stream) = @_;
