@@ -79,10 +79,14 @@ path.l7r.ssl.cert = ${path.l7r.ssl}/cert.pem
 path.l7r.ssl.ca = ${path.l7r.ssl}/ca.pem
 path.l7r.ssl.crl = ${path.l7r.ssl}/crl.pem
 
-path.ssl.ca.system = /etc/ssl/certs
+# Semicolon separated paths in path.ssl.ca.system.path only
+# SYSTEM_DEFAULT is a special value that invokes autodetection
+
+path.ssl.ca.system.path = SYSTEM_DEFAULT:/System/Library/OpenSSL/certs/
+path.ssl.ca.system.file = SYSTEM_DEFAULT
+
 path.ssl.ca.personal = certs
 
-path.darwin.ssl.ca.system = /System/Library/OpenSSL/certs/
 
 ## KVM serial port captures or LXC console output
 path.serial.captures = ${path.tmp}/qvd
