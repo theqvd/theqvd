@@ -9,7 +9,7 @@ my $cups_path = "/usr/lib/cups/backend";
 my $cups_conf_path = "/etc/cups";
 my $cups_post_path = "/usr/local/bin"; 
     
-my $url_win  = "http://192.168.1.53:9000";
+my $url_win  = "http://172.26.9.187:3000";
 my $printer_url = "printer";
 my $printer_job_url = "printjob";
  
@@ -59,8 +59,8 @@ sub create_printers {
 
     # Add new printers
     foreach my $printer (@printers){
-	my ($id, $name, $filename, $color) = read_json($printer);
-	ppd_create($id, $name, $filename, $color);
+	my ($id, $name, $filename, $color, $duplex) = read_json($printer);
+	ppd_create($id, $name, $filename, $color, $duplex);
 	
 	$name =~s/ /_/g;
 	system("lpadmin", "-p", $name, "-v", "tea4cups://", "-P", $filename);
@@ -108,6 +108,11 @@ sub read_json {
     my $id = $printer->{'Id'};
     my $name = $printer->{'Name'};
     my $color = 'False'; 
+    
+    my $duplex = 0;
+    if($printer->{'IsDuplex'}){
+      $duplex = 1;      
+    }
 
     if($printer->{'IsSupportColor'}){
       $color = 'True';   
@@ -115,13 +120,13 @@ sub read_json {
     
     my $filename = "print_".$id."_driver.ppd";
 
-    return ($id, $name, $filename, $color);
+    return ($id, $name, $filename, $color, $duplex);
 }
 
 # It recieves a driver and wr
 sub ppd_create {
     # Open file
-    my ($id, $name, $filename, $color) = (@_);    
+    my ($id, $name, $filename, $color, $duplex) = (@_);    
     open(my $fh, '>', $filename) or die "Could not open file '$filename' $!";
     
     # Write file
@@ -137,7 +142,9 @@ sub ppd_create {
 
     ppd_color($fh, $color);
     
-    ppd_duplex($fh);
+    if($duplex){
+      ppd_duplex($fh);
+    }
 
     ppd_write_line($fh, ppd_line("FileSystem", "False"));
     ppd_write_line($fh, ppd_line("Throughput", "\"1\""));
