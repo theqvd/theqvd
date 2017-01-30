@@ -595,7 +595,8 @@ var UI;
 
         updateState: function(rfb, state, oldstate, msg) {
             if (state == 'normal') {
-                $('.noVNC_screen .loading').hide();
+                Up.I.loadingUnblock();
+                Up.I.stopProgress();
             }
             
             UI.log("INFO", "STATE: " + state + " - " + msg);
@@ -629,8 +630,8 @@ var UI;
                 $('.js-vms-spy-setting-log').val('error');
                 $('.js-vms-spy-setting-log').trigger('chosen:updated');
                 $('.js-vms-spy-setting-log').trigger('change');
-                $('.loading').hide();
-                $('.error-loading').show();
+                Up.I.loadingUnblock();
+                $('.connection-closed').show();
             }
         },
 
@@ -676,8 +677,9 @@ var UI;
             var apiHost = $('#noVNC_apiHost').val();
             var apiPort = $('#noVNC_apiPort').val();
             var sid = $('#noVNC_sid').val();
+            var token = $('#noVNC_token').val();
 
-            var path = 'api/desktops/' + vmId + '/connect';
+            var path = 'api/desktops/' + vmId + '/connect?token=' + token;
 
             if (!UI.initRFB()) return;
 

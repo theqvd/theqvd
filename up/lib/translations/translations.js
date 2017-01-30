@@ -14,7 +14,8 @@ Up.T = {
             ns: {
                 namespaces: [
                     'main',
-                    'api-responses'
+                    'api-responses',
+                    'progress'
                 ],
                 defaultNs: 'main',
                 fallbackNs: 'main'

@@ -1148,5 +1148,79 @@ Up.I = {
         settingsDisabledList['client'] = settingsDisabled;
 
         return settingsDisabledList;
+    },
+    
+    startProgress: function (totalTime) {
+        var that = this;
+        var progressMessages = [
+            {
+                text: 'Connecting with server',
+                class: 'fa fa-plug',
+            },
+            {
+                text: 'Retrieving session',
+                class: 'fa fa-cloud-download'
+            },
+            {
+                text: 'Loading canvas',
+                class: 'fa fa-code',
+            },
+            {
+                text: 'Mixing magic ingredients',
+                class: 'fa fa-cubes'
+            },
+            {
+                text: 'Hocus-Pocus',
+                class: 'fa fa-magic',
+            }
+        ];
+        var almostMessage = {
+            text: 'Are you ready?',
+            class: 'fa fa-smile-o'
+        }
+        
+        var utimestampZero = Date.now();
+        var utimestampEnd = utimestampZero + (totalTime * 1000);
+        
+        var progressMessagesInterval = 100 / progressMessages.length;
+        var currentMessageIndex = 0;
+        
+        that.progressValue = 0;
+        
+        this.progressInterval = setInterval(function () {
+            // Show secondary message
+            var progressMessagesMin = progressMessagesInterval * currentMessageIndex;
+            var progressMessagesMax = progressMessagesMin + progressMessagesInterval;
+            if (that.progressValue > progressMessagesMax) {
+                currentMessageIndex++;
+            }
+            $('.loading-little-message').html($.i18n.t('progress:' + progressMessages[currentMessageIndex].text )+ '...');
+            
+            if (currentMessageIndex > 0) {
+                $('.loading-little-message').removeClass(progressMessages[currentMessageIndex-1].class);
+            }
+            $('.loading-little-message').addClass(progressMessages[currentMessageIndex].class);
+            
+            // Increase progress limited to 100
+            var utimestampNow = Date.now();
+            var progCurrent = utimestampNow - utimestampZero;
+            var progTotal = utimestampEnd - utimestampZero;
+            that.progressValue = 100 * (progCurrent/progTotal);
+            
+            if (that.progressValue >= 100) {
+                that.progressValue = 100;
+                $('.loading-little-message').html($.i18n.t('progress:' + almostMessage.text));
+                $('.loading-little-message').removeClass(progressMessages[progressMessages.length-1].class);
+                $('.loading-little-message').addClass(almostMessage.class);
+            }
+            
+            // Draw graphic
+            var progressData = [that.progressValue, 100 - that.progressValue];
+            Up.I.G.drawPieChartSimple('loading-block', progressData);
+        }, 10);
+    },
+    
+    stopProgress: function () {
+        clearInterval(this.progressInterval);
     }
 }

@@ -71,10 +71,10 @@
 <input id="noVNC_apiHost" type="hidden" value="<%= apiHost %>" />
 <input id="noVNC_apiPort" type="hidden" value="<%= apiPort %>" />
 <input id="noVNC_sid" type="hidden" value="<%= sid %>" />
+<input id="noVNC_token" type="hidden" value="<%= token %>" />
     
 <div id="noVNC_screen" class="noVNC_screen">
-    <%= HTML_LOADING %>
-    <%= HTML_ERROR %>
+    <div class="connection-closed"><i class="fa fa-warning" data-i18n="Connection closed"></i></div>
     
     <!-- HTML5 Canvas -->
     <div id="noVNC_container" class="noVNC_container">

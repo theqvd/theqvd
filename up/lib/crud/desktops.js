@@ -80,8 +80,7 @@ Up.CRUD.desktops = {
         // Store ID of the desktop we are trying to connect with to use it if fails
         this.connectingDesktopId = selectedId;
 
-        window.protocolCheck('qvd:' + query, this.connectDesktopFail)
-        //open('qvd:' + query, '_self');
+        window.protocolCheck('qvd:' + query, this.connectDesktopFail, this.connectDesktopSuccess)
     },
     
     connectDesktopHTML5: function (selectedId, desktopSetup, token) {
@@ -110,6 +109,10 @@ Up.CRUD.desktops = {
                 }
             });
         }, this, 'GET');
+    },
+    
+    connectDesktopSuccess: function () {
+        // Success
     },
     
     connectDesktopFail: function () {

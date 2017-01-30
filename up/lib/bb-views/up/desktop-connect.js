@@ -14,6 +14,7 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
         $('.bb-super-wrapper').html(HTML_LOADING);
         this.model = new Up.Models.Desktop(params);
         Up.Views.MainView.prototype.initialize.apply(this, [params]);
+        $('.loading').hide();
 
         this.model.fetch({
             complete: function () {
@@ -38,7 +39,8 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
                 apiHost: Up.C.apiUrl.split("/")[2].split(':')[0],
                 apiPort: Up.C.apiUrl.split("/")[2].split(':')[1],
                 sid: Up.C.sid,
-                model: this.model
+                model: this.model,
+                token: this.token
             }
         );
         
@@ -47,6 +49,8 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
         $('.bb-super-wrapper').html(template + noVNCIncludes);
         
         $('.error-loading').hide();
+        Up.I.loadingBlock($.i18n.t('progress:Loading your Desktop'));
+        Up.I.startProgress(12);
         
         Up.T.translate();
         
