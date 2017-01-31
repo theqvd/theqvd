@@ -648,8 +648,12 @@ var UI;
                 $('.js-vms-spy-setting-log').trigger('chosen:updated');
                 $('.js-vms-spy-setting-log').trigger('change');
                 Up.I.loadingUnblock();
-                UI.disableFullscreen();
+            }
+            
+            // Parse disconnection message
+            if (msg.indexOf('disconnected') > -1) {
                 $('.connection-closed').show();
+                UI.disableFullscreen();
             }
         },
 
