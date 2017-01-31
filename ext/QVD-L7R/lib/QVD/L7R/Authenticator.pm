@@ -39,7 +39,7 @@ sub _reload_plugins {
     # We use a sandwich strategy here so that some plugins usage may
     # be enforced by the superadmins:
     my @plugins = ( $auth->_split_plugin_list(cfg('l7r.auth.plugins.head')),
-                    $auth->_split_plugin_list(cfg('l7r.auth.plugins', 1, $tenant_id)),
+                    $auth->_split_plugin_list(cfg('l7r.auth.plugins', $tenant_id, 0)),
                     $auth->_split_plugin_list(cfg('l7r.auth.plugins.tail')) );
     DEBUG "loading authenticaion plugins for tenant id $tenant_id: @plugins";
     for (@plugins) {
@@ -129,7 +129,7 @@ sub recheck_authentication {
 
 sub authenticate_basic_2f_split {
     my ($auth, $passwd, $l7r) = @_;
-    for (@{$auth->{modules}}) {
+    for (@{$auth->{plugins}}) {
         if (my ($passwd, $token) = $_->authenticate_basic_2f_split($auth, $passwd, $l7r)) {
             return ($passwd, $token);
         }

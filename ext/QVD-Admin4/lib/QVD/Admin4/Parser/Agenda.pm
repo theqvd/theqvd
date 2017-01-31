@@ -15,7 +15,7 @@ sub BUILD
 sub get_edge
 {
     my $self = shift;
-    shift $EDGES;
+    shift @$EDGES;
 }
 
 sub set_edge

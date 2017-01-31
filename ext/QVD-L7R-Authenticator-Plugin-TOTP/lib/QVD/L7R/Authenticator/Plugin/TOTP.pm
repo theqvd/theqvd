@@ -15,7 +15,8 @@ use parent 'QVD::L7R::Authenticator::Plugin';
 sub authenticate_basic_2f_split {
     my ($plugin, $auth, $passwd, $l7r) = @_;
     DEBUG "extracting 2FA token from password";
-    my $size = cfg('l7r.auth.plugin.totp.token_size', 0) // 6;
+    my $tenant_id = $auth->{tenant_id};
+    my $size = cfg('l7r.auth.plugin.totp.token_size', $tenant_id, 0) // 6;
     my $token = substr($passwd, -$size, $size, "");
     return ($passwd, $token);
 }
@@ -23,8 +24,8 @@ sub authenticate_basic_2f_split {
 sub authenticate_basic_2f {
     my ($plugin, $auth, $login, $token, $l7r) = @_;
     my $now = time;
-
-    my $user = rs(User)->find({login => $login});
+    my $tenant_id = $auth->{tenant_id};
+    my $user = rs(User)->find({login => $login, tenant_id => $tenant_id});
     unless ($user) {
         ERROR "Internal error: Can not find user $login in database";
         return;
@@ -42,11 +43,11 @@ sub authenticate_basic_2f {
         return;
     }
 
-    my $size     = cfg('l7r.auth.plugin.totp.token_size',    0) //  6;
-    my $interval = cfg('l7r.auth.plugin.totp.interval',      0) // 30;
-    my $t0       = cfg('l7r.auth.plugin.totp.t0',            0) //  0;
-    my $before   = cfg('l7r.auth.plugin.totp.leeway_before', 0) //  0;
-    my $leeway   = cfg('l7r.auth.plugin.totp.leeway',        0) //  1;
+    my $size     = cfg('l7r.auth.plugin.totp.token_size',    $tenant_id, 0) //  6;
+    my $interval = cfg('l7r.auth.plugin.totp.interval',      $tenant_id, 0) // 30;
+    my $t0       = cfg('l7r.auth.plugin.totp.t0',            $tenant_id, 0) //  0;
+    my $before   = cfg('l7r.auth.plugin.totp.leeway_before', $tenant_id, 0) //  0;
+    my $leeway   = cfg('l7r.auth.plugin.totp.leeway',        $tenant_id, 0) //  1;
 
     my $n = int(($now - $t0) / $interval);
     for my $i ($n - $leeway .. $n + $before) {
