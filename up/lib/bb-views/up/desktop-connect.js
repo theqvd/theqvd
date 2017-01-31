@@ -40,7 +40,8 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
                 apiPort: Up.C.apiUrl.split("/")[2].split(':')[1],
                 sid: Up.C.sid,
                 model: this.model,
-                token: this.token
+                token: this.token,
+                fullScreen: this.model.get('settings').fullscreen.value
             }
         );
         

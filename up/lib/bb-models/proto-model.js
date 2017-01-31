@@ -9,6 +9,11 @@ Up.Models.Model = Backbone.Model.extend({
     },
     
     parse: function(response) {
+        // If retrieving is from detail view, data is the first element of the API response
+        if ($.isArray(response)) {
+            response = response[0];
+        }
+        
         return this.processResponse(response);
     },
     

@@ -70,8 +70,8 @@
 <input id="noVNC_vmId" type="hidden" value="<%= vmId %>" />
 <input id="noVNC_apiHost" type="hidden" value="<%= apiHost %>" />
 <input id="noVNC_apiPort" type="hidden" value="<%= apiPort %>" />
-<input id="noVNC_sid" type="hidden" value="<%= sid %>" />
 <input id="noVNC_token" type="hidden" value="<%= token %>" />
+<input id="noVNC_fullScreen" type="hidden" value="<%= fullScreen %>" />
     
 <div id="noVNC_screen" class="noVNC_screen">
     <div class="connection-closed"><i class="fa fa-warning" data-i18n="Connection closed"></i></div>
