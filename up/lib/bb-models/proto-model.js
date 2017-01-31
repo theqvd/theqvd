@@ -9,11 +9,6 @@ Up.Models.Model = Backbone.Model.extend({
     },
     
     parse: function(response) {
-        // If retrieving is from detail view, data is the first element of the API response
-        if ($.isArray(response)) {
-            response = response[0];
-        }
-        
         return this.processResponse(response);
     },
     
@@ -38,12 +33,11 @@ Up.Models.Model = Backbone.Model.extend({
         var params = _.extend({
             type: 'GET',
             dataType: 'json',
-            url: encodeURI(this.url()),
+            url: encodeURI(this.url() + "/" + this.id),
             headers: {
                 "Geo-Location": Up.C.getGeolocation()
             },
-            processData: false,
-            data: JSON.stringify({filters: {id: this.id}})
+            processData: false
         }, options);
         
         return $.ajax(params);

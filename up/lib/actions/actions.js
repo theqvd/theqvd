@@ -59,18 +59,6 @@ Up.A = {
             }
         });
     },
-
-    // Check if any action can be affected by expiration or not
-    isExpirableAction: function (action) {
-        switch (action) {
-            case 'current_admin_setup':
-                return false;
-                break;
-            default:
-                return false;
-                break;
-        }
-    },
     
     // Perform any action of the API
     // Params:
@@ -136,10 +124,6 @@ Up.A = {
                 }                   
             },
             success: function (response, result, raw) {
-                if (Up.A.isExpirableAction() && Up.C.sessionExpired(response)) {
-                    return;
-                }
-                
                 // Aborted
                 if (response.readyState == 0) {
                     return;
@@ -281,7 +265,7 @@ Up.A = {
             },
             error: function (response, result, raw) {
                 var responseMsg = JSON.parse(response.responseText).message;
-                Up.I.M.showMessage({message: i18n.t('Error logging in') + ": " + responseMsg, messageType: 'error'});
+                $.cookie('messageToShow', JSON.stringify({'message': i18n.t('Error logging in') + ": " + responseMsg, 'messageType': 'error'}), {expires: 1, path: '/'});
             }
         };
         

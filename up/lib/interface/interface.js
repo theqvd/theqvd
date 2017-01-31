@@ -158,7 +158,7 @@ Up.I = {
                         that.formFilters[qvdObj][columnName].displayDesktop = display;
                     });
                 }
-            });            
+            });
         }
     },
     

@@ -93,10 +93,18 @@ Up.CRUD.desktops = {
         var selectedId = $(e.target).attr('data-id');
 
         Up.A.performAction('desktops/' + selectedId + '/token', {}, function (e) {
+            if (e.retrievedData.status && e.retrievedData.status != STATUS_SUCCESS_HTTP) {
+                return;
+            }
+            
             var token = e.retrievedData.token;
             
             // Retrieve effective desktop setup to make the client call
             Up.A.performAction('desktops/' + selectedId + '/setup', {}, function (e) {
+                if (e.retrievedData.status && e.retrievedData.status != STATUS_SUCCESS_HTTP) {
+                    return;
+                }
+                
                 var client = e.retrievedData.settings.client.value;
                 
                 switch (client) {

@@ -103,10 +103,10 @@ Up.L = {
     //      that: Current context where will be stored API call return
     checkLogin: function (that) {
         that.password = '';
-        
         if (that.retrievedData.status == STATUS_UNAUTHORIZED) {
             Up.I.renderMain();
             Up.CurrentView = new Up.Views.LoginView({});
+            Up.I.M.showMessage({message: that.retrievedData.status, messageType: "error"});
             return;
         }
         // If request is not correctly performed and session is enabled, logout and reload
@@ -121,22 +121,11 @@ Up.L = {
             Up.I.M.showMessage({message: that.retrievedData.statusText, messageType: "error"});
             return;
         }
-        else if (!Up.C.login && that.retrievedData.status == STATUS_NOT_LOGIN) {
+        else if (!Up.C.login) {
             // First loading
             Up.I.M.showMessage({message: that.retrievedData.message, messageType: "error"});
             Up.C.configureVisibility();
             Up.L.afterLogin ();
-            return;
-        }
-        else if (that.retrievedData.status == STATUS_SESSION_EXPIRED || that.retrievedData.status == STATUS_CREDENTIALS_FAIL || that.retrievedData.status == STATUS_NOT_LOGIN || that.retrievedData.status == STATUS_TENANT_RESTRICTED) {
-            if (Up.C.sid) {
-                Up.L.logOut();
-                $.cookie('messageToShow', JSON.stringify({message: that.retrievedData.message, messageType: "error"}), {expires: 1, path: '/'});
-                window.location.reload();
-            }
-            else {
-                Up.I.M.showMessage({message: that.retrievedData.message, messageType: "error"});
-            }
             return;
         }
         
