@@ -15,11 +15,26 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
         this.model = new Up.Models.Desktop(params);
         Up.Views.MainView.prototype.initialize.apply(this, [params]);
         $('.loading').hide();
-
-        this.model.fetch({
+        
+        // Fetch model data, then get desktop setup and connection template
+        this.model.fetch({ 
             complete: function () {
-                that.getTemplatesAndRender();
+                that.getSetup();
             }
+        });
+    },
+    
+    // Get combined setup from specific settings and current workspace
+    getSetup: function () {
+        var that = this;
+        
+        Up.A.performAction('desktops/' + this.model.get('id') + '/setup', {}, function (e) {
+            if (e.retrievedData.status && e.retrievedData.status != STATUS_SUCCESS_HTTP) {
+                return;
+            }
+
+            that.desktopSetup = e.retrievedData;
+            that.getTemplatesAndRender();
         });
     },
     
@@ -41,7 +56,7 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
                 sid: Up.C.sid,
                 model: this.model,
                 token: this.token,
-                fullScreen: this.model.get('settings').fullscreen.value
+                fullScreen: this.desktopSetup.settings.fullscreen.value
             }
         );
         

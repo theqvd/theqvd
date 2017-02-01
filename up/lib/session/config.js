@@ -260,8 +260,14 @@ Up.C = {
                 }
                 
                 switch (jqXHR.status) {
+                    case 200:
+                        // Nothing to do
+                        break;
                     case 401:
                         Up.L.loadLogin();
+                        break;
+                    default:
+                        Up.I.M.showMessage({message: i18n.t('Unexpected error') + ': ' + jqXHR.status + ' - ' + jqXHR.statusText, messageType: 'error'});
                         break;
                 }
             }
