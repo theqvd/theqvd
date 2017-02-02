@@ -66,7 +66,7 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
                 
                 $('.bb-workspaces-select').html(template);
                 
-                Up.I.chosenElement('select[name="active_configuration_select"]', 'single');
+                Up.I.Chosen.element('select[name="active_configuration_select"]', 'single');
                 Up.T.translate();
             }
         });      
@@ -93,9 +93,7 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
         that.shownElementsLabelUpdate();
         
         Up.T.translateAndShow();
-                
-        Up.I.addSortIcons(that.cid);
-                
+        
         Up.I.addOddEvenRowClass(that.listContainer);
     },
     

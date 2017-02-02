@@ -143,11 +143,6 @@ Up.L = {
         Up.C.block = that.retrievedData.admin_block;
         Up.C.tenantBlock = that.retrievedData.tenant_block;
         
-        
-        // Restore possible residous views configuration to default values
-        Up.I.restoreListColumns();
-        Up.I.restoreFormFilters();
-        
         // Store tenant ID and Name
         Up.C.tenantID = that.retrievedData.tenant_id;
         Up.C.tenantName = that.retrievedData.tenant_name;
@@ -188,10 +183,6 @@ Up.L = {
 
         // Binding events manually because backbone doesnt allow bind events to dialogs loaded dinamically
         Up.B.bindCommonEvents();
-
-        if (Up.L.isLogged()) {
-            Up.I.setCustomizationFields();
-        }
         
         // If the router isnt instantiate, do it
         if (Up.Router.upRouter == undefined) {          

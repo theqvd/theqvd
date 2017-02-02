@@ -623,7 +623,7 @@ Up.B = {
             
             Up.A.fillSelect(params, function () {
                 // Update chosen control for osf
-                Up.I.updateChosenControls('[name="osf_id"]');
+                Up.I.Chosen.updateControls('[name="osf_id"]');
 
                 // Trigger change event to update tags
                 $('[name="osf_id"]').trigger('change');
@@ -648,7 +648,7 @@ Up.B = {
             
             Up.A.fillSelect(params, function () {
                 // Update chosen control for user
-                Up.I.updateChosenControls('[name="user_id"]');
+                Up.I.Chosen.updateControls('[name="user_id"]');
             }); 
         },
         

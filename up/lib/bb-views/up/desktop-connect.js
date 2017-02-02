@@ -82,8 +82,8 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
                 $(".js-vnc-keyboard").on('click', that.clickKeyboard);
                 
                 Up.T.translate();
-                Up.I.chosenConfiguration();
-                Up.I.chosenElement('.vms-spy-settings select', 'single100');
+                Up.I.Chosen.configuration();
+                Up.I.Chosen.element('.vms-spy-settings select', 'single100');
             },
             onExtContentLoad:function(){},
             onExtClose:function(){}

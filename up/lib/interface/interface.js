@@ -1,7 +1,9 @@
 // Pure interface utilities
 Up.I = {
-        // Styles Customizer Tool (interface-customize.js)
+    // Styles Customizer Tool (interface-customize.js)
     C: {},
+    // Chosen controls (interface-chosen.js)
+    Chosen: {},
     // Graphs (interface-graphs.js)
     G: {},
     // Templates (interface-templates.js)
@@ -18,163 +20,8 @@ Up.I = {
     getCornerMenu: function () {
         return $.extend(true, [], this.cornerMenu);
     },
-    
-    detailsFields: {
-        vm: {},
-        user: {},
-        host: {},
-        osf: {},
-        di: {},
-        role: {},
-        administrator: {},
-        log: {}
-    }, 
-    
-    detailsDefaultFields: {
-        vm: {},
-        user: {},
-        host: {},
-        osf: {},
-        di: {},
-        role: {},
-        administrator: {},
-        log: {}
-    },
-    
-    getDetailsFields: function (qvdObj) {
-        return $.extend(true, {}, this.detailsFields[qvdObj]);
-    },   
-    
-    listFields: {
-        vm: {},
-        user: {},
-        host: {},
-        osf: {},
-        di: {},
-        role: {},
-        administrator: {},
-        log: {}
-    },
-    
-    listDefaultFields: {
-        vm: {},
-        user: {},
-        host: {},
-        osf: {},
-        di: {},
-        role: {},
-        administrator: {},
-        log: {}
-    }, 
-    
-    getListColumns: function (qvdObj) {
-        return $.extend(true, {}, this.listFields[qvdObj]);
-    },
-    
-    getListDefaultColumns: function (qvdObj) {
-        return $.extend(true, {}, this.listDefaultFields[qvdObj]);
-    },
-    
-    restoreListColumns: function () {
-        this.listFields = $.extend(true, {}, this.listDefaultFields);
-    },
-    
-    formFilters: {
-        vm: {},
-        user: {},
-        host: {},
-        osf: {},
-        di: {},
-        log: {}
-    }, 
-    
-    formDefaultFilters: {
-        vm: {},
-        user: {},
-        host: {},
-        osf: {},
-        di: {},
-        log: {}
-    },
-    
-    getFormFilters: function (qvdObj) {
-        return $.extend(true, {}, this.formFilters[qvdObj]);
-    },   
-    
-    getFormDefaultFilters: function (qvdObj) {
-        return $.extend(true, {}, this.formDefaultFilters[qvdObj]);
-    },
-        
-    restoreFormFilters: function () {
-        this.formFilters = $.extend(true, {}, this.formDefaultFilters);
-    },
-    
-    setCustomizationFields: function (qvdObj) {
-        return;
-        var filters = {};
 
-        // If qvd object is not specified, all will be setted
-        if (qvdObj) {
-            filters.qvd_obj = qvdObj;
-        }
-
-        Up.A.performAction('config_field_get_list', {}, this.setCustomizationFieldsCallback, this);
-    },
-    
-    setCustomizationFieldsCallback: function (that) {
-        if (that.retrievedData.status === 0 && that.retrievedData) {
-            var fields = that.retrievedData.rows;
-
-            $.each(fields, function (iField, field) {
-                // If field options are not defined, we keep the default options doing nothing
-                if (!field.filter_options) {
-                    return;
-                }
-                
-                var fieldName = field.name;               
-                var qvdObj = field.qvd_obj;
-                
-                // Fix bad JSON format returned by API
-                optionsJSON = field.filter_options.replace(/\\"/g,'"');
-                optionsJSON = optionsJSON.replace(/^"/,'');
-                optionsJSON = optionsJSON.replace(/"$/,'');
-                
-                var options = JSON.parse(optionsJSON);
-                
-                if (options.listFields) {
-                    $.each(options.listFields, function (columnName, display) {
-                        that.listFields[qvdObj][columnName].display = display;
-                    });
-                }
-                
-                if (options.mobileFilters) {
-                    $.each(options.mobileFilters, function (columnName, display) {
-                        that.formFilters[qvdObj][columnName].displayMobile = display;
-                    });
-                }
-                
-                if (options.desktopFilters) {
-                    $.each(options.desktopFilters, function (columnName, display) {
-                        that.formFilters[qvdObj][columnName].displayDesktop = display;
-                    });
-                }
-            });
-        }
-    },
-    
-    listActionButton: {
-        vm: {},
-        user: {},
-        host: {},
-        osf: {},
-        di: {}
-    },
-    
     docSections: {
-    },
-    
-    getListActionButton: function (qvdObj) {
-        return $.extend(true, [], this.listActionButton[qvdObj]);
     },
     
     showAll: function () {
@@ -185,7 +32,6 @@ Up.I = {
         if (!Up.I.isMobile()) {
             $('.js-menu-lat').css('visibility','visible');
         }
-        $('.js-content').css('visibility','visible').hide().fadeIn('fast');
         $('.js-menu-corner').css('visibility','visible');
         $('.js-mobile-menu-hamburger').css('visibility','visible');
         $('.js-server-datetime-wrapper').css('visibility','visible');
@@ -211,48 +57,6 @@ Up.I = {
             $('.loading').show();
             $('.related-doc').hide();
         }
-    },
-    
-    addSortIcons: function (cid) {
-        $('.' + cid + ' th.sortable').prepend(HTML_SORT_ICON);
-    },
-    
-    updateSortIcons: function (view) {
-        // If not view is passed, use currentView
-            if (view === undefined) {
-                view = Up.CurrentView;
-            }
-        
-        // Get the context to the view
-            var context = $('.' + view.cid);
-
-        // Add sort icons to the table headers            
-            var sortClassDefault = 'fa-sort';
-            var sortClassAsc = 'fa-sort-asc';
-            var sortClassDesc = 'fa-sort-desc';
-                
-            if (view.sortedBy != '') {
-                switch(view.sortedOrder) {
-                    case '': 
-                        var sortClassSorted = '';
-                        break;
-                    case '-asc':            
-                        var sortClassSorted = sortClassAsc;
-                        break;
-                    case '-desc':
-                        var sortClassSorted = sortClassDesc;
-                        break;
-                }
-            }
-
-            context.find('th.sortable i.sort-icon').removeClass(sortClassDefault + ' ' + sortClassAsc + ' ' + sortClassDesc);
-            context.find('th.sortable i.sort-icon').addClass(sortClassDefault);
-
-            if (view.sortedBy != '') {
-                context.find('[data-sortby="' + view.sortedBy + '"]').addClass('sorted');
-                context.find('[data-sortby="' + view.sortedBy + '"] i').removeClass(sortClassDefault);
-                context.find('[data-sortby="' + view.sortedBy + '"] i').addClass(sortClassSorted);
-            }
     },
     
     enableDataPickers: function () {
@@ -289,86 +93,6 @@ Up.I = {
         $('.datetimepicker').datetimepicker(options);
         
         $('.datepicker-past').datetimepicker(optionsPast);
-    },
-    
-    chosenConfiguration: function () {
-        // Convert the filter selects to library chosen style
-            var chosenOptions = {};
-            chosenOptions.no_results_text = i18n.t('No results match');
-            chosenOptions.placeholder_text_single = i18n.t('Loading');
-            chosenOptions.placeholder_text_multiple = i18n.t('Select some options');
-            chosenOptions.search_contains = true;
-
-            var chosenOptionsSingle = jQuery.extend({}, chosenOptions);
-            chosenOptionsSingle.disable_search = true;
-            chosenOptionsSingle.width = "250px";
-
-            var chosenOptionsSingle100 = jQuery.extend({}, chosenOptionsSingle);
-            chosenOptionsSingle100.width = "100%"; 
-
-            var chosenOptionsAdvanced = jQuery.extend({}, chosenOptions);
-        
-            var chosenOptionsAdvanced100 = jQuery.extend({}, chosenOptions);
-            chosenOptionsAdvanced100.width = "100%";
-        
-            // Store options to be retrieved in dinamic loads
-            this.chosenOptions = {
-                'single': chosenOptionsSingle,
-                'single100': chosenOptionsSingle100,
-                'advanced': chosenOptionsAdvanced,
-                'advanced100': chosenOptionsAdvanced100
-            };
-
-            $('.filter-control select.chosen-advanced').chosen(chosenOptionsAdvanced100);
-            $('.filter-control select.chosen-single').chosen(chosenOptionsSingle100);
-            $('select.chosen-single').chosen(chosenOptionsSingle100);
-    },
-    
-    chosenElement: function (selector, type) {
-        if (type == 'single100' || type == 'advanced100' ) {
-            $(selector).addClass('mob-col-width-100');
-        }
-        
-        $(selector).chosen(this.chosenOptions[type]);
-    },
-    
-    updateChosenControls: function (selector) {
-        var selector = selector || 'select.chosen-advanced, select.chosen-single';
-        $(selector).trigger('chosen:updated');
-                                
-        if ($(selector).find('option').length == 0) {
-            $(selector + '+.chosen-container span').html($.i18n.t('Empty'));
-        }
-
-    },
-    
-    disableChosenControls: function (selector) {
-        var selector = selector || 'select.chosen-advanced, select.chosen-single';
-        $(selector).prop('disabled', true).trigger('chosen:updated');
-    },    
-    
-    enableChosenControls: function (selector) {
-        var selector = selector || 'select.chosen-advanced, select.chosen-single';
-        $(selector).prop('disabled', false).trigger('chosen:updated');
-    },
-    
-    // Set specific menu section as selected
-    setMenuOpt: function (opt) {
-        // Set as selected the menu option
-        $('.menu-option').removeClass('menu-option--selected');
-        $('.menu-option[data-target="' + opt + '"]').addClass('menu-option--selected');
-        
-        // Change styles on corner menu current option
-        var menu = $('.menu-option[data-target="' + opt + '"]').attr('data-menu');
-        
-        $('.js-menu-corner .menu-option').removeClass('menu-option-current');
-        $('.js-menu-corner .js-menu-option-' + menu).addClass('menu-option-current');
-        
-        if (opt == 'home' || !opt) {
-            var menu = 'platform';
-        }
-        $('.menu').hide();
-        $('.js-' + menu + '-menu').show();
     },
     
     renderMain: function () { 
@@ -1089,8 +813,8 @@ Up.I = {
         
         target.html(template);
         
-        Up.I.chosenElement($('select[name="connection"]'), 'single100');
-        Up.I.chosenElement($('select[name="client"]'), 'single100');
+        Up.I.Chosen.element($('select[name="connection"]'), 'single100');
+        Up.I.Chosen.element($('select[name="client"]'), 'single100');
         
         Up.T.translate();
     },

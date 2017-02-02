@@ -2,8 +2,6 @@ Up.Views.ListView = Up.Views.MainView.extend({
     collection: {},
     sortedBy: '',
     sortedOrder: '',
-    formFilters: {},
-    columns: [],
     listContainer: '.bb-list',
     filters: {},
     selectedItems: [],
@@ -73,154 +71,6 @@ Up.Views.ListView = Up.Views.MainView.extend({
         'keypress .pagination input.js-current-page': 'pressPage'
     },
     
-    // Get filter parameters of the form, set in collection, fetch list and render it
-    filter: function (e) {
-        var that = this;
-        
-        $('.list').html(HTML_MID_LOADING);
-
-        if (e && $(e.target).hasClass('mobile-filter')) {
-            var filtersContainer = '.' + this.cid + ' .filter-mobile';
-        }
-        else {
-            var filtersContainer = '.' + this.cid + ' .filter';
-        }
-        
-        // Solve dependences in case of fussioned filters
-        if (e) {
-            Up.I.solveFilterDependences($(e.target).attr('name'), $(e.target).attr('data-filter-field'));
-        }
-        
-        var filters = {};
-        $.each(this.formFilters, function(name, filter) {
-            var filterControl = $(filtersContainer + ' [name="' + name + '"]');
-            
-            // If current field exist in initFilters, delete it to avoid use it when "All" option is selected
-            if (that.initFilters && that.initFilters[filterControl.attr('data-filter-field')]) {
-                delete that.initFilters[filterControl.attr('data-filter-field')];
-            }
-            
-            // If input text box is empty or selected option in a select is All skip filter control
-            switch(filter.type) {
-                case 'select':
-                    if (filterControl.val() == FILTER_ALL || filterControl.val() == undefined) {
-                        return true;
-                    }
-                    
-                    // If is a "not" filter, store it with negation operation
-                    if (filterControl.find('option:selected[data-not]').length == 1) {
-                        filters[filterControl.attr('data-filter-field')] = {
-                            "!=": filterControl.val()
-                        };
-                    }
-                    else if (filter.transform) {
-                        switch (filter.transform) {
-                            case 'dateLessThanPast':
-                                filters[filterControl.attr('data-filter-field')] = {
-                                    "<": Up.U.getRelativeDate(filterControl.val() * -1)
-                                };
-                                break;
-                            case 'dateGreatThanPast':
-                                filters[filterControl.attr('data-filter-field')] = {
-                                    ">": Up.U.getRelativeDate(filterControl.val() * -1)
-                                };
-                                break;
-                            case 'dateLessThanFuture':
-                                filters[filterControl.attr('data-filter-field')] = {
-                                    "<": Up.U.getRelativeDate(filterControl.val())
-                                };
-                                break;
-                            case 'dateGreatThanFuture':
-                                filters[filterControl.attr('data-filter-field')] = {
-                                    ">": Up.U.getRelativeDate(filterControl.val())
-                                };
-                                break;
-                        }
-                    }
-                    else {
-                        filters[filterControl.attr('data-filter-field')] = filterControl.val();
-                    }
-                    break;
-                case 'text':
-                    if (filterControl.val() == '' || filterControl.val() == undefined) {
-                        return true;
-                    }
-                    
-                    if (filter.transform) {
-                        switch (filter.transform) {
-                            case 'dateMin':
-                                if (filters[filterControl.attr('data-filter-field')] == undefined) {
-                                    filters[filterControl.attr('data-filter-field')] = {};
-                                }
-                                
-                                filters[filterControl.attr('data-filter-field')][">="] = filterControl.val() + ' 00:00:00';
-                                break;
-                            case 'dateMax':
-                                if (filters[filterControl.attr('data-filter-field')] == undefined) {
-                                    filters[filterControl.attr('data-filter-field')] = {};
-                                }
-                                
-                                filters[filterControl.attr('data-filter-field')]["<="] = filterControl.val() + ' 23:59:59';
-                                break;
-                        }
-                        
-                        // If dateMin and dateMax were defined, change them by -between special operator
-                        switch (filter.transform) {
-                            case 'dateMin':
-                            case 'dateMax':
-                                if (filters[filterControl.attr('data-filter-field')]["<="] != undefined && filters[filterControl.attr('data-filter-field')][">="] != undefined) {
-                                    filters[filterControl.attr('data-filter-field')]["-between"] = [filters[filterControl.attr('data-filter-field')][">="], filters[filterControl.attr('data-filter-field')]["<="]];
-                                    delete filters[filterControl.attr('data-filter-field')][">="];
-                                    delete filters[filterControl.attr('data-filter-field')]["<="];
-                                }
-                                break;
-                        }
-                    }
-                    else {
-                        // Substring search syntax
-                        filters[filterControl.attr('data-filter-field')] = {
-                            "~" : '%' + filterControl.val() + '%'
-                        };
-                    }
-                    break;
-            }
-        });
-        
-        // Add the init filters to filters
-        filters = $.extend({}, this.initFilters, filters);
-        
-        this.collection.setFilters(filters);
-
-        // When we came from a view without elements pagination doesnt exist
-        var existsPagination = $('.' + this.cid + ' .pagination .first').length > 0;
-        
-        var searchHash = Up.U.transformFiltersToSearchHash(filters);
-        var currentHash = '#' + this.qvdObj + 's/' + searchHash;
-
-        // If pushState is available in browser, modify hash with current section
-        if (history.pushState) {
-            history.pushState(searchHash, null, currentHash);
-        }
-        
-        // If the current offset is not the first page, trigger click on first button of pagination to go to the first page. 
-        // This button render the list so is not necessary render in this case
-        if (this.collection.offset != 1 && existsPagination) {
-            $('.' + this.cid + ' .pagination .first').trigger('click');
-        }
-        else {
-            var params = {};
-                
-            // If there are free search filters, send parameters with container and typed search to compare with search 
-            // on input when search been done and control concurrency
-            if ($(filtersContainer).find('.filter-control>input[type="text"]').length > 0) {
-                params.filtersContainer = filtersContainer;
-                params.typedSearch = $(filtersContainer).find('.filter-control>input[type="text"]').val();
-            }
-
-            this.fetchList($.extend({}, this, params));
-        }
-    },
-    
     /* Clean filter from object memory and collection */
     cleanFilter: function (fKey) {
         delete Up.CurrentView.filters[fKey];
@@ -279,8 +129,7 @@ Up.Views.ListView = Up.Views.MainView.extend({
                 }
                 
                 that.renderList(that.listContainer);
-                Up.I.updateSortIcons(that);
-                Up.I.updateChosenControls();
+                Up.I.Chosen.updateControls();
             }
         });
     },
@@ -301,8 +150,6 @@ Up.Views.ListView = Up.Views.MainView.extend({
         // Fill the list
         var template = _.template(
             Up.TPL[this.qvdObj + 'CommonBlock'], {
-                formFilters: this.formFilters,
-                listActionButton: this.listActionButton,
                 cid: this.cid,
                 qvdObj: this.qvdObj,
                 pagination: false,

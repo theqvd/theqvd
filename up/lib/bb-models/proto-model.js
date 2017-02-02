@@ -33,7 +33,7 @@ Up.Models.Model = Backbone.Model.extend({
         var params = _.extend({
             type: 'GET',
             dataType: 'json',
-            url: encodeURI(this.url() + "/" + this.id),
+            url: encodeURI(this.url() + (this.id ? "/" + this.id : '')),
             headers: {
                 "Geo-Location": Up.C.getGeolocation()
             },

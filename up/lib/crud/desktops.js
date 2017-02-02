@@ -37,7 +37,6 @@ Up.CRUD.desktops = {
     },
     
     connectDesktopClassic: function (selectedId, desktopSetup, token) {
-        this.setDesktopState(selectedId, 'connecting');
         this.startConnectionTimeout(selectedId);
         
         var options = {
@@ -80,11 +79,13 @@ Up.CRUD.desktops = {
         // Store ID of the desktop we are trying to connect with to use it if fails
         this.connectingDesktopId = selectedId;
 
-        window.protocolCheck('qvd:' + query, this.connectDesktopFail, this.connectDesktopSuccess)
+        //window.protocolCheck('qvd:' + query, this.connectDesktopFail, this.connectDesktopSuccess)
+        // Protocol Check is not working properly on chrome. It is disabled by the moment
+        open('qvd:' + query, '_self')
     },
     
     connectDesktopHTML5: function (selectedId, desktopSetup, token) {
-        open('#desktops/' + selectedId + '/connect/' + token, '_blank');
+        open('#desktops/' + selectedId + '/connect/' + token);
     },
     
     connectDesktop: function (e) {
@@ -106,6 +107,7 @@ Up.CRUD.desktops = {
                 }
                 
                 var client = e.retrievedData.settings.client.value;
+                that.setDesktopState(selectedId, 'connecting');
                 
                 switch (client) {
                     case 'classic':
