@@ -8,6 +8,7 @@ use Crypt::OpenSSL::X509;
 use File::Path 'make_path';
 use File::Spec;
 use IO::Socket::INET;
+use IO::Socket::SSL;
 use IO::Socket::Forwarder qw(forward_sockets);
 use JSON;
 use Proc::Background;
@@ -281,16 +282,58 @@ sub _get_httpc {
             }
         }
 
-        $args{SSL_ca_path}          = $DARWIN ? core_cfg('path.darwin.ssl.ca.system') : core_cfg('path.ssl.ca.system');
-        $args{SSL_ca_path_alt}      = $QVD::Client::App::user_certs_dir;
-        $args{SSL_ca_path_alt}      =~ s|^~(?=/)|$ENV{HOME} // $ENV{APPDATA}|e;
+        DEBUG "Finding default CA paths";
+        my %default_ca = IO::Socket::SSL::default_ca();
+        DEBUG "System default SSL_ca_file: " . ($default_ca{SSL_ca_file} // "(none)");
+        DEBUG "System default SSL_ca_path: " . ($default_ca{SSL_ca_path} // "(none)");
+
+
+        my $ca_file = core_cfg('path.ssl.ca.system.file');
+        DEBUG "Config value for path.ssl.ca.system.file: $ca_file";
+        DEBUG "Config value for path.ssl.ca.system.path: " . core_cfg('path.ssl.ca.system.path');
+
+        if ( $ca_file =~ /SYSTEM_DEFAULT/ ) {
+            if ( exists $default_ca{SSL_ca_file} ) {
+                DEBUG "SSL_ca_file set to system default";
+                $args{SSL_ca_file} = $default_ca{SSL_ca_file};
+            }
+        } else {
+            $args{SSL_ca_file} = $ca_file;
+        }
+
+        my @ca_paths_conf = split(/:/, core_cfg('path.ssl.ca.system.path'));
+        my @ca_paths;
+        foreach my $ca_path (@ca_paths_conf) {
+            if ( $ca_path =~ /SYSTEM_DEFAULT/ ) {
+                if ( exists ( $default_ca{SSL_ca_path} ) ) {
+                    DEBUG "Adding system default to SSL_ca_path";
+                    push @ca_paths, $default_ca{SSL_ca_path};
+                }
+            } else {
+                DEBUG "Adding '$ca_path' to SSL_ca_path";
+                push @ca_paths, $ca_path;
+            }
+        }
+
+        my $user_ca_dir = $QVD::Client::App::user_certs_dir;
+        $user_ca_dir    =~ s|^~(?=/)|$ENV{HOME} // $ENV{APPDATA}|e;
+        DEBUG "Adding user dir '$user_ca_dir' to SSL_ca_path";
+        push @ca_paths, $user_ca_dir;
+
+        $args{SSL_ca_path} = \@ca_paths;
+
+        DEBUG "SSL CA file: " . $args{SSL_ca_file};
+        DEBUG "SSL CA path: " . join(':', @{$args{SSL_ca_path}});
+
+        DEBUG "Parsing OCSP mode";
+        $args{SSL_ocsp_mode}        = _parse_flags("IO::Socket::SSL", core_cfg('client.ssl.ocsp_mode'));
 
         # We handle the errors here later, rather than having HTTPC die on those errors
         $args{SSL_fail_on_ocsp}     = 0;
         $args{SSL_fail_on_hostname} = 0;
 
-        DEBUG "SSL CA path: " . $args{SSL_ca_path};
-        DEBUG "SSL CA alt path: " . $args{SSL_ca_path_alt};
+        DEBUG "SSL CA file: " . $args{SSL_ca_file};
+        DEBUG "SSL CA path: " . join(':', @{$args{SSL_ca_path}});
 
         my $use_cert = core_cfg('client.ssl.use_cert');
         if ($use_cert) {
@@ -387,8 +430,11 @@ sub _get_httpc {
                 $self->_add_ssl_error(0, 2103, 0, $oerr);
             } elsif ( $oerr =~ /root ca not trusted/ ) {
                 # Root CA not trusted
-                $self->_add_ssl_error(0, 2103, 0, $oerr);
-            } elsif ( $oerr =~ /certificate status is revoked/ ) {		    
+                $self->_add_ssl_error(0, 2104, 0, $oerr);
+            } elsif ( $oerr =~ /certificate verify error/ ) {
+                # Error verifying certificate on OCSP answer
+                $self->_add_ssl_error(0, 2105, 0, $oerr);
+            } elsif ( $oerr =~ /certificate status is revoked/ ) {
                 $self->_add_ssl_error(0, 2001, 0, $oerr);
             } else {
                 $self->_add_ssl_error(0, 2200, 0, $oerr);
@@ -426,6 +472,47 @@ sub _get_httpc {
     }
 
     $httpc;
+}
+
+# Parse a string containing a list of OR-ed flags by getting the values of those constants
+# Example:
+# $ret = _parse_flags("Example::Module", "FOO | BAR");
+#
+# Will set $ret to the combined values of Example::Module::FOO and Example::Module::BAR
+sub _parse_flags {
+    my ($module, $text) = @_;
+    my $result = 0;
+
+    DEBUG "Parsing flags for $module, value '$text'";
+
+    my @constants = split(/\|/, $text);
+
+    foreach my $const (@constants) {
+        $const =~ s/^\s+//;
+        $const =~ s/\s+$//;
+
+        DEBUG "Checking constant $const";
+        my $func_defined = eval "use $module; defined &$module::$const";
+        if ( $@ ) {
+            ERROR "Error when checking $module::$const: $@";
+        } else {
+            if ( $func_defined ) {
+                DEBUG "Constant found: '$const'";
+                my $ret = eval "use $module; $module::$const();";
+                if ($@) {
+                    ERROR "Error when calling $module::$const: $@";
+                } else {
+                    $result |= $ret;
+                    DEBUG "Constant's value: $ret";
+                }
+            } else {
+                ERROR "Constant '$const' not found in module $module";
+            }
+        }
+    }
+
+    DEBUG "Final result: $result";
+    return $result;
 }
 
 sub connect_to_vm {

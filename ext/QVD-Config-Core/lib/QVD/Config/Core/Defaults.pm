@@ -85,10 +85,14 @@ path.l7r.ssl.cert = ${path.l7r.ssl}/cert.pem
 path.l7r.ssl.ca = ${path.l7r.ssl}/ca.pem
 path.l7r.ssl.crl = ${path.l7r.ssl}/crl.pem
 
-path.ssl.ca.system = /etc/ssl/certs
+# Semicolon separated paths in path.ssl.ca.system.path only
+# SYSTEM_DEFAULT is a special value that invokes autodetection
+
+path.ssl.ca.system.path = SYSTEM_DEFAULT:/System/Library/OpenSSL/certs/
+path.ssl.ca.system.file = SYSTEM_DEFAULT
+
 path.ssl.ca.personal = certs
 
-path.darwin.ssl.ca.system = /System/Library/OpenSSL/certs/
 
 path.api.ssl = /etc/qvd/api/certs
 path.api.ssl.key = ${path.api.ssl}/key.pem
@@ -297,7 +301,36 @@ client.ssl.allow_ocsp_error=0
 ## the certificate. Set to 0 to disable.
 client.ssl.error_timeout=5
 
+## SSL_ocsp_mode in the IO::Socket::SSL manpage. The value is a list
+## of the following, separated by a |
+##     SSL_OCSP_NO_STAPLE
+##         Don't ask the server to staple
+##
+##     SSL_OCSP_TRY_STAPLE
+##         Try using OCSP stapling, but don't require it
+##
+##     SSL_OCSP_MUST_STAPLE
+##         Require OCSP stapling, fail if the server does not provide it
+##
+##     SSL_OCSP_FAIL_HARD
+##         Fail on errors other than a revoked certificate. A revoked cert
+##         always causes a failure. Failures will be handled by the client
+##         and shown to the user in the SSL warning window.
+##
+##         Not setting this option means that issues like OCSP server
+##         malfunctions that make it impossible to verify the cert will be
+##         silently ignored, and won't be shown to the user, nor appear in
+##         the log file.
+##
+##     SSL_OCSP_FULL_CHAIN
+##         Verify the full chain of certificates and not only the client one
+##         Some OCSP servers like Comodo's fail with this option, so it is
+##         discouraged for general use.
+##
+## Example:
+## client.ssl.ocsp_mode = SSL_OCSP_MUST_STAPLE | SSL_OCSP_FULL_CHAIN
 
+client.ssl.ocsp_mode=SSL_OCSP_TRY_STAPLE|SSL_OCSP_FAIL_HARD
 
 ## slave shell
 client.slave.command = ${path.qvd.bin}/qvd-client-slaveserver

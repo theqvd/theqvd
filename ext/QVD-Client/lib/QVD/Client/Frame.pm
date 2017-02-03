@@ -850,6 +850,10 @@ sub OnUnknownCert {
                     $err_desc .= $self->_t("OCSP CA not trusted");
                     _add_advice(\@advice, $self->_t("The OCSP server uses a certificate signed by an untrusted CA. This may be a misconfiguration, and can be ignored."));
                     $no_ok_button = 1 unless core_cfg('client.ssl.allow_ocsp_server_failure');
+                } elsif ( $e == 2105 ) {
+                    $err_desc .= $self->_t("OCSP answer signed with unrecognized certificate");
+                    _add_advice(\@advice, $self->_t("The OCSP server uses a certificate signed by an untrusted CA. This may be a misconfiguration, and can be ignored."));
+                    $no_ok_button = 1 unless core_cfg('client.ssl.allow_ocsp_server_failure');
                 } elsif ( $e == 2200 ) {
                     $err_desc .= $self->_t("Unrecognized OCSP problem");
                     _add_advice(\@advice, $self->_t("The OCSP server returned an unrecognized error code."));
