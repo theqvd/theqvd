@@ -30,7 +30,16 @@ sub authenticate_basic_2f {
         ERROR "Internal error: Can not find user $login in database";
         return;
     }
-    my $prop = $user->properties->find({ key => 'l7r.auth.plugin.totp.secret32' });
+
+    my $prop_obj = rs(QVD_Object_Property_List)->search({'properties_list.key' => 'l7r.auth.plugin.totp.secret32',
+                                                         'properties_list.tenant_id' => $tenant_id,
+                                                         qvd_object => 'user'},
+                                                        { join => 'properties_list'})->first;
+    unless (defined $prop_obj) {
+        ERROR "User property 'l7r.auth.plugin.totp.secret32' not registered for tenant $tenant_id, 2FA aborted";
+    }
+
+    my $prop = $user->properties->find({property_id => $prop_obj->id});
     unless (defined $prop) {
         ERROR "user $login property 'l7r.auth.plugin.totp.secret32' is missing, 2FA aborted";
         return;
