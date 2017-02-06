@@ -162,12 +162,13 @@ sub _process_http_request {
 	    $processor->($self, $method, $url, $headers);
 	};
 	if ($@) {
+            DEBUG "Exception caught when processing $path: $@";
 	    if (ref $@ and $@->isa('QVD::HTTPD::Exception')) {
 		$self->send_http_error(@{$@});
 	    }
 	    else {
 		ERROR "unexpected error: $@";
-		$self->send_http_error(HTTP_INTERNAL_SERVER_ERROR, $@);
+		$self->send_http_error(HTTP_INTERNAL_SERVER_ERROR, [], $@);
 	    }
 	}
     }
