@@ -27,53 +27,53 @@ sub reload {
 
 sub cfg {
     my $key = shift;
-	my $tenant = shift // -1;
-	my $mandatory = shift // 1;
+    my $tenant = shift // -1;
+    my $mandatory = shift // 1;
 
-	# Try to get the value from different repositories
-	my $value;
+    # Try to get the value from different repositories
+    my $value;
 
     if ($USE_DB) {
 
-	    # SSL keys are only loaded on demand.
-		if ($key =~ /^l7r\.ssl\./) {
+        # SSL keys are only loaded on demand.
+        if ($key =~ /^l7r\.ssl\./) {
 	    require QVD::DB::Simple;
-			$tenant != -1 and LOGDIE "Per tenant SSL properties are not supported";
+            $tenant != -1 and LOGDIE "Per tenant SSL properties are not supported";
 	    my $row = QVD::DB::Simple::rs('SSL_Config')->search({ key => $key })->first;
 	    return $row->value if defined $row;
 	}
 
-		# First try to get the value from the database
-		if ($tenant != -1) {
+        # First try to get the value from the database
+        if ($tenant != -1) {
             $USE_DB or LOGDIE "Can't read per tenant configuration when DB access is disabled";
             my $row = QVD::DB::Simple::rs('Config')->search({tenant_id => $tenant, key => $key})->first;
             $value = $row->value if defined $row;
         }
 
-		# If not found in the DB, get it from the ones cached in memory
-		unless (defined $value) {
+        # If not found in the DB, get it from the ones cached in memory
+        unless (defined $value) {
             $cfg || reload;
             $value = $cfg->{$key};
         }
+    }
 
+    # Finally try to get it from the default values
+    unless (defined $value) {
+        $value = core_cfg($key, 0);
+    }
+
+    # Substitute any reference to another token in the configuration value
+    if (defined $value) {
+        $value =~ s/\$\{(.*?)\}/cfg($1, $tenant)/ge;
+    }
+    elsif ($mandatory) {
+        # Raise an error if token is mandatory and not defined
+        if ($mandatory) {
+            LOGDIE "mandatory configuration entry for $key missing";
         }
-    
-	# Finally try to get it from the default values
-	unless (defined $value) {
-		$value = core_cfg($key);
     }
 
-	# Substitute any reference to another token in the configuration value
-	if (defined $value) {
-		$value =~ s/\$\{(.*?)\}/cfg($1, $tenant)/ge;
-	}
-
-	# Raise an error if token is mandatory and not defined
-	if ($mandatory and not defined $value) {
-        LOGDIE "mandatory configuration entry $key missing";
-    }
-
-	return $value;
+    return $value;
 }
 
 sub cfg_keys {
