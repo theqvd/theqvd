@@ -72,6 +72,12 @@ path.run.lxc = ${path.run}/lxc
 path.storage.overlayfs = ${path.storage.btrfs.root}/overlayfs
 path.storage.rootfs = ${path.storage.btrfs.root}/rootfs
 
+# storage datasets for LXC-ZFS
+path.storage.zfs.root = ${path.storage.root}
+
+# zpool name for zfs
+storage.zpool.name = qvd-zfs
+
 ## paths for SSL certificates and CAs
 path.l7r.ssl = ${path.run}/l7r/ssl
 path.l7r.ssl.key = ${path.l7r.ssl}/key.pem
@@ -162,6 +168,10 @@ command.usbsrv = /usr/local/bin/usbsrv
 command.usbclnt = /usr/local/bin/usbclnt
 command.usbip = /usr/bin/usbip
 command.slaveclient = ${path.qvd.bin}/qvd-slaveclient
+
+# zfs commands
+command.zfs = /sbin/zfs
+command.zpool = /sbin/zpool
 
 ## whether to remember password after successful connection
 client.remember_password = 0
