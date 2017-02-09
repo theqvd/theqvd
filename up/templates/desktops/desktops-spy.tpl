@@ -1,3 +1,7 @@
+<div class="message-container js-message-container">
+    <i class="message-close js-message-close fa fa-times-circle"></i>
+    <span class="message"></span>
+</div>
 <input id="noVNC_vmId" type="hidden" value="<%= vmId %>" />
 <input id="noVNC_apiHost" type="hidden" value="<%= apiHost %>" />
 <input id="noVNC_apiPort" type="hidden" value="<%= apiPort %>" />

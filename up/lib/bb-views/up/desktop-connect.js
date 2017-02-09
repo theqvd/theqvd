@@ -8,6 +8,8 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
     initialize: function (params) {
         var that = this;
         
+        Up.B.bindCommonEvents();
+        
         // Store temporal token
         that.token = params.token;
         
@@ -112,7 +114,10 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
                 $( window ).resize(function() {
                     UI.onresize();
                 });
+                
                 clearInterval(loopCheck);
+                
+                that.isAliveRecorder();
             }
         }, 400);
     },
@@ -160,5 +165,44 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
         // focus on a visible input may work
         $('.js-vm-spy-settings-panel').closeMbExtruder();
         $('#kbi').focus();
+    },
+    
+    // Recursive function to record timestamp when it was alive
+    isAliveRecorder: function (that) {
+        // Register timestamp as lastAlive
+        var now = Math.round(new Date().getTime() / 1000);
+        Up.C.lastAlive = now;
+        
+        // First execution, start is alive listener
+        if (!that) {
+            this.isAlive = this.isAliveListener();
+        }
+        
+        var that = that || this;
+        
+        setTimeout(function () {
+            Up.A.apiInfo(that.isAliveRecorder, that);
+        }, 3000);
+    },
+    
+    // Listener to check if is alive
+    isAliveListener: function () {
+        return setInterval(function () {
+            if (!Up.C.lastAlive) {
+                return;
+            }
+            
+            var now = Math.round(new Date().getTime() / 1000);
+
+            var lastAcceptableAlive = now - 4;
+            
+            if (lastAcceptableAlive >= Up.C.lastAlive) {
+                Up.I.M.showMessage({message: i18n.t('Connection to server is lost'), messageType: 'error'});
+                delete Up.C.lastAlive;
+            }
+            else {
+                Up.I.M.closeMessage();
+            }
+        }, 1000);
     }
 });

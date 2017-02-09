@@ -24,6 +24,7 @@
     "Connected": "Connected",
     "Connecting": "Connecting",
     "Connection closed": "Connection closed",
+    "Connection to server is lost": "Connection to server is lost",
     "Connection information": "Connection information",
     "Connection type": "Connection type",
     "Coordinates": "Coordinates",
