@@ -25,6 +25,8 @@ WriteMakefile(
         'QVD::L7R::Authenticator::Plugin' => 0,
         'QVD::Log' => 0,
         'URI::Escape' => 0,
+        'Mojo::URL' => 0,
+        'Mojo::UserAgent' => 0,
     },
     dist          => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean         => { FILES => 'QVD-L7R-Authenticator-Plugin-TOTP-*' }
