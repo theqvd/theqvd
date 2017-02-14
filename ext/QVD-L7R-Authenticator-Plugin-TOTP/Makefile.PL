@@ -20,7 +20,6 @@ WriteMakefile(
         'Image::PNG::QRCode' => 0,
         'Math::Random::MT' => 0,
         'MIME::Lite::TT' => 0,
-        'Mojolicious::Plugin::and' => 0,
         'QVD::DB::Simple' => 0,
         'QVD::Config' => 0,
         'QVD::L7R::Authenticator::Plugin' => 0,
