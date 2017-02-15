@@ -5,8 +5,6 @@ use Mojo::IOLoop;
 use Mojo::Util 'term_escape';
 use QVD::Log;
 
-has ioloop => sub { Mojo::IOLoop->singleton };
-
 has [qw/address port/];
 
 sub open {
@@ -16,11 +14,11 @@ sub open {
         address => $self->address,
         port    => $self->port,
     );
-    my $loop = $self->ioloop;
-    $loop->delay(
+    my $loop = Mojo::IOLoop->singleton;
+    my $delay = $loop->delay(
         sub {
             my $delay = shift;
-            $loop->client(%args, $delay->begin)
+            $loop->client(%args, $delay->begin);
         },
         sub {
             my ($delay, $err, $stream) = @_;
@@ -80,9 +78,9 @@ sub open {
             });
             $stream->start;
         },
-    )->catch(sub { my ($delay, $err) = @_; die $err; })->wait;
+    )->catch(sub { my ($delay, $err) = @_; die $err; });
 
-    return $self;
+    return $delay;
 }
 
 1;

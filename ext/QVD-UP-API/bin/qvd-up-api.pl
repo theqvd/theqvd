@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings FATAL => 'all';
-use QVD::NxBroker;
+use QVD::H5GW::SessionManager;
 
 BEGIN {
     $QVD::Config::USE_DB = 1;
@@ -682,38 +682,46 @@ group {
                 );
 
             $c->app->log->debug("VM Proxy WebSocket opened");
-            $c->render_later->on(finish => sub { $c->app->log->debug("VM Proxy WebSocket closed"); });
+
+            my $l7r_address = cfg('up-api.l7r.address');
+            my $l7r_port = cfg('l7r.port');
+            my $broker = QVD::H5GW::SessionManager->new( host => $l7r_address, port => $l7r_port );
+                
+            $c->on(finish => sub {
+                    $broker->stop_tunnel();
+                    $c->app->log->debug("VM Proxy WebSocket closed");
+                }
+            );
+
             my $vm_id = $c->param('id');
             my $user_id = $c->stash('session')->data('user_id');
             my $vm = rs('VM_Runtime')->find($vm_id);
             if (defined($vm) && ($vm->real_user_id == $user_id))
             {
-                # Run tunnel to L7R
-                my $l7r_address = cfg('up-api.l7r.address');
-                my $l7r_port = cfg('l7r.port');
-                $c->app->log->debug("Create tunnel to L7R $l7r_address:$l7r_port");
-                my $broker = QVD::NxBroker->new( host => $l7r_address, port => $l7r_port );
-                unless ($broker->start_tunnel_with_token($vm_id, $json->{token})){
-                    $c->app->log->error("Error while creating the tunnel");
-                    return $c->render_error(message => "Invalid Desktop", code => 400);
-                }
-                
                 my $tx = $c->tx;
                 $tx->with_protocols( 'binary' );
                 
-                my $ws = QVD::VMProxy->new( address => $broker->tunnel_address(), port => $broker->tunnel_port() );
+                Mojo::IOLoop::singleton->delay(
+                    sub {
+                        my ($delay) = @_;
+                        my $end = $delay->begin;
+                        $c->app->log->debug("Create tunnel to L7R $l7r_address:$l7r_port");
+                        $broker->start_tunnel_with_token($vm_id, $json->{token}, sub { $end->(); });
+                    },
+                    sub {
+                        my ($delay) = @_;
+                        sleep(5);
+                        my $tunnel_address = $broker->tunnel_address();
+                        my $tunnel_port = $broker->tunnel_port();
+                        $c->app->log->debug("Create tunnel to H5GW $tunnel_address:$tunnel_port");
+                        my $proxy = QVD::VMProxy->new( 
+                            address => $tunnel_address,
+                            port => $tunnel_port
+                        );
 
-                $ws->on( error => sub {
-                        $c->app->log->error( "Error in ws: ".$_[1] );
-                        $tx->finish( 1011, $_[1] );
-                        $broker->stop_tunnel();
-                    } );
-                $ws->on( finish => sub {
-                        $c->app->log->debug( "ws finished" );
-                        $broker->stop_tunnel();
-                    } );
-                $ws->open($tx, 30000, 0);
-
+                        $proxy->open($tx, 30000, 0);
+                    }
+                );
             }
             else
             {
