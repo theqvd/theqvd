@@ -122,6 +122,18 @@ fieldset {
         margin-bottom: 12px;
         line-height: 1.3em;
     }
+    
+    .checkbox-wrapper {
+        margin-top: 50px;
+        input[type="checkbox"] {
+            float: left;
+            margin-right: 10px;
+        }
+        
+        label {
+            line-height: 25px;
+        }
+    }
 }
 
 .loading-big {

@@ -228,7 +228,8 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
             
             // If counter reach timeout set disconnected status and breack timeout countdown
             if (that.connectionTimeouts[id].count >= CONNECTION_TIMEOUT) {
-                that.setDesktopState(id, 'disconnected');                
+                that.setDesktopState(id, 'disconnected');
+                that.connectDesktopFail();
                 clearInterval(that.connectionTimeouts[id].timeout);
                 
                 delete(that.connectionTimeouts[id]);

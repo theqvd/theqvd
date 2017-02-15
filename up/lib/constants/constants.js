@@ -4,7 +4,7 @@
 RESTRICT_TEMPLATES = true;
 
 // Connection timeout
-CONNECTION_TIMEOUT = 60;
+CONNECTION_TIMEOUT = 40;
 
 // Debug constants
 DEBUG_ACL_FAILS = false;

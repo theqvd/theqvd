@@ -37,6 +37,8 @@ Up.CRUD.desktops = {
     },
     
     connectDesktopClassic: function (selectedId, desktopSetup, token) {
+        var that = this;
+        
         this.startConnectionTimeout(selectedId);
         
         var options = {
@@ -78,10 +80,14 @@ Up.CRUD.desktops = {
 
         // Store ID of the desktop we are trying to connect with to use it if fails
         this.connectingDesktopId = selectedId;
-
-        //window.protocolCheck('qvd:' + query, this.connectDesktopFail, this.connectDesktopSuccess)
-        // Protocol Check is not working properly on chrome. It is disabled by the moment
-        open('qvd:' + query, '_self')
+        
+        // Protocol Check is not working properly on chrome. We handle it manually.
+        if ($.browser.chrome) {
+            open('qvd:' + query, '_self');
+        }
+        else {
+            window.protocolCheck('qvd:' + query, this.connectDesktopFail, this.connectDesktopSuccess);
+        }
     },
     
     connectDesktopHTML5: function (selectedId, desktopSetup, token) {
@@ -111,7 +117,12 @@ Up.CRUD.desktops = {
                 
                 switch (client) {
                     case 'classic':
-                        that.connectDesktopClassic(selectedId, e.retrievedData, token);
+                        if ($.cookie('dontShowFirstConnectionMsg')) {
+                            that.connectDesktopClassic(selectedId, e.retrievedData, token);
+                        }
+                        else {
+                            that.showClassicClientMessage(selectedId, e.retrievedData, token);
+                        }
                         break;
                     case 'html5':
                         that.connectDesktopHTML5(selectedId, e.retrievedData, token);
@@ -121,17 +132,19 @@ Up.CRUD.desktops = {
         }, this, 'GET');
     },
     
+    // Callback used on custom protocol handler success
     connectDesktopSuccess: function () {
         // Success
     },
     
+    // Callback used on custom protocol handler fail
     connectDesktopFail: function () {
         // Set selected desktop as disconnected
         var model = Up.CurrentView.collection.where({id: parseInt(Up.CurrentView.connectingDesktopId)})[0];
         Up.CurrentView.setDesktopState(model.get('id'), 'disconnected');
         
         var dialogConf = {
-            title: $.i18n.t('QVD client not installed'),
+            title: $.i18n.t('QVD client is taking too much time to respond'),
             buttons : {
                 "Cancel": function () {
                     // Close dialog
@@ -158,4 +171,64 @@ Up.CRUD.desktops = {
 
         Up.I.dialog(dialogConf);
     },  
+    
+    // Show dialog with info about qvd client requierement
+    showClassicClientMessage: function (selectedId, retrievedData, token) {
+        var that = this;
+        
+        var dialogConf = {
+            title: $.i18n.t('Read me before continue'),
+            buttons : {
+                "Cancel": function () {
+                    // Store cookie to never show this message again if is required
+                    if ($('.js-never-show-again').is(':checked')) {
+                        $.cookie('dontShowFirstConnectionMsg', true, {expires: 365, path: '/'});
+                    }
+
+                    // Close dialog
+                    Up.I.closeDialog($(this));
+                },
+                "Download": function () {
+                    // Store cookie to never show this message again if is required
+                    if ($('.js-never-show-again').is(':checked')) {
+                        $.cookie('dontShowFirstConnectionMsg', true, {expires: 1, path: '/'});
+                    }
+
+                    // Go to download section
+                    window.location = '#/downloads';
+
+                    // Close dialog
+                    Up.I.closeDialog($(this));
+                },
+                "Connect": function () {
+                    that.setDesktopState(selectedId, 'connecting');
+
+                    // Store cookie to never show this message again if is required
+                    if ($('.js-never-show-again').is(':checked')) {
+                        $.cookie('dontShowFirstConnectionMsg', true, {expires: 1, path: '/'});
+                    }
+
+                    // Connect
+                    that.connectDesktopClassic(selectedId, retrievedData, token);
+
+                    // Close dialog
+                    Up.I.closeDialog($(this));
+                }
+            },
+            buttonClasses : [CLASS_ICON_CANCEL, CLASS_ICON_CLIENT_DOWNLOAD, CLASS_ICON_DESKTOP_CONNECTED],
+            fillCallback : function (target) {
+                // Abort connection animation
+                Up.CurrentView.setDesktopState(selectedId, 'disconnected');
+
+                var template = _.template(
+                    Up.TPL.dialogClientFirstMessage, {
+                    }
+                );
+
+                $(target).html(template);
+            },
+        }
+
+        Up.I.dialog(dialogConf);
+    }
 }

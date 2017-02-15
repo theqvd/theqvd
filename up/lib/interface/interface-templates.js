@@ -43,6 +43,9 @@ Up.I.T = {
                     },
                     dialogClientNotInstalled: {
                         name: 'dialog/client-not-installed'
+                    },
+                    dialogClientFirstMessage: {
+                        name: 'dialog/client-first-message'
                     }
                 };
 

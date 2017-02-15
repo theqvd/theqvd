@@ -230,7 +230,7 @@ Up.I = {
                     buttons.addClass("button");
                 
                     $.each(buttons, function (iButton, button) {
-                        Up.T.translateElementContain($(button));
+                        Up.T.translateElementContain($(button).find('span'));
                         $(button).addClass(dialogConf.buttonClasses[iButton]);
                     });
                 
