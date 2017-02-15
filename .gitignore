@@ -57,3 +57,6 @@ windows/script.iss
 
 # Generated files
 windows/installer/qvd-client*.exe
+
+# Backup files
+*~
