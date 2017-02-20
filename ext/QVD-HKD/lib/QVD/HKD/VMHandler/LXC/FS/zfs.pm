@@ -71,7 +71,7 @@ sub _make_tmp_dir_for_os_image {
     }
 }
 
-sub _remove_overlay_dir {
+sub _move_dir {
     my ($self, $dir, $move_to) = @_;
     my $overlay = basename($dir);
     my $basefs = $self->{basefs};
