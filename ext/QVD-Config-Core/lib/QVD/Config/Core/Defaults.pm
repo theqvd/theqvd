@@ -76,7 +76,7 @@ path.storage.rootfs = ${path.storage.btrfs.root}/rootfs
 path.storage.zfs.root = ${path.storage.root}
 
 # zpool name for zfs
-storage.zpool.name = qvd-zfs
+storage.zpool.name = qvd
 
 ## paths for SSL certificates and CAs
 path.l7r.ssl = ${path.run}/l7r/ssl

@@ -1,9 +1,7 @@
 package QVD::HKD::VMHandler::LXC::FS::zfs;
 
-use lib 'lib';
 use strict;
 use warnings;
-use Filesys::ZFS;
 use File::Basename;
 
 use QVD::Log;
@@ -13,49 +11,19 @@ use Method::WeakCallback qw(weak_method_callback);
 
 sub init_backend {
     my ($hkd, $on_done, $on_error) = @_;
-    $hkd->_run_cmd({log_error => 'Unable to load kernel module zfs.',
-                    on_done => sub { $hkd->$on_done }, on_error => sub { $hkd->$on_error } },
-                   modprobe => 'zfs');
+    
+    if (system($hkd->_cfg('command.modprobe'), 'zfs')) {
+        ERROR "Unable to load kernel module for zfs";
+        return $hkd->$on_error;
+    }    
 
     my $pool = $hkd->_cfg('storage.zpool.name');
 
-    unless ( $pool ) {
-        DEBUG "ZFS pool for qvd not defined.";
-        return $hkd->$on_error
+    if (system($hkd->_cfg('command.zpool'), 'status', '-x', $pool)) {
+        ERROR "zfs status check failed for pool $pool";
+        return $hkd->$on_error;
     }
 
-    my $ZFS = Filesys::ZFS->new;
-    $ZFS->init || die $ZFS->errstr;
-
-    DEBUG "Checking the pool $pool status.";
-    my $zpoolcmd = $hkd->_cfg("command.zpool");
-    my ($healthy) = $ZFS->_run($zpoolcmd, 'status', '-x', $pool);
-
-    unless ( $healthy =~ m/\bhealthy\b/ ) {
-        DEBUG "The QVD ZFS pool $pool is not healthy...";
-        return $hkd->$on_error
-    }
-
-    my $fn = $hkd->_cfg('path.storage.zfs.root') . '/qvd_zfs_lock';
-    my $fh;
-    unless (open $fh, '>>', $fn) {
-        ERROR "Unable to create or open file $fn to work around LXC make-zfs-ro-on-exit bug: $!";
-        return $hkd->$on_error
-    }
-
-    my @datasets = ("basefs", "homes", "images", "overlayfs", "overlays", "rootfs", "staging");
-    my $zfscmd = $hkd->_cfg("command.zfs");
-    foreach my $dataset (@datasets) {
-        my $new_dataset = $pool . "/" . $dataset;
-	unless ($ZFS->_run($zfscmd, 'list', '-Hp', $new_dataset)) {
-                DEBUG "Create a new datatset '$new_dataset'";
-		$ZFS->_run($zfscmd, 'create', $new_dataset);
-        }
-    }
-
-    DEBUG $healthy;
-    DEBUG "$fn opened";
-    $hkd->{zfs_lock} = $fh;
     $hkd->$on_done;
 }
 
@@ -70,45 +38,20 @@ sub _dir_to_dataset {
     return $dataset;  
 }
 
-sub _check_base_dir {
-    my $self = shift;
-    my $basefs = $self->{basefs};
-    $basefs = $self->_dir_to_dataset($basefs);
-    DEBUG "Check if basefs dataset '$basefs' exists";
-    $self->_run_cmd({log_error => "OS image for DI $self->{di_id} used by VM $self->{vm_id} has not been unpacked yet into dataset $basefs"},
-                     zfs => 'list', '-Hp', $basefs);
-}
-
 sub _place_os_image {
     my $self = shift;
     my $basefs = $self->{basefs};
     my $tmp = $self->{basefs_tmp};
-    $basefs = $self->_dir_to_dataset($basefs);
-    $tmp = $self->_dir_to_dataset($tmp);
+    my $basefs_dataset = $self->_dir_to_dataset($basefs);
+    my $tmp_dataset = $self->_dir_to_dataset($tmp);
    
-    my $ZFS = Filesys::ZFS->new;
-    $ZFS->init || die $ZFS->errstr;
-
-    my $zfscmd = $self->_cfg('command.zfs');
-    my ($dataset) = $ZFS->_run($zfscmd, 'list', '-Hp', $basefs);
-
-    if ( $dataset ) {
-       INFO "$dataset Internal error: image already on place, locking failed";
+    if ( -d $basefs ) {
+       INFO "$basefs_dataset Internal error: image already on place, locking failed";
        return $self->_on_done;
     }
 
-    my ($tmp_basefs) = $ZFS->_run($zfscmd, 'list', '-Hp', $tmp);
-
-    if ( $tmp_basefs ) {
-       INFO "Renaming zfs dataset '$tmp' to '$basefs'";
-       $ZFS->_run($zfscmd, 'rename', '-f', $tmp, $basefs);
-       ($dataset) = $ZFS->_run($zfscmd, 'list', '-Hp', $basefs);
-    }
-
-    unless ( $dataset ) {
-        ERROR "basefs '$basefs' for VM $self->{vm_id} does not exist or is not a directory";
-        return $self->_on_error;
-    }
+    INFO "Renaming zfs dataset '$tmp_dataset' to '$basefs_dataset'";
+    system($self->_cfg('command.zfs'), 'rename', $tmp_dataset, $basefs_dataset);
 
     delete $self->{basefs_tmp};
     $self->_on_done;  
@@ -128,7 +71,7 @@ sub _make_tmp_dir_for_os_image {
     }
 }
 
-sub _move_dir {
+sub _remove_overlay_dir {
     my ($self, $dir, $move_to) = @_;
     my $overlay = basename($dir);
     my $basefs = $self->{basefs};
