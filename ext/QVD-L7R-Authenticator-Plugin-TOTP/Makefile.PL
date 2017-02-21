@@ -9,24 +9,18 @@ if  ( defined $ENV{BUILD_NUMBER} ) {
 }
 
 WriteMakefile(
-    NAME          => 'QVD::L7R::Authenticator::Plugin::TOTP',
-    AUTHOR        => 'QVD Team <qvd@qindel.com>',
-    VERSION	     => '3.5'.$SUF_VERSION,
-    ABSTRACT => 'lib/QVD/L7R/Authenticator/Plugin/TOTP.pm',
-    LICENSE       => 'GPL3',
-    PREREQ_PM     => {
+    NAME        => 'QVD::L7R::Authenticator::Plugin::TOTP',
+    AUTHOR      => 'QVD Team <qvd@qindel.com>',
+    VERSION     => '4.0'.$SUF_VERSION,
+    ABSTRACT    => 'lib/QVD/L7R/Authenticator/Plugin/TOTP.pm',
+    LICENSE     => 'GPL3',
+    PREREQ_PM   => {
         'Convert::Base32'  => '0.06',
         'Digest::HMAC_SHA1' => '1.03',
-        'Image::PNG::QRCode' => 0,
-        'Math::Random::MT' => 0,
-        'MIME::Lite::TT' => 0,
         'QVD::DB::Simple' => 0,
         'QVD::Config' => 0,
         'QVD::L7R::Authenticator::Plugin' => 0,
         'QVD::Log' => 0,
-        'URI::Escape' => 0,
-        'Mojo::URL' => 0,
-        'Mojo::UserAgent' => 0,
     },
     dist          => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean         => { FILES => 'QVD-L7R-Authenticator-Plugin-TOTP-*' }
