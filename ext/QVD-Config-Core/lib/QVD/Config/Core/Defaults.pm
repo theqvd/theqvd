@@ -229,6 +229,10 @@ command.mknod = mknod
 command.setfacl = setfacl
 
 
+# zfs commands
+command.zfs = /sbin/zfs
+command.zpool = /sbin/zpool
+
 ## whether to remember password after successful connection
 client.remember_password = 0
 
