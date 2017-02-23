@@ -25,7 +25,13 @@ WriteMakefile(
         'QVD::SimpleRPC::Client' => 0,
         'QVD::URI'               => 0,
         'URI::Split'             => 0,
+        'Convert::Base32'        => '0.06',
+        'Digest::HMAC_SHA1'      => '1.03',
+        'Image::PNG::QRCode'     => 0,
+        'Math::Random::MT'       => 0,
+        'MIME::Lite::TT'         => 0,
+        'Mojo::UserAgent'        => 0,
+
     },
     EXE_FILES => [qw(bin/qvd-l7r-slave bin/qvd-l7r-nothing-slave)]
 );
-

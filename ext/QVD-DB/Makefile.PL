@@ -34,6 +34,7 @@ WriteMakefile(
         'QVD::Config::Core'           => 0,
         'QVD::Log'                    => 0,
         'Socket::Linux'               => 0,
+	'Session::Token'	      => 0,	
         'SQL::Translator'             => 0,
         'Sort::Versions'              => '1.5',
         'Try::Tiny'                   => 0,
