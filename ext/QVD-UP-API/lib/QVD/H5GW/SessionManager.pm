@@ -27,7 +27,6 @@ sub start_tunnel_with_login {
         {
             PublishAllPorts => \1,
             Cmd             => [
-                "/start_nx2v.pl",
                 "--host", $self->host,
                 "--port", $self->port,
                 "--vm-id", $vm_id,
@@ -74,7 +73,6 @@ sub start_tunnel_with_token {
         {
             PublishAllPorts => \1,
             Cmd             => [
-                "/start_nx2v.pl",
                 "--host", $self->host,
                 "--port", $self->port,
                 "--vm-id", $vm_id,
