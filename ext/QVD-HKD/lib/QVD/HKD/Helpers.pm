@@ -7,7 +7,7 @@ use Carp;
 use Data::Dumper;
 use Exporter;
 
-our @EXPORT_OK = qw(croak_invalid_opts mkpath boolean_db2perl perl_quote);
+our @EXPORT_OK = qw(croak_invalid_opts mkpath mkppath boolean_db2perl perl_quote);
 our @CARP_NOT;
 my %CARP_NOT;
 
@@ -38,6 +38,13 @@ sub mkpath {
         pop @parts;
     }
     return;
+}
+
+# make parent path
+sub mkppath {
+    my $path = shift;
+    my (undef, $dir) = File::Spec->splitpath(File::Spec->rel2abs($path));
+    mkpath($dir, @_);
 }
 
 sub boolean_db2perl {

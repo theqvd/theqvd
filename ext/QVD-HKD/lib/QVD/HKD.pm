@@ -28,7 +28,7 @@ use Linux::Proc::Net::UDP;
 use Method::WeakCallback qw(weak_method_callback);
 use Time::HiRes ();
 
-use QVD::HKD::Helpers;
+use QVD::HKD::Helpers qw(mkppath);
 
 use QVD::HKD::Config;
 use QVD::HKD::Ticker;
@@ -145,6 +145,7 @@ sub _say_hello { INFO "HKD starting, PID: $$" }
 sub _acquire_hkd_lock {
     my $self = shift;
     my $file = $self->_cfg('internal.hkd.lock.path');
+    mkppath($file);
     $self->_flock({ save_to => 'hkd_lock_fh',
                     log_error => "Unable to lock file '$file'",
                     retries => 3 },
