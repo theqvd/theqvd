@@ -481,6 +481,8 @@ vm.hypervisor = lxc
 @sles-11@vm.lxc.unionfs.type = unionfs-fuse
 vm.lxc.unionfs.bind.ro = 1
 
+vm.lxc.unionfs.overlayfs.module.name = overlay
+
 # allow LXC DIs to have hooks for customization - disabled by default
 # because they run as root and can do anything on the host
 vm.lxc.hooks.allow = 0

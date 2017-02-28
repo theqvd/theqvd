@@ -10,21 +10,21 @@ sub init_backend {
     my ($hkd, $on_done, $on_error) = @_;
     $hkd->_run_cmd({log_error => 'Unable to load kernel module overlayfs',
                     on_done => sub { $hkd->$on_done }, on_error => sub { $hkd->$on_error } },
-                    modprobe => 'overlayfs')
+                    modprobe => $hkd->_cfg('vm.lxc.unionfs.overlayfs.module.name'))
 }
 
 sub _mount_root {
     my ($self, $rootfs, $basefs, $overlayfs, $subdir, $workdir) = @_;
     $basefs = File::Spec->join($basefs, $subdir) if defined $subdir;
-
+    my $mount_type = $self->_cfg('vm.lxc.unionfs.overlayfs.module.name');
     my $overlayfs_version = $self->_cfg('command.version.mount.overlayfs');
     my $o = "rw,upperdir=$overlayfs,lowerdir=$basefs";
     $o .= ",workdir=$workdir" if $overlayfs_version > 1;
 
-    $self->_run_cmd({log_error => "Unable to mount overlayfs mix of '$basefs' (ro) and '$overlayfs' (rw) into '$rootfs'"},
+    $self->_run_cmd({log_error => "Unable to mount $mount_type mix of '$basefs' (ro) and '$overlayfs' (rw) into '$rootfs'"},
                     'mount',
-                    -t => 'overlayfs',
-                    -o => $o, "overlayfs", $rootfs);
+                    -t => $mount_type,
+                    -o => $o, $mount_type, $rootfs);
 }
 
 sub _remove_old_workdir {
