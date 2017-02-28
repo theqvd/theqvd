@@ -131,7 +131,8 @@ sub migrate_properties_from_36_to_40 {
     }
 
     my $index = 1;
-    my %property_ids = map { $_ => $index++ } (keys { map { $_->{key} => 1 } @properties } );
+    my %property_ids;
+    $property_ids{$_->{key}} //= $index++ for @properties;
 
     # Create property list
     push @new_list, 'Property_List';
