@@ -54,7 +54,7 @@ sub set_filter {
 }
 
 my %tenant_aware = map { $_ => 1 } qw(osf user config);
-my %tenant_zero  = map { $_ => 1 } qw(config);
+my %tenant_super  = map { $_ => 1 } qw(config);
 
 sub set_tenant_id {
     my ($self, $tenant_id) = @_;
@@ -63,7 +63,7 @@ sub set_tenant_id {
 
 sub _tenant_id {
     my ($self, $obj) = @_;
-    $self->{tenant_id} // ($tenant_zero{$obj} ? 0 : 1);
+    $self->{tenant_id} // ($tenant_super{$obj} ? -1 : 1);
 }
 
 sub reset_filter {
