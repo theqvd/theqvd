@@ -695,8 +695,8 @@ group {
 
             my $vm_id = $c->param('id');
             my $user_id = $c->stash('session')->data('user_id');
-            my $vm = rs('VM_Runtime')->find($vm_id);
-            if (defined($vm) && ($vm->real_user_id == $user_id))
+            my $vm = rs('VM')->find($vm_id);
+            if (defined($vm) && ($vm->user_id == $user_id))
             {
                 my $tx = $c->tx;
                 $tx->with_protocols( 'binary' );
@@ -710,7 +710,7 @@ group {
                     },
                     sub {
                         my ($delay) = @_;
-                        sleep(5);
+                        sleep(10);
                         my $tunnel_address = $broker->tunnel_address();
                         my $tunnel_port = $broker->tunnel_port();
                         $c->app->log->debug("Create tunnel to H5GW $tunnel_address:$tunnel_port");
