@@ -1,9 +1,9 @@
 FROM debian:8.7
 
 RUN apt-get update
-RUN apt-get install -y curl x11-xserver-utils x11vnc xvfb xinit
+RUN apt-get install -y curl wget x11-xserver-utils x11vnc xvfb xinit
 
-COPY ["qvdclient_x86_64", "/usr/bin/qvdclient"]
+RUN ["wget", "-O", "/usr/bin/qvdclient", "http://theqvd.com/downloads/binaries/linux/qvdclient_x86_64"]
 RUN chmod 777 /usr/bin/qvdclient
 
 COPY ["nx2v.pl", "/usr/bin/nx2v"]

@@ -63,7 +63,7 @@ my @xvfb_args = (":$displayID", "-screen", "0", "800x600x16");
 my $client_bin = "/usr/bin/qvdclient";
 my @client_args = ("-h", "$host", "-p", "$port", "-n", "-s", "$vm_id");
 if(defined($token)) {
-    push @client_args, ("-t", "$token");
+    push @client_args, ("-b", "$token");
 } else {
     push @client_args, ("-u", "$login", "-w", "$password");
 }
