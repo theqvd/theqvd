@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Add this file to /etc/cron.daily to clean up docker
+
+CONTAINERS=$(docker ps -a -q -f status=exited)
+STATE=$?
+if [ $STATE != 0 ]
+then
+    exit $STATE
+fi
+
+if [ -n "$CONTAINERS" ]
+then
+    docker rm -v $CONTAINERS
+else
+    echo "No containers were removed"    
+fi
