@@ -1,11 +1,11 @@
 package QVD::VMProxy;
 
-use Mojo::Base 'Mojo::EventEmitter';
+use Moo;
 use Mojo::IOLoop;
 use Mojo::Util 'term_escape';
 use QVD::Log;
 
-has [qw/address port/];
+has [qw/address port/] => ( is => 'ro' );
 
 sub open {
     my ($self, $tx, $timeout, $send_qvd_header) = @_;
@@ -22,8 +22,6 @@ sub open {
         },
         sub {
             my ($delay, $err, $stream) = @_;
-
-            $self->emit(error => "TCP connection error: $err") if $err;
 
             die $err if $err;
             if($send_qvd_header){
@@ -51,9 +49,14 @@ sub open {
             Mojo::IOLoop->stream($tx->connection)->timeout($timeout);
             $stream->timeout($timeout);
 
-            $stream->on(error => sub { $self->emit(error => "TCP error: $_[1]") });
-            $stream->on(close => sub { 
-                $self->emit(error => "TCP connection closed");
+            $stream->on(error => sub {
+                DEBUG term_escape "TCP error: $_[1]";
+                $stream->emit('close');
+            });
+
+            $stream->on(close => sub {
+                DEBUG term_escape "TCP connection closed";
+                $tx->finish;
             });
 
             $stream->on(read => sub {
@@ -68,14 +71,6 @@ sub open {
                 $stream->write($bytes);
             });
 
-            $tx->on(finish => sub {
-                my ($tx, $code, $reason) = @_;
-                $reason ||= '';
-                DEBUG term_escape "-- Websocket Connection closed. Code: $code ($reason)\n";
-                $stream->close;
-                undef $stream;
-                undef $tx;
-            });
             $stream->start;
         },
     )->catch(sub { my ($delay, $err) = @_; die $err; });
@@ -94,10 +89,6 @@ QVD::VMProxy - Forwards x11 protocol data from QVD-VMA
 =head1 SYNOPSIS
 
     my $connection = QVD::VMProxy->new( address => $ip, port => $port );
-    $connection->on( error => sub {
-        print "Error " . $_[1] );
-        $tx->finish();
-    } );
     $connection->open($tx, 60);
 
 =head1 AUTHOR
