@@ -705,7 +705,8 @@ var UI;
                 $D("noVNC_canvas").onclick = UI.enableFullscreenWhenClickCanvas;
             }
 
-            var path = 'api/desktops/' + vmId + '/connect?token=' + token;
+            var resolution = screen.width + 'x' + screen.height + 'x' + screen.colorDepth;
+            var path = 'api/desktops/' + vmId + '/connect?token=' + token + '&resolution=' + resolution;
 
             if (!UI.initRFB()) return;
 

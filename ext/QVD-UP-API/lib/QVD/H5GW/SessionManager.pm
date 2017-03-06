@@ -15,69 +15,23 @@ has 'inspect' => (is => 'ro' );
 my $docker_image = cfg('up-api.docker.image.h5gw');
 my $manager = QVD::H5GW::DockerManager->new(uri => cfg('up-api.docker.uri'));
 
-sub start_tunnel_with_login {
+sub start_tunnel {
     my $self = shift;
-    my $vm_id = shift;
-    my $user_login = shift;
-    my $password = shift;
+    my $options = shift;
     my $cb = shift // sub {};
+
+    my @cmd_args = ("--host", $self->host, "--port", $self->port);
+    push @cmd_args, ("--vm-id", $_) if defined($_ = $options->{'vm_id'});
+    push @cmd_args, ("--login", $_) if defined($_ = $options->{'login'});
+    push @cmd_args, ("--password", $_) if defined($_ = $options->{'password'});
+    push @cmd_args, ("--token", $_) if defined($_ = $options->{'token'});
+    push @cmd_args, ("--resolution", $_) if defined($_ = $options->{'resolution'});
 
     $manager->create(
         $docker_image,
         {
             PublishAllPorts => \1,
-            Cmd             => [
-                "--host", $self->host,
-                "--port", $self->port,
-                "--vm-id", $vm_id,
-                "--login", $user_login,
-                "--password", $password
-            ],
-        },
-        sub {
-            my ($json) = @_;
-            if ($json->{_status} == 0) {
-                $self->{id} = $json->{_id};
-                $manager->start( $self->{id}, { }, sub {
-                        my ($json) = @_;
-                        if ($json->{_status} == 0) {
-                            $manager->inspect($self->{id}, {}, sub {
-                                    my ($json) = @_;
-                                    $self->{inspect} = $json;
-                                    $log->debug("Container ".$self->{id}." started");
-                                    $cb->();
-                                }
-                            );
-                        } else {
-                            $log->error("Cannot start container: " . $json->{_message});
-                        }
-                    }
-                );
-            } else {
-                $log->error("Cannot create container: " . $json->{_message});
-            }
-        }
-    );
-
-    return 1;
-}
-
-sub start_tunnel_with_token {
-    my $self = shift;
-    my $vm_id = shift;
-    my $token = shift;
-    my $cb = shift // sub {};
-
-    $manager->create(
-        $docker_image,
-        {
-            PublishAllPorts => \1,
-            Cmd             => [
-                "--host", $self->host,
-                "--port", $self->port,
-                "--vm-id", $vm_id,
-                "--token", $token
-            ],
+            Cmd             => \@cmd_args,
         },
         sub {
             my ($json) = @_;

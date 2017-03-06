@@ -678,6 +678,7 @@ group {
                     $json,
                     {
                         token      => { mandatory => 1, type => 'STRING' },
+                        resolution => { mandatory => 1, type => 'STRING' },
                     }
                 );
 
@@ -696,37 +697,46 @@ group {
             my $vm_id = $c->param('id');
             my $user_id = $c->stash('session')->data('user_id');
             my $vm = rs('VM')->find($vm_id);
-            if (defined($vm) && ($vm->user_id == $user_id))
-            {
-                my $tx = $c->tx;
-                $tx->with_protocols( 'binary' );
-                
-                Mojo::IOLoop::singleton->delay(
-                    sub {
-                        my ($delay) = @_;
-                        my $end = $delay->begin;
-                        $c->app->log->debug("Create tunnel to L7R $l7r_address:$l7r_port");
-                        $broker->start_tunnel_with_token($vm_id, $json->{token}, sub { $end->(); });
-                    },
-                    sub {
-                        my ($delay) = @_;
-                        sleep(10);
-                        my $tunnel_address = $broker->tunnel_address();
-                        my $tunnel_port = $broker->tunnel_port();
-                        $c->app->log->debug("Create tunnel to H5GW $tunnel_address:$tunnel_port");
-                        my $proxy = QVD::VMProxy->new( 
-                            address => $tunnel_address,
-                            port => $tunnel_port
-                        );
 
-                        $proxy->open($tx, 30000, 0);
-                    }
-                );
-            }
-            else
-            {
-                return $c->render_error(message => "Invalid Desktop", code => 400);
-            }
+            return $c->render_error(message => "Invalid Desktop", code => 400)
+                unless (defined($vm) && ($vm->user_id == $user_id));
+
+            my $vm_state = $vm->vm_runtime->vm_state;
+            return $c->render_error(message => "Invalid Desktop state", code => 400)
+                unless ($vm_state eq "stopped" || $vm_state eq "running");
+            
+            my $tx = $c->tx;
+            $tx->with_protocols( 'binary' );
+                
+            Mojo::IOLoop::singleton->delay(
+                sub {
+                    my ($delay) = @_;
+                    my $end = $delay->begin;
+                    $c->app->log->debug("Create tunnel to L7R $l7r_address:$l7r_port");
+                    $broker->start_tunnel(
+                        {
+                            'vm_id' => $vm_id,
+                            'token' => $json->{token},
+                            'resolution' => $json->{resolution} // "1024x768x24",
+                        },
+                        sub { $end->(); }
+                    );
+                },
+                sub {
+                    my ($delay) = @_;
+                    sleep(10);
+                    my $tunnel_address = $broker->tunnel_address();
+                    my $tunnel_port = $broker->tunnel_port();
+                    $c->app->log->debug("Create tunnel to H5GW $tunnel_address:$tunnel_port");
+                    my $proxy = QVD::VMProxy->new( 
+                        address => $tunnel_address,
+                        port => $tunnel_port
+                    );
+
+                    $proxy->open($tx, 30000, 0);
+                }
+            );
+
         };
 
     }
