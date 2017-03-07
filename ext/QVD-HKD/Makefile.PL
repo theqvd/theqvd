@@ -46,6 +46,7 @@ WriteMakefile(
         bin/qvd-hkd.debrc.pl
         bin/qvd-hkd.postinst
         bin/qvd-hkd.prerm
+        bin/qvd-hkd.service
         ) ],
     AUTHOR        => 'QVD Team <qvd@qindel.com>',
 );

@@ -11,7 +11,8 @@ WriteMakefile(
     EXE_FILES         => [
         'bin/qvd-api.debrc.pl',
         'bin/qvd-api.initrc.pl',
-        'bin/qvd-api.pl'
+        'bin/qvd-api.pl' ,
+        'bin/qvd-api.service'
     ],
     PREREQ_PM         => {
         'Clone' => 0,
