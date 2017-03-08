@@ -8,7 +8,7 @@ use QVD::Log;
 has [qw/address port/] => ( is => 'ro' );
 
 sub open {
-    my ($self, $tx, $timeout, $send_qvd_header) = @_;
+    my ($self, $tx, $send_qvd_header) = @_;
 
     my %args = (
         address => $self->address,
@@ -46,8 +46,7 @@ sub open {
         sub {
             my ($delay, $stream) = @_;
 
-            Mojo::IOLoop->stream($tx->connection)->timeout($timeout);
-            $stream->timeout($timeout);
+            $stream->timeout(0);
 
             $stream->on(error => sub {
                 DEBUG term_escape "TCP error: $_[1]";

@@ -440,7 +440,7 @@ group {
 
         my $session_l7r = rs('User_Token')->create( { 
             token => generate_sid(),
-            expiration => time + cfg('up-api.l7r.expiration'),
+            expiration => time + cfg('up-api.l7r.session.expiration'),
             user_id => $session_up->data->{user_id},
             vm_id =>  $vm_id
         } );
@@ -670,7 +670,6 @@ group {
 
         websocket '/api/desktops/:id/connect' => sub {
             my $c = shift;
-            $c->inactivity_timeout(60);
 
             my $json = $c->req->params->to_hash;
             return $c->render_error(message => $_->{message}, parameters => $_->{parameters}, code => 400)
@@ -683,16 +682,11 @@ group {
                 );
 
             $c->app->log->debug("VM Proxy WebSocket opened");
+            $c->on(finish => sub { $c->app->log->debug( "VM Proxy WebSocket closed" ); } );
 
             my $l7r_address = cfg('up-api.l7r.address');
             my $l7r_port = cfg('l7r.port');
             my $broker = QVD::H5GW::SessionManager->new( host => $l7r_address, port => $l7r_port );
-                
-            $c->on(finish => sub {
-                    $broker->stop_tunnel();
-                    $c->app->log->debug("VM Proxy WebSocket closed");
-                }
-            );
 
             my $vm_id = $c->param('id');
             my $user_id = $c->stash('session')->data('user_id');
@@ -707,7 +701,13 @@ group {
             
             my $tx = $c->tx;
             $tx->with_protocols( 'binary' );
-                
+
+            $tx->on(finish => sub {
+                    $broker->stop_tunnel();
+                    $c->app->log->debug("VM Proxy WebSocket closed");
+                }
+            );
+
             Mojo::IOLoop::singleton->delay(
                 sub {
                     my ($delay) = @_;
@@ -717,7 +717,7 @@ group {
                         {
                             'vm_id' => $vm_id,
                             'token' => $json->{token},
-                            'resolution' => $json->{resolution} // "1024x768x24",
+                            'resolution' => $json->{resolution} // cfg('up-api.default.resolution'),
                         },
                         sub { $end->(); }
                     );
@@ -733,7 +733,7 @@ group {
                         port => $tunnel_port
                     );
 
-                    $proxy->open($tx, 30000, 0);
+                    $proxy->open($tx, 0);
                 }
             );
 
@@ -759,7 +759,7 @@ sub create_up_session_handler {
         store         => [dbi => {dbh => $dbi->storage->dbh, table => "session_up"}],
         transport     => MojoX::Session::Transport::Cookie->new(name => 'up-sid', httponly => 1, secure => 1),
         ip_match      => 1,
-        expires_delta => cfg('up-api.session.timeout')
+        expires_delta => cfg('up-api.session.expiration')
     );
     
     return $session;

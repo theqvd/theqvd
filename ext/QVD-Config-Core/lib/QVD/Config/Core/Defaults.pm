@@ -435,13 +435,14 @@ up-api.stdout.filename = /dev/null
 up-api.stderr.filename = /dev/null
 
 up-api.l7r.address = localhost
+up-api.l7r.session.expiration = 300
 up-api.request.timeout = 3000
 up-api.websocket.timeout = 3600
-up-api.session.timeout = 3600
-up-api.l7r.expiration = 300
+up-api.session.expiration = 3600
 
-up-api.docker.uri = http://127.0.0.1:3128
-#up-api.docker.uri = http+unix://%2Fvar%2Frun%2Fdocker.sock
+up-api.default.resolution = 1024x768x24
+
+up-api.docker.uri = http+unix://%2Fvar%2Frun%2Fdocker.sock
 up-api.docker.image.h5gw = registry.qindel.com:5000/qvd/qvd-nx2v-gateway:latest
 
 # QVD-Admin parameters
