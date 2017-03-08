@@ -38,10 +38,10 @@ plugin SetUserGroup => {user => $user, group => $group}
 
 # Static web data provider
 my $up_path = cfg('path.up');
+app->static->paths->[0] = $up_path;
 
-plugin 'Directory' => {
-    root => $up_path,
-    dir_index => [qw/index.html index.htm/],
+get '/' => sub {
+    shift->reply->static('index.html');
 };
 
 ##### HELPERS #####
