@@ -95,10 +95,10 @@ app->config(
 
 # Static web data provider
 my $wat_path = app->qvd_admin4_api->_cfg('path.wat');
+app->static->paths->[0] = $wat_path;
 
-plugin 'Directory' => {
-	root => $wat_path,
-	dir_index => [qw/index.html index.htm/],
+get '/' => sub {
+    shift->reply->static('index.html');
 };
 
 # This hook prints upload progress of large files in console

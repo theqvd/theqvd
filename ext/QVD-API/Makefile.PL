@@ -30,7 +30,6 @@ WriteMakefile(
         'Mojo::Log' => 0,
         'Mojo::Pg' => 0,
         'Mojolicious::Plugin' => 0,
-        'Mojolicious::Plugin::Directory' => 0,
         'Mojolicious::Plugin::SetUserGroup' => 0,
         'MojoX::Session' => 0,
         'MojoX::Session::Transport' => 0,
