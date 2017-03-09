@@ -8,6 +8,39 @@ use QVD::Log;
 
 has [qw/url/] => ( is => 'ro' );
 
+sub open_ws {
+    my ($self, $tx, $ua) = @_;
+
+    $ua->websocket($self->url => { Host => 'localhost'} => sub {
+            my ($ua, $ws) = @_;
+
+            ERROR "WebSocket handshake failed!\n" and return unless $ws->is_websocket;
+
+            $ws->on(error => sub {
+                    DEBUG "-- Docker connection error $_[1]\n";
+                    $ws->finish;
+                });
+            $ws->on(finish => sub {
+                    DEBUG "-- Docker connection closed\n";
+                    $tx->finish;
+                });
+            $ws->on(binary => sub {
+                    my ($ws, $message) = @_;
+                    DEBUG "-- Docker >>> WebSocket ($message)\n";
+                    $tx->send({binary => $message});
+                });
+            $tx->on(binary => sub {
+                    my ($tx, $message) = @_;
+                    DEBUG "-- Docker <<< WebSocket ($message)\n";
+                    $ws->send({binary => $message});
+                });
+            $ws->send("START\n");
+        }
+    );
+
+    return $ua;
+}
+
 sub open {
     my ($self, $tx, $send_qvd_header) = @_;
 
@@ -90,6 +123,10 @@ QVD::VMProxy - Forwards x11 protocol data from QVD-VMA
 =head1 SYNOPSIS
 
     my $connection = QVD::VMProxy->new( address => $ip, port => $port );
+    $connection->on( error => sub {
+        print "Error " . $_[1] );
+        $tx->finish();
+    } );
     $connection->open($tx, 60);
 
 =head1 AUTHOR

@@ -133,6 +133,21 @@ sub inspect {
     return $self->_parse('GET', '/containers/'.$container.'/json', $params, RESP_DEFAULT, $cb);
 }
 
+sub attach_url {
+    my ($self, $container, $params) = @_;
+    my $custom_params = {
+        logs => 0,
+        stream => 1,
+        stdin => 1,
+        stdout => 1,
+        stderr => 0,
+    };
+    $params //= {};
+    @{$custom_params}{keys %$params} = values %$params;
+    my $url = $self->{uri} . '/containers/'.$container.'/attach/ws?'._params_to_query($custom_params);
+    return $url;
+}
+
 sub ip_address_from_inspect {
     my ($self, $inspect) = @_;
     return $inspect->{NetworkSettings}->{IPAddress};
@@ -142,6 +157,11 @@ sub ports_from_inspect {
     my ($self, $inspect) = @_;
     my @ports = keys %{$inspect->{NetworkSettings}->{Ports}};
     return \@ports;
+}
+
+sub _params_to_query {
+    my $params = shift;
+    return join ("&", map {$_."=".$params->{$_}} keys %$params);
 }
 
 1;

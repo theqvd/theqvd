@@ -26,11 +26,13 @@ sub start_tunnel {
     push @cmd_args, ("--password", $_) if defined($_ = $options->{'password'});
     push @cmd_args, ("--token", $_) if defined($_ = $options->{'token'});
     push @cmd_args, ("--resolution", $_) if defined($_ = $options->{'resolution'});
+    push @cmd_args, ("--stdio", "--wait-for-start-msg");
 
     $manager->create(
         $docker_image,
         {
             PublishAllPorts => \1,
+            OpenStdin       => \1,
             Cmd             => \@cmd_args,
         },
         sub {
@@ -112,6 +114,11 @@ sub tunnel_port {
         $log->error("Container is not started");
     }
     return undef;
+}
+
+sub attach_url {
+    my $self = shift;
+    return $manager->attach_url($self->id, {});
 }
 
 1;

@@ -27,6 +27,7 @@ use QVD::VMProxy;
 
 ##### GLOBAL VARIABLES #####
 my $MOJO_DB;
+my $UA = Mojo::UserAgent->new->inactivity_timeout(0);;
 
 ##### PLUGINS #####
 
@@ -720,13 +721,15 @@ group {
                 },
                 sub {
                     my ($delay) = @_;
-                    sleep(10);
-                    my $url = "http://" . $broker->tunnel_address() . ":" . $broker->tunnel_port();
+                    my $url = $broker->attach_url();
                     $c->app->log->debug("Create tunnel to H5GW $url");
                     my $proxy = QVD::VMProxy->new( 
                         url  => $url,
                     );
-                    $proxy->open($tx, 0);
+
+                    # NOTE: User Agent must be global because other way
+                    # it is lost from current context
+                    $proxy->open_ws($tx, $UA);
                 }
             );
 
