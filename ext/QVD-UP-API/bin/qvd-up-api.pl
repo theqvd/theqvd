@@ -702,11 +702,7 @@ group {
             my $tx = $c->tx;
             $tx->with_protocols( 'binary' );
 
-            $tx->on(finish => sub {
-                    $broker->stop_tunnel();
-                    $c->app->log->debug("VM Proxy WebSocket closed");
-                }
-            );
+            $tx->on(finish => sub { $broker->stop_tunnel(); } );
 
             Mojo::IOLoop::singleton->delay(
                 sub {
@@ -725,14 +721,11 @@ group {
                 sub {
                     my ($delay) = @_;
                     sleep(10);
-                    my $tunnel_address = $broker->tunnel_address();
-                    my $tunnel_port = $broker->tunnel_port();
-                    $c->app->log->debug("Create tunnel to H5GW $tunnel_address:$tunnel_port");
+                    my $url = "http://" . $broker->tunnel_address() . ":" . $broker->tunnel_port();
+                    $c->app->log->debug("Create tunnel to H5GW $url");
                     my $proxy = QVD::VMProxy->new( 
-                        address => $tunnel_address,
-                        port => $tunnel_port
+                        url  => $url,
                     );
-
                     $proxy->open($tx, 0);
                 }
             );

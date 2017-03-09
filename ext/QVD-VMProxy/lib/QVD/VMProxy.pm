@@ -3,16 +3,18 @@ package QVD::VMProxy;
 use Moo;
 use Mojo::IOLoop;
 use Mojo::Util 'term_escape';
+use Mojo::URL;
 use QVD::Log;
 
-has [qw/address port/] => ( is => 'ro' );
+has [qw/url/] => ( is => 'ro' );
 
 sub open {
     my ($self, $tx, $send_qvd_header) = @_;
 
+    my $url = Mojo::URL->new($self->url);
     my %args = (
-        address => $self->address,
-        port    => $self->port,
+        address => $url->host,
+        port    => $url->port,
     );
     my $loop = Mojo::IOLoop->singleton;
     my $delay = $loop->delay(
