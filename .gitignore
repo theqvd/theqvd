@@ -60,3 +60,10 @@ windows/installer/qvd-client*.exe
 
 # Backup files
 *~
+
+windows/installer/Xming/COPYING
+ext/execute.sh
+ext/QVD-Client/NX/
+ext/QVD-Client/VcXsrv
+ext/QVD-Client/Xming
+
