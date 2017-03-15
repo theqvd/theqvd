@@ -478,6 +478,7 @@ admin.ssh.opt.UserKnownHostsFile = /dev/null
 vm.hypervisor = lxc
 
 ## COW fs to use with LXC
+vm.lxc.unionfs.type = overlayfs
 @ubuntu@vm.lxc.unionfs.type = overlayfs
 @sles-12@vm.lxc.unionfs.type = overlayfs
 @sles-11@vm.lxc.unionfs.type = unionfs-fuse
