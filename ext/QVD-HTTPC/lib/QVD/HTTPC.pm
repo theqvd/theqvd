@@ -38,6 +38,7 @@ our @SSL_OPTIONS = qw( SSL_hostname SSL_ca SSL_ca_file SSL_ca_path SSL_client_ca
                        SSL_create_ctx_callback SSL_session_cache_size SSL_session_cache SSL_session_key SSL_session_id_context
                        SSL_error_trap SSL_npn_protocols SSL_alpn_protocols 
                        SSL_ca_path_alt SSL_use_ocsp SSL_fail_on_ocsp SSL_fail_on_hostname SSL_debug
+                       SSL_cert_file SSL_key_file
                     );
 
 sub _create_socket {
