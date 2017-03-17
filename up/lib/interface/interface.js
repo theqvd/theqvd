@@ -299,6 +299,7 @@ Up.I = {
     
     validateForm: function (context) {
         var blankControls = $( context + " input[data-required]:blank:visible" );
+
         if(blankControls.length > 0) {
             blankControls.addClass('not_valid');
             blankControls.parent().find('.validation-message').remove();
@@ -807,7 +808,8 @@ Up.I = {
             Up.TPL.settingsEditor, {
                 model: model,
                 canBeDisabled: canBeDisabled,
-                settingsDisabledList: Up.I.getSettingsDisabledList(model)
+                settingsDisabledList: Up.I.getSettingsDisabledList(model),
+                cid: Up.CurrentView.cid
             }
         );
         
