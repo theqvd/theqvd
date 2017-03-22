@@ -275,7 +275,7 @@ fieldset {
       font-size: 40px; }
   /* line 173, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
   .loading-big .loading-block {
-    width: 150px;
+    width: auto;
     height: 150px;
     margin: 0 auto; }
   /* line 179, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
@@ -3193,19 +3193,23 @@ div.tagsinput span.tag a {
   color: #FEFEFE; }
 
 /* line 359, /home/zarzuelo/code/gotham/up/style/components/_thirds.scss */
+.noVNC_canvas {
+  display: none; }
+
+/* line 363, /home/zarzuelo/code/gotham/up/style/components/_thirds.scss */
 .noVNC_screen {
   text-align: center;
   position: relative; }
 
-/* line 364, /home/zarzuelo/code/gotham/up/style/components/_thirds.scss */
+/* line 368, /home/zarzuelo/code/gotham/up/style/components/_thirds.scss */
 .noVNC_controls, .noVNC_settings, .noVNC_xvp, .noVNC_status {
   display: none !important; }
 
-/* line 368, /home/zarzuelo/code/gotham/up/style/components/_thirds.scss */
+/* line 372, /home/zarzuelo/code/gotham/up/style/components/_thirds.scss */
 .noVNC_canvas--interactive {
   cursor: none !important; }
 
-/* line 372, /home/zarzuelo/code/gotham/up/style/components/_thirds.scss */
+/* line 376, /home/zarzuelo/code/gotham/up/style/components/_thirds.scss */
 .noVNC_canvas--viewonly {
   cursor: auto !important; }
 

@@ -611,11 +611,6 @@ var UI;
         },
 
         updateState: function(rfb, state, oldstate, msg) {
-            if (state == 'normal') {
-                Up.I.loadingUnblock();
-                Up.I.stopProgress();
-            }
-            
             UI.log("INFO", "STATE: " + state + " - " + msg);
 
             UI.updateVisualState();
@@ -642,18 +637,15 @@ var UI;
             $('.vms-spy-log .log-registers').prepend('<p class="' + lineClass + '">' + logMsg + '</p>'); 
             
             if (state == 'ERROR') {
-                // If error, open lateral menu and show log
-                $('.js-vm-spy-settings-panel').openMbExtruder();                    
-                $('.js-vms-spy-setting-log').val('error');
-                $('.js-vms-spy-setting-log').trigger('chosen:updated');
-                $('.js-vms-spy-setting-log').trigger('change');
-                Up.I.loadingUnblock();
+                // If error, log it
+                console.error(msg);
             }
             
             // Parse disconnection message
             if (msg.indexOf('disconnected') > -1) {
                 $('.connection-closed').show();
                 UI.disableFullscreen();
+                Up.I.loadingUnblock();
             }
         },
 

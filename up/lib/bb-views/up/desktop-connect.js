@@ -12,6 +12,9 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
         
         // Store temporal token
         that.token = params.token;
+        that.id = params.id;
+        
+        Up.WS.openWebsocket('desktops', this.changeUserState);
         
         $('.bb-super-wrapper').html(HTML_LOADING);
         this.model = new Up.Models.Desktop(params);
@@ -24,6 +27,25 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
                 that.getSetup();
             }
         });
+    },
+    
+    changeUserState: function (data) {
+        if (data.id != Up.CurrentView.id) {
+            return;
+        }
+        
+        switch (data.user_state) {
+            case 'connecting':
+                Up.I.updateProgressMessage('Waking up virtual machine', 'sun-o');
+                break;
+            case 'connected':
+                Up.I.loadingUnblock();
+                Up.I.stopProgress();
+                $('.noVNC_canvas').show();
+
+                Up.WS.closeAllWebsockets();
+                break;
+        }
     },
     
     // Get combined setup from specific settings and current workspace
@@ -68,28 +90,9 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
         
         $('.error-loading').hide();
         Up.I.loadingBlock($.i18n.t('progress:Loading your Desktop'));
-        Up.I.startProgress(12);
+        Up.I.updateProgressMessage('Connecting with server', 'plug');
         
         Up.T.translate();
-        
-        $('.js-vm-spy-settings-panel').buildMbExtruder({
-            position:"left",
-            width:270,
-            extruderOpacity:.9,
-            hidePanelsOnClose:true,
-            accordionPanels:true,
-            onExtOpen:function(){
-                $(".js-vms-spy-setting-resolution").on('change', that.changeSettingResolution);
-                $(".js-vms-spy-setting-log").on('change', that.changeSettingLog);
-                $(".js-vnc-keyboard").on('click', that.clickKeyboard);
-                
-                Up.T.translate();
-                Up.I.Chosen.configuration();
-                Up.I.Chosen.element('.vms-spy-settings select', 'single100');
-            },
-            onExtContentLoad:function(){},
-            onExtClose:function(){}
-        });
         
         var loopCheck = setInterval(function () {
             if(typeof $D == "function") {
@@ -163,7 +166,6 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
     
     clickKeyboard: function (e) {
         // focus on a visible input may work
-        $('.js-vm-spy-settings-panel').closeMbExtruder();
         $('#kbi').focus();
     },
     
