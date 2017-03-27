@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings FATAL => 'all';
-use QVD::H5GW::SessionManager;
+use QVD::UP::H5GW::SessionManager;
 
 BEGIN {
     $QVD::Config::USE_DB = 1;
@@ -32,8 +32,8 @@ my $UA = Mojo::UserAgent->new->inactivity_timeout(0);;
 ##### PLUGINS #####
 
 # Plugin for dropping privileges
-my $user = cfg('up-api.user');
-my $group = cfg('up-api.group');
+my $user = cfg('up.api.user');
+my $group = cfg('up.api.group');
 plugin SetUserGroup => {user => $user, group => $group}
     if $< == 0 or $> == 0;
 
@@ -62,9 +62,9 @@ helper(register_channels => \&register_channels);
 ##### CONFIGURATION #####
 
 # Intended to set the address where the app is supposed to listen with hypnotoad
-my $api_url = cfg('up-api.url');
-my $cert_path = cfg('path.api.ssl.cert');
-my $key_path = cfg('path.api.ssl.key');
+my $api_url = cfg('up.api.url');
+my $cert_path = cfg('path.up.api.ssl.cert');
+my $key_path = cfg('path.up.api.ssl.key');
 die "Certificate $cert_path file does not exist" unless (-e $cert_path);
 die "Private key $key_path file does not exist" unless (-e $key_path);
 
@@ -74,13 +74,13 @@ app->config(
         accepts => 1000,
         clients => 1000,
         workers => 4,
-        pid_file => '/var/lib/qvd/qvd-up-api.pid'
+        pid_file => '/var/run/qvd/qvd-up-api.pid'
     }
 );
 
 # Intended to store log info about the API
 
-app->log( Mojo::Log->new( path => cfg('log.up-api.filename'), level => 'debug' ) );
+app->log( Mojo::Log->new( path => cfg('log.up.api.filename'), level => 'debug' ) );
 
 # Response hooks
 
@@ -129,10 +129,10 @@ app->hook(after_render => sub {
 under sub {
     my $c = shift;
 
-    open STDOUT, ">>", cfg('up-api.stdout.filename');
-    open STDERR, ">>", cfg('up-api.stderr.filename');
+    open STDOUT, ">>", cfg('up.api.stdout.filename');
+    open STDERR, ">>", cfg('up.api.stderr.filename');
 
-    $c->inactivity_timeout(cfg('up-api.request.timeout'));
+    $c->inactivity_timeout(cfg('up.api.request.timeout'));
 };
 
 # This url retrieves general info about the API.
@@ -174,7 +174,7 @@ any [ qw(POST) ] => '/api/login' => sub {
     my $authorization = "Basic " . encode_base64($login . ":". $password);
 
     my $ua = Mojo::UserAgent->new;
-    my $l7r_vm_list_url = (cfg('l7r.use_ssl') ? "https" : "http") . "://" . cfg('up-api.l7r.address') .
+    my $l7r_vm_list_url = (cfg('l7r.use_ssl') ? "https" : "http") . "://" . cfg('up.api.l7r.address') .
         ":" . cfg('l7r.port') . "/qvd/list_of_vm";
     my $auth_tx = $ua->cert( $cert_path )->key( $key_path )->
         get( $l7r_vm_list_url => { Authorization => $authorization } );
@@ -441,7 +441,7 @@ group {
 
         my $session_l7r = rs('User_Token')->create( { 
             token => generate_sid(),
-            expiration => time + cfg('up-api.l7r.session.expiration'),
+            expiration => time + cfg('up.api.l7r.session.expiration'),
             user_id => $session_up->data->{user_id},
             vm_id =>  $vm_id
         } );
@@ -474,7 +474,7 @@ group {
 
         my $json = {};
         $json->{settings} = element_settings($element);
-        $json->{hostname} = cfg('up-api.l7r.address');
+        $json->{hostname} = cfg('up.api.l7r.address');
         
         return $c->render_response(json => $json);
     };
@@ -650,7 +650,7 @@ group {
         under sub {
             my $c = shift;
 
-            $c->inactivity_timeout(cfg('up-api.websocket.timeout'));
+            $c->inactivity_timeout(cfg('up.api.websocket.timeout'));
         };
                 
         websocket '/api/ws/desktops' => sub {
@@ -685,9 +685,9 @@ group {
             $c->app->log->debug("VM Proxy WebSocket opened");
             $c->on(finish => sub { $c->app->log->debug( "VM Proxy WebSocket closed" ); } );
 
-            my $l7r_address = cfg('up-api.l7r.address');
+            my $l7r_address = cfg('up.api.l7r.address');
             my $l7r_port = cfg('l7r.port');
-            my $broker = QVD::H5GW::SessionManager->new( host => $l7r_address, port => $l7r_port );
+            my $broker = QVD::UP::H5GW::SessionManager->new( host => $l7r_address, port => $l7r_port );
 
             my $vm_id = $c->param('id');
             my $user_id = $c->stash('session')->data('user_id');
@@ -714,7 +714,7 @@ group {
                         {
                             'vm_id' => $vm_id,
                             'token' => $json->{token},
-                            'resolution' => $json->{resolution} // cfg('up-api.default.resolution'),
+                            'resolution' => $json->{resolution} // cfg('up.api.default.resolution'),
                         },
                         sub { $end->(); }
                     );
@@ -755,7 +755,7 @@ sub create_up_session_handler {
         store         => [dbi => {dbh => $dbi->storage->dbh, table => "session_up"}],
         transport     => MojoX::Session::Transport::Cookie->new(name => 'up-sid', httponly => 1, secure => 1),
         ip_match      => 1,
-        expires_delta => cfg('up-api.session.expiration')
+        expires_delta => cfg('up.api.session.expiration')
     );
     
     return $session;
@@ -991,3 +991,13 @@ sub register_channels {
             $c->app->log->debug("WebSocket closed with status $code");
         });
 };
+
+__END__
+
+=pod
+
+=head1 PURPOSE
+
+Script intended to run an instance of the QVD UP API
+
+=cut

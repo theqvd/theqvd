@@ -1,5 +1,5 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: qvd-wat
+Upstream-Name: qvd-up
 Source: http://theqvd.com
 
 Files: *
@@ -9,7 +9,7 @@ Copyright: 2015 <qvd@qindel.com>
 License: GPL-3.0+
 
 Files: debian/*
-Copyright: 2015 Nicolas Arenas <nicolas.arenas@gmail.com>
+Copyright: 2015 QVD Team <qvd@qindel.com>
 
 License: GPL-3.0+
  This program is free software: you can redistribute it and/or modify

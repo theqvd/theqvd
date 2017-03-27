@@ -4,11 +4,16 @@ use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
-    NAME              => 'QVD::API',
+    NAME              => 'QVD::UP',
     AUTHOR            => 'QVD Team <qvd@qindel.es>',
     VERSION	          => '4.0'.$ENV{BUILD_NUMBER},
-    ABSTRACT          => 'QVD::API',
-    EXE_FILES         => [ 'bin/qvd-up-api.pl' ],
+    ABSTRACT          => 'QVD::UP',
+    EXE_FILES         => [
+        'bin/qvd-up-api.debrc.pl',
+        'bin/qvd-up-api.initrc.pl',
+        'bin/qvd-up-api.pl' ,
+        'bin/qvd-up-api.service'
+    ],
     PREREQ_PM         => {
         'HTTP::BrowserDetect' => 0,
         'Mojo::ByteStream' => 0,
@@ -26,8 +31,8 @@ WriteMakefile(
         'QVD::Config' => 0,
         'QVD::DB::Common' => 0,
         'QVD::DB::Simple' => 0,
-        'QVD::H5GW::DockerManager' => 0,
-        'QVD::H5GW::SessionManager' => 0,
+        'QVD::UP::H5GW::DockerManager' => 0,
+        'QVD::UP::H5GW::SessionManager' => 0,
         'QVD::VMProxy' => 0,
     },
 );

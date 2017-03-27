@@ -1,19 +1,19 @@
-package QVD::H5GW::SessionManager;
+package QVD::UP::H5GW::SessionManager;
 use Moo;
 use MooX::Types::MooseLike::Base qw(:all);
-use QVD::H5GW::DockerManager;
+use QVD::UP::H5GW::DockerManager;
 use QVD::Config;
 use Mojo::Log;
 
-our $log = Mojo::Log->new(path => cfg('log.up-api.filename'));
+our $log = Mojo::Log->new(path => cfg('log.up.api.filename'));
 
 has 'host'    => (is => 'ro', isa => Str, required => 1);
 has 'port'    => (is => 'ro', isa => Int, required => 1);
 has 'id'      => (is => 'rw', isa => AnyOf[Undef, Str], default => sub { return undef; } );
 has 'inspect' => (is => 'ro' );
 
-my $docker_image = cfg('up-api.docker.image.h5gw');
-my $manager = QVD::H5GW::DockerManager->new(uri => cfg('up-api.docker.uri'));
+my $docker_image = cfg('up.api.docker.image.h5gw');
+my $manager = QVD::UP::H5GW::DockerManager->new(uri => cfg('up.api.docker.uri'));
 
 sub start_tunnel {
     my $self = shift;

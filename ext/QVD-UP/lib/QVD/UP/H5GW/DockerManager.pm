@@ -1,4 +1,4 @@
-package QVD::H5GW::DockerManager;
+package QVD::UP::H5GW::DockerManager;
 use strict;
 use warnings FATAL => 'all';
 

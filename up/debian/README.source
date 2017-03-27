@@ -1,4 +1,4 @@
-qvd-wat for Debian
+qvd-up for Debian
 ------------------
 
 <this file describes information about the source package, see Debian policy
@@ -6,5 +6,5 @@ manual section 4.14. You WILL either need to modify or delete this file>
 
 
 
- -- unknown <nicolas.arenas@gmail.com>  Thu, 05 Nov 2015 08:39:16 +0000
+ -- unknown <qvd@qindel.com>  Thu, 05 Nov 2015 08:39:16 +0000
 
