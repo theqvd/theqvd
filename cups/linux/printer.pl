@@ -9,18 +9,24 @@ my $cups_path = "/usr/lib/cups/backend";
 my $cups_conf_path = "/etc/cups";
 my $cups_post_path = "/usr/local/bin"; 
     
-my $url_win  = "http://172.26.9.187:3000";
+my $url_win  = "http://127.0.0.1:2100";
 my $printer_url = "printer";
 my $printer_job_url = "printjob";
+
+my $pwd = `pwd`;
  
 create_printers($cups_path, $cups_conf_path, $cups_post_path, $url_win, $printer_url, $printer_job_url);
 
 # Copy to cups
 ## Side effects
 sub copy_tea4cups_files {
-    my ($cpath, $cconf_path, $cups_post_path) = (@_);
-    system("cp", "tea4cups/tea4cups", $cpath);
-    system("cp", "tea4cups/tea4cups.conf", $cconf_path);
+    my ($cpath, $cconf_path, $cups_post_path) = (@_); 
+
+    system("rm", $cpath."tea4cups");
+    system("rm", $cconf_path."tea4cups.conf");
+
+    system("ln", "-s", $pwd."/tea4cups/tea4cups", $cpath."tea4cups");
+    system("ln", "-s", $pwd."/tea4cups/tea4cups.conf", $cconf_path."tea4cups.conf");
     return;
 }
 
@@ -40,7 +46,8 @@ sub add_printer_tea4cups {
     print $fh $line_posthook."\n\n";
     close $fh;
     
-    system("cp", "tea4cups/windowscups", $cups_post_path);
+    system("rm", $cups_post_path."windowscups");
+    system("ln", "-s", $pwd."/tea4cups/windowscups", $cups_post_path."windowscups");
     return;
 }
 
@@ -111,11 +118,11 @@ sub read_json {
     
     my $duplex = 0;
     if($printer->{'IsDuplex'}){
-      $duplex = 1;      
+      $duplex = 1;
     }
 
     if($printer->{'IsSupportColor'}){
-      $color = 'True';   
+      $color = 'True';
     }
     
     my $filename = "print_".$id."_driver.ppd";
@@ -126,7 +133,7 @@ sub read_json {
 # It recieves a driver and wr
 sub ppd_create {
     # Open file
-    my ($id, $name, $filename, $color, $duplex) = (@_);    
+    my ($id, $name, $filename, $color, $duplex) = (@_);
     open(my $fh, '>', $filename) or die "Could not open file '$filename' $!";
     
     # Write file
@@ -298,7 +305,6 @@ sub ppd_comm() {
     my ($comment) = (@_);
     return "*%%%% ".$comment.".";
 }
-
 
 
 
