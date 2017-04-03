@@ -89,47 +89,81 @@ Wat.I.listDefaultFields[qvdObj] = $.extend({}, Wat.I.listFields[qvdObj]);
 
 // Fields configuration on details view
 Wat.I.detailsFields[qvdObj] = {
-    'id': {
-        'display': true,
-        'fields': [
-            'id'
-        ],
-        'acls': 'user.see.id',
-        'text': 'Id'
+    'general': {
+        'text': 'General',
+        'default': true,
+        'fieldList': {
+            'id': {
+                'display': true,
+                'fields': [
+                    'id'
+                ],
+                'acls': 'user.see.id',
+                'text': 'Id',
+                'icon': 'fa fa-asterisk'
+            },
+            'global_username': {
+                'display': true,
+                'fields': [
+                    'id'
+                ],
+                'text': 'Global username',
+                'icon': 'fa fa-sitemap',
+                'onlyMultitenant': true
+            },
+            'description': {
+                'display': true,
+                'fields': [
+                    'description'
+                ],
+                'acls': 'user.see.description',
+                'text': 'Description',
+                'icon': 'fa fa-align-justify',
+            },
+            'block': {
+                'display': true,
+                'fields': [
+                    'id'
+                ],
+                'acls': 'user.see.block',
+                'text': 'Blocking',
+                'icon': 'fa fa-lock'
+            }
+        }
     },
-    'block': {
-        'display': true,
-        'fields': [
-            'id'
-        ],
-        'acls': 'user.see.block',
-        'text': 'Blocking'
-    },
-    'connected_vms': {
-        'display': true,
-        'fields': [
-            'id',
-            'number_of_vms',
-            'number_of_vms_connected'
-        ],
-        'acls': 'user.see.vms-info',
-        'text': 'Connected VMs'
-    },
-    'creation_date': {
-        'text': 'Creation date',
-        'fields': [
-            'creation_date'
-        ],
-        'acls': 'user.see.creation-date',
-        'display': true
-    },
-    'creation_admin': {
-        'text': 'Created by',
-        'fields': [
-            'creation_admin'
-        ],
-        'acls': 'user.see.created-by',
-        'display': true
+    'activity': {
+        'text': 'Activity',
+        'fieldList': {
+            'creation_admin': {
+                'text': 'Created by',
+                'fields': [
+                    'creation_admin'
+                ],
+                'acls': 'user.see.created-by',
+                'display': true,
+                'icon': CLASS_ICON_ADMINS
+            },
+            'creation_date': {
+                'text': 'Creation date',
+                'fields': [
+                    'creation_date'
+                ],
+                'acls': 'user.see.creation-date',
+                'display': true,
+                'icon': 'fa fa-clock-o'
+            },
+            'connected_vms': {
+                'display': true,
+                'fields': [
+                    'id',
+                    'number_of_vms',
+                    'number_of_vms_connected'
+                ],
+                'acls': 'user.see.vms-info',
+                'text': 'Connected VMs',
+                'icon': CLASS_ICON_VMS
+            }
+        }
     }
 };
 

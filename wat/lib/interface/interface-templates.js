@@ -70,6 +70,9 @@ Wat.I.T = {
                     detailsCommon: {
                         name: 'details/common'
                     },
+                    detailsFieldsCommon: {
+                        name: 'details/common-fields'
+                    },
                     detailsCommonProperties: {
                         name: 'details/common-properties'
                     },
@@ -78,6 +81,15 @@ Wat.I.T = {
                     },
                     detailsSide: {
                         name: 'details/' + params.qvdObj + '-side'
+                    },
+                    detailsFields: {
+                        name: 'details/' + params.qvdObj + '-fields'
+                    },
+                    layoutDesktop: {
+                        name: 'details/layout-desktop'
+                    },
+                    layoutMobile: {
+                        name: 'details/layout-mobile'
                     }
                 }
                 break;

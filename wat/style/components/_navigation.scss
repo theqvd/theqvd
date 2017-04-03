@@ -82,7 +82,6 @@
         
         .lateral-menu-option, .lateral-menu-option:active, .lateral-menu-option-discrete {
             float: left;
-            margin-bottom: 10px;
             width: 100%;
         }
         
@@ -272,6 +271,13 @@
     display: block !important;
     visibility: visible !important;
     margin-top: 0px !important;
+    
+    ul>li.lateral-menu-option {
+        margin-bottom: 0px;
+        border-style: dotted;
+        border-radius: 0px !important;
+        font-size: 14px;
+    }
 }
 
 .back-top-button {

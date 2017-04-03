@@ -115,82 +115,105 @@ Wat.I.listDefaultFields[qvdObj] = $.extend({}, Wat.I.listFields[qvdObj]);
 
 // Fields configuration on details view
 Wat.I.detailsFields[qvdObj] = {
-    'id': {
-        'display': false,
-        'fields': [
-            'id'
-        ],
-        'acls': 'osf.see.id',
-        'text': 'Id'
+    'general': {
+        'text': 'General',
+        'default': true,
+        'fieldList': {
+            'id': {
+                'display': false,
+                'fields': [
+                    'id'
+                ],
+                'acls': 'osf.see.id',
+                'text': 'Id',
+                'icon': 'fa fa-asterisk'
+            },
+            'description': {
+                'display': false,
+                'fields': [
+                    'description'
+                ],
+                'acls': 'osf.see.description',
+                'text': 'Description',
+                'icon': 'fa fa-align-justify',
+            }
+        }
     },
-    'name': {
-        'display': true,
-        'fields': [
-            'id',
-            'name'
-        ],
-        'text': 'Name'
+    'hardware': {
+        'text': 'Hardware',
+        'fieldList': {
+            'memory': {
+                'display': true,
+                'fields': [
+                    'memory'
+                ],
+                'acls': 'osf.see.memory',
+                'text': 'Memory',
+                'icon': 'fa fa-bolt'
+            },
+            'user_storage': {
+                'display': true,
+                'fields': [
+                    'user_storage'
+                ],
+                'acls': 'osf.see.user-storage',
+                'text': 'User storage',
+                'icon': 'fa fa-archive'
+            },
+            'overlay': {
+                'display': true,
+                'fields': [
+                    'overlay'
+                ],
+                'acls': 'osf.see.overlay',
+                'text': 'Overlay',
+                'icon': 'fa fa-exchange'
+            },
+        }
     },
-    'overlay': {
-        'display': true,
-        'fields': [
-            'overlay'
-        ],
-        'acls': 'osf.see.overlay',
-        'text': 'Overlay'
-    },
-    'memory': {
-        'display': true,
-        'fields': [
-            'memory'
-        ],
-        'acls': 'osf.see.memory',
-        'text': 'Memory'
-    },
-    'user_storage': {
-        'display': true,
-        'fields': [
-            'user_storage'
-        ],
-        'acls': 'osf.see.user-storage',
-        'text': 'User storage'
-    },
-    'dis': {
-        'display': true,
-        'fields': [
-            'id',
-            'dis'
-        ],
-        'acls': 'osf.see.dis-info',
-        'text': 'DIs'
-    },
-    'vms': {
-        'display': true,
-        'fields': [
-            'id',
-            'vms'
-        ],
-        'acls': 'osf.see.vms-info',
-        'text': 'VMs'
-    },
-    'creation_date': {
-        'text': 'Creation date',
-        'fields': [
-            'creation_date'
-        ],
-        'acls': 'osf.see.creation-date',
-        'display': false,
-        'sortable': true,
-    },
-    'creation_admin_name': {
-        'text': 'Created by',
-        'fields': [
-            'creation_admin_name',
-            'creation_admin_id'
-        ],
-        'acls': 'osf.see.created-by',
-        'display': false,
-        'sortable': true,
+    'activity': {
+        'text': 'Activity',
+        'fieldList': {
+            'creation_admin': {
+                'text': 'Created by',
+                'fields': [
+                    'creation_admin_name',
+                    'creation_admin_id'
+                ],
+                'acls': 'osf.see.created-by',
+                'display': false,
+                'icon': 'fa fa-clock-o'
+            },
+            'creation_date': {
+                'text': 'Creation date',
+                'fields': [
+                    'creation_date'
+                ],
+                'acls': 'osf.see.creation-date',
+                'display': false,
+                'icon': CLASS_ICON_ADMINS
+            },
+            'dis': {
+                'display': true,
+                'fields': [
+                    'id',
+                    'dis'
+                ],
+                'acls': 'osf.see.dis-info',
+                'text': 'DIs',
+                'icon': CLASS_ICON_DIS
+            },
+            'vms': {
+                'display': true,
+                'fields': [
+                    'id',
+                    'vms'
+                ],
+                'acls': 'osf.see.vms-info',
+                'text': 'VMs',
+                'icon': CLASS_ICON_VMS
+            },
+        }
     }
 };
 

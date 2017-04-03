@@ -79,7 +79,83 @@ Wat.I.listFields[qvdObj] = {
 };
 
 Wat.I.listDefaultFields[qvdObj] = $.extend({}, Wat.I.listFields[qvdObj]);
-        
+
+// Fields configuration on details view
+Wat.I.detailsFields[qvdObj] = {
+    'general': {
+        'text': 'General',
+        'default': true,
+        'fieldList': {
+            'id': {
+                'display': true,
+                'fields': [
+                    'id'
+                ],
+                'acls': 'role.see.id',
+                'text': 'Id',
+                'icon': 'fa fa-asterisk'
+            },
+            'description': {
+                'display': true,
+                'fields': [
+                    'description'
+                ],
+                'acls': 'role.see.description',
+                'text': 'Description',
+                'icon': 'fa fa-align-justify',
+            }
+        }
+    },
+    'inheritance': {
+        'text': 'Inheritance',
+        'fieldList': {
+            'roles': {
+                'text': 'Inherited roles',
+                'fields': [
+                    'roles'
+                ],
+                'acls': 'role.see.inherited-roles',
+                'display': true,
+                'icon': CLASS_ICON_ROLES
+            },
+            'templates': {
+                'text': 'Inherited templates',
+                'fields': [
+                    'roles'
+                ],
+                'acls': 'role.see.inherited-roles',
+                'display': true,
+                'icon': CLASS_ICON_TEMPLATES
+            }
+        }
+    },
+    'activity': {
+        'text': 'Activity',
+        'fieldList': {
+            'creation_admin': {
+                'text': 'Created by',
+                'fields': [
+                    'creation_admin'
+                ],
+                'acls': 'role.see.created-by',
+                'display': true,
+                'icon': CLASS_ICON_ADMINS
+            },
+            'creation_date': {
+                'text': 'Creation date',
+                'fields': [
+                    'creation_date'
+                ],
+                'acls': 'role.see.creation-date',
+                'display': true,
+                'icon': 'fa fa-clock-o'
+            }
+        }
+    }
+};
+
+Wat.I.detailsDefaultFields[qvdObj] = $.extend({}, Wat.I.detailsFields[qvdObj]);
+
 // Filters configuration on list view
 Wat.I.formFilters[qvdObj] = {
     'name': {
