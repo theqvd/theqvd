@@ -310,7 +310,7 @@ sub new {
     $self->{username} = Wx::TextCtrl->new($panel, -1, core_cfg('client.remember_username') ?  core_cfg('client.user.name') : "", wxDefaultPosition, wxDefaultSize);
     $grid_sizer->Add($self->{username}, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5);
 
-    $self->{password} = Wx::TextCtrl->new($panel, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+    $self->{password} = Wx::TextCtrl->new($panel, -1, core_cfg('client.remember_password') ?  core_cfg('client.user.password') : "", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
     $grid_sizer->Add($self->{password}, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5);
 
     if (core_cfg('client.show.remember_password')) {

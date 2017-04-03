@@ -58,6 +58,22 @@ windows/script.iss
 # Generated files
 windows/installer/qvd-client*.exe
 
+MANIFEST
+
+*.bak
+
+ext/QVD-Client/META\.json
+
+ext/QVD-Client/META\.yml
+
+ext/QVD-Config-Core/META\.json
+
+ext/QVD-Config-Core/META\.yml
+
+ext/QVD-VMA/META\.json
+
+ext/QVD-VMA/META\.yml
+
 # Backup files
 *~
 
@@ -67,3 +83,5 @@ ext/QVD-Client/NX/
 ext/QVD-Client/VcXsrv
 ext/QVD-Client/Xming
 
+
+ext/QVD-Admin/MANIFEST

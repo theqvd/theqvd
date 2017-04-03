@@ -1,0 +1,11 @@
+[Unit]
+Description=QVD API service
+After=syslog.target network.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/qvd/qvd-api.pid
+ExecStart=/usr/lib/qvd/bin/hypnotoad /usr/lib/qvd/bin/qvd-api.pl
+
+[Install]
+WantedBy=default.target

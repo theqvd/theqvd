@@ -1,0 +1,12 @@
+[Unit]
+Description=QVD HKD service
+After=syslog.target network.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/qvd/qvd-hkd.pid
+EnvironmentFile=-/etc/sysconfig/qvd-hkd
+ExecStart=/usr/lib/qvd/bin/qvd-hkd
+
+[Install]
+WantedBy=default.target

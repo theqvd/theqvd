@@ -132,6 +132,7 @@ command.groupdel = /usr/sbin/groupdel
 command.tar = tar
 command.umount = umount
 command.mount = mount
+command.version.mount.overlayfs = 2
 @ubuntu-14.04@command.version.mount.overlayfs = 2
 @ubuntu-16.04@command.version.mount.overlayfs = 1
 @sles@command.version.mount.overlayfs = 1
@@ -143,6 +144,7 @@ command.lxc-create = ${path.qvd.bin}/lxc-create
 command.lxc-start = ${path.qvd.bin}/lxc-start
 command.lxc-stop = ${path.qvd.bin}/lxc-stop
 command.lxc-wait = ${path.qvd.bin}/lxc-wait
+command.version.lxc = 1.1
 @ubuntu@command.version.lxc = 1.0
 @sles-11@command.version.lxc = 0.7
 @sles-12@command.version.lxc = 1.0
@@ -476,6 +478,7 @@ admin.ssh.opt.UserKnownHostsFile = /dev/null
 vm.hypervisor = lxc
 
 ## COW fs to use with LXC
+vm.lxc.unionfs.type = overlayfs
 @ubuntu@vm.lxc.unionfs.type = overlayfs
 @sles-12@vm.lxc.unionfs.type = overlayfs
 @sles-11@vm.lxc.unionfs.type = unionfs-fuse

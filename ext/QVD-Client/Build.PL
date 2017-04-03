@@ -51,6 +51,7 @@ my $build = $mod->new (
     requires      => {
         'Crypt::OpenSSL::X509' => 0,
         'IO::Socket::Forwarder' => 0,
+        'IO::Socket::SSL' => 0,
         'JSON' => 0,
         'Proc::Background' => 0,
         'QVD::Config::Core' => 0,
