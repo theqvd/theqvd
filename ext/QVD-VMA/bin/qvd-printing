@@ -5,7 +5,7 @@ use Data::Dumper;
 use strict;                     
 use warnings;                 
 
-my $next_printing = 1;
+my $next_printing = 0;
 
 if($next_printing){
 #if($params{'qvd.hook.on_printing'}){
