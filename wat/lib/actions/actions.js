@@ -346,13 +346,17 @@ Wat.A = {
             }
             
             var jsonUrl = Wat.C.getBaseUrl() + '&action=' + params.action;
-
+            
             if (params.filters) {
                 jsonUrl += '&filters=' + JSON.stringify(params.filters);
             }
-            
+
             if (params.order_by) {
                 jsonUrl += '&order_by=' + JSON.stringify(params.order_by);
+            }
+            
+            if (params.groupByField) {
+                params.fields.push(params.groupByField);
             }
             
             if (params.fields) {
