@@ -39,8 +39,12 @@ table.details, table.custom-props {
         vertical-align: top;
         white-space: nowrap;
         
+        @include in(mobile) {
+            white-space: normal;
+        }
+        
         i.fa {
-            @include in(mobile) {                
+            @include in(mobile) {
                 display: none;
             }
         }

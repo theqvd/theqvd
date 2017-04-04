@@ -1,21 +1,18 @@
-<td><i class="fa fa-warning"></i><span data-i18n="Expiration"></span></td>
 <%
     if (!expiration_soft && !expiration_hard) {
 %>
-    <td class="js-details-expiration">
         <div class="no-elements" data-i18n="No"></div>
-    </td>
 <%
     }
     else {
         if (remainingTimeHard.expired) {
 %>
-            <td class="js-details-expiration"><span class="error" data-i18n="Expired"></span></td>
+            <td class="js-details-expiration"><span class="error" data-i18n="Expired"></span></div>
 <%
         }
         else {
 %>
-            <td class="inner-table" class="js-details-expiration">
+            <div class="inner-table" class="js-details-expiration">
                 <table class="expiration-table">
                     <tbody>
                         <%
@@ -40,7 +37,7 @@
                         %>
                     </tbody>
                 </table>
-            </td>
+            </div>
 <%
         }
     }

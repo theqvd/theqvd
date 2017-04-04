@@ -232,171 +232,196 @@ Wat.I.listDefaultFields[qvdObj] = $.extend({}, Wat.I.listFields[qvdObj]);
 
 // Fields configuration on details view
 Wat.I.detailsFields[qvdObj] = {
-    'id': {
-        'text': 'Id',
-        'fields': [
-            'id'
-        ],
-        'acls': 'vm.see.id',
-        'display': false,
+    'general': {
+        'text': 'General',
+        'default': true,
+        'fieldList': {
+            'id': {
+                'text': 'Id',
+                'fields': [
+                    'id'
+                ],
+                'acls': 'vm.see.id',
+                'display': false,
+                'icon': 'fa fa-asterisk'
+            },
+            'description': {
+                'display': true,
+                'fields': [
+                    'description'
+                ],
+                'acls': 'user.see.description',
+                'text': 'Description',
+                'icon': 'fa fa-align-justify',
+            },
+            'user': {
+                'text': 'User',
+                'fields': [
+                    'user_id',
+                    'user_name'
+                ],
+                'acls': 'vm.see.user',
+                'display': true,
+                'icon': CLASS_ICON_USERS
+            },
+            'block': {
+                'display': true,
+                'fields': [
+                    'id'
+                ],
+                'acls': 'vm.see.block',
+                'text': 'Blocking',
+                'icon': 'fa fa-lock'
+            }
+        }
     },
-    'name': {
-        'text': 'Name',
-        'fields': [
-            'id',
-            'name'
-        ],
-        'display': true
+    'image': {
+        'text': 'Image',
+        'fieldList': {
+            'osf': {
+                'text': 'OS Flavour',
+                'fields': [
+                    'osf_id',
+                    'osf_name'
+                ],
+                'acls': 'vm.see.osf',
+                'display': false,
+                'icon': CLASS_ICON_OSFS
+            },
+            'tag': {
+                'text': 'Tag',
+                'fields': [
+                    'di_tag'
+                ],
+                'acls': 'vm.see.di-tag',
+                'display': false,
+                'icon': 'fa fa-tag'
+            },
+            'disk_image': {
+                'text': 'Disk image',
+                'fields': [
+                    'di_name',
+                    'di_id',
+                    'version'
+                ],
+                'acls': 'vm.see.di',
+                'display': false,
+                'icon': CLASS_ICON_DIS
+            },
+        }
     },
-    'block': {
-        'display': true,
-        'fields': [
-            'id'
-        ],
-        'acls': 'vm.see.block',
-        'text': 'Blocking'
+    'execution': {
+        'text': 'Execution',
+        'onlyMobile': true,
+        'onlyWithConditions': {
+            state: ['starting', 'running']
+        },
+        'fieldList': {
+            'state': {
+                'text': 'State',
+                'fields': [
+                    'state'
+                ],
+                'acls': 'vm.see.state',
+                'display': true,
+                'icon': 'fa fa-heart'
+            },
+            'host': {
+                'text': 'Node',
+                'fields': [
+                    'host_id',
+                    'host_name'
+                ],
+                'acls': 'vm.see.host',
+                'display': true,
+                'icon': CLASS_ICON_HOSTS
+            },
+            'expiration': {
+                'text': 'Expiration',
+                'fields': [
+                    'expiration_soft',
+                    'expiration_hard'
+                ],
+                'acls': 'vm.see.expiration',
+                'display': true,
+                'icon': 'fa fa-warning',
+                'bbRow': true
+            },
+            'serial_port': {
+                'text': 'Serial port',
+                'fields': [
+                    'serial_port'
+                ],
+                'acls': 'vm.see.port-serial',
+                'display': false,
+                'icon': 'fa fa-angle-double-right'
+            },
+            'ssh_port': {
+                'text': 'SSH port',
+                'fields': [
+                    'ssh_port'
+                ],
+                'acls': 'vm.see.port-ssh',
+                'display': false,
+                'icon': 'fa fa-angle-double-right'
+            },
+            'vnc_port': {
+                'text': 'VNC port',
+                'fields': [
+                    'vnc_port'
+                ],
+                'acls': 'vm.see.port-vnc',
+                'display': false,
+                'icon': 'fa fa-angle-double-right'
+            }
+        }
     },
-    'host': {
-        'text': 'Node',
-        'fields': [
-            'host_id',
-            'host_name'
-        ],
-        'acls': 'vm.see.host',
-        'display': true
+    'network': {
+        'text': 'Network',
+        'fieldList': {
+            'ip': {
+                'text': 'IP address',
+                'fields': [
+                    'ip'
+                ],
+                'acls': 'vm.see.ip',
+                'display': false,
+                'icon': 'fa fa-ellipsis-h'
+            },
+            'mac': {
+                'text': 'MAC address',
+                'fields': [
+                    'mac'
+                ],
+                'acls': 'vm.see.mac',
+                'display': true,
+                'icon': 'fa fa-ellipsis-h'
+            }
+        }
     },
-    'user': {
-        'text': 'User',
-        'fields': [
-            'user_id',
-            'user_name'
-        ],
-        'acls': 'vm.see.user',
-        'display': true
-    },
-    'user_state': {
-        'text': 'User state',
-        'fields': [
-            'user_state'
-        ],
-        'acls': 'vm.see.user-state',
-        'display': true
-    },
-    'state': {
-        'text': 'State',
-        'fields': [
-            'state'
-        ],
-        'acls': 'vm.see.state',
-        'display': true
-    },
-    'osf': {
-        'text': 'OS Flavour',
-        'fields': [
-            'osf_id',
-            'osf_name'
-        ],
-        'acls': 'vm.see.osf',
-        'display': false
-    },
-    'tag': {
-        'text': 'Tag',
-        'fields': [
-            'di_tag'
-        ],
-        'acls': 'vm.see.di-tag',
-        'display': false
-    },
-    'di_version': {
-        'text': 'DI version',
-        'fields': [
-            'di_version'
-        ],
-        'acls': 'vm.see.di-version',
-        'display': false
-    },
-    'disk_image': {
-        'text': 'Disk image',
-        'fields': [
-            'di_name',
-            'di_id'
-        ],
-        'acls': 'vm.see.di',
-        'display': false
-    },
-    'expiration': {
-        'text': 'Info',
-        'fields': [
-            'expiration_soft',
-            'expiration_hard'
-        ],
-        'acls': 'vm.see.expiration',
-        'display': true
-    },
-    'ip': {
-        'text': 'IP address',
-        'fields': [
-            'ip'
-        ],
-        'acls': 'vm.see.ip',
-        'display': false
-    },
-    'next_boot_ip': {
-        'text': 'Next boot IP',
-        'fields': [
-            'next_boot_ip'
-        ],
-        'acls': 'vm.see.next-boot-ip',
-        'display': false
-    },
-    'mac': {
-        'text': 'MAC address',
-        'fields': [
-            'mac'
-        ],
-        'acls': 'vm.see.mac',
-        'display': true
-    },
-    'serial_port': {
-        'text': 'Serial port',
-        'fields': [
-            'serial_port'
-        ],
-        'acls': 'vm.see.port-serial',
-        'display': false
-    },
-    'ssh_port': {
-        'text': 'SSH port',
-        'fields': [
-            'ssh_port'
-        ],
-        'acls': 'vm.see.port-ssh',
-        'display': false
-    },
-    'vnc_port': {
-        'text': 'VNC port',
-        'fields': [
-            'vnc_port'
-        ],
-        'acls': 'vm.see.port-vnc',
-        'display': false
-    },
-    'creation_date': {
-        'text': 'Creation date',
-        'fields': [
-            'creation_date'
-        ],
-        'acls': 'vm.see.creation-date',
-        'display': true
-    },
-    'creation_admin': {
-        'text': 'Created by',
-        'fields': [
-            'creation_admin_id',
-            'creation_admin_name'
-        ],
-        'acls': 'vm.see.created-by',
-        'display': true
+    'activity': {
+        'text': 'Activity',
+        'fieldList': {
+            'creation_admin': {
+                'text': 'Created by',
+                'fields': [
+                    'creation_admin_id',
+                    'creation_admin_name'
+                ],
+                'acls': 'vm.see.created-by',
+                'display': true,
+                'icon': CLASS_ICON_ADMINS
+            },
+            'creation_date': {
+                'text': 'Creation date',
+                'fields': [
+                    'creation_date'
+                ],
+                'acls': 'vm.see.creation-date',
+                'display': true,
+                'icon': 'fa fa-clock-o'
+            }
+        }
     }
 };
 

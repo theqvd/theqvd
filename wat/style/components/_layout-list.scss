@@ -148,21 +148,26 @@ fieldset {
     
     &.action-selected {
         margin-top: 35px;
+        padding: 10px;
         display: none;
         position: fixed;
-        top: 50px;
-        right: 10px;
-
+        top: 120px;
+        right: 5px;
+        font-size: 12px;
+        
         width: 100px;
 
         @include in(desktop) {
-        width: 250px;
-        }        
+            width: 15%;
+            left: 5px;
+        }
         
         a.button, a.button2 {
             @include in(mobile) {
                 text-align: center;
             }
+            white-space: normal;
+            height: initial;
         }
         min-height: 100px;
         background: lighten($col_blacker, 10);
@@ -172,7 +177,7 @@ fieldset {
             margin-bottom: 20px;
             font-weight: bold;
             line-height: 20px;
-    }
+        }
     } 
 
     .chosen-container {

@@ -130,86 +130,122 @@ Wat.I.listDefaultFields[qvdObj] = $.extend({}, Wat.I.listFields[qvdObj]);
 
 // Fields configuration on details view
 Wat.I.detailsFields[qvdObj] = {
-    'id': {
-        'display': false,
-        'fields': [
-            'id'
-        ],
-        'acls': 'di.see.id',
-        'text': 'Id'
-    },
-    'disk_image': {
-        'display': true,
-        'fields': [
-            'id',
-            'disk_image'
-        ],
-        'text': 'Disk image'
-    },
-    'block': {
-        'display': true,
-        'fields': [
-            'id'
-        ],
-        'acls': 'di.see.block',
-        'text': 'Blocking'
+    'general': {
+        'text': 'General',
+        'default': true,
+        'fieldList': {
+            'id': {
+                'display': false,
+                'fields': [
+                    'id'
+                ],
+                'acls': 'di.see.id',
+                'text': 'Id',
+                'icon': 'fa fa-asterisk'
+            },
+            'state': {
+                'display': true,
+                'fields': [
+                    'state'
+                ],
+                'text': 'State',
+                'icon': 'fa fa-heart'
+            },
+            'description': {
+                'display': true,
+                'fields': [
+                    'description'
+                ],
+                'acls': 'di.see.description',
+                'text': 'Description',
+                'icon': 'fa fa-align-justify',
+            },
+            'version': {
+                'display': true,
+                'fields': [
+                    'version'
+                ],
+                'acls': 'di.see.version',
+                'text': 'Version',
+                'icon': 'fa fa-ticket'
+            },
+            'block': {
+                'display': true,
+                'fields': [
+                    'id'
+                ],
+                'acls': 'di.see.block',
+                'text': 'Blocking',
+                'icon': 'fa fa-lock'
+            },
+            'osf': {
+                'display': true,
+                'fields': [
+                    'osf_id',
+                    'osf_name'
+                ],
+                'acls': 'di.see.osf',
+                'text': 'OS Flavour',
+                'icon': CLASS_ICON_OSFS
+            },
+        },
     },
     'tags': {
-        'display': true,
-        'fields': [
-            'id'
-        ],
-        'acls': 'di.see.tags',
-        'text': 'Tags'
+        'text': 'Tags',
+        'fieldList': {
+            'default': {
+                'display': false,
+                'fields': [
+                    'default'
+                ],
+                'acls': 'di.see.default',
+                'text': 'Default',
+                'onlyIfNotEmpty': 'default',
+                'icon': 'fa fa-home'
+            },
+            'head': {
+                'display': false,
+                'fields': [
+                    'head'
+                ],
+                'acls': 'di.see.head',
+                'text': 'Head',
+                'onlyIfNotEmpty': 'head',
+                'icon': 'fa fa-flag-o'
+            },
+            'tags': {
+                'display': true,
+                'fields': [
+                    'id'
+                ],
+                'acls': 'di.see.tags',
+                'text': 'Tags',
+                'icon': 'fa fa-tags'
+            },
+        }
     },
-    'osf': {
-        'display': true,
-        'fields': [
-            'osf_id',
-            'osf_name'
-        ],
-        'acls': 'di.see.osf',
-        'text': 'OS Flavour'
-    },
-    'version': {
-        'display': true,
-        'fields': [
-            'version'
-        ],
-        'acls': 'di.see.version',
-        'text': 'Version'
-    },
-    'default': {
-        'display': false,
-        'fields': [
-            'tags'
-        ],
-        'acls': 'di.see.default',
-        'text': 'Default'
-    },
-    'head': {
-        'display': false,
-        'fields': [
-            'tags'
-        ],
-        'acls': 'di.see.head',
-        'text': 'Head'
-    },
-    'creation_date': {
-        'text': 'Creation date',
-        'fields': [
-            'creation_date'
-        ],
-        'acls': 'di.see.creation-date',
-        'display': false
-    },
-    'creation_admin': {
-        'text': 'Created by',
-        'fields': [
-            'creation_admin'
-        ],
-        'acls': 'di.see.created-by',
-        'display': false
+    'activity': {
+        'text': 'Activity',
+        'fieldList': {
+            'creation_admin': {
+                'text': 'Created by',
+                'fields': [
+                    'creation_admin'
+                ],
+                'acls': 'di.see.created-by',
+                'display': false,
+                'icon': CLASS_ICON_ADMINS
+            },
+            'creation_date': {
+                'text': 'Creation date',
+                'fields': [
+                    'creation_date'
+                ],
+                'acls': 'di.see.creation-date',
+                'display': false,
+                'icon': 'fa fa-clock-o'
+            }
+        }
     }
 };
 

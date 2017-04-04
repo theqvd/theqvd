@@ -73,7 +73,91 @@ Wat.I.listFields[qvdObj] = {
 
 Wat.I.listDefaultFields[qvdObj] = $.extend({}, Wat.I.listFields[qvdObj]);
 
-        
+// Fields configuration on details view
+Wat.I.detailsFields[qvdObj] = {
+    'general': {
+        'text': 'General',
+        'default': true,
+        'fieldList': {
+            'id': {
+                'display': true,
+                'fields': [
+                    'id'
+                ],
+                'acls': 'tenant.see.id',
+                'text': 'Id',
+                'icon': 'fa fa-asterisk'
+            },
+            'description': {
+                'display': true,
+                'fields': [
+                    'description'
+                ],
+                'acls': 'tenant.see.description',
+                'text': 'Description',
+                'icon': 'fa fa-align-justify',
+            },
+            'block': {
+                'display': true,
+                'fields': [
+                    'id'
+                ],
+                'acls': 'tenant.see.block',
+                'text': 'Blocking',
+                'icon': 'fa fa-lock'
+            }
+        }
+    },
+    'environment': {
+        'text': 'Environment',
+        'fieldList': {
+            'language': {
+                'text': 'Language',
+                'fields': [
+                    'language'
+                ],
+                'acls': 'tenant.see.language',
+                'display': true,
+                'icon': 'fa fa-globe'
+            },
+            'blocksize': {
+                'text': 'Block size',
+                'fields': [
+                    'block'
+                ],
+                'acls': 'tenant.see.blocksize',
+                'display': true,
+                'icon': 'fa fa-list'
+            }
+        }
+    },
+    'activity': {
+        'text': 'Activity',
+        'fieldList': {
+            'creation_admin': {
+                'text': 'Created by',
+                'fields': [
+                    'creation_admin'
+                ],
+                'acls': 'tenant.see.created-by',
+                'display': true,
+                'icon': CLASS_ICON_ADMINS
+            },
+            'creation_date': {
+                'text': 'Creation date',
+                'fields': [
+                    'creation_date'
+                ],
+                'acls': 'tenant.see.creation-date',
+                'display': true,
+                'icon': 'fa fa-clock-o'
+            }
+        }
+    }
+};
+
+Wat.I.detailsDefaultFields[qvdObj] = $.extend({}, Wat.I.detailsFields[qvdObj]);
+
 // Filters configuration on list view
 Wat.I.formFilters[qvdObj] = {
     'name': {

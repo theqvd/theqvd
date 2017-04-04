@@ -298,5 +298,30 @@ Wat.U = {
         return obj.sort(function(a,b) {
             return (a[field] > b[field]) ? 1 : ((b[field] > a[field]) ? -1 : 0);
         });
+    },
+    
+    // Evaluate fields of one model to check if comply certain conditions passed as parameter
+    complyConditions: function (model, conditions) {
+        // Count number of success conditions
+        var matchCounter = 0;
+        $.each(conditions, function (field, values) {
+            var matchCondition = false;
+            $.each(values, function (iValue, value) {
+                if (model.get(field) == value) {
+                    matchCondition = true;
+                }
+            });
+
+            if (matchCondition) {
+                matchCounter++;
+            }
+        });
+
+        // If any confition doesnt pass, ignore the category
+        if (matchCounter < Object.keys(conditions).length) {
+            return false;
+        }
+        
+        return true;
     }
 }

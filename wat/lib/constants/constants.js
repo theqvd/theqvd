@@ -384,5 +384,6 @@ DICTIONARY_STATES = {
     stopped: 'Stopped',
     starting: 'Starting',
     stopping: 'Stopping',
-    zombie: 'Zombie'
+    zombie: 'Zombie',
+    lost: 'Lost'
 };

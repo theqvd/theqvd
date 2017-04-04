@@ -110,70 +110,94 @@ Wat.I.listDefaultFields[qvdObj] = $.extend({}, Wat.I.listFields[qvdObj]);
 
 // Fields configuration on details view
 Wat.I.detailsFields[qvdObj] = {
-    'id': {
-        'display': false,
-        'fields': [
-            'id'
-        ],
-        'acls': 'host.see.id',
-        'text': 'Id'
+    'general': {
+        'text': 'General',
+        'default': true,
+        'fieldList': {
+            'id': {
+                'display': false,
+                'fields': [
+                    'id'
+                ],
+                'acls': 'host.see.id',
+                'text': 'Id',
+                'icon': 'fa fa-asterisk'
+            },
+            'description': {
+                'display': false,
+                'fields': [
+                    'description'
+                ],
+                'acls': 'host.see.description',
+                'text': 'Description',
+                'icon': 'fa fa-align-justify',
+            },
+            'state': {
+                'display': false,
+                'fields': [
+                    'state'
+                ],
+                'acls': 'host.see.state',
+                'text': 'State',
+                'icon': 'fa fa-heart',
+            },
+            'block': {
+                'display': true,
+                'fields': [
+                    'id'
+                ],
+                'acls': 'host.see.block',
+                'text': 'Blocking',
+                'icon': 'fa fa-lock'
+            }
+        }
     },
-    'name': {
-        'display': true,
-        'fields': [
-            'id',
-            'name'
-        ],
-        'text': 'Name'
+    'network': {
+        'text': 'Network',
+        'fieldList': {
+            'address': {
+                'display': true,
+                'fields': [
+                    'address'
+                ],
+                'acls': 'host.see.address',
+                'text': 'IP address',
+                'icon': 'fa fa-ellipsis-h'
+            }
+        }
     },
-    'block': {
-        'display': true,
-        'fields': [
-            'id'
-        ],
-        'acls': 'host.see.block',
-        'text': 'Blocking'
-    },
-    'state': {
-        'display': false,
-        'fields': [
-            'state'
-        ],
-        'acls': 'host.see.state',
-        'text': 'State'
-    },
-    'address': {
-        'display': true,
-        'fields': [
-            'address'
-        ],
-        'acls': 'host.see.address',
-        'text': 'IP address'
-    },
-    'connected_vms': {
-        'display': true,
-        'fields': [
-            'id',
-            'number_of_vms_connected'
-        ],
-        'acls': 'host.see.vms-info',
-        'text': 'Running VMs'
-    },
-    'creation_date': {
-        'text': 'Creation date',
-        'fields': [
-            'creation_date'
-        ],
-        'acls': 'host.see.creation-date',
-        'display': false
-    },
-    'creation_admin': {
-        'text': 'Created by',
-        'fields': [
-            'creation_admin'
-        ],
-        'acls': 'host.see.created-by',
-        'display': false
+    'activity': {
+        'text': 'Activity',
+        'fieldList': {
+            'creation_admin': {
+                'text': 'Created by',
+                'fields': [
+                    'creation_admin'
+                ],
+                'acls': 'host.see.created-by',
+                'display': false,
+                'icon': CLASS_ICON_ADMINS
+            },
+            'creation_date': {
+                'text': 'Creation date',
+                'fields': [
+                    'creation_date'
+                ],
+                'acls': 'host.see.creation-date',
+                'display': false,
+                'icon': 'fa-clock-o'
+            },
+            'connected_vms': {
+                'display': true,
+                'fields': [
+                    'id',
+                    'number_of_vms_connected'
+                ],
+                'acls': 'host.see.vms-info',
+                'text': 'Running VMs',
+                'icon': CLASS_ICON_VMS
+            }
+        }
     }
 };
 

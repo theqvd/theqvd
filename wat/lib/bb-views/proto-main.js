@@ -173,7 +173,7 @@ Wat.Views.MainView = Backbone.View.extend({
 
             if (existsOutTenant) {
                     params['startingOptions'] = {};
-                    params['startingOptions'][COMMON_TENANT_ID] = 'None (Common)';   
+                    params['startingOptions'][COMMON_TENANT_ID] = 'None (Shared)';   
             }
             
             Wat.A.fillSelect(params, function () {

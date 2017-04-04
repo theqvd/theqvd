@@ -111,7 +111,8 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
         'click .js-button-stop-vm': 'stopVM',
         'click .js-button-restart-vm': 'restartVM',
         'click .js-button-disconnect-all-vms': 'applyDisconnectAll',
-        'click .js-show-details-actions': 'toggleActions'
+        'click .js-show-details-actions': 'toggleActions',
+        'click .js-details-option': 'clickDetailsMenuOption'
     },
 
     render: function () {
@@ -190,6 +191,26 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             );
 
             $(this.detailsContainer).html(this.template);
+
+            this.template = _.template(
+                Wat.TPL.layoutDesktop, {
+                    model: this.model,
+                    detailsFields: this.detailsFields,
+                    enabledProperties: enabledProperties
+                }
+            );
+
+            $('.bb-details-layout-desktop').html(this.template);
+
+            this.template = _.template(
+                Wat.TPL.layoutMobile, {
+                    model: this.model,
+                    detailsFields: this.detailsFields,
+                    enabledProperties: enabledProperties
+                }
+            );
+
+            $('.bb-details-layout-mobile').html(this.template);
         
             this.template = _.template(
                 Wat.TPL.detailsSide, {
@@ -289,21 +310,30 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     },
     
     setDetailsFields: function () {
+        var that = this;
+        
         // Get Fields from configuration
         this.detailsFields = Wat.I.getDetailsFields(this.qvdObj);
         
         // Check acls on fields to remove forbidden ones
-        Wat.C.purgeConfigData(this.detailsFields);
+        $.each(this.detailsFields, function (iF, field) {
+            if (that.detailsFields[iF].fieldList) {
+                Wat.C.purgeConfigData(that.detailsFields[iF].fieldList);
+            }
+        });
 
         // The superadmin have an extra field on lists: tenant
         
-        // Every element but the hosts has tenant
-        if (Wat.C.isSuperadmin() && this.qvdObj != 'host') {
-            this.detailsFields.tenant = {
-                'text': 'Tenant',
-                'display': true,
-                'noTranslatable': true
-            };
+        var classifiedByTenant = $.inArray(this.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
+        if (Wat.C.isSuperadmin() && classifiedByTenant) {
+            this.detailsFields.general.fieldList = $.extend({}, { 
+                tenant: {
+                    'text': 'Tenant',
+                    'display': true,
+                    'noTranslatable': true,
+                    'icon': CLASS_ICON_TENANTS
+                }
+            }, this.detailsFields.general.fieldList);
         }
     },
     
@@ -428,4 +458,16 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
             }, 50);
         }
     },
+    
+    clickDetailsMenuOption: function (e) {
+        var option = $(e.target).attr('data-details-target') || $(e.target).parent().attr('data-details-target');
+        
+        // Manage enabled option
+        $('.lateral-menu-option.js-details-option').removeClass('lateral-menu-option--selected');
+        $('.lateral-menu-option[data-details-target="' + option + '"]').addClass('lateral-menu-option--selected');
+        
+        // Show block
+        $('[data-details-block]').hide();
+        $('[data-details-block="' + option + '"]').show();
+    }
 });
