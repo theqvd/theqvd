@@ -111,12 +111,12 @@ path.qvd.bin = /usr/lib/qvd/bin
 path.usb.database = /usr/share/hwdata/usb.ids
 
 ## paths to external executables
+command.kvm = kvm
 @sles@command.kvm = qemu-kvm
-@ubuntu@command.kvm = kvm
 command.kvm-img = qemu-img
 command.sshfs = ${path.qvd.bin}/sshfs
 command.open_file = xdg-open
-@ubuntu@command.sftp-server = /usr/lib/openssh/sftp-server
+command.sftp-server = /usr/lib/openssh/sftp-server
 @sles-11@command.sftp-server = /usr/lib64/ssh/sftp-server
 @sles-12@command.sftp-server = /usr/lib/ssh/sftp-server
 command.nxagent = /usr/bin/nxagent
@@ -132,10 +132,9 @@ command.groupdel = /usr/sbin/groupdel
 command.tar = tar
 command.umount = umount
 command.mount = mount
-command.version.mount.overlayfs = 2
+command.version.mount.overlayfs = 1
 @ubuntu-14.04@command.version.mount.overlayfs = 2
-@ubuntu-16.04@command.version.mount.overlayfs = 1
-@sles@command.version.mount.overlayfs = 1
+@ubuntu-14.04.3@command.version.mount.overlayfs = 1
 command.rm = rm
 command.unionfs-fuse = ${path.qvd.bin}/unionfs
 command.lxc-destroy = ${path.qvd.bin}/lxc-destroy
@@ -145,7 +144,6 @@ command.lxc-start = ${path.qvd.bin}/lxc-start
 command.lxc-stop = ${path.qvd.bin}/lxc-stop
 command.lxc-wait = ${path.qvd.bin}/lxc-wait
 command.version.lxc = 1.1
-@ubuntu@command.version.lxc = 1.0
 @sles-11@command.version.lxc = 0.7
 @sles-12@command.version.lxc = 1.0
 command.ebtables = ebtables
@@ -368,7 +366,7 @@ client.usb.usbip.log = 0
 # Share all USB devices automatically (most of the time not a good idea)
 client.usb.share_all = 0
 
-# List of USB devices to share with the VM.
+# List of USB devices to share with the VM.  
 # Syntax: VID:PID@serial, comma separated. Spaces are allowed. For example:
 # 0441:0012, 1234:5678@12345678
 client.usb.share_list =
@@ -479,12 +477,15 @@ vm.hypervisor = lxc
 
 ## COW fs to use with LXC
 vm.lxc.unionfs.type = overlayfs
-@ubuntu@vm.lxc.unionfs.type = overlayfs
 @sles-12@vm.lxc.unionfs.type = overlayfs
 @sles-11@vm.lxc.unionfs.type = unionfs-fuse
 vm.lxc.unionfs.bind.ro = 1
 
 vm.lxc.unionfs.overlayfs.module.name = overlay
+@ubuntu-14.04@vm.lxc.unionfs.overlayfs.module.name = overlayfs
+@ubuntu-16.04.0@vm.lxc.unionfs.overlayfs.module.name = overlayfs
+@ubuntu-16.04.1@vm.lxc.unionfs.overlayfs.module.name = overlayfs
+@sles@vm.lxc.unionfs.overlayfs.module.name = overlayfs
 
 # allow LXC DIs to have hooks for customization - disabled by default
 # because they run as root and can do anything on the host

@@ -28,7 +28,7 @@ sub detect_os {
             if (my %osr = __parse_file("/etc/os-release")) {
                 $os = $osr{name};
                 $version = $osr{version_id};
-                $revision = 0;
+                $revision = ($osr{version} =~ /^\s*$version\.(\d+)/) ? $1 : 0;
             }
             elsif (my %sv = __parse_file("/etc/SuSE-version")) {
                 $os = 'suse';
