@@ -27,6 +27,7 @@ WriteMakefile(
         'QVD::HTTP::StatusCodes' => 0,
         'QVD::HTTPD'             => 0,
         'QVD::L7R::LoadBalancer' => 0,
+        'QVD::L7R::Authenticator::Plugin::TOTP' => 0,
         'QVD::Log'               => 0,
         'QVD::SimpleRPC::Client' => 0,
         'QVD::URI'               => 0,
