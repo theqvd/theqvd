@@ -99,8 +99,12 @@ a.button-update-customize {
     }
 }
 
-.action-new-token {
+.action-token-top {
     margin-bottom: 10px;
+}
+
+.action-token-bottom {
+    margin-top: 10px;
 }
 
 .config-search-box, .doc-search-box { 
@@ -115,4 +119,12 @@ a.button-update-customize {
 
 .token-action-select {
     width: auto;
+}
+
+.token-row {
+    .token-actions-col {
+        a {
+            width: 100%;
+        }
+    }
 }

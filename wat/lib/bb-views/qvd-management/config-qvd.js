@@ -4,6 +4,11 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     qvdObj: 'config',
     selectedTenant: COMMON_TENANT_ID,
     
+    tokensQueue: {
+        edit: [],
+        delete: []
+    },
+    
     setupOption: 'profile',
     
     limitByACLs: true,
@@ -27,7 +32,26 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         }
     },
     
+    events: {
+        'click .lateral-menu-option': 'clickPrefixOption',
+        'click .js-button-new': 'openNewElementDialog',
+        'click .js-restore-token-default': 'restoreTokenDefault',
+        'click .js-reset-token': 'resetToken',
+        'click .js-delete-token': 'clickDeleteToken',
+        'click .js-button-save': 'clickSaveTokens',
+        'input input.js-token-value': 'editToken',
+        'keypress [name="config_search"]': 'clickOnSearch',
+        'change [name="tenant_id"]': 'changeTenant',
+        'click #tenant_search_chosen': 'clickOpenTenantSelect'
+    },
+    
     initialize: function (params) {
+        // Initialize tokensQueue to avoid errors
+        this.tokensQueue = {
+            edit: [],
+            delete: []
+        };
+        
         // If user have not access to main section, redirect to home
         if (!Wat.C.checkACL('config.qvd.')) {
             Wat.Router.watRouter.trigger('route:defaultRoute');
@@ -46,10 +70,11 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
                     
         var templates = Wat.I.T.getTemplateList('qvdConfig');
         
-        // The templates will be charged asynchronously. 
+        // The templates will be charged asynchronously
         Wat.A.getTemplates(templates, this.getPrefixes, this); 
     },
     
+    // Get the token prefixes from API
     getPrefixes: function (that) {
         var filter = {};
         if (Wat.C.isSuperadmin()) {
@@ -59,6 +84,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         Wat.A.performAction('config_get', {}, filter, {}, that.processPrefixes, that, null, {"field": "key", "order":"-asc"});
     },
     
+    // Process prefixes after be retrieved from API to support unclassified tokens and curren prefix
     processPrefixes: function (that) {
         if (that.retrievedData.statusText == 'abort') {
             return;
@@ -97,20 +123,24 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         }
         
         if (that.currentTokensPrefix == UNCLASSIFIED_CONFIG_CATEGORY) {
-            filter['-not'] = { key : {'~':'%.%'} };
-            Wat.A.performAction('config_get', {}, filter, {}, that.processTokensRender, that);
+            filter['-not'] = {key : {'~':'%.%'}};
         }
         else {
             filter['key'] = {'~': that.currentTokensPrefix + '.%'};
-            Wat.A.performAction('config_get', {}, filter, {}, that.processTokensRender, that);
         }
+        
+        // Retrieve from API current prefix tokens
+        Wat.A.performAction('config_get', {}, filter, {}, that.processBeforeRender, that);
     },
     
-    processTokensRender: function (that) {
+    // Hook executed before render complete view
+    // Sort retrieved tokens and render (Necessary step due API doesnt support order_by parameter for config tokens)
+    processBeforeRender: function (that) {
         that.configTokens = Wat.U.sortObjectByField(that.retrievedData.rows, 'key');
         that.render();
-    },  
+    },
     
+    // Render view
     render: function () {
         this.template = _.template(
             Wat.TPL.qvdConfig, {
@@ -144,15 +174,12 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
             });
         }
         
-        this.renderConfigurationTokens();
+        this.renderList();
     },
     
-    processTokensRenderTokens: function (that) {
-        // If search typed when searching was started is different to the current search in text box, do nothing
-        if (that.typedSearch != undefined && that.typedSearch != $('input[name="config_search"]').val()) {
-            return;
-        }
-        
+    // Process tokens after being retrieved from API when only list will be rendered
+    // If last token of a prefix was deleted, render all view again
+    processBeforeRenderList: function (that) {
         that.configTokens = Wat.U.sortObjectByField(that.retrievedData.rows, 'key');
         
         // If there are not tokens in this prefix, render everything again selecting first prefix
@@ -166,11 +193,12 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
             Wat.A.performAction('config_get', {}, filter, {}, that.processPrefixes, that);
         }
         else {
-            that.renderConfigurationTokens();
+            that.renderList();
         }
     },
     
-    renderConfigurationTokens: function () {
+    // Render tokens list
+    renderList: function () {
         this.template = _.template(
             Wat.TPL.qvdConfigTokens, {
                 configTokens: this.configTokens,
@@ -194,91 +222,137 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         }
     },
     
-    events: {
-        'click .js-token-header': 'clickTokenHeader',
-        'click .lateral-menu-option': 'clickPrefixOption',
-        'click .js-button-new': 'openNewElementDialog',
-        'click .actions_button': 'performTokenAction',
-        'input [name="config_search"]': 'filter',
-        'change [name="tenant_id"]': 'changeTenant'
-    },
+    ////////////////////////////////////////////////////
+    // Triggered functions by form and menu interaction
+    ////////////////////////////////////////////////////
     
-    changeTenant: function (e) {
-        this.selectedTenant = $(e.target).val();
-        
-		// Show loading animation while get tokens
-        $('.bb-config-tokens').html(HTML_MINI_LOADING);
-        $('.secondary-menu ul').remove();
-        $('.secondary-menu').append(HTML_MINI_LOADING);
-
-        this.getPrefixes(this);
-    },
-    
-    filter: function (e) {
-        $('.bb-config-tokens').html(HTML_MINI_LOADING);
-
-        var search = $(e.target).val();
-            
-        Wat.C.currentSearch = search;
-        
-        if (search == '') {
-            $('.lateral-menu-option').eq(0).trigger('click');
-        }
-        else {
-            $('.lateral-menu-option').removeClass('lateral-menu-option--selected');
-            
-            // If pushState is available in browser, modify hash with current token
-            if (history.pushState) {
-                history.pushState(null, null, '#/config');
+        // If there is some field without save when open tenant filter, show warning
+        clickOpenTenantSelect: function (e) {
+            if (this.tokensQueue.edit.length > 0 || this.tokensQueue.delete.length > 0) {
+                this.noSavedWarning(function () {
+                    $('select[name="tenant_id"]').trigger("chosen:open");
+                });
+                setTimeout(function () {
+                    $('select[name="tenant_id"]').trigger("chosen:close");
+                }, 100);
             }
-            
+        },
+    
+        // Filter by tenant
+        changeTenant: function (e) {
+            this.selectedTenant = $(e.target).val();
+
+            // Show loading animation while get tokens
+            $('.bb-config-tokens').html(HTML_MINI_LOADING);
+            $('.secondary-menu ul').remove();
+            $('.secondary-menu').append(HTML_MINI_LOADING);
+
+            this.getPrefixes(this);
+        },
+    
+        // When push carriage return on search box, filter
+        // If there is some field without save when write on search box, show warning
+        clickOnSearch: function (e) {
+            if (e.keyCode == 13) {
+                if (this.tokensQueue.edit.length > 0 || this.tokensQueue.delete.length > 0) {
+                    this.noSavedWarning(this.clickOnSearch, e);
+                    return;
+                }
+
+                $('.bb-config-tokens').html(HTML_MINI_LOADING);
+
+                var search = $(e.target).val();
+
+                Wat.C.currentSearch = search;
+
+                if (search == '') {
+                    $('.lateral-menu-option').eq(0).trigger('click');
+                }
+                else {
+                    $('.lateral-menu-option').removeClass('lateral-menu-option--selected');
+
+                    // If pushState is available in browser, modify hash with current token
+                    if (history.pushState) {
+                        history.pushState(null, null, '#/config');
+                    }
+
+                    var filter = {};
+                    if (Wat.C.isSuperadmin()) {
+                        filter['tenant_id'] = this.selectedTenant;
+                    }
+
+                    // Search substrings into key and operative_value
+                    filter['-or'] = [
+                        "key", {'~': '%' + search + '%'},
+                        "operative_value", {'~': '%' + search + '%'}
+                    ];
+
+                    // Pass typed search with context to avoid concurrency problems 
+                    Wat.A.performAction('config_get', {}, filter, {}, this.processBeforeRenderList, this);
+                }
+            }
+        },
+    
+        // Open new dialog for token creation
+        openNewElementDialog: function (e) {
+            if (this.tokensQueue.edit.length > 0 || this.tokensQueue.delete.length > 0) {
+                this.noSavedWarning(this.openNewElementDialog, e);
+                return;
+            }
+
+            this.dialogConf.title = $.i18n.t('New configuration token');
+            Wat.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
+
+            Wat.I.chosenElement('[name="tenant"]', 'single100');
+
+            // Set initial prefix to the current one
+            $('[name="key"]').val(this.currentTokensPrefix + '.');
+        },
+    
+        // Click on menu option
+        clickPrefixOption: function (e) {
+            if (this.tokensQueue.edit.length > 0 || this.tokensQueue.delete.length > 0) {
+                this.noSavedWarning(this.clickPrefixOption, e);
+                return;
+            }
+
+            // Restore current Search to empty
+            Wat.C.currentSearch = '';
+
+            // Get new hash from data-prefix attribute of clicked menu option
+            var newHash = '#/config/' + $(e.target).attr('data-prefix');
+
+            // If pushState is not available in browser, redirect to new hash reloading page
+            if (!history.pushState) {
+                window.location.hash = newHash;
+                return;
+            }
+
+            history.pushState(null, null, newHash);
+
+            this.selectPrefixMenu($(e.target).attr('data-prefix'));
+
+            this.currentTokensPrefix = $(e.target).attr('data-prefix');
+            $('.bb-config-tokens').html(HTML_MINI_LOADING);
+
             var filter = {};
             if (Wat.C.isSuperadmin()) {
                 filter['tenant_id'] = this.selectedTenant;
             }
-            
-            filter['key'] = {'~': '%' + search + '%'};
-            
-            // Pass typed search with context to avoid concurrency problems 
-            Wat.A.performAction('config_get', {}, filter, {}, this.processTokensRenderTokens, $.extend({}, this, {typedSearch: $('input[name="config_search"]').val()}));
-        }
-    },
+
+            if (this.currentTokensPrefix == UNCLASSIFIED_CONFIG_CATEGORY) {
+                filter['-not'] = { key : {'~':'%.%'} };
+                Wat.A.performAction('config_get', {}, filter, {}, this.processBeforeRenderList, this);
+            }
+            else {
+                filter['key'] = {'~': this.currentTokensPrefix + '.%'};
+                Wat.A.performAction('config_get', {}, filter, {}, this.processBeforeRenderList, this);
+            }
+        },
     
-    clickPrefixOption: function (e) {
-        // Restore current Search to empty
-        Wat.C.currentSearch = '';
-        
-        // Get new hash from data-prefix attribute of clicked menu option
-        var newHash = '#/config/' + $(e.target).attr('data-prefix');
-        
-        // If pushState is not available in browser, redirect to new hash reloading page
-        if (!history.pushState) {
-            window.location.hash = newHash;
-            return;
-        }
-        
-        history.pushState(null, null, newHash);
-        
-        this.selectPrefixMenu($(e.target).attr('data-prefix'));
-        
-        this.currentTokensPrefix = $(e.target).attr('data-prefix');
-        $('.bb-config-tokens').html(HTML_MINI_LOADING);
-        
-        var filter = {};
-        if (Wat.C.isSuperadmin()) {
-            filter['tenant_id'] = this.selectedTenant;
-        }
-        
-        if (this.currentTokensPrefix == UNCLASSIFIED_CONFIG_CATEGORY) {
-            filter['-not'] = { key : {'~':'%.%'} };
-            Wat.A.performAction('config_get', {}, filter, {}, this.processTokensRenderTokens, this);
-        }
-        else {
-            filter['key'] = {'~': this.currentTokensPrefix + '.%'};
-            Wat.A.performAction('config_get', {}, filter, {}, this.processTokensRenderTokens, this);
-        }
-    },
+    ////////////////////////////////////////////////////
     
+    // Set menu option as selected
     selectPrefixMenu: function (prefix) {
         $('.lateral-menu-option').removeClass('lateral-menu-option--selected');
         $('.lateral-menu-option[data-prefix="' + prefix + '"]').addClass('lateral-menu-option--selected');
@@ -290,166 +364,282 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
         $('input[name="config_search"]').val('');
     },
     
-    clickTokenHeader: function (e) {
-        if ($(e.target).is('i')) {
-            $(e.target).parent().trigger('click');
-            return false;
-        }
-        
-        var prefix = $(e.target).attr('data-prefix');
-        var status = $(e.target).attr('data-status');
-        
-        switch(status) {
-            case 'open':
-                $('.js-token-row[data-prefix="' + prefix + '"]').addClass('hidden');
-                $(e.target).find('i').addClass('fa-plus-square-o');
-                $(e.target).find('i').removeClass('fa-minus-square-o');
-                $(e.target).attr('data-status', 'closed');
-                break;
-            case 'closed':
-                $('.js-token-row[data-prefix="' + prefix + '"]').removeClass('hidden');
-                $(e.target).find('i').addClass('fa-minus-square-o');
-                $(e.target).find('i').removeClass('fa-plus-square-o');
-                $(e.target).attr('data-status', 'open');
-                break;
-        }
-    },
-    
-    performTokenAction: function (e) {
+    // Set token value to default value on system
+    // Show indicators of not saved field and store token in delete queue
+    restoreTokenDefault: function (e) {
         var token = $(e.target).attr('data-token');
-        var action = $('.token-action-select[data-token="' + token + '"]').val();
-        var value = $('.token-value[data-token="' + token + '"]').val();
+        var defaultValue = $(e.target).attr('data-default-value');
         
-        switch(action) {
-            case 'save':
-                this.configActionArguments = {
-                    "key": token,
-                    "value": value
-                };
-                
-                if (Wat.C.isSuperadmin()) {
-                    this.configActionArguments['tenant_id'] = this.selectedTenant;
-                }
-                
-                Wat.I.confirm('dialog/config-change', this.applySave, this);
-                
-                break;
-            case 'delete':
-                this.configActionFilters = {
-                    "key": token,
-                };
-                
-                if (Wat.C.isSuperadmin()) {
-                    this.configActionFilters['tenant_id'] = this.selectedTenant;
-                }
-                
-                Wat.I.confirm('dialog/config-change', this.applyDelete, this);
-                break;
+        $('input.js-token-value[data-token="' + token + '"]').val(defaultValue);
+        $('div.js-not-saved[data-token="' + token + '"]').show();
+        $('.js-restore-token-default[data-token="' + token + '"]').hide();
+        $('div.js-default-value[data-token="' + token + '"]').show();
+        
+        // Delete token from edited queue if exists
+        if ($.inArray(token, this.tokensQueue.edit) != -1) {
+            var index = this.tokensQueue.edit.indexOf(token);
+            this.tokensQueue.edit.splice(index, 1);
+        }
+        
+        // Add token to setToDefault queue if not exists
+        if ($.inArray(token, this.tokensQueue.delete) == -1) {
+            this.tokensQueue.delete.push(token);
         }
     },
     
-    applySave: function (that) {
-        Wat.A.performAction('config_set', that.configActionArguments, {}, {'error': i18n.t('Error updating'), 'success': 'Successfully updated'}, that.afterChangeToken, that);
-    },
-
-    applyDelete: function (that) {
-        Wat.A.performAction('config_delete', {}, that.configActionFilters, {'error': i18n.t('Error deleting'), 'success': 'Successfully deleted'}, that.afterChangeToken, that);
-    },
-    
-    openNewElementDialog: function (e) {
+    // Reset token value to saved value
+    // Delete indicators of not saved field and delete token in edition queue
+    resetToken: function (e) {
+        var token = $(e.target).attr('data-token');
+        var value = $(e.target).attr('data-value');
+        var isDefault = parseInt($(e.target).attr('data-is-default'));
+        var isCreated = parseInt($(e.target).attr('data-is-created'));
         
-        this.dialogConf.title = $.i18n.t('New configuration token');
-        Wat.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
+        $('input.js-token-value[data-token="' + token + '"]').val(value);
+        $('div.js-not-saved[data-token="' + token + '"]').hide();
         
-        Wat.I.chosenElement('[name="tenant"]', 'single100');
-        
-        // Set initial prefix to the current one
-        $('[name="key"]').val(this.currentTokensPrefix + '.');
-    },
-    
-    createElement: function () {
-        var valid = Wat.Views.ListView.prototype.createElement.apply(this);
-        
-        if (!valid) {
-            return;
-        }
-                
-        var context = $('.' + this.cid + '.editor-container');
-
-        var key = context.find('input[name="key"]').val();
-        var value = context.find('input[name="value"]').val();
-        
-        var arguments = {
-            "key": key,
-            "value": value
-        };
-        
-        this.createdKey = key;
-        
-        if (Wat.C.isSuperadmin()) {
-            arguments['tenant_id'] = this.selectedTenant;
-        }
-        
-        Wat.A.performAction('config_set', arguments, {}, {'error': i18n.t('Error creating'), 'success': i18n.t('Successfully created')}, this.afterCreateToken, this);
-    },
-    
-    afterCreateToken: function (that) {
-        Wat.I.closeDialog(that.dialog);
-        
-        var keySplitted = that.createdKey.split('.');
-        
-        if (keySplitted.length > 1) {
-            that.currentTokensPrefix = keySplitted[0];
+        if (isDefault) {
+            $('div.js-default-value[data-token="' + token + '"]').show();
         }
         else {
-            that.currentTokensPrefix = UNCLASSIFIED_CONFIG_CATEGORY;
+            $('.js-restore-token-default[data-token="' + token + '"]').show();
+            $('div.js-default-value[data-token="' + token + '"]').hide();
         }
         
-        that.selectPrefixMenu(that.currentTokensPrefix);
+        if (isCreated) {
+            $('div.js-will-delete[data-token="' + token + '"]').hide();
+            $('.js-delete-token[data-token="' + token + '"]').show();
+            $('input.js-token-value[data-token="' + token + '"]').removeAttr('disabled');
+        }
         
-        that.afterChangeToken(that);
+        // Delete token from queue arrays
+        var index = this.tokensQueue.edit.indexOf(token);
+        if (index != -1) {
+            this.tokensQueue.edit.splice(index, 1);
+        }
+        
+        var index = this.tokensQueue.delete.indexOf(token);
+        if (index != -1) {
+            this.tokensQueue.delete.splice(index, 1);
+        }
     },
     
-    afterChangeToken: function (that) {
-        var filter = {};
-        if (Wat.C.isSuperadmin()) {
-            filter['tenant_id'] = that.selectedTenant;
+    // Hook triggered when any token value is modified writing into text input.
+    // Show indicators of not saved field and store token in edition
+    editToken: function (e) {
+        var token = $(e.target).attr('data-token');
+        var isDefault = parseInt($(e.target).attr('data-is-default'));
+        
+        $('div.js-not-saved[data-token="' + token + '"]').show();
+        $('div.js-default-value[data-token="' + token + '"]').hide();
+        
+        if (!isDefault) {
+            $('.js-restore-token-default[data-token="' + token + '"]').show();
         }
         
-        if (that.currentTokensPrefix == UNCLASSIFIED_CONFIG_CATEGORY && $('[data-prefix="unclassified"]').length > 0) {
-            // If changed token is unclassified (no prefix) and exist others of same kind, use special filter
-            filter['-not'] = { key : {'~':'%.%'} };
-            Wat.A.performAction('config_get', {}, filter, {}, that.processTokensRenderTokens, that);
+        // Delete token from setToDefault queue if exist
+        if ($.inArray(token, this.tokensQueue.delete) != -1) {
+            var index = this.tokensQueue.delete.indexOf(token);
+            this.tokensQueue.delete.splice(index, 1);
         }
-        else if (that.currentTokensPrefix == UNCLASSIFIED_CONFIG_CATEGORY) {
-            // If changed token is first unclassified (no prefix), process prefixes again to add new option in side menu
-            Wat.A.performAction('config_get', {}, filter, {}, that.processPrefixes, that);
+        
+        // Add token to edit queue if not exists
+        if ($.inArray(token, this.tokensQueue.edit) == -1) {
+            this.tokensQueue.edit.push(token);
         }
-        else if ($.inArray(that.currentTokensPrefix, that.prefixes) != -1) {
-            if (!$.isEmptyObject(Wat.C.currentSearch)) {
-                filter['key'] = {'~': '%' + Wat.C.currentSearch + '%'};
+    },
+    
+    // Show indicators of field that will be deleted and store token in deletion queue
+    clickDeleteToken: function (e) {
+        var token = $(e.target).attr('data-token');
+        
+        $('div.js-will-delete[data-token="' + token + '"]').show();
+        $('.js-delete-token[data-token="' + token + '"]').hide();
+        $('input.js-token-value[data-token="' + token + '"]').attr('disabled','disabled');
+        
+        // Delete token from edited queue if exists
+        if ($.inArray(token, this.tokensQueue.edit) != -1) {
+            var index = this.tokensQueue.edit.indexOf(token);
+            this.tokensQueue.edit.splice(index, 1);
+        }
+        
+        // Add token to setToDefault queue if not exists
+        if ($.inArray(token, this.tokensQueue.delete) == -1) {
+            this.tokensQueue.delete.push(token);
+        }
+    },
+    
+    ////////////////////////////////////////////////////
+    // Functions for perform actions over tokens
+    ////////////////////////////////////////////////////
+    
+        // Create new token
+        createElement: function () {
+            var valid = Wat.Views.ListView.prototype.createElement.apply(this);
+
+            if (!valid) {
+                return;
+            }
+
+            var context = $('.' + this.cid + '.editor-container');
+
+            var key = context.find('input[name="key"]').val();
+            var value = context.find('input[name="value"]').val();
+
+            var arguments = {
+                "key": key,
+                "value": value
+            };
+
+            this.createdKey = key;
+
+            if (Wat.C.isSuperadmin()) {
+                arguments['tenant_id'] = this.selectedTenant;
+            }
+
+            Wat.A.performAction('config_set', arguments, {}, {'error': i18n.t('Error creating'), 'success': i18n.t('Successfully created')}, this.afterCreateToken, this);
+        },
+    
+        // Hook executed after create token (executed before change hook)
+        afterCreateToken: function (that) {
+            Wat.I.closeDialog(that.dialog);
+
+            var keySplitted = that.createdKey.split('.');
+
+            if (keySplitted.length > 1) {
+                that.currentTokensPrefix = keySplitted[0];
             }
             else {
-                // If there is a current search, filter by it. Otherwise filter by current selected prefix    
-                filter['key'] = {'~': that.currentTokensPrefix + '.%'};
+                that.currentTokensPrefix = UNCLASSIFIED_CONFIG_CATEGORY;
             }
+
+            that.selectPrefixMenu(that.currentTokensPrefix);
+
+            that.afterChangeToken(that);
+        },
+    
+        // Update token value
+        saveToken: function (token, callBack) {
+            var value = $('input.js-token-value[data-token="' + token + '"]').val();
             
-			// If the prefix of the changed token exist, render it after change
-            Wat.A.performAction('config_get', {}, filter, {}, that.processTokensRenderTokens, that);
+            this.configActionArguments = {
+                "key": token,
+                "value": value
+            };
+
+            if (Wat.C.isSuperadmin()) {
+                this.configActionArguments['tenant_id'] = this.selectedTenant;
+            }
+
+            Wat.A.performAction('config_set', this.configActionArguments, {}, {'error': i18n.t('Error updating'), 'success': 'Successfully updated'}, callBack, this);
+        },
+
+        // Delete token
+        deleteToken: function (tokensToDelete, callBack) {
+            this.configActionFilters = {
+                "key": tokensToDelete,
+            };
+
+            if (Wat.C.isSuperadmin()) {
+                this.configActionFilters['tenant_id'] = this.selectedTenant;
+            }
+
+            Wat.A.performAction('config_delete', {}, this.configActionFilters, {'error': i18n.t('Error deleting'), 'success': 'Successfully deleted'}, callBack, this);
+        },
+
+        // Hook executed after any kind of change on tokens (creation, update or delete)
+        afterChangeToken: function (that) {
+            var filter = {};
+            if (Wat.C.isSuperadmin()) {
+                filter['tenant_id'] = that.selectedTenant;
+            }
+
+            if (that.currentTokensPrefix == UNCLASSIFIED_CONFIG_CATEGORY && $('[data-prefix="unclassified"]').length > 0) {
+                // If changed token is unclassified (no prefix) and exist others of same kind, use special filter
+                filter['-not'] = { key : {'~':'%.%'} };
+                Wat.A.performAction('config_get', {}, filter, {}, that.processBeforeRenderList, that);
+            }
+            else if (that.currentTokensPrefix == UNCLASSIFIED_CONFIG_CATEGORY) {
+                // If changed token is first unclassified (no prefix), process prefixes again to add new option in side menu
+                Wat.A.performAction('config_get', {}, filter, {}, that.processPrefixes, that);
+            }
+            else if ($.inArray(that.currentTokensPrefix, that.prefixes) != -1) {
+                if (!$.isEmptyObject(Wat.C.currentSearch)) {
+                    filter['key'] = {'~': '%' + Wat.C.currentSearch + '%'};
+                }
+                else {
+                    // If there is a current search, filter by it. Otherwise filter by current selected prefix    
+                    filter['key'] = {'~': that.currentTokensPrefix + '.%'};
+                }
+
+                // If the prefix of the changed token exist, render it after change
+                Wat.A.performAction('config_get', {}, filter, {}, that.processBeforeRenderList, that);
+            }
+            else {
+                // If the prefix of the changed token doesnt exist, render all to create this new prefix in side menu
+                Wat.A.performAction('config_get', {}, filter, {}, that.processPrefixes, that);
+            }
+
+            if (that.retrievedData.rows) {
+                // Any time one token were deleted or any api.pulblic.* token were created/updated, refresh public configuration from API and render footer
+                if (!that.retrievedData.rows[0] || that.retrievedData.rows[0].key.substring(0,11) == 'api.public.') {
+                    Wat.A.apiInfo(function (that) {
+                        // Store public configuration 
+                        Wat.C.publicConfig = that.retrievedData.public_configuration || {};
+
+                        Wat.I.renderFooter();
+                    }, that);
+                }
+            }
+        },
+    
+    ////////////////////////////////////////////////////
+    
+    // Hook triggered when any token value is modified writing into text input.
+    clickSaveTokens: function (e) {
+        if (this.tokensQueue.edit.length > 0 || this.tokensQueue.delete.length > 0) {
+            Wat.I.confirm('dialog/config-change', this.processTokenQueue, this);
         }
         else {
-			// If the prefix of the changed token doesnt exist, render all to create this new prefix in side menu
-            Wat.A.performAction('config_get', {}, filter, {}, that.processPrefixes, that);
+            Wat.I.M.showMessage({message: 'No tokens were updated - Nothing to do', messageType: 'info'});
         }
-
-        // Any time one token were deleted or any api.pulblic.* token were created/updated, refresh public configuration from API and render footer
-        if (!that.retrievedData.rows[0] || that.retrievedData.rows[0].key.substring(0,11) == 'api.public.') {
-            Wat.A.apiInfo(function (that) {
-                // Store public configuration 
-                Wat.C.publicConfig = that.retrievedData.public_configuration || {};
-
-                Wat.I.renderFooter();
-            }, that);
+    },
+    
+    // Process tokens queue
+    // Edition elements will be done one by one (massive edition is not supported by API)
+    // Deletion elements will be done in one step
+    processTokenQueue: function (that) {
+        var that = that || this;
+        
+        // Process edition queue until is empty.
+        if (that.tokensQueue.edit.length > 0) {
+            // Edition is done token by token
+            var tokenToEdit = that.tokensQueue.edit[0];
+            that.tokensQueue.edit.splice(0, 1);
+            
+            that.saveToken(tokenToEdit, that.processTokenQueue);
         }
+        // If edition queue is empty, process deletion queue
+        else if (that.tokensQueue.delete.length > 0) {
+            // Deletion is done in one step
+            var tokensToDelete = that.tokensQueue.delete;
+            that.tokensQueue.delete = [];
+            
+            that.deleteToken(tokensToDelete, that.processTokenQueue);
+        }
+        // After all, call hook
+        else {
+            that.afterChangeToken(that);
+        }
+    },
+    
+    // Show warning about any field is not saved. If accept, execute callback function passed as parameter
+    noSavedWarning: function (callBack, params) {
+        var that = this;
+        
+        Wat.I.confirm('dialog/config-no-saved', function () {
+            $('.js-reset-token').trigger('click');
+            $.proxy(callBack, that)(params);
+        });
     }
 });

@@ -8,7 +8,7 @@
     <% } %>
     <div class="config-search-box">
         <label for="config_search" data-i18n="Search"></label>
-        <input name="config_search"/>
+        <input name="config_search" data-i18n="[placeholder]Write and press enter"/>
     </div>
     <%
         $.each(prefixes, function (iprefix, prefix) {
@@ -29,10 +29,14 @@
     </div>
     
     <div class="setup-block">
-        <div class="action-new-token">
+        <div class="action-token-top">
             <a class="js-traductable_button js-button-new actions_button button fa fa-plus-circle" name="btn-new-conf-token" data-i18n="New configuration token"></a>
+            <a class="fright js-traductable_button js-button-save actions_button button fa fa-save" name="btn-save-conf-token" data-i18n="Save all"></a>
         </div>
         <div class="bb-config-tokens"></div>
+        <div class="action-token-bottom">
+            <a class="fright js-traductable_button js-button-save actions_button button fa fa-save" name="btn-save-conf-token" data-i18n="Save all"></a>
+        </div>
     </div>
 
 </div>
