@@ -565,7 +565,11 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
             }
             else if ($.inArray(that.currentTokensPrefix, that.prefixes) != -1) {
                 if (!$.isEmptyObject(Wat.C.currentSearch)) {
-                    filter['key'] = {'~': '%' + Wat.C.currentSearch + '%'};
+                    // Search substrings into key and operative_value
+                    filter['-or'] = [
+                        "key", {'~': '%' + Wat.C.currentSearch + '%'},
+                        "operative_value", {'~': '%' + Wat.C.currentSearch + '%'}
+                    ];
                 }
                 else {
                     // If there is a current search, filter by it. Otherwise filter by current selected prefix    
