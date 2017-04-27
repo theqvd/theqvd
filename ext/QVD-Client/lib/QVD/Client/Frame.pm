@@ -782,6 +782,12 @@ sub OnUnknownCert {
                 } elsif ( $e == X509_V_ERR_CERT_REVOKED ) {
                     $err_desc .= $self->_t("The certificate has been revoked.");
                     $no_ok_button = 1 unless core_cfg('client.ssl.allow_revoked');
+                } elsif ( $e == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT ) {
+                    $err_desc .= $self->_t("The certificate is self-signed");
+                    _add_advice(\@advice, $self->_t("If you are using your own CA, see the documentation on how to make the client use your certificate."));
+                } elsif ( $e == X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN ) {
+                    $err_desc .= $self->_t("A certificate in the chain is self-signed");
+                    _add_advice(\@advice, $self->_t("If you are using your own CA, see the documentation on how to make the client use your certificate."));
                 } elsif ( $e == 1001 ) {
                     my @hostnames = ( $cert->{subject}->{cn} );
                     my $str_hostnames = "";
