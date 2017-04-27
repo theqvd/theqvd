@@ -66,10 +66,12 @@ sub open {
                 $stream->on(read => sub {
                         my ($stream, $bytes) = @_;
                         DEBUG term_escape "-- <<< VMA ($bytes)\n";
+                        $stream->stop();
+                        $stream->unsubscribe('read');
                         if ($bytes =~ /101/){
-                            $stream->stop();
-                            $stream->unsubscribe('read');
                             $cb->($stream);
+                        } else {
+                            $tx->finish;
                         }
                     });
                 $stream->start;
