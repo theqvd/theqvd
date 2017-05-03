@@ -438,7 +438,7 @@ up.api.group = root
 up.api.stdout.filename = /dev/null
 up.api.stderr.filename = /dev/null
 
-up.api.l7r.address = localhost
+up.api.l7r.address = 172.17.0.1
 up.api.l7r.session.expiration = 300
 up.api.request.timeout = 3000
 up.api.websocket.timeout = 3600
