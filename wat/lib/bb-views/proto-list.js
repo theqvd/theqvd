@@ -128,7 +128,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         'click .last': 'paginationLast',
         'click a[name="filter_button"]': 'filter',
         'change .filter-control select[name="tenant"]': 'changeTenant',
-        'change .filter-control select': 'filter',
+        'change .filter-control select:not([name="tenant"])': 'filter',
         'input .filter-control input.date-filter': 'filter',
         'input .pagination input.js-current-page': 'typePage',
         'keypress .pagination input.js-current-page': 'pressPage',
@@ -977,12 +977,13 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         // When tenant changes reset all filters with tenant dependence
         $('[data-tenant-depent]').val(FILTER_ALL);
-        $('[data-tenant-depent]').trigger('change');
         
         $('.js-delete-filter-note[data-filter-name="tenant"]').hide();
 
         this.resetSelectFiltersByTenant();
+        
         this.fetchFilters('classifiedByTenant');
+        this.filter();
     },
     
     shownElementsLabelUpdate: function () {
