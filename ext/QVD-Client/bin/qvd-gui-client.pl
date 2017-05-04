@@ -9,7 +9,7 @@ use 5.010;
 use Cwd;
 use File::Spec;
 use Proc::Background;
-use URI::Encode qw(uri_decode);
+use URI::Escape qw(uri_unescape);
 
 our ($WINDOWS, $DARWIN, $user_dir, $app_dir, $user_config_filename, $user_certs_dir, $pixmaps_dir, $orig_display);
 
@@ -49,7 +49,7 @@ BEGIN {
     for $ARGV (@ARGV) {
         my @args = ($ARGV);
         if( $ARGV =~ /^qvd:(.*)$/ ) {
-            @args = split(/\s+/, uri_decode($1));
+            @args = split(/\s+/, uri_unescape($1));
         }
         for my $arg (@args) {
             if (my ($k, $v) = $arg =~ /^\s*([\w\.]+)\s*[:=\s]\s*(.*?)\s*$/) {
