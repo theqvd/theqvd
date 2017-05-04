@@ -28,7 +28,6 @@ sub after_authenticate_basic {
 	    // die "Unable to provision user $normalized_login";
         $user_id = $user_id_obj->id;
     }
-    $auth->{user_id} = $user_id;
 
     if (rs(VM)->search({user_id => $user_id, osf_id => $osf_id})->count == 0) {
 	INFO "Auto provisioning VM for user $normalized_login ($user_id) with OSF $osf_id";

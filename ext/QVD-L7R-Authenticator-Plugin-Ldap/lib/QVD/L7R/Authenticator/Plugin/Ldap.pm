@@ -14,8 +14,10 @@ use parent qw(QVD::L7R::Authenticator::Plugin);
 sub authenticate_basic {
     my ($class, $auth, $login, $password, $l7r) = @_;
 
+    my $tenant_id = $auth->{tenant_id};
+
     # ldap connection
-    my $host = cfg('auth.ldap.host');
+    my $host = cfg('auth.ldap.host', $tenant_id);
     my $ldap = Net::LDAP->new($host);
     unless ($ldap) {
 	ERROR "Unable to connect to LDAP server $host for user $login: $@\n";
@@ -25,7 +27,7 @@ sub authenticate_basic {
     my $escaped_login = escape_dn_value($login);
 
     # Bind directly with a dn pattern (no previous search) if defined
-    if (defined(my $userbindpattern = cfg('auth.ldap.userbindpattern', 0))) {
+    if (defined(my $userbindpattern = cfg('auth.ldap.userbindpattern', $tenant_id, 0))) {
 	$userbindpattern =~ s/\%u/$escaped_login/g;
 	DEBUG("auth.ldap.userbindpattern provided trying login with <$userbindpattern> for user $login");
 	my $msg = $ldap->bind($userbindpattern, password => $password);
@@ -37,11 +39,11 @@ sub authenticate_basic {
     }
 
     my @bind_args;
-    if (defined (my $binddn = cfg('auth.ldap.binddn', 0))) {
+    if (defined (my $binddn = cfg('auth.ldap.binddn', $tenant_id, 0))) {
         $binddn =~ s/\%u/$escaped_login/g;
         push @bind_args, $binddn;
         DEBUG "binding with query '$binddn'";
-        if (defined(my $bindpass = cfg('auth.ldap.bindpass', 0))) {
+        if (defined(my $bindpass = cfg('auth.ldap.bindpass', $tenant_id, 0))) {
             push @bind_args, password => $bindpass;
         }
         else {
@@ -60,12 +62,12 @@ sub authenticate_basic {
     }
 
     # Search for user
-    my $base   = cfg('auth.ldap.base');
-    my $filter = cfg('auth.ldap.filter', 0) // '(uid=%u)';
+    my $base   = cfg('auth.ldap.base', $tenant_id);
+    my $filter = cfg('auth.ldap.filter', $tenant_id, 0) // '(uid=%u)';
     $filter =~ s/\%u/$escaped_login/g;
-    my $scope  = cfg('auth.ldap.scope' , 0) // 'base';
+    my $scope  = cfg('auth.ldap.scope', $tenant_id, 0) // 'base';
     $scope =~ /^(?:base|one|sub)$/ or WARN "bad value $scope for auth.ldap.scope";
-    my $deref = cfg('auth.ldap.deref', 0) // 'never';
+    my $deref = cfg('auth.ldap.deref', $tenant_id, 0) // 'never';
     $deref =~ /^(?:never|search|find|always)$/ or WARN "bad value $deref for auth.ldap.deref";
     $msg = $ldap->search(base   => $base,
 			 filter => $filter,
@@ -104,7 +106,7 @@ sub authenticate_basic {
     $msg = $ldap->bind($dn, password => $password);
     if ($msg->code) {
         my $server_error = $msg->server_error;
-        my $racf_regex = cfg('auth.ldap.racf_allowregex', 0);
+        my $racf_regex = cfg('auth.ldap.racf_allowregex', $tenant_id, 0);
         # In case of failed credentials and if racf_regex is
         # defined, allow to login when the error message matches
         if ($msg->code == LDAP_INVALID_CREDENTIALS and
@@ -139,8 +141,8 @@ sub authenticate_basic {
 
     if (defined (my $uid = $entry->get_value('uid'))) {
         $auth->{params}{'qvd.vm.user.ldap.name'} = $uid;
-        if (cfg('auth.ldap.normalize.name', 0) or
-            cfg('auth.ldap.name.normalize', 0)) {
+        if (cfg('auth.ldap.normalize.name', $tenant_id, 0) or
+            cfg('auth.ldap.name.normalize', $tenant_id, 0)) {
             # we do the normalization here because the normalize_name
             # method is called too early
             $auth->{normalized_login} = $uid;
@@ -149,7 +151,7 @@ sub authenticate_basic {
 
     if (defined (my $home = $entry->get_value('homeDirectory'))) {
         $auth->{params}{'qvd.vm.user.ldap.home'} = $home;
-        if (cfg('auth.ldap.home.set', 0)) {
+        if (cfg('auth.ldap.home.set', $tenant_id, 0)) {
             $auth->{params}{'qvd.vm.user.home'} = $home;
         }
     }

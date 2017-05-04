@@ -118,7 +118,7 @@ sub list_of_vm_processor {
         $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Server is $server_state");
     }
     $auth->before_list_of_vms;
-    my $user_id = $auth->user_id;
+    my $user_id = $auth->{user}->id;
 
     my @vm_list = ( map { { id      => $_->vm_id,
                             state   => $_->vm_state,
@@ -149,7 +149,7 @@ sub connect_to_vm_processor {
     txn_do { $this_host->counters->incr_http_requests; };
     DEBUG 'method connect_to_vm requested';
     my $auth = $l7r->_authenticate_user($headers);
-    my $user_id = $auth->user_id;
+    my $user_id = $auth->{user}->id;
 
     if ($this_host->runtime->blocked) {
         INFO 'Server is blocked';
@@ -238,7 +238,7 @@ sub stop_vm_processor {
     txn_do { $this_host->counters->incr_http_requests; };
     DEBUG 'method stop_vm requested';
     my $auth = $l7r->_authenticate_user($headers);
-    my $user_id = $auth->user_id;
+    my $user_id = $auth->{user}->id;
 
     if ($this_host->runtime->blocked) {
         INFO 'Server is blocked';
@@ -316,7 +316,7 @@ sub _authenticate_user {
             my $peerport = eval { $client->peerport() } // 'unknown';
             INFO "Accepted connection from user $login from ip:port ${peerhost}:$peerport";
             $l7r->{_auth} = $auth;
-            my $user = rs( User )->find( $auth->user_id );
+            my $user = $auth->{user};
             unless ($user->blocked) {
                 txn_do { $this_host->counters->incr_auth_ok };
                 return $auth

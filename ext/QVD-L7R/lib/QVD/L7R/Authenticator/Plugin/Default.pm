@@ -24,7 +24,7 @@ sub authenticate_basic {
     my $rs = rs(User)->search({login => $login, password => $token, tenant_id => $tenant_id});
     return () unless $rs->count > 0;
     DEBUG "authenticated ok";
-    $auth->{user_id} = $rs->first->id;
+
     1;
 }
 

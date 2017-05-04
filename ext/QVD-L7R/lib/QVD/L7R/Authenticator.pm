@@ -179,6 +179,8 @@ sub authenticate_basic {
                             }
 
                             $auth->after_authenticate_basic($auth->{normalized_login}, $l7r);
+                            $auth->{user} = rs( User )->find( { login => $auth->{normalized_login}, tenant_id => $auth->{tenant_id} } );
+                            $auth->{user_id} = $auth->{user}->id;
                             $auth->{authenticated} = 1;
                             return 1;
                         }
