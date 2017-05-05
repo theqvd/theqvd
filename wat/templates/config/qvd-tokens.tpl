@@ -45,7 +45,7 @@ $.each(configTokens, function (iTok, tok) {
             <div class="second_row hidden js-not-saved" data-token="<%= token %>">
                 <span class="second_row fleft fa fa-warning" data-i18n="Not saved"></span>
                 <a 
-                    class="js-traductable_button button2 js-reset-token fright fa fa-rotate-left" 
+                    class="js-traductable_button button2 js-reset-token js-reset-token-to-saved fright fa fa-rotate-left" 
                     data-value="<%= value %>" 
                     data-is-default="<%= isDefault %>" 
                     data-token="<%= token %>" 
@@ -56,7 +56,7 @@ $.each(configTokens, function (iTok, tok) {
             <div class="second_row hidden js-will-delete" data-token="<%= token %>">
                 <span class="second_row fleft fa fa-warning" data-i18n="Will be deleted"></span>
                 <a 
-                    class="js-traductable_button button2 js-reset-token fright fa fa-rotate-left" 
+                    class="js-traductable_button button2 js-reset-token js-reset-token-undo fright fa fa-rotate-left" 
                     data-value="<%= value %>" 
                     data-is-default="<%= isDefault %>" 
                     data-is-created="<%= dvalue == undefined ? 1 : 0 %>" 
