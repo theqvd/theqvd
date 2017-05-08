@@ -592,7 +592,6 @@ print "auth-type: ".$auth_type."\n";
     if ( ! $opts->{vm_id} eq '' ){
         $vm_id = $opts->{vm_id};
     }else{
-        my $vm_list = JSON->new->decode($body);
         $vm_id = $cli->proxy_list_of_vm_loaded($vm_list);
     }
 
