@@ -990,8 +990,21 @@ sub _run {
                                              ReuseAddr => 1,
                                              Listen    => 1 ) or _logdie "Unable to listen on port 4040";
 
-        my $local_socket = $listener->accept() or _logdie "connection from nxproxy failed";
-        undef $listener; # close the listener
+        my $retries = 100;
+        my $fd = $listener->fileno;
+        my $local_socket;
+        while (--$retries > 0) {
+            my $rb = '';
+            vec($rb, $fd, 1) = 1;
+            select($rb, undef, undef, 0.1);
+            if (vec $rb, $fd, 1) {
+                $local_socket = $listener->accept;
+                undef $listener; # close the listener
+                last;
+            }
+            $nxproxy_proc->alive or _logdie "nxproxy has terminated unexpectedly";
+        }
+        $local_socket or _logdie "connection from nxproxy failed";
 
         DEBUG("Connection accepted, forwarding socket\n");
         if ($WINDOWS) {
