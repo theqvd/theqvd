@@ -37,6 +37,12 @@ if ( $LINUX ) {
 	$NX_OS = "darwin";
 }
 
+sub _logdie {
+    my $message = join(' ', @_);
+    ERROR $message;
+    die "$message\n";
+}
+
 sub new {
     my $class = shift;
     my $cli = shift;
@@ -720,363 +726,300 @@ print "auth-type: ".$auth_type."\n";
     DEBUG("Connection closed");
 }
 
-sub _stop_x11 {
-	my $self = shift;
-	
-	unless ( $self->{x11_proc} ) {
-		WARN "X11 wasn't started, not stopping";
-		return;
-	}
-	
-	if ( $self->{x11_proc}->alive ) {
-		DEBUG "X11 process alive with pid " . $self->{x11_proc}->pid . ", killing";
-		
-		if ( $self->{x11_proc}->die ) {
-			INFO "Stopped X11 server";
-		} else {
-			ERROR "Failed to stop X11 server";
-		}
-	} else {
-		WARN "X11 process is already dead";
-	}
-	
-	delete $self->{x11_proc};
-	
+sub _start_x11 {
+    my ($self, %opts) = @_;
 
+    if ( $ENV{QVD_PP_BUILD} ) {
+        DEBUG "Running under a PP build, not starting X";
+        return;
+    }
+
+    if ($QVD::Client::App::orig_display ) {
+        DEBUG "DISPLAY set to $QVD::Client::App::orig_display";
+        return;
+    }
+
+    ###
+    ### Create commandline
+    ###
+    my @cmd;
+    if ($WINDOWS) {
+        DEBUG "Running on Windows, detecting X server";
+
+        $ENV{DISPLAY} = '127.0.0.1:0';
+        my $xming_bin = File::Spec->rel2abs(core_cfg('command.windows.xming'), $QVD::Client::App::app_dir);
+        my $vcxsrv_bin = File::Spec->rel2abs(core_cfg('command.windows.vcxsrv'), $QVD::Client::App::app_dir);
+
+        if ( -f $xming_bin ) {
+            DEBUG "Xming found at $xming_bin";
+            my @extra_args=split(/\s+/, core_cfg('client.xming.extra_args'));
+
+            @cmd = ( $xming_bin,
+                     @extra_args,
+                     -logfile => File::Spec->join($QVD::Client::App::user_dir, "xserver.log") );
+        }
+        elsif ( -f $vcxsrv_bin ) {
+            DEBUG "VcxSrv found at $vcxsrv_bin";
+            my @extra_args=split(/\s+/, core_cfg('client.vcxsrv.extra_args'));
+            @cmd = ( $vcxsrv_bin,
+                     @extra_args,
+                     -logfile => File::Spec->join($QVD::Client::App::user_dir, "xserver.log") );
+
+            if ( $opts{fullscreen} ) {
+                push @cmd, "-fullscreen";
+                @cmd = grep { !/rootless|mwextwm|multiwindow/ } @cmd;
+            }
+        }
+        else {
+            die "X server not found! Tried '$xming_bin' and '$vcxsrv_bin'";
+        }
+    }
+    elsif ($DARWIN) {
+        $ENV{DISPLAY} = ':0';
+        my $x11_cmd = core_cfg('command.darwin.x11');
+        @cmd = qq(open -a $x11_cmd --args true);
+    }
+    else {
+        _logdie "Don't know how to start X server on $^O";
+    }
+
+    ###
+    ### Execute
+    ###
+    DEBUG("DISPLAY set to $ENV{DISPLAY}");
+    DEBUG("Starting X11 server: " . join(' ', @cmd));
+
+    my $proc = Proc::Background->new(@cmd) or
+        _logdie "X server failed to start";
+
+    DEBUG("X server started");
+    if ( $DARWIN ) {
+        DEBUG("Waiting for 'open' process to exit");
+        my $retries = 100;
+        my $rc;
+        while(--$retries > 0) {
+            unless ($proc->alive) {
+                $rc = $proc->wait // (255 << 8);
+                last;
+            }
+            sleep(0.1);
+        }
+
+        if (not defined $rc) {
+            WARN "X server command still seems to be running. Can't exactly determine whether the server started";
+        }
+        elsif ($rc) {
+            _logdie "Unable to launch XQuartz, rc: " . ($rc >> 8);
+        }
+    }
+
+    ###
+    ### Try to wait until X11 is accepting connections
+    ###
+    my $retries = 100;
+    DEBUG "Testing whether the X server is up";
+    require X11::Protocol;
+
+    while (--$retries > 0) {
+        last if eval { X11::Protocol->new->release_number };
+
+        unless ($proc->alive) {
+            unless ($DARWIN) {
+                my $rc = $proc->wait // (255 << 8);
+                _logdie "X server died unexpectedly, rc: " . ($rc >> 8);
+            }
+        }
+        sleep 0.1;
+    }
+
+    if ($retries) {
+        INFO "X11 server started and running";
+    }
+    else {
+        WARN "X11 server started, but connection test failed";
+    }
+
+    return $proc;
 }
 
+sub _stop_proc {
+    my ($self, $name, $proc) = @_;
+    return unless $proc;
 
-sub _start_x11 {
-	my ($self, %opts) = @_;
-	my @cmd;
-
-
-	###
-	### Checks
-	###
-	
-	$self->_stop_x11 if ( $self->{x11_proc} );
-	
-
-	# No need on Linux
-	if ( $WINDOWS ) {
-		DEBUG "Running on Windows, will start X";
-	} elsif ( $DARWIN ) {
-		DEBUG "Running on Darwin, will start X";
-	} else {
-	    DEBUG "Not running on Windows or Darwin, X is not needed";
-		return;
-	}
-
-	# No need if X11 is already running
-	if ( $QVD::Client::App::orig_display ) {
-		DEBUG "\$DISPLAY is already set, not starting X";
-		return;
-	}
-
-	# No need if we're running under a PP build
-	if ( $ENV{QVD_PP_BUILD} ) {
-		DEBUG "Running under a PP build, not starting X";
-		return;
-	}
-
-	###
-	### Create commandline
-	###
-	
-	if ($WINDOWS) {
-		DEBUG "Running on Windows, detecting X server";
-		
-		$ENV{DISPLAY} = '127.0.0.1:0';
-		my $xming_bin = File::Spec->rel2abs(core_cfg('command.windows.xming'), $QVD::Client::App::app_dir);
-		my $vcxsrv_bin = File::Spec->rel2abs(core_cfg('command.windows.vcxsrv'), $QVD::Client::App::app_dir);
-		
-		if ( -f $xming_bin ) {
-			DEBUG "Xming found at $xming_bin";
-			my @extra_args=split(/\s+/, core_cfg('client.xming.extra_args'));
-			
-			@cmd = ( $xming_bin, @extra_args, '-logfile' => File::Spec->join($QVD::Client::App::user_dir, "xserver.log") );
-		} elsif ( -f $vcxsrv_bin ) {
-			DEBUG "VcxSrv found at $vcxsrv_bin";
-			my @extra_args=split(/\s+/, core_cfg('client.vcxsrv.extra_args'));
-			
-			@cmd = ( $vcxsrv_bin, @extra_args, '-logfile' => File::Spec->join($QVD::Client::App::user_dir, "xserver.log") );
-			
-			if ( $opts{fullscreen} ) {
-				push @cmd, "-fullscreen";
-				@cmd = grep { ! /rootless|mwextwm|multiwindow/ } @cmd;
-			}
-		} else {
-			die "X server not found! Tried '$xming_bin' and '$vcxsrv_bin'";
-		}
-	} else { # DARWIN!
-		$ENV{DISPLAY} = ':0';
-		my $x11_cmd = core_cfg('command.darwin.x11');
-		@cmd = qq(open -a $x11_cmd --args true);
-	}
-
-	###
-	### Execute
-	### 
-	
-	DEBUG("DISPLAY set to $ENV{DISPLAY}");
-	DEBUG("Starting X11 server: " . join(' ', @cmd));
-
-	if ( ($self->{x11_proc} = Proc::Background->new(@cmd))  ) {
-		DEBUG("X server started");
-		if ( $DARWIN ) {
-			DEBUG("Waiting to see if X starts");
-			my $timeout=5;
-			my $all_ok;
-			while($timeout-- > 0) {
-				if (!$self->{x11_proc}->alive) {
-					if (!defined $self->{x11_proc}->wait || ($self->{x11_proc}->wait << 8) > 0 ) {
-						_osx_error("Failed to start X server. Please install XQuartz.");
-						exit(1);
-					} else {
-						$all_ok = 1;
-						last;
-					}
-				}
-				sleep(1);
-			}
-
-			if (!$all_ok) {
-				WARN("X server command still seems to be running. Can't exactly determine whether the server started");
-			}
-		}
-	} else {
-		ERROR("X server failed to start");
-		if ($DARWIN) {
-			 _osx_error("Failed to start X server. Please install XQuartz.");
-		}
-	}
-	
-	
-	###
-	### Try to wait until X11 is accepting connections
-	###
-	my $retries = 100;
-	my $x_ok;
-	
-	DEBUG "Testing whether the X server is up";
-	
-	require X11::Protocol;
-	while(!$x_ok && $retries > 0 ) {
-		eval {
-			
-			my $x = X11::Protocol->new();
-			DEBUG "Connected to X11, release " . $x->release_number;
-			$x_ok = 1;
-		};
-		if ( $@ ) {
-			DEBUG "Error connecting to X11, $retries retries left";
-			$retries--;
-		}
-		
-		sleep 0.1;
-	}
-	
-	if (!$x_ok) {
-		WARN "X11 server started, but connection test failed";
-	} else {
-		INFO "X11 server started and running";
-	}
-
+    if ($proc->alive) {
+        DEBUG "Killing $name, PID: ".$proc->pid;
+        $proc->die;
+    }
+    my $rc = $proc->wait // (255 << 8);
+    DEBUG "$name terminated, rc: " . ($rc >> 8);
 }
 
 sub _run {
     my ($self, $httpc, %opts) = @_;
 
     my %o;
+    my $slave_port_file = $QVD::Client::App::user_dir.'/slave-port';
+    my ($nxproxy_proc, $x11_proc, $pa_proc);
+    eval {
+        # Erase any previously set value. This is only for nxproxy, may break other things
+        $self->{client_delegate}->proxy_set_environment( DYLD_LIBRARY_PATH => "" );
 
-    # Erase any previously set value. This is only for nxproxy, may break other things
-    $self->{client_delegate}->proxy_set_environment( DYLD_LIBRARY_PATH => "" );
-    
-    if ($WINDOWS) {
-        my $cygwin_nx_root = "/cygdrive/$QVD::Client::App::user_dir";
-        $cygwin_nx_root =~ tr|:\\|//|;
-        $self->{client_delegate}->proxy_set_environment( NX_ROOT => $cygwin_nx_root );
-        $o{errors} = "$cygwin_nx_root/nxproxy.log";
+        if ($WINDOWS) {
+            my $cygwin_nx_root = "/cygdrive/$QVD::Client::App::user_dir";
+            $cygwin_nx_root =~ tr|:\\|//|;
+            $self->{client_delegate}->proxy_set_environment( NX_ROOT => $cygwin_nx_root );
+            $o{errors} = "$cygwin_nx_root/nxproxy.log";
 
-        DEBUG "NX_ROOT: $cygwin_nx_root";
-        DEBUG "save nxproxy log at: $o{errors}";
-    }
+            DEBUG "NX_ROOT: $cygwin_nx_root";
+            DEBUG "save nxproxy log at: $o{errors}";
+        }
 
-   
-    # Call pulseaudio in Windows or Darwin
-    my $pa_proc;
-    if ( $self->{audio} && ( $WINDOWS || $DARWIN ) ) {
-        my $pa_bin = $WINDOWS ? core_cfg('command.windows.pulseaudio') : core_cfg('command.darwin.pulseaudio');
-        my $pa_log = File::Spec->rel2abs("pulseaudio.log", $QVD::Client::App::user_dir);
-        my $pa_cfg = File::Spec->rel2abs("default.pa", $QVD::Client::App::user_dir);
-        
-        my @pa = (File::Spec->rel2abs($pa_bin, $QVD::Client::App::app_dir),
-            "--high-priority", "-vvvv");
+        # Call pulseaudio in Windows or Darwin
+        if ( $self->{audio} && ( $WINDOWS || $DARWIN ) ) {
+            my $pa_bin = $WINDOWS ? core_cfg('command.windows.pulseaudio') : core_cfg('command.darwin.pulseaudio');
+            my $pa_log = File::Spec->rel2abs("pulseaudio.log", $QVD::Client::App::user_dir);
+            my $pa_cfg = File::Spec->rel2abs("default.pa", $QVD::Client::App::user_dir);
 
-        # Current version of PulseAudio on Windows doesn't permit "file" target
-        push @pa, "--log-target=file:/$pa_log"  if ($DARWIN);
-            
-        if ( -f $pa_cfg ) {
+            my @pa = (File::Spec->rel2abs($pa_bin, $QVD::Client::App::app_dir),
+                      "--high-priority", "-vvvv");
+
+            # Current version of PulseAudio on Windows doesn't permit "file" target
+            push @pa, "--log-target=file:/$pa_log"  if ($DARWIN);
+
+            if ( -f $pa_cfg ) {
 		DEBUG "Using config file $pa_cfg";
 		push @pa, "-F", $pa_cfg;
-	}
-	
-        DEBUG("Starting pulseaudio: @pa");
-        if ( ( $pa_proc = Proc::Background->new(@pa)) ) {
-            DEBUG("Pulseaudio started");
-        } else {
-            ERROR("Pulseaudio failed to start");
-        }
-    }
+            }
 
-     if ( core_cfg('client.slave.enable') && core_cfg('client.usb.enable') ) {
-        DEBUG "USB sharing enabled";
-        
-        my $usb = QVD::Client::USB::instantiate( core_cfg('client.usb.implementation' ) );
-        
-        
-        if ( core_cfg('client.usb.share_all') && $usb->can_autoshare ) {
+            DEBUG("Starting pulseaudio: @pa");
+            $pa_proc = Proc::Background->new(@pa) or
+                WARN("Pulseaudio failed to start, ignoring error");
+        }
+
+        if ( core_cfg('client.slave.enable') && core_cfg('client.usb.enable') ) {
+            DEBUG "USB sharing enabled";
+
+            my $usb = QVD::Client::USB::instantiate( core_cfg('client.usb.implementation' ) );
+
+            if ( core_cfg('client.usb.share_all') and $usb->can_autoshare ) {
 		$usb->set_autoshare(1);
-	} else {
-		$usb->set_autoshare(0) if ( $usb->can_autoshare );
-		
+            } else {
+		$usb->set_autoshare(0) if $usb->can_autoshare;
 		my @devs = map { [ $_ ] } split(/,/, core_cfg('client.usb.share_list'));
 		$usb->share_list_only(@devs);
-		
-	}
+            }
+        }
 
-    }
+        $x11_proc = $self->_start_x11( fullscreen => $opts{fullscreen} );
 
-	
-	$self->_start_x11( fullscreen => $opts{fullscreen} );
-	
-    if ($self->{audio}) {
-	if (defined(my $ps = $ENV{PULSE_SERVER})) {
-	    # FIXME: we should read /etc/pulseaudio/client.conf and
-	    # honor it and also be able to forward media to a UNIX
-	    # socket!!!
-	    if ($ps =~ /^(?:tcp:localhost:)?(\d+)$/) {
-		$o{media} = $1;
-	    }
-	    else { 
-		WARN "Unable to detect PulseAudio configuration from \$PULSE_SERVER ($ps)";
-	    }
-	}
-	$o{media} //= 4713;
-    }
+        if ($self->{audio}) {
+            if (defined(my $ps = $ENV{PULSE_SERVER})) {
+                # FIXME: we should read /etc/pulseaudio/client.conf and
+                # honor it and also be able to forward media to a UNIX
+                # socket!!!
+                if ($ps =~ /^(?:tcp:localhost:)?(\d+)$/) {
+                    $o{media} = $1;
+                }
+                else {
+                    WARN "Unable to detect PulseAudio configuration from \$PULSE_SERVER ($ps)";
+                }
+            }
+            $o{media} //= 4713;
+        }
 
-    if ($self->{printing}) {
+        if ($self->{printing}) {
+            if ($WINDOWS) {
+                $o{smb} = 445;
+            } else {
+                $o{cups} = 631;
+            }
+        }
+
+        @o{ keys %{$self->{extra}} } = values %{$self->{extra}};
+        # Use a port from the ephemeral range for slave server
+        if (core_cfg('client.slave.enable', 1)) {
+            my $port = 62000 + int(rand(2000));
+            if (open(my $fh, '>', $slave_port_file)) {
+                $o{slave} = $port;
+                INFO "Using slave port $port";
+                print $fh $port;
+                close $fh;
+            } else {
+                WARN "Unable to save port used for slave connections; slave client disabled: $^E";
+            }
+        }
+
+        my @cmd;
+        if ( $WINDOWS ) {
+            @cmd = File::Spec->rel2abs(core_cfg('command.windows.nxproxy'), $QVD::Client::App::app_dir);
+        } elsif ( $DARWIN ) {
+            @cmd = File::Spec->rel2abs(core_cfg('command.darwin.nxproxy'), $QVD::Client::App::app_dir);
+        } else {
+            @cmd = core_cfg('command.nxproxy');
+        }
+
+        push @cmd, split(/\s+/, core_cfg('client.nxproxy.extra_args')) if ( core_cfg('client.nxproxy.extra_args') );
+        push @cmd, '-S', map("$_=$o{$_}", keys %o), 'localhost:40';
+
+        my $slave_cmd = core_cfg('client.slave.command', 0);
+        if (defined $slave_cmd and length $slave_cmd) {
+            $slave_cmd = File::Spec->rel2abs($slave_cmd, $QVD::Client::App::app_dir);
+            if (-x $slave_cmd ) {
+                DEBUG("Slave command is '$slave_cmd'");
+                $self->{client_delegate}->proxy_set_environment( QVD_SLAVE_CMD => $slave_cmd );
+            } else {
+                WARN("Slave command '$slave_cmd' not found or not executable.");
+            }
+        }
+
+        if ( $DARWIN ) {
+            $self->{client_delegate}->proxy_set_environment( DYLD_LIBRARY_PATH => "$QVD::Client::App::app_dir/lib" );
+            DEBUG "Running on Darwin, DYLD_LIBRARY_PATH set to $ENV{DYLD_LIBRARY_PATH}";
+        }
+
+        DEBUG("Running nxproxy: @cmd");
+        $nxproxy_proc =  Proc::Background->new(@cmd) or _logdie("nxproxy failed to start");
+        if ( $DARWIN ) {
+            DEBUG "Unsetting DYLD_LIBRARY_PATH on Darwin";
+            $self->{client_delegate}->proxy_set_environment( DYLD_LIBRARY_PATH => "" );
+        }
+
+        DEBUG("Listening on 4040");
+        my $listener = IO::Socket::INET->new(LocalPort => 4040,
+                                             LocalAddr => 'localhost',
+                                             ReuseAddr => 1,
+                                             Listen    => 1 ) or _logdie "Unable to listen on port 4040";
+
+        my $local_socket = $listener->accept() or _logdie "connection from nxproxy failed";
+        undef $listener; # close the listener
+
+        DEBUG("Connection accepted, forwarding socket\n");
         if ($WINDOWS) {
-            $o{smb} = 445;
-        } else {
-            $o{cups} = 631;
+            my $nonblocking = 1;
+            use constant FIONBIO => 0x8004667e;
+            ioctl($local_socket, FIONBIO, \$nonblocking);
         }
-    }
+        $self->{client_delegate}->proxy_connection_status('FORWARDING');
+        forward_sockets($local_socket,
+                        $httpc->get_socket,
+                        buffer_2to1 => $httpc->read_buffered);
+    };
 
-    @o{ keys %{$self->{extra}} } = values %{$self->{extra}};
-    # Use a port from the ephemeral range for slave server
-    my $slave_port_file = $QVD::Client::App::user_dir.'/slave-port'; 
-    if (core_cfg('client.slave.enable', 1)) {
-        my $port = 62000 + int(rand(2000));
-        if (open(my $fh, '>', $slave_port_file)) {
-            $o{slave} = $port;
-            INFO "Using slave port $port";
-            print $fh $port;
-            close $fh;
-        } else {
-            WARN "Unable to save port used for slave connections; slave client disabled: $^E";
+    # cleanup
+    do {
+        local $@;
+        if ($o{slave}) {
+            INFO "Deleting slave port file $slave_port_file";
+            unlink $slave_port_file;
         }
-    }
 
-    my @cmd;
-    if ( $WINDOWS ) {
-        @cmd = File::Spec->rel2abs(core_cfg('command.windows.nxproxy'), $QVD::Client::App::app_dir);
-    } elsif ( $DARWIN ) {
-        @cmd = File::Spec->rel2abs(core_cfg('command.darwin.nxproxy'), $QVD::Client::App::app_dir);
-    } else {
-        @cmd = core_cfg('command.nxproxy');
-    }
+        $self->_stop_proc(nxproxy => $nxproxy_proc);
+        $self->_stop_proc(PulseAudio => $pa_proc);
+        $self->_stop_proc(X11 => $x11_proc);
+    };
 
+    die $@ if $@;
 
-	push @cmd, split(/\s+/, core_cfg('client.nxproxy.extra_args')) if ( core_cfg('client.nxproxy.extra_args') );
-    push @cmd, '-S', map("$_=$o{$_}", keys %o), 'localhost:40';
-
-    my $slave_cmd = core_cfg('client.slave.command', 0);
-    if (defined $slave_cmd and length $slave_cmd) {
-        $slave_cmd = File::Spec->rel2abs($slave_cmd, $QVD::Client::App::app_dir);
-        if (-x $slave_cmd ) {
-            DEBUG("Slave command is '$slave_cmd'");
-            $self->{client_delegate}->proxy_set_environment( QVD_SLAVE_CMD => $slave_cmd );
-        } else {
-            WARN("Slave command '$slave_cmd' not found or not executable.");
-        }
-    }
-    
-    if ( $DARWIN ) {
-        $self->{client_delegate}->proxy_set_environment( DYLD_LIBRARY_PATH => "$QVD::Client::App::app_dir/lib" );
-        DEBUG "Running on Darwin, DYLD_LIBRARY_PATH set to $ENV{DYLD_LIBRARY_PATH}";
-    }
-
-    DEBUG("Running nxproxy: @cmd");
-    my $nxproxy_proc;
-
-    if ( ($nxproxy_proc =  Proc::Background->new(@cmd)) ) {
-        DEBUG("nxproxy started, DYLD_LIBRARY_PATH=" . $ENV{DYLD_LIBRARY_PATH});
-    } else {
-        ERROR("nxproxy failed to start");
-        die "nxproxy failed to start";
-    }
-
-    if ( $DARWIN ) {
-        $self->{client_delegate}->proxy_set_environment( DYLD_LIBRARY_PATH => "" );
-        DEBUG "Running on Darwin, unssetting DYLD_LIBRARY_PATH";
-    }
-
-    DEBUG("Listening on 4040\n");
-    my $ll = IO::Socket::INET->new(
-        LocalPort => 4040,
-        LocalAddr => 'localhost',
-        ReuseAddr => 1,
-        Listen    => 1,
-    ) or die "Unable to listen on port 4040";
-
-    my $local_socket = $ll->accept() or die "connection from nxproxy failed";
-    DEBUG("Connection accepted\n");
-
-    undef $ll; # close the listening socket
-    if ($WINDOWS) {
-        my $nonblocking = 1;
-        use constant FIONBIO => 0x8004667e;
-        ioctl($local_socket, FIONBIO, \$nonblocking);
-    }
-
-    DEBUG("Forwarding sockets\n");
-    $self->{client_delegate}->proxy_connection_status('FORWARDING');
-    forward_sockets(
-        $local_socket,
-        $httpc->get_socket,
-        buffer_2to1 => $httpc->read_buffered,
-        # debug => 1,
-    );
-    DEBUG("nxproxy exited with status " . $nxproxy_proc->wait);
-    
-    if ( $pa_proc ) {
-        DEBUG("Stopping pulseaudio...");
-        if ( $pa_proc->die ) {
-	    DEBUG("Pulseaudio exited with status " . $pa_proc->wait);
-        } else {
-            ERROR("Failed to kill pulseaudio");
-        }
-    }
-
-    if ($o{slave}) {
-        INFO "Deleting slave port file $slave_port_file";
-        unlink $slave_port_file ;
-    }
-
-	$self->_stop_x11;
-	
     DEBUG("Done.");
 
 }
