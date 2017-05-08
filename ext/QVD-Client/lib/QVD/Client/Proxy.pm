@@ -454,7 +454,7 @@ sub connect_to_vm {
     my $vm_list;
 
     eval {
-        $vm_list = JSON->new->decode($body);
+        $vm_list = from_json($body, { utf8 => 1, allow_nonref => 1});
     };
 
     if ( $@ ) {
