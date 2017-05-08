@@ -1348,7 +1348,7 @@ sub start_file_sharing {
     my $slave_client_proc;
     if (core_cfg('client.slave.enable', 1) && core_cfg('client.file_sharing.enable', 1)) {
 
-        use QVD::Client::SlaveClient;
+        require QVD::Client::SlaveClient;
         for my $share (@{ $self->{shares} }) {
             INFO("Starting folder sharing for $share");
             for (my $conn_attempt = 0; $conn_attempt < 10; $conn_attempt++) {
@@ -1387,7 +1387,7 @@ sub start_remote_mounts {
 		
 		last unless ( $local_dir && $remote_dir );
 
-		use QVD::Client::SlaveClient;
+		require QVD::Client::SlaveClient;
 		INFO("Mounting remote directory $remote_dir at $local_dir");
 
 		for (my $conn_attempt = 0; $conn_attempt < 10; $conn_attempt++) {
