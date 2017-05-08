@@ -424,11 +424,11 @@ sub new {
 sub RunWorkerThread {
     my $self = shift;
     my @args = @_;
+    lock(%connect_info);
     while (1) {
         unless ( %connect_info ){ DEBUG "Ending connection thread\n"; threads->exit(0) ; }
-        lock(%connect_info);
         local $@;
-        eval { 
+        eval {
             QVD::Client::Proxy->new($self, %connect_info)->connect_to_vm();
         };
         if ($@) {
@@ -436,7 +436,9 @@ sub RunWorkerThread {
             ERROR "Unable to connect to VM: $msg";
             $self->proxy_connection_error(message => $msg);
         }
+        DEBUG "Slave thread waiting for \%connect_info";
         cond_wait(%connect_info);
+        DEBUG "Slave thread signaled \%connect_info!";
     }
 }
 
@@ -615,9 +617,12 @@ sub OnConnectionError {
     $self->{progress_bar}->SetRange(100);
     my $message = $event->GetData;
     my $dialog = Wx::MessageDialog->new($self, $message, $self->_t("Connection error"), wxOK | wxICON_ERROR);
+    DEBUG "Showing error to user";
     $dialog->ShowModal();
     $dialog->Destroy();
+    DEBUG "Calling EnableControls(1)";
     $self->EnableControls(1);
+    $self->Show;
 }
 
 sub OnListOfVMLoaded {
@@ -1284,6 +1289,9 @@ sub SaveConfiguration {
             $self->_t("Error saving configuration"), wxOK | wxICON_ERROR);
         $dialog->ShowModal();
         $dialog->Destroy();
+    }
+    else {
+        INFO "Configuration saved to $QVD::Client::App::user_config_filename";
     }
 }
 
