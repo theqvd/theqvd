@@ -1,4 +1,4 @@
-<div class="<%= cid %> section-container">
+<div class="<%= cid %> section-container sec-downloads">
     <table class="list">
         <tbody>
             <tr>

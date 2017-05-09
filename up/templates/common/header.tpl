@@ -23,7 +23,7 @@
                             <ul class="js-menu-submenu-<%= iMenu %>">
                                 <% $.each(menuOpt.subMenu, function (iSubMenu, subMenuOpt) { %>
                                     <li>
-                                        <a href="<%= subMenuOpt.link %>" class="js-submenu-option js-submenu-option-<%= iSubMenu %>">
+                                        <a href="<%= subMenuOpt.link %>" class="js-submenu-option js-submenu-option-<%= iSubMenu %>" data-target="<%= iSubMenu %>">
                                             <span class="<%= subMenuOpt.icon %>" data-i18n="<%= subMenuOpt.text %>"></span>
                                         </a>
                                     </li>

@@ -1,4 +1,4 @@
-<div class="list-block <%= cid %>">
+<div class="list-block <%= cid %> sec-desktops">
     <div class="list-navigation">
         <div class="fleft bb-workspaces-select"></div>
         <div class="bb-pagination"></div>
