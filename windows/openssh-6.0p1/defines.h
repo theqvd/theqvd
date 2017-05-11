@@ -304,7 +304,7 @@ typedef int ssize_t;
 #endif /* HAVE_SSIZE_T */
 
 #ifndef HAVE_CLOCK_T
-typedef long clock_t;
+//typedef long clock_t;
 # define HAVE_CLOCK_T
 #endif /* HAVE_CLOCK_T */
 

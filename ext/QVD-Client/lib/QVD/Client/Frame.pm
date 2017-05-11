@@ -1336,6 +1336,8 @@ sub load_share_list {
             push @{$self->{shares}}, '/Volumes' if -e '/Volumes'; # For OS X
         }
     }
+
+    DEBUG "Shares: @{$self->{shares}}";
  
     $self->update_share_list() if ( defined $self->{tab_ctl} );
 

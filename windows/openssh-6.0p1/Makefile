@@ -19,7 +19,7 @@ SOURCES=bufaux.c \
 	xmalloc.c
 
 sftp-server.exe: $(SOURCES:.c=.o)
-	$(CC) --verbose -o $@ $+ -lmsvcrtd -lws2_32
+	$(CC) --verbose -o $@ $+ -L/cygdrive/c/Strawberry/c/i686-w64-mingw32/lib/ -lmsvcrt -lws2_32
 	strip $@
 
 clean:
