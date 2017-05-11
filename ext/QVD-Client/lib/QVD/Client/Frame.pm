@@ -1341,89 +1341,98 @@ sub load_share_list {
 
 }
 
+sub _slave_client_invoke {
+    my $self = shift;
+    my $method = shift;
+
+    require QVD::Client::SlaveClient;
+    for (reverse 0..10) {
+        eval { QVD::Client::SlaveClient->new()->$method(@_) };
+        last unless $@ =~ /ECONNREFUSED|EPIPE/;
+        DEBUG "Unable to mount share: $@";
+        sleep 1 if $_;
+    }
+
+    if ($@) {
+        ERROR $@;
+        $@ =~ /\bServer\s+replied\s+(\d+)\b/i;
+        return ($1 // 500);
+    }
+    return 200;
+}
 
 sub start_file_sharing {
-    my ($self) = @_;
+    my $self = shift;
 
-    my $slave_client_proc;
-    if (core_cfg('client.slave.enable', 1) && core_cfg('client.file_sharing.enable', 1)) {
+    unless (core_cfg('client.slave.enable') and
+            core_cfg('client.file_sharing.enable')) {
+        INFO "Slave channel or file sharing is disabled, not exporting local shares into the remote VM";
+        return;
+    }
+    INFO "Exporting local shares into remote VM";
 
-        require QVD::Client::SlaveClient;
-        for my $share (@{ $self->{shares} }) {
-            INFO("Starting folder sharing for $share");
-            for (my $conn_attempt = 0; $conn_attempt < 10; $conn_attempt++) {
-                local $@;
-                my $client = QVD::Client::SlaveClient->new();
-                eval { $client->handle_share($share) };
-                if ($@) {
-                    if ($@ =~ 'ECONNREFUSED' || $@ =~ 'EPIPE' ) {
-                        sleep 1;
-                        next;
-                    }
-                    ERROR $@;
-                } else {
-                    DEBUG("Folder sharing started for $share");
-                }
-                last;
-            }
+    my @errors;
+    for my $share (@{ $self->{shares} }) {
+        INFO "Starting folder sharing for $share";
+        local $@;
+        my $code = $self->_slave_client_invoke(handle_share => $share);
+        if ($code == 200) {
+            DEBUG "Share $share exported into VM";
         }
+        else {
+            ERROR "Unable to mount share $share: [$code] $@";
+            my $message = sprintf($self->_t("Failed to mount share %s:"), $share) . ' ' . $@;
+            push @errors, $message;
+        }
+    }
+    if (@errors) {
+        my $dialog = Wx::MessageDialog->new($self, join("\n", @errors),
+                                            $self->_t("File sharing error."), wxOK | wxICON_ERROR);
+        $dialog->ShowModal();
+        $dialog->Destroy();
     }
 }
 
 sub start_remote_mounts {
-	my ($self) = @_;
-	my $num = 0;
+    my $self = shift;
 
-    if (core_cfg('client.slave.enable', 1)) {
-		INFO("Starting remote mounts");
-    } else {
-		INFO("Slave channel disabled, remote mounts (if any are configured) won't be started");
-		return;
-	}
+    unless (core_cfg('client.slave.enable')) {
+        INFO "Slave channel disabled, remote mounts won't be started";
+        return;
+    }
+    INFO "Starting remote mounts";
 
-	while(1) {
-		my $remote_dir = core_cfg("client.mount.$num.remote", 0);
-		my $local_dir  = core_cfg("client.mount.$num.local", 0);
-		
-		last unless ( $local_dir && $remote_dir );
+    my @errors;
+    for my $num (map /^client\.mount\.(\d+)\.remote$/, core_cfg_keys) {
+        local $@;
+        my $remote_dir = core_cfg("client.mount.$num.remote", 0) // next;
+        my $local_dir  = core_cfg("client.mount.$num.local", 0)  // next;
 
-		require QVD::Client::SlaveClient;
-		INFO("Mounting remote directory $remote_dir at $local_dir");
 
-		for (my $conn_attempt = 0; $conn_attempt < 10; $conn_attempt++) {
-			local $@;
-			my $client = QVD::Client::SlaveClient->new();
-			eval { $client->handle_mount($remote_dir, $local_dir) };
-			if ($@) {
-				if ($@ =~ 'ECONNREFUSED' || $@ =~ 'EPIPE' ) {
-					sleep 1;
-					next;
-				}
-				ERROR $@;
+        INFO "Mounting remote directory $remote_dir at $local_dir";
 
-				my $message = sprintf($self->_t("Failed to mount remote folder %s at %s:"), $remote_dir, $local_dir) . "\n\n";
-				if ( $@ =~ /Server replied 404/ ) {
-					$message .= sprintf($self->_t("Path %s was not found on the VM"), $remote_dir);
-				} elsif ( $@ =~ /Server replied 403/ ) {
-					$message .= sprintf($self->_t("Path %s is forbidden on the VM"), $remote_dir);
-                } elsif ( $@ =~ /Server replied 501/ ) {
-					$message .= $self->_t("VM lacks file sharing support. Please install the qvd-sshfs package.");
-				} else {
-					$message .= $self->_t("Unrecognized error, full error message follows:") .  "\n\n$@";
-				}
+        my $code = $self->_slave_client_invoke(handle_mount => $remote_dir, $local_dir);
 
-				my $dialog = Wx::MessageDialog->new($self, $message, $self->_t("File sharing error."), wxOK | wxICON_ERROR);
-				$dialog->ShowModal();
-				$dialog->Destroy();
-
-			} else {
-				DEBUG("Remote directory $remote_dir mounted at $local_dir");
-			}
-			last;
-		}
-	
-		$num++;
-	}
+        if ($code == 200) {
+            DEBUG "Remote directory $remote_dir mounted at $local_dir";
+        }
+        else {
+            ERROR "Unable to mount remote directory $remote_dir at $local_dir: [$code] $@";
+            my $reason = (($code == 404) ? sprintf($self->_t("Path %s was not found on the VM"), $remote_dir) :
+                          ($code == 403) ? sprintf($self->_t("Path %s is forbidden on the VM"), $remote_dir)  :
+                          ($code == 501) ? $self->_t("VM lacks file sharing support. Please install the qvd-sshfs package.") :
+                          $self->_t("Unrecognized error, full error message follows:")."\n\n$@");
+            my $message = sprintf($self->_t("Failed to mount remote folder %s at %s:"),
+                                  $remote_dir, $local_dir)." ".$reason;
+            push @errors, $message;
+        }
+    }
+    if (@errors) {
+        my $dialog = Wx::MessageDialog->new($self, join("\n", @errors),
+                                            $self->_t("File sharing error."), wxOK | wxICON_ERROR);
+        $dialog->ShowModal();
+        $dialog->Destroy();
+    }
 }
 
 sub get_osx_resolutions {
