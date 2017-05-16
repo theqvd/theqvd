@@ -33,7 +33,7 @@ $SIG{__DIE__} = sub { ERROR "@_"; };
 use base 'QVD::HTTPD::INET';
 
 my $shares_path = core_cfg('vma.user.shares.path');
-$shares_path =~ s{^\~/}{$home} or do {
+$shares_path =~ s{^\~/}{$home/} or do {
     ERROR "vma.user.shares.path doesn't point inside the user home directory";
     exit -1;
 };

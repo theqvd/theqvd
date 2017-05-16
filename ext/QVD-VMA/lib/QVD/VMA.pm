@@ -430,7 +430,7 @@ sub _umount_remote_shares {
         return;
     };
     my $root = $shares_path;
-    $root =~ s{^\~/|}{$home} or do {
+    $root =~ s{^\~/|}{$home/} or do {
         ERROR "vma.user.shares.root ($shares_path) does not point inside the user home";
         return;
     };

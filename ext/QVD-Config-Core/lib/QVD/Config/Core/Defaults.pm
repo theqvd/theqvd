@@ -585,6 +585,8 @@ vma.user.home.fs = ext4
 ## where to mount the homes device
 vma.user.home.path = /home
 
+## where shares from the client are mounted
+# must start by "~/"
 vma.user.shares.path = ~/Redirected
 
 ## default user name and groups it will belong to
