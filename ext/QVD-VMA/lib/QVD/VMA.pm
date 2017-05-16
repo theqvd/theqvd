@@ -434,7 +434,7 @@ sub _umount_remote_shares {
         ERROR "vma.user.shares.root ($shares_path) does not point inside the user home";
         return;
     };
-    open my($dh), $root or do {
+    opendir my($dh), $root or do {
         DEBUG "Unable to open shares directory $root: $!";
         return;
     };
