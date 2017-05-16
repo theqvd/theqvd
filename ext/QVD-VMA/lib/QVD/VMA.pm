@@ -62,6 +62,9 @@ my $userdel         = cfg('command.userdel');
 my $groupdel        = cfg('command.groupdel');
 my $slaveclient     = cfg('command.slaveclient');
 
+my $mount           = cfg('command.mount');
+my $umount          = cfg('command.umount');
+
 my $default_user_name   = cfg('vma.user.default.name');
 my $default_user_groups = cfg('vma.user.default.groups');
 
@@ -72,6 +75,9 @@ my $home_drive = cfg('vma.user.home.drive');
 my $user_shell = cfg('vma.user.shell');
 
 my $home_partition = $home_drive . '1';
+
+my $shares_path = cfg('vma.user.shares.path');
+
 
 my %on_action =       ( pre_connect    => cfg('vma.on_action.pre-connect'),
                         connect        => cfg('vma.on_action.connect'),
@@ -353,7 +359,7 @@ sub _provisionate_user {
                         system ("mkfs.$home_fs" =>  $home_partition)
                             and die "Unable to create file system on user storage";
                     }
-                    system mount => $home_partition, $home_path
+                    system $mount => $home_partition, $home_path
                         and die 'Unable to mount user storage';
                 }
             }
@@ -416,6 +422,26 @@ sub _fill_props {
     $props{'qvd.vm.user.groups'} //= $default_user_groups;
     $props{'qvd.vm.user.home'} //= "$home_path/$user";
     return %props;
+}
+
+sub _umount_remote_shares {
+    my $home = shift // do {
+        ERROR "Can't umount remote shares because home is not defined";
+        return;
+    };
+    my $root = $shares_path;
+    $root =~ s{^\~/|}{$home} or do {
+        ERROR "vma.user.shares.root ($shares_path) does not point inside the user home";
+        return;
+    };
+    open my($dh), $root or return;
+    while (defined(my $fn = <$dh>)) {
+        next if $fn eq '.' or $fn eq '..';
+        my $path = File::Spec->join($root, $fn);
+        system $umount => -l => $path;
+        unlink $path or WARN "Unable to remove directory $path: $!";
+    }
+    close $dh;
 }
 
 sub _fork_monitor {
@@ -485,20 +511,21 @@ sub _fork_monitor {
                         DEBUG "Agent running";
                         _save_nxagent_pid $1;
                     }
-                    when (/Session: (\w+) session at/) {
-                        DEBUG "Session $1, calling hooks";
-                        _save_nxagent_state_and_call_hook lc $1;
-                    }
-                    when (/Session: Session (\w+) at/) {
-                        DEBUG "Session $1, calling hooks";
-                        _save_nxagent_state_and_call_hook lc $1;
+                    when (/Session: (\w+) session at/ or
+                          /Session: Session (\w+) at/) {
+                        my $state = lc $1;
+                        if ($state eq 'suspended') {
+                            _umount_remote_shares($props{'qvd.vm.user.home'});
+                        }
+                        DEBUG "Session $state, calling hooks";
+                        _save_nxagent_state_and_call_hook $state;
                     }
                     when (/Listening to slave connections on port '(\d+)'/) {
                         DEBUG "Slave channel opened";
-                        
+
                         if ( $props{'qvd.client.usb.enabled' } ) {
                             DEBUG "USB forwarding is enabled, implementation is " . $props{'qvd.client.usb.implementation'};
-                            
+
                             if ( $props{'qvd.client.usb.implementation'} =~ /USBIP/ ) {
                                 _start_usbip($1);
                             } else {
