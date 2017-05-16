@@ -584,6 +584,9 @@ vma.user.home.drive = /dev/vdb
 vma.user.home.fs = ext4
 ## where to mount the homes device
 vma.user.home.path = /home
+
+vma.user.shares.path = ~/Redirected
+
 ## default user name and groups it will belong to
 vma.user.default.name = qvd
 vma.user.default.groups =
