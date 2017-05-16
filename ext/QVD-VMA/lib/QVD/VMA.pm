@@ -430,16 +430,23 @@ sub _umount_remote_shares {
         return;
     };
     my $root = $shares_path;
-    $root =~ s{^\~/|}{$home/} or do {
+    $root =~ s{^\~/}{$home/} or do {
         ERROR "vma.user.shares.root ($shares_path) does not point inside the user home";
         return;
     };
-    open my($dh), $root or return;
-    while (defined(my $fn = <$dh>)) {
+    open my($dh), $root or do {
+        DEBUG "Unable to open shares directory $root: $!";
+        return;
+    };
+    DEBUG "umounting shares in $root...";
+    while (defined(my $fn = readdir $dh)) {
         next if $fn eq '.' or $fn eq '..';
         my $path = File::Spec->join($root, $fn);
-        system $umount => -l => $path;
-        unlink $path or WARN "Unable to remove directory $path: $!";
+        DEBUG "umounting $path";
+        system $umount => -l => $path
+            and DEBUG "$umount failed: $?";
+        unlink $path
+            or WARN "Unable to remove directory $path: $!";
     }
     close $dh;
 }
