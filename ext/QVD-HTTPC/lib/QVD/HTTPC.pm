@@ -328,12 +328,12 @@ sub _sysread {
             }
         }
         else {
-            $n > 0 and die "socket closed unexpectedly";
+            $n > 0 and die "socket closed unexpectedly: $! ($^E)";
             $rv = $select_mask;
         }
 
         $n = select($rv, $wv, undef, $timeout);
-	$n > 0 or $! == Errno::EINTR or die "connection timed out";
+	$n > 0 or $! == Errno::EINTR or die "connection timed out: $! ($^E)";
     }
 }
 
