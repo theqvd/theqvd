@@ -21,7 +21,7 @@ sub handle_share {
     my $charset = 'UTF-8';
 	
     my ($code, $msg, $headers, $data) =
-    $self->{httpc}->make_http_request(PUT => '/shares/'.$path,
+    $self->httpc->make_http_request(PUT => '/shares/'.$path,
         headers => [
             "Authorization: Basic $self->{auth_key}",
             'Connection: Upgrade', 
@@ -38,9 +38,9 @@ sub handle_share {
     if ($pid > 0) {
         return $ticket;
     } else {
-        open STDIN, '<&', $self->{httpc}->{socket} or die "Unable to dup stdin: $^E";
-        open STDOUT, '>&', $self->{httpc}->{socket} or die "Unable to dup stdout: $^E";
-        close $self->{httpc}->{socket};
+        open STDIN, '<&', $self->httpc->{socket} or die "Unable to dup stdin: $^E";
+        open STDOUT, '>&', $self->httpc->{socket} or die "Unable to dup stdout: $^E";
+        close $self->httpc->{socket};
 
         chdir $path or die "Unable to chdir to $path: $^E";
         exec($command_sftp_server, '-e')
@@ -59,7 +59,7 @@ sub handle_mount {
     my $charset = 'UTF-8';
 	
     my ($code, $msg, $headers, $data) =
-    $self->{httpc}->make_http_request(GET => '/shares/'.$path,
+    $self->httpc->make_http_request(GET => '/shares/'.$path,
         headers => [
             "Authorization: Basic $self->{auth_key}",
             'Connection: Upgrade', 
@@ -85,11 +85,11 @@ sub handle_mount {
     } else {
         DEBUG "Redirecting";
 
-        $self->{httpc}->{socket}->blocking(1);
+        $self->httpc->{socket}->blocking(1);
 
-        open STDIN, '<&', $self->{httpc}->{socket} or die "Unable to dup stdin: $^E";
-        open STDOUT, '>&', $self->{httpc}->{socket} or die "Unable to dup stdout: $^E";
-        close $self->{httpc}->{socket};
+        open STDIN, '<&', $self->httpc->{socket} or die "Unable to dup stdin: $^E";
+        open STDOUT, '>&', $self->httpc->{socket} or die "Unable to dup stdout: $^E";
+        close $self->httpc->{socket};
 
         chdir $mountpoint or die "Unable to chdir to $path: $^E";
 		my @cmd;

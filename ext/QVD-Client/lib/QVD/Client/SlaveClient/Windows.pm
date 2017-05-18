@@ -21,7 +21,7 @@ BEGIN {
     # Duplicates a windows socket for use in another process
     Win32::API->Import(ws2_32 => 'int WSADuplicateSocket(HANDLE s, DWORD dwProcessId, LPSTR lpProtocolInfo)')
         or die "Unable to import WSADuplicateSocket";
-	
+
     # Returns the last windows socket error
     Win32::API->Import(ws2_32 => 'int WSAGetLastError()')
         or die "Unable to import WSAGetLastError";
@@ -52,88 +52,87 @@ if (!$app_dir) {
     $app_dir = File::Spec->catdir( @dirs[0..$#dirs-1] ); 
 }
 
-my $command_sftp_server = File::Spec->rel2abs(core_cfg('command.windows.sftp-server'), $app_dir);
-
 sub handle_share {
     my ($self, $path) = @_;
-	
+
     DEBUG "Making a PUT request to /shares/$path";
-	
+
     my ($code, $msg, $headers, $data) =
-    $self->{httpc}->make_http_request(PUT => '/shares/'.encode('utf8',$path),
+    $self->httpc->make_http_request(PUT => '/shares/'.encode('utf8',$path),
         headers => [
             "Authorization: Basic $self->{auth_key}",
             'Connection: Upgrade',
             "Upgrade: qvd:sftp/1.0;charset=utf-8"
         ]);
-		
+
     DEBUG "PUT returned with code $code";
-        
+
     if ($code != HTTP_SWITCHING_PROTOCOLS) {
         die "Server replied $code $msg $data";
     }
 
-    #my $pipe_name = sprintf("//./PIPE/qvd:sftp-server.%04d", rand(10000));
-    #
-    # Create pipe
-    #INFO "** Creating named pipe $pipe_name...\n";
-    #my $pipe = CreateNamedPipe($pipe_name, 0x3, 0x4, 2, 512, 512, 5000, undef);
-    #if ($pipe == -1) {
-    #    die "Unable to create named pipe: $^E";
-    #}
-	
-    # Create tempfile
-    my ($fh, $tempfile) = tempfile(UNLINK => 1);
-    $fh->autoflush(1);
-    
     my $logfile = File::Spec->join($QVD::Client::App::user_dir, 'sftp-server.log');
-	
-    DEBUG "Starting $command_sftp_server to serve $path...\n";
-    DEBUG "Temp file: $tempfile, debug log: $logfile\n";
 
-    # To debug sftp-server.exe under GDB:
-    # my $command_gdb='c:/mingw/bin/gdb.exe';
-    # my $cmdline = "gdb -w --directory \"c:\\documents and settings\\administrador\\Mis documentos\\openssh-6.0p1\" --args \"$command_sftp_server\" -l DEBUG3 -F \"$tempfile\" -L \"$logfile\"";
-    my $cmdline = "$command_sftp_server -l ERROR -F \"$tempfile\" -L \"$logfile\"";
-    my $child;
-    Win32::Process::Create($child, 
-        $command_sftp_server, 
-        $cmdline,
-        1,              # inherit handles
-        NORMAL_PRIORITY_CLASS | CREATE_NO_WINDOW | CREATE_SUSPENDED,       # creation flags
-        shortpathL($path)			# current working directory
-    ) or die "Unable to start sftp-server: $^E";
-	
-    # Duplicate socket
-    DEBUG "Duplicating socket to send it to sftp-server";
-    my $lpProtocolInfo = "\0" x 372; # Size of WSAPROTOCOL_INFO
-    my $handle = FdGetOsFHandle(fileno($self->{httpc}->{socket}));
-    if (WSADuplicateSocket($handle, $child->GetProcessID(), $lpProtocolInfo)) {
-        die "Unable to duplicate socket: ".WSAGetLastError();
+    if (core_cfg('client.use.win-sftp-server')) {
+        my $cmd = File::Spec->rel2abs(core_cfg('command.windows.win-sftp-server'), $app_dir);
+
+        my @cmd = ($cmd, '-v', '-d', shortpathL($path));
+        DEBUG "Executing win-sftp-server as '@cmd'";
+
+        open my($oldin), '<&', STDIN or die "Can't dup stdin: $!";
+        open my($oldout), '>&', STDOUT or die "Can't dup stdout: $!";
+
+        # local (STDIN, STDOUT);
+        open STDIN, '<&', $self->httpc->{socket};
+        open STDOUT, '>&', $self->httpc->{socket};
+
+        my $pid = eval { system 1, @cmd };
+        do {
+            local ($@, $!, $^E, $?);
+            open STDIN, '<&', $oldin;
+            open STDOUT, '>&', $oldout;
+        };
+        unless ($pid) {
+            die "Unable to launch win-sftp-server: " . ($@ || $!);
+        }
     }
+    else { # TO BE REMOVED!!!
+        my $command_sftp_server = File::Spec->rel2abs(core_cfg('command.windows.sftp-server'), $app_dir);
 
-    print $fh $lpProtocolInfo;
-    
-    $child->Resume();
-    
-    close $self->{httpc}->{socket};
+        # Create tempfile
+        my ($fh, $tempfile) = tempfile(UNLINK => 1);
+        $fh->autoflush(1);
 
-    ## Connect to pipe
-    #INFO "** Connecting to pipe $pipe_name...\n";
-    #ConnectNamedPipe($pipe, undef)
-    #    or die "Unable to connect to pipe: $^E";
-    #
-    ## Send "protocol info" to child
-    #INFO "** Sending protocol info to child...\n";
-    #my $written;
-    #WriteFile($pipe, $lpProtocolInfo, 372, $written, [])
-    #    or die "Unable to write to pipe: $^E";
-    #INFO "** Wrote $written bytes to the pipe...\n";
-    #
-    ## Wait for child
-    #INFO "** Waiting for child...\n";
-    #my $status = $child->Wait(INFINITE);
-    #INFO "** Finished. (exit code $status)\n";
+        DEBUG "Starting $command_sftp_server to serve $path...\n";
+        DEBUG "Temp file: $tempfile, debug log: $logfile\n";
+
+        # To debug sftp-server.exe under GDB:
+        # my $command_gdb='c:/mingw/bin/gdb.exe';
+        # my $cmdline = "gdb -w --directory \"c:\\documents and settings\\administrador\\Mis documentos\\openssh-6.0p1\" --args \"$command_sftp_server\" -l DEBUG3 -F \"$tempfile\" -L \"$logfile\"";
+        my $cmdline = "$command_sftp_server -l ERROR -F \"$tempfile\" -L \"$logfile\"";
+        my $child;
+        Win32::Process::Create($child, 
+                               $command_sftp_server, 
+                               $cmdline,
+                               1,              # inherit handles
+                               NORMAL_PRIORITY_CLASS | CREATE_NO_WINDOW | CREATE_SUSPENDED,       # creation flags
+                               shortpathL($path)			# current working directory
+                              ) or die "Unable to start sftp-server: $^E";
+
+        # Duplicate socket
+        DEBUG "Duplicating socket to send it to sftp-server";
+        my $lpProtocolInfo = "\0" x 372; # Size of WSAPROTOCOL_INFO
+        my $handle = FdGetOsFHandle(fileno($self->httpc->{socket}));
+        if (WSADuplicateSocket($handle, $child->GetProcessID(), $lpProtocolInfo)) {
+            die "Unable to duplicate socket: ".WSAGetLastError();
+        }
+
+        print $fh $lpProtocolInfo;
+
+        $child->Resume();
+
+        close $self->httpc->{socket};
+    }
 }
 
 

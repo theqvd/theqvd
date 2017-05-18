@@ -166,7 +166,9 @@ command.windows.vcxsrv = VcxSrv\\vcxsrv.exe
 command.windows.pulseaudio = pulseaudio\\pulseaudio.exe
 command.windows.nxproxy = nx\\nxproxy.exe
 command.windows.sftp-server = bin/sftp-server.exe
-
+commnad.windows.win-sftp-server = bin/win-sftp-server.exe
+client.use.win-sftp-server = 0
+ 
 command.nxagent.args.extra =
 command.x-session.args.extra =
 command.sftp-server = /usr/lib/openssh/sftp-server

@@ -65,6 +65,7 @@ sub new {
     $opts{'slave.port'} = $slave_port;
 
     if ($WINDOWS) {
+        DEBUG "Calling QVD::Client::SlaveClient::Windows->new(@{[%opts]})";
         return QVD::Client::SlaveClient::Windows->new(%opts);
     } else {
         return QVD::Client::SlaveClient::Unix->new(%opts);
