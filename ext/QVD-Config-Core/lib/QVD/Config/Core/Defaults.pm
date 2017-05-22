@@ -208,7 +208,7 @@ client.nxproxy.extra_args =
 client.nxagent.extra_args =
 
 ## Extra arguments for sshfs. These have been determined as reasonable defaults.
-client.sshfs.extra_args=-o atomic_o_trunc -o idmap=user
+client.sshfs.extra_args=
 
 ## Extra arguments for Windows X servers
 client.xming.extra_args=-multiwindow -notrayicon -nowinkill -clipboard +bs -wm

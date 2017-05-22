@@ -84,12 +84,10 @@ sub auth {
 }
 
 sub _url_to_mount_point {
-    my ($url) = @_;
-    chop $url if $url =~ /[\/\\]$/;  # remove dir separator if last character
-
-    (my $mount_dir = $url) =~ s/.*[\/\\]//; # pick last part of path
-    $mount_dir = 'ROOT' if ($mount_dir eq '');
-    return $mount_dir;
+    my $url = @_;
+    $url =~ s/[\:\/\\]$//;  # remove trailing \,  / and : characters
+    $url =~ s/.*[\/\\]//; # pick last part of path
+    length($url) ? $url : 'Root';
 }
 
 sub _url_to_path {
@@ -129,9 +127,14 @@ sub handle_put_share {
         "X-QVD-Share-Ticket: $mount_dir"
     );
 
-    my @cmd = ($command_sshfs => "qvd-client:", $mount_point, -o => 'slave');
-    push @cmd, split(/\s+/, core_cfg('vma.sshfs.extra_args'));
-    push @cmd, -o => "modules=iconv,from_code=$charset" if $charset;
+    my @cmd = ($command_sshfs => "qvd-client:", $mount_point,
+               -o => 'slave',
+               -o => 'atomic_o_trunc',
+               -o => "uid=$>",
+               split(/\s+/, core_cfg('vma.sshfs.extra_args')));
+
+    push @cmd, -o => "modules=iconv,from_code=$charset,to_code=utf-8"
+        if defined $charset and $charset ne 'utf-8';
 
     DEBUG "Going to exec sshfs: @cmd";
     do { exec @cmd };
