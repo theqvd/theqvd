@@ -84,9 +84,9 @@ sub auth {
 }
 
 sub _url_to_mount_point {
-    my $url = @_;
+    my $url = shift;
     $url =~ s/[\:\/\\]$//;  # remove trailing \,  / and : characters
-    $url =~ s/.*[\/\\]//; # pick last part of path
+    $url =~ s/^.*[\/\\]//; # pick last part of path
     length($url) ? $url : 'Root';
 }
 
