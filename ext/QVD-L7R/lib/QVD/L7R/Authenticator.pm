@@ -204,8 +204,14 @@ sub authenticate_bearer {
 
     for (@{$auth->{plugins}}) { 
         if($_->authenticate_bearer($auth, $token, $l7r)) {
-            $auth->{authenticated} = 1;
-            return 1;
+            if(my $user = rs( User )->find( { id => $auth->{user_id} } )) {
+                $auth->{user} = $user;
+                $auth->{user_id} = $auth->{user}->id;
+                $auth->{authenticated} = 1;
+                return 1;
+            } else {
+                DEBUG "User $auth->{normalized_login} is authenticated but not registered in QVD database";
+            }
         }
     }
 
