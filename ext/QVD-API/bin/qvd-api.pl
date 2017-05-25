@@ -600,7 +600,7 @@ group {
             die QVD::API::Exception->new(code => 4210)->message;
         }
 
-        $c->inactivity_timeout(10);
+        $c->inactivity_timeout(0);
 
         $c->app->log->debug("VM Proxy WebSocket opened");
         $c->render_later->on(finish => sub { $c->app->log->debug("VM Proxy WebSocket closed"); });
@@ -616,12 +616,8 @@ group {
             my $tx = $c->tx;
             $tx->with_protocols( 'binary' );
 
-            my $ws = QVD::VMProxy->new( address => $vm_ip, port => $vm_port );
-            $ws->on( error => sub {
-                $c->app->log->error( "Error in ws: ".$_[1] );
-                $tx->finish( 1011, $_[1] )
-            } );
-            $ws->open($tx, 30000);
+            my $ws = QVD::VMProxy->new( url => "http://$vm_ip:$vm_port" );
+            $ws->open($tx, 1);
         }
         else 
         {

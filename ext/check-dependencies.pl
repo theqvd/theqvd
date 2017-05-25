@@ -6,6 +6,7 @@ use Term::ANSIColor;
 use File::Basename;
 use File::Find;
 use Module::CoreList;
+use Pod::Strip;
 
 my $exit_status = 0;
 opendir(my $dh, ".") || print_msg("Can't opendir current directory: $!", "FATAL");
@@ -210,8 +211,11 @@ sub get_deps_from_module {
         "QVD::HTTPD::.+", "QVD::Config::Core::Defaults",
         "QVD::SlaveClient");
     for my $file (@file_list) {
-        open FILE, $file or print_msg("Couldn't open file: $!", "FATAL");
-        while (my $line = <FILE>) {
+        my $parser = Pod::Strip->new();
+        my $output;
+        $parser->output_string(\$output);
+        $parser->parse_file($file);
+        foreach my $line (split /\n/, $output) {
             last if $line =~ /^__END__/;
             for my $regex (keys %regex_sub) {
                 if ($line =~ /$regex/) {

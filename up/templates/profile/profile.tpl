@@ -1,4 +1,4 @@
-<div class="<%= cid %> section-container">
+<div class="<%= cid %> section-container sec-profile">
     <table class="details">
         <tr>
             <td><i class="<%= CLASS_ICON_USER %>"></i><span data-i18n="Username"></span></td>

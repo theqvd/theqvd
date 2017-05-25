@@ -10,10 +10,10 @@ WriteMakefile(
     ABSTRACT          => 'QVD::VMProxy',
     EXE_FILES         => [ ],
     PREREQ_PM         => {
-        'Mojo::Base' => 0,
-        'Mojo::EventEmitter' => 0,
         'Mojo::IOLoop' => 0,
+        'Mojo::URL' => 0,
         'Mojo::Util' => 0,
+        'Moo' => 0,
         'QVD::Log' => 0
     },
 );

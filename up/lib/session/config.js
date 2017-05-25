@@ -188,82 +188,8 @@ Up.C = {
         Up.I.setupMenu = $.extend(true, {}, Up.I.menuSetupOriginal);
         Up.I.mobileMenu = $.extend(true, {}, Up.I.mobileMenuOriginal);
         Up.I.cornerMenu = $.extend(true, {}, Up.I.cornerMenuOriginal);
-        
-        var that = this;
+    },
 
-        // Menu visibility
-        var aclMenu = {
-            'di.see-main.' : 'dis',
-            'host.see-main.' : 'hosts',
-            'osf.see-main.' : 'osfs',
-            'user.see-main.' : 'users',
-            'vm.see-main.' : 'vms',
-        };
-        
-        $.each(aclMenu, function (acl, menu) {
-            if (!that.checkACL(acl)) {
-                delete Up.I.menu[menu];
-                delete Up.I.mobileMenu[menu];
-            }
-        });
-        
-        // Menu visibility
-        var aclSetupMenu = {
-            'config.wat.' : 'watconfig',
-            'role.see-main.' : 'roles',
-            'administrator.see-main.' : 'administrators',
-            'tenant.see-main.' : 'tenants',
-            'views.see-main.' : 'views',
-            'property.see-main.' : 'properties',
-            'log.see-main.' : 'logs',
-        };
-        
-        $.each(aclSetupMenu, function (acl, menu) {
-            if (!that.checkACL(acl)) {
-                delete Up.I.setupMenu[menu];
-            }
-        });
-        
-        // For tenant admins (not superadmins) and recover admin in monotenant mode the acl section tenant will not exist
-        var tenantsExist = false;
-        
-        if (!tenantsExist) {
-            delete ACL_SECTIONS['tenant'];
-            delete ACL_SECTIONS_PATTERNS['tenant'];
-        }
-    },
-    
-    // Check if administrator session is expired
-    // Params:
-    //      response: API call response
-    sessionExpired: function (response) {
-        if (!Up.Router.upRouter) {
-            return false;
-        }
-        else {
-            switch  (response.status) { 
-                case STATUS_TENANT_RESTRICTED:
-                    // Tenant restricted control will only works when logged (sid defined)
-                    if (!Up.C.sid) {
-                        break;
-                    }
-                case STATUS_SESSION_EXPIRED:
-                case STATUS_CREDENTIALS_FAIL:
-                case STATUS_NOT_LOGIN:
-                    // Close dialog (if opened)
-                    $('.js-dialog-container').remove();
-                    $('html, body').attr('style', '');
-                    
-                    // Store message on cookies to print it after reloading
-                    $.cookie('messageToShow', JSON.stringify({'message': ALL_STATUS[response.status], 'messageType': 'error'}), {expires: 1, path: '/'});
-                    window.location = '#/logout';
-                    return true;
-            }
-        }
-        
-        return false;
-    },
-    
     // Abort stored ajax requests
     abortRequests: function () {
         var that = this;
@@ -332,13 +258,19 @@ Up.C = {
                 if (index > -1) {
                     Up.C.requests.splice(index, 1);
                 }
-            },
-            statusCode: {
-                // Not authorized
-                401: function () {
-                    Up.L.loadLogin();
-                },
-            },
+                
+                switch (jqXHR.status) {
+                    case 200:
+                        // Nothing to do
+                        break;
+                    case 401:
+                        Up.L.loadLogin();
+                        break;
+                    default:
+                        Up.I.M.showMessage({message: i18n.t('Unexpected error') + ': ' + jqXHR.status + ' - ' + jqXHR.statusText, messageType: 'error'});
+                        break;
+                }
+            }
         });
         
 		// Attach request url to ajax data

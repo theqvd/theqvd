@@ -116,7 +116,6 @@ Up.Router = Backbone.Router.extend({
         params = params || {};
 
         Up.I.showLoading();
-        Up.I.setMenuOpt(menuOpt);
         
         if (!$.isEmptyObject(Up.CurrentView)) {
             Up.CurrentView.undelegateEvents();

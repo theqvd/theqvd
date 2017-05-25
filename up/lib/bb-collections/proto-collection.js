@@ -42,10 +42,6 @@ Up.Collections.Collection = Backbone.Collection.extend({
     },
 
     parse: function(response) {
-        if (Up.C.sessionExpired(response)) {
-            return;
-        }
-        
         return response;
     },
 

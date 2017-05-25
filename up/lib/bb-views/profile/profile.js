@@ -15,7 +15,7 @@ Up.Views.ProfileView = Up.Views.MainView.extend({
     initialize: function (params) {
         Up.Views.MainView.prototype.initialize.apply(this, [params]);
                 
-        Up.I.chosenConfiguration();
+        Up.I.Chosen.configuration();
         
         params.id = Up.C.adminID;
         this.id = Up.C.adminID;
@@ -79,7 +79,7 @@ Up.Views.ProfileView = Up.Views.MainView.extend({
 
         $('.bb-content').html(this.template);
                 
-        Up.I.chosenElement($('select[name="language"]'), 'single100');
+        Up.I.Chosen.element($('select[name="language"]'), 'single100');
         
         Up.T.translateAndShow();
     }

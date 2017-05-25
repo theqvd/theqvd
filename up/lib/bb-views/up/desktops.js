@@ -66,7 +66,7 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
                 
                 $('.bb-workspaces-select').html(template);
                 
-                Up.I.chosenElement('select[name="active_configuration_select"]', 'single');
+                Up.I.Chosen.element('select[name="active_configuration_select"]', 'single');
                 Up.T.translate();
             }
         });      
@@ -93,9 +93,7 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
         that.shownElementsLabelUpdate();
         
         Up.T.translateAndShow();
-                
-        Up.I.addSortIcons(that.cid);
-                
+        
         Up.I.addOddEvenRowClass(that.listContainer);
     },
     
@@ -230,7 +228,8 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
             
             // If counter reach timeout set disconnected status and breack timeout countdown
             if (that.connectionTimeouts[id].count >= CONNECTION_TIMEOUT) {
-                that.setDesktopState(id, 'disconnected');                
+                that.setDesktopState(id, 'disconnected');
+                that.connectDesktopFail();
                 clearInterval(that.connectionTimeouts[id].timeout);
                 
                 delete(that.connectionTimeouts[id]);

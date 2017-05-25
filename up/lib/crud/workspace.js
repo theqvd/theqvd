@@ -48,6 +48,12 @@ Up.CRUD.workspaces = {
                     Up.I.closeDialog($(this));
                 },
                 "Save": function () {
+                    var valid = Up.I.validateForm('.editor-container.' + that.cid);
+                    
+                    if (!valid) {
+                        return;
+                    }
+                    
                     var params = Up.I.parseForm(this);
                     
                     model.set(params);
@@ -81,6 +87,12 @@ Up.CRUD.workspaces = {
                     Up.I.closeDialog($(this));
                 },
                 "Save": function () {
+                    var valid = Up.I.validateForm('.editor-container.' + that.cid);
+                    
+                    if (!valid) {
+                        return;
+                    }
+                    
                     var params = Up.I.parseForm(this);
                     
                     model.set(params);

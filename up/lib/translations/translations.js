@@ -14,7 +14,8 @@ Up.T = {
             ns: {
                 namespaces: [
                     'main',
-                    'api-responses'
+                    'api-responses',
+                    'progress'
                 ],
                 defaultNs: 'main',
                 fallbackNs: 'main'
@@ -64,10 +65,7 @@ Up.T = {
         });
         
         // Configure different chosen controls (advanced jquery select controls)
-        Up.I.chosenConfiguration();
-
-        // Add sort icons to header
-        Up.I.updateSortIcons();
+        Up.I.Chosen.configuration();
         
         // Process tooltips
         Up.I.tooltipBind();

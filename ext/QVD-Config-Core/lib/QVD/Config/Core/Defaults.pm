@@ -97,6 +97,10 @@ path.api.ssl = /etc/qvd/api/certs
 path.api.ssl.key = ${path.api.ssl}/key.pem
 path.api.ssl.cert = ${path.api.ssl}/cert.pem
 
+path.up.api.ssl = /etc/qvd/api/certs
+path.up.api.ssl.key = ${path.up.api.ssl}/key.pem
+path.up.api.ssl.cert = ${path.up.api.ssl}/cert.pem
+
 ## KVM serial port captures or LXC console output
 path.serial.captures = ${path.tmp}/qvd
 path.hypervisor.captures = ${path.tmp}/qvd
@@ -427,18 +431,23 @@ api.stdout.filename = /dev/null
 api.stderr.filename = /dev/null
 
 # QVD User Portal API parameters
-up-api.url = https://*:4433
-up-api.user = root
-up-api.group = root
+up.api.url = https://*:4433
+up.api.user = root
+up.api.group = root
 
-up-api.stdout.filename = /dev/null
-up-api.stderr.filename = /dev/null
+up.api.stdout.filename = /dev/null
+up.api.stderr.filename = /dev/null
 
-up-api.l7r.address = localhost
-up-api.request.timeout = 3000
-up-api.websocket.timeout = 3600
-up-api.session.timeout = 3600
-up-api.l7r.expiration = 20
+up.api.l7r.address = 172.17.0.1
+up.api.l7r.session.expiration = 300
+up.api.request.timeout = 3000
+up.api.websocket.timeout = 3600
+up.api.session.expiration = 3600
+
+up.api.default.resolution = 1024x768x24
+
+up.api.docker.uri = http+unix://%2Fvar%2Frun%2Fdocker.sock
+up.api.docker.image.h5gw = registry.qindel.com:5000/qvd/qvd-nx2v-gateway:latest
 
 # QVD-Admin parameters
 # url of the API
@@ -463,7 +472,7 @@ log.filename = ${path.log}/qvd.log
 
 ## API logs go into its own file to avoid permission issues as the process is not run as root
 log.api.filename = ${path.log}/qvd-api.log
-log.up-api.filename = ${path.log}/qvd-up-api.log
+log.up.api.filename = ${path.log}/qvd-up-api.log
 
 ## log verbosity (FATAL, ERROR, WARN, INFO, DEBUG or TRACE)
 log.level = INFO

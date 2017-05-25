@@ -122,6 +122,18 @@ fieldset {
         margin-bottom: 12px;
         line-height: 1.3em;
     }
+    
+    .checkbox-wrapper {
+        margin-top: 50px;
+        input[type="checkbox"] {
+            float: left;
+            margin-right: 10px;
+        }
+        
+        label {
+            line-height: 25px;
+        }
+    }
 }
 
 .loading-big {
@@ -151,10 +163,15 @@ fieldset {
     .loading-little-message {
         color: $col_whiter;
         margin-top: 20px;
+        &:before {
+            margin-bottom: 5px;
+            display: block;
+            font-size: 40px;
+        }
     }
     
     .loading-block {
-        width: 150px;
+        width: auto;
         height: 150px;
         margin: 0 auto;
     }
@@ -262,4 +279,14 @@ fieldset {
 }
 .fake-graph-b {
     color: $graph_color_b
+}
+
+.connection-closed {
+    display: none;
+    margin-top: 150px;
+    font-size: 30px;
+    i:before {
+        display: block;
+        font-size: 40px;
+    }
 }

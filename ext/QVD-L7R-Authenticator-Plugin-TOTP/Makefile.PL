@@ -17,6 +17,10 @@ WriteMakefile(
     PREREQ_PM   => {
         'Convert::Base32'  => '0.06',
         'Digest::HMAC_SHA1' => '1.03',
+        'Image::PNG::QRCode' => 0,
+        'Math::Random::MT' => 0,
+        'MIME::Lite::TT' => 0,
+        'Mojo::UserAgent' => 0,
         'QVD::DB::Simple' => 0,
         'QVD::Config' => 0,
         'QVD::L7R::Authenticator::Plugin' => 0,

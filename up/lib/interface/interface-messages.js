@@ -25,8 +25,8 @@ Up.I.M = {
         $('.message-container').removeClass('success error info warning');
         $('.message-container').addClass(msg.messageType);
         
-        // Success and info messages will be hidden automatically
-        if (msg.messageType != 'error' && msg.messageType != 'warning') {
+        // Success messages will be hidden automatically
+        if (msg.messageType == 'success') {
             this.messageTimeout = setTimeout(function() { 
                 Up.I.M.closeMessage();
             },3000);

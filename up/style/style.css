@@ -230,8 +230,18 @@ fieldset {
   .dialog-advice div {
     margin-bottom: 12px;
     line-height: 1.3em; }
+  /* line 126, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+  .dialog-advice .checkbox-wrapper {
+    margin-top: 50px; }
+    /* line 128, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+    .dialog-advice .checkbox-wrapper input[type="checkbox"] {
+      float: left;
+      margin-right: 10px; }
+    /* line 133, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+    .dialog-advice .checkbox-wrapper label {
+      line-height: 25px; }
 
-/* line 127, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+/* line 139, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
 .loading-big {
   position: absolute;
   top: 0;
@@ -241,29 +251,34 @@ fieldset {
   background: #b8b8b8;
   opacity: 0.8;
   z-index: 2000; }
-  /* line 137, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+  /* line 149, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
   .loading-big i {
     font-size: 150px;
     color: #EBEBEB; }
-  /* line 142, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+  /* line 154, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
   .loading-big .loading-big-message {
     font-size: 18px;
     color: #EBEBEB;
     margin-bottom: 20px; }
     @media screen and (min-width: 41em) {
-      /* line 142, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+      /* line 154, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
       .loading-big .loading-big-message {
         font-size: 24px; } }
-  /* line 151, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+  /* line 163, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
   .loading-big .loading-little-message {
     color: #EBEBEB;
     margin-top: 20px; }
-  /* line 156, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+    /* line 166, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+    .loading-big .loading-little-message:before {
+      margin-bottom: 5px;
+      display: block;
+      font-size: 40px; }
+  /* line 173, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
   .loading-big .loading-block {
-    width: 150px;
+    width: auto;
     height: 150px;
     margin: 0 auto; }
-  /* line 162, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+  /* line 179, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
   .loading-big .loading-big-box {
     background: black;
     width: 100vw;
@@ -274,14 +289,14 @@ fieldset {
     text-align: center;
     padding: 50px; }
     @media screen and (min-width: 41em) {
-      /* line 162, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+      /* line 179, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
       .loading-big .loading-big-box {
         border-radius: 15px;
         width: 70vw;
         height: 70vh;
         margin: 70px auto; } }
 
-/* line 182, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+/* line 199, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
 .filter-notes {
   border: 1px #DDDDBB solid;
   padding: 8px;
@@ -290,17 +305,17 @@ fieldset {
   margin-top: -20px;
   margin-bottom: 15px;
   min-height: 40px; }
-  /* line 191, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+  /* line 208, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
   .filter-notes .fa:before {
     margin-right: 4px;
     font-size: 20px; }
-  /* line 196, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+  /* line 213, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
   .filter-notes .filter-notes-list {
     display: inline;
     margin-left: 20px;
     margin-top: 15px;
     margin-bottom: 10px; }
-    /* line 201, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+    /* line 218, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
     .filter-notes .filter-notes-list li {
       display: inline;
       margin-right: 15px;
@@ -309,7 +324,7 @@ fieldset {
       background: #FFF;
       border-radius: 3px;
       padding-bottom: 7px; }
-    /* line 211, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+    /* line 228, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
     .filter-notes .filter-notes-list .fa.delete-filter-note:before {
       font-size: 22px;
       color: #EBEBEB;
@@ -323,7 +338,7 @@ fieldset {
       padding-bottom: 0px;
       border-bottom-left-radius: 3px;
       border-top-left-radius: 3px; }
-    /* line 227, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+    /* line 244, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
     .filter-notes .filter-notes-list .fa.fix-filter-note:before {
       font-size: 22px;
       color: #EBEBEB;
@@ -338,26 +353,36 @@ fieldset {
       padding-bottom: 0px;
       border-bottom-right-radius: 3px;
       border-top-right-radius: 3px; }
-    /* line 243, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+    /* line 260, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
     .filter-notes .filter-notes-list .fa.fix-filter-note.fix-filter-note--enabled:before {
       background: #404040; }
 
-/* line 250, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+/* line 267, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
 .screen-help {
   margin-left: 5px;
   height: 1.2em; }
-  /* line 254, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+  /* line 271, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
   .screen-help:before {
     margin: 0 !important;
     font-size: 1.2em; }
 
-/* line 260, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+/* line 277, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
 .fake-graph-a {
   color: #e3610c; }
 
-/* line 263, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+/* line 280, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
 .fake-graph-b {
   color: #c5c5c5; }
+
+/* line 284, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+.connection-closed {
+  display: none;
+  margin-top: 150px;
+  font-size: 30px; }
+  /* line 288, /home/zarzuelo/code/gotham/up/style/components/_general.scss */
+  .connection-closed i:before {
+    display: block;
+    font-size: 40px; }
 
 /********************************************************************
 *********************************************************************
@@ -3168,19 +3193,23 @@ div.tagsinput span.tag a {
   color: #FEFEFE; }
 
 /* line 359, /home/zarzuelo/code/gotham/up/style/components/_thirds.scss */
+.noVNC_canvas {
+  display: none; }
+
+/* line 363, /home/zarzuelo/code/gotham/up/style/components/_thirds.scss */
 .noVNC_screen {
   text-align: center;
   position: relative; }
 
-/* line 364, /home/zarzuelo/code/gotham/up/style/components/_thirds.scss */
+/* line 368, /home/zarzuelo/code/gotham/up/style/components/_thirds.scss */
 .noVNC_controls, .noVNC_settings, .noVNC_xvp, .noVNC_status {
   display: none !important; }
 
-/* line 368, /home/zarzuelo/code/gotham/up/style/components/_thirds.scss */
+/* line 372, /home/zarzuelo/code/gotham/up/style/components/_thirds.scss */
 .noVNC_canvas--interactive {
   cursor: none !important; }
 
-/* line 372, /home/zarzuelo/code/gotham/up/style/components/_thirds.scss */
+/* line 376, /home/zarzuelo/code/gotham/up/style/components/_thirds.scss */
 .noVNC_canvas--viewonly {
   cursor: auto !important; }
 

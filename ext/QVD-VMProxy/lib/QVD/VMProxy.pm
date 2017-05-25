@@ -1,57 +1,98 @@
 package QVD::VMProxy;
 
-use Mojo::Base 'Mojo::EventEmitter';
+use Moo;
 use Mojo::IOLoop;
 use Mojo::Util 'term_escape';
+use Mojo::URL;
 use QVD::Log;
 
-has ioloop => sub { Mojo::IOLoop->singleton };
+has [qw/url/] => ( is => 'ro' );
 
-has [qw/address port/];
+sub open_ws {
+    my ($self, $tx, $ua) = @_;
+
+    $ua->websocket($self->url => { Host => 'localhost'} => sub {
+            my ($ua, $ws) = @_;
+
+            ERROR "WebSocket handshake failed!\n" and return unless $ws->is_websocket;
+
+            $ws->on(error => sub {
+                    DEBUG "-- Docker connection error $_[1]\n";
+                    $ws->finish;
+                });
+            $ws->on(finish => sub {
+                    DEBUG "-- Docker connection closed\n";
+                    $tx->finish;
+                });
+            $ws->on(binary => sub {
+                    my ($ws, $message) = @_;
+                    DEBUG "-- Docker >>> WebSocket ($message)\n";
+                    $tx->send({binary => $message});
+                });
+            $tx->on(binary => sub {
+                    my ($tx, $message) = @_;
+                    DEBUG "-- Docker <<< WebSocket ($message)\n";
+                    $ws->send({binary => $message});
+                });
+            $ws->send("START\n");
+        }
+    );
+
+    return $ua;
+}
 
 sub open {
-    my ($self, $tx, $timeout) = @_;
+    my ($self, $tx, $send_qvd_header) = @_;
 
+    my $url = Mojo::URL->new($self->url);
     my %args = (
-        address => $self->address,
-        port    => $self->port,
+        address => $url->host,
+        port    => $url->port,
     );
-    my $loop = $self->ioloop;
-    $loop->delay(
+    my $loop = Mojo::IOLoop->singleton;
+    my $delay = $loop->delay(
         sub {
             my $delay = shift;
-            $loop->client(%args, $delay->begin)
+            $loop->client(%args, $delay->begin);
         },
         sub {
             my ($delay, $err, $stream) = @_;
 
-            $self->emit(error => "TCP connection error: $err") if $err;
-
             die $err if $err;
+            if($send_qvd_header){
+                $stream->write("GET \/vma\/vnc_connect HTTP/1.1\nConnection: Upgrade\nUpgrade: VNC\n\n");
 
-            $stream->write("GET \/vma\/vnc_connect HTTP/1.1\nConnection: Upgrade\nUpgrade: VNC\n\n");
-
-            my $cb = $delay->begin(0);
-            $stream->on(read => sub {
-                my ($stream, $bytes) = @_;
-                DEBUG term_escape "-- <<< VMA ($bytes)\n";
-                if ($bytes =~ /101/){
-                    $stream->stop();
-                    $stream->unsubscribe('read');
-                    $cb->($stream);
-                }
-            });
-            $stream->start;
+                my $cb = $delay->begin(0);
+                $stream->on(read => sub {
+                        my ($stream, $bytes) = @_;
+                        DEBUG term_escape "-- <<< VMA ($bytes)\n";
+                        $stream->stop();
+                        $stream->unsubscribe('read');
+                        if ($bytes =~ /101/){
+                            $cb->($stream);
+                        } else {
+                            $tx->finish;
+                        }
+                    });
+                $stream->start;
+            } else {
+                my $cb = $delay->begin(0);
+                $cb->($stream);
+            }
         },
         sub {
             my ($delay, $stream) = @_;
 
-            Mojo::IOLoop->stream($tx->connection)->timeout($timeout);
-            $stream->timeout($timeout);
+            $stream->timeout(0);
 
-            $stream->on(error => sub { $self->emit(error => "TCP error: $_[1]") });
-            $stream->on(close => sub { 
-                $self->emit(error => "TCP connection closed");
+            $stream->on(error => sub {
+                DEBUG term_escape "TCP error: $_[1]";
+                $stream->emit('close');
+            });
+
+            $stream->on(close => sub {
+                DEBUG term_escape "TCP connection closed";
+                $tx->finish;
             });
 
             $stream->on(read => sub {
@@ -66,19 +107,11 @@ sub open {
                 $stream->write($bytes);
             });
 
-            $tx->on(finish => sub {
-                my ($tx, $code, $reason) = @_;
-                $reason ||= '';
-                DEBUG term_escape "-- Websocket Connection closed. Code: $code ($reason)\n";
-                $stream->close;
-                undef $stream;
-                undef $tx;
-            });
             $stream->start;
         },
-    )->catch(sub { my ($delay, $err) = @_; die $err; })->wait;
+    )->catch(sub { my ($delay, $err) = @_; die $err; });
 
-    return $self;
+    return $delay;
 }
 
 1;

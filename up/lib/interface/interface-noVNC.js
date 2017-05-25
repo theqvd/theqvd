@@ -406,28 +406,45 @@ var UI;
                 document.mozFullScreenElement || // currently working methods
                 document.webkitFullscreenElement ||
                 document.msFullscreenElement) {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.mozCancelFullScreen) {
-                    document.mozCancelFullScreen();
-                } else if (document.webkitExitFullscreen) {
-                    document.webkitExitFullscreen();
-                } else if (document.msExitFullscreen) {
-                    document.msExitFullscreen();
-                }
+                
+                UI.enableFullscreen();
+                
             } else {
-                if (document.documentElement.requestFullscreen) {
-                    document.documentElement.requestFullscreen();
-                } else if (document.documentElement.mozRequestFullScreen) {
-                    document.documentElement.mozRequestFullScreen();
-                } else if (document.documentElement.webkitRequestFullscreen) {
-                    document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-                } else if (document.body.msRequestFullscreen) {
-                    document.body.msRequestFullscreen();
-                }
+                
+                UI.disableFullscreen();
+                
             }
             UI.enableDisableViewClip();
             UI.updateFullscreenButton();
+        },
+        
+        disableFullscreen: function () {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        },
+        
+        enableFullscreen: function () {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.mozRequestFullScreen) {
+                document.documentElement.mozRequestFullScreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+            } else if (document.body.msRequestFullscreen) {
+                document.body.msRequestFullscreen();
+            }
+        },
+        
+        enableFullscreenWhenClickCanvas: function () {
+            UI.enableFullscreen();
+            $D("noVNC_canvas").onclick = '';
         },
 
         updateFullscreenButton: function() {
@@ -594,10 +611,6 @@ var UI;
         },
 
         updateState: function(rfb, state, oldstate, msg) {
-            if (state == 'normal') {
-                $('.noVNC_screen .loading').hide();
-            }
-            
             UI.log("INFO", "STATE: " + state + " - " + msg);
 
             UI.updateVisualState();
@@ -624,13 +637,15 @@ var UI;
             $('.vms-spy-log .log-registers').prepend('<p class="' + lineClass + '">' + logMsg + '</p>'); 
             
             if (state == 'ERROR') {
-                // If error, open lateral menu and show log
-                $('.js-vm-spy-settings-panel').openMbExtruder();                    
-                $('.js-vms-spy-setting-log').val('error');
-                $('.js-vms-spy-setting-log').trigger('chosen:updated');
-                $('.js-vms-spy-setting-log').trigger('change');
-                $('.loading').hide();
-                $('.error-loading').show();
+                // If error, log it
+                console.error(msg);
+            }
+            
+            // Parse disconnection message
+            if (msg.indexOf('disconnected') > -1) {
+                $('.connection-closed').show();
+                UI.disableFullscreen();
+                Up.I.loadingUnblock();
             }
         },
 
@@ -675,9 +690,15 @@ var UI;
             var vmId = $('#noVNC_vmId').val();
             var apiHost = $('#noVNC_apiHost').val();
             var apiPort = $('#noVNC_apiPort').val();
-            var sid = $('#noVNC_sid').val();
+            var token = $('#noVNC_token').val();
+            var fullScreen = $('#noVNC_fullScreen').val();
+            
+            if (fullScreen == "1") {
+                $D("noVNC_canvas").onclick = UI.enableFullscreenWhenClickCanvas;
+            }
 
-            var path = 'api/desktops/' + vmId + '/connect';
+            var resolution = screen.width + 'x' + screen.height + 'x' + screen.colorDepth;
+            var path = 'api/desktops/' + vmId + '/connect?token=' + token + '&resolution=' + resolution;
 
             if (!UI.initRFB()) return;
 

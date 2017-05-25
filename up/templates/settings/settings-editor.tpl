@@ -1,9 +1,9 @@
-<table class="settings-editor-table js-settings-editor-table">
+<table class="editor-container <%= cid %> settings-editor-table js-settings-editor-table">
     <tbody>
         <% if (!model.get('fixed')) { %>
             <tr>
-                <td><label data-i18n="Name" for="name"></label></td>
-                <td><input type="text" name="name" id="name" value="<%= model.get('alias') ? model.get('alias') : model.get('name') %>" class="js-form-field"></td>
+                <td><label data-i18n="Name" for="name" class="mandatory-label"></label></td>
+                <td><input type="text" name="name" id="name" value="<%= model.get('alias') ? model.get('alias') : model.get('name') %>" class="js-form-field" data-required></td>
             </tr>
         <% } %>
         <% if (canBeDisabled) { %>

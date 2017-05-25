@@ -1,3 +1,4 @@
+<!--
 <div class="desktop">
     <div class="js-platform-menu menu" style="display: none;">
         <ul>
@@ -70,6 +71,8 @@
         </ul>
     </div>
 </div>
+
+-->
 <div class="menu mobile js-menu-mobile">
     <ul class="nav-collapse">
         <%

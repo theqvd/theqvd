@@ -143,57 +143,6 @@ Up.Views.MainView = Backbone.View.extend({
         Up.I.dialog(this.dialogConf, this);    
     },
     
-    updateElement: function () {
-        this.parseProperties('update');
-        
-        var context = '.editor-container.' + this.cid;
-        
-        return Up.I.validateForm(context);
-    },
-    
-    // Parse properties from create/edit forms
-    parseProperties: function (mode) {
-        var propIds = $('.' + this.cid + '.editor-container input.custom-prop-id');
-        var propValues = $('.' + this.cid + '.editor-container input.custom-prop-value');
-        
-        switch (mode) {
-            case 'create':
-                var createPropertiesACL = this.qvdObj + '.create.properties';
-                
-                if (!createPropertiesACL) {
-                    return;
-                }
-                break;
-            case 'update':
-                switch(this.viewKind) {
-                    case 'list':
-                        var updatePropertiesACL = this.qvdObj + '.update-massive.properties';
-                        break;
-                    case 'details':
-                        var updatePropertiesACL = this.qvdObj + '.update.properties';
-                        break;    
-                }
-                
-                if (!updatePropertiesACL) {
-                    return;
-                }
-                break;
-        }
-        
-        var setProps = {};
-
-        for(i=0;i<propIds.length;i++) {
-            var id = propIds.eq(i);
-            var value = propValues.eq(i);
-                 
-            setProps[id.val()] = value.val();
-        }
-        
-        this.properties = {
-            'set' : setProps
-        };
-    },
-    
     createModel: function (arguments, successCallback, model) {
         var messages = {
             'success': 'Successfully created',

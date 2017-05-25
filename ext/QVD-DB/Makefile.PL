@@ -33,6 +33,7 @@ WriteMakefile(
         'QVD::Config'                 => 0,
         'QVD::Config::Core'           => 0,
         'QVD::Log'                    => 0,
+        'Session::Token'              => 0,
         'Socket::Linux'               => 0,
 	'Session::Token'	      => 0,	
         'SQL::Translator'             => 0,
