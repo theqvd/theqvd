@@ -111,6 +111,7 @@ my $code2message_mapper = {
     6450 => 'No role provided',
     6600 => 'Invalid order direction',
     6610 => 'Invalid order by field',
+    6620 => 'External API not configured',
     
     7100 => 'Refered related items don\'t exist',
     7110 => 'Unable to accomplish, refered related items don\'t exist',

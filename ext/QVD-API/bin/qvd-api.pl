@@ -591,6 +591,42 @@ group {
                 total_size => $len,
                 copy_size => $size }));
     };
+    
+    # API PROXY
+    
+    any [qw(POST GET PUT DELETE OPTIONS)] => '/api/proxy/:api_code/*params' => sub {
+        my $c = shift;
+        
+        my $api_code = $c->param('api_code');
+        my $params = $c->param('params');
+        
+        my $session = $c->stash('session');
+        my $tenant_id = $session->data('tenant_id');
+        my $api_url = $c->qvd_admin4_api->_cfg('api.proxy.' . $api_code . '.address', $tenant_id, 0);
+        my $response_str;
+        
+        if (defined $api_url) {
+            my $full_api_url = $api_url . "/" . $params;
+            
+            my $tx = $c->ua->get($full_api_url);
+
+            if (my $res = $tx->success) {
+                $response_str = $res->body;
+            }
+            else {
+                my $err = $tx->error;
+                my $message = $err->{message} // 'Unknown error';
+                my $code = $err->{code} // '502';
+                $response_str = encode_json({status => $code, message => $message});
+            }
+        
+            deep_utf8_decode($response_str);
+            $c->render(text => b($response_str)->decode('UTF-8'));
+        }
+        else {
+            $c->render(json => QVD::API::Exception->new(code => 6620)->json);
+        }
+    };
 
     websocket '/vmproxy' => sub {
         my $c = shift;

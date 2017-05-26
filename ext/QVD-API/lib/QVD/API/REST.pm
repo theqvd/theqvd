@@ -310,9 +310,8 @@ sub pool
 
 sub _cfg
 {
-    my ($self,$key) = @_;
-
-    return cfg($key);
+    my $self = shift;
+    return cfg(@_);
 }
 
 # Returns db version to the mojo app 
