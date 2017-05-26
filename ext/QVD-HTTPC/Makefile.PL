@@ -20,8 +20,6 @@ WriteMakefile(
         'QVD::Config' => 0,
         'QVD::HTTP::Headers' => 0,
         'QVD::HTTP::StatusCodes' => 0,
-        'QVD::ParallelNet' => 0,
-        'QVD::ParallelNet::Socket' => 0,
         'URI' => 0,
         'URI::Escape' => 0,
     },
