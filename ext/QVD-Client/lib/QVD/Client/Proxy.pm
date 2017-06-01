@@ -964,18 +964,20 @@ sub _run {
         my $slave_cmd = core_cfg('client.slave.command', 0);
         if (defined $slave_cmd and length $slave_cmd) {
             $slave_cmd = File::Spec->rel2abs($slave_cmd, $QVD::Client::App::app_dir);
-            if (-x $slave_cmd ) {
-                DEBUG("Slave command is '$slave_cmd'");
-                if ($WINDOWS) {
-                    my $wrapper = File::Spec->rel2abs(core_cfg('client.slave.wrapper'), $QVD::Client::App::app_dir);
-                    my $perl = File::Spec->rel2abs($^X, $QVD::Client::App::app_dir);
-                    $self->{client_delegate}->proxy_set_environment(NX_SLAVE_CMD => $wrapper);
-                    $self->{client_delegate}->proxy_set_environment(QVD_SLAVE_CMD => $perl);
-                    $self->{client_delegate}->proxy_set_environment(QVD_SLAVE_ARG1 => $slave_cmd);
-                }
-                else {
-                    $self->{client_delegate}->proxy_set_environment(NX_SLAVE_CMD => $slave_cmd);
-                }
+            DEBUG("Slave command is '$slave_cmd'");
+            if ($WINDOWS) {
+                my $wrapper = File::Spec->rel2abs(core_cfg('client.slave.wrapper'), $QVD::Client::App::app_dir);
+                my $perl = File::Spec->rel2abs($^X, $QVD::Client::App::app_dir);
+                DEBUG("NX_SLAVE_CMD=$wrapper");
+                $self->{client_delegate}->proxy_set_environment(NX_SLAVE_CMD => $wrapper);
+                DEBUG("QVD_SLAVE_CMD=$perl");
+                $self->{client_delegate}->proxy_set_environment(QVD_SLAVE_CMD => $perl);
+                # $slave_cmd = q(-e$|=1; print "perl> $_" while <>);
+                DEBUG("QVD_SLAVE_ARG1=$slave_cmd");
+                $self->{client_delegate}->proxy_set_environment(QVD_SLAVE_ARG1 => $slave_cmd);
+            }
+            elsif (-x $slave_cmd ) {
+                $self->{client_delegate}->proxy_set_environment(NX_SLAVE_CMD => $slave_cmd);
             } else {
                 WARN("Slave command '$slave_cmd' not found or not executable.");
             }
