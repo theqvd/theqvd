@@ -79,8 +79,8 @@ sub handle_share {
         my @cmd = ($cmd, '-v', '-d', shortpathL($path));
         DEBUG "Executing win-sftp-server as '@cmd'";
 
-        open my($oldin), '<&', STDIN or die "Can't dup stdin: $!";
-        open my($oldout), '>&', STDOUT or die "Can't dup stdout: $!";
+        open my($oldin), '<&', \*STDIN or die "Can't dup stdin: $!";
+        open my($oldout), '>&', \*STDOUT or die "Can't dup stdout: $!";
 
         # local (STDIN, STDOUT);
         open STDIN, '<&', $self->httpc->{socket};
