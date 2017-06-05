@@ -123,6 +123,7 @@ command.open_file = xdg-open
 command.sftp-server = /usr/lib/openssh/sftp-server
 @sles-11@command.sftp-server = /usr/lib64/ssh/sftp-server
 @sles-12@command.sftp-server = /usr/lib/ssh/sftp-server
+@centos@command.sftp-server = /usr/libexec/openssh/sftp-server
 command.nxagent = /usr/bin/nxagent
 command.nxdiag = ${path.qvd.bin}/nxdiag.pl
 command.x-session = /etc/X11/Xsession
@@ -169,7 +170,6 @@ command.windows.sftp-server = bin/sftp-server.exe
 
 command.nxagent.args.extra =
 command.x-session.args.extra =
-command.sftp-server = /usr/lib/openssh/sftp-server
 
 command.qvd-lxc-autodev = ${path.qvd.bin}/qvd-lxc-autodev
 
