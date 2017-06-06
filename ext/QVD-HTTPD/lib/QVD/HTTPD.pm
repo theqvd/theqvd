@@ -52,13 +52,17 @@ sub post_accept_hook {
     $SIG{__DIE__}  = sub { return if $^S; ERROR shift; };
 }
 
+sub _fd_in { shift->{server}{client} }
+
+sub _fd_out { shift->{server}{client} }
+
 sub process_request {
     my $self = shift;
-    my $server = $self->{server};
-    my $socket = $server->{client};
+    my $socket = $self->_fd_in;
 
     setsockopt $socket, IPPROTO_TCP, TCP_NODELAY, 1;
 
+    my $server = $self->{server};
     if ($server->{SSL}) {
 	require IO::Socket::SSL;
         my @extra;
@@ -186,7 +190,7 @@ sub send_http_response {
 	chomp @lines;
 	push @headers, join("\r\n  ", @lines);
     }
-    my $socket = $self->{server}{client};
+    my $socket = $self->_fd_out;
     print $socket join("\r\n",
 		       "HTTP/1.1 $code ". http_status_message($code),
 		       @headers, '', '');
@@ -202,7 +206,7 @@ sub send_http_response_with_body {
 			      @headers,
 			      "Content-Type: $content_type",
 			      "Content-Length: " . length($content));
-    my $socket = $self->{server}{client};
+    my $socket = $self->_fd_out;
     print $socket $content;
 }
 
@@ -263,7 +267,16 @@ sub process_request {
     $self->{server}{client} = IO::Handle->new_from_fd(fileno(STDIN), '+<');
     $self->{server}{client}->autoflush();
     $self->{server}{client}->blocking(1);
-    $self->QVD::HTTPD::Impl::process_request(@_); }
+
+    $self->{server}{fd_out} = IO::Handle->new_from_fd(fileno(STDOUT), '+>');
+    $self->{server}{fd_out}->autoflush();
+    $self->{server}{fd_out}->blocking(1);
+
+    $self->QVD::HTTPD::Impl::process_request(@_);
+}
+
+sub _fd_out { shift->{server}{fd_out} }
+
 
 1;
 
