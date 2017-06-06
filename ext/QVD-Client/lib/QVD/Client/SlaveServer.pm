@@ -3,30 +3,34 @@ package QVD::Client::SlaveServer;
 use strict;
 use warnings;
 
-BEGIN {
-    @QVD::Config::Core::FILES = ( ($ENV{HOME} || $ENV{APPDATA}).'/.qvd/qvd-client-slaveserver.conf' );
-}
-
-use QVD::Config::Core qw(core_cfg set_core_cfg);
 use File::Spec;
 use IO::Select;
 
 our $WINDOWS;
 
+my ($user_dir);
 BEGIN {
     $WINDOWS = ($^O eq 'MSWin32');
 
-    my $user_dir = File::Spec->rel2abs($WINDOWS
-        ? File::Spec->join($ENV{APPDATA}, 'QVD')
-        : File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
+    $user_dir = File::Spec->rel2abs($WINDOWS
+                                    ? File::Spec->join($ENV{APPDATA}, 'QVD')
+                                    : File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
     mkdir $user_dir;
 
-    set_core_cfg('client-slaveserver.log.filename', File::Spec->join($user_dir, 'qvd-client-slaveserver.log'))
+    no warnings;
+    $QVD::Config::USE_DB = 0;
+    @QVD::Config::Core::FILES = ( ($WINDOWS ? () : ('/etc/qvd/client.conf')),
+                                  File::Spec->join($user_dir, 'client.conf') );
+}
+
+use QVD::Config::Core qw(set_core_cfg core_cfg);
+
+BEGIN {
+    set_core_cfg('client-slaveserver.log.filename', File::Spec->join($user_dir, 'qvd-client.log'))
         unless defined core_cfg('client-slaveserver.log.filename', 0);
     $QVD::Log::DAEMON_NAME = 'client-slaveserver';
 
-	$SIG{PIPE} = sub { die "SIGPIPE"; };
-
+    $SIG{PIPE} = sub { die "SIGPIPE"; };
 }
 
 our $VERSION = '3.5';
