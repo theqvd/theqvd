@@ -599,7 +599,7 @@ group {
     
     # API PROXY
     
-    any [qw(POST GET PUT DELETE OPTIONS)] => '/api/proxy/:api_code/*params' => sub {
+    any [] => '/api/proxy/:api_code/*params' => sub {
         my $c = shift;
         
         my $api_code = $c->param('api_code');
@@ -609,24 +609,29 @@ group {
         my $tenant_id = $session->data('tenant_id');
         my $api_url = $c->qvd_admin4_api->_cfg('api.proxy.' . $api_code . '.address', $tenant_id, 0);
         my $response_str;
+        my $code;
         
         if (defined $api_url) {
             my $full_api_url = $api_url . "/" . $params;
+            my $method = $c->tx->req->method;
             
-            my $tx = $c->ua->get($full_api_url);
-
+            my $tx = $c->ua->build_tx($method => $full_api_url => json => $c->req->json);
+            $tx = $c->ua->start($tx);
+            
+            
             if (my $res = $tx->success) {
                 $response_str = $res->body;
+                $code = $res->{code};
             }
             else {
                 my $err = $tx->error;
                 my $message = $err->{message} // 'Unknown error';
-                my $code = $err->{code} // '502';
+                $code = $err->{code} // '502';
                 $response_str = encode_json({status => $code, message => $message});
             }
         
             deep_utf8_decode($response_str);
-            $c->render(text => b($response_str)->decode('UTF-8'));
+            $c->render(text => b($response_str)->decode('UTF-8'), status => $code);
         }
         else {
             $c->render(json => QVD::API::Exception->new(code => 6620)->json);
@@ -675,13 +680,16 @@ app->start;
 
 sub get_input_json
 {
-	my $c = shift;
-	my $json = $c->req->json;
-	deep_utf8_decode($json) if $json;
+    my $c = shift;
 
-	unless ($json)
-	{
-		$json =  { map { $_ => b($c->param($_))->encode('UTF-8')->to_string } keys($c->req->params->to_hash) };
+    my $json = $c->req->json;
+    if (defined $json) {
+        # Create a copy of the body
+        $json = {%$json};
+        deep_utf8_decode($json);
+    }
+    else {
+        $json =  { map { $_ => b($c->param($_))->encode('UTF-8')->to_string } keys($c->req->params->to_hash) };
         eval
         {
             convert_json_to_hash($json, "filters");
