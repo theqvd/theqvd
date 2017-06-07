@@ -4,7 +4,34 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
 
     initialize: function (params) {
         this.model = new Wat.Models.OSF(params);
+        
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
+    },
+    
+    render: function () {
+        var that = this;
+        
+        Wat.Views.DetailsView.prototype.render.apply(this);
+        
+        // Retrieve distros list
+        this.distros = new Wat.Collections.Distros({});
+        this.distros.fetch({
+            complete: function () {
+                if (that.OSDmodel !== undefined) {
+                    var distroId = that.OSDmodel.get('distro_id');
+                    
+                    var distroModel = that.distros.where({ 'id': distroId })[0];
+
+                    // Add specific parts of editor to dialog
+                    var template = that.getOsDetailsRender(that.OSDmodel, {shrinked: false, editable: false});
+                }
+                else {
+                    var template = 'This OSF is of type custom';
+                }
+                
+                $('.bb-os-configuration').html(template);
+            }
+        });
     },
     
     renderSide: function () {
@@ -107,5 +134,9 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
     
     bindEditorEvents: function() {
         Wat.Views.DetailsView.prototype.bindEditorEvents.apply(this);
+    },
+    
+    afterFetchDetails: function () {
+        this.fetchOSD();
     }
 });

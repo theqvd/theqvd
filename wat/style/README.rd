@@ -38,5 +38,5 @@ You have a detailed user guide about this feature in the documentation.
 
 You can find out this guide in two ways:
 
-* In the embeded WAT documentation (Menu->Help->Documentation)
+* In the embedded WAT documentation (Menu->Help->Documentation)
 * Visiting the online QVD documentation site (http://docs.theqvd.com/docs/)

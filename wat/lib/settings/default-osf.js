@@ -171,6 +171,10 @@ Wat.I.detailsFields[qvdObj] = {
             },
         }
     },
+    'os': {
+        'text': 'Operating system',
+        'bb': 'bb-os-configuration'
+    },
     'activity': {
         'text': 'Activity',
         'fieldList': {

@@ -13,6 +13,8 @@
 
 .ui-dialog {
     z-index: 1002;
+    box-shadow: 3px 2px 5px #888;
+    
     .ui-dialog-titlebar {
         background: $col_brand;
         text-align: center;
@@ -102,9 +104,22 @@
     @include in(desktop) {
         width: $dialog_width !important;
         height: $dialog_height !important;
-        height: auto !important;
-        //height: 85vh !important;
     }
+    
+    &-secondary {
+        @include in(desktop) {
+            top: 35px !important;
+            width: $dialog_secondary_width !important;
+            height: $dialog_secondary_height !important;
+            
+            background: #ddd;
+
+            .ui-dialog-buttonpane {
+                background: #bbb;
+            }
+        }
+    }
+    
     
     td {
         display: block;

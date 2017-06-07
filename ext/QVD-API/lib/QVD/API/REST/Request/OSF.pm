@@ -48,3 +48,4 @@ tenant = me.tenant_id
 tenant_name  = tenant.name
 vms = me.vms_count
 dis = me.dis_count
+osd_id = me.osd_id

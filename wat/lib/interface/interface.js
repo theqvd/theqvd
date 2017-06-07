@@ -536,8 +536,7 @@ Wat.I = {
     
     dialog: function (dialogConf, that) {
         var div = document.createElement("DIV");
-        $(div).addClass('dialog-container');
-        $(div).addClass('js-dialog-container');
+        $(div).addClass('dialog-container js-dialog-container bb-dialog-container');
         document.body.appendChild(div);
         
         $(div).dialog({
@@ -591,6 +590,7 @@ Wat.I = {
             close: function () {
                 // Enable scrolling in window when close
                     $('html, body').attr('style', '');
+                    $(this).empty().dialog('destroy');
             }
         });  
         
@@ -630,6 +630,7 @@ Wat.I = {
     
     validateForm: function (context) {
         var blankControls = $( context + " input[data-required]:blank:visible" );
+        
         if(blankControls.length > 0) {
             blankControls.addClass('not_valid');
             blankControls.parent().find('.validation-message').remove();
@@ -675,16 +676,19 @@ Wat.I = {
     },
     
     
-    // Update the indicator of selected intems situated under the list table
-    updateSelectedItems: function (selectedItems) { 
+    // Update the indicator of selected items situated under the list table
+    updateSelectedItems: function (selectedItems, that) {
+        var that = that || Wat.CurrentView;
+        
         $('.elements-selected').html(selectedItems);
         
         if (selectedItems == 0) {
             this.hideSelectedItemsMenu();
         }
         else {
-            this.showSelectedItemsMenu();
-            this.checkVisibilityConditions();
+            this.showSelectedItemsMenu(that.selectedActions, that.cid);
+            
+            this.checkVisibilityConditions(that);
                 
             if (selectedItems == 1) {
                 $('.js-only-massive').hide();
@@ -697,7 +701,36 @@ Wat.I = {
         }
     },
     
-    checkVisibilityConditions: function () {
+    // Update the indicator of selected items only for select control elements kind
+    updateSelectedItemsSelect: function (selectedItems, embeddedView) { 
+        var that = that || Wat.CurrentView;
+        
+        if (selectedItems == 0) {
+            // Disable options select
+            $('select.js-embedded-dis-action').attr('disabled', 'disabled');
+        }
+        else {
+            // Enable options select
+            $('select.js-embedded-dis-action').removeAttr('disabled');
+            
+            $('select.js-embedded-dis-action option').css('display', 'block');
+
+            this.checkVisibilityConditions(that);
+            
+            if (selectedItems == 1) {
+                $('select.js-embedded-dis-action option.js-only-massive').css('display', 'none');
+                $('select.js-embedded-dis-action option.js-only-one').css('display', 'block');
+            }
+            else {
+                $('select.js-embedded-dis-action option.js-only-one').css('display', 'none');
+                $('select.js-embedded-dis-action option.js-only-massive').css('display', 'block');
+            }
+        }
+    },
+    
+    checkVisibilityConditions: function (that) {
+        var that = that || Wat.CurrentView;
+        
         if ($('[data-visibility-conditioned]').length > 0) {
             $.each($('[data-visibility-conditioned]'), function (i, element) {
                 var conditionType = $(element).attr('data-visibility-cond-type');
@@ -726,8 +759,9 @@ Wat.I = {
                 $(element).hide();
                 
                 var positiveItems = 0;
-                $.each(Wat.CurrentView.selectedItems, function (i, selectedId) {
-                    var selectedModel = Wat.CurrentView.collection.where({id: selectedId})[0];      
+                
+                $.each(that.selectedItems, function (i, selectedId) {
+                    var selectedModel = that.collection.where({id: selectedId})[0];      
                     
                     // If any item is out of view (other page), all options will be shown
                     if (selectedModel == undefined) {
@@ -765,13 +799,29 @@ Wat.I = {
     },
 
     hideSelectedItemsMenu: function () {
-        $('.js-side.filter').css('visibility','');
-        $('.js-action-selected').hide( "slide" );
+        $('.js-side.filter').show();
+        $('.js-action-selected').hide("slide");
+        $('.list-block').css('margin-left', '');
     },
     
-    showSelectedItemsMenu: function () {
-        $('.js-side.filter').css('visibility','hidden');
-        $('.js-action-selected').show( "slide" );
+    showSelectedItemsMenu: function (selectedActions, cid) {
+        var selectedActions = selectedActions || Wat.CurrentView.selectedActions;
+        var cid = cid || Wat.CurrentView.cid;
+        
+        // Fill the html with the template of the selected actions
+        var template = _.template(
+            Wat.TPL.selectedOptionsMenu, {
+                selectedActions: selectedActions,
+                cid: cid
+            });
+        
+        $('.bb-action-selected').html(template);
+        
+        $('.js-side.filter').hide();
+        $('.list-block').css('margin-left', '15%');
+        $('.js-action-selected').show("slide");
+
+        Wat.T.translate();
     },
     
     confirm: function (templateName, successCallback, that, loadingBlock) {        
@@ -890,11 +940,16 @@ Wat.I = {
     getRealView: function (that) {
         var realView = null;
         
-        if (Wat.CurrentView.cid == that.cid) {
+        if (Wat.CurrentView.cid == that.cid || Wat.CurrentView.treeMode) {
             realView = Wat.CurrentView;
         }
         else {
             $.each (Wat.CurrentView.sideViews, function (iV, view) {
+                if (view != undefined && view.cid == that.cid) {
+                    realView = view;
+                }
+            });
+            $.each (Wat.CurrentView.embeddedViews, function (iV, view) {
                 if (view != undefined && view.cid == that.cid) {
                     realView = view;
                 }
@@ -917,14 +972,26 @@ Wat.I = {
                     usefulView = view;
                 }
             });
+            $.each (Wat.CurrentView.embeddedViews, function (iV, view) {
+                if (view != undefined && typeof view[functionName] == 'function' && view.qvdObj == qvdObj) {
+                    usefulView = view;
+                }
+            });
         }
         
         return usefulView;
     },
     
-    closeDialog: function (dialog) {
+    getCurrentView: function (qvdObj) {
+        return this.getUsefulView(qvdObj, 'initialize');
+    },
+    
+    closeDialog: function (dialog, that) {
+        that = that || Wat.CurrentView;
+        
         dialog.dialog('close').remove();
-        delete Wat.CurrentView.dialog;
+        
+        delete that.dialog;
     },
     
     fixTableScrollStyles: function () {
@@ -1117,5 +1184,24 @@ Wat.I = {
         $(Wat.CurrentView.el).html(Wat.TPL[template]);
         Wat.I.showAll();
         Wat.T.translate();
+    },
+    
+    getVisibilityConditionAttrs: function (visibilityCondition) {
+        var visibilityConditionAttrs = '';
+        if (visibilityCondition) {
+            visibilityConditionAttrs += ' data-visibility-conditioned="true" ';
+            $.each(visibilityCondition, function (tokenName, tokenValue) {
+                // Replace macros
+                switch(tokenValue) {
+                    case '__currentAdminId__':
+                        tokenValue = Wat.C.adminID;
+                        break;
+                }
+
+                visibilityConditionAttrs += ' data-visibility-cond-' + tokenName + '="' + tokenValue + '" ';
+            });
+        }
+        
+        return visibilityConditionAttrs;
     }
 }

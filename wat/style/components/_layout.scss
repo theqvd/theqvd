@@ -223,6 +223,13 @@ body {
     color: darken($col_whiter, 10);
 }
 
+.micro-loading {
+    @include icon-size(35px);
+    text-align: center;
+    color: darken($col_whiter, 10);
+    line-height: 0;
+}
+
 .side-component {
     .mini-loading {
         color: darken($col_whiter, 20);
@@ -456,4 +463,143 @@ span.text {
     background: transparent;
     font-size: 0px;
     line-height: 0px;
+}
+
+.os-configuration-fs {
+    legend {
+        text-align: left;
+        font-weight: normal;
+    }
+}
+
+.os-editor-menu {
+    button {
+        width: 100%;
+        display: block;
+        margin-bottom: 5px;
+        text-align: left;
+    }
+    
+    div.menu {
+        width: 180px;
+    }
+}
+
+.configuration-block {
+    margin-bottom: 10px;
+}
+
+.os-editor-panel {
+    height: 400px;
+    vertical-align: top !important;
+    
+    input[type="text"], input[type="file"], select {
+        width: 100%;
+        background: white;
+    }
+    
+    li.installed-package:first-child .order-package-up, li.installed-package:last-child .order-package-down {
+        visibility: hidden;
+    }
+    
+    .package-buttonset {
+        background: $col_whiter;
+    }
+}
+
+button.button-edit-os {
+    margin-bottom: 10px;
+}
+
+table.os-configuration {
+    width: 100%;
+    text-align: left;
+    text-decoration: none;
+    font-weight: normal;
+    border-collapse: separate;
+    
+    th {
+        font-weight: bold;
+        font-size: small;
+        padding-left: 5px;
+        width: 50%;
+    }
+    
+    button {
+        margin-left: 10px;
+        
+        @include in(mobile) {
+            width: 100%;
+        }
+    }
+    
+    .settings-box {
+        overflow: auto;
+        max-height: 120px;
+        display: list-item;
+        
+        font-size: small;
+        border: 1px solid #eee;
+        border-radius: 3px;
+        margin: 5px;
+        padding: 5px;
+        
+        width: 98% !important;
+        
+        @include in(mobile) {
+            display: table-cell;
+            font-size: 7px;
+        }
+        
+        .settings-box-element-name {
+            font-weight: bold;
+        }
+        
+        .settings-box-element-value {
+            font-style: italic;
+            text-align: left;
+            font-weight: normal;
+        }
+        
+        .settings-box-element-app, .settings-box-element-shortcut, .settings-box-element-script {
+            font-style: italic;
+            line-height: 22px;
+        }
+        
+        .setting-row {
+            padding: 3px;
+            
+            &.setting-row-list {
+                @include alternate;
+            }
+            
+            img, .icon-bg {
+                height: 18px;
+                margin-right: 4px;
+            }
+            
+            .os-name {
+                vertical-align: super;
+            }
+        }
+        
+        &-distro {
+            height: auto;
+            background: transparent;
+            border: 0;
+            
+            .os-row {
+                position: relative;
+                
+                button {
+                    @include in(desktop) {
+                        position: absolute;
+                        right: 10px;
+                        top: 17px;
+                    }
+                    margin-bottom: 5px;
+                }
+            }
+        }
+    }
 }

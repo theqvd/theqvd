@@ -441,7 +441,7 @@ Wat.Views.MainView = Backbone.View.extend({
                 that.messageType = 'error';
             }
 
-            if (that.dialog) {
+            if (that.dialog && that.dialog.hasClass("ui-dialog-content")) {
                 Wat.I.closeDialog(that.dialog);
             }
                         

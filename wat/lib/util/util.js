@@ -323,5 +323,38 @@ Wat.U = {
         }
         
         return true;
+    },
+    
+    setFormChangesOnModel: function (wrapperSelector, model) {
+        var attributes = {};
+        
+        $.each($(wrapperSelector + ' [data-form-field]'), function (i, control) {
+            switch ($(control).attr('type')) {
+                case 'checkbox':
+                    attributes[$(control).attr('name')] = $(control).is(':checked') ? 1 : 0;
+                    break;
+                default:
+                    attributes[$(control).attr('name')] = $(control).val();
+                    break;
+            }
+        });
+        
+        $.each($(wrapperSelector + ' [data-form-list]'), function (i, list) {
+            var listName = $(list).attr('data-form-list');
+            
+            if (attributes[listName] == undefined) {
+                attributes[listName] = [];
+            }
+            
+            var listAttributes = {};
+            
+            $.each ($(list).find('[data-form-field-name]'), function (iField, field) {
+                listAttributes[$(field).attr('data-form-field-name')] = $(field).val();
+            });
+            
+            attributes[listName].push(listAttributes);
+        });
+        
+        model.set(attributes);
     }
 }

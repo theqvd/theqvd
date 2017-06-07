@@ -32,9 +32,6 @@ Wat.B = {
         
         // Chosen controls hack
         this.bindEvent('click', '.not_valid', this.formBinds.pressValidatedField);
-        
-        // When open a chosen selector into a dialog, check if dialog size changes to make auto-scroll to bottom
-        this.bindEvent('click', '.js-dialog-container .chosen-container', this.formBinds.checkDialogSizeChange);
     },
     
     bindEditorEvents: function () {
@@ -80,6 +77,14 @@ Wat.B = {
             this.bindEvent('click', '.js-delete-role-button', this.roleEditorBinds.deleteRole);
             this.bindEvent('click', '.js-assign-template-button', this.roleEditorBinds.addTemplate);
             this.bindEvent('click', '.js-delete-template-button', this.roleEditorBinds.deleteTemplate);
+        
+        // OSFs editor
+            // Edit os settings
+            this.bindEvent('click', '.js-button-edit-os', this.osfEditorBinds.openOSEditor);
+            
+            // Show expanded os configuration
+            this.bindEvent('click', '.js-expand-os-conf', this.osfEditorBinds.toggleOSConfigExpanded);
+        
     },
     
     bindHomeEvents: function () {
@@ -138,7 +143,10 @@ Wat.B = {
         $(window).on('scroll', this.navigationBinds.onScroll);
         
         // Kind of image source in DI creation
-        this.bindEvent('change', 'select[name="images_source"]', this.navigationBinds.toggleImagesource);   
+        this.bindEvent('change', 'select[name="images_source"]', this.navigationBinds.toggleImagesource);
+        
+        // OS Distro in OSF creation
+        this.bindEvent('change', 'select[name="os_distro_select"]', this.navigationBinds.toggleOSDistro);
         
         // Propagate click in cells with links
         this.bindEvent('mouseenter', 'td.cell-link', function (e) { 
@@ -219,16 +227,6 @@ Wat.B = {
             if ($(e.target).parent().hasClass('not_valid')) {
                 $(e.target).parent().removeClass('not_valid');
                 $(e.target).parent().parent().parent().find('.validation-message').remove();
-            }
-        },
-        
-        checkDialogSizeChange: function (e) {
-            var container = $(e.target).closest('.chosen-container');
-            var containerOpen = $(container).hasClass('chosen-width-drop');
-            
-            if (Wat.I.dialogScrollHeight < $('.ui-dialog .js-dialog-container')[0].scrollHeight && !containerOpen) {
-                Wat.I.dialogScrollHeight = $('.ui-dialog .js-dialog-container')[0].scrollHeight;
-                $('.ui-dialog .js-dialog-container')[0].scrollTop = $('.ui-dialog .js-dialog-container')[0].scrollHeight;
             }
         }
     },
@@ -391,6 +389,40 @@ Wat.B = {
             }
         },
         
+        toggleOSDistro: function (e) {
+            var selectedDistro = $(e.target).val();
+            
+            switch (selectedDistro) {
+                case "-1":
+                    $('.js-os-configuration-row').hide();
+                    break;
+                default:
+                    var distroModel = Wat.CurrentView.distros.where({id: parseInt(selectedDistro)})[0];
+                    
+                    var attributes = {
+                        name: distroModel.get('id') + "", // Only for testing
+                        distro_id: distroModel.get('id'),
+                        distro_name: distroModel.get('name') + ' ' + distroModel.get('version'),
+                        distro_icon: distroModel.get('icon'),
+                        scripts: distroModel.get('scripts'),
+                        shortcuts: distroModel.get('shortcuts'),
+                        config_params: distroModel.get('config_params')
+                    };
+                    
+                    $.each(distroModel.get('config_params'), function (param_name, param_def) {
+                        attributes[param_name] = distroModel.get(param_name);
+                    });
+                    
+                    Wat.CurrentView.OSDmodel = new Wat.Models.OSD(attributes);
+                    
+                    var template = Wat.CurrentView.getOsDetailsRender(Wat.CurrentView.OSDmodel, {shrinked: true, editable: true});
+                    $('.editor-container .bb-os-configuration').html(template);
+                    $('.js-os-configuration-row').show();
+                    
+                    break;
+            }
+        },
+        
         onScroll: function () {
             if ($('.js-back-top-button').length) {
                 if ($(window).scrollTop() > $(window).height()) {
@@ -467,6 +499,7 @@ Wat.B = {
                     Wat.CurrentView.cleanFilter($('[name="' + name + '"]').attr('data-filter-field'));
                     
                     $('[name="' + name + '"]').val(FILTER_ALL);
+                    $('[name="' + name + '"]').trigger('change');
                     break;
                 case 'text':
                     Wat.CurrentView.cleanFilter($('[name="' + name + '"]').attr('data-filter-field'));
@@ -487,8 +520,6 @@ Wat.B = {
                     break;
             }
             
-            Wat.CurrentView.updateFilterNotes();
-            Wat.CurrentView.filter();
         },
         
         clickFixFilterNote: function (e) {
@@ -777,6 +808,75 @@ Wat.B = {
         toggleNewPassword: function () {
             $('.new_password_row').toggle();
         }
+    },
+    
+    osfEditorBinds: {
+        openOSEditor: function (e) {
+            var osfId = $(e.target).attr('data-osf-id');
+            var massive = false;
+            
+            if (osfId == -1) {
+                osfIds = Wat.CurrentView.selectedItems.join(',');
+                var massive = true;
+            }
+            
+            var dialogConf = {
+                title: "Software configuration",
+                buttons : {
+                    "Cancel": function () {
+                        Wat.I.closeDialog($(this));
+                        
+                        // Send primary dialog to front again
+                        $('.ui-dialog').eq(0).css('z-index','');
+                        
+                        Wat.CurrentView.OSDdialogView.remove();
+                        delete Wat.CurrentView.OSDdialogView;
+                    },
+                    "Save": function () {
+                        Wat.U.setFormChangesOnModel('.js-editor-form-osf-os', Wat.CurrentView.OSDmodel);
+                        var template = Wat.CurrentView.getOsDetailsRender(Wat.CurrentView.OSDmodel, {shrinked: true, editable: true});
+                        $('.editor-container .bb-os-configuration').html(template);
+                        Wat.I.closeDialog($(this));
+                        
+                        // Send primary dialog to front again
+                        $('.ui-dialog').eq(0).css('z-index','');
+                        
+                        Wat.CurrentView.OSDdialogView.remove();
+                        delete Wat.CurrentView.OSDdialogView;
+                    }
+                },
+                buttonClasses: ['fa fa-ban js-button-close','fa fa-save js-button-save'],
+
+                fillCallback: function (target) {
+                    Wat.CurrentView.OSDdialogView = new Wat.Views.OSDEditorView({
+                        el: $(target),
+                        osfId: osfId,
+                        massive: massive
+                    });
+                },
+            }
+
+            Wat.CurrentView.osDialog = Wat.I.dialog(dialogConf);
+            
+            // Add secondary dialog class to new dialog to give different look
+            Wat.CurrentView.osDialog.parent().addClass('ui-dialog-secondary');
+            Wat.CurrentView.osDialog.dialog("option", "position", {my: "center", at: "center", of: window});
+            // Send primary dialog to back because jquery ui doesnt handle it properly
+            $('.ui-dialog').eq(0).css('z-index','100');
+            
+            Wat.I.chosenElement('select[name="icons-collection"]','single100');
+        },
+        
+        toggleOSConfigExpanded: function (e) {
+            if ($(e.target).hasClass('fa-chevron-down')) {
+                $(e.target).removeClass('fa-chevron-down').addClass('fa-chevron-up');
+            }
+            else {
+                $(e.target).removeClass('fa-chevron-up').addClass('fa-chevron-down');
+            }
+            
+            $('.js-os-configuration-expanded').toggle();
+        },
     },
     
     roleEditorBinds: {

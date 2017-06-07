@@ -1,0 +1,5402 @@
+[
+    {
+        "package": "bpython",
+        "description": "fancy interface to the Python interpreter"
+    },
+    {
+        "package": "bpython-gtk",
+        "description": "interfaz avanzada para el intérprete Pytho"
+    },
+    {
+        "package": "bpython-urwid",
+        "description": "fancy interface to the Python interpreter"
+    },
+    {
+        "package": "bpython3",
+        "description": "fancy interface to the Python3 interpreter"
+    },
+    {
+        "package": "cairo-dock-plug-ins-dbus-interf",
+        "description": "Python interface to interact with Cairo-Do"
+    },
+    {
+        "package": "cantor-backend-python",
+        "description": "Python backend for Cantor"
+    },
+    {
+        "package": "cantor-backend-python:i386",
+        "description": "Python backend for Cantor"
+    },
+    {
+        "package": "claws-mail-python-plugin",
+        "description": "Complemento Python y consola para Claws Ma"
+    },
+    {
+        "package": "claws-mail-python-plugin:i386",
+        "description": "Complemento Python y consola para Claws Ma"
+    },
+    {
+        "package": "colortest-python",
+        "description": "utility to test color capabilities of term"
+    },
+    {
+        "package": "dh-python",
+        "description": "Debian helper tools for packaging Python l"
+    },
+    {
+        "package": "dh-python:i386",
+        "description": "dh-python:i386"
+    },
+    {
+        "package": "dico-module-python",
+        "description": "Servidor de diccionario modular que cumple"
+    },
+    {
+        "package": "dico-module-python:i386",
+        "description": "Servidor de diccionario modular que cumple"
+    },
+    {
+        "package": "diveintopython",
+        "description": "libro Python libre para programadores expe"
+    },
+    {
+        "package": "diveintopython-zh",
+        "description": "libro Python libre para programadores expe"
+    },
+    {
+        "package": "diveintopython3",
+        "description": "Book for learning Python 3"
+    },
+    {
+        "package": "dkim-milter-python",
+        "description": "Domain Keys Identified Mail Milter for Sen"
+    },
+    {
+        "package": "drpython",
+        "description": "editor simple y personalizable para el len"
+    },
+    {
+        "package": "ekg2-scripting-python",
+        "description": "instant messenger and IRC client for UNIX"
+    },
+    {
+        "package": "ekg2-scripting-python:i386",
+        "description": "instant messenger and IRC client for UNIX"
+    },
+    {
+        "package": "fontypython",
+        "description": "Find, view and manage font files of all ki"
+    },
+    {
+        "package": "ganglia-monitor-python",
+        "description": "cluster monitoring toolkit - python module"
+    },
+    {
+        "package": "gimp-python",
+        "description": "gimp-python"
+    },
+    {
+        "package": "gimp-python:i386",
+        "description": "gimp-python:i386"
+    },
+    {
+        "package": "idle-python2.7",
+        "description": "IDE for Python (v2.7) using Tkinter"
+    },
+    {
+        "package": "idle-python3.4",
+        "description": "IDE for Python (v3.4) using Tkinter"
+    },
+    {
+        "package": "ipython",
+        "description": "enhanced interactive Python shell"
+    },
+    {
+        "package": "ipython-doc",
+        "description": "enhanced interactive Python shell - Docume"
+    },
+    {
+        "package": "ipython-notebook",
+        "description": "interactive Python html notebook"
+    },
+    {
+        "package": "ipython-notebook-common",
+        "description": "interactive Python html notebook data pack"
+    },
+    {
+        "package": "ipython-qtconsole",
+        "description": "enhanced interactive Python shell - Qt con"
+    },
+    {
+        "package": "ipython3",
+        "description": "enhanced interactive Python 3 shell"
+    },
+    {
+        "package": "ipython3-notebook",
+        "description": "interactive Python 3 html notebook"
+    },
+    {
+        "package": "ipython3-qtconsole",
+        "description": "enhanced interactive Python 3 shell - Qt c"
+    },
+    {
+        "package": "kamailio-python-modules",
+        "description": "contains the app_python module"
+    },
+    {
+        "package": "kamailio-python-modules:i386",
+        "description": "contains the app_python module"
+    },
+    {
+        "package": "kdev-python",
+        "description": "KDevelop Python Plugin"
+    },
+    {
+        "package": "kdev-python:i386",
+        "description": "KDevelop Python Plugin"
+    },
+    {
+        "package": "krosspython",
+        "description": "Módulo de Python para Kross"
+    },
+    {
+        "package": "krosspython:i386",
+        "description": "Módulo de Python para Kross"
+    },
+    {
+        "package": "libapache2-mod-python",
+        "description": "módulo integrado Python para Apache 2"
+    },
+    {
+        "package": "libapache2-mod-python:i386",
+        "description": "módulo integrado Python para Apache 2"
+    },
+    {
+        "package": "libapache2-mod-python-doc",
+        "description": "Modulo de empotrado Python para Apache 2"
+    },
+    {
+        "package": "libboost-mpi-python-dev",
+        "description": "C++ interface to the Message Passing Inter"
+    },
+    {
+        "package": "libboost-mpi-python-dev:i386",
+        "description": "C++ interface to the Message Passing Inter"
+    },
+    {
+        "package": "libboost-mpi-python1.54-dev",
+        "description": "C++ interface to the Message Passing Inter"
+    },
+    {
+        "package": "libboost-mpi-python1.54-dev:i38",
+        "description": "C++ interface to the Message Passing Inter"
+    },
+    {
+        "package": "libboost-mpi-python1.54.0",
+        "description": "C++ interface to the Message Passing Inter"
+    },
+    {
+        "package": "libboost-mpi-python1.54.0:i386",
+        "description": "C++ interface to the Message Passing Inter"
+    },
+    {
+        "package": "libboost-mpi-python1.55-dev",
+        "description": "C++ interface to the Message Passing Inter"
+    },
+    {
+        "package": "libboost-mpi-python1.55-dev:i38",
+        "description": "C++ interface to the Message Passing Inter"
+    },
+    {
+        "package": "libboost-mpi-python1.55.0",
+        "description": "C++ interface to the Message Passing Inter"
+    },
+    {
+        "package": "libboost-mpi-python1.55.0:i386",
+        "description": "C++ interface to the Message Passing Inter"
+    },
+    {
+        "package": "libboost-python-dev",
+        "description": "archivos de desarrollo de labiblioteca Boo"
+    },
+    {
+        "package": "libboost-python-dev:i386",
+        "description": "archivos de desarrollo de labiblioteca Boo"
+    },
+    {
+        "package": "libboost-python1.54-dev",
+        "description": "archivos de desarrollo de la biblioteca Bo"
+    },
+    {
+        "package": "libboost-python1.54-dev:i386",
+        "description": "archivos de desarrollo de la biblioteca Bo"
+    },
+    {
+        "package": "libboost-python1.54.0",
+        "description": "Biblioteca Boost.Python"
+    },
+    {
+        "package": "libboost-python1.54.0:i386",
+        "description": "Biblioteca Boost.Python"
+    },
+    {
+        "package": "libboost-python1.55-dev",
+        "description": "Boost.Python Library development files"
+    },
+    {
+        "package": "libboost-python1.55-dev:i386",
+        "description": "Boost.Python Library development files"
+    },
+    {
+        "package": "libboost-python1.55.0",
+        "description": "Boost.Python Library"
+    },
+    {
+        "package": "libboost-python1.55.0:i386",
+        "description": "Boost.Python Library"
+    },
+    {
+        "package": "libfko-python",
+        "description": "FireWall KNock OPerator - Python module"
+    },
+    {
+        "package": "libfko-python:i386",
+        "description": "FireWall KNock OPerator - Python module"
+    },
+    {
+        "package": "libgv-python",
+        "description": "Vínculos Python para graphviz"
+    },
+    {
+        "package": "libgv-python:i386",
+        "description": "Vínculos Python para graphviz"
+    },
+    {
+        "package": "libhocr-python",
+        "description": "Hebrew OCR library Python bindings"
+    },
+    {
+        "package": "libhocr-python:i386",
+        "description": "Hebrew OCR library Python bindings"
+    },
+    {
+        "package": "liblasso0-python2.3",
+        "description": "liblasso0-python2.3"
+    },
+    {
+        "package": "liblasso0-python2.3:i386",
+        "description": "liblasso0-python2.3:i386"
+    },
+    {
+        "package": "libmyth-python",
+        "description": "Una biblioteca de Python para acceder a al"
+    },
+    {
+        "package": "libpam-python",
+        "description": "Enables PAM modules to be written in Pytho"
+    },
+    {
+        "package": "libpam-python:i386",
+        "description": "Enables PAM modules to be written in Pytho"
+    },
+    {
+        "package": "libpam-python-doc",
+        "description": "Documentación para los vínculos provistos"
+    },
+    {
+        "package": "libpython-all-dbg",
+        "description": "paquete que depende de todos los paquetes"
+    },
+    {
+        "package": "libpython-all-dbg:i386",
+        "description": "paquete que depende de todos los paquetes"
+    },
+    {
+        "package": "libpython-all-dev",
+        "description": "paquete que depende de todos los paquetes"
+    },
+    {
+        "package": "libpython-all-dev:i386",
+        "description": "paquete que depende de todos los paquetes"
+    },
+    {
+        "package": "libpython-dbg",
+        "description": "debug build of the Python Interpreter (ver"
+    },
+    {
+        "package": "libpython-dbg:i386",
+        "description": "debug build of the Python Interpreter (ver"
+    },
+    {
+        "package": "libpython-dev",
+        "description": "archivos de cabecera y una biblioteca está"
+    },
+    {
+        "package": "libpython-dev:i386",
+        "description": "archivos de cabecera y una biblioteca está"
+    },
+    {
+        "package": "libpython-stdlib",
+        "description": "interactive high-level object-oriented lan"
+    },
+    {
+        "package": "libpython-stdlib:i386",
+        "description": "interactive high-level object-oriented lan"
+    },
+    {
+        "package": "libpython2.7",
+        "description": "Biblioteca Python de ejecución compartida"
+    },
+    {
+        "package": "libpython2.7:i386",
+        "description": "Biblioteca Python de ejecución compartida"
+    },
+    {
+        "package": "libpython2.7-dbg",
+        "description": "Depurador del Intérprete de Python (versió"
+    },
+    {
+        "package": "libpython2.7-dbg:i386",
+        "description": "Depurador del Intérprete de Python (versió"
+    },
+    {
+        "package": "libpython2.7-dev",
+        "description": "Archivos de cabecera y biblioteca estática"
+    },
+    {
+        "package": "libpython2.7-dev:i386",
+        "description": "Archivos de cabecera y biblioteca estática"
+    },
+    {
+        "package": "libpython2.7-minimal",
+        "description": "Minimal subset of the Python language (ver"
+    },
+    {
+        "package": "libpython2.7-minimal:i386",
+        "description": "Minimal subset of the Python language (ver"
+    },
+    {
+        "package": "libpython2.7-stdlib",
+        "description": "Interactive high-level object-oriented lan"
+    },
+    {
+        "package": "libpython2.7-stdlib:i386",
+        "description": "Interactive high-level object-oriented lan"
+    },
+    {
+        "package": "libpython2.7-testsuite",
+        "description": "Testsuite for the Python standard library"
+    },
+    {
+        "package": "libpython3-all-dbg",
+        "description": "package depending on all supported Python"
+    },
+    {
+        "package": "libpython3-all-dbg:i386",
+        "description": "package depending on all supported Python"
+    },
+    {
+        "package": "libpython3-all-dev",
+        "description": "package depending on all supported Python"
+    },
+    {
+        "package": "libpython3-all-dev:i386",
+        "description": "package depending on all supported Python"
+    },
+    {
+        "package": "libpython3-dbg",
+        "description": "debug build of the Python 3 Interpreter (v"
+    },
+    {
+        "package": "libpython3-dbg:i386",
+        "description": "debug build of the Python 3 Interpreter (v"
+    },
+    {
+        "package": "libpython3-dev",
+        "description": "archivos de cabecera y una biblioteca está"
+    },
+    {
+        "package": "libpython3-dev:i386",
+        "description": "archivos de cabecera y una biblioteca está"
+    },
+    {
+        "package": "libpython3-stdlib",
+        "description": "lenguaje interactivo de alto nivel orienta"
+    },
+    {
+        "package": "libpython3-stdlib:i386",
+        "description": "lenguaje interactivo de alto nivel orienta"
+    },
+    {
+        "package": "A",
+        "description": "- Shared Python runtime library (version 3.4"
+    },
+    {
+        "package": "libpython3.4:i386",
+        "description": "Shared Python runtime library (version 3.4"
+    },
+    {
+        "package": "libpython3.4-dbg",
+        "description": "Debug Build of the Python Interpreter (ver"
+    },
+    {
+        "package": "libpython3.4-dbg:i386",
+        "description": "Debug Build of the Python Interpreter (ver"
+    },
+    {
+        "package": "libpython3.4-dev",
+        "description": "Header files and a static library for Pyth"
+    },
+    {
+        "package": "libpython3.4-dev:i386",
+        "description": "Header files and a static library for Pyth"
+    },
+    {
+        "package": "libpython3.4-minimal",
+        "description": "Minimal subset of the Python language (ver"
+    },
+    {
+        "package": "libpython3.4-minimal:i386",
+        "description": "Minimal subset of the Python language (ver"
+    },
+    {
+        "package": "libpython3.4-stdlib",
+        "description": "Interactive high-level object-oriented lan"
+    },
+    {
+        "package": "libpython3.4-stdlib:i386",
+        "description": "Interactive high-level object-oriented lan"
+    },
+    {
+        "package": "libpython3.4-testsuite",
+        "description": "Testsuite for the Python standard library"
+    },
+    {
+        "package": "libpythonqt-dev",
+        "description": "Dynamic Python binding for the Qt framewor"
+    },
+    {
+        "package": "libpythonqt-dev:i386",
+        "description": "Dynamic Python binding for the Qt framewor"
+    },
+    {
+        "package": "libpythonqt2.1",
+        "description": "Dynamic Python binding for the Qt framewor"
+    },
+    {
+        "package": "libpythonqt2.1:i386",
+        "description": "Dynamic Python binding for the Qt framewor"
+    },
+    {
+        "package": "libqgispython2.0.1",
+        "description": "QGIS - shared libraries (libqgispython)"
+    },
+    {
+        "package": "libqgispython2.0.1:i386",
+        "description": "QGIS - shared libraries (libqgispython)"
+    },
+    {
+        "package": "libreoffice-script-provider-pyt",
+        "description": "Python script support provider for LibreOf"
+    },
+    {
+        "package": "libroot-bindings-python-dev",
+        "description": "Python extension for ROOT - development fi"
+    },
+    {
+        "package": "libroot-bindings-python-dev:i38",
+        "description": "Python extension for ROOT - development fi"
+    },
+    {
+        "package": "libroot-bindings-python5.34",
+        "description": "Python extension for ROOT - runtime librar"
+    },
+    {
+        "package": "libroot-bindings-python5.34:i38",
+        "description": "Python extension for ROOT - runtime librar"
+    },
+    {
+        "package": "libsnmp-python",
+        "description": "libsnmp-python"
+    },
+    {
+        "package": "libsnmp-python:i386",
+        "description": "libsnmp-python:i386"
+    },
+    {
+        "package": "libtulip-python",
+        "description": "libtulip-python"
+    },
+    {
+        "package": "libtulip-python:i386",
+        "description": "libtulip-python:i386"
+    },
+    {
+        "package": "libtulip-python-4.4",
+        "description": "Tulip graph library - Qt/OpenGL GUI runtim"
+    },
+    {
+        "package": "libtulip-python-4.4:i386",
+        "description": "Tulip graph library - Qt/OpenGL GUI runtim"
+    },
+    {
+        "package": "lintian4python",
+        "description": "Debian package checker (for Python package"
+    },
+    {
+        "package": "mpich2python",
+        "description": "MPI-enhanced Python interpreter (MPICH2 ba"
+    },
+    {
+        "package": "mpich2python:i386",
+        "description": "MPI-enhanced Python interpreter (MPICH2 ba"
+    },
+    {
+        "package": "mpipython",
+        "description": "mpipython"
+    },
+    {
+        "package": "mpipython:i386",
+        "description": "mpipython:i386"
+    },
+    {
+        "package": "msgpack-python",
+        "description": "msgpack-python"
+    },
+    {
+        "package": "msgpack-python:i386",
+        "description": "msgpack-python:i386"
+    },
+    {
+        "package": "nfqueue-bindings-python",
+        "description": "Vínculos Python para nfqueue"
+    },
+    {
+        "package": "nfqueue-bindings-python:i386",
+        "description": "Vínculos Python para nfqueue"
+    },
+    {
+        "package": "nordugrid-arc-nox-python",
+        "description": "nordugrid-arc-nox-python"
+    },
+    {
+        "package": "nordugrid-arc-nox-python:i386",
+        "description": "nordugrid-arc-nox-python:i386"
+    },
+    {
+        "package": "nordugrid-arc-python",
+        "description": "ARC Python wrapper"
+    },
+    {
+        "package": "nordugrid-arc-python:i386",
+        "description": "ARC Python wrapper"
+    },
+    {
+        "package": "nordugrid-arc1-python",
+        "description": "nordugrid-arc1-python"
+    },
+    {
+        "package": "nordugrid-arc1-python:i386",
+        "description": "nordugrid-arc1-python:i386"
+    },
+    {
+        "package": "omniidl-python",
+        "description": "omniidl-python             - omniidl backend to compile Python stubs fr"
+    },
+    {
+        "package": "openmpipython",
+        "description": "MPI-enhanced Python interpreter (OpenMPI b"
+    },
+    {
+        "package": "openmpipython:i386",
+        "description": "MPI-enhanced Python interpreter (OpenMPI b"
+    },
+    {
+        "package": "paraview-python",
+        "description": "Parallel Visualization Application. python"
+    },
+    {
+        "package": "paraview-python:i386",
+        "description": "Parallel Visualization Application. python"
+    },
+    {
+        "package": "plasma-scriptengine-python",
+        "description": "Python script engine for Plasma"
+    },
+    {
+        "package": "postfix-policyd-spf-python",
+        "description": "Postfix policy server for SPF checking"
+    },
+    {
+        "package": "postgres-xc-plpython",
+        "description": "PL/Python procedural language for Postgres"
+    },
+    {
+        "package": "postgres-xc-plpython:i386",
+        "description": "PL/Python procedural language for Postgres"
+    },
+    {
+        "package": "postgresql-plpython",
+        "description": "postgresql-plpython"
+    },
+    {
+        "package": "postgresql-plpython:i386",
+        "description": "postgresql-plpython:i386"
+    },
+    {
+        "package": "postgresql-plpython-9.3",
+        "description": "PL/Python procedural language for PostgreS"
+    },
+    {
+        "package": "postgresql-plpython-9.3:i386",
+        "description": "PL/Python procedural language for PostgreS"
+    },
+    {
+        "package": "postgresql-plpython3",
+        "description": "postgresql-plpython3"
+    },
+    {
+        "package": "postgresql-plpython3:i386",
+        "description": "postgresql-plpython3:i386"
+    },
+    {
+        "package": "postgresql-plpython3-9.3",
+        "description": "PL/Python 3 procedural language for Postgr"
+    },
+    {
+        "package": "postgresql-plpython3-9.3:i386",
+        "description": "PL/Python 3 procedural language for Postgr"
+    },
+    {
+        "package": "python",
+        "description": "Lenguaje interactivo de alto nivel orienta"
+    },
+    {
+        "package": "python:i386",
+        "description": "Lenguaje interactivo de alto nivel orienta"
+    },
+    {
+        "package": "python-aafigure",
+        "description": "ASCII art to image converter"
+    },
+    {
+        "package": "python-aalib",
+        "description": "Interfaz de Python para AAlib, una bibliot"
+    },
+    {
+        "package": "python-acidobasic",
+        "description": "simulation tool for acido-basic titrations"
+    },
+    {
+        "package": "python-acoustid",
+        "description": "Acoustid interface implementation and Chro"
+    },
+    {
+        "package": "python-actdiag",
+        "description": "generate activity-diagram image file from"
+    },
+    {
+        "package": "python-adns",
+        "description": "Vinculaciones Python a la biblioteca de re"
+    },
+    {
+        "package": "python-adns:i386",
+        "description": "Vinculaciones Python a la biblioteca de re"
+    },
+    {
+        "package": "python-adodb",
+        "description": "A database abstraction library for python"
+    },
+    {
+        "package": "python-aiml",
+        "description": "Artificial Intelligence Markup Language in"
+    },
+    {
+        "package": "python-ajax-select",
+        "description": "Django library for editing fields with aut"
+    },
+    {
+        "package": "python-albatross",
+        "description": "Toolkit for Stateful Web Applications"
+    },
+    {
+        "package": "python-albatross-common",
+        "description": "Toolkit for Stateful Web Applications (com"
+    },
+    {
+        "package": "python-albatross-doc",
+        "description": "documentation for the Albatross Web Toolki"
+    },
+    {
+        "package": "python-all",
+        "description": "paquete que depende de todas las versiones"
+    },
+    {
+        "package": "python-all:i386",
+        "description": "paquete que depende de todas las versiones"
+    },
+    {
+        "package": "python-all-dbg",
+        "description": "paquete que depende de todos los paquetes"
+    },
+    {
+        "package": "python-all-dbg:i386",
+        "description": "paquete que depende de todos los paquetes"
+    },
+    {
+        "package": "python-all-dbg:any",
+        "description": "python-all-dbg:any"
+    },
+    {
+        "package": "python-all-dbg:any:i386",
+        "description": "python-all-dbg:any:i386"
+    },
+    {
+        "package": "python-all-dev",
+        "description": "paquete que depende de todos los paquetes"
+    },
+    {
+        "package": "python-all-dev:i386",
+        "description": "paquete que depende de todos los paquetes"
+    },
+    {
+        "package": "python-all-dev:any",
+        "description": "python-all-dev:any"
+    },
+    {
+        "package": "python-all-dev:any:i386",
+        "description": "python-all-dev:any:i386"
+    },
+    {
+        "package": "python-all:any",
+        "description": "python-all:any"
+    },
+    {
+        "package": "python-all:any:i386",
+        "description": "python-all:any:i386"
+    },
+    {
+        "package": "python-alsaaudio",
+        "description": "Vínculos Alsa para Python"
+    },
+    {
+        "package": "python-alsaaudio:i386",
+        "description": "Vínculos Alsa para Python"
+    },
+    {
+        "package": "python-amqp",
+        "description": "Low-level AMQP client"
+    },
+    {
+        "package": "python-amqp-doc",
+        "description": "Low-level AMQP client (Documentation)"
+    },
+    {
+        "package": "python-amqplib",
+        "description": "simple non-threaded Python AMQP client lib"
+    },
+    {
+        "package": "python-amqplib-doc",
+        "description": "simple non-threaded Python AMQP client lib"
+    },
+    {
+        "package": "python-antlr",
+        "description": "Herramienta de lenguajes para construir re"
+    },
+    {
+        "package": "python-anyjson",
+        "description": "Common interface for the best available JS"
+    },
+    {
+        "package": "python-apache-openid",
+        "description": "OpenID consumer module for Apache"
+    },
+    {
+        "package": "python-apipkg",
+        "description": "namespace control and lazy-import mechanis"
+    },
+    {
+        "package": "python-apns-client",
+        "description": "Python client for the Apple Push Notificat"
+    },
+    {
+        "package": "python-apparmor",
+        "description": "AppArmor Python utility library"
+    },
+    {
+        "package": "python-apparmor:i386",
+        "description": "AppArmor Python utility library"
+    },
+    {
+        "package": "python-appconf",
+        "description": "helper class for handling configuration de"
+    },
+    {
+        "package": "python-appdirs",
+        "description": "determining appropriate platform-specific"
+    },
+    {
+        "package": "python-appindicator",
+        "description": "Vínculos de libappindicator para Python"
+    },
+    {
+        "package": "python-appindicator:i386",
+        "description": "Vínculos de libappindicator para Python"
+    },
+    {
+        "package": "python-application",
+        "description": "bloques de construcción básicos para aplic"
+    },
+    {
+        "package": "python-apport",
+        "description": "Python library for Apport crash report han"
+    },
+    {
+        "package": "python-apptools",
+        "description": "ETS Application Tools"
+    },
+    {
+        "package": "python-apscheduler",
+        "description": "In-process task scheduler with Cron-like c"
+    },
+    {
+        "package": "python-apsw",
+        "description": "another Python SQLite 3 wrapper"
+    },
+    {
+        "package": "python-apsw:i386",
+        "description": "another Python SQLite 3 wrapper"
+    },
+    {
+        "package": "python-apsw-dbg",
+        "description": "another Python SQLite 3 wrapper (debug ext"
+    },
+    {
+        "package": "python-apsw-dbg:i386",
+        "description": "another Python SQLite 3 wrapper (debug ext"
+    },
+    {
+        "package": "python-apsw-doc",
+        "description": "documentación para python-apsw"
+    },
+    {
+        "package": "python-apt",
+        "description": "Intefaz de Python para libapt-pkg"
+    },
+    {
+        "package": "python-apt:i386",
+        "description": "Intefaz de Python para libapt-pkg"
+    },
+    {
+        "package": "python-apt-common",
+        "description": "Python interface to libapt-pkg (locales)"
+    },
+    {
+        "package": "python-apt-dbg",
+        "description": "Interfaz Python para libapt-pkg (extensión"
+    },
+    {
+        "package": "python-apt-dbg:i386",
+        "description": "Interfaz Python para libapt-pkg (extensión"
+    },
+    {
+        "package": "python-apt-dbg:any",
+        "description": "python-apt-dbg:any"
+    },
+    {
+        "package": "python-apt-dbg:any:i386",
+        "description": "python-apt-dbg:any:i386"
+    },
+    {
+        "package": "python-apt-dev",
+        "description": "interfaz Python para libapt-pkg (archivos"
+    },
+    {
+        "package": "python-apt-doc",
+        "description": "interfaz Python para libapt-pkg (documenta"
+    },
+    {
+        "package": "python-apt-p2p",
+        "description": "python-apt-p2p"
+    },
+    {
+        "package": "python-apt-p2p-khashmir",
+        "description": "python-apt-p2p-khashmir"
+    },
+    {
+        "package": "python-apt:any",
+        "description": "python-apt:any"
+    },
+    {
+        "package": "python-apt:any:i386",
+        "description": "python-apt:any:i386"
+    },
+    {
+        "package": "A",
+        "description": "-aptdaemon           - Python 2 module for the server and client"
+    },
+    {
+        "package": "python-aptdaemon-gtk",
+        "description": "Paquete de transición"
+    },
+    {
+        "package": "A",
+        "description": "-aptdaemon.gtk3widgets    - Python 2 GTK+ 3 widgets to run an aptdaemo"
+    },
+    {
+        "package": "python-aptdaemon.gtkwidgets",
+        "description": "Python GTK+ 2 widgets to run an aptdaemon"
+    },
+    {
+        "package": "python-argcomplete",
+        "description": "bash tab completion for argparse"
+    },
+    {
+        "package": "python-argh",
+        "description": "simple argparse wrapper"
+    },
+    {
+        "package": "python-argparse",
+        "description": "python-argparse"
+    },
+    {
+        "package": "python-argparse:i386",
+        "description": "python-argparse:i386"
+    },
+    {
+        "package": "python-args",
+        "description": "Command Arguments for Humans (Python 2)"
+    },
+    {
+        "package": "python-argvalidate",
+        "description": "simple argument validator library"
+    },
+    {
+        "package": "python-ariapy",
+        "description": "C++ library for MobileRobots/ActivMedia ro"
+    },
+    {
+        "package": "python-ariapy:i386",
+        "description": "C++ library for MobileRobots/ActivMedia ro"
+    },
+    {
+        "package": "python-arpy",
+        "description": "library for accessing archives"
+    },
+    {
+        "package": "python-ase",
+        "description": "Atomic Simulation Environment for atomisti"
+    },
+    {
+        "package": "python-aspects",
+        "description": "lightweight aspect oriented programming li"
+    },
+    {
+        "package": "python-asterisk",
+        "description": "Asterisk Manager API interface module for"
+    },
+    {
+        "package": "python-astroid",
+        "description": "rebuild a new abstract syntax tree from Py"
+    },
+    {
+        "package": "python-astropy",
+        "description": "Core functionality for performing astrophy"
+    },
+    {
+        "package": "python-astropy:i386",
+        "description": "Core functionality for performing astrophy"
+    },
+    {
+        "package": "python-astropy-doc",
+        "description": "Core functionality for performing astrophy"
+    },
+    {
+        "package": "python-async",
+        "description": "framework to process interdependent tasks"
+    },
+    {
+        "package": "python-async:i386",
+        "description": "framework to process interdependent tasks"
+    },
+    {
+        "package": "python-aubio",
+        "description": "python-aubio               - python interface for aubio, a library for"
+    },
+    {
+        "package": "python-aubio:i386",
+        "description": "python-aubio:i386          - python interface for aubio, a library for"
+    },
+    {
+        "package": "python-audioread",
+        "description": "Backend-agnostic audio decoding Python pac"
+    },
+    {
+        "package": "python-audit",
+        "description": "Python bindings for security auditing"
+    },
+    {
+        "package": "python-audit:i386",
+        "description": "Python bindings for security auditing"
+    },
+    {
+        "package": "python-augeas",
+        "description": "Vínculos Python para Augeas"
+    },
+    {
+        "package": "python-authkit",
+        "description": "authentication and authorisation framework"
+    },
+    {
+        "package": "python-authres",
+        "description": "RFC 5451 Authentication Results Header man"
+    },
+    {
+        "package": "python-autobahn",
+        "description": "WebSocket/WAMP implementation for Python/T"
+    },
+    {
+        "package": "python-autopep8",
+        "description": "tool that automatically formats Python cod"
+    },
+    {
+        "package": "python-autopilot",
+        "description": "Utility to write and run integration tests"
+    },
+    {
+        "package": "python-autopilot-tests",
+        "description": "Tests for the autopilot functional test to"
+    },
+    {
+        "package": "python-autopilot-trace",
+        "description": "Support for tracing in autopilot"
+    },
+    {
+        "package": "python-autopilot-trace:i386",
+        "description": "Support for tracing in autopilot"
+    },
+    {
+        "package": "python-autopilot-vis",
+        "description": "The visualisation application for Autopilo"
+    },
+    {
+        "package": "python-avahi",
+        "description": "Paquete de la utilidades de Python para Av"
+    },
+    {
+        "package": "python-avahi:i386",
+        "description": "Paquete de la utilidades de Python para Av"
+    },
+    {
+        "package": "python-avc",
+        "description": "live connection among widgets and applicat"
+    },
+    {
+        "package": "python-avogadro",
+        "description": "Gráficos moleculares y sistema de modelado"
+    },
+    {
+        "package": "python-avogadro:i386",
+        "description": "Gráficos moleculares y sistema de modelado"
+    },
+    {
+        "package": "python-awsauth",
+        "description": "AWS authentication for Amazon S3 for the p"
+    },
+    {
+        "package": "python-axiom",
+        "description": "Python object database"
+    },
+    {
+        "package": "python-babel",
+        "description": "tools for internationalizing Python applic"
+    },
+    {
+        "package": "python-babel-doc",
+        "description": "tools for internationalizing Python applic"
+    },
+    {
+        "package": "python-babel-localedata",
+        "description": "tools for internationalizing Python applic"
+    },
+    {
+        "package": "python-babelfish",
+        "description": "library to work with countries and languag"
+    },
+    {
+        "package": "python-backup2swift",
+        "description": "backup2swift        - backup data to OpenStack Swift - python 2."
+    },
+    {
+        "package": "python-bcdoc",
+        "description": "ReST document generation tools for botocor"
+    },
+    {
+        "package": "python-bcrypt",
+        "description": "implementation of OpenBSD's Blowfish passw"
+    },
+    {
+        "package": "python-bcrypt:i386",
+        "description": "implementation of OpenBSD's Blowfish passw"
+    },
+    {
+        "package": "python-beaker",
+        "description": "cache and session library"
+    },
+    {
+        "package": "python-beanstalkc",
+        "description": "simple beanstalkd client library for Pytho"
+    },
+    {
+        "package": "python-beautifulsoup",
+        "description": "error-tolerant HTML parser for Python"
+    },
+    {
+        "package": "python-bibtex",
+        "description": "Python interfaces to BibTeX and the GNU Re"
+    },
+    {
+        "package": "python-bibtex:i386",
+        "description": "Python interfaces to BibTeX and the GNU Re"
+    },
+    {
+        "package": "python-billiard",
+        "description": "Multiprocessing Pool Extensions for Python"
+    },
+    {
+        "package": "python-billiard:i386",
+        "description": "Multiprocessing Pool Extensions for Python"
+    },
+    {
+        "package": "python-billiard-doc",
+        "description": "Multiprocessing Pool Extensions for Python"
+    },
+    {
+        "package": "python-binaryornot",
+        "description": "check if a file is binary or text (Python"
+    },
+    {
+        "package": "python-biom-format",
+        "description": "Biological Observation Matrix (BIOM) forma"
+    },
+    {
+        "package": "python-biom-format:i386",
+        "description": "Biological Observation Matrix (BIOM) forma"
+    },
+    {
+        "package": "python-biopython",
+        "description": "Biblioteca para bioinformática en Python"
+    },
+    {
+        "package": "python-biopython:i386",
+        "description": "Biblioteca para bioinformática en Python"
+    },
+    {
+        "package": "python-biopython-doc",
+        "description": "Documentación para la biblioteca Biopython"
+    },
+    {
+        "package": "python-biopython-sql",
+        "description": "Biopython support for the BioSQL database"
+    },
+    {
+        "package": "python-biosig",
+        "description": "Python bindings for BioSig library"
+    },
+    {
+        "package": "python-biosig:i386",
+        "description": "Python bindings for BioSig library"
+    },
+    {
+        "package": "python-bitarray",
+        "description": "Python module for efficient boolean array"
+    },
+    {
+        "package": "python-bitarray:i386",
+        "description": "Python module for efficient boolean array"
+    },
+    {
+        "package": "python-bitbucket",
+        "description": "Python bindings for the bitbucket.org REST"
+    },
+    {
+        "package": "python-bittornado",
+        "description": "python-bittornado"
+    },
+    {
+        "package": "python-bittorrent",
+        "description": "Scatter-gather network file transfer"
+    },
+    {
+        "package": "python-bjsonrpc",
+        "description": "asynchronous bidirectional JSON-RPC protoc"
+    },
+    {
+        "package": "python-bleach",
+        "description": "whitelist-based HTML-sanitizing library"
+    },
+    {
+        "package": "python-blessings",
+        "description": "simple but powerful module to manage termi"
+    },
+    {
+        "package": "python-blinker",
+        "description": "Fast, simple object-to-object and broadcas"
+    },
+    {
+        "package": "python-blist",
+        "description": "List-like type for python with better asym"
+    },
+    {
+        "package": "python-blist:i386",
+        "description": "List-like type for python with better asym"
+    },
+    {
+        "package": "python-blockdiag",
+        "description": "generate block-diagram image file from spe"
+    },
+    {
+        "package": "python-bloomfilter",
+        "description": "Python native implementation of the Bloom"
+    },
+    {
+        "package": "python-bluetooth",
+        "description": "python-bluetooth"
+    },
+    {
+        "package": "python-bluetooth:i386",
+        "description": "python-bluetooth:i386"
+    },
+    {
+        "package": "python-bluez",
+        "description": "Python wrappers around BlueZ for rapid blu"
+    },
+    {
+        "package": "python-bluez:i386",
+        "description": "Python wrappers around BlueZ for rapid blu"
+    },
+    {
+        "package": "python-bobo",
+        "description": "Web application framework for the impatien"
+    },
+    {
+        "package": "python-bootstrapform",
+        "description": "generate twitter-bootstrap form output for"
+    },
+    {
+        "package": "python-bootstrapform-doc",
+        "description": "generate twitter-bootstrap form output for"
+    },
+    {
+        "package": "python-boto",
+        "description": "Interfaz de Python a los servicios web de"
+    },
+    {
+        "package": "python-botocore",
+        "description": "Low-level, data-driven core of boto 3 (Pyt"
+    },
+    {
+        "package": "python-bottle",
+        "description": "fast and simple WSGI-framework for Python"
+    },
+    {
+        "package": "python-bottle-doc",
+        "description": "fast and simple WSGI-framework for Python"
+    },
+    {
+        "package": "python-box2d",
+        "description": "Python Bindings for the 2D Physics Engine"
+    },
+    {
+        "package": "python-box2d:i386",
+        "description": "Python Bindings for the 2D Physics Engine"
+    },
+    {
+        "package": "python-box2d-doc",
+        "description": "Python Bindings for the 2D Physics Engine"
+    },
+    {
+        "package": "python-braintree",
+        "description": "Braintree Python library"
+    },
+    {
+        "package": "python-brian",
+        "description": "simulator for spiking neural networks"
+    },
+    {
+        "package": "python-brian-doc",
+        "description": "simulator for spiking neural networks - do"
+    },
+    {
+        "package": "python-brian-lib",
+        "description": "simulator for spiking neural networks -- e"
+    },
+    {
+        "package": "python-brian-lib:i386",
+        "description": "simulator for spiking neural networks -- e"
+    },
+    {
+        "package": "python-brlapi",
+        "description": "Braille display access via BRLTTY - Python"
+    },
+    {
+        "package": "python-brlapi:i386",
+        "description": "Braille display access via BRLTTY - Python"
+    },
+    {
+        "package": "python-bs4",
+        "description": "analizador de HTML tolerante a errores par"
+    },
+    {
+        "package": "python-bs4-doc",
+        "description": "error-tolerant HTML parser for Python - do"
+    },
+    {
+        "package": "python-bsddb3",
+        "description": "Interfaz de Python para Berkeley DB"
+    },
+    {
+        "package": "python-bsddb3:i386",
+        "description": "Interfaz de Python para Berkeley DB"
+    },
+    {
+        "package": "python-bsddb3-dbg",
+        "description": "Interfaz de Python para Berkeley DB (exten"
+    },
+    {
+        "package": "python-bsddb3-dbg:i386",
+        "description": "Interfaz de Python para Berkeley DB (exten"
+    },
+    {
+        "package": "python-bsddb3-doc",
+        "description": "Documentación para el módulo de interfaz d"
+    },
+    {
+        "package": "python-bson",
+        "description": "Python implementation of BSON for MongoDB"
+    },
+    {
+        "package": "python-bson:i386",
+        "description": "Python implementation of BSON for MongoDB"
+    },
+    {
+        "package": "python-bson-ext",
+        "description": "C-coded extension to the python-bson packa"
+    },
+    {
+        "package": "python-bson-ext:i386",
+        "description": "C-coded extension to the python-bson packa"
+    },
+    {
+        "package": "python-buffy",
+        "description": "Envoltura Python para la biblioteca libbuf"
+    },
+    {
+        "package": "python-buffy:i386",
+        "description": "Envoltura Python para la biblioteca libbuf"
+    },
+    {
+        "package": "python-bugz",
+        "description": "python-bugz"
+    },
+    {
+        "package": "python-bunch",
+        "description": "Dot-accessible Python dictionary (a la Jav"
+    },
+    {
+        "package": "python-buzhug",
+        "description": "pure-Python database engine, using a Pytho"
+    },
+    {
+        "package": "python-byteplay",
+        "description": "Python bytecode manipulation library"
+    },
+    {
+        "package": "python-bzrlib",
+        "description": "sistema de control de versión distribuida"
+    },
+    {
+        "package": "python-bzrlib:i386",
+        "description": "sistema de control de versión distribuida"
+    },
+    {
+        "package": "python-bzrlib-dbg",
+        "description": "distributed version control system - debug"
+    },
+    {
+        "package": "python-bzrlib-dbg:i386",
+        "description": "distributed version control system - debug"
+    },
+    {
+        "package": "python-bzrlib.tests",
+        "description": "distributed version control system - tests"
+    },
+    {
+        "package": "A",
+        "description": "-cairo               - Enlaces de Python para la biblioteca de gr"
+    },
+    {
+        "package": "python-cairo:i386",
+        "description": "Enlaces de Python para la biblioteca de gr"
+    },
+    {
+        "package": "python-cairo-dbg",
+        "description": "Python bindings for the Cairo vector graph"
+    },
+    {
+        "package": "python-cairo-dbg:i386",
+        "description": "Python bindings for the Cairo vector graph"
+    },
+    {
+        "package": "python-cairo-dev",
+        "description": "Enlaces de cairo para Python: archivos de"
+    },
+    {
+        "package": "python-cairosvg",
+        "description": "SVG to PDF/PS/PNG converter based on Cairo"
+    },
+    {
+        "package": "python-calabash",
+        "description": "Bash-style pipelining syntax for Python ge"
+    },
+    {
+        "package": "python-canl",
+        "description": "EMI Common Authentication Library - Python"
+    },
+    {
+        "package": "python-canl:i386",
+        "description": "EMI Common Authentication Library - Python"
+    },
+    {
+        "package": "python-cap-ng",
+        "description": "Enlaces Python para libcap-ng"
+    },
+    {
+        "package": "python-cap-ng:i386",
+        "description": "Enlaces Python para libcap-ng"
+    },
+    {
+        "package": "python-captcha",
+        "description": "collection of Python modules implementing"
+    },
+    {
+        "package": "python-carquinyol",
+        "description": "python-carquinyol"
+    },
+    {
+        "package": "python-carquinyol:i386",
+        "description": "python-carquinyol:i386"
+    },
+    {
+        "package": "python-carquinyol-0.88",
+        "description": "Sugar graphical shell - datastore"
+    },
+    {
+        "package": "python-carquinyol-0.88:i386",
+        "description": "Sugar graphical shell - datastore"
+    },
+    {
+        "package": "python-carquinyol-0.96",
+        "description": "Sugar graphical shell - datastore"
+    },
+    {
+        "package": "python-carquinyol-0.96:i386",
+        "description": "Sugar graphical shell - datastore"
+    },
+    {
+        "package": "python-carquinyol-0.98",
+        "description": "Sugar graphical shell - datastore"
+    },
+    {
+        "package": "python-carquinyol-0.98:i386",
+        "description": "Sugar graphical shell - datastore"
+    },
+    {
+        "package": "python-carrot",
+        "description": "AMQP messaging queue framework"
+    },
+    {
+        "package": "python-casmoothing",
+        "description": "Context-aware mesh smoothing for biomedica"
+    },
+    {
+        "package": "python-casmoothing:i386",
+        "description": "Context-aware mesh smoothing for biomedica"
+    },
+    {
+        "package": "python-catcher",
+        "description": "beautiful stack traces generator for Pytho"
+    },
+    {
+        "package": "python-catwalk",
+        "description": "model management interface for the Turboge"
+    },
+    {
+        "package": "python-cclib",
+        "description": "Parsers and algorithms for computational c"
+    },
+    {
+        "package": "python-cdd",
+        "description": "library to make easier to build CDD relate"
+    },
+    {
+        "package": "python-cddb",
+        "description": "Interfaz Python para CD-IDs y FreeDB"
+    },
+    {
+        "package": "python-cddb:i386",
+        "description": "Interfaz Python para CD-IDs y FreeDB"
+    },
+    {
+        "package": "python-cdo",
+        "description": "Python module for Climate Data Operators"
+    },
+    {
+        "package": "python-cdo:i386",
+        "description": "Python module for Climate Data Operators"
+    },
+    {
+        "package": "python-ceilometer",
+        "description": "ceilometer          - ceilometer python libraries"
+    },
+    {
+        "package": "python-ceilometerclient",
+        "description": "Client library for Openstack ceilometer se"
+    },
+    {
+        "package": "python-celery",
+        "description": "async task/job queue based on message pass"
+    },
+    {
+        "package": "python-celery-doc",
+        "description": "async task/job queue based on message pass"
+    },
+    {
+        "package": "python-ceph",
+        "description": "Python libraries for the Ceph distributed"
+    },
+    {
+        "package": "python-ceph:i386",
+        "description": "Python libraries for the Ceph distributed"
+    },
+    {
+        "package": "python-cerealizer",
+        "description": "secure pickle-like module for Python 2"
+    },
+    {
+        "package": "python-ceres",
+        "description": "database engine for fast, reliable fixed-s"
+    },
+    {
+        "package": "python-cffi",
+        "description": "Foreign Function Interface for Python call"
+    },
+    {
+        "package": "python-cffi:i386",
+        "description": "Foreign Function Interface for Python call"
+    },
+    {
+        "package": "python-cffi-dbg",
+        "description": "Foreign Function Interface for Python call"
+    },
+    {
+        "package": "python-cffi-dbg:i386",
+        "description": "Foreign Function Interface for Python call"
+    },
+    {
+        "package": "python-cfflib",
+        "description": "Multi-modal connectome and metadata manage"
+    },
+    {
+        "package": "python-chaco",
+        "description": "interactive plotting application toolkit"
+    },
+    {
+        "package": "python-chaco:i386",
+        "description": "interactive plotting application toolkit"
+    },
+    {
+        "package": "python-chameleon",
+        "description": "XML-based template compiler"
+    },
+    {
+        "package": "python-changelog",
+        "description": "Sphinx extension to generate changelog fil"
+    },
+    {
+        "package": "python-changesettings",
+        "description": "Python module to change lines in config fi"
+    },
+    {
+        "package": "python-chardet",
+        "description": "detector de codificación de caracteres uni"
+    },
+    {
+        "package": "A",
+        "description": "-chardet-whl         - universal character encoding detector"
+    },
+    {
+        "package": "python-cheetah",
+        "description": "motor de plantillas basadas en texto y gen"
+    },
+    {
+        "package": "python-cheetah:i386",
+        "description": "motor de plantillas basadas en texto y gen"
+    },
+    {
+        "package": "python-chemfp",
+        "description": "cheminformatics fingerprints file formats"
+    },
+    {
+        "package": "python-chemfp:i386",
+        "description": "cheminformatics fingerprints file formats"
+    },
+    {
+        "package": "python-chemps2",
+        "description": "Python 2 interface for libchemps2-1"
+    },
+    {
+        "package": "python-chemps2:i386",
+        "description": "Python 2 interface for libchemps2-1"
+    },
+    {
+        "package": "python-cherrypy",
+        "description": "Python web development framework"
+    },
+    {
+        "package": "python-cherrypy3",
+        "description": "Python web development framework - version"
+    },
+    {
+        "package": "python-chm",
+        "description": "Vínculos Python para CHMLIB"
+    },
+    {
+        "package": "python-chm:i386",
+        "description": "Vínculos Python para CHMLIB"
+    },
+    {
+        "package": "python-cinder",
+        "description": "Cinder Python libraries"
+    },
+    {
+        "package": "python-cinderclient",
+        "description": "python-cinderclient        - python bindings to the OpenStack Volume AP"
+    },
+    {
+        "package": "python-cinfony",
+        "description": "Python abstraction layer to cheminformatic"
+    },
+    {
+        "package": "python-circuits",
+        "description": "event-driven framework with a component ar"
+    },
+    {
+        "package": "python-circuits-doc",
+        "description": "event-driven framework with a component ar"
+    },
+    {
+        "package": "python-cjson",
+        "description": "Very fast JSON encoder/decoder for Python"
+    },
+    {
+        "package": "python-cjson:i386",
+        "description": "Very fast JSON encoder/decoder for Python"
+    },
+    {
+        "package": "python-cjson-dbg",
+        "description": "Very fast JSON encoder/decoder for Python"
+    },
+    {
+        "package": "python-cjson-dbg:i386",
+        "description": "Very fast JSON encoder/decoder for Python"
+    },
+    {
+        "package": "python-ckanclient",
+        "description": "CKAN client Python package"
+    },
+    {
+        "package": "python-ckanclient:i386",
+        "description": "CKAN client Python package"
+    },
+    {
+        "package": "python-cl",
+        "description": "Actor framework for Kombu"
+    },
+    {
+        "package": "python-clamav",
+        "description": "Python bindings to ClamAV - transitional p"
+    },
+    {
+        "package": "python-clamav:i386",
+        "description": "python-clamav:i386"
+    },
+    {
+        "package": "python-clang-3.3",
+        "description": "Clang Python Bindings"
+    },
+    {
+        "package": "python-clang-3.3:i386",
+        "description": "Clang Python Bindings"
+    },
+    {
+        "package": "python-clang-3.4",
+        "description": "Clang Python Bindings"
+    },
+    {
+        "package": "python-clang-3.4:i386",
+        "description": "Clang Python Bindings"
+    },
+    {
+        "package": "python-clang-3.5",
+        "description": "Clang Python Bindings"
+    },
+    {
+        "package": "python-clang-3.5:i386",
+        "description": "Clang Python Bindings"
+    },
+    {
+        "package": "python-clang-3.6",
+        "description": "Clang Python Bindings"
+    },
+    {
+        "package": "python-clang-3.6:i386",
+        "description": "Clang Python Bindings"
+    },
+    {
+        "package": "python-clang-3.8",
+        "description": "Clang Python Bindings"
+    },
+    {
+        "package": "python-clang-3.8:i386",
+        "description": "Clang Python Bindings"
+    },
+    {
+        "package": "python-clearsilver",
+        "description": "Vínculos Python para clearsilver"
+    },
+    {
+        "package": "python-clearsilver:i386",
+        "description": "Vínculos Python para clearsilver"
+    },
+    {
+        "package": "python-cliapp",
+        "description": "Python framework for Unix command line pro"
+    },
+    {
+        "package": "python-clientform",
+        "description": "Paquete vacío de transición"
+    },
+    {
+        "package": "python-cliff",
+        "description": "command line interface formulation framewo"
+    },
+    {
+        "package": "python-cliff-doc",
+        "description": "command line interface formulation framewo"
+    },
+    {
+        "package": "python-clint",
+        "description": "Python Command-line Application Tools"
+    },
+    {
+        "package": "python-clips",
+        "description": "Python module to interface the CLIPS exper"
+    },
+    {
+        "package": "python-clips:i386",
+        "description": "Python module to interface the CLIPS exper"
+    },
+    {
+        "package": "python-cloud-sptheme",
+        "description": "Cloud Sphinx theme and related extensions"
+    },
+    {
+        "package": "python-cloudfiles",
+        "description": "Python language bindings for Cloud Files A"
+    },
+    {
+        "package": "python-cluster",
+        "description": "allows grouping a list of arbitrary object"
+    },
+    {
+        "package": "python-cmd2",
+        "description": "enhanced Python cmd module - Python 2.x"
+    },
+    {
+        "package": "python-cmor",
+        "description": "python-cmor                - python interface to CMOR"
+    },
+    {
+        "package": "python-cmor:i386",
+        "description": "python-cmor:i386           - python interface to CMOR"
+    },
+    {
+        "package": "python-cobbler",
+        "description": "Install server - python libraries."
+    },
+    {
+        "package": "python-cobe",
+        "description": "Markov chain based text generator library"
+    },
+    {
+        "package": "python-cogent",
+        "description": "framework for genomic biology"
+    },
+    {
+        "package": "python-cogent:i386",
+        "description": "framework for genomic biology"
+    },
+    {
+        "package": "python-cogent-dbg",
+        "description": "debug information for pycogent"
+    },
+    {
+        "package": "python-cogent-dbg:i386",
+        "description": "debug information for pycogent"
+    },
+    {
+        "package": "python-cogent-doc",
+        "description": "docs for python-cogent"
+    },
+    {
+        "package": "python-coherence",
+        "description": "Python UPnP framework"
+    },
+    {
+        "package": "python-colander",
+        "description": "simple schema-based serialization and dese"
+    },
+    {
+        "package": "python-collada",
+        "description": "Python module for creating, editing and lo"
+    },
+    {
+        "package": "A",
+        "description": "-colorama            - Cross-platform colored terminal text in Py"
+    },
+    {
+        "package": "A",
+        "description": "-colorama-whl        - Cross-platform colored terminal text in Py"
+    },
+    {
+        "package": "python-comedilib",
+        "description": "Envoltura Python para Comedilib"
+    },
+    {
+        "package": "python-comedilib:i386",
+        "description": "Envoltura Python para Comedilib"
+    },
+    {
+        "package": "python-commandnotfound",
+        "description": "Python 2 bindings for command-not-found."
+    },
+    {
+        "package": "python-commando",
+        "description": "wrapper for argparse to define declarative"
+    },
+    {
+        "package": "python-compizconfig",
+        "description": "Enlaces Compizconfig para python"
+    },
+    {
+        "package": "python-compizconfig:i386",
+        "description": "Enlaces Compizconfig para python"
+    },
+    {
+        "package": "python-compressor",
+        "description": "Compresses linked and inline JavaScript or"
+    },
+    {
+        "package": "python-concurrent.futures",
+        "description": "backport of concurrent.futures package fro"
+    },
+    {
+        "package": "python-configglue",
+        "description": "Glues together optparse.OptionParser and C"
+    },
+    {
+        "package": "python-configobj",
+        "description": "simple pero poderoso lector y escritor de"
+    },
+    {
+        "package": "python-configparser",
+        "description": "backport of the enhanced config parser int"
+    },
+    {
+        "package": "python-configshell",
+        "description": "framework to create cli interfaces"
+    },
+    {
+        "package": "python-construct",
+        "description": "powerful declarative parser (and builder)"
+    },
+    {
+        "package": "python-contextlib2",
+        "description": "Backport and enhancements for the contextl"
+    },
+    {
+        "package": "python-contract",
+        "description": "Programming by contract for Python"
+    },
+    {
+        "package": "python-convoy",
+        "description": "WSGI app for loading multiple files in the"
+    },
+    {
+        "package": "python-cookiecutter",
+        "description": "create projects from project templates (Py"
+    },
+    {
+        "package": "python-cookiecutter-doc",
+        "description": "create projects from project templates (do"
+    },
+    {
+        "package": "python-corepywrap",
+        "description": "library that exports C++ mmCIF accessors t"
+    },
+    {
+        "package": "python-corepywrap:i386",
+        "description": "library that exports C++ mmCIF accessors t"
+    },
+    {
+        "package": "python-corepywrap-dbg",
+        "description": "library that exports C++ mmCIF accessors t"
+    },
+    {
+        "package": "python-corepywrap-dbg:i386",
+        "description": "library that exports C++ mmCIF accessors t"
+    },
+    {
+        "package": "python-couchdb",
+        "description": "library for working with Apache CouchDB"
+    },
+    {
+        "package": "python-couchdbkit",
+        "description": "Trying to improve couchdb experience in Py"
+    },
+    {
+        "package": "python-couleur",
+        "description": "tool to play around with ANSI features in"
+    },
+    {
+        "package": "python-coverage",
+        "description": "code coverage tool for Python 2"
+    },
+    {
+        "package": "python-coverage:i386",
+        "description": "code coverage tool for Python 2"
+    },
+    {
+        "package": "python-coverage-dbg",
+        "description": "code coverage tool for Python 2 – debug li"
+    },
+    {
+        "package": "python-coverage-dbg:i386",
+        "description": "code coverage tool for Python 2 – debug li"
+    },
+    {
+        "package": "python-coverage-test-runner",
+        "description": "fail Python program unit tests unless they"
+    },
+    {
+        "package": "python-cpl",
+        "description": "Control pipeline recipes from the European"
+    },
+    {
+        "package": "python-cpl:i386",
+        "description": "Control pipeline recipes from the European"
+    },
+    {
+        "package": "python-cqmf2",
+        "description": "enterprise messaging system - Python CQMF2"
+    },
+    {
+        "package": "python-cqmf2:i386",
+        "description": "enterprise messaging system - Python CQMF2"
+    },
+    {
+        "package": "python-cqpid",
+        "description": "enterprise messaging system - Python CQPID"
+    },
+    {
+        "package": "python-cqpid:i386",
+        "description": "enterprise messaging system - Python CQPID"
+    },
+    {
+        "package": "python-cracklib",
+        "description": "Python bindings for password checker libra"
+    },
+    {
+        "package": "python-cracklib:i386",
+        "description": "Python bindings for password checker libra"
+    },
+    {
+        "package": "python-crcmod",
+        "description": "CRC Generator - python 2.x"
+    },
+    {
+        "package": "python-crcmod:i386",
+        "description": "CRC Generator - python 2.x"
+    },
+    {
+        "package": "python-cream",
+        "description": "Cream Melange Python modules"
+    },
+    {
+        "package": "python-cream.melange",
+        "description": "Melange Widget System for the Cream Deskto"
+    },
+    {
+        "package": "python-creoleparser",
+        "description": "Parser for the Creole common wiki markup l"
+    },
+    {
+        "package": "python-crochet",
+        "description": "Use Twisted Anywhere!"
+    },
+    {
+        "package": "python-croniter",
+        "description": "datetime iteration with cron format"
+    },
+    {
+        "package": "A",
+        "description": "-crypto              - cryptographic algorithms and protocols for"
+    },
+    {
+        "package": "python-crypto:i386",
+        "description": "cryptographic algorithms and protocols for"
+    },
+    {
+        "package": "python-crypto-dbg",
+        "description": "cryptographic algorithms and protocols for"
+    },
+    {
+        "package": "python-crypto-dbg:i386",
+        "description": "cryptographic algorithms and protocols for"
+    },
+    {
+        "package": "python-crypto-doc",
+        "description": "cryptographic algorithms and protocols for"
+    },
+    {
+        "package": "python-csa",
+        "description": "Connection-Set Algebra (CSA) implemented i"
+    },
+    {
+        "package": "python-csb",
+        "description": "Python framework for structural bioinforma"
+    },
+    {
+        "package": "python-csb-doc",
+        "description": "Python framework for structural bioinforma"
+    },
+    {
+        "package": "python-csound",
+        "description": "Vínculos Python para Csound"
+    },
+    {
+        "package": "python-csound:i386",
+        "description": "Vínculos Python para Csound"
+    },
+    {
+        "package": "python-csoundac",
+        "description": "Vínculos Python para CsoundAC"
+    },
+    {
+        "package": "python-csoundac:i386",
+        "description": "Vínculos Python para CsoundAC"
+    },
+    {
+        "package": "python-cssselect",
+        "description": "cssselect           - cssselect parses CSS3 Selectors and transl"
+    },
+    {
+        "package": "python-cssutils",
+        "description": "CSS Cascading Style Sheets parser and buil"
+    },
+    {
+        "package": "python-ctypes",
+        "description": "python-ctypes"
+    },
+    {
+        "package": "python-ctypes:i386",
+        "description": "python-ctypes:i386"
+    },
+    {
+        "package": "python-ctypeslib",
+        "description": "code generator to convert header files int"
+    },
+    {
+        "package": "python-cubictemp",
+        "description": "small, elegant, Python-specific HTML templ"
+    },
+    {
+        "package": "python-cups",
+        "description": "Enlaces de Python a CUPS"
+    },
+    {
+        "package": "python-cups:i386",
+        "description": "Enlaces de Python a CUPS"
+    },
+    {
+        "package": "python-cupshelpers",
+        "description": "Python modules for printer configuration w"
+    },
+    {
+        "package": "python-curtin",
+        "description": "Library and tools for curtin installer"
+    },
+    {
+        "package": "python-cvxopt",
+        "description": "Python package for convex optimization"
+    },
+    {
+        "package": "python-cvxopt:i386",
+        "description": "Python package for convex optimization"
+    },
+    {
+        "package": "python-cwiid",
+        "description": "library to interface with the wiimote"
+    },
+    {
+        "package": "python-cwiid:i386",
+        "description": "library to interface with the wiimote"
+    },
+    {
+        "package": "python-cxx-dev",
+        "description": "Set of facilities to extend Python with C+"
+    },
+    {
+        "package": "python-cyclone",
+        "description": "web server framework for Python Twisted us"
+    },
+    {
+        "package": "python-d2to1",
+        "description": "Python support for distutils2-like setup.c"
+    },
+    {
+        "package": "python-daap",
+        "description": "DAAP client implemented in Python"
+    },
+    {
+        "package": "python-daap:i386",
+        "description": "DAAP client implemented in Python"
+    },
+    {
+        "package": "python-daemon",
+        "description": "library for making a Unix daemon process"
+    },
+    {
+        "package": "python-dap",
+        "description": "DAP (Data Access Protocol) client and serv"
+    },
+    {
+        "package": "python-dateutil",
+        "description": "powerful extensions to the standard dateti"
+    },
+    {
+        "package": "python-dballe",
+        "description": "DB-ALL.e Python library for weather resear"
+    },
+    {
+        "package": "python-dballe:i386",
+        "description": "DB-ALL.e Python library for weather resear"
+    },
+    {
+        "package": "python-dbf",
+        "description": "Python module for reading and writing dbf"
+    },
+    {
+        "package": "python-dbf-doc",
+        "description": "Python module for reading and writing dbf"
+    },
+    {
+        "package": "python-dbg",
+        "description": "debug build of the Python Interpreter (ver"
+    },
+    {
+        "package": "python-dbg:i386",
+        "description": "debug build of the Python Interpreter (ver"
+    },
+    {
+        "package": "python-dbg:any",
+        "description": "python-dbg:any"
+    },
+    {
+        "package": "python-dbg:any:i386",
+        "description": "python-dbg:any:i386"
+    },
+    {
+        "package": "A",
+        "description": "-dbus                - simple interprocess messaging system (Pyth"
+    },
+    {
+        "package": "python-dbus:i386",
+        "description": "simple interprocess messaging system (Pyth"
+    },
+    {
+        "package": "python-dbus-dbg",
+        "description": "debug build of the D-Bus Python 2 interfac"
+    },
+    {
+        "package": "python-dbus-dbg:i386",
+        "description": "debug build of the D-Bus Python 2 interfac"
+    },
+    {
+        "package": "A",
+        "description": "-dbus-de         - main loop integration development files fo"
+    },
+    {
+        "package": "python-dbus-doc",
+        "description": "Documentation for the D-Bus Python interfa"
+    },
+    {
+        "package": "python-dbusmock",
+        "description": "mock            - mock D-Bus objects for tests (Python 2)"
+    },
+    {
+        "package": "python-ddt",
+        "description": "Data-Driven/Decorated Tests"
+    },
+    {
+        "package": "python-deap",
+        "description": "Distributed Evolutionary Algorithms in Pyt"
+    },
+    {
+        "package": "python-deap-doc",
+        "description": "Distributed Evolutionary Algorithms in Pyt"
+    },
+    {
+        "package": "python-deb822",
+        "description": "python-deb822"
+    },
+    {
+        "package": "python-debian",
+        "description": "Python modules to work with Debian-related"
+    },
+    {
+        "package": "python-debianbts",
+        "description": "Python interface to Debian's Bug Tracking"
+    },
+    {
+        "package": "python-debiancontributors",
+        "description": "Manage submissions to contributors.debian."
+    },
+    {
+        "package": "A",
+        "description": "-debtagshw           - Match debtags hardware:: tags against the"
+    },
+    {
+        "package": "python-decorator",
+        "description": "simplify usage of Python decorators by pro"
+    },
+    {
+        "package": "python-decoratortools",
+        "description": "transitional dummy package for python-peak"
+    },
+    {
+        "package": "A",
+        "description": "-defer               - Small framework for asynchronous programmi"
+    },
+    {
+        "package": "python-defusedxml",
+        "description": "XML bomb protection for Python stdlib modu"
+    },
+    {
+        "package": "python-deltarpm",
+        "description": "Python bindings for deltarpm"
+    },
+    {
+        "package": "python-deltarpm:i386",
+        "description": "Python bindings for deltarpm"
+    },
+    {
+        "package": "python-demgengeo",
+        "description": "DEMGenGeo is a library for creating geomet"
+    },
+    {
+        "package": "python-demgengeo:i386",
+        "description": "DEMGenGeo is a library for creating geomet"
+    },
+    {
+        "package": "python-demjson",
+        "description": "encoder, decoder, and lint/validator for J"
+    },
+    {
+        "package": "python-designateclient",
+        "description": "dns as a service - client"
+    },
+    {
+        "package": "python-desktop-agnostic",
+        "description": "Enlaces Python para libdesktop-agnostic"
+    },
+    {
+        "package": "python-desktop-agnostic:i386",
+        "description": "Enlaces Python para libdesktop-agnostic"
+    },
+    {
+        "package": "python-dev",
+        "description": "archivos de cabecera y una biblioteca está"
+    },
+    {
+        "package": "python-dev:i386",
+        "description": "archivos de cabecera y una biblioteca está"
+    },
+    {
+        "package": "python-dev:any",
+        "description": "python-dev:any"
+    },
+    {
+        "package": "python-dev:any:i386",
+        "description": "python-dev:any:i386"
+    },
+    {
+        "package": "python-dexml",
+        "description": "Dead-simple Object-XML mapper for Python"
+    },
+    {
+        "package": "python-dhm",
+        "description": "collection of Python utilities / helper"
+    },
+    {
+        "package": "python-dialog",
+        "description": "Python module for making simple Text/Conso"
+    },
+    {
+        "package": "python-dicoclient",
+        "description": "RFC 2229 compliant dictionary client modul"
+    },
+    {
+        "package": "python-dicom",
+        "description": "DICOM medical file reading and writing"
+    },
+    {
+        "package": "python-dictclient",
+        "description": "Python client library for DICT (RFC2229) p"
+    },
+    {
+        "package": "python-dictdlib",
+        "description": "Python library for generating dictd dictio"
+    },
+    {
+        "package": "python-dingus",
+        "description": "A record-then-assert mocking library"
+    },
+    {
+        "package": "python-dipy",
+        "description": "toolbox for analysis of MR diffusion imagi"
+    },
+    {
+        "package": "python-dipy-doc",
+        "description": "toolbox for analysis of MR diffusion imagi"
+    },
+    {
+        "package": "python-dipy-lib",
+        "description": "toolbox for analysis of MR diffusion imagi"
+    },
+    {
+        "package": "python-dipy-lib:i386",
+        "description": "toolbox for analysis of MR diffusion imagi"
+    },
+    {
+        "package": "A",
+        "description": "-dirspec             - Python User Folders Specification Library"
+    },
+    {
+        "package": "A",
+        "description": "-distlib             - low-level components of python distutils2/"
+    },
+    {
+        "package": "A",
+        "description": "-distlib-whl         - low-level components of python distutils2/"
+    },
+    {
+        "package": "python-distribute",
+        "description": "python-distribute"
+    },
+    {
+        "package": "python-distro-info",
+        "description": "information about distributions' releases"
+    },
+    {
+        "package": "python-distutils-extra",
+        "description": "mejoras al sistema de ensamblado de Python"
+    },
+    {
+        "package": "python-django",
+        "description": "Entorno de trabajo de desarrollo web de al"
+    },
+    {
+        "package": "python-django-adminaudit",
+        "description": "improves the logging capabilities of Djang"
+    },
+    {
+        "package": "python-django-app-plugins",
+        "description": "plugins  - plugin system for django"
+    },
+    {
+        "package": "python-django-auth-ldap",
+        "description": "Django LDAP authentication backend"
+    },
+    {
+        "package": "python-django-auth-ldap-doc",
+        "description": "Django LDAP authentication backend (docume"
+    },
+    {
+        "package": "python-django-auth-openid",
+        "description": "provides optional OpenID integration for D"
+    },
+    {
+        "package": "python-django-authority",
+        "description": "more powerful permission system for Django"
+    },
+    {
+        "package": "python-django-bitfield",
+        "description": "Django module implementing BitFields"
+    },
+    {
+        "package": "python-django-braces",
+        "description": "set of reusable, generic mixins for Django"
+    },
+    {
+        "package": "python-django-celery",
+        "description": "Celery integration for Django"
+    },
+    {
+        "package": "python-django-celery-doc",
+        "description": "Celery integration for Django (Documentati"
+    },
+    {
+        "package": "python-django-classy-tags",
+        "description": "Class based template tags for Django proje"
+    },
+    {
+        "package": "python-django-classy-tags:i386",
+        "description": "Class based template tags for Django proje"
+    },
+    {
+        "package": "python-django-configglue",
+        "description": "Django commands for working with configglu"
+    },
+    {
+        "package": "python-django-conneg",
+        "description": "Framework for content-negotiated views in"
+    },
+    {
+        "package": "python-django-contact-form",
+        "description": "extensible contact-form application for Dj"
+    },
+    {
+        "package": "python-django-countries",
+        "description": "provides a country field for Django models"
+    },
+    {
+        "package": "python-django-crispy-forms",
+        "description": "app for Django providing elegant form rend"
+    },
+    {
+        "package": "python-django-dajax",
+        "description": "easy to use ajax library for django"
+    },
+    {
+        "package": "python-django-dajaxice",
+        "description": "agnostic and easy to use AJAX library for"
+    },
+    {
+        "package": "python-django-debug-toolbar",
+        "description": "Embedded debugging toolbar for Django proj"
+    },
+    {
+        "package": "python-django-discover-runner",
+        "description": "alternative Django test runner"
+    },
+    {
+        "package": "python-django-djapian",
+        "description": "Search API for Django using Xapian"
+    },
+    {
+        "package": "python-django-doc",
+        "description": "Entorno de trabajo de desarrollo web de al"
+    },
+    {
+        "package": "python-django-evolution",
+        "description": "Implementation of schema evolution for the"
+    },
+    {
+        "package": "python-django-extdirect",
+        "description": "Ext.Direct serverside implementation for D"
+    },
+    {
+        "package": "python-django-extensions",
+        "description": "Useful extensions for Django projects"
+    },
+    {
+        "package": "python-django-extra-views",
+        "description": "Extra class-based views for Django"
+    },
+    {
+        "package": "python-django-feincms",
+        "description": "Django-based Page CMS and CMS building too"
+    },
+    {
+        "package": "python-django-feincms-doc",
+        "description": "Django-based Page CMS and CMS building too"
+    },
+    {
+        "package": "python-django-filter",
+        "description": "filter       - filter Django QuerySets based on user sele"
+    },
+    {
+        "package": "python-django-filters",
+        "description": "filters      - filter Django QuerySets based on user sele"
+    },
+    {
+        "package": "python-django-filters-doc",
+        "description": "filters-doc  - filter Django QuerySets based on user sele"
+    },
+    {
+        "package": "python-django-floppyforms",
+        "description": "better control of form rendering in Django"
+    },
+    {
+        "package": "python-django-formfieldset",
+        "description": "fieldset - fieldset rendering mixin for Django-based"
+    },
+    {
+        "package": "python-django-genshi",
+        "description": "Django integration for Genshi"
+    },
+    {
+        "package": "python-django-guardian",
+        "description": "per object permissions of django"
+    },
+    {
+        "package": "python-django-guardian-doc",
+        "description": "per object permissions of django (document"
+    },
+    {
+        "package": "python-django-horizon",
+        "description": "Django module providing web based interact"
+    },
+    {
+        "package": "python-django-jsonfield",
+        "description": "JSON field for Django models (Python 2)"
+    },
+    {
+        "package": "python-django-ldapdb",
+        "description": "LDAP database backend for Django"
+    },
+    {
+        "package": "python-django-lint",
+        "description": "Static analysis tool for Django projects a"
+    },
+    {
+        "package": "python-django-localeurl",
+        "description": "Django application allows the language be"
+    },
+    {
+        "package": "python-django-maas",
+        "description": "MAAS server Django web framework"
+    },
+    {
+        "package": "python-django-macaddress",
+        "description": "MAC address model and form fields for Djan"
+    },
+    {
+        "package": "python-django-mailer",
+        "description": "easy to use django app for queing the send"
+    },
+    {
+        "package": "python-django-mailer:i386",
+        "description": "easy to use django app for queing the send"
+    },
+    {
+        "package": "python-django-markupfield",
+        "description": "custom Django field for easy use of markup"
+    },
+    {
+        "package": "python-django-model-utils",
+        "description": "Django model mixins and utilities"
+    },
+    {
+        "package": "python-django-mptt",
+        "description": "Modified Preorder Tree Traversal Django ap"
+    },
+    {
+        "package": "python-django-mumble",
+        "description": "Mumble-Server config application for Djang"
+    },
+    {
+        "package": "python-django-nose",
+        "description": "Django test runner that uses python-nose"
+    },
+    {
+        "package": "python-django-notification",
+        "description": "user notification management for Django"
+    },
+    {
+        "package": "python-django-nova",
+        "description": "Nova django module."
+    },
+    {
+        "package": "python-django-nova:i386",
+        "description": "Nova django module."
+    },
+    {
+        "package": "python-django-oauth-plus",
+        "description": "Support of OAuth 1.0a in Django using pyth"
+    },
+    {
+        "package": "python-django-openid-auth",
+        "description": "Paquete vacío de transición"
+    },
+    {
+        "package": "python-django-openstack",
+        "description": "dummy transitonal package"
+    },
+    {
+        "package": "python-django-pagination",
+        "description": "utilities for creating pagination tools fo"
+    },
+    {
+        "package": "python-django-picklefield",
+        "description": "Pickled object field for Django"
+    },
+    {
+        "package": "python-django-pipeline",
+        "description": "Asset packaging library for Django"
+    },
+    {
+        "package": "python-django-pipeline-doc",
+        "description": "Documentation for Django Pipeline library"
+    },
+    {
+        "package": "python-django-piston",
+        "description": "Django mini-framework creating RESTful API"
+    },
+    {
+        "package": "python-django-ratelimit",
+        "description": "Cache-based rate-limiting for Django."
+    },
+    {
+        "package": "python-django-ratelimit-doc",
+        "description": "Cache-based rate-limiting for Django (docu"
+    },
+    {
+        "package": "python-django-registration",
+        "description": "User-registration application for Django"
+    },
+    {
+        "package": "python-django-reversion",
+        "description": "Provides comprehensive version control fac"
+    },
+    {
+        "package": "python-django-reversion-doc",
+        "description": "Provides comprehensive version control fac"
+    },
+    {
+        "package": "python-django-rosetta",
+        "description": "Eases the translation process of your Djan"
+    },
+    {
+        "package": "python-django-sekizai",
+        "description": "template blocks for Django projects"
+    },
+    {
+        "package": "python-django-shorturls",
+        "description": "Short URL handler for Django applications"
+    },
+    {
+        "package": "python-django-shortuuidfield",
+        "description": "Short UUIDField for Django"
+    },
+    {
+        "package": "python-django-social-auth",
+        "description": "Django social authentication made simple"
+    },
+    {
+        "package": "python-django-south",
+        "description": "Intelligent schema migrations for django a"
+    },
+    {
+        "package": "python-django-tables2",
+        "description": "Table/data-grid framework for Django"
+    },
+    {
+        "package": "python-django-tables2-doc",
+        "description": "Table/data-grid framework for Django (Docu"
+    },
+    {
+        "package": "python-django-tagging",
+        "description": "Generic tagging application for Django pro"
+    },
+    {
+        "package": "python-django-taggit",
+        "description": "simple tagging for Django"
+    },
+    {
+        "package": "python-django-threaded-multihos",
+        "description": "allows to serve multiple sites from one dj"
+    },
+    {
+        "package": "python-django-threadedcomments",
+        "description": "simple yet flexible threaded commenting sy"
+    },
+    {
+        "package": "python-django-tinymce",
+        "description": "replacement text widget for Django web fra"
+    },
+    {
+        "package": "python-django-treebeard",
+        "description": "Efficient implementations of tree data str"
+    },
+    {
+        "package": "python-django-treebeard-doc",
+        "description": "Efficient implementations of tree data str"
+    },
+    {
+        "package": "python-django-voting",
+        "description": "generic voting application for Django"
+    },
+    {
+        "package": "python-django-websocket",
+        "description": "Websocket support for django"
+    },
+    {
+        "package": "python-djangorestframework",
+        "description": "Web APIs for Django, made easy"
+    },
+    {
+        "package": "python-djangorestframework-doc",
+        "description": "Web APIs for Django, made easy (documentat"
+    },
+    {
+        "package": "python-djorm-ext-pgarray",
+        "description": "PostgreSQL native array fields extension f"
+    },
+    {
+        "package": "python-djvu",
+        "description": "Python support for the DjVu image format"
+    },
+    {
+        "package": "python-djvu:i386",
+        "description": "Python support for the DjVu image format"
+    },
+    {
+        "package": "python-djvu-dbg",
+        "description": "Python support for the DjVu image format ("
+    },
+    {
+        "package": "python-djvu-dbg:i386",
+        "description": "Python support for the DjVu image format ("
+    },
+    {
+        "package": "python-djvu-doc",
+        "description": "Python support for the DjVu image format ("
+    },
+    {
+        "package": "python-dkim",
+        "description": "Python module for DKIM signing and verific"
+    },
+    {
+        "package": "python-dmidecode",
+        "description": "Python extension module for dmidecode"
+    },
+    {
+        "package": "python-dmidecode:i386",
+        "description": "Python extension module for dmidecode"
+    },
+    {
+        "package": "python-dmidecode-dbg",
+        "description": "Python extension module for dmidecode (deb"
+    },
+    {
+        "package": "python-dmidecode-dbg:i386",
+        "description": "Python extension module for dmidecode (deb"
+    },
+    {
+        "package": "python-dns",
+        "description": "DNS client module for Python"
+    },
+    {
+        "package": "python-dnspython",
+        "description": "Herramientas DNS para Python"
+    },
+    {
+        "package": "python-doc",
+        "description": "documentación del lenguaje de alto nivel o"
+    },
+    {
+        "package": "python-dockmanager",
+        "description": "DockManager Python D-Bus Bindings"
+    },
+    {
+        "package": "python-docopt",
+        "description": "Creates beautiful command-line interfaces"
+    },
+    {
+        "package": "python-docutils",
+        "description": "text processing system for reStructuredTex"
+    },
+    {
+        "package": "python-dogpile.cache",
+        "description": "caching API built around the concept of a"
+    },
+    {
+        "package": "python-dogpile.core",
+        "description": "´dogpile´ lock, part of a typically larger"
+    },
+    {
+        "package": "python-dogtail",
+        "description": "GUI test tool and automation framework"
+    },
+    {
+        "package": "python-doit",
+        "description": "Automation tool to execute any kind of tas"
+    },
+    {
+        "package": "python-doit-doc",
+        "description": "Automation tool for executing any kind of"
+    },
+    {
+        "package": "python-dolfin",
+        "description": "Interfaz de Python para DOLFIN"
+    },
+    {
+        "package": "python-dolfin:i386",
+        "description": "Interfaz de Python para DOLFIN"
+    },
+    {
+        "package": "python-dolfin-dbg",
+        "description": "Python extension modules for DOLFIN with d"
+    },
+    {
+        "package": "python-dolfin-dbg:i386",
+        "description": "Python extension modules for DOLFIN with d"
+    },
+    {
+        "package": "python-doublex",
+        "description": "test doubles framework for Python 2"
+    },
+    {
+        "package": "python-dpkt",
+        "description": "Python packet creation / parsing module"
+    },
+    {
+        "package": "python-dpm",
+        "description": "Disk Pool Manager (DPM) python bindings"
+    },
+    {
+        "package": "python-dpm:i386",
+        "description": "Disk Pool Manager (DPM) python bindings"
+    },
+    {
+        "package": "python-dput",
+        "description": "next generation Debian package upload tool"
+    },
+    {
+        "package": "python-drmaa",
+        "description": "interface to DRMAA-compliant distributed r"
+    },
+    {
+        "package": "python-drslib",
+        "description": "Library for processing the CMIP5 Data Refe"
+    },
+    {
+        "package": "python-dsv",
+        "description": "Python module for delimiter-separated-valu"
+    },
+    {
+        "package": "python-dtest",
+        "description": "Dependency-based Threaded Test Framework f"
+    },
+    {
+        "package": "python-dulwich",
+        "description": "Python Git library"
+    },
+    {
+        "package": "python-dulwich:i386",
+        "description": "Python Git library"
+    },
+    {
+        "package": "python-dulwich-dbg",
+        "description": "Python Git library - Debug Extension"
+    },
+    {
+        "package": "python-dulwich-dbg:i386",
+        "description": "Python Git library - Debug Extension"
+    },
+    {
+        "package": "python-dumbnet",
+        "description": "A dumb, portable networking library -- pyt"
+    },
+    {
+        "package": "python-dumbnet:i386",
+        "description": "A dumb, portable networking library -- pyt"
+    },
+    {
+        "package": "python-easygui",
+        "description": "module for very simple, very easy GUI prog"
+    },
+    {
+        "package": "python-easyzone",
+        "description": "DNS Zone abstraction Python module"
+    },
+    {
+        "package": "python-ecasound",
+        "description": "multitrack-capable audio recorder and effe"
+    },
+    {
+        "package": "python-ecdsa",
+        "description": "ECDSA cryptographic signature library (Pyt"
+    },
+    {
+        "package": "python-ecryptfs",
+        "description": "ecryptfs            - ecryptfs cryptographic filesystem (python)"
+    },
+    {
+        "package": "python-ecryptfs:i386",
+        "description": "ecryptfs:i386       - ecryptfs cryptographic filesystem (python)"
+    },
+    {
+        "package": "python-edbus",
+        "description": "Python bindings for the Enlightenment D-Bu"
+    },
+    {
+        "package": "python-edbus:i386",
+        "description": "Python bindings for the Enlightenment D-Bu"
+    },
+    {
+        "package": "python-editobj",
+        "description": "Python object editor"
+    },
+    {
+        "package": "python-egenix-mx-base-dbg",
+        "description": "extension files for the egenix-mx-base dis"
+    },
+    {
+        "package": "python-egenix-mx-base-dbg:i386",
+        "description": "extension files for the egenix-mx-base dis"
+    },
+    {
+        "package": "python-egenix-mx-base-dev",
+        "description": "development files for the egenix-mx-base d"
+    },
+    {
+        "package": "python-egenix-mxbeebase",
+        "description": "on-disk B+Tree based database kit for Pyth"
+    },
+    {
+        "package": "python-egenix-mxbeebase:i386",
+        "description": "on-disk B+Tree based database kit for Pyth"
+    },
+    {
+        "package": "python-egenix-mxbeebase-dbg",
+        "description": "python-egenix-mxbeebase-dbg"
+    },
+    {
+        "package": "python-egenix-mxbeebase-dbg:i38",
+        "description": "python-egenix-mxbeebase-dbg:i38"
+    },
+    {
+        "package": "python-egenix-mxbeebase-doc",
+        "description": "on-disk B+Tree based database kit for Pyth"
+    },
+    {
+        "package": "python-egenix-mxdatetime",
+        "description": "datetime   - date and time handling routines for Python"
+    },
+    {
+        "package": "python-egenix-mxdatetime:i386",
+        "description": "datetime:i386   - date and time handling routines for Python"
+    },
+    {
+        "package": "python-egenix-mxdatetime-dbg",
+        "description": "python-egenix-mxdatetime-dbg"
+    },
+    {
+        "package": "python-egenix-mxdatetime-dbg:i3",
+        "description": "python-egenix-mxdatetime-dbg:i3"
+    },
+    {
+        "package": "python-egenix-mxdatetime-doc",
+        "description": "rutinas para el manejo de fecha y hora par"
+    },
+    {
+        "package": "python-egenix-mxproxy",
+        "description": "generic proxy wrapper type for Python"
+    },
+    {
+        "package": "python-egenix-mxproxy:i386",
+        "description": "generic proxy wrapper type for Python"
+    },
+    {
+        "package": "python-egenix-mxproxy-dbg",
+        "description": "python-egenix-mxproxy-dbg"
+    },
+    {
+        "package": "python-egenix-mxproxy-dbg:i386",
+        "description": "python-egenix-mxproxy-dbg:i386"
+    },
+    {
+        "package": "python-egenix-mxproxy-doc",
+        "description": "empaquetador para proxy genérico para Pyth"
+    },
+    {
+        "package": "python-egenix-mxqueue",
+        "description": "fast and memory-efficient queue for Python"
+    },
+    {
+        "package": "python-egenix-mxqueue:i386",
+        "description": "fast and memory-efficient queue for Python"
+    },
+    {
+        "package": "python-egenix-mxqueue-dbg",
+        "description": "python-egenix-mxqueue-dbg"
+    },
+    {
+        "package": "python-egenix-mxqueue-dbg:i386",
+        "description": "python-egenix-mxqueue-dbg:i386"
+    },
+    {
+        "package": "python-egenix-mxqueue-doc",
+        "description": "cola rápida de memoria eficiente para Pyth"
+    },
+    {
+        "package": "python-egenix-mxstack",
+        "description": "fast and memory-efficient stack for Python"
+    },
+    {
+        "package": "python-egenix-mxstack:i386",
+        "description": "fast and memory-efficient stack for Python"
+    },
+    {
+        "package": "python-egenix-mxstack-dbg",
+        "description": "python-egenix-mxstack-dbg"
+    },
+    {
+        "package": "python-egenix-mxstack-dbg:i386",
+        "description": "python-egenix-mxstack-dbg:i386"
+    },
+    {
+        "package": "python-egenix-mxstack-doc",
+        "description": "pila rápida de memoria eficiente para Pyth"
+    },
+    {
+        "package": "python-egenix-mxtexttools",
+        "description": "fast text processing tools for Python"
+    },
+    {
+        "package": "python-egenix-mxtexttools:i386",
+        "description": "fast text processing tools for Python"
+    },
+    {
+        "package": "python-egenix-mxtexttools-dbg",
+        "description": "python-egenix-mxtexttools-dbg"
+    },
+    {
+        "package": "python-egenix-mxtexttools-dbg:i",
+        "description": "python-egenix-mxtexttools-dbg:i"
+    },
+    {
+        "package": "python-egenix-mxtexttools-doc",
+        "description": "herramientas de procesado de texto rápidas"
+    },
+    {
+        "package": "python-egenix-mxtools",
+        "description": "collection of additional builtins for Pyth"
+    },
+    {
+        "package": "python-egenix-mxtools:i386",
+        "description": "collection of additional builtins for Pyth"
+    },
+    {
+        "package": "python-egenix-mxtools-dbg",
+        "description": "python-egenix-mxtools-dbg"
+    },
+    {
+        "package": "python-egenix-mxtools-dbg:i386",
+        "description": "python-egenix-mxtools-dbg:i386"
+    },
+    {
+        "package": "python-egenix-mxtools-doc",
+        "description": "colección de builtins adicionales para Pyt"
+    },
+    {
+        "package": "python-egenix-mxuid",
+        "description": "unique identifiers for Python"
+    },
+    {
+        "package": "python-egenix-mxuid:i386",
+        "description": "unique identifiers for Python"
+    },
+    {
+        "package": "python-egenix-mxuid-dbg",
+        "description": "python-egenix-mxuid-dbg"
+    },
+    {
+        "package": "python-egenix-mxuid-dbg:i386",
+        "description": "python-egenix-mxuid-dbg:i386"
+    },
+    {
+        "package": "python-egenix-mxuid-doc",
+        "description": "identificadores únicos para Python (docume"
+    },
+    {
+        "package": "python-egenix-mxurl",
+        "description": "tipo de dato URL flexible para Python"
+    },
+    {
+        "package": "python-egenix-mxurl:i386",
+        "description": "tipo de dato URL flexible para Python"
+    },
+    {
+        "package": "python-egenix-mxurl-dbg",
+        "description": "python-egenix-mxurl-dbg"
+    },
+    {
+        "package": "python-egenix-mxurl-dbg:i386",
+        "description": "python-egenix-mxurl-dbg:i386"
+    },
+    {
+        "package": "python-egenix-mxurl-doc",
+        "description": "tipo de datos URL flexibles para Python (d"
+    },
+    {
+        "package": "python-electrum",
+        "description": "Easy to use bitcoin client - python module"
+    },
+    {
+        "package": "python-elements",
+        "description": "A 2D Physics API for Python"
+    },
+    {
+        "package": "python-elementtidy",
+        "description": "An HTML tree builder for ElementTree based"
+    },
+    {
+        "package": "python-elementtidy:i386",
+        "description": "An HTML tree builder for ElementTree based"
+    },
+    {
+        "package": "python-elib.intl",
+        "description": "enhanced internationalization (I18N) for P"
+    },
+    {
+        "package": "python-elisp",
+        "description": "python-elisp"
+    },
+    {
+        "package": "python-elixir",
+        "description": "declarative mapper for SQLAlchemy"
+    },
+    {
+        "package": "python-email",
+        "description": "python-email"
+    },
+    {
+        "package": "python-email:i386",
+        "description": "python-email:i386"
+    },
+    {
+        "package": "python-empy",
+        "description": "templating system for Python (Python 2)"
+    },
+    {
+        "package": "python-empy-doc",
+        "description": "documentation for python-empy"
+    },
+    {
+        "package": "python-enable",
+        "description": "Drawing and interaction packages"
+    },
+    {
+        "package": "python-enable:i386",
+        "description": "Drawing and interaction packages"
+    },
+    {
+        "package": "python-enchant",
+        "description": "spellchecking library for Python"
+    },
+    {
+        "package": "python-encutils",
+        "description": "python-encutils"
+    },
+    {
+        "package": "python-enet",
+        "description": "wrapper for the ENet library"
+    },
+    {
+        "package": "python-enet:i386",
+        "description": "wrapper for the ENet library"
+    },
+    {
+        "package": "python-enthoughtbase",
+        "description": "Core packages for the Enthought Tool Suite"
+    },
+    {
+        "package": "python-enum",
+        "description": "robust enumerated type support in Python"
+    },
+    {
+        "package": "python-enum34",
+        "description": "backport of Python 3.4's enum package"
+    },
+    {
+        "package": "python-enum34-doc",
+        "description": "backport of Python 3.4's enum package"
+    },
+    {
+        "package": "python-envisage",
+        "description": "Extensible Application Framework"
+    },
+    {
+        "package": "python-enzyme",
+        "description": "video metadata parser (Python 2)"
+    },
+    {
+        "package": "python-epr",
+        "description": "Python ENVISAT Product Reader API (Python"
+    },
+    {
+        "package": "python-epr:i386",
+        "description": "Python ENVISAT Product Reader API (Python"
+    },
+    {
+        "package": "python-epr-dbg",
+        "description": "Python ENVISAT Product Reader API (debug e"
+    },
+    {
+        "package": "python-epr-dbg:i386",
+        "description": "Python ENVISAT Product Reader API (debug e"
+    },
+    {
+        "package": "python-epr-doc",
+        "description": "Python ENVISAT Product Reader API (common"
+    },
+    {
+        "package": "python-epsilon",
+        "description": "Python utility modules commonly used by Di"
+    },
+    {
+        "package": "python-epydoc",
+        "description": "herramienta para documentar módulos Python"
+    },
+    {
+        "package": "python-espeak",
+        "description": "Vínculos Python para eSpeak"
+    },
+    {
+        "package": "python-espeak:i386",
+        "description": "Vínculos Python para eSpeak"
+    },
+    {
+        "package": "python-ethtool",
+        "description": "Python bindings for the ethtool kernel int"
+    },
+    {
+        "package": "python-ethtool:i386",
+        "description": "Python bindings for the ethtool kernel int"
+    },
+    {
+        "package": "python-etk.docking",
+        "description": "PyGTK Docking Widgets"
+    },
+    {
+        "package": "python-evdev",
+        "description": "python-evde            - python bindings for the generic input even"
+    },
+    {
+        "package": "python-evdev:i386",
+        "description": "python-evdev:i386          - python bindings for the generic input even"
+    },
+    {
+        "package": "python-evemu",
+        "description": "Linux Input Event Device Emulation Library"
+    },
+    {
+        "package": "python-evemu:i386",
+        "description": "Linux Input Event Device Emulation Library"
+    },
+    {
+        "package": "python-evemu:any",
+        "description": "python-evemu:any"
+    },
+    {
+        "package": "python-evemu:any:i386",
+        "description": "python-evemu:any:i386"
+    },
+    {
+        "package": "python-eventlet",
+        "description": "concurrent networking library for Python"
+    },
+    {
+        "package": "python-exactimage",
+        "description": "fast image manipulation library (Python bi"
+    },
+    {
+        "package": "python-exactimage:i386",
+        "description": "fast image manipulation library (Python bi"
+    },
+    {
+        "package": "python-examples",
+        "description": "ejemplos para el lenguaje Python (versión"
+    },
+    {
+        "package": "python-excelerator",
+        "description": "module for reading/writing Excel spreadshe"
+    },
+    {
+        "package": "python-exconsole",
+        "description": "emergency/postmortem Python console"
+    },
+    {
+        "package": "python-execnet",
+        "description": "rapid multi-Python deployment"
+    },
+    {
+        "package": "python-exif",
+        "description": "Python library to extract EXIF data from t"
+    },
+    {
+        "package": "python-expeyes",
+        "description": "Python library for expeyes"
+    },
+    {
+        "package": "python-extractor",
+        "description": "extracts meta-data from files of arbitrary"
+    },
+    {
+        "package": "python-extras",
+        "description": "extensions to the Python standard library"
+    },
+    {
+        "package": "python-eyed3",
+        "description": "Módulo Python para la manipulación de id3-"
+    },
+    {
+        "package": "python-f2py",
+        "description": "python-f2py"
+    },
+    {
+        "package": "python-f2py:i386",
+        "description": "python-f2py:i386"
+    },
+    {
+        "package": "python-fabio",
+        "description": "I/O library for images produced by 2D X-ra"
+    },
+    {
+        "package": "python-fabio:i386",
+        "description": "I/O library for images produced by 2D X-ra"
+    },
+    {
+        "package": "python-fabio-dbg",
+        "description": "I/O library for images produced by 2D X-ra"
+    },
+    {
+        "package": "python-fabio-dbg:i386",
+        "description": "I/O library for images produced by 2D X-ra"
+    },
+    {
+        "package": "python-fabio-doc",
+        "description": "I/O library for images produced by 2D X-ra"
+    },
+    {
+        "package": "python-fabulous",
+        "description": "Python module to make your terminal output"
+    },
+    {
+        "package": "python-fabulous:i386",
+        "description": "Python module to make your terminal output"
+    },
+    {
+        "package": "python-fabulous-doc",
+        "description": "Python module to make your terminal output"
+    },
+    {
+        "package": "python-facebook",
+        "description": "Python wrappers for the Facebook API"
+    },
+    {
+        "package": "python-factory-boy",
+        "description": "test fixtures replacement based on thought"
+    },
+    {
+        "package": "python-falcon",
+        "description": "supersonic micro-framework for building cl"
+    },
+    {
+        "package": "python-falcon:i386",
+        "description": "supersonic micro-framework for building cl"
+    },
+    {
+        "package": "python-farstream",
+        "description": "Audio/Video communications framework: Pyth"
+    },
+    {
+        "package": "python-farstream:i386",
+        "description": "Audio/Video communications framework: Pyth"
+    },
+    {
+        "package": "python-fastimport",
+        "description": "Fastimport file format parser and generato"
+    },
+    {
+        "package": "python-faulthandler",
+        "description": "Display the Python backtrace on a crash"
+    },
+    {
+        "package": "python-faulthandler:i386",
+        "description": "Display the Python backtrace on a crash"
+    },
+    {
+        "package": "python-fcgi",
+        "description": "Simple FastCGI module for Python"
+    },
+    {
+        "package": "python-fdsend",
+        "description": "Provides an abstraction for file descripto"
+    },
+    {
+        "package": "python-fdsend:i386",
+        "description": "Provides an abstraction for file descripto"
+    },
+    {
+        "package": "python-fedmsg",
+        "description": "Fedora messaging infrastructure system"
+    },
+    {
+        "package": "python-fedmsg-doc",
+        "description": "Fedora messaging infrastructure system doc"
+    },
+    {
+        "package": "python-fedmsg-meta-debian",
+        "description": "metadata providers for the Debian fedmsg d"
+    },
+    {
+        "package": "python-feed",
+        "description": "set of Python modules for working with syn"
+    },
+    {
+        "package": "python-feedgenerator",
+        "description": "Syndication feed generation library"
+    },
+    {
+        "package": "python-feedparser",
+        "description": "Universal Feed Parser for Python"
+    },
+    {
+        "package": "python-feedvalidator",
+        "description": "library and tool for validating syndicatio"
+    },
+    {
+        "package": "python-ferari",
+        "description": "optimizations for evaluation of variationa"
+    },
+    {
+        "package": "python-ffc",
+        "description": "compiler for finite element variational fo"
+    },
+    {
+        "package": "python-ffc:i386",
+        "description": "compiler for finite element variational fo"
+    },
+    {
+        "package": "python-fftw",
+        "description": "Python bindings to the FFTW3 C-library for"
+    },
+    {
+        "package": "python-fftw:i386",
+        "description": "Python bindings to the FFTW3 C-library for"
+    },
+    {
+        "package": "python-fiat",
+        "description": "tabulation of finite element function spac"
+    },
+    {
+        "package": "python-fibranet",
+        "description": "cooperative threading and event driven fra"
+    },
+    {
+        "package": "python-fife",
+        "description": "FIFE is a multi-platform isometric game en"
+    },
+    {
+        "package": "python-fife:i386",
+        "description": "FIFE is a multi-platform isometric game en"
+    },
+    {
+        "package": "python-first",
+        "description": "simple function that returns the first tru"
+    },
+    {
+        "package": "python-fitbit",
+        "description": "FitBit REST API Client Implementation"
+    },
+    {
+        "package": "python-fiu",
+        "description": "userspace fault injection framework (Pytho"
+    },
+    {
+        "package": "python-fiu:i386",
+        "description": "userspace fault injection framework (Pytho"
+    },
+    {
+        "package": "python-fixtures",
+        "description": "PyUnit extension for defining test fixture"
+    },
+    {
+        "package": "python-flake8",
+        "description": "code checker using pep8 and pyflakes"
+    },
+    {
+        "package": "python-flake8:i386",
+        "description": "code checker using pep8 and pyflakes"
+    },
+    {
+        "package": "python-flask",
+        "description": "micro web framework based on Werkzeug, Jin"
+    },
+    {
+        "package": "python-flask-autoindex",
+        "description": "automatically generated index pages for Fl"
+    },
+    {
+        "package": "python-flask-autoindex-doc",
+        "description": "automatically generated index pages for Fl"
+    },
+    {
+        "package": "python-flask-babel",
+        "description": "internationalization and localization supp"
+    },
+    {
+        "package": "python-flask-babel-doc",
+        "description": "internationalization and localization supp"
+    },
+    {
+        "package": "python-flask-doc",
+        "description": "documentation for Flask micro web framewor"
+    },
+    {
+        "package": "python-flask-login",
+        "description": "user session management for Flask"
+    },
+    {
+        "package": "python-flask-migrate",
+        "description": "SQLAlchemy database migrations for Flask a"
+    },
+    {
+        "package": "python-flask-openid",
+        "description": "OpenID support for Flask applications"
+    },
+    {
+        "package": "python-flask-openid-doc",
+        "description": "OpenID support for Flask applications (doc"
+    },
+    {
+        "package": "python-flask-principal",
+        "description": "identity management for Flask"
+    },
+    {
+        "package": "python-flask-script",
+        "description": "set of utilities for use with the Flask fr"
+    },
+    {
+        "package": "python-flask-silk",
+        "description": "FamFamFam Silk icon set for Flask applicat"
+    },
+    {
+        "package": "python-flask-silk-doc",
+        "description": "FamFamFam Silk icon set for Flask applicat"
+    },
+    {
+        "package": "python-flask-sqlalchemy",
+        "description": "adds SQLAlchemy support to your Flask appl"
+    },
+    {
+        "package": "python-flaskext.wtf",
+        "description": "Simple integration of Flask and WTForms"
+    },
+    {
+        "package": "python-flexmock",
+        "description": "Mock/Stub/Spy library for Python"
+    },
+    {
+        "package": "python-flickrapi",
+        "description": "Flickr API wrapper for Python"
+    },
+    {
+        "package": "python-fltk",
+        "description": "Python wrapper for the Fast Light Toolkit"
+    },
+    {
+        "package": "python-fltk:i386",
+        "description": "Python wrapper for the Fast Light Toolkit"
+    },
+    {
+        "package": "python-fltk-dbg",
+        "description": "Python wrapper for the Fast Light Toolkit"
+    },
+    {
+        "package": "python-fltk-dbg:i386",
+        "description": "Python wrapper for the Fast Light Toolkit"
+    },
+    {
+        "package": "python-fltk-doc",
+        "description": "Documentación pyFltk"
+    },
+    {
+        "package": "python-flufl.bounce",
+        "description": "email bounce detectors (Python 2)"
+    },
+    {
+        "package": "python-flufl.bounce-doc",
+        "description": "email bounce detectors (common documentati"
+    },
+    {
+        "package": "python-flufl.enum",
+        "description": "yet another Python enumeration package (Py"
+    },
+    {
+        "package": "python-flufl.enum-doc",
+        "description": "yet another Python enumeration package (co"
+    },
+    {
+        "package": "python-flufl.i18n",
+        "description": "high level API for Python internationaliza"
+    },
+    {
+        "package": "python-flufl.i18n-doc",
+        "description": "high level API for Python internationaliza"
+    },
+    {
+        "package": "python-flufl.lock",
+        "description": "NFS-safe file-based lock with timeouts (Py"
+    },
+    {
+        "package": "python-flufl.lock-doc",
+        "description": "NFS-safe file-based lock with timeouts (co"
+    },
+    {
+        "package": "python-flufl.password",
+        "description": "password      - password hashing and verification (Python"
+    },
+    {
+        "package": "python-flufl.password-doc",
+        "description": "password-doc  - password hashing and verification (common"
+    },
+    {
+        "package": "python-flup",
+        "description": "Implements Python Web Server Gateway Inter"
+    },
+    {
+        "package": "python-fmcs",
+        "description": "Find Maximum Common Substructure"
+    },
+    {
+        "package": "python-fontconfig",
+        "description": "python-fontconfig          - python bindings for the Fontconfig library"
+    },
+    {
+        "package": "python-fontconfig:i386",
+        "description": "python-fontconfig:i386     - python bindings for the Fontconfig library"
+    },
+    {
+        "package": "python-fontconfig-dbg",
+        "description": "python-fontconfig-dbg      - python bindings for the Fontconfig library"
+    },
+    {
+        "package": "python-fontconfig-dbg:i386",
+        "description": "python-fontconfig-dbg:i386 - python bindings for the Fontconfig library"
+    },
+    {
+        "package": "python-fontforge",
+        "description": "fontforge           - font editor - Python bindings"
+    },
+    {
+        "package": "python-fontforge:i386",
+        "description": "fontforge:i386      - font editor - Python bindings"
+    },
+    {
+        "package": "python-foolscap",
+        "description": "object-capability-based RPC system for Twi"
+    },
+    {
+        "package": "python-forgethtml",
+        "description": "Python module for easy HTML-writing"
+    },
+    {
+        "package": "python-forgetsql",
+        "description": "Python module for easy SQL-database access"
+    },
+    {
+        "package": "python-formalchemy",
+        "description": "HTML input form fields from your SQLAlchem"
+    },
+    {
+        "package": "python-formalchemy:i386",
+        "description": "HTML input form fields from your SQLAlchem"
+    },
+    {
+        "package": "python-formencode",
+        "description": "paquete Python para validación y generació"
+    },
+    {
+        "package": "python-fpconst",
+        "description": "Utilities for handling IEEE 754 floating p"
+    },
+    {
+        "package": "python-freecontact",
+        "description": "fast protein contact predictor - binding f"
+    },
+    {
+        "package": "python-freecontact:i386",
+        "description": "fast protein contact predictor - binding f"
+    },
+    {
+        "package": "python-freeipa",
+        "description": "FreeIPA centralized identity framework --"
+    },
+    {
+        "package": "python-freeipa:i386",
+        "description": "FreeIPA centralized identity framework --"
+    },
+    {
+        "package": "python-freenect",
+        "description": "library for accessing Kinect device -- Pyt"
+    },
+    {
+        "package": "python-freenect:i386",
+        "description": "library for accessing Kinect device -- Pyt"
+    },
+    {
+        "package": "python-freevo",
+        "description": "home theater framework - Python modules"
+    },
+    {
+        "package": "python-freshen",
+        "description": "acceptance testing framework for Python"
+    },
+    {
+        "package": "python-fs",
+        "description": "Python filesystem abstraction"
+    },
+    {
+        "package": "python-fswrap",
+        "description": "Unified object oriented interface for inte"
+    },
+    {
+        "package": "python-ftdi",
+        "description": "Python module to control and program the F"
+    },
+    {
+        "package": "python-ftdi:i386",
+        "description": "Python module to control and program the F"
+    },
+    {
+        "package": "python-ftp-cloudfs",
+        "description": "FTP interface to Rackspace Cloud Files and"
+    },
+    {
+        "package": "python-fudge",
+        "description": "Python module for using fake objects to te"
+    },
+    {
+        "package": "python-fudge-doc",
+        "description": "Python module for using fake objects for t"
+    },
+    {
+        "package": "python-funcparserlib",
+        "description": "Recursive descent parsing library based on"
+    },
+    {
+        "package": "python-fuse",
+        "description": "Python bindings for FUSE (Filesystems in U"
+    },
+    {
+        "package": "python-fuse:i386",
+        "description": "Python bindings for FUSE (Filesystems in U"
+    },
+    {
+        "package": "python-futures",
+        "description": "python-futures"
+    },
+    {
+        "package": "python-gadfly",
+        "description": "SQL database and parser generator for Pyth"
+    },
+    {
+        "package": "python-galleryremote",
+        "description": "Python library for accessing Gallery web i"
+    },
+    {
+        "package": "python-gamera",
+        "description": "framework for building document analysis a"
+    },
+    {
+        "package": "python-gamera:i386",
+        "description": "framework for building document analysis a"
+    },
+    {
+        "package": "python-gamera-dbg",
+        "description": "framework for building document analysis a"
+    },
+    {
+        "package": "python-gamera-dbg:i386",
+        "description": "framework for building document analysis a"
+    },
+    {
+        "package": "python-gamera-dev",
+        "description": "framework for building document analysis a"
+    },
+    {
+        "package": "python-gamera.toolkits.greekocr",
+        "description": "toolkits.greekocr - toolkit for building OCR systems for polyt"
+    },
+    {
+        "package": "python-gamera.toolkits.ocr",
+        "description": "toolkits.ocr - toolkit for building OCR systems"
+    },
+    {
+        "package": "python-gamin",
+        "description": "Enlaces de Python a la biblioteca cliente"
+    },
+    {
+        "package": "python-gamin:i386",
+        "description": "Enlaces de Python a la biblioteca cliente"
+    },
+    {
+        "package": "python-gammu",
+        "description": "Python module to communicate with mobile p"
+    },
+    {
+        "package": "python-gammu:i386",
+        "description": "Python module to communicate with mobile p"
+    },
+    {
+        "package": "python-gammu-dbg",
+        "description": "Python module to communicate with mobile p"
+    },
+    {
+        "package": "python-gammu-dbg:i386",
+        "description": "Python module to communicate with mobile p"
+    },
+    {
+        "package": "python-gammu-doc",
+        "description": "Transitional dummy package for Gammu docum"
+    },
+    {
+        "package": "python-ganeti-rapi",
+        "description": "Cluster-based virtualization management so"
+    },
+    {
+        "package": "python-gaphas",
+        "description": "diagramming widget"
+    },
+    {
+        "package": "python-gasp",
+        "description": "procedural Python graphics library for beg"
+    },
+    {
+        "package": "python-gastables",
+        "description": "compressible flow gas table modules for Py"
+    },
+    {
+        "package": "python-gcm-client",
+        "description": "Python client for Google Cloud Messaging ("
+    },
+    {
+        "package": "A",
+        "description": "-gconf               - Uniones Python al sistema de bases de dato"
+    },
+    {
+        "package": "python-gconf:i386",
+        "description": "Uniones Python al sistema de bases de dato"
+    },
+    {
+        "package": "python-gd",
+        "description": "Python module wrapper for libgd"
+    },
+    {
+        "package": "python-gd:i386",
+        "description": "Python module wrapper for libgd"
+    },
+    {
+        "package": "python-gd-dbg",
+        "description": "Python module wrapper for libgd (debug ext"
+    },
+    {
+        "package": "python-gd-dbg:i386",
+        "description": "Python module wrapper for libgd (debug ext"
+    },
+    {
+        "package": "python-gdal",
+        "description": "Python bindings to the Geospatial Data Abs"
+    },
+    {
+        "package": "python-gdal:i386",
+        "description": "Python bindings to the Geospatial Data Abs"
+    },
+    {
+        "package": "python-gdata",
+        "description": "Google Data Python client library"
+    },
+    {
+        "package": "python-gdata-doc",
+        "description": "Google Data Python client library, documen"
+    },
+    {
+        "package": "python-gdbm",
+        "description": "GNU dbm database support for Python"
+    },
+    {
+        "package": "python-gdbm:i386",
+        "description": "GNU dbm database support for Python"
+    },
+    {
+        "package": "python-gdbm-dbg",
+        "description": "GNU dbm database support for Python (debug"
+    },
+    {
+        "package": "python-gdbm-dbg:i386",
+        "description": "GNU dbm database support for Python (debug"
+    },
+    {
+        "package": "python-gdchart2",
+        "description": "Python OO interface to GDChart"
+    },
+    {
+        "package": "python-gdchart2:i386",
+        "description": "Python OO interface to GDChart"
+    },
+    {
+        "package": "python-gdchart2-doc",
+        "description": "Python OO interface to GDChart - docs"
+    },
+    {
+        "package": "python-gdcm",
+        "description": "Grassroots DICOM Python bindings"
+    },
+    {
+        "package": "python-gdcm:i386",
+        "description": "Grassroots DICOM Python bindings"
+    },
+    {
+        "package": "python-gear",
+        "description": "Pure Python Async Gear Protocol Library"
+    },
+    {
+        "package": "python-gearman",
+        "description": "Python interface to the Gearman system"
+    },
+    {
+        "package": "python-gearman.libgearman",
+        "description": "Envoltura Python de libgearman"
+    },
+    {
+        "package": "python-gearman.libgearman:i386",
+        "description": "Envoltura Python de libgearman"
+    },
+    {
+        "package": "python-genetic",
+        "description": "genetic             - genetic algorithms in Python"
+    },
+    {
+        "package": "python-genometools",
+        "description": "Python bindings for genometools"
+    },
+    {
+        "package": "python-genometools:i386",
+        "description": "Python bindings for genometools"
+    },
+    {
+        "package": "python-genshi",
+        "description": "Python XML-based template engine - Python"
+    },
+    {
+        "package": "python-genshi:i386",
+        "description": "Python XML-based template engine - Python"
+    },
+    {
+        "package": "python-genshi-doc",
+        "description": "Motor basado en plantillas XML en Python ("
+    },
+    {
+        "package": "python-geoclue",
+        "description": "Python module to access Geoclue data"
+    },
+    {
+        "package": "python-geographiclib",
+        "description": "Python binding for GeographicLib"
+    },
+    {
+        "package": "python-geographiclib:i386",
+        "description": "Python binding for GeographicLib"
+    },
+    {
+        "package": "python-geohash",
+        "description": "fast, accurate Python geohashing library"
+    },
+    {
+        "package": "python-geohash:i386",
+        "description": "fast, accurate Python geohashing library"
+    },
+    {
+        "package": "python-geohash-dbg",
+        "description": "fast, accurate Python geohashing library ("
+    },
+    {
+        "package": "python-geohash-dbg:i386",
+        "description": "fast, accurate Python geohashing library ("
+    },
+    {
+        "package": "python-geoip",
+        "description": "Uniones de Python a la biblioteca de resol"
+    },
+    {
+        "package": "python-geoip:i386",
+        "description": "Uniones de Python a la biblioteca de resol"
+    },
+    {
+        "package": "python-geoip-dbg",
+        "description": "Vínculos para Python de la biblioteca del"
+    },
+    {
+        "package": "python-geoip-dbg:i386",
+        "description": "Vínculos para Python de la biblioteca del"
+    },
+    {
+        "package": "python-geopy",
+        "description": "geocoding toolbox for Python"
+    },
+    {
+        "package": "python-germinate",
+        "description": "expand dependencies in seed packages (Pyth"
+    },
+    {
+        "package": "python-getfem++",
+        "description": "Python interface to the GETFEM++ generic f"
+    },
+    {
+        "package": "python-getfem++:i386",
+        "description": "Python interface to the GETFEM++ generic f"
+    },
+    {
+        "package": "python-gevent",
+        "description": "gevent              - gevent is a coroutine-based Python network"
+    },
+    {
+        "package": "python-gevent:i386",
+        "description": "gevent:i386         - gevent is a coroutine-based Python network"
+    },
+    {
+        "package": "python-gevent-dbg",
+        "description": "gevent-dbg          - gevent is a coroutine-based Python network"
+    },
+    {
+        "package": "python-gevent-dbg:i386",
+        "description": "gevent-dbg:i386     - gevent is a coroutine-based Python network"
+    },
+    {
+        "package": "python-gevent-doc",
+        "description": "gevent-doc          - gevent is a coroutine-based Python network"
+    },
+    {
+        "package": "python-gevent-websocket",
+        "description": "websocket    - websocket library for the gevent networkin"
+    },
+    {
+        "package": "python-gflags",
+        "description": "Python implementation of the Google comman"
+    },
+    {
+        "package": "A",
+        "description": "-gi                  - Python 2.x bindings for gobject-introspect"
+    },
+    {
+        "package": "python-gi:i386",
+        "description": "Python 2.x bindings for gobject-introspect"
+    },
+    {
+        "package": "A",
+        "description": "-gi-cairo            - Enlaces Cairo Python para la biblioteca GO"
+    },
+    {
+        "package": "python-gi-cairo:i386",
+        "description": "Enlaces Cairo Python para la biblioteca GO"
+    },
+    {
+        "package": "python-gi-dbg",
+        "description": "Python bindings for the GObject library (d"
+    },
+    {
+        "package": "python-gi-dbg:i386",
+        "description": "Python bindings for the GObject library (d"
+    },
+    {
+        "package": "python-gi-dev",
+        "description": "development headers for GObject Python bin"
+    },
+    {
+        "package": "python-gi-dev:i386",
+        "description": "development headers for GObject Python bin"
+    },
+    {
+        "package": "python-git",
+        "description": "Biblioteca Python para interactuar con rep"
+    },
+    {
+        "package": "python-gitdb",
+        "description": "pure-Python git object database"
+    },
+    {
+        "package": "python-gitdb:i386",
+        "description": "pure-Python git object database"
+    },
+    {
+        "package": "A",
+        "description": "-glade2              - Enlaces de GTK+: Compatibilidad con Glade"
+    },
+    {
+        "package": "python-glade2:i386",
+        "description": "Enlaces de GTK+: Compatibilidad con Glade"
+    },
+    {
+        "package": "python-glance",
+        "description": "OpenStack Image Registry and Delivery Serv"
+    },
+    {
+        "package": "python-glance-doc",
+        "description": "OpenStack Image Registry and Delivery Serv"
+    },
+    {
+        "package": "python-glanceclient",
+        "description": "Client library for Openstack glance server"
+    },
+    {
+        "package": "python-glitch",
+        "description": "Python library for OpenGL graphics program"
+    },
+    {
+        "package": "python-glpk",
+        "description": "Python bindings to the GNU Linear Programm"
+    },
+    {
+        "package": "python-glpk:i386",
+        "description": "Python bindings to the GNU Linear Programm"
+    },
+    {
+        "package": "python-gluon",
+        "description": "High-level Python web development framewor"
+    },
+    {
+        "package": "python-gmenu",
+        "description": "GNOME implementation of the freedesktop me"
+    },
+    {
+        "package": "python-gmenu:i386",
+        "description": "GNOME implementation of the freedesktop me"
+    },
+    {
+        "package": "python-gmenu-dbg",
+        "description": "Python bindings for the freedesktop menu s"
+    },
+    {
+        "package": "python-gmenu-dbg:i386",
+        "description": "Python bindings for the freedesktop menu s"
+    },
+    {
+        "package": "python-gmpy",
+        "description": "interfaces GMP to Python for fast, unbound"
+    },
+    {
+        "package": "python-gmpy:i386",
+        "description": "interfaces GMP to Python for fast, unbound"
+    },
+    {
+        "package": "python-gmpy2",
+        "description": "interfaces GMP to Python 2 for fast, unbou"
+    },
+    {
+        "package": "python-gmpy2:i386",
+        "description": "interfaces GMP to Python 2 for fast, unbou"
+    },
+    {
+        "package": "python-gmpy2-common",
+        "description": "interfaces GMP to Python for fast, unbound"
+    },
+    {
+        "package": "python-gnatpython",
+        "description": "Python framework to ease development of te"
+    },
+    {
+        "package": "python-gnatpython:i386",
+        "description": "Python framework to ease development of te"
+    },
+    {
+        "package": "python-gnatpython-doc",
+        "description": "Python framework to ease development of te"
+    },
+    {
+        "package": "A",
+        "description": "-gnome2              - Enlaces de Python al entorno de escritorio"
+    },
+    {
+        "package": "python-gnome2:i386",
+        "description": "Enlaces de Python al entorno de escritorio"
+    },
+    {
+        "package": "python-gnome2-desktop-dev",
+        "description": "Enlaces de Python al entorno de escritorio"
+    },
+    {
+        "package": "python-gnome2-dev",
+        "description": "Enlaces de Python para el entorno de escri"
+    },
+    {
+        "package": "python-gnome2-doc",
+        "description": "Enlaces de Python al entorno de escritorio"
+    },
+    {
+        "package": "python-gnomekeyring",
+        "description": "Vínculos de Python para la biblioteca del"
+    },
+    {
+        "package": "python-gnomekeyring:i386",
+        "description": "Vínculos de Python para la biblioteca del"
+    },
+    {
+        "package": "python-gnomeosd",
+        "description": "python-gnomeosd"
+    },
+    {
+        "package": "python-gnucash",
+        "description": "Gnucash interface for Python"
+    },
+    {
+        "package": "python-gnucash:i386",
+        "description": "Gnucash interface for Python"
+    },
+    {
+        "package": "python-gnupg",
+        "description": "Python wrapper for the Gnu Privacy Guard ("
+    },
+    {
+        "package": "python-gnupginterface",
+        "description": "Python interface to GnuPG (GPG)"
+    },
+    {
+        "package": "python-gnuplot",
+        "description": "Python interface to the gnuplot plotting p"
+    },
+    {
+        "package": "python-gnutls",
+        "description": "Python wrapper for the GNUTLS library"
+    },
+    {
+        "package": "python-gnutls:i386",
+        "description": "Python wrapper for the GNUTLS library"
+    },
+    {
+        "package": "A",
+        "description": "-gobject             - Python 2.x bindings for GObject - transiti"
+    },
+    {
+        "package": "A",
+        "description": "-gobject-2           - deprecated static Python bindings for the"
+    },
+    {
+        "package": "python-gobject-2:i386",
+        "description": "deprecated static Python bindings for the"
+    },
+    {
+        "package": "python-gobject-2-dbg",
+        "description": "deprecated static Python bindings for the"
+    },
+    {
+        "package": "python-gobject-2-dbg:i386",
+        "description": "deprecated static Python bindings for the"
+    },
+    {
+        "package": "python-gobject-2-dev",
+        "description": "development headers for the static GObject"
+    },
+    {
+        "package": "python-gobject-cairo",
+        "description": "python-gobject-cairo"
+    },
+    {
+        "package": "python-gobject-cairo:i386",
+        "description": "python-gobject-cairo:i386"
+    },
+    {
+        "package": "python-gobject-dbg",
+        "description": "Python 2.x debugging modules for GObject"
+    },
+    {
+        "package": "python-gobject-dev",
+        "description": "Python 2.x development headers for GObject"
+    },
+    {
+        "package": "python-google-apputils",
+        "description": "Google Application Utilities for Python"
+    },
+    {
+        "package": "python-google-compute-engine",
+        "description": "Python library for Google Compute Engine i"
+    },
+    {
+        "package": "python-googleapi",
+        "description": "Google APIs Client Library for Python"
+    },
+    {
+        "package": "python-googleapi-samples",
+        "description": "Google APIs Client Library for Python, sam"
+    },
+    {
+        "package": "python-gpgme",
+        "description": "python-gpgme               - python wrapper for the GPGME library (Pyth"
+    },
+    {
+        "package": "python-gpgme:i386",
+        "description": "python-gpgme:i386          - python wrapper for the GPGME library (Pyth"
+    },
+    {
+        "package": "python-gpgme-dbg",
+        "description": "python-gpgme-dbg           - python wrapper for the GPGME library (debu"
+    },
+    {
+        "package": "python-gpgme-dbg:i386",
+        "description": "python-gpgme-dbg:i386      - python wrapper for the GPGME library (debu"
+    },
+    {
+        "package": "python-gpiv",
+        "description": "envoltura de libgpi"
+    },
+    {
+        "package": "python-gpiv:i386",
+        "description": "envoltura de libgpi"
+    },
+    {
+        "package": "python-gpod",
+        "description": "Vínculos Python para libgpod"
+    },
+    {
+        "package": "python-gpod:i386",
+        "description": "Vínculos Python para libgpod"
+    },
+    {
+        "package": "python-gps",
+        "description": "Global Positioning System - Python librari"
+    },
+    {
+        "package": "python-gps:i386",
+        "description": "Global Positioning System - Python librari"
+    },
+    {
+        "package": "python-gpyconf",
+        "description": "Python configuration framework with suppor"
+    },
+    {
+        "package": "python-grapefruit",
+        "description": "Python module to manipulate color informat"
+    },
+    {
+        "package": "python-grapefruit-doc",
+        "description": "Python module to manipulate color informat"
+    },
+    {
+        "package": "python-graphy",
+        "description": "chart generation library for Python"
+    },
+    {
+        "package": "python-greenlet",
+        "description": "Lightweight in-process concurrent programm"
+    },
+    {
+        "package": "python-greenlet:i386",
+        "description": "Lightweight in-process concurrent programm"
+    },
+    {
+        "package": "python-greenlet-dbg",
+        "description": "Lightweight in-process concurrent programm"
+    },
+    {
+        "package": "python-greenlet-dbg:i386",
+        "description": "Lightweight in-process concurrent programm"
+    },
+    {
+        "package": "python-greenlet-dev",
+        "description": "Lightweight in-process concurrent programm"
+    },
+    {
+        "package": "python-greenlet-dev:i386",
+        "description": "Lightweight in-process concurrent programm"
+    },
+    {
+        "package": "python-greenlet-doc",
+        "description": "Lightweight in-process concurrent programm"
+    },
+    {
+        "package": "python-grib",
+        "description": "Python module for reading and writing GRIB"
+    },
+    {
+        "package": "python-grib:i386",
+        "description": "Python module for reading and writing GRIB"
+    },
+    {
+        "package": "python-grib-doc",
+        "description": "Documentation and examples for Python GRIB"
+    },
+    {
+        "package": "python-gridfs",
+        "description": "Python implementation of GridFS for MongoD"
+    },
+    {
+        "package": "python-grip",
+        "description": "python-grip                - python bindings for libgrip"
+    },
+    {
+        "package": "python-grokcore.component",
+        "description": "Grok-like configuration for basic componen"
+    },
+    {
+        "package": "python-gst-1.0",
+        "description": "GStreamer GObject Introspection overrides"
+    },
+    {
+        "package": "python-gst-1.0:i386",
+        "description": "GStreamer GObject Introspection overrides"
+    },
+    {
+        "package": "python-gst-1.0-dbg",
+        "description": "GStreamer GObject Introspection overrides"
+    },
+    {
+        "package": "python-gst-1.0-dbg:i386",
+        "description": "GStreamer GObject Introspection overrides"
+    },
+    {
+        "package": "python-gst0.10",
+        "description": "Entorno genérico de reproducción multimedi"
+    },
+    {
+        "package": "python-gst0.10:i386",
+        "description": "Entorno genérico de reproducción multimedi"
+    },
+    {
+        "package": "python-gst0.10-dbg",
+        "description": "generic media-playing framework (Python de"
+    },
+    {
+        "package": "python-gst0.10-dbg:i386",
+        "description": "generic media-playing framework (Python de"
+    },
+    {
+        "package": "python-gst0.10-dev",
+        "description": "Entorno genérico de reproducción multimedi"
+    },
+    {
+        "package": "python-gst0.10-dev:i386",
+        "description": "Entorno genérico de reproducción multimedi"
+    },
+    {
+        "package": "python-gst0.10-rtsp",
+        "description": "GStreamer RTSP server plugin (Python bindi"
+    },
+    {
+        "package": "python-gst0.10-rtsp:i386",
+        "description": "GStreamer RTSP server plugin (Python bindi"
+    },
+    {
+        "package": "python-gsw",
+        "description": "Python implementation of the Thermodynamic"
+    },
+    {
+        "package": "python-gtk-gnash",
+        "description": "GNU Shockwave Flash (SWF) player - Python"
+    },
+    {
+        "package": "python-gtk-gnash:i386",
+        "description": "GNU Shockwave Flash (SWF) player - Python"
+    },
+    {
+        "package": "python-gtk-vnc",
+        "description": "VNC viewer widget for GTK+2 (Python bindin"
+    },
+    {
+        "package": "python-gtk-vnc:i386",
+        "description": "VNC viewer widget for GTK+2 (Python bindin"
+    },
+    {
+        "package": "A",
+        "description": "-gtk2                - Enlaces de Python para el conjunto de elem"
+    },
+    {
+        "package": "python-gtk2:i386",
+        "description": "Enlaces de Python para el conjunto de elem"
+    },
+    {
+        "package": "python-gtk2-dbg",
+        "description": "Python bindings for the GTK+ widget set (d"
+    },
+    {
+        "package": "python-gtk2-dbg:i386",
+        "description": "Python bindings for the GTK+ widget set (d"
+    },
+    {
+        "package": "python-gtk2-dev",
+        "description": "Vínculos GTK+: archivos de desarrollo"
+    },
+    {
+        "package": "python-gtk2-doc",
+        "description": "Enlaces Python para el conjunto de control"
+    },
+    {
+        "package": "python-gtk2-tutorial",
+        "description": "tutorial       - tutorial for the GTK2 python library"
+    },
+    {
+        "package": "python-gtkglext1",
+        "description": "Vínculos Python para GtkGLext"
+    },
+    {
+        "package": "python-gtkglext1:i386",
+        "description": "Vínculos Python para GtkGLext"
+    },
+    {
+        "package": "python-gtkmvc",
+        "description": "model-view-controller (MVC) implementation"
+    },
+    {
+        "package": "python-gtkmvc-doc",
+        "description": "documentación pygtkmvc, manual y ejemplos"
+    },
+    {
+        "package": "A",
+        "description": "-gtksourceview2      - Python bindings for the GtkSourceView widg"
+    },
+    {
+        "package": "python-gtksourceview2:i386",
+        "description": "Python bindings for the GtkSourceView widg"
+    },
+    {
+        "package": "python-gtkspell",
+        "description": "Python bindings for the GtkSpell library"
+    },
+    {
+        "package": "python-gtkspell:i386",
+        "description": "Python bindings for the GtkSpell library"
+    },
+    {
+        "package": "python-gtkspellcheck",
+        "description": "spellchecking library written in Python fo"
+    },
+    {
+        "package": "python-gtkspellcheck-doc",
+        "description": "Python GTK Spellcheck common documentation"
+    },
+    {
+        "package": "python-gts",
+        "description": "Python wrapper for the GNU Triangulated Su"
+    },
+    {
+        "package": "python-gts:i386",
+        "description": "Python wrapper for the GNU Triangulated Su"
+    },
+    {
+        "package": "python-gudev",
+        "description": "Vínculos Python para gude"
+    },
+    {
+        "package": "python-gudev:i386",
+        "description": "Vínculos Python para gude"
+    },
+    {
+        "package": "python-guestfs",
+        "description": "guestfs             - guest disk image management system - Pytho"
+    },
+    {
+        "package": "python-guestfs:i386",
+        "description": "guestfs:i386        - guest disk image management system - Pytho"
+    },
+    {
+        "package": "python-guidata",
+        "description": "dataset manipulation GUI generator"
+    },
+    {
+        "package": "python-guiqwt",
+        "description": "efficient 2D data-plotting library"
+    },
+    {
+        "package": "python-guiqwt:i386",
+        "description": "efficient 2D data-plotting library"
+    },
+    {
+        "package": "python-gupnp-igd",
+        "description": "Python binding for the UPnP IGD port mappi"
+    },
+    {
+        "package": "python-gupnp-igd:i386",
+        "description": "Python binding for the UPnP IGD port mappi"
+    },
+    {
+        "package": "python-guppy",
+        "description": "Python programming environment Guppy-PE"
+    },
+    {
+        "package": "python-guppy-lib",
+        "description": "Bibliotecas dinámicas para Guppy-PE"
+    },
+    {
+        "package": "python-guppy-lib:i386",
+        "description": "Bibliotecas dinámicas para Guppy-PE"
+    },
+    {
+        "package": "python-guppy-lib-dbg",
+        "description": "Debug Build of Dynamic libraries for Guppy"
+    },
+    {
+        "package": "python-guppy-lib-dbg:i386",
+        "description": "Debug Build of Dynamic libraries for Guppy"
+    },
+    {
+        "package": "python-gvgen",
+        "description": "Python class to generate dot files"
+    },
+    {
+        "package": "python-h5py",
+        "description": "h5py                - h5py is a general-purpose Python interface"
+    },
+    {
+        "package": "python-h5py:i386",
+        "description": "h5py:i386           - h5py is a general-purpose Python interface"
+    },
+    {
+        "package": "python-hachoir-core",
+        "description": "Core of Hachoir framework: parse and edit"
+    },
+    {
+        "package": "python-hachoir-metadata",
+        "description": "Program to extract metadata using Hachoir"
+    },
+    {
+        "package": "python-hachoir-parser",
+        "description": "Package of Hachoir parsers used to open bi"
+    },
+    {
+        "package": "python-hachoir-regex",
+        "description": "biblioteca Python para la manipulación de"
+    },
+    {
+        "package": "python-hachoir-subfile",
+        "description": "find subfiles in any binary stream"
+    },
+    {
+        "package": "python-hachoir-urwid",
+        "description": "Binary file explorer using Hachoir and urw"
+    },
+    {
+        "package": "python-hachoir-wx",
+        "description": "wxWidgets GUI for the hachoir binary parse"
+    },
+    {
+        "package": "python-hacking",
+        "description": "Flake8 OpenStack Hacking Guidelines Enforc"
+    },
+    {
+        "package": "python-hamcrest",
+        "description": "Hamcrest framework for matcher objects (Py"
+    },
+    {
+        "package": "python-happybase",
+        "description": "developer-friendly Python library to inter"
+    },
+    {
+        "package": "python-hdate",
+        "description": "Provides a library that help use hebrew da"
+    },
+    {
+        "package": "python-hdate:i386",
+        "description": "Provides a library that help use hebrew da"
+    },
+    {
+        "package": "python-heat",
+        "description": "OpenStack orchestration service - Python f"
+    },
+    {
+        "package": "python-heatclient",
+        "description": "client          - client library and CLI for OpenStack Heat"
+    },
+    {
+        "package": "python-hglib",
+        "description": "Python library for interfacing with Mercur"
+    },
+    {
+        "package": "python-hijra",
+        "description": "Calendario islámico hijri conversor de fun"
+    },
+    {
+        "package": "python-hippocanvas",
+        "description": "Vínculos Python para hippo-canvas"
+    },
+    {
+        "package": "python-hippocanvas:i386",
+        "description": "Vínculos Python para hippo-canvas"
+    },
+    {
+        "package": "python-hiredis",
+        "description": "redis             - redis protocol reader for Python using hir"
+    },
+    {
+        "package": "python-hiredis:i386",
+        "description": "redis:i386        - redis protocol reader for Python using hir"
+    },
+    {
+        "package": "python-hivex",
+        "description": "Python bindings for hivex"
+    },
+    {
+        "package": "python-hivex:i386",
+        "description": "Python bindings for hivex"
+    },
+    {
+        "package": "python-hl7",
+        "description": "Python library for parsing HL7 messages"
+    },
+    {
+        "package": "python-hp3parclient",
+        "description": "client        - client library that can talk to the HP 3PA"
+    },
+    {
+        "package": "python-hplefthandclient",
+        "description": "HP LeftHand/StoreVirtual HTTP REST Client"
+    },
+    {
+        "package": "python-hplefthandclient-doc",
+        "description": "HP LeftHand/StoreVirtual HTTP REST Client"
+    },
+    {
+        "package": "python-hsi",
+        "description": "python-hsi"
+    },
+    {
+        "package": "python-hsi:i386",
+        "description": "python-hsi:i386"
+    },
+    {
+        "package": "python-html2text",
+        "description": "Python module for converting HTML to Markd"
+    },
+    {
+        "package": "A",
+        "description": "-html5lib            - HTML parser/tokenizer based on the WHATWG"
+    },
+    {
+        "package": "A",
+        "description": "-html5lib-whl        - HTML parser/tokenizer based on the WHATWG"
+    },
+    {
+        "package": "python-htmlgen",
+        "description": "Biblioteca Python para generar HTML"
+    },
+    {
+        "package": "python-htmltmpl",
+        "description": "Templating engine for separation of code a"
+    },
+    {
+        "package": "python-htseq",
+        "description": "high-throughput genome sequencing read ana"
+    },
+    {
+        "package": "python-htseq:i386",
+        "description": "high-throughput genome sequencing read ana"
+    },
+    {
+        "package": "python-htseq-doc",
+        "description": "documetation for HTSeq (high-throughput ge"
+    },
+    {
+        "package": "python-http-parser",
+        "description": "http-parser         - http request/response parser"
+    },
+    {
+        "package": "python-http-parser:i386",
+        "description": "http-parser:i386    - http request/response parser"
+    },
+    {
+        "package": "A",
+        "description": "-httplib2            - biblioteca cliente HTTP completa escrita p"
+    },
+    {
+        "package": "python-httpretty",
+        "description": "HTTP client mock for Python"
+    },
+    {
+        "package": "python-hunspell",
+        "description": "Python 2 binding for Hunspell"
+    },
+    {
+        "package": "python-hunspell:i386",
+        "description": "Python 2 binding for Hunspell"
+    },
+    {
+        "package": "python-hurry",
+        "description": "python-hurry"
+    },
+    {
+        "package": "python-hurry.query",
+        "description": "Higher level query system for the zope.cat"
+    },
+    {
+        "package": "python-iapws",
+        "description": "Python implementation of the international"
+    },
+    {
+        "package": "python-ibus",
+        "description": "Intelligent Input Bus - Python support"
+    },
+    {
+        "package": "python-icalendar",
+        "description": "parser/generator of iCalendar files for us"
+    },
+    {
+        "package": "python-icalendar-doc",
+        "description": "parser/generator of iCalendar files for us"
+    },
+    {
+        "package": "python-id3",
+        "description": "Módulo Python para la manipulación de id3-"
+    },
+    {
+        "package": "python-ieee1284",
+        "description": "Vínculos Python para libieee1284"
+    },
+    {
+        "package": "python-ieee1284:i386",
+        "description": "Vínculos Python para libieee1284"
+    },
+    {
+        "package": "python-ifeffit",
+        "description": "Interfaz Python y extensiones para IFEFFIT"
+    },
+    {
+        "package": "python-ifeffit:i386",
+        "description": "Interfaz Python y extensiones para IFEFFIT"
+    },
+    {
+        "package": "python-igraph",
+        "description": "High performance graph data structures and"
+    },
+    {
+        "package": "python-igraph:i386",
+        "description": "High performance graph data structures and"
+    },
+    {
+        "package": "python-imaging",
+        "description": "Python Imaging Library compatibility layer"
+    },
+    {
+        "package": "python-imaging-compat",
+        "description": "Dummy transitional package"
+    },
+    {
+        "package": "python-imaging-dbg",
+        "description": "Dummy transitional package"
+    },
+    {
+        "package": "python-imaging-dbg:i386",
+        "description": "python-imaging-dbg:i386"
+    },
+    {
+        "package": "python-imaging-doc",
+        "description": "Dummy transitional package"
+    },
+    {
+        "package": "python-imaging-doc-html",
+        "description": "Documentation for the Python Imaging Libra"
+    },
+    {
+        "package": "python-imaging-doc-pdf",
+        "description": "Documentation for the Python Imaging Libra"
+    },
+    {
+        "package": "python-imaging-sane",
+        "description": "Dummy transitional package"
+    },
+    {
+        "package": "python-imaging-sane:i386",
+        "description": "python-imaging-sane:i386"
+    },
+    {
+        "package": "python-imaging-sane-dbg",
+        "description": "Dummy transitional package"
+    },
+    {
+        "package": "python-imaging-sane-dbg:i386",
+        "description": "python-imaging-sane-dbg:i386"
+    },
+    {
+        "package": "python-imaging-tk",
+        "description": "Dummy transitional package"
+    },
+    {
+        "package": "python-imaging-tk:i386",
+        "description": "python-imaging-tk:i386"
+    },
+    {
+        "package": "python-imaging-tk-dbg",
+        "description": "Dummy transitional package"
+    },
+    {
+        "package": "python-imaging-tk-dbg:i386",
+        "description": "python-imaging-tk-dbg:i386"
+    },
+    {
+        "package": "python-imdbpy",
+        "description": "Python package to access the IMDb's movie"
+    },
+    {
+        "package": "python-imdbpy:i386",
+        "description": "Python package to access the IMDb's movie"
+    },
+    {
+        "package": "python-imobiledevice",
+        "description": "Biblioteca para comunicarse con los dispos"
+    },
+    {
+        "package": "python-imobiledevice:i386",
+        "description": "Biblioteca para comunicarse con los dispos"
+    },
+    {
+        "package": "python-impacket",
+        "description": "Python module to easily build and dissect"
+    },
+    {
+        "package": "python-importlib",
+        "description": "python-importlib"
+    },
+    {
+        "package": "python-importlib:i386",
+        "description": "python-importlib:i386"
+    },
+    {
+        "package": "python-imposm",
+        "description": "importer for OpenStreetMap data - Python m"
+    },
+    {
+        "package": "python-imposm:i386",
+        "description": "importer for OpenStreetMap data - Python m"
+    },
+    {
+        "package": "python-imposm-parser",
+        "description": "Python module to parse OpenStreetMap data"
+    },
+    {
+        "package": "python-imposm-parser:i386",
+        "description": "Python module to parse OpenStreetMap data"
+    },
+    {
+        "package": "python-indicate",
+        "description": "Python bindings for libindicate"
+    },
+    {
+        "package": "python-indicate:i386",
+        "description": "Python bindings for libindicate"
+    },
+    {
+        "package": "python-indigo",
+        "description": "Organic Chemistry Toolkit (Python module)"
+    },
+    {
+        "package": "python-iniparse",
+        "description": "Module to access and modify configuration"
+    },
+    {
+        "package": "python-inotifyx",
+        "description": "simple Python binding to the Linux inotify"
+    },
+    {
+        "package": "python-inotifyx:i386",
+        "description": "simple Python binding to the Linux inotify"
+    },
+    {
+        "package": "python-input-pad",
+        "description": "On-screen Input Pad to Send Characters wit"
+    },
+    {
+        "package": "python-input-pad:i386",
+        "description": "On-screen Input Pad to Send Characters wit"
+    },
+    {
+        "package": "python-instant",
+        "description": "simple inlining of C / C++ code in Python"
+    },
+    {
+        "package": "python-iowait",
+        "description": "Platform-independent module for I/O comple"
+    },
+    {
+        "package": "python-ipaddr",
+        "description": "Python module for working with IP addresse"
+    },
+    {
+        "package": "python-ipcalc",
+        "description": "perform IP subnet calculations"
+    },
+    {
+        "package": "python-ipdb",
+        "description": "IPython-based pdb replacement"
+    },
+    {
+        "package": "python-iplib",
+        "description": "Python library to convert amongst many dif"
+    },
+    {
+        "package": "python-iptcdata",
+        "description": "Vínculos Python para la biblioteca iptcdat"
+    },
+    {
+        "package": "python-iptcdata:i386",
+        "description": "Vínculos Python para la biblioteca iptcdat"
+    },
+    {
+        "package": "python-ipy",
+        "description": "Python module for handling IPv4 and IPv6 a"
+    },
+    {
+        "package": "python-irc",
+        "description": "Internet Relay Chat (IRC) protocol client"
+    },
+    {
+        "package": "python-irclib",
+        "description": "Biblioteca IRC cliente para Python"
+    },
+    {
+        "package": "python-ironic",
+        "description": "Openstack bare metal provisioning service"
+    },
+    {
+        "package": "python-ironicclient",
+        "description": "Python bindings for the Ironic API"
+    },
+    {
+        "package": "python-iscpy",
+        "description": "Python library to parse ISC style config f"
+    },
+    {
+        "package": "python-iso8583",
+        "description": "library for ISO 8583 transactions"
+    },
+    {
+        "package": "python-iso8601",
+        "description": "python-iso8601             - python module to parse ISO 8601 dates (pyt"
+    },
+    {
+        "package": "python-isodate",
+        "description": "ISO 8601 date/time/duration parser and for"
+    },
+    {
+        "package": "python-itsdangerous",
+        "description": "Various helpers to pass trusted data to un"
+    },
+    {
+        "package": "python-jabber",
+        "description": "Módulo de Python para la plataforma de men"
+    },
+    {
+        "package": "python-jabberbot",
+        "description": "easily write simple Jabber bots"
+    },
+    {
+        "package": "python-jarabe",
+        "description": "python-jarabe"
+    },
+    {
+        "package": "python-jarabe-0.96",
+        "description": "Sugar graphical shell - library"
+    },
+    {
+        "package": "python-jarabe-0.98",
+        "description": "Sugar graphical shell - library"
+    },
+    {
+        "package": "python-jaxml",
+        "description": "Módulo de python para generar documentos e"
+    },
+    {
+        "package": "python-jedi",
+        "description": "autocompletion tool for Python"
+    },
+    {
+        "package": "python-jenkins",
+        "description": "Python bindings for the Jenkins Remote API"
+    },
+    {
+        "package": "python-jenkinsapi",
+        "description": "bindings for Python usage of the Jenkins r"
+    },
+    {
+        "package": "python-jinja2",
+        "description": "pequeño motor de plantilla autónomo y fáci"
+    },
+    {
+        "package": "python-jinja2-doc",
+        "description": "documentación para la biblioteca Jinja2 Py"
+    },
+    {
+        "package": "python-jmespath",
+        "description": "JSON Matching Expressions (Python 2)"
+    },
+    {
+        "package": "python-joblib",
+        "description": "tools to provide lightweight pipelining in"
+    },
+    {
+        "package": "python-jpylyzer",
+        "description": "JP2 (JPEG 2000 Part 1) validator and prope"
+    },
+    {
+        "package": "python-jpylyzer-doc",
+        "description": "JP2 (JPEG 2000 Part 1) validator and prope"
+    },
+    {
+        "package": "python-jpype",
+        "description": "Binding the worlds of Java and Python"
+    },
+    {
+        "package": "python-jpype:i386",
+        "description": "Binding the worlds of Java and Python"
+    },
+    {
+        "package": "python-json-patch",
+        "description": "library to apply JSON patches - python 2.x"
+    },
+    {
+        "package": "python-json-pointer",
+        "description": "resolve JSON pointers - python 2.x"
+    },
+    {
+        "package": "python-jsonpatch",
+        "description": "library to apply JSON patches - python 2.x"
+    },
+    {
+        "package": "python-jsonpath-rw",
+        "description": "extended implementation of JSONPath for Py"
+    },
+    {
+        "package": "python-jsonpickle",
+        "description": "Python library for serializing object grap"
+    },
+    {
+        "package": "python-jsonpickle-doc",
+        "description": "Python library for serializing object grap"
+    },
+    {
+        "package": "python-jsonpipe",
+        "description": "Convert JSON to a UNIX-friendly line-based"
+    },
+    {
+        "package": "python-jsonrpc2",
+        "description": "Python WSGI Framework for JSON RPC 2.0"
+    },
+    {
+        "package": "python-jsonrpclib",
+        "description": "implementation of the JSON-RPC v2.0 specif"
+    },
+    {
+        "package": "python-jsonschema",
+        "description": "An(other) implementation of JSON Schema (D"
+    },
+    {
+        "package": "python-jswebkit",
+        "description": "WebKit/JavaScriptCore Python bindings"
+    },
+    {
+        "package": "python-jswebkit:i386",
+        "description": "WebKit/JavaScriptCore Python bindings"
+    },
+    {
+        "package": "python-jujuclient",
+        "description": "Python API client for juju"
+    },
+    {
+        "package": "python-junitxml",
+        "description": "PyUnit extension for reporting in JUnit co"
+    },
+    {
+        "package": "python-kaa-base",
+        "description": "Base Kaa Framework for all Kaa Modules"
+    },
+    {
+        "package": "python-kaa-base:i386",
+        "description": "Base Kaa Framework for all Kaa Modules"
+    },
+    {
+        "package": "python-kaa-imlib2",
+        "description": "Imlib2 Wrapper for Python"
+    },
+    {
+        "package": "python-kaa-imlib2:i386",
+        "description": "Imlib2 Wrapper for Python"
+    },
+    {
+        "package": "python-kaa-metadata",
+        "description": "Media Metadata for Python"
+    },
+    {
+        "package": "python-kaa-metadata:i386",
+        "description": "Media Metadata for Python"
+    },
+    {
+        "package": "python-kajiki",
+        "description": "Really fast well-formed xml templates"
+    },
+    {
+        "package": "python-kazoo",
+        "description": "higher level API to Apache Zookeeper for P"
+    },
+    {
+        "package": "python-kazoo-doc",
+        "description": "API to Apache Zookeeper for Python clients"
+    },
+    {
+        "package": "python-kde4",
+        "description": "Python bindings for the KDE Development Pl"
+    },
+    {
+        "package": "python-kde4:i386",
+        "description": "Python bindings for the KDE Development Pl"
+    },
+    {
+        "package": "python-kde4-dbg",
+        "description": "debugging symbols for the PyKDE bindings"
+    },
+    {
+        "package": "python-kde4-dbg:i386",
+        "description": "debugging symbols for the PyKDE bindings"
+    },
+    {
+        "package": "python-kde4-dev",
+        "description": "UIC compiler and SIP files for PyKDE"
+    },
+    {
+        "package": "python-kde4-doc",
+        "description": "documentation and examples for PyKDE"
+    },
+    {
+        "package": "python-kdtree",
+        "description": "container for kd-tree sorting for Python"
+    },
+    {
+        "package": "python-kdtree:i386",
+        "description": "container for kd-tree sorting for Python"
+    },
+    {
+        "package": "python-kdtree-dbg",
+        "description": "container for kd-tree sorting for Python ("
+    },
+    {
+        "package": "python-kdtree-dbg:i386",
+        "description": "container for kd-tree sorting for Python ("
+    },
+    {
+        "package": "python-kerberos",
+        "description": "GSSAPI interface module for Python"
+    },
+    {
+        "package": "python-kerberos:i386",
+        "description": "GSSAPI interface module for Python"
+    },
+    {
+        "package": "python-keybinder",
+        "description": "registers global key bindings for applicat"
+    },
+    {
+        "package": "python-keybinder:i386",
+        "description": "registers global key bindings for applicat"
+    },
+    {
+        "package": "python-keyczar",
+        "description": "Toolkit for safe and simple cryptography f"
+    },
+    {
+        "package": "python-keyring",
+        "description": "almacene y acceda a sus contraseñas de for"
+    },
+    {
+        "package": "python-keystone",
+        "description": "OpenStack identity service - Python librar"
+    },
+    {
+        "package": "python-keystoneclient",
+        "description": "Client library for OpenStack Identity API"
+    },
+    {
+        "package": "python-kid",
+        "description": "simple Pythonic template language for XML"
+    },
+    {
+        "package": "python-kinterbasdb",
+        "description": "Python DB API 2.0 extension for Firebird a"
+    },
+    {
+        "package": "python-kinterbasdb:i386",
+        "description": "Python DB API 2.0 extension for Firebird a"
+    },
+    {
+        "package": "python-kinterbasdb-dbg",
+        "description": "Python DB API 2.0 extension for Firebird a"
+    },
+    {
+        "package": "python-kinterbasdb-dbg:i386",
+        "description": "Python DB API 2.0 extension for Firebird a"
+    },
+    {
+        "package": "python-kitchen",
+        "description": "Python library of containers, text and i18"
+    },
+    {
+        "package": "python-kivy",
+        "description": "Kivy - Multimedia / Multitouch framework i"
+    },
+    {
+        "package": "python-kivy:i386",
+        "description": "Kivy - Multimedia / Multitouch framework i"
+    },
+    {
+        "package": "python-kivy-examples",
+        "description": "Kivy - Example files"
+    },
+    {
+        "package": "python-kiwi",
+        "description": "Un entorno de trabajo gráfico para constru"
+    },
+    {
+        "package": "python-kjbuckets",
+        "description": "Set and graph data types for Python"
+    },
+    {
+        "package": "python-kjbuckets:i386",
+        "description": "Set and graph data types for Python"
+    },
+    {
+        "package": "python-kml",
+        "description": "Library to manipulate KML 2.2 OGC standard"
+    },
+    {
+        "package": "python-kml:i386",
+        "description": "Library to manipulate KML 2.2 OGC standard"
+    },
+    {
+        "package": "python-koan",
+        "description": "kickstart-over-a-network (koan) - python l"
+    },
+    {
+        "package": "python-kolabformat",
+        "description": "Python bindings for Kolab Format 3.0 XML p"
+    }
+]

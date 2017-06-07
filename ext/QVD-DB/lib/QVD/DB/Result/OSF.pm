@@ -13,6 +13,7 @@ __PACKAGE__->add_columns(
 	description => { data_type => 'varchar(32768)', is_nullable => 1 },
 	memory      => { data_type => 'integer' }, use_overlay => { data_type => 'boolean' },
 	user_storage_size => { data_type => 'integer', is_nullable => 1 },
+	osd_id => { data_type => 'integer', is_nullable => 1 },
 );
 
 __PACKAGE__->set_primary_key('id');

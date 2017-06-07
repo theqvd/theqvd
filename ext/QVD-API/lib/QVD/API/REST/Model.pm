@@ -800,7 +800,7 @@ my $AVAILABLE_FIELDS = {
 
 	      Config => [qw(tenant_id key operative_value default_value is_default)],
 
-	      OSF => [qw(id name description overlay user_storage memory  number_of_vms number_of_dis properties creation_date creation_admin_id creation_admin_name)],
+	      OSF => [qw(id name description overlay user_storage memory  number_of_vms number_of_dis properties creation_date creation_admin_id creation_admin_name osd_id)],
 
 	      Role => [qw(name id description fixed internal acls roles creation_date creation_admin_id creation_admin_name)],
 
@@ -853,7 +853,7 @@ my $AVAILABLE_FIELDS = {
 
 		 Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time antiquity status source ip type_of_action qvd_object object_deleted admin_deleted superadmin)],
 
-		 OSF => [qw(id name description overlay user_storage memory  number_of_vms number_of_dis properties creation_date creation_admin_id creation_admin_name)],
+		 OSF => [qw(id name description overlay user_storage memory  number_of_vms number_of_dis properties creation_date creation_admin_id creation_admin_name osd_id)],
 		 
 		 Role => [qw(name description id fixed internal acls roles creation_date creation_admin_id creation_admin_name)],
 		
@@ -1124,7 +1124,7 @@ my $AVAILABLE_ARGUMENTS = {
     User => [qw(name password blocked description)],
     VM => [qw(name ip blocked expiration_soft expiration_hard storage di_tag description)],
     Host => [qw(name address blocked description)],
-    OSF => [qw(name memory user_storage overlay description)],
+    OSF => [qw(name memory user_storage overlay description osd_id)],
     DI => [qw(blocked description)],
     My_Tenant => [qw(name language block description)],
     Tenant => [qw(name language block blocked description)],
@@ -1323,6 +1323,7 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER = {
         'vm_id' => 'vms.id',
         'di_id' => 'dis.id',
         'description' => 'me.description',
+        'osd_id' => 'me.osd_id',
         'tenant_id' => 'me.tenant_id',
         'tenant_name' => 'tenant.name',
         'number_of_vms' => 'view.number_of_vms',

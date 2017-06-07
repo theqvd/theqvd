@@ -11,6 +11,23 @@
             <textarea id="description" type="text" name="description"></textarea>
         </td>
     </tr>
+    <tr>
+        <td data-i18n="OS distro">OS distro</td>
+        <td>
+            <select class="" id="os_distro_select" name="os_distro_select">
+                <option value="<%= OSF_DISTRO_COMMON_ID %>" data-i18n="Custom">Custom</option>
+            </select>
+        </td>
+    </tr>
+    <tr class="js-os-configuration-row os-configuration-row hidden">
+        <td></td>
+        <td>
+            <fieldset class="os-configuration-fs">
+                <legend data-i18n="Software configuration">Software configuration</legend>
+                <div class="bb-os-configuration"></div>
+            </fieldset>
+        </td>
+    </tr>
     <% 
     if (Wat.C.checkACL('osf.create.memory')) { 
     %>

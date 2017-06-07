@@ -70,9 +70,14 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
                 else {
                     that.render();
                 }
+                
+                that.afterFetchDetails();
             }
         });
     },
+    
+    // Hook to be executed after fetch details
+    afterFetchDetails: function () {},
     
     completePropertiesAndRender: function (that) {
 		// If is an element without properties just render

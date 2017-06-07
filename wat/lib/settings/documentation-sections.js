@@ -1,4 +1,4 @@
-// Documentation section IDs to be retrieved for embeded help
+// Documentation section IDs to be retrieved for embedded help
 Wat.I.docSections = {
     home: { 
         en: '_home_page',

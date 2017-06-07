@@ -109,7 +109,7 @@
         .action-new-item {
             @extend %clearfix;
             margin-bottom: 10px;
-            margin-top: -10px;
+            margin-top: 5px;
             @include in(desktop) {
                 float: left;
             }

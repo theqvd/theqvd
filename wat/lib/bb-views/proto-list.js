@@ -695,9 +695,11 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     // Fetch collection and render list
     fetchList: function (that) {
-        var that = that || this;        
-
-        that.collection.fetch({      
+        var that = that || this;
+        
+        that.collection.reset();
+        
+        that.collection.fetch({
             complete: function () {
                 // If loaded page is not the first one and is empty, go to previous page
                 if (that.collection.offset > 1 && that.collection.length == 0) {
@@ -1044,7 +1046,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         
         // Show loading animation while loading
-        $('.' + this.cid).find('.list').html(HTML_MID_LOADING);
+        $('.' + this.cid).find('.list td').html(HTML_MICRO_LOADING);
         
         var totalPages = Math.ceil(this.collection.elementsTotal/this.collection.block);
         var currentPage = this.collection.offset;
@@ -1082,7 +1084,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 break;
         }
         
-        this.fetchList();        
+        this.fetchList();
     },
     
     openMassiveChangesDialog: function (that) {  

@@ -140,6 +140,9 @@ Wat.I.T = {
                     },
                     sortingRow: {
                         name: 'list/sorting-row'
+                    },
+                    selectedOptionsMenu: {
+                        name: 'list/selected-options-menu'
                     }
                 }
 
@@ -300,6 +303,49 @@ Wat.I.T = {
                     },
                 }
                 break;
+            case 'osDetails':
+                templates = {
+                    osConfiguration: {
+                        name: 'details/osf-os-configuration'
+                    },
+                    osConfigurationEditor: {
+                        name: 'editor/osf-os-configuration'
+                    },
+                    osConfigurationEditorAppearance: {
+                        name: 'editor/osf-os-configuration-appearance'
+                    },
+                    osConfigurationEditorApps: {
+                        name: 'editor/osf-os-configuration-applications'
+                    },
+                    osConfigurationEditorPackages: {
+                        name: 'editor/osf-os-configuration-packages'
+                    },
+                    osConfigurationEditorSettings: {
+                        name: 'editor/osf-os-configuration-settings'
+                    },
+                    osConfigurationEditorShortcuts: {
+                        name: 'editor/osf-os-configuration-shortcuts'
+                    },
+                    osConfigurationEditorShortcutsRows: {
+                        name: 'editor/osf-os-configuration-shortcuts-rows'
+                    },
+                    osConfigurationEditorScripts: {
+                        name: 'editor/osf-os-configuration-scripts'
+                    },
+                    osConfigurationEditorScriptsRows: {
+                        name: 'editor/osf-os-configuration-scripts-rows'
+                    },
+                    packageBlockWrapper: {
+                        name: 'list/package-block-wrapper'
+                    }
+                }
+                break;
+            case 'importOSsettings':
+                templates = {
+                    importableOSFDI: {
+                        name: 'list/importable-osf-di'
+                    }
+                }
             default:
                 // Empty object will be returned
                 break;

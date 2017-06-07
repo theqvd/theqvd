@@ -50,10 +50,12 @@ $details_side: right;
 $other_properties_width: 40;
 
 // Dialog
-$dialog_width: 650px;
-$dialog_height: 550px;
+$dialog_width: 65%;
+$dialog_height: auto;
 $dialog_mobile_width: 100%;
 $dialog_mobile_height: 100vh;
+$dialog_secondary_width: 75%;
+$dialog_secondary_height: auto;
 
 // Fonts
 $font-sizes: 0.9 1 1.1 1.4;

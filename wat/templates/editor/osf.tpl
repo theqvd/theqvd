@@ -20,6 +20,19 @@
     </tr>
     <% 
     }
+    if (model.get('osd_id')) {
+    %>
+    <tr class="js-os-configuration-row os-configuration-row">
+        <td data-i18n="OS distro">OS distro</td>
+        <td>
+            <fieldset class="os-configuration-fs">
+                <legend data-i18n="Software configuration">Software configuration</legend>
+                <div class="bb-os-configuration"></div>
+            </fieldset>
+        </td>
+    </tr>
+    <%
+    }
     if (Wat.C.checkACL('osf.update.memory')) { 
     %>
         <tr>

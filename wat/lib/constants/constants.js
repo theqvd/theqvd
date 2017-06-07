@@ -237,6 +237,7 @@ DEFAULT_OSF_MEMORY = 256;
 UNCLASSIFIED_CONFIG_CATEGORY = 'unclassified';
 
 // Html pieces
+HTML_MICRO_LOADING = '<div class="micro-loading"><i class="fa fa-gear fa-spin"></i></div>';
 HTML_MINI_LOADING = '<div class="mini-loading"><i class="fa fa-gear fa-spin"></i></div>';
 HTML_LOADING = '<div class="loading"><i class="fa fa-gear fa-spin"></i></div>';
 HTML_MID_LOADING = '<div class="loading-mid"><i class="fa fa-gear fa-spin"></i></div>';
@@ -378,8 +379,6 @@ ROLE_TEMPLATE_SCOPE = ['Users', 'VMs', 'Nodes', 'OSFs', 'Images', 'Administrator
 ROLE_TEMPLATE_ACTIONS = ['Reader', 'Operator', 'Creator', 'Updater', 'Eraser', 'Manager'];
 
 // Dictionaries
-
-
 DICTIONARY_STATES = {
     running: 'Running',
     stopped: 'Stopped',
@@ -388,3 +387,6 @@ DICTIONARY_STATES = {
     zombie: 'Zombie',
     lost: 'Lost'
 };
+
+// DIG (Disk Image Generator)
+OSF_DISTRO_COMMON_ID = -1;
