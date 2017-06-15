@@ -15,6 +15,8 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
         'click .js-button-show-shortcut-details': 'toggleShortcutConfiguration',
         'click .js-add-starting-script': 'addScript',
         'click .js-delete-starting-script': 'deleteScript',
+        'change input[type="checkbox"][js-autosave-field]': 'autoSaveCheck',
+        'change .js-starting-script-mode': 'changeScriptMode'
     },
     
     ////////////////////////////////////////////////////
@@ -175,27 +177,48 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
         var command = $('input[name="shortcut_command"]').val();
         var name = $('input[name="shortcut_name"]').val();
         var defaultIconUrl = "http://icons.iconarchive.com/icons/custom-icon-design/flatastic-11/256/Application-icon.png";
+        
+        // Save plugin element
+        Wat.DIG.setPluginListElement({
+            pluginId: 'shortcuts',
+            osdId: this.params.osdId,
+            attributes: {
+                name: name,
+                icon_url: defaultIconUrl,
+                command: command
+            }
+        }, this.afterAddShortcut, function () {});
+    },
+    
+    afterAddShortcut: function (e) {
+        var response = JSON.parse(e.responseText);
+        
+        // Mock
+        var command = $('input[name="shortcut_command"]').val();
+        var name = $('input[name="shortcut_name"]').val();
+        var defaultIconUrl = "http://icons.iconarchive.com/icons/custom-icon-design/flatastic-11/256/Application-icon.png";
 
         var newShortcut = {
             name: name,
             icon_url: defaultIconUrl,
-            icon_id: 666,
             command: command,
-            id: command
+            id: btoa(command + name)
         };
-
+        // End Mock
+        
+        // Render new shortcut on shortcut list
         var template = _.template(
             Wat.TPL.osConfigurationEditorShortcutsRows, {
                 shortcuts: [newShortcut]
             }
         );
-
+        
         $('.bb-os-conf-shortcuts-new-rows').prepend(template);
-
+        
         // Reset controls
         $('.shortcuts-form input[name="shortcut_command"]').val('');
         $('.shortcuts-form input[name="shortcut_name"]').val('');
-
+        
         Wat.T.translate();
     },
     
@@ -217,12 +240,32 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
         $('[data-form-field-name="icon_url"]').val(newIcon);
 
         $('.js-button-show-shortcut-details[data-id="' + id + '"]').trigger('click');
+        
+        // Save plugin element
+        Wat.DIG.setPluginListElement({
+            pluginId: 'shortcuts',
+            osdId: this.params.osdId,
+            attributes: {
+                id: id,
+                name: newName,
+                command: newCommand,
+                newIcon:  newIcon
+                
+            }
+        }, function () {}, function () {});
     },
     
     deleteShortcut: function (e) {
         var id = $(e.target).attr('data-id');
         $('.js-shortcut-row[data-id="' + id + '"]').remove();
         $('.js-editor-row[data-id="' + id + '"]').remove();
+        
+        // Delete plugin element
+        Wat.DIG.deletePluginListElement({
+            pluginId: 'shortcuts',
+            osdId: this.params.osdId,
+            attributes: {id: id}
+        }, function () {}, function () {});
     },
     
     toggleShortcutConfiguration: function (e) {
@@ -256,13 +299,31 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
 
         var fileName = $('.js-starting-script')[0].files[0].name;
 
+        // Save plugin element
+        Wat.DIG.setPluginListElement({
+            pluginId: 'execution_hooks',
+            osdId: this.params.osdId,
+            attributes: {
+                name: fileName
+            }
+        }, this.afterAddScript, function () {});
+    },
+    
+    
+    afterAddScript: function (e) {
+        // Mock
+        var fileName = $('.js-starting-script')[0].files[0].name;
+        var id = btoa(fileName);
+        var execution_hook = 'first_connection';
+        // End mock
+        
         // Add starting script row
         var newRow = _.template(
             Wat.TPL.osConfigurationEditorScriptsRows, {
                 scripts: [{
-                    id: 1,
+                    id: id,
                     name: fileName,
-                    execution_hook : ''
+                    execution_hook : execution_hook
                 }]
             }
         );
@@ -276,8 +337,9 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
 
         $('.js-starting-script').val('');
     },
-
+    
     deleteScript: function (e) {
+        var id = $(e.target).attr('data-id');
         $(e.target).closest('tr').remove();
 
         var nRows = $('table.js-scripts-list tr').length;
@@ -285,5 +347,50 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
         if (nRows == 1) {
             $('table.js-scripts-list tr.js-scripts-empty').show();
         }
+        
+        // Delete plugin element
+        Wat.DIG.deletePluginListElement({
+            pluginId: 'execution_hooks',
+            osdId: this.params.osdId,
+            attributes: {id: id}
+        }, function () {}, function () {});
     },
+    
+    changeScriptMode: function (e) {
+        var newMode = $(e.target).val();
+        var id = $(e.target).attr('data-id');
+        
+        // Save plugin element
+        Wat.DIG.setPluginListElement({
+            pluginId: 'execution_hooks',
+            osdId: this.params.osdId,
+            attributes: {
+                id: id,
+                mode: newMode
+            }
+        }, function () {}, function () {});
+    },
+    
+    ////////////////////////////////////////////////////
+    // Functions for single controls
+    ////////////////////////////////////////////////////
+    
+    autoSaveCheck: function (e) {
+        var that = this;
+    
+        var name = $(e.target).attr('name');
+        var checked = $(e.target).is(':checked');
+        
+        var [pluginId, attrName] = name.split('.');
+        
+        // Save distro id
+        var attributes = {};
+        attributes['id'] = attrName;
+        attributes[attrName] = checked;
+        
+        Wat.DIG.setPluginAttr({
+            pluginId: pluginId,
+            attributes: attributes
+        }, function () {}, function () {});
+    }
 });

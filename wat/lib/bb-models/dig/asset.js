@@ -1,7 +1,4 @@
-Wat.Models.Asset = Backbone.Model.extend({
-    actionPrefix: 'asset',
-    apiCode: 'dig',
-    
+Wat.Models.Asset = Wat.Models.DIG.extend({
     defaults: {
     },
     
@@ -20,7 +17,7 @@ Wat.Models.Asset = Backbone.Model.extend({
     },
     
     url: function () {
-        var url = Wat.C.getApiUrl() + 'proxy/' + this.apiCode + '/osd';
+        var url = this.baseUrl() + '/osd';
         
         return url;
     }

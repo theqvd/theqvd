@@ -1,6 +1,5 @@
 Wat.Collections.Packages = Wat.Collections.Collection.extend({
     model: Wat.Models.Package,
-    actionPrefix: 'package',
     
     parse: function(rawResponse) {
         var that = this;

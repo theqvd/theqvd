@@ -523,10 +523,14 @@ Wat.Views.MainView = Backbone.View.extend({
         this.dialogConf.buttons = {
             Cancel: function (e) {
                 Wat.I.closeDialog($(this));
+                
+                that.afterNewElementDialogAction('cancel');
             },
             Create: function (e) {
                 that.dialog = $(this);
                 that.createElement($(this));
+                
+                that.afterNewElementDialogAction('create');
             }
         };
 
@@ -545,10 +549,14 @@ Wat.Views.MainView = Backbone.View.extend({
         this.dialogConf.buttons = {
             Cancel: function () {
                 Wat.I.closeDialog($(this));
+                
+                that.afterEditElementDialogAction('cancel');
             },
             Update: function () {
                 that.dialog = $(this);
                 that.updateElement();
+                
+                that.afterEditElementDialogAction('update');
             }
         };
         
@@ -634,5 +642,9 @@ Wat.Views.MainView = Backbone.View.extend({
                 that.fetchDetails();
                 break;
         }
-    }
+    },
+    
+    // Hooks after click a button on dialog
+    afterNewElementDialogAction: function (action) {},
+    afterEditElementDialogAction: function (action) {},
 });

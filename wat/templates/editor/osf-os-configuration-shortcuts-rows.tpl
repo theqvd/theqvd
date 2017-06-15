@@ -1,5 +1,6 @@
 <%
 $.each(shortcuts, function (iSc, sc) {
+    sc.id = btoa(sc.command); // Just mock
 %>
     <tr data-form-list="shortcuts" class="js-shortcut-row" data-id="<%= sc.id %>">
         <td class="col-width-5">
@@ -61,5 +62,6 @@ $.each(shortcuts, function (iSc, sc) {
         </td>
     </tr>
 <%
+    delete sc.id; // Just mock
 });
 %>

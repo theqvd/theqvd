@@ -5,10 +5,6 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
     initialize: function (params) {
         this.collection = new Wat.Collections.OSFs(params);
         
-        // Retrieve distros list
-        this.distros = new Wat.Collections.Distros({});
-        this.distros.fetch();
-        
         Wat.Views.ListView.prototype.initialize.apply(this, [params]);
     },
     
@@ -16,6 +12,8 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
     listEvents: {},
     
     openNewElementDialog: function (e) {
+        var that = this;
+        
         this.model = new Wat.Models.OSF();
         this.dialogConf.title = $.i18n.t('New OS Flavour');
         
@@ -23,13 +21,29 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
         
         Wat.I.chosenElement('select[name="os_distro_select"]','single100');
         
-        //Fill distros select
-        $.each (this.distros.models, function (iDistro, distro) {
-            var opt = document.createElement("OPTION");
-            $(opt).val(distro.get('id')).html(distro.get('name') + '-' + distro.get('version'));
-            $('select[name="os_distro_select"').append(opt);
+        // Create OSD
+        Wat.DIG.createOSD(function (OSDmodel) {
+            that.OSDmodel = OSDmodel;
+            
+            var osList = that.OSDmodel.getPluginAttrOptions('os.distro');
+            
+            $.each (osList, function (id, distro) {
+                var opt = document.createElement("OPTION");
+                $(opt).val(id).html(distro.value);
+                $('select[name="os_distro_select"').append(opt);
+            });
+            
+            $('select[name="os_distro_select"').trigger('chosen:updated');
         });
-        $('select[name="os_distro_select"').trigger('chosen:updated');
+    },
+    
+    afterNewElementDialogAction: function (action) {
+        switch (action) {
+            case 'cancel':
+                // Delete temporary OSD if OSF is not finally created
+                this.OSDmodel.destroy();
+                break;
+        }
     },
     
     createElement: function () {

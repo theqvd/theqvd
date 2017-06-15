@@ -397,27 +397,24 @@ Wat.B = {
                     $('.js-os-configuration-row').hide();
                     break;
                 default:
-                    var distroModel = Wat.CurrentView.distros.where({id: parseInt(selectedDistro)})[0];
+                    // Save distro id in OSD just for MOCK!
+                    Wat.CurrentView.OSDmodel.set({distro_id: selectedDistro, name: selectedDistro});
+                    Wat.CurrentView.OSDmodel.save();
                     
-                    var attributes = {
-                        name: distroModel.get('id') + "", // Only for testing
-                        distro_id: distroModel.get('id'),
-                        distro_name: distroModel.get('name') + ' ' + distroModel.get('version'),
-                        distro_icon: distroModel.get('icon'),
-                        scripts: distroModel.get('scripts'),
-                        shortcuts: distroModel.get('shortcuts'),
-                        config_params: distroModel.get('config_params')
+                    // Save distro id
+                    var opts = {
+                        pluginId: 'os',
+                        attributes: {distro: selectedDistro}
                     };
                     
-                    $.each(distroModel.get('config_params'), function (param_name, param_def) {
-                        attributes[param_name] = distroModel.get(param_name);
+                    Wat.DIG.setPluginAttr(opts, function () {}, function () {
+                        Wat.CurrentView.renderOSDetails(Wat.CurrentView.OSDmodel, {
+                            shrinked: true,
+                            editable: true,
+                            container: '.editor-container'
+                        });
+                        $('.js-os-configuration-row').show();
                     });
-                    
-                    Wat.CurrentView.OSDmodel = new Wat.Models.OSD(attributes);
-                    
-                    var template = Wat.CurrentView.getOsDetailsRender(Wat.CurrentView.OSDmodel, {shrinked: true, editable: true});
-                    $('.editor-container .bb-os-configuration').html(template);
-                    $('.js-os-configuration-row').show();
                     
                     break;
             }
@@ -831,11 +828,20 @@ Wat.B = {
                         
                         Wat.CurrentView.OSDdialogView.remove();
                         delete Wat.CurrentView.OSDdialogView;
+                        
+                        var savepoint = new Wat.Models.OSDSavepoint({}, { 
+                            osdId: Wat.CurrentView.OSDmodel.id, 
+                            discard: true 
+                        });
+                        savepoint.save();
                     },
                     "Save": function () {
                         Wat.U.setFormChangesOnModel('.js-editor-form-osf-os', Wat.CurrentView.OSDmodel);
-                        var template = Wat.CurrentView.getOsDetailsRender(Wat.CurrentView.OSDmodel, {shrinked: true, editable: true});
-                        $('.editor-container .bb-os-configuration').html(template);
+                        Wat.CurrentView.renderOSDetails(Wat.CurrentView.OSDmodel, {
+                            shrinked: true, 
+                            editable: true,
+                            container: '.editor-container'
+                        });
                         Wat.I.closeDialog($(this));
                         
                         // Send primary dialog to front again
@@ -843,6 +849,11 @@ Wat.B = {
                         
                         Wat.CurrentView.OSDdialogView.remove();
                         delete Wat.CurrentView.OSDdialogView;
+                        
+                        var savepoint = new Wat.Models.OSDSavepoint({}, { 
+                            osdId: Wat.CurrentView.OSDmodel.id 
+                        });
+                        savepoint.save();
                     }
                 },
                 buttonClasses: ['fa fa-ban js-button-close','fa fa-save js-button-save'],
@@ -851,7 +862,8 @@ Wat.B = {
                     Wat.CurrentView.OSDdialogView = new Wat.Views.OSDEditorView({
                         el: $(target),
                         osfId: osfId,
-                        massive: massive
+                        massive: massive,
+                        osdId: Wat.CurrentView.OSDmodel.id
                     });
                 },
             }

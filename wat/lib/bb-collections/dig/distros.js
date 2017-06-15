@@ -1,7 +1,4 @@
-Wat.Collections.Distros = Backbone.Collection.extend({
-    actionPrefix: 'distro',
-    apiCode: 'dig',
-    
+Wat.Collections.Distros = Wat.Collections.DIG.extend({
     parse: function(response) {
         return this.mock();
     },
@@ -138,7 +135,6 @@ Wat.Collections.Distros = Backbone.Collection.extend({
                 shortcuts: []
             }
         ];
-        
         return os_distros;
     },
     

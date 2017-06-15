@@ -13,7 +13,7 @@
             </select>
         </td>
         <td class="col-width-20">
-            <a class="button2 fa fa-trash js-delete-starting-script col-width-100 center" data-i18n="Delete"></a>
+            <a class="button2 fa fa-trash js-delete-starting-script col-width-100 center" data-id="<%= script.id %>" data-i18n="Delete"></a>
         </td>
     </tr>
 <% }) %>

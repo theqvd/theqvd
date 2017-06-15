@@ -1,11 +1,22 @@
-Wat.Models.OSD = Backbone.Model.extend({
-    actionPrefix: 'osd',
-    apiCode: 'dig',
+Wat.Models.OSD = Wat.Models.DIG.extend({
+    pluginDef: {},
+    pluginData: {},
     
-    initialize: function (params) {
-        Backbone.Model.prototype.initialize.apply(this, [params]);
+    initialize: function (attrs, opts) {
+        Backbone.Model.prototype.initialize.apply(this, [attrs]);
         
-        this.urlRoot = Wat.C.getApiUrl() + 'proxy/' + this.apiCode + '/osd';
+        this.urlRoot = this.baseUrl() + '/osd';
+    },
+    
+    initPlugins: function () {
+        var that = this;
+        
+        $.each (this.pluginDef.models, function (iModel, model) {
+            var pluginId = model.get('plugin_id');
+            var plugin = model.get('plugin');
+            
+            that.pluginData[pluginId] = new Wat.Models.Plugin({}, {osdId: that.id, pluginId: pluginId});
+        });
     },
     
     defaults: {
@@ -84,9 +95,15 @@ Wat.Models.OSD = Backbone.Model.extend({
         return osd;
     },
     
-    urlz: function () {
-        var url = Wat.C.getApiUrl() + 'proxy/' + this.apiCode + '/osd';
+    getPluginAttrOptions: function (attr) {
+        var [pluginId, attr] = attr.split('.');
         
-        return url;
-    }
+        var plugin = this.getPlugin(pluginId);
+        return plugin[attr].list_options;
+    },
+    
+    getPlugin: function (pluginId) {
+        var pluginModel = this.pluginDef.where({plugin_id: pluginId})[0];
+        return pluginModel.get('plugin');
+    },
 });

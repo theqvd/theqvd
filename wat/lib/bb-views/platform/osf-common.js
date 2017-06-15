@@ -26,7 +26,7 @@ Wat.Common.BySection.osf = {
         
         var context = $('.' + that.cid + '.editor-container');
         
-        var name = context.find('input[name="name"]').val();        
+        var name = context.find('input[name="name"]').val();
         var memory = context.find('input[name="memory"]').val();
         var user_storage = context.find('input[name="user_storage"]').val();
         var description = context.find('textarea[name="description"]').val();
@@ -69,6 +69,7 @@ Wat.Common.BySection.osf = {
     },
     
     openEditElementDialog: function(e) {
+        var that = this;
         if (this.viewKind == 'list') {
             this.model = this.collection.where({id: this.selectedItems[0]})[0];
         }
@@ -77,28 +78,22 @@ Wat.Common.BySection.osf = {
         
         Wat.Views.DetailsView.prototype.openEditElementDialog.apply(this, [e]);
         
-        this.fetchOSD(function (that) {
-            var template = that.getOsDetailsRender(that.OSDmodel, {shrinked: true, editable: true});
-            $('.editor-container .bb-os-configuration').html(template);
-        });
-    },
-    
-    fetchOSD: function (callback) {
-        callback = callback || function () {};
-        var that = this;
-        
-        if (!this.model.get('osd_id')) {
-            callback(that);
-            return;
+        // If OSF were created using DIG, retrieve OS info from DIG
+        var osdID = this.model.get('osd_id');
+        if (osdID) {
+            Wat.DIG.fetchOSD(osdID, function (OSDmodel) {
+                that.OSDmodel = OSDmodel;
+
+                that.renderOSDetails(that.OSDmodel, {
+                    shrinked: true, 
+                    editable: true, 
+                    container: '.editor-container'
+                });
+            });
         }
-        
-        this.OSDmodel = new Wat.Models.OSD({id: this.model.get('osd_id')});
-        
-        this.OSDmodel.fetch({
-            success: function(e) {
-                callback(that);
-            }
-        });
+        else {
+            that.renderOSDetails();
+        }
     },
     
     // Render OS Details template and return it
@@ -106,24 +101,34 @@ Wat.Common.BySection.osf = {
     // options: Options of the rendering
     //          - editable: If Edit button will be rendering
     //          - shrinked: If is just showed SO distro and rest of the info is expanded clicking More button
-    getOsDetailsRender: function (model, options) {
-        var osfId = this.model.get('id') || 0;
-        var distroModel = this.distros.where({id: model.get('distro_id')})[0];
+    //          - container: CSS selector of the container where will be rendered
+    renderOSDetails: function (model, options) {
+        options.container = options.container || '';
         
-        // Add specific parts of editor to dialog
-        var template = _.template(
-                    Wat.TPL.osConfiguration, {
-                        osfId: osfId,
-                        model: model,
-                        config_params: model.get('config_params'),
-                        shortcuts: model.get('shortcuts'),
-                        scripts: model.get('scripts'),
-                        distroModel: distroModel,
-                        editable: options.editable,
-                        shrinked: options.shrinked
-                    }
-                );
+        if (!model) {
+            var template = 'This OSF is of type custom';
+        }
+        else {
+            var osfId = this.model.get('id') || 0;
+            var distroId = model.get('distro_id');
+            
+            var distros = model.getPluginAttrOptions('os.distro');
+
+            // Add specific parts of editor to dialog
+            var template = _.template(
+                        Wat.TPL.osConfiguration, {
+                            osfId: osfId,
+                            model: model,
+                            config_params: model.get('config_params'),
+                            shortcuts: model.get('shortcuts'),
+                            scripts: model.get('scripts'),
+                            distro: distros[distroId],
+                            editable: options.editable,
+                            shrinked: options.shrinked
+                        }
+                    );
+        }
         
-        return template;
+        $(options.container + ' .bb-os-configuration').html(template);
     }
 }
