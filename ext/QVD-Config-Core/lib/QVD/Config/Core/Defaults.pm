@@ -113,6 +113,7 @@ path.client.pixmaps = pixmaps
 path.client.pixmaps.alt = /usr/share/pixmaps
 
 path.qvd.bin = /usr/lib/qvd/bin
+path.qvd.etc = /usr/lib/qvd/etc
 path.usb.database = /usr/share/hwdata/usb.ids
 
 ## paths to external executables
@@ -680,6 +681,7 @@ internal.vma.on_printing.stopped = ${path.qvd.bin}/qvd-printing
 internal.vma.printing.config = ${path.run}/printing.conf
 internal.vma.slave.config = ${path.run}/slave.conf
 internal.vma.nxagent.config = ${path.run}/nxagent.conf
+internal.vma.pulseaudio.config = ${path.run}/default.pa
 
 # TODO: some of these DB settings may not be used anymore, cleanup them!
 internal.database.client.connect.timeout = 20

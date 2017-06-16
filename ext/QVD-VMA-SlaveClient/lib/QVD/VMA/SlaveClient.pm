@@ -59,7 +59,7 @@ sub _add_exit_hook {
 sub _handle_exit  {
     my ($self) = @_;
     warn "Sending TERM to subprocesses";
-    @kids = keys $self->{exit_hooks};
+    @kids = keys %{$self->{exit_hooks}};
     kill TERM => @kids;
 }
 
