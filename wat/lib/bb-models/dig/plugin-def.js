@@ -107,13 +107,13 @@ Wat.Models.PluginDef = Wat.Models.DIG.extend({
                         description: 'Scripts',
                         control_type: 'list_files',
                         list_files: {
-                            12: {
+                            10: {
                                 name: 'configure_anything.sh'
                             },
-                            17: {
+                            11: {
                                 name: 'log_connection.sh'
                             },
-                            34: {
+                            12: {
                                 name: 'close_connection.sh'
                             },
                         },
@@ -122,8 +122,8 @@ Wat.Models.PluginDef = Wat.Models.DIG.extend({
                                 description: 'When be executed',
                                 control_type: 'list_options',
                                 list_options: {
-                                    'first_connection': 'In any session starting',
-                                    'vma.on_state.connected': 'Only first session starting',
+                                    'first_connection': 'Only first session starting',
+                                    'vma.on_state.connected': 'In any session starting',
                                     'vma.on_state.expire': 'On expiration'
                                 },
                             }
@@ -136,7 +136,7 @@ Wat.Models.PluginDef = Wat.Models.DIG.extend({
                     shortcut: {
                         description: 'Shortcuts',
                         control_type: 'controls_group',
-                        settings: {
+                        controls_group: {
                             name: {
                                 description: 'Shortcut name',
                                 control_type: 'text',

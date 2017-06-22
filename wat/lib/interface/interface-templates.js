@@ -332,8 +332,14 @@ Wat.I.T = {
                     osConfigurationEditorScripts: {
                         name: 'editor/osf-os-configuration-scripts'
                     },
+                    osConfigurationEditorScriptsManager: {
+                        name: 'editor/osf-os-configuration-scripts-manager'
+                    },
                     osConfigurationEditorScriptsRows: {
                         name: 'editor/osf-os-configuration-scripts-rows'
+                    },
+                    osConfigurationEditorAssetOptions: {
+                        name: 'editor/osf-os-configuration-asset-options'
                     },
                     packageBlockWrapper: {
                         name: 'list/package-block-wrapper'

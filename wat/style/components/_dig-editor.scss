@@ -1,0 +1,55 @@
+/********************************************************************
+*********************************************************************
+*********************************************************************
+
+                @APPEARANCE
+                components/_dig-appearance.scss
+
+*********************************************************************
+*********************************************************************
+********************************************************************/
+
+
+
+.os-conf-editor {
+    .data-preview-message {
+        text-align: center;
+        margin-top: 50px;
+    }
+    
+    .data-preview-box--script {
+        background: #222;
+        color: #ddd;
+        
+        overflow: auto;
+        
+        font-size: small;
+        font-weight: normal;
+        font-style: italic;
+        text-align: left;
+        
+        border: 1px #666 solid;
+        border-radius: 4px;
+        
+        width: 100%;
+        height: 250px;
+        
+        margin: 10px auto;
+        padding: 8px;
+    }
+    
+    div {
+        &.editor-title {
+            font-weight: bold;
+            text-align: left;
+            min-height: 25px;
+        }
+        
+        margin-bottom: 10px;
+    }
+    
+    input[type="text"], input[type="file"], select {
+        width: 100%;
+        background: white;
+    }
+}

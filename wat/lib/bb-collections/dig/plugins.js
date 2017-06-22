@@ -19,7 +19,7 @@ Wat.Collections.Plugins = Wat.Collections.DIG.extend({
                 data = [
                     {
                         script: {
-                            value: 12,
+                            value: 10,
                             settings: {
                                 execution_hook: 'first_connection'
                             }
@@ -27,7 +27,7 @@ Wat.Collections.Plugins = Wat.Collections.DIG.extend({
                     },
                     {
                         script: {
-                            value: 17,
+                            value: 11,
                             settings: {
                                 execution_hook: 'vma.on_state.connected'
                             }
@@ -35,9 +35,20 @@ Wat.Collections.Plugins = Wat.Collections.DIG.extend({
                     },
                     {
                         script: {
-                            value: 34,
+                            value: 12,
                             settings: {
                                 execution_hook: 'vma.on_state.expire'
+                            }
+                        }
+                    }
+                ]
+                break;
+            case 'desktop':
+                data = [
+                    {
+                        wallpaper: {
+                            value: 2,
+                            settings: {
                             }
                         }
                     }

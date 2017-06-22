@@ -3,9 +3,16 @@ Wat.Models.Plugin = Wat.Models.DIG.extend({
     },
     
     initialize: function (attrs, opts) {
+        this.pluginId = opts.pluginId;
+        this.osdId = opts.osdId;
+        
         Backbone.Model.prototype.initialize.apply(this, [attrs]);
         
         this.urlRoot = this.baseUrl() + '/osd/' + opts.osdId + '/' + opts.pluginId;
+    },
+    
+    url: function () {
+        return this.baseUrl() + '/osd/' + this.osdId + '/' + this.pluginId;
     },
     
     parse: function (response) {
@@ -15,7 +22,7 @@ Wat.Models.Plugin = Wat.Models.DIG.extend({
     mock: function () {
         var data = {};
         
-        switch (this.id) {
+        switch (this.pluginId) {
             case 'os':
                 data = {
                     os_distro: {
@@ -43,7 +50,7 @@ Wat.Models.Plugin = Wat.Models.DIG.extend({
             case 'desktop':
                 data = {
                     wallpaper: {
-                        value: 11,
+                        value: 2,
                         settings: {}
                     }
                 }
@@ -52,7 +59,7 @@ Wat.Models.Plugin = Wat.Models.DIG.extend({
                 data = [
                     {
                         script: {
-                            value: 12,
+                            value: 10,
                             settings: {
                                 execution_hook: 'first_connection'
                             }
@@ -60,7 +67,7 @@ Wat.Models.Plugin = Wat.Models.DIG.extend({
                     },
                     {
                         script: {
-                            value: 17,
+                            value: 11,
                             settings: {
                                 execution_hook: 'vma.on_state.connected'
                             }
@@ -68,7 +75,7 @@ Wat.Models.Plugin = Wat.Models.DIG.extend({
                     },
                     {
                         script: {
-                            value: 34,
+                            value: 12,
                             settings: {
                                 execution_hook: 'vma.on_state.expire'
                             }

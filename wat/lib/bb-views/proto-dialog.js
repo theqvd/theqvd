@@ -16,6 +16,6 @@ Wat.Views.DialogView = Wat.Views.MainView.extend({
     render: function () {
         $(this.el).html('<div class="bb-dialog-content content ' + this.cid + '"></div>');
         
-        this.el = '.bb-dialog-content';
+        this.el = '.bb-dialog-content.' + this.cid;
     },
 });

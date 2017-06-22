@@ -493,11 +493,6 @@ span.text {
     height: 400px;
     vertical-align: top !important;
     
-    input[type="text"], input[type="file"], select {
-        width: 100%;
-        background: white;
-    }
-    
     li.installed-package:first-child .order-package-up, li.installed-package:last-child .order-package-down {
         visibility: hidden;
     }

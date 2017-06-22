@@ -13,10 +13,15 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
         'click .js-delete-shortcut': 'deleteShortcut',
         'click .js-update-shortcut': 'updateShortcut',
         'click .js-button-show-shortcut-details': 'toggleShortcutConfiguration',
-        'click .js-add-starting-script': 'addScript',
         'click .js-delete-starting-script': 'deleteScript',
         'change input[type="checkbox"][js-autosave-field]': 'autoSaveCheck',
-        'change .js-starting-script-mode': 'changeScriptMode'
+        'change .js-starting-script-mode': 'changeScriptMode',
+        'click .js-open-script-manager': 'openAssetManager',
+        'change .js-asset-selector': 'changeAssetSelector',
+        'click .input[type="radio"][name="wallpaper"]': 'changeAssetSelector',
+        'click .js-wallpaper-name': 'clickWallpaperName',
+        'click .js-toggle-upload-select-mode': 'toggleUploadSelectMode',
+        'click .js-upload-wallpaper': 'uploadWallpaper'
     },
     
     ////////////////////////////////////////////////////
@@ -44,8 +49,6 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
         this.renderSectionScripts();
 
         Wat.I.chosenElement('select.js-app-to-shortcut', 'single100');
-
-        $("textarea").expanding();
         
         Wat.T.translate();
     },
@@ -53,11 +56,19 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
     renderSectionAppearence: function () {
         var template = _.template(
             Wat.TPL.osConfigurationEditorAppearance, {
-                massive: this.massive
+                massive: this.massive,
+                assetType: 'wallpaper'
             }
         );
 
         $('.bb-os-conf-appearance').html(template);
+        
+        this.renderAssetsControl({
+            assetType: 'wallpaper',
+            pluginId: 'desktop'
+        });
+        
+        $('.js-upload-mode').hide();
     },
     
     renderSectionPackages: function () {
@@ -131,25 +142,58 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
         var template = _.template(
             Wat.TPL.osConfigurationEditorScripts, {
                 massive: this.massive,
-                model: Wat.CurrentView.OSDmodel
+                model: Wat.CurrentView.OSDmodel,
+                hookOptions: Wat.CurrentView.OSDmodel.getPluginAttrSettingOptions('execution_hooks.script.hook')
             }
         );
 
         $('.bb-os-conf-scripts').html(template);
-
+        
+        this.renderAssetsControl({
+            assetType: 'script',
+            pluginId: 'execution_hooks'
+        });
+        
+        this.renderSectionScriptsRows(Wat.CurrentView.OSDmodel.get('scripts'));
+    },
+    
+    renderAssetsControl: function (opts) {
+        var assets = new Wat.Collections.Assets(null, {
+            filter: {
+                type: opts.assetType
+            } 
+        });
+        assets.fetch({
+            complete: function () {
+                var template = _.template(
+                    Wat.TPL.osConfigurationEditorAssetOptions, {
+                        models: assets.models,
+                        assetType: opts.assetType,
+                        pluginId: opts.pluginId
+                    }
+                );
+                
+                $('.bb-os-conf-' + opts.assetType + '-assets').html(template);
+                
+                // Select first radio button
+                $('input[type="radio"][name="' + opts.assetType + '"]').eq(0).trigger('click');
+            }
+        });
+    },
+    
+    renderSectionScriptsRows: function (scripts) {
         // Render rows with existent scripts
         var rows = _.template(
             Wat.TPL.osConfigurationEditorScriptsRows, {
-                scripts: Wat.CurrentView.OSDmodel.get('scripts')
+                scripts: scripts,
+                hookOptions: Wat.CurrentView.OSDmodel.getPluginAttrSettingOptions('execution_hooks.script.hook')
             }
         );
 
-        $("table.js-scripts-list").append(rows);
+        $('table.js-scripts-list').html(rows);
         Wat.I.chosenElement('.js-starting-script-mode', 'single100');
-
-        if (Wat.CurrentView.OSDmodel.get('scripts').length > 0) {
-            $('table.js-scripts-list tr.js-scripts-empty').hide();
-        }
+        
+        Wat.T.translate();
     },
     
     ////////////////////////////////////////////////////
@@ -291,30 +335,37 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
     // Functions for scripts
     ////////////////////////////////////////////////////
         
-    addScript: function (e) {
-        if (!$('.js-starting-script').val()) {
+    addScript: function (finishCallback) {
+        var id = $('input[name="script"]:checked').val();
+        
+        if (!id) {
             Wat.I.M.showMessage({message: 'Nothing to do', messageType: 'info'});
             return;
         }
-
-        var fileName = $('.js-starting-script')[0].files[0].name;
-
+        
+        var row = $('tr[data-control-id][data-id="' + id + '"]');
+        
+        var fileName = $(row).attr('data-name');
+        var execution_hook = $('.js-starting-script-mode[data-new-file]').val();
+        
         // Save plugin element
         Wat.DIG.setPluginListElement({
             pluginId: 'execution_hooks',
             osdId: this.params.osdId,
             attributes: {
-                name: fileName
+                name: fileName,
+                hook: execution_hook
             }
-        }, this.afterAddScript, function () {});
+        }, this.afterAddScript, finishCallback);
     },
     
     
     afterAddScript: function (e) {
         // Mock
-        var fileName = $('.js-starting-script')[0].files[0].name;
-        var id = btoa(fileName);
-        var execution_hook = 'first_connection';
+        var id = $('input[name="script"]:checked').val();
+        var row = $('tr[data-control-id][data-id="' + id + '"]');
+        var fileName = $(row).attr('data-name');
+        var execution_hook = $('.js-starting-script-mode[data-new-file]').val();
         // End mock
         
         // Add starting script row
@@ -324,28 +375,37 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
                     id: id,
                     name: fileName,
                     execution_hook : execution_hook
-                }]
+                }],
+                hookOptions: Wat.CurrentView.OSDmodel.getPluginAttrSettingOptions('execution_hooks.script.hook')
             }
         );
 
-        $("table.js-scripts-list").append(newRow);
-        Wat.I.chosenElement('.js-starting-script-mode', 'single100');
-
-        $('table.js-scripts-list tr.js-scripts-empty').hide();
-
-        Wat.T.translate();
+        Wat.CurrentView.OSDmodel.attributes.scripts.push({
+            id: id,
+            name: fileName,
+            execution_hook : execution_hook
+        });
+        
+        Wat.CurrentView.OSDdialogView.renderSectionScriptsRows(Wat.CurrentView.OSDmodel.get('scripts'));
 
         $('.js-starting-script').val('');
     },
     
     deleteScript: function (e) {
         var id = $(e.target).attr('data-id');
-        $(e.target).closest('tr').remove();
-
-        var nRows = $('table.js-scripts-list tr').length;
-
-        if (nRows == 1) {
-            $('table.js-scripts-list tr.js-scripts-empty').show();
+        
+        // Delete script from stored scripts (just for mock)
+        var storedScripts = Wat.CurrentView.OSDmodel.get('scripts');
+        
+        var deletedScriptIndex = -1;
+        $.each(storedScripts, function (i, v) {
+            if (v.id == id) {
+                deletedScriptIndex = i;
+            }
+        });
+        
+        if (deletedScriptIndex > -1) {
+            storedScripts.splice(deletedScriptIndex, 1);
         }
         
         // Delete plugin element
@@ -353,7 +413,12 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
             pluginId: 'execution_hooks',
             osdId: this.params.osdId,
             attributes: {id: id}
-        }, function () {}, function () {});
+        }, this.afterDeleteScript, function () {});
+    },
+    
+    afterDeleteScript: function (e) {
+        var scripts = Wat.CurrentView.OSDmodel.get('scripts');
+        Wat.CurrentView.OSDdialogView.renderSectionScriptsRows(scripts);
     },
     
     changeScriptMode: function (e) {
@@ -392,5 +457,154 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
             pluginId: pluginId,
             attributes: attributes
         }, function () {}, function () {});
+    },
+    
+    openAssetManager: function (e) {
+        var that = this;
+        
+        var dialogConf = {
+            title: "Asset manager",
+            buttons : {
+                "Cancel": function () {
+                    Wat.I.closeDialog($(this));
+                    
+                    Wat.CurrentView.OSDdialogView.ScriptsDialogView.remove();
+                    delete Wat.CurrentView.OSDdialogView.ScriptsDialogView;
+                    
+                    $('.ui-dialog-secondary').eq(0).css('z-index','1003');
+                },
+                "Add": function () {
+                    var those = this;
+                    that.addScript(function () {
+                        Wat.I.closeDialog($(those));
+                    
+                        Wat.CurrentView.OSDdialogView.ScriptsDialogView.remove();
+                        delete Wat.CurrentView.OSDdialogView.ScriptsDialogView;
+                        
+                        $('.ui-dialog-secondary').eq(0).css('z-index','1003');
+                    });
+                }
+            },
+            buttonClasses: ['fa fa-ban js-button-close','fa fa-plus-circle js-button-add'],
+
+            fillCallback: function (target) {
+                Wat.CurrentView.OSDdialogView.ScriptsDialogView = new Wat.Views.OSDScriptsEditorView({
+                    el: $(target),
+                    //osfId: osfId,
+                    massive: false,
+                    osdId: Wat.CurrentView.OSDmodel.id
+                });
+            },
+        }
+
+        Wat.CurrentView.osDialog.scriptsDialog = Wat.I.dialog(dialogConf);
+
+        // Add secondary dialog class to new dialog to give different look
+        //Wat.CurrentView.osDialog.scriptsDialog.parent().addClass('ui-dialog-secondary');
+        Wat.CurrentView.osDialog.scriptsDialog.dialog("option", "position", {my: "center", at: "center", of: window});
+        // Send primary dialog to back because jquery ui doesnt handle it properly
+        $('.ui-dialog-secondary').eq(0).css('z-index','1001');
+    },
+    
+    changeAssetSelector: function (e) {
+        Wat.DIG.changeAssetSelector(e);
+        var row = $(e.target).closest('tr');
+        var pluginId = $(row).attr('data-plugin-id');
+        var setCallback = function () {};
+
+        switch(pluginId) {
+            case 'desktop':
+                    var id = $(row).attr('data-id');
+                    var name = $(row).attr('data-name');
+                    var url = $(row).attr('data-url');
+                    setCallback = this.afterSetWallpaper;
+                break;
+            default:
+                return;
+        }
+        
+        // Save plugin element
+        Wat.DIG.setPluginListElement({
+            pluginId: pluginId,
+            osdId: Wat.CurrentView.OSDmodel.id,
+            attributes: {
+                id: id,
+                name: name,
+                url: url
+            }
+        }, setCallback, function () {});
+        
+        // Show loading message for preview image until it is loaded
+        $('.js-preview img').hide();
+        $('.js-data-preview-message').show();
+        $('.js-preview img').on('load', function () {
+            $('.js-preview img').show();
+            $('.js-data-preview-message').hide();
+        });
+    },
+    
+    afterSetWallpaper: function (e) {
+        var row = $('tr[data-type="wallpaper"].selected-row');
+        
+        var response = JSON.parse(e.responseText);
+        
+        // Mock
+        var newWallpaper = {
+            id: $(row).attr('data-id'),
+            name: $(row).attr('data-name'),
+            url: $(row).attr('data-url'),
+        };
+        // End Mock
+        
+        return;
+        
+        // Render new shortcut on shortcut list
+        var template = _.template(
+            Wat.TPL.osConfigurationEditorShortcutsRows, {
+                shortcuts: [newShortcut]
+            }
+        );
+        
+        $('.bb-os-conf-shortcuts-new-rows').prepend(template);
+        
+        // Reset controls
+        $('.shortcuts-form input[name="shortcut_command"]').val('');
+        $('.shortcuts-form input[name="shortcut_name"]').val('');
+        
+        Wat.T.translate();
+    },
+    
+    clickWallpaperName: function (e) {
+        // Select this script
+        $(e.target).parent().find('input[type="radio"]').trigger('click');
+    },
+    
+    toggleUploadSelectMode: function (e) {
+        $('.js-upload-mode, .js-select-mode').toggle();
+        $('.js-preview img').toggle();
+        
+        $('input[name="wallpaper_name"]').val('');
+        var file = $('input[name="wallpaper_file"]').val('');
+    },
+    
+    uploadWallpaper: function (e) {
+        var name = $('input[name="wallpaper_name"]').val();
+        var file = $('input[name="wallpaper_file"]')[0].files[0];
+        
+        if (!name || !file) {
+            Wat.I.M.showMessage({message: 'Nothing to do', messageType: 'info'});
+            return;
+        }
+        
+        var uploadedWallpaper = {
+            name: name,
+            url: 'https://s-media-cache-ak0.pinimg.com/originals/8b/8f/b2/8b8fb268842167174d0265df49c2a0ba.jpg'
+        };
+        
+        Wat.CurrentView.OSDmodel.pluginDef.where({plugin_id: 'desktop'})[0].attributes.plugin.wallpaper.list_images[55] = uploadedWallpaper;
+        
+        this.toggleUploadSelectMode();
+        
+        Wat.CurrentView.OSDdialogView.renderSectionAppearence();
     }
 });

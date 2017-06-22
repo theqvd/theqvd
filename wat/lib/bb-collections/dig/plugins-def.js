@@ -72,7 +72,7 @@ Wat.Collections.PluginsDef = Wat.Collections.DIG.extend({
                 plugin_type: 'values',
             },
             {
-                plugin_id: 'wallpaper',
+                plugin_id: 'desktop',
                 plugin: {
                     wallpaper: {
                         description: 'Wallpaper',
@@ -106,13 +106,13 @@ Wat.Collections.PluginsDef = Wat.Collections.DIG.extend({
                         description: 'Scripts',
                         control_type: 'list_files',
                         list_files: {
-                            12: {
+                            10: {
                                 name: 'configure_anything.sh'
                             },
-                            17: {
+                            11: {
                                 name: 'log_connection.sh'
                             },
-                            34: {
+                            12: {
                                 name: 'close_connection.sh'
                             },
                         },
@@ -121,8 +121,8 @@ Wat.Collections.PluginsDef = Wat.Collections.DIG.extend({
                                 description: 'When be executed',
                                 control_type: 'list_options',
                                 list_options: {
-                                    'first_connection': 'In any session starting',
-                                    'vma.on_state.connected': 'Only first session starting',
+                                    'first_connection': 'Only first session starting',
+                                    'vma.on_state.connected': 'In any session starting',
                                     'vma.on_state.expire': 'On expiration'
                                 },
                             }
@@ -137,7 +137,7 @@ Wat.Collections.PluginsDef = Wat.Collections.DIG.extend({
                     shortcut: {
                         description: 'Shortcuts',
                         control_type: 'controls_group',
-                        settings: {
+                        controls_group: {
                             name: {
                                 description: 'Shortcut name',
                                 control_type: 'text',
@@ -153,23 +153,23 @@ Wat.Collections.PluginsDef = Wat.Collections.DIG.extend({
                                 default_value: 1,
                                 control_type: 'list_images',
                                 list_images: {
-                                    1: {
+                                    5: {
                                         url: 'http://icons.iconarchive.com/icons/custom-icon-design/flatastic-11/256/Application-icon.png',
                                         name: 'Generic application'
                                     },
-                                    2: {
+                                    6: {
                                         url: 'https://lh6.ggpht.com/RZeFXe1KB7fk9w6t7C8qM6rX6pyZIT6SrezUkTqTawVOKCw_ZRa2wQa3-9a_lO5gGU7e=w300',
                                         name: 'Ubuntu'
                                     },
-                                    3: {
+                                    7: {
                                         url: 'https://www.iconfinder.com/data/icons/flat-round-system/512/opensuse-128.png',
                                         name: 'SLES'
                                     },
-                                    4: {
+                                    8: {
                                         url: 'https://cdn1.iconfinder.com/data/icons/nuove/128x128/apps/redhat.png',
                                         name: 'Red Hat'
                                     },
-                                    5: {
+                                    9: {
                                         url: 'https://www.mozilla.org/media/img/styleguide/identity/firefox/guidelines-logo.7ea045a4e288.png',
                                         name: 'Firefox'
                                     }

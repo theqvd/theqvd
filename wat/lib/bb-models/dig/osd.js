@@ -8,6 +8,10 @@ Wat.Models.OSD = Wat.Models.DIG.extend({
         this.urlRoot = this.baseUrl() + '/osd';
     },
     
+    url: function () {
+        return this.baseUrl() + '/osd';
+    },
+    
     initPlugins: function () {
         var that = this;
         
@@ -66,17 +70,17 @@ Wat.Models.OSD = Wat.Models.DIG.extend({
             },
             scripts: [
                 {
-                    id: 12,
+                    id: 10,
                     name: 'configure_anything.sh',
                     execution_hook: 'first_connection'
                 },
                 {
-                    id: 17,
+                    id: 11,
                     name: 'log_connection.sh',
                     execution_hook: 'vma.on_state.connected'
                 },
                 {
-                    id: 34,
+                    id: 12,
                     name: 'close_connection.sh',
                     execution_hook: 'vma.on_state.expire'
                 },
@@ -95,15 +99,31 @@ Wat.Models.OSD = Wat.Models.DIG.extend({
         return osd;
     },
     
-    getPluginAttrOptions: function (attr) {
-        var [pluginId, attr] = attr.split('.');
+    // Get plugin definition
+    // - pluginId: Id of the plugin (alphanumeric)
+    //      I.E.: os|vma|execution_hooks|shortcuts...
+    getPluginDef: function (pluginId) {
+        var pluginModel = this.pluginDef.where({plugin_id: pluginId})[0];
+        return pluginModel.get('plugin');
+    },
+    
+    // Get possible options of an attribute of type list of a plugin
+    // - pluginAttr: Plugin and attribute Ids separated by dots
+    //      I.E.: os.distro|execution_hooks.script
+    getPluginAttrOptions: function (pluginAttr) {
+        var [pluginId, attr] = pluginAttr.split('.');
         
-        var plugin = this.getPlugin(pluginId);
+        var plugin = this.getPluginDef(pluginId);
         return plugin[attr].list_options;
     },
     
-    getPlugin: function (pluginId) {
-        var pluginModel = this.pluginDef.where({plugin_id: pluginId})[0];
-        return pluginModel.get('plugin');
+    // Get possible options of a setting of type list form an attribute of type list of a plugin
+    // - pluginAttr: Plugin and attribute Ids separated by dots
+    //      I.E.: execution_hooks.script.hook
+    getPluginAttrSettingOptions: function (pluginAttrSetting) {
+        var [pluginId, attr, setting] = pluginAttrSetting.split('.');
+        
+        var plugin = this.getPluginDef(pluginId);
+        return plugin[attr].settings[setting].list_options;
     },
 });

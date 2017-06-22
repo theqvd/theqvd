@@ -139,7 +139,7 @@ Wat.Collections.Distros = Wat.Collections.DIG.extend({
     },
     
     url: function () {
-        var url = Wat.C.getApiUrl() + 'proxy/' + this.apiCode + '/osd';
+        var url = this.baseUrl() + '/osd';
         
         return url;
     }

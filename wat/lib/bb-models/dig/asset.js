@@ -3,11 +3,18 @@ Wat.Models.Asset = Wat.Models.DIG.extend({
     },
     
     parse: function(response) {
-        response.id = this.id;
-        response.name = 'Ball';
-        response.type = 'wallpaper';
-        response.url = 'http://www.planwallpaper.com/static/images/6768666-1080p-wallpapers.jpg';
-        return response;
+        return $.extend({}, response, this.mock(response));
+    },
+    
+    mock: function (response) {
+        var asset = {
+            id: this.id,
+            name: 'Ball',
+            type: 'wallpaper',
+            url: 'http://www.planwallpaper.com/static/images/6768666-1080p-wallpapers.jpg'
+        }
+        
+        return asset;
     },
     
     initialize: function (params) {
