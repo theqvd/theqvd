@@ -680,8 +680,6 @@ Wat.I = {
     updateSelectedItems: function (selectedItems, that) {
         var that = that || Wat.CurrentView;
         
-        $('.elements-selected').html(selectedItems);
-        
         if (selectedItems == 0) {
             this.hideSelectedItemsMenu();
         }
@@ -699,6 +697,8 @@ Wat.I = {
                 $('.js-only-massive').show();
             }
         }
+        
+        $('.elements-selected').html(selectedItems);
     },
     
     // Update the indicator of selected items only for select control elements kind
