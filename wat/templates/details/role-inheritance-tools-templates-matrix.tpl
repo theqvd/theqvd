@@ -1,4 +1,4 @@
-<table class="role-template-tools">
+<table class="role-template-tools <%= cid %>">
     <thead>
         <tr>
             <th class="center">

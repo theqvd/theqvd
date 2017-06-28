@@ -1,7 +1,8 @@
-Wat.Views.ProfileView = Wat.Views.DetailsView.extend({  
+Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
     setupOption: 'administrators',
     secondaryContainer: '.bb-setup',
     qvdObj: 'profile',
+    editorViewClass: Wat.Views.ProfileEditorView,
     
     setupOption: 'profile',
     
@@ -39,7 +40,7 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         Wat.A.getTemplates(templates, this.render, this); 
     },
     
-    render: function () {        
+    render: function () {
         this.template = _.template(
             Wat.TPL.profile, {
                 cid: this.cid,
@@ -66,59 +67,5 @@ Wat.Views.ProfileView = Wat.Views.DetailsView.extend({
         Wat.I.chosenConfiguration();
         Wat.I.chosenElement('select[name="language"]', 'single100');
         Wat.I.chosenElement('select[name="block"]', 'single100');
-    },
-    
-    updateElement: function (dialog) {
-        var valid = Wat.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
-        
-        if (!valid) {
-            return;
-        }
-        
-        var filters = {};
-        var arguments = {};
-        
-        var context = $('.' + this.cid + '.editor-container');
-
-        // If change password is checked
-        if (context.find('input.js-change-password').is(':checked')) {
-            var password = context.find('input[name="password"]').val();
-            var password2 = context.find('input[name="password2"]').val();
-            if (password && password2 && password == password2) {
-                arguments['password'] = password;
-            }
-        }
-        
-        // Set language
-        var language = context.find('select[name="language"]').val();
-        arguments['language'] = language;  
-        
-        // Set block size
-        var block = context.find('select[name="block"]').val();
-        arguments['block'] = block;
-        
-        // Store new language to make things after update
-        this.newLanguage = language;
-        this.newBlock = block;
-        
-        this.updateModel(arguments, filters, this.afterUpdateElement);
-    },
-    
-    afterUpdateElement: function (that) {
-        // If change is made succesfully check new language to ender again and translate
-        if (that.retrievedData.status == STATUS_SUCCESS) {
-            if (Wat.C.language != that.newLanguage) {
-                Wat.C.language = that.newLanguage;
-            }
-            if (Wat.C.block != that.newBlock) {
-                Wat.C.block = that.newBlock;
-            }
-            that.render();
-            
-            // Render footer to update translations if necessary
-            Wat.I.renderFooter();
-            
-            Wat.T.initTranslate();
-        }
     }
 });

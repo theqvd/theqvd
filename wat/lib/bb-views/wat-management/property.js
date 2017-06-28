@@ -5,6 +5,7 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
     qvdObj: 'property',
     selectedObj: 'all',
     selectedTenant: '0',
+    editorViewClass: Wat.Views.PropertyEditorView,
     
     breadcrumbs: {
         'screen': 'Home',
@@ -17,7 +18,7 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
         }
     },
     
-    initialize: function (params) {     
+    initialize: function (params) {
         this.collection = new Wat.Collections.Properties(params);
         
         // Disable pagination
@@ -145,7 +146,7 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
 
         that.collection.filters = filters;
         
-        that.collection.fetch({      
+        that.collection.fetch({
             complete: function () {
                 that.renderPropertyList(that);
             }
@@ -190,7 +191,7 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
                     var selectedObj = $('select[name="obj-qvd-select"]').val();
                     
                     if (selectedObj == qvdObj) {
-                        $(row).hide();                    
+                        $(row).hide();
                         if ($('.js-row-property-' + qvdObj).length == 0) {
                             $('.js-zero-properties').show();
                         }
@@ -208,97 +209,18 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
                 else {
                     Wat.I.M.showMessage({message: i18n.t('Error deleting'), messageType: 'error'}, that.retrievedData);
                 }
-            }                            
+            }
         }, this);
     },
     
-    openNewElementDialog: function (e) {
-        this.model = new Wat.Models.Property();
-        this.dialogConf.title = $.i18n.t('New property');
-        Wat.Views.MainView.prototype.openNewElementDialog.apply(this, [e]);
-    },
-    
     openEditElementDialog: function (e) {
+        // This editor is different than the others, so the modelation needs to done here because item selection is done with button click instead checkbox
         var propertyId = $(e.target).attr('data-property-id');
+        this.model = this.collection.where({property_id: parseInt(propertyId)})[0];
         
-        // Doesnt work, do manually
-        // this.model = this.collection.where({property_id: propertyId});
-        
-        var that = this;
-        $.each(this.collection.models, function (iMod, mod) {
-            if (mod.get('property_id') == propertyId) {
-                that.model = mod;
-            }
-        });
-                
         this.editingFromList = true;
         
-        this.dialogConf.title = $.i18n.t('Edit property');
         Wat.Views.MainView.prototype.openEditElementDialog.apply(this, [e]);
-    },
-    
-    createElement: function () {
-        var valid = Wat.Views.MainView.prototype.createElement.apply(this);
-        
-        if (!valid) {
-            return;
-        }
-                
-        var context = $('.' + this.cid + '.editor-container');
-
-        var key = context.find('input[name="key"]').val();
-        var description = context.find('textarea[name="description"]').val(); 
-        
-        var args = {
-            "key": key,
-            "description": description,
-            "__property_assign__": []
-        };
-        
-        if (Wat.C.isSuperadmin()) {
-            var tenant_id = context.find('select[name="tenant_id"]').val();
-            args['tenant_id'] = tenant_id;
-        }
-        else {
-            // TODO: This assignation must be done by the server automatically for tenant admins
-            args["tenant_id"] = Wat.C.tenantID;
-        }
-                
-        $.each(QVD_OBJS_WITH_PROPERTIES, function (iObj, qvdObj) {
-            if ($('input[name="in_' + qvdObj + '"]').is(':checked')) {
-                args["__property_assign__"].push(qvdObj);
-            }
-        });
-        
-        this.createModel(args, this.render);
-    },
-    
-    updateElement: function (dialog) {
-        var that = that || this;
-                
-        var valid = Wat.Views.DetailsView.prototype.updateElement.apply(this, [dialog]);
-        
-        if (!valid) {
-            return;
-        }
-        
-        var context = $('.' + this.cid + '.editor-container');
-        
-        var name = context.find('input[name="key"]').val();
-        var description = context.find('textarea[name="description"]').val();
-
-        var filters = {"id": that.model.get('property_id')};
-        var arguments = {};
-        
-        //if (Wat.C.checkACL('role.update.name')) {
-            arguments['key'] = name;
-        //}
-        
-        //if (Wat.C.checkACL('role.update.description')) {
-            arguments["description"] = description;
-        //}
-        
-        this.updateModel(arguments, filters, this.render);
     },
     
     askDelete: function (e) {

@@ -128,247 +128,6 @@ Wat.Views.MainView = Backbone.View.extend({
         }
     },
     
-    // Editor
-    editorElement: function (e) {
-        Wat.I.dialog(this.dialogConf, this);    
-    },
-    
-    fillEditor: function (target, that) {
-        var that = that || Wat.CurrentView;
-        
-        var isSuperadmin = Wat.C.isSuperadmin();
-                
-        if (that.viewKind == 'details' || that.viewKind == 'admin' || that.editingFromList) {
-            var editorMode = 'edit';
-            delete that.editingFromList;
-        }
-        else {
-            var editorMode = 'create';
-        }
-        
-        var classifiedByTenant = $.inArray(that.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
-        
-        // Add common parts of editor to dialog
-        that.template = _.template(
-                    Wat.TPL.editorCommon, {
-                        classifiedByTenant: editorMode == 'create' ? classifiedByTenant : 0,
-                        isSuperadmin: isSuperadmin,
-                        editorMode: editorMode,
-                        blocked: that.model ? that.model.attributes.blocked : 0,
-                        cid: that.cid
-                    }
-                );
-        
-        target.html(that.template);
-        
-        if (editorMode == 'create' && isSuperadmin && classifiedByTenant) { 
-            var params = {
-                'actionAuto': 'tenant',
-                'selectedId': that.selectedTenant || 0,
-                'controlId': 'tenant_editor',
-                'chosenType': 'advanced100'
-            };
-            
-            var existsOutTenant = $.inArray(that.qvdObj, QVD_OBJS_EXIST_OUT_TENANT) != -1;
-
-            if (existsOutTenant) {
-                    params['startingOptions'] = {};
-                    params['startingOptions'][COMMON_TENANT_ID] = 'None (Shared)';   
-            }
-            
-            Wat.A.fillSelect(params, function () {
-                // Remove supertenant from tenant selector
-                var existsInSupertenant = $.inArray(that.qvdObj, QVD_OBJS_EXIST_IN_SUPERTENANT) != -1;
-
-                if (!existsInSupertenant) {
-                    $('select[name="tenant_id"] option[value="0"]').remove();
-                    
-                    Wat.I.updateChosenControls('[name="tenant_id"]');
-                }
-                                
-                Wat.B.bindEvent('change', '.tenant-selector select[name="tenant_id"]', Wat.B.editorBinds.updatePropertyRows);
-                $('[name="tenant_id"]').trigger('change');
-            });
-        }
-        
-        // Add specific parts of editor to dialog
-        that.template = _.template(
-                    that.templateEditor, {
-                        model: that.model || that.collection.where({id: that.selectedItems[0]})[0]
-                    }
-                );
-
-        $(that.editorContainer).html(that.template);
-        
-        // Apply expanding plugin to make textareas expandable
-        $("textarea").expanding();
-        
-        // Custom Properties
-        
-        if (!Wat.C.checkACL(Wat.CurrentView.qvdObj + '.update.properties')) {
-            var enabledProperties = false;
-        }
-        // Get enabled properties value from constant. Properties could be disabled by variable
-        else if (that.enabledProperties != undefined) {
-            var enabledProperties =  that.enabledProperties;
-            // Clean enabledProperties variable
-            delete that.enabledProperties;
-        }
-        else {
-            var enabledProperties =  $.inArray(that.qvdObj, QVD_OBJS_WITH_PROPERTIES) != -1;
-        }
-        
-        switch (editorMode) {
-            case 'create':
-                var enabledEditProperties = Wat.C.checkACL(that.qvdObj + '.create.properties');
-                break;
-            case 'edit':
-                var enabledEditProperties = Wat.C.checkACL(that.qvdObj + '.update.properties');
-                break;
-        }
-        
-        if (enabledProperties && enabledEditProperties) {
-            var filters = {};
-
-            var classifiedByTenant = $.inArray(that.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
-
-            if (editorMode == 'edit' && classifiedByTenant) {
-                if (Wat.C.isMultitenant() && Wat.C.isSuperadmin()) {
-                    filters['-or'] = ['tenant_id', that.model.get('tenant_id'), 'tenant_id', SUPERTENANT_ID];
-                }
-                else {
-                    filters['tenant_id'] = that.model.get('tenant_id');
-                }
-            }
-            
-            that.editorMode = editorMode;
-                
-            Wat.A.performAction(that.qvdObj + '_get_property_list', {}, filters, {}, that.fillEditorProperties, that, undefined, {"field":"key","order":"-asc"});
-        }
-        
-        // Store scrollHeight of the dialog container
-        Wat.I.dialogScrollHeight = $('.ui-dialog .js-dialog-container')[0].scrollHeight;
-    },
-    
-    fillEditorProperties: function (that) {
-        var properties = {};
-        
-        if (that.retrievedData.total > 0) {            
-            $.each(that.retrievedData.rows, function (iProp, prop) {
-                var value = '';
-                
-                // Massive editor will not show any value
-                if (that.editorMode != 'massive-edit' && that.model && that.model.get('properties') && that.model.get('properties')[prop.property_id]) {
-                    value = that.model.get('properties')[prop.property_id].value;
-                }
-                
-                properties[prop.id] = {
-                    value: value,
-                    key: prop.key,
-                    description: prop.description,
-                    tenant_id: prop.tenant_id,
-                    property_id: prop.id,
-                };
-            });
-        }
-            
-        // Override properties including not setted on element
-        that.model.set({properties: properties});
-        
-        that.template = _.template(
-                    Wat.TPL.editorCommonProperties, {
-                        properties: that.model && that.model.attributes.properties ? that.model.attributes.properties : {},
-                        editorMode: that.editorMode
-                    }
-                );
-        
-        $(that.editorPropertiesContainer).html(that.template);
-        
-        Wat.T.translate();
-
-        if (that.editorMode != 'create' || !Wat.C.isSuperadmin()) {
-            $('.js-editor-property-row').show();
-        }
-        else if (Wat.C.isMultitenant() && Wat.C.isSuperadmin() && $('[name="tenant_id"]').val() != undefined) {
-            $('.js-editor-property-row[data-tenant-id="' + $('[name="tenant_id"]').val() + '"]').show();
-            $('.js-editor-property-row[data-tenant-id="' + SUPERTENANT_ID + '"]').show();
-        }
-        else {
-            var existsInSupertenant = $.inArray(that.qvdObj, QVD_OBJS_EXIST_IN_SUPERTENANT) != -1;
-            if (!existsInSupertenant) {
-                $('.js-editor-property-row[data-tenant-id="' + Wat.C.tenantID + '"]').show();
-            }
-        }
-
-        // Store scrollHeight of the dialog container
-        Wat.I.dialogScrollHeight = $('.ui-dialog .js-dialog-container')[0].scrollHeight;
-        
-        delete that.editorMode;
-    },
-    
-    updateElement: function () {
-        this.parseProperties('update');
-        
-        var context = '.editor-container.' + this.cid;
-        
-        return Wat.I.validateForm(context);
-    },  
-    
-    createElement: function () {
-        this.parseProperties('create');
-        
-        var context = '.editor-container.' + this.cid;
-        
-        return Wat.I.validateForm(context);
-    },
-    
-    // Parse properties from create/edit forms
-    parseProperties: function (mode) {
-        var propKeys = $('.' + this.cid + '.editor-container .js-editor-property-row:visible input.custom-prop-key');
-        var propValues = $('.' + this.cid + '.editor-container .js-editor-property-row:visible input.custom-prop-value');
-        
-        switch (mode) {
-            case 'create':
-                var createPropertiesACL = this.qvdObj + '.create.properties';
-                
-                if (!createPropertiesACL) {
-                    return;
-                }
-                break;
-            case 'update':
-                switch(this.viewKind) {
-                    case 'list':
-                        var updatePropertiesACL = this.qvdObj + '.update-massive.properties';
-                        break;
-                    case 'details':
-                        var updatePropertiesACL = this.qvdObj + '.update.properties';
-                        break;    
-                }
-                
-                if (!updatePropertiesACL) {
-                    return;
-                }
-                break;
-        }
-        
-        var setProps = {};
-
-        for(i=0;i<propKeys.length;i++) {
-            var id = propKeys.eq(i);
-            var value = propValues.eq(i);
-            
-            if (!Wat.I.isMassiveFieldChanging(id.val())) {
-                continue;
-            }
-            
-            setProps[id.val()] = value.val();
-        }
-        
-        this.properties = {
-            'set' : setProps
-        };
-    },
-    
     createModel: function (arguments, successCallback) {
         this.model.setOperation('create');
         
@@ -377,7 +136,7 @@ Wat.Views.MainView = Backbone.View.extend({
             'error': 'Error creating'
         };
         
-        this.saveModel(arguments, {}, messages, successCallback);        
+        this.saveModel(arguments, {}, messages, successCallback);
     },
     
     updateModel: function (arguments, filters, successCallback, model) {
@@ -518,56 +277,72 @@ Wat.Views.MainView = Backbone.View.extend({
     openNewElementDialog: function (e) {
         var that = this;
         
-        this.templateEditor = Wat.TPL['editorNew_' + that.qvdObj];
-        
         this.dialogConf.buttons = {
             Cancel: function (e) {
                 Wat.I.closeDialog($(this));
                 
-                that.afterNewElementDialogAction('cancel');
+                Wat.CurrentView.editorView.afterNewElementDialogAction('cancel');
             },
             Create: function (e) {
-                that.dialog = $(this);
-                that.createElement($(this));
+                var valid = Wat.CurrentView.editorView.validateForm();
+
+                if (!valid) {
+                    return;
+                }
                 
-                that.afterNewElementDialogAction('create');
+                that.dialog = $(this);
+                Wat.CurrentView.editorView.createElement($(this));
+                
+                Wat.CurrentView.editorView.afterNewElementDialogAction('create');
+                
+                Wat.I.closeDialog($(this));
             }
         };
 
         this.dialogConf.buttonClasses = ['fa fa-ban js-button-cancel', 'fa fa-plus-circle js-button-create'];
         
-        this.dialogConf.fillCallback = this.fillEditor;
-
-        this.editorElement(e);
+        this.dialogConf.fillCallback = function (target, that) {
+            var editorViewClass = Wat.Common.BySection[that.qvdObj] ? Wat.Common.BySection[that.qvdObj].editorViewClass : Wat.CurrentView.editorViewClass;
+            Wat.CurrentView.editorView = new editorViewClass({ action: 'create', el: $(target) });
+        };
+        
+        this.dialog = Wat.I.dialog(this.dialogConf, this);
     },
     
     openEditElementDialog: function (e) {
         var that = this;
         
-        this.templateEditor = Wat.TPL['editor_' + that.qvdObj];
-        
         this.dialogConf.buttons = {
-            Cancel: function () {
+            Cancel: function (e) {
                 Wat.I.closeDialog($(this));
                 
                 that.afterEditElementDialogAction('cancel');
             },
-            Update: function () {
-                that.dialog = $(this);
-                that.updateElement();
+            Update: function (e) {
+                var valid = Wat.CurrentView.editorView.validateForm();
+
+                if (!valid) {
+                    return;
+                }
                 
-                that.afterEditElementDialogAction('update');
+                that.dialog = $(this);
+                Wat.CurrentView.editorView.updateElement();
+                
+                Wat.CurrentView.editorView.afterEditElementDialogAction('update');
             }
         };
-        
+
         this.dialogConf.buttonClasses = ['fa fa-ban js-button-cancel', 'fa fa-save js-button-update'];
         
-        this.dialogConf.fillCallback = this.fillEditor;
+        this.dialogConf.fillCallback = function (target, that) {
+            var editorViewClass = Wat.Common.BySection[that.qvdObj] ? Wat.Common.BySection[that.qvdObj].editorViewClass : Wat.CurrentView.editorViewClass;
+            Wat.CurrentView.editorView = new editorViewClass({ action: 'update', el: $(target) });
+        };
         
-        this.editorElement (e);
+        Wat.I.dialog(this.dialogConf, this);
     },
     
-    stopVM: function (filters, messages) {        
+    stopVM: function (filters, messages) {
         var messages = messages || {
             'success': 'Stop request successfully performed',
             'error': 'Error stopping Virtual machine'

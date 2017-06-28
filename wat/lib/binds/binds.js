@@ -1,8 +1,7 @@
 Wat.B = {
     bindCommonEvents: function () {
-        this.bindMessageEvents();  
-        this.bindEditorEvents();  
-        this.bindNavigationEvents();  
+        this.bindMessageEvents();
+        this.bindNavigationEvents();
         this.bindFormEvents();
         this.bindDeleteConflicts();
     },
@@ -13,7 +12,7 @@ Wat.B = {
     },
     
     // Events binded in classic way to works in special places like jQueryUI dialog where Backbone events doesnt work
-    bindMessageEvents: function () {         
+    bindMessageEvents: function () {
         // Close message layer
         this.bindEvent('click', '.js-message-close', this.messageBinds.closeMessage);
         
@@ -32,59 +31,6 @@ Wat.B = {
         
         // Chosen controls hack
         this.bindEvent('click', '.not_valid', this.formBinds.pressValidatedField);
-    },
-    
-    bindEditorEvents: function () {
-        // Common Editor  
-            // Hide property help when write on text input
-            this.bindEvent('focus', '.custom-properties>tr>td input', this.editorBinds.hidePropertyHelp);
-
-            // Active focus on property input when click on help message becaus it is over it
-            this.bindEvent('click', '.property-help', this.editorBinds.focusPropertyField);
-
-            // Toggle controls for expire fields (it's only needed for vm form, but it can be accesible from two views: list and details)
-            this.bindEvent('change', 'input[name="expire"]', this.editorBinds.toggleExpire);
-        
-        // Massive editor
-            // Clean fields when click on "no changes" checkbox
-            this.bindEvent('change', 'input[type="checkbox"].js-no-change', this.editorBinds.clickNoChangeCheckbox); 
-            
-            // Uncheck "no changes" checkbox when fields changes
-            this.bindEvent('change', '.js-massive-editor-table select', this.editorBinds.changeMassiveFieldSelect);
-            this.bindEvent('change', '.js-massive-editor-table input[type="checkbox"], .js-massive-editor-table input[type="text"].datetimepicker', this.editorBinds.changeMassiveField);
-            this.bindEvent('input', '.js-massive-editor-table input[type="text"], .js-massive-editor-table textarea', this.editorBinds.changeMassiveField);
-            this.bindEvent('click', '.js-no-change-reset', this.editorBinds.resetMassiveField);
-        
-        // Virtual Machines Editor
-        
-            // Toggle controls for disk images tags retrieving when select osf (it's only needed for vm form, but it can be accesible from two views: list and details)
-            this.bindEvent('change', 'select[name="osf_id"]', this.editorBinds.fillDITags, this);
-        
-        // User editor
-                
-            // Toggle controls for new password
-            this.bindEvent('change', 'input[name="change_password"]', this.userEditorBinds.toggleNewPassword);
-        
-        // Roles editor
-            // Delete positive ACL
-            this.bindEvent('click', '.js-templates-matrix-mode-btn', this.roleEditorBinds.openMatrixMode);
-        
-            // Change ACL check from matrix view
-            this.bindEvent('change', '.js-add-template-button', this.roleEditorBinds.changeMatrixACL);
-
-            // Add/Delete inherited Role
-            this.bindEvent('click', '.js-assign-role-button', this.roleEditorBinds.addRole);
-            this.bindEvent('click', '.js-delete-role-button', this.roleEditorBinds.deleteRole);
-            this.bindEvent('click', '.js-assign-template-button', this.roleEditorBinds.addTemplate);
-            this.bindEvent('click', '.js-delete-template-button', this.roleEditorBinds.deleteTemplate);
-        
-        // OSFs editor
-            // Edit os settings
-            this.bindEvent('click', '.js-button-edit-os', this.osfEditorBinds.openOSEditor);
-            
-            // Show expanded os configuration
-            this.bindEvent('click', '.js-expand-os-conf', this.osfEditorBinds.toggleOSConfigExpanded);
-        
     },
     
     bindHomeEvents: function () {
@@ -144,9 +90,6 @@ Wat.B = {
         
         // Kind of image source in DI creation
         this.bindEvent('change', 'select[name="images_source"]', this.navigationBinds.toggleImagesource);
-        
-        // OS Distro in OSF creation
-        this.bindEvent('change', 'select[name="os_distro_select"]', this.navigationBinds.toggleOSDistro);
         
         // Propagate click in cells with links
         this.bindEvent('mouseenter', 'td.cell-link', function (e) { 
@@ -385,37 +328,6 @@ Wat.B = {
                     $('.image_computer_row').hide();
                     $('.image_staging_row').hide();
                     $('.image_url_row').show();
-                    break;
-            }
-        },
-        
-        toggleOSDistro: function (e) {
-            var selectedDistro = $(e.target).val();
-            
-            switch (selectedDistro) {
-                case "-1":
-                    $('.js-os-configuration-row').hide();
-                    break;
-                default:
-                    // Save distro id in OSD just for MOCK!
-                    Wat.CurrentView.OSDmodel.set({distro_id: selectedDistro, name: selectedDistro});
-                    Wat.CurrentView.OSDmodel.save();
-                    
-                    // Save distro id
-                    var opts = {
-                        pluginId: 'os',
-                        attributes: {distro: selectedDistro}
-                    };
-                    
-                    Wat.DIG.setPluginAttr(opts, function () {}, function () {
-                        Wat.CurrentView.renderOSDetails(Wat.CurrentView.OSDmodel, {
-                            shrinked: true,
-                            editable: true,
-                            container: '.editor-container'
-                        });
-                        $('.js-os-configuration-row').show();
-                    });
-                    
                     break;
             }
         },
@@ -677,39 +589,6 @@ Wat.B = {
     
     // Callbacks of the events binded on editor
     editorBinds: {
-        hidePropertyHelp: function () {
-            $(this).parent().find('.property-help').hide();
-        },
-
-        focusPropertyField: function () {
-            $(this).parent().find('input').focus();
-        },
-        
-        toggleExpire: function () {
-            $('.expiration_row').toggle();
-        },
-        
-        // Fill the select combo with the available tags in the disk images of an OSF
-        fillDITags: function (event) {
-            var that = event.data;
-            
-            $('[name="di_tag"]').find('option').remove();
-            
-            // Fill DI Tags select on virtual machines creation form
-            var params = {
-                'actionAuto': 'tag',
-                'selectedId': '',
-                'controlName': 'di_tag',
-                'filters': {
-                    'osf_id': $('[name="osf_id"]').val()
-                },
-                'nameAsId': true,
-                'chosenType': 'advanced100'
-            };
-
-            Wat.A.fillSelect(params);
-        },
-        
         filterTenantOSFs: function () {
             var params = {
                 'actionAuto': 'osf',
@@ -763,196 +642,9 @@ Wat.B = {
             $('.js-editor-property-row[data-tenant-id="' + $('[name="tenant_id"]').val() + '"]').show();
             $('.js-editor-property-row[data-tenant-id="' + SUPERTENANT_ID + '"]').show();
         },
-        
-        changeMassiveField: function (e) {
-            var name = $(e.target).attr('name');
-            $(e.target).removeAttr('placeholder');
-            $('.js-no-change-reset[data-field="' + name + '"]').removeClass('invisible');
-        },   
-        
-        changeMassiveFieldSelect: function (e) {
-            var name = $(e.target).attr('name');
-            if ($(e.target).val() != '') {
-                $('.js-no-change-reset[data-field="' + name + '"]').removeClass('invisible');
-            }
-            else {
-                $('.js-no-change-reset[data-field="' + name + '"]').addClass('invisible');
-            }
-        },
-        
-        resetMassiveField: function (e) {
-            var name = $(e.target).attr('data-field');
-            $(e.target).addClass('invisible');
-            
-            if ($('select[name="' + name + '"]').length) {
-                $('select[name="' + name + '"]').find('option[value=""]').prop('selected', true);
-                $('select[name="' + name + '"]').trigger('chosen:updated');
-            }
-            else {
-                $('input[name="' + name + '"], textarea[name="' + name + '"]').val('').attr('placeholder', $.i18n.t('No changes'));
-            }
-        },
-        
-        clickNoChangeCheckbox: function (e) {
-            if ($(e.target).is(':checked')) {
-                var field = $(e.target).attr('data-field');
-                $('.js-massive-editor-table td:last-child input[name="' + field + '"], .js-editor-table td:last-child textarea[name="' + field + '"]').val('');
-            }
-        },
-    },
-    
-    userEditorBinds: {
-        toggleNewPassword: function () {
-            $('.new_password_row').toggle();
-        }
-    },
-    
-    osfEditorBinds: {
-        openOSEditor: function (e) {
-            var osfId = $(e.target).attr('data-osf-id');
-            var massive = false;
-            
-            if (osfId == -1) {
-                osfIds = Wat.CurrentView.selectedItems.join(',');
-                var massive = true;
-            }
-            
-            var dialogConf = {
-                title: "Software configuration",
-                buttons : {
-                    "Cancel": function () {
-                        Wat.I.closeDialog($(this));
-                        
-                        // Send primary dialog to front again
-                        $('.ui-dialog').eq(0).css('z-index','');
-                        
-                        Wat.CurrentView.OSDdialogView.remove();
-                        delete Wat.CurrentView.OSDdialogView;
-                        
-                        var savepoint = new Wat.Models.OSDSavepoint({}, { 
-                            osdId: Wat.CurrentView.OSDmodel.id, 
-                            discard: true 
-                        });
-                        savepoint.save();
-                    },
-                    "Save": function () {
-                        Wat.U.setFormChangesOnModel('.js-editor-form-osf-os', Wat.CurrentView.OSDmodel);
-                        Wat.CurrentView.renderOSDetails(Wat.CurrentView.OSDmodel, {
-                            shrinked: true, 
-                            editable: true,
-                            container: '.editor-container'
-                        });
-                        Wat.I.closeDialog($(this));
-                        
-                        // Send primary dialog to front again
-                        $('.ui-dialog').eq(0).css('z-index','');
-                        
-                        Wat.CurrentView.OSDdialogView.remove();
-                        delete Wat.CurrentView.OSDdialogView;
-                        
-                        var savepoint = new Wat.Models.OSDSavepoint({}, { 
-                            osdId: Wat.CurrentView.OSDmodel.id 
-                        });
-                        savepoint.save();
-                    }
-                },
-                buttonClasses: ['fa fa-ban js-button-close','fa fa-save js-button-save'],
-
-                fillCallback: function (target) {
-                    Wat.CurrentView.OSDdialogView = new Wat.Views.OSDEditorView({
-                        el: $(target),
-                        osfId: osfId,
-                        massive: massive,
-                        osdId: Wat.CurrentView.OSDmodel.id
-                    });
-                },
-            }
-
-            Wat.CurrentView.osDialog = Wat.I.dialog(dialogConf);
-            
-            // Add secondary dialog class to new dialog to give different look
-            Wat.CurrentView.osDialog.parent().addClass('ui-dialog-secondary');
-            Wat.CurrentView.osDialog.dialog("option", "position", {my: "center", at: "center", of: window});
-            // Send primary dialog to back because jquery ui doesnt handle it properly
-            $('.ui-dialog').eq(0).css('z-index','100');
-            
-            Wat.I.chosenElement('select[name="icons-collection"]','single100');
-        },
-        
-        toggleOSConfigExpanded: function (e) {
-            if ($(e.target).hasClass('fa-chevron-down')) {
-                $(e.target).removeClass('fa-chevron-down').addClass('fa-chevron-up');
-            }
-            else {
-                $(e.target).removeClass('fa-chevron-up').addClass('fa-chevron-down');
-            }
-            
-            $('.js-os-configuration-expanded').toggle();
-        },
     },
     
     roleEditorBinds: {
-        openMatrixMode: function (e) {            
-            var dialogConf = {
-                title: $.i18n.t('Matrix mode'),
-                buttons : {
-                    "Close": function () {                    
-                        Wat.I.closeDialog($(this));
-                    }
-                },
-                buttonClasses: ['fa fa-ban js-button-close'],
-
-                fillCallback: function (target) {
-                    // Add common parts of editor to dialog
-                    var template = _.template(
-                        Wat.TPL.inheritanceToolsTemplatesMatrix, {
-                            templates: Wat.CurrentView.editorTemplates
-                        }
-                    );
-
-                    target.html(template);
-                }
-            }
-
-            Wat.CurrentView.matrixDialog = Wat.I.dialog(dialogConf);
-        },
-        
-        changeMatrixACL: function (e) {
-            var templateId = $(e.target).attr('data-role-template-id');
-            var checked = $(e.target).is(':checked');
-            
-            if (checked) {
-                $('select[name="template_to_be_assigned"]').val(templateId);
-                $('.js-assign-template-button').trigger('click');
-            }
-            else {
-                $('.js-delete-template-button[data-id="' + templateId + '"]').trigger('click');
-            }
-        },
-        
-        addRole: function (e) {
-            var roleId = $('select[name="role_to_be_assigned"]').val();
-            
-            Wat.CurrentView.editorAssignRole(roleId);
-        },
-        
-        deleteRole: function (e) {
-            var roleId = $(e.target).attr('data-id');
-            
-            Wat.CurrentView.editorDeleteRole(roleId);
-        },
-        
-        addTemplate: function (e) {
-            var templateId = $('select[name="template_to_be_assigned"]').val();
-            
-            Wat.CurrentView.editorAssignTemplate(templateId);
-        },
-        
-        deleteTemplate: function (e) {
-            var templateId = $(e.target).attr('data-id');
-            
-            Wat.CurrentView.editorDeleteTemplate(templateId);
-        },
     },
     
     tenantBinds: {

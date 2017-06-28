@@ -695,7 +695,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     // Fetch collection and render list
     fetchList: function (that) {
-        var that = that || this;
+        //var that = that || this;
+        that = Wat.CurrentView;
         
         that.collection.reset();
         
@@ -1103,69 +1104,19 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             },
             Update: function () {
                 that.dialog = $(this);
-                that.updateMassiveElement($(this), that.selectedItems);
+                Wat.CurrentView.editorView.updateMassiveElement($(this), that.selectedItems);
             }
         };
         
         that.dialogConf.buttonClasses = ['fa fa-ban js-button-cancel', 'fa fa-save js-button-update'];
         
-        that.dialogConf.fillCallback = that.fillMassiveEditor;
+        that.dialogConf.fillCallback = function (target, that) {
+            Wat.CurrentView.editorView = new Wat.Common.BySection[that.qvdObj].editorViewClass({ action: 'massive_update', el: $(target) });
+        };
+        
         that.dialogConf.title = i18n.t('Massive changes over __counter__ elements', {counter: that.selectedItems.length}) + '<i class="fa fa-warning" title="' + i18n.t('Some fields could not be able in the massive editor') + '"></i>';
-
-        that.editorElement();
-    },
-    
-    fillMassiveEditor: function (target) {
-        var that = Wat.CurrentView;
         
-        // Add common parts of editor to dialog
-        that.template = _.template(
-                    Wat.TPL.editorCommon, {
-                        classifiedByTenant: 0,
-                        editorMode: 'massive_edit',
-                        isSuperadmin: Wat.C.isSuperadmin(),
-                        blocked: undefined,
-                        properties: [],
-                        cid: that.cid
-                    }
-                );
-        
-        target.html(that.template);
-
-        // Add specific parts of editor to dialog
-        that.template = _.template(
-                    Wat.TPL.editorMassive, {
-                        model: that.model
-                    }
-                );
-
-        $(that.editorContainer).html(that.template);
-        
-        var enabledProperties = $.inArray(that.qvdObj, QVD_OBJS_WITH_PROPERTIES) != -1;
-        var enabledEditProperties = Wat.C.checkACL(that.qvdObj + '.update-massive.properties');
-        
-        if (enabledProperties && enabledEditProperties) {
-            var filters = {};
-            
-            var classifiedByTenant = $.inArray(that.qvdObj, QVD_OBJS_CLASSIFIED_BY_TENANT) != -1;
-
-            // In massive edition for superadmins, only is available the specific properties for superadmins
-            if (Wat.C.isSuperadmin() && classifiedByTenant) {
-                filters['tenant_id'] = SUPERTENANT_ID;
-            }
-
-            that.model = new that.collection.model(); 
-            
-            if (that.selectedItems.length > 1) {
-                that.model = that.collection.where({id: that.selectedItems[0]})[0];
-            }
-
-            that.editorMode = 'massive-edit';
-                
-            Wat.A.performAction(that.qvdObj + '_get_property_list', {}, filters, {}, that.fillEditorProperties, that, undefined, {"field":"key","order":"-asc"});
-        }
-        
-        that.configureMassiveEditor (that);
+        Wat.I.dialog(that.dialogConf, that);
     },
     
     applySelectedAction: function (e) { 
@@ -1330,66 +1281,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     // Additional changes on massive editor interface after render it
     configureMassiveEditor: function (that) {  
         // Extended from specific list view if necessary
-    },
-    
-    updateMassiveElement: function (dialog, id) {
-        var valid = Wat.Views.ListView.prototype.updateElement.apply(this, [dialog]);
-        
-        if (!valid) {
-            return;
-        }
-        
-        // Properties to create, update and delete obtained from parent view
-        var properties = this.properties;
-        
-        var arguments = {};
-        
-        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL(this.qvdObj + '.update-massive.properties')) {
-            arguments['__properties_changes__'] = properties;
-        }
-        
-        var context = $('.' + this.cid + '.editor-container');
-
-        var description = context.find('textarea[name="description"]').val();
-        
-        if (Wat.I.isMassiveFieldChanging("description") && Wat.C.checkACL(this.qvdObj + '.update-massive.description')) {
-            arguments["description"] = description;
-        }
-        
-        var filters = {"id": id};
-
-        this.resetSelectedItems();
-        
-        var auxModel = {};
-        
-        switch (this.qvdObj) {
-            case 'user':
-                auxModel = new Wat.Models.User();
-                break;
-            case 'vm':
-                auxModel = new Wat.Models.VM();
-                break;
-            case 'host':
-                auxModel = new Wat.Models.Host();
-                break;
-            case 'osf':
-                auxModel = new Wat.Models.OSF();
-                break;
-            case 'di':
-                auxModel = new Wat.Models.DI();
-                break;
-            case 'administrator':
-                auxModel = new Wat.Models.Admin();
-                break;
-            case 'role':
-                auxModel = new Wat.Models.Role();
-                break;
-            case 'tenant':
-                auxModel = new Wat.Models.Tenant();
-                break;
-        }
-        
-        this.updateModel(arguments, filters, this.fetchList, auxModel);
     },
     
     // Check pagination text input control to avoid wrong characters

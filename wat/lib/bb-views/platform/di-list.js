@@ -55,143 +55,6 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         that.updateModel(arguments, {id: id}, checkMachinesChanges);
     },
     
-    openNewElementDialog: function (e) {
-        this.model = new Wat.Models.DI();
-        this.dialogConf.title = $.i18n.t('New Disk image');
-
-        Wat.Views.ListView.prototype.openNewElementDialog.apply(this, [e]);
-        
-        // Configure tags inputs
-        Wat.I.tagsInputConfiguration();
-        
-        // Fill disk images of staging folder select on disk images creation form
-        var params = {
-            'action': 'dis_in_staging',
-            'controlName': 'disk_image',
-            'nameAsId': true,
-            'chosenType': 'advanced100'
-        };
-        
-        Wat.A.fillSelect(params); 
-
-        // If main view is osf view, we are creating a disk image from osf details view. 
-        // OSF and tenant (if exists) controls will be removed
-        if (Wat.CurrentView.qvdObj == 'osf') {
-            $('[name="osf_id"]').parent().parent().remove();
-
-            var userHidden = document.createElement('input');
-            userHidden.type = "hidden";
-            userHidden.name = "osf_id";
-            userHidden.value = Wat.CurrentView.model.get('id');
-            $('.editor-container').append(userHidden);
-                        
-            if ($('[name="tenant_id"]').length > 0) {
-                $('[name="tenant_id"]').parent().parent().remove();
-            }
-        }
-        else {
-            // Fill OSF select on virtual machines creation form
-            var params = {
-                'actionAuto': 'osf',
-                'selectedId': $('.' + this.cid + ' .filter select[name="osf"]').val(),
-                'controlName': 'osf_id',
-                'chosenType': 'advanced100'
-            };
-
-            // If exist tenant control (in superadmin cases) show osfs of selected tenant
-            if ($('[name="tenant_id"]').length > 0) {
-                // Add an event to the tenant select change
-                Wat.B.bindEvent('change', '[name="tenant_id"]', Wat.B.editorBinds.filterTenantOSFs);
-                Wat.I.chosenElement('select[name="osf_id"]', 'advanced100');
-            }
-            else {
-            Wat.A.fillSelect(params);  
-        }
-        }
-        
-        $('select[name="images_source"]').trigger('change');
-        Wat.I.chosenElement('select[name="images_source"]', 'single100');
-    },
-    
-    createElement: function () {
-        var valid = Wat.Views.ListView.prototype.createElement.apply(this);
-        
-        if (!valid) {
-            return;
-        }
-        
-        // Properties to create, update and delete obtained from parent view
-        var properties = this.properties;
-                
-        var context = $('.' + this.cid + '.editor-container');
-
-        var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
-        var osf_id = context.find('[name="osf_id"]').val();
-        
-        var arguments = {
-            "blocked": blocked ? 1 : 0,
-            "osf_id": osf_id
-        };
-        
-        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('di.create.properties')) {
-            arguments["__properties__"] = properties.set;
-        }
-        
-        var version = context.find('input[name="version"]').val();
-        if (version && Wat.C.checkACL('di.create.version')) {
-            arguments["version"] = version;
-        }
-        
-        var tags = context.find('input[name="tags"]').val();
-        tags = tags && Wat.C.checkACL('di.create.tags') ? tags.split(',') : [];
-        
-        var def = context.find('input[name="default"][value=1]').is(':checked');
-        
-        // If we set default add this tag
-        if (def && Wat.C.checkACL('di.create.default')) {
-            tags.push('default');
-        }
-        
-        arguments['__tags__'] = tags;
-        
-        var description = context.find('textarea[name="description"]').val();
-        if (description) {
-            arguments["description"] = description;
-        }
-        
-        var image_source = context.find('select[name="images_source"]').val();
-        
-        // Store tags for affected VMs checking
-        tags.push('head');
-        
-        this.tagChanges = {
-            create: tags,
-            delete: []
-        };
-        
-        switch (image_source) {
-            case 'staging':
-                var disk_image = context.find('select[name="disk_image"]').val();
-                if (disk_image) {
-                    arguments["disk_image"] = disk_image;
-                }
-                this.heavyCreateStaging(arguments);
-                break;
-            case 'computer':
-                var diskImageFile = context.find('input[name="disk_image_file"]');
-                
-                // In this case the progress is controlled by HTML5 API for files uploading
-                this.saveFile(arguments, diskImageFile);
-                break;
-            case 'url':
-                var diskImageUrl = context.find('input[name="disk_image_url"]').val();
-                arguments["disk_image"] = Wat.U.basename(diskImageUrl);
-                
-                this.heavyCreateDownload(arguments, diskImageUrl);
-                break;
-        }
-    },
-    
     saveFile: function(arguments, disk_image_file) {
         var that = this;
         var file = disk_image_file[0].files[0];
@@ -221,8 +84,8 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             processData: false,
             contentType: false, // Setting contentType as false 'multipart/form-data' and boundary will be sent
 
-        }).success(function(){            
-            Wat.I.closeDialog(that.dialog);
+        }).success(function(){
+            //Wat.I.closeDialog(that.dialog);
             Wat.I.loadingUnblock();
             
             var realView = Wat.I.getRealView(that);

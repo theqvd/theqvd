@@ -422,6 +422,11 @@ Wat.I = {
         }
         
         $(selector).chosen(this.chosenOptions[type]);
+        
+        // Workaround to fix concurrency problems when chosen controls too soon after modify options
+        setTimeout(function  () {
+            $(selector).trigger('chosen:updated');
+        }, 100);
     },
     
     updateChosenControls: function (selector) {
@@ -592,7 +597,7 @@ Wat.I = {
                     $('html, body').attr('style', '');
                     $(this).empty().dialog('destroy');
             }
-        });  
+        });
         
         return $(div);
     },
