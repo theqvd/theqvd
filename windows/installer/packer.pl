@@ -64,10 +64,13 @@ my @qvd_client_modules = qw(QVD::Client QVD::Config::Core QVD::Config
                          QVD::Log QVD::SimpleRPC QVD::URI
                          IO::Socket::Forwarder);
 
+my $icon = $installer_path->child('pixmaps/qvd.ico')->stringify;
+
 my @extra_inc = grep -d $_, map $ext_path->child(s/::/-/gr)->child('lib'), @qvd_client_modules;
 
 my %args = (app_name => 'QVD Client',
             scripts => $qvd_src_path->child('ext/QVD-Client/bin/qvd-gui-client.pl')->stringify,
+            app_type => 'windows',
             work_dir => "$work_path",
             extra_inc => \@extra_inc,
             extra_module => [qw(Log::Dispatch::FileRotate
@@ -78,6 +81,7 @@ my %args = (app_name => 'QVD Client',
             keep_work_dir => $keep_work_dir,
             cache => $cache,
             clean_cache => $clean_cache,
+            icon => $icon,
             cygwin => $cygwin,
             cygdrive => $cygdrive);
 
