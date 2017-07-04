@@ -51,13 +51,15 @@ my $vcxsrv_path = path($vcxsrv)->realpath;
 
 my @extra_exes = ( { path => $nx_libs_path->child('nxproxy/nxproxy.exe')->stringify,
                      search_path => $nx_libs_path->child('nxcomp')->stringify,
-                     subdir => 'nxproxy',
+                     subdir => 'nx',
+                     subsystem => 'windows',
                      cygwin => 1},
+                   #{ path => $vcxsrv_path->child('vcxsrv.exe')->stringify,
+                   #  subdir => 'vcxsrv' }
+                 );
 
-                   { path => $vcxsrv_path->child('vcxsrv.exe')->stringify,
-                     subdir => 'vcxsrv' } );
-
-my @extra_dirs = ( { path => $installer_path->child('pixmaps')->stringify } );
+my @extra_dirs = ( { path => $installer_path->child('pixmaps')->stringify },
+                   { path => "$vcxsrv_path", subdir => 'vcxsrv' } );
 
 my @qvd_client_modules = qw(QVD::Client QVD::Config::Core QVD::Config
                          QVD::HTTP QVD::HTTPC QVD::HTTPD
@@ -75,7 +77,9 @@ my %args = (app_name => 'QVD Client',
             extra_inc => \@extra_inc,
             extra_module => [qw(Log::Dispatch::FileRotate
                                 Tie::Hash::NamedCapture
-                                PerlIO::encoding)],
+                                PerlIO::encoding
+                                X11::Auth
+                                X11::Protocol::Ext::XC_MISC)],
             extra_exe => \@extra_exes,
             extra_dir => \@extra_dirs,
             keep_work_dir => $keep_work_dir,
