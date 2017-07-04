@@ -223,6 +223,21 @@ Wat.I.detailsFields[qvdObj] = {
 
 Wat.I.detailsDefaultFields[qvdObj] = $.extend({}, Wat.I.detailsFields[qvdObj]);
 
+Wat.I.editorCategories[qvdObj] = [
+    {
+        code: 'general',
+        text: 'General'
+    },
+    {
+        code: 'hardware',
+        text: 'Hardware'
+    },
+    {
+        code: 'software',
+        text: 'Software'
+    }
+];
+    
 // Filters configuration on list view
 Wat.I.formFilters[qvdObj] = {
     'name': {

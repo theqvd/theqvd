@@ -13,7 +13,7 @@ Wat.Views.VMEditorView = Wat.Views.EditorView.extend({
     
     renderCreate: function (target, that) {
         Wat.CurrentView.model = new Wat.Models.VM();
-        $('.ui-dialog-title').html($.i18n.t('New Virtual machine'));
+        $('.ui-dialog-titlebar').html($.i18n.t('New Virtual machine'));
         
         Wat.Views.EditorView.prototype.renderCreate.apply(this, [target, that]);
         
@@ -102,7 +102,7 @@ Wat.Views.VMEditorView = Wat.Views.EditorView.extend({
     renderUpdate: function (target, that) {
         Wat.Views.EditorView.prototype.renderUpdate.apply(this, [target, that]);
         
-        $('.ui-dialog-title').html($.i18n.t('Edit Virtual machine') + ": " + this.model.get('name'));
+        $('.ui-dialog-titlebar').html($.i18n.t('Edit Virtual machine') + ": " + this.model.get('name'));
         
         // Virtual machine form include a date time picker control, so we need enable it
         Wat.I.enableDataPickers();

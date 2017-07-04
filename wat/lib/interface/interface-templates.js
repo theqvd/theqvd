@@ -38,6 +38,9 @@ Wat.I.T = {
                     },
                     warn404: {
                         name: 'error/404'
+                    },
+                    formErrors: {
+                        name: 'dialog/form-errors'
                     }
                 };
                 break;

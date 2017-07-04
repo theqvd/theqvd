@@ -1,11 +1,607 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.9" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="generator" content="AsciiDoc 8.6.9">
 <title>WAT step by step</title>
 <style type="text/css">
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+h5 {
+  font-size: 1.0em;
+}
+
+div.sectionbody {
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
+
+pre {
+  padding: 0;
+  margin: 0;
+}
+
+#author {
+  color: #527bbd;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+#email {
+}
+#revnumber, #revdate, #revremark {
+}
+
+#footer {
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #f0f0f0;
+  color: #777777;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
+}
+
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
+  margin-bottom: 2.5em;
+}
+
+#toctitle {
+  color: #527bbd;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
+
+
+/*
+ * Theme specific overrides of the preceding (asciidoc.css) CSS.
+ *
+ */
+body {
+  font-family: Garamond, Georgia, serif;
+  font-size: 17px;
+  color: #3E4349;
+  line-height: 1.3em;
+}
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Garmond, Georgia, serif;
+  font-weight: normal;
+  border-bottom-width: 0;
+  color: #3E4349;
+}
+div.title, caption.title { color: #596673; font-weight: bold; }
+h1 { font-size: 240%; }
+h2 { font-size: 180%; }
+h3 { font-size: 150%; }
+h4 { font-size: 130%; }
+h5 { font-size: 115%; }
+h6 { font-size: 100%; }
+#header h1 { margin-top: 0; }
+#toc {
+  color: #444444;
+  line-height: 1.5;
+  padding-top: 1.5em;
+}
+#toctitle {
+  font-size: 20px;
+}
+#toc a {
+    border-bottom: 1px dotted #999999;
+    color: #444444 !important;
+    text-decoration: none !important;
+}
+#toc a:hover {
+    border-bottom: 1px solid #6D4100;
+    color: #6D4100 !important;
+    text-decoration: none !important;
+}
+div.toclevel1 { margin-top: 0.2em; font-size: 16px; }
+div.toclevel2 { margin-top: 0.15em; font-size: 14px; }
+em, dt, td.hdlist1 { color: black; }
+strong { color: #3E4349; }
+a { color: #004B6B; text-decoration: none; border-bottom: 1px dotted #004B6B; }
+a:visited { color: #615FA0; border-bottom: 1px dotted #615FA0; }
+a:hover { color: #6D4100; border-bottom: 1px solid #6D4100; }
+div.tableblock > table, table.tableblock { border: 3px solid #E8E8E8; }
+th.tableblock, td.tableblock { border: 1px solid #E8E8E8; }
+ul > li > * { color: #3E4349; }
+pre, tt, .monospaced { font-family: Consolas,Menlo,'Deja Vu Sans Mono','Bitstream Vera Sans Mono',monospace; }
+tt, .monospaced { font-size: 0.9em; color: black;
+}
+div.exampleblock > div.content, div.sidebarblock > div.content, div.listingblock > div.content { border-width: 0 0 0 3px; border-color: #E8E8E8; }
+div.verseblock { border-left-width: 0; margin-left: 3em; }
+div.quoteblock { border-left-width: 3px; margin-left: 0; margin-right: 0;}
+div.admonitionblock td.content { border-left: 3px solid #E8E8E8; }
 
 
 </style>
@@ -218,12 +814,12 @@ asciidoc.install(3);
 <div class="paragraph"><p>In the guide ' WAT step by step ' we will see from the user login to the most complex sections, going over the different WAT sections, analyzing its use and key aspects.</p></div>
 <div class="paragraph"><p>We find these sections in the general menu placed on the right part of the header.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/menu_general.png" alt="menu_general.png" width="960px" />
+<img src="/images/doc_images/menu_general.png" alt="menu_general.png" width="960px">
 </span></p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/important.png" alt="Important" />
+<img src="/images/doc_images/icons//important.png" alt="Important">
 </td>
 <td class="content">it is necessary to bear in mind that <strong>no all the administrators need to have the same permissions</strong>, and therefore, not all of them will see each of the sections or buttons that are going to be described next.</td>
 </tr></table>
@@ -235,7 +831,7 @@ asciidoc.install(3);
 <div class="sectionbody">
 <div class="paragraph"><p>When WAT is loaded, the first thing that appears will be a login screen, where we can authenticate with our credentials <em>username / password</em>.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/login.png" alt="login.png" width="960px" />
+<img src="/images/doc_images/login.png" alt="login.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>The first time you log in, you will be asked if you want to save username and password for the future (when the browser allows it)</p></div>
 </div>
@@ -246,7 +842,7 @@ asciidoc.install(3);
 <div class="paragraph"><p>The first screen which is shown when you log in is a tactical view formed by graphs and tables summary of the system.</p></div>
 <div class="paragraph"><p>In addition to this, below the title, there are some buttons available with the uses.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/home.png" alt="home.png" width="960px" />
+<img src="/images/doc_images/home.png" alt="home.png" width="960px">
 </span></p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
@@ -351,7 +947,7 @@ Widgets of statistics
 <h2 id="_help">3. Help</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/menu_help.png" alt="menu_help.png" width="600px" />
+<img src="/images/doc_images/menu_help.png" alt="menu_help.png" width="600px">
 </span></p></div>
 <div class="sect2">
 <h3 id="_about">3.1. About</h3>
@@ -386,12 +982,12 @@ A <strong>User&#8217;s guide</strong> with instructions to deal with common task
 <h2 id="_platform">4. Platform</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/menu_platform.png" alt="menu_platform.png" width="600px" />
+<img src="/images/doc_images/menu_platform.png" alt="menu_platform.png" width="600px">
 </span></p></div>
 <div class="paragraph"><p>In this section we will find the different QVD elements. It is considered * core administration of QVD*.</p></div>
 <div class="literalblock">
-<div class="content">
-<pre><code>All of them have some *common components* with a list view, paging controls, filtering and massive actions, detail view and creation/edition forms. For further information visit "Structure list-detail" in the introduction of the documentation.</code></pre>
+<div class="content monospaced">
+<pre>All of them have some *common components* with a list view, paging controls, filtering and massive actions, detail view and creation/edition forms. For further information visit "Structure list-detail" in the introduction of the documentation.</pre>
 </div></div>
 <div class="sect2">
 <h3 id="_users">4.1. Users</h3>
@@ -403,9 +999,9 @@ List view
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>The main view is a list with the users of QVD.
-<span class="image">
-<img src="images/doc_images/screenshot_user_list.png" alt="screenshot_user_list.png" width="960px" />
+<div class="paragraph"><p>The main view is a list with the users of QVD.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_user_list.png" alt="screenshot_user_list.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -429,7 +1025,7 @@ The <strong>blocking state</strong> of the users:
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_locked.png" alt="icon_locked.png" />
+<img src="/images/doc_images/icon_locked.png" alt="icon_locked.png">
 </span></p></div>
 <div class="paragraph"><p>A blocked user will not be able to log in to any of their virtual machines.</p></div>
 </div></div>
@@ -450,7 +1046,7 @@ Massive actions
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_user_massiveactions.png" alt="screenshot_user_massiveactions.png" width="960px" />
+<img src="/images/doc_images/screenshot_user_massiveactions.png" alt="screenshot_user_massiveactions.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Ths massive actions give us the following options to do on the selected users:</p></div>
 <div class="paragraph"><p>*Lock users
@@ -461,7 +1057,7 @@ Massive actions
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">If only one element is selected, in the case of the edition we can edit the same fields that with the normal edition of an element in the detail view.</td>
 </tr></table>
@@ -475,7 +1071,7 @@ Massive editor
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_user_massiveeditor.png" alt="screenshot_user_massiveeditor.png" width="960px" />
+<img src="/images/doc_images/screenshot_user_massiveeditor.png" alt="screenshot_user_massiveeditor.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>The massive editor of the users only let us modify the custom properties.</p></div>
 <div class="paragraph"><p>As any other massive editor, the value which will be defined, it would rewrite the one that could exist in all the edited elements unless "No changes" option were selected.</p></div>
@@ -489,7 +1085,7 @@ Creation
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_user_create.png" alt="screenshot_user_create.png" width="960px" />
+<img src="/images/doc_images/screenshot_user_create.png" alt="screenshot_user_create.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>When creating a user we will establish its name, password and properties.</p></div>
 </div></div>
@@ -501,7 +1097,7 @@ Detail view
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_user_details.png" alt="screenshot_user_details.png" width="960px" />
+<img src="/images/doc_images/screenshot_user_details.png" alt="screenshot_user_details.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>We observe a small <strong>head top</strong> next to the <strong>username</strong> where <strong>the buttom to delete it and the action buttoms</strong> are.</p></div>
 <div class="paragraph"><p>The available buttoms in the detail view of the user are:</p></div>
@@ -530,13 +1126,13 @@ Edition
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_user_edit.png" alt="screenshot_user_edit.png" width="960px" />
+<img src="/images/doc_images/screenshot_user_edit.png" alt="screenshot_user_edit.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>When editing a new user we can choose among changing the <strong>password</strong> (if we do not select the check box, it will remain unchanged) and <strong>editing properties.</strong></p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">We can also access to the edition of the element from the list view with the massive actions only if we select one element.</td>
 </tr></table>
@@ -555,9 +1151,9 @@ List view
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>The main view is a list with the virtual machines of QVD.
-<span class="image">
-<img src="images/doc_images/screenshot_vm_list.png" alt="screenshot_vm_list.png" width="960px" />
+<div class="paragraph"><p>The main view is a list with the virtual machines of QVD.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_vm_list.png" alt="screenshot_vm_list.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -581,7 +1177,7 @@ The <strong>blocking stauts</strong> of the virtual machines:
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_locked.png" alt="icon_locked.png" />
+<img src="/images/doc_images/icon_locked.png" alt="icon_locked.png">
 </span></p></div>
 <div class="paragraph"><p>A blocked virtual machine will not be able to start.</p></div>
 </div></div>
@@ -605,7 +1201,7 @@ If the virtual machines have defined an <strong>expiration date</strong>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_expire.png" alt="icon_expire.png" />
+<img src="/images/doc_images/icon_expire.png" alt="icon_expire.png">
 </span></p></div>
 <div class="paragraph"><p>This icon shows that there is an expiration stablished, <strong>whether it is soft or hard</strong>.</p></div>
 </div></div>
@@ -629,7 +1225,7 @@ If the virtual machines have defined an <strong>expiration date</strong>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_stopped.png" alt="icon_stopped.png" />
+<img src="/images/doc_images/icon_stopped.png" alt="icon_stopped.png">
 </span></p></div>
 </div></div>
 </li>
@@ -645,7 +1241,7 @@ If the virtual machines have defined an <strong>expiration date</strong>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_running.png" alt="icon_running.png" />
+<img src="/images/doc_images/icon_running.png" alt="icon_running.png">
 </span></p></div>
 </div></div>
 </li>
@@ -668,7 +1264,7 @@ If the virtual machines have defined an <strong>expiration date</strong>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_userconnected.png" alt="icon_userconnected.png" />
+<img src="/images/doc_images/icon_userconnected.png" alt="icon_userconnected.png">
 </span></p></div>
 </div></div>
 </li>
@@ -688,7 +1284,7 @@ Massive actions
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_massiveactions.png" alt="screenshot_vm_massiveactions.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_massiveactions.png" alt="screenshot_vm_massiveactions.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>The massive actions give us the following options to do on the selected virtual machines:</p></div>
 <div class="ulist"><ul>
@@ -731,7 +1327,7 @@ Edit virtual machines: the name of the virtual machines will not appear in the m
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">If only one element is selected, in the case of the edition we can edit the same fields that with the normal edition of an element in the detail view.</td>
 </tr></table>
@@ -745,7 +1341,7 @@ Massive editor
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_massiveeditor.png" alt="screenshot_vm_massiveeditor.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_massiveeditor.png" alt="screenshot_vm_massiveeditor.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>The massive editor of the virtual machines let us change the tag of the image used, assign an expiration date and modify custom properties.</p></div>
 <div class="paragraph"><p>As any other massive editor, the value which will be defined, it would rewrite the one that could exist in all the edited elements unless "No changes" option were selected.</p></div>
@@ -760,7 +1356,7 @@ The virtual machines having assigned the same OSF: In this case the tag selector
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_massiveeditor_opencombo.png" alt="screenshot_vm_massiveeditor_opencombo.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_massiveeditor_opencombo.png" alt="screenshot_vm_massiveeditor_opencombo.png" width="960px">
 </span></p></div>
 </div></div>
 </li>
@@ -771,11 +1367,11 @@ The vitual machines having assigned different OSFs. In this case a warning will 
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_massiveeditor_differentOSF.png" alt="screenshot_vm_massiveeditor_differentOSF.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_massiveeditor_differentOSF.png" alt="screenshot_vm_massiveeditor_differentOSF.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>As we can not obtain a real list of tags for all the selected virtual machines, we can only choose between <em>default</em> and <em>head</em>.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_massiveeditor_differentOSF_opencombo.png" alt="screenshot_vm_massiveeditor_differentOSF_opencombo.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_massiveeditor_differentOSF_opencombo.png" alt="screenshot_vm_massiveeditor_differentOSF_opencombo.png" width="960px">
 </span></p></div>
 </div></div>
 </li>
@@ -793,7 +1389,7 @@ Creation
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_create.png" alt="screenshot_vm_create.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_create.png" alt="screenshot_vm_create.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>When creating a virtual machine we will establish its <strong>name</strong>, the <strong>user</strong> that it belongs to (except if we create it from the user detail view) and the <strong>image</strong> it will use.</p></div>
 <div class="paragraph"><p>We will select the image by choosing an OSF and the image tag wanted. When selecting the OSF, the tags of the images asociated to thar OSF will be charged in the following combo, where you can choose one of them as well as the special tags <em>default</em> and <em>head</em>, with which the default image or the last created image in the OSF respectively will be charged.</p></div>
@@ -807,7 +1403,7 @@ Detail view
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_details.png" alt="screenshot_vm_details.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_details.png" alt="screenshot_vm_details.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>We observe a small <strong>head top</strong> next to the <strong>name of the virtual machine</strong> where <strong>the buttom to delete it and the action buttoms</strong> are.</p></div>
 <div class="paragraph"><p>The available buttoms in the detail view of the virtual machine are:
@@ -845,7 +1441,7 @@ Expiration dates
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/vm_expiration_no.png" alt="vm_expiration_no.png" width="600px" />
+<img src="/images/doc_images/vm_expiration_no.png" alt="vm_expiration_no.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -856,7 +1452,7 @@ Expiration dates
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/vm_expiration_enabled.png" alt="vm_expiration_enabled.png" width="600px" />
+<img src="/images/doc_images/vm_expiration_enabled.png" alt="vm_expiration_enabled.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -867,7 +1463,7 @@ Expiration dates
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/vm_expiration_expired.png" alt="vm_expiration_expired.png" width="600px" />
+<img src="/images/doc_images/vm_expiration_expired.png" alt="vm_expiration_expired.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -882,12 +1478,12 @@ Execution status
 <div class="content">
 <div class="paragraph"><p>On the right part of the detail view there is a <strong>chart with the execution state</strong> of the virtual machine. If the machine is running, we will be able to see the <strong>execution parameters</strong>.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_details_execparams.png" alt="screenshot_vm_details_execparams.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_details_execparams.png" alt="screenshot_vm_details_execparams.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>These parameters can change from one execution to another and they do not need to coincide with the current attributes of the machine.</p></div>
 <div class="paragraph"><p><em>For exaple, in the snapshot, we observe that the default tag is set, so the machine is executing the image that the OSF has set as a default. If the default image of the OSF changes, we observe that in the attributes another disk image appears, but in the execution parameters the previous one still appears, since it is the one that is being executed.</em></p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_details_execparams_warning.png" alt="screenshot_vm_details_execparams_warning.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_details_execparams_warning.png" alt="screenshot_vm_details_execparams_warning.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>In this case a warning will appear to make us realise that an execution parameter is different to the current ones, and if we want it to change we will have to restart the virtual machine.</p></div>
 <div class="paragraph"><p>The chart with the execution state also has a control to start/stop the virtual machine.</p></div>
@@ -900,7 +1496,7 @@ Execution status
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/vm_execution_state_running.png" alt="vm_execution_state_running.png" width="600px" />
+<img src="/images/doc_images/vm_execution_state_running.png" alt="vm_execution_state_running.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -911,7 +1507,7 @@ Execution status
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/vm_execution_state_stopped.png" alt="vm_execution_state_stopped.png" width="600px" />
+<img src="/images/doc_images/vm_execution_state_stopped.png" alt="vm_execution_state_stopped.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -922,7 +1518,7 @@ Execution status
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/vm_execution_state_starting.png" alt="vm_execution_state_starting.png" width="600px" />
+<img src="/images/doc_images/vm_execution_state_starting.png" alt="vm_execution_state_starting.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -933,7 +1529,7 @@ Execution status
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/vm_execution_state_stopping.png" alt="vm_execution_state_stopping.png" width="600px" />
+<img src="/images/doc_images/vm_execution_state_stopping.png" alt="vm_execution_state_stopping.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -950,7 +1546,7 @@ Edition
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_edit.png" alt="screenshot_vm_edit.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_edit.png" alt="screenshot_vm_edit.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>When editing the virtual machine we can change the <strong>name</strong>, the <strong>tag</strong> of the image, the <strong>expiration dates</strong> and <strong>edit properties</strong>.</p></div>
 <div class="paragraph"><p>Two expiration dates can be configured:</p></div>
@@ -968,12 +1564,12 @@ Edition
 </ul></div>
 <div class="paragraph"><p>To edit the dates of expiration a control of calendar exists.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_edit_expiration.png" alt="screenshot_vm_edit_expiration.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_edit_expiration.png" alt="screenshot_vm_edit_expiration.png" width="960px">
 </span></p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">We can also access to the edition of the element from the list view with the massive actions only if we select one element.</td>
 </tr></table>
@@ -992,9 +1588,9 @@ List view
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>The main view is a list with QVD nodes.
-<span class="image">
-<img src="images/doc_images/screenshot_host_list.png" alt="screenshot_host_list.png" width="960px" />
+<div class="paragraph"><p>The main view is a list with QVD nodes.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_host_list.png" alt="screenshot_host_list.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -1020,7 +1616,7 @@ The information column will indicate us about:
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_stopped.png" alt="icon_stopped.png" />
+<img src="/images/doc_images/icon_stopped.png" alt="icon_stopped.png">
 </span></p></div>
 </div></div>
 </li>
@@ -1031,7 +1627,7 @@ The information column will indicate us about:
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_running.png" alt="icon_running.png" />
+<img src="/images/doc_images/icon_running.png" alt="icon_running.png">
 </span></p></div>
 </div></div>
 </li>
@@ -1053,7 +1649,7 @@ The *Locking Status*of the nodes:
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_locked.png" alt="icon_locked.png" />
+<img src="/images/doc_images/icon_locked.png" alt="icon_locked.png">
 </span></p></div>
 <div class="paragraph"><p>In a blocked node, virtual machines will not run.</p></div>
 </div></div>
@@ -1072,7 +1668,7 @@ Massive actions
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_host_massiveactions.png" alt="screenshot_host_massiveactions.png" width="960px" />
+<img src="/images/doc_images/screenshot_host_massiveactions.png" alt="screenshot_host_massiveactions.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Massive actions give us the following options to do on the selected nodes:</p></div>
 <div class="ulist"><ul>
@@ -1105,7 +1701,7 @@ Edit nodes: neither the name nor the IP address of the nodes will appear in the 
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">If only one element is selected, in the case of the edition we can edit the same fields that with the normal edition of an element in the detail view.</td>
 </tr></table>
@@ -1119,7 +1715,7 @@ Massive editor
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_host_massiveeditor.png" alt="screenshot_host_massiveeditor.png" width="960px" />
+<img src="/images/doc_images/screenshot_host_massiveeditor.png" alt="screenshot_host_massiveeditor.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>The massive editor of nodes only let us modify custom properties.</p></div>
 <div class="paragraph"><p>As any other massive editor, the value which will be defined, it would rewrite the one that could exist in all the edited elements unless "No changes" option were selected.</p></div>
@@ -1133,7 +1729,7 @@ Creation
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_host_create.png" alt="screenshot_host_create.png" width="960px" />
+<img src="/images/doc_images/screenshot_host_create.png" alt="screenshot_host_create.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>When creating a node we will establish its name, IP address and properties.</p></div>
 </div></div>
@@ -1145,7 +1741,7 @@ Detail view
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_host_details.png" alt="screenshot_host_details.png" width="960px" />
+<img src="/images/doc_images/screenshot_host_details.png" alt="screenshot_host_details.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>We observe a small <strong>head top</strong> next to the <strong>name of the node</strong> where <strong>the buttom to delete it and the action buttoms</strong> are.</p></div>
 <div class="paragraph"><p>The available buttoms in the detail view of the user are:</p></div>
@@ -1183,13 +1779,13 @@ Edition
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_host_edit.png" alt="screenshot_host_edit.png" width="960px" />
+<img src="/images/doc_images/screenshot_host_edit.png" alt="screenshot_host_edit.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>When editing a node we will be able to edit its <strong>name, IP address or edit properties</strong>.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">We can also access to the edition of the element from the list view with the massive actions only if we select one element.</td>
 </tr></table>
@@ -1208,9 +1804,9 @@ List view
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>The main view is a list with the OSFs of QVD.
-<span class="image">
-<img src="images/doc_images/screenshot_osf_list.png" alt="screenshot_osf_list.png" width="960px" />
+<div class="paragraph"><p>The main view is a list with the OSFs of QVD.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_osf_list.png" alt="screenshot_osf_list.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -1229,7 +1825,7 @@ Massive actions
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_osf_massiveactions.png" alt="screenshot_osf_massiveactions.png" width="960px" />
+<img src="/images/doc_images/screenshot_osf_massiveactions.png" alt="screenshot_osf_massiveactions.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>The massive actions give us the following options to do on the selected OSFs.</p></div>
 <div class="ulist"><ul>
@@ -1247,7 +1843,7 @@ Edit OSFs: the name will not appear in the massive editor. To change it, it will
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">If only one element is selected, in the case of the edition we can edit the same fields that with the normal edition of an element in the detail view.</td>
 </tr></table>
@@ -1261,7 +1857,7 @@ Massive editor
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_osf_massiveeditor.png" alt="screenshot_osf_massiveeditor.png" width="960px" />
+<img src="/images/doc_images/screenshot_osf_massiveeditor.png" alt="screenshot_osf_massiveeditor.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>The massive editor of OSFs let us modify the memory, the user storage and the custom properties.</p></div>
 <div class="paragraph"><p>*If we leave the memory box and the user storage in blank they will not be modified.</p></div>
@@ -1275,7 +1871,7 @@ Creation
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_osf_create.png" alt="screenshot_osf_create.png" width="960px" />
+<img src="/images/doc_images/screenshot_osf_create.png" alt="screenshot_osf_create.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>When creating an OSFs we will establish its name, memory, user storage and properties.</p></div>
 </div></div>
@@ -1287,7 +1883,7 @@ Detail view
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_osf_details.png" alt="screenshot_osf_details.png" width="960px" />
+<img src="/images/doc_images/screenshot_osf_details.png" alt="screenshot_osf_details.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>We observe a small <strong>head top</strong> next to the <strong>name of the OSFs</strong> where <strong>the buttoms to delete it and edit it</strong> are.</p></div>
 <div class="paragraph"><p>Below this head top there is a <strong>table with the attributes of the OSF</strong> including the properties, if there were.</p></div>
@@ -1318,13 +1914,13 @@ Edition
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_osf_edit.png" alt="screenshot_osf_edit.png" width="960px" />
+<img src="/images/doc_images/screenshot_osf_edit.png" alt="screenshot_osf_edit.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>When editing an OSF we will be able to edit its <strong>name, memory, user storage and edit properties</strong>.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">We can also access to the edition of the element from the list view with the massive actions only if we select one element.</td>
 </tr></table>
@@ -1343,9 +1939,9 @@ List view
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>The main view is a list with QVD disk images.
-<span class="image">
-<img src="images/doc_images/screenshot_di_list.png" alt="screenshot_di_list.png" width="960px" />
+<div class="paragraph"><p>The main view is a list with QVD disk images.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_di_list.png" alt="screenshot_di_list.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -1369,7 +1965,7 @@ The images <strong>blocking status</strong>:
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_locked.png" alt="icon_locked.png" />
+<img src="/images/doc_images/icon_locked.png" alt="icon_locked.png">
 </span></p></div>
 <div class="paragraph"><p>An image which is locked cannot be used, so the virtual machines which use them could not be started.</p></div>
 </div></div>
@@ -1390,7 +1986,7 @@ The <strong>tags</strong> combined with the images: if an image has some tags, i
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_tags.png" alt="icon_tags.png" />
+<img src="/images/doc_images/icon_tags.png" alt="icon_tags.png">
 </span></p></div>
 <div class="paragraph"><p>If an image does not have tags, this icon will not show.</p></div>
 </div></div>
@@ -1402,7 +1998,7 @@ If an image is the <strong>OSF default image</strong>. Home icon
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_default.png" alt="icon_default.png" />
+<img src="/images/doc_images/icon_default.png" alt="icon_default.png">
 </span></p></div>
 <div class="paragraph"><p>In some view we can find this feature as the special tag <em>default</em>.</p></div>
 </div></div>
@@ -1414,7 +2010,7 @@ If an image is <strong>the last one created in its OSF</strong>. Flag icon.
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_head.png" alt="icon_head.png" />
+<img src="/images/doc_images/icon_head.png" alt="icon_head.png">
 </span></p></div>
 <div class="paragraph"><p>In some view we can find this feature as the special tag <em>head</em>.</p></div>
 </div></div>
@@ -1428,7 +2024,7 @@ Massive actions
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_di_massiveactions.png" alt="screenshot_di_massiveactions.png" width="960px" />
+<img src="/images/doc_images/screenshot_di_massiveactions.png" alt="screenshot_di_massiveactions.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Massive actions provide us with the following options to carry out on the selected disk images:</p></div>
 <div class="ulist"><ul>
@@ -1456,7 +2052,7 @@ Edit images: Tags edition will not appear in the massive editor. In order to man
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">If only one element is selected, in the case of the edition, we can edit the same fields that with the normal edition of an element in the detail view.</td>
 </tr></table>
@@ -1470,7 +2066,7 @@ Massive editor
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_di_massiveeditor.png" alt="screenshot_di_massiveeditor.png" width="960px" />
+<img src="/images/doc_images/screenshot_di_massiveeditor.png" alt="screenshot_di_massiveeditor.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>The massive editor of disk images only allows us to modify custom properties.</p></div>
 <div class="paragraph"><p>As any other massive editor, the value which will be defined, it would rewrite the one that could exist in all the edited elements unless "No changes" option were selected.</p></div>
@@ -1493,7 +2089,7 @@ By selecting an image among the ones available in the <em>staging</em> directory
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_di_create_staging.png" alt="screenshot_di_create_staging.png" width="960px" />
+<img src="/images/doc_images/screenshot_di_create_staging.png" alt="screenshot_di_create_staging.png" width="960px">
 </span></p></div>
 </div></div>
 </li>
@@ -1504,7 +2100,7 @@ By uploading an image from our computer:
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_di_create_upload.png" alt="screenshot_di_create_upload.png" width="960px" />
+<img src="/images/doc_images/screenshot_di_create_upload.png" alt="screenshot_di_create_upload.png" width="960px">
 </span></p></div>
 </div></div>
 </li>
@@ -1515,7 +2111,7 @@ By providing an image URL which will be downloaded and hosted on the server:
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_di_create_url.png" alt="screenshot_di_create_url.png" width="960px" />
+<img src="/images/doc_images/screenshot_di_create_url.png" alt="screenshot_di_create_url.png" width="960px">
 </span></p></div>
 </div></div>
 </li>
@@ -1523,7 +2119,7 @@ By providing an image URL which will be downloaded and hosted on the server:
 <div class="paragraph"><p>Unlike the creation of the rest of the elements, disk images need more time as they are the physical copy of large files.</p></div>
 <div class="paragraph"><p>Thus, when we create a disk image, an upload  screen will show with a creating progress chart.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_di_creating.png" alt="screenshot_di_creating.png" width="960px" />
+<img src="/images/doc_images/screenshot_di_creating.png" alt="screenshot_di_creating.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -1534,7 +2130,7 @@ Detail view
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_di_details.png" alt="screenshot_di_details.png" width="960px" />
+<img src="/images/doc_images/screenshot_di_details.png" alt="screenshot_di_details.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>We notice a small <strong>head top</strong> where next to the <strong>image name</strong> there are the <strong>button to delete it and the action buttons</strong>.</p></div>
 <div class="paragraph"><p>The available buttons in the detail view are:</p></div>
@@ -1578,14 +2174,14 @@ Edition
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_di_edit.png" alt="screenshot_di_edit.png" width="960px" />
+<img src="/images/doc_images/screenshot_di_edit.png" alt="screenshot_di_edit.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>When we edit an image we will be able to manage its <strong>tags and edit properties</strong>. Moreover, we can establish it as its OSF default image, in case it is not so yet. If it already is, a warning will appear.</p></div>
 <div class="paragraph"><p><strong>A disc Image tags can not be repeated in the same OSF</strong>. <strong>If we add a tag to a disc Image which already exists</strong> in other Image in the same OSF, the system will allow it, but what we will be doing, in fact, is to <strong>move the tag between the Images</strong>, it will disappear from the one it has it at the beginning, to establish itself in the Image we are editing.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">An element edition can also be accessed from the list view with the massive actions if we only select an element.</td>
 </tr></table>
@@ -1640,7 +2236,7 @@ Creating an Image in a OSF when there is already a virtual machine assigned to t
 </ul></div>
 <div class="paragraph"><p>After any of these actions, a modal window will appear to warn us about the situation of the virtual Machines affected alongside the checkboxes and a form to assign an expiration date to those Machines in the list we want to.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_di_edit_affected_vms.png" alt="screenshot_di_edit_affected_vms.png" width="960px" />
+<img src="/images/doc_images/screenshot_di_edit_affected_vms.png" alt="screenshot_di_edit_affected_vms.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -1652,14 +2248,14 @@ Creating an Image in a OSF when there is already a virtual machine assigned to t
 <h2 id="_wat_management">5. WAT management</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/menu_config_wat.png" alt="menu_config_wat.png" width="600px" />
+<img src="/images/doc_images/menu_config_wat.png" alt="menu_config_wat.png" width="600px">
 </span></p></div>
 <div class="paragraph"><p>One part of WAT is devoted to its own management. Giving tools for the management of  WAT general configuration, administrators and its permissions.</p></div>
 <div class="sect2">
 <h3 id="_wat_configuration">5.1. WAT Configuration</h3>
 <div class="paragraph"><p>In this section we will define a series of general values that affect all the administrators of WAT. They are values that will be used as default settings, and that every administrator will set up according to his preferences.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_watconfig_view.png" alt="screenshot_watconfig_view.png" width="960px" />
+<img src="/images/doc_images/screenshot_watconfig_view.png" alt="screenshot_watconfig_view.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Find a table with the current values and on the right part the button of edition..</p></div>
 <div class="dlist"><dl>
@@ -1670,7 +2266,7 @@ Edition
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_watconfig_edit.png" alt="screenshot_watconfig_edit.png" width="960px" />
+<img src="/images/doc_images/screenshot_watconfig_edit.png" alt="screenshot_watconfig_edit.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>The parameters that can be configured are:</p></div>
 <div class="ulist"><ul>
@@ -1729,9 +2325,9 @@ List view
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>The main view is a list with the administrators of WAT.
-<span class="image">
-<img src="images/doc_images/screenshot_administrator_list.png" alt="screenshot_administrator_list.png" width="960px" />
+<div class="paragraph"><p>The main view is a list with the administrators of WAT.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_administrator_list.png" alt="screenshot_administrator_list.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -1755,7 +2351,7 @@ The <strong>blocking status</strong> of the users:
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_montarboard.png" alt="icon_montarboard.png" />
+<img src="/images/doc_images/icon_montarboard.png" alt="icon_montarboard.png">
 </span></p></div>
 <div class="paragraph"><p>I we go over with the mouse we can see the roles that the administrator has asociated.</p></div>
 </div></div>
@@ -1767,7 +2363,7 @@ The <strong>blocking status</strong> of the users:
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_warning.png" alt="icon_warning.png" />
+<img src="/images/doc_images/icon_warning.png" alt="icon_warning.png">
 </span></p></div>
 <div class="paragraph"><p>If the administrator does not have asociated roles, a warning icon will appear since an administrator without roles does not make sense.</p></div>
 </div></div>
@@ -1779,7 +2375,7 @@ The <strong>blocking status</strong> of the users:
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_archiver.png" alt="icon_archiver.png" />
+<img src="/images/doc_images/icon_archiver.png" alt="icon_archiver.png">
 </span></p></div>
 <div class="paragraph"><p>If the administrator is the logged administrator, it will have this identifier with the warning <em>This administrator is me</em>.</p></div>
 </div></div>
@@ -1795,7 +2391,7 @@ Massive actions
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_administrator_massiveactions.png" alt="screenshot_administrator_massiveactions.png" width="960px" />
+<img src="/images/doc_images/screenshot_administrator_massiveactions.png" alt="screenshot_administrator_massiveactions.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>The massive actions give us the following options to do on the selected administrators:</p></div>
 <div class="ulist"><ul>
@@ -1814,7 +2410,7 @@ Creation
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_administrator_create.png" alt="screenshot_administrator_create.png" width="960px" />
+<img src="/images/doc_images/screenshot_administrator_create.png" alt="screenshot_administrator_create.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>When creating an administrator we will stablish its name, password and its language. If we leave the default language, the administrator will have the general language of the system although it can be changed.</p></div>
 <div class="paragraph"><p>Besides, we can assign roles of privileges, depending on the permits we want that the administrator has. If we assign more than one role, the administrator will have the addition of the privileges of each role. If we do not assign any role, the administrator will not be able to enter in the Administration panel.</p></div>
@@ -1827,7 +2423,7 @@ Detail view
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_administrator_details.png" alt="screenshot_administrator_details.png" width="960px" />
+<img src="/images/doc_images/screenshot_administrator_details.png" alt="screenshot_administrator_details.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>We observe a small <strong>head top</strong> next to the <strong>name of the administrator</strong> where <strong>the buttom to delete it and the action buttoms</strong> are.</p></div>
 <div class="paragraph"><p>Below this head top there is a <strong>table with the attributes of the administrator</strong>. Among them we can find the roles asociated to the administrator with a control to delete next to each of them. By clicking in one the names of the roles, we will go to the detail view of each role.</p></div>
@@ -1851,7 +2447,7 @@ By <strong>sections</strong> of WAT:
 <div class="paragraph"><p>The ACLs are clasified by the section where they are used or the type of element that they affect to.</p></div>
 <div class="paragraph"><p><em>For example, in the Configuration section the configuration part of WAT as well as the configuration of QVD are found.</em></p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_admin_treesections.png" alt="screenshot_admin_treesections.png" width="600px" />
+<img src="/images/doc_images/screenshot_admin_treesections.png" alt="screenshot_admin_treesections.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -1863,7 +2459,7 @@ By type of <strong>image</strong>:
 <div class="content">
 <div class="paragraph"><p>In this clasification the same ACLs are found but clasified by the type of action that they let.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_admin_treeactions.png" alt="screenshot_admin_treeactions.png" width="600px" />
+<img src="/images/doc_images/screenshot_admin_treeactions.png" alt="screenshot_admin_treeactions.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -1879,7 +2475,7 @@ Edition
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_administrator_edit.png" alt="screenshot_administrator_edit.png" width="960px" />
+<img src="/images/doc_images/screenshot_administrator_edit.png" alt="screenshot_administrator_edit.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>When editing an administrator, we can choose if changing the <strong>password</strong> (if we do not click on the check-box, it will remain the same) and the <strong>language</strong>, remembering that they are values that the administrator itself can change.</p></div>
 <div class="paragraph"><p>In addition, we can assign/unasign roles of privileges.</p></div>
@@ -1897,9 +2493,9 @@ List view
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>The main view is a list with the roles of WAT.
-<span class="image">
-<img src="images/doc_images/screenshot_role_list.png" alt="screenshot_role_list.png" width="960px" />
+<div class="paragraph"><p>The main view is a list with the roles of WAT.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_role_list.png" alt="screenshot_role_list.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -1918,7 +2514,7 @@ Massive actions
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_massiveactions.png" alt="screenshot_role_massiveactions.png" width="960px" />
+<img src="/images/doc_images/screenshot_role_massiveactions.png" alt="screenshot_role_massiveactions.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Massive actions will give us the following options to be done on the selected roles:</p></div>
 <div class="ulist"><ul>
@@ -1942,7 +2538,7 @@ Creation
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_create.png" alt="screenshot_role_create.png" width="960px" />
+<img src="/images/doc_images/screenshot_role_create.png" alt="screenshot_role_create.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>When creating a role we will set its name, description and will assign licenses inheriting ACLs.</p></div>
 <div class="paragraph"><p>The inheritance of ACLs has got two modes:</p></div>
@@ -1954,7 +2550,7 @@ Creation
 </li>
 </ul></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_inherit_roles.png" alt="screenshot_role_inherit_roles.png" width="600px" />
+<img src="/images/doc_images/screenshot_role_inherit_roles.png" alt="screenshot_role_inherit_roles.png" width="600px">
 </span></p></div>
 <div class="ulist"><ul>
 <li>
@@ -1964,15 +2560,15 @@ Creation
 </li>
 </ul></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_inherit_templates.png" alt="screenshot_role_inherit_templates.png" width="600px" />
+<img src="/images/doc_images/screenshot_role_inherit_templates.png" alt="screenshot_role_inherit_templates.png" width="600px">
 </span></p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_inherit_templates_matrix.png" alt="screenshot_role_inherit_templates_matrix.png" width="600px" />
+<img src="/images/doc_images/screenshot_role_inherit_templates_matrix.png" alt="screenshot_role_inherit_templates_matrix.png" width="600px">
 </span></p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">If it is inherited from one or more roles/templates, it will be inherited the sum of its ACLs regardless the common ACLs.  After this inheritance, you can remove or add single ACLs manually from the Tree of ACLs to customize the references obtained by them according to the needs of the administrator. In this way, if we are interested in all the ACLs of a role or template except one, it will be as easy as inheriting the role/template and remove manually the remaining ACL.</td>
 </tr></table>
@@ -1987,7 +2583,7 @@ Detail view
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_details.png" alt="screenshot_role_details.png" width="960px" />
+<img src="/images/doc_images/screenshot_role_details.png" alt="screenshot_role_details.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>In this view which is very similar to that of administrators, we can see a small <strong>header</strong> where next to the <strong>role name</strong> is <strong>button to delete it, and the button of edition</strong>.</p></div>
 <div class="paragraph"><p>Under this header there is a <strong>table with role attributes</strong>. Among the attributes we can find the list of <strong>inheritance roles and templates</strong>.</p></div>
@@ -2081,7 +2677,7 @@ By <strong>sections</strong> of WAT:
 <div class="paragraph"><p>The ACLs are classified according to the section where they are applied or the type or element they affect.</p></div>
 <div class="paragraph"><p>The main ACL of every section, and necessary to have this section at least available in the menu, next to its main view is "Access to the main view of&#8230;", except in the sections of setting which are ruled by a single ACL "Management of setting WAT/QVD".</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_treesections.png" alt="screenshot_role_treesections.png" width="600px" />
+<img src="/images/doc_images/screenshot_role_treesections.png" alt="screenshot_role_treesections.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -2095,7 +2691,7 @@ By types of <strong>actions</strong>:
 <em> For example in the branch "See main section " we can set up what sections to see. </em></p></div>
 <div class="paragraph"><p>If we want to apply certain permissions of a type (Delete, update, etc.) to several types of elements, this classification simplifies ACLs management.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_treeactions.png" alt="screenshot_role_treeactions.png" width="600px" />
+<img src="/images/doc_images/screenshot_role_treeactions.png" alt="screenshot_role_treeactions.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -2115,7 +2711,7 @@ Edition
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_edit.png" alt="screenshot_role_edit.png" width="960px" />
+<img src="/images/doc_images/screenshot_role_edit.png" alt="screenshot_role_edit.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>When editing a role we will be able to change name and description, in addition to configure the roles and ACL templates inheritance.</p></div>
 <div class="paragraph"><p>See Roles creation section for more details about roles and templates configuration.</p></div>
@@ -2129,28 +2725,28 @@ Edition
 <div class="paragraph"><p>These columns and filters can be set up globally in the system, and then each administrator will be able to customize these values only for himself.</p></div>
 <div class="paragraph"><p>With a selection combo we can change between columns and filters.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_watconfig_defaultviews_columns.png" alt="screenshot_watconfig_defaultviews_columns.png" width="960px" />
+<img src="/images/doc_images/screenshot_watconfig_defaultviews_columns.png" alt="screenshot_watconfig_defaultviews_columns.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_watconfig_defaultviews_filters.png" alt="screenshot_watconfig_defaultviews_filters.png" width="960px" />
+<img src="/images/doc_images/screenshot_watconfig_defaultviews_filters.png" alt="screenshot_watconfig_defaultviews_filters.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>In this section the general configuration of these parameters will be done by ticking a series of checkboxes. In the first place, the displayed columns are set up and secondly the available filters.</p></div>
 <div class="paragraph"><p>With respect to the <strong>columns</strong> it is a valid configuration for the <strong>desktop version</strong>, since in the mobile version will always display a simplified version. On the other hand, the <strong>filters</strong> will be set up regardless if it is for <strong>desktop and mobile</strong>. This distinction is made in order to do the mobile version more or less simple according to our needs.</p></div>
 <div class="paragraph"><p>After an information notice we will see a drop-down menu with the section that we want to customize and a button to restore the views by default.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_watconfig_defaultviews_sections.png" alt="screenshot_watconfig_defaultviews_sections.png" width="960px" />
+<img src="/images/doc_images/screenshot_watconfig_defaultviews_sections.png" alt="screenshot_watconfig_defaultviews_sections.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>As we select one or another section, the columns and filters of the above mentioned section will be added. Only by clicking on the different checkboxes the change will be saved.</p></div>
 <div class="paragraph"><p>If we want to <strong>return to initial configuration</strong> we will use the button of <strong>restore views by default</strong>. This action can be done on the loaded section or on the whole system, choosing one or another option in the dialogue that appears before carrying out the restoration.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_watconfig_defaultviews_reset.png" alt="screenshot_watconfig_defaultviews_reset.png" width="960px" />
+<img src="/images/doc_images/screenshot_watconfig_defaultviews_reset.png" alt="screenshot_watconfig_defaultviews_reset.png" width="960px">
 </span></p></div>
 </div>
 <div class="sect2">
 <h3 id="_properties">5.5. Properties</h3>
 <div class="literalblock">
-<div class="content">
-<pre><code>In this section we will manage the custom properties of every QVD element. In this way, we will be able to create extras properties for the elements that support this functionality: Users, Virtual Machines, Nodes, OSFs and Disk Images.</code></pre>
+<div class="content monospaced">
+<pre>In this section we will manage the custom properties of every QVD element. In this way, we will be able to create extras properties for the elements that support this functionality: Users, Virtual Machines, Nodes, OSFs and Disk Images.</pre>
 </div></div>
 <div class="paragraph"><p>A custom property in the Users, for example, will appear in all the users of the system as one more field. Not only in its detail view, but also in its forms of creation and edition. It might also appear in the list view as a column and/or specific filter if it was set up from the section of <em>Views</em>.</p></div>
 <div class="dlist"><dl>
@@ -2190,13 +2786,13 @@ It might be common to establish the same property in different types of QVD elem
 <h2 id="_qvd_management">6. QVD Management</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/menu_config_qvd.png" alt="menu_config_qvd.png" width="600px" />
+<img src="/images/doc_images/menu_config_qvd.png" alt="menu_config_qvd.png" width="600px">
 </span></p></div>
 <div class="sect2">
 <h3 id="_qvd_configuration">6.1. QVD configuration</h3>
 <div class="paragraph"><p>The parameters of QVD are distributed in several configuration files and the database. From WAT these parameters are shown in a centrally way, where they can be edited easily regardless its backgrounds.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_config.png" alt="screenshot_config.png" width="960px" />
+<img src="/images/doc_images/screenshot_config.png" alt="screenshot_config.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>The parameters are clasified in categories. These categories correspond with the first segment of the name of the parameter, it means inmediately preceding the first stop.</p></div>
 <div class="paragraph"><p><em>For example, the parameters that start with "admin" will be included in the "admin" category, as we can see in the snapshot.</em></p></div>
@@ -2209,7 +2805,7 @@ Navigation and research
 <div class="content">
 <div class="paragraph"><p>It is possible to navigate through the different categories to edit its parameters or to use the <strong>search control</strong> to find the parameters that contain a <strong>substring</strong>.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_config_search.png" alt="screenshot_config_search.png" width="960px" />
+<img src="/images/doc_images/screenshot_config_search.png" alt="screenshot_config_search.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -2221,7 +2817,7 @@ Parameters creation
 <div class="content">
 <div class="paragraph"><p>It is possible to add <strong>new parameters</strong>, that will be situated in the category that corresponds depending on the beginning of its name.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_config_custom.png" alt="screenshot_config_custom.png" width="960px" />
+<img src="/images/doc_images/screenshot_config_custom.png" alt="screenshot_config_custom.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>If the category does not exist it will be created in the menu, and if the name of the parameter do not contain stops it will take part of the special category <em>unclassified</em>.</p></div>
 </div></div>
@@ -2234,11 +2830,11 @@ Deleting and restoring parameters
 <div class="content">
 <div class="paragraph"><p>The parameters added after the installation can be deleted.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_config_delete.png" alt="screenshot_config_delete.png" width="960px" />
+<img src="/images/doc_images/screenshot_config_delete.png" alt="screenshot_config_delete.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>And the ones that were standard will be able to be restored to the default value.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_config_restore.png" alt="screenshot_config_restore.png" width="960px" />
+<img src="/images/doc_images/screenshot_config_restore.png" alt="screenshot_config_restore.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -2250,13 +2846,13 @@ Deleting and restoring parameters
 <h2 id="_user_area">7. User Area</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/menu_userarea.png" alt="menu_userarea.png" width="600px" />
+<img src="/images/doc_images/menu_userarea.png" alt="menu_userarea.png" width="600px">
 </span></p></div>
 <div class="sect2">
 <h3 id="_profile">7.1. Profile</h3>
 <div class="paragraph"><p>This is the part where we can check and update the set-up of the logged administrator.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_userarea_profile.png" alt="screenshot_userarea_profile.png" width="960px" />
+<img src="/images/doc_images/screenshot_userarea_profile.png" alt="screenshot_userarea_profile.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>The  WAT interface language can be set up as well as the block size, the one which corresponds to the number of elements shown in each page in the list views.
 Both parameters can be defined as <em>by default</em> thus adopting the WAT general set-up, or a fix value for the current administrator.</p></div>
@@ -2268,91 +2864,46 @@ Both parameters can be defined as <em>by default</em> thus adopting the WAT gene
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/important.png" alt="Important" />
+<img src="/images/doc_images/icons//important.png" alt="Important">
 </td>
 <td class="content">If an administrator does not change the configuration of his or her views, these could vary if the global configuration were modified. On the other hand, if an administrator changes a parameter, it will be fixed in the stablished value, without being altered by the changes in the global configuration.</td>
 </tr></table>
 </div>
 <div class="paragraph"><p>With a selection combo we can change between columns and filters.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_userarea_customize_columns.png" alt="screenshot_userarea_customize_columns.png" width="960px" />
+<img src="/images/doc_images/screenshot_userarea_customize_columns.png" alt="screenshot_userarea_customize_columns.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_userarea_customize_filters.png" alt="screenshot_userarea_customize_filters.png" width="960px" />
+<img src="/images/doc_images/screenshot_userarea_customize_filters.png" alt="screenshot_userarea_customize_filters.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>In this part it will be done a configuration for the current administrator of these parameters by ticking a series of check-boxes. On the one hand the shown columns are configured and on the other hand the available filters.</p></div>
 <div class="paragraph"><p>In the case of the <strong>columns</strong>, it is a valid configuration for the <strong>desktop version</strong> since in the mobile version, the version will always be simplified. On the other hand the <strong>filters</strong> are configured independently for the <strong>desktop and mobile</strong> This difference is made in order to do the mobile version more or less simple according to our neccesities.</p></div>
 <div class="paragraph"><p>In the section we will find a drop down menu with the section that we want to customize and a buttom to restore the default views.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_watconfig_defaultviews_sections.png" alt="screenshot_watconfig_defaultviews_sections.png" width="960px" />
+<img src="/images/doc_images/screenshot_watconfig_defaultviews_sections.png" alt="screenshot_watconfig_defaultviews_sections.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>When we select one or another section, the columns and filters of that section will be charged. Only by clicking on the different check-boxes, the change will be saved.</p></div>
 <div class="paragraph"><p>If we want to <strong>revert to the system configuration</strong> we will use the buttom to <strong>restore the default views</strong>. This action can be done over the current loaded section or over all the system, choosing one or the other option in the dialogue that appears before doing the restoration.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/important.png" alt="Important" />
+<img src="/images/doc_images/icons//important.png" alt="Important">
 </td>
 <td class="content">The views that we reset to the system configuration will be again subject to the changes that the global configuration may suffer.</td>
 </tr></table>
 </div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_userarea_customize_reset.png" alt="screenshot_userarea_customize_reset.png" width="960px" />
-</span>
- d</p></div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_customize_views">7.2. Customize Views</h3>
-<div class="paragraph"><p>As we saw in the part of the management of WAT, we can customize which columns or filters are shown in the different views of WAT. That is a global configuration of the system.</p></div>
-<div class="paragraph"><p>On the basis of this configuration, each administrator can customize his or her views in a very similar way, adapting them to his or her preferences.</p></div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<img src="images/doc_images/icons/important.png" alt="Important" />
-</td>
-<td class="content">If an administrator does not change the configuration of his or her views, these could vary if the global configuration were modified. On the other hand, if an administrator changes a parameter, it will be fixed in the stablished value, without being altered by the changes in the global configuration.</td>
-</tr></table>
-</div>
-<div class="paragraph"><p>With a selection combo we can change between columns and filters.</p></div>
-<div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_userarea_customize_columns.png" alt="screenshot_userarea_customize_columns.png" width="960px" />
+<img src="/images/doc_images/screenshot_userarea_customize_reset.png" alt="screenshot_userarea_customize_reset.png" width="960px">
 </span></p></div>
-<div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_userarea_customize_filters.png" alt="screenshot_userarea_customize_filters.png" width="960px" />
-</span></p></div>
-<div class="paragraph"><p>In this part it will be done a configuration for the current administrator of these parameters by ticking a series of check-boxes. On the one hand the shown columns are configured and on the other hand the available filters.</p></div>
-<div class="paragraph"><p>In the case of the <strong>columns</strong>, it is a valid configuration for the <strong>desktop version</strong> since in the mobile version, the version will always be simplified. On the other hand the <strong>filters</strong> are configured independently for the <strong>desktop and mobile</strong> This difference is made in order to do the mobile version more or less simple according to our neccesities.</p></div>
-<div class="paragraph"><p>In the section we will find a drop down menu with the section that we want to customize and a buttom to restore the default views.</p></div>
-<div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_watconfig_defaultviews_sections.png" alt="screenshot_watconfig_defaultviews_sections.png" width="960px" />
-</span></p></div>
-<div class="paragraph"><p>When we select one or another section, the columns and filters of that section will be charged. Only by clicking on the different check-boxes, the change will be saved.</p></div>
-<div class="paragraph"><p>If we want to <strong>revert to the system configuration</strong> we will use the buttom to <strong>restore the default views</strong>. This action can be done over the current loaded section or over all the system, choosing one or the other option in the dialogue that appears before doing the restoration.</p></div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<img src="images/doc_images/icons/important.png" alt="Important" />
-</td>
-<td class="content">The views that we reset to the system configuration will be again subject to the changes that the global configuration may suffer.</td>
-</tr></table>
-</div>
-<div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_userarea_customize_reset.png" alt="screenshot_userarea_customize_reset.png" width="960px" />
-</span>
- d</p></div>
-</div>
-<div class="sect2">
-<h3 id="_log_out_session">7.3. Log out session</h3>
-<div class="paragraph"><p>With this option the current administrator is logged out and it appears the login.</p></div>
 </div>
 </div>
 </div>
 </div>
-<div id="footnotes"><hr /></div>
+</div>
+<div id="footnotes"><hr></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-12-14 08:21:47 CET
+Last updated 2017-02-14 15:33:45 CET
 </div>
 </div>
 </body>

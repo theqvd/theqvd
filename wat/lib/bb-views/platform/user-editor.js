@@ -13,7 +13,7 @@ Wat.Views.UserEditorView = Wat.Views.EditorView.extend({
     
     renderCreate: function (target, that) {
         Wat.CurrentView.model = new Wat.Models.User();
-        $('.ui-dialog-title').html($.i18n.t('New User'));
+        $('.ui-dialog-titlebar').html($.i18n.t('New User'));
         
         Wat.Views.EditorView.prototype.renderCreate.apply(this, [target, that]);
     },
@@ -21,7 +21,7 @@ Wat.Views.UserEditorView = Wat.Views.EditorView.extend({
     renderUpdate: function (target, that) {
         Wat.Views.EditorView.prototype.renderUpdate.apply(this, [target, that]);
         
-        $('.ui-dialog-title').html($.i18n.t('Edit user') + ": " + this.model.get('name'));
+        $('.ui-dialog-titlebar').html($.i18n.t('Edit user') + ": " + this.model.get('name'));
     },
     
     createElement: function () {

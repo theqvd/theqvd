@@ -34,7 +34,7 @@ Wat.Views.OSDScriptsEditorView = Wat.Views.DialogView.extend({
         
         $('.js-upload-mode').hide();
         
-        Wat.CurrentView.OSDdialogView.renderAssetsControl({
+        Wat.CurrentView.editorView.softwareEditorView.renderAssetsControl({
             assetType: 'script',
             pluginId: 'execution_hooks'
         });
@@ -72,7 +72,7 @@ Wat.Views.OSDScriptsEditorView = Wat.Views.DialogView.extend({
         
         this.toggleUploadSelectMode();
         
-        Wat.CurrentView.OSDdialogView.renderSectionScripts();
+        Wat.CurrentView.editorView.softwareEditorView.renderSectionScripts();
     },
     
     toggleUploadSelectMode: function (e) {

@@ -2,7 +2,7 @@
     <% 
     if (Wat.C.checkACL('osf.update.name')) { 
     %>
-        <tr>
+        <tr data-tab-field="general">
             <td data-i18n="Name"></td>
             <td>
                 <input type="text" class="" name="name" value="<%= model.get('name') %>" data-required>
@@ -12,7 +12,7 @@
     }
     if (Wat.C.checkACL('vm.update.description')) { 
     %>
-    <tr>
+    <tr data-tab-field="general">
         <td data-i18n="Description"></td>
         <td>
             <textarea id="name" type="text" name="description"><%= model.get('description') %></textarea>
@@ -22,20 +22,14 @@
     }
     if (model.get('osd_id')) {
     %>
-    <tr class="js-os-configuration-row os-configuration-row">
-        <td data-i18n="OS distro">OS distro</td>
-        <td>
-            <fieldset class="os-configuration-fs">
-                <legend data-i18n="Software configuration">Software configuration</legend>
-                <div class="bb-os-configuration"></div>
-            </fieldset>
-        </td>
+    <tr data-tab-field="software">
+        <td colspan=2 class="bb-os-configuration-editor os-configuration-editor"></td>
     </tr>
     <%
     }
     if (Wat.C.checkACL('osf.update.memory')) { 
     %>
-        <tr>
+        <tr data-tab-field="hardware">
             <td data-i18n="Memory"></td>
             <td>
                 <input type="text" class="half100" name="memory" value="<%= model.get('memory') %>"> MB
@@ -50,7 +44,7 @@
     }
     if (Wat.C.checkACL('osf.update.user-storage')) { 
     %>
-        <tr>
+        <tr data-tab-field="hardware">
             <td data-i18n="User storage"></td>
             <td>
                 <input type="text" class="half100" name="user_storage" value="<%= model.get('user_storage') %>"> MB

@@ -12,7 +12,7 @@ Wat.Views.TenantEditorView = Wat.Views.EditorView.extend({
     
     renderCreate: function (target, that) {
         Wat.CurrentView.model = new Wat.Models.Tenant();
-        $('.ui-dialog-title').html($.i18n.t('New Tenant'));
+        $('.ui-dialog-titlebar').html($.i18n.t('New Tenant'));
         
         Wat.Views.EditorView.prototype.renderCreate.apply(this, [target, that]);
         
@@ -23,7 +23,7 @@ Wat.Views.TenantEditorView = Wat.Views.EditorView.extend({
     renderUpdate: function(target, that) {
         Wat.Views.EditorView.prototype.renderUpdate.apply(this, [target, that]);
         
-        $('.ui-dialog-title').html($.i18n.t('Edit tenant') + ": " + this.model.get('name'));
+        $('.ui-dialog-titlebar').html($.i18n.t('Edit tenant') + ": " + this.model.get('name'));
 
         Wat.I.chosenElement('select[name="language"]', 'single100');
         Wat.I.chosenElement('select[name="block"]', 'single100');

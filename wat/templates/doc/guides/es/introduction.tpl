@@ -1,11 +1,607 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.9" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="generator" content="AsciiDoc 8.6.9">
 <title>Introducción</title>
 <style type="text/css">
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+h5 {
+  font-size: 1.0em;
+}
+
+div.sectionbody {
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
+
+pre {
+  padding: 0;
+  margin: 0;
+}
+
+#author {
+  color: #527bbd;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+#email {
+}
+#revnumber, #revdate, #revremark {
+}
+
+#footer {
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #f0f0f0;
+  color: #777777;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
+}
+
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
+  margin-bottom: 2.5em;
+}
+
+#toctitle {
+  color: #527bbd;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
+
+
+/*
+ * Theme specific overrides of the preceding (asciidoc.css) CSS.
+ *
+ */
+body {
+  font-family: Garamond, Georgia, serif;
+  font-size: 17px;
+  color: #3E4349;
+  line-height: 1.3em;
+}
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Garmond, Georgia, serif;
+  font-weight: normal;
+  border-bottom-width: 0;
+  color: #3E4349;
+}
+div.title, caption.title { color: #596673; font-weight: bold; }
+h1 { font-size: 240%; }
+h2 { font-size: 180%; }
+h3 { font-size: 150%; }
+h4 { font-size: 130%; }
+h5 { font-size: 115%; }
+h6 { font-size: 100%; }
+#header h1 { margin-top: 0; }
+#toc {
+  color: #444444;
+  line-height: 1.5;
+  padding-top: 1.5em;
+}
+#toctitle {
+  font-size: 20px;
+}
+#toc a {
+    border-bottom: 1px dotted #999999;
+    color: #444444 !important;
+    text-decoration: none !important;
+}
+#toc a:hover {
+    border-bottom: 1px solid #6D4100;
+    color: #6D4100 !important;
+    text-decoration: none !important;
+}
+div.toclevel1 { margin-top: 0.2em; font-size: 16px; }
+div.toclevel2 { margin-top: 0.15em; font-size: 14px; }
+em, dt, td.hdlist1 { color: black; }
+strong { color: #3E4349; }
+a { color: #004B6B; text-decoration: none; border-bottom: 1px dotted #004B6B; }
+a:visited { color: #615FA0; border-bottom: 1px dotted #615FA0; }
+a:hover { color: #6D4100; border-bottom: 1px solid #6D4100; }
+div.tableblock > table, table.tableblock { border: 3px solid #E8E8E8; }
+th.tableblock, td.tableblock { border: 1px solid #E8E8E8; }
+ul > li > * { color: #3E4349; }
+pre, tt, .monospaced { font-family: Consolas,Menlo,'Deja Vu Sans Mono','Bitstream Vera Sans Mono',monospace; }
+tt, .monospaced { font-size: 0.9em; color: black;
+}
+div.exampleblock > div.content, div.sidebarblock > div.content, div.listingblock > div.content { border-width: 0 0 0 3px; border-color: #E8E8E8; }
+div.verseblock { border-left-width: 0; margin-left: 3em; }
+div.quoteblock { border-left-width: 3px; margin-left: 0; margin-right: 0;}
+div.admonitionblock td.content { border-left: 3px solid #E8E8E8; }
 
 
 </style>
@@ -233,33 +829,31 @@ Escritorio
 <dd>
 </dd>
 </dl></div>
-<div class="tableblock">
-<table rules="all"
-width="100%"
-frame="border"
-cellspacing="0" cellpadding="4">
-<col width="25%" />
-<col width="25%" />
-<col width="25%" />
-<col width="25%" />
+<table class="tableblock frame-all grid-all"
+style="
+width:100%;
+">
+<col style="width:25%;">
+<col style="width:25%;">
+<col style="width:25%;">
+<col style="width:25%;">
 <thead>
 <tr>
-<th align="left" valign="top">Chrome </th>
-<th align="left" valign="top">Firefox        </th>
-<th align="left" valign="top">Internet Explorer </th>
-<th align="left" valign="top">Opera</th>
+<th class="tableblock halign-left valign-top" >Chrome </th>
+<th class="tableblock halign-left valign-top" >Firefox        </th>
+<th class="tableblock halign-left valign-top" >Internet Explorer </th>
+<th class="tableblock halign-left valign-top" >Opera</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table">40+</p></td>
-<td align="left" valign="top"><p class="table">31+</p></td>
-<td align="left" valign="top"><p class="table">11+</p></td>
-<td align="left" valign="top"><p class="table">31+</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">40+</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">31+</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">11+</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">31+</p></td>
 </tr>
 </tbody>
 </table>
-</div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 Dispositivos móviles
@@ -267,33 +861,31 @@ Dispositivos móviles
 <dd>
 </dd>
 </dl></div>
-<div class="tableblock">
-<table rules="all"
-width="100%"
-frame="border"
-cellspacing="0" cellpadding="4">
-<col width="25%" />
-<col width="25%" />
-<col width="25%" />
-<col width="25%" />
+<table class="tableblock frame-all grid-all"
+style="
+width:100%;
+">
+<col style="width:25%;">
+<col style="width:25%;">
+<col style="width:25%;">
+<col style="width:25%;">
 <thead>
 <tr>
-<th align="left" valign="top">iOS Safari     </th>
-<th align="left" valign="top">iOS Chrome     </th>
-<th align="left" valign="top">Android Browser    </th>
-<th align="left" valign="top">Android Chrome</th>
+<th class="tableblock halign-left valign-top" >iOS Safari     </th>
+<th class="tableblock halign-left valign-top" >iOS Chrome     </th>
+<th class="tableblock halign-left valign-top" >Android Browser    </th>
+<th class="tableblock halign-left valign-top" >Android Chrome</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table">8.4+</p></td>
-<td align="left" valign="top"><p class="table">40+</p></td>
-<td align="left" valign="top"><p class="table">4.3+</p></td>
-<td align="left" valign="top"><p class="table">44+</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">8.4+</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">40+</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">4.3+</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">44+</p></td>
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 </div>
 <div class="sect1">
@@ -308,7 +900,7 @@ Captura
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_list.png" alt="screenshot_vm_list.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_list.png" alt="screenshot_vm_list.png" width="960px">
 </span></p></div>
 </div></div>
 </li>
@@ -319,7 +911,7 @@ Captura por componentes
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/interface_structure.png" alt="interface_structure.png" width="960px" />
+<img src="/images/doc_images/interface_structure.png" alt="interface_structure.png" width="960px">
 </span></p></div>
 </div></div>
 </li>
@@ -375,7 +967,7 @@ Captura
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/menu_drop_down.png" alt="menu_drop_down.png" width="960px" />
+<img src="/images/doc_images/menu_drop_down.png" alt="menu_drop_down.png" width="960px">
 </span></p></div>
 </div></div>
 </li>
@@ -397,7 +989,7 @@ Captura
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/menu_section_platform.png" alt="menu_section_platform.png" width="600px" />
+<img src="/images/doc_images/menu_section_platform.png" alt="menu_section_platform.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -418,7 +1010,7 @@ Captura
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/breadcrumbs.png" alt="breadcrumbs.png" width="300px" />
+<img src="/images/doc_images/breadcrumbs.png" alt="breadcrumbs.png" width="300px">
 </span></p></div>
 </div></div>
 </li>
@@ -445,7 +1037,7 @@ Captura
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/related_documentation.png" alt="related_documentation.png" width="600px" />
+<img src="/images/doc_images/related_documentation.png" alt="related_documentation.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -483,7 +1075,7 @@ Vista listado básica
 <dd>
 <p>
 <span class="image">
-<img src="images/doc_images/interface_list.png" alt="interface_list.png" width="960px" />
+<img src="/images/doc_images/interface_list.png" alt="interface_list.png" width="960px">
 </span>
 </p>
 </dd>
@@ -493,7 +1085,7 @@ Vista listado tras aplicar un filtro
 <dd>
 <p>
 <span class="image">
-<img src="images/doc_images/interface_list_filtered.png" alt="interface_list_filtered.png" width="960px" />
+<img src="/images/doc_images/interface_list_filtered.png" alt="interface_list_filtered.png" width="960px">
 </span>
 </p>
 </dd>
@@ -507,7 +1099,7 @@ Vista listado tras aplicar un filtro y seleccionar un elemento
 <dd>
 <p>
 <span class="image">
-<img src="images/doc_images/interface_list_checked.png" alt="interface_list_checked.png" width="960px" />
+<img src="/images/doc_images/interface_list_checked.png" alt="interface_list_checked.png" width="960px">
 </span>
 </p>
 </dd>
@@ -523,7 +1115,7 @@ Captura por componentes
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/interface_list_components.png" alt="interface_list_components.png" width="960px" />
+<img src="/images/doc_images/interface_list_components.png" alt="interface_list_components.png" width="960px">
 </span></p></div>
 </div></div>
 </li>
@@ -540,7 +1132,7 @@ Componentes detallados
 <div class="content">
 <div class="paragraph"><p>Algunas de las columnas de este listado tendrán links a otras secciones del WAT (si el administrador tiene permiso para ver dichas secciones).
 La principal columna que suele coincidir con el nombre del elemento tendrá un link a la vista detalle del elemento. Este link irá acompañado de un icono de lupa.</p></div>
-<div class="paragraph"><p>Esta lista estará paginada a un número de elementos por página configurable. Las columnas de esta tabla se pueden configurar <code>(Ver Personalización de vistas en el manual)</code>.</p></div>
+<div class="paragraph"><p>Esta lista estará paginada a un número de elementos por página configurable. Las columnas de esta tabla se pueden configurar <span class="monospaced">(Ver Personalización de vistas en el manual)</span>.</p></div>
 </div></div>
 </li>
 <li>
@@ -613,7 +1205,7 @@ Captura
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_user_details.png" alt="screenshot_user_details.png" width="960px" />
+<img src="/images/doc_images/screenshot_user_details.png" alt="screenshot_user_details.png" width="960px">
 </span></p></div>
 </div></div>
 </li>
@@ -624,7 +1216,7 @@ Captura por componentes
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/interface_details.png" alt="interface_details.png" width="960px" />
+<img src="/images/doc_images/interface_details.png" alt="interface_details.png" width="960px">
 </span></p></div>
 </div></div>
 </li>
@@ -667,10 +1259,10 @@ Componentes detallados
 <h3 id="_formularios_de_creación_edición">4.3. Formularios de creación-edición</h3>
 <div class="paragraph"><p>Tanto en una vista como en otra, al crear o editar un elemento, se mostrarán los diferentes formularios en ventanas modales, sin salir del contexto de la vista.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_user_create.png" alt="screenshot_user_create.png" width="960px" />
+<img src="/images/doc_images/screenshot_user_create.png" alt="screenshot_user_create.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_user_edit.png" alt="screenshot_user_edit.png" width="960px" />
+<img src="/images/doc_images/screenshot_user_edit.png" alt="screenshot_user_edit.png" width="960px">
 </span></p></div>
 </div>
 </div>
@@ -679,37 +1271,33 @@ Componentes detallados
 <h2 id="_versión_móvil">5. Versión móvil</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>La interfaz del WAT está diseñada para ser visualizada tanto en dispositivos con resoluciones grandes (Escritorio, Tablets&#8230;) como en dipositivos móviles. Para las pantallas pequeñas automáticamente se cargará una versión simplificada.</p></div>
-<div class="tableblock">
-<table rules="all"
-width="100%"
-frame="border"
-cellspacing="0" cellpadding="4">
-<col width="100%" />
+<table class="tableblock frame-all grid-all"
+style="
+width:100%;
+">
+<col style="width:100%;">
 <tbody>
 <tr>
-<td align="center" valign="top"><p class="table"><span class="image">
-<img src="images/doc_images/mobile_version_home.png" alt="mobile_version_home.png" width="300px" />
+<td class="tableblock halign-center valign-top" ><p class="tableblock"><span class="image">
+<img src="/images/doc_images/mobile_version_home.png" alt="mobile_version_home.png" width="300px">
 </span></p></td>
 </tr>
 </tbody>
 </table>
-</div>
 <div class="paragraph"><p>En esta versión el menú será un desplegable al que se accede haciendo click en el tipico icono de menú formado por barras horizontales.</p></div>
-<div class="tableblock">
-<table rules="all"
-width="100%"
-frame="border"
-cellspacing="0" cellpadding="4">
-<col width="100%" />
+<table class="tableblock frame-all grid-all"
+style="
+width:100%;
+">
+<col style="width:100%;">
 <tbody>
 <tr>
-<td align="center" valign="top"><p class="table"><span class="image">
-<img src="images/doc_images/mobile_version_menu.png" alt="mobile_version_menu.png" width="300px" />
+<td class="tableblock halign-center valign-top" ><p class="tableblock"><span class="image">
+<img src="/images/doc_images/mobile_version_menu.png" alt="mobile_version_menu.png" width="300px">
 </span></p></td>
 </tr>
 </tbody>
 </table>
-</div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 Características
@@ -720,37 +1308,33 @@ La versión móvil tendrá todas las funcionalidades relativas a la administraci
 </p>
 </dd>
 </dl></div>
-<div class="tableblock">
-<table rules="all"
-width="100%"
-frame="border"
-cellspacing="0" cellpadding="4">
-<col width="100%" />
+<table class="tableblock frame-all grid-all"
+style="
+width:100%;
+">
+<col style="width:100%;">
 <tbody>
 <tr>
-<td align="center" valign="top"><p class="table"><span class="image">
-<img src="images/doc_images/mobile_version_list_view.png" alt="mobile_version_list_view.png" width="300px" />
+<td class="tableblock halign-center valign-top" ><p class="tableblock"><span class="image">
+<img src="/images/doc_images/mobile_version_list_view.png" alt="mobile_version_list_view.png" width="300px">
 </span></p></td>
 </tr>
 </tbody>
 </table>
-</div>
 <div class="paragraph"><p>De este modo acciones como arrancar o parar una máquina virtual estarán disponibles del mismo modo que en la versión de escritorio.</p></div>
-<div class="tableblock">
-<table rules="all"
-width="100%"
-frame="border"
-cellspacing="0" cellpadding="4">
-<col width="100%" />
+<table class="tableblock frame-all grid-all"
+style="
+width:100%;
+">
+<col style="width:100%;">
 <tbody>
 <tr>
-<td align="center" valign="top"><p class="table"><span class="image">
-<img src="images/doc_images/mobile_version_actions.png" alt="mobile_version_actions.png" width="300px" />
+<td class="tableblock halign-center valign-top" ><p class="tableblock"><span class="image">
+<img src="/images/doc_images/mobile_version_actions.png" alt="mobile_version_actions.png" width="300px">
 </span></p></td>
 </tr>
 </tbody>
 </table>
-</div>
 <div class="paragraph"><p>Las características relativas a la administración del WAT, tales como gestión de permisos y administradores, serán solo accesibles desde la versión escritorio del WAT.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
@@ -762,21 +1346,19 @@ Es posible forzar la versión de escritorio en los dispositivos móviles y con e
 </p>
 </dd>
 </dl></div>
-<div class="tableblock">
-<table rules="all"
-width="100%"
-frame="border"
-cellspacing="0" cellpadding="4">
-<col width="100%" />
+<table class="tableblock frame-all grid-all"
+style="
+width:100%;
+">
+<col style="width:100%;">
 <tbody>
 <tr>
-<td align="center" valign="top"><p class="table"><span class="image">
-<img src="images/doc_images/mobile_version_desktop_button.png" alt="mobile_version_desktop_button.png" width="300px" />
+<td class="tableblock halign-center valign-top" ><p class="tableblock"><span class="image">
+<img src="/images/doc_images/mobile_version_desktop_button.png" alt="mobile_version_desktop_button.png" width="300px">
 </span></p></td>
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 </div>
 <div class="sect1">
@@ -793,7 +1375,7 @@ cellspacing="0" cellpadding="4">
 <div class="paragraph"><p>Los administradores del WAT pueden ser configurados para tener <strong>diferentes permisos para ver determinada información o realizar diferentes acciones</strong>. A estos permisos los denominamos <strong>ACLs</strong>.</p></div>
 <div class="paragraph"><p>Dicha asignación no se realiza directamente, sino que se configuran una serie de <strong>roles con los ACLs deseados</strong> y dichos roles se asignan a los administradores.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/acls_roles_administrators.png" alt="acls_roles_administrators.png" width="600px" />
+<img src="/images/doc_images/acls_roles_administrators.png" alt="acls_roles_administrators.png" width="600px">
 </span></p></div>
 <div class="paragraph"><p>Si no tenemos el rol o conjunto de roles deseados para ese administrador deberemos crearlo.</p></div>
 <div class="sect3">
@@ -875,16 +1457,16 @@ Gestionar sus propios ACLs, pudiendo llegar a tener permisos totales o incluso p
 </ul></div>
 </li>
 </ul></div>
-<div class="paragraph"><p>Para aprender a configurar permisos ver la guía <code>Gestionar Administradores y Permisos</code>.</p></div>
+<div class="paragraph"><p>Para aprender a configurar permisos ver la guía <span class="monospaced">Gestionar Administradores y Permisos</span>.</p></div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div id="footnotes"><hr /></div>
+<div id="footnotes"><hr></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-12-14 08:21:47 CET
+Last updated 2017-02-14 15:33:46 CET
 </div>
 </div>
 </body>

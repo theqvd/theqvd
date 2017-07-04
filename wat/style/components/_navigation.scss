@@ -16,11 +16,12 @@
         display: block;
     }
     
-    &>ul {    
+    &>ul {
         .menu-option, .lateral-menu-option, .lateral-menu-option-discrete {
             @extend %not-selectable;
             display: block;
-
+            text-align: left;
+            
             @include in(desktop) {
                 display: inline;
             }

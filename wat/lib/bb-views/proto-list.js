@@ -695,8 +695,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     // Fetch collection and render list
     fetchList: function (that) {
-        //var that = that || this;
-        that = Wat.CurrentView;
+        var that = that || this;
         
         that.collection.reset();
         

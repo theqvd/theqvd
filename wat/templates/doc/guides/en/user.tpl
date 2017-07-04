@@ -1,11 +1,607 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.9" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="generator" content="AsciiDoc 8.6.9">
 <title>User guide</title>
 <style type="text/css">
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+h5 {
+  font-size: 1.0em;
+}
+
+div.sectionbody {
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
+
+pre {
+  padding: 0;
+  margin: 0;
+}
+
+#author {
+  color: #527bbd;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+#email {
+}
+#revnumber, #revdate, #revremark {
+}
+
+#footer {
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #f0f0f0;
+  color: #777777;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
+}
+
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
+  margin-bottom: 2.5em;
+}
+
+#toctitle {
+  color: #527bbd;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
+
+
+/*
+ * Theme specific overrides of the preceding (asciidoc.css) CSS.
+ *
+ */
+body {
+  font-family: Garamond, Georgia, serif;
+  font-size: 17px;
+  color: #3E4349;
+  line-height: 1.3em;
+}
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Garmond, Georgia, serif;
+  font-weight: normal;
+  border-bottom-width: 0;
+  color: #3E4349;
+}
+div.title, caption.title { color: #596673; font-weight: bold; }
+h1 { font-size: 240%; }
+h2 { font-size: 180%; }
+h3 { font-size: 150%; }
+h4 { font-size: 130%; }
+h5 { font-size: 115%; }
+h6 { font-size: 100%; }
+#header h1 { margin-top: 0; }
+#toc {
+  color: #444444;
+  line-height: 1.5;
+  padding-top: 1.5em;
+}
+#toctitle {
+  font-size: 20px;
+}
+#toc a {
+    border-bottom: 1px dotted #999999;
+    color: #444444 !important;
+    text-decoration: none !important;
+}
+#toc a:hover {
+    border-bottom: 1px solid #6D4100;
+    color: #6D4100 !important;
+    text-decoration: none !important;
+}
+div.toclevel1 { margin-top: 0.2em; font-size: 16px; }
+div.toclevel2 { margin-top: 0.15em; font-size: 14px; }
+em, dt, td.hdlist1 { color: black; }
+strong { color: #3E4349; }
+a { color: #004B6B; text-decoration: none; border-bottom: 1px dotted #004B6B; }
+a:visited { color: #615FA0; border-bottom: 1px dotted #615FA0; }
+a:hover { color: #6D4100; border-bottom: 1px solid #6D4100; }
+div.tableblock > table, table.tableblock { border: 3px solid #E8E8E8; }
+th.tableblock, td.tableblock { border: 1px solid #E8E8E8; }
+ul > li > * { color: #3E4349; }
+pre, tt, .monospaced { font-family: Consolas,Menlo,'Deja Vu Sans Mono','Bitstream Vera Sans Mono',monospace; }
+tt, .monospaced { font-size: 0.9em; color: black;
+}
+div.exampleblock > div.content, div.sidebarblock > div.content, div.listingblock > div.content { border-width: 0 0 0 3px; border-color: #E8E8E8; }
+div.verseblock { border-left-width: 0; margin-left: 3em; }
+div.quoteblock { border-left-width: 3px; margin-left: 0; margin-right: 0;}
+div.admonitionblock td.content { border-left: 3px solid #E8E8E8; }
 
 
 </style>
@@ -218,14 +814,14 @@ asciidoc.install(3);
 <div class="sectionbody">
 <div class="paragraph"><p>After a clean installation of WAT an administrator with full access will have been created. His credentials are:</p></div>
 <div class="literalblock">
-<div class="content">
-<pre><code>User: admin
-Password: admin</code></pre>
+<div class="content monospaced">
+<pre>User: admin
+Password: admin</pre>
 </div></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">If we are going to have a single WAT administrator <em>admin</em> will be enough. If, otherwise, we want to have different administrators we can create them with <em>admin</em> with the possibility of giving them different permissions.</td>
 </tr></table>
@@ -329,8 +925,8 @@ OSF
 <div class="openblock">
 <div class="content">
 <div class="literalblock">
-<div class="content">
-<pre><code>(*) Having less than a Node is not necessary to create a virtual machine but it is to start it.</code></pre>
+<div class="content monospaced">
+<pre>(*) Having less than a Node is not necessary to create a virtual machine but it is to start it.</pre>
 </div></div>
 </div></div>
 </div>
@@ -372,7 +968,7 @@ OSF
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/note.png" alt="Note" />
+<img src="/images/doc_images/icons//note.png" alt="Note">
 </td>
 <td class="content">The sections used in this chapter describe in detail the section <em>Platform</em> in the guide <em>WAT step by step</em>.</td>
 </tr></table>
@@ -380,7 +976,7 @@ OSF
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/warning.png" alt="Warning" />
+<img src="/images/doc_images/icons//warning.png" alt="Warning">
 </td>
 <td class="content">The administrator account we use in WAT to carry out the next actions must have the required permissions. If there are any permissions lacking, some options or sections might become unavailable.</td>
 </tr></table>
@@ -619,12 +1215,15 @@ Optionally, we could create <em>other properties</em> for the image for internal
 </ul></div>
 </div></div>
 </dd>
-</dl></div>
-<div class="paragraph"><p>We will check if the image has been correctly created</p></div>
-<div class="paragraph"><p>+</p></div>
+<dt class="hdlist1">
+We will check if the image has been correctly created
+</dt>
+<dd>
 <div class="openblock">
 <div class="content">
 </div></div>
+</dd>
+</dl></div>
 </div>
 <div class="sect2">
 <h3 id="_user_creation">2.4. User creation</h3>
@@ -887,7 +1486,7 @@ We click on the button <em>Apply</em>.
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/note.png" alt="Note" />
+<img src="/images/doc_images/icons//note.png" alt="Note">
 </td>
 <td class="content">The sections used in this part are described in detail in the <em>Platform</em> section in the guide <em>WAT step by step</em>.</td>
 </tr></table>
@@ -1075,9 +1674,9 @@ Solution
 <div class="paragraph"><p>This situation will appear when we have no administrator allowed to manage permissions, because otherwise, we could recover it.</p></div>
 <div class="paragraph"><p>To restore the missing features, the WAT has a special recovering administrator. Its credentials are:</p></div>
 <div class="literalblock">
-<div class="content">
-<pre><code>User: batman
-Password: (Consult the support team)</code></pre>
+<div class="content monospaced">
+<pre>User: batman
+Password: (Consult the support team)</pre>
 </div></div>
 <div class="paragraph"><p>This administrator has the following characteristics:</p></div>
 <div class="ulist"><ul>
@@ -1229,8 +1828,8 @@ Operator L3
 <div class="openblock">
 <div class="content">
 <div class="literalblock">
-<div class="content">
-<pre><code>For example: Basic users provider</code></pre>
+<div class="content monospaced">
+<pre>For example: Basic users provider</pre>
 </div></div>
 </div></div>
 </li>
@@ -1273,13 +1872,13 @@ On the detail view we have <strong>two available tools</strong>
 <div class="content">
 <div class="paragraph"><p>The templates are descriptive of the ACLs they contain, normally making reference to what elements affect and how they affect them.</p></div>
 <div class="literalblock">
-<div class="content">
-<pre><code>For example: Users Creator, Images Operator, Vms Manager, Roles Eraser...</code></pre>
+<div class="content monospaced">
+<pre>For example: Users Creator, Images Operator, Vms Manager, Roles Eraser...</pre>
 </div></div>
 <div class="paragraph"><p>In <strong>future WAT updates</strong> <strong>new ACLs</strong> might appear. To avoid having to re-configure our administrators ACLs after an update, <strong>we recommend using the templates inheritance</strong> to configure our roles. These roles will be updated with the WAT containing the new ACLs in a coherent way with its use.</p></div>
 <div class="literalblock">
-<div class="content">
-<pre><code>For example: if we add a new field in the users view, the ACL that allows its display will be added to the internal role Users Reader. The roles that inherit this internal role, will be updated and will automatically have said new access.</code></pre>
+<div class="content monospaced">
+<pre>For example: if we add a new field in the users view, the ACL that allows its display will be added to the internal role Users Reader. The roles that inherit this internal role, will be updated and will automatically have said new access.</pre>
 </div></div>
 </div></div>
 </li>
@@ -1309,8 +1908,8 @@ On the detail view we have <strong>two available tools</strong>
 <div class="content">
 <div class="paragraph"><p>Useful if we want to create a role that gives permissions with <strong>much depth but little extent</strong>.</p></div>
 <div class="literalblock">
-<div class="content">
-<pre><code>For example, total permissions in users and virtual machines.</code></pre>
+<div class="content monospaced">
+<pre>For example, total permissions in users and virtual machines.</pre>
 </div></div>
 </div></div>
 </li>
@@ -1322,8 +1921,8 @@ On the detail view we have <strong>two available tools</strong>
 <div class="content">
 <div class="paragraph"><p>Useful if we want to create a role that gives permissions with <strong>little depth and much extent</strong>.</p></div>
 <div class="literalblock">
-<div class="content">
-<pre><code>For example, total permissions in users and virtual machines.</code></pre>
+<div class="content monospaced">
+<pre>For example, total permissions in users and virtual machines.</pre>
 </div></div>
 </div></div>
 </li>
@@ -1357,1583 +1956,1563 @@ The ACLs are obtained at the moment of the login, so, if we decide to change ACL
 <div class="paragraph"><p>List of the ACLs sorted out by the different object they affect. Each category contains a table with a short description, the internal code and a description in detail for each of the ACLs.</p></div>
 <div class="sect3">
 <h4 id="_users_acls">7.1.1. Users' ACLs</h4>
-<div class="tableblock">
-<table rules="all"
-width="100%"
-frame="border"
-cellspacing="0" cellpadding="4">
-<col width="33%" />
-<col width="33%" />
-<col width="33%" />
+<table class="tableblock frame-all grid-all"
+style="
+width:100%;
+">
+<col style="width:33%;">
+<col style="width:33%;">
+<col style="width:33%;">
 <thead>
 <tr>
-<th align="left" valign="top">ACL    </th>
-<th align="left" valign="top">ACL code       </th>
-<th align="left" valign="top">Description</th>
+<th class="tableblock halign-left valign-top" >ACL    </th>
+<th class="tableblock halign-left valign-top" >ACL code       </th>
+<th class="tableblock halign-left valign-top" >Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create users</strong></p></td>
-<td align="left" valign="top"><p class="table">user.create.</p></td>
-<td align="left" valign="top"><p class="table">Creation of users including initial settings for name and password.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Create users</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.create.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Creation of users including initial settings for name and password.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set properties on users in creation</strong></p></td>
-<td align="left" valign="top"><p class="table">user.create.properties</p></td>
-<td align="left" valign="top"><p class="table">Setting of custom properties in the creation process of users.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Set properties on users in creation</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.create.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Setting of custom properties in the creation process of users.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete users (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">user.delete-massive.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of users massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete users (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.delete-massive.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of users massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete users</strong></p></td>
-<td align="left" valign="top"><p class="table">user.delete.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of users one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete users</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.delete.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of users one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter users by blocking status</strong></p></td>
-<td align="left" valign="top"><p class="table">user.filter.block</p></td>
-<td align="left" valign="top"><p class="table">Filter of users list by disk image&#8217;s blocking status</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter users by blocking status</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.filter.block</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of users list by disk image&#8217;s blocking status</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter users by creator</strong></p></td>
-<td align="left" valign="top"><p class="table">user.filter.created-by</p></td>
-<td align="left" valign="top"><p class="table">Filter of users list by administrator who created it</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter users by creator</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.filter.created-by</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of users list by administrator who created it</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter users by creation date</strong></p></td>
-<td align="left" valign="top"><p class="table">user.filter.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Filter of users list by date when it was created</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter users by creation date</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.filter.creation-date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of users list by date when it was created</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter users by name</strong></p></td>
-<td align="left" valign="top"><p class="table">user.filter.name</p></td>
-<td align="left" valign="top"><p class="table">Filter of users list by user&#8217;s name.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter users by name</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.filter.name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of users list by user&#8217;s name.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter users by properties</strong></p></td>
-<td align="left" valign="top"><p class="table">user.filter.properties</p></td>
-<td align="left" valign="top"><p class="table">Filter of users list by desired custom property.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter users by properties</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.filter.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of users list by desired custom property.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to user&#8217;s details view</strong></p></td>
-<td align="left" valign="top"><p class="table">user.see-details.</p></td>
-<td align="left" valign="top"><p class="table">This ACL grants the access to the details view. The minimum data on it is name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to user&#8217;s details view</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.see-details.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">This ACL grants the access to the details view. The minimum data on it is name</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to user&#8217;s main section</strong></p></td>
-<td align="left" valign="top"><p class="table">user.see-main.</p></td>
-<td align="left" valign="top"><p class="table">This ACL grants the access to the list. The minimum data on it is name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to user&#8217;s main section</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.see-main.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">This ACL grants the access to the list. The minimum data on it is name</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s blocking state</strong></p></td>
-<td align="left" valign="top"><p class="table">user.see.block</p></td>
-<td align="left" valign="top"><p class="table">Blocking state (blocked/unblocked) of users</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See user&#8217;s blocking state</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.see.block</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Blocking state (blocked/unblocked) of users</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s creator</strong></p></td>
-<td align="left" valign="top"><p class="table">user.see.created-by</p></td>
-<td align="left" valign="top"><p class="table">WAT administrator who created a user.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See user&#8217;s creator</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.see.created-by</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">WAT administrator who created a user.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s creation date</strong></p></td>
-<td align="left" valign="top"><p class="table">user.see.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Datetime when a user was created</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See user&#8217;s creation date</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.see.creation-date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Datetime when a user was created</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s description</strong></p></td>
-<td align="left" valign="top"><p class="table">user.see.description</p></td>
-<td align="left" valign="top"><p class="table">The description of the users.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See user&#8217;s description</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.see.description</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The description of the users.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s ID</strong></p></td>
-<td align="left" valign="top"><p class="table">user.see.id</p></td>
-<td align="left" valign="top"><p class="table">The database identiefier of the users. Useful to make calls from CLI.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See user&#8217;s ID</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.see.id</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The database identiefier of the users. Useful to make calls from CLI.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s properties</strong></p></td>
-<td align="left" valign="top"><p class="table">user.see.properties</p></td>
-<td align="left" valign="top"><p class="table">The custom properties of the users.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See user&#8217;s properties</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.see.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The custom properties of the users.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s virtual machines</strong></p></td>
-<td align="left" valign="top"><p class="table">user.see.vm-list</p></td>
-<td align="left" valign="top"><p class="table">See the virtual machines of one user in his details view. This view will contain: name, state, block and expire information of each vm</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See user&#8217;s virtual machines</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.see.vm-list</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">See the virtual machines of one user in his details view. This view will contain: name, state, block and expire information of each vm</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s virtual machines' blocking state</strong></p></td>
-<td align="left" valign="top"><p class="table">user.see.vm-list-block</p></td>
-<td align="left" valign="top"><p class="table">Blocking info of the virtual machines shown in user details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See user&#8217;s virtual machines' blocking state</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.see.vm-list-block</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Blocking info of the virtual machines shown in user details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s virtual machines' expiration</strong></p></td>
-<td align="left" valign="top"><p class="table">user.see.vm-list-expiration</p></td>
-<td align="left" valign="top"><p class="table">Expiration info of the virtual machines shown in user details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See user&#8217;s virtual machines' expiration</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.see.vm-list-expiration</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Expiration info of the virtual machines shown in user details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s virtual machines' running state</strong></p></td>
-<td align="left" valign="top"><p class="table">user.see.vm-list-state</p></td>
-<td align="left" valign="top"><p class="table">State (stopped/started) of the virtual machines shown in user details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See user&#8217;s virtual machines' running state</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.see.vm-list-state</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">State (stopped/started) of the virtual machines shown in user details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user&#8217;s virtual machines' user state</strong></p></td>
-<td align="left" valign="top"><p class="table">user.see.vm-list-user-state</p></td>
-<td align="left" valign="top"><p class="table">User state (connected/disconnected)) of the virtual machines shown in user details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See user&#8217;s virtual machines' user state</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.see.vm-list-user-state</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">User state (connected/disconnected)) of the virtual machines shown in user details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See number of user&#8217;s virtual machines</strong></p></td>
-<td align="left" valign="top"><p class="table">user.see.vms-info</p></td>
-<td align="left" valign="top"><p class="table">Total and connected virtual machines of this user</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See number of user&#8217;s virtual machines</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.see.vms-info</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Total and connected virtual machines of this user</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of number of users</strong></p></td>
-<td align="left" valign="top"><p class="table">user.stats.blocked</p></td>
-<td align="left" valign="top"><p class="table">Total of blocked users in current tenant or all system for superadministrators.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See statistics of number of users</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.stats.blocked</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Total of blocked users in current tenant or all system for superadministrators.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of number of connected users</strong></p></td>
-<td align="left" valign="top"><p class="table">user.stats.connected-users</p></td>
-<td align="left" valign="top"><p class="table">Total of users connected in at least one virtual machine.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See statistics of number of connected users</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.stats.connected-users</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Total of users connected in at least one virtual machine.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of number of blocked users</strong></p></td>
-<td align="left" valign="top"><p class="table">user.stats.summary</p></td>
-<td align="left" valign="top"><p class="table">Total of users in current tenant or all system for superadministrators.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See statistics of number of blocked users</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.stats.summary</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Total of users in current tenant or all system for superadministrators.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Block-Unblock users (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">user.update-massive.block</p></td>
-<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of users massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Block-Unblock users (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.update-massive.block</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of users massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update user&#8217;s description (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">user.update-massive.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of users massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update user&#8217;s description (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.update-massive.description</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of users massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update properties when update users (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">user.update-massive.properties</p></td>
-<td align="left" valign="top"><p class="table">Update properties in user&#8217;s massive update process.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update properties when update users (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.update-massive.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in user&#8217;s massive update process.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Block-Unblock users</strong></p></td>
-<td align="left" valign="top"><p class="table">user.update.block</p></td>
-<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of users one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Block-Unblock users</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.update.block</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of users one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update user&#8217;s description</strong></p></td>
-<td align="left" valign="top"><p class="table">user.update.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of users one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update user&#8217;s description</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.update.description</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of users one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update user&#8217;s password</strong></p></td>
-<td align="left" valign="top"><p class="table">user.update.password</p></td>
-<td align="left" valign="top"><p class="table">Update the password of users.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update user&#8217;s password</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.update.password</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the password of users.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update properties when update users</strong></p></td>
-<td align="left" valign="top"><p class="table">user.update.properties</p></td>
-<td align="left" valign="top"><p class="table">Update properties in user&#8217;s one by one update process.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update properties when update users</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">user.update.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in user&#8217;s one by one update process.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 <div class="sect3">
 <h4 id="_virtual_machines_acls">7.1.2. Virtual Machines' ACLs</h4>
-<div class="tableblock">
-<table rules="all"
-width="100%"
-frame="border"
-cellspacing="0" cellpadding="4">
-<col width="33%" />
-<col width="33%" />
-<col width="33%" />
+<table class="tableblock frame-all grid-all"
+style="
+width:100%;
+">
+<col style="width:33%;">
+<col style="width:33%;">
+<col style="width:33%;">
 <thead>
 <tr>
-<th align="left" valign="top">ACL    </th>
-<th align="left" valign="top">ACL code       </th>
-<th align="left" valign="top">Description</th>
+<th class="tableblock halign-left valign-top" >ACL    </th>
+<th class="tableblock halign-left valign-top" >ACL code       </th>
+<th class="tableblock halign-left valign-top" >Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create virtual machines</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.create.</p></td>
-<td align="left" valign="top"><p class="table">Creation of virtual machines including initial setting for name, user and OS flavour.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Create virtual machines</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.create.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Creation of virtual machines including initial setting for name, user and OS flavour.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set tag in virtual macine&#8217;s creation</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.create.di-tag</p></td>
-<td align="left" valign="top"><p class="table">Setting of disk image&#8217;s tag in the creation process of virtual machines. Without this ACL, the system will set <em>default</em> automatically.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Set tag in virtual macine&#8217;s creation</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.create.di-tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Setting of disk image&#8217;s tag in the creation process of virtual machines. Without this ACL, the system will set <em>default</em> automatically.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set properties in virtual machine&#8217;s creation</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.create.properties</p></td>
-<td align="left" valign="top"><p class="table">Setting of custom properties in the creation process of virtual machines.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Set properties in virtual machine&#8217;s creation</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.create.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Setting of custom properties in the creation process of virtual machines.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete virtual machines (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.delete-massive.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of virtual machines massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete virtual machines (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.delete-massive.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of virtual machines massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete virtual machines</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.delete.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of virtual machines one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete virtual machines</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.delete.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of virtual machines one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by creator</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.filter.created-by</p></td>
-<td align="left" valign="top"><p class="table">Filter of virtual machines list by administrator who created it</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter virtual machines by creator</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.created-by</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of virtual machines list by administrator who created it</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by creation date</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.filter.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Filter of virtual machines list by date when it was created</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter virtual machines by creation date</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.creation-date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of virtual machines list by date when it was created</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by expiration date</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.filter.expiration-date</p></td>
-<td align="left" valign="top"><p class="table">Filter of virtual machines list by date when it will expire. This is refered to the hard expiration.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter virtual machines by expiration date</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.expiration-date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of virtual machines list by date when it will expire. This is refered to the hard expiration.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by host</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.filter.host</p></td>
-<td align="left" valign="top"><p class="table">Filter of virtual machines list by host where the virtual machines are running.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter virtual machines by host</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.host</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of virtual machines list by host where the virtual machines are running.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by name</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.filter.name</p></td>
-<td align="left" valign="top"><p class="table">Filter of virtual machines list by virtual machine&#8217;s name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter virtual machines by name</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of virtual machines list by virtual machine&#8217;s name</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by OS Flavour</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.filter.osf</p></td>
-<td align="left" valign="top"><p class="table">Filter of virtual machines list by OS flavour assigned to the virtual machine.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter virtual machines by OS Flavour</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.osf</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of virtual machines list by OS flavour assigned to the virtual machine.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by properties</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.filter.properties</p></td>
-<td align="left" valign="top"><p class="table">Filter of virtual machines list by desired custom property.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter virtual machines by properties</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of virtual machines list by desired custom property.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by running state</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.filter.state</p></td>
-<td align="left" valign="top"><p class="table">Filter of virtual machines list by virtual machine&#8217;s state (stopped/started)</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter virtual machines by running state</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.state</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of virtual machines list by virtual machine&#8217;s state (stopped/started)</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter virtual machines by user</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.filter.user</p></td>
-<td align="left" valign="top"><p class="table">Filter of virtual machines list by user who the virtual machines belong.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter virtual machines by user</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.user</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of virtual machines list by user who the virtual machines belong.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to virtual machine&#8217;s details view</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see-details.</p></td>
-<td align="left" valign="top"><p class="table">This ACL grants the access to the details view. The minimum data on it is name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to virtual machine&#8217;s details view</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see-details.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">This ACL grants the access to the details view. The minimum data on it is name</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to virtual machine&#8217;s main section</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see-main.</p></td>
-<td align="left" valign="top"><p class="table">This ACL grants the access to the list. The minimum data on it is disk_image</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to virtual machine&#8217;s main section</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see-main.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">This ACL grants the access to the list. The minimum data on it is disk_image</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s blocking status</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see.block</p></td>
-<td align="left" valign="top"><p class="table">Blocking state (blocked/unblocked) of virtual machines</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See virtual machine&#8217;s blocking status</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see.block</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Blocking state (blocked/unblocked) of virtual machines</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s creator</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see.created-by</p></td>
-<td align="left" valign="top"><p class="table">WAT administrator who created a virtual machine.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See virtual machine&#8217;s creator</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see.created-by</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">WAT administrator who created a virtual machine.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s creation date</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Datetime when a virtual machine was created</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See virtual machine&#8217;s creation date</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see.creation-date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Datetime when a virtual machine was created</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s description</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see.description</p></td>
-<td align="left" valign="top"><p class="table">The description of virtual machines.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See virtual machine&#8217;s description</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see.description</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The description of virtual machines.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s disk image</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see.di</p></td>
-<td align="left" valign="top"><p class="table">Disk images used by each virtual machine</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See virtual machine&#8217;s disk image</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see.di</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Disk images used by each virtual machine</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s disk image&#8217;s tag</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see.di-tag</p></td>
-<td align="left" valign="top"><p class="table">Disk image&#8217;s tag assigned in each virtual machine to define which disk image will be used.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See virtual machine&#8217;s disk image&#8217;s tag</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see.di-tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Disk image&#8217;s tag assigned in each virtual machine to define which disk image will be used.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s disk image&#8217;s version</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see.di-version</p></td>
-<td align="left" valign="top"><p class="table">Disk image&#8217;s version used by each virtual machine</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See virtual machine&#8217;s disk image&#8217;s version</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see.di-version</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Disk image&#8217;s version used by each virtual machine</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s Expiration</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see.expiration</p></td>
-<td align="left" valign="top"><p class="table">Expiration info of the virtual machines.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See virtual machine&#8217;s Expiration</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see.expiration</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Expiration info of the virtual machines.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s Node</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see.host</p></td>
-<td align="left" valign="top"><p class="table">Host where each virtual machines are running</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See virtual machine&#8217;s Node</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see.host</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Host where each virtual machines are running</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s ID</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see.id</p></td>
-<td align="left" valign="top"><p class="table">The database identiefier of the virtual machines. Useful to make calls from CLI.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See virtual machine&#8217;s ID</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see.id</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The database identiefier of the virtual machines. Useful to make calls from CLI.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s IP address</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see.ip</p></td>
-<td align="left" valign="top"><p class="table">Current IP addres of the virtual machines.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See virtual machine&#8217;s IP address</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see.ip</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Current IP addres of the virtual machines.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s MAC address</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see.mac</p></td>
-<td align="left" valign="top"><p class="table">MAC address of the virtual machines.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See virtual machine&#8217;s MAC address</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see.mac</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">MAC address of the virtual machines.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s IP address for next boot</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see.next-boot-ip</p></td>
-<td align="left" valign="top"><p class="table">IP address that will be assigned in the next boot of the virtual machines.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See virtual machine&#8217;s IP address for next boot</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see.next-boot-ip</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">IP address that will be assigned in the next boot of the virtual machines.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s OS Flavour</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see.osf</p></td>
-<td align="left" valign="top"><p class="table">OS flavours assigned to each virtual machine.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See virtual machine&#8217;s OS Flavour</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see.osf</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">OS flavours assigned to each virtual machine.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s Serial port</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see.port-serial</p></td>
-<td align="left" valign="top"><p class="table">Serial port assigned to a running virtual machine.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See virtual machine&#8217;s Serial port</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see.port-serial</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Serial port assigned to a running virtual machine.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s SSH port</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see.port-ssh</p></td>
-<td align="left" valign="top"><p class="table">SSH port assigned to a running virtual machine.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See virtual machine&#8217;s SSH port</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see.port-ssh</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">SSH port assigned to a running virtual machine.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s VNC port</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see.port-vnc</p></td>
-<td align="left" valign="top"><p class="table">VNC port assigned to a running virtual machine.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See virtual machine&#8217;s VNC port</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see.port-vnc</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">VNC port assigned to a running virtual machine.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s properties</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see.properties</p></td>
-<td align="left" valign="top"><p class="table">The custom properties of the virtual machines.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See virtual machine&#8217;s properties</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The custom properties of the virtual machines.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s state</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see.state</p></td>
-<td align="left" valign="top"><p class="table">The status of the virtual machines (stopped/started)</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See virtual machine&#8217;s state</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see.state</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The status of the virtual machines (stopped/started)</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s user</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see.user</p></td>
-<td align="left" valign="top"><p class="table">The user owner of the virtual machines.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See virtual machine&#8217;s user</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see.user</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The user owner of the virtual machines.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See virtual machine&#8217;s user&#8217;s connection state</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.see.user-state</p></td>
-<td align="left" valign="top"><p class="table">The user state of a virtual machine (connected/disconnected)</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See virtual machine&#8217;s user&#8217;s connection state</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.see.user-state</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The user state of a virtual machine (connected/disconnected)</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of number of blocked virtual machines</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.stats.blocked</p></td>
-<td align="left" valign="top"><p class="table">Total of blocked virtual machines in current tenant or all system for superadministrators.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See statistics of number of blocked virtual machines</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.stats.blocked</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Total of blocked virtual machines in current tenant or all system for superadministrators.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of virtual machines close to expire</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.stats.close-to-expire</p></td>
-<td align="left" valign="top"><p class="table">Info of the virutal machines that will be expire (hard expiration) in next 7 days.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See statistics of virtual machines close to expire</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.stats.close-to-expire</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Info of the virutal machines that will be expire (hard expiration) in next 7 days.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of running virtual machines</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.stats.running-vms</p></td>
-<td align="left" valign="top"><p class="table">Total of running virtual machines in current tenant or all system for superadministrators.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See statistics of running virtual machines</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.stats.running-vms</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Total of running virtual machines in current tenant or all system for superadministrators.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of number of virtual machines</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.stats.summary</p></td>
-<td align="left" valign="top"><p class="table">Total of virtual machines in current tenant or all system for superadministrators.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See statistics of number of virtual machines</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.stats.summary</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Total of virtual machines in current tenant or all system for superadministrators.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Block-Unblock virtual machines (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.update-massive.block</p></td>
-<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of virtual machines massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Block-Unblock virtual machines (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update-massive.block</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of virtual machines massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s description (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.update-massive.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of virtual machines massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update virtual machine&#8217;s description (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update-massive.description</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of virtual machines massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s tag (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.update-massive.di-tag</p></td>
-<td align="left" valign="top"><p class="table">Update the disk image&#8217;s tag setted on virtual machines massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update virtual machine&#8217;s tag (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update-massive.di-tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the disk image&#8217;s tag setted on virtual machines massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Disconnect user from virtual machine (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.update-massive.disconnect-user</p></td>
-<td align="left" valign="top"><p class="table">Disconnect the user connected to virtual machines massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Disconnect user from virtual machine (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update-massive.disconnect-user</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Disconnect the user connected to virtual machines massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s expiration (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.update-massive.expiration</p></td>
-<td align="left" valign="top"><p class="table">Update the expiration date times of virtual machines massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update virtual machine&#8217;s expiration (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update-massive.expiration</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the expiration date times of virtual machines massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update properties when update virtual machines (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.update-massive.properties</p></td>
-<td align="left" valign="top"><p class="table">Update properties in virtual machines&#8217;s massive update process.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update properties when update virtual machines (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update-massive.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in virtual machines&#8217;s massive update process.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Start-Stop virtual machines (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.update-massive.state</p></td>
-<td align="left" valign="top"><p class="table">Start/Stop virtual machines massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Start-Stop virtual machines (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update-massive.state</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Start/Stop virtual machines massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Block-Unblock virtual machines</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.update.block</p></td>
-<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of virtual machines one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Block-Unblock virtual machines</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update.block</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of virtual machines one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s description</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.update.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of virtual machines one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update virtual machine&#8217;s description</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update.description</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of virtual machines one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s tag</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.update.di-tag</p></td>
-<td align="left" valign="top"><p class="table">Update the disk image&#8217;s tag setted on virtual machines one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update virtual machine&#8217;s tag</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update.di-tag</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the disk image&#8217;s tag setted on virtual machines one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Disconnect user from virtual machine</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.update.disconnect-user</p></td>
-<td align="left" valign="top"><p class="table">Disconnect the user connected to virtual machines one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Disconnect user from virtual machine</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update.disconnect-user</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Disconnect the user connected to virtual machines one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s expiration</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.update.expiration</p></td>
-<td align="left" valign="top"><p class="table">Update the expiration date times of virtual machines one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update virtual machine&#8217;s expiration</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update.expiration</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the expiration date times of virtual machines one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update virtual machine&#8217;s name</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.update.name</p></td>
-<td align="left" valign="top"><p class="table">Update the name of virtual machines.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update virtual machine&#8217;s name</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update.name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the name of virtual machines.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update properties when update virtual machines</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.update.properties</p></td>
-<td align="left" valign="top"><p class="table">Update properties in virtual machines&#8217;s one by one update process.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update properties when update virtual machines</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in virtual machines&#8217;s one by one update process.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Start-Stop virtual machines</strong></p></td>
-<td align="left" valign="top"><p class="table">vm.update.state</p></td>
-<td align="left" valign="top"><p class="table">Start/Stop virtual machines one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Start-Stop virtual machines</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update.state</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Start/Stop virtual machines one by one.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 <div class="sect3">
 <h4 id="_nodes_acls">7.1.3. Nodes' ACLs</h4>
-<div class="tableblock">
-<table rules="all"
-width="100%"
-frame="border"
-cellspacing="0" cellpadding="4">
-<col width="33%" />
-<col width="33%" />
-<col width="33%" />
+<table class="tableblock frame-all grid-all"
+style="
+width:100%;
+">
+<col style="width:33%;">
+<col style="width:33%;">
+<col style="width:33%;">
 <thead>
 <tr>
-<th align="left" valign="top">ACL    </th>
-<th align="left" valign="top">ACL code       </th>
-<th align="left" valign="top">Description</th>
+<th class="tableblock halign-left valign-top" >ACL    </th>
+<th class="tableblock halign-left valign-top" >ACL code       </th>
+<th class="tableblock halign-left valign-top" >Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create nodes</strong></p></td>
-<td align="left" valign="top"><p class="table">host.create.</p></td>
-<td align="left" valign="top"><p class="table">Creation of hosts including initial setting for name and address.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Create nodes</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.create.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Creation of hosts including initial setting for name and address.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set properties on nodes in creation</strong></p></td>
-<td align="left" valign="top"><p class="table">host.create.properties</p></td>
-<td align="left" valign="top"><p class="table">Setting of custom properties in the creation process of hosts.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Set properties on nodes in creation</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.create.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Setting of custom properties in the creation process of hosts.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete nodes (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">host.delete-massive.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of hosts massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete nodes (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.delete-massive.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of hosts massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete nodes</strong></p></td>
-<td align="left" valign="top"><p class="table">host.delete.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of hosts one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete nodes</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.delete.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of hosts one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter nodes by blocking status</strong></p></td>
-<td align="left" valign="top"><p class="table">host.filter.block</p></td>
-<td align="left" valign="top"><p class="table">Filter of hosts list by disk image&#8217;s blocking status</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter nodes by blocking status</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.filter.block</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of hosts list by disk image&#8217;s blocking status</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter nodes by creator</strong></p></td>
-<td align="left" valign="top"><p class="table">host.filter.created-by</p></td>
-<td align="left" valign="top"><p class="table">Filter of hosts list by administrator who created it</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter nodes by creator</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.filter.created-by</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of hosts list by administrator who created it</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter nodes by creation date</strong></p></td>
-<td align="left" valign="top"><p class="table">host.filter.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Filter of hosts list by date when it was created</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter nodes by creation date</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.filter.creation-date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of hosts list by date when it was created</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter nodes by name</strong></p></td>
-<td align="left" valign="top"><p class="table">host.filter.name</p></td>
-<td align="left" valign="top"><p class="table">Filter of hosts list by host&#8217;s name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter nodes by name</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.filter.name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of hosts list by host&#8217;s name</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter nodes by properties</strong></p></td>
-<td align="left" valign="top"><p class="table">host.filter.properties</p></td>
-<td align="left" valign="top"><p class="table">Filter of hosts list by desired custom property.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter nodes by properties</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.filter.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of hosts list by desired custom property.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter nodes by running state</strong></p></td>
-<td align="left" valign="top"><p class="table">host.filter.state</p></td>
-<td align="left" valign="top"><p class="table">Filter of hosts list by running state.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter nodes by running state</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.filter.state</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of hosts list by running state.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter nodes by virtual machines</strong></p></td>
-<td align="left" valign="top"><p class="table">host.filter.vm</p></td>
-<td align="left" valign="top"><p class="table">Filter of hosts list by virtual machine that is running in the host.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter nodes by virtual machines</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.filter.vm</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of hosts list by virtual machine that is running in the host.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to node&#8217;s details view</strong></p></td>
-<td align="left" valign="top"><p class="table">host.see-details.</p></td>
-<td align="left" valign="top"><p class="table">This ACL grants the access to the details view. The minimum data on it is name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to node&#8217;s details view</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.see-details.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">This ACL grants the access to the details view. The minimum data on it is name</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to node&#8217;s main section</strong></p></td>
-<td align="left" valign="top"><p class="table">host.see-main.</p></td>
-<td align="left" valign="top"><p class="table">Access to hosts section (without it, it won&#8217;t appear in menu)</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to node&#8217;s main section</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.see-main.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Access to hosts section (without it, it won&#8217;t appear in menu)</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s IP address</strong></p></td>
-<td align="left" valign="top"><p class="table">host.see.address</p></td>
-<td align="left" valign="top"><p class="table">IP address of the hosts.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See node&#8217;s IP address</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.see.address</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">IP address of the hosts.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s blocking state</strong></p></td>
-<td align="left" valign="top"><p class="table">host.see.block</p></td>
-<td align="left" valign="top"><p class="table">Blocking state (blocked/unblocked) of hosts</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See node&#8217;s blocking state</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.see.block</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Blocking state (blocked/unblocked) of hosts</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s creator</strong></p></td>
-<td align="left" valign="top"><p class="table">host.see.created-by</p></td>
-<td align="left" valign="top"><p class="table">WAT administrator who created a host.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See node&#8217;s creator</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.see.created-by</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">WAT administrator who created a host.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s creation date</strong></p></td>
-<td align="left" valign="top"><p class="table">host.see.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Datetime when a host was created</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See node&#8217;s creation date</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.see.creation-date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Datetime when a host was created</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s description</strong></p></td>
-<td align="left" valign="top"><p class="table">host.see.description</p></td>
-<td align="left" valign="top"><p class="table">The description of the hosts.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See node&#8217;s description</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.see.description</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The description of the hosts.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s ID</strong></p></td>
-<td align="left" valign="top"><p class="table">host.see.id</p></td>
-<td align="left" valign="top"><p class="table">The database identiefier of the hosts. Useful to make calls from CLI.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See node&#8217;s ID</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.see.id</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The database identiefier of the hosts. Useful to make calls from CLI.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s properties</strong></p></td>
-<td align="left" valign="top"><p class="table">host.see.properties</p></td>
-<td align="left" valign="top"><p class="table">The custom properties of the hosts.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See node&#8217;s properties</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.see.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The custom properties of the hosts.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s running state</strong></p></td>
-<td align="left" valign="top"><p class="table">host.see.state</p></td>
-<td align="left" valign="top"><p class="table">State of the hosts (stopped/started)</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See node&#8217;s running state</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.see.state</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">State of the hosts (stopped/started)</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s running virtual machines</strong></p></td>
-<td align="left" valign="top"><p class="table">host.see.vm-list</p></td>
-<td align="left" valign="top"><p class="table">See the virtual machines running on one host in his details view. This view will contain: name, state, block and expire information of each vm</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See node&#8217;s running virtual machines</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.see.vm-list</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">See the virtual machines running on one host in his details view. This view will contain: name, state, block and expire information of each vm</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s running virtual machines' blocking state</strong></p></td>
-<td align="left" valign="top"><p class="table">host.see.vm-list-block</p></td>
-<td align="left" valign="top"><p class="table">Blocking info of the virtual machines shown in host details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See node&#8217;s running virtual machines' blocking state</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.see.vm-list-block</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Blocking info of the virtual machines shown in host details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s running virtual machines' expiration</strong></p></td>
-<td align="left" valign="top"><p class="table">host.see.vm-list-expiration</p></td>
-<td align="left" valign="top"><p class="table">Expiration info of the virtual machines shown in host details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See node&#8217;s running virtual machines' expiration</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.see.vm-list-expiration</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Expiration info of the virtual machines shown in host details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s running virtual machines' running state</strong></p></td>
-<td align="left" valign="top"><p class="table">host.see.vm-list-state</p></td>
-<td align="left" valign="top"><p class="table">State (stopped/started) of the virtual machines shown in host details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See node&#8217;s running virtual machines' running state</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.see.vm-list-state</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">State (stopped/started) of the virtual machines shown in host details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See node&#8217;s running virtual machines' user state</strong></p></td>
-<td align="left" valign="top"><p class="table">host.see.vm-list-user-state</p></td>
-<td align="left" valign="top"><p class="table">User state (connected/disconnected) of the virtual machines shown in host details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See node&#8217;s running virtual machines' user state</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.see.vm-list-user-state</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">User state (connected/disconnected) of the virtual machines shown in host details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See number of running vms running on nodes</strong></p></td>
-<td align="left" valign="top"><p class="table">host.see.vms-info</p></td>
-<td align="left" valign="top"><p class="table">Virtual machines information such as how many virtual machines are running in each host</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See number of running vms running on nodes</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.see.vms-info</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Virtual machines information such as how many virtual machines are running in each host</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of number of blocked nodes</strong></p></td>
-<td align="left" valign="top"><p class="table">host.stats.blocked</p></td>
-<td align="left" valign="top"><p class="table">Total of blocked hosts in current tenant or all system for superadministrators.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See statistics of number of blocked nodes</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.stats.blocked</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Total of blocked hosts in current tenant or all system for superadministrators.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of running nodes</strong></p></td>
-<td align="left" valign="top"><p class="table">host.stats.running-hosts</p></td>
-<td align="left" valign="top"><p class="table">Total of running hosts in current tenant or all system for superadministrators.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See statistics of running nodes</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.stats.running-hosts</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Total of running hosts in current tenant or all system for superadministrators.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of number of nodes</strong></p></td>
-<td align="left" valign="top"><p class="table">host.stats.summary</p></td>
-<td align="left" valign="top"><p class="table">Total of hosts in current tenant or all system for superadministrators.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See statistics of number of nodes</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.stats.summary</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Total of hosts in current tenant or all system for superadministrators.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of nodes with most running Vms</strong></p></td>
-<td align="left" valign="top"><p class="table">host.stats.top-hosts-most-vms</p></td>
-<td align="left" valign="top"><p class="table">Top 5 of hosts with most running virtual machines.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See statistics of nodes with most running Vms</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.stats.top-hosts-most-vms</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Top 5 of hosts with most running virtual machines.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Block-Unblock nodes (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">host.update-massive.block</p></td>
-<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of hosts massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Block-Unblock nodes (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.update-massive.block</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of hosts massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update node&#8217;s description (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">host.update-massive.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of the hosts massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update node&#8217;s description (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.update-massive.description</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of the hosts massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update properties when update nodes (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">host.update-massive.properties</p></td>
-<td align="left" valign="top"><p class="table">Update properties in node&#8217;s massive update process.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update properties when update nodes (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.update-massive.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in node&#8217;s massive update process.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Stop all virtual machines of a node (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">host.update-massive.stop-vms</p></td>
-<td align="left" valign="top"><p class="table">Stop all the virtual machines of hosts massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Stop all virtual machines of a node (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.update-massive.stop-vms</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Stop all the virtual machines of hosts massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update node&#8217;s address</strong></p></td>
-<td align="left" valign="top"><p class="table">host.update.address</p></td>
-<td align="left" valign="top"><p class="table">Update the IP address of the hosts.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update node&#8217;s address</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.update.address</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the IP address of the hosts.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Block-Unblock nodes</strong></p></td>
-<td align="left" valign="top"><p class="table">host.update.block</p></td>
-<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of hosts one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Block-Unblock nodes</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.update.block</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of hosts one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update node&#8217;s description</strong></p></td>
-<td align="left" valign="top"><p class="table">host.update.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of the hosts one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update node&#8217;s description</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.update.description</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of the hosts one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update node&#8217;s name</strong></p></td>
-<td align="left" valign="top"><p class="table">host.update.name</p></td>
-<td align="left" valign="top"><p class="table">Update the name of the hosts.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update node&#8217;s name</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.update.name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the name of the hosts.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update properties when update nodes</strong></p></td>
-<td align="left" valign="top"><p class="table">host.update.properties</p></td>
-<td align="left" valign="top"><p class="table">Update properties in node&#8217;s one by one update process.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update properties when update nodes</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.update.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in node&#8217;s one by one update process.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Stop all virtual machines of a node</strong></p></td>
-<td align="left" valign="top"><p class="table">host.update.stop-vms</p></td>
-<td align="left" valign="top"><p class="table">Stop all the virtual machines of hosts one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Stop all virtual machines of a node</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">host.update.stop-vms</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Stop all the virtual machines of hosts one by one.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 <div class="sect3">
 <h4 id="_osfs_acls">7.1.4. OSFs' ACLs</h4>
-<div class="tableblock">
-<table rules="all"
-width="100%"
-frame="border"
-cellspacing="0" cellpadding="4">
-<col width="33%" />
-<col width="33%" />
-<col width="33%" />
+<table class="tableblock frame-all grid-all"
+style="
+width:100%;
+">
+<col style="width:33%;">
+<col style="width:33%;">
+<col style="width:33%;">
 <thead>
 <tr>
-<th align="left" valign="top">ACL    </th>
-<th align="left" valign="top">ACL code       </th>
-<th align="left" valign="top">Description</th>
+<th class="tableblock halign-left valign-top" >ACL    </th>
+<th class="tableblock halign-left valign-top" >ACL code       </th>
+<th class="tableblock halign-left valign-top" >Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create OS Flavours</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.create.</p></td>
-<td align="left" valign="top"><p class="table">Creation of OS flavours including initial setting for name.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Create OS Flavours</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.create.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Creation of OS flavours including initial setting for name.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set memory in OS Flavour&#8217;s creation</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.create.memory</p></td>
-<td align="left" valign="top"><p class="table">Setting of memory in the creation process of OS flavours.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Set memory in OS Flavour&#8217;s creation</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.create.memory</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Setting of memory in the creation process of OS flavours.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set properties in OS Flavour&#8217;s creation</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.create.properties</p></td>
-<td align="left" valign="top"><p class="table">Setting of custom properties in the creation process of OS flavours.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Set properties in OS Flavour&#8217;s creation</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.create.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Setting of custom properties in the creation process of OS flavours.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set user storage in OS Flavour&#8217;s creation</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.create.user-storage</p></td>
-<td align="left" valign="top"><p class="table">Setting of user storage in the creation process of OS flavours.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Set user storage in OS Flavour&#8217;s creation</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.create.user-storage</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Setting of user storage in the creation process of OS flavours.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete OS Flavours (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.delete-massive.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of OS flavours massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete OS Flavours (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.delete-massive.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of OS flavours massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete OS Flavours</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.delete.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of OS flavours one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete OS Flavours</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.delete.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of OS flavours one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter OS Flavours by creator</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.filter.created-by</p></td>
-<td align="left" valign="top"><p class="table">Filter of OS flavours list by administrator who created it</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter OS Flavours by creator</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.filter.created-by</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of OS flavours list by administrator who created it</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter OS Flavours by creation date</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.filter.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Filter of OS flavours list by date when it was created</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter OS Flavours by creation date</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.filter.creation-date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of OS flavours list by date when it was created</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter OS Flavours by disk image</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.filter.di</p></td>
-<td align="left" valign="top"><p class="table">Filter of OS flavours list by disk image&#8217;s that belong to the OSF.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter OS Flavours by disk image</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.filter.di</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of OS flavours list by disk image&#8217;s that belong to the OSF.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter OS Flavours by name</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.filter.name</p></td>
-<td align="left" valign="top"><p class="table">Filter of OS flavours list by OSF&#8217;s name.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter OS Flavours by name</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.filter.name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of OS flavours list by OSF&#8217;s name.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter OS Flavours by properties</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.filter.properties</p></td>
-<td align="left" valign="top"><p class="table">Filter of OSF flavours list by desired custom property.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter OS Flavours by properties</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.filter.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of OSF flavours list by desired custom property.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter OS Flavours by virtual machine</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.filter.vm</p></td>
-<td align="left" valign="top"><p class="table">Filter of OS flavours list by virtual machines assigned to the OSFs.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter OS Flavours by virtual machine</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.filter.vm</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of OS flavours list by virtual machines assigned to the OSFs.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to OS Flavour&#8217;s details view</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see-details.</p></td>
-<td align="left" valign="top"><p class="table">This ACL grants the access to the details view. The minimum data on it is name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to OS Flavour&#8217;s details view</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see-details.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">This ACL grants the access to the details view. The minimum data on it is name</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to OS Flavour&#8217;s main section</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see-main.</p></td>
-<td align="left" valign="top"><p class="table">This ACL grants the access to the list. The minimum data on it is nname</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to OS Flavour&#8217;s main section</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see-main.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">This ACL grants the access to the list. The minimum data on it is nname</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s creator</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.created-by</p></td>
-<td align="left" valign="top"><p class="table">WAT administrator who created an OS flavour.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See OS Flavour&#8217;s creator</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.created-by</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">WAT administrator who created an OS flavour.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s creation date</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Datetime when an OS flavour image was created</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See OS Flavour&#8217;s creation date</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.creation-date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Datetime when an OS flavour image was created</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s description</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.description</p></td>
-<td align="left" valign="top"><p class="table">The description of the OSFs.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See OS Flavour&#8217;s description</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.description</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The description of the OSFs.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s disk images</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.di-list</p></td>
-<td align="left" valign="top"><p class="table">See the disk images of this osf in his details view. This view will contain: name, block, tags, default, head and the feature of change which is default one</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See OS Flavour&#8217;s disk images</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.di-list</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">See the disk images of this osf in his details view. This view will contain: name, block, tags, default, head and the feature of change which is default one</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s disk blocking state</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.di-list-block</p></td>
-<td align="left" valign="top"><p class="table">Blocking info of the disk images shown in osf details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See OS Flavour&#8217;s disk blocking state</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.di-list-block</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Blocking info of the disk images shown in osf details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s disk images' default state</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.di-list-default</p></td>
-<td align="left" valign="top"><p class="table">What of the Dis is the default one in osf details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See OS Flavour&#8217;s disk images' default state</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.di-list-default</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">What of the Dis is the default one in osf details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Change OS Flavour&#8217;s disk images' default info</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.di-list-default-update</p></td>
-<td align="left" valign="top"><p class="table">Controls to change the default disk image of an osf in osf details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Change OS Flavour&#8217;s disk images' default info</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.di-list-default-update</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Controls to change the default disk image of an osf in osf details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s disk images' head info</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.di-list-head</p></td>
-<td align="left" valign="top"><p class="table">What of the Dis is the head (last created) in osf details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See OS Flavour&#8217;s disk images' head info</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.di-list-head</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">What of the Dis is the head (last created) in osf details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s disk images' tags</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.di-list-tags</p></td>
-<td align="left" valign="top"><p class="table">Tags of the disk images shown in osf details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See OS Flavour&#8217;s disk images' tags</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.di-list-tags</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Tags of the disk images shown in osf details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See number of OS Flavour&#8217;s disk images</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.dis-info</p></td>
-<td align="left" valign="top"><p class="table">Number of disk images assigned to each OS flavours</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See number of OS Flavour&#8217;s disk images</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.dis-info</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Number of disk images assigned to each OS flavours</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s ID</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.id</p></td>
-<td align="left" valign="top"><p class="table">The database identiefier of the OS flavours. Useful to make calls from CLI.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See OS Flavour&#8217;s ID</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.id</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The database identiefier of the OS flavours. Useful to make calls from CLI.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s memory</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.memory</p></td>
-<td align="left" valign="top"><p class="table">Amount of memory in the OS flavours</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See OS Flavour&#8217;s memory</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.memory</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Amount of memory in the OS flavours</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s overlay</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.overlay</p></td>
-<td align="left" valign="top"><p class="table">Overlay configuration of the OS flavours</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See OS Flavour&#8217;s overlay</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.overlay</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Overlay configuration of the OS flavours</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s properties</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.properties</p></td>
-<td align="left" valign="top"><p class="table">The custom properties of the OS flavours</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See OS Flavour&#8217;s properties</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The custom properties of the OS flavours</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s user storage</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.user-storage</p></td>
-<td align="left" valign="top"><p class="table">User storage of the OS flavours</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See OS Flavour&#8217;s user storage</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.user-storage</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">User storage of the OS flavours</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s virtual machines</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.vm-list</p></td>
-<td align="left" valign="top"><p class="table">See the virtual machines using this osf in his details view. This view will contain: name, state, block, di tag and expire information of each vm</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See OS Flavour&#8217;s virtual machines</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.vm-list</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">See the virtual machines using this osf in his details view. This view will contain: name, state, block, di tag and expire information of each vm</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s virtual machines' blocking state</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.vm-list-block</p></td>
-<td align="left" valign="top"><p class="table">Blocking info of the virtual machines shown in osf details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See OS Flavour&#8217;s virtual machines' blocking state</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.vm-list-block</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Blocking info of the virtual machines shown in osf details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s virtual machines' expiration</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.vm-list-expiration</p></td>
-<td align="left" valign="top"><p class="table">Expiration info of the virtual machines shown in osf details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See OS Flavour&#8217;s virtual machines' expiration</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.vm-list-expiration</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Expiration info of the virtual machines shown in osf details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s virtual machines' running state</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.vm-list-state</p></td>
-<td align="left" valign="top"><p class="table">State (stopped/started) of the virtual machines shown in osf details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See OS Flavour&#8217;s virtual machines' running state</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.vm-list-state</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">State (stopped/started) of the virtual machines shown in osf details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OS Flavour&#8217;s virtual machines' user state</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.vm-list-user-state</p></td>
-<td align="left" valign="top"><p class="table">User state (connected/disconnected) of the virtual machines shown in osf details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See OS Flavour&#8217;s virtual machines' user state</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.vm-list-user-state</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">User state (connected/disconnected) of the virtual machines shown in osf details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See number of OS Flavour&#8217;s virtual machines</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.see.vms-info</p></td>
-<td align="left" valign="top"><p class="table">Number of virtual machines that are using a Disk image of each OS flavours</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See number of OS Flavour&#8217;s virtual machines</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.vms-info</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Number of virtual machines that are using a Disk image of each OS flavours</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of number of OS Flavours</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.stats.summary</p></td>
-<td align="left" valign="top"><p class="table">Total of OS flavours in current tenant or all system for superadministrators.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See statistics of number of OS Flavours</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.stats.summary</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Total of OS flavours in current tenant or all system for superadministrators.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s description (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update-massive.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of OSF flavours massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update OS Flavour&#8217;s description (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update-massive.description</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of OSF flavours massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s memory (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update-massive.memory</p></td>
-<td align="left" valign="top"><p class="table">Update the memory of OSF flavours massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update OS Flavour&#8217;s memory (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update-massive.memory</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the memory of OSF flavours massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update properties when update OSFs (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update-massive.properties</p></td>
-<td align="left" valign="top"><p class="table">Update properties in OSF&#8217;s massive update process.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update properties when update OSFs (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update-massive.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in OSF&#8217;s massive update process.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s user storage (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update-massive.user-storage</p></td>
-<td align="left" valign="top"><p class="table">Update the memory of OSF flavours massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update OS Flavour&#8217;s user storage (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update-massive.user-storage</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the memory of OSF flavours massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s description</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of OSF flavours one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update OS Flavour&#8217;s description</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update.description</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of OSF flavours one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s memory</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update.memory</p></td>
-<td align="left" valign="top"><p class="table">Update the memory of OSF flavours one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update OS Flavour&#8217;s memory</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update.memory</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the memory of OSF flavours one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s name</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update.name</p></td>
-<td align="left" valign="top"><p class="table">Update the name of OSF flavour&#8217;s.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update OS Flavour&#8217;s name</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update.name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the name of OSF flavour&#8217;s.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update properties when update OSFs</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update.properties</p></td>
-<td align="left" valign="top"><p class="table">Update properties in OSF&#8217;s one by one update process.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update properties when update OSFs</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in OSF&#8217;s one by one update process.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update OS Flavour&#8217;s user storage</strong></p></td>
-<td align="left" valign="top"><p class="table">osf.update.user-storage</p></td>
-<td align="left" valign="top"><p class="table">Update the user storage of OSF flavours one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update OS Flavour&#8217;s user storage</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update.user-storage</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the user storage of OSF flavours one by one.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 <div class="sect3">
 <h4 id="_disk_images_acls">7.1.5. Disk images' ACLs</h4>
-<div class="tableblock">
-<table rules="all"
-width="100%"
-frame="border"
-cellspacing="0" cellpadding="4">
-<col width="33%" />
-<col width="33%" />
-<col width="33%" />
+<table class="tableblock frame-all grid-all"
+style="
+width:100%;
+">
+<col style="width:33%;">
+<col style="width:33%;">
+<col style="width:33%;">
 <thead>
 <tr>
-<th align="left" valign="top">ACL    </th>
-<th align="left" valign="top">ACL code       </th>
-<th align="left" valign="top">Description</th>
+<th class="tableblock halign-left valign-top" >ACL    </th>
+<th class="tableblock halign-left valign-top" >ACL code       </th>
+<th class="tableblock halign-left valign-top" >Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create disk images</strong></p></td>
-<td align="left" valign="top"><p class="table">di.create.</p></td>
-<td align="left" valign="top"><p class="table">Creation of hosts including initial setting for disk image and OS flavour.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Create disk images</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.create.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Creation of hosts including initial setting for disk image and OS flavour.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set disk images as default on disk images creation</strong></p></td>
-<td align="left" valign="top"><p class="table">di.create.default</p></td>
-<td align="left" valign="top"><p class="table">Setting of disk image as default in the creation process of disk images.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Set disk images as default on disk images creation</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.create.default</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Setting of disk image as default in the creation process of disk images.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set properties on disk images creation</strong></p></td>
-<td align="left" valign="top"><p class="table">di.create.properties</p></td>
-<td align="left" valign="top"><p class="table">Setting of custom properties in the creation process of disk images.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Set properties on disk images creation</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.create.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Setting of custom properties in the creation process of disk images.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set tags on disk images creation</strong></p></td>
-<td align="left" valign="top"><p class="table">di.create.tags</p></td>
-<td align="left" valign="top"><p class="table">Setting of tags in the creation process of disk images.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Set tags on disk images creation</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.create.tags</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Setting of tags in the creation process of disk images.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set version on disk images creation</strong></p></td>
-<td align="left" valign="top"><p class="table">di.create.version</p></td>
-<td align="left" valign="top"><p class="table">Setting of version in the creation process of disk images. Without this ACL, the system will set it automatically with a string based on the timestamp and an order digit.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Set version on disk images creation</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.create.version</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Setting of version in the creation process of disk images. Without this ACL, the system will set it automatically with a string based on the timestamp and an order digit.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete disk images (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">di.delete-massive.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of disk images massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete disk images (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.delete-massive.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of disk images massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete disk images</strong></p></td>
-<td align="left" valign="top"><p class="table">di.delete.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of disk images one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete disk images</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.delete.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of disk images one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter disk images by blocking status</strong></p></td>
-<td align="left" valign="top"><p class="table">di.filter.block</p></td>
-<td align="left" valign="top"><p class="table">Filter of disk images list by disk image&#8217;s blocking status</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter disk images by blocking status</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.filter.block</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of disk images list by disk image&#8217;s blocking status</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter disk images by creator</strong></p></td>
-<td align="left" valign="top"><p class="table">di.filter.created-by</p></td>
-<td align="left" valign="top"><p class="table">Filter of disk images list by administrator who created it</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter disk images by creator</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.filter.created-by</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of disk images list by administrator who created it</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter disk images by creation date</strong></p></td>
-<td align="left" valign="top"><p class="table">di.filter.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Filter of disk images list by date when it was created</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter disk images by creation date</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.filter.creation-date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of disk images list by date when it was created</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter disk images by DI&#8217;s name</strong></p></td>
-<td align="left" valign="top"><p class="table">di.filter.disk-image</p></td>
-<td align="left" valign="top"><p class="table">Filter of disk images list by disk image&#8217;s name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter disk images by DI&#8217;s name</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.filter.disk-image</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of disk images list by disk image&#8217;s name</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter disk images by OS Flavour</strong></p></td>
-<td align="left" valign="top"><p class="table">di.filter.osf</p></td>
-<td align="left" valign="top"><p class="table">Filter of disk images list by OS flavour</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter disk images by OS Flavour</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.filter.osf</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of disk images list by OS flavour</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter disk images by properties</strong></p></td>
-<td align="left" valign="top"><p class="table">di.filter.properties</p></td>
-<td align="left" valign="top"><p class="table">Filter of disk images list by desired custom property.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter disk images by properties</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.filter.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of disk images list by desired custom property.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to disk image&#8217;s details view</strong></p></td>
-<td align="left" valign="top"><p class="table">di.see-details.</p></td>
-<td align="left" valign="top"><p class="table">This ACL grants the access to the details view. The minimum data on it is disk image</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to disk image&#8217;s details view</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.see-details.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">This ACL grants the access to the details view. The minimum data on it is disk image</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to disk image&#8217;s main section</strong></p></td>
-<td align="left" valign="top"><p class="table">di.see-main.</p></td>
-<td align="left" valign="top"><p class="table">This ACL grants the access to the list. The minimum data on it is disk_image</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to disk image&#8217;s main section</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.see-main.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">This ACL grants the access to the list. The minimum data on it is disk_image</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s blocking state</strong></p></td>
-<td align="left" valign="top"><p class="table">di.see.block</p></td>
-<td align="left" valign="top"><p class="table">Blocking state of disk images</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See disk image&#8217;s blocking state</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.block</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Blocking state of disk images</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s creator</strong></p></td>
-<td align="left" valign="top"><p class="table">di.see.created-by</p></td>
-<td align="left" valign="top"><p class="table">Wat administrator who created a disk image</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See disk image&#8217;s creator</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.created-by</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Wat administrator who created a disk image</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s creation date</strong></p></td>
-<td align="left" valign="top"><p class="table">di.see.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Datetime when a disk image was created</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See disk image&#8217;s creation date</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.creation-date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Datetime when a disk image was created</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OSF&#8217;s default disk image</strong></p></td>
-<td align="left" valign="top"><p class="table">di.see.default</p></td>
-<td align="left" valign="top"><p class="table">If a disk image is setted as default image within the OSF where it belongs</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See OSF&#8217;s default disk image</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.default</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">If a disk image is setted as default image within the OSF where it belongs</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s description</strong></p></td>
-<td align="left" valign="top"><p class="table">di.see.description</p></td>
-<td align="left" valign="top"><p class="table">The description of disk images.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See disk image&#8217;s description</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.description</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The description of disk images.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See OSF&#8217;s last created disk image</strong></p></td>
-<td align="left" valign="top"><p class="table">di.see.head</p></td>
-<td align="left" valign="top"><p class="table">If a disk image is the last created image within the OSF where it belongs</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See OSF&#8217;s last created disk image</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.head</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">If a disk image is the last created image within the OSF where it belongs</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s ID</strong></p></td>
-<td align="left" valign="top"><p class="table">di.see.id</p></td>
-<td align="left" valign="top"><p class="table">The database identiefier of disk images. Useful to make calls from CLI.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See disk image&#8217;s ID</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.id</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The database identiefier of disk images. Useful to make calls from CLI.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s OS Flavour</strong></p></td>
-<td align="left" valign="top"><p class="table">di.see.osf</p></td>
-<td align="left" valign="top"><p class="table">The OS Flavour associated to the disk images.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See disk image&#8217;s OS Flavour</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.osf</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The OS Flavour associated to the disk images.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s properties</strong></p></td>
-<td align="left" valign="top"><p class="table">di.see.properties</p></td>
-<td align="left" valign="top"><p class="table">The custom properties of the disk images.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See disk image&#8217;s properties</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The custom properties of the disk images.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s tags</strong></p></td>
-<td align="left" valign="top"><p class="table">di.see.tags</p></td>
-<td align="left" valign="top"><p class="table">The disk images tags</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See disk image&#8217;s tags</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.tags</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The disk images tags</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s version</strong></p></td>
-<td align="left" valign="top"><p class="table">di.see.version</p></td>
-<td align="left" valign="top"><p class="table">The disk images version</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See disk image&#8217;s version</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.version</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The disk images version</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk image&#8217;s list of virtual machines</strong></p></td>
-<td align="left" valign="top"><p class="table">di.see.vm-list</p></td>
-<td align="left" valign="top"><p class="table">Virtual machines using this image in his details view. This view will contain: name and tag of each vm</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See disk image&#8217;s list of virtual machines</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.vm-list</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Virtual machines using this image in his details view. This view will contain: name and tag of each vm</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See blocking state of VM&#8217;s list of DI&#8217;s</strong></p></td>
-<td align="left" valign="top"><p class="table">di.see.vm-list-block</p></td>
-<td align="left" valign="top"><p class="table">Blocking info of the virtual machines shown in DI details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See blocking state of VM&#8217;s list of DI&#8217;s</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.vm-list-block</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Blocking info of the virtual machines shown in DI details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See expiration of VM&#8217;s list of DI&#8217;s</strong></p></td>
-<td align="left" valign="top"><p class="table">di.see.vm-list-expiration</p></td>
-<td align="left" valign="top"><p class="table">Expiration info of the virtual machines shown in DI details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See expiration of VM&#8217;s list of DI&#8217;s</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.vm-list-expiration</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Expiration info of the virtual machines shown in DI details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See running state of VM&#8217;s list of DI&#8217;s</strong></p></td>
-<td align="left" valign="top"><p class="table">di.see.vm-list-state</p></td>
-<td align="left" valign="top"><p class="table">State (stop/started) of the virtual machines shown in DI details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See running state of VM&#8217;s list of DI&#8217;s</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.vm-list-state</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">State (stop/started) of the virtual machines shown in DI details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See user state of VM&#8217;s list of DI&#8217;s</strong></p></td>
-<td align="left" valign="top"><p class="table">di.see.vm-list-user-state</p></td>
-<td align="left" valign="top"><p class="table">User state (connected/disconnected) of the virtual machines shown in DI details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See user state of VM&#8217;s list of DI&#8217;s</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.vm-list-user-state</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">User state (connected/disconnected) of the virtual machines shown in DI details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of number of blocked disk images</strong></p></td>
-<td align="left" valign="top"><p class="table">di.stats.blocked</p></td>
-<td align="left" valign="top"><p class="table">Total of blocked disk images in current tenant or all system for superadministrators.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See statistics of number of blocked disk images</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.stats.blocked</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Total of blocked disk images in current tenant or all system for superadministrators.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See statistics of number of disk images</strong></p></td>
-<td align="left" valign="top"><p class="table">di.stats.summary</p></td>
-<td align="left" valign="top"><p class="table">Total of disk images in current tenant or all system for superadministrators.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See statistics of number of disk images</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.stats.summary</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Total of disk images in current tenant or all system for superadministrators.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Block-Unblock disk images (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">di.update-massive.block</p></td>
-<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of disk images massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Block-Unblock disk images (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.update-massive.block</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of disk images massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update disk image&#8217;s description (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">di.update-massive.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of disk images massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update disk image&#8217;s description (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.update-massive.description</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of disk images massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update properties when update disk images (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">di.update-massive.properties</p></td>
-<td align="left" valign="top"><p class="table">Update properties in disk image&#8217;s massive update process.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update properties when update disk images (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.update-massive.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in disk image&#8217;s massive update process.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update disk image&#8217;s tags (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">di.update-massive.tags</p></td>
-<td align="left" valign="top"><p class="table">Update the tags (create and delete) of disk images massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update disk image&#8217;s tags (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.update-massive.tags</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the tags (create and delete) of disk images massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Block-Unblock disk images</strong></p></td>
-<td align="left" valign="top"><p class="table">di.update.block</p></td>
-<td align="left" valign="top"><p class="table">Update the blocking state (blocked/unblocked) of disk images one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Block-Unblock disk images</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.update.block</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of disk images one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set disk images as default</strong></p></td>
-<td align="left" valign="top"><p class="table">di.update.default</p></td>
-<td align="left" valign="top"><p class="table">Set as default a disk image in the OS flavour where it belongs.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Set disk images as default</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.update.default</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Set as default a disk image in the OS flavour where it belongs.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update disk image&#8217;s description</strong></p></td>
-<td align="left" valign="top"><p class="table">di.update.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of disk images one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update disk image&#8217;s description</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.update.description</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of disk images one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update properties when update disk images</strong></p></td>
-<td align="left" valign="top"><p class="table">di.update.properties</p></td>
-<td align="left" valign="top"><p class="table">Update properties in disk image&#8217;s one by one update process.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update properties when update disk images</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.update.properties</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in disk image&#8217;s one by one update process.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update disk image&#8217;s tags</strong></p></td>
-<td align="left" valign="top"><p class="table">di.update.tags</p></td>
-<td align="left" valign="top"><p class="table">Update the tags (create and delete) of disk images one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update disk image&#8217;s tags</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">di.update.tags</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the tags (create and delete) of disk images one by one.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 <div class="sect3">
 <h4 id="_administrators_acls">7.1.6. Administrators'  ACLs</h4>
-<div class="tableblock">
-<table rules="all"
-width="100%"
-frame="border"
-cellspacing="0" cellpadding="4">
-<col width="33%" />
-<col width="33%" />
-<col width="33%" />
+<table class="tableblock frame-all grid-all"
+style="
+width:100%;
+">
+<col style="width:33%;">
+<col style="width:33%;">
+<col style="width:33%;">
 <thead>
 <tr>
-<th align="left" valign="top">ACL    </th>
-<th align="left" valign="top">ACL code       </th>
-<th align="left" valign="top">Description</th>
+<th class="tableblock halign-left valign-top" >ACL    </th>
+<th class="tableblock halign-left valign-top" >ACL code       </th>
+<th class="tableblock halign-left valign-top" >Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create administrators</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.create.</p></td>
-<td align="left" valign="top"><p class="table">Create WAT Administrators. It includes name and password setting</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Create administrators</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.create.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Create WAT Administrators. It includes name and password setting</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set language on administrator creation</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.create.language</p></td>
-<td align="left" valign="top"><p class="table">Setting of language in the creation process of administrators.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Set language on administrator creation</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.create.language</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Setting of language in the creation process of administrators.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete administrators</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.delete-massive.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of WAT administrators massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete administrators</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.delete-massive.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of WAT administrators massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete administrators (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.delete.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of WAT administrators one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete administrators (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.delete.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of WAT administrators one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter administrators by creator</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.filter.created-by</p></td>
-<td align="left" valign="top"><p class="table">Filter of administrators list by administrator who created it</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter administrators by creator</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.filter.created-by</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of administrators list by administrator who created it</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter administrators by creation date</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.filter.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Filter of administrators list by date when it were created</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter administrators by creation date</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.filter.creation-date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of administrators list by date when it were created</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter administrators by name</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.filter.name</p></td>
-<td align="left" valign="top"><p class="table">Filter of administrators list by administrator&#8217;s name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter administrators by name</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.filter.name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of administrators list by administrator&#8217;s name</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to administrator&#8217;s details view</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.see-details.</p></td>
-<td align="left" valign="top"><p class="table">Access to details view of WAT administrators. This view includes name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to administrator&#8217;s details view</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.see-details.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Access to details view of WAT administrators. This view includes name</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to administrator&#8217;s main section</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.see-main.</p></td>
-<td align="left" valign="top"><p class="table">Access to WAT Administrators section (without it, it won&#8217;t appear in menu). This list view includes name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to administrator&#8217;s main section</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.see-main.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Access to WAT Administrators section (without it, it won&#8217;t appear in menu). This list view includes name</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See administrator&#8217;s ACLs</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.see.acl-list</p></td>
-<td align="left" valign="top"><p class="table">Effective ACL list for a WAT administrator calculated from the assigned roles</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See administrator&#8217;s ACLs</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.see.acl-list</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Effective ACL list for a WAT administrator calculated from the assigned roles</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Source roles of Administrator&#8217;s ACL</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.see.acl-list-roles</p></td>
-<td align="left" valign="top"><p class="table">Which role is the origin of each effective acls in WAT administrator details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Source roles of Administrator&#8217;s ACL</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.see.acl-list-roles</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Which role is the origin of each effective acls in WAT administrator details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk administrator&#8217;s creator</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.see.created-by</p></td>
-<td align="left" valign="top"><p class="table">Wat administrator who created an administrator</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See disk administrator&#8217;s creator</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.see.created-by</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Wat administrator who created an administrator</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See disk administrator&#8217;s creation date</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.see.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Datetime when an administrator was created</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See disk administrator&#8217;s creation date</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.see.creation-date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Datetime when an administrator was created</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See administrator&#8217;s description</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.see.description</p></td>
-<td align="left" valign="top"><p class="table">The description of the WAT administrators.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See administrator&#8217;s description</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.see.description</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The description of the WAT administrators.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See administrator&#8217;s ID</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.see.id</p></td>
-<td align="left" valign="top"><p class="table">The database identiefier of the WAT administrators. Useful to make calls from CLI.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See administrator&#8217;s ID</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.see.id</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The database identiefier of the WAT administrators. Useful to make calls from CLI.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See administrator&#8217;s language</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.see.language</p></td>
-<td align="left" valign="top"><p class="table">Language of the WAT administrators.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See administrator&#8217;s language</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.see.language</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Language of the WAT administrators.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See administrator&#8217;s Roles</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.see.roles</p></td>
-<td align="left" valign="top"><p class="table">Assigned roles to the WAT administrator</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See administrator&#8217;s Roles</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.see.roles</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Assigned roles to the WAT administrator</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update administrator&#8217;s description (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.update-massive.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of administrators massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update administrator&#8217;s description (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.update-massive.description</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of administrators massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update administrator&#8217;s language (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.update-massive.language</p></td>
-<td align="left" valign="top"><p class="table">Update the language of administrators massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update administrator&#8217;s language (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.update-massive.language</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the language of administrators massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Assign-Unassign administrator&#8217;s roles</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.update.assign-role</p></td>
-<td align="left" valign="top"><p class="table">Assign roles to WAT administrators to give to them their ACLs.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Assign-Unassign administrator&#8217;s roles</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.update.assign-role</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Assign roles to WAT administrators to give to them their ACLs.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update administrator&#8217;s description</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.update.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of administrators one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update administrator&#8217;s description</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.update.description</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of administrators one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update administrator&#8217;s language</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.update.language</p></td>
-<td align="left" valign="top"><p class="table">Update the language of administrators one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update administrator&#8217;s language</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.update.language</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the language of administrators one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Change administrator&#8217;s password</strong></p></td>
-<td align="left" valign="top"><p class="table">administrator.update.password</p></td>
-<td align="left" valign="top"><p class="table">Update WAT administrator password (it doesn&#8217;t include roles management)</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Change administrator&#8217;s password</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.update.password</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update WAT administrator password (it doesn&#8217;t include roles management)</p></td>
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 <div class="sect3">
 <h4 id="_roles_acls">7.1.7. Roles' ACLs</h4>
-<div class="tableblock">
-<table rules="all"
-width="100%"
-frame="border"
-cellspacing="0" cellpadding="4">
-<col width="33%" />
-<col width="33%" />
-<col width="33%" />
+<table class="tableblock frame-all grid-all"
+style="
+width:100%;
+">
+<col style="width:33%;">
+<col style="width:33%;">
+<col style="width:33%;">
 <thead>
 <tr>
-<th align="left" valign="top">ACL    </th>
-<th align="left" valign="top">ACL code       </th>
-<th align="left" valign="top">Description</th>
+<th class="tableblock halign-left valign-top" >ACL    </th>
+<th class="tableblock halign-left valign-top" >ACL code       </th>
+<th class="tableblock halign-left valign-top" >Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Create roles</strong></p></td>
-<td align="left" valign="top"><p class="table">role.create.</p></td>
-<td align="left" valign="top"><p class="table">Creation of roles including initial setting for name.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Create roles</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">role.create.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Creation of roles including initial setting for name.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete roles (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">role.delete-massive.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of roles massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete roles (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">role.delete-massive.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of roles massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Delete roles</strong></p></td>
-<td align="left" valign="top"><p class="table">role.delete.</p></td>
-<td align="left" valign="top"><p class="table">Deletion of roles one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete roles</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">role.delete.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of roles one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter roles by creator</strong></p></td>
-<td align="left" valign="top"><p class="table">role.filter.created-by</p></td>
-<td align="left" valign="top"><p class="table">Filter of roles list by administrator who created it</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter roles by creator</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">role.filter.created-by</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of roles list by administrator who created it</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter roles by creation date</strong></p></td>
-<td align="left" valign="top"><p class="table">role.filter.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Filter of roles list by date when it was created</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter roles by creation date</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">role.filter.creation-date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of roles list by date when it was created</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Filter roles by name</strong></p></td>
-<td align="left" valign="top"><p class="table">role.filter.name</p></td>
-<td align="left" valign="top"><p class="table">Filter of roles list by role&#8217;s name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter roles by name</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">role.filter.name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of roles list by role&#8217;s name</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to role&#8217;s details view</strong></p></td>
-<td align="left" valign="top"><p class="table">role.see-details.</p></td>
-<td align="left" valign="top"><p class="table">Access to details view of Roles. This view includes name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to role&#8217;s details view</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">role.see-details.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Access to details view of Roles. This view includes name</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to role&#8217;s main section</strong></p></td>
-<td align="left" valign="top"><p class="table">role.see-main.</p></td>
-<td align="left" valign="top"><p class="table">Access to the roles view. The minimum data on it is name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to role&#8217;s main section</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">role.see-main.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Access to the roles view. The minimum data on it is name</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See role&#8217;s acls</strong></p></td>
-<td align="left" valign="top"><p class="table">role.see.acl-list</p></td>
-<td align="left" valign="top"><p class="table">Effective ACL list for a role  calculated from the inherited roles</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See role&#8217;s acls</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">role.see.acl-list</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Effective ACL list for a role  calculated from the inherited roles</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See role&#8217;s acls' origin roles</strong></p></td>
-<td align="left" valign="top"><p class="table">role.see.acl-list-roles</p></td>
-<td align="left" valign="top"><p class="table">Which role is the origin of each effective acls in role details view</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See role&#8217;s acls' origin roles</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">role.see.acl-list-roles</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Which role is the origin of each effective acls in role details view</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See role&#8217;s creator</strong></p></td>
-<td align="left" valign="top"><p class="table">role.see.created-by</p></td>
-<td align="left" valign="top"><p class="table">Wat administrator who created a role</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See role&#8217;s creator</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">role.see.created-by</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Wat administrator who created a role</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See role&#8217;s creation date</strong></p></td>
-<td align="left" valign="top"><p class="table">role.see.creation-date</p></td>
-<td align="left" valign="top"><p class="table">Datetime when a role was created</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See role&#8217;s creation date</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">role.see.creation-date</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Datetime when a role was created</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See role&#8217;s description</strong></p></td>
-<td align="left" valign="top"><p class="table">role.see.description</p></td>
-<td align="left" valign="top"><p class="table">The description of a role.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See role&#8217;s description</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">role.see.description</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The description of a role.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See role&#8217;s ID</strong></p></td>
-<td align="left" valign="top"><p class="table">role.see.id</p></td>
-<td align="left" valign="top"><p class="table">The database identiefier of the roles. Useful to make calls from CLI.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See role&#8217;s ID</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">role.see.id</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">The database identiefier of the roles. Useful to make calls from CLI.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>See role&#8217;s inherited roles</strong></p></td>
-<td align="left" valign="top"><p class="table">role.see.inherited-roles</p></td>
-<td align="left" valign="top"><p class="table">Inherited roles of a role.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See role&#8217;s inherited roles</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">role.see.inherited-roles</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Inherited roles of a role.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update role&#8217;s description (massive)</strong></p></td>
-<td align="left" valign="top"><p class="table">role.update-massive.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of roles massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update role&#8217;s description (massive)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">role.update-massive.description</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of roles massively.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Assign-Unassign role&#8217;s ACLs</strong></p></td>
-<td align="left" valign="top"><p class="table">role.update.assign-acl</p></td>
-<td align="left" valign="top"><p class="table">Add/Remove acl on role.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Assign-Unassign role&#8217;s ACLs</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">role.update.assign-acl</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Add/Remove acl on role.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Assign-Unassign role&#8217;s inherited roles</strong></p></td>
-<td align="left" valign="top"><p class="table">role.update.assign-role</p></td>
-<td align="left" valign="top"><p class="table">Manage the inheritance of roles adding roles in others.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Assign-Unassign role&#8217;s inherited roles</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">role.update.assign-role</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Manage the inheritance of roles adding roles in others.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update role&#8217;s description</strong></p></td>
-<td align="left" valign="top"><p class="table">role.update.description</p></td>
-<td align="left" valign="top"><p class="table">Update the description of roles one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update role&#8217;s description</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">role.update.description</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of roles one by one.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Update role&#8217;s name</strong></p></td>
-<td align="left" valign="top"><p class="table">role.update.name</p></td>
-<td align="left" valign="top"><p class="table">Update the name of roles.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update role&#8217;s name</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">role.update.name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the name of roles.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 <div class="sect3">
 <h4 id="_custom_properties_acls">7.1.8. Custom properties' ACLs</h4>
-<div class="tableblock">
-<table rules="all"
-width="100%"
-frame="border"
-cellspacing="0" cellpadding="4">
-<col width="33%" />
-<col width="33%" />
-<col width="33%" />
+<table class="tableblock frame-all grid-all"
+style="
+width:100%;
+">
+<col style="width:33%;">
+<col style="width:33%;">
+<col style="width:33%;">
 <thead>
 <tr>
-<th align="left" valign="top">ACL    </th>
-<th align="left" valign="top">ACL code       </th>
-<th align="left" valign="top">Description</th>
+<th class="tableblock halign-left valign-top" >ACL    </th>
+<th class="tableblock halign-left valign-top" >ACL code       </th>
+<th class="tableblock halign-left valign-top" >Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to properties&#8217;s main section</strong></p></td>
-<td align="left" valign="top"><p class="table">property.see-main.</p></td>
-<td align="left" valign="top"><p class="table">Access to custom properties managment section</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to properties&#8217;s main section</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">property.see-main.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Access to custom properties managment section</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Manage user&#8217;s custom properties</strong></p></td>
-<td align="left" valign="top"><p class="table">property.manage.user</p></td>
-<td align="left" valign="top"><p class="table">Create, update and delete custom properties of users.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Manage user&#8217;s custom properties</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">property.manage.user</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Create, update and delete custom properties of users.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Manage virtual machines&#8217;s custom properties</strong></p></td>
-<td align="left" valign="top"><p class="table">property.manage.vm</p></td>
-<td align="left" valign="top"><p class="table">Create, update and delete custom properties of virtual machines.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Manage virtual machines&#8217;s custom properties</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">property.manage.vm</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Create, update and delete custom properties of virtual machines.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Manage node&#8217;s custom properties</strong></p></td>
-<td align="left" valign="top"><p class="table">property.manage.host</p></td>
-<td align="left" valign="top"><p class="table">Create, update and delete custom properties of nodes.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Manage node&#8217;s custom properties</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">property.manage.host</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Create, update and delete custom properties of nodes.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Manage OSF&#8217;s custom properties</strong></p></td>
-<td align="left" valign="top"><p class="table">property.manage.osf</p></td>
-<td align="left" valign="top"><p class="table">Create, update and delete custom properties of OS Flavours.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Manage OSF&#8217;s custom properties</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">property.manage.osf</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Create, update and delete custom properties of OS Flavours.</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Manage disk image&#8217;s custom properties</strong></p></td>
-<td align="left" valign="top"><p class="table">property.manage.di</p></td>
-<td align="left" valign="top"><p class="table">Create, update and delete custom properties of disk images.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Manage disk image&#8217;s custom properties</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">property.manage.di</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Create, update and delete custom properties of disk images.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 <div class="sect3">
 <h4 id="_views_acls">7.1.9. Views' ACLs</h4>
-<div class="tableblock">
-<table rules="all"
-width="100%"
-frame="border"
-cellspacing="0" cellpadding="4">
-<col width="33%" />
-<col width="33%" />
-<col width="33%" />
+<table class="tableblock frame-all grid-all"
+style="
+width:100%;
+">
+<col style="width:33%;">
+<col style="width:33%;">
+<col style="width:33%;">
 <thead>
 <tr>
-<th align="left" valign="top">ACL    </th>
-<th align="left" valign="top">ACL code       </th>
-<th align="left" valign="top">Description</th>
+<th class="tableblock halign-left valign-top" >ACL    </th>
+<th class="tableblock halign-left valign-top" >ACL code       </th>
+<th class="tableblock halign-left valign-top" >Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Access to default view&#8217;s main section</strong></p></td>
-<td align="left" valign="top"><p class="table">views.see-main.</p></td>
-<td align="left" valign="top"><p class="table">Access to WAT Customize section (without it, it won&#8217;t appear in menu).</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to default view&#8217;s main section</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">views.see-main.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Access to WAT Customize section (without it, it won&#8217;t appear in menu).</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set default columns on list views</strong></p></td>
-<td align="left" valign="top"><p class="table">views.update.columns</p></td>
-<td align="left" valign="top"><p class="table">Set what columns will be shown in list views by default by tenant</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Set default columns on list views</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">views.update.columns</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Set what columns will be shown in list views by default by tenant</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set default filters on list views for desktop</strong></p></td>
-<td align="left" valign="top"><p class="table">views.update.filters-desktop</p></td>
-<td align="left" valign="top"><p class="table">Set what filters will be shown in list views by default for desktop version by tenant</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Set default filters on list views for desktop</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">views.update.filters-desktop</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Set what filters will be shown in list views by default for desktop version by tenant</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>Set default filters on list views for mobile</strong></p></td>
-<td align="left" valign="top"><p class="table">views.update.filters-mobile</p></td>
-<td align="left" valign="top"><p class="table">Set what filters will be shown in list views by default for mobile version by tenant</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Set default filters on list views for mobile</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">views.update.filters-mobile</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Set what filters will be shown in list views by default for mobile version by tenant</p></td>
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 <div class="sect3">
 <h4 id="_configuration_acls">7.1.10. Configuration ACLs</h4>
-<div class="tableblock">
-<table rules="all"
-width="100%"
-frame="border"
-cellspacing="0" cellpadding="4">
-<col width="33%" />
-<col width="33%" />
-<col width="33%" />
+<table class="tableblock frame-all grid-all"
+style="
+width:100%;
+">
+<col style="width:33%;">
+<col style="width:33%;">
+<col style="width:33%;">
 <thead>
 <tr>
-<th align="left" valign="top">ACL    </th>
-<th align="left" valign="top">ACL code       </th>
-<th align="left" valign="top">Description</th>
+<th class="tableblock halign-left valign-top" >ACL    </th>
+<th class="tableblock halign-left valign-top" >ACL code       </th>
+<th class="tableblock halign-left valign-top" >Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>QVD&#8217;s configuration management</strong></p></td>
-<td align="left" valign="top"><p class="table">config.qvd.</p></td>
-<td align="left" valign="top"><p class="table">Manage QVD configuration (add/update tokens).</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>QVD&#8217;s configuration management</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">config.qvd.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Manage QVD configuration (add/update tokens).</p></td>
 </tr>
 <tr>
-<td align="left" valign="top"><p class="table"><strong>WAT&#8217;s configuration management</strong></p></td>
-<td align="left" valign="top"><p class="table">config.wat.</p></td>
-<td align="left" valign="top"><p class="table">Manage WAT configuration (language&#8230;).</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>WAT&#8217;s configuration management</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">config.wat.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Manage WAT configuration (language&#8230;).</p></td>
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 </div>
 <div class="sect2">
@@ -2950,7 +3529,7 @@ Notation
 <dd>
 <p>
 <span class="image">
-<img src="images/doc_images/Templates_Hierarchy_Legend_-_Primitives.png" alt="Templates_Hierarchy_Legend_-_Primitives.png" width="300px" />
+<img src="/images/doc_images/Templates_Hierarchy_Legend_-_Primitives.png" alt="Templates_Hierarchy_Legend_-_Primitives.png" width="300px">
 </span>
 </p>
 </dd>
@@ -3238,7 +3817,7 @@ Notation
 <dd>
 <p>
 <span class="image">
-<img src="images/doc_images/Templates_Hierarchy_Legend_-_Action.png" alt="Templates_Hierarchy_Legend_-_Action.png" width="300px" />
+<img src="/images/doc_images/Templates_Hierarchy_Legend_-_Action.png" alt="Templates_Hierarchy_Legend_-_Action.png" width="300px">
 </span>
 </p>
 </dd>
@@ -3283,7 +3862,7 @@ Images Creator
 </li>
 </ul></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/Templates_Hierarchy_-_QVD_Creator.png" alt="Templates_Hierarchy_-_QVD_Creator.png" width="600px" />
+<img src="/images/doc_images/Templates_Hierarchy_-_QVD_Creator.png" alt="Templates_Hierarchy_-_QVD_Creator.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -3323,7 +3902,7 @@ Images Updater
 </li>
 </ul></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/Templates_Hierarchy_-_QVD_Updater.png" alt="Templates_Hierarchy_-_QVD_Updater.png" width="600px" />
+<img src="/images/doc_images/Templates_Hierarchy_-_QVD_Updater.png" alt="Templates_Hierarchy_-_QVD_Updater.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -3363,7 +3942,7 @@ Images Reader
 </li>
 </ul></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/Templates_Hierarchy_-_QVD_Reader.png" alt="Templates_Hierarchy_-_QVD_Reader.png" width="600px" />
+<img src="/images/doc_images/Templates_Hierarchy_-_QVD_Reader.png" alt="Templates_Hierarchy_-_QVD_Reader.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -3403,7 +3982,7 @@ Images Operator
 </li>
 </ul></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/Templates_Hierarchy_-_QVD_Operator.png" alt="Templates_Hierarchy_-_QVD_Operator.png" width="600px" />
+<img src="/images/doc_images/Templates_Hierarchy_-_QVD_Operator.png" alt="Templates_Hierarchy_-_QVD_Operator.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -3443,7 +4022,7 @@ Images Eraser
 </li>
 </ul></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/Templates_Hierarchy_-_QVD_Eraser.png" alt="Templates_Hierarchy_-_QVD_Eraser.png" width="600px" />
+<img src="/images/doc_images/Templates_Hierarchy_-_QVD_Eraser.png" alt="Templates_Hierarchy_-_QVD_Eraser.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -3461,7 +4040,7 @@ Notation
 <dd>
 <p>
 <span class="image">
-<img src="images/doc_images/Templates_Hierarchy_Legend_-_Manager.png" alt="Templates_Hierarchy_Legend_-_Manager.png" width="300px" />
+<img src="/images/doc_images/Templates_Hierarchy_Legend_-_Manager.png" alt="Templates_Hierarchy_Legend_-_Manager.png" width="300px">
 </span>
 </p>
 </dd>
@@ -3511,7 +4090,7 @@ Users Eraser
 </li>
 </ul></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/Templates_Hierarchy_-_Users_Manager.png" alt="Templates_Hierarchy_-_Users_Manager.png" width="600px" />
+<img src="/images/doc_images/Templates_Hierarchy_-_Users_Manager.png" alt="Templates_Hierarchy_-_Users_Manager.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -3556,7 +4135,7 @@ VMs Eraser
 </li>
 </ul></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/Templates_Hierarchy_-_VMs_Manager.png" alt="Templates_Hierarchy_-_VMs_Manager.png" width="600px" />
+<img src="/images/doc_images/Templates_Hierarchy_-_VMs_Manager.png" alt="Templates_Hierarchy_-_VMs_Manager.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -3601,7 +4180,7 @@ OSFs Eraser
 </li>
 </ul></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/Templates_Hierarchy_-_OSFs_Manager.png" alt="Templates_Hierarchy_-_OSFs_Manager.png" width="600px" />
+<img src="/images/doc_images/Templates_Hierarchy_-_OSFs_Manager.png" alt="Templates_Hierarchy_-_OSFs_Manager.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -3646,7 +4225,7 @@ Images Eraser
 </li>
 </ul></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/Templates_Hierarchy_-_Images_Manager.png" alt="Templates_Hierarchy_-_Images_Manager.png" width="600px" />
+<img src="/images/doc_images/Templates_Hierarchy_-_Images_Manager.png" alt="Templates_Hierarchy_-_Images_Manager.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -3691,7 +4270,7 @@ Administrators Eraser
 </li>
 </ul></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/Templates_Hierarchy_-_Administrators_Manager.png" alt="Templates_Hierarchy_-_Administrators_Manager.png" width="600px" />
+<img src="/images/doc_images/Templates_Hierarchy_-_Administrators_Manager.png" alt="Templates_Hierarchy_-_Administrators_Manager.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -3736,7 +4315,7 @@ Roles Eraser
 </li>
 </ul></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/Templates_Hierarchy_-_Roles_Manager.png" alt="Templates_Hierarchy_-_Roles_Manager.png" width="600px" />
+<img src="/images/doc_images/Templates_Hierarchy_-_Roles_Manager.png" alt="Templates_Hierarchy_-_Roles_Manager.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -3766,7 +4345,7 @@ Views Operator
 </li>
 </ul></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/Templates_Hierarchy_-_Views_Manager.png" alt="Templates_Hierarchy_-_Views_Manager.png" width="600px" />
+<img src="/images/doc_images/Templates_Hierarchy_-_Views_Manager.png" alt="Templates_Hierarchy_-_Views_Manager.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -3811,7 +4390,7 @@ Nodes Eraser
 </li>
 </ul></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/Templates_Hierarchy_-_Nodes_Manager.png" alt="Templates_Hierarchy_-_Nodes_Manager.png" width="600px" />
+<img src="/images/doc_images/Templates_Hierarchy_-_Nodes_Manager.png" alt="Templates_Hierarchy_-_Nodes_Manager.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -3829,7 +4408,7 @@ Notation
 <dd>
 <p>
 <span class="image">
-<img src="images/doc_images/Templates_Hierarchy_Legend_-_Global_Manager.png" alt="Templates_Hierarchy_Legend_-_Global_Manager.png" width="300px" />
+<img src="/images/doc_images/Templates_Hierarchy_Legend_-_Global_Manager.png" alt="Templates_Hierarchy_Legend_-_Global_Manager.png" width="300px">
 </span>
 </p>
 </dd>
@@ -3880,7 +4459,7 @@ Diagram
 <dd>
 <p>
 <span class="image">
-<img src="images/doc_images/Templates_Hierarchy_-_WAT_Manager.png" alt="Templates_Hierarchy_-_WAT_Manager.png" width="600px" />
+<img src="/images/doc_images/Templates_Hierarchy_-_WAT_Manager.png" alt="Templates_Hierarchy_-_WAT_Manager.png" width="600px">
 </span>
 </p>
 </dd>
@@ -3934,7 +4513,7 @@ Diagram
 <dd>
 <p>
 <span class="image">
-<img src="images/doc_images/Templates_Hierarchy_-_QVD_Manager.png" alt="Templates_Hierarchy_-_QVD_Manager.png" width="600px" />
+<img src="/images/doc_images/Templates_Hierarchy_-_QVD_Manager.png" alt="Templates_Hierarchy_-_QVD_Manager.png" width="600px">
 </span>
 </p>
 </dd>
@@ -3963,7 +4542,7 @@ Notation
 <dd>
 <p>
 <span class="image">
-<img src="images/doc_images/Templates_Hierarchy_Legend_-_Master.png" alt="Templates_Hierarchy_Legend_-_Master.png" width="300px" />
+<img src="/images/doc_images/Templates_Hierarchy_Legend_-_Master.png" alt="Templates_Hierarchy_Legend_-_Master.png" width="300px">
 </span>
 </p>
 </dd>
@@ -3973,7 +4552,7 @@ Diagram
 <dd>
 <p>
 <span class="image">
-<img src="images/doc_images/Templates_Hierarchy_-_Master.png" alt="Templates_Hierarchy_-_Master.png" width="600px" />
+<img src="/images/doc_images/Templates_Hierarchy_-_Master.png" alt="Templates_Hierarchy_-_Master.png" width="600px">
 </span>
 </p>
 </dd>
@@ -3994,7 +4573,7 @@ Notation
 <dd>
 <p>
 <span class="image">
-<img src="images/doc_images/Templates_Hierarchy_Legend_-_Total_Master.png" alt="Templates_Hierarchy_Legend_-_Total_Master.png" width="300px" />
+<img src="/images/doc_images/Templates_Hierarchy_Legend_-_Total_Master.png" alt="Templates_Hierarchy_Legend_-_Total_Master.png" width="300px">
 </span>
 </p>
 </dd>
@@ -4004,7 +4583,7 @@ Diagram
 <dd>
 <p>
 <span class="image">
-<img src="images/doc_images/Templates_Hierarchy_-_Total_Master.png" alt="Templates_Hierarchy_-_Total_Master.png" width="600px" />
+<img src="/images/doc_images/Templates_Hierarchy_-_Total_Master.png" alt="Templates_Hierarchy_-_Total_Master.png" width="600px">
 </span>
 </p>
 </dd>
@@ -4018,7 +4597,7 @@ Diagram
 <h4 id="_template_8217_s_hierarchy">7.2.6. Template&#8217;s Hierarchy</h4>
 <div class="paragraph"><p>In just a quick look, one can see the complete template&#8217;s hierarchy in the following diagram.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/Templates_Hierarchy_Monotenant.png" alt="Templates_Hierarchy_Monotenant.png" width="960px" />
+<img src="/images/doc_images/Templates_Hierarchy_Monotenant.png" alt="Templates_Hierarchy_Monotenant.png" width="960px">
 </span></p></div>
 </div>
 </div>
@@ -4152,7 +4731,7 @@ Inherits from
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">We can create a property in the users called <em>Company</em>, to store the company to which the different users belong to and later filter the list by this data. Other interesting use of these properties is to use them through external scripts through the CLI to perform bulk actions on the subset of filtered elements depending on our needs.</td>
 </tr></table>
@@ -4161,7 +4740,7 @@ Inherits from
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/important.png" alt="Important" />
+<img src="/images/doc_images/icons//important.png" alt="Important">
 </td>
 <td class="content">The elements with customised properties are: Users, Virtual Machines, Nodes, OSFs and Disk images.</td>
 </tr></table>
@@ -4246,7 +4825,7 @@ Check every element on the list, including the ones in other pages.
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">On the left part, right under the list table we could see at any moment the number of elements that are checked.</td>
 </tr></table>
@@ -4302,7 +4881,7 @@ Check every element on the list, including the ones in other pages.
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/important.png" alt="Important" />
+<img src="/images/doc_images/icons//important.png" alt="Important">
 </td>
 <td class="content">To make the changes done with this tool permanent, it will be necessary to have access to the server where the WAT is uploaded.</td>
 </tr></table>
@@ -4311,15 +4890,15 @@ Check every element on the list, including the ones in other pages.
 <div class="paragraph"><p>This tool is not a section, but a feature present in every WAT section.</p></div>
 <div class="paragraph"><p>When the style customisation tool is on, a tab will appear on the left part of the screen showing the text “Customiser”.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_customizer_enabled.png" alt="screenshot_customizer_enabled.png" width="960px" />
+<img src="/images/doc_images/screenshot_customizer_enabled.png" alt="screenshot_customizer_enabled.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>If we click on the tab a menu with a category selector will appear.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_customizer_open_select.png" alt="screenshot_customizer_open_select.png" width="960px" />
+<img src="/images/doc_images/screenshot_customizer_open_select.png" alt="screenshot_customizer_open_select.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Each category will have certain configurable parameters, most of them colours.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_customizer_open.png" alt="screenshot_customizer_open.png" width="960px" />
+<img src="/images/doc_images/screenshot_customizer_open.png" alt="screenshot_customizer_open.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Styles customising parameters divided by categories:</p></div>
 <div class="ulist"><ul>
@@ -4528,30 +5107,30 @@ Login Box text colour
 </ul></div>
 <div class="paragraph"><p>The colour changes will be made with a palette that will be shown if we click on the box with the colour we want to use.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_customizer_change.png" alt="screenshot_customizer_change.png" width="960px" />
+<img src="/images/doc_images/screenshot_customizer_change.png" alt="screenshot_customizer_change.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Although we can also set an RGB code in the text box of the parameter. For example.: #ff0494</p></div>
 <div class="sect2">
 <h3 id="_preview">10.1. Preview</h3>
 <div class="paragraph"><p>If we click on the preview button the system will calculate the changes and generate a preview showing the new styles.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_customizer_preview_loading.png" alt="screenshot_customizer_preview_loading.png" width="960px" />
+<img src="/images/doc_images/screenshot_customizer_preview_loading.png" alt="screenshot_customizer_preview_loading.png" width="960px">
 </span></p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/important.png" alt="Important" />
+<img src="/images/doc_images/icons//important.png" alt="Important">
 </td>
 <td class="content">These changes will be temporary and only visible in the browser where the preview is performed.</td>
 </tr></table>
 </div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_customizer_preview.png" alt="screenshot_customizer_preview.png" width="960px" />
+<img src="/images/doc_images/screenshot_customizer_preview.png" alt="screenshot_customizer_preview.png" width="960px">
 </span></p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/warning.png" alt="Warning" />
+<img src="/images/doc_images/icons//warning.png" alt="Warning">
 </td>
 <td class="content">Choosing yellow as background colour is a dramatisation. Do not try at home.</td>
 </tr></table>
@@ -4573,12 +5152,12 @@ Login Box text colour
 <h3 id="_changes_example">10.5. Changes example</h3>
 <div class="paragraph"><p>Let&#8217;s imagine we want to change the WAT style to bluish colours more in the line with our organisation. Changing the initial colours to different tones of blue would display a result like the following:</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_customizer_blue.png" alt="screenshot_customizer_blue.png" width="960px" />
+<img src="/images/doc_images/screenshot_customizer_blue.png" alt="screenshot_customizer_blue.png" width="960px">
 </span></p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/warning.png" alt="Warning" />
+<img src="/images/doc_images/icons//warning.png" alt="Warning">
 </td>
 <td class="content">Qindel Group is not responsible for aesthetic disasters caused by daltonic administrators using this tool or by administrators suffering of any other visual dysfunction.</td>
 </tr></table>
@@ -4593,7 +5172,7 @@ Login Box text colour
 <div class="paragraph"><p>If the administrator of QVD has <strong>enough permissions</strong>, when the virtual machine is started, the option <strong>Spy</strong> will appear both in the detail view and in the massive options in the list view (in this case the option will only appear if an only element is selected).</p></div>
 <div class="paragraph"><p>When clicking on <strong>Spy</strong>, a new tab in the browser will open where the desktop with the current session will be loaded.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vmspy.png" alt="screenshot_vmspy.png" width="960px" />
+<img src="/images/doc_images/screenshot_vmspy.png" alt="screenshot_vmspy.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>If the user is doing things, we will see in real time what he sees including his cursor.</p></div>
 <div class="dlist"><dl>
@@ -4625,19 +5204,19 @@ On the left side there is a <em>settings</em> tab that displays a lateral menu w
 </dl></div>
 <div class="paragraph"><p><em>Adapted resolution and log shown</em>
 <span class="image">
-<img src="images/doc_images/screenshot_vmspy_options.png" alt="screenshot_vmspy_options.png" width="960px" />
+<img src="/images/doc_images/screenshot_vmspy_options.png" alt="screenshot_vmspy_options.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p><em>Original resolution and log hidden</em>
 <span class="image">
-<img src="images/doc_images/screenshot_vmspy_options2.png" alt="screenshot_vmspy_options2.png" width="960px" />
+<img src="/images/doc_images/screenshot_vmspy_options2.png" alt="screenshot_vmspy_options2.png" width="960px">
 </span></p></div>
 </div>
 </div>
 </div>
-<div id="footnotes"><hr /></div>
+<div id="footnotes"><hr></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-12-15 08:58:13 CET
+Last updated 2017-03-06 11:18:09 CET
 </div>
 </div>
 </body>

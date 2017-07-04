@@ -30,6 +30,8 @@ Wat.I = {
         log: {}
     }, 
     
+    editorCategories: {},
+    
     detailsDefaultFields: {
         vm: {},
         user: {},
@@ -43,7 +45,7 @@ Wat.I = {
     
     getDetailsFields: function (qvdObj) {
         return $.extend(true, {}, this.detailsFields[qvdObj]);
-    },   
+    },
     
     listFields: {
         vm: {},
@@ -633,13 +635,31 @@ Wat.I = {
         return fieldType;
     },
     
-    validateForm: function (context) {
-        var blankControls = $( context + " input[data-required]:blank:visible" );
+    validateForm: function (context, fieldsToValidate) {
+        var fieldsToValidate = fieldsToValidate || 'all';
+        
+        switch (fieldsToValidate) {
+            case 'all':
+                var blankControls = $( context + " input[data-required]:blank" );
+                break;
+            case 'visible':
+                var blankControls = $( context + " input[data-required]:blank:visible" );
+                break;
+        }
         
         if(blankControls.length > 0) {
             blankControls.addClass('not_valid');
             blankControls.parent().find('.validation-message').remove();
             blankControls.parent().append('<div class="second_row--error validation-message">' + i18n.t('Required field') + '</div>');
+            
+            // Switch to error tab if necessary
+            var dataField = $(blankControls).eq(0).closest('tr').attr('data-tab-field');
+            var errorTab = $('[data-tab="' + dataField + '"]');
+            if (!$(errorTab).hasClass('tab-active')) {
+                $(errorTab).trigger('click');
+            }
+            
+            Wat.CurrentView.editorView.openFormErrorsDialog()
             return false;
         }
         
@@ -674,6 +694,7 @@ Wat.I = {
         });
         
         if (returnFalse) {
+            Wat.CurrentView.editorView.openFormErrorsDialog();
             return false;
         }
         

@@ -1,21 +1,8 @@
 
 <div>
-    <input type="text" name="packages_search" class="fleft col-width-25 configuration-block" data-i18n="[placeholder]Search" value="<%= filters.search %>">
+    <input type="text" name="packages_search" class="fleft col-width-24 configuration-block" data-i18n="[placeholder]Search" value="<%= filters.search %>">
 </div>
 <table class="list">
-    <thead>
-        <tr>
-            <th>
-                
-            </th>
-            <th>
-                <span data-i18n="Name"><%= i18n.t('Name') %></span>
-            </th>
-            <th>
-                <span data-i18n="Description"><%= i18n.t('Description') %></span>
-            </th>
-        </tr>
-    </thead>
     <tbody>
         <% _.each(models, function(model) { %>
             <tr>
@@ -25,9 +12,7 @@
                 </td>
                 <td>
                     <span class="text"><%= model.get('package') %></span>
-                </td>
-                <td style="white-space: normal;">
-                    <span class="text second_row"><%= model.get('description') %></span>
+                    <div class="text second_row"><%= model.get('description') %></div>
                 </td>
             </tr>
         <% }); %>

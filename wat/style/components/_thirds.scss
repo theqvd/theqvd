@@ -36,6 +36,7 @@
     .ui-dialog-buttonset {
         padding: 10px;
         text-align: right;
+        width: 100%;
         
         .button {
             margin-left: 30px;
@@ -47,11 +48,10 @@
     
     .dialog-container {
         overflow-y: auto;
-        padding-left: 0px;
-        padding-right: 0px;
         max-height: 70vh !important;
+        min-height: 50vh !important;
         height: auto;
-        padding: 10px;
+        padding: 0px;
     }
 }
 

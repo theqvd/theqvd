@@ -5,15 +5,16 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
         this.params = params;
     
         Wat.Views.DialogView.prototype.initialize.apply(this, [params]);
+        
+        this.render();
     },
     
     dialogEvents: {
-        'click .js-os-editor-menu': 'clickOSEditorMenu',
+        'click .js-os-editor-menu li': 'clickOSEditorMenu',
         'click .js-add-shortcut': 'addShortcut',
         'click .js-delete-shortcut': 'deleteShortcut',
         'click .js-update-shortcut': 'updateShortcut',
         'click .js-button-show-shortcut-details': 'toggleShortcutConfiguration',
-        'click .js-delete-starting-script': 'deleteScript',
         'change input[type="checkbox"][js-autosave-field]': 'autoSaveCheck',
         'change .js-starting-script-mode': 'changeScriptMode',
         'click .js-open-script-manager': 'openAssetManager',
@@ -40,7 +41,7 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
         );
         
         $(this.el).html(template);
-            
+        
         // Render sections
         this.renderSectionAppearence();
         this.renderSectionPackages();
@@ -77,7 +78,7 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
                 massive: this.massive
             }
         );
-
+        
         $('.bb-os-conf-packages').html(template);
         
         this.renderPackages();
@@ -202,7 +203,6 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
     
     clickOSEditorMenu: function (e) {
         target = $(e.target).attr('data-target') || $(e.target).parent().attr('data-target');
-
         $('li.lateral-menu-option').removeClass('lateral-menu-option--selected');
         $('li.js-lateral-menu-sub-div').hide();
         $('.js-os-editor-panel').hide();
@@ -284,7 +284,7 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
         $('[data-form-field-name="icon_url"]').val(newIcon);
 
         $('.js-button-show-shortcut-details[data-id="' + id + '"]').trigger('click');
-        
+
         // Save plugin element
         Wat.DIG.setPluginListElement({
             pluginId: 'shortcuts',
@@ -347,7 +347,7 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
         
         var fileName = $(row).attr('data-name');
         var execution_hook = $('.js-starting-script-mode[data-new-file]').val();
-        
+
         // Save plugin element
         Wat.DIG.setPluginListElement({
             pluginId: 'execution_hooks',
@@ -386,7 +386,7 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
             execution_hook : execution_hook
         });
         
-        Wat.CurrentView.OSDdialogView.renderSectionScriptsRows(Wat.CurrentView.OSDmodel.get('scripts'));
+        Wat.CurrentView.editorView.softwareEditorView.renderSectionScriptsRows(Wat.CurrentView.OSDmodel.get('scripts'));
 
         $('.js-starting-script').val('');
     },
@@ -418,13 +418,13 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
     
     afterDeleteScript: function (e) {
         var scripts = Wat.CurrentView.OSDmodel.get('scripts');
-        Wat.CurrentView.OSDdialogView.renderSectionScriptsRows(scripts);
+        Wat.CurrentView.editorView.softwareEditorView.renderSectionScriptsRows(scripts);
     },
     
     changeScriptMode: function (e) {
         var newMode = $(e.target).val();
         var id = $(e.target).attr('data-id');
-        
+
         // Save plugin element
         Wat.DIG.setPluginListElement({
             pluginId: 'execution_hooks',
@@ -468,8 +468,8 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
                 "Cancel": function () {
                     Wat.I.closeDialog($(this));
                     
-                    Wat.CurrentView.OSDdialogView.ScriptsDialogView.remove();
-                    delete Wat.CurrentView.OSDdialogView.ScriptsDialogView;
+                    that.ScriptsDialogView.remove();
+                    delete that.ScriptsDialogView;
                     
                     $('.ui-dialog-secondary').eq(0).css('z-index','1003');
                 },
@@ -478,8 +478,8 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
                     that.addScript(function () {
                         Wat.I.closeDialog($(those));
                     
-                        Wat.CurrentView.OSDdialogView.ScriptsDialogView.remove();
-                        delete Wat.CurrentView.OSDdialogView.ScriptsDialogView;
+                        that.ScriptsDialogView.remove();
+                        delete that.ScriptsDialogView;
                         
                         $('.ui-dialog-secondary').eq(0).css('z-index','1003');
                     });
@@ -488,7 +488,7 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
             buttonClasses: ['fa fa-ban js-button-close','fa fa-plus-circle js-button-add'],
 
             fillCallback: function (target) {
-                Wat.CurrentView.OSDdialogView.ScriptsDialogView = new Wat.Views.OSDScriptsEditorView({
+                this.ScriptsDialogView = new Wat.Views.OSDScriptsEditorView({
                     el: $(target),
                     //osfId: osfId,
                     massive: false,
@@ -497,11 +497,11 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
             },
         }
 
-        Wat.CurrentView.osDialog.scriptsDialog = Wat.I.dialog(dialogConf);
+        Wat.CurrentView.editorView.softwareEditorView.scriptsDialog = Wat.I.dialog(dialogConf);
 
         // Add secondary dialog class to new dialog to give different look
-        //Wat.CurrentView.osDialog.scriptsDialog.parent().addClass('ui-dialog-secondary');
-        Wat.CurrentView.osDialog.scriptsDialog.dialog("option", "position", {my: "center", at: "center", of: window});
+        //Wat.CurrentView.editorView.softwareEditorView.scriptsDialog.parent().addClass('ui-dialog-secondary');
+        Wat.CurrentView.editorView.softwareEditorView.scriptsDialog.dialog("option", "position", {my: "center", at: "center", of: window});
         // Send primary dialog to back because jquery ui doesnt handle it properly
         $('.ui-dialog-secondary').eq(0).css('z-index','1001');
     },
@@ -522,7 +522,8 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
             default:
                 return;
         }
-        
+                console.log(4);
+
         // Save plugin element
         Wat.DIG.setPluginListElement({
             pluginId: pluginId,
@@ -605,6 +606,6 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
         
         this.toggleUploadSelectMode();
         
-        Wat.CurrentView.OSDdialogView.renderSectionAppearence();
+        Wat.CurrentView.editorView.softwareEditorView.renderSectionAppearence();
     }
 });

@@ -1,7 +1,7 @@
 <% 
-    $.each(properties, function(propertyId, property) { 
+    $.each(properties, function(propertyId, property) {
 %>
-        <tr style="display: none;" class="js-editor-property-row" data-tenant-id="<%= property.tenant_id %>">
+        <tr style="display: none;" class="js-editor-property-row" data-tenant-id="<%= property.tenant_id %>" data-tab-field="general">
             <td>
                 <input type="hidden" class="custom-prop-key" value="<%= property.key %>">
                 <span class="custom-prop-name"><%= property.key %></span>

@@ -1,6 +1,6 @@
 <table>
     <% if (Wat.C.checkACL('osf.update-massive.description')) { %>
-    <tr>
+    <tr data-tab-field="general">
         <td>
             <span data-i18n="Description"></span>
             <a class="button fa fa-rotate-left js-no-change-reset no-change-reset invisible" data-i18n="Reset" data-field="description"></a>
@@ -10,7 +10,7 @@
         </td>
     </tr>
     <% } %>
-    <tr>
+    <tr data-tab-field="hardware">
         <td>
             <span data-i18n="Memory"></span>
             <a class="button fa fa-rotate-left js-no-change-reset no-change-reset invisible" data-i18n="Reset" data-field="memory"></a>
@@ -19,7 +19,7 @@
             <input type="text" class="half100" name="memory" value="" data-i18n="[placeholder]No changes"> MB
         </td>
     </tr>
-    <tr>
+    <tr data-tab-field="hardware">
         <td>
             <span data-i18n="User storage"></span>
             <a class="button fa fa-rotate-left js-no-change-reset no-change-reset invisible" data-i18n="Reset" data-field="user_storage"></a>

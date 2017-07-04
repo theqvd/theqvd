@@ -12,7 +12,7 @@ Wat.Views.PropertyEditorView = Wat.Views.EditorView.extend({
     
     renderCreate: function (target, that) {
         Wat.CurrentView.model = new Wat.Models.Property();
-        $('.ui-dialog-title').html($.i18n.t('New property'));
+        $('.ui-dialog-titlebar').html($.i18n.t('New property'));
         
         Wat.Views.EditorView.prototype.renderCreate.apply(this, [target, that]);
     },
@@ -20,7 +20,7 @@ Wat.Views.PropertyEditorView = Wat.Views.EditorView.extend({
     renderUpdate: function (target, that) {
         Wat.Views.EditorView.prototype.renderUpdate.apply(this, [target, that]);
         
-        $('.ui-dialog-title').html($.i18n.t('Edit property'));
+        $('.ui-dialog-titlebar').html($.i18n.t('Edit property'));
     },
     
     createElement: function () {

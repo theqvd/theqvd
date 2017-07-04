@@ -189,7 +189,7 @@ Wat.B = {
         
         // When click on a corner menu option
         clickCornerMenu: function(e) {
-        },        
+        },
         
         // When click on a submenu option, show properly subsection
         clickSubMenu: function() {

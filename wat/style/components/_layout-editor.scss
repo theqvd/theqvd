@@ -2,7 +2,7 @@
     margin: 0;
     
     @include in(desktop) {
-        margin: 10px 20px;
+        margin: 5px 0px;
     }
     
     .editor-table {
@@ -40,7 +40,7 @@
 
         .custom-properties {
             td {
-                position: relative;            
+                position: relative;
                 
                 .property-help {
                     position: absolute;
@@ -50,6 +50,29 @@
                     font-weight: normal;
                 }
             }
+        }
+    }
+}
+
+.editor-tabs {
+    display: -webkit-flex;
+    -webkit-flex-direction: column;
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    height: 30px;
+    
+    li {
+        flex-grow: 1;
+        padding: 7px;
+        cursor: pointer;
+        background: #ddd;
+        color: #999;
+        font-weight: bold;
+        
+        &.tab-active, &:hover {
+            background: $col_brand;
+            color: $col_whiter;
         }
     }
 }

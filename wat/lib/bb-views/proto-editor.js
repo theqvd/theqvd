@@ -26,6 +26,7 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
         'input  .js-massive-editor-table input[type="text"]': 'changeMassiveField',
         'input  .js-massive-editor-table textarea': 'changeMassiveField',
         'change .js-massive-editor-table select': 'changeMassiveFieldSelect',
+        'click  .js-editor-tabs>li': 'clickEditorTab',
     },
     
     renderCreate: function (target, that) {
@@ -51,6 +52,7 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
                         isSuperadmin: Wat.C.isSuperadmin(),
                         blocked: undefined,
                         properties: [],
+                        editorCategories: Wat.I.editorCategories[this.qvdObj],
                         cid: this.cid
                     }
                 );
@@ -91,6 +93,8 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
         }
         
         that.configureMassiveEditor (that);
+        
+        this.setupEditorTabs();
     },
     
     render: function (target, that) {
@@ -115,6 +119,7 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
                         isSuperadmin: isSuperadmin,
                         editorMode: editorMode,
                         blocked: that.model ? that.model.attributes.blocked : 0,
+                        editorCategories: Wat.I.editorCategories[this.qvdObj],
                         cid: this.cid
                     }
                 );
@@ -210,6 +215,8 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
         Wat.I.dialogScrollHeight = $('.ui-dialog .js-dialog-container')[0].scrollHeight;
         
         Wat.Views.MainView.prototype.render.apply(this, [target, that]);
+        
+        this.setupEditorTabs();
     },
     
     renderProperties: function (that) {
@@ -285,10 +292,10 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
         return model;
     },
     
-    validateForm: function () {
-        var context = '.editor-container.' + this.cid;
+    validateForm: function (fieldsToValidate) {
+        var context = '.' + this.cid;
         
-        return Wat.I.validateForm(context);
+        return Wat.I.validateForm(context, fieldsToValidate);
     },
     
     // Parse properties from create/edit forms
@@ -419,5 +426,89 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
         else {
             $('.js-no-change-reset[data-field="' + name + '"]').addClass('invisible');
         }
+    },
+    
+    clickEditorTab: function (e) {
+        var tab = $(e.target).attr('data-tab');
+        
+        this.switchEditorTab(tab);
+    },
+    
+    switchEditorTab: function (tab) {
+        var valid = this.validateForm('visible');
+        
+        if (!valid) {
+            return;
+        }
+        
+        $('[data-tab-field]').hide();
+        $('[data-tab-field="' + tab + '"]').show();
+        
+        $('[data-tab]').removeClass('tab-active');
+        $('[data-tab="' + tab + '"]').addClass('tab-active');
+        
+        // Hide continue button in last tab
+        var lastTab = $('[data-tab]:last-child').attr('data-tab');
+        if (tab == lastTab) {
+            $('.js-next-tab').hide();
+        }
+        else {
+            $('.js-next-tab').show();
+        }
+    },
+    
+    setupEditorTabs: function () {
+        // Remove empty categories
+        $.each($('[data-tab]'), function (iTab, tab) {
+            var tabCode = $(tab).attr('data-tab');
+            var catFields = $('[data-tab-field="' + tabCode + '"]');
+            
+            if ($(catFields).length == 0) {
+                $(tab).remove();
+            }
+        });
+        
+        // Show only fields of the first tab
+        var firstTab = $('[data-tab]:first-child').attr('data-tab');
+        
+        $('[data-tab="' + firstTab + '"]').addClass('tab-active');
+        $('[data-tab-field]').hide();
+        $('[data-tab-field="' + firstTab + '"]').show();
+    },
+    
+    openFormErrorsDialog: function () {
+        var that = this;
+        
+        var dialogConf = {
+            title: $.i18n.t('Errors in form'),
+            buttons : {
+                "OK": function () {
+                    // Send primary dialog to front again
+                    $('.ui-dialog').eq(0).css('z-index','');
+                    
+                    Wat.I.closeDialog($(this));
+                },
+            },
+            buttonClasses: ['fa fa-check'],
+            
+            fillCallback: function (target) {
+                // Add common parts of editor to dialog
+                var template = _.template(
+                    Wat.TPL.formErrors, {
+                    }
+                );
+
+                target.html(template);
+            },
+            width: 200,
+        }
+
+        Wat.CurrentView.warningDialog = Wat.I.dialog(dialogConf);
+        
+        // Add secondary dialog class to new dialog to give different look
+        Wat.CurrentView.warningDialog.parent().addClass('ui-dialog-secondary');
+        Wat.CurrentView.warningDialog.dialog("option", "position", {my: "center", at: "center", of: window});
+        // Send primary dialog to back because jquery ui doesnt handle it properly
+        $('.ui-dialog').eq(0).css('z-index','100');
     },
 });

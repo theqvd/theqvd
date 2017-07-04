@@ -13,7 +13,7 @@ Wat.Views.ConfigWatEditorView = Wat.Views.EditorView.extend({
     renderUpdate: function (target, that) {
         Wat.Views.EditorView.prototype.renderUpdate.apply(this, [target, that]);
         
-        $('.ui-dialog-title').html($.i18n.t('WAT Config'));
+        $('.ui-dialog-titlebar').html($.i18n.t('WAT Config'));
         
         Wat.I.chosenElement('select[name="language"]', 'single100');
         Wat.I.chosenElement('select[name="block"]', 'single100');

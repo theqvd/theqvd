@@ -8,10 +8,6 @@ Wat.Models.OSD = Wat.Models.DIG.extend({
         this.urlRoot = this.baseUrl() + '/osd';
     },
     
-    url: function () {
-        return this.baseUrl() + '/osd';
-    },
-    
     initPlugins: function () {
         var that = this;
         

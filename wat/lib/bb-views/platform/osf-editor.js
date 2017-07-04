@@ -8,8 +8,7 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
     },
     
     editorEvents: {
-        'change select[name="os_distro_select"]' : 'toggleOSDistro',
-        'click .js-button-edit-os': 'openOSEditor',
+        'change select[name="os_distro_select"]' : 'showOSEditor',
         'click .js-expand-os-conf': 'toggleOSConfigExpanded'
     },
     
@@ -63,7 +62,7 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
             
             args['osd_id'] = Wat.CurrentView.OSDmodel.get('id');
         }
-        
+        console.log(args);
         Wat.CurrentView.createModel(args, Wat.CurrentView.fetchList);
     },
     
@@ -114,41 +113,53 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
         Wat.CurrentView.updateModel(args, filters, Wat.CurrentView.fetchAny);
     },
     
-    toggleOSDistro: function (e) {
+    showOSEditor: function (e) {
         var selectedDistro = $(e.target).val();
 
         switch (selectedDistro) {
             case "-1":
                 $('.js-os-configuration-row').hide();
+                
+                Wat.CurrentView.editorView.softwareEditorView.remove();
+                //$('.bb-os-configuration-editor').html('');
                 break;
             default:
                 // Save distro id in OSD just for MOCK!
                 Wat.CurrentView.OSDmodel.set({distro_id: selectedDistro, name: selectedDistro});
                 Wat.CurrentView.OSDmodel.save();
-
+                
+                $('.bb-os-configuration-editor').html('<div style="color: #222;">' + HTML_MID_LOADING + '</div>');
+                
                 // Save distro id
                 var opts = {
                     pluginId: 'os',
                     attributes: {distro: selectedDistro}
                 };
-
+                
                 Wat.DIG.setPluginAttr(opts, function () {}, function () {
-                    Wat.CurrentView.renderOSDetails(Wat.CurrentView.OSDmodel, {
-                        shrinked: true,
-                        editable: true,
-                        container: '.editor-container'
+                    var osfId = $(e.target).attr('data-osf-id');
+                    var massive = false;
+                    
+                    if (osfId == -1) {
+                        osfIds = Wat.CurrentView.selectedItems.join(',');
+                        var massive = true;
+                    }
+                    
+                    Wat.CurrentView.editorView.softwareEditorView = new Wat.Views.OSDEditorView({
+                        el: '.bb-os-configuration-editor',
+                        osfId: osfId,
+                        massive: false,
+                        osdId: Wat.CurrentView.OSDmodel.id
                     });
-                    $('.js-os-configuration-row').show();
                 });
 
                 break;
         }
-    
     },
     
     renderCreate: function (target, that) {
         Wat.CurrentView.model = new Wat.Models.OSF();
-        $('.ui-dialog-title').html($.i18n.t('New OS Flavour'));
+        $('.ui-dialog-titlebar').html($.i18n.t('New OS Flavour'));
         
         Wat.Views.EditorView.prototype.renderCreate.apply(this, [target, that]);
         
@@ -173,23 +184,28 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
     renderUpdate: function (target, that) {
         Wat.Views.EditorView.prototype.renderUpdate.apply(this, [target, that]);
         
-        $('.ui-dialog-title').html($.i18n.t('Edit OS Flavour') + ": " + this.model.get('name'));
+        $('.ui-dialog-titlebar').html($.i18n.t('Edit OS Flavour') + ": " + this.model.get('name'));
         
         // If OSF were created using DIG, retrieve OS info from DIG
-        var osdID = this.model.get('osd_id');
-        if (osdID) {
-            Wat.DIG.fetchOSD(osdID, function (OSDmodel) {
-                that.OSDmodel = OSDmodel;
-
-                Wat.CurrentView.renderOSDetails(that.OSDmodel, {
-                    shrinked: true, 
-                    editable: true, 
-                    container: '.editor-container'
+        var osdId = this.model.get('osd_id');
+        if (osdId) {
+            Wat.DIG.fetchOSD(osdId, function (OSDmodel) {
+                Wat.CurrentView.OSDmodel = OSDmodel;
+                
+                if (Wat.CurrentView.viewKind == 'list') {
+                    var osfId = Wat.CurrentView.selectedItems[0];
+                }
+                else {
+                    var osfId = Wat.CurrentView.id;
+                }
+                
+                Wat.CurrentView.editorView.softwareEditorView = new Wat.Views.OSDEditorView({
+                    el: '.bb-os-configuration-editor',
+                    osfId: osfId,
+                    massive: false,
+                    osdId: osdId
                 });
             });
-        }
-        else {
-            that.renderOSDetails();
         }
     },
     
@@ -241,12 +257,12 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
     openOSEditor: function (e) {
         var osfId = $(e.target).attr('data-osf-id');
         var massive = false;
-
+        
         if (osfId == -1) {
             osfIds = Wat.CurrentView.selectedItems.join(',');
             var massive = true;
         }
-
+        
         var dialogConf = {
             title: "Software configuration",
             buttons : {
@@ -299,7 +315,7 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
         }
 
         Wat.CurrentView.osDialog = Wat.I.dialog(dialogConf);
-
+        
         // Add secondary dialog class to new dialog to give different look
         Wat.CurrentView.osDialog.parent().addClass('ui-dialog-secondary');
         Wat.CurrentView.osDialog.dialog("option", "position", {my: "center", at: "center", of: window});

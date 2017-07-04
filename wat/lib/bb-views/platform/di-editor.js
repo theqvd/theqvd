@@ -12,7 +12,7 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
     
     renderCreate: function (target, that) {
         Wat.CurrentView.model = new Wat.Models.DI();
-        $('.ui-dialog-title').html($.i18n.t('New Disk Image'));
+        $('.ui-dialog-titlebar').html($.i18n.t('New Disk Image'));
         
         Wat.Views.EditorView.prototype.renderCreate.apply(this, [target, that]);
         
@@ -71,7 +71,7 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
     renderUpdate: function (target, that) {
         Wat.Views.EditorView.prototype.renderUpdate.apply(this, [target, that]);
         
-        $('.ui-dialog-title').html($.i18n.t('Edit Disk image') + ": " + this.model.get('disk_image'));
+        $('.ui-dialog-titlebar').html($.i18n.t('Edit Disk image') + ": " + this.model.get('disk_image'));
 
         // Configure tags inputs
         Wat.I.tagsInputConfiguration();

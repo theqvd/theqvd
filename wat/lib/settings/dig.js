@@ -71,7 +71,6 @@ Wat.DIG = {
             osdId: opts.osdId,
             pluginId: opts.pluginId
         });
-                
         Wat.CurrentView.OSDmodel.pluginData[opts.pluginId].save({}, {
             complete: function (e) {
                 callbackSave(e);

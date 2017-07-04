@@ -428,9 +428,9 @@ span.text {
 
 .info-header {
     height: auto;
-    padding: 10px;
+    margin: 10px;
     .fa:before {
-        margin-right: 5px;    
+        margin-right: 5px;
     }
 }
 
@@ -490,7 +490,7 @@ span.text {
 }
 
 .os-editor-panel {
-    height: 400px;
+    text-align: left;
     vertical-align: top !important;
     
     li.installed-package:first-child .order-package-up, li.installed-package:last-child .order-package-down {
@@ -504,6 +504,16 @@ span.text {
 
 button.button-edit-os {
     margin-bottom: 10px;
+}
+
+.os-configuration-editor {
+    text-align: left;
+    
+    .packages-list {
+        td {
+            font-size: 12px;
+        }
+    }
 }
 
 table.os-configuration {

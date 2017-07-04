@@ -77,7 +77,8 @@ Wat.Views.MainView = Backbone.View.extend({
     },
     
     events:  {
-        'input .filter-control>input': 'filterBySubstring'
+        'input .filter-control>input': 'filterBySubstring',
+        'click .js-next-tab': 'nextTab'
     },
     
     filterBySubstring: function(e) {
@@ -299,7 +300,10 @@ Wat.Views.MainView = Backbone.View.extend({
             }
         };
 
-        this.dialogConf.buttonClasses = ['fa fa-ban js-button-cancel', 'fa fa-plus-circle js-button-create'];
+        this.dialogConf.buttonClasses = [
+            'fa fa-ban js-button-cancel', 
+            'fa fa-plus-circle js-button-create'
+        ];
         
         this.dialogConf.fillCallback = function (target, that) {
             var editorViewClass = Wat.Common.BySection[that.qvdObj] ? Wat.Common.BySection[that.qvdObj].editorViewClass : Wat.CurrentView.editorViewClass;
@@ -307,6 +311,21 @@ Wat.Views.MainView = Backbone.View.extend({
         };
         
         this.dialog = Wat.I.dialog(this.dialogConf, this);
+    },
+    
+    // Switch editor form to next tab
+    nextTab: function () {
+        var activeTab = -1;
+        $.each($('.js-editor-tabs>li'), function (iTab, tab) {
+            if (activeTab > -1 && iTab == (activeTab+1)) {
+                $(tab).trigger('click');
+                return;
+            }
+
+            if ($(tab).hasClass('tab-active')) {
+                activeTab = iTab;
+            }
+        });
     },
     
     openEditElementDialog: function (e) {
@@ -317,6 +336,11 @@ Wat.Views.MainView = Backbone.View.extend({
                 Wat.I.closeDialog($(this));
                 
                 that.afterEditElementDialogAction('cancel');
+                
+                // If we are updating an element from list view, reset selected items
+                if (that.viewKind == 'list') {
+                    //that.resetSelectedItems();
+                }
             },
             Update: function (e) {
                 var valid = Wat.CurrentView.editorView.validateForm();
@@ -422,4 +446,10 @@ Wat.Views.MainView = Backbone.View.extend({
     // Hooks after click a button on dialog
     afterNewElementDialogAction: function (action) {},
     afterEditElementDialogAction: function (action) {},
+    
+    // Override view remove method to do not destroy $el from DOM. Only empty it.
+    remove: function() {
+        this.$el.empty();
+        this.undelegateEvents();
+    }
 });

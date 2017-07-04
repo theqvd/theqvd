@@ -1,11 +1,607 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.9" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="generator" content="AsciiDoc 8.6.9">
 <title>El WAT paso a paso</title>
 <style type="text/css">
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+h5 {
+  font-size: 1.0em;
+}
+
+div.sectionbody {
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
+
+pre {
+  padding: 0;
+  margin: 0;
+}
+
+#author {
+  color: #527bbd;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+#email {
+}
+#revnumber, #revdate, #revremark {
+}
+
+#footer {
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #f0f0f0;
+  color: #777777;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
+}
+
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
+  margin-bottom: 2.5em;
+}
+
+#toctitle {
+  color: #527bbd;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
+
+
+/*
+ * Theme specific overrides of the preceding (asciidoc.css) CSS.
+ *
+ */
+body {
+  font-family: Garamond, Georgia, serif;
+  font-size: 17px;
+  color: #3E4349;
+  line-height: 1.3em;
+}
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Garmond, Georgia, serif;
+  font-weight: normal;
+  border-bottom-width: 0;
+  color: #3E4349;
+}
+div.title, caption.title { color: #596673; font-weight: bold; }
+h1 { font-size: 240%; }
+h2 { font-size: 180%; }
+h3 { font-size: 150%; }
+h4 { font-size: 130%; }
+h5 { font-size: 115%; }
+h6 { font-size: 100%; }
+#header h1 { margin-top: 0; }
+#toc {
+  color: #444444;
+  line-height: 1.5;
+  padding-top: 1.5em;
+}
+#toctitle {
+  font-size: 20px;
+}
+#toc a {
+    border-bottom: 1px dotted #999999;
+    color: #444444 !important;
+    text-decoration: none !important;
+}
+#toc a:hover {
+    border-bottom: 1px solid #6D4100;
+    color: #6D4100 !important;
+    text-decoration: none !important;
+}
+div.toclevel1 { margin-top: 0.2em; font-size: 16px; }
+div.toclevel2 { margin-top: 0.15em; font-size: 14px; }
+em, dt, td.hdlist1 { color: black; }
+strong { color: #3E4349; }
+a { color: #004B6B; text-decoration: none; border-bottom: 1px dotted #004B6B; }
+a:visited { color: #615FA0; border-bottom: 1px dotted #615FA0; }
+a:hover { color: #6D4100; border-bottom: 1px solid #6D4100; }
+div.tableblock > table, table.tableblock { border: 3px solid #E8E8E8; }
+th.tableblock, td.tableblock { border: 1px solid #E8E8E8; }
+ul > li > * { color: #3E4349; }
+pre, tt, .monospaced { font-family: Consolas,Menlo,'Deja Vu Sans Mono','Bitstream Vera Sans Mono',monospace; }
+tt, .monospaced { font-size: 0.9em; color: black;
+}
+div.exampleblock > div.content, div.sidebarblock > div.content, div.listingblock > div.content { border-width: 0 0 0 3px; border-color: #E8E8E8; }
+div.verseblock { border-left-width: 0; margin-left: 3em; }
+div.quoteblock { border-left-width: 3px; margin-left: 0; margin-right: 0;}
+div.admonitionblock td.content { border-left: 3px solid #E8E8E8; }
 
 
 </style>
@@ -218,12 +814,12 @@ asciidoc.install(3);
 <div class="paragraph"><p>En la guía <em>WAT paso a paso</em> veremos desde el inicio de sesión hasta las secciones más complejas, haciendo un recorrido por las diferentes secciones del WAT analizando su utilidad y aspectos clave.</p></div>
 <div class="paragraph"><p>Estas secciones las encontramos en el menú general situado en la parte derecha de la cabecera.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/menu_general.png" alt="menu_general.png" width="960px" />
+<img src="/images/doc_images/menu_general.png" alt="menu_general.png" width="960px">
 </span></p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/important.png" alt="Important" />
+<img src="/images/doc_images/icons//important.png" alt="Important">
 </td>
 <td class="content">Hay que tener en cuenta que <strong>no todos los administradores tienen por qué tener los mismos permisos</strong>, y por lo tanto, no todos verán cada una de las secciones o botones que se van a describir a continuación.</td>
 </tr></table>
@@ -235,7 +831,7 @@ asciidoc.install(3);
 <div class="sectionbody">
 <div class="paragraph"><p>Cuando cargamos el WAT, lo primero que nos aparecerá será una pantalla de inicio de sesión, donde autenticarnos con nuestras credenciales <em>usuario/contraseña</em>.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/login.png" alt="login.png" width="960px" />
+<img src="/images/doc_images/login.png" alt="login.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>La primera vez que inicies sesión te preguntará si deseas guardar el usuario y contraseña para el futuro (siempre que el navegador lo permita).</p></div>
 </div>
@@ -246,7 +842,7 @@ asciidoc.install(3);
 <div class="paragraph"><p>La primera pantalla que se muestra al iniciar sesión es una vista táctica compuesta por gráficas y tablas resumen del sistema.</p></div>
 <div class="paragraph"><p>Además, bajo el título, están disponibles algunos botones con utilidades.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/home.png" alt="home.png" width="960px" />
+<img src="/images/doc_images/home.png" alt="home.png" width="960px">
 </span></p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
@@ -351,7 +947,7 @@ Widgets de estadísticas
 <h2 id="_ayuda">3. Ayuda</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/menu_help.png" alt="menu_help.png" width="600px" />
+<img src="/images/doc_images/menu_help.png" alt="menu_help.png" width="600px">
 </span></p></div>
 <div class="sect2">
 <h3 id="_acerca_de">3.1. Acerca de</h3>
@@ -386,7 +982,7 @@ Una <strong>Guía de usuario</strong> con indicaciones para realizar tareas frec
 <h2 id="_plataforma">4. Plataforma</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/menu_platform.png" alt="menu_platform.png" width="600px" />
+<img src="/images/doc_images/menu_platform.png" alt="menu_platform.png" width="600px">
 </span></p></div>
 <div class="paragraph"><p>En esta sección encontraremos los diferentes elementos de QVD. Es lo que consideramos <strong>el núcleo de la administración de QVD</strong>.</p></div>
 <div class="paragraph"><p>Todas ellas tienen unos <strong>componentes comunes</strong> con una vista de listado, controles de paginación, filtrado y acciones masivas, vista detalle y formularios de creación/edición. Para saber más visitar “Estructura listado-detalle” en la introducción de la documentación.</p></div>
@@ -400,9 +996,9 @@ Vista listado
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>La vista principal es un listado con los usuarios de QVD.
-<span class="image">
-<img src="images/doc_images/screenshot_user_list.png" alt="screenshot_user_list.png" width="960px" />
+<div class="paragraph"><p>La vista principal es un listado con los usuarios de QVD.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_user_list.png" alt="screenshot_user_list.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -426,7 +1022,7 @@ El <strong>estado de bloqueo</strong> de los usuarios:
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_locked.png" alt="icon_locked.png" />
+<img src="/images/doc_images/icon_locked.png" alt="icon_locked.png">
 </span></p></div>
 <div class="paragraph"><p>Un usuario bloqueado no podrá iniciar sesión en ninguna de sus máquinas virtuales.</p></div>
 </div></div>
@@ -447,7 +1043,7 @@ Acciones masivas
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_user_massiveactions.png" alt="screenshot_user_massiveactions.png" width="960px" />
+<img src="/images/doc_images/screenshot_user_massiveactions.png" alt="screenshot_user_massiveactions.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Las acciones masivas nos dan las siguientes opciones a realizar sobre los usuarios seleccionados:</p></div>
 <div class="ulist"><ul>
@@ -480,7 +1076,7 @@ Editar usuarios: La contraseña de los usuarios no aparecerá en el editor masiv
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">Si se selecciona solamente un elemento, en el caso de la edición se podrán editar los mismos campos que con la edición normal del elemento desde su vista detalle.</td>
 </tr></table>
@@ -494,7 +1090,7 @@ Editor masivo
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_user_massiveeditor.png" alt="screenshot_user_massiveeditor.png" width="960px" />
+<img src="/images/doc_images/screenshot_user_massiveeditor.png" alt="screenshot_user_massiveeditor.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>El editor masivo de usuarios solamente permite modificar propiedades porsonalizadas.</p></div>
 <div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados, salvo que se escoja la opción "Sin cambios".</p></div>
@@ -508,7 +1104,7 @@ Creación
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_user_create.png" alt="screenshot_user_create.png" width="960px" />
+<img src="/images/doc_images/screenshot_user_create.png" alt="screenshot_user_create.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Al crear un usuario estableceremos su nombre, password y sus propiedades.</p></div>
 </div></div>
@@ -520,7 +1116,7 @@ Vista detalle
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_user_details.png" alt="screenshot_user_details.png" width="960px" />
+<img src="/images/doc_images/screenshot_user_details.png" alt="screenshot_user_details.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Observamos una pequeña <strong>cabecera</strong> donde junto al <strong>nombre del usuario</strong> está el <strong>botón para eliminarlo, y los botones de acción</strong>.</p></div>
 <div class="paragraph"><p>Los botones disponibles en la vista detalle de usuario son:</p></div>
@@ -559,13 +1155,13 @@ Edición
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_user_edit.png" alt="screenshot_user_edit.png" width="960px" />
+<img src="/images/doc_images/screenshot_user_edit.png" alt="screenshot_user_edit.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Al editar un usuario podremos escoger si cambiarle la <strong>contraseña</strong> (si no marchamos la casilla de verificación,  permanecerá inalterada) y <strong>editar propiedades</strong>.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas si solo seleccionamos un elemento.</td>
 </tr></table>
@@ -584,9 +1180,9 @@ Vista listado
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>La vista principal es un listado con las máquinas virtuales de QVD.
-<span class="image">
-<img src="images/doc_images/screenshot_vm_list.png" alt="screenshot_vm_list.png" width="960px" />
+<div class="paragraph"><p>La vista principal es un listado con las máquinas virtuales de QVD.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_vm_list.png" alt="screenshot_vm_list.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -610,7 +1206,7 @@ El <strong>estado de bloqueo</strong> de las máquinas virtuales:
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_locked.png" alt="icon_locked.png" />
+<img src="/images/doc_images/icon_locked.png" alt="icon_locked.png">
 </span></p></div>
 <div class="paragraph"><p>Una máquina virtual bloqueada no podrá arrancar.</p></div>
 </div></div>
@@ -634,7 +1230,7 @@ Si las máquinas virtuales tienen definida une <strong>fecha de expiración</str
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_expire.png" alt="icon_expire.png" />
+<img src="/images/doc_images/icon_expire.png" alt="icon_expire.png">
 </span></p></div>
 <div class="paragraph"><p>Este icono indica que hay cualquier expiración establecida, <strong>tanto si es suave como dura</strong>.</p></div>
 </div></div>
@@ -658,7 +1254,7 @@ Si las máquinas virtuales tienen definida une <strong>fecha de expiración</str
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_stopped.png" alt="icon_stopped.png" />
+<img src="/images/doc_images/icon_stopped.png" alt="icon_stopped.png">
 </span></p></div>
 </div></div>
 </li>
@@ -674,7 +1270,7 @@ Si las máquinas virtuales tienen definida une <strong>fecha de expiración</str
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_running.png" alt="icon_running.png" />
+<img src="/images/doc_images/icon_running.png" alt="icon_running.png">
 </span></p></div>
 </div></div>
 </li>
@@ -697,7 +1293,7 @@ Si las máquinas virtuales tienen definida une <strong>fecha de expiración</str
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_userconnected.png" alt="icon_userconnected.png" />
+<img src="/images/doc_images/icon_userconnected.png" alt="icon_userconnected.png">
 </span></p></div>
 </div></div>
 </li>
@@ -717,7 +1313,7 @@ Acciones masivas
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_massiveactions.png" alt="screenshot_vm_massiveactions.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_massiveactions.png" alt="screenshot_vm_massiveactions.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Las acciones masivas nos dan las siguientes opciones a realizar sobre las máquinas virtuales seleccionadas:</p></div>
 <div class="ulist"><ul>
@@ -765,7 +1361,7 @@ Editar máquinas virtuales: El nombre de las máquinas virtuales no aparecerá e
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">Si se selecciona solamente un elemento, en el caso de la edición se podrán editar los mismos campos que con la edición normal del elemento desde su vista detalle.</td>
 </tr></table>
@@ -779,7 +1375,7 @@ Editor masivo
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_massiveeditor.png" alt="screenshot_vm_massiveeditor.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_massiveeditor.png" alt="screenshot_vm_massiveeditor.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>El editor masivo de máquinas virtuales permite cambiar el tag de imagen utilizado, asignar una fecha de expiración y modificar propiedades personalizadas.</p></div>
 <div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados, salvo que se escoja la opción "Sin cambios".</p></div>
@@ -794,7 +1390,7 @@ Que las máquinas virtuales tengan asignado el mismo OSF: En este caso el select
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_massiveeditor_opencombo.png" alt="screenshot_vm_massiveeditor_opencombo.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_massiveeditor_opencombo.png" alt="screenshot_vm_massiveeditor_opencombo.png" width="960px">
 </span></p></div>
 </div></div>
 </li>
@@ -805,11 +1401,11 @@ Que la máquinas virtuales tengan asignados OSFs distintos: En este caso, se mos
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_massiveeditor_differentOSF.png" alt="screenshot_vm_massiveeditor_differentOSF.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_massiveeditor_differentOSF.png" alt="screenshot_vm_massiveeditor_differentOSF.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Al no poder obtener una lista de tags real para todas las máquinas virtuales seleccionadas, solamente se podrá escoger entre <em>default</em> y <em>head</em>.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_massiveeditor_differentOSF_opencombo.png" alt="screenshot_vm_massiveeditor_differentOSF_opencombo.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_massiveeditor_differentOSF_opencombo.png" alt="screenshot_vm_massiveeditor_differentOSF_opencombo.png" width="960px">
 </span></p></div>
 </div></div>
 </li>
@@ -827,7 +1423,7 @@ Creación
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_create.png" alt="screenshot_vm_create.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_create.png" alt="screenshot_vm_create.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Al crear una máquina virtual estableceremos su <strong>nombre</strong>, el <strong>usuario</strong> al que pertenece (salvo si la creamos desde la vista detalle del usuario) y la <strong>imagen</strong> que utilizará.</p></div>
 <div class="paragraph"><p>La imagen la seleccionaremos escogiendo un OSF, y el tag de imagen deseado. Al seleccionar el OSF, los tags de las imágenes asociadas a dicho OSF se cargarán en el siguiente combo, pudiendo escoger uno de ellos así como los tags especiales <em>default</em> y <em>head</em>, con los que se cargará la imagen por defecto o la última imagen creada en el OSF respectivamente.</p></div>
@@ -841,7 +1437,7 @@ Vista detalle
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_details.png" alt="screenshot_vm_details.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_details.png" alt="screenshot_vm_details.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Observamos una pequeña <strong>cabecera</strong> donde junto al <strong>nombre de la máquina virtual</strong> está el <strong>botón para eliminarla, y los botones de acción</strong>.</p></div>
 <div class="paragraph"><p>Los botones disponibles en la vista detalle de máquina virtual son:</p></div>
@@ -897,7 +1493,7 @@ Fechas de expiración
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/vm_expiration_no.png" alt="vm_expiration_no.png" width="600px" />
+<img src="/images/doc_images/vm_expiration_no.png" alt="vm_expiration_no.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -908,7 +1504,7 @@ Fechas de expiración
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/vm_expiration_enabled.png" alt="vm_expiration_enabled.png" width="600px" />
+<img src="/images/doc_images/vm_expiration_enabled.png" alt="vm_expiration_enabled.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -919,7 +1515,7 @@ Fechas de expiración
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/vm_expiration_expiring.png" alt="vm_expiration_expiring.png" width="600px" />
+<img src="/images/doc_images/vm_expiration_expiring.png" alt="vm_expiration_expiring.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -930,7 +1526,7 @@ Fechas de expiración
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/vm_expiration_expired.png" alt="vm_expiration_expired.png" width="600px" />
+<img src="/images/doc_images/vm_expiration_expired.png" alt="vm_expiration_expired.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -945,13 +1541,13 @@ Estado de ejecución
 <div class="content">
 <div class="paragraph"><p>En la parte derecha de la vista detalle se muestra un <strong>cuadro con el estado de ejecución</strong> de la máquina virtual. Si la máquina está corriendo, podremos ver los <strong>parámetros de ejecución</strong>.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_details_execparams.png" alt="screenshot_vm_details_execparams.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_details_execparams.png" alt="screenshot_vm_details_execparams.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Estos parámetros pueden cambiar de una ejecución a otra y no tienen por qué coincidir con los atributos actuales de la máquina.</p></div>
 <div class="paragraph"><p><em>Por ejemplo, en la captura, observamos que está configurado el tag default, por lo que la máquina virtual está ejecutando la imagen que el OSF mUbuntu tiene configurada por defecto.
 Si la imagen por defecto del OSF cambia, observamos que en los atributos aparece otra imagen de disco, pero en los parámetros de ejecución sigue apareciendo la de antes, puesto que es la que se está ejecutando.</em></p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_details_execparams_warning.png" alt="screenshot_vm_details_execparams_warning.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_details_execparams_warning.png" alt="screenshot_vm_details_execparams_warning.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>En este caso nos aparecerá un aviso para hacernos notar que algún parámetro en ejecución es distinto a los actuales, y si queremos que cambie deberemos reiniciar la máquina virtual.</p></div>
 <div class="paragraph"><p>El cuadro con el estado de ejecución tiene, además, un control para arrancar/parar la máquina virtual.</p></div>
@@ -964,7 +1560,7 @@ Si la imagen por defecto del OSF cambia, observamos que en los atributos aparece
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/vm_execution_state_running.png" alt="vm_execution_state_running.png" width="600px" />
+<img src="/images/doc_images/vm_execution_state_running.png" alt="vm_execution_state_running.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -975,7 +1571,7 @@ Si la imagen por defecto del OSF cambia, observamos que en los atributos aparece
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/vm_execution_state_stopped.png" alt="vm_execution_state_stopped.png" width="600px" />
+<img src="/images/doc_images/vm_execution_state_stopped.png" alt="vm_execution_state_stopped.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -986,7 +1582,7 @@ Si la imagen por defecto del OSF cambia, observamos que en los atributos aparece
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/vm_execution_state_starting.png" alt="vm_execution_state_starting.png" width="600px" />
+<img src="/images/doc_images/vm_execution_state_starting.png" alt="vm_execution_state_starting.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -997,7 +1593,7 @@ Si la imagen por defecto del OSF cambia, observamos que en los atributos aparece
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/vm_execution_state_stopping.png" alt="vm_execution_state_stopping.png" width="600px" />
+<img src="/images/doc_images/vm_execution_state_stopping.png" alt="vm_execution_state_stopping.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -1016,7 +1612,7 @@ Edición
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_edit.png" alt="screenshot_vm_edit.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_edit.png" alt="screenshot_vm_edit.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Al editar una máquina virtual podremos cambiarle el <strong>nombre</strong>, el <strong>tag</strong> de imagen, las <strong>fechas de expiración</strong> y <strong>editar propiedades</strong>.</p></div>
 <div class="paragraph"><p>Se pueden configurar dos fechas de expiración:</p></div>
@@ -1034,12 +1630,12 @@ Edición
 </ul></div>
 <div class="paragraph"><p>Para configurar las fechas de expiración existe un control de calendario.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_vm_edit_expiration.png" alt="screenshot_vm_edit_expiration.png" width="960px" />
+<img src="/images/doc_images/screenshot_vm_edit_expiration.png" alt="screenshot_vm_edit_expiration.png" width="960px">
 </span></p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas si solo seleccionamos un elemento.</td>
 </tr></table>
@@ -1058,9 +1654,9 @@ Vista listado
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>La vista principal es un listado con los nodos de QVD.
-<span class="image">
-<img src="images/doc_images/screenshot_host_list.png" alt="screenshot_host_list.png" width="960px" />
+<div class="paragraph"><p>La vista principal es un listado con los nodos de QVD.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_host_list.png" alt="screenshot_host_list.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -1086,7 +1682,7 @@ La columna informativa nos indicará:
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_stopped.png" alt="icon_stopped.png" />
+<img src="/images/doc_images/icon_stopped.png" alt="icon_stopped.png">
 </span></p></div>
 </div></div>
 </li>
@@ -1097,7 +1693,7 @@ La columna informativa nos indicará:
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_running.png" alt="icon_running.png" />
+<img src="/images/doc_images/icon_running.png" alt="icon_running.png">
 </span></p></div>
 </div></div>
 </li>
@@ -1117,7 +1713,7 @@ El <strong>estado de bloqueo</strong> de los nodos:
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_locked.png" alt="icon_locked.png" />
+<img src="/images/doc_images/icon_locked.png" alt="icon_locked.png">
 </span></p></div>
 <div class="paragraph"><p>En un nodo bloqueado no correrán máquinas virtuales.</p></div>
 </div></div>
@@ -1138,7 +1734,7 @@ Acciones masivas
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_host_massiveactions.png" alt="screenshot_host_massiveactions.png" width="960px" />
+<img src="/images/doc_images/screenshot_host_massiveactions.png" alt="screenshot_host_massiveactions.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Las acciones masivas nos dan las siguientes opciones a realizar sobre los nodos seleccionados:</p></div>
 <div class="ulist"><ul>
@@ -1171,7 +1767,7 @@ Editar nodos: Ni el nombre ni la dirección IP de los nodos aparecerá en el edi
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">Si se selecciona solamente un elemento, en el caso de la edición se podrán editar los mismos campos que con la edición normal del elemento desde su vista detalle.</td>
 </tr></table>
@@ -1185,7 +1781,7 @@ Editor masivo
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_host_massiveeditor.png" alt="screenshot_host_massiveeditor.png" width="960px" />
+<img src="/images/doc_images/screenshot_host_massiveeditor.png" alt="screenshot_host_massiveeditor.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>El editor masivo de nodos solamente permite modificar propiedades porsonalizadas.</p></div>
 <div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados, salvo que se escoja la opción "Sin cambios".</p></div>
@@ -1199,7 +1795,7 @@ Creación
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_host_create.png" alt="screenshot_host_create.png" width="960px" />
+<img src="/images/doc_images/screenshot_host_create.png" alt="screenshot_host_create.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Al crear un nodo estableceremos su nombre, dirección IP y sus propiedades.</p></div>
 </div></div>
@@ -1211,7 +1807,7 @@ Vista detalle
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_host_details.png" alt="screenshot_host_details.png" width="960px" />
+<img src="/images/doc_images/screenshot_host_details.png" alt="screenshot_host_details.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Observamos una pequeña <strong>cabecera</strong> donde junto al <strong>nombre del nodo</strong> está el <strong>botón para eliminarlo, y los botones de acción</strong>.</p></div>
 <div class="paragraph"><p>Los botones disponibles en la vista detalle de usuario son:</p></div>
@@ -1249,13 +1845,13 @@ Edición
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_host_edit.png" alt="screenshot_host_edit.png" width="960px" />
+<img src="/images/doc_images/screenshot_host_edit.png" alt="screenshot_host_edit.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Al editar un nodo podremos editar su <strong>nombre, dirección IP y editar propiedades</strong>.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas si solo seleccionamos un elemento.</td>
 </tr></table>
@@ -1274,9 +1870,9 @@ Vista listado
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>La vista principal es un listado con los OSFs de QVD.
-<span class="image">
-<img src="images/doc_images/screenshot_osf_list.png" alt="screenshot_osf_list.png" width="960px" />
+<div class="paragraph"><p>La vista principal es un listado con los OSFs de QVD.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_osf_list.png" alt="screenshot_osf_list.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -1295,7 +1891,7 @@ Acciones masivas
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_osf_massiveactions.png" alt="screenshot_osf_massiveactions.png" width="960px" />
+<img src="/images/doc_images/screenshot_osf_massiveactions.png" alt="screenshot_osf_massiveactions.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Las acciones masivas nos dan las siguientes opciones a realizar sobre los OSFs seleccionados:</p></div>
 <div class="ulist"><ul>
@@ -1313,7 +1909,7 @@ Editar OSFs: El nombre no aparecerá en el editor masivo. Para cambiarlo se debe
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">Si se selecciona solamente un elemento, en el caso de la edición se podrán editar los mismos campos que con la edición normal del elemento desde su vista detalle.</td>
 </tr></table>
@@ -1327,7 +1923,7 @@ Editor masivo
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_osf_massiveeditor.png" alt="screenshot_osf_massiveeditor.png" width="960px" />
+<img src="/images/doc_images/screenshot_osf_massiveeditor.png" alt="screenshot_osf_massiveeditor.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>El editor masivo de OSFs permite modificar la memoria, el almacenamiento de usuario y las propiedades personalizadas.</p></div>
 <div class="paragraph"><p><strong>Si dejamos la caja de memoria y almacenamiento de usuario en blanco no se modificarán</strong>.</p></div>
@@ -1341,7 +1937,7 @@ Creación
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_osf_create.png" alt="screenshot_osf_create.png" width="960px" />
+<img src="/images/doc_images/screenshot_osf_create.png" alt="screenshot_osf_create.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Al crear un OSF estableceremos su nombre, memoria, almacenamiento de usuario y sus propiedades.</p></div>
 </div></div>
@@ -1353,7 +1949,7 @@ Vista detalle
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_osf_details.png" alt="screenshot_osf_details.png" width="960px" />
+<img src="/images/doc_images/screenshot_osf_details.png" alt="screenshot_osf_details.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Observamos una pequeña <strong>cabecera</strong> donde junto al <strong>nombre del OSF</strong> estan los <strong>botones para eliminarlo y editarlo</strong>.</p></div>
 <div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos del OSF</strong>, incluídas las propiedades, de haberlas.</p></div>
@@ -1385,13 +1981,13 @@ Edición
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_osf_edit.png" alt="screenshot_osf_edit.png" width="960px" />
+<img src="/images/doc_images/screenshot_osf_edit.png" alt="screenshot_osf_edit.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Al editar un OSF podremos editar su <strong>nombre, memoria, almacenamiento de usuario y editar propiedades</strong>.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas si solo seleccionamos un elemento.</td>
 </tr></table>
@@ -1410,9 +2006,9 @@ Vista listado
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>La vista principal es un listado con las imágenes de disco de QVD.
-<span class="image">
-<img src="images/doc_images/screenshot_di_list.png" alt="screenshot_di_list.png" width="960px" />
+<div class="paragraph"><p>La vista principal es un listado con las imágenes de disco de QVD.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_di_list.png" alt="screenshot_di_list.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -1436,7 +2032,7 @@ El <strong>estado de bloqueo</strong> de las imágenes:
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_locked.png" alt="icon_locked.png" />
+<img src="/images/doc_images/icon_locked.png" alt="icon_locked.png">
 </span></p></div>
 <div class="paragraph"><p>Una imagen bloqueada no permitirá ser usada, por lo que las máquinas virtuales que la utilicen no podrán ser arrancadas.</p></div>
 </div></div>
@@ -1455,7 +2051,7 @@ Los <strong>tags</strong> asociados a las imágenes: Si una imagen tiene tags ap
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_tags.png" alt="icon_tags.png" />
+<img src="/images/doc_images/icon_tags.png" alt="icon_tags.png">
 </span></p></div>
 <div class="paragraph"><p>Si una imagen no tiene tags, este icono no aparecerá.</p></div>
 </div></div>
@@ -1467,7 +2063,7 @@ Si una imagen es <strong>la imagen por defecto de su OSF</strong>: Icono de casa
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_default.png" alt="icon_default.png" />
+<img src="/images/doc_images/icon_default.png" alt="icon_default.png">
 </span></p></div>
 <div class="paragraph"><p>En alguna vista podemos encontrar esta característica como el tag especial <em>default</em>.</p></div>
 </div></div>
@@ -1479,7 +2075,7 @@ Si una imagen es <strong>la última creada de su OSF</strong>: Icono de bandera.
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_head.png" alt="icon_head.png" />
+<img src="/images/doc_images/icon_head.png" alt="icon_head.png">
 </span></p></div>
 <div class="paragraph"><p>En alguna vista podemos encontrar esta característica como el tag especial <em>head</em>.</p></div>
 </div></div>
@@ -1493,7 +2089,7 @@ Acciones masivas
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_di_massiveactions.png" alt="screenshot_di_massiveactions.png" width="960px" />
+<img src="/images/doc_images/screenshot_di_massiveactions.png" alt="screenshot_di_massiveactions.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Las acciones masivas nos dan las siguientes opciones a realizar sobre las imágenes de disco seleccionados:</p></div>
 <div class="ulist"><ul>
@@ -1521,7 +2117,7 @@ Editar imágenes: La edición de tags no aparecerán en el editor masivo. Para g
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">Si se selecciona solamente un elemento, en el caso de la edición se podrán editar los mismos campos que con la edición normal del elemento desde su vista detalle.</td>
 </tr></table>
@@ -1535,7 +2131,7 @@ Editor masivo
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_di_massiveeditor.png" alt="screenshot_di_massiveeditor.png" width="960px" />
+<img src="/images/doc_images/screenshot_di_massiveeditor.png" alt="screenshot_di_massiveeditor.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>El editor masivo de imágenes de disco solamente permite modificar propiedades porsonalizadas.</p></div>
 <div class="paragraph"><p>Como cualquier editor masivo, el valor que se defina sobreescribirá el que pueda existir en todos los elementos editados, salvo que se escoja la opción "Sin cambios".</p></div>
@@ -1558,7 +2154,7 @@ Seleccionando una imagen de entre las disponibles en el directorio <em>staging</
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_di_create_staging.png" alt="screenshot_di_create_staging.png" width="960px" />
+<img src="/images/doc_images/screenshot_di_create_staging.png" alt="screenshot_di_create_staging.png" width="960px">
 </span></p></div>
 </div></div>
 </li>
@@ -1569,7 +2165,7 @@ Subiendo una imagen desde nuestra computadora:
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_di_create_upload.png" alt="screenshot_di_create_upload.png" width="960px" />
+<img src="/images/doc_images/screenshot_di_create_upload.png" alt="screenshot_di_create_upload.png" width="960px">
 </span></p></div>
 </div></div>
 </li>
@@ -1580,7 +2176,7 @@ Proporcionando la URL de una imagen, que se descargará y alojará en el servido
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_di_create_url.png" alt="screenshot_di_create_url.png" width="960px" />
+<img src="/images/doc_images/screenshot_di_create_url.png" alt="screenshot_di_create_url.png" width="960px">
 </span></p></div>
 </div></div>
 </li>
@@ -1588,7 +2184,7 @@ Proporcionando la URL de una imagen, que se descargará y alojará en el servido
 <div class="paragraph"><p>A diferencia de la creación del resto de elementos, la de las imágenes de disco requieren tiempo al suponer la copia física de ficheros de gran tamaño.</p></div>
 <div class="paragraph"><p>Por ello, al crear una imagen de disco aparecerá una pantalla de carga con una gráfica de progreso de creación.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_di_creating.png" alt="screenshot_di_creating.png" width="960px" />
+<img src="/images/doc_images/screenshot_di_creating.png" alt="screenshot_di_creating.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -1599,7 +2195,7 @@ Vista detalle
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_di_details.png" alt="screenshot_di_details.png" width="960px" />
+<img src="/images/doc_images/screenshot_di_details.png" alt="screenshot_di_details.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Observamos una pequeña <strong>cabecera</strong> donde junto al <strong>nombre de la imagen</strong> está el <strong>botón para eliminarlo, y los botones de acción</strong>.</p></div>
 <div class="paragraph"><p>Los botones disponibles en la vista detalle de usuario son:</p></div>
@@ -1643,14 +2239,14 @@ Edición
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_di_edit.png" alt="screenshot_di_edit.png" width="960px" />
+<img src="/images/doc_images/screenshot_di_edit.png" alt="screenshot_di_edit.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Al editar una imagen podremos gestionar sus <strong>tags y editar propiedades</strong>. Ademas podremos establecerla como imagen por defecto de su OSF, en el caso de no serlo ya. Si lo es, nos saldrá un aviso.</p></div>
 <div class="paragraph"><p><strong>Los tags de una Imagen de disco no se pueden repetir en las Imágenes asociadas a un mismo OSF</strong>. <strong>Si añadimos un tag a una Imagen de disco que ya existe</strong> en otra Imagen de su mismo OSF el sistema nos lo permitirá, pero lo que estaremos haciendo en realidad es <strong>mover el tag entre las dos Imágenes</strong>, desapareciendo de la que lo tenía en un inicio para establecerse en la Imagen que estemos editando.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">A la edición del elemento también se puede acceder desde la vista listado con las acciones masivas si solo seleccionamos un elemento.</td>
 </tr></table>
@@ -1705,7 +2301,7 @@ Crear una Imagen en un OSF habiendo una máquina virtual asignada a ese mismo OS
 </ul></div>
 <div class="paragraph"><p>Tras cualquiera de estas acciones, aparecerá una ventana modal avisándonos de la situación con la lista de Máquinas virtuales afectadas junto a casillas de verificación y un formulario para asignar una fecha de expiración a aquellas Máquinas de la lista que deseemos.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_di_edit_affected_vms.png" alt="screenshot_di_edit_affected_vms.png" width="960px" />
+<img src="/images/doc_images/screenshot_di_edit_affected_vms.png" alt="screenshot_di_edit_affected_vms.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -1717,14 +2313,14 @@ Crear una Imagen en un OSF habiendo una máquina virtual asignada a ese mismo OS
 <h2 id="_gestión_del_wat">5. Gestión del WAT</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/menu_config_wat.png" alt="menu_config_wat.png" width="600px" />
+<img src="/images/doc_images/menu_config_wat.png" alt="menu_config_wat.png" width="600px">
 </span></p></div>
 <div class="paragraph"><p>Una parte del WAT está dedicada a la gestión del mismo. Proporcionando herramientas para la gestión de la configuración general del WAT, los administradores y sus permisos.</p></div>
 <div class="sect2">
 <h3 id="_configuración_del_wat">5.1. Configuración del WAT</h3>
 <div class="paragraph"><p>En este apartado podremos definir una serie de valores generales que afectan a todos los administradores del WAT. Serán valores que servirán de configuración por defecto, y que cada administrador podrá configurar según sus preferencias.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_watconfig_view.png" alt="screenshot_watconfig_view.png" width="960px" />
+<img src="/images/doc_images/screenshot_watconfig_view.png" alt="screenshot_watconfig_view.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Encontramos una tabla con los valores actuales y en la parte derecha el botón de edición.</p></div>
 <div class="dlist"><dl>
@@ -1735,7 +2331,7 @@ Edición
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_watconfig_edit.png" alt="screenshot_watconfig_edit.png" width="960px" />
+<img src="/images/doc_images/screenshot_watconfig_edit.png" alt="screenshot_watconfig_edit.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Los parámetros configurables son:</p></div>
 <div class="ulist"><ul>
@@ -1794,9 +2390,9 @@ Vista listado
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>La vista principal es un listado con los administradores del WAT.
-<span class="image">
-<img src="images/doc_images/screenshot_administrator_list.png" alt="screenshot_administrator_list.png" width="960px" />
+<div class="paragraph"><p>La vista principal es un listado con los administradores del WAT.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_administrator_list.png" alt="screenshot_administrator_list.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -1820,7 +2416,7 @@ El <strong>estado de bloqueo</strong> de los usuarios:
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_montarboard.png" alt="icon_montarboard.png" />
+<img src="/images/doc_images/icon_montarboard.png" alt="icon_montarboard.png">
 </span></p></div>
 <div class="paragraph"><p>Si pasamos el ratón por encima podremos ver los roles que tiene asociados el administrador.</p></div>
 </div></div>
@@ -1832,7 +2428,7 @@ El <strong>estado de bloqueo</strong> de los usuarios:
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_warning.png" alt="icon_warning.png" />
+<img src="/images/doc_images/icon_warning.png" alt="icon_warning.png">
 </span></p></div>
 <div class="paragraph"><p>Si el administrador no tiene roles asociados, aparecerá un icono de advertencia, ya que un administrador sin roles no tiene sentido.</p></div>
 </div></div>
@@ -1844,7 +2440,7 @@ El <strong>estado de bloqueo</strong> de los usuarios:
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/icon_archiver.png" alt="icon_archiver.png" />
+<img src="/images/doc_images/icon_archiver.png" alt="icon_archiver.png">
 </span></p></div>
 <div class="paragraph"><p>Si el administrador es el administrador logueado, llevará este identificador con el aviso <em>Este administrador soy yo</em>.</p></div>
 </div></div>
@@ -1860,7 +2456,7 @@ Acciones masivas
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_administrator_massiveactions.png" alt="screenshot_administrator_massiveactions.png" width="960px" />
+<img src="/images/doc_images/screenshot_administrator_massiveactions.png" alt="screenshot_administrator_massiveactions.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Las acciones masivas nos dan las siguientes opciones a realizar sobre los administradores seleccionados:</p></div>
 <div class="ulist"><ul>
@@ -1879,7 +2475,7 @@ Creación
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_administrator_create.png" alt="screenshot_administrator_create.png" width="960px" />
+<img src="/images/doc_images/screenshot_administrator_create.png" alt="screenshot_administrator_create.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Al crear un administrador estableceremos su nombre, password y su idioma. Si dejamos el idioma por defecto, el administrador tendrá el idioma general del sistema aunque podrá cambiarlo.</p></div>
 <div class="paragraph"><p>Además, podemos asignar roles de privilegios, dependiendo de qué permisos queremos que tenga el administrador. Si asignamos más de un rol, el administrador tendrá la suma de los privilegios de cada rol. Si no le asignamos ningún rol, el administrador no podrá ni entrar en el Panel de administración.</p></div>
@@ -1892,7 +2488,7 @@ Vista detalle
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_administrator_details.png" alt="screenshot_administrator_details.png" width="960px" />
+<img src="/images/doc_images/screenshot_administrator_details.png" alt="screenshot_administrator_details.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Observamos una pequeña <strong>cabecera</strong> donde junto al <strong>nombre del administrador</strong> están los <strong>botones para eliminarlo y editarlo</strong>.</p></div>
 <div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos del administrador</strong>. Entre ellos se encuentran los roles asociados al administrador con un control de borrado junto a cada uno. Haciendo click en el nombre de los roles, se irá a la vista detalle de cada rol.</p></div>
@@ -1916,7 +2512,7 @@ Por <strong>secciones</strong> del WAT:
 <div class="paragraph"><p>Los ACLs se clasifican por la sección donde se aplican o el tipo de elemento al que afectan.</p></div>
 <div class="paragraph"><p><em>Por ejemplo, en la sección Configuración se encuentran tanto la parte de configuración de WAT como la configuración de QVD.</em></p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_admin_treesections.png" alt="screenshot_admin_treesections.png" width="600px" />
+<img src="/images/doc_images/screenshot_admin_treesections.png" alt="screenshot_admin_treesections.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -1928,7 +2524,7 @@ Por tipo de <strong>acciones</strong>:
 <div class="content">
 <div class="paragraph"><p>En esta clasificación se encuentran los mismos ACLs, pero clasificados por el tipo de acción que permiten.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_admin_treeactions.png" alt="screenshot_admin_treeactions.png" width="600px" />
+<img src="/images/doc_images/screenshot_admin_treeactions.png" alt="screenshot_admin_treeactions.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -1944,7 +2540,7 @@ Edición
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_administrator_edit.png" alt="screenshot_administrator_edit.png" width="960px" />
+<img src="/images/doc_images/screenshot_administrator_edit.png" alt="screenshot_administrator_edit.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Al editar un administrador podremos escoger si cambiarle la <strong>contraseña</strong> (si no marchamos la casilla de verificación, permanecerá inalterada) y el <strong>idioma</strong>, recordando que son valores que él mismo puede cambiar.</p></div>
 <div class="paragraph"><p>Además, podemos asignar/desasignar roles de privilegios.</p></div>
@@ -1962,9 +2558,9 @@ Vista listado
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>La vista principal es un listado con los roles del WAT.
-<span class="image">
-<img src="images/doc_images/screenshot_role_list.png" alt="screenshot_role_list.png" width="960px" />
+<div class="paragraph"><p>La vista principal es un listado con los roles del WAT.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_role_list.png" alt="screenshot_role_list.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -1983,7 +2579,7 @@ Acciones masivas
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_massiveactions.png" alt="screenshot_role_massiveactions.png" width="960px" />
+<img src="/images/doc_images/screenshot_role_massiveactions.png" alt="screenshot_role_massiveactions.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Las acciones masivas nos dan las siguientes opciones a realizar sobre los roles seleccionados:</p></div>
 <div class="ulist"><ul>
@@ -2007,7 +2603,7 @@ Creación
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_create.png" alt="screenshot_role_create.png" width="960px" />
+<img src="/images/doc_images/screenshot_role_create.png" alt="screenshot_role_create.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Al crear un rol estableceremos su nombre, descripción y le asignaremos permisos heredando ACLs.</p></div>
 <div class="paragraph"><p>La herencia de ACLs tiene dos modos:</p></div>
@@ -2019,7 +2615,7 @@ Creación
 </li>
 </ul></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_inherit_roles.png" alt="screenshot_role_inherit_roles.png" width="600px" />
+<img src="/images/doc_images/screenshot_role_inherit_roles.png" alt="screenshot_role_inherit_roles.png" width="600px">
 </span></p></div>
 <div class="ulist"><ul>
 <li>
@@ -2029,15 +2625,15 @@ Creación
 </li>
 </ul></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_inherit_templates.png" alt="screenshot_role_inherit_templates.png" width="600px" />
+<img src="/images/doc_images/screenshot_role_inherit_templates.png" alt="screenshot_role_inherit_templates.png" width="600px">
 </span></p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_inherit_templates_matrix.png" alt="screenshot_role_inherit_templates_matrix.png" width="600px" />
+<img src="/images/doc_images/screenshot_role_inherit_templates_matrix.png" alt="screenshot_role_inherit_templates_matrix.png" width="600px">
 </span></p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/tip.png" alt="Tip" />
+<img src="/images/doc_images/icons//tip.png" alt="Tip">
 </td>
 <td class="content">Si se hereda de uno o más roles/plantillas, se heredará la suma de sus ACLs sin importar los ACLs comunes. Tras esta herencia, se pueden quitar o agregar ACLs sueltos manualmente desde el Árbol de ACLs para personalizar las credenciales obtenidas por ellos según las necesidades del administrador. De este modo, si nos interesan todos los ACLs de un rol o plantilla excepto uno, será tan fácil como heredar el rol/plantilla y quitar a mano el ACL sobrante.</td>
 </tr></table>
@@ -2052,7 +2648,7 @@ Vista detalle
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_details.png" alt="screenshot_role_details.png" width="960px" />
+<img src="/images/doc_images/screenshot_role_details.png" alt="screenshot_role_details.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>En esta vista muy similar a la de administradores, observamos una pequeña <strong>cabecera</strong> donde junto al <strong>nombre del rol</strong> está el <strong>botón para eliminarlo, y el botón de edición</strong>.</p></div>
 <div class="paragraph"><p>Bajo esta cabecera hay una <strong>tabla con los atributos del rol</strong>. Entre los atributos se encuentra la lista de <strong>roles y plantillas heredados</strong>.</p></div>
@@ -2146,7 +2742,7 @@ Por <strong>secciones</strong> del WAT:
 <div class="paragraph"><p>Los ACLs se clasifican por la sección donde se aplican o el tipo de elemento al que afectan.</p></div>
 <div class="paragraph"><p>El ACL principal de cada sección, y necesario para que esa sección al menos esté disponible en el menú, junto a su vista principal es “Acceder a vista principal de&#8230;”, salvo en los apartados de configuración que se rigen por un único ACL “Gestión de configuración WAT/QVD”.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_treesections.png" alt="screenshot_role_treesections.png" width="600px" />
+<img src="/images/doc_images/screenshot_role_treesections.png" alt="screenshot_role_treesections.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -2160,7 +2756,7 @@ Por tipo de <strong>acciones</strong>:
 <div class="paragraph"><p><em>Por ejemplo en la rama “Ver sección principal” podemos configurar que secciones ver.</em></p></div>
 <div class="paragraph"><p>Si queremos aplicarles ciertos permisos de un tipo (borrar, actualizar, etc.) sobre varios tipos de elementos, esta clasificiación simplifica la gestión de ACLs.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_treeactions.png" alt="screenshot_role_treeactions.png" width="600px" />
+<img src="/images/doc_images/screenshot_role_treeactions.png" alt="screenshot_role_treeactions.png" width="600px">
 </span></p></div>
 </div></div>
 </li>
@@ -2180,7 +2776,7 @@ Edición
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_role_edit.png" alt="screenshot_role_edit.png" width="960px" />
+<img src="/images/doc_images/screenshot_role_edit.png" alt="screenshot_role_edit.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Al editar un rol podremos cambiarle el nombre y la descripción, además de configurar la herencia de roles y plantillas de ACLs.</p></div>
 <div class="paragraph"><p>Ver sección de Creación de roles para más detalles acerca de la configuración de roles y plantillas.</p></div>
@@ -2194,21 +2790,21 @@ Edición
 <div class="paragraph"><p>Estas columnas y filtros se puede configurar globalmente en el sistema, y luego cada administrador podrá personalizar estos valores sólamente para él.</p></div>
 <div class="paragraph"><p>Con un combo de selección podremos cambiar entre columnas y filtros.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_watconfig_defaultviews_columns.png" alt="screenshot_watconfig_defaultviews_columns.png" width="960px" />
+<img src="/images/doc_images/screenshot_watconfig_defaultviews_columns.png" alt="screenshot_watconfig_defaultviews_columns.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_watconfig_defaultviews_filters.png" alt="screenshot_watconfig_defaultviews_filters.png" width="960px" />
+<img src="/images/doc_images/screenshot_watconfig_defaultviews_filters.png" alt="screenshot_watconfig_defaultviews_filters.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>En este apartado se realizará la configuración general de estos parámetros marcando una serie de casillas de verificación. Por un lado se configuran las columnas mostradas y por otro los filtros disponibles.</p></div>
 <div class="paragraph"><p>En el caso de las <strong>columnas</strong> es una configuración válida para la <strong>versión escritorio</strong>, ya que en la versión móvil se mostrará una versión siempre simplificada. Por otro lado, los <strong>filtros</strong> se configuran independientemente para <strong>escritorio y móvil</strong>. Esta diferenciación se hace para poder hacer la versión móvil más o menos simple según nuestras necesidades.</p></div>
 <div class="paragraph"><p>Tras un aviso informativo vemos un menú desplegable con la sección que queremos personalizar y un botón para restaurar las vistas por defecto.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_watconfig_defaultviews_sections.png" alt="screenshot_watconfig_defaultviews_sections.png" width="960px" />
+<img src="/images/doc_images/screenshot_watconfig_defaultviews_sections.png" alt="screenshot_watconfig_defaultviews_sections.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Según seleccionemos una u otra sección se cargarán las columnas y filtros de dicha sección. Solamente con hacer click sobre las diferentes casillas de verificación, se guardará el cambio.</p></div>
 <div class="paragraph"><p>Si deseamos <strong>volver a la configuración inicial</strong> utilizaremos el botón de <strong>restaurar vistas por defecto</strong>. Esta acción puede realizarse sobre la sección cargada actualmente o sobre todo el sistema, escogiendo una u otra opción en el diálogo que aparece antes de llevarse a cabo la restauración.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_watconfig_defaultviews_reset.png" alt="screenshot_watconfig_defaultviews_reset.png" width="960px" />
+<img src="/images/doc_images/screenshot_watconfig_defaultviews_reset.png" alt="screenshot_watconfig_defaultviews_reset.png" width="960px">
 </span></p></div>
 </div>
 <div class="sect2">
@@ -2252,13 +2848,13 @@ Puede ser común establecer la misma propiedad en diferentes tipos de elementos 
 <h2 id="_gestión_de_qvd">6. Gestión de QVD</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/menu_config_qvd.png" alt="menu_config_qvd.png" width="600px" />
+<img src="/images/doc_images/menu_config_qvd.png" alt="menu_config_qvd.png" width="600px">
 </span></p></div>
 <div class="sect2">
 <h3 id="_configuración_de_qvd">6.1. Configuración de QVD</h3>
 <div class="paragraph"><p><strong>Los parámetros de QVD están distribuídos</strong> por varios ficheros de configuración y la base de datos. <strong>Desde el WAT</strong>, estos parámetros se muestran de <strong>forma centralizada</strong>, siendo editables cómodamente sin importar su procedencia.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_config.png" alt="screenshot_config.png" width="960px" />
+<img src="/images/doc_images/screenshot_config.png" alt="screenshot_config.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Los parámetros están clasificados por categorías. Dichas categorías corresponden con el primer segmento del nombre de los parámetros, osea lo inmediatamente anterior al primer punto.</p></div>
 <div class="paragraph"><p><em>Por ejemplo, los parámetros que comienzan con “admin.” estarán englobados en la categoría “admin”, como vemos en la captura.</em></p></div>
@@ -2271,7 +2867,7 @@ Navegación y búsqueda
 <div class="content">
 <div class="paragraph"><p>Se puede navegar por las distintas categorías para editar sus parámetros o bien utilizar el <strong>control de búsqueda</strong> para encontrar los parámetros que contengan una <strong>subcadena</strong>.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_config_search.png" alt="screenshot_config_search.png" width="960px" />
+<img src="/images/doc_images/screenshot_config_search.png" alt="screenshot_config_search.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -2283,7 +2879,7 @@ Creación de parámetros
 <div class="content">
 <div class="paragraph"><p>Se pueden añadir <strong>parámetros nuevos</strong>, que se situarán en la categoría que corresponda con el inicio de su nombre.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_config_custom.png" alt="screenshot_config_custom.png" width="960px" />
+<img src="/images/doc_images/screenshot_config_custom.png" alt="screenshot_config_custom.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Si no existe la categoría se creará en el menú, y si el nombre del parámetro no contiene puntos formará parte de la categoría especial <em>unclassified</em>.</p></div>
 </div></div>
@@ -2296,11 +2892,11 @@ Eliminado y restauración de parámetros
 <div class="content">
 <div class="paragraph"><p>Los parámetros añadidos tras la instalación, podrán eliminarse.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_config_delete.png" alt="screenshot_config_delete.png" width="960px" />
+<img src="/images/doc_images/screenshot_config_delete.png" alt="screenshot_config_delete.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Y los que venían de serie, podrán restaurarse al valor por defecto.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_config_restore.png" alt="screenshot_config_restore.png" width="960px" />
+<img src="/images/doc_images/screenshot_config_restore.png" alt="screenshot_config_restore.png" width="960px">
 </span></p></div>
 </div></div>
 </dd>
@@ -2312,13 +2908,13 @@ Eliminado y restauración de parámetros
 <h2 id="_área_de_usuario">7. Área de usuario</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/menu_userarea.png" alt="menu_userarea.png" width="600px" />
+<img src="/images/doc_images/menu_userarea.png" alt="menu_userarea.png" width="600px">
 </span></p></div>
 <div class="sect2">
 <h3 id="_perfil">7.1. Perfil</h3>
 <div class="paragraph"><p>Es el apartado donde se puede consultar y actualizar la configuración del administrador logueado.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_userarea_profile.png" alt="screenshot_userarea_profile.png" width="960px" />
+<img src="/images/doc_images/screenshot_userarea_profile.png" alt="screenshot_userarea_profile.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Se pueden configurar el <strong>idioma</strong> de la interfaz del WAT así como el <strong>tamaño de bloque</strong>, que corresponde al número de elementos mostrados en cada página en las vistas listado.
 Ambos parámetros se pueden definir como <em>por defecto</em> adoptando así la configuración general del WAT, o bien definir un valor fijo para el administrador actual.</p></div>
@@ -2330,36 +2926,36 @@ Ambos parámetros se pueden definir como <em>por defecto</em> adoptando así la 
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/important.png" alt="Important" />
+<img src="/images/doc_images/icons//important.png" alt="Important">
 </td>
 <td class="content">Si un administrador no cambia la configuración de sus vistas, estas podrían variar si la configuración global fuese modificada. Por otro lado, si un administrador cambia un parámetro, éste quedará fijado en el valor establecido, sin ser alterado por los cambios en la configuración global.</td>
 </tr></table>
 </div>
 <div class="paragraph"><p>Con un combo de selección podremos cambiar entre columnas y filtros.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_userarea_customize_columns.png" alt="screenshot_userarea_customize_columns.png" width="960px" />
+<img src="/images/doc_images/screenshot_userarea_customize_columns.png" alt="screenshot_userarea_customize_columns.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_userarea_customize_filters.png" alt="screenshot_userarea_customize_filters.png" width="960px" />
+<img src="/images/doc_images/screenshot_userarea_customize_filters.png" alt="screenshot_userarea_customize_filters.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>En este apartado se realizará la configuración <strong>para el administrador actual</strong> de estos parámetros marcando una serie de casillas de verificación. Por un lado se configuran las columnas mostradas y por otro los filtros disponibles.</p></div>
 <div class="paragraph"><p>En el caso de las <strong>columnas</strong> es una configuración válida para la <strong>versión escritorio</strong>, ya que en la versión móvil se mostrará una versión siempre simplificada. Por otro lado, los <strong>filtros</strong> se configuran independientemente para <strong>escritorio y móvil</strong>. Esta diferenciación se hace para poder hacer la versión móvil más o menos simple según nuestras necesidades.</p></div>
 <div class="paragraph"><p>En la sección encontramos un menú desplegable con la sección que queremos personalizar y un botón para restaurar las vistas por defecto.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_userarea_customize_sections.png" alt="screenshot_userarea_customize_sections.png" width="960px" />
+<img src="/images/doc_images/screenshot_userarea_customize_sections.png" alt="screenshot_userarea_customize_sections.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Según seleccionemos una u otra sección se cargarán las columnas y filtros de dicha sección. Solamente con hacer click sobre las diferentes casillas de verificación, se guardará el cambio.</p></div>
 <div class="paragraph"><p>Si deseamos <strong>volver a la configuración del sistema</strong> utilizaremos el botón de <strong>restaurar vistas por defecto</strong>. Esta acción puede realizarse sobre la sección cargada actualmente o sobre todo el sistema, escogiendo una u otra opción en el diálogo que aparece antes de llevarse a cabo la restauración.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="images/doc_images/icons/important.png" alt="Important" />
+<img src="/images/doc_images/icons//important.png" alt="Important">
 </td>
 <td class="content">Las vistas que reestablezcamos a la configuración del sistema, volverán a ser susceptibles de los cambios que pueda sufrir la configuración global.</td>
 </tr></table>
 </div>
 <div class="paragraph"><p><span class="image">
-<img src="images/doc_images/screenshot_userarea_customize_reset.png" alt="screenshot_userarea_customize_reset.png" width="960px" />
+<img src="/images/doc_images/screenshot_userarea_customize_reset.png" alt="screenshot_userarea_customize_reset.png" width="960px">
 </span></p></div>
 </div>
 </div>
@@ -2370,10 +2966,10 @@ Ambos parámetros se pueden definir como <em>por defecto</em> adoptando así la 
 </div>
 </div>
 </div>
-<div id="footnotes"><hr /></div>
+<div id="footnotes"><hr></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-12-14 08:21:47 CET
+Last updated 2017-02-14 15:33:46 CET
 </div>
 </div>
 </body>

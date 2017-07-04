@@ -20,7 +20,7 @@ Wat.Views.AdminEditorView = Wat.Views.AdministratorRoleEditorView.extend({
     
     renderCreate: function (target, that) {
         Wat.CurrentView.model = new Wat.Models.Admin();
-        $('.ui-dialog-title').html($.i18n.t('New Administrator'));
+        $('.ui-dialog-titlebar').html($.i18n.t('New Administrator'));
         
         Wat.Views.EditorView.prototype.renderCreate.apply(this, [target, that]);
         
@@ -30,7 +30,7 @@ Wat.Views.AdminEditorView = Wat.Views.AdministratorRoleEditorView.extend({
     renderUpdate: function (target, that) {
         Wat.Views.EditorView.prototype.renderUpdate.apply(this, [target, that]);
         
-        $('.ui-dialog-title').html($.i18n.t('Edit Administrator') + ": " + this.model.get('name'));
+        $('.ui-dialog-titlebar').html($.i18n.t('Edit Administrator') + ": " + this.model.get('name'));
 
         Wat.I.chosenElement('[name="language"]', 'single100');
     },

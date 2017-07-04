@@ -22,7 +22,7 @@ Wat.Views.RoleEditorView = Wat.Views.AdministratorRoleEditorView.extend({
     
     renderCreate: function (target, that) {
         Wat.CurrentView.model = new Wat.Models.Role();
-        $('.ui-dialog-title').html($.i18n.t('New Role'));
+        $('.ui-dialog-titlebar').html($.i18n.t('New Role'));
         
         Wat.Views.EditorView.prototype.renderCreate.apply(this, [target, that]);
         
@@ -44,7 +44,7 @@ Wat.Views.RoleEditorView = Wat.Views.AdministratorRoleEditorView.extend({
     renderUpdate: function (target, that) {
         Wat.Views.EditorView.prototype.renderUpdate.apply(this, [target, that]);
         
-        $('.ui-dialog-title').html($.i18n.t('Edit Role') + ": " + this.model.get('name'));
+        $('.ui-dialog-titlebar').html($.i18n.t('Edit Role') + ": " + this.model.get('name'));
     },
     
     renderMassiveUpdate: function (target, that) {
