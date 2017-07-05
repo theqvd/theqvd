@@ -93,4 +93,4 @@ delete $args{$_} for grep !defined $args{$_}, keys %args;
 $log->tracef("Win32::Packer args: %s", \%args);
 
 my $p = Win32::Packer->new(%args);
-$p->build;
+$p->make_installer;
