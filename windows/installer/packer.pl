@@ -25,6 +25,7 @@ my $nx_libs = $qvd_src_path->parent->child('nx-libs')->stringify;
 my $vcxsrv = 'c:\\program files\\vcxsrv';
 my $cygwin;
 my $cygdrive;
+my $qvd_version = '4.x';
 
 GetOptions('log-file|log|l=s' => \$log_file,
            'log-level|L=s' => \$log_level,
@@ -35,6 +36,7 @@ GetOptions('log-file|log|l=s' => \$log_file,
            'vcxsrv|x=s' => \$vcxsrv,
            'cygwin=s' => \$cygwin,
            'cygdrive=s' => \$cygdrive,
+           'qvd-version|V=s' => \$qvd_version,
           );
 
 # Log::Any::Adapter->set('Stderr', log_level => 'info');
@@ -53,9 +55,7 @@ my @extra_exes = ( { path => $nx_libs_path->child('nxproxy/nxproxy.exe')->string
                      search_path => $nx_libs_path->child('nxcomp')->stringify,
                      subdir => 'nx',
                      subsystem => 'windows',
-                     cygwin => 1},
-                   #{ path => $vcxsrv_path->child('vcxsrv.exe')->stringify,
-                   #  subdir => 'vcxsrv' }
+                     cygwin => 1 },
                  );
 
 my @extra_dirs = ( { path => $installer_path->child('pixmaps')->stringify },
@@ -71,8 +71,9 @@ my $icon = $installer_path->child('pixmaps/qvd.ico')->stringify;
 my @extra_inc = grep -d $_, map $ext_path->child(s/::/-/gr)->child('lib'), @qvd_client_modules;
 
 my %args = (app_name => 'QVD Client',
+            app_version => $qvd_version,
             scripts => $qvd_src_path->child('ext/QVD-Client/bin/qvd-gui-client.pl')->stringify,
-            app_type => 'windows',
+            app_subsystem => 'windows',
             work_dir => "$work_path",
             extra_inc => \@extra_inc,
             extra_module => [qw(Log::Dispatch::FileRotate
@@ -87,10 +88,12 @@ my %args = (app_name => 'QVD Client',
             clean_cache => $clean_cache,
             icon => $icon,
             cygwin => $cygwin,
-            cygdrive => $cygdrive);
+            cygdrive => $cygdrive,
+            search_path => 'c:\strawberry\win-builds\bin',
+           );
 
 delete $args{$_} for grep !defined $args{$_}, keys %args;
 $log->tracef("Win32::Packer args: %s", \%args);
 
 my $p = Win32::Packer->new(%args);
-$p->make_installer;
+$p->make_installer(compression => 'deflated', compression_level => 'best');
