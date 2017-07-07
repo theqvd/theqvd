@@ -23,20 +23,30 @@ my $cache = $installer_path->child('cache')->stringify;
 my $clean_cache;
 my $nx_libs = $qvd_src_path->parent->child('nx-libs')->stringify;
 my $vcxsrv = 'c:\\program files\\vcxsrv';
+
+my $pulseaudio = $installer_path->child('pulseaudio');
+my $win_sftp_server = $installer_path->child('win-sftp-server');
+
 my $cygwin;
 my $cygdrive;
 my $qvd_version = '4.x';
+my $installer_type = 'zip';
+my $output_dir;
 
 GetOptions('log-file|log|l=s' => \$log_file,
            'log-level|L=s' => \$log_level,
+           'installer-type|type|t=s' => \$installer_type,
            'keep-work-dir|k' => \$keep_work_dir,
            'cache-dir|cache|c=s' => \$cache,
            'clean-cache|C' => \$clean_cache,
-           'nx-libs|n=s' => \$nx_libs,
-           'vcxsrv|x=s' => \$vcxsrv,
+           'nx-libs=s' => \$nx_libs,
+           'vcxsrv=s' => \$vcxsrv,
+           'pulseaudio=s' => \$pulseaudio,
+           'win-sftp-server=s' => \$win_sftp_server,
            'cygwin=s' => \$cygwin,
            'cygdrive=s' => \$cygdrive,
            'qvd-version|V=s' => \$qvd_version,
+           'output-dir|output|o=s' => \$output_dir,
           );
 
 # Log::Any::Adapter->set('Stderr', log_level => 'info');
@@ -50,21 +60,28 @@ my $log = Log::Any->get_logger;
 my $nx_libs_path = path($nx_libs)->realpath;
 -d $vcxsrv or die "$vcxsrv not found";
 my $vcxsrv_path = path($vcxsrv)->realpath;
+-d $win_sftp_server or die "$win_sftp_server not found";
+my $win_sftp_server_path = path($win_sftp_server)->realpath;
+-d $pulseaudio or die "$pulseaudio not found";
+my $pulseaudio_path = path($pulseaudio)->realpath;
 
-my @extra_exes = ( { path => $nx_libs_path->child('nxproxy/nxproxy.exe')->stringify,
-                     search_path => $nx_libs_path->child('nxcomp')->stringify,
+my @extra_exes = ( { path => $nx_libs_path->child('nxproxy/nxproxy.exe'),
+                     search_path => $nx_libs_path->child('nxcomp'),
                      subdir => 'nx',
                      subsystem => 'windows',
                      cygwin => 1 },
+                   { path => $win_sftp_server_path->child('win-sftp-server.exe') },
                  );
 
 my @extra_dirs = ( { path => $installer_path->child('pixmaps')->stringify },
-                   { path => "$vcxsrv_path", subdir => 'vcxsrv' } );
+                   { path => $vcxsrv_path, subdir => 'vcxsrv' },
+                   { path => $pulseaudio_path, subdir => 'pulseaudio' },
+                 );
 
 my @qvd_client_modules = qw(QVD::Client QVD::Config::Core QVD::Config
-                         QVD::HTTP QVD::HTTPC QVD::HTTPD
-                         QVD::Log QVD::SimpleRPC QVD::URI
-                         IO::Socket::Forwarder);
+                            QVD::HTTP QVD::HTTPC QVD::HTTPD
+                            QVD::Log QVD::SimpleRPC QVD::URI
+                            IO::Socket::Forwarder);
 
 my $icon = $installer_path->child('pixmaps/qvd.ico')->stringify;
 
@@ -76,7 +93,9 @@ my %args = (app_name => 'QVD Client',
             app_subsystem => 'windows',
             work_dir => "$work_path",
             extra_inc => \@extra_inc,
-            extra_module => [qw(Log::Dispatch::FileRotate
+            extra_module => [qw(QVD::Client::SlaveClient::Windows
+                                Log::Dispatch::FileRotate
+                                Encode::Unicode
                                 Tie::Hash::NamedCapture
                                 PerlIO::encoding
                                 X11::Auth
@@ -90,10 +109,16 @@ my %args = (app_name => 'QVD Client',
             cygwin => $cygwin,
             cygdrive => $cygdrive,
             search_path => 'c:\strawberry\win-builds\bin',
+            output_dir => $output_dir,
            );
 
 delete $args{$_} for grep !defined $args{$_}, keys %args;
 $log->tracef("Win32::Packer args: %s", \%args);
 
 my $p = Win32::Packer->new(%args);
-$p->make_installer(compression => 'deflated', compression_level => 'best');
+if ($installer_type eq 'zip') {
+    $p->make_installer(compression => 'deflated', compression_level => 'best');
+}
+else {
+    $p->make_installer(type => $installer_type);
+}

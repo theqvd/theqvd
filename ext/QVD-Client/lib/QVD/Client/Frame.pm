@@ -658,6 +658,9 @@ sub OnListOfVMLoaded {
 sub OnConnectionStatusChanged {
     my ($self, $event) = @_;
     my $status = $event->GetData();
+
+    DEBUG "OnConnectionStatusChanged($status)";
+    
     if ($status eq 'CONNECTING') {
         $self->EnableControls(0);
         $self->{timer}->Start(50, 0);
