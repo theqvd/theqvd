@@ -98,6 +98,7 @@ my %args = (app_name => 'QVD Client',
                                 Encode::Unicode
                                 Tie::Hash::NamedCapture
                                 PerlIO::encoding
+                                IO::Socket::IP
                                 X11::Auth
                                 X11::Protocol::Ext::XC_MISC)],
             extra_exe => \@extra_exes,
