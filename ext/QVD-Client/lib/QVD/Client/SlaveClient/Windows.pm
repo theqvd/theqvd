@@ -45,12 +45,8 @@ BEGIN {
     #    or die "Unable to import ConnectNamedPipe";
 }
 
-my $app_dir = core_cfg('path.client.installation', 0);
-if (!$app_dir) {
-    my $bin_dir = File::Spec->join((File::Spec->splitpath(File::Spec->rel2abs($0)))[0, 1]);
-    my @dirs = File::Spec->splitdir($bin_dir);
-    $app_dir = File::Spec->catdir( @dirs[0..$#dirs-1] ); 
-}
+my $app_dir = core_cfg('path.client.installation', 0)
+    // File::Spec->catdir( @dirs[0..$#dirs] );
 
 sub handle_share {
     my ($self, $path) = @_;
