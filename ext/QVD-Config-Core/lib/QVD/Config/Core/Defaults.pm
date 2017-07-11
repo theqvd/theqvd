@@ -166,7 +166,7 @@ command.windows.vcxsrv = VcxSrv\\vcxsrv.exe
 command.windows.pulseaudio = pulseaudio\\pulseaudio.exe
 command.windows.nxproxy = nx\\nxproxy.exe
 command.windows.sftp-server = bin/sftp-server.exe
-commnad.windows.win-sftp-server = win-sftp-server.exe
+command.windows.win-sftp-server = win-sftp-server.exe
 client.use.win-sftp-server = 1
  
 command.nxagent.args.extra =
@@ -771,6 +771,8 @@ internal.hkd.nothing.timeout.on_state.zombie = 100
 internal.l7r.nothing.timeout.x_start = 5
 internal.l7r.nothing.timeout.x_state = 5
 internal.l7r.nothing.timeout.run_forwarder = 5
+
+internal.client.xserver.startup.timeout = 30
 
 internal.untar-dis.lock.path = ${path.run}/untar-dis.lock
 
