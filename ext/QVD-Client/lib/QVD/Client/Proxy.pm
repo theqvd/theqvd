@@ -816,30 +816,39 @@ sub _start_x11 {
     ###
     ### Try to wait until X11 is accepting connections
     ###
-    my $retries = 100;
+
     DEBUG "Testing whether the X server is up";
     require X11::Protocol;
 
-    while (--$retries > 0) {
-        last if eval { X11::Protocol->new->release_number };
+    # FIXME: Checks bellow kill the X server if they are run before it
+    # settles down.
+    sleep 3 if $WINDOWS;
 
-        unless ($proc->alive) {
-            unless ($DARWIN) {
-                my $rc = $proc->wait // (255 << 8);
-                _logdie "X server died unexpectedly, rc: " . ($rc >> 8);
-            }
+    my $start = time();
+    while (1) {
+        my $rn = eval {
+            my $x11 = X11::Protocol->new // die "no connection";
+            $x11->release_number
+        };
+        DEBUG "X11 error: " . ($@ // 'undef');
+
+        if (defined $rn) {
+            DEBUG "release number: $rn";
+            INFO "X11 server started and running";
+
+            return $proc;
         }
+
+        unless ($proc->alive or $DARWIN) {
+            my $rc = $proc->wait // (255 << 8);
+            _logdie "X server died unexpectedly, rc: " . ($rc >> 8);
+        }
+
+        _logdie "Too many retries waiting for X11 server to come up... aborting!"
+            if time() - $start > core_cfg('internal.client.xserver.startup.timeout');
+
         sleep 0.1;
     }
-
-    if ($retries) {
-        INFO "X11 server started and running";
-    }
-    else {
-        WARN "X11 server started, but connection test failed";
-    }
-
-    return $proc;
 }
 
 sub _stop_proc {
@@ -1027,6 +1036,8 @@ sub _run {
         forward_sockets($local_socket,
                         $httpc->get_socket,
                         buffer_2to1 => $httpc->read_buffered);
+
+        DEBUG("socket forwarding ended");
     };
 
     # cleanup
