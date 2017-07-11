@@ -70,7 +70,8 @@ my @extra_exes = ( { path => $nx_libs_path->child('nxproxy/nxproxy.exe'),
                      subdir => 'nx',
                      subsystem => 'windows',
                      cygwin => 1 },
-                   { path => $win_sftp_server_path->child('win-sftp-server.exe') },
+                   { path => $win_sftp_server_path->child('win-sftp-server.exe'),
+                     subsystem => 'windows' },
                  );
 
 my @extra_dirs = ( { path => $installer_path->child('pixmaps')->stringify },
