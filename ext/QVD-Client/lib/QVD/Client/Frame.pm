@@ -1438,6 +1438,9 @@ sub start_remote_mounts {
         $dialog->ShowModal();
         $dialog->Destroy();
     }
+    else {
+        DEBUG "All remote mounts started";
+    }
 }
 
 sub get_osx_resolutions {
