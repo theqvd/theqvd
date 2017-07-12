@@ -761,7 +761,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     //Render list with controls (list block)
     renderListBlock: function (that) {
         var that = that || this;
-
+        
         var targetReady = $(that.listBlockContainer).length != 0;
         
         // Target is not ready
@@ -783,14 +783,14 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         );
         
         $(that.listBlockContainer).html(template);
-                        
+        
         // Only fetch filters if view is not embeded
         if (Wat.CurrentView.cid == this.cid) {
             this.fetchFilters('all');
         }
-
+        
         that.renderList();
-                
+        
         // Translate the strings rendered. 
         // This translation is only done here, in the first charge. 
         // When the list were rendered in actions such as sorting, filtering or pagination, 
@@ -798,7 +798,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         Wat.T.translate();
         Wat.I.enableDataPickers();
-    },    
+    },
     
     // Render only the list. Usefull to functions such as pagination, sorting and filtering where is not necessary render controls
     renderList: function () {
@@ -815,10 +815,11 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         );
         
         $(this.listContainer).html(template);
+        
         this.paginationUpdate();
         this.shownElementsLabelUpdate();
         
-        Wat.I.updateSelectedItems(this.selectedItems.length);
+        Wat.I.updateSelectedItems(this.selectedItems.length, this);
         
         // Open websockets for live fields
         if (this.liveFields) {
@@ -1264,12 +1265,13 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     resetSelectedItems: function () {
         if (this.selectedItems.length > 0) {
-            Wat.I.hideSelectedItemsMenu();
+            Wat.I.hideSelectedItemsMenu(this.cid);
         }
         this.selectedAll = false;
         this.selectedItems = [];
-        $('.js-check-it').prop('checked', false);
-        $('.check_all').prop('checked', false);
+        
+        $('.' + this.cid + ' .js-check-it').prop('checked', false);
+        $('.' + this.cid + ' .check_all').prop('checked', false);
     },
     
     setupMassiveChangesDialog: function (that) {

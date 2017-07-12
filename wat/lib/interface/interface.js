@@ -635,8 +635,12 @@ Wat.I = {
         return fieldType;
     },
     
-    validateForm: function (context, fieldsToValidate) {
-        var fieldsToValidate = fieldsToValidate || 'all';
+    validateForm: function (context) {
+        var fieldsToValidate = 'visible';
+        
+        if ($(context + '.js-editor-tabs').length) {
+            var fieldsToValidate = 'all';
+        }
         
         switch (fieldsToValidate) {
             case 'all':
@@ -653,10 +657,12 @@ Wat.I = {
             blankControls.parent().append('<div class="second_row--error validation-message">' + i18n.t('Required field') + '</div>');
             
             // Switch to error tab if necessary
-            var dataField = $(blankControls).eq(0).closest('tr').attr('data-tab-field');
-            var errorTab = $('[data-tab="' + dataField + '"]');
-            if (!$(errorTab).hasClass('tab-active')) {
-                $(errorTab).trigger('click');
+            if ($(context + '.js-editor-tabs').length) {
+                var dataField = $(blankControls).eq(0).closest('tr').attr('data-tab-field');
+                var errorTab = $('[data-tab="' + dataField + '"]');
+                if (!$(errorTab).hasClass('tab-active')) {
+                    $(errorTab).trigger('click');
+                }
             }
             
             Wat.CurrentView.editorView.openFormErrorsDialog()
@@ -707,7 +713,7 @@ Wat.I = {
         var that = that || Wat.CurrentView;
         
         if (selectedItems == 0) {
-            this.hideSelectedItemsMenu();
+            this.hideSelectedItemsMenu(that.cid);
         }
         else {
             this.showSelectedItemsMenu(that.selectedActions, that.cid);
@@ -715,16 +721,16 @@ Wat.I = {
             this.checkVisibilityConditions(that);
                 
             if (selectedItems == 1) {
-                $('.js-only-massive').hide();
-                $('.js-only-one').show();
+                $('.' + that.cid + ' .js-only-massive').hide();
+                $('.' + that.cid + ' .js-only-one').show();
             }
             else {
-                $('.js-only-one').hide();
-                $('.js-only-massive').show();
+                $('.' + that.cid + ' .js-only-one').hide();
+                $('.' + that.cid + ' .js-only-massive').show();
             }
         }
         
-        $('.elements-selected').html(selectedItems);
+        $('.' + that.cid + ' .elements-selected').html(selectedItems);
     },
     
     // Update the indicator of selected items only for select control elements kind
@@ -824,10 +830,12 @@ Wat.I = {
         }
     },
 
-    hideSelectedItemsMenu: function () {
-        $('.js-side.filter').show();
-        $('.js-action-selected').hide("slide");
-        $('.list-block').css('margin-left', '');
+    hideSelectedItemsMenu: function (cid) {
+        var cid = cid || Wat.CurrentView.cid;
+        
+        $('.' + cid + ' .js-side.filter').show();
+        $('.' + cid + ' .js-action-selected').hide("slide");
+        $('.' + cid + ' .list-block').css('margin-left', '');
     },
     
     showSelectedItemsMenu: function (selectedActions, cid) {

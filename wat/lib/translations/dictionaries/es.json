@@ -365,6 +365,7 @@
     "Some elements cannot be deleted due the following dependency": "Algunos elementos no han podido eliminarse por la siguiente dependencia",
     "Some fields are not available to be edited in massive edition": "Algunos campos no se pueden editar en la edición masiva",
     "Some fields could not be able in the massive editor": "Algunos campos podrían no estar disponibles en el editor masivos",
+    "Some of the affected items by this action are not visible": "Algunos de los campos afectados por esta acción no son visibles",
     "Sorting by __field__": "Ordenando por __field__",
     "Source": "Origen",
     "Spanish": "Español",

@@ -339,12 +339,12 @@ Wat.Views.MainView = Backbone.View.extend({
                 
                 // If we are updating an element from list view, reset selected items
                 if (that.viewKind == 'list') {
-                    //that.resetSelectedItems();
+                    that.resetSelectedItems();
                 }
             },
             Update: function (e) {
                 var valid = Wat.CurrentView.editorView.validateForm();
-
+                
                 if (!valid) {
                     return;
                 }

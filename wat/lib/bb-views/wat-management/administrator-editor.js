@@ -48,23 +48,6 @@ Wat.Views.AdminEditorView = Wat.Views.AdministratorRoleEditorView.extend({
         this.fetchAndRenderRoles();
     },
     
-    fetchAndRenderRoles: function () {
-        // If the field tenant is not present, fetch and render roles. Otherwise, this rendering will be done after tenant select filling
-        if ($('[name="tenant_id"]').length > 0) {
-            // When tenant id is present attach change events. Roles will be filled once the events were triggered
-            Wat.B.bindEvent('change', 'select[name="tenant_id"]', function () {
-                this.fetchAndRenderRoles({
-                    forcedTenantId: $('select[name="tenant_id"]').val()
-                });
-            });
-        }
-        else {
-            this.fetchAndRenderRoles({
-                forcedTenantId: Wat.C.tenantID
-            });
-        }
-    },
-    
     createElement: function () {
         var context = $('.' + this.cid + '.editor-container');
 

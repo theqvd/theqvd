@@ -62,7 +62,7 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
             
             args['osd_id'] = Wat.CurrentView.OSDmodel.get('id');
         }
-        console.log(args);
+        
         Wat.CurrentView.createModel(args, Wat.CurrentView.fetchList);
     },
     

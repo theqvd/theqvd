@@ -3,10 +3,7 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
     
     initialize: function (params) {
         this.params = params;
-    
         Wat.Views.DialogView.prototype.initialize.apply(this, [params]);
-        
-        this.render();
     },
     
     dialogEvents: {
@@ -94,8 +91,9 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
         params.block = 5;
         params.filters = {"tenant_id": this.elementId};
         Wat.CurrentView.embeddedViews = Wat.CurrentView.embeddedViews || {};
+        
         Wat.CurrentView.embeddedViews.package = new Wat.Views.PackageListView(params);
-
+        
         $.each (Wat.CurrentView.embeddedViews.package.events, function (actionSelector, func) {
             actionSelector = actionSelector.split(' ');
             var action = actionSelector.shift();
@@ -508,6 +506,7 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
     
     changeAssetSelector: function (e) {
         Wat.DIG.changeAssetSelector(e);
+        
         var row = $(e.target).closest('tr');
         var pluginId = $(row).attr('data-plugin-id');
         var setCallback = function () {};
@@ -522,8 +521,7 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
             default:
                 return;
         }
-                console.log(4);
-
+        
         // Save plugin element
         Wat.DIG.setPluginListElement({
             pluginId: pluginId,

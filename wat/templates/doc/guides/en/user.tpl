@@ -1817,7 +1817,7 @@ Operator L3
 </div>
 <div class="sect2">
 <h3 id="_roles_management">6.2. Roles management</h3>
-<div class="paragraph"><p>In the search for administrators with customised permissions, we will create the roles we need. To make our work easier, a good strategy will be creating reusable roles, seeking they have the common ACLs we want for an administration group.</p></div>
+<div class="paragraph"><p>In the search for administrators with customized permissions, we will create the roles we need. To make our work easier, a good strategy will be creating reusable roles, seeking they have the common ACLs we want for an administration group.</p></div>
 <div class="paragraph"><p>As with the administrators, when creating a role, we can assign it ACLs in the creation process or create it empty, in which case we will have to edit it to assign it ACLs.</p></div>
 <div class="paragraph"><p>The process will be:</p></div>
 <div class="ulist"><ul>
@@ -4722,11 +4722,11 @@ Inherits from
 </div>
 </div>
 <div class="sect1">
-<h2 id="_customised_properties">8. Customised properties</h2>
+<h2 id="_customized_properties">8. Customized properties</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><strong>The QVD elements have attributes</strong> like for example the name, its block state, its associated IP address (in the case of virtual machines or nodes) or the reference to other QVD objects to which they are associated with. For example the disk images have an OSF assigned or the virtual machines are always linked to a user.</p></div>
 <div class="paragraph"><p>Each of these attributes describe how the QVD objects are, they allow us to see distinguish them from the rest, they give us information about what dependencies they have and show us about their behaviour. This information is fixed, although their visibility through the ACLs can be configured, being possible to create administrator roles that only allow to see them partly.</p></div>
-<div class="paragraph"><p>Due to the varied needs that can be required in different QVD environments, there is a way to <strong>customise the information</strong> that is stored in each QVD object. This customisation is possible thanks to the <strong>customised properties</strong>, that are <strong>special attributes of the QVD objects</strong> created by administrators to cope with their needs.</p></div>
+<div class="paragraph"><p>Due to the varied needs that can be required in different QVD environments, there is a way to <strong>customize the information</strong> that is stored in each QVD object. This customization is possible thanks to the <strong>customized properties</strong>, that are <strong>special attributes of the QVD objects</strong> created by administrators to cope with their needs.</p></div>
 <div class="paragraph"><p>These properties will be extra attributes that could be configured as an extra column and enable them as a filter on the list view.</p></div>
 <div class="admonitionblock">
 <table><tr>
@@ -4742,17 +4742,17 @@ Inherits from
 <td class="icon">
 <img src="/images/doc_images/icons//important.png" alt="Important">
 </td>
-<td class="content">The elements with customised properties are: Users, Virtual Machines, Nodes, OSFs and Disk images.</td>
+<td class="content">The elements with customized properties are: Users, Virtual Machines, Nodes, OSFs and Disk images.</td>
 </tr></table>
 </div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-Customised properties Management
+Customized properties Management
 </dt>
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>To create, edit or delete customised properties we will go the the section “WAT Management”, described in the guide “Step by Step”</p></div>
+<div class="paragraph"><p>To create, edit or delete customized properties we will go the the section “WAT Management”, described in the guide “Step by Step”</p></div>
 <div class="paragraph"><p>In this section we could manage the properties of each QVD element. Being able to easily assign the same property to one or more than one of them, rename it or add it a description that will appear along with it in the interface to guide the user.</p></div>
 </div></div>
 </dd>
@@ -4875,9 +4875,9 @@ Check every element on the list, including the ones in other pages.
 </div>
 </div>
 <div class="sect1">
-<h2 id="_tool_for_style_customisation">10. Tool for style customisation</h2>
+<h2 id="_tool_for_style_customization">10. Tool for style customization</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>With this tool we could customise the WAT style, including logos and colours.</p></div>
+<div class="paragraph"><p>With this tool we could customize the WAT style, including logos and colours.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
@@ -4888,7 +4888,7 @@ Check every element on the list, including the ones in other pages.
 </div>
 <div class="paragraph"><p>The tool will be available for those administrators with WAT configuration permissions along with the ability to edit other parameters like the language or the paging block size.</p></div>
 <div class="paragraph"><p>This tool is not a section, but a feature present in every WAT section.</p></div>
-<div class="paragraph"><p>When the style customisation tool is on, a tab will appear on the left part of the screen showing the text “Customiser”.</p></div>
+<div class="paragraph"><p>When the style customization tool is on, a tab will appear on the left part of the screen showing the text “Customizer”.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/screenshot_customizer_enabled.png" alt="screenshot_customizer_enabled.png" width="960px">
 </span></p></div>
@@ -4900,7 +4900,7 @@ Check every element on the list, including the ones in other pages.
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/screenshot_customizer_open.png" alt="screenshot_customizer_open.png" width="960px">
 </span></p></div>
-<div class="paragraph"><p>Styles customising parameters divided by categories:</p></div>
+<div class="paragraph"><p>Styles customizing parameters divided by categories:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -5146,7 +5146,7 @@ Login Box text colour
 </div>
 <div class="sect2">
 <h3 id="_change_logos">10.4. Change logos</h3>
-<div class="paragraph"><p>From the customisation tool we can only change the logos file name, but not the file itself. So, to make it visible in preview and to make it permanent, the new logos must be uploaded to <em>/images/</em> in the server.</p></div>
+<div class="paragraph"><p>From the customization tool we can only change the logos file name, but not the file itself. So, to make it visible in preview and to make it permanent, the new logos must be uploaded to <em>/images/</em> in the server.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_changes_example">10.5. Changes example</h3>
@@ -5216,7 +5216,7 @@ On the left side there is a <em>settings</em> tab that displays a lateral menu w
 <div id="footnotes"><hr></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-03-06 11:18:09 CET
+Last updated 2017-07-11 10:56:52 CEST
 </div>
 </div>
 </body>

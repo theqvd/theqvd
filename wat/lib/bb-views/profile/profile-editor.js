@@ -8,6 +8,7 @@ Wat.Views.ProfileEditorView = Wat.Views.EditorView.extend({
     },
     
     editorEvents: {
+        'change input[name="change_password"]': 'toggleNewPassword'
     },
     
     updateElement: function (dialog) {
@@ -56,5 +57,9 @@ Wat.Views.ProfileEditorView = Wat.Views.EditorView.extend({
             
             Wat.T.initTranslate();
         }
+    },
+    
+    toggleNewPassword: function () {
+        $('.new_password_row').toggle();
     }
 });

@@ -292,10 +292,10 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
         return model;
     },
     
-    validateForm: function (fieldsToValidate) {
+    validateForm: function () {
         var context = '.' + this.cid;
         
-        return Wat.I.validateForm(context, fieldsToValidate);
+        return Wat.I.validateForm(context);
     },
     
     // Parse properties from create/edit forms
@@ -435,7 +435,7 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
     },
     
     switchEditorTab: function (tab) {
-        var valid = this.validateForm('visible');
+        var valid = this.validateForm();
         
         if (!valid) {
             return;
@@ -458,6 +458,11 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
     },
     
     setupEditorTabs: function () {
+        // If no tabs are present, setup is not necessary
+        if ($('.' + this.cid + '.js-editor-tabs').length == 0) {
+            return;
+        }
+        
         // Remove empty categories
         $.each($('[data-tab]'), function (iTab, tab) {
             var tabCode = $(tab).attr('data-tab');
