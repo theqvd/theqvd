@@ -473,51 +473,6 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     // Functions for perform actions over tokens
     ////////////////////////////////////////////////////
     
-        // Create new token
-        createElement: function () {
-            var valid = Wat.Views.ListView.prototype.createElement.apply(this);
-
-            if (!valid) {
-                return;
-            }
-
-            var context = $('.' + this.cid + '.editor-container');
-
-            var key = context.find('input[name="key"]').val();
-            var value = context.find('input[name="value"]').val();
-
-            var arguments = {
-                "key": key,
-                "value": value
-            };
-
-            this.createdKey = key;
-
-            if (Wat.C.isSuperadmin()) {
-                arguments['tenant_id'] = this.selectedTenant;
-            }
-
-            Wat.A.performAction('config_set', arguments, {}, {'error': i18n.t('Error creating'), 'success': i18n.t('Successfully created')}, this.afterCreateToken, this);
-        },
-    
-        // Hook executed after create token (executed before change hook)
-        afterCreateToken: function (that) {
-            Wat.I.closeDialog(that.dialog);
-
-            var keySplitted = that.createdKey.split('.');
-
-            if (keySplitted.length > 1) {
-                that.currentTokensPrefix = keySplitted[0];
-            }
-            else {
-                that.currentTokensPrefix = UNCLASSIFIED_CONFIG_CATEGORY;
-            }
-
-            that.selectPrefixMenu(that.currentTokensPrefix);
-
-            that.afterChangeToken(that);
-        },
-    
         // Update token value
         saveToken: function (token, callBack) {
             var value = $('input.js-token-value[data-token="' + token + '"]').val();

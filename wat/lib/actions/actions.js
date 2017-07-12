@@ -118,7 +118,6 @@ Wat.A = {
             processData: false,
             parse: true,
             error: function (response) {
-                console.err(response);
                 if (that) {
                     that.retrievedData = response;
                 }
