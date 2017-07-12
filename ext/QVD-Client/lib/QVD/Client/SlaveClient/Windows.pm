@@ -46,7 +46,7 @@ BEGIN {
 }
 
 my $app_dir = core_cfg('path.client.installation', 0)
-    // File::Spec->catdir( @dirs[0..$#dirs] );
+    // File::Spec->join((File::Spec->splitpath(File::Spec->rel2abs($0)))[0, 1]);
 
 sub handle_share {
     my ($self, $path) = @_;
