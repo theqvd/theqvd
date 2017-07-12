@@ -247,7 +247,8 @@ sub _allocate_os_disk {
 
 sub _allocate_user_disk {
     my $self = shift;
-    my $size = $self->{user_storage_size};
+    # Convert size from MB to bytes
+    my $size = $self->{user_storage_size} * 1048576;
     unless ($size) {
         DEBUG 'Not allocating user storage';
         return $self->_on_done;
