@@ -14,6 +14,7 @@ use Win32::LongPath;
 use Win32API::File qw(FdGetOsFHandle WriteFile);
 use File::Temp qw(tempfile);
 use QVD::Log;
+use IPC::Open3 qw(open3);
 
 BEGIN {
     # Import the required Windows API functions.
@@ -66,72 +67,69 @@ sub handle_share {
     if ($code != HTTP_SWITCHING_PROTOCOLS) {
         die "Server replied $code $msg $data";
     }
-
+sf
     my $logfile = File::Spec->join($QVD::Client::App::user_dir, 'sftp-server.log');
 
+    my ($cmd, @args);
     if (core_cfg('client.use.win-sftp-server')) {
-        my $cmd = File::Spec->rel2abs(core_cfg('command.windows.win-sftp-server'), $app_dir);
-
-        my @cmd = ($cmd, '-v', '-d', shortpathL($path));
-        DEBUG "Executing win-sftp-server as '@cmd'";
-
-        DEBUG sprintf("STDIN fd: %s, STDOUT fd: %s", fileno(STDIN) // 'undef', fileno(STDOUT) // 'undef');
-        open my($oldin), '<&', \*STDIN or die "Can't dup stdin: $^E";
-        open my($oldout), '>&', \*STDOUT or die "Can't dup stdout: $^E";
-
-        # local (STDIN, STDOUT);
-        open STDIN, '<&', $self->httpc->{socket};
-        open STDOUT, '>&', $self->httpc->{socket};
-
-        my $pid = eval { system 1, @cmd };
-        do {
-            local ($@, $!, $^E, $?);
-            open STDIN, '<&', $oldin;
-            open STDOUT, '>&', $oldout;
-        };
-        unless ($pid) {
-            die "Unable to launch win-sftp-server: " . ($@ || $!);
-        }
+        $cmd = shortpathL(File::Spec->rel2abs(core_cfg('command.windows.win-sftp-server'), $app_dir));
+        @args = ('-v', '-d', shortpathL($path), '-L', shortpathL($logfile));
     }
     else { # TO BE REMOVED!!!
-        my $command_sftp_server = File::Spec->rel2abs(core_cfg('command.windows.sftp-server'), $app_dir);
+        $cmd = shortpathL(File::Spec->rel2abs(core_cfg('command.windows.sftp-server'), $app_dir));
+        @args = ('-l', 'ERROR', '-L', shortpathL($logfile));
+    }
 
-        # Create tempfile
-        my ($fh, $tempfile) = tempfile(UNLINK => 1);
-        $fh->autoflush(1);
+    # Create tempfile
+    my ($fh, $tempfile) = tempfile(UNLINK => 1);
+    #$fh->binmode(1);
+    $fh->autoflush(1);
 
-        DEBUG "Starting $command_sftp_server to serve $path...\n";
-        DEBUG "Temp file: $tempfile, debug log: $logfile\n";
+    DEBUG "Temp file for socket info: $tempfile";
+    push @args, -F => $tempfile;
 
-        # To debug sftp-server.exe under GDB:
-        # my $command_gdb='c:/mingw/bin/gdb.exe';
-        # my $cmdline = "gdb -w --directory \"c:\\documents and settings\\administrador\\Mis documentos\\openssh-6.0p1\" --args \"$command_sftp_server\" -l DEBUG3 -F \"$tempfile\" -L \"$logfile\"";
-        my $cmdline = "$command_sftp_server -l ERROR -F \"$tempfile\" -L \"$logfile\"";
-        my $child;
-        Win32::Process::Create($child, 
-                               $command_sftp_server, 
-                               $cmdline,
-                               1,              # inherit handles
-                               NORMAL_PRIORITY_CLASS | CREATE_NO_WINDOW | CREATE_SUSPENDED,       # creation flags
-                               shortpathL($path)			# current working directory
-                              ) or die "Unable to start sftp-server: $^E";
+    my $cmdline = _win32_cmd_quote($cmd, @args);
+    DEBUG "Running SFTP server as >>$cmd<< >>$cmdline<<";
 
-        # Duplicate socket
-        DEBUG "Duplicating socket to send it to sftp-server";
-        my $lpProtocolInfo = "\0" x 372; # Size of WSAPROTOCOL_INFO
-        my $handle = FdGetOsFHandle(fileno($self->httpc->{socket}));
-        if (WSADuplicateSocket($handle, $child->GetProcessID(), $lpProtocolInfo)) {
-            die "Unable to duplicate socket: ".WSAGetLastError();
+    my $child;
+    Win32::Process::Create($child, $cmd, $cmdline,
+                           1, # inherit handles
+                           NORMAL_PRIORITY_CLASS | CREATE_NO_WINDOW | CREATE_SUSPENDED, # creation flags
+                           shortpathL($path) # current working directory
+                          ) or die "Unable to start sftp-server: $^E";
+
+    # Duplicate socket
+    DEBUG "Duplicating socket for SFTP server";
+    my $lpProtocolInfo = "\0" x 1024; # Size of WSAPROTOCOL_INFO = 372
+    my $handle = FdGetOsFHandle(fileno($self->httpc->{socket}));
+    WSADuplicateSocket($handle, $child->GetProcessID(), $lpProtocolInfo) == 0
+        or die "Unable to duplicate socket: ".WSAGetLastError();
+
+    print $fh $lpProtocolInfo;
+    close $fh;
+    DEBUG "Socket duplicated and sent, continuing SFTP server";
+    $child->Resume();
+
+    close $self->httpc->{socket};
+}
+
+sub _w32q {
+    my $arg = shift;
+    for ($arg) {
+        $_ eq '' and return '""';
+        if (/[ \t\n\x0b"]/) {
+            s{(\\+)(?="|\z)}{$1$1}g;
+            s{"}{\\"}g;
+            return qq("$_")
         }
-
-        print $fh $lpProtocolInfo;
-
-        $child->Resume();
-
-        close $self->httpc->{socket};
+        return $_
     }
 }
 
+sub _win32_cmd_quote {
+    my @r = map _w32q($_), @_;
+    wantarray ? @r : join(" ", @r)
+}
 
 sub handle_mount {
 	die "Not implemented yet";
