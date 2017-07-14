@@ -2,7 +2,7 @@ Wat.Collections.PluginsDef = Wat.Collections.DIG.extend({
     //model: Wat.Models.PluginDef,
     
     parse: function(response) {
-        return this.mock();
+        return response.concat(this.mock());
     },
     
     initialize: function (attrs, opts) {
@@ -18,7 +18,7 @@ Wat.Collections.PluginsDef = Wat.Collections.DIG.extend({
     mock: function () {
         var data = [
             {
-                plugin_id: 'os',
+                code: 'os',
                 plugin: {
                     distro: {
                         description: 'OS distro',
@@ -42,7 +42,7 @@ Wat.Collections.PluginsDef = Wat.Collections.DIG.extend({
                 plugin_type: 'values',
             },
             {
-                plugin_id: 'vma',
+                code: 'vma',
                 plugin: {
                     vma_allow_sound: {
                         description: 'Allow sound',
@@ -72,7 +72,7 @@ Wat.Collections.PluginsDef = Wat.Collections.DIG.extend({
                 plugin_type: 'values',
             },
             {
-                plugin_id: 'desktop',
+                code: 'desktop',
                 plugin: {
                     wallpaper: {
                         description: 'Wallpaper',
@@ -100,7 +100,7 @@ Wat.Collections.PluginsDef = Wat.Collections.DIG.extend({
                 plugin_type: 'values',
             },
             {
-                plugin_id: 'execution_hooks',
+                code: 'execution_hooks',
                 plugin: {
                     script: {
                         description: 'Scripts',
@@ -132,7 +132,7 @@ Wat.Collections.PluginsDef = Wat.Collections.DIG.extend({
                 plugin_type: 'list',
             },
             {
-                plugin_id: 'shortcuts',
+                code: 'shortcuts',
                 plugin: {
                     shortcut: {
                         description: 'Shortcuts',
@@ -181,7 +181,7 @@ Wat.Collections.PluginsDef = Wat.Collections.DIG.extend({
                 plugin_type: 'list',
             },
             {
-                plugin_id: 'example_blocked',
+                code: 'example_blocked',
                 plugin: {
                     blocked: true,
                     blocked_by: ['os']

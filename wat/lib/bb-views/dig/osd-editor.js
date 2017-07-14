@@ -600,7 +600,7 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
             url: 'https://s-media-cache-ak0.pinimg.com/originals/8b/8f/b2/8b8fb268842167174d0265df49c2a0ba.jpg'
         };
         
-        Wat.CurrentView.OSDmodel.pluginDef.where({plugin_id: 'desktop'})[0].attributes.plugin.wallpaper.list_images[55] = uploadedWallpaper;
+        Wat.CurrentView.OSDmodel.pluginDef.where({code: 'desktop'})[0].attributes.plugin.wallpaper.list_images[55] = uploadedWallpaper;
         
         this.toggleUploadSelectMode();
         

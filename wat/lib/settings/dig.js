@@ -23,8 +23,11 @@ Wat.DIG = {
         var OSDmodel = new Wat.Models.OSD({id: osdId});
         
         OSDmodel.fetch({
-            complete: function(e) {
+            success: function(e) {
                 that.fetchPluginDef(OSDmodel, callback);
+            },
+            error: function (e) {
+                callback(false);
             }
         });
     },
@@ -36,8 +39,11 @@ Wat.DIG = {
         
         OSDmodel.pluginDef = new Wat.Collections.PluginsDef(null, {osdId: osdId});
         OSDmodel.pluginDef.fetch({
-            complete: function () {
+            success: function () {
                 callbackFetchDef(OSDmodel);
+            },
+            error: function (e) {
+                callbackFetchDef(false);
             }
         });
     },
@@ -57,12 +63,12 @@ Wat.DIG = {
     
     setPluginAttr: function (opts, callbackSave, callbackFetch) {
         Wat.CurrentView.OSDmodel.pluginData[opts.pluginId].save(opts.attributes, {
+            type: 'PUT',
             complete: function (e) {
                 callbackSave(e);
                 // After any plugin update, plugin definitions must be retrieved
                 Wat.DIG.fetchPluginDef(Wat.CurrentView.OSDmodel, callbackFetch);
-            },
-            patch: true
+            }
         });
     },
     

@@ -68,7 +68,7 @@ Wat.Views.OSDScriptsEditorView = Wat.Views.DialogView.extend({
             url: fileName
         };
         
-        Wat.CurrentView.OSDmodel.pluginDef.where({plugin_id: 'execution_hooks'})[0].attributes.plugin.script.list_files[55] = uploadedScript;
+        Wat.CurrentView.OSDmodel.pluginDef.where({code: 'execution_hooks'})[0].attributes.plugin.script.list_files[55] = uploadedScript;
         
         this.toggleUploadSelectMode();
         

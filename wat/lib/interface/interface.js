@@ -665,7 +665,6 @@ Wat.I = {
                 }
             }
             
-            Wat.CurrentView.editorView.openFormErrorsDialog()
             return false;
         }
         
@@ -700,7 +699,6 @@ Wat.I = {
         });
         
         if (returnFalse) {
-            Wat.CurrentView.editorView.openFormErrorsDialog();
             return false;
         }
         

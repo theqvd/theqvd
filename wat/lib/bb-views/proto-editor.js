@@ -459,7 +459,7 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
     
     setupEditorTabs: function () {
         // If no tabs are present, setup is not necessary
-        if ($('.' + this.cid + '.js-editor-tabs').length == 0) {
+        if ($('.' + this.cid + ' .js-editor-tabs').length == 0) {
             return;
         }
         
@@ -481,7 +481,10 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
         $('[data-tab-field="' + firstTab + '"]').show();
     },
     
-    openFormErrorsDialog: function () {
+    showFormErrorsMessage: function () {
+        Wat.I.M.showMessage({message: 'There are errors in the form', messageType: 'error'});
+        return;
+        
         var that = this;
         
         var dialogConf = {

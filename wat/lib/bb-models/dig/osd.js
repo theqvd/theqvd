@@ -12,7 +12,7 @@ Wat.Models.OSD = Wat.Models.DIG.extend({
         var that = this;
         
         $.each (this.pluginDef.models, function (iModel, model) {
-            var pluginId = model.get('plugin_id');
+            var pluginId = model.get('code');
             var plugin = model.get('plugin');
             
             that.pluginData[pluginId] = new Wat.Models.Plugin({}, {osdId: that.id, pluginId: pluginId});
@@ -98,19 +98,46 @@ Wat.Models.OSD = Wat.Models.DIG.extend({
     // Get plugin definition
     // - pluginId: Id of the plugin (alphanumeric)
     //      I.E.: os|vma|execution_hooks|shortcuts...
-    getPluginDef: function (pluginId) {
-        var pluginModel = this.pluginDef.where({plugin_id: pluginId})[0];
+    getPluginDefOLD: function (pluginId) {
+        var pluginModel = this.pluginDef.where({code: pluginId})[0];
         return pluginModel.get('plugin');
+    },
+    
+    getPluginDef: function (pluginId) {
+        var pluginModel = this.pluginDef.where({code: pluginId})[0];
+        
+        return pluginModel.attributes;
     },
     
     // Get possible options of an attribute of type list of a plugin
     // - pluginAttr: Plugin and attribute Ids separated by dots
     //      I.E.: os.distro|execution_hooks.script
-    getPluginAttrOptions: function (pluginAttr) {
+    getPluginAttrOptions: function (pluginAttr, enumCallback) {
         var [pluginId, attr] = pluginAttr.split('.');
         
         var plugin = this.getPluginDef(pluginId);
-        return plugin[attr].list_options;
+        $.each(plugin.values, function(i,v) {
+            if (v.EnumLocationElement.code == attr) {
+                if (v.EnumLocationElement && v.EnumLocationElement.type == 'enum_location') {
+                    var location = v.EnumLocationElement.location;
+                    
+                    var enums = new Wat.Collections.PluginEnums({location: location});
+                    
+                    enums.fetch({
+                        complete: function () {
+                            var listEnums = {};
+                            $.each(enums.models, function (i, model) {
+                                listEnums[model.id] = model.attributes;
+                                listEnums[model.id].value = model.get(v.EnumLocationElement.field);
+                            });
+                            
+                            enumCallback(listEnums);
+                        }
+                    });
+                }
+            }
+        });
+        //return plugin[attr].list_options;
     },
     
     // Get possible options of a setting of type list form an attribute of type list of a plugin
@@ -120,6 +147,7 @@ Wat.Models.OSD = Wat.Models.DIG.extend({
         var [pluginId, attr, setting] = pluginAttrSetting.split('.');
         
         var plugin = this.getPluginDef(pluginId);
-        return plugin[attr].settings[setting].list_options;
+        
+        return plugin.plugin[attr].settings[setting].list_options;
     },
 });

@@ -115,6 +115,7 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
     
     showOSEditor: function (e) {
         var selectedDistro = $(e.target).val();
+        var selectedDistroName = $('[name="os_distro_select"] option:selected').html();
 
         switch (selectedDistro) {
             case "-1":
@@ -133,7 +134,9 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
                 // Save distro id
                 var opts = {
                     pluginId: 'os',
-                    attributes: {distro: selectedDistro}
+                    attributes: {
+                        distro: selectedDistroName
+                    }
                 };
                 
                 Wat.DIG.setPluginAttr(opts, function () {}, function () {
@@ -169,15 +172,15 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
         Wat.DIG.createOSD(function (OSDmodel) {
             Wat.CurrentView.OSDmodel = OSDmodel;
             
-            var osList = Wat.CurrentView.OSDmodel.getPluginAttrOptions('os.distro');
-            
-            $.each (osList, function (id, distro) {
-                var opt = document.createElement("OPTION");
-                $(opt).val(id).html(distro.value);
-                $('select[name="os_distro_select"').append(opt);
+            var osList = Wat.CurrentView.OSDmodel.getPluginAttrOptions('os.distro', function (osList) {
+                $.each (osList, function (id, distro) {
+                    var opt = document.createElement("OPTION");
+                    $(opt).val(id).html(distro.value);
+                    $('select[name="os_distro_select"').append(opt);
+                });
+
+                $('select[name="os_distro_select"').trigger('chosen:updated');
             });
-            
-            $('select[name="os_distro_select"').trigger('chosen:updated');
         });
     },
     
@@ -190,6 +193,12 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
         var osdId = this.model.get('osd_id');
         if (osdId) {
             Wat.DIG.fetchOSD(osdId, function (OSDmodel) {
+                // If OSD is not retrieved properly hide software tab
+                if (!OSDmodel) {
+                    $('[data-tab="software"]').remove();
+                    return;
+                }
+                
                 Wat.CurrentView.OSDmodel = OSDmodel;
                 
                 if (Wat.CurrentView.viewKind == 'list') {

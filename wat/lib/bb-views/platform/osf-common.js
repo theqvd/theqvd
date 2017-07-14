@@ -26,23 +26,23 @@ Wat.Common.BySection.osf = {
             var osfId = Wat.CurrentView.model ? Wat.CurrentView.model.get('id') : 0;
             var distroId = model.get('distro_id');
             
-            var distros = model.getPluginAttrOptions('os.distro');
-
-            // Add specific parts of editor to dialog
-            var template = _.template(
-                        Wat.TPL.osConfiguration, {
-                            osfId: osfId,
-                            model: model,
-                            config_params: model.get('config_params'),
-                            shortcuts: model.get('shortcuts'),
-                            scripts: model.get('scripts'),
-                            distro: distros[distroId],
-                            editable: options.editable,
-                            shrinked: options.shrinked
-                        }
-                    );
-        }
+            var distros = model.getPluginAttrOptions('os.distro', function (distros) {
+                // Add specific parts of editor to dialog
+                var template = _.template(
+                            Wat.TPL.osConfiguration, {
+                                osfId: osfId,
+                                model: model,
+                                config_params: model.get('config_params'),
+                                shortcuts: model.get('shortcuts'),
+                                scripts: model.get('scripts'),
+                                distro: distros[distroId],
+                                editable: options.editable,
+                                shrinked: options.shrinked
+                            }
+                        );
         
-        $(options.container + ' .bb-os-configuration').html(template);
+                $(options.container + ' .bb-os-configuration').html(template);
+            });
+        }
     },
 }

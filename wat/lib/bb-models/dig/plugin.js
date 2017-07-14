@@ -24,12 +24,7 @@ Wat.Models.Plugin = Wat.Models.DIG.extend({
         
         switch (this.pluginId) {
             case 'os':
-                data = {
-                    os_distro: {
-                        value: 1,
-                        settings: {}
-                    }
-                }
+                data = {}
                 break;
             case 'vma':
                 data = {
