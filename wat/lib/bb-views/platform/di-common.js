@@ -4,9 +4,11 @@ Wat.Common.BySection.di = {
     
     // This initialize function will be executed one time and deleted
     initializeCommon: function (that) {
-        var templates = Wat.I.T.getTemplateList('commonDI');
+        var templatesOD = Wat.I.T.getTemplateList('osDetails');
         
-        this.templates = $.extend({}, this.templates, templates);
+        var templatesCommon = Wat.I.T.getTemplateList('commonDI');
+        
+        this.templates = $.extend({}, this.templates, templatesOD, templatesCommon);
     },
     
     // Check if any running VM has suffered changes with a DI update

@@ -29,6 +29,8 @@
             min-width: 50%;
             @include in(desktop) {
                 text-align: right;
+                white-space: normal;
+                width: 25%;
             }
             vertical-align: top;
             padding-top: 5px;

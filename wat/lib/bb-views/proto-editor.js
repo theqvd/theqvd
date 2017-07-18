@@ -479,44 +479,5 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
         $('[data-tab="' + firstTab + '"]').addClass('tab-active');
         $('[data-tab-field]').hide();
         $('[data-tab-field="' + firstTab + '"]').show();
-    },
-    
-    showFormErrorsMessage: function () {
-        Wat.I.M.showMessage({message: 'There are errors in the form', messageType: 'error'});
-        return;
-        
-        var that = this;
-        
-        var dialogConf = {
-            title: $.i18n.t('Errors in form'),
-            buttons : {
-                "OK": function () {
-                    // Send primary dialog to front again
-                    $('.ui-dialog').eq(0).css('z-index','');
-                    
-                    Wat.I.closeDialog($(this));
-                },
-            },
-            buttonClasses: ['fa fa-check'],
-            
-            fillCallback: function (target) {
-                // Add common parts of editor to dialog
-                var template = _.template(
-                    Wat.TPL.formErrors, {
-                    }
-                );
-
-                target.html(template);
-            },
-            width: 200,
-        }
-
-        Wat.CurrentView.warningDialog = Wat.I.dialog(dialogConf);
-        
-        // Add secondary dialog class to new dialog to give different look
-        Wat.CurrentView.warningDialog.parent().addClass('ui-dialog-secondary');
-        Wat.CurrentView.warningDialog.dialog("option", "position", {my: "center", at: "center", of: window});
-        // Send primary dialog to back because jquery ui doesnt handle it properly
-        $('.ui-dialog').eq(0).css('z-index','100');
-    },
+    }
 });

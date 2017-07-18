@@ -131,4 +131,46 @@ Wat.DIG = {
         $('table.js-asset-selector tr').removeClass('selected-row');
         $(row).addClass('selected-row');
     },
+    
+    // Render OS Details template and return it
+    // model: Backbone model of the OSD
+    // options: Options of the rendering
+    //          - editable: If Edit button will be rendering
+    //          - shrinked: If is just showed SO distro and rest of the info is expanded clicking More button
+    //          - container: CSS selector of the container where will be rendered
+    renderOSDetails: function (model, options) {
+        options = options || {};
+        options.container = options.container || '';
+        
+        if (model === undefined) {
+            var template = $.i18n.t('Software information not available');
+            $(options.container + ' .bb-os-configuration').html(template);
+        }
+        else if (model === false) {
+            var template = $.i18n.t('Error retrieving software information');
+            $(options.container + ' .bb-os-configuration').html(template);
+        }
+        else {
+            var osfId = Wat.CurrentView.model ? Wat.CurrentView.model.get('id') : 0;
+            var distroId = model.get('distro_id');
+            
+            var distros = model.getPluginAttrOptions('os.distro', function (distros) {
+                // Add specific parts of editor to dialog
+                var template = _.template(
+                            Wat.TPL.osConfiguration, {
+                                osfId: osfId,
+                                model: model,
+                                config_params: model.get('config_params'),
+                                shortcuts: model.get('shortcuts'),
+                                scripts: model.get('scripts'),
+                                distro: distros[distroId],
+                                editable: options.editable,
+                                shrinked: options.shrinked
+                            }
+                        );
+        
+                $(options.container + ' .bb-os-configuration').html(template);
+            });
+        }
+    },
 }

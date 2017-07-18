@@ -8,8 +8,7 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
     },
     
     editorEvents: {
-        'change select[name="os_distro_select"]' : 'showOSEditor',
-        'click .js-expand-os-conf': 'toggleOSConfigExpanded'
+        'change select[name="os_distro_select"]' : 'showOSEditor'
     },
     
     createElement: function () {
@@ -122,7 +121,6 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
                 $('.js-os-configuration-row').hide();
                 
                 Wat.CurrentView.editorView.softwareEditorView.remove();
-                //$('.bb-os-configuration-editor').html('');
                 break;
             default:
                 // Save distro id in OSD just for MOCK!
@@ -292,7 +290,7 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
                 },
                 "Save": function () {
                     Wat.U.setFormChangesOnModel('.js-editor-form-osf-os', Wat.CurrentView.OSDmodel);
-                    Wat.CurrentView.renderOSDetails(Wat.CurrentView.OSDmodel, {
+                    Wat.DIG.renderOSDetails(Wat.CurrentView.OSDmodel, {
                         shrinked: true, 
                         editable: true,
                         container: '.editor-container'
@@ -332,16 +330,5 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
         $('.ui-dialog').eq(0).css('z-index','100');
 
         Wat.I.chosenElement('select[name="icons-collection"]','single100');
-    },
-
-    toggleOSConfigExpanded: function (e) {
-        if ($(e.target).hasClass('fa-chevron-down')) {
-            $(e.target).removeClass('fa-chevron-down').addClass('fa-chevron-up');
-        }
-        else {
-            $(e.target).removeClass('fa-chevron-up').addClass('fa-chevron-down');
-        }
-
-        $('.js-os-configuration-expanded').toggle();
     },
 });

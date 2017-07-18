@@ -1,3 +1,4 @@
+<input type="hidden" name="osd_id"></input>
 <table>
     <tr>
         <td data-i18n="Description"></td>
@@ -6,6 +7,16 @@
         </td>
     </tr>
     <tr>
+        <td data-i18n="OS Flavour"></td>
+        <td>
+            <select class="" name="osf_id" data-any-selected></select>
+        </td>
+    </tr>
+    <tr class="js-osd-row">
+        <td data-i18n="Software preview"></td>
+        <td class="bb-os-configuration"></td>
+    </tr>
+    <tr class="js-custom-image-row">
         <td data-i18n="Image's source"></td>
         <td>
             <select class="" id="images_source" name="images_source" data-any-selected>
@@ -15,13 +26,13 @@
             </select>
         </td>
     </tr>
-    <tr class="image_staging_row" style="display: none;">
+    <tr class="image_staging_row js-custom-image-row" style="display: none;">
         <td data-i18n="Disk image"></td>
         <td>
             <select class="" name="disk_image" id="disk_image"></select>
         </td>
     </tr>
-    <tr class="image_computer_row">
+    <tr class="image_computer_row js-custom-image-row">
         <td data-i18n="Disk image"></td>
         <td>
             <form id="form_file_update">
@@ -29,7 +40,7 @@
             </form>
         </td>
     </tr>
-    <tr class="image_url_row">
+    <tr class="image_url_row js-custom-image-row">
         <td data-i18n="Disk image's URL"></td>
         <td>
             <input type="text" name="disk_image_url" class="col-width-100" data-required></select>
@@ -49,14 +60,6 @@
     </tr>
     <% 
     }
-    %>
-    <tr>
-        <td data-i18n="OS Flavour"></td>
-        <td>
-            <select class="" name="osf_id" data-any-selected></select>
-        </td>
-    </tr>
-    <% 
     if (Wat.C.checkACL('di.create.default')) { 
     %>
     <tr>

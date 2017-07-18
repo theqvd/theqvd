@@ -19,7 +19,7 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
             Wat.DIG.fetchOSD(osdID, function (OSDmodel) {
                 that.OSDmodel = OSDmodel;
 
-                that.renderOSDetails(that.OSDmodel, {
+                Wat.DIG.renderOSDetails(that.OSDmodel, {
                     shrinked: false,
                     editable: false,
                     container: ''
@@ -27,7 +27,7 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
             });
         }
         else {
-            that.renderOSDetails();
+            Wat.DIG.renderOSDetails();
         }
     },
     

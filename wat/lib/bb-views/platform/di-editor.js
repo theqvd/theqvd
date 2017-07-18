@@ -8,6 +8,8 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
     },
     
     editorEvents: {
+        'change select[name="osf_id"]': 'changeOSF',
+        'click .js-expand-os-conf': 'toggleOSConfigExpanded'
     },
     
     renderCreate: function (target, that) {
@@ -43,6 +45,8 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
             if ($('[name="tenant_id"]').length > 0) {
                 $('[name="tenant_id"]').parent().parent().remove();
             }
+            
+            this.toggleSoftwareFields(Wat.CurrentView.id);
         }
         else {
             // Fill OSF select on virtual machines creation form
@@ -116,8 +120,6 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
             arguments["description"] = description;
         }
         
-        var image_source = context.find('select[name="images_source"]').val();
-        
         // Store tags for affected VMs checking
         tags.push('head');
         
@@ -126,26 +128,42 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
             delete: []
         };
         
-        switch (image_source) {
-            case 'staging':
-                var disk_image = context.find('select[name="disk_image"]').val();
-                if (disk_image) {
-                    arguments["disk_image"] = disk_image;
+        var osdId = context.find('input[name="osd_id"]').val();
+        
+        if (osdId) {
+            var imageModel = new Wat.Models.Plugin({}, {osdId: osdId, pluginId: 'image'});
+            
+            imageModel.save({name: 'image_name'}, {
+                complete: function () {
+                    Wat.I.M.showMessage({message: 'Succesfully created', messageType: 'success'});
                 }
-                Wat.CurrentView.heavyCreateStaging(arguments);
-                break;
-            case 'computer':
-                var diskImageFile = context.find('input[name="disk_image_file"]');
-                
-                // In this case the progress is controlled by HTML5 API for files uploading
-                Wat.CurrentView.saveFile(arguments, diskImageFile);
-                break;
-            case 'url':
-                var diskImageUrl = context.find('input[name="disk_image_url"]').val();
-                arguments["disk_image"] = Wat.U.basename(diskImageUrl);
-                
-                Wat.CurrentView.heavyCreateDownload(arguments, diskImageUrl);
-                break;
+            });
+            return;
+        }
+        else {
+            var image_source = context.find('select[name="images_source"]').val();
+            
+            switch (image_source) {
+                case 'staging':
+                    var disk_image = context.find('select[name="disk_image"]').val();
+                    if (disk_image) {
+                        arguments["disk_image"] = disk_image;
+                    }
+                    Wat.CurrentView.heavyCreateStaging(arguments);
+                    break;
+                case 'computer':
+                    var diskImageFile = context.find('input[name="disk_image_file"]');
+                    
+                    // In this case the progress is controlled by HTML5 API for files uploading
+                    Wat.CurrentView.saveFile(arguments, diskImageFile);
+                    break;
+                case 'url':
+                    var diskImageUrl = context.find('input[name="disk_image_url"]').val();
+                    arguments["disk_image"] = Wat.U.basename(diskImageUrl);
+                    
+                    Wat.CurrentView.heavyCreateDownload(arguments, diskImageUrl);
+                    break;
+            }
         }
     },
     
@@ -198,5 +216,55 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
         Wat.CurrentView.tagChanges = arguments['__tags_changes__'];
         
         Wat.CurrentView.updateModel(arguments, filters, Wat.CurrentView.checkMachinesChanges);
-    }
+    },
+    
+    // Show/Hide image source and software configuration depending on OSD
+    changeOSF: function (e) {
+        var osfId = $(e.target).val();
+        
+        this.toggleSoftwareFields(osfId);
+    },
+    
+    toggleSoftwareFields: function (osfId) {
+        var that = this;
+        
+        var osfModel = new Wat.Models.OSF({ id: osfId });
+        
+        osfModel.fetch ({
+            complete: function () {
+                var osdId = osfModel.get('osd_id');
+                
+                $('input[name="osd_id"]').val(osdId);
+                
+                if (osdId) {
+                    $('.js-custom-image-row').hide();
+                    
+                    Wat.DIG.fetchOSD(osdId, function (OSDmodel) {
+                        Wat.DIG.renderOSDetails(OSDmodel, {
+                            shrinked: true,
+                            container: '.' + that.cid
+                        });
+                        
+                        $('.js-osd-row').show();
+                    });
+                }
+                else { 
+                    $('.js-osd-row').hide();
+                    $('.js-custom-image-row').show();
+                    $('select[name="images_source"]').trigger('change');
+                }
+            }
+        });
+    },
+
+    toggleOSConfigExpanded: function (e) {
+        if ($(e.target).hasClass('fa-chevron-down')) {
+            $(e.target).removeClass('fa-chevron-down').addClass('fa-chevron-up');
+        }
+        else {
+            $(e.target).removeClass('fa-chevron-up').addClass('fa-chevron-down');
+        }
+
+        $('.' + this.cid + ' .js-os-configuration-expanded').toggle();
+    },
 });
