@@ -31,7 +31,7 @@ my $win_sftp_server = $installer_path->child('win-sftp-server');
 
 my $cygwin;
 my $cygdrive;
-my $qvd_version = '4.x';
+my $qvd_version = '4.1';
 my $installer_type = 'zip';
 my $output_dir;
 
@@ -100,7 +100,8 @@ else {
 
     my %args = (app_name => 'QVD Client',
                 app_version => $qvd_version,
-                scripts => $qvd_src_path->child('ext/QVD-Client/bin/qvd-gui-client.pl')->stringify,
+                scripts => { path => $qvd_src_path->child('ext/QVD-Client/bin/qvd-gui-client.pl')->stringify,
+                             shortcut => "QVD Client" },
                 app_subsystem => 'windows',
                 work_dir => "$work_path",
                 extra_inc => \@extra_inc,
