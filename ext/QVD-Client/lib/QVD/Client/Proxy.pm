@@ -763,6 +763,8 @@ sub _start_x11 {
             my @extra_args=split(/\s+/, core_cfg('client.vcxsrv.extra_args'));
             @cmd = ( $vcxsrv_bin,
                      @extra_args,
+                     -listen => 'inet',
+                     -nolisten => 'inet6',
                      -logfile => File::Spec->join($QVD::Client::App::user_dir, "xserver.log") );
 
             if ( $opts{fullscreen} ) {
