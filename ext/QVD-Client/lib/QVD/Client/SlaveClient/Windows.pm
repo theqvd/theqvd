@@ -67,7 +67,7 @@ sub handle_share {
     if ($code != HTTP_SWITCHING_PROTOCOLS) {
         die "Server replied $code $msg $data";
     }
-sf
+
     my $logfile = File::Spec->join($QVD::Client::App::user_dir, 'sftp-server.log');
 
     my ($cmd, @args);
