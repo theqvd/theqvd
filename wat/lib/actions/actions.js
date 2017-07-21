@@ -139,7 +139,7 @@ Wat.A = {
                     };
 
                     Wat.I.M.showMessage(messageParams, response);
-                }
+                }                   
             },
             success: function (response, result, raw) {
                 if (Wat.A.isExpirableAction() && Wat.C.sessionExpired(response)) {
@@ -158,7 +158,7 @@ Wat.A = {
                 if (that) {
                     that.retrievedData = response;
                 }
-                
+
                 successCallback(that);
                 
                 if (!$.isEmptyObject(messages)) {
@@ -177,7 +177,7 @@ Wat.A = {
                     };
 
                     Wat.I.M.showMessage(messageParams, response);
-                }
+                }                
             }
         };
         
