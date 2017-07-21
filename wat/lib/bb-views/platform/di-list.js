@@ -85,7 +85,6 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             contentType: false, // Setting contentType as false 'multipart/form-data' and boundary will be sent
 
         }).success(function(){
-            //Wat.I.closeDialog(that.dialog);
             Wat.I.loadingUnblock();
             
             var realView = Wat.I.getRealView(that);

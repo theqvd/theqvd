@@ -62,13 +62,9 @@ Wat.Views.PropertyEditorView = Wat.Views.EditorView.extend({
         var filters = {"id": Wat.CurrentView.model.get('property_id')};
         var arguments = {};
         
-        //if (Wat.C.checkACL('role.update.name')) {
-            arguments['key'] = name;
-        //}
+        arguments['key'] = name;
         
-        //if (Wat.C.checkACL('role.update.description')) {
-            arguments["description"] = description;
-        //}
+        arguments["description"] = description;
         
         Wat.CurrentView.updateModel(arguments, filters, Wat.CurrentView.render);
     }
