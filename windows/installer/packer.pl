@@ -38,6 +38,7 @@ my $cygdrive;
 my $qvd_version = '4.1';
 my $installer_type = 'zip';
 my $output_dir;
+my $update;
 
 GetOptions('log-file|log|l=s' => \$log_file,
            'log-level|L=s' => \$log_level,
@@ -56,7 +57,10 @@ GetOptions('log-file|log|l=s' => \$log_file,
            'guid=s' => \$guid,
            'store=s' => \$store,
            'retrieve=s' => \$retrieve,
+           'update' => \$update,
           );
+
+$keep_work_dir //= 1 if grep defined, $store, $retrieve;
 
 # Log::Any::Adapter->set('Stderr', log_level => 'info');
 
@@ -111,7 +115,8 @@ else {
                 scripts => { path => $qvd_src_path->child('ext/QVD-Client/bin/qvd-gui-client.pl')->stringify,
                              shortcut => "QVD Client",
                              shortcut_description => "The QVD Client Application",
-                             handles => { scheme => 'qvd' } },
+                             handles => { scheme => 'qvd',
+                                          extension => '.qvd' } },
                 app_subsystem => 'windows',
                 work_dir => "$work_path",
                 extra_inc => \@extra_inc,
@@ -125,6 +130,8 @@ else {
                                     X11::Protocol::Ext::XC_MISC)],
                 extra_exe => \@extra_exes,
                 extra_dir => \@extra_dirs,
+                merge => [ { path => 'vcxsrv/vcxsrv.exe', firewall_allow => 'localhost' },
+                           { path => 'pulseaudio/pulseaudio.exe', firewall_allow => 'localhost' } ],
                 keep_work_dir => $keep_work_dir,
                 cache => $cache,
                 clean_cache => $clean_cache,
@@ -146,7 +153,9 @@ my @im_args = (type => $installer_type);
 if ($installer_type eq 'zip') {
     push @im_args, (compression => 'deflated', compression_level => 'best')
 }
-
+elsif ($installer_type eq 'dir') {
+    push @im_args, update => 1 if $update;
+}
 $im = $p->installer_maker(@im_args);
 $p->store($store);
 $im->run;
