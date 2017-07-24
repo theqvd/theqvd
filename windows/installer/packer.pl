@@ -32,7 +32,7 @@ my $vcxsrv = 'c:\\program files\\vcxsrv';
 
 my $pulseaudio = $installer_path->child('pulseaudio');
 my $win_sftp_server = $installer_path->child('win-sftp-server');
-
+my $slaveserver_wrapper = $qvd_src_path->child('windows', 'qvd-slaveserver-wrapper');
 my $cygwin;
 my $cygdrive;
 my $qvd_version = '4.1';
@@ -50,6 +50,7 @@ GetOptions('log-file|log|l=s' => \$log_file,
            'vcxsrv=s' => \$vcxsrv,
            'pulseaudio=s' => \$pulseaudio,
            'win-sftp-server=s' => \$win_sftp_server,
+           'slaveserver-wrapper=s' => \$slaveserver_wrapper,
            'cygwin=s' => \$cygwin,
            'cygdrive=s' => \$cygdrive,
            'qvd-version|V=s' => \$qvd_version,
@@ -83,6 +84,8 @@ else {
     my $win_sftp_server_path = path($win_sftp_server)->realpath;
     -d $pulseaudio or die "$pulseaudio not found";
     my $pulseaudio_path = path($pulseaudio)->realpath;
+    -d $slaveserver_wrapper or die "$slaveserver_wrapper no found";
+    my $slaveserver_wrapper_path = path($slaveserver_wrapper)->realpath;
 
     my @extra_exes = ( { path => $nx_libs_path->child('nxproxy/nxproxy.exe'),
                          search_path => $nx_libs_path->child('nxcomp'),
@@ -95,6 +98,10 @@ else {
                          subdir => 'pulseaudio',
                          subsystem => 'windows',
                          scan_deps => 0 },
+                       { path => $slaveserver_wrapper_path->child('qvd-slaveserver-wrapper.exe'),
+                         subsystem => 'windows',
+                         subdir => 'slaveserver-wrapper',
+                         cygwin => 1 },
                      );
 
     my @extra_dirs = ( { path => $installer_path->child('pixmaps')->stringify },
@@ -116,11 +123,12 @@ else {
                 app_version => $qvd_version,
                 app_id => $guid,
                 license => $license,
-                scripts => { path => $qvd_src_path->child('ext/QVD-Client/bin/qvd-gui-client.pl')->stringify,
-                             shortcut => "QVD Client",
-                             shortcut_description => "The QVD Client Application",
-                             handles => { scheme => 'qvd',
-                                          extension => '.qvd' } },
+                scripts => [ { path => $qvd_src_path->child('ext/QVD-Client/bin/qvd-gui-client.pl'),
+                               shortcut => "QVD Client",
+                               shortcut_description => "The QVD Client Application",
+                               handles => { scheme => 'qvd',
+                                            extension => '.qvd' } },
+                             { path => $qvd_src_path->child('ext/QVD-Client/bin/qvd-client-slaveserver') } ],
                 app_subsystem => 'windows',
                 work_dir => "$work_path",
                 extra_inc => \@extra_inc,

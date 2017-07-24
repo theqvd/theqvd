@@ -986,11 +986,10 @@ sub _run {
                 my $perl = File::Spec->rel2abs($^X, $QVD::Client::App::app_dir);
                 DEBUG("NX_SLAVE_CMD=$wrapper");
                 $self->{client_delegate}->proxy_set_environment(NX_SLAVE_CMD => $wrapper);
-                DEBUG("QVD_SLAVE_CMD=$perl");
-                $self->{client_delegate}->proxy_set_environment(QVD_SLAVE_CMD => $perl);
-                # $slave_cmd = q(-e$|=1; print "perl> $_" while <>);
-                DEBUG("QVD_SLAVE_ARG1=$slave_cmd");
-                $self->{client_delegate}->proxy_set_environment(QVD_SLAVE_ARG1 => $slave_cmd);
+                DEBUG("QVD_SLAVE_CMD=$slave_cmd");
+                $self->{client_delegate}->proxy_set_environment(QVD_SLAVE_CMD => $slave_cmd);
+                #DEBUG("QVD_SLAVE_ARG1=$slave_cmd");
+                #$self->{client_delegate}->proxy_set_environment(QVD_SLAVE_ARG1 => $slave_cmd);
             }
             elsif (-x $slave_cmd ) {
                 $self->{client_delegate}->proxy_set_environment(NX_SLAVE_CMD => $slave_cmd);
