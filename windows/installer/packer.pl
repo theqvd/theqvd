@@ -91,11 +91,15 @@ else {
                          cygwin => 1 },
                        { path => $win_sftp_server_path->child('win-sftp-server.exe'),
                          subsystem => 'windows' },
+                       { path => $pulseaudio_path->child('pulseaudio.exe'),
+                         subdir => 'pulseaudio',
+                         subsystem => 'windows',
+                         scan_deps => 0 },
                      );
 
     my @extra_dirs = ( { path => $installer_path->child('pixmaps')->stringify },
                        { path => $vcxsrv_path, subdir => 'vcxsrv' },
-                       { path => $pulseaudio_path, subdir => 'pulseaudio' },
+                       { path => $pulseaudio_path, subdir => 'pulseaudio', skip => 'pulseaudio.exe' },
                      );
 
     my @qvd_client_modules = qw(QVD::Client QVD::Config::Core QVD::Config
