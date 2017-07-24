@@ -164,6 +164,7 @@ command.qvd-l7r-slave = ${path.qvd.bin}/qvd-l7r-slave
 command.windows.xming = Xming\\Xming.exe
 command.windows.vcxsrv = VcxSrv\\vcxsrv.exe
 command.windows.pulseaudio = pulseaudio\\pulseaudio.exe
+command.windows.pulseaudio.default.pa = pulseaudio\\default.pa
 command.windows.nxproxy = nx\\nxproxy.exe
 command.windows.sftp-server = bin/sftp-server.exe
 command.windows.win-sftp-server = win-sftp-server.exe
@@ -178,6 +179,7 @@ command.qvd-lxc-autodev = ${path.qvd.bin}/qvd-lxc-autodev
 command.darwin.x11 = XQuartz.app
 command.darwin.nxproxy = bin/nxproxy
 command.darwin.pulseaudio = bin/pulseaudio
+command.darwin.pulseaudio.default.pa = etc/pulse/default.pa
 command.darwin.sftp-server = /usr/libexec/sftp-server
 
 command.usbsrv = /usr/local/bin/usbsrv

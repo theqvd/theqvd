@@ -887,20 +887,23 @@ sub _run {
 
         # Call pulseaudio in Windows or Darwin
         if ( $self->{audio} && ( $WINDOWS || $DARWIN ) ) {
-            my $pa_bin = $WINDOWS ? core_cfg('command.windows.pulseaudio') : core_cfg('command.darwin.pulseaudio');
+            my $pa_exe = File::Spec->rel2abs(core_cfg($WINDOWS
+                                                      ? 'command.windows.pulseaudio'
+                                                      : 'command.darwin.pulseaudio'),
+                                             $QVD::Client::App::app_dir);
+            my $pa_cfg = File::Spec->rel2abs(core_cfg($WINDOWS
+                                                      ? 'command.windows.pulseaudio.default.pa'
+                                                      : 'command.darwin.pulseaudio.default.pa'),
+                                             $QVD::Client::App::app_dir);
             my $pa_log = File::Spec->rel2abs("pulseaudio.log", $QVD::Client::App::user_dir);
-            my $pa_cfg = File::Spec->rel2abs("default.pa", $QVD::Client::App::user_dir);
-
-            my @pa = (File::Spec->rel2abs($pa_bin, $QVD::Client::App::app_dir),
-                      "--high-priority", "-vvvv");
-
-            # Current version of PulseAudio on Windows doesn't permit "file" target
-            push @pa, "--log-target=file:/$pa_log"  if ($DARWIN);
-
-            if ( -f $pa_cfg ) {
-		DEBUG "Using config file $pa_cfg";
-		push @pa, "-F", $pa_cfg;
-            }
+            my @pa = ($pa_exe,
+                      "--file=$pa_cfg",
+                      '--log-level=debug',
+                      '--high-priority=yes',
+                      '--use-pid-file=no',
+                      '--daemonize=no',
+                      '--system=no',
+                      "--log-target=file:$pa_log");
 
             DEBUG("Starting pulseaudio: @pa");
             $pa_proc = Proc::Background->new(@pa) or
