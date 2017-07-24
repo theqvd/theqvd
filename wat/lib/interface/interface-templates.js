@@ -306,40 +306,40 @@ Wat.I.T = {
             case 'osDetails':
                 templates = {
                     osConfiguration: {
-                        name: 'details/osf-os-configuration'
+                        name: 'details/osd'
                     },
                     osConfigurationEditor: {
-                        name: 'editor/osf-os-configuration'
+                        name: 'editor/osd'
                     },
                     osConfigurationEditorAppearance: {
-                        name: 'editor/osf-os-configuration-appearance'
+                        name: 'editor/osd-appearance'
                     },
                     osConfigurationEditorApps: {
-                        name: 'editor/osf-os-configuration-applications'
+                        name: 'editor/osd-applications'
                     },
                     osConfigurationEditorPackages: {
-                        name: 'editor/osf-os-configuration-packages'
+                        name: 'editor/osd-packages'
                     },
                     osConfigurationEditorSettings: {
-                        name: 'editor/osf-os-configuration-settings'
+                        name: 'editor/osd-settings'
                     },
                     osConfigurationEditorShortcuts: {
-                        name: 'editor/osf-os-configuration-shortcuts'
+                        name: 'editor/osd-shortcuts'
                     },
                     osConfigurationEditorShortcutsRows: {
-                        name: 'editor/osf-os-configuration-shortcuts-rows'
+                        name: 'editor/osd-shortcuts-rows'
                     },
                     osConfigurationEditorScripts: {
-                        name: 'editor/osf-os-configuration-scripts'
+                        name: 'editor/osd-scripts'
                     },
                     osConfigurationEditorScriptsManager: {
-                        name: 'editor/osf-os-configuration-scripts-manager'
+                        name: 'editor/osd-scripts-manager'
                     },
                     osConfigurationEditorScriptsRows: {
-                        name: 'editor/osf-os-configuration-scripts-rows'
+                        name: 'editor/osd-scripts-rows'
                     },
                     osConfigurationEditorAssetOptions: {
-                        name: 'editor/osf-os-configuration-asset-options'
+                        name: 'editor/osd-asset-options'
                     },
                     packageBlockWrapper: {
                         name: 'list/package-block-wrapper'

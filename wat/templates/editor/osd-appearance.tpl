@@ -1,4 +1,4 @@
-<table class="js-editor-table editor-table list os-conf-editor os-conf-editor--appearance">
+<table class="js-editor-table editor-table list os-conf-editor os-conf-editor--appearance <%= cid %>">
     <tr>
         <td class="col-width-40 js-select-mode select-mode">
             <div>

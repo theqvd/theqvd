@@ -1,4 +1,4 @@
-<table class="js-editor-table editor-table">
+<table class="js-editor-table editor-table <%= cid %>">
     <tr>
         <td>
             <table class="col-width-100 list">

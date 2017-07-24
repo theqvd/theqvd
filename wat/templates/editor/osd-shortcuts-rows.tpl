@@ -2,7 +2,7 @@
 $.each(shortcuts, function (iSc, sc) {
     sc.id = btoa(sc.command); // Just mock
 %>
-    <tr data-form-list="shortcuts" class="js-shortcut-row" data-id="<%= sc.id %>">
+    <tr data-form-list="shortcuts" class="js-shortcut-row <%= cid %>" data-id="<%= sc.id %>">
         <td class="col-width-5">
             <button class="button2 fright button-icon--desktop js-button-show-shortcut-details fa fa-chevron-down" href="javascript:" data-i18n="[title]Edit" data-id="<%= sc.id %>">
             </button>
@@ -26,7 +26,7 @@ $.each(shortcuts, function (iSc, sc) {
             </button>
         </td>
     </tr>
-    <tr class="hidden js-editor-row" data-id="<%= sc.id %>">
+    <tr class="hidden js-editor-row <%= cid %>" data-id="<%= sc.id %>">
         <td colspan="4">
             <table class="col-width-100">
                 <tr>

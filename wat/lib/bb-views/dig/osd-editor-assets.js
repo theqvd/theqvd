@@ -1,4 +1,4 @@
-Wat.Views.OSDScriptsEditorView = Wat.Views.DialogView.extend({
+Wat.Views.OSDAssetsEditorView = Wat.Views.OSDEditorView.extend({
     qvdObj: 'osf',
     
     initialize: function (params) {
@@ -26,7 +26,8 @@ Wat.Views.OSDScriptsEditorView = Wat.Views.DialogView.extend({
                 massive: false,
                 model: Wat.CurrentView.OSDmodel,
                 hookOptions: Wat.CurrentView.OSDmodel.getPluginAttrSettingOptions('execution_hooks.script.hook'),
-                assetType: 'script'
+                assetType: 'script',
+                cid: this.cid
             }
         );
 

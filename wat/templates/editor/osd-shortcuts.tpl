@@ -4,7 +4,7 @@
         </div>
 <% } %>
 
-<table class="js-list-shortcuts" style="margin-bottom: 20px;">
+<table class="js-list-shortcuts <%= cid %>" style="margin-bottom: 20px;">
     <tbody class="shortcuts-form">
         <tr>
             <td class="col-width-47">
