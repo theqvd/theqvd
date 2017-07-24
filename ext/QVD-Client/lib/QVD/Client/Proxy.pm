@@ -903,6 +903,8 @@ sub _run {
                       '--use-pid-file=no',
                       '--daemonize=no',
                       '--system=no',
+                      '--disallow-exit=yes',
+                      '--exit-idle-time=-1',
                       "--log-target=file:$pa_log");
 
             DEBUG("Starting pulseaudio: @pa");
