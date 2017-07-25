@@ -917,16 +917,6 @@ sub _cmd
 ## METHODS TO PRINT RESPONSES IN CONSOLE RUN ##
 ###############################################
 
-# It prints the total number of objects retrieved 
-# by the API
-
-sub print_count
-{
-    my ($self,$res) = @_;
-	my $total = $res->json('/total');
-	print "Total: $total\n" if defined($total);
-}
-
 # It takes the response of the API and the original query
 # According to fields asked in the query, it prints in a 
 # table in console the info stored in the API response
@@ -942,36 +932,41 @@ sub print_table
 
 	my @fields = $self->get_fields($parsing, $res);
 
-	unless (@fields) {
-		$self->print_count($res);
-		return;
-	}
-
 	my $n = 0;
 	my @values = ();
-    while (my $field = $res->json("/rows/$n")) 
-    { 
+	while (my $field = $res->json("/rows/$n"))
+	{
 		$values[$n] = [ map {
 			$self->get_field_value($parsing, $field, $_) // ''
 		} @fields ];
-	$n++;
-    }
+		$n++;
+	}
 
 	my $display_mode = $self->getDisplayTableMode();
 	if ($display_mode eq "CSV") {
-		print join(";", @fields) . "\n";
-		for ($n = 0; $n < @values; $n++) {
-			print join(";", @{$values[$n]} ) . "\n";
+		if (@fields) {
+			print join(";", @fields)."\n";
+			for ($n = 0; $n < @values; $n++) {
+				print join(";", @{$values[$n]} )."\n";
+			}
+		} else {
+			print STDOUT "total\n";
+			print STDOUT $res->json('/total')."\n";
 		}
+	} elsif ($display_mode eq "TABLE") {
+		if(@fields) {
+			my $tb = Text::UnicodeTable::Simple->new();
+
+			$tb->set_header(@fields);
+			for ($n = 0; $n < @values; $n++) {
+				$tb->add_row( $values[$n] );
+			}
+
+			print STDOUT "$tb";
+		}
+		print STDOUT "Total: ".$res->json('/total')."\n";
 	} else {
-		my $tb = Text::UnicodeTable::Simple->new();
-
-		$tb->set_header(@fields);
-		for ($n = 0; $n < @values; $n++) {
-			$tb->add_row( $values[$n] );
-		}
-
-    print STDOUT "$tb" . "Total: ".$res->json('/total')."\n";
+		print STDOUT "Unknown format $display_mode\n";
 	}
 }
 
@@ -1092,9 +1087,11 @@ sub ask_api_staging
         else
         {
             print STDERR sprintf("\nUpload finished (%s) : %s\n", $msg_data->{status}, $msg_data->{message});
+			$res = $tx->res;
+			# Include message content in response body
+			$res->body($msg);
             $tx->finish;
             $accomplished = 1;
-            $res = $tx->res;
         }
     };
 
