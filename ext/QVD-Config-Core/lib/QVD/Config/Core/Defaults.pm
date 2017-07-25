@@ -165,7 +165,7 @@ command.windows.xming = Xming\\Xming.exe
 command.windows.vcxsrv = VcxSrv\\vcxsrv.exe
 command.windows.pulseaudio = pulseaudio\\pulseaudio.exe
 command.windows.pulseaudio.default.pa = pulseaudio\\default.pa
-command.windows.nxproxy = nx\\nxproxy.exe
+command.windows.nxproxy = bin\\nxproxy.exe
 command.windows.sftp-server = bin/sftp-server.exe
 command.windows.win-sftp-server = win-sftp-server.exe
 client.use.win-sftp-server = 1
@@ -342,7 +342,7 @@ client.ssl.ocsp_mode=SSL_OCSP_TRY_STAPLE|SSL_OCSP_FAIL_HARD
 ## slave shell
 client.slave.command = ${path.qvd.bin}/
 @mswin@client.slave.command = qvd-client-slaveserver
-@mswin@client.slave.wrapper = slaveserver-wrapper/qvd-slaveserver-wrapper.exe
+@mswin@client.slave.wrapper = bin/qvd-slaveserver-wrapper.exe
 client.slave.client = ${path.qvd.bin}/qvd-slaveclient
 # enable commands used for benchmarking and testing the functionality
 # of the slave channel
