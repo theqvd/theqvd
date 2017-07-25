@@ -84,12 +84,12 @@ else {
     my $win_sftp_server_path = path($win_sftp_server)->realpath;
     -d $pulseaudio or die "$pulseaudio not found";
     my $pulseaudio_path = path($pulseaudio)->realpath;
-    -d $slaveserver_wrapper or die "$slaveserver_wrapper no found";
+    -d $slaveserver_wrapper or die "$slaveserver_wrapper not found";
     my $slaveserver_wrapper_path = path($slaveserver_wrapper)->realpath;
 
     my @extra_exes = ( { path => $nx_libs_path->child('nxproxy/nxproxy.exe'),
                          search_path => $nx_libs_path->child('nxcomp'),
-                         subdir => 'nx',
+                         subdir => 'bin',
                          subsystem => 'windows',
                          cygwin => 1 },
                        { path => $win_sftp_server_path->child('win-sftp-server.exe'),
@@ -100,11 +100,14 @@ else {
                          scan_deps => 0 },
                        { path => $slaveserver_wrapper_path->child('qvd-slaveserver-wrapper.exe'),
                          subsystem => 'windows',
-                         subdir => 'slaveserver-wrapper',
+                         subdir => 'bin',
+                         cygwin => 1 },
+                       { path => 'cygwin-console-helper.exe',
+                         subdir => 'bin',
                          cygwin => 1 },
                      );
 
-    my @extra_dirs = ( { path => $installer_path->child('pixmaps')->stringify },
+    my @extra_dirs = ( { path => $installer_path->child('pixmaps'), subdir => 'pixmaps' },
                        { path => $vcxsrv_path, subdir => 'vcxsrv' },
                        { path => $pulseaudio_path, subdir => 'pulseaudio', skip => 'pulseaudio.exe' },
                      );
