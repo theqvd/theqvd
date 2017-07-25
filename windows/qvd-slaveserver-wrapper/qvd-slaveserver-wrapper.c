@@ -6,9 +6,28 @@
 #include <string.h>
 #include <poll.h>
 #include <errno.h>
+#include <stdarg.h>
 #include <sys/wait.h>
 
 #define BUFSIZE (1024*16)
+
+
+static void dbg(const char *fmt, ...) {
+#ifdef DEBUG
+    static FILE *logfh = NULL;
+
+    if (!logfh) logfh = fopen("/tmp/qvd-slaveserver-wrapper.log", "a");
+
+    if (logfh) {
+        va_list args;
+        va_start(args, fmt);
+        vfprintf(logfh, fmt, args);
+        fputs("\n", logfh);
+        fflush(logfh);
+        va_end(args);
+    }
+#endif
+}
 
 /* C = child, P = parent, I = in (we write here), O = out (we read from here) */
 #define FDPO 0
@@ -44,6 +63,19 @@ main(int argc, char *argv[]) {
         exit(254);
     }
 
+    char *cargv[5];
+    cargv[0] = getenv("QVD_SLAVE_CMD");
+    cargv[1] = getenv("QVD_SLAVE_ARG1");
+    cargv[2] = getenv("QVD_SLAVE_ARG2");
+    cargv[3] = getenv("QVD_SLAVE_ARG3");
+    cargv[4] = NULL;
+
+    if (cargv[0] == NULL) {
+        errno = EINVAL;
+        perror("QVD_SLAVE_CMD not set");
+        exit(254);
+    }
+
     struct sigaction intsave, quitsave;
     sigaction(SIGINT, NULL, &intsave);
     sigaction(SIGQUIT, NULL, &quitsave);
@@ -65,19 +97,6 @@ main(int argc, char *argv[]) {
         for (int fd = 0; fd < 2; fd++)
             fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) & ~FD_CLOEXEC);
 
-        char *cargv[5];
-        cargv[0] = getenv("QVD_SLAVE_CMD");
-        cargv[1] = getenv("QVD_SLAVE_ARG1");
-        cargv[2] = getenv("QVD_SLAVE_ARG2");
-        cargv[3] = getenv("QVD_SLAVE_ARG3");
-        cargv[4] = NULL;
-
-        if (cargv[0] == NULL) {
-            errno = EINVAL;
-            perror("QVD_SLAVE_CMD not set");
-            exit(254);
-        }
-
         execvp(cargv[0], cargv);
         perror("execvp failed");
         exit(254);
@@ -91,7 +110,9 @@ main(int argc, char *argv[]) {
     dup2(cin[1], FDCI);
     dup2(cout[0], FDCO);
 
-    /* for (int fd = FDUNUSED; fd < 256; fd++) close(fd); */
+    for (int fd = FDUNUSED; fd < 256; fd++) close(fd);
+
+    dbg("child forked, pid: %d", pid);
 
     char p2c[BUFSIZE];
     char c2p[BUFSIZE];
@@ -111,16 +132,25 @@ main(int argc, char *argv[]) {
     pfd[FDCO].events = POLLIN;
 
     while (pfd[FDCI].fd >= 0 || pfd[FDPI].fd >= 0) {
+
+        for (int fd = 0; fd < FDUNUSED; fd++) pfd[fd].revents = 0;
+
         int n = poll(pfd, FDUNUSED, 1000);
+        dbg("Looping, n: %d", n);
         if (n < 0) {
             if (n == EINTR) continue;
             perror("poll failed");
             exit(254);
         }
 
+        dbg("revents pi: %d ci: %d po: %d co: %d",
+            pfd[FDPI].revents, pfd[FDCI].revents,
+            pfd[FDPO].revents, pfd[FDCO].revents);
+
         if (pfd[FDPI].events) {
             if (pfd[FDPI].revents & POLLOUT) {
                 int n = write(FDPI, c2p + c2p_p, (c2p_c - c2p_p));
+                dbg("%d bytes written in %d", n, FDPI);
                 if (n < 0) {
                     if (n != EAGAIN && n != EINTR) {
                         perror("write failed");
@@ -148,21 +178,14 @@ main(int argc, char *argv[]) {
                             pfd[FDCO].events = POLLIN;
                     }
                 }
-            }
-            else if (pfd[FDPI].revents & POLLHUP) {
-                close(FDPI);
-                pfd[FDPI].fd = -1;
-                pfd[FDPI].events = 0;
-                if (pfd[FDCO].fd >= 0) {
-                    close(FDCO);
-                    pfd[FDCO].fd = -1;
-                    pfd[FDCO].events = 0;
-                }
+                else
+                    pfd[FDPI].revents |= POLLHUP;
             }
         }
         if (pfd[FDCI].events) {
             if (pfd[FDCI].revents & POLLOUT) {
                 int n = write(FDCI, p2c + p2c_c, (p2c_p - p2c_c));
+                dbg("%d bytes written in %d", n, FDCI);
                 if (n < 0){
                     if (n != EAGAIN && n != EINTR) {
                         perror("write failed");
@@ -190,28 +213,22 @@ main(int argc, char *argv[]) {
                             pfd[FDPO].events = POLLIN;
                     }
                 }
-            }
-            else if (pfd[FDCI].revents & POLLHUP) {
-                close(FDCI);
-                pfd[FDCI].fd = -1;
-                pfd[FDCI].events = 0;
-                if (pfd[FDPO].fd >= 0) {
-                    close(FDPO);
-                    pfd[FDPO].fd = -1;
-                    pfd[FDPO].events = 0;
-                }
+                else
+                    pfd[FDCI].revents |= POLLHUP;
             }
         }
+
         if (pfd[FDPO].events) {
             if (pfd[FDPO].revents & POLLIN) {
                 int n = read(FDPO, p2c + p2c_p, BUFSIZE - p2c_p);
+                dbg("%d bytes read in %d", n, FDPO);
                 if (n < 0) {
-                     if (n != EAGAIN && n != EINTR) {
+                    if (n != EAGAIN && n != EINTR) {
                         perror("write failed");
                         exit(254);
                     }
                 }
-                else {
+                else if (n > 0) {
                     p2c_p += n;
                     if (p2c_p) {
                         pfd[FDCI].events = POLLOUT;
@@ -219,28 +236,23 @@ main(int argc, char *argv[]) {
                             pfd[FDPO].events = 0;
                     }
                 }
-            }
-            else if (pfd[FDPO].revents & POLLHUP) {
-                close(FDPO);
-                pfd[FDPO].fd = -1;
-                pfd[FDPO].events = 0;
-                if (p2c_p == p2c_c) {
-                    close(FDCI);
-                    pfd[FDCI].fd = -1;
-                    pfd[FDCI].events = 0;
-                }
+                else
+                    pfd[FDPO].revents |= POLLHUP;
             }
         }
+
         if (pfd[FDCO].events) {
+            dbg("FDCO events: %d", pfd[FDCO].events);
             if (pfd[FDCO].revents & POLLIN) {
                 int n = read(FDCO, c2p + c2p_c, BUFSIZE - c2p_c);
+                dbg("%d bytes read in %d", n, FDCO);
                 if (n < 0) {
-                     if (n != EAGAIN && n != EINTR) {
+                    if (n != EAGAIN && n != EINTR) {
                         perror("write failed");
                         exit(254);
                     }
                 }
-                else {
+                else if (n > 0) {
                     c2p_c += n;
                     if (c2p_c) {
                         pfd[FDPI].events = POLLOUT;
@@ -248,23 +260,63 @@ main(int argc, char *argv[]) {
                             pfd[FDCO].events = 0;
                     }
                 }
+                else
+                    pfd[FDCO].revents |= POLLHUP;
             }
-            else if (pfd[FDCO].revents & POLLHUP) {
+        }
+        if (pfd[FDPO].revents & POLLHUP) {
+            dbg("hup in %d", FDPO);
+            close(FDPO);
+            pfd[FDPO].fd = -1;
+            pfd[FDPO].events = 0;
+            if (p2c_p == p2c_c) {
+                close(FDCI);
+                pfd[FDCI].fd = -1;
+                pfd[FDCI].events = 0;
+            }
+        }
+        if (pfd[FDCO].revents & POLLHUP) {
+            dbg("hup in %d", FDCO);
+            close(FDCO);
+            pfd[FDCO].fd = -1;
+            pfd[FDCO].events = 0;
+            if (c2p_c == c2p_p) {
+                close(FDPI);
+                pfd[FDPI].fd = -1;
+                pfd[FDPI].events = 0;
+            }
+            if (pfd[FDCI].fd >= 0)
+                pfd[FDCI].revents |= POLLHUP;
+        }
+        if (pfd[FDPI].revents & POLLHUP) {
+            dbg("hup in %d", n, FDPI);
+            close(FDPI);
+            pfd[FDPI].fd = -1;
+            pfd[FDPI].events = 0;
+            if (pfd[FDCO].fd >= 0) {
                 close(FDCO);
                 pfd[FDCO].fd = -1;
                 pfd[FDCO].events = 0;
-                if (c2p_c == c2p_p) {
-                    close(FDPI);
-                    pfd[FDPI].fd = -1;
-                    pfd[FDPI].events = 0;
-                }
+            }
+        }
+        if (pfd[FDCI].revents & POLLHUP) {
+            dbg("hup in %d", FDCI);
+            close(FDCI);
+            pfd[FDCI].fd = -1;
+            pfd[FDCI].events = 0;
+            if (pfd[FDPO].fd >= 0) {
+                close(FDPO);
+                pfd[FDPO].fd = -1;
+                pfd[FDPO].events = 0;
             }
         }
     }
 
+    dbg("waiting for child %d", pid);
     int wstatus;
     while(1) {
         int rc = waitpid(pid, &wstatus, 0);
+        dbg("waitpid returned %d", rc);
         if (rc < 0) {
             perror("waitpid failed");
             exit(254);
