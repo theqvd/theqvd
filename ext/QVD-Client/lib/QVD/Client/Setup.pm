@@ -1,10 +1,14 @@
+package QVD::Client::Setup;
+
 use strict;
 use warnings;
 use 5.010;
 
-our ($WINDOWS, $DARWIN, $user_dir, $app_dir);
+require Exporter;
+our @ISA = qw(Exporter);
+our @EXPORT = qw($WINDOWS $DARWIN $user_dir $app_dir);
 
-package QVD::Client::Setup;
+our ($WINDOWS, $DARWIN, $user_dir, $app_dir);
 
 use File::Spec;
 use Cwd;
@@ -24,8 +28,8 @@ BEGIN {
 
     no warnings;
     $QVD::Config::USE_DB = 0;
-    @QVD::Config::Core::FILES = ( ($WINDOWS ? () : ('/etc/qvd/client.conf')),
-                                  $user_config_filename );
+    @QVD::Config::Core::FILES = (($WINDOWS ? () : ('/etc/qvd/client.conf')),
+                                  $cfg_fn);
 }
 
 # we can load the configuration now:

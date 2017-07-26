@@ -18,6 +18,7 @@ use QVD::Log;
 use QVD::HTTP::StatusCodes qw(:all);
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
 use File::Temp;
+use QVD::HTTP::Headers qw(header_lookup);
 
 sub default_values { return { no_client_stdout => 1 } }
 
@@ -134,16 +135,19 @@ sub process_request {
 sub set_http_request_processor {
     my ($self, $callback, $method, $url) = @_;
     my $matcher;
-    if (my $captures = $url =~ /\*/g) {
+    my $captures = $url =~ /\*+/g;
+    if ($captures) {
         my @parts = split /(\*+)/, $url;
-        $matcher = join('', map { $_ eq '**' ? '(.*)'    :
-                                  $_ eq '*'  ? '([^/]*)' :
-                                      quotemeta $_ } @parts);
+        $matcher = join('', $method, ' ',
+                        map { $_ eq '**' ? '(.*)'    :
+                              $_ eq '*'  ? '([^/]*)' :
+                                  quotemeta $_ } @parts);
     }
     else {
         $matcher = quotemeta("$method $url");
     }
     $matcher = qr/^$matcher$/;
+    DEBUG "Registering processor for $method $url, matcher: $matcher";
     my $p = $self->{_http_request_processor} //= [];
     @$p = sort { length $a->[1] <=> length $b->[1] } @$p, [$callback, $url, $matcher, $captures];
     my $c = $self->{_http_request_processor_cache} ||= {};
@@ -157,15 +161,17 @@ sub _get_http_request_processor {
     my $cache = $self->{_http_request_processor_cache} //= {};
     return $cache->{$pair} if defined $cache->{pair};
     for my $p (@{$self->{_http_request_processor} //= []}) {
-        my $matcher = $_->[2];
-        if ($_->[3]) { # matcher captures!
+        my $matcher = $p->[2];
+        DEBUG "Checking $pair against $matcher";
+        if ($p->[3]) { # matcher captures!
             if (my @captures = $pair =~ $matcher) {
                 # don't cache capturing URLs
-                return ($_->[0], @captures);
+                DEBUG "Match!";
+                return ($p->[0], @captures);
             }
         }
         elsif ($pair =~ $matcher) {
-            return $cache->{$pair} = $_->[0];
+            return $cache->{$pair} = $p->[0];
         }
     }
     ()
@@ -263,17 +269,17 @@ sub save_content_into_temp_file {
         binmode $fh;
         while ($len) {
             my $chunk_size = ($len > 8192 ? 8192 : $len);
-            my $bytes = read($sock, my $buf, $chunk_size);
+            my $bytes = read($socket, my $buf, $chunk_size);
             if (defined $bytes) {
                 if ($bytes > 0) {
-                    print {$fh} $bytes;
+                    print {$fh} $buf;
                     $len -= $bytes;
-                    continue;
+                    next
                 }
             }
             elsif ($! == Errno::EINTR or $! == Errno::EAGAIN or $! == Errno::EWOULDBLOCK) {
                 select undef, undef, undef, 0.1;
-                continue;
+                next
             }
             unlink $fn;
             $self->throw_http_error(QVD::HTTP::StatusCodes::HTTP_BAD_REQUEST);
@@ -316,10 +322,12 @@ sub process_request {
     # Net::Server::INET sets up doesn't work well. (But this also means this
     # module is not really compatible with INET.)
     $self->{server}{client} = IO::Handle->new_from_fd(fileno(STDIN), '+<');
+    binmode $self->{server}{client};
     $self->{server}{client}->autoflush();
     $self->{server}{client}->blocking(1);
 
     $self->{server}{fd_out} = IO::Handle->new_from_fd(fileno(STDOUT), '+>');
+    binmode $self->{server}{fd_out};
     $self->{server}{fd_out}->autoflush();
     $self->{server}{fd_out}->blocking(1);
 

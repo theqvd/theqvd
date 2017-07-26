@@ -9,17 +9,19 @@ use QVD::Client::Setup;
 
 BEGIN {
     require parent;
-    parent->import('QVD::HTTPD::INET',
-                   ($WINDOWS
-                    ? 'QVD::Client::SlaveServer::Windows'
-                    : 'QVD::Client::SlaveServer::Unix'));
+    parent->import($WINDOWS
+                   ? 'QVD::Client::SlaveServer::Windows'
+                   : 'QVD::Client::SlaveServer::Unix');
+    require QVD::HTTPD;
+    push our(@ISA), 'QVD::HTTPD::INET';
 }
 
 use QVD::Log;
+use QVD::Config::Core qw(core_cfg);
 use IO::Select;
 use QVD::HTTP::Headers qw(header_eq_check header_lookup);
 use QVD::HTTP::StatusCodes qw(:all);
-use QVD::HTTPD;
+
 use File::Spec;
 use URI::Split qw(uri_split);
 use URI;
@@ -162,15 +164,14 @@ sub handle_fastgen {
 	
 	my $char = $self->_url_to_port($url);
 	if (!$char && $char < 0 || $char > 255 ) {
-		$self->send_http_error(HTTP_BAD_REQUEST, "Character number must be between 0 and 255");
-		return;
+            $self->throw_http_error(HTTP_BAD_REQUEST, "Character number must be between 0 and 255");
 	}
 	
 	$self->send_http_response(HTTP_SWITCHING_PROTOCOLS);
 	
 	my $buf = chr($char) x 1024;
 	while( syswrite(STDOUT, $buf) ) {
-		# nothing
+            # nothing
 	}
 
 }
@@ -180,7 +181,7 @@ sub handle_connect {
     my ($self, $method, $url, $headers, $captures) = @_;
 
     my $port = $captures->[0];
-    $self->send_http_error(HTTP_BAD_REQUEST, "Bad port number")
+    $self->throw_http_error(HTTP_BAD_REQUEST, "Bad port number")
         unless defined $port and $port =~ /^\w+$/;
 
     _tcp_connect($port);
@@ -206,12 +207,8 @@ sub handle_connect {
 sub handle_port_check {
     my ($self, $method, $url, $headers) = @_;
 
-    my $port = $self->_url_to_port($url);
-
-    unless ($port) {
-        $self->send_http_error(HTTP_BAD_REQUEST, "Bad port number");
-        return;
-    }
+    my $port = $self->_url_to_port($url) ||
+        $self->throw_http_error(HTTP_BAD_REQUEST, "Bad port number");
 
     my $sock = new IO::Socket::INET( PeerAddr => 'localhost',
                                      PeerPort => $port,
@@ -220,16 +217,16 @@ sub handle_port_check {
     if ( $sock ) {
         $self->send_http_response(HTTP_OK);
     } else {
-        $self->send_http_error(HTTP_FORBIDDEN, $!);
+        $self->throw_http_error(HTTP_FORBIDDEN, $!);
     }
 }
 
 sub handle_get_nsplugin {
     my ($httpd, $method, $url, $headers) = @_;
 
-    $httpd->send_http_error(HTTP_BAD_REQUEST)
-        unless header_eq_check($headers, Connection => 'Upgrade')
-           and header_eq_check($headers, Upgrade => 'qvd:slave/1.0');
+    $httpd->throw_http_error(HTTP_BAD_REQUEST)
+        unless ( header_eq_check($headers, Connection => 'Upgrade') and
+                 header_eq_check($headers, Upgrade => 'qvd:slave/1.0') );
 
     my $uri = URI->new($url);
     my %query = $uri->query_form();
@@ -281,18 +278,27 @@ sub handle_printer_printjob {
     my ($self, $method, $url, $headers, $captures) = @_;
     my $printer_name = $captures->[0] // do {
         ERROR "printer name missing from end-point";
-        $self->_send_http_error(HTTP_BAD_REQUEST, "Bad printer name");
+        $self->_throw_http_error(HTTP_BAD_REQUEST, "Bad printer name");
     };
 
-    my $fn = $self->save_content_info_temp_file($headers);
+    my $fn = $self->save_content_into_temp_file($headers);
 
-    $l7r->send_http_response(HTTP_PROCESSING,
+    $self->send_http_response(HTTP_PROCESSING,
                              "X-QVD-SlaveServer-Info: Document is being queued for printing");
-    $self->_print_file($printer_name, $fn);
+    my $rc = $self->_print_file($printer_name, $fn);
     unlink $fn;
 
-    # FIXME: we return the printer name as plain text here, really?
-    $self->send_http_response_with_body(HTTP_OK, 'text/plain', [], $printer_name);
+    if ($rc) {
+        DEBUG "File $fn printed to $printer_name";
+        # FIXME: we return the printer name as plain text here, really?
+        $self->send_http_response_with_body(HTTP_OK, 'text/plain', [], $printer_name);
+    }
+    else {
+        ERROR "Unable to send file $fn to printer $printer_name";
+        $self->send_http_error(HTTP_INTERNAL_SERVER_ERROR,
+                               "Unable to enqueue docuement for printing");
+    }
+
 }
 
 'QVD-Client'
