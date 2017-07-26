@@ -33,6 +33,7 @@ my $vcxsrv = 'c:\\program files\\vcxsrv';
 my $pulseaudio = $installer_path->child('pulseaudio');
 my $win_sftp_server = $installer_path->child('win-sftp-server');
 my $slaveserver_wrapper = $qvd_src_path->child('windows', 'qvd-slaveserver-wrapper');
+my $gsview = 'c:\\program files\\ghostgum\\gsview';
 my $cygwin;
 my $cygdrive;
 my $qvd_version = '4.1';
@@ -51,6 +52,7 @@ GetOptions('log-file|log|l=s' => \$log_file,
            'pulseaudio=s' => \$pulseaudio,
            'win-sftp-server=s' => \$win_sftp_server,
            'slaveserver-wrapper=s' => \$slaveserver_wrapper,
+           'gsview=s' => \$gsview,
            'cygwin=s' => \$cygwin,
            'cygdrive=s' => \$cygdrive,
            'qvd-version|V=s' => \$qvd_version,
@@ -86,6 +88,8 @@ else {
     my $pulseaudio_path = path($pulseaudio)->realpath;
     -d $slaveserver_wrapper or die "$slaveserver_wrapper not found";
     my $slaveserver_wrapper_path = path($slaveserver_wrapper)->realpath;
+    -d $gsview or die "$gsview not found";
+    my $gsview_path = path($gsview)->realpath;
 
     my @extra_exes = ( { path => $nx_libs_path->child('nxproxy/nxproxy.exe'),
                          search_path => $nx_libs_path->child('nxcomp'),
@@ -105,6 +109,9 @@ else {
                        { path => 'cygwin-console-helper.exe',
                          subdir => 'bin',
                          cygwin => 1 },
+                       { path => $gsview_path->child('gsprint.exe'),
+                         subdir => 'gsview',
+                         subsystem => 'windows' },
                      );
 
     my @extra_dirs = ( { path => $installer_path->child('pixmaps'), subdir => 'pixmaps' },
@@ -136,6 +143,7 @@ else {
                 work_dir => "$work_path",
                 extra_inc => \@extra_inc,
                 extra_module => [qw(QVD::Client::SlaveClient::Windows
+                                    QVD::Client::SlaveServer::Windows
                                     Log::Dispatch::FileRotate
                                     Encode::Unicode
                                     Tie::Hash::NamedCapture

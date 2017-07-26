@@ -187,6 +187,8 @@ command.usbclnt = /usr/local/bin/usbclnt
 command.usbip = /usr/bin/usbip
 command.slaveclient = ${path.qvd.bin}/qvd-slaveclient
 
+@mswin@command.gsprint = gsview/gsprint
+
 ## whether to remember password after successful connection
 client.remember_password = 0
 
