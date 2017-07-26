@@ -1,50 +1,18 @@
-#!/Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/perl 
+#!/usr/bin/perl
 
 package QVD::Client::App;
+use QVD::Client::Setup;
 
 use strict;
 use warnings;
 use 5.010;
 
-use Cwd;
 use File::Spec;
 use Proc::Background;
 use URI::Escape qw(uri_unescape);
+use QVD::Config::Core qw(core_cfg);
+use QVD::Log;
 
-our ($WINDOWS, $DARWIN, $user_dir, $app_dir, $user_config_filename, $user_certs_dir, $pixmaps_dir, $orig_display);
-
-my $prev_bad_log_level;
-
-BEGIN {
-    $WINDOWS = ($^O eq 'MSWin32');
-    $DARWIN = ($^O eq 'darwin');
-
-# Make sure cups service is online (in El Capitan , cups is not running until used)
-    if ( $DARWIN ){ system('/usr/sbin/cupsctl >/dev/null 2>&1'); }
-
-    $user_dir = File::Spec->rel2abs($WINDOWS
-                                    ? File::Spec->join($ENV{APPDATA}, 'QVD')
-                                    : File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
-    mkdir($user_dir);
-
-    # FIXME NX_CLIENT is used for showing the user information on things
-    # like broken connection, perhaps we should show them to the user
-    # instead of ignoring them? 
-    $ENV{NX_CLIENT} = $WINDOWS ? 'cmd.exe /c :' : 'false';
-
-    $user_config_filename = $ARGV[0] // File::Spec->join($user_dir, 'client.conf');
-
-    no warnings;
-    $QVD::Config::USE_DB = 0;
-    @QVD::Config::Core::FILES = ( ($WINDOWS ? () : ('/etc/qvd/client.conf')),
-                                  $user_config_filename );
-								  
-	$orig_display = $ENV{DISPLAY};
-}
-
-use QVD::Config::Core qw(set_core_cfg core_cfg);
-
-# change defaults for log configuration before loading it
 BEGIN {
     for $ARGV (@ARGV) {
         my @args = ($ARGV);
@@ -57,48 +25,14 @@ BEGIN {
             }
         }
     }
-
-    set_core_cfg('client.log.filename', File::Spec->join($user_dir, 'qvd-client.log'))
-        unless defined core_cfg('client.log.filename', 0);
-    $QVD::Log::DAEMON_NAME = 'client';
-
-    $app_dir = core_cfg('path.client.installation', 0);
-    if (!$app_dir) {
-        my ($drive, $dir, $file) = File::Spec->splitpath(File::Spec->rel2abs($0));
-        my $bin_dir = File::Spec->catpath($drive, $dir);
-        if ($WINDOWS) {
-            $app_dir = $bin_dir;
-        }
-        else {
-            my @dirs = File::Spec->splitdir($bin_dir);
-            $app_dir = File::Spec->catdir( @dirs[0..$#dirs-1] );
-        }
-    }
-
-	if ( core_cfg('log.level') !~ /^(DEBUG|INFO|WARN|ERROR|FATAL|TRACE|ALL|OFF)$/ ) {
-		$prev_bad_log_level = core_cfg('log.level');
-
-		warn "Bad log.level '$prev_bad_log_level', changing to DEBUG";
-		set_core_cfg('log.level', 'DEBUG');
-	}
 }
 
-use QVD::Log;
-
-if ( $prev_bad_log_level ) {
-	WARN "Bad log.level in config file: '$prev_bad_log_level'";
-	WARN "Changed to " . core_cfg('log.level');
-}
-
-INFO "user_dir: $user_dir";
-INFO "app_dir: $app_dir";
-
-$user_certs_dir = File::Spec->rel2abs(core_cfg('path.ssl.ca.personal'), $user_dir);
+our $orig_display = $ENV{DISPLAY};
+our $user_certs_dir = File::Spec->rel2abs(core_cfg('path.ssl.ca.personal'), $user_dir);
 mkdir $user_certs_dir;
-
 INFO "user_certs_dir: $user_certs_dir";
 
-$pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps'), $app_dir);
+our $pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps'), $app_dir);
 $pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps.alt'), $app_dir) unless -d $pixmaps_dir;
 INFO "pixmaps_dir: $pixmaps_dir";
 
