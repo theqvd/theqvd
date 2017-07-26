@@ -8,7 +8,6 @@ use warnings;
 use 5.010;
 
 use File::Spec;
-use Proc::Background;
 use URI::Escape qw(uri_unescape);
 use QVD::Config::Core qw(core_cfg);
 use QVD::Log;
@@ -46,9 +45,6 @@ use parent 'Wx::App';
 sub OnInit {
     my $self = shift;
     DEBUG("OnInit called");
-
-
-
     DEBUG("Showing frame");
     my $frame = QVD::Client::Frame->new();
     $self->SetTopWindow($frame);
@@ -98,15 +94,16 @@ __END__
 
 =head1 NAME
 
-qvd-client - The QVD GUI Client
+qvd-gui-client - The QVD GUI Client
 
 =head1 DESCRIPTION
 
-B<qvd-client> is a graphic client that lets a user to connect to a virtual machine and take control of the remote desktop.
+B<qvd-client> is a graphical client that lets a user connect to a
+virtual machine and take control of the remote desktop.
 
 =head1 COPYRIGHT
 
-Copyright 2009-2010 by Qindel Formacion y Servicios S.L.
+Copyright 2009-2017 by Qindel Formacion y Servicios S.L.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU GPL version 3 as published by the Free
