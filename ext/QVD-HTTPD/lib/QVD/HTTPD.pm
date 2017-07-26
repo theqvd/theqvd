@@ -17,6 +17,7 @@ use URI::Split qw(uri_split);
 use QVD::Log;
 use QVD::HTTP::StatusCodes qw(:all);
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
+use File::Temp;
 
 sub default_values { return { no_client_stdout => 1 } }
 
@@ -132,12 +133,19 @@ sub process_request {
 
 sub set_http_request_processor {
     my ($self, $callback, $method, $url) = @_;
-    my $children_also = $url =~ s|/\*$||;
-    my $matcher = quotemeta("$method $url");
-    $matcher .= "(?:/.*)?" if $children_also;
+    my $matcher;
+    if (my $captures = $url =~ /\*/g) {
+        my @parts = split /(\*+)/, $url;
+        $matcher = join('', map { $_ eq '**' ? '(.*)'    :
+                                  $_ eq '*'  ? '([^/]*)' :
+                                      quotemeta $_ } @parts);
+    }
+    else {
+        $matcher = quotemeta("$method $url");
+    }
     $matcher = qr/^$matcher$/;
-    my $p = $self->{_http_request_processor} ||= [];
-    @$p = sort { length $a->[1] <=> length $b->[1] } @$p, [$callback, $url, $matcher];
+    my $p = $self->{_http_request_processor} //= [];
+    @$p = sort { length $a->[1] <=> length $b->[1] } @$p, [$callback, $url, $matcher, $captures];
     my $c = $self->{_http_request_processor_cache} ||= {};
     delete $$c{$_} for (grep /$matcher/, keys %$c);
     1
@@ -145,14 +153,22 @@ sub set_http_request_processor {
 
 sub _get_http_request_processor {
     my ($self, $method, $url) = @_;
-    my $c = $self->{_http_request_processor_cache} ||= {};
     my $pair = "$method $url";
-    $c->{$pair} ||= do {
-	my $p = $self->{_http_request_processor} ||= [];
-	my $h = (grep $pair =~ $_->[2], @$p)[0]
-	    or return undef;
-	$h->[0];
+    my $cache = $self->{_http_request_processor_cache} //= {};
+    return $cache->{$pair} if defined $cache->{pair};
+    for my $p (@{$self->{_http_request_processor} //= []}) {
+        my $matcher = $_->[2];
+        if ($_->[3]) { # matcher captures!
+            if (my @captures = $pair =~ $matcher) {
+                # don't cache capturing URLs
+                return ($_->[0], @captures);
+            }
+        }
+        elsif ($pair =~ $matcher) {
+            return $cache->{$pair} = $_->[0];
+        }
     }
+    ()
 }
 
 sub _process_http_request {
@@ -160,10 +176,10 @@ sub _process_http_request {
     my ($method, $url, $headers) = @_;
     # DEBUG "processing request $method $url";
     my $path = (uri_split $url)[2];
-    my $processor = $self->_get_http_request_processor($method, $path);
+    my ($processor, @captures) = $self->_get_http_request_processor($method, $path);
     if ($processor) {
 	eval {
-	    $processor->($self, $method, $url, $headers);
+	    $processor->($self, $method, $url, $headers, \@captures);
 	};
 	if ($@) {
             DEBUG "Exception caught when processing $path: $@";
@@ -231,6 +247,41 @@ sub throw_http_error {
     shift;
     DEBUG "throwing error " . (ref $_[1] ? "$_[0] [@{$_[1]}] @_[2..$#_]" : "@_");
     die QVD::HTTPD::Exception->new(@_);
+}
+
+sub save_content_into_temp_file {
+    my ($self, $headers, $ext) = @_;
+    $ext //= 'tmp';
+
+    my $len = header_lookup($headers, 'Content-Length')
+        // $self->throw_http_error(QVD::HTTP::StatusCodes::HTTP_LENGTH_REQUIRED);
+
+    my $socket = $self->_fd_in;
+    if (my ($fh, $fn) = File::Temp::tempfile(SUFFIX => ".$ext")) {
+        DEBUG "Saving content into '$fn', len: $len";
+
+        binmode $fh;
+        while ($len) {
+            my $chunk_size = ($len > 8192 ? 8192 : $len);
+            my $bytes = read($sock, my $buf, $chunk_size);
+            if (defined $bytes) {
+                if ($bytes > 0) {
+                    print {$fh} $bytes;
+                    $len -= $bytes;
+                    continue;
+                }
+            }
+            elsif ($! == Errno::EINTR or $! == Errno::EAGAIN or $! == Errno::EWOULDBLOCK) {
+                select undef, undef, undef, 0.1;
+                continue;
+            }
+            unlink $fn;
+            $self->throw_http_error(QVD::HTTP::StatusCodes::HTTP_BAD_REQUEST);
+        }
+        return $fn;
+    }
+    $self->throw_http_error(QVD::HTTP::StatusCodes::HTTP_INTERNAL_SERVER_ERROR,
+                            "Unable to create temporary file for saving content");
 }
 
 package QVD::HTTPD::Exception;
