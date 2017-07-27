@@ -8,6 +8,7 @@ use Log::Any::Adapter;
 use Getopt::Long;
 use Path::Tiny;
 use Alien::wxWidgets;
+use File::Glob qw(bsd_glob);
 
 my $installer_path = path($0)->realpath->parent;
 my $qvd_src_path = $installer_path->parent->parent;
@@ -34,6 +35,7 @@ my $pulseaudio = $installer_path->child('pulseaudio');
 my $win_sftp_server = $installer_path->child('win-sftp-server');
 my $slaveserver_wrapper = $qvd_src_path->child('windows', 'qvd-slaveserver-wrapper');
 my $gsview = 'c:\\program files\\ghostgum\\gsview';
+my $ghostscript = bsd_glob('c:\\program files\\gs\\gs*');
 my $cygwin;
 my $cygdrive;
 my $qvd_version = '4.1';
@@ -53,6 +55,7 @@ GetOptions('log-file|log|l=s' => \$log_file,
            'win-sftp-server=s' => \$win_sftp_server,
            'slaveserver-wrapper=s' => \$slaveserver_wrapper,
            'gsview=s' => \$gsview,
+           'ghostscript|gs=s' => \$ghostscript,
            'cygwin=s' => \$cygwin,
            'cygdrive=s' => \$cygdrive,
            'qvd-version|V=s' => \$qvd_version,
@@ -90,6 +93,9 @@ else {
     my $slaveserver_wrapper_path = path($slaveserver_wrapper)->realpath;
     -d $gsview or die "$gsview not found";
     my $gsview_path = path($gsview)->realpath;
+    defined $ghostscript or die "ghostscript not found";
+    -d $ghostscript or die "$ghostscript not found";
+    my $ghostscript_path = path($ghostscript)->realpath;
 
     my @extra_exes = ( { path => $nx_libs_path->child('nxproxy/nxproxy.exe'),
                          search_path => $nx_libs_path->child('nxcomp'),
@@ -111,6 +117,9 @@ else {
                          cygwin => 1 },
                        { path => $gsview_path->child('gsprint.exe'),
                          subdir => 'gsview',
+                         subsystem => 'windows' },
+                       { path => $ghostscript_path->child('bin', 'gswin32.exe'),
+                         subdir => 'ghostscript',
                          subsystem => 'windows' },
                      );
 
