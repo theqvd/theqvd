@@ -341,6 +341,9 @@ Wat.I.T = {
                     osConfigurationEditorAssetOptions: {
                         name: 'editor/osd-asset-options'
                     },
+                    osConfigurationEditorAssetRows: {
+                        name: 'editor/osd-asset-rows'
+                    },
                     packageBlockWrapper: {
                         name: 'list/package-block-wrapper'
                     }

@@ -35,7 +35,7 @@
             </div>
             <div>
                 <div>
-                    <input type="file" name="script_file"/>
+                    <input type="file" name="asset_file"/>
                 </div>
                 <a class="button2 fright fa fa-upload js-upload-script center" data-i18n="Upload script">Upload script</a>
             </div>

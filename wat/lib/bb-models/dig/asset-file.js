@@ -1,4 +1,4 @@
-Wat.Models.Asset = Wat.Models.DIG.extend({
+Wat.Models.AssetFile = Wat.Models.DIG.extend({
     defaults: {
     },
     
@@ -21,7 +21,21 @@ Wat.Models.Asset = Wat.Models.DIG.extend({
         if (params !== undefined) {
             this.id = params.id;
         }
+    },
+    
+    url: function () {
+        var url = this.baseUrl() + '/asset/' + this.id + '/file';
         
-        this.urlRoot = this.baseUrl() + '/asset';
+        return url;
+    },
+    
+    save: function(attributes, options) { 
+        options = {
+            processData: false,
+            contentType: false,
+            data: attributes.data
+        };
+        
+        return Backbone.Model.prototype.save.call(this, attributes, options);
     }
 });

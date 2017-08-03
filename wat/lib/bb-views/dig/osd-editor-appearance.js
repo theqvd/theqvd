@@ -9,10 +9,14 @@ Wat.Views.OSDAppearenceEditorView = Wat.Views.OSDEditorView.extend({
     
     dialogEvents: {
         'click .input[type="radio"][name="wallpaper"]': 'changeAssetSelector',
-        'click .js-wallpaper-name': 'clickWallpaperName',
+        'click .js-wallpaper-name': 'clickAssetName',
+        'change .js-asset-check': 'changeAssetManagerSelector',
         'change .js-asset-selector': 'changeAssetSelector',
-        'click .js-toggle-upload-select-mode': 'toggleUploadSelectMode',
-        'click .js-upload-wallpaper': 'uploadWallpaper'
+        'click .js-upload-asset': 'createWallpaper',
+        'click .js-delete-selected-asset': 'deleteWallpaper',
+        'click .js-show-upload': 'toggleUploadControl',
+        'click .js-show-select-mode': 'showSelectMode',
+        'click .js-show-manage-mode': 'showManageMode',
     },
     
     render: function () {
@@ -31,57 +35,20 @@ Wat.Views.OSDAppearenceEditorView = Wat.Views.OSDEditorView.extend({
             pluginId: 'desktop'
         });
         
-        $('.js-upload-mode').hide();
-    },
-    
-    changeAssetSelector: function (e) {
-        Wat.DIG.changeAssetSelector(e);
-        
-        var row = $(e.target).closest('tr');
-        var pluginId = $(row).attr('data-plugin-id');
-        var setCallback = function () {};
-
-        switch(pluginId) {
-            case 'desktop':
-                    var id = $(row).attr('data-id');
-                    var name = $(row).attr('data-name');
-                    var url = $(row).attr('data-url');
-                    setCallback = this.afterSetWallpaper;
-                break;
-            default:
-                return;
-        }
-        
-        // Save plugin element
-        Wat.DIG.setPluginListElement({
-            pluginId: pluginId,
-            osdId: Wat.CurrentView.OSDmodel.id,
-            attributes: {
-                id: id,
-                name: name,
-                url: url
-            }
-        }, setCallback, function () {});
-        
-        // Show loading message for preview image until it is loaded
-        $('.js-preview img').hide();
-        $('.js-data-preview-message').show();
-        $('.js-preview img').on('load', function () {
-            $('.js-preview img').show();
-            $('.js-data-preview-message').hide();
-        });
+        $('.' + this.cid + ' .js-upload-mode').hide();
     },
     
     afterSetWallpaper: function (e) {
-        var row = $('tr[data-type="wallpaper"].selected-row');
-        
-        var response = JSON.parse(e.responseText);
+        var opt = $('.js-asset-selector>option:checked');
+        if (e.responseText) {
+            var response = JSON.parse(e.responseText);
+        }
         
         // Mock
         var newWallpaper = {
-            id: $(row).attr('data-id'),
-            name: $(row).attr('data-name'),
-            url: $(row).attr('data-url'),
+            id: $(opt).attr('data-id'),
+            name: $(opt).attr('data-name'),
+            url: $(opt).attr('data-url'),
         };
         // End Mock
         
@@ -103,37 +70,85 @@ Wat.Views.OSDAppearenceEditorView = Wat.Views.OSDEditorView.extend({
         Wat.T.translate();
     },
     
-    clickWallpaperName: function (e) {
-        // Select this script
-        $(e.target).parent().find('input[type="radio"]').trigger('click');
-    },
-    
-    toggleUploadSelectMode: function (e) {
-        $('.js-upload-mode, .js-select-mode').toggle();
-        $('.js-preview img').toggle();
+    createWallpaper: function (e) {
+        var that = this;
         
-        $('input[name="wallpaper_name"]').val('');
-        var file = $('input[name="wallpaper_file"]').val('');
-    },
-    
-    uploadWallpaper: function (e) {
-        var name = $('input[name="wallpaper_name"]').val();
-        var file = $('input[name="wallpaper_file"]')[0].files[0];
+        var name = $('.' + this.cid + ' input[name="asset_name"]').val();
         
-        if (!name || !file) {
+        if (!name) {
             Wat.I.M.showMessage({message: 'Nothing to do', messageType: 'info'});
             return;
         }
         
-        var uploadedWallpaper = {
+        this.assetModel = new Wat.Models.Asset({
             name: name,
-            url: 'https://s-media-cache-ak0.pinimg.com/originals/8b/8f/b2/8b8fb268842167174d0265df49c2a0ba.jpg'
-        };
+            assetType: 'wallpaper'
+        });
         
-        Wat.CurrentView.OSDmodel.pluginDef.where({code: 'desktop'})[0].attributes.plugin.wallpaper.list_images[55] = uploadedWallpaper;
+        this.assetModel.save().complete(
+            function (e) {
+                that.uploadWallpaper(that.assetModel.id);
+            }
+        );
+    },
+    
+    uploadWallpaper: function (assetId) {
+        var that = this;
         
-        this.toggleUploadSelectMode();
+        this.assetFileModel = new Wat.Models.AssetFile({
+            id: assetId
+        });
         
-        Wat.CurrentView.editorView.softwareEditorView.renderSectionAppearence();
-    }
+        var file = $('.' + this.cid + ' input[name="asset_file"]')[0].files[0];
+        
+        if (!file) {
+            Wat.I.M.showMessage({message: 'Nothing to do', messageType: 'info'});
+            return;
+        }
+        
+        var data = new FormData();
+        data.append('fileUpload', file);
+        
+        this.assetFileModel.save({
+            data: data,
+        }).complete(function () {
+            that.renderAssetsControl({ 
+                assetType: 'wallpaper',
+                pluginId: 'desktop',
+                afterRender: function () {
+                    // Select uploaded element
+                    $('.' + this.cid + ' [data-id="' + assetId + '"]>td>input.js-asset-check').trigger('change').prop('checked', true);
+                }
+            });
+            
+            Wat.I.M.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
+            
+            // Hide upload control
+            that.toggleUploadControl();
+        });
+    },
+    
+    deleteWallpaper: function (e) {
+        var that = this;
+        
+        var id = $('.' + this.cid + ' .js-asset-check:checked').val();
+        
+        var assetModel = new Wat.Models.Asset({
+            id: id
+        });
+        
+        assetModel.destroy({
+            success: function () {
+                that.renderAssetsControl({ 
+                    assetType: 'wallpaper',
+                    pluginId: 'desktop'
+                });
+                
+                Wat.I.M.showMessage({message: i18n.t('Successfully deleted'), messageType: 'success'});
+            },
+            error: function () {
+                Wat.I.M.showMessage({message: i18n.t('Error deleting'), messageType: 'error'});
+            }
+        });
+    },
 });

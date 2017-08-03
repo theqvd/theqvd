@@ -43,11 +43,14 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
     },
     
     renderAssetsControl: function (opts) {
+        var that = this;
+        
         var assets = new Wat.Collections.Assets(null, {
             filter: {
                 type: opts.assetType
             } 
         });
+        
         assets.fetch({
             complete: function () {
                 var template = _.template(
@@ -58,10 +61,28 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
                     }
                 );
                 
-                $('.bb-os-conf-' + opts.assetType + '-assets').html(template);
-                
+                $('select.bb-os-conf-' + opts.assetType + '-assets').html(template);
+                Wat.I.chosenElement('select.bb-os-conf-' + opts.assetType + '-assets', 'single100');
+                $('select.bb-os-conf-' + opts.assetType + '-assets').trigger('chosen:update');
+
                 // Select first radio button
-                $('input[type="radio"][name="' + opts.assetType + '"]').eq(0).trigger('click');
+                $('.' + that.cid + ' select.js-asset-selector').trigger('change');
+                
+                var template = _.template(
+                    Wat.TPL.osConfigurationEditorAssetRows, {
+                        models: assets.models,
+                        assetType: opts.assetType,
+                        pluginId: opts.pluginId
+                    }
+                );
+                
+                $('table.bb-os-conf-' + opts.assetType + '-assets').html(template);
+                
+                $('.' + that.cid + ' .js-asset-check').eq(0).prop('checked',true);
+                
+                if (opts.afterRender) {
+                    opts.afterRender(assets);
+                }
             }
         });
     },
@@ -102,4 +123,77 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
             attributes: attributes
         }, function () {}, function () {});
     },
+    
+    showSelectMode: function (e) {
+        $('.' + this.cid + ' .js-upload-mode').hide();
+        $('.' + this.cid + ' .js-select-mode').show();
+        
+        $('.' + this.cid + ' .js-asset-selector').trigger('change');
+    },
+    
+    showManageMode: function (e) {
+        $('.' + this.cid + ' .js-upload-mode').show();
+        $('.' + this.cid + ' .js-select-mode').hide();
+        
+        $('.' + this.cid + ' input[name="asset_name"]').val('');
+        $('.' + this.cid + ' input[name="asset_file"]').val('');
+        
+        $('.' + this.cid + ' .js-asset-check:checked').trigger('change');
+    },
+    
+    toggleUploadControl: function (e) {
+        $('.' + this.cid + ' .js-upload-control').toggle();
+    },
+    
+    changeAssetManagerSelector: function (e) {
+        var row = $(e.target).closest('tr');
+        
+        Wat.DIG.changeAssetSelector(e, row);
+    },
+    
+    changeAssetSelector: function (e) {
+        var opt = $(e.target).find('option:checked');
+        
+        Wat.DIG.changeAssetSelector(e, opt);
+        
+        var pluginId = $(opt).attr('data-plugin-id');
+        var setCallback = function () {};
+        
+        switch(pluginId) {
+            case 'desktop':
+                    var id = $(opt).attr('data-id');
+                    var name = $(opt).attr('data-name');
+                    var url = $(opt).attr('data-url');
+                    setCallback = this.afterSetWallpaper;
+                break;
+            default:
+                return;
+        }
+        
+        /*
+        // Save plugin element
+        Wat.DIG.setPluginListElement({
+            pluginId: pluginId,
+            osdId: Wat.CurrentView.OSDmodel.id,
+            attributes: {
+                id: id,
+                name: name,
+                url: url
+            }
+        }, setCallback, function () {});
+        */
+        
+        // Show loading message for preview image until it is loaded
+        $('.js-preview img').hide();
+        $('.js-data-preview-message').show();
+        $('.js-preview img').on('load', function () {
+            $('.js-preview img').show();
+            $('.js-data-preview-message').hide();
+        });
+    },
+    
+    clickAssetName: function (e) {
+        // Select this script
+        $(e.target).parent().find('input[type="radio"]').trigger('click');
+    }
 });

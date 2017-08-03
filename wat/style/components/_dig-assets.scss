@@ -9,15 +9,72 @@
 *********************************************************************
 ********************************************************************/
 
-table.asset-selector {
-    font-weight: normal;
-    text-align: left;
+div.asset-selector-wrapper {
+    .asset-selector {
+        text-align: left;
+    }
+}
+
+.upload-mode {
+    .button-icon {
+        margin-bottom: 5px;
+        margin-left: 5px;
+    }
+}
+
+.asset-switch-buttonset {
+    height: 20px;
+    margin: 5px 0px;
+}
+
+.os-conf-editor {
+    margin-top: 15px;
+
+    .data-preview-message {
+        text-align: center;
+        margin-top: 50px;
+    }
     
-    tr {
-        cursor: pointer;
+    .data-preview-box--script {
+        background: #222;
+        color: #ddd;
+        max-width: 300px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: normal;
+        word-wrap: break-word;
+        font-family: monospace !important;
         
-        &.selected-row {
-            background: darken($col_whiter, 20);
+        font-size: small;
+        font-weight: normal;
+        text-align: left;
+        
+        border: 1px #666 solid;
+        border-radius: 4px;
+        
+        width: 100%;
+        height: 250px;
+        
+        margin: 10px auto;
+        padding: 8px;
+    }
+    
+    div {
+        &.editor-title {
+            font-weight: bold;
+            text-align: left;
+            min-height: 25px;
         }
+        
+        margin-bottom: 10px;
+    }
+    
+    input[type="text"], input[type="file"], select {
+        width: 100%;
+        background: white;
+    }
+    
+    td.asset-name {
+        cursor: pointer;
     }
 }

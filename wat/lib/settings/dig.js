@@ -8,7 +8,7 @@ Wat.DIG = {
         
         OSDmodel.save({}, {
             type: 'POST',
-            complete: function () {
+            complete: function (e) {
                 that.fetchPluginDef(OSDmodel, function (OSDmodel) {
                     OSDmodel.initPlugins();
                     callback(OSDmodel);
@@ -101,15 +101,13 @@ Wat.DIG = {
         });
     },
     
-    changeAssetSelector: function (e) {
-        var row = $(e.target).closest('tr').eq(0);
-        
-        var controlId = $(row).attr('data-control-id');
-        var assetId = $(row).val();
-        var type = $(row).attr('data-type');
-        var url = $(row).attr('data-url');
-        var pluginId = $(row).attr('data-plugin-id');
-        var name = $(row).attr('data-name');
+    changeAssetSelector: function (e, opt) {
+        var controlId = $(opt).attr('data-control-id');
+        var assetId = $(opt).val();
+        var type = $(opt).attr('data-type');
+        var url = $(opt).attr('data-url');
+        var pluginId = $(opt).attr('data-plugin-id');
+        var name = $(opt).attr('data-name');
         
         switch (type) {
             case 'script':
@@ -124,12 +122,9 @@ Wat.DIG = {
                 });
                 break;
             case 'wallpaper':
-                $('[data-preview-id="' + controlId + '"]').html('<img src="' + url + '" style="width: 100%;"></img>');
+                $('[data-preview-id="' + controlId + '"]').html('<img src="' + url + '" style="width: 90%; display: block; margin: 0 auto;"></img>');
                 break;
         }
-        
-        $('table.js-asset-selector tr').removeClass('selected-row');
-        $(row).addClass('selected-row');
     },
     
     // Render OS Details template and return it

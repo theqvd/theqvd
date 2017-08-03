@@ -3,13 +3,21 @@ Wat.Views.OSDScriptsEditorView = Wat.Views.OSDEditorView.extend({
     
     initialize: function (params) {
         this.params = params;
-    
+        
         Wat.Views.DialogView.prototype.initialize.apply(this, [params]);
     },
     
     dialogEvents: {
-        'click .js-open-script-manager': 'openAssetManager',
         'change .js-starting-script-mode': 'changeScriptMode',
+        'click .js-script-name': 'clickAssetName',
+        'click .js-show-select-mode': 'showSelectMode',
+        'click .js-show-manage-mode': 'showManageMode',
+        'click .js-add-starting-script': 'addScript',
+        'click .js-show-upload': 'toggleUploadControl',
+        'click .js-upload-asset': 'createScript',
+        'click .js-delete-selected-asset': 'deleteScript',
+        'change .js-asset-check': 'changeAssetManagerSelector',
+        'change .js-asset-selector': 'changeAssetSelector',
     },
     
     ////////////////////////////////////////////////////
@@ -17,12 +25,15 @@ Wat.Views.OSDScriptsEditorView = Wat.Views.OSDEditorView.extend({
     ////////////////////////////////////////////////////
     
     render: function () {
+        var that = this;
+        
         var template = _.template(
             Wat.TPL.osConfigurationEditorScripts, {
                 massive: this.massive,
                 model: Wat.CurrentView.OSDmodel,
                 hookOptions: Wat.CurrentView.OSDmodel.getPluginAttrSettingOptions('execution_hooks.script.hook'),
-                cid: this.cid
+                cid: this.cid,
+                assetType: 'script',
             }
         );
 
@@ -30,75 +41,35 @@ Wat.Views.OSDScriptsEditorView = Wat.Views.OSDEditorView.extend({
         
         this.renderAssetsControl({
             assetType: 'script',
-            pluginId: 'execution_hooks'
+            pluginId: 'execution_hooks',
+            afterRender: function (availableScriptsCollection) {
+                that.renderSectionScriptsRows(Wat.CurrentView.OSDmodel.get('scripts'), availableScriptsCollection.models);
+            }
         });
-        
-        this.renderSectionScriptsRows(Wat.CurrentView.OSDmodel.get('scripts'));
     },
     
-    renderSectionScriptsRows: function (scripts) {
+    renderSectionScriptsRows: function (scripts, availableScripts) {
         // Render rows with existent scripts
         var rows = _.template(
             Wat.TPL.osConfigurationEditorScriptsRows, {
                 scripts: scripts,
-                hookOptions: Wat.CurrentView.OSDmodel.getPluginAttrSettingOptions('execution_hooks.script.hook')
+                hookOptions: Wat.CurrentView.OSDmodel.getPluginAttrSettingOptions('execution_hooks.script.hook'),
+                availableScripts: availableScripts
             }
         );
 
         $('table.js-scripts-list').html(rows);
+        Wat.I.chosenElement('.js-starting-script', 'single100');
         Wat.I.chosenElement('.js-starting-script-mode', 'single100');
         
         Wat.T.translate();
-    },
-    
-    openAssetManager: function (e) {
-        var that = this;
         
-        var dialogConf = {
-            title: "Asset manager",
-            buttons : {
-                "Cancel": function () {
-                    Wat.I.closeDialog($(this));
-                    
-                    that.ScriptsDialogView.remove();
-                    delete that.ScriptsDialogView;
-                    
-                    $('.ui-dialog-secondary').eq(0).css('z-index','1003');
-                },
-                "Add": function () {
-                    var those = this;
-                    that.addScript(function () {
-                        Wat.I.closeDialog($(those));
-                    
-                        that.ScriptsDialogView.remove();
-                        delete that.ScriptsDialogView;
-                        
-                        $('.ui-dialog-secondary').eq(0).css('z-index','1003');
-                    });
-                }
-            },
-            buttonClasses: ['fa fa-ban js-button-close','fa fa-plus-circle js-button-add'],
-
-            fillCallback: function (target) {
-                that.ScriptsDialogView = new Wat.Views.OSDAssetsEditorView({
-                    el: $(target),
-                    massive: false,
-                    osdId: Wat.CurrentView.OSDmodel.id
-                });
-            },
-        }
-
-        Wat.CurrentView.editorView.softwareEditorView.scriptsDialog = Wat.I.dialog(dialogConf);
-
-        // Add secondary dialog class to new dialog to give different look
-        //Wat.CurrentView.editorView.softwareEditorView.scriptsDialog.parent().addClass('ui-dialog-secondary');
-        Wat.CurrentView.editorView.softwareEditorView.scriptsDialog.dialog("option", "position", {my: "center", at: "center", of: window});
-        // Send primary dialog to back because jquery ui doesnt handle it properly
-        $('.ui-dialog-secondary').eq(0).css('z-index','1001');
+        $('.' + this.cid + ' .js-upload-mode').hide();
+        $('.' + this.cid + ' .js-preview').hide();
     },
     
     addScript: function (finishCallback) {
-        var id = $('input[name="script"]:checked').val();
+        var id = $('.js-starting-script').val();
         
         if (!id) {
             Wat.I.M.showMessage({message: 'Nothing to do', messageType: 'info'});
@@ -107,8 +78,8 @@ Wat.Views.OSDScriptsEditorView = Wat.Views.OSDEditorView.extend({
         
         var row = $('tr[data-control-id][data-id="' + id + '"]');
         
-        var fileName = $(row).attr('data-name');
-        var execution_hook = $('.js-starting-script-mode[data-new-file]').val();
+        var fileName = $('.js-starting-script option:checked').html();
+        var execution_hook = $('.js-starting-script-mode').val();
 
         // Save plugin element
         Wat.DIG.setPluginListElement({
@@ -123,10 +94,10 @@ Wat.Views.OSDScriptsEditorView = Wat.Views.OSDEditorView.extend({
     
     afterAddScript: function (e) {
         // Mock
-        var id = $('input[name="script"]:checked').val();
+        var id = $('.js-starting-script').val();
         var row = $('tr[data-control-id][data-id="' + id + '"]');
-        var fileName = $(row).attr('data-name');
-        var execution_hook = $('.js-starting-script-mode[data-new-file]').val();
+        var fileName = $('.js-starting-script option:checked').html();
+        var execution_hook = $('.js-starting-script-mode').val();
         // End mock
         
         // Add starting script row
@@ -135,7 +106,8 @@ Wat.Views.OSDScriptsEditorView = Wat.Views.OSDEditorView.extend({
                 scripts: [{
                     id: id,
                     name: fileName,
-                    execution_hook : execution_hook
+                    execution_hook : execution_hook,
+                    availableScripts: Wat.CurrentView.OSDmodel.pluginDef.where({code: 'execution_hooks'})[0].attributes.plugin.script.list_files
                 }],
                 hookOptions: Wat.CurrentView.OSDmodel.getPluginAttrSettingOptions('execution_hooks.script.hook')
             }
@@ -152,33 +124,9 @@ Wat.Views.OSDScriptsEditorView = Wat.Views.OSDEditorView.extend({
         $('.js-starting-script').val('');
     },
     
-    deleteScript: function (e) {
-        var id = $(e.target).attr('data-id');
-        
-        // Delete script from stored scripts (just for mock)
-        var storedScripts = Wat.CurrentView.OSDmodel.get('scripts');
-        
-        var deletedScriptIndex = -1;
-        $.each(storedScripts, function (i, v) {
-            if (v.id == id) {
-                deletedScriptIndex = i;
-            }
-        });
-        
-        if (deletedScriptIndex > -1) {
-            storedScripts.splice(deletedScriptIndex, 1);
-        }
-        
-        // Delete plugin element
-        Wat.DIG.deletePluginListElement({
-            pluginId: 'execution_hooks',
-            osdId: this.params.osdId,
-            attributes: {id: id}
-        }, this.afterDeleteScript, function () {});
-    },
-    
     afterDeleteScript: function (e) {
         var scripts = Wat.CurrentView.OSDmodel.get('scripts');
+        
         Wat.CurrentView.editorView.softwareEditorView.sectionScriptsView.renderSectionScriptsRows(scripts);
     },
     
@@ -196,5 +144,110 @@ Wat.Views.OSDScriptsEditorView = Wat.Views.OSDEditorView.extend({
             }
         }, function () {}, function () {});
     },
-
+    
+    showSelectMode: function (e) {
+        Wat.Views.OSDEditorView.prototype.showSelectMode.apply(this, [e]);
+        
+        $('.' + this.cid + ' .js-preview').hide();
+    },
+    
+    showManageMode: function (e) {
+        Wat.Views.OSDEditorView.prototype.showManageMode.apply(this, [e]);
+        
+        $('.' + this.cid + ' .js-preview').show();
+    },
+    
+    createScript: function (e) {
+        var that = this;
+        
+        var name = $('.' + this.cid + ' input[name="asset_name"]').val();
+        
+        if (!name) {
+            Wat.I.M.showMessage({message: 'Nothing to do', messageType: 'info'});
+            return;
+        }
+        
+        this.assetModel = new Wat.Models.Asset({
+            name: name,
+            assetType: 'script'
+        });
+        
+        this.assetModel.save().complete(
+            function (e) {
+                that.uploadScript(that.assetModel.id);
+            }
+        );
+    },
+    
+    uploadScript: function (assetId) {
+        var that = this;
+        
+        this.assetFileModel = new Wat.Models.AssetFile({
+            id: assetId
+        });
+        
+        var file = $('.' + this.cid + ' input[name="asset_file"]')[0].files[0];
+        
+        if (!file) {
+            Wat.I.M.showMessage({message: 'Nothing to do', messageType: 'info'});
+            return;
+        }
+        
+        var data = new FormData();
+        data.append('fileUpload', file);
+        
+        this.assetFileModel.save({
+            data: data,
+        }).complete(function () {
+            that.renderAssetsControl({ 
+                assetType: 'script',
+                pluginId: 'desktop',
+                afterRender: function () {
+                    // Select uploaded element
+                    $('.' + this.cid + ' [data-id="' + assetId + '"]>td>input.js-asset-check').trigger('change').prop('checked', true);
+                }
+            });
+            
+            Wat.I.M.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
+            
+            // Hide upload control
+            that.toggleUploadControl();
+            
+            // Reload combo list with available scripts
+            that.renderAssetsControl({
+                assetType: 'script',
+                pluginId: 'execution_hooks'
+            });
+        });
+    },
+    
+    deleteScript: function (e) {
+        var that = this;
+        
+        var id = $('.' + this.cid + ' .js-asset-check:checked').val();
+        
+        var assetModel = new Wat.Models.Asset({
+            id: id
+        });
+        
+        assetModel.destroy({
+            success: function () {
+                that.renderAssetsControl({ 
+                    assetType: 'script',
+                    pluginId: 'desktop'
+                });
+                
+                Wat.I.M.showMessage({message: i18n.t('Successfully deleted'), messageType: 'success'});
+            },
+            error: function () {
+                Wat.I.M.showMessage({message: i18n.t('Error deleting'), messageType: 'error'});
+            }
+        });
+    },
+    
+    changeAssetManagerSelector: function(e) {
+        $('.' + this.cid + ' .js-data-preview-box').html('Loading');
+        
+        Wat.Views.OSDEditorView.prototype.changeAssetManagerSelector.apply(this, [e]);
+    }
 });

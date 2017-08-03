@@ -611,17 +611,20 @@ group {
         my $response_str;
         my $code;
         
+        my $query_params = $c->tx->req->params->to_string;
+        
+        $params = $params . '?' . $query_params unless $query_params eq '';
+        
         if (defined $api_url) {
             my $full_api_url = $api_url . "/" . $params;
             my $method = $c->tx->req->method;
             
-            my $tx = $c->ua->build_tx($method => $full_api_url => json => $c->req->json);
+            my $tx = $c->ua->build_tx($method => $full_api_url => $c->req->headers->to_hash => $c->req->build_body);
             $tx = $c->ua->start($tx);
             
-            
             if (my $res = $tx->success) {
-                $response_str = $res->body;
-                $code = $res->{code};
+                $c->tx->{res} = $res;
+                $c->rendered();
             }
             else {
                 my $err = $tx->error;
@@ -629,9 +632,6 @@ group {
                 $code = $err->{code} // '502';
                 $response_str = encode_json({status => $code, message => $message});
             }
-        
-            deep_utf8_decode($response_str);
-            $c->render(text => b($response_str)->decode('UTF-8'), status => $code);
         }
         else {
             $c->render(json => QVD::API::Exception->new(code => 6620)->json);

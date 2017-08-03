@@ -2,19 +2,13 @@ Wat.Collections.Assets = Wat.Collections.DIG.extend({
     //model: Wat.Models.Asset,
     
     parse: function (response) {
-        response = this.mock();
+        var that = this;
         
-        // Mock filter
-        var filteredResponse = [];
-        if (this.filter) {
-            var filter = this.filter;
-            $.each (response, function (i, v) {
-                if (filter.type == v.type) {
-                    filteredResponse.push(v);
-                }
-            });
-        }
-        return filteredResponse;
+        $.each(response, function (i, asset) {
+            response[i].url = that.baseUrl() + '/asset/' + asset.id + '/file';
+        });
+        
+        return response;
     },
     
     initialize: function (attrs, opts) {
@@ -106,7 +100,10 @@ Wat.Collections.Assets = Wat.Collections.DIG.extend({
     
     url: function () {
         var url = this.baseUrl() + '/asset';
-        var url = this.baseUrl() + '/osd';
+        
+        if (this.filter) {
+            url += '?type=' + this.filter.type;
+        }
         
         return url;
     }
