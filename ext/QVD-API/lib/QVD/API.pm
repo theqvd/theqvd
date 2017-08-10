@@ -274,7 +274,7 @@ sub update_related_objects
 sub delete
 {
 	my ($self,$request,$modifiers) = @_;
-    my $result = $self->select($request);
+    my $result = $self->select($request,$modifiers);
     QVD::API::Exception->throw(code => 1300) unless $result->{total};
 
 	$modifiers //= {};
@@ -373,71 +373,62 @@ sub reset_admin_views
 
 ### Manage properties ###
 
+sub property_create {
+    my ($self, $request, $modifiers) = @_;
+
+    $self->check_property_name_is_not_registered($request->arguments->{key}, $request->arguments->{tenant_id});
+
+    return $self->create($request, $modifiers);
+}
+
+sub property_update {
+    my ($self, $request, $modifiers) = @_;
+
+    $self->check_property_name_is_not_registered($request->arguments->{key}, $request->arguments->{tenant_id});
+
+    return $self->update($request, $modifiers);
+}
+
 sub user_property_action {
 	my ($self, $request) = @_;
-	return $self->property_action($request, 'user');
+	return $self->qvd_property_action($request, 'user');
 }
 
 sub host_property_action {
 	my ($self, $request) = @_;
-	return $self->property_action($request, 'host');
+	return $self->qvd_property_action($request, 'host');
 }
 
 sub vm_property_action {
 	my ($self, $request) = @_;
-	return $self->property_action($request, 'vm');
+	return $self->qvd_property_action($request, 'vm');
 }
 
 sub osf_property_action {
 	my ($self, $request) = @_;
-	return $self->property_action($request, 'osf');
+	return $self->qvd_property_action($request, 'osf');
 }
 
 sub di_property_action {
 	my ($self, $request) = @_;
-	return $self->property_action($request, 'di');
+	return $self->qvd_property_action($request, 'di');
 }
 
-sub property_action {
+sub qvd_property_action {
 	my ($self, $request, $object) = @_;
 	my $action = $request->get_type_of_action();
 	my $outcome;
 
 	if ($action eq 'list') {
-		$outcome = $self->property_get_list($request, {qvd_object => $object} );
+		$outcome = $self->select($request, { filters => { qvd_object => $object } });
 	} elsif ($action eq 'create' || $action eq 'update') {
-		$outcome = $self->property_create_or_update($request, {qvd_object => $object});
+		$outcome = $self->create_or_update($request, { arguments => { qvd_object => $object } });
 	} elsif ($action eq 'delete') {
-		$outcome = $self->property_delete($request, ["is_${object}_property"]);
+		$outcome = $self->delete($request, { filters => { qvd_object => $object } });
 	}
 
 	return $outcome;
 }
-
-sub property_get_list {
-	my ($self, $request, $filters) = @_;
-
-	my $result = $self->select($request, { filters => $filters } );
-
-	return $result;
-}
-
-sub property_create_or_update {
-	my ($self, $request, $arguments) = @_;
-
-	my $result = $self->create_or_update($request, { arguments => $arguments } );
-
-	return $result;
-}
-
-sub property_delete {
-	my ($self, $request, $conditions) = @_;
-
-	my $result = $self->delete($request, { conditions => $conditions } );
-
-	return $result;
-}
-
 
 # FOR REGULAR CREATE ACTIONS
 
@@ -718,20 +709,35 @@ sub custom_properties_set
 {
     my ($self,$props,$obj,$request) = @_;
 
-    my $class = ref($obj);     # FIX ME.  Can be improved the identification of the class?
+    my $class = ref($obj);     # FIXME.  Can be improved the identification of the class?
     $class =~ s/^QVD::DB::Result::(.+)$/$1/;
 
-    while (my ($key,$value) = each %$props)
-    { 
-	$key = undef if defined $key && $key eq ''; 
-    
-	my $t = $class . "_Property";
-	my $k = lc($class) . "_id";
-	my $a = {property_id => $key, value => $value, $k => $obj->id};
+    while (my ($prop_name,$prop_value) = each %$props)
+    {
+        my @rows = ();
+        eval {
+            my @tenant_ids = ($obj->tenant_id);
+            push @tenant_ids, $request->administrator->tenant_id if $request->administrator->is_superadmin();
 
-	eval { $DB->resultset($t)->update_or_create($a) };
-	QVD::API::Exception->throw(exception => $@, 
-				      query => 'properties') if $@;
+            @rows = $DB->resultset('QVD_Object_Property_List')->search(
+                {
+                    "properties_list.tenant_id" => { '-or' => { '=' => \@tenant_ids } },
+                    "properties_list.key" => { '=' => $prop_name }
+                },
+                { join => 'properties_list' }
+            )->all();
+        };
+        QVD::API::Exception->throw(exception => $@, query => 'properties') if $@;
+
+        QVD::API::Exception->throw(exception => $@, query => 'properties') if @rows != 1;
+        my $prop_id = $rows[0]->id;
+
+        my $table = $class . "_Property";
+        my $key = lc($class) . "_id";
+        my $tuple = {property_id => $prop_id, value => $prop_value, $key => $obj->id};
+
+        eval { $DB->resultset($table)->update_or_create($tuple) };
+        QVD::API::Exception->throw(exception => $@, query => 'properties') if $@;
     }
 }
 
@@ -1189,6 +1195,31 @@ sub check_admin_is_allowed_to_config
     return 1;
 }
 
+sub check_property_name_is_not_registered {
+    my ($self,$property_name,$tenant_id) = @_;
+
+    my $is_superadmin_property = ($tenant_id == QVD::DB::Result::Tenant::SUPERADMIN_TENANT_ID);
+    my $filter = {
+        key => $property_name
+    };
+    $filter->{tenant_id} = { '-or' => { '=' => [ $tenant_id, QVD::DB::Result::Tenant::SUPERADMIN_TENANT_ID ] } }
+        if !$is_superadmin_property;
+
+    my @rows  = ();
+    eval {
+        @rows = $DB->resultset('Property_List')->search($filter)->all();
+    };
+    QVD::API::Exception->throw(exception => $@, query => 'select') if $@;
+
+    if(@rows > 0) {
+        if($rows[0]->tenant_id == QVD::DB::Result::Tenant::SUPERADMIN_TENANT_ID) {
+            QVD::API::Exception->throw(code => 7211);
+        } else {
+            QVD::API::Exception->throw(code => 7210);
+        }
+    }
+}
+
 ######################################
 ## AD HOC FUNCTIONS WITHOUT REQUEST
 ######################################
@@ -1621,32 +1652,6 @@ sub assign_property_to_objects {
 		}
 	}
 
-}
-
-# FIXME: These functions shall be removed and use the methods of the object
-sub is_user_property {
-	my ($self, $property) = @_;
-	return ($property->is_user_property());
-}
-
-sub is_host_property {
-	my ($self, $property) = @_;
-	return ($property->is_host_property());
-}
-
-sub is_osf_property {
-	my ($self, $property) = @_;
-	return ($property->is_osf_property());
-}
-
-sub is_vm_property {
-	my ($self, $property) = @_;
-	return ($property->is_vm_property());
-}
-
-sub is_di_property {
-	my ($self, $property) = @_;
-	return ($property->is_di_property());
 }
 
 sub myadmin_update {

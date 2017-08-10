@@ -13,8 +13,14 @@ __PACKAGE__->belongs_to(qvd_properties_list => 'QVD::DB::Result::QVD_Object_Prop
 
 sub key
 {
-	my $self = shift;
-	return $self->qvd_properties_list->properties_list->key;
+    my $self = shift;
+    return $self->qvd_properties_list->key;
+}
+
+sub tenant_id
+{
+    my $self = shift;
+    return $self->qvd_properties_list->tenant_id;
 }
 
 1;

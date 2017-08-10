@@ -109,6 +109,10 @@ my $RULES =
    right_side => [ { label => 'config', saturated => 1 } ],
    meaning   => sub { 'config'}},
 
+  { left_side => { label => $UNKNOWN_TAG, saturated => 1 },
+    right_side => [ { label => 'property', saturated => 1 } ],
+    meaning   => sub { 'property'}},
+
  { left_side => { label => $UNKNOWN_TAG, saturated => 1 }, 
    right_side => [ { label => 'tenant', saturated => 1 } ],
    meaning   => sub { 'tenant'}},
@@ -271,6 +275,10 @@ my $RULES =
  { left_side => { label => 'QVD_OBJECT', saturated => 0 },
  right_side => [ { label => 'config', saturated => 1 } ],
  meaning   => sub {'config'}},
+
+ { left_side => { label => 'QVD_OBJECT', saturated => 0 },
+ right_side => [ { label => 'property', saturated => 1 } ],
+ meaning   => sub {'property'}},
 
  { left_side => { label => "QVD_OBJECT", saturated => 1 }, 
    right_side => [ { label => 'QVD_OBJECT', saturated => 0}, 
@@ -500,6 +508,18 @@ my $RULES =
 		   { label => "role", saturated => 1 },
                    { label => "ITEM", saturated => 1, feature => 0 }],
    meaning => sub { my ($c0,$c1,$c2,$c3) = @_; { command => 'update', obj1 => $c0, arguments => { __roles_changes__ => { unassign_roles => [ fields($c3,'-and') ] }}}}},
+
+    { left_side => { label => 'ROOT', saturated => 1 },
+        right_side => [ { label => "QVD_OBJECT", saturated => 1 },
+            { label => 'assign', saturated => 1 },
+            { label => "ITEM", saturated => 1, feature => 0 }],
+        meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'assign', obj1 => $c0, arguments => { object => $c2 } }}},
+
+    { left_side => { label => 'ROOT', saturated => 1 },
+        right_side => [ { label => "QVD_OBJECT", saturated => 1 },
+            { label => 'unassign', saturated => 1 },
+            { label => "ITEM", saturated => 1, feature => 0 }],
+        meaning => sub { my ($c0,$c1,$c2) = @_; { command => 'unassign', obj1 => $c0, arguments => { object => $c2 } }}},
 
  { left_side => { label => 'ROOT', saturated => 1 }, 
    right_side => [ { label => "QVD_OBJECT", saturated => 1 },

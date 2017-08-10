@@ -96,7 +96,7 @@ sub is_recovery_admin
 sub is_superadmin
 {
     my $self = shift;
-    $self->tenant_id eq 0 ? return 1 : return 0;
+    return ($self->tenant_id eq QVD::DB::Result::Tenant::SUPERADMIN_TENANT_ID ? 1 : 0);
 }
 
 sub tenant_name

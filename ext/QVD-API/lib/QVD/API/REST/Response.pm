@@ -107,7 +107,15 @@ sub _get_property_value
 {
     my ($self,$dbix_object,$property) = @_;
 
-    return eval { $self->data->{extra}->{$dbix_object->id}->properties->{$property} };
+    my $properties = $self->data->{extra}->{$dbix_object->id}->properties;
+    for my $prop_id (keys %$properties) {
+        if ($properties->{$prop_id}->{key} eq $property && $properties->{$prop_id}->{tenant_id} != 0)
+        {
+            return $properties->{$prop_id}->{value};
+        }
+    }
+
+    return undef;
 };
 
 sub _get_field_list

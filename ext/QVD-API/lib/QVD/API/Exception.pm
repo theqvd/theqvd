@@ -118,6 +118,7 @@ my $code2message_mapper = {
     7120 => 'Unable to remove, other items depend on it',
     7200 => 'This element already exists',
     7210 => 'This property already exists',
+    7211 => 'This property is already defined as global',
     7220 => 'This acl has already been assigned',
     7230 => 'This role has already been assigned',
     7310 => 'Unable to remove VM - This VM is running',

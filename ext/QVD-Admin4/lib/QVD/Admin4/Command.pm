@@ -520,6 +520,12 @@ my $FIELDS = {
 	     deleted_admin => 'deleted_admin', 
 		superadmin => 'superadmin'
 	},
+
+    property => {
+        id => 'id',
+        key => 'key',
+        description => 'description'
+    }
 };
 
 # For every field to retrieve, a callback can be specified.
@@ -721,6 +727,14 @@ my $CLI_CMD2API_ACTION = {
 
     log => { get => 'log_get_list' },
 
+    property => {
+        ids    => 'property_get_list',
+        get    => 'property_get_list',
+        update => 'property_update',
+        create => 'property_create',
+        delete => 'property_delete',
+    },
+
 };
 
 # Default lists of fields that must be displayed
@@ -728,27 +742,29 @@ my $CLI_CMD2API_ACTION = {
 
 my $DEFAULT_FIELDS = {
 
-    vm => [ qw( id tenant name blocked user host di ip ip_in_use di_in_use state user_state ) ],
+    vm => [ qw( id name blocked user host di ip ip_in_use di_in_use state user_state ) ],
 
-    user => [ qw( id tenant name blocked number_of_vms number_of_vms_connected ) ],
+    user => [ qw( id name blocked number_of_vms number_of_vms_connected ) ],
 
     host => [ qw( id name blocked address frontend backend state number_of_vms_connected ) ],
 
     osf => [ qw( id name overlay user_storage memory tenant number_of_vms number_of_dis ) ],
 
-    di => [ qw( id tenant name version osf blocked tags ) ],
+    di => [ qw( id name version osf blocked tags ) ],
 
 	tenant => [ qw( id name language block blocked) ],
 
     config => [ qw( key value default is_default ) ],
 
-    admin => [ qw(id tenant name language block) ],
+    admin => [ qw(id name language block) ],
 
     role => [ qw(id name fixed internal) ],
 
     acl => [ qw(id name) ],
 
-    log => [qw(time admin_name type_of_action qvd_object object_name status)]
+    log => [qw(time admin_name type_of_action qvd_object object_name status)],
+
+    property => [qw(id key description)],
 };
 
 ##############################################################
@@ -759,23 +775,32 @@ sub run
 {
     my ($self, $opts, @args) = @_;
 
+    # Generate a QVD::Admin4::Grammar::Response
     my $parsing = $self->parse_string(@args); # It parses the input CLI query
 
     if ($parsing->command eq 'get')  # For display queries
     {
-	$self->_get($parsing);
+        $self->_get($parsing);
     }
     elsif ($parsing->command eq 'create') # For creation queries
     {
-	$self->_create($parsing);
+        $self->_create($parsing);
     }
     elsif ($parsing->command eq 'can') # For queries that check the acls of an admin or role
     {
-	$self->_can($parsing);
+        $self->_can($parsing);
+    }
+    elsif ($parsing->command eq 'assign')
+    {
+        $self->_assign($parsing);
+    }
+    elsif ($parsing->command eq 'unassign')
+    {
+        $self->_unassign($parsing);
     }
     else # For other queries (update/delete/...)
     {
-	$self->_cmd($parsing);
+        $self->_cmd($parsing);
     }
 }
 
@@ -833,6 +858,105 @@ sub _can
 	$self->execute_and_display_query($query,$parsing); # Ask the API and prints a table in pagination mode
 }
 
+# Function intended to execute update, delete and the rest of actions.
+# All these actions must include an id filter in API. So, firstly,
+# the corresponding ids are requested to API, and then the update/delete
+# request is performed
+
+sub _cmd
+{
+    my ($self,$parsing) = @_;
+
+    # It gets all the ids correspondig the objects that must
+    # be deleted/updated
+
+    my $filters = $self->get_filters($parsing);
+    my $ids = eval { $self->ask_for_ids($parsing->qvd_object, $filters) };
+    $filters = { id => { '=' => $ids }} if defined $ids;
+
+    # TODO: Check if any of the arguments is a property
+    my @properties = (); # Get list of properties for object
+
+    # It performs the update/delete over the objects with those ids
+
+    my $res = $self->ask_api_standard(
+        $self->get_app->cache->get('api_default_path'),
+        {
+            action => $self->get_action($parsing),
+            filters => $filters,
+            order_by => $self->get_order($parsing),
+            arguments => $self->get_arguments($parsing)
+        }
+    );
+
+    # The API response is printed
+
+    $self->print_table($res,$parsing);
+}
+
+# Function intended to execute assign command
+
+sub _assign
+{
+    my ($self,$parsing) = @_;
+
+    my $ids = eval { $self->ask_for_ids($parsing->qvd_object, $self->get_filters($parsing)) };
+    CLI::Framework::Exception->throw('Ambiguous filter, several properties returned') if @$ids > 1;
+    CLI::Framework::Exception->throw('No property matches the filter') if @$ids == 0;
+
+    my $id = shift @$ids;
+
+    my $settings = {};
+    if($parsing->qvd_object eq 'property') {
+        $settings = {
+            action    => $parsing->arguments->{object}."_create_property_list",
+            arguments => { property_id => $id }
+        };
+    } else {
+        $settings = {
+            action    => $self->get_action($parsing),
+            filters   => $self->get_filters($parsing),
+            arguments => $self->get_arguments($parsing)
+        };
+    }
+
+    my $res = $self->ask_api_standard($self->get_app->cache->get('api_default_path'), $settings);
+
+    # The API response is printed
+    $self->print_table($res,$parsing);
+}
+
+# Function intended to execute assign command
+
+sub _unassign
+{
+    my ($self,$parsing) = @_;
+
+    my $ids = eval { $self->ask_for_ids($parsing->qvd_object, $self->get_filters($parsing)) };
+    CLI::Framework::Exception->throw('Ambiguous filter, several properties returned') if @$ids > 1;
+    CLI::Framework::Exception->throw('No property matches the filter') if @$ids == 0;
+
+    my $id = shift @$ids;
+
+    my $settings = {};
+    if($parsing->qvd_object eq 'property') {
+        $settings = {
+            action    => $parsing->arguments->{object}."_delete_property_list",
+            filters => { property_id => $id }
+        };
+    } else {
+        $settings = {
+            action    => $self->get_action($parsing),
+            filters   => $self->get_filters($parsing)
+        };
+    }
+
+    my $res = $self->ask_api_standard($self->get_app->cache->get('api_default_path'), $settings);
+
+    # The API response is printed
+    $self->print_table($res,$parsing);
+}
+
 # Function intended to execute a query in pagination mode.
 # It sets the console in pagination mode and asks the API and
 # prints a new table for every new page.
@@ -879,39 +1003,6 @@ sub execute_and_display_query
     ReadMode(0); # Return to normal mode in console 
 }
 
-
-# Function intended to execute update, delete and the rest of actions.
-# All these actions must include an id filter in API. So, firstly,
-# the corresponding ids are requested to API, and then the update/delete
-# request is performed
-
-sub _cmd
-{
-    my ($self,$parsing) = @_;
-
-    # It gets all the ids correspondig the objects that must
-    # be deleted/updated
-
-    my $filters = $self->get_filters($parsing);
-    my $ids = eval { $self->ask_for_ids($parsing->qvd_object, $filters) };
-    $filters = { id => { '=' => $ids }} if defined $ids;
-
-    # It performs the update/delete over the objects with those ids
-
-    my $res = $self->ask_api_standard(
-        $self->get_app->cache->get('api_default_path'),
-        {
-            action => $self->get_action($parsing),
-            filters => $filters,
-            order_by => $self->get_order($parsing),
-            arguments => $self->get_arguments($parsing)
-        }
-    );
-
-    # The API response is printed
-
-    $self->print_table($res,$parsing);
-}
 
 ###############################################
 ## METHODS TO PRINT RESPONSES IN CONSOLE RUN ##
@@ -1254,24 +1345,22 @@ sub get_fields
 {
     my ($self,$parsing,$api_res) = @_;
 
-    my $rows = $api_res->json('/rows') // return ();
-    my $first = $$rows[0] // return ();
+    return () unless $api_res->json('/rows');
     return qw(id) if $parsing->command eq 'create';
     return qw() unless $parsing->command eq 'get';
 
-    my @asked_fields = @{$parsing->fields} ? 
-	@{$parsing->fields}  : @{$DEFAULT_FIELDS->{$parsing->qvd_object}};
+    my @asked_fields = @{$parsing->fields} ?
+        @{$parsing->fields}  : @{$DEFAULT_FIELDS->{$parsing->qvd_object}};
 
     my @retrieved_fields;
     for my $asked_field (@asked_fields)
     {
-	my $api_field = eval {
-	    $FIELDS->{$parsing->qvd_object}->{$asked_field} 
-	} // $asked_field;
+        my $api_field = eval {
+            $FIELDS->{$parsing->qvd_object}->{$asked_field}
+        } // $asked_field;
 
-	push @retrieved_fields, $asked_field
-	    if exists $first->{$api_field};
-    } 
+        push @retrieved_fields, $api_field;
+    }
     @retrieved_fields;
 }
 

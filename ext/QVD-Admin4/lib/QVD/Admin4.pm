@@ -58,6 +58,8 @@ sub usage_text {
         admin (Intended to QVD administrators management)
     
         config (Intended to QVD configuration management)
+
+        property (Intended to QVD configuration management)
     ";
 }
 
@@ -88,6 +90,7 @@ sub command_map {
 		host     => 'QVD::Admin4::Command::Host',
 		osf      => 'QVD::Admin4::Command::OSF',
 		di       => 'QVD::Admin4::Command::DI',
+		property => 'QVD::Admin4::Command::Property',
 		login    => 'QVD::Admin4::Command::Login',
 		logout   => 'QVD::Admin4::Command::Logout',
 		password => 'QVD::Admin4::Command::Password',

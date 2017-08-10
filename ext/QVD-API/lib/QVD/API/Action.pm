@@ -776,14 +776,14 @@ my $ACTIONS = {
 
 	property_create => {
 		type_of_action => 'create',
-		 admin4method => 'create',
+		 admin4method => 'property_create',
         acls => [qr/^property\.see-main\./],
 		qvd_object => 'Property_List'
 	},
 
 	property_update => {
 		type_of_action => 'update',
-		 admin4method => 'update',
+		 admin4method => 'property_update',
         acls => [qr/^property\.see-main\./],
 		qvd_object => 'Property_List'
 	},
