@@ -710,11 +710,14 @@ sub set_nested_queries_in_request
 sub set_tables_to_join_in_request
 {
     my $self = shift;
-    $self->add_to_join($_) 
-	for @{$self->qvd_object_model->dbix_join_value};
-
-    $self->add_to_prefetch($_) 
-	for @{$self->qvd_object_model->dbix_prefetch_value};
+    $self->add_to_join($_)
+        for @{$self->qvd_object_model->dbix_join_value};
+    
+    $self->add_to_prefetch($_)
+        for @{$self->qvd_object_model->dbix_prefetch_value};
+    
+    # Joining tables might returns duplicated rows, so they shall be ommited by adding distinct
+    $self->modifiers->{distinct} = 1;
 }
 
 sub set_related_views_in_request
