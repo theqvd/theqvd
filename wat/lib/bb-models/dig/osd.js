@@ -116,28 +116,21 @@ Wat.Models.OSD = Wat.Models.DIG.extend({
         var [pluginId, attr] = pluginAttr.split('.');
         
         var plugin = this.getPluginDef(pluginId);
-        $.each(plugin.values, function(i,v) {
-            if (v.EnumLocationElement.code == attr) {
-                if (v.EnumLocationElement && v.EnumLocationElement.type == 'enum_location') {
-                    var location = v.EnumLocationElement.location;
-                    
-                    var enums = new Wat.Collections.PluginEnums({location: location});
-                    
-                    enums.fetch({
-                        complete: function () {
-                            var listEnums = {};
-                            $.each(enums.models, function (i, model) {
-                                listEnums[model.id] = model.attributes;
-                                listEnums[model.id].value = model.get(v.EnumLocationElement.field);
-                            });
-                            
-                            enumCallback(listEnums);
-                        }
-                    });
-                }
+        var location = '/' + pluginId;
+
+        var enums = new Wat.Collections.PluginEnums({location: location});
+
+        enums.fetch({
+            complete: function () {
+                var listEnums = {};
+                $.each(enums.models, function (i, model) {
+                    listEnums[model.id] = model.attributes;
+                    listEnums[model.id].value = model.get('name');
+                });
+                
+                enumCallback(listEnums);
             }
         });
-        //return plugin[attr].list_options;
     },
     
     // Get possible options of a setting of type list form an attribute of type list of a plugin

@@ -133,7 +133,7 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
                 var opts = {
                     pluginId: 'os',
                     attributes: {
-                        distro: selectedDistroName
+                        id: selectedDistro
                     }
                 };
                 

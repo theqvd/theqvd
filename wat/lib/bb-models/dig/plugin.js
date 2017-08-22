@@ -11,10 +11,6 @@ Wat.Models.Plugin = Wat.Models.DIG.extend({
         this.urlRoot = this.baseUrl() + '/osd/' + opts.osdId + '/' + opts.pluginId;
     },
     
-    url: function () {
-        return this.baseUrl() + '/osd/' + this.osdId + '/' + this.pluginId;
-    },
-    
     parse: function (response) {
         return $.extend({}, response, this.mock(response));
     },
