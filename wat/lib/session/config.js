@@ -501,7 +501,7 @@ Wat.C = {
     },
     
     setConfigToken: function (token, value) {
-        if ($.inArray(token, ['apiUrl']) == -1) {
+        if ($.inArray(token, ['apiUrl','digApiCode']) == -1) {
             console.error('A not allowed token was intented to load from config file (' + token + ')');
             return;
         }

@@ -1303,7 +1303,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     // When press key on pagination text input
     pressPage: function (e) {
         var inputContent = parseInt($(e.target).val());
-        var totalPages = parseInt($('.pagination_total_pages').html());
+        var totalPages = parseInt($('.' + this.cid + ' .pagination_total_pages').html());
         
         // Control overflow
         if (inputContent > totalPages) {
@@ -1317,7 +1317,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         if (e.keyCode == 13) {
             if (inputContent && this.collection.offset != inputContent) {
                 // Show loading animation while loading
-                $('.' + this.cid).find('.list').html(HTML_MID_LOADING);
+                $('.' + this.cid).find('.list td').html(HTML_MICRO_LOADING);
                 
                 this.collection.offset = inputContent;
                 this.fetchList();

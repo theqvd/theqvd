@@ -4,12 +4,12 @@ Wat.Views.PackageListView = Wat.Views.ListView.extend({
     
     // This events will be added to view events
     listEvents: {
-        'click .js-package-conf-btn': 'showPackageConfiguration',
         'click .js-add-package-btn': 'addPackage',
         'click .js-delete-package-btn': 'deletePackage',
         'click .js-order-package-down': 'sortDown',
         'click .js-order-package-up': 'sortUp',
-        'keypress [name="packages_search"]': 'filter'
+        'keypress [name="packages_search"]': 'typeSearch',
+        'change select[name="packages-installed-filter"]': 'filter'
     },
     
     initialize: function (params) { 
@@ -35,68 +35,43 @@ Wat.Views.PackageListView = Wat.Views.ListView.extend({
         Wat.Views.ListView.prototype.renderListBlock.apply(that, []);
     },
     
-    showPackageConfiguration: function (e) {
-        var package = $(e.target).attr('data-package');
-        var currentView = Wat.I.getCurrentView('package');
-        
-        if (!currentView.configVisible) {
-            $(e.target).removeClass('button2').addClass('button');
-            $('.js-package-buttonset').show();
-            currentView.configVisible = true;
-        }
-        else {
-            $(e.target).removeClass('button').addClass('button2');
-            $('.js-package-buttonset').hide();
-            currentView.configVisible = false;
-        }
-        
+    renderList: function () {
+        Wat.Views.ListView.prototype.renderList.apply(this, []);
+        Wat.I.chosenElement('[name="packages-installed-filter"]', 'single');
     },
     
     addPackage: function (e) {
+        var id = $(e.target).attr('data-id');
         var package = $(e.target).attr('data-package');
         var currentView = Wat.I.getCurrentView('package');
         
-        $('.js-add-package-btn[data-package="' + package + '"]').hide();
-        $('.js-add-package-check[data-package="' + package + '"]').show();
+        var affectedModel = currentView.collection.where({id: parseInt(id)})[0];
+        
+        affectedModel.save();
+        
+        $('.js-add-package-btn[data-id="' + id + '"]').hide();
+        $('.js-delete-package-btn[data-id="' + id + '"]').show();
         var template = _.template(
             Wat.TPL.editor_package, {
                 package: package,
+                id: id,
                 configVisible: currentView.configVisible
             }
         );
-        $('ul.js-installed-packages').append(template);
-        
-        if ($('ul.js-installed-packages>li').length == 1) {
-            $('.js-installed-packages-not-found').hide();
-        }
-        
-        if ($('ul.js-installed-packages>li').length >=2) {
-            $('.js-package-conf-btn').show();
-        }
     },
 
     deletePackage: function (e) {
+        var id = $(e.target).attr('data-id');
         var package = $(e.target).attr('data-package');
         var currentView = Wat.I.getCurrentView('package');
-
+        
+        var affectedModel = new Wat.Models.Package({id: parseInt(id)});
+        
+        affectedModel.destroy();
+        
         $('li.js-installed-package[data-package="' + package + '"]').remove();
-        $('.js-add-package-btn[data-package="' + package + '"]').show();
-        $('.js-add-package-check[data-package="' + package + '"]').hide();
-        
-        switch ($('ul.js-installed-packages>li').length) {
-            case 0:
-                $('.js-installed-packages-not-found').show();
-                break;
-            case 1:
-                if (currentView.configVisible) {
-                    $('.js-package-conf-btn').trigger('click');
-                }
-                break;
-        }
-        
-        if ($('ul.js-installed-packages>li').length < 2) {
-            $('.js-package-conf-btn').hide();
-        }
+        $('.js-add-package-btn[data-id="' + id + '"]').show();
+        $('.js-delete-package-btn[data-id="' + id + '"]').hide();
     },
     
     sortDown: function (e) {
@@ -113,13 +88,29 @@ Wat.Views.PackageListView = Wat.Views.ListView.extend({
         item.insertBefore(itemPrev);
     },
     
-    filter: function (e) {
+    typeSearch: function (e) {
         if (e.keyCode == 13) {
-            var currentView = Wat.I.getCurrentView('package');
-
-            currentView.collection.filters.search = $('input[name="packages_search"]').val();
-
-            currentView.fetchList();
+            this.filter();
         }
+    },
+    
+    filter: function () {
+        // Show loading animation while loading
+        $('.' + this.cid).find('.list td').html(HTML_MICRO_LOADING);
+        
+        var currentView = Wat.I.getCurrentView('package');
+        
+        // Reset pagination befor filter
+        currentView.collection.offset = 1;
+        
+        currentView.collection.filters.search = $('input[name="packages_search"]').val();
+        if ($('select[name="packages-installed-filter"]').val() == 'installed') {
+            currentView.collection.filters.installed = true;
+        }
+        else {
+            delete currentView.collection.filters.installed;
+        }
+
+        currentView.fetchList();
     }
 });

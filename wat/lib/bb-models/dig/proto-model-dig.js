@@ -1,7 +1,5 @@
 Wat.Models.DIG = Backbone.Model.extend({
-    apiCode: 'dig',
-    
     baseUrl: function () {
-        return Wat.C.getApiUrl() + 'proxy/' + this.apiCode;
+        return Wat.C.getApiUrl() + 'proxy/' + Wat.C.digApiCode;
     }
 });

@@ -30,8 +30,8 @@ Wat.Views.OSDPackagesEditorView = Wat.Views.OSDEditorView.extend({
         params.forceListActionButton = null;
 
         params.forceSelectedActions = {};
-        params.block = 5;
-        params.filters = {"tenant_id": this.elementId};
+        params.offset = 1;
+        params.block = 8;
         Wat.CurrentView.embeddedViews = Wat.CurrentView.embeddedViews || {};
         
         Wat.CurrentView.embeddedViews.package = new Wat.Views.PackageListView(params);

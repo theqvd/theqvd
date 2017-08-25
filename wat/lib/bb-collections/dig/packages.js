@@ -1,53 +1,33 @@
-Wat.Collections.Packages = Wat.Collections.Collection.extend({
+Wat.Collections.Packages = Wat.Collections.DIG.extend({
     model: Wat.Models.Package,
+    filters: {},
     
-    parse: function(rawResponse) {
-        var that = this;
-        var startIndex = (this.offset - 1) * this.block;
-        var endIndex = startIndex + this.block - 1;
-        var page = [];
-
-        if (this.filters.search) {
-            var response = [];
-            
-            $.each(rawResponse, function (index, p) {
-                if (!p) {
-                    return;
-                }
-
-                if (p.package.indexOf(that.filters.search) !== -1) {
-                    response.push(p);
-                }
-            });
-        }
-        else {
-            var response = rawResponse;
-        }
-            
-        for(i=startIndex;i<=endIndex;i++) {
-            if (!response[i]) {
-                continue;
-            }
-            page.push(response[i]);
-        }
+    initialize: function (params) {
+        params = params || {};
         
-        this.elementsTotal = response.length;
-        
-        return page;
+        this.offset = params.offset;
+        this.block = params.block;
     },
     
-    sync: function(method, model, options) {
-        var that = this;
-        
-        var params = _.extend({
-            type: 'GET',
-            dataType: 'json',
-            url: 'packages.json',
-            processData: false
-        }, options);
-        
-        params.error = Wat.A.processResponseError;
+    parse: function(rawResponse) {
+        this.elementsTotal = rawResponse.total || 0;
 
-        return $.ajax(params);
-    }
+        return rawResponse.packages;
+    },
+    
+    url: function () {
+        var url = this.baseUrl() + '/osd/' + Wat.CurrentView.OSDmodel.id + '/pkg';
+        
+        url+= '?offset=' + this.offset + '&limit=' + this.block + '&sort=name,asc';
+        
+        if (this.filters.search) {
+            url+= '&name=' + this.filters.search;
+        }
+        
+        if (this.filters.installed) {
+            url+= '&installed=true';
+        }
+        
+        return url;
+    },
 });

@@ -1,3 +1,4 @@
 {
-   "apiUrl": "https://localhost:443"
+    "apiUrl": "https://localhost:443",
+    "digApiCode": "dig"
 }
