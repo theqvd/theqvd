@@ -91,17 +91,17 @@ Wat.DIG = {
             osdId: opts.osdId,
             pluginId: opts.pluginId
         });
-                
+
         Wat.CurrentView.OSDmodel.pluginData[opts.pluginId].destroy({
             complete: function (e) {
                 callbackDestroy(e);
                 // After any plugin update, plugin definitions must be retrieved
                 Wat.DIG.fetchPluginDef(Wat.CurrentView.OSDmodel, callbackFetch);
-            }
+            },
         });
     },
     
-    changeAssetSelector: function (e, opt) {
+    updateAssetPreview: function (opt) {
         var controlId = $(opt).attr('data-control-id');
         var assetId = $(opt).val();
         var type = $(opt).attr('data-type');
@@ -123,7 +123,19 @@ Wat.DIG = {
                 break;
             case 'wallpaper':
                 $('[data-preview-id="' + controlId + '"]').html('<img src="' + url + '" style="width: 90%; display: block; margin: 0 auto;"></img>');
+                
+                // Show loading message for preview image until it is loaded
+                $('.js-preview img').hide();
+                $('.js-data-preview-message').show();
+                $('.js-preview img').on('load', function () {
+                    $('.js-preview img').show();
+                    $('.js-data-preview-message').hide();
+                });
                 break;
+            default:
+                if ($(opt).attr('data-none')) {
+                    $('[data-preview-id="' + controlId + '"]').html('');
+                }
         }
     },
     

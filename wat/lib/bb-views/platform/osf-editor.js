@@ -191,6 +191,8 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
         var osdId = this.model.get('osd_id');
         if (osdId) {
             Wat.DIG.fetchOSD(osdId, function (OSDmodel) {
+                OSDmodel.initPlugins();
+                
                 // If OSD is not retrieved properly hide software tab
                 if (!OSDmodel) {
                     $('[data-tab="software"]').remove();

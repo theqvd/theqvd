@@ -1,3 +1,11 @@
+<option 
+    data-control-id="<%= assetType %>" 
+    data-plugin-id="<%= pluginId %>" 
+    data-none="true"
+    data-i18n="None"
+    >
+        None
+    </option>
 <% $.each (models, function (i, model) { %>
     <option 
         data-id="<%= model.get('id') %>" 

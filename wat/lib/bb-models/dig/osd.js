@@ -10,7 +10,6 @@ Wat.Models.OSD = Wat.Models.DIG.extend({
     
     initPlugins: function () {
         var that = this;
-        
         $.each (this.pluginDef.models, function (iModel, model) {
             var pluginId = model.get('code');
             var plugin = model.get('plugin');
@@ -93,14 +92,6 @@ Wat.Models.OSD = Wat.Models.DIG.extend({
         };
         
         return osd;
-    },
-    
-    // Get plugin definition
-    // - pluginId: Id of the plugin (alphanumeric)
-    //      I.E.: os|vma|execution_hooks|shortcuts...
-    getPluginDefOLD: function (pluginId) {
-        var pluginModel = this.pluginDef.where({code: pluginId})[0];
-        return pluginModel.get('plugin');
     },
     
     getPluginDef: function (pluginId) {

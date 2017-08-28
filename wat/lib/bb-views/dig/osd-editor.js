@@ -10,7 +10,6 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
     dialogEvents: {
         'click .js-os-editor-menu li': 'clickOSEditorMenu',
         'change input[type="checkbox"][js-autosave-field]': 'autoSaveCheck',
-        'change .js-asset-selector': 'changeAssetSelector',
     },
     
     ////////////////////////////////////////////////////
@@ -63,10 +62,15 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
                 
                 $('select.bb-os-conf-' + opts.assetType + '-assets').html(template);
                 Wat.I.chosenElement('select.bb-os-conf-' + opts.assetType + '-assets', 'single100');
+                
+                var currentAssetId = Wat.CurrentView.OSDmodel.pluginData[opts.pluginId].get('id');
+                if (currentAssetId) {
+                    $('select.bb-os-conf-' + opts.assetType + '-assets>option[data-id="' + currentAssetId + '"]').prop('selected','selected');
+                }
                 $('select.bb-os-conf-' + opts.assetType + '-assets').trigger('chosen:update');
-
-                // Select first radio button
-                $('.' + that.cid + ' select.js-asset-selector').trigger('change');
+                
+                // Update preview of the selected asset
+                Wat.DIG.updateAssetPreview($('.' + that.cid + ' select.js-asset-selector>option:checked'));
                 
                 var template = _.template(
                     Wat.TPL.osConfigurationEditorAssetRows, {
@@ -148,19 +152,35 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
     changeAssetManagerSelector: function (e) {
         var row = $(e.target).closest('tr');
         
-        Wat.DIG.changeAssetSelector(e, row);
+        Wat.DIG.updateAssetPreview(row);
     },
     
     changeAssetSelector: function (e) {
         var opt = $(e.target).find('option:checked');
         
-        Wat.DIG.changeAssetSelector(e, opt);
+        Wat.DIG.updateAssetPreview(opt);
         
         var pluginId = $(opt).attr('data-plugin-id');
+        
+        // If new option is None, element will be deleted
+        if ($(opt).attr('data-none')) {
+            // Save plugin element
+            Wat.DIG.deletePluginListElement({
+                pluginId: 'wallpaper',
+                osdId: Wat.CurrentView.OSDmodel.id,
+                attributes: {
+                    pluginId: pluginId,
+                    id: Wat.CurrentView.OSDmodel.pluginData.wallpaper.get('id')
+                }
+            }, function () {}, function () {});
+            
+            return;
+        }
+        
         var setCallback = function () {};
         
         switch(pluginId) {
-            case 'desktop':
+            case 'wallpaper':
                     var id = $(opt).attr('data-id');
                     var name = $(opt).attr('data-name');
                     var url = $(opt).attr('data-url');
@@ -170,7 +190,6 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
                 return;
         }
         
-        /*
         // Save plugin element
         Wat.DIG.setPluginListElement({
             pluginId: pluginId,
@@ -181,15 +200,6 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
                 url: url
             }
         }, setCallback, function () {});
-        */
-        
-        // Show loading message for preview image until it is loaded
-        $('.js-preview img').hide();
-        $('.js-data-preview-message').show();
-        $('.js-preview img').on('load', function () {
-            $('.js-preview img').show();
-            $('.js-data-preview-message').hide();
-        });
     },
     
     clickAssetName: function (e) {

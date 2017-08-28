@@ -3,7 +3,7 @@ Wat.Views.OSDAppearenceEditorView = Wat.Views.OSDEditorView.extend({
     
     initialize: function (params) {
         this.params = params;
-    
+        
         Wat.Views.DialogView.prototype.initialize.apply(this, [params]);
     },
     
@@ -20,6 +20,8 @@ Wat.Views.OSDAppearenceEditorView = Wat.Views.OSDEditorView.extend({
     },
     
     render: function () {
+        Wat.CurrentView.OSDmodel.pluginData.wallpaper.fetch({});
+        
         var template = _.template(
             Wat.TPL.osConfigurationEditorAppearance, {
                 massive: this.massive,
@@ -27,12 +29,12 @@ Wat.Views.OSDAppearenceEditorView = Wat.Views.OSDEditorView.extend({
                 cid: this.cid
             }
         );
-
+        
         $('.bb-os-conf-appearance').html(template);
         
         this.renderAssetsControl({
             assetType: 'wallpaper',
-            pluginId: 'desktop'
+            pluginId: 'wallpaper'
         });
         
         $('.' + this.cid + ' .js-upload-mode').hide();
@@ -114,7 +116,7 @@ Wat.Views.OSDAppearenceEditorView = Wat.Views.OSDEditorView.extend({
         }).complete(function () {
             that.renderAssetsControl({ 
                 assetType: 'wallpaper',
-                pluginId: 'desktop',
+                pluginId: 'wallpaper',
                 afterRender: function () {
                     // Select uploaded element
                     $('.' + this.cid + ' [data-id="' + assetId + '"]>td>input.js-asset-check').trigger('change').prop('checked', true);
@@ -141,7 +143,7 @@ Wat.Views.OSDAppearenceEditorView = Wat.Views.OSDEditorView.extend({
             success: function () {
                 that.renderAssetsControl({ 
                     assetType: 'wallpaper',
-                    pluginId: 'desktop'
+                    pluginId: 'wallpaper'
                 });
                 
                 Wat.I.M.showMessage({message: i18n.t('Successfully deleted'), messageType: 'success'});
