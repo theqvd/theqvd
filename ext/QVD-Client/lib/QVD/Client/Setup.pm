@@ -6,9 +6,9 @@ use 5.010;
 
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT = qw($WINDOWS $DARWIN $user_dir $app_dir);
+our @EXPORT = qw($WINDOWS $DARWIN $user_dir $app_dir $user_config_fn);
 
-our ($WINDOWS, $DARWIN, $user_dir, $app_dir);
+our ($WINDOWS, $DARWIN, $user_dir, $app_dir, $user_config_fn);
 
 use File::Spec;
 use Cwd;
@@ -24,12 +24,12 @@ BEGIN {
                                     : File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
     mkdir($user_dir);
 
-    my $cfg_fn = $ARGV[0] || File::Spec->join($user_dir, 'client.conf');
+    $user_config_fn = $ARGV[0] || File::Spec->join($user_dir, 'client.conf');
 
     no warnings;
     $QVD::Config::USE_DB = 0;
     @QVD::Config::Core::FILES = (($WINDOWS ? () : ('/etc/qvd/client.conf')),
-                                  $cfg_fn);
+                                  $user_config_fn);
 }
 
 # we can load the configuration now:

@@ -1282,10 +1282,8 @@ sub SaveConfiguration {
 
     set_core_cfg("client.share.$share_num", "");
 
-
-
     local $@;
-    eval { save_core_cfg($QVD::Client::App::user_config_filename) };
+    eval { save_core_cfg($QVD::Client::App::user_config_fn) };
     if ($@) {
         my $message = $@;
         my $dialog = Wx::MessageDialog->new($self, $message, 
@@ -1294,7 +1292,7 @@ sub SaveConfiguration {
         $dialog->Destroy();
     }
     else {
-        INFO "Configuration saved to $QVD::Client::App::user_config_filename";
+        INFO "Configuration saved to $QVD::Client::App::user_config_fn";
     }
 }
 
