@@ -119,13 +119,14 @@ else {
                          subdir => 'gsview',
                          subsystem => 'windows' },
                        { path => $ghostscript_path->child('bin', 'gswin32.exe'),
-                         subdir => 'ghostscript',
+                         subdir => 'ghostscript/bin',
                          subsystem => 'windows' },
                      );
 
     my @extra_dirs = ( { path => $installer_path->child('pixmaps'), subdir => 'pixmaps' },
                        { path => $vcxsrv_path, subdir => 'vcxsrv' },
                        { path => $pulseaudio_path, subdir => 'pulseaudio', skip => 'pulseaudio.exe' },
+                       { path => $ghostscript_path, subdir => 'ghostscript', skip => 'bin/gswin32.exe' },
                      );
 
     my @qvd_client_modules = qw(QVD::Client QVD::Config::Core QVD::Config

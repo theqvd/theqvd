@@ -169,7 +169,7 @@ command.windows.nxproxy = bin\\nxproxy.exe
 command.windows.sftp-server = bin/sftp-server.exe
 command.windows.win-sftp-server = win-sftp-server.exe
 client.use.win-sftp-server = 1
- 
+
 command.nxagent.args.extra =
 command.x-session.args.extra =
 command.sftp-server = /usr/lib/openssh/sftp-server
@@ -188,7 +188,7 @@ command.usbip = /usr/bin/usbip
 command.slaveclient = ${path.qvd.bin}/qvd-slaveclient
 
 @mswin@command.gsprint = gsview/gsprint.exe
-@mswin@command.ghostscript = ghostscript/gswin32.exe
+@mswin@command.ghostscript = ghostscript/bin/gswin32.exe
 
 ## whether to remember password after successful connection
 client.remember_password = 0

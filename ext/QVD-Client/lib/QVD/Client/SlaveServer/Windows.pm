@@ -67,6 +67,17 @@ sub _print_file {
     my $ghostscript_exe = File::Spec->rel2abs(core_cfg('command.ghostscript'),
                                               $QVD::Client::SlaveServer::app_dir);
     DEBUG "gsprint.exe at '$gsprint_exe', ghostscript.exe at '$ghostscript_exe'";
+
+    my ($drive, $gs_path) = File::Spec->splitpath($ghostscript_exe, 1);
+    my @gs_exe_path= File::Spec->splitdir($gs_path);
+    my $gs_path = File::Spec->catdir(@gs_exe_path[0..$#gs_exe_path - 2]);
+    my $ghostscript_lib = shortpathL(File::Spec->catpath($drive, $gs_path, 'lib')) // do {
+        ERROR "Unable to locate Ghostscript library directory";
+        $self->throw_http_error(HTTP_INTERNAL_SERVER_ERROR, "Ghostscript installation is broken");
+    };
+
+    DEBUG "ghostscript drive: $drive, path: $gs_path, inc: $ghostscript_lib";
+
     my @names = $self->_printer_names;
     for (@names) {
         my $real_name = $_;
@@ -75,7 +86,9 @@ sub _print_file {
             DEBUG "Printer real name is '$real_name'";
             my $child;
             my $cmd = shortpathL($gsprint_exe);
-            my $line = _cmd_quote($cmd,
+            my $line = _cmd_quote($cmd, '-color',
+                                  # '-quiet', # we better let ghostscript tell the user what it is doing!
+                                  "-I$ghostscript_lib",
                                   -ghostscript => $ghostscript_exe,
                                   -printer => $real_name,
                                   $fn);
