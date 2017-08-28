@@ -6,7 +6,13 @@ use 5.022;
 
 use Path::Tiny;
 
-my $dest = path(shift // '.')->child('lib');
+my $comp = shift if @ARGV > 1;
+$comp //= 'client';
+
+my $dest = path(shift // '.');
+
+$dest = $dest->child('lib') unless $dest =~ /\blib\b/;
+
 $dest->is_dir or die "target directory $dest does not exist";
 
 
@@ -14,11 +20,14 @@ my $qvd_src = path($0)->realpath->parent->parent->parent;
 
 warn "qvd-src: $qvd_src\n";
 
-for my $module (qw( QVD::Client QVD::Config::Core QVD::Config
-                    QVD::HTTP QVD::HTTPC QVD::HTTPD
-                    QVD::Log QVD::SimpleRPC QVD::URI
-                    IO::Socket::Forwarder )) {
 
+my %module = (client => [qw( QVD::Client QVD::Config::Core QVD::Config
+	                     QVD::HTTP QVD::HTTPC QVD::HTTPD
+                             QVD::Log QVD::SimpleRPC QVD::URI
+                             IO::Socket::Forwarder)],
+	      vma => [qw( QVD::VMA QVD::HTTPD QVD::HTTPC QVD::Config::Core QVD::Config QVD::Log QVD::SimpleRPC)]);
+
+for my $module (@{$module{$comp}}) {
 
     my $top = $qvd_src->child('ext', ($module =~ s/::/-/gr), 'lib');
     #warn "top: $top\n";
@@ -28,17 +37,12 @@ for my $module (qw( QVD::Client QVD::Config::Core QVD::Config
                     if ($path =~ /\.pm$/i) {
                         my $rel = $path->relative($top);
                         my $to = $dest->child($rel);
-                        if ($to->is_file) {
-                            if ($path->stat->[9] > $to->stat->[9]) {
-                                warn "updating $rel!\n";
-                                $path->copy($to);
-                            }
-                            else {
-                                # warn "file $rel did not change.\n";
-                            }
+                        if (!$to->exists or $path->stat->[9] > $to->stat->[9]) {
+                            warn "updating $rel!\n";
+                            $path->copy($to);
                         }
                         else {
-                            warn "$rel does not exists in target, ignoring it.\n";
+                            # warn "file $rel did not change.\n";
                         }
                     }
                 },
