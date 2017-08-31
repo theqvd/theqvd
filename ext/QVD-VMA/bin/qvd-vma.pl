@@ -5,13 +5,12 @@ use warnings;
 
 # ensure we load the VMA configuration
 
-BEGIN {
-    $QVD::Config::USE_DB = 0;
-    @QVD::Config::Core::FILES = ('/etc/qvd/vma.conf');
-}
+use QVD::VMA::Setup;
+use QVD::VMA;
+
 use QVD::Config::Core;
 
-use QVD::VMA;
+
 use App::Daemon qw(daemonize);
 $App::Daemon::pidfile = core_cfg('vma.pid_file');
 $App::Daemon::as_user = 'root';
