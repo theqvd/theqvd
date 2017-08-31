@@ -28,7 +28,7 @@ if ($params{'qvd.hook.on_printing'} eq 'connected') {
         ($client_os eq 'windows' ? 'cifs' : 'ipp');
 
     if ($flavor eq 'cifs') {
-        if (open my $fh, '-|', 'smbclient', -L => '127.0.0.1', -p => $prt_port, '-gN') {
+        if (open my $fh, '-|', $smbclient, -L => '127.0.0.1', -p => $prt_port, '-gN') {
             my %ptrs;
             while (<$fh>) {
                 if (my ($target, $desc) = /^Printer\|([^|]+)\|(.*)$/) {
