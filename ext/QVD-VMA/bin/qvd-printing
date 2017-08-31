@@ -1,50 +1,97 @@
 #!/usr/bin/perl
-use LWP::Simple;               
-use JSON qw( decode_json );    
-use Data::Dumper;
-use strict;                     
-use warnings;                 
 
+use strict;
+use warnings;
+use 5.010;
+
+use QVD::VMA::Setup;
+use QVD::Config::Core;
+use QVD::Log;
+use URI::Escape qw(uri_escape);
+
+use LWP::Simple;
+use Data::Dumper;
+
+my $lpadmin = core_cfg('command.lpadmin');
+my $lpstat = core_cfg('command.lpstat');
+my $smbclient = core_cfg('command.smbclient');
 
 my %params = @ARGV;
-my $lpadmin = '/usr/sbin/lpadmin';
-	# Remove all printers that might already be configured
-	my @printers = map { /^([^ ]+)/, $1} `lpstat -a`;
-	for my $prt (@printers) {
-	    next unless $prt =~ /^QVD-/;
-	    system($lpadmin, "-x", $prt);
-	}
 
-	if ($params{'qvd.hook.on_printing'} eq 'connected') {
-		my $client_os = $params{'qvd.client.os'};
-		my $prt_port = $params{'qvd.printing.port'};
-		if ($params{'qvd.client.os'} eq 'windows') {
-			my @lst = grep /^Printer/, `smbclient -L 127.0.0.1 -p $prt_port -gN`;
-			my %printers = map { /^Printer\|([^|]+)\|(.*)$/, $1 => $2} @lst;
-			while (my ($k, $v) = each(%printers)) {
-				(my $d = $v) =~ tr/[A-Za-z0-9]/_/c;
-				$k =~ s/ /%20/g;
-				system($lpadmin, "-p", "QVD-$d", "-D", "$v", "-v", "smb://LOCALHOST:$prt_port/$k",  "-E");
-			}
-		} else {
-			my @printers = map { /^([^ ]+)/, $1} `lpstat -h 127.0.0.1:$prt_port -a`;
-			my $default_set;
+_remove_all_qvd_printers(); # we remove then in every call.
 
-			for my $prt (@printers) {
-				system($lpadmin, "-p", "QVD-$prt", "-v", "ipp://127.0.0.1:$prt_port/printers/$prt", "-E");
+if ($params{'qvd.hook.on_printing'} eq 'connected') {
+    my $client_os = $params{'qvd.client.os'};
+    my $prt_port = $params{'qvd.printing.port'};
 
-				if (!$default_set) {
-					# Set the first printer as the default one. Otherwise the lp tools
-					# complain there is "no default destination available" when trying
-					# to print without specifying a printer.
-					#
-					# Newer software that uses CUPS doesn't seem to care.
+    my $flavor = $params{'qvd.client.printing.flavor'} //
+        ($client_os eq 'windows' ? 'cifs' : 'ipp');
 
-					system($lpadmin, "-d", "QVD-$prt");
-					$default_set = 1;
-				}
-			}
-		}
-	}		
+    if ($flavor eq 'cifs') {
+        if (open my $fh, '-|', 'smbclient', -L => '127.0.0.1', -p => $prt_port, '-gN') {
+            my %ptrs;
+            while (<$fh>) {
+                if (my ($target, $desc) = /^Printer\|([^|]+)\|(.*)$/) {
+                    $ptrs{$desc} = $target;
+                }
+            }
 
+            for my $desc (keys %ptrs) {
+                my $name = "QVD-$desc";
+                $name =~ tr/[A-Za-z0-9\-]/_/c;
+                INFO "Registering printer '$name'";
+                system($lpadmin,
+                       -p => $name,
+                       -D => $desc,
+                       -v => "smb://LOCALHOST:$ptr_port/".uri_escape($ptrs{$desc}),
+                       '-E')
+                    and ERROR "Unable to register printer '$desc', lpadmin failed";
+            }
+        }
+        else {
+            ERROR "Unable to retrieve printer list, smbclient failed: $!";
+        }
+    }
+    elsif ($flavor eq 'ipp') {
+        my $default_set;
+        if (open my $fh, '-|', 'lpstat', -h => "127.0.0.1:$prt_port", '-a') {
+            if (my ($ptr) = /^(\S+)/) {
+                INFO "Registering printer 'QVD-$ptr'";
+                if (system($lpadmin,
+                           -p => "QVD-$prt",
+                           -v => "ipp://127.0.0.1:$prt_port/printers/$prt",
+                           '-E') == 0) {
+                    # Set the first printer as the default
+                    # one. Otherwise the lp tools complain there is
+                    # "no default destination available" when trying
+                    # to print without specifying a printer. Newer
+                    # software using CUPS doesn't seem to care.
+                    system($lpadmin, "-d", "QVD-$prt")
+                        unless $default_set++;
+                }
+                else {
+                    ERROR "Unable to register printer '$ptr', lpadmin failed: $?";
+                }
+            }
+        }
+    }
+    elsif ($flavor eq 'qvd4') {
+    }
+}
+
+sub _remove_all_qvd_printers {
+    # Remove all QVD printers that might already be configured
+    if (open my $fh, '-|', $lpstat, '-a') {
+        while (<$fh>) {
+            if (my ($ptr) = /^(QVD-\S+)/) {
+                INFO "Removing printer $ptr";
+                system $lpadmin, -x => $ptr
+                    and ERROR "Unable to remove printer '$ptr', lpadmin failed: $?";
+            }
+        }
+    }
+    else {
+        ERROR "Unable to run lpstat: $!";
+    }
+}
 

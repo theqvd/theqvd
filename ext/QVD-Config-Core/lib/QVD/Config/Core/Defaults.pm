@@ -190,6 +190,11 @@ command.slaveclient = ${path.qvd.bin}/qvd-slaveclient
 @mswin@command.gsprint = gsview/gsprint.exe
 @mswin@command.ghostscript = ghostscript/bin/gswin32.exe
 
+# VMA commands
+command.lpadmin = /usr/bin/lpadmin
+command.lpstat = /usr/bin/lpstat
+command.smbclient = /usr/bin/smbclient
+
 ## whether to remember password after successful connection
 client.remember_password = 0
 
