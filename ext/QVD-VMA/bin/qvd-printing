@@ -75,7 +75,7 @@ if ($params{'qvd.hook.on_printing'} eq 'connected') {
             }
         }
     }
-    elsif ($flavor eq 'qvd4') {
+    elsif ($flavor eq 'slave4') {
     }
 }
 

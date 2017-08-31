@@ -656,14 +656,17 @@ print "auth-type: ".$auth_type."\n";
         'qvd.client.usb.enabled'        => $self->{usb},
         'qvd.client.usb.implementation' => $self->{usb_impl},
     );
-	
-	if ( $WINDOWS ) {
-		DEBUG "Sending Windows version and host info";
-		require Win32;
-		$o{'qvd.client.os.name'}    = join('; ' , Win32::GetOSName());
-		$o{'qvd.client.os.version'} = join('; ', Win32::GetOSVersion());
-		$o{'qvd.client.hostname'}   = Win32::NodeName();
-	}
+
+    if ( $WINDOWS ) {
+        DEBUG "Sending Windows version and host info";
+        require Win32;
+        $o{'qvd.client.os.name'}    = join('; ' , Win32::GetOSName());
+        $o{'qvd.client.os.version'} = join('; ', Win32::GetOSVersion());
+        $o{'qvd.client.hostname'}   = Win32::NodeName();
+
+        DEBUG "Enabling new qvd4 printing support";
+        $o{'qvd.client.printing.flavor'} = 'slave4';
+    }
 
     $q = join '&', map { 
         warn "Undefined value for option $_" unless defined $o{$_};
