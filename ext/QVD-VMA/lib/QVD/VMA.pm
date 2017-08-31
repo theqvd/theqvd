@@ -100,6 +100,7 @@ my %on_printing =     ( connected      => cfg('internal.vma.on_printing.connecte
 
 my $display       = cfg('internal.nxagent.display');
 my $printing_port = $display + 2000;
+my $slave_port    = $display + 11000;
 
 my %timeout = ( initiating => cfg('internal.nxagent.timeout.initiating'),
                 listening  => cfg('internal.nxagent.timeout.listening'),
@@ -619,8 +620,14 @@ sub _save_printing_config {
     my %args = @_;
     my $props = Config::Properties->new;
     $props->setProperty('qvd.printing.enabled' => ($enable_printing && $args{'qvd.client.printing.enabled'}) // 0);
-    $props->setProperty('qvd.client.os' => $args{'qvd.client.os'});
     $props->setProperty('qvd.printing.port' => $printing_port);
+    $props->setProperty('qvd.slave.port' => $slave_port);
+
+    for my $key (qw(qvd.client.os qvd.client.printing.flavor)) {
+        if (defined (my $v = $args{$key})) {
+            $props->setProperty($k) = $v;
+        }
+    }
 
     my $tmp = "$printing_conf.tmp";
     open my $fh, '>', $tmp or die "Unable to save printing configuration to $tmp";
