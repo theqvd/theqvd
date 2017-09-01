@@ -16,6 +16,11 @@
           <td class="cell-check">
               <input type="radio" name="<%= assetType %>" value="<%= model.get('id') %>" class="js-asset-check" data-plugin-id="<%= pluginId %>">
           </td>
+          <% if (assetType == 'icon') { %>
+              <td class="col-width-10 js-<%= assetType %> asset-image">
+                  <img src="<%= model.get('url') %>" style="width: 32px;">
+              </td>
+          <% } %>
           <td class="col-width-100 js-<%= assetType %>-name asset-name">
               <%= model.get('name') %>
           </td>

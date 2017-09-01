@@ -38,7 +38,7 @@ td {
     i.fa-lock, i.fa-unlock-alt {
         @include icon-size(($table_icons_size_mobile + 3) + px);
         
-        @include in(desktop) {        
+        @include in(desktop) {
             @include icon-size(($table_icons_size + 3) + px);
         }
         
@@ -57,8 +57,8 @@ td {
 }
 
 .icon-bg {
-    width: 20px;
-    height: 20px;
+    width: 32px;
+    height: 32px;
     background-size: 100%;
     background-repeat: no-repeat;
     position: relative;

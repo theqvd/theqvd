@@ -223,6 +223,10 @@ table.list {
             white-space: normal;
         }
     }
+    
+    tr.selected-row>td {
+        background: darken($col_whiter, 17);
+    }
 }
 
 

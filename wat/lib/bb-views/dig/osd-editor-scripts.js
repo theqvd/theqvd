@@ -13,7 +13,8 @@ Wat.Views.OSDScriptsEditorView = Wat.Views.OSDEditorView.extend({
         'click .js-show-select-mode': 'showSelectMode',
         'click .js-show-manage-mode': 'showManageMode',
         'click .js-add-starting-script': 'addScript',
-        'click .js-show-upload': 'toggleUploadControl',
+        'click .js-show-upload': 'showUploadControl',
+        'click .js-hide-upload': 'hideUploadControl',
         'click .js-upload-asset': 'createScript',
         'click .js-delete-selected-asset': 'deleteScript',
         'change .js-asset-check': 'changeAssetManagerSelector',
@@ -119,7 +120,7 @@ Wat.Views.OSDScriptsEditorView = Wat.Views.OSDEditorView.extend({
             execution_hook : execution_hook
         });
         
-        Wat.CurrentView.editorView.softwareEditorView.sectionScriptsView.renderSectionScriptsRows(Wat.CurrentView.OSDmodel.get('scripts'));
+        Wat.CurrentView.editorView.softwareEditorView.sectionViews.scripts.renderSectionScriptsRows(Wat.CurrentView.OSDmodel.get('scripts'));
 
         $('.js-starting-script').val('');
     },
@@ -127,7 +128,7 @@ Wat.Views.OSDScriptsEditorView = Wat.Views.OSDEditorView.extend({
     afterDeleteScript: function (e) {
         var scripts = Wat.CurrentView.OSDmodel.get('scripts');
         
-        Wat.CurrentView.editorView.softwareEditorView.sectionScriptsView.renderSectionScriptsRows(scripts);
+        Wat.CurrentView.editorView.softwareEditorView.sectionViews.scripts.renderSectionScriptsRows(scripts);
     },
     
     changeScriptMode: function (e) {
@@ -211,7 +212,7 @@ Wat.Views.OSDScriptsEditorView = Wat.Views.OSDEditorView.extend({
             Wat.I.M.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
             
             // Hide upload control
-            that.toggleUploadControl();
+            that.hideUploadControl();
             
             // Reload combo list with available scripts
             that.renderAssetsControl({

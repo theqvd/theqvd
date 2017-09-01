@@ -329,6 +329,9 @@ Wat.I.T = {
                     osConfigurationEditorShortcutsRows: {
                         name: 'editor/osd-shortcuts-rows'
                     },
+                    osConfigurationEditorShortcutsRowsEdit: {
+                        name: 'editor/osd-shortcuts-rows-edit'
+                    },
                     osConfigurationEditorScripts: {
                         name: 'editor/osd-scripts'
                     },
@@ -343,6 +346,9 @@ Wat.I.T = {
                     },
                     osConfigurationEditorAssetRows: {
                         name: 'editor/osd-asset-rows'
+                    },
+                    osConfigurationEditorAssetUploadControl: {
+                        name: 'editor/osd-asset-upload-control'
                     },
                     packageBlockWrapper: {
                         name: 'list/package-block-wrapper'

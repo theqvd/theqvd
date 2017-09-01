@@ -31,7 +31,7 @@ Wat.Views.OSDPackagesEditorView = Wat.Views.OSDEditorView.extend({
 
         params.forceSelectedActions = {};
         params.offset = 1;
-        params.block = 8;
+        params.block = 6;
         Wat.CurrentView.embeddedViews = Wat.CurrentView.embeddedViews || {};
         
         Wat.CurrentView.embeddedViews.package = new Wat.Views.PackageListView(params);

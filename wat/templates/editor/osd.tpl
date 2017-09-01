@@ -5,23 +5,23 @@
                 <ul>
                      <li class="lateral-menu-option needsclick lateral-menu-option--selected" data-target="settings">
                          <i class="fa fa-tasks"></i>
-                         <span data-18n="Settings">Settings</span>
+                         <span data-i18n="Settings">Settings</span>
                      </li>
                      <li class="lateral-menu-option needsclick" data-target="packages">
                          <i class="fa fa-cubes"></i>
-                         <span data-18n="Packages">Packages</span>
+                         <span data-i18n="Packages">Packages</span>
                      </li>
                      <li class="lateral-menu-option needsclick" data-target="shortcuts">
                          <i class="fa fa-share"></i>
-                         <span data-18n="Shortcuts">Shortcuts</span>
+                         <span data-i18n="Shortcuts">Shortcuts</span>
                      </li>
                      <li class="lateral-menu-option needsclick" data-target="appearance">
                         <i class="fa fa-paint-brush"></i>
-                        <span data-18n="Appearance">Appearance</span>
+                        <span data-i18n="Appearance">Appearance</span>
                      </li>
                      <li class="lateral-menu-option needsclick" data-target="scripts">
                         <i class="fa fa-code"></i>
-                        <span data-18n="Scripts">Scripts</span>
+                        <span data-i18n="Scripts">Scripts</span>
                      </li>
                 </ul>
             </div>

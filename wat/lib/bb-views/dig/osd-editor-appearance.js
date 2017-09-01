@@ -14,31 +14,69 @@ Wat.Views.OSDAppearenceEditorView = Wat.Views.OSDEditorView.extend({
         'change .js-asset-selector': 'changeAssetSelector',
         'click .js-upload-asset': 'createWallpaper',
         'click .js-delete-selected-asset': 'deleteWallpaper',
-        'click .js-show-upload': 'toggleUploadControl',
-        'click .js-show-select-mode': 'showSelectMode',
-        'click .js-show-manage-mode': 'showManageMode',
+        'click .js-show-upload': 'showUploadControl',
+        'click .js-hide-upload': 'hideUploadControl',
+        'change .js-change-mode': 'changeMode',
     },
     
     render: function () {
-        Wat.CurrentView.OSDmodel.pluginData.wallpaper.fetch({});
+        var that = this;
         
-        var template = _.template(
-            Wat.TPL.osConfigurationEditorAppearance, {
-                massive: this.massive,
-                assetType: 'wallpaper',
-                cid: this.cid
+        Wat.CurrentView.OSDmodel.pluginData.wallpaper.fetch({
+            complete: function () {
+                var template = _.template(
+                    Wat.TPL.osConfigurationEditorAppearance, {
+                        massive: this.massive,
+                        assetType: 'wallpaper',
+                        cid: that.cid
+                    }
+                );
+
+                $('.bb-os-conf-appearance').html(template);
+
+                Wat.I.chosenElement('select.js-change-mode', 'single100');
+
+                var template = _.template(
+                    Wat.TPL.osConfigurationEditorAssetUploadControl, {
+                    }
+                );
+
+                $('.bb-upload-control').html(template);
+
+                that.renderAssetsControl({
+                    assetType: 'wallpaper',
+                    pluginId: 'wallpaper'
+                });
+
+                $('.' + that.cid + ' .js-upload-mode').hide();
             }
-        );
-        
-        $('.bb-os-conf-appearance').html(template);
-        
-        this.renderAssetsControl({
-            assetType: 'wallpaper',
-            pluginId: 'wallpaper'
         });
-        
-        $('.' + this.cid + ' .js-upload-mode').hide();
     },
+    
+    afterLoadSection: function () {
+        this.showSelectMode();
+    },
+    
+    ////////////////////////////////////////////////////
+    // Functions for interface
+    ////////////////////////////////////////////////////
+    
+    showSelectMode: function (e) {
+        Wat.Views.OSDEditorView.prototype.showSelectMode.apply(this, [e]);
+        
+        var opt = $('.' + this.cid + ' .js-asset-selector>option:checked');
+        Wat.DIG.updateAssetPreview(opt);
+    },
+    
+    showManageMode: function (e) {
+        Wat.Views.OSDEditorView.prototype.showManageMode.apply(this, [e]);
+        
+        $('.' + this.cid + ' .js-asset-check:checked').trigger('change');
+    },
+    
+    ////////////////////////////////////////////////////
+    // Functions for wallpapers configuration on OSD
+    ////////////////////////////////////////////////////
     
     afterSetWallpaper: function (e) {
         var opt = $('.js-asset-selector>option:checked');
@@ -46,31 +84,12 @@ Wat.Views.OSDAppearenceEditorView = Wat.Views.OSDEditorView.extend({
             var response = JSON.parse(e.responseText);
         }
         
-        // Mock
-        var newWallpaper = {
-            id: $(opt).attr('data-id'),
-            name: $(opt).attr('data-name'),
-            url: $(opt).attr('data-url'),
-        };
-        // End Mock
-        
-        return;
-        
-        // Render new shortcut on shortcut list
-        var template = _.template(
-            Wat.TPL.osConfigurationEditorShortcutsRows, {
-                shortcuts: [newShortcut]
-            }
-        );
-        
-        $('.bb-os-conf-shortcuts-new-rows').prepend(template);
-        
-        // Reset controls
-        $('.shortcuts-form input[name="shortcut_command"]').val('');
-        $('.shortcuts-form input[name="shortcut_name"]').val('');
-        
-        Wat.T.translate();
+        Wat.I.M.showMessage({message: i18n.t('Successfully updated'), messageType: 'success'});
     },
+    
+    ////////////////////////////////////////////////////
+    // Functions for wallpapers (assets) management
+    ////////////////////////////////////////////////////
     
     createWallpaper: function (e) {
         var that = this;
@@ -123,10 +142,10 @@ Wat.Views.OSDAppearenceEditorView = Wat.Views.OSDEditorView.extend({
                 }
             });
             
-            Wat.I.M.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
+            Wat.I.M.showMessage({message: i18n.t('Successfully uploaded'), messageType: 'success'});
             
             // Hide upload control
-            that.toggleUploadControl();
+            that.hideUploadControl();
         });
     },
     

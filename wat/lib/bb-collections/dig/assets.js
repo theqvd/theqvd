@@ -1,6 +1,4 @@
 Wat.Collections.Assets = Wat.Collections.DIG.extend({
-    //model: Wat.Models.Asset,
-    
     parse: function (response) {
         var that = this;
         

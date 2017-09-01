@@ -1,25 +1,17 @@
 <div class="<%= cid %>">
-    <div class="asset-switch-buttonset">
-        <a class="button2 fright fa fa-cog js-show-manage-mode center js-select-mode" data-i18n="Manage wallpapers">Manage wallpapers</a>
-        <a class="button2 fright fa fa-image js-show-select-mode center hidden js-upload-mode" data-i18n="Wallpaper selection">Wallpaper selection</a>
+    <div class="asset-switch-buttonset js-asset-switch-buttonset">
+        <a class="button fleft fa fa-upload js-show-upload js-upload-mode" style="margin-right: 10px;" data-i18n="Upload wallpaper">Upload wallpaper</a>
+        <div class="fright col-width-40">
+            <select class="js-change-mode col-width-40">
+                <option value="selection" data-i18n="Wallpaper selection">Wallpaper selection</option>
+                <option value="manage" data-i18n="Manage wallpapers">Manage wallpapers</option>
+            </select>
+        </div>
     </div>
-    <table class="js-editor-table editor-table list os-conf-editor os-conf-editor--appearance">
-        <tr class="js-upload-control upload-control hidden">
-            <td class="col-width-100" colspan=2>
-                <div class="col-width-49 fleft">
-                    <input type="text" name="asset_name" data-i18n="[placeholder]Name"/>
-                </div>
-                <div class="col-width-49 fright">
-                    <input type="file" name="asset_file"/>
-                </div>
-                <div class="col-width-100">
-                    <a class="button2 fright fa fa-upload js-upload-asset center" data-i18n="Upload">Upload</a>
-                    <a class="button2 fright fa fa-ban js-show-upload center" data-i18n="Cancel">Cancel</a>
-                </div>
-            </td>
-        </tr>
+    
+    <table class="js-editor-table list js-osf-conf-editor os-conf-editor os-conf-editor--appearance">
         <tr>
-            <td class="col-width-50 js-select-mode select-mode">
+            <td class="col-width-60 js-select-mode select-mode">
                 <div class="editor-title" data-i18n="Wallpaper">Wallpaper</div>
                 <div class="asset-selector-wrapper">
                     <select class="bb-os-conf-wallpaper-assets bb-os-conf-wallpaper-type-options js-asset-selector asset-selector list" data-control-id="<%= assetType %>">
@@ -27,10 +19,9 @@
                     </select>
                 </div>
             </td>
-            <td class="col-width-50 js-upload-mode upload-mode hidden">
+            <td class="col-width-60 js-upload-mode upload-mode hidden">
                 <div>
-                    <a class="button2 fright button-icon fa fa-trash js-delete-selected-asset center" title="Delete" data-i18n="[title]Delete"></a>
-                    <a class="button2 fright button-icon fa fa-upload js-show-upload center" title="Upload" data-i18n="[title]Upload"></a>
+                    <a class="button2 fright fa fa-trash js-delete-selected-asset center" data-i18n="Delete selected" style="margin-bottom: 5px;">Delete selected</a>
                 </div>
                 <div style="height: 200px; width: 100%; overflow-y: auto;">
                     <table class="bb-os-conf-wallpaper-assets list" data-control-id="<%= assetType %>">
@@ -40,7 +31,7 @@
                     </table>
                 </div>
             </td>
-            <td class="col-width-50 js-preview preview">
+            <td class="col-width-40 js-preview preview">
                 <div class="editor-title">
                     <span data-i18n="Preview">Preview</span>
                 </div>
@@ -49,4 +40,9 @@
             </td>
         </tr>
     </table>
+    
+    <div class="js-upload-control hidden">
+        <span data-i18n="Upload wallpaper">Upload wallpaper</span>
+    </div>
+    <div class="bb-upload-control"></div>
 </div>

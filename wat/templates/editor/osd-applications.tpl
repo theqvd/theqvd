@@ -4,9 +4,6 @@
             <span data-i18n class="fa fa-info-circle">Selected elements will be overrided or added to the affected OSFs without remove other existing items</span><br> 
         </div>
 <% } %>
-<div>
-    <input type="text" class="fleft col-width-25 configuration-block" data-i18n="[placeholder]Search">
-</div>
 <table class="list js-list-apps">
     <% $.each(apps, function (appCode, app) { %>
         <tbody data-unique-id="code-<%= appCode %>" data-row-app-wrapper="<%= appCode %>" 

@@ -3,8 +3,8 @@
 </div>
 <div>
     <select name="packages-installed-filter">
-        <option value="all" <%= filters.installed ? '' : selected="selected" %>>All</option>
-        <option value="installed" <%= filters.installed ? selected="selected" : '' %>>Only installed</option>
+        <option value="all" <%= filters.installed ? '' : selected="selected" %> data-i18n="All">All</option>
+        <option value="installed" <%= filters.installed ? selected="selected" : '' %> data-i18n="Installed">Installed</option>
     </select>
 </div>
 <table class="list">

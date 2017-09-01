@@ -26,7 +26,7 @@
                 $.each(model.get('config_params'), function (paramName, paramDef) {
             %>
                     <div class="setting-row setting-row-list">
-                        <span class="settings-box-element-name" data-18n="<%= paramDef.description %>"><%= paramDef.description %></span>
+                        <span class="settings-box-element-name" data-i18n="<%= paramDef.description %>"><%= paramDef.description %></span>
                         <div class="settings-box-element-value" >
                             <%
                                 switch (paramDef.type) {

@@ -121,9 +121,21 @@ Wat.DIG = {
                     },
                 });
                 break;
+            case 'icon':
+                $('[data-preview-id="' + controlId + '"]').html('<img src="' + url + '" style="width: 32px; display: block; margin: 50px auto;"></img>');
+                break;
             case 'wallpaper':
                 $('[data-preview-id="' + controlId + '"]').html('<img src="' + url + '" style="width: 90%; display: block; margin: 0 auto;"></img>');
-                
+                break;
+            default:
+                if ($(opt).attr('data-none')) {
+                    $('[data-preview-id="' + controlId + '"]').html('');
+                }
+        }
+        
+        switch (type) {
+            case 'icon':
+            case 'wallpaper':
                 // Show loading message for preview image until it is loaded
                 $('.js-preview img').hide();
                 $('.js-data-preview-message').show();
@@ -132,10 +144,6 @@ Wat.DIG = {
                     $('.js-data-preview-message').hide();
                 });
                 break;
-            default:
-                if ($(opt).attr('data-none')) {
-                    $('[data-preview-id="' + controlId + '"]').html('');
-                }
         }
     },
     
