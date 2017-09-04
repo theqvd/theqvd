@@ -232,7 +232,6 @@ sub send_http_request {
     my $params = delete $opts{params};
     my @headers = @{delete $opts{headers} // []};
     push @headers, "User-Agent: QVD::HTTPC/$VERSION ($^O)";
-    my $body = delete $opts{body};
 
     if ($params and %$params) {
 	my @kvs = map {
@@ -241,9 +240,25 @@ sub send_http_request {
 	$url .= '?' . join('&', @kvs)
     }
 
-    if (defined $body) {
+    my $body = delete $opts{body};
+    my $file = delete $opts{file};
+    my ($fh, $length);
+    if (defined $body or defined $file) {
 	my $content_type = delete $opts{content_type} // 'text/ascii';
-	push @headers, ("Content-Length: " . length $body,
+        my $length;
+
+        if (defined $body) {
+            croak "both body and file options given" if defined $file;
+            $length = length $body;
+        }
+        else {
+            open $fh, '<', $file or die "unable to open file '$file'";
+            binmode $fh;
+            $length = sysseek($fh, 0, 2);
+            sysseek($fh, 0, 0);
+        }
+
+	push @headers, ("Content-Length: $length",
 			"Content-Type: $content_type");
     }
 
@@ -252,6 +267,26 @@ sub send_http_request {
 			@headers,
 			'');
     $self->_print($body) if defined $body;
+    $self->_send_http_body_from_fh($fh, $length) if defined $fh
+}
+
+sub _send_http_body_from_file {
+    my ($self, $fh, $length) = @_;
+    while ($length) {
+        my $chunk = (($length >= 16384) ? 16384 : $length);
+        my $bytes = sysread $fh, my($buffer), $chunk;
+        if ($bytes) {
+            $self->_print($buffer);
+            $length -= $bytes;
+        }
+        elsif ($! == Errno::EINTR or $! == Errno::EAGAIN) {
+            select undef, undef, undef, 0.1;
+        }
+        else {
+            die "Unable to read from file: $!";
+        }
+    }
+    1;
 }
 
 # token          = 1*<any CHAR except CTLs or separators>
