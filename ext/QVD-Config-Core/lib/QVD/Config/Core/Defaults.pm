@@ -93,6 +93,8 @@ path.ssl.ca.system.file = SYSTEM_DEFAULT
 
 path.ssl.ca.personal = certs
 
+path.vma.run.printing = ${path.run}/printing
+
 path.api.ssl = /etc/qvd/api/certs
 path.api.ssl.key = ${path.api.ssl}/key.pem
 path.api.ssl.cert = ${path.api.ssl}/cert.pem
@@ -194,6 +196,12 @@ command.slaveclient = ${path.qvd.bin}/qvd-slaveclient
 command.lpadmin = /usr/bin/lpadmin
 command.lpstat = /usr/bin/lpstat
 command.smbclient = /usr/bin/smbclient
+command.cupsenable = /usr/sbin/cupsenable
+command.cupsaccept = /usr/sbin/cupsaccept
+
+command.systemctl = /bin/systemctl
+command.init_d.cups = /etc/init.d/cups
+
 
 ## whether to remember password after successful connection
 client.remember_password = 0
@@ -783,6 +791,9 @@ internal.l7r.nothing.timeout.x_state = 5
 internal.l7r.nothing.timeout.run_forwarder = 5
 
 internal.client.xserver.startup.timeout = 30
+
+internal.vma.printing.timeout = 120
+internal.vma.use.systemctl = 1
 
 internal.untar-dis.lock.path = ${path.run}/untar-dis.lock
 
