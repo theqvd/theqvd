@@ -1,0 +1,48 @@
+#!/var/lib/qvd/bin/perl
+
+use strict;
+use warnings;
+use 5.010;
+
+use QVD::VMA::Setup;
+use QVD::Config::Core;
+use QVD::Log;
+use QVD::HTTPC;
+use Config::Properties;
+use QVD::HTTP::StatusCodes qw(:all);
+
+my $printer_name = $ENV{TEAPRINTERNAME};
+my $file         = $ENV{TEADATAFILE};
+
+INFO "Sending file '$file' to printer '$printer_name'";
+
+my $ok = eval {
+    my $ptr_cfg = Config::Properties->new(file => core_cfg('internal.vma.printing.config'));
+    my $slave_port = $ptr_cfg->getProperty('qvd.slave.port', '11100');
+
+    my $httpc = QVD::HTTPC->new("localhost:$slave_port",
+                                timeout => $timeout);
+
+    $httpc->send_http_request(POST => '/printer/$printer_name/printjob',
+                              file => $file);
+    while (1) {
+        my ($code, $msg) = $httpc->read_http_response;
+        DEBUG "Return code: $code $msg";
+        if ($code == HTTP_PROCESSING) {
+            DEBUG "Still waiting for remote end";
+            next;
+        }
+        if ($code == HTTP_OK) {
+            INFO "File queued correctly";
+            return 1;
+        }
+        else {
+            ERROR "Unable to queue print job, remote code: $code $msg";
+            return;
+        }
+    }
+};
+
+$@ and ERROR "Unable to queue print job, internal error: $@";
+
+exit($ok ? 0 : 1);
