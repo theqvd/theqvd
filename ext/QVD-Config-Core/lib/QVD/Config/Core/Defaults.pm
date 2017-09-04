@@ -794,6 +794,7 @@ internal.client.xserver.startup.timeout = 30
 
 internal.vma.printing.timeout = 120
 internal.vma.use.systemctl = 1
+internal.vma.systemd.cups = 'cups'
 
 internal.untar-dis.lock.path = ${path.run}/untar-dis.lock
 
