@@ -15,6 +15,12 @@ use Data::Dumper;
 my $lpadmin = core_cfg('command.lpadmin');
 my $lpstat = core_cfg('command.lpstat');
 my $smbclient = core_cfg('command.smbclient');
+my $cupsenable = core_cfg('command.cupsanable');
+my $cupsaccept = core_cfg('command.cupsaccept');
+my $systemctl = core_cfg('command.systemctl');
+my $init_d_cups = core_cfg('command.init_d.cups');
+
+my $timeout = core_cfg('internal.vma.printing.timeout');
 
 my %params = @ARGV;
 
@@ -76,7 +82,72 @@ if ($params{'qvd.hook.on_printing'} eq 'connected') {
         }
     }
     elsif ($flavor eq 'slave4') {
+        require QVD::SimpleRPC::Client;
+        my $slave_port = $params{'qvd.slave.port'};
+        my $slavec = $QVD::SimpleRPC::Client->new("http://localhost:$slave_port/",
+                                                 timeout => $timeout);
+
+        my $work_dir = core_cfg('path.vma.run.printing');
+        _mkpath($work_dir);
+        my $ppd_dir = "$work_dir/ppd";
+        _mkpath($ppd_dir);
+
+        if (my @ptrs = eval { @{$slavec->printer->{Printers}} }) {
+            for my $ptr (@ptr) {
+                my $id = $ptr->{id};
+                my $name = $ptr->{name};
+
+                INFO "Registering printer '$name'";
+
+                my $ppd_fn = "$ppd_dir/print_$id_driver.ppd";
+                if (_write_ppd($ppd_fn,
+                               name => $name,
+                               duplex => _json_boolean($ptr->{duplex}),
+                               color => _json_boolean($ptr->{color}))) {
+                    if (system($lpadmin, -p => $name, -v => 'tea4cups://', -P => $ppd_fn) or
+                        system($cupsenable, $name) or
+                        system($cupsaccept, $name)) {
+                        ERROR "Unable to register printer '$name', command failed: $?"
+                    }
+                }
+            }
+
+            INFO "Restarting Cups service";
+            my @cups_cmd = 
+                (core_cfg('internal.vma.use.systemctl')
+                 ? ($systemctl, 'restart', core_cfg('internal.vma.systemd.cups'))
+                 : ($init_d_cups, 'restart'));
+            DEBUG "Running cmd >>@cups_cmd<<";
+            system @cups_cmd and
+                ERROR "Unable to restart cups, command failed: $?";
+        }
+        else {
+            INFO "No remote printers found";
+        }
     }
+}
+
+sub _mkpath {
+    my ($path, $mask) = @_;
+    $mask ||= 0755;
+    my @dirs;
+    my @parts = File::Spec->splitdir(File::Spec->rel2abs($path));
+    while (@parts) {
+        my $dir = File::Spec->join(@parts);
+        if (-d $dir) {
+            -d $_ or mkdir $_, $mask or return for @dirs;
+            return -d $path;
+        }
+        unshift @dirs, $dir;
+        pop @parts;
+    }
+    return;
+}
+
+sub _json_boolean {
+    my $v = shift;
+    return 1 if defined $v and $v =~ /^\s*(?:true|yes|1)\s*$/i;
+    0;
 }
 
 sub _remove_all_qvd_printers {
@@ -95,3 +166,127 @@ sub _remove_all_qvd_printers {
     }
 }
 
+sub _write_ppd {
+    my ($fn, %opts) = @_;
+
+    open my $fh, '>', $fn or do {
+        ERROR "Unable to create file '$fn': $!";
+        return;
+    };
+
+    my ($color_device, $default_color_space) = ($opts{color}
+                                                ? ('True', 'CMYK')
+                                                : ('False', 'Gray'));
+
+    print {$fh} <<EOP;
+*PPD-Adobe: 4.3
+*%%%% Created by the CUPS PPD Compiler CUPS v2.1.4.
+*FormatVersion: "4.3"
+*FileVersion: "1.0"
+*LanguageVersion: English
+*LanguageEncoding: ISOLatin1
+*PCFileName: "".$fn.""
+
+*Product: "(".$name.")"
+*Manufacturer: "Foo"
+*ModelName: "FooJet 2000"
+*ShortNickName: "".$name.""
+*NickName: "".$name.", 1.0"
+*PSVersion: "(3010.000) 0"
+*LanguageLevel: "3"
+
+*%%%% Color config.
+*ColorDevice: $color_device
+*DefaultColorSpace: $default_color_space
+EOP
+
+    print {$fh} <<EOP if $opts{duplex};
+*%%%% %====Duplex===.
+*OpenUI *Duplex: PickOne
+*OrderDependency: 25 AnySetup *Duplex
+*DefaultDuplex: None
+*Duplex DuplexTumble: "<</Duplex true /Tumble true>>setpagedevice"
+*Duplex DuplexNoTumble: "<</Duplex false /Tumble false>>setpagedevice"
+*Duplex None: "<</Duplex false /Tumble false>>setpagedevice"
+*CloseUI: *Duplex
+EOP
+
+    print {$fh} <<EOP;
+*FileSystem: False
+*Throughput: "1"
+*LandscapeOrientation: Plus90
+*TTRasterizer: Type42
+*cupsVersion: 2.1
+*cupsModelNumber: 0
+*cupsManualCopies: False
+*cupsLanguages: "en"
+*OpenUI *PageSize/Media Size: PickOne
+*OrderDependency: 10 AnySetup *PageSize
+*DefaultPageSize: Letter
+*PageSize Letter/US Letter: "<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*PageSize A4/A4: "<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageSize
+*OpenUI *PageRegion/Media Size: PickOne
+*OrderDependency: 10 AnySetup *PageRegion
+*DefaultPageRegion: Letter
+*PageRegion Letter/US Letter: "<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*PageRegion A4/A4: "<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageRegion
+*DefaultImageableArea: Letter
+*ImageableArea Letter/US Letter: "0 0 612 792"
+*ImageableArea A4/A4: "0 0 595 842"
+*DefaultPaperDimension: Letter
+*PaperDimension Letter/US Letter: "612 792"
+*PaperDimension A4/A4: "595 842"
+*OpenUI *Resolution/Resolution: PickOne
+*OrderDependency: 10 AnySetup *Resolution
+*DefaultResolution: 600dpi
+*Resolution 600dpi/600 DPI: "<</HWResolution[600 600]/cupsBitsPerColor 8/cupsRowCount 0/cupsRowFeed 0/cupsRowStep 0/cupsColorSpace 3>>setpagedevice"
+*CloseUI: *Resolution
+*DefaultFont: Courier
+*Font AvantGarde-Book: Standard "(1.05)" Standard ROM
+*Font AvantGarde-BookOblique: Standard "(1.05)" Standard ROM
+*Font AvantGarde-Demi: Standard "(1.05)" Standard ROM
+*Font AvantGarde-DemiOblique: Standard "(1.05)" Standard ROM
+*Font Bookman-Demi: Standard "(1.05)" Standard ROM
+*Font Bookman-DemiItalic: Standard "(1.05)" Standard ROM
+*Font Bookman-Light: Standard "(1.05)" Standard ROM
+*Font Bookman-LightItalic: Standard "(1.05)" Standard ROM
+*Font Courier: Standard "(1.05)" Standard ROM
+*Font Courier-Bold: Standard "(1.05)" Standard ROM
+*Font Courier-BoldOblique: Standard "(1.05)" Standard ROM
+*Font Courier-Oblique: Standard "(1.05)" Standard ROM
+*Font Helvetica: Standard "(1.05)" Standard ROM
+*Font Helvetica-Bold: Standard "(1.05)" Standard ROM
+*Font Helvetica-BoldOblique: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow-Bold: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow-BoldOblique: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow-Oblique: Standard "(1.05)" Standard ROM
+*Font Helvetica-Oblique: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-Bold: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-BoldItalic: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-Italic: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-Roman: Standard "(1.05)" Standard ROM
+*Font Palatino-Bold: Standard "(1.05)" Standard ROM
+*Font Palatino-BoldItalic: Standard "(1.05)" Standard ROM
+*Font Palatino-Italic: Standard "(1.05)" Standard ROM
+*Font Palatino-Roman: Standard "(1.05)" Standard ROM
+*Font Symbol: Special "(001.005)" Special ROM
+*Font Times-Bold: Standard "(1.05)" Standard ROM
+*Font Times-BoldItalic: Standard "(1.05)" Standard ROM
+*Font Times-Italic: Standard "(1.05)" Standard ROM
+*Font Times-Roman: Standard "(1.05)" Standard ROM
+*Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
+*Font ZapfDingbats: Special "(001.005)" Special ROM
+*%%%% End of "$fn".
+EOP
+
+    unless (close $fh) {
+        ERROR "Unable to write PPD into $fn: $!";
+        return;
+    }
+
+    DEBUG "PPD file correctly written at $fn";
+    return 1;
+}
