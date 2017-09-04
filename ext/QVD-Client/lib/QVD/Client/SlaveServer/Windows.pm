@@ -52,11 +52,11 @@ sub _printers {
 
     my $id;
     my @prs = map {
-        { Id => ++$id,
-          Name => $_,
-          Default_printer => 0, # unimplemented
-          IsDuplex => _printer_config($_, 'DuplexingMode'),
-          Color => _printer_config($_, 'Color') }
+        { id => ++$id,
+          name => $_,
+          default_printer => 0, # unimplemented
+          duplex => _printer_config($_, 'DuplexingMode'),
+          color => _printer_config($_, 'Color') }
     } @names;
 }
 
