@@ -193,7 +193,7 @@ command.slaveclient = ${path.qvd.bin}/qvd-slaveclient
 @mswin@command.ghostscript = ghostscript/bin/gswin32.exe
 
 # VMA commands
-command.lpadmin = /usr/bin/lpadmin
+command.lpadmin = /usr/sbin/lpadmin
 command.lpstat = /usr/bin/lpstat
 command.smbclient = /usr/bin/smbclient
 command.cupsenable = /usr/sbin/cupsenable

@@ -15,12 +15,14 @@ use Data::Dumper;
 my $lpadmin = core_cfg('command.lpadmin');
 my $lpstat = core_cfg('command.lpstat');
 my $smbclient = core_cfg('command.smbclient');
-my $cupsenable = core_cfg('command.cupsanable');
+my $cupsenable = core_cfg('command.cupsenable');
 my $cupsaccept = core_cfg('command.cupsaccept');
 my $systemctl = core_cfg('command.systemctl');
 my $init_d_cups = core_cfg('command.init_d.cups');
 
 my $timeout = core_cfg('internal.vma.printing.timeout');
+
+DEBUG "qvd-printing hook called with arguments: @ARGV";
 
 my %params = @ARGV;
 
@@ -95,7 +97,7 @@ if ($params{'qvd.hook.on_printing'} eq 'connected') {
         if (my @ptrs = eval { @{$slavec->printer->{Printers}} }) {
             for my $ptr (@ptrs) {
                 my $id = $ptr->{id};
-                my $name = $ptr->{name};
+                my $name = "QVD-$ptr->{name}";
 
                 INFO "Registering printer '$name'";
 
@@ -104,11 +106,15 @@ if ($params{'qvd.hook.on_printing'} eq 'connected') {
                                name => $name,
                                duplex => _json_boolean($ptr->{duplex}),
                                color => _json_boolean($ptr->{color}))) {
-                    if (system($lpadmin, -p => $name, -v => 'tea4cups://', -P => $ppd_fn) or
-                        system($cupsenable, $name) or
-                        system($cupsaccept, $name)) {
-                        ERROR "Unable to register printer '$name', command failed: $?"
-                    }
+		    for my $cmd ([$lpadmin, -p => $name, -v => 'qvd4cups://', -P => $ppd_fn],
+				 [$cupsenable, $name],
+				 [$cupsaccept, $name]) {
+			DEBUG "Running cmd @$cmd";
+			if (system @$cmd) {
+			    ERROR "Unable to register printer '$name', command '$cmd->[0]' failed: $?";
+			    last;
+			}
+		    }
                 }
             }
 

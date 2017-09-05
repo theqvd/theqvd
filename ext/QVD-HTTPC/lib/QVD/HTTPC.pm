@@ -245,7 +245,6 @@ sub send_http_request {
     my ($fh, $length);
     if (defined $body or defined $file) {
 	my $content_type = delete $opts{content_type} // 'text/ascii';
-        my $length;
 
         if (defined $body) {
             croak "both body and file options given" if defined $file;
@@ -254,7 +253,7 @@ sub send_http_request {
         else {
             open $fh, '<', $file or die "unable to open file '$file'";
             binmode $fh;
-            $length = sysseek($fh, 0, 2);
+            $length = sysseek($fh, 0, 2) // die "Can't get file length";
             sysseek($fh, 0, 0);
         }
 
@@ -270,8 +269,9 @@ sub send_http_request {
     $self->_send_http_body_from_fh($fh, $length) if defined $fh
 }
 
-sub _send_http_body_from_file {
+sub _send_http_body_from_fh {
     my ($self, $fh, $length) = @_;
+
     while ($length) {
         my $chunk = (($length >= 16384) ? 16384 : $length);
         my $bytes = sysread $fh, my($buffer), $chunk;

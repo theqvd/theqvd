@@ -1,4 +1,4 @@
-#!/var/lib/qvd/bin/perl
+#!/usr/lib/qvd/bin/perl
 
 use strict;
 use warnings;
@@ -11,10 +11,14 @@ use QVD::HTTPC;
 use Config::Properties;
 use QVD::HTTP::StatusCodes qw(:all);
 
+my $timeout = core_cfg('internal.vma.printing.timeout');
+
 my $printer_name = $ENV{TEAPRINTERNAME};
 my $file         = $ENV{TEADATAFILE};
 
 INFO "Sending file '$file' to printer '$printer_name'";
+
+$printer_name =~ s/^qvd-//i;
 
 my $ok = eval {
     my $ptr_cfg = Config::Properties->new(file => core_cfg('internal.vma.printing.config'));
@@ -23,7 +27,7 @@ my $ok = eval {
     my $httpc = QVD::HTTPC->new("localhost:$slave_port",
                                 timeout => $timeout);
 
-    $httpc->send_http_request(POST => '/printer/$printer_name/printjob',
+    $httpc->send_http_request(POST => "/printer/$printer_name/printjob",
                               file => $file);
     while (1) {
         my ($code, $msg) = $httpc->read_http_response;
