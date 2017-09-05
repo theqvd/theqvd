@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/lib/qvd/bin/perl
 
 use strict;
 use warnings;
@@ -28,13 +28,13 @@ _remove_all_qvd_printers(); # we remove then in every call.
 
 if ($params{'qvd.hook.on_printing'} eq 'connected') {
     my $client_os = $params{'qvd.client.os'};
-    my $prt_port = $params{'qvd.printing.port'};
+    my $ptr_port = $params{'qvd.printing.port'};
 
     my $flavor = $params{'qvd.client.printing.flavor'} //
         ($client_os eq 'windows' ? 'cifs' : 'ipp');
 
     if ($flavor eq 'cifs') {
-        if (open my $fh, '-|', $smbclient, -L => '127.0.0.1', -p => $prt_port, '-gN') {
+        if (open my $fh, '-|', $smbclient, -L => '127.0.0.1', -p => $ptr_port, '-gN') {
             my %ptrs;
             while (<$fh>) {
                 if (my ($target, $desc) = /^Printer\|([^|]+)\|(.*)$/) {
@@ -60,19 +60,19 @@ if ($params{'qvd.hook.on_printing'} eq 'connected') {
     }
     elsif ($flavor eq 'ipp') {
         my $default_set;
-        if (open my $fh, '-|', 'lpstat', -h => "127.0.0.1:$prt_port", '-a') {
+        if (open my $fh, '-|', 'lpstat', -h => "127.0.0.1:$ptr_port", '-a') {
             if (my ($ptr) = /^(\S+)/) {
                 INFO "Registering printer 'QVD-$ptr'";
                 if (system($lpadmin,
-                           -p => "QVD-$prt",
-                           -v => "ipp://127.0.0.1:$prt_port/printers/$prt",
+                           -p => "QVD-$ptr",
+                           -v => "ipp://127.0.0.1:$ptr_port/printers/$ptr",
                            '-E') == 0) {
                     # Set the first printer as the default
                     # one. Otherwise the lp tools complain there is
                     # "no default destination available" when trying
                     # to print without specifying a printer. Newer
                     # software using CUPS doesn't seem to care.
-                    system($lpadmin, "-d", "QVD-$prt")
+                    system($lpadmin, "-d", "QVD-$ptr")
                         unless $default_set++;
                 }
                 else {
@@ -84,7 +84,7 @@ if ($params{'qvd.hook.on_printing'} eq 'connected') {
     elsif ($flavor eq 'slave4') {
         require QVD::SimpleRPC::Client;
         my $slave_port = $params{'qvd.slave.port'};
-        my $slavec = $QVD::SimpleRPC::Client->new("http://localhost:$slave_port/",
+        my $slavec = QVD::SimpleRPC::Client->new("http://localhost:$slave_port/",
                                                  timeout => $timeout);
 
         my $work_dir = core_cfg('path.vma.run.printing');
@@ -93,13 +93,13 @@ if ($params{'qvd.hook.on_printing'} eq 'connected') {
         _mkpath($ppd_dir);
 
         if (my @ptrs = eval { @{$slavec->printer->{Printers}} }) {
-            for my $ptr (@ptr) {
+            for my $ptr (@ptrs) {
                 my $id = $ptr->{id};
                 my $name = $ptr->{name};
 
                 INFO "Registering printer '$name'";
 
-                my $ppd_fn = "$ppd_dir/print_$id_driver.ppd";
+                my $ppd_fn = "$ppd_dir/print_${id}_driver.ppd";
                 if (_write_ppd($ppd_fn,
                                name => $name,
                                duplex => _json_boolean($ptr->{duplex}),
@@ -185,13 +185,13 @@ sub _write_ppd {
 *FileVersion: "1.0"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
-*PCFileName: "".$fn.""
+*PCFileName: "$fn"
 
-*Product: "(".$name.")"
+*Product: "($opts{name})"
 *Manufacturer: "Foo"
 *ModelName: "FooJet 2000"
-*ShortNickName: "".$name.""
-*NickName: "".$name.", 1.0"
+*ShortNickName: "$opts{name}"
+*NickName: "$opts{name}, 1.0"
 *PSVersion: "(3010.000) 0"
 *LanguageLevel: "3"
 
