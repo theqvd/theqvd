@@ -625,7 +625,7 @@ sub _save_printing_config {
 
     for my $key (qw(qvd.client.os qvd.client.printing.flavor)) {
         if (defined (my $v = $args{$key})) {
-            $props->setProperty($k) = $v;
+            $props->setProperty($key) = $v;
         }
     }
 
