@@ -35,7 +35,10 @@ sub detect_os {
                     $revision = ($osr{version} =~ /^\s*$version\.(\d+)/) ? $1 : 0;
                 }
                 else {
-                    ($version, $revision) = $osr{version_id} =~ /^(\d+)(?:\.(\d+))?/;
+                    if ($osr{version_id} =~ /^(\d+)(?:\.(\d+))?/) {
+                        $version = $1;
+                        $revision = $2 // '0';
+                    }
                 }
             }
             elsif (my %sv = __parse_file($suse_version_path)) {
