@@ -96,6 +96,7 @@ path.ssl.ca.personal = certs
 path.api.ssl = /etc/qvd/api/certs
 path.api.ssl.key = ${path.api.ssl}/key.pem
 path.api.ssl.cert = ${path.api.ssl}/cert.pem
+path.api.pid_file = ${path.run}/qvd-api.pid
 
 path.up.api.ssl = /etc/qvd/api/certs
 path.up.api.ssl.key = ${path.up.api.ssl}/key.pem

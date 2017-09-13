@@ -80,6 +80,11 @@ $ENV{MOJO_TMPDIR} = app->qvd_admin4_api->_cfg('path.storage.images');
 my $api_url = app->qvd_admin4_api->_cfg('api.url');
 my $cert_path = app->qvd_admin4_api->_cfg('path.api.ssl.cert');
 my $key_path = app->qvd_admin4_api->_cfg('path.api.ssl.key');
+my $pid_file = app->qvd_admin4_api->_cfg('path.api.pid_file');
+my $path_run = app->qvd_admin4_api->_cfg('path.run');
+# We suppose here pid_file resides in /var/run/qvd ...
+unless ( -e $path_run and -d $path_run ) { mkdir $path_run; }
+die "Directory $path_run can't be created by this process" unless (-e $path_run);
 die "Certificate $cert_path file does not exist" unless (-e $cert_path);
 die "Private key $key_path file does not exist" unless (-e $key_path);
 
@@ -89,7 +94,7 @@ app->config(
         accepts => 1000,
         clients => 1000,
         workers => 4,
-        pid_file => '/var/run/qvd/qvd-api.pid'
+        pid_file => $pid_file
     }
 );
 
