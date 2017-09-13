@@ -96,8 +96,8 @@ if ($params{'qvd.hook.on_printing'} eq 'connected') {
 
         if (my @ptrs = eval { @{$slavec->printer->{Printers}} }) {
             for my $ptr (@ptrs) {
-                my $id = $ptr->{id};
-                my $name = "QVD-$ptr->{name}";
+                my $qvd_id = "QVD-$ptr->{qvd_id}";
+                my $name = "QVD Client: $ptr->{name}";
 
                 INFO "Registering printer '$name'";
 
@@ -106,12 +106,12 @@ if ($params{'qvd.hook.on_printing'} eq 'connected') {
                                name => $name,
                                duplex => _json_boolean($ptr->{duplex}),
                                color => _json_boolean($ptr->{color}))) {
-		    for my $cmd ([$lpadmin, -p => $name, -v => 'qvd4cups://', -P => $ppd_fn],
-				 [$cupsenable, $name],
-				 [$cupsaccept, $name]) {
+		    for my $cmd ([$lpadmin, -p => $qvd_id, -v => 'qvd4cups://', -P => $ppd_fn, -D => $name],
+				 [$cupsenable, $qvd_id],
+				 [$cupsaccept, $qvd_id]) {
 			DEBUG "Running cmd @$cmd";
 			if (system @$cmd) {
-			    ERROR "Unable to register printer '$name', command '$cmd->[0]' failed: $?";
+			    ERROR "Unable to register printer '$qvd_id' ('$name'), command '$cmd->[0]' failed: $?";
 			    last;
 			}
 		    }

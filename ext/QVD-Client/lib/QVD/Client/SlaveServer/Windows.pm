@@ -33,35 +33,37 @@ sub _cmd_quote {
     wantarray ? @r : join(" ", @r);
 }
 
-sub _printer_config {
-    my ($name, $key) = _cmd_quote @_;
-    my $cmd = _cmd_quote "& Get-PrintConfiguration -PrinterName $name | Format-Wide -Property $key -Column 1";
-    my $val = `Powershell.exe -windowstyle hidden $cmd`;
-    $val =~ s/^\s+|\s+$//g;
-    $val;
+sub _ptrpath {
+    my $ptr = shift;
+    my $name = $ptr->{PrinterName};
+    my $server = $ptr->{ServerName};
+    defined $server ? '\\$server\\$name' : $name;
 }
 
-sub _printer_names {
-    _trim `Powershell.exe -windowstyle hidden "& Get-Printer | Format-Wide -Property Name -Column 1"`;
+sub _ptrid {
+    my $id = _ptrpath(shift);
+    $id =~ s/\W/_/g;
+    $id
 }
 
 sub _printers {
     my $self = shift;
-    my @names = $self->_printer_names;
-    s/\W/_/g for @names;
 
-    my $id;
-    my @prs = map {
-        { id => ++$id,
-          name => $_,
-          default_printer => 0, # unimplemented
-          duplex => _printer_config($_, 'DuplexingMode'),
-          color => _printer_config($_, 'Color') }
-    } @names;
+    require Win32::EnumPrinters;
+    my $default = Win32::EnumPrinters::GetDefaultPrinter();
+
+    map {
+        my %data = ( qvd_id => _ptrid($_),
+                     name   => _ptrpath($_) );
+        $data{default} = 1 if $name eq $default;
+        $data{duplex}  = 1 if $_->{DevMode}{Duplex} ne 'simplex';
+        $data{color}   = 1 if $_->{DevMode}{Color}  eq 'color';
+        \%data
+    } Win32::EnumPrinters('local', undef, 2);
 }
 
 sub _print_file {
-    my ($self, $printer_name, $fn) = @_;
+    my ($self, $printer_id, $fn) = @_;
     my $gsprint_exe     = File::Spec->rel2abs(core_cfg('command.gsprint'),
                                               $QVD::Client::SlaveServer::app_dir);
     my $ghostscript_exe = File::Spec->rel2abs(core_cfg('command.ghostscript'),
@@ -78,19 +80,17 @@ sub _print_file {
 
     DEBUG "ghostscript drive: $drive, path: $gs_path, inc: $ghostscript_lib";
 
-    my @names = $self->_printer_names;
-    for (@names) {
-        my $real_name = $_;
-        s/\W/_/g;
-        if ($_ eq $printer_name) {
-            DEBUG "Printer real name is '$real_name'";
+    for (Win32::EnumPrinters::EnumPrinters('local', undef, 2) {
+        if (_ptrid($_) eq $printer_id) {
+            my $path = _ptrpath($_);
+            DEBUG "Printer real name is '$path'";
             my $child;
             my $cmd = shortpathL($gsprint_exe);
             my $line = _cmd_quote($cmd, '-color',
                                   # '-quiet', # we better let ghostscript tell the user what it is doing!
                                   "-I$ghostscript_lib",
                                   -ghostscript => $ghostscript_exe,
-                                  -printer => $real_name,
+                                  -printer => $path,
                                   $fn);
             DEBUG "Running command '$cmd', line: '$line'";
 
