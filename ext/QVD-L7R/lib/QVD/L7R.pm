@@ -9,6 +9,7 @@ use Carp;
 use feature 'switch';
 use URI::Split qw(uri_split);
 use MIME::Base64 'decode_base64';
+use Socket qw(IPPROTO_TCP TCP_NODELAY);
 use IO::Socket::Forwarder qw(forward_sockets);
 
 use QVD::Config;
@@ -528,6 +529,8 @@ sub _run_forwarder {
                                        Proto => 'tcp',
                                        KeepAlive => 1)
         or LOGDIE "Unable to connect to X server  on VM VM_ID: " . $vm->id .  ": $!";
+    setsockopt($socket, IPPROTO_TCP, TCP_NODELAY, 1) or WARN "Cannot set TCP_NODELAY";
+
     txn_do { $this_host->counters->incr_nx_ok; };
 
     DEBUG "Socket connected to X server on VM VM_ID: " . $vm->id;

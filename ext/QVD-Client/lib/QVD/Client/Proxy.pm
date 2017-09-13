@@ -7,6 +7,7 @@ use 5.010;
 use Crypt::OpenSSL::X509;
 use File::Path 'make_path';
 use File::Spec;
+use Socket qw(IPPROTO_TCP TCP_NODELAY);
 use IO::Socket::INET;
 use IO::Socket::SSL;
 use IO::Socket::Forwarder qw(forward_sockets);
@@ -1005,6 +1006,7 @@ sub _run {
             $nxproxy_proc->alive or _logdie "nxproxy has terminated unexpectedly";
         }
         $local_socket or _logdie "connection from nxproxy failed";
+        setsockopt($local_socket, IPPROTO_TCP, TCP_NODELAY, 1) or WARN "Cannot set TCP_NODELAY";
 
         DEBUG("Connection accepted, forwarding socket\n");
         if ($WINDOWS) {
