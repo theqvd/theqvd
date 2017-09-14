@@ -8,7 +8,6 @@ Wat.Views.OSDShortcutsEditorView = Wat.Views.OSDEditorView.extend({
     dialogEvents: {
         'click .js-add-shortcut': 'addShortcut',
         'click .js-delete-shortcut': 'deleteShortcut',
-        'click .js-update-shortcut': 'updateShortcut',
         'click .js-save-shortcut': 'saveShortcut',
         'click .js-button-open-shortcut-configuration': 'openShortcutConfiguration',
         'click .js-button-close-shortcut-configuration': 'closeShortcutConfiguration',
@@ -127,8 +126,6 @@ Wat.Views.OSDShortcutsEditorView = Wat.Views.OSDEditorView.extend({
     
     deleteShortcut: function (e) {
         var id = $(e.target).attr('data-id');
-        $('.js-shortcut-row[data-id="' + id + '"]').remove();
-        $('.js-shortcut-edit-row[data-id="' + id + '"]').remove();
         
         // Delete plugin element
         Wat.DIG.deletePluginListElement({
@@ -228,7 +225,12 @@ Wat.Views.OSDShortcutsEditorView = Wat.Views.OSDEditorView.extend({
         }
         
         this.showSelectMode();
+    },
+    
+    showSelectMode: function (e) {
+        Wat.Views.OSDEditorView.prototype.showSelectMode.apply(this, [e]);
         
+        // Keep editor hidden
         $('.' + this.cid + ' .bb-os-conf-shortcuts-rows-editor').html('');
         $('.' + this.cid + ' .js-os-conf-shortcuts-rows-editor').hide();
         $('.' + this.cid + ' .js-asset-switch-buttonset').show();

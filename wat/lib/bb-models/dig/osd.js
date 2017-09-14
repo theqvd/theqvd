@@ -107,10 +107,25 @@ Wat.Models.OSD = Wat.Models.DIG.extend({
         var [pluginId, attr] = pluginAttr.split('.');
         
         var plugin = this.getPluginDef(pluginId);
+        var attrModel = {};
+        $.each(plugin.values, function (i,v) {
+            if (v.method == 'PUT') {
+                $.each(v.model, function (ii, vv) {
+                    if (vv.code == attr) {
+                        attrModel = vv;
+                        return false;
+                    }
+                });
+                return false;
+            }
+        });
+        
+        if (attrModel.type == 'enum') {
+            return attrModel.values;
+        }
+        
         var location = '/' + pluginId;
-
         var enums = new Wat.Collections.PluginEnums({location: location});
-
         enums.fetch({
             complete: function () {
                 var listEnums = {};

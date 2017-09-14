@@ -1,10 +1,10 @@
 <table class="js-editor-table list os-conf-editor js-upload-control upload-control hidden">
     <tr>
         <td class="col-width-100" colspan=2>
-            <div class="col-width-49 fleft">
+            <div class="col-width-49 fleft js-asset-name-wrapper">
                 <input type="text" name="asset_name" data-i18n="[placeholder]Name"/>
             </div>
-            <div class="col-width-49 fright">
+            <div class="col-width-49 fright js-asset-file-wrapper">
                 <input type="file" name="asset_file"/>
             </div>
             <div class="col-width-100">

@@ -23,6 +23,7 @@
           <% } %>
           <td class="col-width-100 js-<%= assetType %>-name asset-name">
               <%= model.get('name') %>
+              
           </td>
       </tr>
 <% }); %>

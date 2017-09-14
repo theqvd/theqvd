@@ -35,7 +35,7 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
             packages: new Wat.Views.OSDPackagesEditorView({massive: this.massive}),
             shortcuts: new Wat.Views.OSDShortcutsEditorView({massive: this.massive}),
             appearance: new Wat.Views.OSDAppearenceEditorView({massive: this.massive}),
-            scripts: new Wat.Views.OSDScriptsEditorView({massive: this.massive}),
+            hooks: new Wat.Views.OSDHooksEditorView({massive: this.massive}),
         };
         
         Wat.I.chosenElement('select.js-app-to-shortcut', 'single100');
@@ -166,6 +166,7 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
         $('.' + this.cid + ' input[name="asset_file"]').val('');
         
         $('.' + this.cid + ' .js-change-mode').val('manage').trigger('chosen:updated');
+        $('.' + this.cid + ' .js-asset-check:checked').trigger('change');
     },
     
     showUploadControl: function (e) {

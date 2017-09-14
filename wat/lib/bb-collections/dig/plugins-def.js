@@ -103,7 +103,7 @@ Wat.Collections.PluginsDef = Wat.Collections.DIG.extend({
                 code: 'execution_hooks',
                 plugin: {
                     script: {
-                        description: 'Scripts',
+                        description: 'Hooks',
                         control_type: 'list_files',
                         list_files: {
                             10: {

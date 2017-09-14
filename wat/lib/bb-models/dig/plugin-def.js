@@ -104,7 +104,7 @@ Wat.Models.PluginDef = Wat.Models.DIG.extend({
             case 'execution_hooks':
                 data = {
                     script: {
-                        description: 'Scripts',
+                        description: 'Hooks',
                         control_type: 'list_files',
                         list_files: {
                             10: {

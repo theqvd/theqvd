@@ -332,14 +332,17 @@ Wat.I.T = {
                     osConfigurationEditorShortcutsRowsEdit: {
                         name: 'editor/osd-shortcuts-rows-edit'
                     },
-                    osConfigurationEditorScripts: {
-                        name: 'editor/osd-scripts'
+                    osConfigurationEditorHooks: {
+                        name: 'editor/osd-hooks'
                     },
-                    osConfigurationEditorScriptsManager: {
-                        name: 'editor/osd-scripts-manager'
+                    osConfigurationEditorHooksManager: {
+                        name: 'editor/osd-hooks-manager'
                     },
-                    osConfigurationEditorScriptsRows: {
-                        name: 'editor/osd-scripts-rows'
+                    osConfigurationEditorHooksRows: {
+                        name: 'editor/osd-hooks-rows'
+                    },
+                    osConfigurationEditorHooksRowsEdit: {
+                        name: 'editor/osd-hooks-rows-edit'
                     },
                     osConfigurationEditorAssetOptions: {
                         name: 'editor/osd-asset-options'

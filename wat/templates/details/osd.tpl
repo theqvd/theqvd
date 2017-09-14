@@ -79,7 +79,7 @@
     <tr class="js-os-configuration-expanded <%= shrinked ? 'hidden' : '' %>">
         <td>
             <i class="fa fa-code"></i>
-            <span data-i18n="Scripts">Scripts</span>
+            <span data-i18n="Hooks">Hooks</span>
         </td>
         <td class="settings-box">
             <%

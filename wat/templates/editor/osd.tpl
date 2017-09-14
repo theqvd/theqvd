@@ -19,9 +19,9 @@
                         <i class="fa fa-paint-brush"></i>
                         <span data-i18n="Appearance">Appearance</span>
                      </li>
-                     <li class="lateral-menu-option needsclick" data-target="scripts">
+                     <li class="lateral-menu-option needsclick" data-target="hooks">
                         <i class="fa fa-code"></i>
-                        <span data-i18n="Scripts">Scripts</span>
+                        <span data-i18n="Hooks">Hooks</span>
                      </li>
                 </ul>
             </div>
@@ -35,6 +35,6 @@
         
         <td class="col-width-80 js-os-editor-panel os-editor-panel bb-os-conf-appearance" style="display: none;" data-target="appearance"></td>
         
-        <td class="col-width-80 js-os-editor-panel os-editor-panel bb-os-conf-scripts" style="display: none;" data-target="scripts"></td>
+        <td class="col-width-80 js-os-editor-panel os-editor-panel bb-os-conf-hooks" style="display: none;" data-target="hooks"></td>
     </tr>
 </table>

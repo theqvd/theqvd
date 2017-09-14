@@ -68,12 +68,6 @@ Wat.Views.OSDAppearenceEditorView = Wat.Views.OSDEditorView.extend({
         Wat.DIG.updateAssetPreview(opt);
     },
     
-    showManageMode: function (e) {
-        Wat.Views.OSDEditorView.prototype.showManageMode.apply(this, [e]);
-        
-        $('.' + this.cid + ' .js-asset-check:checked').trigger('change');
-    },
-    
     ////////////////////////////////////////////////////
     // Functions for wallpapers configuration on OSD
     ////////////////////////////////////////////////////

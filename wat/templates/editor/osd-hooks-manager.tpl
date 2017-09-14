@@ -5,14 +5,14 @@
                 Execution
             </div>
             <div>
-                <select class="js-starting-script-mode bb-os-conf-scripts-type-options" data-new-file data-form-field-name="execution_hook">
+                <select class="js-starting-script-mode bb-os-conf-hooks-type-options" data-new-file data-form-field-name="execution_hook">
                     <% $.each(hookOptions, function (hookCode, hookName) { %>
                         <option value="<%= hookCode %>"><%= hookName %></option>
                     <% }); %>
                 </select>
             </div>
             <div  class="editor-title col-width-100">
-                Scripts
+                Hooks
                 <a class="button2 button-icon fright fa fa-upload js-toggle-upload-select-mode center" title="Upload" data-i18n="[title]Upload"></a>
             </div>
             <% if (massive) { %>
