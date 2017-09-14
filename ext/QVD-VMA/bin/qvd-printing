@@ -101,7 +101,7 @@ if ($params{'qvd.hook.on_printing'} eq 'connected') {
 
                 INFO "Registering printer '$name'";
 
-                my $ppd_fn = "$ppd_dir/print_${id}_driver.ppd";
+                my $ppd_fn = "$ppd_dir/print_${qvd_id}_driver.ppd";
                 if (_write_ppd($ppd_fn,
                                name => $name,
                                duplex => _json_boolean($ptr->{duplex}),

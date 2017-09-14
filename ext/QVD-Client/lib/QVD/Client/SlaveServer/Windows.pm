@@ -55,11 +55,11 @@ sub _printers {
     map {
         my %data = ( qvd_id => _ptrid($_),
                      name   => _ptrpath($_) );
-        $data{default} = 1 if $name eq $default;
+        $data{default} = 1 if $_->{PrinterName} eq $default;
         $data{duplex}  = 1 if $_->{DevMode}{Duplex} ne 'simplex';
         $data{color}   = 1 if $_->{DevMode}{Color}  eq 'color';
         \%data
-    } Win32::EnumPrinters('local', undef, 2);
+    } Win32::EnumPrinters::EnumPrinters('local', undef, 2);
 }
 
 sub _print_file {
@@ -70,8 +70,8 @@ sub _print_file {
                                               $QVD::Client::SlaveServer::app_dir);
     DEBUG "gsprint.exe at '$gsprint_exe', ghostscript.exe at '$ghostscript_exe'";
 
-    my ($drive, $gs_path) = File::Spec->splitpath($ghostscript_exe, 1);
-    my @gs_exe_path= File::Spec->splitdir($gs_path);
+    my ($drive, $path) = File::Spec->splitpath($ghostscript_exe, 1);
+    my @gs_exe_path= File::Spec->splitdir($path);
     my $gs_path = File::Spec->catdir(@gs_exe_path[0..$#gs_exe_path - 2]);
     my $ghostscript_lib = shortpathL(File::Spec->catpath($drive, $gs_path, 'lib')) // do {
         ERROR "Unable to locate Ghostscript library directory";
@@ -80,7 +80,7 @@ sub _print_file {
 
     DEBUG "ghostscript drive: $drive, path: $gs_path, inc: $ghostscript_lib";
 
-    for (Win32::EnumPrinters::EnumPrinters('local', undef, 2) {
+    for (Win32::EnumPrinters::EnumPrinters('local', undef, 2)) {
         if (_ptrid($_) eq $printer_id) {
             my $path = _ptrpath($_);
             DEBUG "Printer real name is '$path'";
