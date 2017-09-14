@@ -23,30 +23,33 @@
                     <td class="cell-check center">
                         <input 
                             type="checkbox" 
-                            name="vma.vma_allow_sound" 
+                            name="audio" 
+                            data-plugin-id="vma" 
                             data-form-field 
-                            js-autosave-field
-                            <%= model.get('vma_allow_sound') ? 'checked="checked"' : '' %> 
+                            js-vma-field
+                            <%= vmaModel.get('audio') ? 'checked="checked"' : '' %> 
                             class="js-form-field js-form-field--setting" 
                             data-subfield="settings">
                     </td>
                     <td class="cell-check center">
                         <input 
                             type="checkbox" 
-                            name="vma.vma_allow_printing" 
+                            name="printing" 
+                            data-plugin-id="vma" 
                             data-form-field 
-                            js-autosave-field
-                            <%= model.get('vma_allow_printing') ? 'checked="checked"' : '' %> 
+                            js-vma-field
+                            <%= vmaModel.get('printing') ? 'checked="checked"' : '' %> 
                             class="js-form-field js-form-field--setting" 
                             data-subfield="settings">
                     </td>
                     <td class="cell-check center">
                         <input 
                             type="checkbox" 
-                            name="vma.vma_allow_sharing" 
+                            name="portForwarding" 
+                            data-plugin-id="vma" 
                             data-form-field 
-                            js-autosave-field
-                            <%= model.get('vma_allow_sharing') ? 'checked="checked"' : '' %> 
+                            js-vma-field
+                            <%= vmaModel.get('portForwarding') ? 'checked="checked"' : '' %> 
                             class="js-form-field js-form-field--setting js-share-folders-check" 
                             data-subfield="settings">
                     </td>

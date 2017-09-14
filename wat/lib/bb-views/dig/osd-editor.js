@@ -9,7 +9,6 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
     
     dialogEvents: {
         'click .js-os-editor-menu li': 'clickOSEditorMenu',
-        'change input[type="checkbox"][js-autosave-field]': 'autoSaveCheck',
     },
     
     ////////////////////////////////////////////////////
@@ -119,25 +118,6 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
     ////////////////////////////////////////////////////
     // Functions for single controls
     ////////////////////////////////////////////////////
-    
-    autoSaveCheck: function (e) {
-        var that = this;
-    
-        var name = $(e.target).attr('name');
-        var checked = $(e.target).is(':checked');
-        
-        var [pluginId, attrName] = name.split('.');
-        
-        // Save distro id
-        var attributes = {};
-        attributes['id'] = attrName;
-        attributes[attrName] = checked;
-        
-        Wat.DIG.setPluginAttr({
-            pluginId: pluginId,
-            attributes: attributes
-        }, function () {}, function () {});
-    },
     
     changeMode: function (e) {
         switch($(e.target).val()) {
