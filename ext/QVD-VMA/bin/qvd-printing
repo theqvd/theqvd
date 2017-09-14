@@ -97,35 +97,26 @@ if ($params{'qvd.hook.on_printing'} eq 'connected') {
         if (my @ptrs = eval { @{$slavec->printer->{Printers}} }) {
             for my $ptr (@ptrs) {
                 my $qvd_id = "QVD-$ptr->{qvd_id}";
-                my $name = "QVD Client: $ptr->{name}";
 
-                INFO "Registering printer '$name'";
+                INFO "Registering printer '$qvd_id'";
 
                 my $ppd_fn = "$ppd_dir/print_${qvd_id}_driver.ppd";
                 if (_write_ppd($ppd_fn,
-                               name => $name,
+                               name => $ptr->{name},
                                duplex => _json_boolean($ptr->{duplex}),
                                color => _json_boolean($ptr->{color}))) {
-		    for my $cmd ([$lpadmin, -p => $qvd_id, -v => 'qvd4cups://', -P => $ppd_fn, -D => $name],
+		    for my $cmd ([$lpadmin, -p => $qvd_id, -v => 'tea4cups://', -P => $ppd_fn,
+				  -D => $ptr->{name}, -L => "QVD Client"],
 				 [$cupsenable, $qvd_id],
 				 [$cupsaccept, $qvd_id]) {
 			DEBUG "Running cmd @$cmd";
 			if (system @$cmd) {
-			    ERROR "Unable to register printer '$qvd_id' ('$name'), command '$cmd->[0]' failed: $?";
+			    ERROR "Unable to register printer '$qvd_id' ('$ptr->{name}'), command '$cmd->[0]' failed: $?";
 			    last;
 			}
 		    }
                 }
             }
-
-            INFO "Restarting Cups service";
-            my @cups_cmd = 
-                (core_cfg('internal.vma.use.systemctl')
-                 ? ($systemctl, 'restart', core_cfg('internal.vma.systemd.cups'))
-                 : ($init_d_cups, 'restart'));
-            DEBUG "Running cmd >>@cups_cmd<<";
-            system @cups_cmd and
-                ERROR "Unable to restart cups, command failed: $?";
         }
         else {
             INFO "No remote printers found";

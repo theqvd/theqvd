@@ -16,7 +16,7 @@ my $timeout = core_cfg('internal.vma.printing.timeout');
 my $printer_id = $ENV{TEAPRINTERNAME};
 my $file       = $ENV{TEADATAFILE};
 
-INFO "Sending file '$file' to printer '$printer_name'";
+INFO "Sending file '$file' to printer '$printer_id'";
 
 $printer_id =~ s/^qvd-//i;
 
