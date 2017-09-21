@@ -356,5 +356,32 @@ Wat.U = {
         });
         
         model.set(attributes);
+    },
+    
+    secondsToHms: function (seconds) {
+        var secondsOnDay = 60*60*24;
+        var secondsOnHour = 60*60;
+        var secondsOnMinute = 60;
+        var ret = '';
+        
+        if (seconds > secondsOnDay) {
+            var days = Math.round(seconds / secondsOnDay);
+            seconds = seconds % secondsOnDay;
+            
+            ret = days + ' days ';
+        }
+        
+        var hours = Math.floor(seconds / secondsOnHour);
+        seconds = seconds % secondsOnHour;
+        var minutes = Math.floor(seconds / secondsOnMinute);
+        seconds = seconds % secondsOnMinute;
+        
+        if (hours < 10) { hours = '0' + hours }
+        if (minutes < 10) { minutes = '0' + minutes }
+        if (seconds < 10) { seconds = '0' + seconds }
+
+        ret += hours + ':' + minutes + ':' + seconds;
+        
+        return ret;
     }
 }

@@ -75,7 +75,7 @@ Wat.Views.VMDetailsView = Wat.Views.DetailsView.extend({
         var oldState = '';
         var filledDot = 1;
         
-        this.executionAnimationInterval = setInterval(function() {
+        this.intervals['executionAnimation'] = setInterval(function() {
             if (oldState != that.model.get('state')) {
                 filledDot = 1;
                 oldState = that.model.get('state');

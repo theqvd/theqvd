@@ -197,6 +197,16 @@ Wat.I.detailsFields[qvdObj] = {
                 'display': false,
                 'icon': CLASS_ICON_ADMINS
             },
+            'vms': {
+                'display': true,
+                'fields': [
+                    'id',
+                    'vms'
+                ],
+                'acls': 'osf.see.vms-info',
+                'text': 'VMs',
+                'icon': CLASS_ICON_VMS
+            },
             'dis': {
                 'display': true,
                 'fields': [
@@ -207,15 +217,12 @@ Wat.I.detailsFields[qvdObj] = {
                 'text': 'DIs',
                 'icon': CLASS_ICON_DIS
             },
-            'vms': {
+            'dis_log': {
                 'display': true,
-                'fields': [
-                    'id',
-                    'vms'
-                ],
-                'acls': 'osf.see.vms-info',
-                'text': 'VMs',
-                'icon': CLASS_ICON_VMS
+                'fields': [],
+                'acls': 'osf.see.dis-info',
+                'text': 'DIs Log',
+                'icon': CLASS_ICON_LOG
             },
         }
     }

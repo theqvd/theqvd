@@ -15,6 +15,7 @@ Wat.Views.MainView = Backbone.View.extend({
     currentMenu: '', // platform-setup
     sideViews: [],
     templates: {},
+    intervals: {},
     
     initialize: function () {
         _.bindAll(this, 'render');

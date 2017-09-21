@@ -122,7 +122,12 @@ Wat.DIG = {
                 });
                 break;
             case 'icon':
-                $('[data-preview-id="' + controlId + '"]').html('<img src="' + url + '" style="width: 32px; display: block; margin: 50px auto;"></img>');
+                if (assetId) {
+                    $('[data-preview-id="' + controlId + '"]').html('<img src="' + url + '" style="width: 32px; display: block; margin: 50px auto;"></img>');
+                }
+                else {
+                    $('[data-preview-id="' + controlId + '"]').html('');
+                }
                 break;
             case 'wallpaper':
                 $('[data-preview-id="' + controlId + '"]').html('<img src="' + url + '" style="width: 90%; display: block; margin: 0 auto;"></img>');
@@ -137,8 +142,10 @@ Wat.DIG = {
             case 'icon':
             case 'wallpaper':
                 // Show loading message for preview image until it is loaded
-                $('.js-preview img').hide();
-                $('.js-data-preview-message').show();
+                if (assetId) {
+                    $('.js-preview img').hide();
+                    $('.js-data-preview-message').show();
+                }
                 $('.js-preview img').on('load', function () {
                     $('.js-preview img').show();
                     $('.js-data-preview-message').hide();
@@ -167,7 +174,7 @@ Wat.DIG = {
         }
         else {
             var osfId = Wat.CurrentView.model ? Wat.CurrentView.model.get('id') : 0;
-            var distroId = model.get('distro_id');
+            var distroId = model.get('distro_id') || 1;
             
             var distros = model.getPluginAttrOptions('os.distro', function (distros) {
                 // Add specific parts of editor to dialog

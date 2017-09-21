@@ -264,3 +264,13 @@ fieldset {
 .fake-graph-b {
     color: $graph_color_b
 }
+
+.progress-label {
+    float: left;
+    text-align: center;
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #fff;
+}

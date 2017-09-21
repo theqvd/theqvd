@@ -136,9 +136,14 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
             imageModel.save({name: 'image_name'}, {
                 complete: function () {
                     Wat.I.M.showMessage({message: 'Succesfully created', messageType: 'success'});
+                    
+                    // If view is OSF details, render DI progress monitoring
+                    if (Wat.CurrentView.qvdObj == 'osf') {
+                        Wat.CurrentView.renderDiProgress(osdId);
+                        $('.js-details-option[data-details-target="activity"]').trigger('click');
+                    }
                 }
             });
-            return;
         }
         else {
             var image_source = context.find('select[name="images_source"]').val();

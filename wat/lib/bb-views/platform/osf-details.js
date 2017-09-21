@@ -25,10 +25,103 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
                     container: ''
                 });
             });
+            
+            that.renderDiProgress(osdID);
         }
         else {
             Wat.DIG.renderOSDetails();
+            
+            // If no OSD, remove dis log info from DOM
+            // TODO: Call to di_list on API
+            $('.js-dis-log').closest('tr').remove();
         }
+    },
+    
+    renderDiProgress: function (osdID) {
+        var that = this;
+        
+        var imageModel = new Wat.Models.Plugin({}, {osdId: osdID, pluginId: 'image'});
+
+        imageModel.fetch({
+            complete: function () {
+                var template = _.template(
+                            Wat.TPL.osfDiLogOsd, {
+                                images: imageModel.attributes
+                            }
+                        );
+
+                $('.bb-dis-log').html(template);
+
+                var progressBars = $(".progressbar");
+
+                $.each (progressBars, function (i, progressBar) {
+                    var progressLabel = $(progressBar).find('.progress-label');
+
+                    $(progressBar).progressbar({
+                        value: false,
+                        change: function () {
+                            that.updateDiProgress(progressBar);
+                        },
+                        complete: function () {
+                            var progressLabel = $(progressBar).find('.progress-label');
+                            progressLabel.text("Complete!");
+                        }
+                    });
+                });
+
+                // TODO: Replace by websockets
+                that.intervals['diProgressBars'] = setInterval(function () {
+                    imageModel.fetch({
+                        complete: function () {
+                            $.each(imageModel.attributes, function (i, image) {
+                                var progressBar = $('.js-images-log-list tr[data-id="' + image.id + '"] .progressbar');
+                                var percent = image.percent;
+                                var remainingTime = image.remainingTime;
+                                var elapsedTime = image.elapsedTime;
+
+                                $(progressBar).attr('data-percent', percent);
+                                $(progressBar).attr('data-remaining', remainingTime);
+                                $(progressBar).attr('data-elapsed', elapsedTime);
+
+                                $(progressBar).progressbar("value", percent);
+                            });
+                        }
+                    });
+                }, 3000);
+
+                that.intervals['localDiProgressTime'] = setInterval(function () {
+                    $.each(imageModel.attributes, function (i, image) {
+                        var progressBar = $('.js-images-log-list tr[data-id="' + image.id + '"] .progressbar');
+                        var percent = parseInt($(progressBar).attr('data-percent'));
+                        var remainingTime = parseInt($(progressBar).attr('data-remaining'));
+                        var elapsedTime = parseInt($(progressBar).attr('data-elapsed'));
+                        
+                        if (percent >= 100) {
+                            return;
+                        }
+                        
+                        $(progressBar).attr('data-remaining', remainingTime>0 ? remainingTime-1 : 0);
+                        $(progressBar).attr('data-elapsed', elapsedTime+1);
+
+                        that.updateDiProgress(progressBar);
+                    });
+                }, 1000);
+            }
+        });
+    },
+    
+    updateDiProgress: function (progressBar) {
+        var progressRemaining = $(progressBar).parent().find('.progress-remaining');
+        var progressElapsed = $(progressBar).parent().find('.progress-elapsed');
+        var progressLabel = $(progressBar).find('.progress-label');
+        
+        var percent = $(progressBar).attr('data-percent');
+        var remaining = $(progressBar).attr('data-remaining');
+        var elapsed = $(progressBar).attr('data-elapsed');
+
+        progressRemaining.html(Wat.U.secondsToHms(remaining));
+        progressElapsed.html(Wat.U.secondsToHms(elapsed));
+        progressLabel.text(percent + "%");
     },
     
     renderSide: function () {

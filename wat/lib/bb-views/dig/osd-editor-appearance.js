@@ -41,7 +41,7 @@ Wat.Views.OSDAppearenceEditorView = Wat.Views.OSDEditorView.extend({
                     }
                 );
 
-                $('.bb-upload-control').html(template);
+                $('.' + that.cid + ' .bb-upload-control').html(template);
 
                 that.renderAssetsControl({
                     assetType: 'wallpaper',

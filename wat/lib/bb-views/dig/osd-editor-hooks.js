@@ -46,6 +46,13 @@ Wat.Views.OSDHooksEditorView = Wat.Views.OSDEditorView.extend({
         
         Wat.I.chosenElement('select.js-change-mode', 'single100');
         
+        var template = _.template(
+            Wat.TPL.osConfigurationEditorAssetUploadControl, {
+            }
+        );
+        
+        $('.' + that.cid + ' .bb-upload-control').html(template);
+        
         Wat.CurrentView.OSDmodel.pluginData.hook.fetch({
             success: function () {
                 // Fetch scripts and load images on list
@@ -81,6 +88,8 @@ Wat.Views.OSDHooksEditorView = Wat.Views.OSDEditorView.extend({
         $('.bb-os-conf-hooks-rows').html(template);
         
         $('.' + this.cid + ' .js-asset-check').eq(0).prop('checked', true).trigger('change');
+        
+        Wat.T.translate();
     },
     
     afterLoadSection: function () {

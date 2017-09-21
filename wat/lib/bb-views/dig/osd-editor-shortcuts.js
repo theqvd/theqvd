@@ -41,7 +41,7 @@ Wat.Views.OSDShortcutsEditorView = Wat.Views.OSDEditorView.extend({
             }
         );
         
-        $('.bb-upload-control').html(template);
+        $('.' + that.cid + ' .bb-upload-control').html(template);
         
         Wat.CurrentView.OSDmodel.pluginData.shortcut.fetch({
             success: function () {

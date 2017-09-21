@@ -286,12 +286,16 @@ Wat.Router = Backbone.Router.extend({
         if (!$.isEmptyObject(Wat.CurrentView)) {
             Wat.CurrentView.undelegateEvents();
             Wat.WS.closeAllWebsockets();
+        
+            // Stop all intervals of old view
+            $.each(Wat.CurrentView.intervals, function (i,v) {
+                clearInterval(v);
+            });
         }
         
 		// Abort pending requests
         if (Wat.C.abortOldRequests) {
             Wat.C.abortRequests();
-            clearInterval(Wat.CurrentView.executionAnimationInterval);
         }
         
         Wat.CurrentView = new view(params);

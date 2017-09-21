@@ -92,6 +92,14 @@ Wat.I.T = {
                         name: 'details/layout-mobile'
                     }
                 }
+                
+                switch (params.qvdObj) {
+                    case 'osf':
+                        templates['osfDiLogOsd'] = {
+                            name: 'details/osf-di-log-osd'
+                        };
+                        break;
+                }
                 break;
             case 'doc':
                 templates = {
