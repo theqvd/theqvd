@@ -80,6 +80,7 @@ sub _print_file {
 
     DEBUG "ghostscript drive: $drive, path: $gs_path, inc: $ghostscript_lib";
 
+    require Win32::EnumPrinters;
     for (Win32::EnumPrinters::EnumPrinters('local', undef, 2)) {
         if (_ptrid($_) eq $printer_id) {
             my $path = _ptrpath($_);
