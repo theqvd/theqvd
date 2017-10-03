@@ -32,6 +32,10 @@ Wat.Views.OSDHooksEditorView = Wat.Views.OSDEditorView.extend({
     render: function () {
         var that = this;
         
+        if (!Wat.CurrentView.OSDmodel.pluginData.hook) {
+            return;
+        }
+        
         var template = _.template(
             Wat.TPL.osConfigurationEditorHooks, {
                 massive: this.massive,

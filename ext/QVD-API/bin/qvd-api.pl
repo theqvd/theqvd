@@ -618,7 +618,7 @@ group {
         if (defined $api_url) {
             my $full_api_url = $api_url . "/" . $params;
             my $method = $c->tx->req->method;
-            
+
             my $tx = $c->ua->build_tx($method => $full_api_url => $c->req->headers->to_hash => $c->req->build_body);
             $tx = $c->ua->start($tx);
             
@@ -627,10 +627,7 @@ group {
                 $c->rendered();
             }
             else {
-                my $err = $tx->error;
-                my $message = $err->{message} // 'Unknown error';
-                $code = $err->{code} // '502';
-                $response_str = encode_json({status => $code, message => $message});
+                $c->render(json => QVD::API::Exception->new(code => 1100)->json);
             }
         }
         else {

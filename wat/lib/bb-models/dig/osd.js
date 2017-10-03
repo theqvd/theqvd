@@ -22,6 +22,10 @@ Wat.Models.OSD = Wat.Models.DIG.extend({
     },
     
     parse: function(response) {
+        if (response.status && response.status != STATUS_SUCCESS) {
+            response.error = response.message;
+        }
+        
         return $.extend({}, response, this.mock(response));
     },
     
@@ -97,7 +101,7 @@ Wat.Models.OSD = Wat.Models.DIG.extend({
     getPluginDef: function (pluginId) {
         var pluginModel = this.pluginDef.where({code: pluginId})[0];
         
-        return pluginModel.attributes;
+        return pluginModel ? pluginModel.attributes : false;
     },
     
     // Get possible options of an attribute of type list of a plugin
@@ -107,6 +111,11 @@ Wat.Models.OSD = Wat.Models.DIG.extend({
         var [pluginId, attr] = pluginAttr.split('.');
         
         var plugin = this.getPluginDef(pluginId);
+        
+        if (!plugin) {
+            return [];
+        }
+        
         var attrModel = {};
         $.each(plugin.values, function (i,v) {
             if (v.method == 'PUT') {

@@ -22,6 +22,10 @@ Wat.Views.OSDAppearenceEditorView = Wat.Views.OSDEditorView.extend({
     render: function () {
         var that = this;
         
+        if (!Wat.CurrentView.OSDmodel.pluginData.wallpaper) {
+            return;
+        }
+        
         Wat.CurrentView.OSDmodel.pluginData.wallpaper.fetch({
             complete: function () {
                 var template = _.template(

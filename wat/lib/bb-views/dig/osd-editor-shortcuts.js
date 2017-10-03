@@ -25,6 +25,10 @@ Wat.Views.OSDShortcutsEditorView = Wat.Views.OSDEditorView.extend({
     render: function () {
         var that = this;
         
+        if (!Wat.CurrentView.OSDmodel.pluginData.shortcut) {
+            return;
+        }
+        
         var template = _.template(
             Wat.TPL.osConfigurationEditorShortcuts, {
                 massive: this.massive,

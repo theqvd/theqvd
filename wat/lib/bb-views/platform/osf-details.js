@@ -44,6 +44,12 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
 
         imageModel.fetch({
             complete: function () {
+                if (imageModel.get('error')) {
+                    $('.bb-dis-log').html('<div class="center" data-i18n="Error retrieving software information"></div>');
+                    Wat.T.translate();
+                    return;
+                }
+                
                 var template = _.template(
                             Wat.TPL.osfDiLogOsd, {
                                 images: imageModel.attributes

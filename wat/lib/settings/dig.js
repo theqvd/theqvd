@@ -168,7 +168,7 @@ Wat.DIG = {
             var template = $.i18n.t('Software information not available');
             $(options.container + ' .bb-os-configuration').html(template);
         }
-        else if (model === false) {
+        else if (model === false || model.get('error')) {
             var template = $.i18n.t('Error retrieving software information');
             $(options.container + ' .bb-os-configuration').html(template);
         }

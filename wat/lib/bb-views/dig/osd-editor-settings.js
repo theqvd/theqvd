@@ -14,6 +14,10 @@ Wat.Views.OSDSettingsEditorView = Wat.Views.OSDEditorView.extend({
     render: function () {
         var that = this;
         
+        if (!Wat.CurrentView.OSDmodel.pluginData.vma) {
+            return;
+        }
+        
         Wat.CurrentView.OSDmodel.pluginData.vma.fetch({
             success: function () {
                 var template = _.template(

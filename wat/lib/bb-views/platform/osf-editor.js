@@ -193,6 +193,7 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
             Wat.DIG.fetchOSD(osdId, function (OSDmodel) {
                 if (OSDmodel.get('error')) {
                     $('.bb-os-configuration-editor').html('<div class="center" data-i18n="Error retrieving software information"></div>');
+                    Wat.T.translate();
                     return;
                 }
                 
