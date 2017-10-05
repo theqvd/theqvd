@@ -1,0 +1,14 @@
+msys2:
+  src: http://repo.msys2.org/distrib/i686/msys2-i686-20161025.exe
+  prefix: c:/msys32/
+  commands:
+    update:
+      - pacman -Syu
+      - pacman -Su
+    install:
+      - pacman -Sy %s
+    wrapper:
+      - /usr/bin/bash --login -c %s
+  packages:
+    - perl
+    - git
