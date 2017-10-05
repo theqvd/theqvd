@@ -719,43 +719,16 @@ Wat.I = {
             this.checkVisibilityConditions(that);
                 
             if (selectedItems == 1) {
-                $('.' + that.cid + ' .js-only-massive').hide();
-                $('.' + that.cid + ' .js-only-one').show();
+                $('.js-only-massive[data-cid="' + that.cid + '"]').hide();
+                $('.js-only-one[data-cid="' + that.cid + '"]').show();
             }
             else {
-                $('.' + that.cid + ' .js-only-one').hide();
-                $('.' + that.cid + ' .js-only-massive').show();
+                $('.js-only-one[data-cid="' + that.cid + '"]').hide();
+                $('.js-only-massive[data-cid="' + that.cid + '"]').show();
             }
         }
         
-        $('.' + that.cid + ' .elements-selected').html(selectedItems);
-    },
-    
-    // Update the indicator of selected items only for select control elements kind
-    updateSelectedItemsSelect: function (selectedItems, embeddedView) { 
-        var that = that || Wat.CurrentView;
-        
-        if (selectedItems == 0) {
-            // Disable options select
-            $('select.js-embedded-dis-action').attr('disabled', 'disabled');
-        }
-        else {
-            // Enable options select
-            $('select.js-embedded-dis-action').removeAttr('disabled');
-            
-            $('select.js-embedded-dis-action option').css('display', 'block');
-
-            this.checkVisibilityConditions(that);
-            
-            if (selectedItems == 1) {
-                $('select.js-embedded-dis-action option.js-only-massive').css('display', 'none');
-                $('select.js-embedded-dis-action option.js-only-one').css('display', 'block');
-            }
-            else {
-                $('select.js-embedded-dis-action option.js-only-one').css('display', 'none');
-                $('select.js-embedded-dis-action option.js-only-massive').css('display', 'block');
-            }
-        }
+        $('.elements-selected[data-cid="' + that.cid + '"]').html(selectedItems);
     },
     
     checkVisibilityConditions: function (that) {
@@ -828,12 +801,10 @@ Wat.I = {
         }
     },
 
-    hideSelectedItemsMenu: function (cid) {
-        var cid = cid || Wat.CurrentView.cid;
-        
-        $('.' + cid + ' .js-side.filter').show();
-        $('.' + cid + ' .js-action-selected').hide("slide");
-        $('.' + cid + ' .list-block').css('margin-left', '');
+    hideSelectedItemsMenu: function () {
+        $('.js-side.filter').show();
+        $('.js-action-selected').hide("slide");
+        $('.list-block').css('margin-left', '');
     },
     
     showSelectedItemsMenu: function (selectedActions, cid) {
@@ -972,7 +943,7 @@ Wat.I = {
     getRealView: function (that) {
         var realView = null;
         
-        if (Wat.CurrentView.cid == that.cid || Wat.CurrentView.treeMode) {
+        if (Wat.CurrentView.cid == that.cid) {
             realView = Wat.CurrentView;
         }
         else {
@@ -994,7 +965,6 @@ Wat.I = {
     // Get first view among current and side views with a determinate function
     getUsefulView: function (qvdObj, functionName) {
         var usefulView = null;
-        
         if (typeof Wat.CurrentView[functionName] == 'function' && Wat.CurrentView.qvdObj == qvdObj) {
             usefulView = Wat.CurrentView;
         }
@@ -1010,7 +980,6 @@ Wat.I = {
                 }
             });
         }
-        
         return usefulView;
     },
     

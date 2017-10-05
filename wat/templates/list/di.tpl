@@ -20,7 +20,7 @@
                             var checkedAttr = selectedAll ? 'checked' : '';
             %>
                             <th data-fieldname="<%= name %>" class="<%= sortAttr %> max-1-icons cell-check">
-                                <input type="checkbox" class="check_all" <%= checkedAttr %>>
+                                <input type="checkbox" class="check_all" <%= checkedAttr %> data-check-id="di">
                             </th>
             <%
                             break;
@@ -114,9 +114,11 @@
         <%
         }                
         _.each(models, function(model) {
+            var state = Wat.C.getDIStatus(model.get('id'));
+            
             var cleanName = model.get('disk_image').substr(model.get('disk_image').indexOf('-')+1);
         %>
-            <tr class="row-<%= model.get('id') %>" data-name="<%= cleanName %>" data-id="<%= model.get('id') %>">
+            <tr class="di-row-state-<%= state %> row-<%= model.get('id') %>" data-name="<%= cleanName %>" data-id="<%= model.get('id') %>">
                 <% 
                     $.each(columns, function(name, col) {
                         if (col.display == false) {
@@ -128,15 +130,35 @@
                                 var checkedAttr = $.inArray(parseInt(model.get('id')), selectedItems) > -1 ? 'checked' : '';
 
                 %>
-                                <td class="cell-check">
-                                    <input type="checkbox" class="check-it js-check-it" data-id="<%= model.get('id') %>" <%= checkedAttr %>>
+                                <td class="cell-check max-1-icons">
+                                    <input type="checkbox" class="check-it js-check-it" data-qvd-obj="di" data-check-id="di" data-id="<%= model.get('id') %>" <%= checkedAttr %>>
                                 </td>
                 <%
                                 break;
                             case 'info':
                 %>
-                                <td class="desktop">
-                                    <%
+                                <td class="desktop max-1-icons">
+                                <% 
+                                    switch (state) { 
+                                        case 'creating':
+                                            %>
+                                                <i class="fa fa-magic faa-wrench animated" title="Being created"></i>
+                                            <%
+                                            break;
+                                        case 'scheduled':
+                                            %>
+                                                <i class="fa fa-calendar" title="Scheduled: 2 days"></i>
+                                                <div class="second_row">
+
+                                                </div>
+                                            <%
+                                            break;
+                                        case 'published':
+                                            %>
+                                                <i class="fa fa-check" title="Published"></i>
+                                            <%
+                                            break;
+                                    }
                                     
                                     if (model.get('tags') && (!infoRestrictions || infoRestrictions.tags)) {
                                     %>

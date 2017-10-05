@@ -5,16 +5,16 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
         switch (params.action) {
             case 'create':
                 this.templateEditor = Wat.TPL['editorNew_' + this.qvdObj];
-                this.model = this.getModel('create');
-                this.renderCreate(params.target, this);
+                this.model = this.getModel('create', params.parentView);
+                this.renderCreate(params.el, params.parentView);
                 break;
             case 'update':
                 this.templateEditor = Wat.TPL['editor_' + this.qvdObj];
-                this.model = this.getModel('update');
-                this.renderUpdate(params.target, this);
+                this.model = this.getModel('update', params.parentView);
+                this.renderUpdate(params.el, params.parentView);
                 break;
             case 'massive_update':
-                this.renderMassiveUpdate(params.target, this);
+                this.renderMassiveUpdate(params.el, params.parentView);
                 break;
         }
     },
@@ -29,19 +29,19 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
         'click  .js-editor-tabs>li': 'clickEditorTab',
     },
     
-    renderCreate: function (target, that) {
-        this.render(target, that);
+    renderCreate: function (target, dataView) {
+        this.render(target, dataView);
     },
     
-    renderUpdate: function (target, that) {
-        if (Wat.CurrentView.viewKind == 'list') {
-            Wat.CurrentView.model = Wat.CurrentView.collection.where({id: Wat.CurrentView.selectedItems[0]})[0];
+    renderUpdate: function (target, dataView) {
+        if (dataView.viewKind == 'list') {
+            dataView.model = dataView.collection.where({id: dataView.selectedItems[0]})[0];
         }
         
-        this.render(target, that);
+        this.render(target, dataView);
     },
     
-    renderMassiveUpdate: function (target, that) {
+    renderMassiveUpdate: function (target, dataView) {
         var that = Wat.CurrentView;
         
         // Add common parts of editor to dialog
@@ -97,14 +97,14 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
         this.setupEditorTabs();
     },
     
-    render: function (target, that) {
-        var that = that || Wat.CurrentView;
+    render: function (target, dataView) {
+        var that = dataView || Wat.CurrentView;
         
         var isSuperadmin = Wat.C.isSuperadmin();
-                
-        if (Wat.CurrentView.viewKind == 'details' || Wat.CurrentView.viewKind == 'admin' || Wat.CurrentView.editingFromList) {
+        
+        if (that.viewKind == 'details' || that.viewKind == 'admin' || that.editingFromList) {
             var editorMode = 'edit';
-            delete Wat.CurrentView.editingFromList;
+            delete that.editingFromList;
         }
         else {
             var editorMode = 'create';
@@ -124,7 +124,7 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
                     }
                 );
         
-        $(this.el).html(that.template);
+        $(target).html(that.template);
         
         if (editorMode == 'create' && isSuperadmin && classifiedByTenant) { 
             var params = {
@@ -138,7 +138,7 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
 
             if (existsOutTenant) {
                     params['startingOptions'] = {};
-                    params['startingOptions'][COMMON_TENANT_ID] = 'None (Shared)';   
+                    params['startingOptions'][COMMON_TENANT_ID] = 'None (Shared)';
             }
             
             Wat.A.fillSelect(params, function () {
@@ -170,7 +170,7 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
         
         // Custom Properties
         
-        if (!Wat.C.checkACL(Wat.CurrentView.qvdObj + '.update.properties')) {
+        if (!Wat.C.checkACL(that.qvdObj + '.update.properties')) {
             var enabledProperties = false;
         }
         // Get enabled properties value from constant. Properties could be disabled by variable
@@ -208,7 +208,7 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
             
             that.editorMode = editorMode;
             
-            Wat.A.performAction(that.qvdObj + '_get_property_list', {}, filters, {}, that.renderProperties, that, undefined, {"field":"key","order":"-asc"});
+            Wat.A.performAction(that.qvdObj + '_get_property_list', {}, filters, {}, this.renderProperties, that, undefined, {"field":"key","order":"-asc"});
         }
         
         // Store scrollHeight of the dialog container
@@ -274,17 +274,17 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
         delete that.editorMode;
     },
     
-    getModel: function (action) {
+    getModel: function (action, view) {
         switch (action) {
             case 'create':
                 var model = new Wat.Models.OSF();
                 break;
             case 'update':
-                if (Wat.CurrentView.viewKind == 'list') {
-                    var model = Wat.CurrentView.collection.where({id: Wat.CurrentView.selectedItems[0]})[0];
+                if (view.viewKind == 'list') {
+                    var model = view.collection.where({id: view.selectedItems[0]})[0];
                 }
                 else {
-                    var model = Wat.CurrentView.model;
+                    var model = view.model;
                 }
                 break;
         }

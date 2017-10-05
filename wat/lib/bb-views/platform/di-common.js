@@ -42,7 +42,7 @@ Wat.Common.BySection.di = {
                 var vmFilters = {
                     "-or": tagCond, 
                     "state": "running",
-                    "osf_id": Wat.CurrentView.model.get('osf_id')
+                    "osf_id": Wat.CurrentView.model ? Wat.CurrentView.model.get('osf_id') : ''
                 };
                 
                 Wat.A.performAction('vm_get_list', {}, vmFilters, {}, that.warnMachinesChanges, that);
@@ -172,4 +172,9 @@ Wat.Common.BySection.di = {
         
         Wat.I.enableDataPickers();
     },
+    
+    // Hook to be called after create an element
+    afterCreating: function () {
+        // Nothing
+    }
 }

@@ -13,7 +13,13 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
     },
     
     renderCreate: function (target, that) {
-        Wat.CurrentView.model = new Wat.Models.DI();
+        if (Wat.CurrentView.qvdObj == 'osf') {
+            Wat.CurrentView.embeddedViews.di.model = new Wat.Models.DI();
+        }
+        else {
+            Wat.CurrentView.model = new Wat.Models.DI();
+        }
+        
         $('.ui-dialog-titlebar').html($.i18n.t('New Disk Image'));
         
         Wat.Views.EditorView.prototype.renderCreate.apply(this, [target, that]);
@@ -39,7 +45,14 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
             var userHidden = document.createElement('input');
             userHidden.type = "hidden";
             userHidden.name = "osf_id";
-            userHidden.value = Wat.CurrentView.model.get('id');
+            // If is OSF details view get id from model
+            if (Wat.CurrentView.model && Wat.CurrentView.model.id) {
+                userHidden.value = Wat.CurrentView.model.get('id');
+            }
+            else if (Wat.CurrentView.collection) {
+                // If is OSF list view get id from subview filters
+                userHidden.value = Wat.CurrentView.embeddedViews.di.collection.filters.osf_id;
+            }
             $('.editor-container').append(userHidden);
             
             if ($('[name="tenant_id"]').length > 0) {
@@ -154,19 +167,19 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
                     if (disk_image) {
                         arguments["disk_image"] = disk_image;
                     }
-                    Wat.CurrentView.heavyCreateStaging(arguments);
+                    this.heavyCreateStaging(arguments);
                     break;
                 case 'computer':
                     var diskImageFile = context.find('input[name="disk_image_file"]');
                     
                     // In this case the progress is controlled by HTML5 API for files uploading
-                    Wat.CurrentView.saveFile(arguments, diskImageFile);
+                    this.saveFile(arguments, diskImageFile);
                     break;
                 case 'url':
                     var diskImageUrl = context.find('input[name="disk_image_url"]').val();
                     arguments["disk_image"] = Wat.U.basename(diskImageUrl);
                     
-                    Wat.CurrentView.heavyCreateDownload(arguments, diskImageUrl);
+                    this.heavyCreateDownload(arguments, diskImageUrl);
                     break;
             }
         }
@@ -174,9 +187,9 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
     
     updateElement: function (dialog, that) {
         // If current view is list, use selected ID as update element ID
-        if (Wat.CurrentView.viewKind == 'list') {
-            Wat.CurrentView.id = Wat.CurrentView.selectedItems[0];
-            Wat.CurrentView.model = Wat.CurrentView.collection.where({id: Wat.CurrentView.selectedItems[0]})[0];
+        if (that.viewKind == 'list') {
+            that.id = that.selectedItems[0];
+            that.model = that.collection.where({id: that.selectedItems[0]})[0];
         }
         
         var properties = this.parseProperties('update');
@@ -190,17 +203,17 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
         var def = context.find('input[name="default"][value=1]').is(':checked');
         
         // If we set default (only if the DI wasn't default), add this tag
-        if (def && !Wat.CurrentView.model.get('default') && Wat.C.checkACL('di.update.default')) {
+        if (def && !that.model.get('default') && Wat.C.checkACL('di.update.default')) {
             newTags.push('default');
         }
                 
-        var baseTags = Wat.CurrentView.model.attributes.tags ? Wat.CurrentView.model.attributes.tags.split(',') : [];
+        var baseTags = that.model.attributes.tags ? that.model.attributes.tags.split(',') : [];
         var keepedTags = _.intersection(baseTags, newTags);
         
         var createdTags = _.difference(newTags, keepedTags);
         var deletedTags = _.difference(baseTags, keepedTags);
         
-        var filters = {"id": Wat.CurrentView.id};
+        var filters = {"id": that.id};
         var arguments = {};
         
         if (Wat.C.checkACL('di.update.tags') || Wat.C.checkACL('di.update.default')) {
@@ -218,9 +231,9 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
             arguments["description"] = description;
         }
         
-        Wat.CurrentView.tagChanges = arguments['__tags_changes__'];
+        that.tagChanges = arguments['__tags_changes__'];
         
-        Wat.CurrentView.updateModel(arguments, filters, Wat.CurrentView.checkMachinesChanges);
+        that.updateModel(arguments, filters, that.checkMachinesChanges);
     },
     
     // Show/Hide image source and software configuration depending on OSD
@@ -271,5 +284,32 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
         }
 
         $('.' + this.cid + ' .js-os-configuration-expanded').toggle();
+    },
+    
+    heavyCreateDownload: function (args, diskImageUrl) {
+        // Di creation is a heavy operation. Screen will be blocked and a progress graph shown
+        Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
+        Wat.WS.openWebsocket (this.qvdObj, 'di_create', {
+                arguments: args,
+                url: encodeURI(diskImageUrl)
+        }, this.creatingProcessDownload, 'di/download/');
+    },
+    
+    heavyCreateStaging: function (args) {
+        // Di creation is a heavy operation. Screen will be blocked and a progress graph shown
+        Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
+        Wat.WS.openWebsocket (this.qvdObj, 'di_create', {
+                arguments: args
+        }, this.creatingProcessStaging, 'staging');
+    },
+    
+    creatingProcessStaging: function (qvdObj, id, data, ws) {
+        var usefulView = Wat.I.getUsefulView(qvdObj, 'creatingProcess');
+        usefulView.creatingProcess(qvdObj, id, data, ws, 'staging');
+    },
+    
+    creatingProcessDownload: function (qvdObj, id, data, ws) {
+        var usefulView = Wat.I.getUsefulView(qvdObj, 'creatingProcess');
+        usefulView.creatingProcess(qvdObj, id, data, ws, 'download');
     },
 });

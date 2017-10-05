@@ -33,6 +33,10 @@ td {
         line-height: 18px;
         margin-right: 4px;
         text-align: center;
+        
+        &.disabled {
+            color: darken($col_whiter, 25);
+        }
     }
     
     i.fa-lock, i.fa-unlock-alt {

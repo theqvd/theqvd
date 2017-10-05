@@ -69,6 +69,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     },
     
     readParams: function (params) {
+        var that = this;
         params = params || {};
         
         this.filters = params.filters || {};
@@ -92,7 +93,24 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         if (params.forceListActionButton !== undefined) {
             this.listActionButton = params.forceListActionButton;
-        }            
+        }
+        if (params.forceRenderListBlock !== undefined) {
+            this.renderListBlock = this[params.forceRenderListBlock];
+        }
+        if (params.forceRenderList !== undefined) {
+            this.renderList = this[params.forceRenderList];
+        }
+        if (params.changeFunctionsInternal) {
+            $.each (params.changeFunctionsInternal, function (f, f2) {
+                that[f] = that[f2]
+            });
+        }
+        if (params.changeFunctionsExternal) {
+            $.each (params.changeFunctionsExternal, function (f, f2) {
+                that[f] = f2
+            });
+        }
+        
         if (params.forceListColumns !== undefined) {
             var that = this;
             
@@ -120,8 +138,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     commonListEvents: {
         'click th.sortable': 'sort',
-        'click input.check_all': 'checkAll',
-        'click input.check-it': 'checkOne',
+        'click input.check_all:not([data-embedded-view])': 'checkAll',
+        'click input.check-it:not([data-embedded-view])': 'checkOne',
         'click .first': 'paginationFirst',
         'click .prev': 'paginationPrev',
         'click .next': 'paginationNext',
@@ -134,7 +152,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         'keypress .pagination input.js-current-page': 'pressPage',
         'click .js-button-new': 'openNewElementDialog',
         'click .js-selected-actions-button': 'applySelectedAction',
-        'click .js-unckeck-all': 'resetSelectedItems'
+        'click .js-uncheck-all': 'resetSelectedItems'
     },
     
     // Render list sorted by a column
@@ -366,7 +384,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     updateFilterNotes: function (firstLoad) {     
         var that = this;
         
-        // Show-Hide filter notes only when view is not embeded
+        // Show-Hide filter notes only when view is not embedded
         if (this.cid == Wat.CurrentView.cid) {
             var filtersContainer = '.' + this.cid + ' .filter';
             
@@ -520,6 +538,14 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     
     checkOne: function (e) {
         var itemId = $(e.target).attr('data-id');
+        var checkId = $(e.target).attr('data-check-id');
+        var embeddedView = $(e.target).attr('data-embedded-view');
+        
+        if (!embeddedView) {
+            // Close subrow if its opened
+            $('.button2.' + CLASS_ICON_BUTTON_SUBROW_CLOSE).trigger('click');
+        }
+        
         if ($(e.target).is(":checked")) {
             this.selectedItems.push(parseInt(itemId));
         }
@@ -530,37 +556,47 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         if (this.selectedItems.length == this.collection.elementsTotal) {
             this.selectedAll = true;
-            $('.check_all').prop("checked", true);
+            $('.check_all[data-check-id="' + checkId + '"]').prop("checked", true);
         }
         else {
             this.selectedAll = false;
-            $('.check_all').prop("checked", false);
+            $('.check_all[data-check-id="' + checkId + '"]').prop("checked", false);
         }
         
-        Wat.I.updateSelectedItems(this.selectedItems.length);
+        var view = embeddedView ? Wat.CurrentView.embeddedViews[embeddedView] : Wat.CurrentView;
+        
+        Wat.I.updateSelectedItems(this.selectedItems.length, view);
     },
     
     // Set as checked all the checkboxes of a list and store the IDs
-    checkAll: function (e) {        
+    checkAll: function (e) {
+        var checkId = $(e.target).attr('data-check-id');
+        var embeddedView = $(e.target).attr('data-embedded-view');
+        
+        if (!embeddedView) {
+            // Close subrow if its opened
+            $('.button2.' + CLASS_ICON_BUTTON_SUBROW_CLOSE).trigger('click');
+        }
+
         if ($(e.target).is(":checked")) {
-            var hiddenElements = this.collection.elementsTotal > this.collection.length;
             var that = this;
+            var hiddenElements = this.collection.elementsTotal > this.collection.length;
             
             if (hiddenElements) {
                 var dialogConf = {
                     title: '<i class="fa fa-question"></i>',
                     buttons : {
                         "Select only visible items": function () {
-                            $('.js-check-it').prop("checked", true);
+                            $('.js-check-it[data-check-id="' + checkId + '"]').prop("checked", true);
                             that.selectedItems = [];
-                            $.each($('.js-check-it'), function (iCheckbox, checkbox) {
+                            $.each($('.js-check-it[data-check-id="' + checkId + '"]'), function (iCheckbox, checkbox) {
                                 that.selectedItems.push(parseInt($(checkbox).attr('data-id')));
                             });
                             Wat.I.closeDialog($(this));
                             Wat.I.updateSelectedItems(that.selectedItems.length);
                         },
                         "Select all": function () {
-                            $('.js-check-it').prop("checked", true);
+                            $('.js-check-it[data-check-id="' + checkId + '"]').prop("checked", true);
                             that.dialog = $(this);
                             Wat.A.performAction(that.qvdObj + '_all_ids', {}, that.collection.filters, {}, that.storeAllSelectedIds, that);
                         }
@@ -572,15 +608,15 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 Wat.I.dialog(dialogConf);
             }
             else {
-                $('.js-check-it').prop("checked", true);
+                $('.js-check-it[data-check-id="' + checkId + '"]').prop("checked", true);
                 that.selectedItems = [];
-                $.each($('.js-check-it'), function (iCheckbox, checkbox) {
+                $.each($('.js-check-it[data-check-id="' + checkId + '"]'), function (iCheckbox, checkbox) {
                     that.selectedItems.push(parseInt($(checkbox).attr('data-id')));
                 });
                 Wat.I.updateSelectedItems(that.selectedItems.length);
             }
         } else {
-            $('.js-check-it').prop("checked", false);
+            $('.js-check-it[data-check-id="' + checkId + '"]').prop("checked", false);
             this.resetSelectedItems ();
             Wat.I.updateSelectedItems(this.selectedItems.length);
         }
@@ -1104,14 +1140,14 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             },
             Update: function () {
                 that.dialog = $(this);
-                Wat.CurrentView.editorView.updateMassiveElement($(this), that.selectedItems);
+                that.updateMassiveElement($(this), that.selectedItems);
             }
         };
         
         that.dialogConf.buttonClasses = ['fa fa-ban js-button-cancel', 'fa fa-save js-button-update'];
         
         that.dialogConf.fillCallback = function (target, that) {
-            Wat.CurrentView.editorView = new Wat.Common.BySection[that.qvdObj].editorViewClass({ action: 'massive_update', el: $(target) });
+            Wat.CurrentView.editorView = new Wat.Common.BySection[that.qvdObj].editorViewClass({ action: 'massive_update', el: $(target), parentView: that });
         };
         
         that.dialogConf.title = i18n.t('Massive changes over __counter__ elements', {counter: that.selectedItems.length}) + '<i class="fa fa-warning" title="' + i18n.t('Some fields could not be able in the massive editor') + '"></i>';
@@ -1119,14 +1155,25 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         Wat.I.dialog(that.dialogConf, that);
     },
     
-    applySelectedAction: function (e) { 
-        if ($(e.target).attr('data-action')) {
-        var action = $(e.target).attr('data-action');
+    applySelectedAction: function (e) {
+        var cid = $(e.target).attr('data-cid');
+        
+        if (this.cid != cid) {
+            var actionsView = Wat.U.getViewFromCid(cid);
+            actionsView.applySelectedAction(e);
+            return;
         }
-        else {
+        
+        if ($(e.target).attr('data-action')) {
+            var action = $(e.target).attr('data-action');
+        }
+        else if ($(e.target).parent().attr('data-action')) {
             var action = $(e.target).parent().attr('data-action');
         }
-
+        else {
+            var action = $(e.target).find(":selected").attr('data-action');
+        }
+        
         if (!this.selectedItems.length) {
             Wat.I.M.showMessage({message: 'No items were selected - Nothing to do', messageType: 'info'});
             return;
@@ -1242,6 +1289,25 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             case 'delete_acl':
                 Wat.I.confirm('dialog/confirm-undone', that.applyDeleteACL, that, loadingBlock);
                 break;
+            case 'new_osf_di':
+                var params = {};
+                params.changeFunctionsExternal = {
+                    render: function () {},
+                    renderList: function () {},
+                    afterCreating: function () { Wat.CurrentView.resetSelectedItems() }
+                };
+                
+                params.filters = {"osf_id": this.selectedItems[0]};
+                
+                Wat.CurrentView.embeddedViews = Wat.CurrentView.embeddedViews || {};
+            
+                Wat.CurrentView.embeddedViews.di = new Wat.Views.DIListView(params);
+                
+                setTimeout(function () {
+                    Wat.CurrentView.embeddedViews.di.openNewElementDialog();
+                }, 100);
+
+                break;
         };
     },
                                                
@@ -1263,15 +1329,26 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         that.updateModel({blocked: 0}, that.applyFilters, that.fetchList, auxModel);
     },
     
-    resetSelectedItems: function () {
-        if (this.selectedItems.length > 0) {
-            Wat.I.hideSelectedItemsMenu(this.cid);
+    resetSelectedItems: function (e) {
+        if (e) {
+            var cid = $(e.target).attr('data-cid');
         }
-        this.selectedAll = false;
-        this.selectedItems = [];
         
-        $('.' + this.cid + ' .js-check-it').prop('checked', false);
-        $('.' + this.cid + ' .check_all').prop('checked', false);
+        if (cid) {
+            var view = Wat.U.getViewFromCid(cid);
+        }
+        else {
+            var view = this;
+        }
+        
+        if (view.selectedItems.length > 0) {
+            Wat.I.hideSelectedItemsMenu();
+        }
+        view.selectedAll = false;
+        view.selectedItems = [];
+        
+        $('.' + view.cid + ' .js-check-it').prop('checked', false);
+        $('.' + view.cid + ' .check_all').prop('checked', false);
     },
     
     setupMassiveChangesDialog: function (that) {

@@ -325,6 +325,19 @@ Wat.U = {
         return true;
     },
     
+    getViewFromCid: function (cid) {
+        var view = Wat.CurrentView;
+        
+        $.each(Wat.CurrentView.embeddedViews, function (qvdObj, eView) {
+            if (eView.cid == cid) {
+                view = eView;
+                return false;
+            }
+        });
+        
+        return view;
+    },
+    
     setFormChangesOnModel: function (wrapperSelector, model) {
         var attributes = {};
         

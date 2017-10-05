@@ -127,6 +127,19 @@
         float: left;
         color: $col_whiter;
     }
+    
+    // DI rows    
+    .di-row-state-creating {
+        background: #ffa;
+
+        input[type="checkbox"] {
+            display: none;
+        }
+    }
+
+    .di-row-state-scheduled {
+        background: #ddd;
+    }
 }
 
 .more-tags {

@@ -198,6 +198,8 @@ CLASS_ICON_STATUS_STARTING = 'fa fa-play faa-flash animated';
 CLASS_ICON_STATUS_STOPPING = 'fa fa-stop faa-flash animated';
 CLASS_ICON_STATUS_ZOMBIE = 'fa fa-medkit';
 CLASS_ICON_STATUS_LOST = 'fa fa-map-o faa-flash animated';
+CLASS_ICON_BUTTON_SUBROW_OPEN = 'fa-eye'
+CLASS_ICON_BUTTON_SUBROW_CLOSE = 'fa-eye-slash'
 
 CLASS_ICON_BY_QVD_OBJ = {
     user: CLASS_ICON_USERS,
@@ -213,6 +215,8 @@ CLASS_ICON_BY_QVD_OBJ = {
 // Classification of Qvd Objects
 QVD_OBJS_WITH_PROPERTIES = ['user', 'vm', 'host', 'osf', 'di'];
 QVD_OBJS_CLASSIFIED_BY_TENANT = ['user', 'vm', 'osf', 'di', 'administrator', 'log', 'role', 'property'];
+QVD_OBJS_CREATABLE = ['user', 'vm', 'host', 'osf', 'di', 'administrator', 'role', 'tenant'];
+QVD_OBJS_EDITABLE = ['user', 'vm', 'host', 'osf', 'di', 'administrator', 'role', 'tenant', 'package'];
 QVD_OBJS_MASSIVE_EDITABLE = ['user', 'vm', 'host', 'osf', 'di', 'administrator', 'role', 'tenant'];
 QVD_OBJS_EXIST_IN_SUPERTENANT = ['role', 'administrator', 'property'];
 QVD_OBJS_EXIST_OUT_TENANT = ['role'];
@@ -221,6 +225,11 @@ QVD_OBJS_SETUP = ['role', 'administrator', 'tenant', 'views', 'watconfig'];
 QVD_OBJS_USERAREA = ['profile', 'myviews'];
 QVD_OBJS_HELP = ['about', 'documentation'];
 QVD_OBJS_QVDCONFIG = ['config'];
+QVD_OBJS_EMBEDDED_VIEWS = {
+    osf: [
+        'di'
+    ]
+};
 
 // Filters
 FILTER_ALL = -10;

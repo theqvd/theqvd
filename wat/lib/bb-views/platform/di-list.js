@@ -12,7 +12,11 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
     
     listEvents: {
         'change input[data-name="di_default"]': 'setDefault',
-        'click .js-more-tags': 'showExtraTags'
+        'click .js-more-tags': 'showExtraTags',
+        'change .js-selected-actions-select': 'applySelectedAction',
+        'click .js-unshrink-btn': 'unshrinkRows',
+        'click input.check_all[data-embedded-view="di"]': 'checkAll',
+        'click input.check-it[data-embedded-view="di"]': 'checkOne',
     },
     
     showExtraTags: function (e) {
@@ -84,7 +88,8 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
             processData: false,
             contentType: false, // Setting contentType as false 'multipart/form-data' and boundary will be sent
 
-        }).success(function(){
+        }).success(function(){            
+            Wat.I.closeDialog(that.dialog);
             Wat.I.loadingUnblock();
             
             var realView = Wat.I.getRealView(that);
@@ -130,31 +135,38 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         $('.loading-little-message').html(creatingMessage + '<br><br>' + progressMessage);
     },
     
-    heavyCreateDownload: function (args, diskImageUrl) {
-        // Di creation is a heavy operation. Screen will be blocked and a progress graph shown
-        Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
-        Wat.WS.openWebsocket (this.qvdObj, 'di_create', {
-                arguments: args,
-                url: encodeURI(diskImageUrl)
-        }, this.creatingProcessDownload, 'di/download/');
-    },   
-    
-    heavyCreateStaging: function (args) {
-        // Di creation is a heavy operation. Screen will be blocked and a progress graph shown
-        Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
-        Wat.WS.openWebsocket (this.qvdObj, 'di_create', {
-                arguments: args
-        }, this.creatingProcessStaging, 'staging');
+    renderEmbeddedBlockList: function () {
+        this.renderEmbeddedList();
     },
     
-    creatingProcessStaging: function (qvdObj, id, data, ws) {
-        var usefulView = Wat.I.getUsefulView(qvdObj, 'creatingProcess');
-        usefulView.creatingProcess(qvdObj, id, data, ws, 'staging');
+    renderEmbeddedList: function () {
+        this.template = _.template(
+            Wat.TPL.embedded_osf_di, {
+                cid: this.cid,
+                models: this.collection.models,
+                selectedActions: Wat.C.purgeConfigData(Wat.I.selectedActions.di),
+                osfId: $('.dis-subrow').attr('data-dis-row'),
+                shrinkFactor: 3
+            }
+        );
+        
+        $('.dis-subrow .bb-list').html(this.template);
+        
+        Wat.T.translateAndShow();
     },
     
-    creatingProcessDownload: function (qvdObj, id, data, ws) {
-        var usefulView = Wat.I.getUsefulView(qvdObj, 'creatingProcess');
-        usefulView.creatingProcess(qvdObj, id, data, ws, 'download');
+    applySelectedAction: function (e) {
+        // Apply action
+        Wat.Views.ListView.prototype.applySelectedAction.apply(this, [e]);
+        
+        // Reset combo after apply action
+        $(e.target).val('').trigger('chosen:updated');
+    },
+    
+    // Show hidden rows on shrinked lists
+    unshrinkRows: function () {
+        $('tr.js-rows-unshrink-row').remove();
+        $('tr.js-shrinked-row').show();
     },
     
     creatingProcess: function (qvdObj, id, data, ws, mode) {
@@ -212,6 +224,8 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
                 // Check affected machine changes
                 var realView = Wat.I.getRealView(this);
                 realView.checkMachinesChanges(this);
+                
+                realView.afterCreating();
                 break;
             default:
                 if (ws.readyState == WS_OPEN) {
@@ -222,5 +236,5 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
                 $(".ui-dialog-buttonset button:first-child").trigger('click');
                 Wat.I.M.showMessage({message: i18n.t(ALL_STATUS[data.status]), messageType: 'error'});
         }
-    }
+    },
 });

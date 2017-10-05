@@ -1,4 +1,4 @@
-<a class="fright fa fa-times button button-icon js-unckeck-all desktop" style="font-size: 0.8em;"></a>
+<a class="fright fa fa-times button button-icon js-uncheck-all desktop" style="font-size: 0.8em;" data-cid="<%= cid %>"></a>
 <div data-i18n="Actions over selected items" class="title desktop"></div>
         <% $.each(selectedActions, function(action, actionConfig) { %>
     <% 
@@ -28,6 +28,6 @@
 <div class="selected-elements js-selected-elements">
     <i class="fa fa-check-square-o mobile"></i>
     <span class="fa fa-check-square-o desktop" data=i18n="Selected"><%= $.i18n.t('Selected') %></span>:
-    <span class="elements-selected">0</span>
+    <span class="elements-selected" data-cid="<%= cid %>">0</span>
 </div>
 <div class="clear mobile"></div>

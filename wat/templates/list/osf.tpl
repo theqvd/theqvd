@@ -20,7 +20,7 @@
                             var checkedAttr = selectedAll ? 'checked' : '';
             %>
                             <th data-fieldname="<%= name %>" class="<%= sortAttr %> max-1-icons cell-check">
-                                <input type="checkbox" class="check_all" <%= checkedAttr %>>
+                                <input type="checkbox" class="check_all" <%= checkedAttr %> data-check-id="osf">
                             </th>
             <%
                             break;
@@ -127,7 +127,7 @@
 
                 %>
                                 <td class="cell-check">
-                                    <input type="checkbox" class="check-it js-check-it" data-id="<%= model.get('id') %>" <%= checkedAttr %>>
+                                    <input type="checkbox" class="check-it js-check-it" data-qvd-obj="osf" data-check-id="osf" data-id="<%= model.get('id') %>" <%= checkedAttr %>>
                                 </td>
                 <%
                                 break;
@@ -192,6 +192,7 @@
                             case 'dis':
                 %>
                                 <td class="desktop">
+                                    <a class="button2 button-icon fa fa-eye js-toggle-dis-row <%= model.get('number_of_dis') == 0 ? 'disabled' : '' %>" data-id="<%= model.get('id') %>"></a>
                                     <% if (model.get('number_of_dis') > 0) { %>
                                     <%= Wat.C.ifACL('<a href="#/dis/' + Wat.U.transformFiltersToSearchHash({osf_id: model.get('id')}) + '">', 'di.see-main.') %>
                                         <span data-wsupdate="number_of_dis" data-id="<%= model.get('id') %>"><%= model.get('number_of_dis') %></span>

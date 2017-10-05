@@ -20,7 +20,7 @@
                             var checkedAttr = selectedAll ? 'checked' : '';
             %>
                             <th data-fieldname="<%= name %>" class="<%= sortAttr %> max-1-icons cell-check">
-                                <input type="checkbox" class="check_all" <%= checkedAttr %>>
+                                <input type="checkbox" class="check_all" <%= checkedAttr %> data-check-id="user">
                             </th>
             <%
                             break;
@@ -119,7 +119,7 @@
 
                 %>
                                 <td class="cell-check">
-                                    <input type="checkbox" class="check-it js-check-it" data-id="<%= model.get('id') %>" <%= checkedAttr %>>
+                                    <input type="checkbox" class="check-it js-check-it" data-qvd-obj="user" data-check-id="user" data-id="<%= model.get('id') %>" <%= checkedAttr %>>
                                 </td>
                 <%
                                 break;

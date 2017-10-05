@@ -14,6 +14,7 @@ Wat.Views.MainView = Backbone.View.extend({
     addRoles: [],
     currentMenu: '', // platform-setup
     sideViews: [],
+    embeddedViews: {},
     templates: {},
     intervals: {},
     
@@ -279,6 +280,11 @@ Wat.Views.MainView = Backbone.View.extend({
     openNewElementDialog: function (e) {
         var that = this;
         
+        // Avoid open dialogs relative to another qvd objets in screens with embedded views
+        if ($(e.target).attr('data-qvd-obj') != this.qvdObj) {
+            return;
+        }
+        
         this.dialogConf.buttons = {
             Cancel: function (e) {
                 Wat.I.closeDialog($(this));
@@ -351,7 +357,7 @@ Wat.Views.MainView = Backbone.View.extend({
                 }
                 
                 that.dialog = $(this);
-                Wat.CurrentView.editorView.updateElement();
+                Wat.CurrentView.editorView.updateElement(that.dialog, that);
                 
                 Wat.CurrentView.editorView.afterEditElementDialogAction('update');
             }
@@ -361,7 +367,7 @@ Wat.Views.MainView = Backbone.View.extend({
         
         this.dialogConf.fillCallback = function (target, that) {
             var editorViewClass = Wat.Common.BySection[that.qvdObj] ? Wat.Common.BySection[that.qvdObj].editorViewClass : Wat.CurrentView.editorViewClass;
-            Wat.CurrentView.editorView = new editorViewClass({ action: 'update', el: $(target) });
+            Wat.CurrentView.editorView = new editorViewClass({ action: 'update', el: $(target), parentView: that });
         };
         
         Wat.I.dialog(this.dialogConf, this);

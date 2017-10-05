@@ -1,7 +1,7 @@
 <br>
 <div class="list-navigation">    
     <div class="action-new-item">    
-        <a href="javascript:" class="button fa fa-plus-circle js-button-new" data-i18n="New property"></a>
+        <a href="javascript:" class="button fa fa-plus-circle js-button-new" data-qvd-obj="property" data-i18n="New property"></a>
     </div>
 </div>
             

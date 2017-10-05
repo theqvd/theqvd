@@ -131,9 +131,12 @@ Wat.I.T = {
                 }
                 break;
             case 'commonEditors':
-                templates['editor_' + params.qvdObj] = {
-                    name: 'editor/' + params.qvdObj
-                };
+                // If qvd object is editable, get editor template
+                if ($.inArray(params.qvdObj, QVD_OBJS_EDITABLE) != -1) {
+                    templates['editor_' + params.qvdObj] = {
+                        name: 'editor/' + params.qvdObj
+                    };
+                }
                 break;
             case 'list':
                 templates = {
@@ -153,11 +156,14 @@ Wat.I.T = {
                         name: 'list/selected-options-menu'
                     }
                 }
-
-                templates["editorNew_" + params.qvdObj] = {
-                    name: 'creator/' + params.qvdObj
-                };        
-
+                
+                // If qvd object is creatable, get creator template
+                if ($.inArray(params.qvdObj, QVD_OBJS_CREATABLE) != -1) {
+                    templates["editorNew_" + params.qvdObj] = {
+                        name: 'creator/' + params.qvdObj
+                    };
+                }
+                
                 templates["list_" + params.qvdObj] = {
                     name: 'list/' + params.qvdObj
                 };
@@ -167,6 +173,14 @@ Wat.I.T = {
                     templates.editorMassive = {
                         name: 'editor/' + params.qvdObj + '-massive'
                     };
+                }
+                
+                if (QVD_OBJS_EMBEDDED_VIEWS[params.qvdObj]) {
+                    $.each(QVD_OBJS_EMBEDDED_VIEWS[params.qvdObj], function (ieObj, embeddedObj) {
+                        templates["embedded_" + params.qvdObj + '_' + embeddedObj] = {
+                            name: 'list/embedded-' + params.qvdObj + '-' + embeddedObj
+                        }
+                    });
                 }
                 break; 
             case 'about':

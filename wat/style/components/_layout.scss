@@ -608,3 +608,86 @@ table.os-configuration {
         }
     }
 }
+
+.dis-subrow {
+    padding: 0px 0px 0px 55px  !important;
+    box-shadow: inset 0 0 3px #ccc;
+    
+    .loading {
+        text-align: center;
+        font-size: inherit;
+        margin: 10px auto;
+        i {
+            color: darken($col_whiter, 25);
+            font-size: 40px;
+            line-height: 40px;
+        }
+    }
+    
+    .embedded-dis-header-table {
+        width: 100%;
+        table-layout: fixed;
+    }
+    
+    .list-wrapper {
+        width: 100%;
+        
+        .list {
+            border: 0 !important;
+            margin: 0 !important;
+            border-radius: 0;
+            border: #aaa 1px dotted !important;
+            
+            &>thead, &>tbody {
+                display: block;
+                
+                th, td {
+                    padding: 2px 10px;
+                }
+            }
+            
+            thead {
+                tr {
+                    th {
+                        background: transparent;
+
+                        .chosen-container {
+                            //min-width: 350px;
+                        }
+                        
+                    
+                        &:first-child {
+                            padding-right: 10px !important;
+                        }
+                        
+                        &:last-child {
+                            padding: 2px;
+                        }
+                    }
+                }
+            }
+
+            tbody {
+                max-height: 200px;
+                overflow-y: auto;
+                
+                tr {
+                    td.description {
+                        width: 100%;
+                        vertical-align: top;
+                        white-space: normal;
+                    }
+                }
+                
+                tr.rows-unshrink-row {
+                    background: transparent !important;
+                    text-align: center;
+                    
+                    a {
+                        width: 50% !important;
+                    }
+                }
+            }
+        }
+    }
+}
