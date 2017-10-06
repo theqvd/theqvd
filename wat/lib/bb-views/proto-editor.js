@@ -300,8 +300,8 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
     
     // Parse properties from create/edit forms
     parseProperties: function (mode) {
-        var propIds = $('.' + this.cid + '.editor-container input.custom-prop-id');
-        var propValues = $('.' + this.cid + '.editor-container input.custom-prop-value');
+        var propKeys = $('.' + this.cid + '.editor-container .js-editor-property-row:visible input.custom-prop-key');
+        var propValues = $('.' + this.cid + '.editor-container .js-editor-property-row:visible input.custom-prop-value');
         
         switch (mode) {
             case 'create':
@@ -329,8 +329,8 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
         
         var setProps = {};
         
-        for(i=0;i<propIds.length;i++) {
-            var id = propIds.eq(i);
+        for(i=0;i<propKeys.length;i++) {
+            var id = propKeys.eq(i);
             var value = propValues.eq(i);
             
             if (!Wat.I.isMassiveFieldChanging(id.val())) {
