@@ -13,6 +13,7 @@ my $logger = Log::Any->get_logger;
 my $this_path = path($0)->realpath->parent;
 my $p = Win32::Packer->new( app_name => 'qvd-automate',
                             scripts => $this_path->child('automate.pl'),
+                            extra_module => [qw(if IO::Socket::SSL IO::Socket::IP)],
                             extra_file => $this_path->child('automate.yaml'),
                             logger => $logger);
 

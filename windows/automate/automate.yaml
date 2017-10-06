@@ -1,14 +1,32 @@
 msys2:
-  src: http://repo.msys2.org/distrib/i686/msys2-i686-20161025.exe
+  url: http://repo.msys2.org/distrib/i686/msys2-i686-20161025.exe
+  script-url: https://raw.githubusercontent.com/msys2/msys2-installer/master/auto-install.js
   prefix: c:/msys32/
   commands:
+    wrapper: usr/bin/bash --login -c
     update:
-      - pacman -Syu
-      - pacman -Su
-    install:
-      - pacman -Sy %s
-    wrapper:
-      - /usr/bin/bash --login -c %s
+      - pacman -Syu --noconfirm
+      - pacman -Su --noconfirm
+    install: pacman -S --noconfirm
   packages:
     - perl
     - git
+
+perl:
+  url: http://strawberryperl.com/download/5.26.1.1/strawberry-perl-5.26.1.1-32bit.msi
+  prefix: c:/strawberry/
+  modules:
+    cpan:
+
+    git:
+      - url: 
+        branch:
+
+pulseaudio:
+  repository:
+    url: https://github.com/theqvd/pulseaudio.git
+    branch: opus
+  build:
+    commands:
+      - ./autogen.sh
+      
