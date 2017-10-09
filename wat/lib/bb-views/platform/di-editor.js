@@ -14,6 +14,7 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
     
     renderCreate: function (target, that) {
         if (Wat.CurrentView.qvdObj == 'osf') {
+            Wat.CurrentView.embeddedViews.di = Wat.CurrentView.embeddedViews.di || {};
             Wat.CurrentView.embeddedViews.di.model = new Wat.Models.DI();
         }
         else {

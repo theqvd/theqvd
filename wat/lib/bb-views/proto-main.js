@@ -314,7 +314,7 @@ Wat.Views.MainView = Backbone.View.extend({
         
         this.dialogConf.fillCallback = function (target, that) {
             var editorViewClass = Wat.Common.BySection[that.qvdObj] ? Wat.Common.BySection[that.qvdObj].editorViewClass : Wat.CurrentView.editorViewClass;
-            Wat.CurrentView.editorView = new editorViewClass({ action: 'create', el: $(target) });
+            Wat.CurrentView.editorView = new editorViewClass({ action: 'create', el: $(target), parentView: Wat.U.getViewFromQvdObj(that.qvdObj) });
         };
         
         this.dialog = Wat.I.dialog(this.dialogConf, this);

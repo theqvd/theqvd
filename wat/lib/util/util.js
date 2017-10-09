@@ -338,6 +338,20 @@ Wat.U = {
         return view;
     },
     
+    
+    getViewFromQvdObj: function (qvdObjSearch) {
+        var view = Wat.CurrentView;
+        
+        $.each(Wat.CurrentView.embeddedViews, function (qvdObj, eView) {
+            if (qvdObjSearch == qvdObj) {
+                view = eView;
+                return false;
+            }
+        });
+        
+        return view;
+    },
+    
     setFormChangesOnModel: function (wrapperSelector, model) {
         var attributes = {};
         
