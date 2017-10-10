@@ -23,6 +23,8 @@ sub ENUMERATES {
         [ qw(es en auto default) ],
         user_portal_parameters_enum                            =>
         [ qw(connection audio printers fullscreen share_folders share_usb client) ],
+        di_generation_state_enum                               =>
+        [ qw(new generating fail uploading upload_stalled verifying ready published retired) ],
     };
 }
 
