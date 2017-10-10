@@ -940,11 +940,17 @@ Wat.I = {
         }, 'fast');
     },
     
+    // Return view where the affected model of collection is. Useful to recover focus from embedded views or dialogs
     getRealView: function (that) {
         var realView = null;
         
+        // If view where code is executed is the root view, this will be the real view
         if (Wat.CurrentView.cid == that.cid) {
             realView = Wat.CurrentView;
+        }
+        // If there is a parent view, this will be the real view
+        else if (that.parentView) {
+            realView = that.parentView;
         }
         else {
             $.each (Wat.CurrentView.sideViews, function (iV, view) {

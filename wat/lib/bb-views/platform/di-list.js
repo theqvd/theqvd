@@ -59,51 +59,6 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         that.updateModel(arguments, {id: id}, checkMachinesChanges);
     },
     
-    saveFile: function(arguments, disk_image_file) {
-        var that = this;
-        var file = disk_image_file[0].files[0];
-        var data = new FormData();
-        data.append('file', file);
-        
-        // Set as disk_image the basename of the file
-        arguments.disk_image = file.name;
-        
-        // Get Url for the API call
-        var url = Wat.C.getUpdateDiUrl() + '&action=di_create&arguments=' + JSON.stringify(arguments) + '&parameters=' + JSON.stringify({source: Wat.C.source});
-        
-        Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
-
-        $.ajax({
-            url: encodeURI(url), 
-            data: data,
-            type: 'POST',
-            xhr: function() {  // Custom XMLHttpRequest
-                var myXhr = $.ajaxSettings.xhr();
-                if(myXhr.upload){ // Check if upload property exists
-                    myXhr.upload.addEventListener('progress', that.updateProgress, false); // For handling the progress of the upload
-                }
-                
-                return myXhr;
-            },
-            processData: false,
-            contentType: false, // Setting contentType as false 'multipart/form-data' and boundary will be sent
-
-        }).success(function(){            
-            Wat.I.closeDialog(that.dialog);
-            Wat.I.loadingUnblock();
-            
-            var realView = Wat.I.getRealView(that);
-            realView.fetchList();
-            realView.checkMachinesChanges(that);
-
-            Wat.I.M.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
-        }).fail(function(data){
-            Wat.I.closeDialog(that.dialog);
-            Wat.I.loadingUnblock();
-            Wat.I.M.showMessage({message: i18n.t('Error creating'), messageType: 'error'});
-        });
-    },
-    
     updateProgress: function (e)  {        
         if (e.total == 0) {
             var percent = 100;

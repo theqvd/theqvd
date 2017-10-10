@@ -2,6 +2,9 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
     initialize: function(params) {
         this.extendEvents(this.editorCommonEvents);
         
+        // Store parent view
+        this.parentView = params.parentView;
+        
         switch (params.action) {
             case 'create':
                 this.templateEditor = Wat.TPL['editorNew_' + this.qvdObj];
