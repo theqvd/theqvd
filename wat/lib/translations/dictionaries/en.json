@@ -869,6 +869,8 @@
     "Manage disk image's custom properties": "Manage disk image's custom properties",
     "Spy QVD option to see the VM activity via VNC": "Spy QVD option to see the VM activity via VNC",
     "Interactive mode on Spy QVD feature to take desktop control": "Interactive mode on Spy QVD feature to take desktop control",
+    "See DI generation parameters": "See DI generation parameters",
+    "Update DI generation parameters": "Update DI generation parameters",
 "#######NOTRANSLATE#######_API_STATUS": "",
     "Successful completion": "Successful completion", 
     "In progress": "In progress", 

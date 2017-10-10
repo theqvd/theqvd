@@ -409,8 +409,9 @@ my $ACTIONS = {
 
 	di_get_list => {
 		type_of_action => 'list',
-		 admin4method => 'select',
-		 acls => [qr/^(di\.see-main\.|[^.]+\.see\.di-list)$/],
+		admin4method => 'select',
+		channels => [qw(di_created di_deleted di_changed)],
+		acls => [qr/^(di\.see-main\.|[^.]+\.see\.di-list)$/],
 		qvd_object => 'DI'
 	},
 

@@ -180,7 +180,16 @@ my $ACLS_FOR_FILTERS = {
     DI => {
         osf_id => [qr/^di\.filter\.osf|osf\.see\.di-list$/],
         osf_name => [qr/^di\.filter\.osf$/],
-        osf => [qr/^di\.filter\.osf$/]
+        osf => [qr/^di\.filter\.osf$/],
+        auto_publish =>  [qr/^di\.see\.generation$/],
+        expiration_time_soft => [qr/^di\.see\.generation$/],
+        expiration_time_hard => [qr/^di\.see\.generation$/],
+        state => [qr/^di\.see\.generation$/],
+        state_ts => [qr/^di\.see\.generation$/],
+        elapsed_time => [qr/^di\.see\.generation$/],
+        percentage => [qr/^di\.see\.generation$/],
+        error_code => [qr/^di\.see\.generation$/],
+        status_message => [qr/^di\.see\.generation$/],
     },
 
     OSF => {
@@ -261,19 +270,28 @@ my $ACLS_FOR_FIELDS = {
         creation_admin_id => [qr/^role\.see\.created-by$/],
         creation_admin_name => [qr/^role\.see\.created-by$/]
     },
-
-	DI => {
-		creation_admin_id => [qr/^di\.see\.created-by$/],
-	    creation_admin_name => [qr/^di\.see\.created-by$/],
-	    creation_date => [qr/^di\.see\.creation-date$/],
-	    version => [qr/^di\.see\.version$/],
-	    osf_id => [qr/^di\.see\.osf$/],
-	    osf_name => [qr/^di\.see\.osf$/],
-	    blocked => [qr/^di\.see\.block$/],
-	    tags => [qr/^(di\.see\.|[^.]+\.see\.di-list-)(tags|default|head)$/],
-	    properties => [qr/^di\.see\.properties$/],
-		description => [qr/^di\.see\.description$/]
-	},
+    
+    DI => {
+        creation_admin_id => [qr/^di\.see\.created-by$/],
+        creation_admin_name => [qr/^di\.see\.created-by$/],
+        creation_date => [qr/^di\.see\.creation-date$/],
+        version => [qr/^di\.see\.version$/],
+        osf_id => [qr/^di\.see\.osf$/],
+        osf_name => [qr/^di\.see\.osf$/],
+        blocked => [qr/^di\.see\.block$/],
+        tags => [qr/^(di\.see\.|[^.]+\.see\.di-list-)(tags|default|head)$/],
+        properties => [qr/^di\.see\.properties$/],
+        description => [qr/^di\.see\.description$/],
+        auto_publish =>  [qr/^di\.see\.generation$/],
+        expiration_time_soft => [qr/^di\.see\.generation$/],
+        expiration_time_hard => [qr/^di\.see\.generation$/],
+        state => [qr/^di\.see\.generation$/],
+        state_ts => [qr/^di\.see\.generation$/],
+        elapsed_time => [qr/^di\.see\.generation$/],
+        percentage => [qr/^di\.see\.generation$/],
+        error_code => [qr/^di\.see\.generation$/],
+        status_message => [qr/^di\.see\.generation$/],
+    },
 
     VM => {
         description => [qr/^vm\.see\.description$/],
@@ -408,6 +426,9 @@ my $ACLS_FOR_ARGUMENTS_IN_UPDATE = {
     DI => {
         blocked => [qr/^di\.update\.block$/],
         description => [qr/^di\.update\.description$/],
+        auto_publish =>  [qr/^di\.update\.generation/],
+        expiration_time_soft => [qr/^di\.update\.generation$/],
+        expiration_time_hard => [qr/^di\.update\.generation$/],
         __properties_changes__set => [qr/^di\.update\.properties$/],
         __properties_changes__delete => [qr/^di\.update\.properties$/],
         __tags_changes__create => [qr/^(di\.update\.(tags|defaults)|osf\.see\.di-list-default-update)$/],
@@ -651,9 +672,13 @@ my $AVAILABLE_FILTERS = {
 	      User => [qw(id name description blocked creation_date creation_admin_id creation_admin_name tenant_id tenant_name)],
 
 	      Host => [qw(id name description address blocked frontend backend state vm_id creation_date creation_admin_id creation_admin_name)],
-
-	      DI => [qw(id disk_image description version  osf_id osf_name  tenant_id blocked tenant_name tag creation_date creation_admin_id creation_admin_name)],
-
+        
+        DI => [qw(id disk_image description version osf_id osf_name blocked tags
+            properties creation_date creation_admin_id creation_admin_name
+            state state_ts elapsed_time auto_publish foreign_id
+            expiration_time_soft expiration_time_hard
+            percentage error_code status_message)],
+        
 	      OSF => [qw(id name description overlay user_storage memory vm_id di_id  tenant_id tenant_name creation_date creation_admin_id creation_admin_name)],
 
 	      ACL => [qw(id name role_id admin_id description)],
@@ -699,9 +724,13 @@ my $AVAILABLE_FILTERS = {
 		 User => [qw(id name description blocked creation_date creation_admin_id creation_admin_name tenant_id tenant_name )],
 
 		 Host => [qw(id name description address blocked frontend backend state vm_id creation_date creation_admin_id creation_admin_name)],
-
-		 DI => [qw(id disk_image description version osf osf_id osf_name tenant_id blocked tenant_name tag creation_date creation_admin_id creation_admin_name)],
-
+        
+        DI => [qw(id disk_image description version osf_id osf_name blocked tags
+            properties creation_date creation_admin_id creation_admin_name
+            state state_ts elapsed_time auto_publish foreign_id
+            expiration_time_soft expiration_time_hard
+            percentage error_code status_message)],
+        
 		 OSF => [qw(id name description overlay user_storage memory vm_id di_id  tenant_id tenant_name creation_date creation_admin_id creation_admin_name)],
 
 		 ACL => [qw(id name description role_id admin_id description )],
@@ -803,10 +832,14 @@ my $AVAILABLE_FIELDS = {
 	      OSF => [qw(id name description overlay user_storage memory  number_of_vms number_of_dis properties creation_date creation_admin_id creation_admin_name osd_id)],
 
 	      Role => [qw(name id description fixed internal acls roles creation_date creation_admin_id creation_admin_name)],
-
-	      DI => [qw(id disk_image description version osf_id osf_name blocked tags  properties creation_date creation_admin_id creation_admin_name)],
-
-	      VM => [qw(storage id name description user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
+        
+        DI => [qw(id disk_image description version osf_id osf_name blocked tags
+            properties creation_date creation_admin_id creation_admin_name
+            state state_ts elapsed_time auto_publish foreign_id
+            expiration_time_soft expiration_time_hard
+            percentage error_code status_message)],
+        
+        VM => [qw(storage id name description user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
                         state host_id host_name  di_id user_state ip mac next_boot_ip ssh_port vnc_port serial_port 
                         creation_date creation_admin_id creation_admin_name di_version di_name di_id properties ip_in_use di_id_in_use di_name_in_use di_version_in_use
 	                time_until_expiration_soft time_until_expiration_hard )],
@@ -856,9 +889,13 @@ my $AVAILABLE_FIELDS = {
 		 OSF => [qw(id name description overlay user_storage memory  number_of_vms number_of_dis properties creation_date creation_admin_id creation_admin_name osd_id)],
 		 
 		 Role => [qw(name description id fixed internal acls roles creation_date creation_admin_id creation_admin_name)],
-		
-		 DI => [qw(id disk_image description version osf_id osf_name  blocked tags  properties creation_date creation_admin_id creation_admin_name)],
-		
+        
+        DI => [qw(id disk_image description version osf_id osf_name blocked tags
+            properties creation_date creation_admin_id creation_admin_name
+            state state_ts elapsed_time auto_publish foreign_id
+            expiration_time_soft expiration_time_hard
+            percentage error_code status_message)],
+        
 		 VM => [qw(storage id name description user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
                            time_until_expiration_soft time_until_expiration_hard state host_id host_name  di_id user_state ip mac next_boot_ip ssh_port vnc_port serial_port 
                            creation_date creation_admin_id creation_admin_name di_version di_name di_id properties ip_in_use di_id_in_use di_name_in_use di_version_in_use )],
@@ -1125,7 +1162,7 @@ my $AVAILABLE_ARGUMENTS = {
     VM => [qw(name ip blocked expiration_soft expiration_hard storage di_tag description)],
     Host => [qw(name address blocked description)],
     OSF => [qw(name memory user_storage overlay description osd_id)],
-    DI => [qw(blocked description)],
+    DI => [qw(blocked description auto_publish expiration_time_soft expiration_time_hard)],
     My_Tenant => [qw(name language block description)],
     Tenant => [qw(name language block blocked description)],
     Role => [qw(name description)],
@@ -1367,6 +1404,16 @@ my $FILTERS_TO_DBIX_FORMAT_MAPPER = {
         'creation_date' => 'creation_log_entry.time',
         'creation_admin_id' => 'creation_log_entry.administrator_id',
         'creation_admin_name' => 'creation_log_entry.administrator_name',
+        'state' => 'di_runtime.state',
+        'state_ts' => 'di_runtime.state_ts',
+        'elapsed_time' => 'di_runtime.elapsed_time',
+        'auto_publish' => 'di_runtime.auto_publish',
+        'foreign_id' => 'di_runtime.foreign_id',
+        'expiration_time_soft' => 'di_runtime.expiration_time_soft',
+        'expiration_time_hard' => 'di_runtime.expiration_time_hard',
+        'percentage' => 'di_runtime.percentage',
+        'error_code' => 'di_runtime.error_code',
+        'status_message' => 'di_runtime.status_message',
     },
     
     User => {
@@ -1634,7 +1681,7 @@ my $DBIX_JOIN_VALUE = {
 
     OSF => [ qw(tenant vms), qw(creation_log_entry)],
 
-    DI => [qw(vm_runtimes tags), {osf => 'tenant'}, qw(creation_log_entry)],
+    DI => [qw(vm_runtimes tags), {osf => 'tenant'}, qw(creation_log_entry), 'di_runtime'],
 
     DI_Tag => [{di => {osf => 'tenant'}}],
 
@@ -1714,6 +1761,7 @@ my $DBIX_HAS_ONE_RELATIONSHIPS = {
     Host => [qw(runtime counters)],
     Tenant => [qw(wat_setups)],
     Administrator => [qw(wat_setups)],
+    DI => [qw(di_runtime)]
 };
 
 
