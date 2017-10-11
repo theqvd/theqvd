@@ -1,32 +1,58 @@
-msys2:
-  url: http://repo.msys2.org/distrib/i686/msys2-i686-20161025.exe
-  script-url: https://raw.githubusercontent.com/msys2/msys2-installer/master/auto-install.js
-  prefix: c:/msys32/
-  commands:
+run:
+  do:
+    - build
+    - pack
+  workdir: c:/temp
+  msys2:
+    prefix: c:/msys32/
     wrapper: usr/bin/bash --login -c
-    update:
-      - pacman -Syu --noconfirm
-      - pacman -Su --noconfirm
-    install: pacman -S --noconfirm
-  packages:
-    - perl
-    - git
+  mingw32:
+    prefix: mingw32
+  perl:
+    prefix: c:/strawberry/
 
-perl:
-  url: http://strawberryperl.com/download/5.26.1.1/strawberry-perl-5.26.1.1-32bit.msi
-  prefix: c:/strawberry/
-  modules:
-    cpan:
-
-    git:
-      - url: 
-        branch:
-
-pulseaudio:
-  repository:
-    url: https://github.com/theqvd/pulseaudio.git
-    branch: opus
-  build:
+setup:
+  msys2:
+    url: http://repo.msys2.org/distrib/i686/msys2-i686-20161025.exe
+    autoinstall-script-url: https://raw.githubusercontent.com/msys2/msys2-installer/master/auto-install.js
+    product: MSYS2
     commands:
-      - ./autogen.sh
-      
+      update:
+        - pacman -Syu --noconfirm
+        - pacman -Su --noconfirm
+      install: pacman -S --noconfirm --needed
+      uninstall: maintenancetool.exe
+    packages:
+      - perl
+      - git
+      - msys2-devel
+      - mingw-w64-i686-toolchain
+      - mingw-w64-i686-libtool
+      - intltool
+      - autoconf
+      - automake
+      - tar
+
+  perl:
+    url: http://strawberryperl.com/download/5.26.1.1/strawberry-perl-5.26.1.1-32bit.msi
+    product: Strawberry Perl
+    modules:
+      cpan:
+        - Config::Properties
+      git:
+        - url: foo
+          branch: bar
+
+  cygwin:
+    url:
+
+build:
+  pulseaudio:
+    repository:
+      url: https://github.com/theqvd/pulseaudio.git
+      branch: opus
+    build:
+      commands:
+        autogen: ./autogen.sh
+        make: make
+        install: make install

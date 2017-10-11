@@ -1,0 +1,68 @@
+Usage: C:/Users/Salva/AppData/Local/Temp/06GbLAzJZJ/msys2-i686-20161025.exe [options] Key=Value
+
+Options:
+  -?, -h, --help                       Displays this help.
+  --version                            Displays version information.
+  --framework-version                  Displays the version of the Qt Installer
+                                       Framework.
+  -v, --verbose                        Verbose mode. Prints out more
+                                       information.
+  --proxy                              Use system proxy on Windows and Linux.
+                                       This option has no effect on OS X.
+  --script <file>                      Execute the script given as argument.
+  --checkupdates                       Check for updates and return an XML
+                                       description.
+  --updater                            Start application in updater mode.
+  --manage-packages                    Start application in package manager
+                                       mode.
+  --no-force-installations             Allow deselecting components that are
+                                       marked as forced.
+  --show-virtual-components            Show virtual components in installer and
+                                       package manager.
+  --logging-rules <rules>              Enables logging according to passed
+                                       rules. Comma separated logging rules have
+                                       the following syntax:
+                                       loggingCategory=true/false. Passing empty
+                                       logging rules enables all logging
+                                       categories. The following rules enable a
+                                       single category:
+                                       ifw.*=false,ifw.category=true The
+                                       following logging categories are
+                                       available:
+                                       ifw.componentChecker
+                                       ifw.resources
+                                       ifw.translations
+                                       ifw.network
+  --create-local-repository            Create a local repository inside the
+                                       installation directory. This option has
+                                       no effect on online installers.
+  --addRepository <URI,...>            Add a local or remote repository to the
+                                       list of user defined repositories.
+  --addTempRepository <URI,...>        Add a local or remote repository to the
+                                       list of temporary available repositories.
+  --setTempRepository <URI,...>        Set a local or remote repository as
+                                       temporary repository, it is the only one
+                                       used during fetch.
+                                       Note: URI must be prefixed with the
+                                       protocol, i.e. file:///, https://,
+                                       http:// or ftp://.
+  --startserver <mode,socketname,key>  Starts the application as headless
+                                       process waiting for commands to execute.
+                                       Mode can be DEBUG or PRODUCTION. In DEBUG
+                                       mode, the option values can be
+                                       omitted.Note: The server will not
+                                       shutdown on his own, you need to quit the
+                                       process by hand.
+  --startclient <socketname,key>       Starts the application to debug the
+                                       client-server communication. If a value
+                                       is omitted, the client will use a default
+                                       instead. Note: The server process is not
+                                       started by the client application in that
+                                       case, you need to start it on your own.
+  --platform <platform-plugin>         Use specified platform plugin. The
+                                       'minimal' platform plugin can be used to
+                                       run in headless mode.
+
+Arguments:
+  Key=Value                            Key Value pair to be set.
+
