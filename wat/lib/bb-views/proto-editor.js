@@ -8,7 +8,9 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
         switch (params.action) {
             case 'create':
                 this.templateEditor = Wat.TPL['editorNew_' + this.qvdObj];
-                this.model = this.getModel('create', params.parentView);
+                if (params.parentView.qvdObj != 'config') {
+                    params.parentView.model = this.getModel('create', params.parentView);
+                }
                 this.renderCreate(params.el, params.parentView);
                 break;
             case 'update':
@@ -256,8 +258,8 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
         $(that.editorPropertiesContainer).html(that.template);
         
         Wat.T.translate();
-
-        if (that.editorMode != 'create' || !Wat.C.isSuperadmin()) {
+        
+        if ($('[name="tenant_id"]').val() == undefined) {
             $('.js-editor-property-row').show();
         }
         else if (Wat.C.isMultitenant() && Wat.C.isSuperadmin() && $('[name="tenant_id"]').val() != undefined) {
@@ -280,7 +282,7 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
     getModel: function (action, view) {
         switch (action) {
             case 'create':
-                var model = new Wat.Models.OSF();
+                var model = Wat.U.getModelFromQvdObj(this.qvdObj);
                 break;
             case 'update':
                 if (view.viewKind == 'list') {
@@ -445,7 +447,7 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
         }
         
         $('[data-tab-field]').hide();
-        $('[data-tab-field="' + tab + '"]').show();
+        $('[data-tab-field="' + tab + '"]:not(.hidden-by-conf)').show();
         
         $('[data-tab]').removeClass('tab-active');
         $('[data-tab="' + tab + '"]').addClass('tab-active');

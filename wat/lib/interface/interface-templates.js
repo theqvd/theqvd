@@ -4,7 +4,7 @@ Wat.I.T = {
         var templates = {};
 
         switch(code) {
-            case 'starting':        
+            case 'starting':
                 templates = {
                     main: {
                         name: 'common/main'
@@ -91,14 +91,6 @@ Wat.I.T = {
                     layoutMobile: {
                         name: 'details/layout-mobile'
                     }
-                }
-                
-                switch (params.qvdObj) {
-                    case 'osf':
-                        templates['osfDiLogOsd'] = {
-                            name: 'details/osf-di-log-osd'
-                        };
-                        break;
                 }
                 break;
             case 'doc':
@@ -197,6 +189,9 @@ Wat.I.T = {
                     },
                     editorAffectedVMList: {
                         name: 'editor/affected-vms-list'
+                    },
+                    diProgressBar: {
+                        name: 'details/di-progress-bar'
                     }
                 };
                 break;

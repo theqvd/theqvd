@@ -3,6 +3,7 @@ Wat.Models.Model = Backbone.Model.extend({
     id: 0,
     detailsView: false,
     operation: '',
+    endpoint: '',
     
     parse: function(response) {
         if (response.rows) {
@@ -82,6 +83,10 @@ Wat.Models.Model = Backbone.Model.extend({
         }
     },
     
+    setEndpoint: function (endpoint) {
+        this.endpoint = endpoint;
+    },
+    
     sync: function(method, model, options) {        
         var that = this;
         var params = _.extend({
@@ -98,7 +103,7 @@ Wat.Models.Model = Backbone.Model.extend({
     
     save: function(attributes, options) { 
         options = {
-            url: encodeURI(Wat.C.getBaseUrl() + 
+            url: encodeURI(Wat.C.getBaseUrl({endpoint: this.endpoint}) + 
                 "&action=" + this.operation +
                 "&filters=" + JSON.stringify(options.filters) + 
                 "&arguments=" + JSON.stringify(attributes) +

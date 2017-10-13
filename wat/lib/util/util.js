@@ -340,7 +340,7 @@ Wat.U = {
     
     
     getViewFromQvdObj: function (qvdObjSearch) {
-        var view = Wat.CurrentView;
+        var view = false;
         
         $.each(Wat.CurrentView.embeddedViews, function (qvdObj, eView) {
             if (qvdObjSearch == qvdObj) {
@@ -349,7 +349,23 @@ Wat.U = {
             }
         });
         
-        return view;
+        if (view) {
+            return view;
+        }
+        
+        $.each(Wat.CurrentView.sideViews, function (qvdObj, eView) {
+            if (qvdObjSearch == eView.qvdObj) {
+                view = eView;
+                return false;
+            }
+        });
+        
+        if (view) {
+            return view;
+        }
+        else {
+            return Wat.CurrentView;
+        }
     },
     
     setFormChangesOnModel: function (wrapperSelector, model) {

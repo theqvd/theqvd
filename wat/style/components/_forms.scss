@@ -51,10 +51,6 @@ input {
     line-height: $height_input;
 }
 
-textarea, input[type="text"], input[type="password"] {
-    border: 1px solid #bbb !important;
-}
-
 select, input, textarea, .button, .button2 {
     border-radius: $form_elements_radius;
     border-style: solid;
@@ -62,6 +58,10 @@ select, input, textarea, .button, .button2 {
     -webkit-box-shadow: inset 1px 1px 1px 0px #dddddd;
        -moz-box-shadow: inset 1px 1px 1px 0px #dddddd;
             box-shadow: inset 1px 1px 1px 0px #dddddd;
+}
+
+textarea, input[type="text"], input[type="password"] {
+    border: 1px solid #bbb;
 }
 
 .button2 {

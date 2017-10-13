@@ -88,9 +88,6 @@ Wat.B = {
         $(window).off('scroll');
         $(window).on('scroll', this.navigationBinds.onScroll);
         
-        // Kind of image source in DI creation
-        this.bindEvent('change', 'select[name="images_source"]', this.navigationBinds.toggleImagesource);
-        
         // Propagate click in cells with links
         this.bindEvent('mouseenter', 'td.cell-link', function (e) { 
             var firstLink = $(e.target).find('a')[0];
@@ -308,28 +305,6 @@ Wat.B = {
         unforceDesktopMode: function () {
             $.removeCookie('forceDesktop', { path: '/' });
             window.location.reload();
-        },
-        
-        toggleImagesource: function (e) {
-            var selectedSource = $(e.target).val();
-            
-            switch (selectedSource) {
-                case 'computer':
-                    $('.image_computer_row').show();
-                    $('.image_staging_row').hide();
-                    $('.image_url_row').hide();
-                    break;
-                case 'staging':
-                    $('.image_computer_row').hide();
-                    $('.image_staging_row').show();
-                    $('.image_url_row').hide();
-                    break;
-                case 'url':
-                    $('.image_computer_row').hide();
-                    $('.image_staging_row').hide();
-                    $('.image_url_row').show();
-                    break;
-            }
         },
         
         onScroll: function () {

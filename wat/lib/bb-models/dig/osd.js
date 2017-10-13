@@ -156,6 +156,11 @@ Wat.Models.OSD = Wat.Models.DIG.extend({
         
         var plugin = this.getPluginDef(pluginId);
         
-        return plugin.plugin[attr].settings[setting].list_options;
+        if (plugin.plugin) {
+            return plugin.plugin[attr].settings[setting].list_options;
+        }
+        else {
+            return {};
+        }
     },
 });

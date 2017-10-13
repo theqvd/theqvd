@@ -9,7 +9,11 @@
         </td>
         <td class="settings-box settings-box-distro" colspan=2>
             <div class="fleft setting-row os-row js-os-row">
-                <div class="settings-box-element-value" ><img class="os-icon" src="<%= distro.icon %>"><span class="os-name"><%= distro.value %></span></div>
+                <div class="settings-box-element-value" >
+                    <img class="os-icon" src="<%= distro.icon %>">
+                    <span class="os-name"><%= distro.value %></span>
+                    <input type="hidden" name="os-name" value="<%= distro.value %>">
+                </div>
             </div>
             <% if (shrinked) { %>
                 <a class="button2 fright fa fa-chevron-down js-expand-os-conf">More</a>

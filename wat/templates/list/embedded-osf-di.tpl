@@ -11,7 +11,6 @@
     </thead>
     <tbody>
     <% $.each(models, function (iModel, model) {
-            var state = Wat.C.getDIStatus(model.get('id'));
             if (shrinkFactor == iModel) {
                 %>
                     <tr class="js-rows-unshrink-row rows-unshrink-row">
@@ -23,7 +22,7 @@
             }
             
     %>
-        <tr class="di-row-state-<%= state %> <%= shrinkFactor <= iModel ? 'hidden' : '' %> js-shrinked-row">
+        <tr class="di-row-state-<%= model.get('state') %> <%= shrinkFactor <= iModel ? 'hidden' : '' %> js-shrinked-row">
             <td class="cell-check">
                 <input type="checkbox" 
                     class="check-it js-check-it" 
@@ -35,15 +34,16 @@
             </td>
             <td class="desktop max-1-icons">
                 <% 
-                switch (state) { 
-                    case 'creating':
+                switch (model.get('state')) { 
+                    case 'new':
+                    case 'generating':
                         %>
                             <i class="fa fa-magic faa-wrench animated" title="Being created"></i>
                         <%
                         break;
-                    case 'scheduled':
+                    case 'ready':
                         %>
-                            <i class="fa fa-calendar" title="Scheduled: 2 days"></i>
+                            <i class="fa fa-thumbs-up" title="Ready"></i>
                         <%
                         break;
                     case 'published':
@@ -76,18 +76,33 @@
                     <i class="fa fa-lock" data-i18n="[title]Blocked" title="<%= i18n.t('Blocked') %>"></i>
                 <%
                 }
+
+                if (model.get('auto_publish') && model.get('state') != 'published' && model.get('state') != 'ready') {
+                %>
+                    <i class="fa fa-rocket" data-i18n="[title]Will be published" title="<%= i18n.t('Will be published') %>"></i>
+                <%
+                }
+                
+                if (model.get('expiration_time_hard') != null && model.get('state') != 'published' && model.get('state') != 'ready') {
+                %>
+                    <i class="fa fa-clock-o" data-i18n="[title]Affected machines will expire" title="<%= i18n.t('Affected machines will expire') %>: <%= model.get('expiration_time_hard')  %> seconds after generation"></i>
+                <%
+                }
                 %>
             </td>
             <td class="col-width-40">
                 <%= model.get('version') %>
+                <% if (model.get('state') != 'generating' && model.get('state') != 'new') { %>
                 <div class="second_row">
                     <span class="fa fa-database">
                         <%= model.get('disk_image') %>
                     </span>
                 </div>
             <%
+                }
                 if (model.get('description')) {
                     switch(model.get('state')) {
+                        case 'new':
                         case 'generating':
                         case 'uploading':
             %>
@@ -106,6 +121,7 @@
             <%
                 if (model.get('description')) {
                     switch(model.get('state')) {
+                        case 'new':
                         case 'generating':
                         case 'uploading':
                             break;
@@ -120,46 +136,8 @@
                             break;
                     }
                 }
-                var statusStr = '';
-                switch(model.get('state')) {
-                    case 'generating':
-                        statusStr = 'Generating';
-                        break;
-                    case 'uploading':
-                        statusStr = 'Uploading';
-                        break;
-                }
-                
-                switch (model.get('state')) {
-                    case 'generating':
-                    case 'uploading':
-                        %>
-                            <div data-wsupdate="percentage" data-id="<%= model.get('id') %>" class="progressbar" data-percent="<%= model.get('percentage') %>" data-remaining="<%= model.get('remaining_time') %>" data-elapsed="<%= model.get('elapsed_time') %>" data-status-str="<%= statusStr %>">
-                                <div class="progress-label"><span data-i18n="Loading"></span></div>
-                            </div>
-                            <div class="second_row">
-                                <div>
-                                    <span class="fa fa-clock-o">
-                                        <span data-i18n="Elapsed time"></span>: <span class="progress-elapsed">-</span>
-                                    </span>
-                                </div>
-                                <div>
-                                    <span class="fa fa-clock-o">
-                                        <span data-i18n="Remaining time"></span>: <span class="progress-remaining">-</span>
-                                    </span>
-                                </div>
-                            </div>
-                        <%
-                        break;
-                    case 'scheduled':
-                        %>
-                            <div class="second_row">The disk image is not public yet.</div>
-                            <div class="second_row">It will be published and ready to use at:</div>
-                            <div class="second_row"><%= (new Date()).toISOString().substring(0, 16).replace('T',' ') %> (In 03:04:32)</div>
-                        <%
-                        break;
-                } 
                 %>
+                <div class="bb-di-progress" data-id="<%= model.get('id') %>"></div>
             </td>
         </tr>
     <% }); %>

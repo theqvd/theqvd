@@ -507,3 +507,18 @@ div.tagsinput span.tag a {
 .ui-progressbar-value {
     background: lighten($col_brand, 20);
 }
+
+// jQuery spinner
+
+.ui-spinner {
+    border: 1px solid #bbb;
+    -webkit-box-shadow: inset 1px 1px 1px 0px #dddddd;
+       -moz-box-shadow: inset 1px 1px 1px 0px #dddddd;
+            box-shadow: inset 1px 1px 1px 0px #dddddd;
+    width: 60px;
+}
+
+.ui-spinner-input {
+    border: none !important;
+    box-shadow: 0 0 !important;
+}

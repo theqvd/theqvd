@@ -20,6 +20,36 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
     renderProgressBars: function () {
         var that = this;
         
+        $.each(that.collection.models, function (i, model) {
+            var statusStr = '';
+            
+            switch(model.get('state')) {
+                case 'new':
+                case 'generating':
+                    statusStr = 'Generating';
+                    break;
+                case 'uploading':
+                    statusStr = 'Uploading';
+                    break;
+                default:
+                    // Exit from loop iteration (Do not show progressBar)
+                    return;
+            }
+            
+            this.template = _.template(
+                Wat.TPL.diProgressBar, {
+                    id: model.get('id'),
+                    state: model.get('state'),
+                    percentage: model.get('percentage'),
+                    remainingTime: model.get('remaining_time'),
+                    elapsedTime: model.get('elapsed_time'),
+                    statusStr: statusStr
+                }
+            );
+
+            $('.bb-di-progress[data-id="' + model.get('id') + '"]').html(this.template);
+        });
+        
         var progressBars = $("." + this.cid + " .progressbar");
 
         $.each (progressBars, function (i, progressBar) {

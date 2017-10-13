@@ -58,9 +58,13 @@ Wat.C = {
     },
 
     // Get the base URL for API calls using credentials or session ID
-    getBaseUrl: function () {
+    getBaseUrl: function (options) {
+        var options = options || {};
+        
+        options.endpoint = options.endpoint || '';
+        
         if (this.login && this.password) {
-            var baseUrl = this.getApiUrl() + "?login=" + this.login + "&password=" + this.password;
+            var baseUrl = this.getApiUrl() + options.endpoint + "?login=" + this.login + "&password=" + this.password;
             
             if (this.multitenant && this.tenant != undefined) {
                 baseUrl += "&tenant=" + this.tenant;
@@ -69,7 +73,7 @@ Wat.C = {
             return baseUrl;
         }
         else {
-            return this.getApiUrl() + "?" + Wat.C.getUrlSid();
+            return this.getApiUrl() + options.endpoint + "?" + Wat.C.getUrlSid();
         }
     },
     
@@ -639,20 +643,5 @@ Wat.C = {
         // if auto get first two characters from i18n language to get ISO 639-1 format. 
         // Example: Convert 'en_US' to 'en'
         return lan == "auto" ? window.i18n.lng().substr(0, 2) : lan;
-    },
-    
-    // Just for mock TODO: Delete
-    getDIStatus: function (id) {
-        var state = 'published';
-            
-        if (id == '10000') {
-            state = 'scheduled';
-        }
-
-        if (id == '10026') {
-            state = 'creating';
-        }
-        
-        return state;
     }
 }

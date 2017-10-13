@@ -18,6 +18,9 @@ switch (dFieldCode) {
             <div class="second_row" data-i18n="Last image created on this OSF"></div>
         <%
         break;
+    case 'state':
+            print(model.get('state'));
+        break;
     case 'tags':
         if (!model.get('tags')) {
         %>

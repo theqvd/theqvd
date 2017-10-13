@@ -33,6 +33,9 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
             
             // Remove row
             $('tr[data-dis-row="' + id + '"]').remove();
+            
+            // Stop progress bar interval
+            clearInterval(Wat.CurrentView.embeddedViews.di.intervals['localDiProgressTime']);
         }
         else {
             // Uncheck all OSF checks

@@ -112,13 +112,11 @@
                 </td>
             </tr>
         <%
-        }                
+        }
         _.each(models, function(model) {
-            var state = Wat.C.getDIStatus(model.get('id'));
-            
             var cleanName = model.get('disk_image').substr(model.get('disk_image').indexOf('-')+1);
         %>
-            <tr class="di-row-state-<%= state %> row-<%= model.get('id') %>" data-name="<%= cleanName %>" data-id="<%= model.get('id') %>">
+            <tr class="di-row-state-<%= model.get('state') %> row-<%= model.get('id') %>" data-name="<%= cleanName %>" data-id="<%= model.get('id') %>">
                 <% 
                     $.each(columns, function(name, col) {
                         if (col.display == false) {
@@ -139,18 +137,16 @@
                 %>
                                 <td class="desktop max-1-icons">
                                 <% 
-                                    switch (state) { 
-                                        case 'creating':
+                                    switch (model.get('state')) { 
+                                        case 'new':
+                                        case 'generating':
                                             %>
                                                 <i class="fa fa-magic faa-wrench animated" title="Being created"></i>
                                             <%
                                             break;
-                                        case 'scheduled':
+                                        case 'ready':
                                             %>
-                                                <i class="fa fa-calendar" title="Scheduled: 2 days"></i>
-                                                <div class="second_row">
-
-                                                </div>
+                                                <i class="fa fa-thumbs-up" title="Ready"></i>
                                             <%
                                             break;
                                         case 'published':
@@ -183,6 +179,18 @@
                                         <i class="fa fa-lock" data-i18n="[title]Blocked" title="<%= i18n.t('Blocked') %>"></i>
                                     <%
                                     }
+                                    
+                                    if (model.get('auto_publish') && model.get('state') != 'published' && model.get('state') != 'ready') {
+                                    %>
+                                        <i class="fa fa-rocket" data-i18n="[title]Will be published" title="<%= i18n.t('Will be published') %>"></i>
+                                    <%
+                                    }
+                                    
+                                    if (model.get('expiration_time_hard') != null && model.get('state') != 'published' && model.get('state') != 'ready') {
+                                    %>
+                                        <i class="fa fa-clock-o" data-i18n="[title]Affected machines will expire" title="<%= i18n.t('Affected machines will expire') %>: <%= model.get('expiration_time_hard')  %> seconds after generation"></i>
+                                    <%
+                                    }
                                     %>
                                 </td>
                 <%
@@ -210,31 +218,7 @@
                                     <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'di.see-details.') %>
                                         <span class="text"><%= model.get('disk_image') %></span>
                                     <%= Wat.C.ifACL('</a>', 'di.see-details.') %>
-                                    
-                                    <%
-                                        var statusStr = '';
-                                        switch(model.get('state')) {
-                                            case 'generating':
-                                                statusStr = 'Generating';
-                                                break;
-                                            case 'uploading':
-                                                statusStr = 'Uploading';
-                                                break;
-                                        }
-                                        
-                                        switch(model.get('state')) {
-                                            case 'generating':
-                                            case 'uploading':
-                                                %>
-                                                    <div data-wsupdate="percentage" data-id="<%= model.get('id') %>" class="progressbar" data-percent="<%= model.get('percentage') %>" data-remaining="<%= model.get('remaining_time') %>" data-elapsed="<%= model.get('elapsed_time') %>" data-status-str="<%= statusStr %>">
-                                                        <div class="progress-label">
-                                                            <span data-i18n="Loading"></span>...
-                                                        </div>
-                                                    </div>
-                                                <%
-                                                break;
-                                        }
-                                    %>
+                                    <div class="bb-di-progress" data-id="<%= model.get('id') %>"></div>
                                 </td>
                 <%
                                 break;

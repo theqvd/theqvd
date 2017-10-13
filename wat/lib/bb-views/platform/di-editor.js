@@ -9,13 +9,19 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
     
     editorEvents: {
         'change select[name="osf_id"]': 'changeOSF',
-        'click .js-expand-os-conf': 'toggleOSConfigExpanded'
+        'click .js-expand-os-conf': 'toggleOSConfigExpanded',
+        'change select[name="images_source"]': 'changeImagesource',
+        'change select[name="expire_vms"]': 'changeExpireVms',
+        'change .js-scheduler-hours': 'changeSchedulerHours',
+        'click .js-scheduler-hours + .ui-spinner-button': 'changeSchedulerHours',
+        'click .js-scheduler-hours + .ui-spinner-button + .ui-spinner-button': 'changeSchedulerHours',
+        'click .js-scheduler-minutes + .ui-spinner-button': 'changeSchedulerMinutes',
+        'click .js-scheduler-minutes + .ui-spinner-button + .ui-spinner-button': 'changeSchedulerMinutes'
     },
     
     renderCreate: function (target, that) {
         if (Wat.CurrentView.qvdObj == 'osf') {
-            Wat.CurrentView.embeddedViews.di = Wat.CurrentView.embeddedViews.di || {};
-            Wat.CurrentView.embeddedViews.di.model = new Wat.Models.DI();
+            this.model = new Wat.Models.DI();
         }
         else {
             Wat.CurrentView.model = new Wat.Models.DI();
@@ -60,10 +66,10 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
                 $('[name="tenant_id"]').parent().parent().remove();
             }
             
-            this.toggleSoftwareFields(Wat.CurrentView.id);
+            this.toggleSoftwareFields(userHidden.value);
         }
         else {
-            // Fill OSF select on virtual machines creation form
+            // Fill OSF select on disk images creation form
             var params = {
                 'actionAuto': 'osf',
                 'selectedId': $('.' + this.cid + ' .filter select[name="osf"]').val(),
@@ -82,22 +88,31 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
             }
         }
         
-        $('select[name="images_source"]').trigger('change');
         Wat.I.chosenElement('select[name="images_source"]', 'single100');
+        Wat.I.chosenElement('select[name="publish"]', 'single100');
+        Wat.I.chosenElement('select[name="expire_vms"]', 'single100');
+        $('[name="expire_vms_hours"]').spinner();
+        $('[name="expire_vms_minutes"]').spinner();
     },
     
     renderUpdate: function (target, that) {
         Wat.Views.EditorView.prototype.renderUpdate.apply(this, [target, that]);
         
         $('.ui-dialog-titlebar').html($.i18n.t('Edit Disk image') + ": " + this.model.get('disk_image'));
-
+        
         // Configure tags inputs
         Wat.I.tagsInputConfiguration();
+        
+        this.toggleSoftwareFields(this.model.get('osf_id'));
+        
+        Wat.I.chosenElement('select[name="publish"]', 'single100');
+        Wat.I.chosenElement('select[name="expire_vms"]', 'single100');
+        $('[name="expire_vms_hours"]').spinner();
+        $('[name="expire_vms_minutes"]').spinner();
     },
     
     createElement: function () {
         var properties = this.parseProperties('create');
-                
         var context = $('.' + this.cid + '.editor-container');
 
         var blocked = context.find('input[name="blocked"][value=1]').is(':checked');
@@ -145,19 +160,34 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
         var osdId = context.find('input[name="osd_id"]').val();
         
         if (osdId) {
-            var imageModel = new Wat.Models.Plugin({}, {osdId: osdId, pluginId: 'image'});
+            switch (context.find('select[name="publish"]').val()) {
+                case 'no':
+                    arguments["auto_publish"] = false;
+                    break;
+                case 'when_finish':
+                    arguments["auto_publish"] = true;
+                    break;
+            }
             
-            imageModel.save({name: 'image_name'}, {
-                complete: function () {
-                    Wat.I.M.showMessage({message: 'Succesfully created', messageType: 'success'});
-                    
-                    // If view is OSF details, render DI progress monitoring
-                    if (Wat.CurrentView.qvdObj == 'osf') {
-                        Wat.CurrentView.renderDiProgress(osdId);
-                        $('.js-details-option[data-details-target="activity"]').trigger('click');
-                    }
-                }
-            });
+            switch (context.find('select[name="expire_vms"]').val()) {
+                case 'no':
+                    // No send expiration parameters
+                    break;
+                case 'when_finish':
+                    arguments["expiration_time_soft"] = 0;
+                    arguments["expiration_time_hard"] = 0;
+                    break;
+                case 'after_finish':
+                    arguments["expiration_time_soft"] = 0;
+                    var hours = parseInt(context.find('input[name="expire_vms_hours"]').val());
+                    var minutes = parseInt(context.find('input[name="expire_vms_minutes"]').val());
+                    arguments["expiration_time_hard"] = ((hours * 60) + minutes) * 60;
+                    break;
+            }
+            
+            arguments.disk_image = context.find('input[name="os-name"]').val();
+            
+            this.createDig(arguments);
         }
         else {
             var image_source = context.find('select[name="images_source"]').val();
@@ -234,6 +264,36 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
         
         that.tagChanges = arguments['__tags_changes__'];
         
+        var osdId = context.find('input[name="osd_id"]').val();
+        
+        if (osdId) {
+            switch (context.find('select[name="publish"]').val()) {
+                case 'no':
+                    arguments["auto_publish"] = false;
+                    break;
+                case 'when_finish':
+                    arguments["auto_publish"] = true;
+                    break;
+            }
+            
+            switch (context.find('select[name="expire_vms"]').val()) {
+                case 'no':
+                    arguments["expiration_time_soft"] = null;
+                    arguments["expiration_time_hard"] = null;
+                    break;
+                case 'when_finish':
+                    arguments["expiration_time_soft"] = 0;
+                    arguments["expiration_time_hard"] = 0;
+                    break;
+                case 'after_finish':
+                    arguments["expiration_time_soft"] = 0;
+                    var hours = parseInt(context.find('input[name="expire_vms_hours"]').val());
+                    var minutes = parseInt(context.find('input[name="expire_vms_minutes"]').val());
+                    arguments["expiration_time_hard"] = ((hours * 60) + minutes) * 60;
+                    break;
+            }
+        }
+        
         that.updateModel(arguments, filters, that.checkMachinesChanges);
     },
     
@@ -256,21 +316,20 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
                 $('input[name="osd_id"]').val(osdId);
                 
                 if (osdId) {
-                    $('.js-custom-image-row').hide();
+                    $('.js-custom-image-row').hide().addClass('hidden-by-conf');
+                    $('.js-osd-row').removeClass('hidden-by-conf');
+
                     
                     Wat.DIG.fetchOSD(osdId, function (OSDmodel) {
                         Wat.DIG.renderOSDetails(OSDmodel, {
                             shrinked: true,
                             container: '.' + that.cid
                         });
-                        
-                        $('.js-osd-row').show();
                     });
                 }
                 else { 
-                    $('.js-osd-row').hide();
-                    $('.js-custom-image-row').show();
-                    $('select[name="images_source"]').trigger('change');
+                    $('.js-osd-row').addClass('hidden-by-conf');
+                    $('.js-custom-image-row').removeClass('hidden-by-conf');
                 }
             }
         });
@@ -302,6 +361,23 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
         Wat.WS.openWebsocket (this.qvdObj, 'di_create', {
                 arguments: args
         }, this.creatingProcessStaging, 'staging');
+    },
+    
+    createDig: function (args) {
+        var that = this;
+        
+        var realView = Wat.I.getRealView(this);
+        
+        realView.model.setEndpoint('di/generate');
+        realView.model.setOperation('create');
+        realView.model.save(args, {
+            filters: {}
+        }).complete(function (e) {
+            realView.fetchList();
+            realView.checkMachinesChanges(that);
+            
+            Wat.I.M.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
+        });
     },
     
     creatingProcessStaging: function (qvdObj, id, data, ws) {
@@ -356,4 +432,93 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
             Wat.I.M.showMessage({message: i18n.t('Error creating'), messageType: 'error'});
         });
     },
+    
+    changeImagesource: function (e) {
+        var selectedSource = $(e.target).val();
+        
+        var that = Wat.U.getViewFromQvdObj('di');
+        var that = Wat.CurrentView;
+        that.editorView.toggleImageSource(selectedSource);
+    },
+    
+    toggleImageSource: function (selectedSource) {
+        switch (selectedSource) {
+            case 'computer':
+                $('.image_computer_row').show();
+                $('.image_staging_row').hide();
+                $('.image_url_row').hide();
+                break;
+            case 'staging':
+                $('.image_computer_row').hide();
+                $('.image_staging_row').show();
+                $('.image_url_row').hide();
+                break;
+            case 'url':
+                $('.image_computer_row').hide();
+                $('.image_staging_row').hide();
+                $('.image_url_row').show();
+                break;
+        }
+    },
+    
+    switchEditorTab: function (tab) {
+        Wat.Views.EditorView.prototype.switchEditorTab.apply(this, [tab]);
+        
+        if (tab == 'image') {
+            // Reset visibility of image source control
+            $('.js-custom-image-row--source').hide();
+            if ($('select[name="images_source"]').closest('tr').css('display') != 'none') {
+                $('select[name="images_source"]').trigger('change');
+            }
+            
+            $('.js-expire-vms-scheduler').hide();
+            if ($('select[name="expire_vms"]').closest('tr').css('display') != 'none') {
+                $('select[name="expire_vms"]').trigger('change');
+            }
+        }
+    },
+    
+    changeExpireVms: function (e) {
+        switch ($(e.target).val()) {
+            case 'after_finish':
+                $('.js-expire-vms-scheduler').show();
+                break;
+            default:
+                $('.js-expire-vms-scheduler').hide();
+                break;
+        }
+    },
+    
+    changeSchedulerHours: function (e) {
+        var field = $(e.target).closest('.ui-spinner-button').parent().find('input');
+        var hours = parseInt($(field).val());
+        
+        if (hours < 0) {
+            hours = 0;
+        }
+        
+        $(field).val(hours);
+    },
+    
+    changeSchedulerMinutes: function (e) {
+        var field = $(e.target).closest('.ui-spinner-button').parent().find('input');
+        var minutes = parseInt($(field).val());
+        
+        // Minutes will be updated 5 by 5
+        if (minutes % 5 < 3) {
+            minutes = Math.ceil(minutes / 5) * 5;
+        }
+        else {
+            minutes = Math.floor(minutes / 5) * 5;
+        }
+        
+        if (minutes < 0) {
+            minutes = 0;
+        }
+        else if (minutes > 59) {
+            minutes = 55;
+        }
+        
+        $(field).val(minutes);
+    }
 });
