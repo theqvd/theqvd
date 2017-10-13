@@ -86,10 +86,14 @@ sub runcmd {
 sub skip_for {
     my $action = shift;
     my $tag = $action;
-    do {
-        return 1 if $do{$tag};
-        last if $skip{$tag};
-    } while ($tag =~ s/-[^\-]*$//);
+    while (1) {
+        if ($do{$tag}) {
+            $log->debug("Doing action $action");
+            return 1;
+        }
+        $skip{$tag} and last;
+        $tag =~ s/-[^\-]*$// or last;
+    }
     no warnings 'exiting';
     $log->warn("Skipping action $action");
     last SKIP;
@@ -162,9 +166,21 @@ sub mkcmd_mingw32 {
     state $env = do {
         my $prefix = path($cfg->{run}{mingw32}{prefix})
             ->absolute($cfg->{run}{msys2}{prefix});
-        my $msys_prefix = posix_quote(w32_path_to_msys($prefix));
-        my $msys_bin = posix_quote(w32_path_to_msys($prefix->child('bin')));
-        "MSYSTEM=MINGW32 MINGW_PREFIX=$msys_prefix PATH=$msys_bin:\$PATH";
+        my $mingw32_prefix = posix_quote(w32_path_to_msys($prefix));
+        my $mingw32_bin = posix_quote(w32_path_to_msys($prefix->child('bin')));
+        my $mingw32_aclocal = posix_quote(w32_path_to_msys($prefix->child('share/aclocal')));
+        my $mingw32_lib_pkgconfig = posix_quote(w32_path_to_msys($prefix->child('lib/pkgconfig')));
+        my $mingw32_share_pkgconfig = posix_quote(w32_path_to_msys($prefix->child('share/pkgconfig')));
+        my %env = ( MSYSTEM => 'MINGW32',
+                    MSYSTEM_PREFIX => $mingw32_prefix,
+                    MINGW_PREFIX => $mingw32_prefix,
+                    PATH => "$mingw32_bin:\$PATH",
+                    CONFIG_SITE => posix_quote(w32_path_to_msys($prefix->child('etc/config.site'))),
+                    MSYSTEM_CHOST => 'i686-w64-mingw32',
+                    MINGW_CHOST => 'i686-w64-mingw32',
+                    ACLOCAL_PATH => "$mingw32_aclocal:\$ACLOCAL_PATH",
+                    PKG_CONFIG_PATH => "$mingw32_lib_pkgconfig:$mingw32_share_pkgconfig" );
+        join ' ', map { "$_=$env{$_}" } sort keys %env;
     };
 
     mkcmd_msys_c("$env ". mkcmd_msys_c(@_));
@@ -284,57 +300,75 @@ sub git_in {
 }
 
 sub build_pulseaudio {
-    my $pa = $cfg->{build}{pulseaudio};
-    my $commands = $pa->{build}{commands};
-    my $repo_url = $pa->{repository}{url};
-    my $branch = $pa->{repository}{branch};
-    my $pa_wd = $wd->child('pulseaudio');
-    my $pa_src = $pa_wd->child('src');
-    my $pa_out = $pa_wd->child('out');
+    build_from_git('pulseaudio');
+}
+
+sub build_win_sftp_server {
+    build_from_git('win-sftp-server');
+}
+
+sub build_from_git {
+    my $name = shift;
+    my $prog = $cfg->{build}{$name};
+    my $commands = $prog->{build}{commands};
+    my $repo_url = $prog->{repository}{url};
+    my $branch = $prog->{repository}{branch};
+    my $prog_wd = $wd->child($name);
+    my $prog_src = $prog_wd->child('src');
+    my $prog_out = $prog_wd->child('out');
  SKIP: {
-        skip_for 'build-pulseaudio-out-remove';
-        eval { $pa_out->remove_tree({safe => 0}) };
-        $pa_out->mkpath;
+        skip_for "build-$name-out-remove";
+        eval { $prog_out->remove_tree({safe => 0}) };
+        $prog_out->mkpath;
     }
  SKIP: {
-        skip_for 'build-pulseaudio-git-clone';
+        skip_for "build-$name-git-clone";
 
-        if (-d $pa_src) {
+        if (-d $prog_src) {
         SKIP: {
-                skip_for 'build-pulseaudio-git-clone-remove';
-                eval { $pa_wd->remove_tree({safe => 0}) };
+                skip_for "build-$name-git-clone-remove";
+                eval { $prog_wd->remove_tree({safe => 0}) };
             }
         }
-        $pa_src->mkpath;
-        git_in($pa_src, clone => $repo_url, '.');
+        $prog_src->mkpath;
+        git_in($prog_src, clone => $repo_url, '.');
     }
  SKIP: {
-        skip_for 'build-pulseaudio-git-checkout';
-        git_in($pa_src, checkout => $pa->{repository}{branch});
+        skip_for "build-$name-git-checkout";
+        git_in($prog_src, checkout => $prog->{repository}{branch});
     }
  SKIP: {
-        skip_for 'build-pulseaudio-git-pull';
-        git_in($pa_src, pull => 'origin', $pa->{repository}{branch});
+        skip_for "build-$name-git-pull";
+        git_in($prog_src, pull => 'origin', $prog->{repository}{branch});
     }
  SKIP: {
-        skip_for 'build-pulseaudio-autogen';
-        my $autogen = "$commands->{autogen} --prefix=".w32_path_to_msys($pa_out);
-        runcmd_mingw32_in($pa_src, $commands->{autogen});
+        skip_for "build-$name-env";
+        runcmd_mingw32_in($prog_src, $commands->{env});
     }
  SKIP: {
-        skip_for 'build-pulseaudio-make';
-        runcmd_mingw32_in($pa_src, $commands->{make});
+        skip_for "build-$name-clean";
+        runcmd_mingw32_in($prog_src, $commands->{clean});
     }
  SKIP: {
-        skip_for 'build-pulseaudio-install';
-        runcmd_mingw32_in($pa_src, $commands->{install});
+        skip_for "build-$name-bootstrap";
+        runcmd_mingw32_in($prog_src, $commands->{bootstrap});
+    }
+ SKIP: {
+        skip_for "build-$name-configure";
+        my $configure = "$commands->{configure} --prefix=".w32_path_to_msys($prog_out);
+        runcmd_mingw32_in($prog_src, $configure);
+    }
+ SKIP: {
+        skip_for "build-$name-make";
+        runcmd_mingw32_in($prog_src, $commands->{make});
+    }
+ SKIP: {
+        skip_for "build-$name-install";
+        runcmd_mingw32_in($prog_src, $commands->{install});
     }
 }
 
 sub build_nxproxy {
-}
-
-sub build_win_sftp_server {
 }
 
 sub build_slave_wrapper {
