@@ -15,7 +15,7 @@ BEGIN { *w32q = \&Win32::ShellQuote::quote_system_string }
 
 my $this_path = path($0)->realpath->parent;
 my $cfg_fn = $this_path->child('automate.yaml');
-my $log_fn = $this_path->child('log.txt');
+my $log_fn; # = $this_path->child('log.txt');
 my $log_level = 'info';
 my $wd;
 my @skip;
@@ -28,7 +28,12 @@ GetOptions('config|cfg|f=s'   => \$cfg_fn,
            'do|D=s'           => \@do)
     or die "Error in command line arguments\n";
 
-Log::Any::Adapter->set(File => $log_fn, log_level => $log_level);
+if (defined $log_fn) {
+    Log::Any::Adapter->set(File => $log_fn, log_level => $log_level);
+}
+else {
+    Log::Any::Adapter->set(Stderr => log_level => $log_level);
+}
 my $log = Log::Any->get_logger;
 
 sub logdie {
@@ -207,6 +212,19 @@ sub runcmd_mingw32_in {
     runcmd_msys mkcmd_mingw32_in @_;
 }
 
+sub runcmd_env_in {
+    my $env = shift;
+    if ($env eq 'msys') {
+        runcmd_msys_in(@_);
+    }
+    elsif ($env eq 'mingw32') {
+        runcmd_mingw32_in(@_);
+    }
+    else {
+        logdie("Bad environment designator '$env'");
+    }
+}
+
 sub setup_msys2 {
     my $msys2 = $cfg->{setup}{msys2};
     my $prefix = path($cfg->{run}{msys2}{prefix});
@@ -307,69 +325,100 @@ sub build_win_sftp_server {
     build_from_git('win-sftp-server');
 }
 
-sub build_from_git {
-    my $name = shift;
-    my $prog = $cfg->{build}{$name};
-    my $commands = $prog->{build}{commands};
-    my $repo_url = $prog->{repository}{url};
-    my $branch = $prog->{repository}{branch};
-    my $prog_wd = $wd->child($name);
-    my $prog_src = $prog_wd->child('src');
-    my $prog_out = $prog_wd->child('out');
- SKIP: {
-        skip_for "build-$name-out-remove";
-        eval { $prog_out->remove_tree({safe => 0}) };
-        $prog_out->mkpath;
-    }
- SKIP: {
-        skip_for "build-$name-git-clone";
-
-        if (-d $prog_src) {
-        SKIP: {
-                skip_for "build-$name-git-clone-remove";
-                eval { $prog_wd->remove_tree({safe => 0}) };
-            }
-        }
-        $prog_src->mkpath;
-        git_in($prog_src, clone => $repo_url, '.');
-    }
- SKIP: {
-        skip_for "build-$name-git-checkout";
-        git_in($prog_src, checkout => $prog->{repository}{branch});
-    }
- SKIP: {
-        skip_for "build-$name-git-pull";
-        git_in($prog_src, pull => 'origin', $prog->{repository}{branch});
-    }
- SKIP: {
-        skip_for "build-$name-env";
-        runcmd_mingw32_in($prog_src, $commands->{env});
-    }
- SKIP: {
-        skip_for "build-$name-clean";
-        runcmd_mingw32_in($prog_src, $commands->{clean});
-    }
- SKIP: {
-        skip_for "build-$name-bootstrap";
-        runcmd_mingw32_in($prog_src, $commands->{bootstrap});
-    }
- SKIP: {
-        skip_for "build-$name-configure";
-        my $configure = "$commands->{configure} --prefix=".w32_path_to_msys($prog_out);
-        runcmd_mingw32_in($prog_src, $configure);
-    }
- SKIP: {
-        skip_for "build-$name-make";
-        runcmd_mingw32_in($prog_src, $commands->{make});
-    }
- SKIP: {
-        skip_for "build-$name-install";
-        runcmd_mingw32_in($prog_src, $commands->{install});
-    }
-}
-
 sub build_nxproxy {
+    build_from_git('nxproxy');
 }
 
 sub build_slave_wrapper {
 }
+
+
+sub build_from_git {
+    my ($name, $this, $parent) = @_;
+    $this   //= $cfg->{build}{$name};
+    $parent //= $cfg->{build};
+    my $longname = $this->{longname} //= join('-', grep defined, $parent->{longname}, $name);
+    my $build = $this->{build};
+    my $env = $build->{env} //= ($parent->{build}{env} // 'mingw32');
+    my $commands = $build->{commands};
+    my $srcdir = path($this->{srcdir} //= path($parent->{srcdir} // 'src')
+                      ->absolute($wd)->child($name)->stringify());
+    my $outdir = path($this->{outdir} //= path($parent->{outdir} // 'out')
+                      ->absolute($wd)->child($name)->stringify());
+    use Data::Dumper;
+    $log->debug("This: ".Dumper(\@_));
+ SKIP: {
+        skip_for "build-$longname-out-remove";
+        eval { $outdir->remove_tree({safe => 0}) };
+        $outdir->mkpath;
+    }
+    if (my $repo = $this->{repository}) {
+        my $repo_url = $this->{repository}{url};
+        my $branch = $this->{repository}{branch};
+    SKIP: {
+            skip_for "build-$longname-git-clone";
+            if (-d $srcdir) {
+            SKIP: {
+                    skip_for "build-$longname-git-clone-remove";
+                    eval { $srcdir->remove_tree({safe => 0}) };
+                }
+            }
+            $srcdir->mkpath;
+            git_in($srcdir, clone => $repo_url, '.');
+        }
+    SKIP: {
+            skip_for "build-$longname-git-checkout";
+            git_in($srcdir, checkout => $this->{repository}{branch});
+        }
+    SKIP: {
+            skip_for "build-$longname-git-pull";
+            git_in($srcdir, pull => 'origin', $this->{repository}{branch});
+        }
+        if ($commands and $commands->{clean}) {
+        SKIP: {
+                skip_for "build-$longname-clean";
+                runcmd_env_in($env, $srcdir, $commands->{clean});
+            }
+        }
+    }
+    if ($commands) {
+        if ($commands->{env}) {
+        SKIP: {
+                skip_for "build-$longname-env";
+                runcmd_env_in($env, $srcdir, $commands->{env});
+            }
+        }
+        if ($commands->{bootstrap}) {
+        SKIP: {
+                skip_for "build-$longname-bootstrap";
+                runcmd_env_in($env, $srcdir, $commands->{bootstrap});
+            }
+        }
+        if ($commands->{configure}) {
+        SKIP: {
+                skip_for "build-$longname-configure";
+                my $configure = "$commands->{configure} --prefix=".w32_path_to_msys($outdir);
+                runcmd_env_in($env, $srcdir, $configure);
+            }
+        }
+        if ($commands->{make}) {
+        SKIP: {
+                skip_for "build-$longname-make";
+                runcmd_env_in($env, $srcdir, $commands->{make});
+            }
+        }
+        if ($commands->{install}) {
+        SKIP: {
+                skip_for "build-$longname-install";
+                runcmd_env_in($env, $srcdir, $commands->{install});
+            }
+        }
+    }
+
+    if (my $children = $this->{children}) {
+        for my $child (@$children) {
+            build_from_git($child->{name}, $child, $this);
+        }
+    }
+}
+

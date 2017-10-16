@@ -34,6 +34,8 @@ setup:
       - automake
       - tar
       - mingw-w64-i686-libsndfile
+      - libtool
+      - nasm
 
   perl:
     url: http://strawberryperl.com/download/5.26.1.1/strawberry-perl-5.26.1.1-32bit.msi
@@ -54,39 +56,55 @@ build:
       url: https://github.com/theqvd/pulseaudio.git
       branch: opus
     build:
+      env: mingw32
       commands:
         clean: git clean -dfx
         bootstrap: NOCONFIGURE=1 ./bootstrap.sh
         configure: ./configure --disable-nls --disable-rpath --disable-largefile --disable-memfd --disable-x11 --disable-tests --disable-oss-output --disable-oss-wrapper --disable-alsa --disable-esound --disable-solaris --disable-coreaudio-output --disable-glib2 --disable-gtk3 --disable-gconf --disable-avahi --disable-jack --disable-asyncns --disable-tcpwrap --disable-lirc --disable-dbus --disable-bluez4 --disable-bluez5 --disable-bluez5-ofono-headset --disable-bluez5-native-headset --disable-udev --disable-hal-compat --disable-ipv6 --disable-openssl --disable-systemd-daemon --disable-systemd-login --disable-systemd-journal --disable-manpages --disable-per-user-esound-socket --disable-default-build-tests --disable-legacy-database-entry-format --without-libiconv-prefix --without-libintl-prefix
         make: make
         install: make install
-        env: env
 
   win-sftp-server:
     repository:
       url: https://github.com/salva/win-sftp-server.git
       branch: master
     build:
+      env: mingw32
       commands:
         clean: git clean -dfx
-        bootstrap: true
-        configure: true
         make: make
-        install: cp win-sftp-server.exe ../out/
-        env: env
+        install: cp win-sftp-server.exe ../../out/win-sftp-server
 
   nxproxy:
     repository:
       url: https://github.com/ArcticaProject/nx-libs.git
       branch: 3.6.x
     build:
+      env: msys
       commands:
         clean: git clean -dfx
-        env: env
-      subcomponents:
-        - name: nxcomp
+    children:
+      - name: libjpeg-turbo
+        repository:
+          url: https://github.com/libjpeg-turbo/libjpeg-turbo.git
+          branch: master
+        build:
           commands:
-            bootstrap: true
+            bootstrap: autoreconf -fiv
             configure: ./configure
             make: make
-        - name: nxproxy
+            install: make install
+      - name: nxcomp
+        build:
+          commands:
+            bootstrap: autoreconf -vfi
+            configure: ./configure
+            make: make
+            install: make install
+      - name: nxproxy
+        build:
+          commands:
+            bootstrap: autoreconf -vfi
+            configure: ./configure
+            make: make
+            install: make install
