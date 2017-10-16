@@ -942,5 +942,8 @@
     "Incompatible expiration dates - Soft date must precede the hard one": "Fechas de expiración incompatibles - La fecha suave debe preceder a la fuerte",
     "Unable to remove a core config item": "Imposible eliminar un elemento de configuración nativo",
     "Unable to switch to monotenant mode - More than one tenant in the system": "Imposible cambiar a modo monotenant - Hay más de un tenant en el sistema",
-    "Cannot create new configuration token": "Imposible crear nuevo token de configuración"
+    "Cannot create new configuration token": "Imposible crear nuevo token de configuración",
+    "Error while accessing to Disk Image Generator": "Error al acceder al Generador de Imágenes de Disco",
+    "Configuration parameter is not defined": "Parámetro de configuración no definido",
+    "OSD is not defined for specified OSF": "El OSD no está definido para el OSF especificado"
 }

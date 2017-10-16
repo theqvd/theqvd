@@ -1,5 +1,6 @@
 package QVD::API::Exception;
 use Moo;
+use Devel::StackTrace;
 use  5.010;
 
 with 'Throwable';
@@ -40,19 +41,23 @@ has 'object', is => 'ro', isa => sub { die "Invalid type for attribute object" i
 # exception, that can be used to provide additional information
 has 'additional_info', is => 'ro', isa => sub {};
 
+# Stack trace where the exception was generated
+has 'stack_trace', is => 'ro';
+
 ## CLASS VARIABLES
 
 # This is the mapper that relates numeric codes of exceptions
 # with its corresponding messages. Supported codes must be listed in here
 
 my $code2message_mapper = {
+    # General codes
     0000 => 'Successful completion',
-
     1000 => 'In progress', 
     1100 => 'Internal server error',
     1200 => 'Action not accomplished for all elements',
     1300 => 'Zero items selected, no item has been changed',
 
+    # Disk Images management errors
     2100 => 'No connection to database',
     2210 => 'Unable to copy disk image from staging',
     2211 => 'Unable to copy whole disk image (lack of space?)',
@@ -64,14 +69,18 @@ my $code2message_mapper = {
     2260 => 'Unable to download disk image', 
     2261 => 'Unable to move downloaded disk image', 
 	2270 => 'Unable to read file from disk',
+    2280 => 'Error while accessing to Disk Image Generator',
 
+    # General API errors
     3100 => 'No credentials provided for authentication',
 	3200 => 'Wrong credentials - Login again',
     3300 => 'Session expired - Login again',
     3400 => 'Problems to update expiration time in session',
 	3500 => 'Access to tenant is restricted',
     3600 => 'Error in log out',
+    3700 => 'Configuration parameter is not defined',
 
+    # ACLs errors
     4100 => 'Unavailable action',
     4110 => 'Invalid or null action name provided',
     4210 => 'Forbidden action for this administrator',
@@ -82,11 +91,13 @@ my $code2message_mapper = {
     4250 => 'Forbidden field for this administrator',
     4260 => 'Forbidden sorted by field for this administrator',
     
+    # QVD Virtual Machines errors
     5110 => 'Unable to disconnect user in current state',
     5120 => 'Unable to stop VM in current state',
     5130 => 'Unable to start VM in current state',
     5140 => 'Unable to assign host, no host available',
 
+    # Input JSON errors
     6100 => 'Syntax errors in input json',
     6210 => 'Inappropiate filter for this action',
     6220 => 'No mandatory filter for this action',
@@ -113,6 +124,7 @@ my $code2message_mapper = {
     6610 => 'Invalid order by field',
     6620 => 'External API not configured',
     
+    # QVD Items related errors
     7100 => 'Refered related items don\'t exist',
     7110 => 'Unable to accomplish, refered related items don\'t exist',
     7120 => 'Unable to remove, other items depend on it',
@@ -130,8 +142,8 @@ my $code2message_mapper = {
     7370 => 'Unable to remove a core config item',
     7373 => 'Unable to switch to monotenant mode - More than one tenant in the system',
     7382 => 'Cannot create new configuration token',
-	7390 => 'Configuration token value is already set to the default one',
-
+    7390 => 'Configuration token value is already set to the default one',
+    7500 => 'OSD is not defined for specified OSF',
 };
 
 # When an exception is thrown by DBIx::Class, it is catched and passed as a parameter 
@@ -165,6 +177,8 @@ sub BUILD
     my $exception_defined = defined($self->exception);
     my $failures_defined = defined($self->failures);
 
+    $self->{stack_trace} = Devel::StackTrace->new->as_string;
+    
     # This object is recursive if a QVD::API::Exception object was
     # provided via the exception parameter. In that case, this object
     # is built from that one
