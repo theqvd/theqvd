@@ -15,7 +15,6 @@ __PACKAGE__->add_columns(
     percentage           => { data_type => 'real', default_value => 0 },
     error_code           => { data_type => 'integer', is_nullable => 1 },
     status_message       => { data_type => 'text', is_nullable => 1 },
-    source               => { data_type => 'text', is_nullable => 1 },
 );
 
 __PACKAGE__->set_primary_key('di_id');
