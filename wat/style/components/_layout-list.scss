@@ -128,9 +128,9 @@
         color: $col_whiter;
     }
     
-    // DI rows    
-    .di-row-state-creating {
-        background: #ffa;
+    // DI rows
+    .di-row-state-generating {
+        background: #d7d7d7;
 
         input[type="checkbox"] {
             display: none;

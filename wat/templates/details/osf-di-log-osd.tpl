@@ -16,7 +16,7 @@ else {
                 </td>
                 <td>
                     <div class="progressbar" data-percent="<%= image.percent %>" data-remaining="<%= image.remainingTime %>" data-elapsed="<%= image.elapsedTime %>">
-                        <div class="progress-label"><span data-i18n="Loading">Cargando</span>...</div>
+                        <div class="progress-label"><span data-i18n="Loading"></span>...</div>
                     </div>
                     <div class="second_row">
                         <div><span data-i18n="Elapsed time">Elapsed time</span>: <span class="progress-elapsed">-</span></div>

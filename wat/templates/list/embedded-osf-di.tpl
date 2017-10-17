@@ -78,21 +78,77 @@
                 }
                 %>
             </td>
-            <td>
+            <td class="col-width-40">
                 <%= model.get('version') %>
-                <% if (state != 'creating') { %>
                 <div class="second_row">
                     <span class="fa fa-database">
                         <%= model.get('disk_image') %>
                     </span>
                 </div>
-                <% } %>
+            <%
+                if (model.get('description')) {
+                    switch(model.get('state')) {
+                        case 'generating':
+                        case 'uploading':
+            %>
+                            <div class="second_row">
+                                <span class="fa fa-file-text-o">
+                                    <%= model.get('description') %>
+                                </span>
+                            </div>
+            <%
+                            break;
+                    }
+                }
+            %>
             </td>
-            <td class="description"><% 
-                switch (state) { 
-                    case 'creating':
+            <td class="description">
+            <%
+                if (model.get('description')) {
+                    switch(model.get('state')) {
+                        case 'generating':
+                        case 'uploading':
+                            break;
+                        default:
+            %>
+                            <div class="second_row">
+                                <span class="fa fa-file-text-o">
+                                    <%= model.get('description') %>
+                                </span>
+                            </div>
+            <%
+                            break;
+                    }
+                }
+                var statusStr = '';
+                switch(model.get('state')) {
+                    case 'generating':
+                        statusStr = 'Generating';
+                        break;
+                    case 'uploading':
+                        statusStr = 'Uploading';
+                        break;
+                }
+                
+                switch (model.get('state')) {
+                    case 'generating':
+                    case 'uploading':
                         %>
-                            <div class="second_row">The disk image is being created</div>
+                            <div data-wsupdate="percentage" data-id="<%= model.get('id') %>" class="progressbar" data-percent="<%= model.get('percentage') %>" data-remaining="<%= model.get('remaining_time') %>" data-elapsed="<%= model.get('elapsed_time') %>" data-status-str="<%= statusStr %>">
+                                <div class="progress-label"><span data-i18n="Loading"></span></div>
+                            </div>
+                            <div class="second_row">
+                                <div>
+                                    <span class="fa fa-clock-o">
+                                        <span data-i18n="Elapsed time"></span>: <span class="progress-elapsed">-</span>
+                                    </span>
+                                </div>
+                                <div>
+                                    <span class="fa fa-clock-o">
+                                        <span data-i18n="Remaining time"></span>: <span class="progress-remaining">-</span>
+                                    </span>
+                                </div>
+                            </div>
                         <%
                         break;
                     case 'scheduled':
@@ -104,7 +160,6 @@
                         break;
                 } 
                 %>
-                <div class="second_row"><%= model.get('description') %></div>
             </td>
         </tr>
     <% }); %>

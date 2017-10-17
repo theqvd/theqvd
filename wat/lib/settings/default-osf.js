@@ -216,14 +216,7 @@ Wat.I.detailsFields[qvdObj] = {
                 'acls': 'osf.see.dis-info',
                 'text': 'DIs',
                 'icon': CLASS_ICON_DIS
-            },
-            'dis_log': {
-                'display': true,
-                'fields': [],
-                'acls': 'osf.see.dis-info',
-                'text': 'DIs Log',
-                'icon': CLASS_ICON_LOG
-            },
+            }
         }
     }
 };

@@ -159,6 +159,8 @@ var Wat = {
         changeWebsocketUser: function () {},
         // Web Sockets for VMs (lib/websockets/websockets.vm.js)
         changeWebsocketVm: function () {},
+        // Web Sockets for VMs (lib/websockets/websockets.di.js)
+        changeWebsocketDi: function () {},
     },
     
     // Templates storage

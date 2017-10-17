@@ -265,6 +265,11 @@ fieldset {
     color: $graph_color_b
 }
 
+.progressbar {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
 .progress-label {
     float: left;
     text-align: center;
@@ -272,5 +277,4 @@ fieldset {
     margin-top: 5px;
     margin-bottom: 5px;
     font-weight: bold;
-    text-shadow: 1px 1px 0 #fff;
 }

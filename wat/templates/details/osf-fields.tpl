@@ -31,9 +31,6 @@ switch (dFieldCode) {
         %> <span data-wsupdate="number_of_dis" data-id="<%= model.get('id') %>"><%= model.get('number_of_dis') %></span> <%
         print(Wat.C.ifACL('</a>', 'di.see-main.'));
         break;
-    case 'dis_log':
-        print('<div class="bb-dis-log js-dis-log"></div>');
-        break;
     default:
         var commonField = _.template(
             Wat.TPL.detailsFieldsCommon, {

@@ -1,5 +1,6 @@
 Wat.Views.DIListView = Wat.Views.ListView.extend({
     qvdObj: 'di',
+    liveFields: ['percentage', 'elapsed_time'],
     relatedDoc: {
         image_update: "Images update guide"
     },
@@ -8,6 +9,70 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         this.collection = new Wat.Collections.DIs(params);
         
         Wat.Views.ListView.prototype.initialize.apply(this, [params]);
+    },
+    
+    renderList: function (params) {
+        Wat.Views.ListView.prototype.renderList.apply(this, [params]);
+        
+        this.renderProgressBars();
+    },
+    
+    renderProgressBars: function () {
+        var that = this;
+        
+        var progressBars = $("." + this.cid + " .progressbar");
+
+        $.each (progressBars, function (i, progressBar) {
+            var progressLabel = $(progressBar).find('.progress-label');
+            $(progressBar).progressbar({
+                value: false,
+                change: function (e) {
+                    that.updateDiProgress(progressBar);
+                },
+                complete: function () {
+                    var progressLabel = $(progressBar).find('.progress-label');
+                    progressLabel.text($.i18n.t("Complete"));
+                }
+            });
+        });
+        
+        that.intervals['localDiProgressTime'] = setInterval(function () {
+            $.each(progressBars, function (i, progressBar) {
+                var percent = parseInt($(progressBar).attr('data-percent'));
+                var remainingTime = parseInt($(progressBar).attr('data-remaining'));
+                var elapsedTime = parseInt($(progressBar).attr('data-elapsed'));
+
+                if (percent >= 100) {
+                    return;
+                }
+
+                $(progressBar).attr('data-remaining', remainingTime>0 ? remainingTime-1 : 0);
+                $(progressBar).attr('data-elapsed', elapsedTime+1);
+
+                that.updateDiProgress(progressBar);
+            });
+        }, 1000);
+    },
+    
+    updateDiProgress: function (progressBar) {
+        var progressRemaining = $(progressBar).parent().find('.progress-remaining');
+        var progressElapsed = $(progressBar).parent().find('.progress-elapsed');
+        var progressLabel = $(progressBar).find('.progress-label');
+        
+        var percent = $(progressBar).attr('data-percent');
+        var remaining = $(progressBar).attr('data-remaining');
+        var elapsed = $(progressBar).attr('data-elapsed');
+        var statusStr = $(progressBar).attr('data-status-str');
+        
+        progressRemaining.html(Wat.U.secondsToHms(remaining));
+        progressElapsed.html(Wat.U.secondsToHms(elapsed));
+        var progressText = percent + "%";
+        if (statusStr) {
+            progressText = $.i18n.t(statusStr) + ': ' + progressText;
+        }
+        progressLabel.text(progressText);
+        $(progressBar).progressbar("value", percent);
+        $(progressBar).find('.ui-progressbar-value').css('width', percent + '%').show();
     },
     
     listEvents: {
@@ -107,7 +172,14 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         
         $('.dis-subrow .bb-list').html(this.template);
         
+        this.renderProgressBars();
+        
         Wat.T.translateAndShow();
+        
+        // Open websockets for live fields
+        if (this.liveFields) {
+            Wat.WS.openListWebsockets(this.qvdObj, this.collection, this.liveFields, this.cid);
+        }
     },
     
     applySelectedAction: function (e) {

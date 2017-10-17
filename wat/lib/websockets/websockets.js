@@ -227,6 +227,9 @@ Wat.WS = {
                     case 'osf':
                         Wat.WS.changeWebsocketOsf(id, field, value);
                         break;
+                    case 'di':
+                        Wat.WS.changeWebsocketDi(id, field, value, row);
+                        break;
                     case 'home':
                         Wat.WS.changeWebsocketStats(field, value);
                         break;

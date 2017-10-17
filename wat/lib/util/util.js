@@ -410,5 +410,9 @@ Wat.U = {
         ret += hours + ':' + minutes + ':' + seconds;
         
         return ret;
+    },
+    
+    getRemainingTime: function (elapsedTime, percentage) {
+        return ((100 * elapsedTime)/percentage) - elapsedTime;
     }
 }

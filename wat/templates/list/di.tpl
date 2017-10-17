@@ -210,6 +210,31 @@
                                     <%= Wat.C.ifACL('<i class="fa fa-search"></i>', 'di.see-details.') %>
                                         <span class="text"><%= model.get('disk_image') %></span>
                                     <%= Wat.C.ifACL('</a>', 'di.see-details.') %>
+                                    
+                                    <%
+                                        var statusStr = '';
+                                        switch(model.get('state')) {
+                                            case 'generating':
+                                                statusStr = 'Generating';
+                                                break;
+                                            case 'uploading':
+                                                statusStr = 'Uploading';
+                                                break;
+                                        }
+                                        
+                                        switch(model.get('state')) {
+                                            case 'generating':
+                                            case 'uploading':
+                                                %>
+                                                    <div data-wsupdate="percentage" data-id="<%= model.get('id') %>" class="progressbar" data-percent="<%= model.get('percentage') %>" data-remaining="<%= model.get('remaining_time') %>" data-elapsed="<%= model.get('elapsed_time') %>" data-status-str="<%= statusStr %>">
+                                                        <div class="progress-label">
+                                                            <span data-i18n="Loading"></span>...
+                                                        </div>
+                                                    </div>
+                                                <%
+                                                break;
+                                        }
+                                    %>
                                 </td>
                 <%
                                 break;

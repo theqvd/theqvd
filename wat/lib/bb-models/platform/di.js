@@ -44,6 +44,10 @@ Wat.Models.DI = Wat.Models.Model.extend({
             model.tags = tags.join(',');
             model.default = tagDefault ? 1 : 0;
             model.head = tagHead ? 1 : 0;
+            
+            if (model.elapsed_time != null) {
+                model.remaining_time = Wat.U.getRemainingTime(model.elapsed_time, model.percentage);
+            }
         }
         
         return Wat.Models.Model.prototype.parse.apply(this, [response]);
