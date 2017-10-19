@@ -10,6 +10,9 @@ run:
     prefix: mingw32
   perl:
     prefix: c:/strawberry/
+  cygwin:
+    wrapper: bin/bash --login -c
+    prefix: c:/cygwin/
 
 setup:
   msys2:
@@ -48,7 +51,24 @@ setup:
           branch: bar
 
   cygwin:
-    url:
+    url: https://www.cygwin.com/setup-x86.exe
+    site: http://cygwin.netbet.org/
+    product: Cygwin
+    packages:
+      - git
+      - gcc-g++
+      - gcc-core
+      - bash
+      - binutils
+      - libtool
+      - autoconf
+      - automake
+      - pkg-config
+      - make
+      - libjpeg-devel
+      - libpng-devel
+      - xorg-server-devel
+      - imake
 
 build:
   pulseaudio:
@@ -77,23 +97,27 @@ build:
 
   nxproxy:
     repository:
-      url: https://github.com/ArcticaProject/nx-libs.git
-      branch: 3.6.x
+      # url: https://github.com/ArcticaProject/nx-libs.git
+      # branch: 9193d11eeeea933e293acd5e0f03fa4e9887186b
+      # branch: 3.6.x
+      url: https://github.com/salva/nx-libs.git
+      branch: fix-cygwin-compilation
+
     build:
-      env: msys
+      env: cygwin
       commands:
         clean: git clean -dfx
     children:
-      - name: libjpeg-turbo
-        repository:
-          url: https://github.com/libjpeg-turbo/libjpeg-turbo.git
-          branch: master
-        build:
-          commands:
-            bootstrap: autoreconf -fiv
-            configure: ./configure
-            make: make
-            install: make install
+      #- name: libjpeg-turbo
+      #  repository:
+      #    url: https://github.com/libjpeg-turbo/libjpeg-turbo.git
+      #    branch: master
+      #  build:
+      #    commands:
+      #      bootstrap: autoreconf -fiv
+      #      configure: ./configure
+      #      make: make
+      #      install: make install
       - name: nxcomp
         build:
           commands:

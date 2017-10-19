@@ -49,6 +49,9 @@ $wd //= $cfg->{run}{workdir};
 $wd = ($wd ? path($wd) : Path::Tiny->tempdir);
 $log->info("Working dir: $wd");
 
+my $downloads = $wd->child('download');
+my $src = $wd->child('src');
+my $out = $wd->child('out');
 
 @do = @{$cfg->{run}{do}} unless @do;
 
@@ -57,6 +60,7 @@ my %do = map { lc($_) => 1 } @do;
 
 my $ua = HTTP::Tiny->new();
 
+setup_skel();
 setup_msys2();
 setup_strawberry_perl();
 setup_cygwin();
@@ -86,6 +90,17 @@ sub runcmd {
     my $cmd = join(" ", @_);
     $log->debug("Running command $cmd");
     system $cmd and logdie "Running command $cmd failed: $?"
+}
+
+sub rmtree {
+    my $path = path(shift);
+    if ($path->is_dir) {
+        eval { runcmd 'rd', '/s', '/q', w32q($path->canonpath) };
+    }
+    if ($path->exists) {
+        eval { $path->remove_tree({safe => 0}) };
+        $log->warn("remove_tree for ".$path->canonpath." failed: $@") if $@
+    }
 }
 
 sub skip_for {
@@ -125,7 +140,7 @@ sub wmic_uninstall {
     runcmd "wmic product where name=".w32q($name)." call uninstall";
 }
 
-sub mkcmd_msys_c {
+sub mkcmd_posix {
     join " ", (@_ > 1 ? join(' ', map posix_quote($_), @_) : $_[0]);
 }
 
@@ -135,7 +150,16 @@ sub mkcmd_msys {
         @wrapper = split /\s+/, $cfg->{run}{msys2}{wrapper};
         $wrapper[0] = w32q(path($wrapper[0])->absolute($cfg->{run}{msys2}{prefix})->canonpath);
     }
-    return join " ", @wrapper, w32q(mkcmd_msys_c(@_));
+    return join " ", @wrapper, w32q(mkcmd_posix(@_));
+}
+
+sub mkcmd_cygwin {
+    state @wrapper;
+    unless (@wrapper) {
+        @wrapper = split /\s+/, $cfg->{run}{cygwin}{wrapper};
+        $wrapper[0] = w32q(path($wrapper[0])->absolute($cfg->{run}{cygwin}{prefix})->canonpath);
+    }
+    return join " ", @wrapper, w32q(mkcmd_posix(@_));
 }
 
 sub w32_path_to_msys {
@@ -162,9 +186,39 @@ sub msys_path_to_w32 {
     }
 }
 
+sub w32_path_to_cygwin {
+    my $path = shift;
+    state %cache;
+    $cache{$path} //= do {
+        my $cmd = mkcmd_cygwin cygpath => -u => $path;
+        $log->debug("Capturing command: $cmd");
+        my $out = `$cmd`;
+        chomp($out);
+        $log->debug("win32 path $path translated to cygwin $out");
+        $out
+    };
+}
+
+sub cygwin_path_to_w32 {
+    my $path = shift;
+    state %cache;
+    $cache{$path} //= do {
+        my $cmd = mkcmd_cygwin cygpath => -w => $path;
+        my $out = `$cmd`;
+        chomp($out);
+        $log->debug("cygwin path $path translated to win32 $out");
+        $out
+    }
+}
+
 sub mkcmd_msys_in {
     my $dir = shift;
-    join(' ', cd => posix_quote(w32_path_to_msys($dir->canonpath)), '&&', mkcmd_msys_c(@_))
+    join(' ', cd => posix_quote(w32_path_to_msys($dir->canonpath)), '&&', mkcmd_posix(@_))
+}
+
+sub mkcmd_cygwin_in {
+    my $dir = shift;
+    join(' ', cd => posix_quote(w32_path_to_cygwin($dir->canonpath)), '&&', mkcmd_posix(@_))
 }
 
 sub mkcmd_mingw32 {
@@ -188,7 +242,7 @@ sub mkcmd_mingw32 {
         join ' ', map { "$_=$env{$_}" } sort keys %env;
     };
 
-    mkcmd_msys_c("$env ". mkcmd_msys_c(@_));
+    "$env ". mkcmd_posix(@_)
 }
 
 sub mkcmd_mingw32_in {
@@ -212,6 +266,14 @@ sub runcmd_mingw32_in {
     runcmd_msys mkcmd_mingw32_in @_;
 }
 
+sub runcmd_cygwin {
+    runcmd mkcmd_cygwin(@_);
+}
+
+sub runcmd_cygwin_in {
+    runcmd_cygwin mkcmd_cygwin_in(@_);
+}
+
 sub runcmd_env_in {
     my $env = shift;
     if ($env eq 'msys') {
@@ -220,9 +282,19 @@ sub runcmd_env_in {
     elsif ($env eq 'mingw32') {
         runcmd_mingw32_in(@_);
     }
+    elsif ($env eq 'cygwin') {
+        runcmd_cygwin_in(@_);
+    }
     else {
         logdie("Bad environment designator '$env'");
     }
+}
+
+sub setup_skel {
+    $wd->mkpath;
+    $downloads->mkpath;
+    $src->mkpath;
+    $out->mkpath;
 }
 
 sub setup_msys2 {
@@ -233,9 +305,9 @@ sub setup_msys2 {
  SKIP: {
         skip_for 'setup-msys2-install';
         my $url = $msys2->{url};
-        my $exe = $wd->child($url =~ s{.*/}{}r);
+        my $exe = $downloads->child($url =~ s{.*/}{}r);
         my $script_url = $msys2->{'autoinstall-script-url'};
-        my $script = $wd->child($script_url =~ s{.*/}{}r);
+        my $script = $downloads->child($script_url =~ s{.*/}{}r);
         mirror($url, $exe);
         mirror($script_url, $script);
         my $uninstall = $prefix->child($commands->{uninstall});
@@ -250,7 +322,7 @@ sub setup_msys2 {
         SKIP: {
                 skip_for 'setup-msys2-install-remove';
                 $log->info("Removing previous installation at $prefix");
-                eval { $prefix->remove_tree({safe => 0}) };
+                rmtree($prefix);
             }
         }
 
@@ -283,7 +355,7 @@ sub setup_strawberry_perl {
  SKIP: {
         skip_for 'setup-perl-install';
         my $url = $perl->{url};
-        my $exe = $wd->child($url =~ s{.*/}{}r);
+        my $exe = $downloads->child($url =~ s{.*/}{}r);
         mirror($url, $exe);
 
         if (my @p = wmic_look_for $product) {
@@ -297,7 +369,7 @@ sub setup_strawberry_perl {
         SKIP: {
                 skip_for 'setup-perl-install-remove';
                 $log->info("Removing previous installation at $prefix");
-                eval { $prefix->remove_tree({safe => 0}) };
+                rmtree($prefix);
             }
         }
 
@@ -308,6 +380,39 @@ sub setup_strawberry_perl {
 }
 
 sub setup_cygwin {
+    my $cygwin = $cfg->{setup}{cygwin};
+    my $prefix = path($cfg->{run}{cygwin}{prefix});
+    my $product = $cygwin->{product};
+ SKIP: {
+        skip_for 'setup-cygwin-install';
+        my $url = $cygwin->{url};
+        my $exe = $downloads->child($url =~ s{.*/}{}r);
+        mirror($url, $exe);
+
+        if (-d $prefix) {
+            skip_for 'setup-cygwin-install-remove';
+            $log->info("Removing previous installation at $prefix");
+            rmtree($prefix);
+        }
+
+        my $site = $cygwin->{site};
+        my @cmd = (w32q($exe->canonpath),
+                   '--root', w32q($prefix->canonpath),
+                   '--site', w32q($site),
+                   '--local-package-dir', w32q($downloads->canonpath),
+                   '--quiet-mode', '--wait', '--no-admin', '--no-shortcuts');
+
+        if (my @packages = @{$cygwin->{packages} // []}) {
+            push @cmd, '--packages', join ',', map w32q($_), @packages;
+        }
+
+        runcmd @cmd;
+
+    SKIP: {
+            skip_for 'setup-cygwin-install-firstuse';
+            runcmd_cygwin 'true';
+        }
+    }
     $log->info("Cygwin installation completed");
 }
 
@@ -349,7 +454,7 @@ sub build_from_git {
     $log->debug("This: ".Dumper(\@_));
  SKIP: {
         skip_for "build-$longname-out-remove";
-        eval { $outdir->remove_tree({safe => 0}) };
+        rmtree($outdir);
         $outdir->mkpath;
     }
     if (my $repo = $this->{repository}) {
@@ -360,10 +465,14 @@ sub build_from_git {
             if (-d $srcdir) {
             SKIP: {
                     skip_for "build-$longname-git-clone-remove";
-                    eval { $srcdir->remove_tree({safe => 0}) };
+                    rmtree($srcdir);
                 }
             }
+            else {
+                $log->debug("$srcdir was empty");
+            }
             $srcdir->mkpath;
+            # git_in($srcdir, clone => -c => 'core.symlinks=true', $repo_url, '.');
             git_in($srcdir, clone => $repo_url, '.');
         }
     SKIP: {
