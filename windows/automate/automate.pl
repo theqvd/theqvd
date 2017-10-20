@@ -46,7 +46,7 @@ my $cfg = YAML::LoadFile($cfg_fn)
     or logdie($cfg_fn, "Loading configuration file failed");
 
 $wd //= $cfg->{run}{workdir};
-$wd = ($wd ? path($wd) : Path::Tiny->tempdir);
+$wd = ($wd ? path($wd) : Path::Tiny->tempdir)->absolute;
 $log->info("Working dir: $wd");
 
 my $downloads = $wd->child('download');
@@ -162,13 +162,20 @@ sub mkcmd_cygwin {
     return join " ", @wrapper, w32q(mkcmd_posix(@_));
 }
 
+sub capturecmd {
+    my $cmd = join(" ", @_);
+    $log->debug("Capturing command $cmd");
+    my @out = `$cmd`;
+    $? and logdie "Running command $cmd failed: $?";
+    chomp @out;
+    wantarray ? @out : $out[0];
+}
+
 sub w32_path_to_msys {
     my $path = shift;
     state %cache;
     $cache{$path} //= do {
-        my $cmd = mkcmd_msys cygpath => -u => $path;
-        my $out = `$cmd`;
-        chomp($out);
+        my $out = capturecmd mkcmd_msys cygpath => -u => $path;
         $log->debug("win32 path $path translated to msys $out");
         $out
     };
@@ -178,9 +185,7 @@ sub msys_path_to_w32 {
     my $path = shift;
     state %cache;
     $cache{$path} //= do {
-        my $cmd = mkcmd_msys cygpath => -w => $path;
-        my $out = `$cmd`;
-        chomp($out);
+        my $out = capturecmd mkcmd_msys cygpath => -w => $path;
         $log->debug("msys path $path translated to win32 $out");
         $out
     }
@@ -190,10 +195,7 @@ sub w32_path_to_cygwin {
     my $path = shift;
     state %cache;
     $cache{$path} //= do {
-        my $cmd = mkcmd_cygwin cygpath => -u => $path;
-        $log->debug("Capturing command: $cmd");
-        my $out = `$cmd`;
-        chomp($out);
+        my $out = capturecmd mkcmd_cygwin cygpath => -u => $path;
         $log->debug("win32 path $path translated to cygwin $out");
         $out
     };
@@ -203,9 +205,7 @@ sub cygwin_path_to_w32 {
     my $path = shift;
     state %cache;
     $cache{$path} //= do {
-        my $cmd = mkcmd_cygwin cygpath => -w => $path;
-        my $out = `$cmd`;
-        chomp($out);
+        my $out = capturecmd mkcmd_cygwin cygpath => -w => $path;
         $log->debug("cygwin path $path translated to win32 $out");
         $out
     }
@@ -416,10 +416,11 @@ sub setup_cygwin {
     $log->info("Cygwin installation completed");
 }
 
-sub git_in {
+sub git_env_in {
+    my $env = shift;
     my $dir = shift;
-    $log->debug("running git command in directory $dir: git @_");
-    runcmd_msys_in $dir, git => @_;
+    $log->debug("running $env git command in directory $dir: git @_");
+    runcmd_env_in $env, $dir, git => @_;
 }
 
 sub build_pulseaudio {
@@ -437,21 +438,34 @@ sub build_nxproxy {
 sub build_slave_wrapper {
 }
 
-
 sub build_from_git {
     my ($name, $this, $parent) = @_;
-    $this   //= $cfg->{build}{$name};
-    $parent //= $cfg->{build};
-    my $longname = $this->{longname} //= join('-', grep defined, $parent->{longname}, $name);
+    $this //= $cfg->{build}{$name};
     my $build = $this->{build};
-    my $env = $build->{env} //= ($parent->{build}{env} // 'mingw32');
     my $commands = $build->{commands};
-    my $srcdir = path($this->{srcdir} //= path($parent->{srcdir} // 'src')
-                      ->absolute($wd)->child($name)->stringify());
-    my $outdir = path($this->{outdir} //= path($parent->{outdir} // 'out')
-                      ->absolute($wd)->child($name)->stringify());
+    my ($longname, $srcdir, $outdir, $env);
+    if ($parent) {
+        $longname = $this->{longname} //= join('-', grep defined, $parent->{longname}, $name);
+        $srcdir = path($this->{srcdir} //= path($parent->{srcdir})->child($name)->stringify());
+        $outdir = path($this->{outdir} //= $parent->{outdir});
+        $env = $build->{env} //= $parent->{build}{env};
+    }
+    else {
+        $longname = $this->{longname} //= $name;
+        $srcdir = path($this->{srcdir} //= $wd->child('src', $name)->stringify);
+        $outdir = path($this->{outdir} //= $wd->child('out', $name)->stringify);
+        $env = $build->{env} //= 'mingw32';
+    }
+    my $envname = uc($longname =~ s/[\W]+/_/gr);
+    $ENV{"${envname}_OUTDIR"} = $outdir->canonpath;
+    $ENV{"${envname}_SRCDIR"} = $srcdir->canonpath;
+    $ENV{"${envname}_OUTDIR_CYGWIN"} = w32_path_to_cygwin($outdir->canonpath);
+    $ENV{"${envname}_SRCDIR_CYGWIN"} = w32_path_to_cygwin($srcdir->canonpath);
+    $ENV{"${envname}_OUTDIR_MSYS"} = w32_path_to_msys($outdir->canonpath);
+    $ENV{"${envname}_SRCDIR_MSYS"} = w32_path_to_msys($srcdir->canonpath);
+
     use Data::Dumper;
-    $log->debug("This: ".Dumper(\@_));
+    $log->debug("This: ".Dumper($this)."\nArgs: ".Dumper(\@_)."\nEnv: ".Dumper(\%ENV));
  SKIP: {
         skip_for "build-$longname-out-remove";
         rmtree($outdir);
@@ -473,15 +487,15 @@ sub build_from_git {
             }
             $srcdir->mkpath;
             # git_in($srcdir, clone => -c => 'core.symlinks=true', $repo_url, '.');
-            git_in($srcdir, clone => $repo_url, '.');
+            git_env_in($env, $srcdir, clone => $repo_url, '.');
         }
     SKIP: {
             skip_for "build-$longname-git-checkout";
-            git_in($srcdir, checkout => $this->{repository}{branch});
+            git_env_in($env, $srcdir, checkout => $this->{repository}{branch});
         }
     SKIP: {
             skip_for "build-$longname-git-pull";
-            git_in($srcdir, pull => 'origin', $this->{repository}{branch});
+            git_env_in($env, $srcdir, pull => 'origin', $this->{repository}{branch});
         }
         if ($commands and $commands->{clean}) {
         SKIP: {
@@ -506,7 +520,7 @@ sub build_from_git {
         if ($commands->{configure}) {
         SKIP: {
                 skip_for "build-$longname-configure";
-                my $configure = "$commands->{configure} --prefix=".w32_path_to_msys($outdir);
+                my $configure = $commands->{configure};
                 runcmd_env_in($env, $srcdir, $configure);
             }
         }

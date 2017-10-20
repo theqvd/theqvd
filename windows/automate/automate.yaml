@@ -37,8 +37,10 @@ setup:
       - automake
       - tar
       - mingw-w64-i686-libsndfile
+      - mingw-w64-i686-pcre2
       - libtool
       - nasm
+
 
   perl:
     url: http://strawberryperl.com/download/5.26.1.1/strawberry-perl-5.26.1.1-32bit.msi
@@ -80,7 +82,7 @@ build:
       commands:
         clean: git clean -dfx
         bootstrap: NOCONFIGURE=1 ./bootstrap.sh
-        configure: ./configure --disable-nls --disable-rpath --disable-largefile --disable-memfd --disable-x11 --disable-tests --disable-oss-output --disable-oss-wrapper --disable-alsa --disable-esound --disable-solaris --disable-coreaudio-output --disable-glib2 --disable-gtk3 --disable-gconf --disable-avahi --disable-jack --disable-asyncns --disable-tcpwrap --disable-lirc --disable-dbus --disable-bluez4 --disable-bluez5 --disable-bluez5-ofono-headset --disable-bluez5-native-headset --disable-udev --disable-hal-compat --disable-ipv6 --disable-openssl --disable-systemd-daemon --disable-systemd-login --disable-systemd-journal --disable-manpages --disable-per-user-esound-socket --disable-default-build-tests --disable-legacy-database-entry-format --without-libiconv-prefix --without-libintl-prefix
+        configure: ./configure --disable-nls --disable-rpath --disable-largefile --disable-memfd --disable-x11 --disable-tests --disable-oss-output --disable-oss-wrapper --disable-alsa --disable-esound --disable-solaris --disable-coreaudio-output --disable-glib2 --disable-gtk3 --disable-gconf --disable-avahi --disable-jack --disable-asyncns --disable-tcpwrap --disable-lirc --disable-dbus --disable-bluez4 --disable-bluez5 --disable-bluez5-ofono-headset --disable-bluez5-native-headset --disable-udev --disable-hal-compat --disable-ipv6 --disable-openssl --disable-systemd-daemon --disable-systemd-login --disable-systemd-journal --disable-manpages --disable-per-user-esound-socket --disable-default-build-tests --disable-legacy-database-entry-format --without-libiconv-prefix --without-libintl-prefix --prefix=$PULSEAUDIO_OUTDIR_CYGWIN
         make: make
         install: make install
 
@@ -93,15 +95,15 @@ build:
       commands:
         clean: git clean -dfx
         make: make
-        install: cp win-sftp-server.exe ../../out/win-sftp-server
+        install: cp win-sftp-server.exe $WIN_SFTP_SERVER_OUTDIR/win-sftp-server
 
   nxproxy:
     repository:
-      # url: https://github.com/ArcticaProject/nx-libs.git
+      url: https://github.com/ArcticaProject/nx-libs.git
       # branch: 9193d11eeeea933e293acd5e0f03fa4e9887186b
-      # branch: 3.6.x
-      url: https://github.com/salva/nx-libs.git
-      branch: fix-cygwin-compilation
+      branch: 3.6.x
+      #url: https://github.com/salva/nx-libs.git
+      #branch: fix-cygwin-compilation
 
     build:
       env: cygwin
@@ -122,13 +124,13 @@ build:
         build:
           commands:
             bootstrap: autoreconf -vfi
-            configure: ./configure
+            configure: ./configure --prefix=$NXPROXY_OUTDIR
             make: make
             install: make install
       - name: nxproxy
         build:
           commands:
             bootstrap: autoreconf -vfi
-            configure: ./configure
+            configure: ./configure --prefix=$NXPROXY_OUTDIR
             make: make
             install: make install
