@@ -68,7 +68,7 @@ setup_cygwin();
 build_pulseaudio();
 build_nxproxy();
 build_win_sftp_server();
-build_slave_wrapper();
+build_qvd_slaveserver_wrapper();
 
 exit(0);
 
@@ -435,7 +435,8 @@ sub build_nxproxy {
     build_from_git('nxproxy');
 }
 
-sub build_slave_wrapper {
+sub build_qvd_slaveserver_wrapper {
+    build_from_git('qvd-slaveserver-wrapper');
 }
 
 sub build_from_git {
@@ -443,16 +444,20 @@ sub build_from_git {
     $this //= $cfg->{build}{$name};
     my $build = $this->{build};
     my $commands = $build->{commands};
-    my ($longname, $srcdir, $outdir, $env);
+    my ($longname, $unpackdir, $srcdir, $outdir, $env);
     if ($parent) {
         $longname = $this->{longname} //= join('-', grep defined, $parent->{longname}, $name);
-        $srcdir = path($this->{srcdir} //= path($parent->{srcdir})->child($name)->stringify());
+        $unpackdir = path($this->{unpackdir} //= $parent->{unpackdir});
+        $srcdir = path($this->{srcdir} //= path($parent->{srcdir})->child($this->{subdir} // $name)->stringify());
         $outdir = path($this->{outdir} //= $parent->{outdir});
         $env = $build->{env} //= $parent->{build}{env};
     }
     else {
         $longname = $this->{longname} //= $name;
-        $srcdir = path($this->{srcdir} //= $wd->child('src', $name)->stringify);
+        $unpackdir = path($this->{unpackdir} //= $wd->child('src', $name)->stringify);
+        $srcdir = path($this->{srcdir} //= (defined($build->{subdir})
+                                            ? $unpackdir->child($build->{subdir})
+                                            : $unpackdir)->stringify);
         $outdir = path($this->{outdir} //= $wd->child('out', $name)->stringify);
         $env = $build->{env} //= 'mingw32';
     }
@@ -476,31 +481,31 @@ sub build_from_git {
         my $branch = $this->{repository}{branch};
     SKIP: {
             skip_for "build-$longname-git-clone";
-            if (-d $srcdir) {
+            if (-d $unpackdir) {
             SKIP: {
                     skip_for "build-$longname-git-clone-remove";
-                    rmtree($srcdir);
+                    rmtree($unpackdir);
                 }
             }
             else {
-                $log->debug("$srcdir was empty");
+                $log->debug("$unpackdir was empty");
             }
-            $srcdir->mkpath;
-            # git_in($srcdir, clone => -c => 'core.symlinks=true', $repo_url, '.');
-            git_env_in($env, $srcdir, clone => $repo_url, '.');
+            $unpackdir->mkpath;
+            # git_in($unpackdir, clone => -c => 'core.symlinks=true', $repo_url, '.');
+            git_env_in($env, $unpackdir, clone => $repo_url, '.');
         }
     SKIP: {
             skip_for "build-$longname-git-checkout";
-            git_env_in($env, $srcdir, checkout => $this->{repository}{branch});
+            git_env_in($env, $unpackdir, checkout => $this->{repository}{branch});
         }
     SKIP: {
             skip_for "build-$longname-git-pull";
-            git_env_in($env, $srcdir, pull => 'origin', $this->{repository}{branch});
+            git_env_in($env, $unpackdir, pull => 'origin', $this->{repository}{branch});
         }
         if ($commands and $commands->{clean}) {
         SKIP: {
                 skip_for "build-$longname-clean";
-                runcmd_env_in($env, $srcdir, $commands->{clean});
+                runcmd_env_in($env, $unpackdir, $commands->{clean});
             }
         }
     }

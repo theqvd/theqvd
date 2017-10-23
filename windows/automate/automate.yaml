@@ -37,10 +37,9 @@ setup:
       - automake
       - tar
       - mingw-w64-i686-libsndfile
-      - mingw-w64-i686-pcre2
+      - mingw-w64-i686-pcre
       - libtool
       - nasm
-
 
   perl:
     url: http://strawberryperl.com/download/5.26.1.1/strawberry-perl-5.26.1.1-32bit.msi
@@ -110,27 +109,28 @@ build:
       commands:
         clean: git clean -dfx
     children:
-      #- name: libjpeg-turbo
-      #  repository:
-      #    url: https://github.com/libjpeg-turbo/libjpeg-turbo.git
-      #    branch: master
-      #  build:
-      #    commands:
-      #      bootstrap: autoreconf -fiv
-      #      configure: ./configure
-      #      make: make
-      #      install: make install
       - name: nxcomp
         build:
           commands:
             bootstrap: autoreconf -vfi
-            configure: ./configure --prefix=$NXPROXY_OUTDIR
+            configure: ./configure --prefix=$NXPROXY_OUTDIR_CYGWIN
             make: make
             install: make install
       - name: nxproxy
         build:
           commands:
             bootstrap: autoreconf -vfi
-            configure: ./configure --prefix=$NXPROXY_OUTDIR
+            configure: ./configure --prefix=$NXPROXY_OUTDIR_CYGWIN
             make: make
             install: make install
+
+  qvd-slaveserver-wrapper:
+    repository:
+      url: https://github.com/theqvd/theqvd.git
+      branch: client-cleanup
+    build:
+      env: cygwin
+      subdir: windows/qvd-slaveserver-wrapper
+      commands:
+        make: make -f Makefile.cygwin
+        install: cp qvd-slaveserver-wrapper.exe $QVD_SLAVESERVER_WRAPPER_OUTDIR_CYGWIN
