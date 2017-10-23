@@ -1,6 +1,6 @@
 Wat.Views.DIListView = Wat.Views.ListView.extend({
     qvdObj: 'di',
-    liveFields: ['percentage', 'elapsed_time'],
+    liveFields: ['percentage', 'elapsed_time', 'state'],
     relatedDoc: {
         image_update: "Images update guide"
     },
@@ -21,20 +21,9 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         var that = this;
         
         $.each(that.collection.models, function (i, model) {
-            var statusStr = '';
-            
-            switch(model.get('state')) {
-                case 'new':
-                case 'generating':
-                    statusStr = 'Generating';
-                    break;
-                case 'uploading':
-                    statusStr = 'Uploading';
-                    break;
-                default:
-                    // Exit from loop iteration (Do not show progressBar)
-                    return;
-            }
+            // Show only state icons for each row
+            $('[data-id="' + model.get('id') + '"] .js-progress-icon').hide();
+            $('[data-id="' + model.get('id') + '"] .js-progress-icon--' + model.get('state')).show();
             
             this.template = _.template(
                 Wat.TPL.diProgressBar, {
@@ -42,11 +31,10 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
                     state: model.get('state'),
                     percentage: model.get('percentage'),
                     remainingTime: model.get('remaining_time'),
-                    elapsedTime: model.get('elapsed_time'),
-                    statusStr: statusStr
+                    elapsedTime: model.get('elapsed_time')
                 }
             );
-
+            
             $('.bb-di-progress[data-id="' + model.get('id') + '"]').html(this.template);
         });
         
@@ -87,19 +75,15 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
     updateDiProgress: function (progressBar) {
         var progressRemaining = $(progressBar).parent().find('.progress-remaining');
         var progressElapsed = $(progressBar).parent().find('.progress-elapsed');
-        var progressLabel = $(progressBar).find('.progress-label');
+        var progressLabel = $(progressBar).find('.js-progress-label--percentage');
         
         var percent = $(progressBar).attr('data-percent');
         var remaining = $(progressBar).attr('data-remaining');
         var elapsed = $(progressBar).attr('data-elapsed');
-        var statusStr = $(progressBar).attr('data-status-str');
         
         progressRemaining.html(Wat.U.secondsToHms(remaining));
         progressElapsed.html(Wat.U.secondsToHms(elapsed));
         var progressText = percent + "%";
-        if (statusStr) {
-            progressText = $.i18n.t(statusStr) + ': ' + progressText;
-        }
         progressLabel.text(progressText);
         $(progressBar).progressbar("value", percent);
         $(progressBar).find('.ui-progressbar-value').css('width', percent + '%').show();

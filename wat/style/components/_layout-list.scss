@@ -129,8 +129,54 @@
     }
     
     // DI rows
-    .di-row-state-generating {
-        background: #d7d7d7;
+    .di-row-state--new, .di-row-state--generating, .di-row-state--uploading {
+        td:first-child {
+            border-left: solid 3px lighten($col_blacker, 25);
+        }
+        
+        i {
+            color: lighten($col_blacker, 25);
+        }
+    }
+    
+    .di-row-state--fail {
+        td:first-child {
+            border-left: solid 3px darken(red, 10);
+        }
+        
+        i {
+            color: darken(red, 10);
+        }
+    }
+    
+    .di-row-state--upload_stalled {
+        td:first-child {
+            border-left: solid 3px darken(yellow, 10);
+        }
+        
+        i {
+            color: darken(yellow, 10);
+        }
+    }
+    
+    .di-row-state--ready {
+        td:first-child {
+            border-left: solid 3px darken(green, 10);
+        }
+        
+        i {
+            color: darken(green, 10);
+        }
+    }
+    
+    .di-row-state--retired {
+        td:first-child {
+            border-left: solid 3px darken($col_blacker, 10);
+        }
+        
+        i {
+            color: darken($col_blacker, 10);
+        }
     }
 }
 

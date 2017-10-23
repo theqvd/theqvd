@@ -118,7 +118,7 @@ Wat.I.detailsFields[qvdObj] = {
                 ],
                 'acls': 'tenant.see.language',
                 'display': true,
-                'icon': 'fa fa-globe'
+                'icon': 'fa fa-language'
             },
             'blocksize': {
                 'text': 'Block size',

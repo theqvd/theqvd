@@ -16,7 +16,7 @@
         </td>
     </tr>
     <tr>
-        <td><i class="fa fa-globe"></i><span data-i18n="Language"></span></td>
+        <td><i class="fa fa-language"></i><span data-i18n="Language"></span></td>
         <td>
             <span data-i18n="<%= WAT_LANGUAGE_ADMIN_OPTIONS[language] %>"></span>
             <%

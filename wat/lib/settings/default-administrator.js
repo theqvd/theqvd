@@ -130,7 +130,7 @@ Wat.I.detailsFields[qvdObj] = {
                 ],
                 'acls': 'administrator.see.language',
                 'display': true,
-                'icon': 'fa fa-globe'
+                'icon': 'fa fa-language'
             }
         }
     },

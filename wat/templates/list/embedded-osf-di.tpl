@@ -22,7 +22,7 @@
             }
             
     %>
-        <tr class="di-row-state-<%= model.get('state') %> <%= shrinkFactor <= iModel ? 'hidden' : '' %> js-shrinked-row">
+        <tr class="js-di-row-state di-row-state di-row-state--<%= model.get('state') %> <%= shrinkFactor <= iModel ? 'hidden' : '' %> js-shrinked-row" data-id="<%= model.get('id') %>">
             <td class="cell-check">
                 <input type="checkbox" 
                     class="check-it js-check-it" 
@@ -32,27 +32,18 @@
                     data-embedded-view="di"
                 >
             </td>
-            <td class="desktop max-1-icons">
-                <% 
-                switch (model.get('state')) { 
-                    case 'new':
-                    case 'generating':
-                        %>
-                            <i class="fa fa-magic faa-wrench animated" title="Being created"></i>
-                        <%
-                        break;
-                    case 'ready':
-                        %>
-                            <i class="fa fa-thumbs-up" title="Ready"></i>
-                        <%
-                        break;
-                    case 'published':
-                        %>
-                            <i class="fa fa-check" title="Published"></i>
-                        <%
-                        break;
-                }
-
+            <td class="desktop max-1-icons" data-id="<%= model.get('id') %>">
+                <i class="fa fa-magic faa-wrench animated js-progress-icon js-progress-icon--new" title="New"></i>
+                <i class="fa fa-magic faa-wrench animated js-progress-icon js-progress-icon--generating" title="Generating"></i>
+                <i class="fa fa-thumbs-up js-progress-icon js-progress-icon--ready" title="Ready"></i>
+                <i class="fa fa-globe js-progress-icon js-progress-icon--published" title="Published"></i>
+                <i class="fa fa-warning js-progress-icon js-progress-icon--fail" title="Fail"></i>
+                <i class="fa fa-upload js-progress-icon js-progress-icon--uploading" title="Uploading"></i>
+                <i class="fa fa-warning js-progress-icon js-progress-icon--upload_stalled" title="Upload stalled"></i>
+                <i class="fa fa-check faa-wrench animated js-progress-icon js-progress-icon--verifying" title="Verifying"></i>
+                <i class="fa fa-ban js-progress-icon js-progress-icon--retired" title="Retired"></i>
+                
+                <%
                 if (model.get('tags')) {
                 %>
                     <i class="fa fa-tags" title="&raquo; <%= model.get('tags').replace(/,/g,'<br /><br />&raquo; ') %>"></i>
@@ -77,15 +68,18 @@
                 <%
                 }
 
-                if (model.get('auto_publish') && model.get('state') != 'published' && model.get('state') != 'ready') {
+                if (model.get('auto_publish')) {
                 %>
-                    <i class="fa fa-rocket" data-i18n="[title]Will be published" title="<%= i18n.t('Will be published') %>"></i>
+                    <i class="fa fa-rocket js-auto-publish-icon" data-i18n="[title]Will be published after generation" title="<%= i18n.t('Will be published after generation') %>"></i>
                 <%
                 }
                 
-                if (model.get('expiration_time_hard') != null && model.get('state') != 'published' && model.get('state') != 'ready') {
+                if (model.get('expiration_time_hard') != null) {
+                    var expirationTime = Wat.U.secondsToHms(model.get('expiration_time_hard'), 'strLong');
                 %>
-                    <i class="fa fa-clock-o" data-i18n="[title]Affected machines will expire" title="<%= i18n.t('Affected machines will expire') %>: <%= model.get('expiration_time_hard')  %> seconds after generation"></i>
+                    <i class="fa fa-clock-o js-expiration-icon" title="<%= i18n.t('Affected machines will expire') %>: <%= i18n.t('__time__ after generation', {
+                        time: expirationTime
+                    }) %>"></i>
                 <%
                 }
                 %>

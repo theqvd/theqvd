@@ -401,29 +401,66 @@ Wat.U = {
         model.set(attributes);
     },
     
-    secondsToHms: function (seconds) {
+    // Convert seconds to format hours:minutes:seconds
+    // Parameters:
+    //  seconds: Number of seconds (integer)
+    //  format: strShort|strLong|object
+    secondsToHms: function (seconds, format) {
+        var format = format || 'strShort';
+        
         var secondsOnDay = 60*60*24;
         var secondsOnHour = 60*60;
         var secondsOnMinute = 60;
-        var ret = '';
         
+        var days = 0;
         if (seconds > secondsOnDay) {
-            var days = Math.round(seconds / secondsOnDay);
+            days = Math.round(seconds / secondsOnDay);
             seconds = seconds % secondsOnDay;
-            
-            ret = days + ' days ';
         }
         
-        var hours = Math.floor(seconds / secondsOnHour);
+        var hours = parseInt(Math.floor(seconds / secondsOnHour));
         seconds = seconds % secondsOnHour;
-        var minutes = Math.floor(seconds / secondsOnMinute);
-        seconds = seconds % secondsOnMinute;
+        var minutes = parseInt(Math.floor(seconds / secondsOnMinute));
+        seconds = parseInt(seconds % secondsOnMinute);
         
-        if (hours < 10) { hours = '0' + hours }
-        if (minutes < 10) { minutes = '0' + minutes }
-        if (seconds < 10) { seconds = '0' + seconds }
+        switch (format) {
+            case 'strShort':
+                var ret = '';
+                
+                if (days > 0) {
+                    ret = $.i18n.t("__count__ days", {count: days});
+                }
+                
+                if (hours < 10) { hours = '0' + hours }
+                if (minutes < 10) { minutes = '0' + minutes }
+                if (seconds < 10) { seconds = '0' + seconds }
 
-        ret += hours + ':' + minutes + ':' + seconds;
+                ret += hours + ':' + minutes + ':' + seconds;
+                break;
+            case 'strLong':
+                var ret = '';
+                
+                if (days > 0) {
+                    ret += $.i18n.t("__count__ days", {count: days});
+                }
+                
+                if (hours > 0) {
+                    ret += ' ' + $.i18n.t("__count__ hours", {count: hours});
+                }
+                
+                if (minutes > 0) {
+                    ret += ' ' + $.i18n.t("__count__ minutes", {count: minutes});
+                }
+                break;
+            case 'object':
+                var ret = {
+                    days: days,
+                    hours: hours,
+                    minutes: minutes,
+                    seconds: seconds
+                }
+                break;
+        }
         
         return ret;
     },

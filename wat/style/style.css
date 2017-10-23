@@ -1790,23 +1790,50 @@ body {
       margin-top: 9px;
       float: left;
       color: #fdfdfd; }
-    /* line 132, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
-    .wrapper .content .list-block .di-row-state-generating, .wrapper .content .details-side .di-row-state-generating {
-      background: #d7d7d7; }
+    /* line 133, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
+    .wrapper .content .list-block .di-row-state--new td:first-child, .wrapper .content .list-block .di-row-state--generating td:first-child, .wrapper .content .list-block .di-row-state--uploading td:first-child, .wrapper .content .details-side .di-row-state--new td:first-child, .wrapper .content .details-side .di-row-state--generating td:first-child, .wrapper .content .details-side .di-row-state--uploading td:first-child {
+      border-left: solid 3px #737373; }
     /* line 137, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
+    .wrapper .content .list-block .di-row-state--new i, .wrapper .content .list-block .di-row-state--generating i, .wrapper .content .list-block .di-row-state--uploading i, .wrapper .content .details-side .di-row-state--new i, .wrapper .content .details-side .di-row-state--generating i, .wrapper .content .details-side .di-row-state--uploading i {
+      color: #737373; }
+    /* line 143, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
+    .wrapper .content .list-block .di-row-state--fail td:first-child, .wrapper .content .details-side .di-row-state--fail td:first-child {
+      border-left: solid 3px #cc0000; }
+    /* line 147, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
+    .wrapper .content .list-block .di-row-state--fail i, .wrapper .content .details-side .di-row-state--fail i {
+      color: #cc0000; }
+    /* line 153, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
+    .wrapper .content .list-block .di-row-state--upload_stalled td:first-child, .wrapper .content .details-side .di-row-state--upload_stalled td:first-child {
+      border-left: solid 3px #cccc00; }
+    /* line 157, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
+    .wrapper .content .list-block .di-row-state--upload_stalled i, .wrapper .content .details-side .di-row-state--upload_stalled i {
+      color: #cccc00; }
+    /* line 163, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
+    .wrapper .content .list-block .di-row-state--ready td:first-child, .wrapper .content .details-side .di-row-state--ready td:first-child {
+      border-left: solid 3px #004d00; }
+    /* line 167, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
+    .wrapper .content .list-block .di-row-state--ready i, .wrapper .content .details-side .di-row-state--ready i {
+      color: #004d00; }
+    /* line 173, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
+    .wrapper .content .list-block .di-row-state--retired td:first-child, .wrapper .content .details-side .di-row-state--retired td:first-child {
+      border-left: solid 3px #1a1a1a; }
+    /* line 177, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
+    .wrapper .content .list-block .di-row-state--retired i, .wrapper .content .details-side .di-row-state--retired i {
+      color: #1a1a1a; }
+    /* line 183, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
     .wrapper .content .more-tags {
       margin-top: 8px; }
-    /* line 141, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
+    /* line 187, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
     .wrapper .content fieldset {
       width: 100%;
       clear: both;
       background: whitesmoke;
       border: 2px solid #ebebeb;
       padding: 20px; }
-      /* line 150, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
+      /* line 196, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
       .wrapper .content fieldset.action-select {
         margin-top: 60px; }
-      /* line 154, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
+      /* line 200, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
       .wrapper .content fieldset.action-selected {
         margin-top: 35px;
         padding: 10px;
@@ -1819,28 +1846,28 @@ body {
         min-height: 100px;
         background: #4d4d4d; }
         @media screen and (min-width: 41em) {
-          /* line 154, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
+          /* line 200, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
           .wrapper .content fieldset.action-selected {
             width: 15%;
             left: 5px; } }
-        /* line 170, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
+        /* line 216, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
         .wrapper .content fieldset.action-selected a.button, .wrapper .content fieldset.action-selected a.button2 {
           white-space: normal;
           height: initial; }
           @media only screen and (max-width: 41em) {
-            /* line 170, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
+            /* line 216, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
             .wrapper .content fieldset.action-selected a.button, .wrapper .content fieldset.action-selected a.button2 {
               text-align: center; } }
-        /* line 180, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
+        /* line 226, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
         .wrapper .content fieldset.action-selected .title {
           color: #fdfdfd;
           margin-bottom: 20px;
           font-weight: bold;
           line-height: 20px; }
-      /* line 188, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
+      /* line 234, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
       .wrapper .content fieldset .chosen-container {
         margin-top: -6px; }
-      /* line 192, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
+      /* line 238, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout-list.scss */
       .wrapper .content fieldset legend {
         text-align: left;
         color: #333;
