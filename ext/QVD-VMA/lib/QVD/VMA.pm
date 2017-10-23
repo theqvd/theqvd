@@ -493,7 +493,7 @@ sub _fork_monitor {
                         DEBUG "Session $1, calling hooks";
                         _save_nxagent_state_and_call_hook lc $1;
                     }
-                    when (/Listening to slave connections on port '(\d+)'/) {
+                    when (/Listening to slave connections on port '(?:tcp:\w+:)?(\d+)'/) {
                         DEBUG "Slave channel opened";
                         
                         if ( $props{'qvd.client.usb.enabled' } ) {
