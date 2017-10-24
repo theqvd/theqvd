@@ -64,6 +64,7 @@ setup_skel();
 setup_msys2();
 setup_strawberry_perl();
 setup_cygwin();
+setup_vcxsrv();
 
 build_pulseaudio();
 build_nxproxy();
@@ -211,6 +212,11 @@ sub cygwin_path_to_w32 {
     }
 }
 
+sub mkcmd_cmd_in {
+    my $dir = shift;
+    join(' ', cd => w32q($dir->canonpath), '&&', @_);
+}
+
 sub mkcmd_msys_in {
     my $dir = shift;
     join(' ', cd => posix_quote(w32_path_to_msys($dir->canonpath)), '&&', mkcmd_posix(@_))
@@ -274,6 +280,23 @@ sub runcmd_cygwin_in {
     runcmd_cygwin mkcmd_cygwin_in(@_);
 }
 
+sub runcmd_perl {
+    my $prefix = path($cfg->{run}{perl}{prefix});
+    my $msys2_prefix = path($cfg->{run}{msys2}{prefix});
+    my $mingw32_prefix = path($cfg->{run}{mingw32}{prefix})->absolute($msys2_prefix);
+    local $ENV{PATH} = join(';',
+                            w32q($prefix->child('perl/bin')),
+                            w32q($prefix->child('c/bin')),
+                            w32q($mingw32_prefix->child('bin')),
+                            w32q($msys2_prefix->child('usr/bin')),
+                            $ENV{PATH});
+    runcmd @_;
+}
+
+sub runcmd_perl_in {
+    runcmd_perl mkcmd_cmd_in(@_);
+}
+
 sub runcmd_env_in {
     my $env = shift;
     if ($env eq 'msys') {
@@ -284,6 +307,9 @@ sub runcmd_env_in {
     }
     elsif ($env eq 'cygwin') {
         runcmd_cygwin_in(@_);
+    }
+    elsif ($env eq 'perl') {
+        runcmd_perl_in(@_);
     }
     else {
         logdie("Bad environment designator '$env'");
@@ -374,8 +400,24 @@ sub setup_strawberry_perl {
         }
 
         $log->info("Running $exe");
-        runcmd 'MSIEXEC', '/a', w32q($exe->canonpath), '/passive';
+        runcmd 'MSIEXEC', '/i', w32q($exe->canonpath), '/passive';
     }
+
+ SKIP: {
+        skip_for 'setup-perl-modules';
+        for my $module (@{$perl->{modules}}) {
+            my $name = $module->{name};
+            my $src = $module->{url} // $name;
+            if (defined (my $branch = $module->{branch})) {
+                $src .= '@' . $branch;
+            }
+            $log->info(defined($name)
+                       ? "Installing Perl module '$name' from '$src'"
+                       : "Installing Perl module from '$src'");
+            runcmd_perl cpanm => w32q($src);
+        }
+    }
+
     $log->info("$product installation completed");
 }
 
@@ -414,6 +456,25 @@ sub setup_cygwin {
         }
     }
     $log->info("Cygwin installation completed");
+}
+
+sub setup_vcxsrv {
+    my $vcxsrv = $cfg->{setup}{vcxsrv};
+    my $prefix = path($cfg->{run}{vcxsrv}{prefix});
+    my $product = $vcxsrv->{product};
+ SKIP: {
+        skip_for 'setup-vcxsrv';
+        my $url = $vcxsrv->{url};
+        my $exe = $downloads->child($url =~ s{.*/}{}r);
+        mirror($url, $exe);
+
+        if (-d $prefix) {
+
+        }
+        $log->info("Installing VcXsrv");
+        runcmd w32q($exe);
+    }
+    $log->info("VcXsrv installation completed");
 }
 
 sub git_env_in {
@@ -462,8 +523,8 @@ sub build_from_git {
         $env = $build->{env} //= 'mingw32';
     }
     my $envname = uc($longname =~ s/[\W]+/_/gr);
-    $ENV{"${envname}_OUTDIR"} = $outdir->canonpath;
-    $ENV{"${envname}_SRCDIR"} = $srcdir->canonpath;
+    $ENV{"${envname}_OUTDIR"} = w32q($outdir->canonpath);
+    $ENV{"${envname}_SRCDIR"} = w32q($srcdir->canonpath);
     $ENV{"${envname}_OUTDIR_CYGWIN"} = w32_path_to_cygwin($outdir->canonpath);
     $ENV{"${envname}_SRCDIR_CYGWIN"} = w32_path_to_cygwin($srcdir->canonpath);
     $ENV{"${envname}_OUTDIR_MSYS"} = w32_path_to_msys($outdir->canonpath);

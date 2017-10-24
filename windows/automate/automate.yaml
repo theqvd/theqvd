@@ -45,11 +45,23 @@ setup:
     url: http://strawberryperl.com/download/5.26.1.1/strawberry-perl-5.26.1.1-32bit.msi
     product: Strawberry Perl
     modules:
-      cpan:
-        - Config::Properties
-      git:
-        - url: foo
-          branch: bar
+      - name: Config::Properties
+      - name: Config::AutoConf
+      - name: Win32::Ldd
+        url: https://github.com/salva/p5-Win32-Ldd.git
+        branch: master
+      - name: Win32::Packer
+        url: https://github.com/salva/p5-Win32-Packer.git
+        branch: master
+      - name: Win32::EnumPrinters
+        url: https://github.com/salva/p5-Win32-EnumPrinters.git
+        branch: master
+      - name: Locale::gettext
+        url: https://github.com/vandry/Perl-Locale-gettext.git
+        branch: master
+      - name: Proc::Background
+        url: https://github.com/salva/p5-Proc-Background.git
+        branch: master
 
   cygwin:
     url: https://www.cygwin.com/setup-x86.exe
@@ -70,6 +82,10 @@ setup:
       - libpng-devel
       - xorg-server-devel
       - imake
+
+  vcxsrv:
+    url: https://kent.dl.sourceforge.net/project/vcxsrv/vcxsrv/1.19.3.3/vcxsrv.1.19.3.3.installer.exe
+    product: VcXsrv
 
 build:
   pulseaudio:
@@ -134,3 +150,13 @@ build:
       commands:
         make: make -f Makefile.cygwin
         install: cp qvd-slaveserver-wrapper.exe $QVD_SLAVESERVER_WRAPPER_OUTDIR_CYGWIN
+
+  qvd-client:
+    repository:
+      url: https://github.com/theqvd/theqvd.git
+      branch: client-cleanup
+    build:
+      env: perl
+      subdir: windows/installer
+      commands:
+        make: perl ./packer.pl --log-level=trace --installer-type=msi --keep-work-dir --nx-libs=$NXPROXY_OUTDIR --pulseaudio=$PULSEAUDIO_OUTDIR
