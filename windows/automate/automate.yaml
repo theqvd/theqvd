@@ -3,19 +3,23 @@ run:
     - build
     - pack
   workdir: c:/temp
-  msys2:
+  msys:
     prefix: c:/msys32/
     wrapper: usr/bin/bash --login -c
   mingw32:
     prefix: mingw32
   perl:
     prefix: c:/strawberry/
+  perl_sh:
+    wrapper: usr/bin/sh -c
   cygwin:
     wrapper: bin/bash --login -c
     prefix: c:/cygwin/
+  vcxsrv:
+    prefix: c:/vcxsrv/
 
 setup:
-  msys2:
+  msys:
     url: http://repo.msys2.org/distrib/i686/msys2-i686-20161025.exe
     autoinstall-script-url: https://raw.githubusercontent.com/msys2/msys2-installer/master/auto-install.js
     product: MSYS2
@@ -55,9 +59,6 @@ setup:
         branch: master
       - name: Win32::EnumPrinters
         url: https://github.com/salva/p5-Win32-EnumPrinters.git
-        branch: master
-      - name: Locale::gettext
-        url: https://github.com/vandry/Perl-Locale-gettext.git
         branch: master
       - name: Proc::Background
         url: https://github.com/salva/p5-Proc-Background.git
@@ -151,6 +152,33 @@ build:
         make: make -f Makefile.cygwin
         install: cp qvd-slaveserver-wrapper.exe $QVD_SLAVESERVER_WRAPPER_OUTDIR_CYGWIN
 
+  perl-libgettext:
+    repository:
+      url: http://ftp.gnu.org/pub/gnu/gettext/gettext-0.19.8.1.tar.gz
+    build:
+      env: perl_sh
+      subdir: gettext-0.19.8.1/gettext-runtime
+      commands:
+        configure: ./configure --prefix=$PERL_PREFIX_MSYS/perl
+    children:
+      - name: intl
+        build:
+          commands:
+            make: make
+            install: make install
+
+  perl-locale-gettext:
+    repository:
+      url: https://github.com/salva/p5-Locale-gettext.git
+      branch: fix_win_tests
+    build:
+      env: perl_sh
+      commands:
+        configure: perl Makefile.PL
+        make: gmake
+        test: gmake test
+        install: gmake install
+
   qvd-client:
     repository:
       url: https://github.com/theqvd/theqvd.git
@@ -160,3 +188,4 @@ build:
       subdir: windows/installer
       commands:
         make: perl ./packer.pl --log-level=trace --installer-type=msi --keep-work-dir --nx-libs=$NXPROXY_OUTDIR --pulseaudio=$PULSEAUDIO_OUTDIR
+

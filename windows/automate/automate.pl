@@ -61,11 +61,15 @@ my %do = map { lc($_) => 1 } @do;
 my $ua = HTTP::Tiny->new();
 
 setup_skel();
-setup_msys2();
+setup_msys();
 setup_strawberry_perl();
 setup_cygwin();
 setup_vcxsrv();
 
+setup_env();
+
+build_perl_libgettext();
+build_perl_locale_gettext();
 build_pulseaudio();
 build_nxproxy();
 build_win_sftp_server();
@@ -148,8 +152,17 @@ sub mkcmd_posix {
 sub mkcmd_msys {
     state @wrapper;
     unless (@wrapper) {
-        @wrapper = split /\s+/, $cfg->{run}{msys2}{wrapper};
-        $wrapper[0] = w32q(path($wrapper[0])->absolute($cfg->{run}{msys2}{prefix})->canonpath);
+        @wrapper = split /\s+/, $cfg->{run}{msys}{wrapper};
+        $wrapper[0] = w32q(path($wrapper[0])->absolute($cfg->{run}{msys}{prefix})->canonpath);
+    }
+    return join " ", @wrapper, w32q(mkcmd_posix(@_));
+}
+
+sub mkcmd_perl_sh {
+    state @wrapper;
+    unless (@wrapper) {
+        @wrapper = split /\s+/, $cfg->{run}{perl_sh}{wrapper};
+        $wrapper[0] = w32q(path($wrapper[0])->absolute($cfg->{run}{msys}{prefix})->canonpath);
     }
     return join " ", @wrapper, w32q(mkcmd_posix(@_));
 }
@@ -214,7 +227,7 @@ sub cygwin_path_to_w32 {
 
 sub mkcmd_cmd_in {
     my $dir = shift;
-    join(' ', cd => w32q($dir->canonpath), '&&', @_);
+    join(' ', cd => w32q($dir->canonpath), '&', @_);
 }
 
 sub mkcmd_msys_in {
@@ -227,10 +240,15 @@ sub mkcmd_cygwin_in {
     join(' ', cd => posix_quote(w32_path_to_cygwin($dir->canonpath)), '&&', mkcmd_posix(@_))
 }
 
+sub mkcmd_perl_sh_in {
+    my $dir = shift;
+    mkcmd_perl_sh join(' ', cd => posix_quote(w32_path_to_msys($dir->canonpath)), '&&', mkcmd_posix(@_))
+}
+
 sub mkcmd_mingw32 {
     state $env = do {
         my $prefix = path($cfg->{run}{mingw32}{prefix})
-            ->absolute($cfg->{run}{msys2}{prefix});
+            ->absolute($cfg->{run}{msys}{prefix});
         my $mingw32_prefix = posix_quote(w32_path_to_msys($prefix));
         my $mingw32_bin = posix_quote(w32_path_to_msys($prefix->child('bin')));
         my $mingw32_aclocal = posix_quote(w32_path_to_msys($prefix->child('share/aclocal')));
@@ -282,16 +300,21 @@ sub runcmd_cygwin_in {
 
 sub runcmd_perl {
     my $prefix = path($cfg->{run}{perl}{prefix});
-    my $msys2_prefix = path($cfg->{run}{msys2}{prefix});
-    my $mingw32_prefix = path($cfg->{run}{mingw32}{prefix})->absolute($msys2_prefix);
+    my $msys_prefix = path($cfg->{run}{msys}{prefix});
+    my $mingw32_prefix = path($cfg->{run}{mingw32}{prefix})->absolute($msys_prefix);
     local $ENV{PATH} = join(';',
                             w32q($prefix->child('perl/bin')),
                             w32q($prefix->child('c/bin')),
                             w32q($mingw32_prefix->child('bin')),
-                            w32q($msys2_prefix->child('usr/bin')),
+                            w32q($msys_prefix->child('usr/bin')),
                             $ENV{PATH});
     runcmd @_;
 }
+
+sub runcmd_perl_sh_in {
+    runcmd_perl mkcmd_perl_sh_in @_;
+}
+
 
 sub runcmd_perl_in {
     runcmd_perl mkcmd_cmd_in(@_);
@@ -311,6 +334,9 @@ sub runcmd_env_in {
     elsif ($env eq 'perl') {
         runcmd_perl_in(@_);
     }
+    elsif ($env eq 'perl_sh') {
+        runcmd_perl_sh_in(@_);
+    }
     else {
         logdie("Bad environment designator '$env'");
     }
@@ -323,30 +349,30 @@ sub setup_skel {
     $out->mkpath;
 }
 
-sub setup_msys2 {
-    my $msys2 = $cfg->{setup}{msys2};
-    my $prefix = path($cfg->{run}{msys2}{prefix});
-    my $product = $msys2->{product};
-    my $commands = $msys2->{commands};
+sub setup_msys {
+    my $msys = $cfg->{setup}{msys};
+    my $prefix = path($cfg->{run}{msys}{prefix});
+    my $product = $msys->{product};
+    my $commands = $msys->{commands};
  SKIP: {
-        skip_for 'setup-msys2-install';
-        my $url = $msys2->{url};
+        skip_for 'setup-msys-install';
+        my $url = $msys->{url};
         my $exe = $downloads->child($url =~ s{.*/}{}r);
-        my $script_url = $msys2->{'autoinstall-script-url'};
+        my $script_url = $msys->{'autoinstall-script-url'};
         my $script = $downloads->child($script_url =~ s{.*/}{}r);
         mirror($url, $exe);
         mirror($script_url, $script);
         my $uninstall = $prefix->child($commands->{uninstall});
         if (-x $uninstall) {
         SKIP: {
-                skip_for 'setup-msys2-install-uninstall';
+                skip_for 'setup-msys-install-uninstall';
                 $log->info("Removing previous installations of $product");
                 runcmd w32q($uninstall);
             }
         }
         if (-d $prefix) {
         SKIP: {
-                skip_for 'setup-msys2-install-remove';
+                skip_for 'setup-msys-install-remove';
                 $log->info("Removing previous installation at $prefix");
                 rmtree($prefix);
             }
@@ -356,17 +382,17 @@ sub setup_msys2 {
         runcmd w32q($exe->canonpath), '--script' => w32q($script->canonpath);
     }
  SKIP: {
-        skip_for 'setup-msys2-update';
+        skip_for 'setup-msys-update';
         $log->info("Updating $product");
         for my $update (@{$commands->{update}}) {
             runcmd_msys $update;
         }
     }
  SKIP: {
-        skip_for 'setup-msys2-packages';
+        skip_for 'setup-msys-packages';
         $log->info("Installing packages");
         my $install = $commands->{install};
-        for my $pkg (@{$msys2->{packages}}) {
+        for my $pkg (@{$msys->{packages}}) {
             $log->info("Installing $pkg");
             runcmd_msys $install . " " . posix_quote($pkg);
         }
@@ -480,27 +506,47 @@ sub setup_vcxsrv {
 sub git_env_in {
     my $env = shift;
     my $dir = shift;
+    $env = 'perl_sh' if $env eq 'perl';
     $log->debug("running $env git command in directory $dir: git @_");
     runcmd_env_in $env, $dir, git => @_;
 }
 
 sub build_pulseaudio {
-    build_from_git('pulseaudio');
+    build_from_repos('pulseaudio');
 }
 
 sub build_win_sftp_server {
-    build_from_git('win-sftp-server');
+    build_from_repos('win-sftp-server');
 }
 
 sub build_nxproxy {
-    build_from_git('nxproxy');
+    build_from_repos('nxproxy');
 }
 
 sub build_qvd_slaveserver_wrapper {
-    build_from_git('qvd-slaveserver-wrapper');
+    build_from_repos('qvd-slaveserver-wrapper');
 }
 
-sub build_from_git {
+sub setup_env {
+    for my $env (qw(perl cygwin msys)) {
+        my $prefix = path($cfg->{run}{$env}{prefix});
+        my $cp = $prefix->canonpath;
+        $ENV{uc($env)."_PREFIX"} = w32q($cp);
+        $ENV{uc($env)."_PREFIX_CYGWIN"} = w32_path_to_cygwin($cp);
+        $ENV{uc($env)."_PREFIX_MSYS"} = w32_path_to_msys($cp);
+    }
+}
+
+
+sub build_perl_libgettext {
+    build_from_repos('perl-libgettext');
+}
+
+sub build_perl_locale_gettext {
+    build_from_repos('perl-locale-gettext');
+}
+
+sub build_from_repos {
     my ($name, $this, $parent) = @_;
     $this //= $cfg->{build}{$name};
     my $build = $this->{build};
@@ -530,8 +576,8 @@ sub build_from_git {
     $ENV{"${envname}_OUTDIR_MSYS"} = w32_path_to_msys($outdir->canonpath);
     $ENV{"${envname}_SRCDIR_MSYS"} = w32_path_to_msys($srcdir->canonpath);
 
-    use Data::Dumper;
-    $log->debug("This: ".Dumper($this)."\nArgs: ".Dumper(\@_)."\nEnv: ".Dumper(\%ENV));
+    #use Data::Dumper;
+    #$log->debug("This: ".Dumper($this)."\nArgs: ".Dumper(\@_)."\nEnv: ".Dumper(\%ENV));
  SKIP: {
         skip_for "build-$longname-out-remove";
         rmtree($outdir);
@@ -539,30 +585,58 @@ sub build_from_git {
     }
     if (my $repo = $this->{repository}) {
         my $repo_url = $this->{repository}{url};
-        my $branch = $this->{repository}{branch};
-    SKIP: {
-            skip_for "build-$longname-git-clone";
-            if (-d $unpackdir) {
-            SKIP: {
-                    skip_for "build-$longname-git-clone-remove";
-                    rmtree($unpackdir);
+
+        if ($repo_url =~ /\.git$/) {
+            my $branch = $this->{repository}{branch};
+        SKIP: {
+                skip_for "build-$longname-git-clone";
+                if (-d $unpackdir) {
+                SKIP: {
+                        skip_for "build-$longname-git-clone-remove";
+                        rmtree($unpackdir);
+                    }
                 }
+                else {
+                    $log->debug("$unpackdir was empty");
+                }
+                $unpackdir->mkpath;
+                # git_in($unpackdir, clone => -c => 'core.symlinks=true', $repo_url, '.');
+                git_env_in($env, $unpackdir, clone => $repo_url, '.');
             }
-            else {
-                $log->debug("$unpackdir was empty");
+        SKIP: {
+                skip_for "build-$longname-git-checkout";
+                git_env_in($env, $unpackdir, checkout => $this->{repository}{branch});
             }
-            $unpackdir->mkpath;
-            # git_in($unpackdir, clone => -c => 'core.symlinks=true', $repo_url, '.');
-            git_env_in($env, $unpackdir, clone => $repo_url, '.');
+        SKIP: {
+                skip_for "build-$longname-git-pull";
+                git_env_in($env, $unpackdir, pull => 'origin', $this->{repository}{branch});
+            }
         }
-    SKIP: {
-            skip_for "build-$longname-git-checkout";
-            git_env_in($env, $unpackdir, checkout => $this->{repository}{branch});
+        elsif ($repo_url =~ /\.t(?:ar\.)?gz$/) {
+            my $tgz = $downloads->child($repo_url =~ s{.*/}{}r);
+        SKIP: {
+                skip_for "build-$longname-download";
+                mirror($repo_url, $tgz);
+            }
+        SKIP: {
+                skip_for "build-$longname-unpack";
+                if (-d $unpackdir) {
+                SKIP: {
+                        skip_for "build-$longname-unpack-remove";
+                        rmtree($unpackdir);
+                    }
+                }
+                else {
+                    $log->debug("$unpackdir was empty");
+                }
+                $unpackdir->mkpath;
+                runcmd_env_in('msys', $unpackdir, tar => 'xzf', w32_path_to_msys($tgz->canonpath));
+            }
         }
-    SKIP: {
-            skip_for "build-$longname-git-pull";
-            git_env_in($env, $unpackdir, pull => 'origin', $this->{repository}{branch});
+        else {
+            logdie("unsupported termination in url: $repo_url");
         }
+
         if ($commands and $commands->{clean}) {
         SKIP: {
                 skip_for "build-$longname-clean";
@@ -596,6 +670,12 @@ sub build_from_git {
                 runcmd_env_in($env, $srcdir, $commands->{make});
             }
         }
+        if ($commands->{test}) {
+        SKIP: {
+                skip_for "build-$longname-test";
+                runcmd_env_in($env, $srcdir, $commands->{test});
+            }
+        }
         if ($commands->{install}) {
         SKIP: {
                 skip_for "build-$longname-install";
@@ -606,7 +686,7 @@ sub build_from_git {
 
     if (my $children = $this->{children}) {
         for my $child (@$children) {
-            build_from_git($child->{name}, $child, $this);
+            build_from_repos($child->{name}, $child, $this);
         }
     }
 }
