@@ -57,7 +57,7 @@ Wat.Models.Model = Backbone.Model.extend({
     
     url: function () {
         var url = Wat.C.getBaseUrl();
-        url += "&action=" + this.actionPrefix + "_get_details";
+        url += "&action=" + this.actionPrefix + "_get_list";
         if (this.id != undefined) {
             url += "&filters={\"id\":" + this.id + "}";
         }

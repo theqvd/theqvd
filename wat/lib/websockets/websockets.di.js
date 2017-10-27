@@ -26,40 +26,37 @@ Wat.WS.changeWebsocketDi = function (id, field, data, row) {
                     break;
                 case 'uploading':
                     $('[data-id="' + id + '"] .js-progressbar').show();
-                    $('[data-id="' + id + '"] .js-progressbar-times--elapsed').show();
                     break;
             }
             
             // Change row styles
-            $('[data-id="' + id + '"].js-di-row-state').removeClass('di-row-state--new');
-            $('[data-id="' + id + '"].js-di-row-state').removeClass('di-row-state--generating');
-            $('[data-id="' + id + '"].js-di-row-state').removeClass('di-row-state--uploading');
-            $('[data-id="' + id + '"].js-di-row-state').removeClass('di-row-state--upload_stalled');
-            $('[data-id="' + id + '"].js-di-row-state').removeClass('di-row-state--verifying');
-            $('[data-id="' + id + '"].js-di-row-state').removeClass('di-row-state--fail');
-            $('[data-id="' + id + '"].js-di-row-state').removeClass('di-row-state--ready');
-            $('[data-id="' + id + '"].js-di-row-state').removeClass('di-row-state--published');
-            $('[data-id="' + id + '"].js-di-row-state').removeClass('di-row-state--retired');
+            $.each(Wat.I.detailsFields.di.general.fieldList.state.options, function (key, values) {
+                $('[data-id="' + id + '"].js-di-row-state').removeClass('di-row-state--' + key);
+            });
             
             $('[data-id="' + id + '"].js-di-row-state').addClass('di-row-state--' + data);
             
+            
+            var statusStr = $.i18n.t(Wat.I.detailsFields.di.general.fieldList.state.options[data].text);
+            
             // Status label
-            
-            var statusStr = '';
-            
             switch(data) {
                 case 'new':
                 case 'generating':
-                    statusStr = 'Generating';
-                    break;
                 case 'uploading':
-                    statusStr = 'Uploading';
+                    $('[data-id="' + id + '"] .js-progress-label--state').html($.i18n.t(statusStr) + ': ');
+                    $('[data-wsupdate="state-text"][data-id="' + id + '"]').hide();
                     break;
+                default:
+                    $('[data-wsupdate="state-text"][data-id="' + id + '"]').show();
             }
             
-            if (statusStr) {
-                $('[data-id="' + id + '"] .js-progress-label--state').html($.i18n.t(statusStr) + ': ');
+            if (row['status_message']) {
+                statusStr += ': ' + row['status_message'];
             }
+            
+            $('[data-id="' + id + '"] .js-progress-icon--' + data).attr('title', statusStr);
+            $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(statusStr);
             
             // Icons for autopublish and expiration time
             
@@ -74,6 +71,29 @@ Wat.WS.changeWebsocketDi = function (id, field, data, row) {
                     break;
             }
             
+            // Icons for default and tags
+            
+            $('[data-id="' + id + '"] .js-head-icon').hide();
+            $('[data-id="' + id + '"] .js-default-icon').hide();
+            $('[data-id="' + id + '"] .js-tags-icon').hide();
+            $('[data-id="' + id + '"] .js-future-tags-icon').show();
+            
+            // For details view
+            $('[data-field-code="head"]').hide();
+            $('.js-future-tags-note').show();
+            
+            switch(data) {
+                case 'published':
+                    $('[data-id="' + id + '"] .js-head-icon').show();
+                    $('[data-id="' + id + '"] .js-default-icon').show();
+                    $('[data-id="' + id + '"] .js-tags-icon').show();
+                    $('[data-id="' + id + '"] .js-future-tags-icon').hide();
+                    
+                    // For details view
+                    $('[data-field-code="head"]').show();
+                    $('.js-future-tags-note').hide();
+                    break;
+            }
             break;
     }
 }

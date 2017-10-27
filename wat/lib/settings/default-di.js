@@ -149,7 +149,45 @@ Wat.I.detailsFields[qvdObj] = {
                     'state'
                 ],
                 'text': 'State',
-                'icon': 'fa fa-heart'
+                'icon': 'fa fa-heart',
+                'options': {
+                    new: {
+                        text: 'New',
+                        icon: 'fa fa-magic faa-wrench animated',
+                    },
+                    generating: {
+                        text: 'Generating',
+                        icon: 'fa fa-magic faa-wrench animated',
+                    },
+                    fail: {
+                        text: 'Fail',
+                        icon: 'fa fa-warning',
+                    },
+                    uploading: {
+                        text: 'Uploading',
+                        icon: 'fa fa-upload',
+                    },
+                    upload_stalled: {
+                        text: 'Upload stalled',
+                        icon: 'fa fa-warning',
+                    },
+                    verifying: {
+                        text: 'Verifying',
+                        icon: 'fa fa-check faa-wrench animated',
+                    },
+                    ready: {
+                        text: 'Ready',
+                        icon: 'fa fa-thumbs-up',
+                    },
+                    published: {
+                        text: 'Published',
+                        icon: 'fa fa-globe',
+                    },
+                    retired: {
+                        text: 'Retired',
+                        icon: 'fa fa-ban',
+                    }
+                }
             },
             'description': {
                 'display': true,
@@ -244,6 +282,24 @@ Wat.I.detailsFields[qvdObj] = {
                 'acls': 'di.see.creation-date',
                 'display': false,
                 'icon': 'fa fa-clock-o'
+            },
+            'auto_publish': {
+                'text': 'Publish',
+                'fields': [
+                    'auto_publish'
+                ],
+                'acls': 'di.see.creation-date',
+                'display': false,
+                'icon': 'fa fa-rocket'
+            },
+            'expire_vms': {
+                'text': 'Affected machines will expire',
+                'fields': [
+                    'expiretion_time_hard'
+                ],
+                'acls': 'di.see.creation-date',
+                'display': false,
+                'icon': 'fa fa-hourglass-half'
             }
         }
     }

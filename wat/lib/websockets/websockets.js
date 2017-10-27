@@ -173,7 +173,7 @@ Wat.WS = {
             id: model.get('id')
         };
         
-        that.openWebsocket(qvdObj, qvdObj + '_get_details', {
+        that.openWebsocket(qvdObj, qvdObj + '_get_list', {
             filters: filters, 
             fields: fields
         }, that.changeWebsocket, 'ws', viewType);

@@ -1,6 +1,6 @@
 Wat.Views.DIListView = Wat.Views.ListView.extend({
     qvdObj: 'di',
-    liveFields: ['percentage', 'elapsed_time', 'state'],
+    liveFields: ['percentage', 'elapsed_time', 'state', 'status_message'],
     relatedDoc: {
         image_update: "Images update guide"
     },
@@ -14,79 +14,23 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
     renderList: function (params) {
         Wat.Views.ListView.prototype.renderList.apply(this, [params]);
         
+        this.execModelFunctions();
+        
         this.renderProgressBars();
+        
+        Wat.T.translate();
     },
     
-    renderProgressBars: function () {
+    execModelFunctions: function () {
         var that = this;
         
-        $.each(that.collection.models, function (i, model) {
-            // Show only state icons for each row
-            $('[data-id="' + model.get('id') + '"] .js-progress-icon').hide();
-            $('[data-id="' + model.get('id') + '"] .js-progress-icon--' + model.get('state')).show();
+        $.each($('[data-model-function]'), function (i, element) {
+            var f = $(element).attr('data-model-function');
+            var id = parseInt($(element).attr('data-id'));
+            var model = that.collection.where({id: id})[0]
             
-            this.template = _.template(
-                Wat.TPL.diProgressBar, {
-                    id: model.get('id'),
-                    state: model.get('state'),
-                    percentage: model.get('percentage'),
-                    remainingTime: model.get('remaining_time'),
-                    elapsedTime: model.get('elapsed_time')
-                }
-            );
-            
-            $('.bb-di-progress[data-id="' + model.get('id') + '"]').html(this.template);
+            that[f](element, model);
         });
-        
-        var progressBars = $("." + this.cid + " .progressbar");
-
-        $.each (progressBars, function (i, progressBar) {
-            var progressLabel = $(progressBar).find('.progress-label');
-            $(progressBar).progressbar({
-                value: false,
-                change: function (e) {
-                    that.updateDiProgress(progressBar);
-                },
-                complete: function () {
-                    var progressLabel = $(progressBar).find('.progress-label');
-                    progressLabel.text($.i18n.t("Complete"));
-                }
-            });
-        });
-        
-        that.intervals['localDiProgressTime'] = setInterval(function () {
-            $.each(progressBars, function (i, progressBar) {
-                var percent = parseInt($(progressBar).attr('data-percent'));
-                var remainingTime = parseInt($(progressBar).attr('data-remaining'));
-                var elapsedTime = parseInt($(progressBar).attr('data-elapsed'));
-
-                if (percent >= 100) {
-                    return;
-                }
-
-                $(progressBar).attr('data-remaining', remainingTime>0 ? remainingTime-1 : 0);
-                $(progressBar).attr('data-elapsed', elapsedTime+1);
-
-                that.updateDiProgress(progressBar);
-            });
-        }, 1000);
-    },
-    
-    updateDiProgress: function (progressBar) {
-        var progressRemaining = $(progressBar).parent().find('.progress-remaining');
-        var progressElapsed = $(progressBar).parent().find('.progress-elapsed');
-        var progressLabel = $(progressBar).find('.js-progress-label--percentage');
-        
-        var percent = $(progressBar).attr('data-percent');
-        var remaining = $(progressBar).attr('data-remaining');
-        var elapsed = $(progressBar).attr('data-elapsed');
-        
-        progressRemaining.html(Wat.U.secondsToHms(remaining));
-        progressElapsed.html(Wat.U.secondsToHms(elapsed));
-        var progressText = percent + "%";
-        progressLabel.text(progressText);
-        $(progressBar).progressbar("value", percent);
-        $(progressBar).find('.ui-progressbar-value').css('width', percent + '%').show();
     },
     
     listEvents: {
@@ -174,6 +118,8 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
     },
     
     renderEmbeddedList: function () {
+        var that = this;
+        
         this.template = _.template(
             Wat.TPL.embedded_osf_di, {
                 cid: this.cid,
@@ -186,6 +132,8 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         
         $('.dis-subrow .bb-list').html(this.template);
         
+        this.execModelFunctions();
+        
         this.renderProgressBars();
         
         Wat.T.translateAndShow();
@@ -194,6 +142,28 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         if (this.liveFields) {
             Wat.WS.openListWebsockets(this.qvdObj, this.collection, this.liveFields, this.cid);
         }
+    },
+    
+    // Render tags of a model and set it on the title attribute of an element
+    renderTags: function (element, model) {
+        $(element).attr('title', '&raquo; ' + model.get('tags').replace(/,/g,'<br /><br />&raquo; '));
+    },
+    
+    // Render future tags of a model and set it on the title attribute of an element
+    renderFutureTags: function (element, model) {
+        if (model.get('tags')) {
+            var tags = '&raquo; ' + model.get('tags').replace(/,/g,'<br /><br />&raquo; ');
+            tags = $.i18n.t('Tags') + ':<br /><br />' + tags;
+        }
+        else {
+            var tags = $.i18n.t('Tags') + ': ' + $.i18n.t('No');
+        }
+        
+        var def = model.get('default') ? $.i18n.t('Yes') : $.i18n.t('No');
+        
+        var futureTags = $.i18n.t('Settings after publication') + ': <br /><br /> default: ' + def + '<br /><br />' + tags;
+        
+        $(element).attr('title', futureTags);
     },
     
     applySelectedAction: function (e) {

@@ -1,5 +1,6 @@
 Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({  
     qvdObj: 'di',
+    liveFields: ['percentage', 'elapsed_time', 'state', 'status_message'],
     relatedDoc: {
         image_update: "Images update guide"
     },
@@ -83,10 +84,20 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
     render: function () {
         this.notFound = this.model.attributes.disk_image == undefined;
         
-        Wat.Views.DetailsView.prototype.render.apply(this);        
+        Wat.Views.DetailsView.prototype.render.apply(this);
+        
+        this.addFutureTagsNote();
+        
+        this.renderProgressBars();
+        
+        Wat.T.translate();
     },
     
     bindEditorEvents: function() {
         Wat.Views.DetailsView.prototype.bindEditorEvents.apply(this);
+    },
+    
+    addFutureTagsNote: function () {
+        $('.details-list[data-details-block="tags"]>tbody').append(Wat.TPL.futureTagsNote);
     }
 });

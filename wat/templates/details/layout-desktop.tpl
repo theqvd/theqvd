@@ -49,7 +49,7 @@ $.each(detailsFields, function (dCategoryCode, dCategory) {
                     return;
                 }
                 %>
-                <tr>
+                <tr data-field-code="<%= dFieldCode %>">
                     <td><i class="<%= dField.icon %>"></i><span data-i18n="<%= dField.text %>"></span></td>
                     <td>
                     <%= 

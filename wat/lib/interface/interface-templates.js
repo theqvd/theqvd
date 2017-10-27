@@ -92,6 +92,12 @@ Wat.I.T = {
                         name: 'details/layout-mobile'
                     }
                 }
+                
+                if (params.qvdObj == 'di') {
+                    templates["futureTagsNote"] = {
+                        name: 'details/di-future-tags-row-note'
+                    };
+                }
                 break;
             case 'doc':
                 templates = {

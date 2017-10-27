@@ -176,5 +176,86 @@ Wat.Common.BySection.di = {
     // Hook to be called after create an element
     afterCreating: function () {
         // Nothing
-    }
+    },
+    
+    renderProgressBars: function () {
+        var that = this;
+        
+        if (that.collection) {
+            var models = that.collection.models;
+        }
+        else {
+            var models = [that.model];
+        }
+        
+        $.each(models, function (i, model) {
+            // Show only state icons for each row
+            $('[data-id="' + model.get('id') + '"] .js-progress-icon').hide();
+            $('[data-id="' + model.get('id') + '"] .js-progress-icon--' + model.get('state')).show();
+            
+            this.template = _.template(
+                Wat.TPL.diProgressBar, {
+                    id: model.get('id'),
+                    state: model.get('state'),
+                    percentage: model.get('percentage'),
+                    remainingTime: model.get('remaining_time'),
+                    elapsedTime: model.get('elapsed_time')
+                }
+            );
+            
+            $('.bb-di-progress[data-id="' + model.get('id') + '"]').html(this.template);
+        });
+        
+        var progressBars = $("." + this.cid + " .progressbar");
+
+        $.each (progressBars, function (i, progressBar) {
+            var progressLabel = $(progressBar).find('.progress-label');
+            $(progressBar).progressbar({
+                value: false,
+                change: function (e) {
+                    that.updateDiProgress(progressBar);
+                },
+                complete: function () {
+                    var progressLabel = $(progressBar).find('.progress-label');
+                    progressLabel.text($.i18n.t("Complete"));
+                }
+            });
+        });
+        
+        clearInterval(that.intervals['localDiProgressTime']);
+        
+        that.intervals['localDiProgressTime'] = setInterval(function () {
+            $.each(progressBars, function (i, progressBar) {
+                var percent = parseInt($(progressBar).attr('data-percent'));
+                var remainingTime = parseInt($(progressBar).attr('data-remaining'));
+                var elapsedTime = parseInt($(progressBar).attr('data-elapsed'));
+
+                if (percent >= 100) {
+                    return;
+                }
+
+                $(progressBar).attr('data-remaining', remainingTime>0 ? remainingTime-1 : 0);
+                $(progressBar).attr('data-elapsed', elapsedTime+1);
+
+                that.updateDiProgress(progressBar);
+            });
+        }, 1000);
+    },
+    
+    updateDiProgress: function (progressBar) {
+        var progressRemaining = $(progressBar).parent().find('.progress-remaining');
+        var progressElapsed = $(progressBar).parent().find('.progress-elapsed');
+        var progressLabel = $(progressBar).find('.js-progress-label--percentage');
+        
+        var percent = $(progressBar).attr('data-percent');
+        var remaining = $(progressBar).attr('data-remaining');
+        var elapsed = $(progressBar).attr('data-elapsed');
+        
+        progressRemaining.html(Wat.U.secondsToHms(remaining));
+        progressElapsed.html(Wat.U.secondsToHms(elapsed));
+        var progressText = percent + "%";
+        progressLabel.text(progressText);
+        $(progressBar).progressbar("value", percent);
+        $(progressBar).find('.ui-progressbar-value').css('width', percent + '%').show();
+    },
 }

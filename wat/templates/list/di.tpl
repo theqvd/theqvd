@@ -136,32 +136,32 @@
                             case 'info':
                 %>
                                 <td class="desktop max-1-icons" data-id="<%= model.get('id') %>">
-                                    <i class="fa fa-magic faa-wrench animated js-progress-icon js-progress-icon--new" title="New"></i>
-                                    <i class="fa fa-magic faa-wrench animated js-progress-icon js-progress-icon--generating" title="Generating"></i>
-                                    <i class="fa fa-thumbs-up js-progress-icon js-progress-icon--ready" title="Ready"></i>
-                                    <i class="fa fa-globe js-progress-icon js-progress-icon--published" title="Published"></i>
-                                    <i class="fa fa-warning js-progress-icon js-progress-icon--fail" title="Fail"></i>
-                                    <i class="fa fa-upload js-progress-icon js-progress-icon--uploading" title="Uploading"></i>
-                                    <i class="fa fa-warning js-progress-icon js-progress-icon--upload_stalled" title="Upload stalled"></i>
-                                    <i class="fa fa-check faa-wrench animated js-progress-icon js-progress-icon--verifying" title="Verifying"></i>
-                                    <i class="fa fa-ban js-progress-icon js-progress-icon--retired" title="Retired"></i>
+                                    <% $.each(Wat.I.detailsFields.di.general.fieldList.state.options, function (key, values) { %>
+                                        <i class="<%= values.icon %> js-progress-icon js-progress-icon--<%= key %>" data-i18n="[title]<%= values.text %>"></i>
+                                    <% }); %>
                                     
                                     <%
+                                    if (model.get('state') != 'published') {
+                                    %>
+                                        <i class="fa fa-road js-future-tags-icon" data-model-function="renderFutureTags" data-id="<%= model.get('id') %>"></i>
+                                    <%
+                                    }
+                                    
                                     if (model.get('tags') && (!infoRestrictions || infoRestrictions.tags)) {
                                     %>
-                                        <i class="fa fa-tags" title="&raquo; <%= model.get('tags').replace(/,/g,'<br /><br />&raquo; ') %>"></i>
+                                        <i class="fa fa-tags js-tags-icon" data-model-function="renderTags" data-id="<%= model.get('id') %>"></i>
                                     <%
                                     }
                                     
                                     if (model.get('head') && (!infoRestrictions || infoRestrictions.head)) {
                                     %>
-                                        <i class="fa fa-flag-o" title="head"></i>
+                                        <i class="fa fa-flag-o js-head-icon" title="head"></i>
                                     <%
                                     }
                                     
                                     if (model.get('default') && (!infoRestrictions || infoRestrictions.default)) {
                                     %>
-                                        <i class="fa fa-home" title="default"></i>
+                                        <i class="fa fa-home js-default-icon" title="default"></i>
                                     <%
                                     }
                                     
@@ -180,7 +180,7 @@
                                     if (model.get('expiration_time_hard') != null) {
                                         var expirationTime = Wat.U.secondsToHms(model.get('expiration_time_hard'), 'strLong');
                                     %>
-                                        <i class="fa fa-clock-o js-expiration-icon" title="<%= i18n.t('Affected machines will expire') %>: <%= i18n.t('__time__ after generation', {
+                                        <i class="fa fa-hourglass-half js-expiration-icon" title="<%= i18n.t('Affected machines will expire') %>: <%= i18n.t('__time__ after generation', {
                                             time: expirationTime
                                         }) %>"></i>
                                     <%

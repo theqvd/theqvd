@@ -19,7 +19,17 @@ switch (dFieldCode) {
         <%
         break;
     case 'state':
-            print(model.get('state'));
+            var statusStr = Wat.I.detailsFields.di.general.fieldList.state.options[model.get('state')].text;
+            var icon = Wat.I.detailsFields.di.general.fieldList.state.options[model.get('state')].icon;
+            
+            if (model.get('status_message')) {
+                statusStr += ': ' + model.get('status_message');
+            }
+            %>
+            <span data-wsupdate="state-text" data-id="<%= model.get('id') %>"><%= statusStr %></span>
+            
+            <div class="bb-di-progress" data-id="<%= model.get('id') %>"></div>
+            <%
         break;
     case 'tags':
         if (!model.get('tags')) {
@@ -40,6 +50,36 @@ switch (dFieldCode) {
             %>
         </ul>
         <%
+        break;
+    case 'auto_publish':
+        if (model.get('auto_publish')) {
+        %>
+            <span data-i18n="When finish generation"></span>
+        <%
+        }
+        else {
+        %>
+            <span data-i18n="No"></span>
+        <%
+        }
+        break;
+    case 'expire_vms':
+        if (model.get('expiration_time_hard') === null) {
+        %>
+            <span data-i18n="No"></span>
+        <%
+        }
+        else if (model.get('expiration_time_hard') === 0) {
+        %>
+            <span data-i18n="When finish generation"></span>
+        <%
+        }
+        else if (model.get('expiration_time_hard') > 0) {
+            var expirationTime = Wat.U.secondsToHms(model.get('expiration_time_hard'), 'strLong');
+            print(i18n.t('__time__ after generation', {
+                        time: expirationTime
+                    }));
+        }
         break;
     default:
         var commonField = _.template(
