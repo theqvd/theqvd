@@ -17,6 +17,10 @@ run:
     prefix: c:/cygwin/
   vcxsrv:
     prefix: c:/vcxsrv/
+  ghostscript:
+    prefix: c:/ghostscript/
+  gsview:
+    prefix: c:/gsview/
 
 setup:
   msys:
@@ -44,6 +48,7 @@ setup:
       - mingw-w64-i686-pcre
       - libtool
       - nasm
+      - unzip
 
   perl:
     url: http://strawberryperl.com/download/5.26.1.1/strawberry-perl-5.26.1.1-32bit.msi
@@ -51,6 +56,7 @@ setup:
     modules:
       - name: Config::Properties
       - name: Config::AutoConf
+      - name: Wx
       - name: Win32::Ldd
         url: https://github.com/salva/p5-Win32-Ldd.git
         branch: master
@@ -87,6 +93,14 @@ setup:
   vcxsrv:
     url: https://kent.dl.sourceforge.net/project/vcxsrv/vcxsrv/1.19.3.3/vcxsrv.1.19.3.3.installer.exe
     product: VcXsrv
+
+  ghostscript:
+    url: https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs922/gs922w32.exe
+    product: Ghostscript
+
+  gsview:
+    url: http://pages.cs.wisc.edu/~ghost/gsview/download/gsv50w32.exe
+    product: GSview
 
 build:
   pulseaudio:
@@ -187,5 +201,5 @@ build:
       env: perl
       subdir: windows/installer
       commands:
-        make: perl ./packer.pl --log-level=trace --installer-type=msi --keep-work-dir --nx-libs=$NXPROXY_OUTDIR --pulseaudio=$PULSEAUDIO_OUTDIR
+        make: perl ./packer.pl --log-level=trace --installer-type=msi --keep-work-dir --nx-libs=%NXPROXY_OUTDIR% --pulseaudio=%PULSEAUDIO_OUTDIR% --gsview=%GSVIEW_PREFIX%\gsview --ghostscript=%GHOSTSCRIPT_PREFIX% --vcxsrv=%VCXSRV_PREFIX%
 

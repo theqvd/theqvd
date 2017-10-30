@@ -65,6 +65,8 @@ setup_msys();
 setup_strawberry_perl();
 setup_cygwin();
 setup_vcxsrv();
+setup_ghostscript();
+setup_gsview();
 
 setup_env();
 
@@ -74,6 +76,7 @@ build_pulseaudio();
 build_nxproxy();
 build_win_sftp_server();
 build_qvd_slaveserver_wrapper();
+build_qvd_client();
 
 exit(0);
 
@@ -300,19 +303,26 @@ sub runcmd_cygwin_in {
 
 sub runcmd_perl {
     my $prefix = path($cfg->{run}{perl}{prefix});
-    my $msys_prefix = path($cfg->{run}{msys}{prefix});
-    my $mingw32_prefix = path($cfg->{run}{mingw32}{prefix})->absolute($msys_prefix);
     local $ENV{PATH} = join(';',
                             w32q($prefix->child('perl/bin')),
                             w32q($prefix->child('c/bin')),
-                            w32q($mingw32_prefix->child('bin')),
-                            w32q($msys_prefix->child('usr/bin')),
+                            # w32q($msys_prefix->child('usr/bin')),
                             $ENV{PATH});
     runcmd @_;
 }
 
+sub runcmd_perl_msys {
+    my $msys_prefix = path($cfg->{run}{msys}{prefix});
+    my $mingw32_prefix = path($cfg->{run}{mingw32}{prefix})->absolute($msys_prefix);
+    local $ENV{PATH} = join(';',
+                            w32q($mingw32_prefix->child('bin')),
+                            w32q($msys_prefix->child('usr/bin')),
+                            $ENV{PATH});
+    runcmd_perl @_;
+}
+
 sub runcmd_perl_sh_in {
-    runcmd_perl mkcmd_perl_sh_in @_;
+    runcmd_perl_msys mkcmd_perl_sh_in @_;
 }
 
 
@@ -433,14 +443,20 @@ sub setup_strawberry_perl {
         skip_for 'setup-perl-modules';
         for my $module (@{$perl->{modules}}) {
             my $name = $module->{name};
-            my $src = $module->{url} // $name;
+            my $url = $module->{url};
+            my $src = $url // $name;
             if (defined (my $branch = $module->{branch})) {
                 $src .= '@' . $branch;
             }
             $log->info(defined($name)
                        ? "Installing Perl module '$name' from '$src'"
                        : "Installing Perl module from '$src'");
-            runcmd_perl cpanm => w32q($src);
+            if (defined $url and $url =~ /\.git$/) {
+                runcmd_perl_msys cpanm => w32q($src);
+            }
+            else {
+                runcmd_perl cpanm => w32q($src);
+            }
         }
     }
 
@@ -498,9 +514,51 @@ sub setup_vcxsrv {
 
         }
         $log->info("Installing VcXsrv");
-        runcmd w32q($exe);
+        $prefix->mkpath;
+        runcmd w32q($exe), '/S', '/D=' . $prefix->canonpath;
     }
     $log->info("VcXsrv installation completed");
+}
+
+sub setup_ghostscript {
+    my $ghostscript = $cfg->{setup}{ghostscript};
+    my $prefix = path($cfg->{run}{ghostscript}{prefix});
+    my $product = $ghostscript->{product};
+ SKIP: {
+        skip_for 'setup-ghostscript';
+        my $url = $ghostscript->{url};
+        my $exe = $downloads->child($url =~ s{.*/}{}r);
+        mirror($url, $exe);
+
+        if (-d $prefix) {
+
+        }
+        $log->info("Installing Ghostscript");
+        runcmd w32q($exe), '/S', "/D=" . $prefix->canonpath; # $prefix shouldn't be quoted here!!!
+    }
+    $log->info("Ghostscript installation completed");
+}
+
+sub setup_gsview {
+    my $gsview = $cfg->{setup}{gsview};
+    my $prefix = path($cfg->{run}{gsview}{prefix});
+    my $product = $gsview->{product};
+ SKIP: {
+        skip_for 'setup-gsview';
+        my $url = $gsview->{url};
+        my $exe = $downloads->child($url =~ s{.*/}{}r);
+        mirror($url, $exe);
+
+        if (-d $prefix) {
+
+        }
+        $log->info("Installing Gsview");
+        # runcmd w32q($exe);
+
+        $prefix->mkpath;
+        runcmd_msys_in($prefix, unzip => w32_path_to_msys($exe->canonpath));
+    }
+    $log->info("GSview installation completed");
 }
 
 sub git_env_in {
@@ -528,7 +586,7 @@ sub build_qvd_slaveserver_wrapper {
 }
 
 sub setup_env {
-    for my $env (qw(perl cygwin msys)) {
+    for my $env (qw(perl cygwin msys gsview ghostscript vcxsrv)) {
         my $prefix = path($cfg->{run}{$env}{prefix});
         my $cp = $prefix->canonpath;
         $ENV{uc($env)."_PREFIX"} = w32q($cp);
@@ -544,6 +602,10 @@ sub build_perl_libgettext {
 
 sub build_perl_locale_gettext {
     build_from_repos('perl-locale-gettext');
+}
+
+sub build_qvd_client {
+    build_from_repos('qvd-client');
 }
 
 sub build_from_repos {
