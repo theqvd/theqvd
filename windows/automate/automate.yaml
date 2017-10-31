@@ -21,6 +21,8 @@ run:
     prefix: c:/ghostscript/
   gsview:
     prefix: c:/gsview/
+  wix:
+    prefix: c:/wix/
 
 setup:
   msys:
@@ -57,6 +59,15 @@ setup:
       - name: Config::Properties
       - name: Config::AutoConf
       - name: Wx
+      - name: Log::Dispatch::FileRotate
+      - name: Win32::LongPath
+      - name: Data::UUID
+        url: https://github.com/salva/p5-Data-UUID.git
+        branch: master
+      - name: Data::GUID
+      - name: X11::Protocol
+        test: no
+      - name: X11::Auth
       - name: XML::FromPerl
         url: https://github.com/salva/p5-XML-FromPerl.git
         branch: master
@@ -104,6 +115,10 @@ setup:
   gsview:
     url: http://pages.cs.wisc.edu/~ghost/gsview/download/gsv50w32.exe
     product: GSview
+
+  wix:
+    url: https://github.com/wixtoolset/wix3/releases/download/wix311rtm/wix311.exe
+    product: Wix Toolset
 
 build:
   pulseaudio:
@@ -167,7 +182,7 @@ build:
       subdir: windows/qvd-slaveserver-wrapper
       commands:
         make: make -f Makefile.cygwin
-        install: cp qvd-slaveserver-wrapper.exe $QVD_SLAVESERVER_WRAPPER_OUTDIR_CYGWIN
+        install: cp qvd-slaveserver-wrapper.exe $QVD_SLAVESERVER_WRAPPER_OUTDIR_CYGWIN/qvd-slaveserver-wrapper.exe
 
   perl-libgettext:
     repository:
@@ -205,5 +220,5 @@ build:
       subdir: windows/installer
       commands:
         configure: perl -de 1
-        make: perl packer.pl --log-level=trace --installer-type=msi --keep-work-dir --nx-libs=%NXPROXY_OUTDIR% --pulseaudio=%PULSEAUDIO_OUTDIR% --gsview=%GSVIEW_PREFIX%\gsview --ghostscript=%GHOSTSCRIPT_PREFIX% --vcxsrv=%VCXSRV_PREFIX% --win-sftp-server=%WIN_SFTP_SERVER_OUTDIR% --output-dir=%QVD_CLIENT_OUTDIR%
+        make: perl packer.pl --log-level=trace --installer-type=msi --keep-work-dir --nx-libs=%NXPROXY_OUTDIR% --pulseaudio=%PULSEAUDIO_OUTDIR% --gsview=%GSVIEW_PREFIX%\gsview --ghostscript=%GHOSTSCRIPT_PREFIX% --vcxsrv=%VCXSRV_PREFIX% --win-sftp-server=%WIN_SFTP_SERVER_OUTDIR% --slaveserver-wrapper=%QVD_SLAVESERVER_WRAPPER_OUTDIR% --output-dir=%QVD_CLIENT_OUTDIR%
 

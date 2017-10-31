@@ -67,6 +67,7 @@ setup_cygwin();
 setup_vcxsrv();
 setup_ghostscript();
 setup_gsview();
+setup_wix();
 
 setup_env();
 
@@ -451,11 +452,15 @@ sub setup_strawberry_perl {
             $log->info(defined($name)
                        ? "Installing Perl module '$name' from '$src'"
                        : "Installing Perl module from '$src'");
+
+            my @flags;
+            my $test = $module->{test} // 'yes';
+            push @flags, '-n' if $test eq 'no';
             if (defined $url and $url =~ /\.git$/) {
-                runcmd_perl_msys cpanm => w32q($src);
+                runcmd_perl_msys cpanm => @flags, w32q($src);
             }
             else {
-                runcmd_perl cpanm => w32q($src);
+                runcmd_perl cpanm => @flags, w32q($src);
             }
         }
     }
@@ -561,6 +566,25 @@ sub setup_gsview {
     $log->info("GSview installation completed");
 }
 
+sub setup_wix {
+    my $wix = $cfg->{setup}{wix};
+    my $prefix = path($cfg->{run}{wix}{prefix});
+    my $product = $wix->{product};
+ SKIP: {
+        skip_for 'setup-wix';
+        my $url = $wix->{url};
+        my $exe = $downloads->child($url =~ s{.*/}{}r);
+        mirror($url, $exe);
+
+        if (-d $prefix) {
+
+        }
+        $log->info("Installing Wix");
+        runcmd w32q($exe);
+    }
+    $log->info("Wix installation completed");
+}
+
 sub git_env_in {
     my $env = shift;
     my $dir = shift;
@@ -586,7 +610,7 @@ sub build_qvd_slaveserver_wrapper {
 }
 
 sub setup_env {
-    for my $env (qw(perl cygwin msys gsview ghostscript vcxsrv)) {
+    for my $env (qw(perl cygwin msys gsview ghostscript vcxsrv wix)) {
         my $prefix = path($cfg->{run}{$env}{prefix});
         my $cp = $prefix->canonpath;
         $ENV{uc($env)."_PREFIX"} = w32q($cp);
