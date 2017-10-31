@@ -57,6 +57,9 @@ setup:
       - name: Config::Properties
       - name: Config::AutoConf
       - name: Wx
+      - name: XML::FromPerl
+        url: https://github.com/salva/p5-XML-FromPerl.git
+        branch: master
       - name: Win32::Ldd
         url: https://github.com/salva/p5-Win32-Ldd.git
         branch: master
@@ -112,7 +115,7 @@ build:
       commands:
         clean: git clean -dfx
         bootstrap: NOCONFIGURE=1 ./bootstrap.sh
-        configure: ./configure --disable-nls --disable-rpath --disable-largefile --disable-memfd --disable-x11 --disable-tests --disable-oss-output --disable-oss-wrapper --disable-alsa --disable-esound --disable-solaris --disable-coreaudio-output --disable-glib2 --disable-gtk3 --disable-gconf --disable-avahi --disable-jack --disable-asyncns --disable-tcpwrap --disable-lirc --disable-dbus --disable-bluez4 --disable-bluez5 --disable-bluez5-ofono-headset --disable-bluez5-native-headset --disable-udev --disable-hal-compat --disable-ipv6 --disable-openssl --disable-systemd-daemon --disable-systemd-login --disable-systemd-journal --disable-manpages --disable-per-user-esound-socket --disable-default-build-tests --disable-legacy-database-entry-format --without-libiconv-prefix --without-libintl-prefix --prefix=$PULSEAUDIO_OUTDIR_CYGWIN
+        configure: ./configure --disable-nls --disable-rpath --disable-largefile --disable-memfd --disable-x11 --disable-tests --disable-oss-output --disable-oss-wrapper --disable-alsa --disable-esound --disable-solaris --disable-coreaudio-output --disable-glib2 --disable-gtk3 --disable-gconf --disable-avahi --disable-jack --disable-asyncns --disable-tcpwrap --disable-lirc --disable-dbus --disable-bluez4 --disable-bluez5 --disable-bluez5-ofono-headset --disable-bluez5-native-headset --disable-udev --disable-hal-compat --disable-ipv6 --disable-openssl --disable-systemd-daemon --disable-systemd-login --disable-systemd-journal --disable-manpages --disable-per-user-esound-socket --disable-default-build-tests --disable-legacy-database-entry-format --without-libiconv-prefix --without-libintl-prefix --prefix=$PULSEAUDIO_OUTDIR_MSYS
         make: make
         install: make install
 
@@ -125,7 +128,7 @@ build:
       commands:
         clean: git clean -dfx
         make: make
-        install: cp win-sftp-server.exe $WIN_SFTP_SERVER_OUTDIR/win-sftp-server
+        install: cp win-sftp-server.exe $WIN_SFTP_SERVER_OUTDIR_MSYS/win-sftp-server.exe
 
   nxproxy:
     repository:
@@ -201,5 +204,6 @@ build:
       env: perl
       subdir: windows/installer
       commands:
-        make: perl ./packer.pl --log-level=trace --installer-type=msi --keep-work-dir --nx-libs=%NXPROXY_OUTDIR% --pulseaudio=%PULSEAUDIO_OUTDIR% --gsview=%GSVIEW_PREFIX%\gsview --ghostscript=%GHOSTSCRIPT_PREFIX% --vcxsrv=%VCXSRV_PREFIX%
+        configure: perl -de 1
+        make: perl packer.pl --log-level=trace --installer-type=msi --keep-work-dir --nx-libs=%NXPROXY_OUTDIR% --pulseaudio=%PULSEAUDIO_OUTDIR% --gsview=%GSVIEW_PREFIX%\gsview --ghostscript=%GHOSTSCRIPT_PREFIX% --vcxsrv=%VCXSRV_PREFIX% --win-sftp-server=%WIN_SFTP_SERVER_OUTDIR% --output-dir=%QVD_CLIENT_OUTDIR%
 

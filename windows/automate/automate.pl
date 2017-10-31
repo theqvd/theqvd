@@ -230,7 +230,7 @@ sub cygwin_path_to_w32 {
 
 sub mkcmd_cmd_in {
     my $dir = shift;
-    join(' ', cd => w32q($dir->canonpath), '&', @_);
+    join(' ', cd => '/d', w32q($dir->canonpath), '&', @_);
 }
 
 sub mkcmd_msys_in {
@@ -608,6 +608,13 @@ sub build_qvd_client {
     build_from_repos('qvd-client');
 }
 
+sub next_temp {
+    my $name = shift;
+    state $ix = 0;
+    $ix++;
+    $wd->child('temp', "$ix-$name");
+}
+
 sub build_from_repos {
     my ($name, $this, $parent) = @_;
     $this //= $cfg->{build}{$name};
@@ -630,16 +637,31 @@ sub build_from_repos {
         $outdir = path($this->{outdir} //= $wd->child('out', $name)->stringify);
         $env = $build->{env} //= 'mingw32';
     }
+
+    my $tempdir = path($this->{tempdir} //= next_temp($longname)->stringify);
+
     my $envname = uc($longname =~ s/[\W]+/_/gr);
     $ENV{"${envname}_OUTDIR"} = w32q($outdir->canonpath);
     $ENV{"${envname}_SRCDIR"} = w32q($srcdir->canonpath);
+    $ENV{"${envname}_TEMPDIR"} = w32q($tempdir->canonpath);
     $ENV{"${envname}_OUTDIR_CYGWIN"} = w32_path_to_cygwin($outdir->canonpath);
     $ENV{"${envname}_SRCDIR_CYGWIN"} = w32_path_to_cygwin($srcdir->canonpath);
+    $ENV{"${envname}_TEMPDIR_CYGWIN"} = w32_path_to_cygwin($tempdir->canonpath);
     $ENV{"${envname}_OUTDIR_MSYS"} = w32_path_to_msys($outdir->canonpath);
     $ENV{"${envname}_SRCDIR_MSYS"} = w32_path_to_msys($srcdir->canonpath);
+    $ENV{"${envname}_TEMPDIR_MSYS"} = w32_path_to_msys($tempdir->canonpath);
 
     #use Data::Dumper;
     #$log->debug("This: ".Dumper($this)."\nArgs: ".Dumper(\@_)."\nEnv: ".Dumper(\%ENV));
+
+    if (-d $tempdir) {
+    SKIP: {
+            skip_for "build-$longname-temp-remove";
+            $log->trace("cleaning $tempdir");
+            rmtree($tempdir);
+        }
+    }
+
  SKIP: {
         skip_for "build-$longname-out-remove";
         rmtree($outdir);
