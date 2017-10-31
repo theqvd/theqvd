@@ -97,7 +97,7 @@ else {
     -d $ghostscript or die "$ghostscript not found";
     my $ghostscript_path = path($ghostscript)->realpath;
 
-    my @extra_exes = ( { path => $nx_libs_path->child('nxproxy/nxproxy.exe'),
+    my @extra_exes = ( { path => $nx_libs_path->child('libexec/nxproxy.exe'),
                          search_path => $nx_libs_path->child('nxcomp'),
                          subdir => 'bin',
                          subsystem => 'windows',
