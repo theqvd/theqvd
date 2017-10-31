@@ -157,7 +157,6 @@ Wat.DIG = {
     // Render OS Details template and return it
     // model: Backbone model of the OSD
     // options: Options of the rendering
-    //          - editable: If Edit button will be rendering
     //          - shrinked: If is just showed SO distro and rest of the info is expanded clicking More button
     //          - container: CSS selector of the container where will be rendered
     renderOSDetails: function (model, options) {
@@ -186,12 +185,49 @@ Wat.DIG = {
                                 shortcuts: model.get('shortcuts'),
                                 scripts: model.get('scripts'),
                                 distro: distros[distroId],
-                                editable: options.editable,
                                 shrinked: options.shrinked
                             }
                         );
-        
+                
                 $(options.container + ' .bb-os-configuration').html(template);
+                
+                // Get all assets to be showed in OSD details
+                var assets = new Wat.Collections.Assets();
+
+                assets.fetch({
+                    complete: function (e) {
+                        $.each(model.pluginData, function (pluginKey, pluginData) {
+                            // Packages case is special and will be treated individually
+                            if (pluginKey == 'pkg') {
+                                pluginData = new Wat.Collections.Packages({ 
+                                    offset: 1,
+                                    block: 100,
+                                    installed: 1,
+                                    filters: {
+                                        installed: true
+                                    }
+                                });
+                            }
+                            
+                            $(options.container + ' .bb-osd-' + pluginKey).html(HTML_MICRO_LOADING);
+                            
+                            pluginData.fetch({
+                                complete: function (e) {
+                                    var template = _.template(
+                                        Wat.TPL['osConfiguration_' + pluginKey], {
+                                            pluginData: pluginData,
+                                            assets: assets,
+                                            shrinked: options.shrinked
+                                        }
+                                    );
+
+                                    $(options.container + ' .bb-osd-' + pluginKey).html(template);
+                                    Wat.T.translate();
+                                }
+                            });
+                        });
+                    }
+                });
             });
         }
     },

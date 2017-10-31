@@ -318,9 +318,12 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
                 if (osdId) {
                     $('.js-custom-image-row').hide().addClass('hidden-by-conf');
                     $('.js-osd-row').removeClass('hidden-by-conf');
-
                     
                     Wat.DIG.fetchOSD(osdId, function (OSDmodel) {
+                        Wat.CurrentView.OSDmodel = OSDmodel;
+                        
+                        OSDmodel.initPlugins();
+                        
                         Wat.DIG.renderOSDetails(OSDmodel, {
                             shrinked: true,
                             container: '.' + that.cid

@@ -8,30 +8,36 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
         Wat.Views.DetailsView.prototype.initialize.apply(this, [params]);
     },
     
-    render: function () {
+    switchDetailsMenuOption: function (option) {
         var that = this;
         
-        Wat.Views.DetailsView.prototype.render.apply(this);
+        Wat.Views.DetailsView.prototype.switchDetailsMenuOption.apply(this, [option]);
         
-        // If OSF were created using DIG, retrieve OS info from DIG
-        var osdID = this.model.get('osd_id');
-        if (osdID) {
-            Wat.DIG.fetchOSD(osdID, function (OSDmodel) {
-                that.OSDmodel = OSDmodel;
+        switch (option) {
+            case 'os':
+                // If OSF were created using DIG, retrieve OS info from DIG
+                var osdID = this.model.get('osd_id');
 
-                Wat.DIG.renderOSDetails(that.OSDmodel, {
-                    shrinked: false,
-                    editable: false,
-                    container: ''
-                });
-            });
-        }
-        else {
-            Wat.DIG.renderOSDetails();
-            
-            // If no OSD, remove dis log info from DOM
-            // TODO: Call to di_list on API
-            $('.js-dis-log').closest('tr').remove();
+                if (osdID) {
+                    Wat.DIG.fetchOSD(osdID, function (OSDmodel) {
+                        that.OSDmodel = OSDmodel;
+
+                        that.OSDmodel.initPlugins();
+
+                        Wat.DIG.renderOSDetails(that.OSDmodel, {
+                            shrinked: false,
+                            container: ''
+                        });
+                    });
+                }
+                else {
+                    Wat.DIG.renderOSDetails();
+
+                    // If no OSD, remove dis log info from DOM
+                    // TODO: Call to di_list on API
+                    $('.js-dis-log').closest('tr').remove();
+                }
+                break;
         }
     },
     

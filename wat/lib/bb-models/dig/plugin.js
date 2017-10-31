@@ -6,7 +6,7 @@ Wat.Models.Plugin = Wat.Models.DIG.extend({
         this.pluginId = opts.pluginId;
         this.osdId = opts.osdId;
         
-        Backbone.Model.prototype.initialize.apply(this, [attrs]);
+        Wat.Models.DIG.prototype.initialize.apply(this, [attrs]);
         
         this.urlRoot = this.baseUrl() + '/osd/' + opts.osdId + '/' + opts.pluginId;
     },

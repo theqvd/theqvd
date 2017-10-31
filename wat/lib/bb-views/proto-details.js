@@ -467,6 +467,10 @@ Wat.Views.DetailsView = Wat.Views.MainView.extend({
     clickDetailsMenuOption: function (e) {
         var option = $(e.target).attr('data-details-target') || $(e.target).parent().attr('data-details-target');
         
+        this.switchDetailsMenuOption(option);
+    },
+    
+    switchDetailsMenuOption: function (option) {
         // Manage enabled option
         $('.lateral-menu-option.js-details-option').removeClass('lateral-menu-option--selected');
         $('.lateral-menu-option[data-details-target="' + option + '"]').addClass('lateral-menu-option--selected');

@@ -331,6 +331,24 @@ Wat.I.T = {
                     osConfiguration: {
                         name: 'details/osd'
                     },
+                    osConfiguration_hook: {
+                        name: 'details/osd-hook'
+                    },
+                    osConfiguration_os: {
+                        name: 'details/osd-os'
+                    },
+                    osConfiguration_pkg: {
+                        name: 'details/osd-pkg'
+                    },
+                    osConfiguration_shortcut: {
+                        name: 'details/osd-shortcut'
+                    },
+                    osConfiguration_vma: {
+                        name: 'details/osd-vma'
+                    },
+                    osConfiguration_wallpaper: {
+                        name: 'details/osd-wallpaper'
+                    },
                     osConfigurationEditor: {
                         name: 'editor/osd'
                     },

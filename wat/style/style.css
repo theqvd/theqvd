@@ -2703,7 +2703,7 @@ table.os-configuration {
   /* line 541, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_layout.scss */
   table.os-configuration .settings-box {
     overflow: auto;
-    max-height: 120px;
+    max-height: 240px;
     display: list-item;
     font-size: small;
     border: 1px solid #eee;

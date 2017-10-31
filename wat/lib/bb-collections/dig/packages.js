@@ -7,6 +7,7 @@ Wat.Collections.Packages = Wat.Collections.DIG.extend({
         
         this.offset = params.offset;
         this.block = params.block;
+        this.filters = params.filters || {};
     },
     
     parse: function(rawResponse) {
