@@ -104,7 +104,7 @@ else {
                          cygwin => 1 },
                        { path => $win_sftp_server_path->child('win-sftp-server.exe'),
                          subsystem => 'windows' },
-                       { path => $pulseaudio_path->child('pulseaudio.exe'),
+                       { path => $pulseaudio_path->child('bin', 'pulseaudio.exe'),
                          subdir => 'pulseaudio',
                          subsystem => 'windows',
                          scan_deps => 0 },
@@ -125,7 +125,7 @@ else {
 
     my @extra_dirs = ( { path => $installer_path->child('pixmaps'), subdir => 'pixmaps' },
                        { path => $vcxsrv_path, subdir => 'vcxsrv' },
-                       { path => $pulseaudio_path, subdir => 'pulseaudio', skip => 'pulseaudio.exe' },
+                       { path => $pulseaudio_path, subdir => 'pulseaudio', skip => 'bin/pulseaudio.exe' },
                        { path => $ghostscript_path, subdir => 'ghostscript', skip => 'bin/gswin32.exe' },
                      );
 
