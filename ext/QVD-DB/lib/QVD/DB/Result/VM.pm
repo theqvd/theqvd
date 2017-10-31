@@ -31,17 +31,20 @@ __PACKAGE__->has_one (vm_runtime => 'QVD::DB::Result::VM_Runtime',  'vm_id');
 __PACKAGE__->has_one (counters   => 'QVD::DB::Result::VM_Counter',  'vm_id');
 __PACKAGE__->has_many(properties => 'QVD::DB::Result::VM_Property', 'vm_id',{join_type => 'LEFT', order_by => {'-asc' => 'property_id'}});
 __PACKAGE__->belongs_to(di => 'QVD::DB::Result::DI',
-			sub {
-  			  my $args = shift;
- 			  my $in = <<EOIN;
- SELECT dis.id from dis, di_tags
-  WHERE di_tags.di_id = dis.id
+    sub {
+        my $args = shift;
+        my $in = <<EOIN;
+  SELECT dis.id FROM dis, di_tags, di_runtimes
+    WHERE di_tags.di_id = dis.id
+    AND di_runtimes.di_id = dis.id
     AND di_tags.tag = $args->{self_alias}.di_tag
+    AND di_runtimes.state = 'published'
 EOIN
-  			  return { "$args->{foreign_alias}.osf_id" => {-ident => "$args->{self_alias}.osf_id"},
-				   "$args->{foreign_alias}.id" => { -in => \$in } };
-
-			});
+        return {
+            "$args->{foreign_alias}.osf_id" => {-ident => "$args->{self_alias}.osf_id"},
+            "$args->{foreign_alias}.id" => { -in => \$in }
+        };
+    });
 __PACKAGE__->might_have(desktop => 'QVD::DB::Result::Desktop', 'vm_id');
 __PACKAGE__->might_have(token => 'QVD::DB::Result::User_Token', 'vm_id');
 
