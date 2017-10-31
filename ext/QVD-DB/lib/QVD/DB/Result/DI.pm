@@ -151,6 +151,12 @@ sub tag_list {
     sort (map $_->tag, $di->tags);
 }
 
+sub related_vms {
+    my $di = shift;
+    my $vms = [ $di->osf->vms->search({di_tag => [map { $_->tag } $di->tags]})->all ];
+    return $vms;
+}
+
 sub has_tag {
     my ($di, $tag) = @_;
     my $ditag = $di->tags->search({tag => $tag})->first;

@@ -6,7 +6,7 @@ __PACKAGE__->table('di_runtimes');
 __PACKAGE__->add_columns(
     di_id                => { data_type => 'integer' },
     state                => { data_type => 'di_generation_state_enum', default_value => 'new' },
-    state_ts             => { data_type => 'timestamp', is_nullable => 1 },
+    state_ts             => { data_type => 'integer', is_nullable => 1 },
     elapsed_time         => { data_type => 'integer', is_nullable => 1 },
     auto_publish         => { data_type => 'integer', default_value => 0 },
     foreign_id           => { data_type => 'integer', is_nullable => 1 },

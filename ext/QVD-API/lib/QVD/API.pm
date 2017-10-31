@@ -484,26 +484,53 @@ sub create_related_objects
 sub di_create
 {
     my ($self,$request) = @_;
-
+    
     my $result = $self->create($request);
     my $di = @{$result->{rows}}[0];
-
-    eval
-    {
-	$di->osf->delete_tag('head');
-	$di->osf->delete_tag($di->version);
-	$DB->resultset('DI_Tag')->create({di_id => $di->id, tag => $di->version, fixed => 1});
-	$DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'head'});
-	$DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'default'})
-	    unless $di->osf->di_by_tag('default');
-    };
-
-    QVD::API::Exception->throw(exception => $@,
-				  query => 'tags') if $@;
-
+    
+    $self->db->resultset('DI_Tag')->create({di_id => $di->id, tag => $di->version, fixed => 1});
+    $self->db->resultset('DI_Tag')->create({di_id => $di->id, tag => 'head'});
+    
     $di->update({path => $di->id . '-' . $di->path});
     
     $result;
+}
+
+# Publication of DIs
+
+sub di_publish {
+    my ($self, $di_id) = @_;
+    my $di_runtime = $self->db->resultset('DI_Runtime')->find({di_id => $di_id});
+    
+    QVD::API::Exception->throw(code => 1100) unless ($di_runtime->state eq 'ready');
+    
+    $self->tags_consolidate($di_runtime->di);
+    
+    $self->di_state_update($di_id, 'published');
+    
+    my $vms = $di_runtime->di->related_vms;
+    for my $vm (@$vms) {
+        if ($vm->vm_runtime->vm_state eq 'running') {
+            my $expiration_date_soft = DateTime->now->add( seconds => $di_runtime->expiration_time_soft );
+            my $expiration_date_hard = DateTime->now->add( seconds => $di_runtime->expiration_time_hard );
+            $vm->vm_runtime->update({ vm_expiration_soft => $expiration_date_soft,
+                vm_expiration_hard => $expiration_date_hard })
+        }
+    }
+}
+
+# Update state of creation of DIs
+
+sub di_state_update {
+    my $self = shift;
+    my $di_id = shift;
+    my $state = shift;
+    my $message = shift;
+    
+    # TODO: Check transitions between states
+    
+    my $di_runtime = $self->db->resultset('DI_Runtime')->find({di_id => $di_id});
+    $di_runtime->update({state => $state, state_ts => time, status_message => $message });
 }
 
 # FOR SETTING OF CONFIG TOKENS AND CONFIG VIEWS
@@ -759,46 +786,120 @@ sub custom_properties_del
 
 sub tags_create
 {
-    my ($self,$tags,$di,$request) = @_;
-
-    for my $tag (@$tags)
-    { 	
-	$tag = undef if defined $tag && $tag eq '';	
-	eval
-	{
-	    my $old_tag = $DB->resultset('DI_Tag')->search({'me.tag' => $tag,
-							    'osf.id' => $di->osf_id},
-							   {join => [{ di => 'osf' }]})->first;
-	    $old_tag->fixed ? 
-		QVD::API::Exception->throw(code => 7330) : 
-		$old_tag->delete if $old_tag;
-
-	    $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => $tag});
-	};
-
-	QVD::API::Exception->throw(exception => $@, 
-				      query => 'tags') if $@;
+    my ($self,$tags,$di_obj) = @_;
+    
+    $self->db->txn_begin;
+    
+    try {
+        my @tags = grep { defined($_) && ($_ ne '') } @$tags;
+        
+        for my $tag (@tags) {
+            my $is_fixed = defined (
+                $self->db->resultset("DI_Tag")->find(
+                    {
+                        'me.tag' => $tag,
+                        'di.osf_id' => $di_obj->osf_id,
+                        'me.fixed' => 1
+                    },
+                    {
+                        join => [ { di => 'di_runtime' } ]
+                    })
+            );
+            QVD::API::Exception->throw(code => 7330)
+                if $is_fixed;
+            
+            $self->db->resultset('DI_Tag')->create({di_id => $di_obj->id, tag => $tag});
+        }
+    } catch {
+        my $e = shift;
+        $self->db->txn_rollback;
+        # TODO: QVD::API::Exception shall accept any argument to avoid this conditional
+        ref($e) eq 'QVD::API::Exception' ? $e->throw : die $e;
+    };
+    
+    $self->db->txn_commit;
+    
+    if ($di_obj->di_runtime->state eq 'published') {
+        $self->tags_consolidate($di_obj);
     }
 }
 
 sub tags_delete
 {
     my ($self,$tags,$di) = @_;
+    
+    $self->db->txn_begin;
+    
+    try {
+        for my $tag (@$tags) {
+            next unless defined $tag || $tag eq '';
+            
+            $tag = $di->search_related('tags',{tag => $tag})->first // next;
+            eval {
+                QVD::API::Exception->throw(code => 7340)
+                    if ($tag->fixed || $tag->tag eq 'head' || $tag->tag eq 'default');
+                $tag->delete;
+            };
+            
+            QVD::API::Exception->throw(exception => $@,
+                query => 'tags') if $@;
+        }
+    } catch {
+        my $e = shift;
+        $self->db->txn_rollback;
+        # TODO: QVD::API::Exception shall accept any argument to avoid this conditional
+        ref($e) eq 'QVD::API::Exception' ? $e->throw : die $e;
+    };
+    
+    $self->db->txn_commit;
+}
 
-    for my $tag (@$tags)
-    {
-	$tag = undef if defined $tag && $tag eq ''; # FIX ME
-	$tag = $di->search_related('tags',{tag => $tag})->first // next;	    
-	eval 
-	{ 
-	    ($tag->fixed || $tag->tag eq 'head' || $tag->tag eq 'default') 
-		&& QVD::API::Exception->throw(code => 7340);
-	    $tag->delete;
-	};
-	
-	QVD::API::Exception->throw(exception => $@, 
-				      query => 'tags') if $@;
-    }
+sub tags_consolidate
+{
+    my ($self, $di_obj) = @_;
+    
+    $self->db->txn_begin;
+    
+    try {
+        for my $tag_obj ($di_obj->tags) {
+            my $current_tag = $self->db->resultset('DI_Tag')->search(
+                {
+                    'me.tag' => $tag_obj->tag,
+                    'di.osf_id' => $di_obj->osf_id,
+                    'di_runtime.state' => 'published',
+                    'di.id' => { '!=' => $di_obj->id }
+                },
+                {
+                    join => [ { di => 'di_runtime' } ]
+                })->first;
+            
+            if(defined($current_tag)) {
+                $current_tag->delete;
+            }
+            
+            if($tag_obj->fixed) {
+                my @obsolete_tags = $self->db->resultset('DI_Tag')->search(
+                    {
+                        'me.tag' => $tag_obj->tag,
+                        'di.osf_id' => $di_obj->osf_id,
+                        'di.id' => { '!=' => $di_obj->id }
+                    },
+                    {
+                        join => [ { di => 'di_runtime' } ]
+                    })->all;
+                for my $obsolete_tag (@obsolete_tags) {
+                    $obsolete_tag->delete;
+                }
+            }
+        }
+    } catch {
+        my $e = shift;
+        $self->db->txn_rollback;
+        # TODO: QVD::API::Exception shall accept any argument to avoid this conditional
+        ref($e) eq 'QVD::API::Exception' ? $e->throw : die $e;
+    };
+    
+    $self->db->txn_commit;
 }
 
 # ASSIGNATION OF ROLES AND ACLS.

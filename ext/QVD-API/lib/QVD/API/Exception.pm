@@ -70,7 +70,9 @@ my $code2message_mapper = {
     2261 => 'Unable to move downloaded disk image', 
 	2270 => 'Unable to read file from disk',
     2280 => 'Error while accessing to Disk Image Generator',
-
+    2290 => 'Unable to find Disk Image',
+    2291 => 'Unable to find OSD',
+    
     # General API errors
     3100 => 'No credentials provided for authentication',
 	3200 => 'Wrong credentials - Login again',

@@ -44,6 +44,7 @@ sub register
 
 sub _db { $QVD_ADMIN->_db; };
 
+sub qvd_api { return $QVD_ADMIN; };
 
 ##########################################################
 ## FUNCTIONS TO VALIDATE USERS (administrators, really) ##

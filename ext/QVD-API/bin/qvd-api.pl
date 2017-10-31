@@ -42,6 +42,9 @@ plugin SetUserGroup => {user => $user, group => $group}
 # General function to manage api calls and exceptions
 helper (qvd_api_call => \&qvd_api_call);
 
+# Log exception into QVD log
+helper (log_qvd_exception => \&log_qvd_exception);
+
 # Intended to check and encode the JSON that receives the API as iunput
 
 helper (get_input_json => \&get_input_json); 
@@ -65,6 +68,9 @@ helper (update_session => \&update_session);
 # Reports problems with disk images upload/download/copy in log
 
 helper (report_di_problem_in_log => \&report_di_problem_in_log);
+
+# Download and publish an image from a url
+helper (download_image_from_url => \&download_image_from_url);
 
 # Intended to avoid a max size for file uploads. 
 # Needed for disk images uploads.
@@ -108,20 +114,6 @@ app->static->paths->[0] = $wat_path;
 get '/' => sub {
     shift->reply->static('index.html');
 };
-
-# This hook prints upload progress of large files in console
-
-app->hook(after_build_tx => sub {
-    my ($tx, $app) = @_;
-
-    $tx->req->on(progress => sub{
-        my $message = shift;
-        return unless my $len = $message->headers->content_length;
-        my $size = $message->content->progress;
-	my $percent = $size == $len ? 100 : int($size / ($len / 100));
-        print 'Progress: ', $percent , '%', " size: $size","\r";
-		 })
-});
 
 app->hook(after_render => sub {
     my ($c, $output, $format) = @_;
@@ -200,6 +192,8 @@ any [qw(POST GET)] => '/api/info' => sub {
 
   $c->render(json => $json );
 };
+
+any [qw(POST)] => '/api/di/notify' => sub { shift->qvd_api_call(\&update_di_status) };
 
 group {
 
@@ -380,7 +374,7 @@ group {
 
     # COPY OF DISK IMAGES FROM STAGING
 
-    websocket '/api/staging' => sub { shift->qvd_api_call(\&copy_image_from_staging) };
+    any [qw(POST)] => '/api/di/staging' => sub { shift->qvd_api_call(\&copy_image_from_staging) };
 
     # UPLOAD OF DISK IMAGES
 
@@ -388,7 +382,7 @@ group {
 
     # DOWNLOAD OF DISK IMAGES
 
-    websocket '/api/di/download' => sub { shift->qvd_api_call(\&download_image_from_url) };
+    any [qw(POST)] => '/api/di/download' => sub { shift->qvd_api_call(\&download_image_from_url_request) };
     
     # API PROXY
     
@@ -477,18 +471,25 @@ sub qvd_api_call {
         $response = $call_back->($controller);
     } catch {
         my $exception = shift;
-        if(ref($exception) eq "QVD::API::Exception") {
-            $controller->app->log->debug($exception->stack_trace);
-        } else {
-            $controller->app->log->debug($exception);
-            $exception = QVD::API::Exception->new(code => 1100);
-        }
-        $controller->app->log->error("Exception " . $exception->code . " : " . $exception->message);
+        $exception = $controller->log_qvd_exception($exception);
         $response = $exception->json;
     }
         
     deep_utf8_decode($response);
     $controller->render(text => b(encode_json($response))->decode('UTF-8'));
+}
+
+sub log_qvd_exception {
+    my $controller = shift;
+    my $exception = shift;
+    if(ref($exception) eq "QVD::API::Exception") {
+        $controller->app->log->debug($exception->stack_trace);
+    } else {
+        $controller->app->log->debug($exception);
+        $exception = QVD::API::Exception->new(code => 1100);
+    }
+    $controller->app->log->error("Exception " . $exception->code . " : " . $exception->message);
+    return $exception;
 }
 
 #### API callbacks ####
@@ -514,8 +515,7 @@ sub generate_di {
     
     # Create image with JSON
     my $response = $c->process_api_query( $json );
-    if ($response->{status} == 0000)
-    {
+    if ($response->{status} == 0) {
         # Get new DI parameters
         my $di_id = ${$response->{rows}}[0]->{id};
         my $di_obj = $c->qvd_admin4_api->_db->resultset('DI')->find({ id => $di_id });
@@ -534,13 +534,12 @@ sub generate_di {
             my $dig_id = $tx->res->json->{id};
             $c->qvd_admin4_api->_db->resultset('DI_Runtime')
                 ->find({ di_id => $di_id })
-                ->update({ foreign_id => $dig_id, state => 'generating', percentage => 0 });
+                ->update({ foreign_id => $dig_id, percentage => 0 });
+            $c->qvd_admin4_api->qvd_api->di_state_update($di_id, 'generating');
         } else {
             # Update DI state to fail
             my $message = $tx->res->json->{status} // "";
-            $c->qvd_admin4_api->_db->resultset('DI_Runtime')
-                ->find({ di_id => $di_id })
-                ->update({ state => 'fail', status_message => "$message" });
+            $c->qvd_admin4_api->qvd_api->di_state_update($di_id, 'fail', $message);
             QVD::API::Exception->new(code => 2280)->throw;
         }
     }
@@ -559,46 +558,38 @@ sub copy_image_from_staging {
     my $staging_path = $c->qvd_admin4_api->_cfg('path.storage.staging');
     my $staging_file = eval { $json->{arguments}->{disk_image} } // '';
     my $images_file = $staging_file . '-tmp'. rand;
-    my $sf_size = eval { -s "$staging_path/$staging_file" } // 0;
+    my $total_size = eval { -s "$staging_path/$staging_file" } // 0;
     
-    my $accomplished=0;
+    # Create DI object in DB
+    my $response = $c->process_api_query( $json );
+    if ($response->{status} != 0) {
+        QVD::API::Exception->new(code => $response->{status})->throw;
+    }
+    my $di_id = ${$response->{rows}}[0]->{id};
     
-    $c->on(message => sub {
-            my ($c,$msg) = @_;
-            unless ($accomplished) {
-                my $if_size = eval { -s "$images_path/$images_file" } // 0;
-                $c->send( b( encode_json( {
-                    status     => 1000,
-                    total_size => $sf_size,
-                    copy_size  => $if_size } )
-                )->decode( 'UTF-8' )
-                );
+    # Get DI information
+    my $di_obj = $c->qvd_admin4_api->_db->resultset('DI')->find({ id => $di_id });
+    
+    # Update status
+    $c->qvd_admin4_api->qvd_api->di_state_update($di_id, 'uploading');
+    $di_obj->di_runtime->update({ percentage => 0 });
+    
+    # Monitor size of the copied file
+    my $update_interval = 2;
+    my $timer = Mojo::IOLoop->timer($update_interval => 
+        sub {
+            my $current_size = eval { -s "$images_path/$images_file" } // 0;
+            my $percentage = eval { ($current_size / $total_size) * 1.0 } // 1.0;
+            if ($percentage == 1.0) {
+                $di_obj->di_runtime->update({ percentage => $percentage });
             }
-        });
+        }
+    );
     
-    my $tx = $c->tx;
     my $fc = Mojo::IOLoop::ForkCall->new();
-    $fc->on( finish => sub {
-            my ($fc, $err, $response) = @_;
-            $accomplished=1;
-            if($response->{status} == 0000) {
-                $c->send( b( encode_json( {
-                    status         => 1000,
-                    total_size => $sf_size,
-                    copy_size  => $sf_size } )
-                )->decode( 'UTF-8' ) );
-            }
-            my $code = $response->{status};
-            my $msg = $response->{message};
-            $c->app->log->debug("Copy finished ($code): $msg");
-            $c->send(b(encode_json($response))->decode('UTF-8'));
-        } );
     $fc->run(
         sub {
-            my $response = {};
             try {
-                $c->app->log->debug( "Starting copy" );
-                
                 QVD::API::Exception->throw( code => '2220' )
                     unless -d $images_path;
                 
@@ -608,46 +599,31 @@ sub copy_image_from_staging {
                 QVD::API::Exception->throw( code => '2240' )
                     unless -e "$staging_path/$staging_file";
                 
-                for (1 .. 5)
-                {
-                    eval { copy( "$staging_path/$staging_file", "$images_path/$images_file" ) };
-                    $@ ? print $@ : last;
-                }
-                
-                if ($@)
-                {
-                    $c->report_di_problem_in_log( json => $json, tx => $tx, code =>
-                            $response ? $response->{status} : 2210 );
-                    QVD::API::Exception->throw( code => '2210' );
-                }
-                else
-                {
-                    $response = $c->process_api_query( $json );
-                    if ($response->{status} == 0000)
-                    {
-                        my $di_id = ${$response->{rows}}[0]->{id};
-                        eval { move( "$images_path/$images_file", "$images_path/".$di_id.'-'.$staging_file ) };
-                        
-                        if ($@)
-                        {
-                            $c->qvd_admin4_api->_db->resultset( 'DI' )->find( { id => $di_id } )->delete;
-                            $c->qvd_admin4_api->_db->resultset( 'Log' )->find(
-                                { object_id => $di_id, qvd_object => 'di' } )->update(
-                                { object_id => undef, object_name => undef, status => 2210 } );
-                            QVD::API::Exception->throw( code => 2210 );
-                        }
-                    }
+                if ($response->{status} == 0) {
+                    $c->app->log->debug( "Starting copy" );
+                    copy( "$staging_path/$staging_file", "$images_path/$images_file" )
+                        or QVD::API::Exception->throw( code => 2210 );
+                    move( "$images_path/$images_file", "$images_path/".$di_id.'-'.$staging_file )
+                        or QVD::API::Exception->throw( code => 2261 );
+    
+                    $di_obj->di_runtime->update({ percentage => 1.0 });
+    
+                    $c->qvd_admin4_api->qvd_api->di_state_update($di_id, 'ready');
+                    $c->qvd_admin4_api->qvd_api->di_publish($di_id);
+                } else {
+                    QVD::API::Exception->throw( code => $response->{status} );
                 }
             } catch {
-                my $exception = $_;
-                $response = $exception->json;
+                my $exception = shift;
+                $c->log_qvd_exception($exception);
+                $c->qvd_admin4_api->qvd_api->di_state_update($di_id, 'fail');
             } finally {
-                eval { unlink( "$images_path/$images_file" ); };
-            };
-            
-            return $response;
+                Mojo::IOLoop->remove($timer) if defined($timer);
+            }
         }
     );
+    
+    return $response;
 };
 
 sub upload_image_from_local {
@@ -656,115 +632,197 @@ sub upload_image_from_local {
     $c->inactivity_timeout(30000);
     my $response;
     
-    if ($c->req->method eq 'POST')
-    {
+    if ($c->req->method eq 'POST') {
         my $json = $c->get_input_json;
         my $file = eval { $c->req->upload('file') };
         
-        if ($file)
-        {
+        if ($file) {
             $response = $c->process_api_query($json);
             
-            if ($response->{status} eq 0)
-            {
+            if ($response->{status} eq 0) {
                 my $di_id = ${$response->{rows}}[0]->{id};
                 my $disk_image = $json->{arguments}->{disk_image};
                 my $images_path  = $c->qvd_admin4_api->_cfg('path.storage.images');
                 
                 eval { $file->move_to($images_path .'/'. $di_id . '-'. $disk_image) };
                 
-                if ($@)
-                {
+                if ($@) {
                     $c->qvd_admin4_api->_db->resultset('DI')->find({ id => $di_id })->delete;
                     $c->qvd_admin4_api->_db->resultset('Log')->find(
                         { object_id => $di_id, qvd_object => 'di' })->update(
                         { object_id => undef, object_name => undef, status => 2251});
                     $response = QVD::API::Exception->new(code => 2251)->json;
+                } else {
+                    $c->qvd_admin4_api->qvd_api->di_state_update($di_id, 'ready');
+                    $c->qvd_admin4_api->qvd_api->di_publish($di_id);
                 }
             }
-        }
-        else
-        {
+        } else {
             $c->report_di_problem_in_log(json => $json, code => 2250);
             $response = QVD::API::Exception->new(code => 2250)->json;
         }
-    }
-    else
-    {
+    } else {
         $response = {status => 0};
     }
 
     return $response;
 };
 
-sub download_image_from_url {
+sub download_image_from_url_request {
+    my $controller = shift;
+    $controller->inactivity_timeout(30000);
+    my $json = $controller->get_input_json;
     
-    my $c = shift;
-    $c->inactivity_timeout(30000);
-    
-    my ($size,$len) = (0,0);
-    
-    $c->ua->on(start => sub {
-            my ($ua, $tx) = @_;
-            $tx->req->once(finish => sub {
-                    $tx->res->on(progress => sub {
-                            my $msg = shift;
-                            return unless $len = $msg->headers->content_length;
-                            
-                            $size = $msg->content->progress;
-                            my $percent = $size == $len ? 100 : int($size / ($len / 100));
-                            print "\rProgress: ", $size == $len ? 100 : int($size / ($len / 100)), '%';
-                        });
-                });
-        });
-    
-    my $json = $c->get_input_json;
-    
+    # Get download parameters
     my $url = decode_json($json->{url});
-    my $tx2 = $c->ua->build_tx(GET => $url);
     
-    my ($response,$accomplished);
+    # Create DI object in DB
+    my $response = $controller->process_api_query( $json );
+    if ($response->{status} != 0) {
+        QVD::API::Exception->new(code => $response->{status})->throw;
+    }
+    my $di_id = ${$response->{rows}}[0]->{id};
     
-    $c->ua->start($tx2, sub {
+    my $update_interval = 5; # seconds
+    my $autopublish = 1;
+    
+    $controller->download_image_from_url($url, $di_id, $autopublish, $update_interval);
+    
+    return $response;
+};
+
+sub download_image_from_url {
+    my $c = shift;
+    my $url = shift;
+    my $di_id = shift;
+    my $autopublish = shift // 0;
+    my $update_interval = shift // 10;
+    
+    # Get DI information
+    my $di_obj = $c->qvd_admin4_api->_db->resultset('DI')->find({ id => $di_id });
+    
+    # Update status
+    $c->qvd_admin4_api->qvd_api->di_state_update($di_id, 'uploading');
+    $di_obj->di_runtime->update({ percentage => 0 });
+    
+    # Local variables to store current status
+    my $last_update = 0;
+    my $size = 0;
+    my $len = 0;
+    
+    # Generate download transaction that monitors the size of the downloaded file
+    if($update_interval > 0) {
+        $c->ua->on(start =>
+            sub {
+                my ($ua, $tx) = @_;
+                $tx->req->once(finish =>
+                    sub {
+                        $tx->res->on(progress =>
+                            sub {
+                                my $msg = shift;
+                                return unless $len = $msg->headers->content_length;
+                            
+                                $size = $msg->content->progress;
+                                my $percentage = ($size / $len) * 1.0;
+                                my $current_time = time;
+                                if (($percentage == 1.0) || ($current_time - $last_update > $update_interval)) {
+                                    $last_update = $current_time;
+                                    $di_obj->di_runtime->update({ percentage => $percentage });
+                                }
+                            }
+                        );
+                    }
+                );
+            }
+        );
+    }
+    
+    # Start to download the file
+    my $url_download_tx = $c->ua->build_tx(GET => $url);
+    $c->ua->start(
+        $url_download_tx,
+        sub {
             my ($ua,$tx) = @_;
             
-            if ($tx->res->code eq 200)
-            {
-                $response = $c->process_api_query( $json );
-                
-                if ($response->{status} eq 0)
-                {
-                    my $di_id = ${$response->{rows}}[0]->{id};
-                    my $disk_image = $json->{arguments}->{disk_image};
-                    my $images_path  = $c->qvd_admin4_api->_cfg('path.storage.images');
-                    my $image_name = $images_path .'/'. $di_id . '-'. $disk_image;
-                    eval { $tx->res->content->asset->move_to($image_name) };
-                    if ($@)
-                    {
-                        $c->qvd_admin4_api->_db->resultset('DI')->find({ id => $di_id })->delete;
-                        $c->qvd_admin4_api->_db->resultset('Log')->find(
-                            { object_id => $di_id, qvd_object => 'di' })->update(
-                            { object_id => undef, object_name => undef, status => 2261});
-                        $response = QVD::API::Exception->new(code => 2261)->json;
+            try {
+                if ($tx->success) {
+                    my $image_name = $di_obj->path;
+                    my $images_path = $c->qvd_admin4_api->_cfg('path.storage.images');
+                    my $image_path = "$images_path/$image_name";
+                    eval { $tx->res->content->asset->move_to($image_path) };
+                    if ($@) {
+                        $c->qvd_admin4_api->qvd_api->di_state_update($di_id, 'fail');
+                        QVD::API::Exception->new(code => 2261)->throw;
+                    } else {
+                        $c->qvd_admin4_api->qvd_api->di_state_update($di_id, 'ready');
+                        if ($autopublish) {
+                            $c->qvd_admin4_api->qvd_api->di_publish($di_id);
+                        }
                     }
+                } else {
+                    $c->qvd_admin4_api->qvd_api->di_state_update($di_id, 'fail');
+                    QVD::API::Exception->new(code => 2260)->throw;
                 }
+            } catch {
+                my $exception = shift;
+                $c->log_qvd_exception($exception);
             }
-            else
-            {
-                $c->report_di_problem_in_log(json => $json,code => 2260);
-                $response = QVD::API::Exception->new(code => 2260)->json;
-            }
-            
-            $accomplished = 1; });
+        }
+    );
+}
+
+sub update_di_status {
+    my $c = shift;
     
-    $c->on(message => sub { my ($c,$msg) = @_;
-            my $to_send = $accomplished ? $response : { status => 1000, total_size => $len, copy_size => $size };
-            $c->send(encode_json($to_send)); });
+    # Get JSON
+    my $json = $c->get_input_json;
     
-    $c->send(encode_json({ status => 1000,
-        total_size => $len,
-        copy_size => $size }));
-};
+    # Get configuration parameters
+    my $api_url = $c->qvd_admin4_api->_cfg('api.proxy.dig.address');
+    QVD::API::Exception->new(code => 3700, additional_info => 'api.proxy.dig.address')->throw
+        unless defined($api_url);
+    
+    # Check provided id corresponds to a valid DI
+    my $foreign_id = $json->{id};
+    QVD::API::Exception->new(code => 2290)->throw
+        unless defined($foreign_id);
+    my $di_runtime = $c->qvd_admin4_api->_db->resultset('DI_Runtime')->find({ foreign_id => $foreign_id });
+    QVD::API::Exception->new(code => 2290)->throw
+        unless defined($di_runtime);
+    my $osd_id = $di_runtime->di->osf->osd_id;
+    QVD::API::Exception->new(code => 2291)->throw
+        unless defined($osd_id);
+    
+    # Call DIG to get image status
+    my $tx = $c->ua->build_tx(GET => $api_url . "/osd/$osd_id/image/$foreign_id" => {Accept => '*/*'} => json => { });
+    $tx = $c->ua->start($tx);
+    
+    if ($tx->success) {
+        # Update DI state to generating
+        my $percentage = $tx->res->json->{percent};
+        my $elapsed_time = $tx->res->json->{elapsedTime};
+        $di_runtime->update({ percentage => $percentage, elapsed_time => $elapsed_time });
+        
+        # Upload DI image file
+        my $status = $tx->res->json->{status};
+        if ($status eq 'COMPLETED' && $di_runtime->state eq 'generating') {
+            my $file = $tx->res->json->{file};
+            my $file_url = "$api_url/images/$file";
+            my $update_time_in_seconds = 5;
+            $c->download_image_from_url($file_url, $di_runtime->di_id, $di_runtime->auto_publish, $update_time_in_seconds);
+        } elsif ($status eq 'ERROR') {
+            my $message = $tx->res->json->{message};
+            $c->qvd_admin4_api->qvd_api->di_state_update($di_runtime->di_id, 'fail', $message);
+        }
+    } else {
+        # Update DI state to fail
+        my $message = $tx->error->{message};
+        $c->qvd_admin4_api->qvd_api->di_state_update($di_runtime->di_id, 'fail', $message);
+        QVD::API::Exception->new(code => 2280)->throw;
+    }
+    
+    return { status => 0 };
+}
 
 #################
 ### FUNCTIONS ###
