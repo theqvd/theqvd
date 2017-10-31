@@ -384,6 +384,10 @@ group {
 
     any [qw(POST)] => '/api/di/download' => sub { shift->qvd_api_call(\&download_image_from_url_request) };
     
+    # PUBLISH DISK IMAGE
+
+    any [qw(POST)] => '/api/di/publish' => sub { shift->qvd_api_call(\&publish_disk_image_request) };
+
     # API PROXY
     
     any [] => '/api/proxy/:api_code/*params' => sub {
@@ -820,6 +824,20 @@ sub update_di_status {
         $c->qvd_admin4_api->qvd_api->di_state_update($di_runtime->di_id, 'fail', $message);
         QVD::API::Exception->new(code => 2280)->throw;
     }
+    
+    return { status => 0 };
+}
+
+sub publish_disk_image_request {
+    my $controller = shift;
+    my $json = $controller->get_input_json;
+    
+    # Check provided id corresponds to a valid DI
+    my $di_id = $json->{id};
+    QVD::API::Exception->new(code => 2290)->throw
+        unless defined($di_id);
+    
+    $controller->qvd_admin4_api->qvd_api->di_publish($di_id);
     
     return { status => 0 };
 }
