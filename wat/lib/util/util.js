@@ -49,24 +49,24 @@ Wat.U = {
                 case 'days':
                     remainingTimeAttr = 'data-days="' + remainingTime + '"';
                     remainingTimeAttrObj['data-days'] = remainingTime;
+                    remainingTime = i18n.t('__count__ days', {'count': remainingTime});
                     break;
                 case 'months':
                     remainingTimeAttr = 'data-months="' + remainingTime + '"';
                     remainingTimeAttrObj['data-months'] = remainingTime;
+                    remainingTime = i18n.t('__count__ months', {'count': remainingTime});
                     break;
                 case '>year':
                     remainingTimeAttr = 'data-years="' + remainingTime + '"';
                     remainingTimeAttrObj['data-years'] = remainingTime;
+                    remainingTime = i18n.t('__count__ years', {'count': remainingTime});
                     break;
             }
-
-            // If remainingTimeAttr is not empty, remainingTime will be empty
-            remainingTime = remainingTimeAttr ? '' : remainingTime;
         }
         
         return {
             returnType: returnType,
-            remainingTime: remainingTime,            
+            remainingTime: remainingTime,
             remainingTimeAttr: remainingTimeAttr,
             priorityClass: priorityClass,
             expired: rawRemainingTime.expired,

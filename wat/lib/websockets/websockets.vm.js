@@ -1,4 +1,4 @@
-Wat.WS.changeWebsocketVm = function (id, field, data, viewType) {
+Wat.WS.changeWebsocketVm = function (id, field, data, viewType, row) {
     switch (field) {
         case 'state':
             if (viewType == 'details' && Wat.CurrentView.model) {
@@ -137,7 +137,7 @@ Wat.WS.changeWebsocketVm = function (id, field, data, viewType) {
                             expiration_hard: $('[data-wsupdate="expiration-icon"][data-id="' + id + '"]').attr('data-expiration_hard')
                         }
                     
-                        if (newExpiration.expiration_soft || newExpiration.expiration_hard) {
+                        if ((newExpiration.expiration_soft || newExpiration.expiration_hard) && row['state'] == 'running') {
                             $('[data-wsupdate="expiration-icon"][data-id="' + id + '"]').show();
                         }
                         else {

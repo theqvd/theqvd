@@ -199,6 +199,14 @@
                                         </tr>
                                     <% 
                                     }
+                                    if (Wat.C.checkACL('vm.see.expiration')) { 
+                                    %>
+                                        <tr>
+                                            <td><i class="fa fa-warning"></i><span data-i18n="Expiration"></span></td>
+                                            <td><div class="bb-vm-details-expiration" data-wsupdate="expiration_soft-row" data-id="<%= model.get('id') %>" data-expiration_soft="<%= model.get('expiration_soft') %>" data-expiration_hard="<%= model.get('expiration_hard') %>"></div></td>
+                                        </tr>
+                                    <%
+                                    }
                                     if (Wat.C.checkACL('vm.see.port-ssh')) { 
                                     %>
                                         <tr>

@@ -64,9 +64,9 @@ Wat.WS.changeWebsocketDi = function (id, field, data, row) {
             
             switch(data) {
                 case 'published':
+                    $('[data-id="' + id + '"] .js-expiration-icon').hide();
                 case 'ready':
                     $('[data-id="' + id + '"] .js-auto-publish-icon').hide();
-                    $('[data-id="' + id + '"] .js-expiration-icon').hide();
                     break;
             }
             

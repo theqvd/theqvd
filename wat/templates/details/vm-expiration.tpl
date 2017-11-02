@@ -19,7 +19,9 @@
                             if (expiration_soft) {
                         %>
                             <tr>
-                                <td class="<%= remainingTimeSoft.priorityClass %>" data-i18n="Soft"></td>
+                                <th colspan=2 class="center <%= remainingTimeSoft.priorityClass %>" data-i18n="Soft"></th>
+                            </tr>
+                            <tr>
                                 <td class="<%= remainingTimeSoft.priorityClass %>"><%= expiration_soft.replace('T',' ') %></td>
                                 <td class="<%= remainingTimeSoft.priorityClass %>" <%= remainingTimeSoft.remainingTimeAttr %> data-countdown data-raw="<%= time_until_expiration_soft_raw %>"><%= remainingTimeSoft.remainingTime %></td>
                             </tr>
@@ -28,7 +30,9 @@
                             if (expiration_hard) {
                         %>
                             <tr>
-                                <td class="<%= remainingTimeHard.priorityClass %>" data-i18n="Hard"></td>
+                                <th colspan=2 class="center <%= remainingTimeHard.priorityClass %>" data-i18n="Hard"></th>
+                            </tr>
+                            <tr>
                                 <td class="<%= remainingTimeHard.priorityClass %>"><%= expiration_hard.replace('T',' ') %></td>
                                 <td class="<%= remainingTimeHard.priorityClass %>" <%= remainingTimeHard.remainingTimeAttr %> data-countdown data-raw="<%= time_until_expiration_hard_raw %>"><%= remainingTimeHard.remainingTime %></td>
                             </tr>

@@ -216,7 +216,7 @@ Wat.WS = {
                 
                 switch (qvdObj) {
                     case 'vm':
-                        Wat.WS.changeWebsocketVm(id, field, value, viewType);
+                        Wat.WS.changeWebsocketVm(id, field, value, viewType, row);
                         break;
                     case 'user':
                         Wat.WS.changeWebsocketUser(id, field, value);
