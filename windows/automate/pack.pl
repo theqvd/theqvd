@@ -27,12 +27,15 @@ if ($opt_f) {
 }
 else {
     my $p = Win32::Packer->new( app_name => $app_name,
-                                scripts => $this_path->child('automate.pl'),
+                                scripts => { path => $this_path->child('automate.pl'),
+                                             require_administrator => 1 },
                                 extra_module => [qw(if IO::Socket::SSL IO::Socket::IP)],
                                 extra_file => $this_path->child('automate.yaml'),
-                                logger => $logger);
+                                logger => $logger,
+                                work_dir => $this_path->child('wd'));
 
-    $p->make_installer(type => 'dir', update => 1);
+    #$p->make_installer(type => 'dir', update => 1);
+    $p->make_installer(type => 'zip', update => 1);
 }
 
 

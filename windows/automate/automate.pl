@@ -67,6 +67,7 @@ setup_cygwin();
 setup_vcxsrv();
 setup_ghostscript();
 setup_gsview();
+setup_net35();
 setup_wix();
 
 setup_env();
@@ -566,6 +567,18 @@ sub setup_gsview {
     $log->info("GSview installation completed");
 }
 
+sub setup_net35 {
+    my $net35 = $cfg->{setup}{net35};
+    my $product = $net35->{product};
+
+ SKIP: {
+        skip_for 'setup-net35';
+        $log->info("Enabling feature .Net 3.5");
+        my $command = $net35->{command};
+        runcmd $command;
+    }
+}
+
 sub setup_wix {
     my $wix = $cfg->{setup}{wix};
     my $prefix = path($cfg->{run}{wix}{prefix});
@@ -580,7 +593,7 @@ sub setup_wix {
 
         }
         $log->info("Installing Wix");
-        runcmd w32q($exe);
+        runcmd w32q($exe), '/passive';
     }
     $log->info("Wix installation completed");
 }

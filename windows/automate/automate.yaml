@@ -120,6 +120,10 @@ setup:
     url: https://github.com/wixtoolset/wix3/releases/download/wix311rtm/wix311.exe
     product: Wix Toolset
 
+  net35:
+    product: .Net 3.5
+    command: DISM /Online /Enable-Feature /FeatureName:NetFx3 /All 
+
 build:
   pulseaudio:
     repository:
