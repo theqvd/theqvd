@@ -29,6 +29,8 @@
     <a class="button fright button-icon--desktop js-button-default fa fa-home" href="javascript:" data-i18n="[title]Set by default"><span data-i18n="Set by default" class="mobile"></span></a>
     <% } %>
     
+    <a class="button fright button-icon--desktop js-button-publish fa fa-rocket" href="javascript:" data-i18n="[title]Publish"><span data-i18n="Publish" class="mobile"></span></a>
+    
     <div class="clear mobile"></div>
 </div>
 

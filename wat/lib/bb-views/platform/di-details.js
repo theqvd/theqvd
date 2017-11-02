@@ -81,6 +81,21 @@ Wat.Views.DIDetailsView = Wat.Views.DetailsView.extend({
         this.updateModel(arguments, {id: this.elementId}, this.checkMachinesChanges);
     },
     
+    applyPublish: function () {
+        this.model.setEndpoint('di/publish');
+        this.model.setExtraUrlArguments('&id=' + this.elementId);
+        
+        var messages = {
+            'success': 'Successfully updated',
+            'error': 'Error updating'
+        };
+        
+        this.saveModel({}, {}, messages, function () {
+            // Uncheck all DI checks
+            $('.check_all[data-check-id="di"]').prop('checked',true).trigger('click');
+        });
+    },
+    
     render: function () {
         this.notFound = this.model.attributes.disk_image == undefined;
         

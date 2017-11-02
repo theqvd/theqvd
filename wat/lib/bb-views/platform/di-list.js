@@ -82,6 +82,26 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         that.updateModel(arguments, {id: id}, checkMachinesChanges);
     },
     
+    applyPublish: function (that) {
+        // Came from list view
+        var id = that.applyFilters.id[0];
+        
+        that.model = new Wat.Models.DI();
+        
+        that.model.setEndpoint('di/publish');
+        that.model.setExtraUrlArguments('&id=' + id);
+        
+        var messages = {
+            'success': 'Successfully updated',
+            'error': 'Error updating'
+        };
+        
+        that.saveModel({}, {}, messages, function () {
+            // Uncheck all DI checks
+            $('.check_all[data-check-id="di"]').prop('checked',true).trigger('click');
+        });
+    },
+    
     renderEmbeddedBlockList: function () {
         this.renderEmbeddedList();
     },

@@ -468,6 +468,15 @@ Wat.I.selectedActions[qvdObj] = {
             'value': '1'
         }
     },
+    'publish': {
+        'text': 'Publish',
+        'iconClass': 'fa fa-rocket',
+        'visibilityCondition': {
+            'type': 'eq',
+            'field': 'state',
+            'value': 'ready'
+        }
+    },
     'delete': {
         'text': 'Delete',
         'acls': 'di.delete-massive.',
