@@ -12,7 +12,13 @@ Wat.Views.VMEditorView = Wat.Views.EditorView.extend({
     },
     
     renderCreate: function (target, that) {
-        Wat.CurrentView.model = new Wat.Models.VM();
+        if (Wat.CurrentView.qvdObj == 'user') {
+            this.model = new Wat.Models.VM();
+        }
+        else {
+            Wat.CurrentView.model = new Wat.Models.VM();
+        }
+        
         $('.ui-dialog-titlebar').html($.i18n.t('New Virtual machine'));
         
         Wat.Views.EditorView.prototype.renderCreate.apply(this, [target, that]);
@@ -154,7 +160,9 @@ Wat.Views.VMEditorView = Wat.Views.EditorView.extend({
             arguments["description"] = description;
         }
         
-        Wat.CurrentView.createModel(arguments, Wat.CurrentView.fetchList);
+        var vmView = Wat.U.getViewFromQvdObj('vm');
+        
+        vmView.createModel(arguments, vmView.fetchList);
     },
     
     updateElement: function (dialog) {
