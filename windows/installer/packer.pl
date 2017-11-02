@@ -42,6 +42,7 @@ my $qvd_version = '4.1';
 my $installer_type = 'zip';
 my $output_dir;
 my $update;
+my $subsystem = 'windows';
 
 GetOptions('log-file|log|l=s' => \$log_file,
            'log-level|L=s' => \$log_level,
@@ -64,6 +65,7 @@ GetOptions('log-file|log|l=s' => \$log_file,
            'store=s' => \$store,
            'retrieve=s' => \$retrieve,
            'update' => \$update,
+           'subsystem=s' => \$subsystem,
           );
 
 $keep_work_dir //= 1 if grep defined, $store, $retrieve;
@@ -149,7 +151,7 @@ else {
                                handles => { scheme => 'qvd',
                                             extension => '.qvd' } },
                              { path => $qvd_src_path->child('ext/QVD-Client/bin/qvd-client-slaveserver') } ],
-                app_subsystem => 'windows',
+                app_subsystem => $subsystem,
                 work_dir => "$work_path",
                 extra_inc => \@extra_inc,
                 extra_module => [qw(QVD::Client::SlaveClient::Windows

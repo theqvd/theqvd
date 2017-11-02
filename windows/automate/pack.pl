@@ -12,9 +12,9 @@ use Getopt::Std;
 my $app_name = 'qvd-automate';
 
 our $opt_f;
+our $opt_t = 'zip';
 
-
-getopts('f');
+getopts('ft:');
 
 Log::Any::Adapter->set(Stderr => log_level => 'debug');
 my $logger = Log::Any->get_logger;
@@ -27,15 +27,19 @@ if ($opt_f) {
 }
 else {
     my $p = Win32::Packer->new( app_name => $app_name,
-                                scripts => { path => $this_path->child('automate.pl'),
-                                             require_administrator => 1 },
+                                scripts => [ { path => $this_path->child('automate.pl'),
+                                               require_administrator => 1 },
+                                             { path => $this_path->child('automate.pl'),
+                                               require_administrator => 0,
+                                               basename => 'automate_user' } ],
+
                                 extra_module => [qw(if IO::Socket::SSL IO::Socket::IP)],
                                 extra_file => $this_path->child('automate.yaml'),
                                 logger => $logger,
                                 work_dir => $this_path->child('wd'));
 
     #$p->make_installer(type => 'dir', update => 1);
-    $p->make_installer(type => 'zip', update => 1);
+    $p->make_installer(type => $opt_t, update => 1);
 }
 
 
