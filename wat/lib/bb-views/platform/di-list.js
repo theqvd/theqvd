@@ -1,6 +1,6 @@
 Wat.Views.DIListView = Wat.Views.ListView.extend({
     qvdObj: 'di',
-    liveFields: ['percentage', 'elapsed_time', 'state', 'status_message'],
+    liveFields: ['percentage', 'elapsed_time', 'state', 'status_message', 'osf_id'],
     relatedDoc: {
         image_update: "Images update guide"
     },

@@ -153,7 +153,7 @@ Wat.I.detailsFields[qvdObj] = {
                 'options': {
                     new: {
                         text: 'New',
-                        icon: 'fa fa-magic faa-wrench animated',
+                        icon: 'fa fa-star-o',
                     },
                     generating: {
                         text: 'Generating',

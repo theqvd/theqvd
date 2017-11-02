@@ -116,7 +116,7 @@
         _.each(models, function(model) {
             var cleanName = model.get('disk_image').substr(model.get('disk_image').indexOf('-')+1);
         %>
-            <tr class="js-di-row-state di-row-state di-row-state--<%= model.get('state') %> row-<%= model.get('id') %>" data-name="<%= cleanName %>" data-id="<%= model.get('id') %>">
+            <tr class="js-di-row-state di-row-state di-row-state--<%= model.get('state') %> row-<%= model.get('id') %>" data-name="<%= cleanName %>" data-id="<%= model.get('id') %>" data-osf-id="<%= model.get('osf_id') %>">
                 <% 
                     $.each(columns, function(name, col) {
                         if (col.display == false) {
@@ -235,7 +235,7 @@
                             case 'default':
                 %>
                                 <td class="desktop center cell-check">
-                                    <input type="radio" data-di_id="<%= model.get('id') %>" data-name="di_default" name="di_default" <%= model.get('default') ? 'checked': '' %> value="0">
+                                    <input class="<%= model.get('state') != 'published' ? 'hidden' : '' %>" type="radio" data-di_id="<%= model.get('id') %>" data-name="di_default" name="di_default" <%= model.get('default') ? 'checked': '' %> value="0">
                                 </td>
                 <%
                                 break;

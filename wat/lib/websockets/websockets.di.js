@@ -41,7 +41,6 @@ Wat.WS.changeWebsocketDi = function (id, field, data, row) {
             
             // Status label
             switch(data) {
-                case 'new':
                 case 'generating':
                 case 'uploading':
                     $('[data-id="' + id + '"] .js-progress-label--state').html($.i18n.t(statusStr) + ': ');
@@ -72,7 +71,6 @@ Wat.WS.changeWebsocketDi = function (id, field, data, row) {
             }
             
             // Icons for default and tags
-            
             $('[data-id="' + id + '"] .js-head-icon').hide();
             $('[data-id="' + id + '"] .js-default-icon').hide();
             $('[data-id="' + id + '"] .js-tags-icon').hide();
@@ -84,8 +82,14 @@ Wat.WS.changeWebsocketDi = function (id, field, data, row) {
             
             switch(data) {
                 case 'published':
-                    $('[data-id="' + id + '"] .js-head-icon').show();
-                    $('[data-id="' + id + '"] .js-default-icon').show();
+                    if ($('[data-id="' + id + '"] .js-head-icon').length) {
+                        $('[data-osf-id="' + row['osf_id'] + '"] .js-head-icon').hide();
+                        $('[data-id="' + id + '"] .js-head-icon').show();
+                    }
+                    if ($('[data-id="' + id + '"] .js-default-icon').length) {
+                        $('[data-osf-id="' + row['osf_id'] + '"] .js-default-icon').hide();
+                        $('[data-id="' + id + '"] .js-default-icon').show();
+                    }
                     $('[data-id="' + id + '"] .js-tags-icon').show();
                     $('[data-id="' + id + '"] .js-future-tags-icon').hide();
                     

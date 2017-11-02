@@ -22,7 +22,7 @@
             }
             
     %>
-        <tr class="js-di-row-state di-row-state di-row-state--<%= model.get('state') %> <%= shrinkFactor <= iModel ? 'hidden' : '' %> js-shrinked-row" data-id="<%= model.get('id') %>">
+        <tr class="js-di-row-state di-row-state di-row-state--<%= model.get('state') %> <%= shrinkFactor <= iModel ? 'hidden' : '' %> js-shrinked-row" data-id="<%= model.get('id') %>" data-osf-id="<%= model.get('osf_id') %>">
             <td class="cell-check">
                 <input type="checkbox" 
                     class="check-it js-check-it" 
