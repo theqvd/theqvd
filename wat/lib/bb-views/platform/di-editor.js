@@ -149,9 +149,6 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
             arguments["description"] = description;
         }
         
-        // Store tags for affected VMs checking
-        tags.push('head');
-        
         this.tagChanges = {
             create: tags,
             delete: []
@@ -185,7 +182,7 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
                     break;
             }
             
-            arguments.disk_image = context.find('input[name="os-name"]').val();
+            arguments.disk_image = context.find('.os-name').html()
             
             this.createDig(arguments);
         }
@@ -198,7 +195,10 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
                     if (disk_image) {
                         arguments["disk_image"] = disk_image;
                     }
-                    this.heavyCreateStaging(arguments);
+                    var diView = Wat.U.getViewFromQvdObj('di');
+                    diView.model.setEndpoint('di/staging');
+                    
+                    diView.createModel(arguments, diView.fetchList);
                     break;
                 case 'computer':
                     var diskImageFile = context.find('input[name="disk_image_file"]');
@@ -210,7 +210,11 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
                     var diskImageUrl = context.find('input[name="disk_image_url"]').val();
                     arguments["disk_image"] = Wat.U.basename(diskImageUrl);
                     
-                    this.heavyCreateDownload(arguments, diskImageUrl);
+                    var diView = Wat.U.getViewFromQvdObj('di');
+                    diView.model.setEndpoint('di/download');
+                    diView.model.setExtraUrlArguments('&url="' + diskImageUrl + '"');
+                    
+                    diView.createModel(arguments, diView.fetchList);
                     break;
             }
         }
@@ -349,23 +353,6 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
         $('.' + this.cid + ' .js-os-configuration-expanded').toggle();
     },
     
-    heavyCreateDownload: function (args, diskImageUrl) {
-        // Di creation is a heavy operation. Screen will be blocked and a progress graph shown
-        Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
-        Wat.WS.openWebsocket (this.qvdObj, 'di_create', {
-                arguments: args,
-                url: encodeURI(diskImageUrl)
-        }, this.creatingProcessDownload, 'di/download/');
-    },
-    
-    heavyCreateStaging: function (args) {
-        // Di creation is a heavy operation. Screen will be blocked and a progress graph shown
-        Wat.I.loadingBlock($.i18n.t('Please, wait while action is performed') + '<br><br>' + $.i18n.t('Do not close or refresh the window'));
-        Wat.WS.openWebsocket (this.qvdObj, 'di_create', {
-                arguments: args
-        }, this.creatingProcessStaging, 'staging');
-    },
-    
     createDig: function (args) {
         var that = this;
         
@@ -376,21 +363,18 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
         realView.model.save(args, {
             filters: {}
         }).complete(function (e) {
+            var response = JSON.parse(e.responseText);
+            
+            if (response.status != STATUS_SUCCESS) {
+                Wat.I.M.showMessage({message: i18n.t(response.message), messageType: 'error'});
+                return;
+            }
+            
             realView.fetchList();
             realView.checkMachinesChanges(that);
             
             Wat.I.M.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
         });
-    },
-    
-    creatingProcessStaging: function (qvdObj, id, data, ws) {
-        var usefulView = Wat.I.getUsefulView(qvdObj, 'creatingProcess');
-        usefulView.creatingProcess(qvdObj, id, data, ws, 'staging');
-    },
-    
-    creatingProcessDownload: function (qvdObj, id, data, ws) {
-        var usefulView = Wat.I.getUsefulView(qvdObj, 'creatingProcess');
-        usefulView.creatingProcess(qvdObj, id, data, ws, 'download');
     },
     
     saveFile: function(arguments, disk_image_file) {
@@ -413,6 +397,7 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
             type: 'POST',
             xhr: function() {  // Custom XMLHttpRequest
                 var myXhr = $.ajaxSettings.xhr();
+                
                 if(myXhr.upload){ // Check if upload property exists
                     myXhr.upload.addEventListener('progress', that.updateProgress, false); // For handling the progress of the upload
                 }
@@ -434,6 +419,37 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
             Wat.I.loadingUnblock();
             Wat.I.M.showMessage({message: i18n.t('Error creating'), messageType: 'error'});
         });
+    },
+    
+    updateProgress: function (e)  {
+        if (e.total == 0) {
+            var percent = 100;
+        }
+        else {
+            var percent = parseInt((e.loaded / e.total) * 100);
+        }
+
+        var step = 5;
+        
+        if (percent == 100) {
+            var progressHiddenInput = '<input type="hidden" data-di-uploading="completed">';
+        }
+        else {
+            var progressHiddenInput = '<input type="hidden" data-di-uploading="inprogress-' + Math.floor(percent/step)*step + '">';
+        }
+
+        var progressData = [e.loaded, e.total - e.loaded];
+        Wat.I.G.drawPieChartSimple('loading-block', progressData);
+
+        var progressMessage = '';
+        progressMessage += parseInt(e.loaded/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB';
+        progressMessage += ' / ';
+        progressMessage += parseInt(e.total/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB';
+        progressMessage += progressHiddenInput;
+        
+        var creatingMessage = $.i18n.t('Uploading image to server');
+        
+        $('.loading-little-message').html(creatingMessage + '<br><br>' + progressMessage);
     },
     
     changeImagesource: function (e) {

@@ -4,6 +4,7 @@ Wat.Models.Model = Backbone.Model.extend({
     detailsView: false,
     operation: '',
     endpoint: '',
+    extraArgs: '',
     
     parse: function(response) {
         if (response.rows) {
@@ -87,7 +88,11 @@ Wat.Models.Model = Backbone.Model.extend({
         this.endpoint = endpoint;
     },
     
-    sync: function(method, model, options) {        
+    setExtraUrlArguments: function (extraArgs) {
+        this.extraArgs = extraArgs;
+    },
+    
+    sync: function(method, model, options) {
         var that = this;
         var params = _.extend({
             type: 'POST',
@@ -107,7 +112,8 @@ Wat.Models.Model = Backbone.Model.extend({
                 "&action=" + this.operation +
                 "&filters=" + JSON.stringify(options.filters) + 
                 "&arguments=" + JSON.stringify(attributes) +
-                "&parameters=" + JSON.stringify({source: Wat.C.source}))
+                "&parameters=" + JSON.stringify({source: Wat.C.source})) +
+                this.extraArgs
         };
         
         return Backbone.Model.prototype.save.call(this, attributes, options);

@@ -82,37 +82,6 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         that.updateModel(arguments, {id: id}, checkMachinesChanges);
     },
     
-    updateProgress: function (e)  {        
-        if (e.total == 0) {
-            var percent = 100;
-        }
-        else {
-            var percent = parseInt((e.loaded / e.total) * 100);
-        }
-
-        var step = 5;
-        
-        if (percent == 100) {
-            var progressHiddenInput = '<input type="hidden" data-di-uploading="completed">';
-        }
-        else {
-            var progressHiddenInput = '<input type="hidden" data-di-uploading="inprogress-' + Math.floor(percent/step)*step + '">';
-        }
-
-        var progressData = [e.loaded, e.total - e.loaded];
-        Wat.I.G.drawPieChartSimple('loading-block', progressData);
-
-        var progressMessage = '';
-        progressMessage += parseInt(e.loaded/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB';
-        progressMessage += ' / ';
-        progressMessage += parseInt(e.total/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB';
-        progressMessage += progressHiddenInput;
-        
-        var creatingMessage = $.i18n.t('Uploading image to server');
-        
-        $('.loading-little-message').html(creatingMessage + '<br><br>' + progressMessage);
-    },
-    
     renderEmbeddedBlockList: function () {
         this.renderEmbeddedList();
     },
@@ -178,74 +147,5 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
     unshrinkRows: function () {
         $('tr.js-rows-unshrink-row').remove();
         $('tr.js-shrinked-row').show();
-    },
-    
-    creatingProcess: function (qvdObj, id, data, ws, mode) {
-        switch (parseInt(data.status)) {
-            case STATUS_IN_PROGRESS:
-                if (data.total_size == 0) {
-                    var percent = 100;
-                }
-                else {
-                    var percent = parseInt((data.copy_size / data.total_size) * 100);
-                }
-
-                var progressData = [data.copy_size, data.total_size - data.copy_size];
-                Wat.I.G.drawPieChartSimple('loading-block', progressData);
-
-                var step = 5;
-
-                if (percent == 100) {
-                    var progressHiddenInput = '<input type="hidden" data-di-uploading="completed">';
-                }
-                else {
-                    var progressHiddenInput = '<input type="hidden" data-di-uploading="inprogress-' + Math.floor(percent/step)*step + '">';
-                }
-                
-                var progressMessage = '';
-                progressMessage += parseInt(data.copy_size/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB';
-                progressMessage += ' / ';
-                progressMessage += parseInt(data.total_size/(BYTES_ON_KB*BYTES_ON_KB)) + 'MB';
-                progressMessage += progressHiddenInput;
-                
-                var creatingMessage = '';
-                switch (mode) {
-                    case 'staging':
-                        creatingMessage = $.i18n.t('Copying image from staging to images folder in server');
-                        break;
-                    case 'download':
-                        creatingMessage = $.i18n.t('Downloading image from given URL to images folder in server');
-                        break;
-                }
-
-                $('.loading-little-message').html(creatingMessage + '<br><br>' + progressMessage); 
-                break;
-            case STATUS_SUCCESS:
-                if (ws.readyState == WS_OPEN) {
-                    ws.close();
-                }           
-                Wat.I.loadingUnblock();
-                $(".ui-dialog-buttonset button:first-child").trigger('click');
-                
-                var realView = Wat.I.getRealView(this);
-                realView.fetchList();
-
-                Wat.I.M.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
-                
-                // Check affected machine changes
-                var realView = Wat.I.getRealView(this);
-                realView.checkMachinesChanges(this);
-                
-                realView.afterCreating();
-                break;
-            default:
-                if (ws.readyState == WS_OPEN) {
-                    ws.close();
-                }   
-
-                Wat.I.loadingUnblock();
-                $(".ui-dialog-buttonset button:first-child").trigger('click');
-                Wat.I.M.showMessage({message: i18n.t(ALL_STATUS[data.status]), messageType: 'error'});
-        }
-    },
+    }
 });
