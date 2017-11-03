@@ -94,6 +94,7 @@ sub usage_text {
   osf_name      (Name of the OSF the Disk Image is linked to)
   osf_id        (ID of the OSF the Disk Image is linked to)
   tags          (List of tags the Disk Image is tagged with)
+  state         (Current state of the generation of the image)
 
 $QVD::Admin4::Command::COMMON_USAGE_TEXT
 "
@@ -113,11 +114,10 @@ sub run
     }
     elsif ($parsing->command eq 'create')
     {
-        my $res = $self->ask_api_staging(
+        my $res = $self->ask_api_standard(
             $self->get_app->cache->get('api_staging_path'),
             $self->make_api_query($parsing)
         );
-        $self->check_api_result($res);
         $self->print_table($res,$parsing);
     }
     elsif ($parsing->command eq 'can')

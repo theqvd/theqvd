@@ -750,7 +750,7 @@ my $DEFAULT_FIELDS = {
 
     osf => [ qw( id name overlay user_storage memory tenant number_of_vms number_of_dis ) ],
 
-    di => [ qw( id name version osf blocked tags ) ],
+    di => [ qw( id name version osf blocked tags state ) ],
 
 	tenant => [ qw( id name language block blocked) ],
 
@@ -1135,64 +1135,6 @@ sub ask_api_standard
 	unless $res->code;
 
     $self->check_api_result($res);
-
-    return $res;
-}
-
-# Method to create a DI copying the image from the
-# staging directory in API server
-
-sub ask_api_staging
-{
-    my ($self, $path, $query) = @_;
-    
-    my $ua = $self->get_app->cache->get('user_agent');
-    my $credentials = $self->get_credentials();
-    my $url = Mojo::URL->new($self->get_app->cache->get('ws_url'));
-    $url = $url->path($path // $self->get_app->cache->get('api_staging_path'));
-    
-    for my $k (keys %$query)
-    {
-        my $v = $query->{$k};
-        $query->{$k} = ref($v) ? encode_json($v) : $v;
-    }
-
-    $url->query(%$query, %$credentials, parameters => '{ "source" :  "CLI" }');
-
-    my $res = {};
-    my $msg_data = {};
-    my $accomplished = 0;
-    my $on_message_cb = sub {
-
-        my ($tx, $msg) = @_;
-
-        $msg_data = decode_json($msg);
-        if ($msg_data->{status} == 1000 && $accomplished == 0)
-        {
-            my $total = $msg_data->{total_size} // 0;
-            my $partial = $msg_data->{copy_size} // 0;
-            my $percentage = ($total > 0 ? $partial / $total : 1) * 100 ;
-            printf STDERR "\rFile Upload Progress: %06.2f%%", $percentage;
-            $tx->send('ECHO Request');
-        }
-        else
-        {
-            print STDERR sprintf("\nUpload finished (%s) : %s\n", $msg_data->{status}, $msg_data->{message});
-			$res = $tx->res;
-			# Include message content in response body
-			$res->body($msg);
-            $tx->finish;
-            $accomplished = 1;
-        }
-    };
-
-    $ua->websocket("$url" =>  sub {
-            my ($ua, $tx) = @_;
-            $tx->on(message => $on_message_cb);
-            $tx->send('ECHO Request');
-        } );
-
-    Mojo::IOLoop->start;
 
     return $res;
 }

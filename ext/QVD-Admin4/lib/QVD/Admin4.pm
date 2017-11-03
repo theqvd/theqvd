@@ -134,7 +134,7 @@ sub init {
 	my $api_default_path = "api";
 	my $api_info_path = "$api_default_path/info";
 	my $api_di_upload_path = "$api_default_path/di/upload";
-	my $api_staging_path = "$api_default_path/staging";
+	my $api_staging_path = "$api_default_path/di/staging";
 	
 	# Created a web client
 	my $user_agent = Mojo::UserAgent->new();
