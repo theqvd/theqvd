@@ -819,7 +819,7 @@ sub tags_create
     
     $self->db->txn_commit;
     
-    if ($di_obj->di_runtime->state eq 'published') {
+    if ($di_obj->state eq 'published') {
         $self->tags_consolidate($di_obj);
     }
 }
@@ -1205,15 +1205,16 @@ sub di_no_dependant_vms
 sub di_no_head_default_tags
 {
     my ($self,$di) = @_;
-
-    for my $tag (qw/default head/) 
-    {
-	next unless $di->has_tag($tag);
-	my @potentials = grep { $_->id ne $di->id } $di->osf->dis;
-	if (@potentials) {
-	    my $new_di = $potentials[-1];
-	    $DB->resultset('DI_Tag')->create({di_id => $new_di->id, tag => $tag});
-	}
+    
+    if($di->state eq 'published') {
+        for my $tag (qw/default head/) {
+            next unless $di->has_tag($tag);
+            my @potentials = grep { $_->id ne $di->id && $_->state eq 'published' } $di->osf->dis;
+            if (@potentials) {
+                my $new_di = $potentials[-1];
+                $self->db->resultset('DI_Tag')->create({ di_id => $new_di->id, tag => $tag });
+            }
+        }
     }
     return 1;
 }
