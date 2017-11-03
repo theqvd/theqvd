@@ -572,6 +572,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     checkAll: function (e) {
         var checkId = $(e.target).attr('data-check-id');
         var embeddedView = $(e.target).attr('data-embedded-view');
+        var view = embeddedView ? Wat.CurrentView.embeddedViews[embeddedView] : Wat.CurrentView;
         
         if (!embeddedView) {
             // Close subrow if its opened
@@ -593,7 +594,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                                 that.selectedItems.push(parseInt($(checkbox).attr('data-id')));
                             });
                             Wat.I.closeDialog($(this));
-                            Wat.I.updateSelectedItems(that.selectedItems.length);
+                            Wat.I.updateSelectedItems(that.selectedItems.length, view);
                         },
                         "Select all": function () {
                             $('.js-check-it[data-check-id="' + checkId + '"]').prop("checked", true);
@@ -613,12 +614,12 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 $.each($('.js-check-it[data-check-id="' + checkId + '"]'), function (iCheckbox, checkbox) {
                     that.selectedItems.push(parseInt($(checkbox).attr('data-id')));
                 });
-                Wat.I.updateSelectedItems(that.selectedItems.length);
+                Wat.I.updateSelectedItems(that.selectedItems.length, view);
             }
         } else {
             $('.js-check-it[data-check-id="' + checkId + '"]').prop("checked", false);
             this.resetSelectedItems ();
-            Wat.I.updateSelectedItems(this.selectedItems.length);
+            Wat.I.updateSelectedItems(this.selectedItems.length, view);
         }
     },
     
@@ -1293,23 +1294,12 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 Wat.I.confirm('dialog/confirm-undone', that.applyDeleteACL, that, loadingBlock);
                 break;
             case 'new_osf_di':
-                var params = {};
-                params.changeFunctionsExternal = {
-                    render: function () {},
-                    renderList: function () {},
-                    afterCreating: function () { Wat.CurrentView.resetSelectedItems() }
-                };
+                Wat.CurrentView.embeddedViews.di = new Wat.Views.DIListView({
+                    listContainer: '.js-invisible-layer',
+                    whatRender: 'none'
+                });
                 
-                params.filters = {"osf_id": this.selectedItems[0]};
-                
-                Wat.CurrentView.embeddedViews = Wat.CurrentView.embeddedViews || {};
-            
-                Wat.CurrentView.embeddedViews.di = new Wat.Views.DIListView(params);
-                
-                setTimeout(function () {
-                    Wat.CurrentView.embeddedViews.di.openNewElementDialog();
-                }, 100);
-
+                Wat.CurrentView.embeddedViews.di.openNewElementDialog();
                 break;
         };
     },

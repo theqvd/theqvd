@@ -281,7 +281,7 @@ Wat.Views.MainView = Backbone.View.extend({
         var that = this;
         
         // Avoid open dialogs relative to another qvd objets in screens with embedded views
-        if ($(e.target).attr('data-qvd-obj') != this.qvdObj) {
+        if (e && $(e.target).attr('data-qvd-obj') != this.qvdObj) {
             return;
         }
         

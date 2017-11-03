@@ -162,6 +162,12 @@ Wat.I.T = {
                     };
                 }
                 
+                if (params.qvdObj == 'osf') {
+                    templates["editorNew_di"] = {
+                        name: 'creator/di'
+                    };
+                }
+                
                 templates["list_" + params.qvdObj] = {
                     name: 'list/' + params.qvdObj
                 };

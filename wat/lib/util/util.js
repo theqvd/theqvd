@@ -338,34 +338,36 @@ Wat.U = {
         return view;
     },
     
-    
     getViewFromQvdObj: function (qvdObjSearch) {
         var view = false;
+        var embeddedView = false;
         
         $.each(Wat.CurrentView.embeddedViews, function (qvdObj, eView) {
             if (qvdObjSearch == qvdObj) {
-                view = eView;
-                return false;
+                embeddedView = eView;
+                return false; // break $.each
             }
         });
         
-        if (view) {
-            return view;
-        }
-        
-        $.each(Wat.CurrentView.sideViews, function (qvdObj, eView) {
-            if (qvdObjSearch == eView.qvdObj) {
-                view = eView;
-                return false;
-            }
-        });
-        
-        if (view) {
-            return view;
+        if (embeddedView) {
+            view = embeddedView;
         }
         else {
-            return Wat.CurrentView;
+            var sideView = false;
+            
+            $.each(Wat.CurrentView.sideViews, function (qvdObj, sView) {
+                if (qvdObjSearch == sView.qvdObj) {
+                    sideView = sView;
+                    return false; // break $.each
+                }
+            });
+            
+            if (sideView) {
+                view = sideView;
+            }
         }
+        
+        return view || Wat.CurrentView;
     },
     
     setFormChangesOnModel: function (wrapperSelector, model) {

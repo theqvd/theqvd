@@ -192,7 +192,7 @@
                             case 'dis':
                 %>
                                 <td class="desktop">
-                                    <a class="button2 button-icon fa fa-eye js-toggle-dis-row <%= model.get('number_of_dis') == 0 ? 'disabled' : '' %>" data-id="<%= model.get('id') %>"></a>
+                                    <a class="button2 button-icon fa fa-eye js-toggle-dis-row" data-id="<%= model.get('id') %>"></a>
                                     <% if (model.get('number_of_dis') > 0) { %>
                                     <%= Wat.C.ifACL('<a href="#/dis/' + Wat.U.transformFiltersToSearchHash({osf_id: model.get('id')}) + '">', 'di.see-main.') %>
                                         <span data-wsupdate="number_of_dis" data-id="<%= model.get('id') %>"><%= model.get('number_of_dis') %></span>

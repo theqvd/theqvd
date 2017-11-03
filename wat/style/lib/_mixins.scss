@@ -229,7 +229,7 @@
     tr {
         td, th {
             padding: 12px 8px 8px 8px;
-            vertical-align: top;
+            vertical-align: middle;
 
             border-right: dotted 1px darken($col_whiter, 10);
             border-bottom: dotted 1px darken($col_whiter, 10);
@@ -237,16 +237,6 @@
             &:last-child {
                 border-right: 0px;
             }
-        }
-    }
-    
-    >tbody:nth-child(2) tr:first-child {
-        td: first-child {
-            //border-right: dotted 1px darken($col_whiter, 10);
-        }
-        
-        td {
-            //border-top: dotted 1px darken($col_whiter, 10);
         }
     }
 

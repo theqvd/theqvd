@@ -457,7 +457,7 @@ Wat.I.selectedActions[qvdObj] = {
             'field': 'blocked',
             'value': '0'
         }
-    },           
+    },
     'unblock': {
         'text': 'Unblock',
         'acls': 'di.update-massive.block',
@@ -475,7 +475,8 @@ Wat.I.selectedActions[qvdObj] = {
             'type': 'eq',
             'field': 'state',
             'value': 'ready'
-        }
+        },
+        'otherClass': 'js-only-one'
     },
     'delete': {
         'text': 'Delete',

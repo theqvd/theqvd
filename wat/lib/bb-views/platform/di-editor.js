@@ -10,7 +10,7 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
     editorEvents: {
         'change select[name="osf_id"]': 'changeOSF',
         'click .js-expand-os-conf': 'toggleOSConfigExpanded',
-        'change select[name="images_source"]': 'changeImagesource',
+        'change select[name="images_source"]': 'changeImageSource',
         'change select[name="expire_vms"]': 'changeExpireVms',
         'change .js-scheduler-hours': 'changeSchedulerHours',
         'click .js-scheduler-hours + .ui-spinner-button': 'changeSchedulerHours',
@@ -57,8 +57,14 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
                 userHidden.value = Wat.CurrentView.model.get('id');
             }
             else if (Wat.CurrentView.collection) {
-                // If is OSF list view get id from subview filters
-                userHidden.value = Wat.CurrentView.embeddedViews.di.collection.filters.osf_id;
+                // If some OSF is selected means that the DI is created from selectedActions
+                if (Wat.CurrentView.selectedItems[0]) {
+                    userHidden.value = Wat.CurrentView.selectedItems[0];
+                }
+                else {
+                    // If is OSF list view get id from subview filters
+                    userHidden.value = Wat.CurrentView.embeddedViews.di.collection.filters.osf_id;
+                }
             }
             $('.editor-container').append(userHidden);
             
@@ -452,15 +458,9 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
         $('.loading-little-message').html(creatingMessage + '<br><br>' + progressMessage);
     },
     
-    changeImagesource: function (e) {
+    changeImageSource: function (e) {
         var selectedSource = $(e.target).val();
         
-        var that = Wat.U.getViewFromQvdObj('di');
-        var that = Wat.CurrentView;
-        that.editorView.toggleImageSource(selectedSource);
-    },
-    
-    toggleImageSource: function (selectedSource) {
         switch (selectedSource) {
             case 'computer':
                 $('.image_computer_row').show();

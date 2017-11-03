@@ -98,7 +98,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         
         that.saveModel({}, {}, messages, function () {
             // Uncheck all DI checks
-            $('.check_all[data-check-id="di"]').prop('checked',true).trigger('click');
+            $('.js-check-it:checked').prop('checked',true).trigger('click');
         });
     },
     

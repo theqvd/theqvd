@@ -353,6 +353,12 @@ Wat.I.selectedActions[qvdObj] = {
         'iconClass': 'fa fa-pencil',
         'otherClass': 'js-only-one'
     },
+    'new_osf_di': {
+        'text': 'New Disk image',
+        'iconClass': CLASS_ICON_DIS,
+        'acls': 'di.create.',
+        'otherClass': 'js-only-one'
+    },
     'delete': {
         'text': 'Delete',
         'acls': 'osf.delete-massive.',

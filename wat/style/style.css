@@ -1405,28 +1405,25 @@ body {
       /* line 230, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
       .wrapper .content .home-wrapper tr td, .wrapper .content .home-wrapper tr th {
         padding: 12px 8px 8px 8px;
-        vertical-align: top;
+        vertical-align: middle;
         border-right: dotted 1px #e4e4e4;
         border-bottom: dotted 1px #e4e4e4; }
         /* line 237, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
         .wrapper .content .home-wrapper tr td:last-child, .wrapper .content .home-wrapper tr th:last-child {
           border-right: 0px; }
-      /* line 243, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
-      .wrapper .content .home-wrapper > tbody:nth-child(2) tr:first-child {
-        td: first-child; }
       /* line 5, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
       .wrapper .content .home-wrapper > tbody > tr:nth-child(even) {
         background-color: #fdfdfd; }
       /* line 8, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
       .wrapper .content .home-wrapper > tbody > tr:nth-child(odd) {
         background-color: #f3f3f3; }
-      /* line 264, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
+      /* line 254, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
       .wrapper .content .home-wrapper tr:last-child td:first-child {
         border-bottom-left-radius: 4px; }
-      /* line 267, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
+      /* line 257, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
       .wrapper .content .home-wrapper tr:last-child td:last-child {
         border-bottom-right-radius: 4px; }
-      /* line 272, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
+      /* line 262, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
       .wrapper .content .home-wrapper .info-in-name-cell {
         margin-top: 8px;
         float: right; }
@@ -1512,28 +1509,25 @@ body {
             /* line 230, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
             .wrapper .content .home-wrapper .home-row .home-cell .summary-table tr td, .wrapper .content .home-wrapper .home-row .home-cell .summary-table tr th {
               padding: 12px 8px 8px 8px;
-              vertical-align: top;
+              vertical-align: middle;
               border-right: dotted 1px #e4e4e4;
               border-bottom: dotted 1px #e4e4e4; }
               /* line 237, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
               .wrapper .content .home-wrapper .home-row .home-cell .summary-table tr td:last-child, .wrapper .content .home-wrapper .home-row .home-cell .summary-table tr th:last-child {
                 border-right: 0px; }
-            /* line 243, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
-            .wrapper .content .home-wrapper .home-row .home-cell .summary-table > tbody:nth-child(2) tr:first-child {
-              td: first-child; }
             /* line 5, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
             .wrapper .content .home-wrapper .home-row .home-cell .summary-table > tbody > tr:nth-child(even) {
               background-color: #fdfdfd; }
             /* line 8, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
             .wrapper .content .home-wrapper .home-row .home-cell .summary-table > tbody > tr:nth-child(odd) {
               background-color: #f3f3f3; }
-            /* line 264, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
+            /* line 254, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
             .wrapper .content .home-wrapper .home-row .home-cell .summary-table tr:last-child td:first-child {
               border-bottom-left-radius: 4px; }
-            /* line 267, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
+            /* line 257, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
             .wrapper .content .home-wrapper .home-row .home-cell .summary-table tr:last-child td:last-child {
               border-bottom-right-radius: 4px; }
-            /* line 272, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
+            /* line 262, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
             .wrapper .content .home-wrapper .home-row .home-cell .summary-table .info-in-name-cell {
               margin-top: 8px;
               float: right; }
@@ -1657,28 +1651,25 @@ body {
         /* line 230, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
         .wrapper .content .home-wrapper .log-table tr td, .wrapper .content .home-wrapper .log-table tr th {
           padding: 12px 8px 8px 8px;
-          vertical-align: top;
+          vertical-align: middle;
           border-right: dotted 1px #e4e4e4;
           border-bottom: dotted 1px #e4e4e4; }
           /* line 237, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
           .wrapper .content .home-wrapper .log-table tr td:last-child, .wrapper .content .home-wrapper .log-table tr th:last-child {
             border-right: 0px; }
-        /* line 243, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
-        .wrapper .content .home-wrapper .log-table > tbody:nth-child(2) tr:first-child {
-          td: first-child; }
         /* line 5, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
         .wrapper .content .home-wrapper .log-table > tbody > tr:nth-child(even) {
           background-color: #fdfdfd; }
         /* line 8, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
         .wrapper .content .home-wrapper .log-table > tbody > tr:nth-child(odd) {
           background-color: #f3f3f3; }
-        /* line 264, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
+        /* line 254, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
         .wrapper .content .home-wrapper .log-table tr:last-child td:first-child {
           border-bottom-left-radius: 4px; }
-        /* line 267, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
+        /* line 257, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
         .wrapper .content .home-wrapper .log-table tr:last-child td:last-child {
           border-bottom-right-radius: 4px; }
-        /* line 272, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
+        /* line 262, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
         .wrapper .content .home-wrapper .log-table .info-in-name-cell {
           margin-top: 8px;
           float: right; }
@@ -2872,28 +2863,25 @@ table.list, table.customize-fields {
   /* line 230, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
   table.list tr td, table.list tr th, table.customize-fields tr td, table.customize-fields tr th {
     padding: 12px 8px 8px 8px;
-    vertical-align: top;
+    vertical-align: middle;
     border-right: dotted 1px #e4e4e4;
     border-bottom: dotted 1px #e4e4e4; }
     /* line 237, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
     table.list tr td:last-child, table.list tr th:last-child, table.customize-fields tr td:last-child, table.customize-fields tr th:last-child {
       border-right: 0px; }
-  /* line 243, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
-  table.list > tbody:nth-child(2) tr:first-child, table.customize-fields > tbody:nth-child(2) tr:first-child {
-    td: first-child; }
   /* line 5, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
   table.list > tbody > tr:nth-child(even), table.customize-fields > tbody > tr:nth-child(even) {
     background-color: #fdfdfd; }
   /* line 8, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
   table.list > tbody > tr:nth-child(odd), table.customize-fields > tbody > tr:nth-child(odd) {
     background-color: #f3f3f3; }
-  /* line 264, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
+  /* line 254, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
   table.list tr:last-child td:first-child, table.customize-fields tr:last-child td:first-child {
     border-bottom-left-radius: 4px; }
-  /* line 267, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
+  /* line 257, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
   table.list tr:last-child td:last-child, table.customize-fields tr:last-child td:last-child {
     border-bottom-right-radius: 4px; }
-  /* line 272, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
+  /* line 262, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
   table.list .info-in-name-cell, table.customize-fields .info-in-name-cell {
     margin-top: 8px;
     float: right; }
@@ -2938,28 +2926,25 @@ table.custom-props, table.details {
   /* line 230, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
   table.custom-props tr td, table.custom-props tr th, table.details tr td, table.details tr th {
     padding: 12px 8px 8px 8px;
-    vertical-align: top;
+    vertical-align: middle;
     border-right: dotted 1px #e4e4e4;
     border-bottom: dotted 1px #e4e4e4; }
     /* line 237, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
     table.custom-props tr td:last-child, table.custom-props tr th:last-child, table.details tr td:last-child, table.details tr th:last-child {
       border-right: 0px; }
-  /* line 243, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
-  table.custom-props > tbody:nth-child(2) tr:first-child, table.details > tbody:nth-child(2) tr:first-child {
-    td: first-child; }
   /* line 23, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
   table.custom-props > tbody > tr > td, table.details > tbody > tr > td {
     background-color: #fdfdfd; }
   /* line 26, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
   table.custom-props > tbody > tr > td:nth-child(1), table.details > tbody > tr > td:nth-child(1) {
     background-color: #f3f3f3; }
-  /* line 264, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
+  /* line 254, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
   table.custom-props tr:last-child td:first-child, table.details tr:last-child td:first-child {
     border-bottom-left-radius: 4px; }
-  /* line 267, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
+  /* line 257, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
   table.custom-props tr:last-child td:last-child, table.details tr:last-child td:last-child {
     border-bottom-right-radius: 4px; }
-  /* line 272, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
+  /* line 262, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
   table.custom-props .info-in-name-cell, table.details .info-in-name-cell {
     margin-top: 8px;
     float: right; }
@@ -4118,28 +4103,25 @@ table.role-template-tools {
   /* line 230, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
   table.role-template-tools tr td, table.role-template-tools tr th {
     padding: 12px 8px 8px 8px;
-    vertical-align: top;
+    vertical-align: middle;
     border-right: dotted 1px #e4e4e4;
     border-bottom: dotted 1px #e4e4e4; }
     /* line 237, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
     table.role-template-tools tr td:last-child, table.role-template-tools tr th:last-child {
       border-right: 0px; }
-  /* line 243, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
-  table.role-template-tools > tbody:nth-child(2) tr:first-child {
-    td: first-child; }
   /* line 5, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
   table.role-template-tools > tbody > tr:nth-child(even) {
     background-color: #fdfdfd; }
   /* line 8, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
   table.role-template-tools > tbody > tr:nth-child(odd) {
     background-color: #f3f3f3; }
-  /* line 264, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
+  /* line 254, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
   table.role-template-tools tr:last-child td:first-child {
     border-bottom-left-radius: 4px; }
-  /* line 267, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
+  /* line 257, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
   table.role-template-tools tr:last-child td:last-child {
     border-bottom-right-radius: 4px; }
-  /* line 272, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
+  /* line 262, /home/zarzuelo/code/gotham/qvd-src/wat/style/lib/_mixins.scss */
   table.role-template-tools .info-in-name-cell {
     margin-top: 8px;
     float: right; }
