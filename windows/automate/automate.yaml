@@ -60,6 +60,8 @@ setup:
       - name: Config::AutoConf
       - name: Wx
       - name: Log::Dispatch::FileRotate
+      - name: Log::Log4perl
+        test: no
       - name: Win32::LongPath
       - name: Data::UUID
         url: https://github.com/salva/p5-Data-UUID.git
@@ -195,7 +197,7 @@ build:
       env: perl_sh
       subdir: gettext-0.19.8.1/gettext-runtime
       commands:
-        configure: ./configure --prefix=$PERL_PREFIX_MSYS/perl
+        configure: ./configure --prefix=$PERL_PREFIX_MSYS/c
     children:
       - name: intl
         build:
