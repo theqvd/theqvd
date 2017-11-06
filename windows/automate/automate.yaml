@@ -1,7 +1,6 @@
 run:
   do:
     - build
-    - pack
   workdir: c:/temp
   msys:
     prefix: c:/msys32/
