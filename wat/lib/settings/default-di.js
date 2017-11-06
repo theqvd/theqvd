@@ -165,7 +165,7 @@ Wat.I.detailsFields[qvdObj] = {
                     },
                     uploading: {
                         text: 'Uploading',
-                        icon: 'fa fa-upload',
+                        icon: 'fa fa-upload faa-bounce animated',
                     },
                     upload_stalled: {
                         text: 'Upload stalled',

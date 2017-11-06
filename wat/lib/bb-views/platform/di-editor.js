@@ -53,7 +53,7 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
             userHidden.type = "hidden";
             userHidden.name = "osf_id";
             // If is OSF details view get id from model
-            if (Wat.CurrentView.model && Wat.CurrentView.model.id) {
+            if (Wat.CurrentView.viewKind == 'details' && Wat.CurrentView.model.id) {
                 userHidden.value = Wat.CurrentView.model.get('id');
             }
             else if (Wat.CurrentView.collection) {

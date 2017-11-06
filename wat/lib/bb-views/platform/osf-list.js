@@ -74,4 +74,36 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
             Wat.CurrentView.embeddedViews.di = new Wat.Views.DIListView(params);
         }
     },
+    
+    renderList: function (params) {
+        Wat.Views.ListView.prototype.renderList.apply(this, [params]);
+        
+        // Open a websocket to monitor published images number
+        Wat.WS.openWebsocket('di', 'di_get_list', {
+            filters: {state: 'published'}, 
+            fields: ['osf_id']
+        }, function (qvdObj, id, data) {
+            var diCount = {};
+            
+            $.each(data.rows, function (i, row) {
+                if (!diCount[row.osf_id]) {
+                    diCount[row.osf_id] = 0;
+                }
+                
+                diCount[row.osf_id]++;
+            });
+            
+            $.each(diCount, function (osfId, diCount) {
+                $('[data-wsupdate="number_of_published_dis"][data-id="' + osfId + '"]').html(diCount);
+            });
+            
+            // Not included osfs into rows, will be setted to 0
+            var queryIds = Object.keys(diCount);
+            $.each($('[data-wsupdate="number_of_published_dis"]'), function (i, element) {
+                if ($.inArray($(element).attr('data-id'), queryIds) == -1) {
+                    $(element).html(0);
+                }
+            });
+        }, 'ws', 'list');
+    },
 });

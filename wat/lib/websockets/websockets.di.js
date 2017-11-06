@@ -4,10 +4,11 @@ Wat.WS.changeWebsocketDi = function (id, field, data, row) {
             var view = Wat.U.getViewFromQvdObj('di');
             var progressBar = $('.progressbar[data-id="' + id + '"]');
             var percentage = parseFloat(row.percentage * 100).toFixed(2);
+            var elapsedTime = row.elapsed_time || 0;
             
             $(progressBar).attr('data-percent', percentage);
             $(progressBar).attr('data-remaining', Wat.U.getRemainingTime(row.elapsed_time, percentage));
-            $(progressBar).attr('data-elapsed', row.elapsed_time);
+            $(progressBar).attr('data-elapsed', elapsedTime);
             break;
         case 'state':
             // Show proper icon

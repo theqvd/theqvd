@@ -191,22 +191,22 @@
                                 break;
                             case 'dis':
                 %>
-                                <td class="desktop">
-                                    <a class="button2 button-icon fa fa-eye js-toggle-dis-row" data-id="<%= model.get('id') %>"></a>
-                                    <% if (model.get('number_of_dis') > 0) { %>
+                                <td class="desktop center">
                                     <%= Wat.C.ifACL('<a href="#/dis/' + Wat.U.transformFiltersToSearchHash({osf_id: model.get('id')}) + '">', 'di.see-main.') %>
-                                        <span data-wsupdate="number_of_dis" data-id="<%= model.get('id') %>"><%= model.get('number_of_dis') %></span>
+                                        <span data-i18n="[title]Published disk images">
+                                            <span data-wsupdate="number_of_published_dis" data-id="<%= model.get('id') %>">?</span> / 
+                                            <span data-wsupdate="number_of_dis" data-id="<%= model.get('id') %>"><%= model.get('number_of_dis') %></span>
+                                        </span>
                                     <%= Wat.C.ifACL('</a>', 'di.see-main.') %>
-                                    <% } else {
-                                    %>
-                                        <span data-wsupdate="number_of_dis" data-id="<%= model.get('id') %>"><%= model.get('number_of_dis') %></span>
-                                    <% } %>
+                                    <div>
+                                        <a class="button2 button-icon fa fa-eye js-toggle-dis-row" data-id="<%= model.get('id') %>"></a>
+                                    </div>
                                 </td>
                 <%
                                 break;
                             case 'vms':
                 %>
-                                <td class="desktop">
+                                <td class="desktop center">
                                     <% if (model.get('number_of_vms') > 0) { %>
                                     <%= Wat.C.ifACL('<a href="#/vms/' + Wat.U.transformFiltersToSearchHash({osf_id: model.get('id')}) + '">', 'vm.see-main.') %>
                                         <span data-wsupdate="number_of_vms" data-id="<%= model.get('id') %>"><%= model.get('number_of_vms') %></span>

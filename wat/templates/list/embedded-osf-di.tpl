@@ -10,12 +10,24 @@
         </tr>
     </thead>
     <tbody>
-    <% $.each(models, function (iModel, model) {
+    <%
+    if (models.length == 0) {
+    %>
+        <tr style="display:block;">
+            <td colspan=5 class="center" style="display:block;">
+                <span class="no-elements" data-i18n="There are no elements">
+                    <%= i18n.t('There are no elements') %>
+                </span>
+            </td>
+        </tr>
+    <%
+    }
+    $.each(models, function (iModel, model) {
             if (shrinkFactor == iModel) {
                 %>
                     <tr class="js-rows-unshrink-row rows-unshrink-row">
                         <td colspan="4">
-                            <a class="button2 fa fa-chevron-down col-width-100 center js-unshrink-btn">See all disk images</a>
+                            <a class="button2 fa fa-chevron-down col-width-100 center js-unshrink-btn" data-i18n="See all"></a>
                         </td>
                     </tr>
                 <%

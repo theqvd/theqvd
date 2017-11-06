@@ -290,7 +290,7 @@ Wat.Views.OSDShortcutsEditorView = Wat.Views.OSDEditorView.extend({
         }).complete(function () {
             that.renderAssetsControl({ 
                 assetType: 'icon',
-                pluginId: 'shortcuts',
+                pluginId: 'shortcut',
                 afterRender: function () {
                     // Select uploaded element
                     $('.' + this.cid + ' [data-id="' + assetId + '"]>td>input.js-asset-check').trigger('change').prop('checked', true);
