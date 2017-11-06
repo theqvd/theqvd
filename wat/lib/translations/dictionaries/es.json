@@ -52,6 +52,7 @@
     "Assigned roles": "Roles asignados",
     "Available ACLs": "ACLs disponibles",
     "Auto": "Auto",
+    "Auto-publish": "Auto-publicar",
     "Because of the last change, the following Virtual Machines are running with a different Disk Image than the assigned one": "A causa de la última modificación, las siguientes Máquinas Virtuales se están ejecutando con una imagen de disco diferente a la asignada",
     "Block": "Bloquear",
     "Block size": "Tamaño de bloque",

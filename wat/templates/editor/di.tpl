@@ -14,7 +14,7 @@
     if (model.get('state') != 'published' && model.get('state') != 'ready') { 
     %>
         <tr class="js-osd-row" data-tab-field="image">
-            <td data-i18n="Publish"></td>
+            <td data-i18n="Auto-publish"></td>
             <td>
                 <select class="" id="publish" name="publish" data-any-selected>
                     <option value="no" data-i18n="No" <%= model.get('auto_publish') ? '' : 'selected="selected"' %>></option>

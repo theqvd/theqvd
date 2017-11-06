@@ -716,8 +716,6 @@ Wat.I = {
         else {
             this.showSelectedItemsMenu(that.selectedActions, that.cid);
             
-            this.checkVisibilityConditions(that);
-                
             if (selectedItems == 1) {
                 $('.js-only-massive[data-cid="' + that.cid + '"]').hide();
                 $('.js-only-one[data-cid="' + that.cid + '"]').show();
@@ -726,6 +724,8 @@ Wat.I = {
                 $('.js-only-one[data-cid="' + that.cid + '"]').hide();
                 $('.js-only-massive[data-cid="' + that.cid + '"]').show();
             }
+            
+            this.checkVisibilityConditions(that);
         }
         
         $('.elements-selected[data-cid="' + that.cid + '"]').html(selectedItems);
@@ -733,13 +733,12 @@ Wat.I = {
     
     checkVisibilityConditions: function (that) {
         var that = that || Wat.CurrentView;
-        
         if ($('[data-visibility-conditioned]').length > 0) {
             $.each($('[data-visibility-conditioned]'), function (i, element) {
                 var conditionType = $(element).attr('data-visibility-cond-type');
                 var conditionField = $(element).attr('data-visibility-cond-field');
                 var conditionValue = $(element).attr('data-visibility-cond-value');
-                    
+                
                 // Process AND/OR clauses
 
                 // For single and OR clauses, necessary matches will be just one
@@ -764,8 +763,7 @@ Wat.I = {
                 var positiveItems = 0;
                 
                 $.each(that.selectedItems, function (i, selectedId) {
-                    var selectedModel = that.collection.where({id: selectedId})[0];      
-                    
+                    var selectedModel = that.collection.where({id: selectedId})[0];
                     // If any item is out of view (other page), all options will be shown
                     if (selectedModel == undefined) {
                         $(element).show();
@@ -773,16 +771,16 @@ Wat.I = {
                     }
                     
                     var matches = 0;
-                    $.each(conditionValues, function (iVal, conditionValue) {     
+                    $.each(conditionValues, function (iVal, conditionValue) {
                         switch(conditionType) {
                             case 'eq':
                                     if (selectedModel.get(conditionField) == conditionValue) {
-                                            matches++;   
+                                            matches++;
                                     }
                                 break;
                             case 'ne':
                                     if (selectedModel.get(conditionField) != conditionValue) {
-                                            matches++;     
+                                            matches++; 
                                     }
                                 break;
                         }

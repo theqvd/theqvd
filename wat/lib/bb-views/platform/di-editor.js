@@ -335,7 +335,7 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
                         OSDmodel.initPlugins();
                         
                         Wat.DIG.renderOSDetails(OSDmodel, {
-                            shrinked: true,
+                            mode : 'shrinked',
                             container: '.' + that.cid
                         });
                     });
@@ -351,6 +351,10 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
     toggleOSConfigExpanded: function (e) {
         if ($(e.target).hasClass('fa-chevron-down')) {
             $(e.target).removeClass('fa-chevron-down').addClass('fa-chevron-up');
+            
+            Wat.DIG.renderOSDetails(Wat.CurrentView.OSDmodel, {
+                mode: 'unshrinked'
+            });
         }
         else {
             $(e.target).removeClass('fa-chevron-up').addClass('fa-chevron-down');

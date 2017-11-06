@@ -25,7 +25,7 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
                         that.OSDmodel.initPlugins();
 
                         Wat.DIG.renderOSDetails(that.OSDmodel, {
-                            shrinked: false,
+                            mode: 'full',
                             container: ''
                         });
                     });

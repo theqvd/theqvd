@@ -284,7 +284,7 @@ Wat.I.detailsFields[qvdObj] = {
                 'icon': 'fa fa-clock-o'
             },
             'auto_publish': {
-                'text': 'Publish',
+                'text': 'Auto-publish',
                 'fields': [
                     'auto_publish'
                 ],
@@ -372,6 +372,59 @@ Wat.I.formFilters[qvdObj] = {
         'displayMobile': false,
         'displayDesktop': true,
         'acls': 'di.filter.block'
+    },
+    'state': {
+        'filterField': 'state',
+        'type': 'select',
+        'text': 'State',
+        'class': 'chosen-advanced',
+        'fillable': false,
+        'options': [
+            {
+                'value': FILTER_ALL,
+                'text': 'All',
+                'selected': true
+            },
+            {
+                'value': 'new',
+                'text': 'New'
+            },
+            {
+                'value': 'generating',
+                'text': 'Generating'
+            },
+            {
+                'value': 'fail',
+                'text': 'Fail'
+            },
+            {
+                'value': 'uploading',
+                'text': 'Uploading'
+            },
+            {
+                'value': 'upload_stalled',
+                'text': 'Upload stalled'
+            },
+            {
+                'value': 'verifying',
+                'text': 'Verifying'
+            },
+            {
+                'value': 'ready',
+                'text': 'Ready'
+            },
+            {
+                'value': 'published',
+                'text': 'Published'
+            },
+            {
+                'value': 'retired',
+                'text': 'Retired'
+            }
+                    ],
+        'displayMobile': false,
+        'displayDesktop': true,
+        'acls': 'di.see-main.'
     },
     'administrator': {
         'filterField': 'creation_admin_id',

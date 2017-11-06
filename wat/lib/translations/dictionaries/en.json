@@ -50,6 +50,7 @@
     "Assign selected role": "Assign selected role",
     "Assigned roles": "Assigned roles",
     "Auto": "Auto",
+    "Auto-publish": "Auto-publish",
     "Available ACLs": "Available ACLs",
     "Because of the last change, the following Virtual Machines are running with a different Disk Image than the assigned one": "Because of the last change, the following Virtual Machines are running with a different Disk Image than the assigned one",
     "Block": "Block",

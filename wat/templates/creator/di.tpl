@@ -62,7 +62,7 @@
     }
     %>
     <tr class="js-osd-row" data-tab-field="image">
-        <td data-i18n="Publish"></td>
+        <td data-i18n="Auto-publish"></td>
         <td>
             <select class="" id="publish" name="publish" data-any-selected>
                 <option value="no" data-i18n="No"></option>

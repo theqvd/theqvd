@@ -3,6 +3,6 @@
         <span class="os-name"><%= pluginData.get('name') %></span>
     </div>
 </div>
-<% if (shrinked) { %>
-    <a class="button2 fright fa fa-chevron-down js-expand-os-conf">More</a>
+<% if (mode != 'full') { %>
+    <a class="button2 fright fa fa-chevron-<%= mode == 'shrinked' ? 'down' : 'up' %> js-expand-os-conf">More</a>
 <% } %>

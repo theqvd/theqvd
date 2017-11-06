@@ -157,7 +157,10 @@ Wat.DIG = {
     // Render OS Details template and return it
     // model: Backbone model of the OSD
     // options: Options of the rendering
-    //          - shrinked: If is just showed SO distro and rest of the info is expanded clicking More button
+    //          - mode:
+    //              + shrinked: If is just showed SO distro and rest of the info is expanded clicking More button
+    //              + unshrinked: If is showed full data and More button
+    //              + full: If is showed full data without More button
     //          - container: CSS selector of the container where will be rendered
     renderOSDetails: function (model, options) {
         options = options || {};
@@ -176,20 +179,23 @@ Wat.DIG = {
             var distroId = model.get('distro_id') || 1;
             
             var distros = model.getPluginAttrOptions('os.distro', function (distros) {
-                // Add specific parts of editor to dialog
-                var template = _.template(
-                            Wat.TPL.osConfiguration, {
-                                osfId: osfId,
-                                model: model,
-                                config_params: model.get('config_params'),
-                                shortcuts: model.get('shortcuts'),
-                                scripts: model.get('scripts'),
-                                distro: distros[distroId],
-                                shrinked: options.shrinked
-                            }
-                        );
-                
-                $(options.container + ' .bb-os-configuration').html(template);
+                // If mode is unshrinked means that is not needed render all table again
+                if (options.mode != 'unshrinked') {
+                    // Add specific parts of editor to dialog
+                    var template = _.template(
+                                Wat.TPL.osConfiguration, {
+                                    osfId: osfId,
+                                    model: model,
+                                    config_params: model.get('config_params'),
+                                    shortcuts: model.get('shortcuts'),
+                                    scripts: model.get('scripts'),
+                                    distro: distros[distroId],
+                                    mode: options.mode
+                                }
+                            );
+
+                    $(options.container + ' .bb-os-configuration').html(template);
+                }
                 
                 // Get all assets to be showed in OSD details
                 var assets = new Wat.Collections.Assets();
@@ -197,6 +203,15 @@ Wat.DIG = {
                 assets.fetch({
                     complete: function (e) {
                         $.each(model.pluginData, function (pluginKey, pluginData) {
+                            // When mode shrinked, only OS is rendered
+                            if (options.mode == 'shrinked' && pluginKey != 'os') {
+                                return;
+                            }
+                            // When mode unshrinked, all but OS is rendered
+                            if (options.mode == 'unshrinked' && pluginKey == 'os') {
+                                return;
+                            }
+                            
                             // Packages case is special and will be treated individually
                             if (pluginKey == 'pkg') {
                                 pluginData = new Wat.Collections.Packages({ 
@@ -217,7 +232,7 @@ Wat.DIG = {
                                         Wat.TPL['osConfiguration_' + pluginKey], {
                                             pluginData: pluginData,
                                             assets: assets,
-                                            shrinked: options.shrinked
+                                            mode: options.mode
                                         }
                                     );
 

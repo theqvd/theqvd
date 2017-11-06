@@ -98,6 +98,16 @@ Wat.WS.changeWebsocketDi = function (id, field, data, row) {
                     $('.js-future-tags-note').hide();
                     break;
             }
+            
+            // For activity section within details view
+            switch(data) {
+                case 'published':
+                    $('[data-field-code="expire_vms"]').hide();
+                case 'ready':
+                    $('[data-field-code="auto_publish"]').hide();
+                    break;
+            }
+            
             break;
     }
 }
