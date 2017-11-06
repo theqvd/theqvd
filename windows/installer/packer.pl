@@ -100,7 +100,7 @@ else {
     my $ghostscript_path = path($ghostscript)->realpath;
 
     my @extra_exes = ( { path => $nx_libs_path->child('libexec/nxproxy.exe'),
-                         search_path => $nx_libs_path->child('nxcomp'),
+                         search_path => $nx_libs_path->child('bin'),
                          subdir => 'bin',
                          subsystem => 'windows',
                          cygwin => 1 },
