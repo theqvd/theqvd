@@ -224,6 +224,5 @@ build:
       env: perl
       subdir: windows/installer
       commands:
-        configure: perl -de 1
         make: perl packer.pl --log-level=trace --installer-type=msi --keep-work-dir --nx-libs=%NXPROXY_OUTDIR% --pulseaudio=%PULSEAUDIO_OUTDIR% --gsview=%GSVIEW_PREFIX%\gsview --ghostscript=%GHOSTSCRIPT_PREFIX% --vcxsrv=%VCXSRV_PREFIX% --win-sftp-server=%WIN_SFTP_SERVER_OUTDIR% --slaveserver-wrapper=%QVD_SLAVESERVER_WRAPPER_OUTDIR% --output-dir=%QVD_CLIENT_OUTDIR% --subsystem=console
 
