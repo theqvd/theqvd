@@ -12,7 +12,7 @@ use Getopt::Std;
 my $app_name = 'qvd-automate';
 
 our $opt_f;
-our $opt_t = 'zip';
+our $opt_t = 'msi';
 
 getopts('ft:');
 
