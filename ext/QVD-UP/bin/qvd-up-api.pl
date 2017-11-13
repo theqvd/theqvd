@@ -528,8 +528,11 @@ group {
         $args->{name} = $_ if defined($_ = $json->{name});
         $args->{active} = $_ if defined($_ = $json->{active});
             
-        if($args->{active}){
-            rs('Workspace')->search({active => 1})->update({active => 0});
+        my $active_workspaces = rs('Workspace')->search({user_id => $user_id, active => 1});
+        if ($args->{active}) {
+            $active_workspaces->update({active => 0});
+        } elsif (scalar($active_workspaces->all()) == 0) {
+            $args->{active} = 1;
         }
 
         my $workspace = rs('Workspace')->create({
