@@ -104,10 +104,18 @@ Wat.U = {
         }
     },
     
-    jsonDateToString : function (string) {
-        if (string) {
-            var dt = new Date(string);
+    databaseDateToString: function (databaseDate) {
+        if (databaseDate) {
+            var dt = new Date(databaseDate);
             return this.dateToString(dt);
+        } else {
+            return '';
+        }
+    },
+    
+    stringDateToDatabase: function (string) {
+        if (string) {
+            return new Date(string).toJSON();
         } else {
             return '';
         }

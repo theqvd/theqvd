@@ -12,13 +12,8 @@ Wat.Models.DI = Wat.Models.Model.extend({
             return {};
         }
         
-        if (response) {
-            if (response.rows) {
-                var model = response.rows[0];
-            }
-            else {
-                var model = response;
-            }
+        if (response && response.rows) {
+            var model = response.rows[0];
         }
         else {
             var model = response;

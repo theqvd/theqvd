@@ -201,13 +201,12 @@ Wat.Views.VMEditorView = Wat.Views.EditorView.extend({
         if (Wat.C.checkACL('vm.update.expiration')) {
             var expiration_soft = context.find('input[name="expiration_soft"]').val();
             var expiration_hard = context.find('input[name="expiration_hard"]').val();
-
+            
             if (expiration_soft != undefined) {
-                arguments['expiration_soft'] = new Date(expiration_soft).toJSON();
+                arguments['expiration_soft'] = Wat.U.stringDateToDatabase(expiration_soft);
             }
-
             if (expiration_hard != undefined) {
-                arguments['expiration_hard'] = new Date(expiration_hard).toJSON();
+                arguments['expiration_hard'] = Wat.U.stringDateToDatabase(expiration_hard);
             }
         }
         

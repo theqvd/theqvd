@@ -196,17 +196,35 @@
                                     
                                     var expArr = [];
                                     if (model.get('expiration_soft')) {
-                                        var softExpStr = Wat.U.processRemainingTime(model.get('time_until_expiration_soft')).remainingTime;
-                                        expArr.push($.i18n.t('Soft') + ': ' + $.i18n.t('Within __remaining_time__', { remaining_time: softExpStr }));
+                                        if (model.get('time_until_expiration_soft').expired) {
+                                            var softExpStr = $.i18n.t('Expired');
+                                        }
+                                        else {
+                                            var softRemainingTime = Wat.U.processRemainingTime(model.get('time_until_expiration_soft')).remainingTime;
+                                            var softExpStr = $.i18n.t('Within __remaining_time__', { remaining_time: softRemainingTime });
+                                        }
+                                        expArr.push($.i18n.t('Soft') + ': ' + softExpStr);
                                     }
                                     if (model.get('expiration_hard')) {
-                                        var hardExpStr = Wat.U.processRemainingTime(model.get('time_until_expiration_hard')).remainingTime;
-                                        expArr.push($.i18n.t('Hard') + ': ' + $.i18n.t('Within __remaining_time__', { remaining_time: hardExpStr }));
+                                        if (model.get('time_until_expiration_hard').expired) {
+                                            var hardExpStr = $.i18n.t('Expired');
+                                        }
+                                        else {
+                                            var hardRemainingTime = Wat.U.processRemainingTime(model.get('time_until_expiration_hard')).remainingTime;
+                                            var hardExpStr = $.i18n.t('Within __remaining_time__', { remaining_time: hardRemainingTime });
+                                        }
+                                        expArr.push($.i18n.t('Hard') + ': ' + hardExpStr);
                                     }
                                     
                                     var expirationStr = '<br/>' + expArr.join('<br/>');
                                     %>
-                                        <i class="fa fa-clock-o icon-info <%= expirationHiddenClass %>" title="<%= i18n.t('This virtual machine will expire') + ': ' + expirationStr %>" data-wsupdate="expiration-icon" data-expiration_soft="<%= model.get('expiration_soft') %>" data-expiration_hard="<%= model.get('expiration_hard') %>" data-id="<%= model.get('id') %>"></i>
+                                        <i class="fa fa-clock-o icon-info <%= expirationHiddenClass %>" 
+                                           title="<%= i18n.t('This virtual machine will expire') + ': ' + expirationStr %>" 
+                                           data-wsupdate="expiration-icon" 
+                                           data-expiration_soft="<%= Wat.U.databaseDateToString(model.get('expiration_soft')) %>" 
+                                           data-expiration_hard="<%= Wat.U.databaseDateToString(model.get('expiration_hard')) %>" 
+                                           data-id="<%= model.get('id') %>">
+                                        </i>
                                 </td>
                 <%
                                 break;

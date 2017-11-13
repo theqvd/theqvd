@@ -133,13 +133,13 @@ Wat.Common.BySection.di = {
                 if (Wat.C.checkACL('vm.update.expiration')) {
                     var expiration_soft = that.dialog.find('input[name="expiration_soft"]').val();
                     var expiration_hard = that.dialog.find('input[name="expiration_hard"]').val();
-
+                    
+                    // Convert expiration dates to UTC and a properly format to be stored
                     if (expiration_soft != undefined) {
-                        args['expiration_soft'] = new Date(expiration_soft).toJSON();
+                        args['expiration_soft'] = Wat.U.stringDateToDatabase(expiration_soft);
                     }
-
                     if (expiration_hard != undefined) {
-                        args['expiration_hard'] = new Date(expiration_hard).toJSON();
+                        args['expiration_hard'] = Wat.U.stringDateToDatabase(expiration_hard);
                     }
                 }
                 

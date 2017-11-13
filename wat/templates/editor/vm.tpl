@@ -24,13 +24,13 @@
     <tr class="expiration_row">
         <td data-i18n="Soft expiration"></td>
         <td>
-            <input type="text" class="datetimepicker" name="expiration_soft" value="<%= model.get('expiration_soft') ? model.get('expiration_soft').replace('T',' ') : '' %>">
+            <input type="text" class="datetimepicker" name="expiration_soft" value="<%= model.get('expiration_soft') ? Wat.U.databaseDateToString(model.get('expiration_soft')) : '' %>">
         </td>
     </tr>
     <tr class="expiration_row">
         <td data-i18n="Hard expiration"></td>
         <td>
-            <input type="text" class="datetimepicker" name="expiration_hard" value="<%= model.get('expiration_hard') ? model.get('expiration_hard').replace('T',' ') : '' %>">
+            <input type="text" class="datetimepicker" name="expiration_hard" value="<%= model.get('expiration_hard') ? Wat.U.databaseDateToString(model.get('expiration_hard')) : '' %>">
         </td>
     </tr>
  </table>
