@@ -21,7 +21,7 @@
                 </div>
             <% } %>
             <div>
-                <table class="bb-os-conf-script-assets js-asset-selector asset-selector list" data-control-id="<%= assetType %>">
+                <table class="bb-os-conf-script-assets js-asset-selector asset-selector list" data-asset-type="<%= assetType %>">
                     <tr>
                         <td class="second_row" data-i18n="Loading scripts">Loading scripts</td>
                     </tr>

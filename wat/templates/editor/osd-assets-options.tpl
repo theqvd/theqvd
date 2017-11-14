@@ -1,5 +1,5 @@
 <option 
-    data-control-id="<%= assetType %>" 
+    data-asset-type="<%= assetType %>" 
     data-plugin-id="<%= pluginId %>" 
     data-none="true"
     data-i18n="None"
@@ -14,7 +14,7 @@
         data-type="<%= model.get('assetType') %>" 
         data-url="<%= model.get('url') %>"
         data-name="<%= model.get('name') %>"
-        data-control-id="<%= assetType %>"
+        data-asset-type="<%= assetType %>"
         data-plugin-id="<%= pluginId %>"
     >
         <%= model.get('name') %>

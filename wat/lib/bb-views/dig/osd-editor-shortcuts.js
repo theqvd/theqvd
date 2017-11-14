@@ -11,15 +11,7 @@ Wat.Views.OSDShortcutsEditorView = Wat.Views.OSDEditorView.extend({
         'click .js-save-shortcut': 'saveShortcut',
         'click .js-button-open-shortcut-configuration': 'openShortcutConfiguration',
         'click .js-button-close-shortcut-configuration': 'closeShortcutConfiguration',
-        'click .js-icon-name': 'clickAssetName',
-        'change .js-asset-check': 'changeAssetManagerSelector',
-        'change .js-asset-selector': 'changeAssetSelector',
-        'click .js-upload-asset': 'createIcon',
-        'click .js-delete-selected-asset': 'deleteIcon',
-        'click .js-show-upload': 'showUploadControl',
-        'click .js-hide-upload': 'hideUploadControl',
-        'change .js-change-mode': 'changeMode',
-        'change .js-list-shortcuts .js-asset-selector[data-control-id="icon"]': 'changeIcon'
+        'change .js-list-shortcuts .js-asset-selector[data-asset-type="icon"]': 'changeIcon'
     },
     
     render: function () {
@@ -37,15 +29,6 @@ Wat.Views.OSDShortcutsEditorView = Wat.Views.OSDEditorView.extend({
         );
         
         $('.bb-os-conf-shortcuts').html(template);
-        
-        Wat.I.chosenElement('select.js-change-mode', 'single100');
-        
-        var template = _.template(
-            Wat.TPL.osConfigurationEditorAssetUploadControl, {
-            }
-        );
-        
-        $('.' + that.cid + ' .bb-upload-control').html(template);
         
         Wat.CurrentView.OSDmodel.pluginData.shortcut.fetch({
             success: function () {
@@ -239,92 +222,5 @@ Wat.Views.OSDShortcutsEditorView = Wat.Views.OSDEditorView.extend({
         $('.' + this.cid + ' .js-os-conf-shortcuts-rows-editor').hide();
         $('.' + this.cid + ' .js-asset-switch-buttonset').show();
         $('.' + this.cid + ' .js-os-conf-shortcuts-rows-editor--new, .js-os-conf-shortcuts-rows-editor--edit').hide();
-    },
-    
-    ////////////////////////////////////////////////////
-    // Functions for icons (assets) management
-    ////////////////////////////////////////////////////
-    
-    createIcon: function (e) {
-        var that = this;
-        
-        var name = $('.' + this.cid + ' input[name="asset_name"]').val();
-        
-        if (!name) {
-            Wat.I.M.showMessage({message: 'Nothing to do', messageType: 'info'});
-            return;
-        }
-        
-        
-        this.assetModel = new Wat.Models.Asset({
-            name: name,
-            assetType: 'icon'
-        });
-        
-        this.assetModel.save().complete(
-            function (e) {
-                that.uploadIcon(that.assetModel.id);
-            }
-        );
-    },
-    
-    uploadIcon: function (assetId) {
-        var that = this;
-        
-        this.assetFileModel = new Wat.Models.AssetFile({
-            id: assetId
-        });
-        
-        var file = $('.' + this.cid + ' input[name="asset_file"]')[0].files[0];
-        
-        if (!file) {
-            Wat.I.M.showMessage({message: 'Nothing to do', messageType: 'info'});
-            return;
-        }
-        
-        var data = new FormData();
-        data.append('fileUpload', file);
-        
-        this.assetFileModel.save({
-            data: data,
-        }).complete(function () {
-            that.renderAssetsControl({ 
-                assetType: 'icon',
-                pluginId: 'shortcut',
-                afterRender: function () {
-                    // Select uploaded element
-                    $('.' + this.cid + ' [data-id="' + assetId + '"]>td>input.js-asset-check').trigger('change').prop('checked', true);
-                }
-            });
-            
-            Wat.I.M.showMessage({message: i18n.t('Successfully uploaded'), messageType: 'success'});
-            
-            // Hide upload control
-            that.hideUploadControl();
-        });
-    },
-    
-    deleteIcon: function (e) {
-        var that = this;
-        
-        var id = $('.' + this.cid + ' .js-asset-check:checked').val();
-        
-        var assetModel = new Wat.Models.Asset({
-            id: id
-        });
-        
-        assetModel.destroy({
-            success: function () {
-                that.renderAssetsControl({ 
-                    assetType: 'icon',
-                    pluginId: 'shortcut'
-                });
-                
-                Wat.I.M.showMessage({message: i18n.t('Successfully deleted'), messageType: 'success'});
-            },
-            error: function () {
-                Wat.I.M.showMessage({message: i18n.t('Error deleting'), messageType: 'error'});
-            }
-        });
-    },
+    }
 });

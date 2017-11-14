@@ -102,7 +102,7 @@ Wat.DIG = {
     },
     
     updateAssetPreview: function (opt) {
-        var controlId = $(opt).attr('data-control-id');
+        var controlId = $(opt).attr('data-asset-type');
         var assetId = $(opt).val();
         var type = $(opt).attr('data-type');
         var url = $(opt).attr('data-url');

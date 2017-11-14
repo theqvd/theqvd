@@ -6,9 +6,12 @@
     </td>
     <td class="col-width-40">
         <div data-i18n="Icon" class="left">Icon</div>
-        <select data-id="<%= shortcut.id %>" class="bb-os-conf-icon-assets bb-os-conf-icon-type-options js-asset-selector asset-selector list" data-control-id="icon">
+        <select data-id="<%= shortcut.id %>" class="bb-os-conf-icon-assets bb-os-conf-icon-type-options js-asset-selector asset-selector list" data-asset-type="icon">
             <option data-i18n="Loading icons">Loading icons</option>
         </select>
+        <div>
+            <a href="javascript:" class="fa fa-file-o js-go-to-assets-management fright" data-asset-type="icon" data-i18n="Manage icons"></a>
+        </div>
     </td>
     <td class="col-width-50">
         <div data-i18n="Name" class="left">Name</div>

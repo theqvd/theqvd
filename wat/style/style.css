@@ -140,103 +140,106 @@ body {
   height: 100vh !important; }
 
 /* line 22, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
-a, a:active, a:hover {
+a {
   color: #FF5C00;
   text-decoration: none;
   font-weight: bold; }
   /* line 27, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
-  a i.hover, a:active i.hover, a:hover i.hover {
+  a i.hover {
     color: #333; }
 
-/* line 33, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
-a:hover i:before {
-  color: #333; }
+/* line 32, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+a:hover, a:active {
+  color: #FF5C00; }
+  /* line 34, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+  a:hover i:before, a:active i:before {
+    color: #333; }
 
-/* line 38, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+/* line 39, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
 .invisible {
   visibility: hidden; }
 
-/* line 42, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+/* line 43, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
 .relative {
   position: relative; }
 
-/* line 46, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+/* line 47, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
 .center {
   text-align: center; }
 
-/* line 51, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+/* line 52, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
 fieldset {
   padding: 8px;
   border: 1px solid #fcd7bf;
   border-radius: 6px; }
-  /* line 56, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+  /* line 57, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
   fieldset legend {
     color: #a1a1a1;
     text-align: right; }
 
-/* line 63, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+/* line 64, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
 .h1 {
   position: relative;
   margin-bottom: 15px; }
-  /* line 67, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+  /* line 68, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
   .h1 .subtitle {
     color: #b3b3b3; }
-  /* line 71, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+  /* line 72, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
   .h1 .fa:before {
     margin-right: 5px; }
 
-/* line 76, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+/* line 77, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
 .h2 {
   margin-bottom: 14px; }
 
-/* line 81, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+/* line 82, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
 .ok {
   color: #009900; }
 
-/* line 84, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+/* line 85, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
 .warning {
   color: #ccab00; }
 
-/* line 87, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+/* line 88, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
 .error {
   color: #cc0000; }
 
-/* line 91, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+/* line 92, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
 .error-404, .error-refresh {
   text-align: center; }
-  /* line 93, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+  /* line 94, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
   .error-404 i.fa, .error-refresh i.fa {
     font-size: 90px;
     color: #595959; }
-  /* line 97, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+  /* line 98, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
   .error-404 div, .error-refresh div {
     font-size: 50px;
     color: #595959; }
 
-/* line 103, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+/* line 104, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
 .error-refresh {
   margin-top: 30px; }
-  /* line 106, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+  /* line 107, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
   .error-refresh a {
     margin-top: 20px; }
 
-/* line 111, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+/* line 112, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
 .no-elements {
   font-style: italic;
   font-weight: normal;
   color: #666666;
   margin-top: 6px; }
 
-/* line 118, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+/* line 119, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
 .dialog-advice {
   padding: 40px;
   text-align: center; }
-  /* line 122, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+  /* line 123, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
   .dialog-advice div {
     margin-bottom: 12px;
     line-height: 1.3em; }
 
-/* line 128, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+/* line 129, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
 .loading-big {
   position: absolute;
   top: 0;
@@ -246,29 +249,29 @@ fieldset {
   background: #cacaca;
   opacity: 0.8;
   z-index: 2000; }
-  /* line 138, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+  /* line 139, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
   .loading-big i {
     font-size: 150px;
     color: #fdfdfd; }
-  /* line 143, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+  /* line 144, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
   .loading-big .loading-big-message {
     font-size: 18px;
     color: #fdfdfd;
     margin-bottom: 20px; }
     @media screen and (min-width: 41em) {
-      /* line 143, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+      /* line 144, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
       .loading-big .loading-big-message {
         font-size: 24px; } }
-  /* line 152, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+  /* line 153, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
   .loading-big .loading-little-message {
     color: #fdfdfd;
     margin-top: 20px; }
-  /* line 157, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+  /* line 158, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
   .loading-big .loading-block {
     width: 150px;
     height: 150px;
     margin: 0 auto; }
-  /* line 163, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+  /* line 164, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
   .loading-big .loading-big-box {
     background: black;
     width: 100vw;
@@ -279,14 +282,14 @@ fieldset {
     text-align: center;
     padding: 50px; }
     @media screen and (min-width: 41em) {
-      /* line 163, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+      /* line 164, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
       .loading-big .loading-big-box {
         border-radius: 15px;
         width: 70vw;
         height: 70vh;
         margin: 70px auto; } }
 
-/* line 183, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+/* line 184, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
 .filter-notes {
   border: 1px #DDDDBB solid;
   padding: 8px;
@@ -295,17 +298,17 @@ fieldset {
   margin-top: -20px;
   margin-bottom: 15px;
   min-height: 40px; }
-  /* line 192, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+  /* line 193, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
   .filter-notes .fa:before {
     margin-right: 4px;
     font-size: 20px; }
-  /* line 197, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+  /* line 198, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
   .filter-notes .filter-notes-list {
     display: inline;
     margin-left: 20px;
     margin-top: 15px;
     margin-bottom: 10px; }
-    /* line 202, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+    /* line 203, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
     .filter-notes .filter-notes-list li {
       display: inline;
       margin-right: 15px;
@@ -314,7 +317,7 @@ fieldset {
       background: #FFF;
       border-radius: 3px;
       padding-bottom: 7px; }
-    /* line 212, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+    /* line 213, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
     .filter-notes .filter-notes-list .fa.delete-filter-note:before {
       font-size: 22px;
       color: #fdfdfd;
@@ -328,7 +331,7 @@ fieldset {
       padding-bottom: 0px;
       border-bottom-left-radius: 3px;
       border-top-left-radius: 3px; }
-    /* line 228, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+    /* line 229, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
     .filter-notes .filter-notes-list .fa.fix-filter-note:before {
       font-size: 22px;
       color: #fdfdfd;
@@ -343,33 +346,33 @@ fieldset {
       padding-bottom: 0px;
       border-bottom-right-radius: 3px;
       border-top-right-radius: 3px; }
-    /* line 244, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+    /* line 245, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
     .filter-notes .filter-notes-list .fa.fix-filter-note.fix-filter-note--enabled:before {
       background: #404040; }
 
-/* line 251, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+/* line 252, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
 .screen-help {
   margin-left: 5px;
   height: 1.2em; }
-  /* line 255, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+  /* line 256, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
   .screen-help:before {
     margin: 0 !important;
     font-size: 1.2em; }
 
-/* line 261, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+/* line 262, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
 .fake-graph-a {
   color: #e3610c; }
 
-/* line 264, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+/* line 265, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
 .fake-graph-b {
   color: #d7d7d7; }
 
-/* line 268, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+/* line 269, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
 .progressbar {
   margin-top: 5px;
   margin-bottom: 5px; }
 
-/* line 273, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+/* line 274, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
 .progress-label {
   float: left;
   text-align: center;
@@ -443,34 +446,38 @@ fieldset {
       .menu > ul .menu-option:active, .menu > ul .lateral-menu-option:active, .menu > ul .lateral-menu-option-discrete:active {
         margin-bottom: -2px;
         margin-top: 1px; } }
-  /* line 84, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+    /* line 82, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+    .menu > ul .menu-option.out-of-menu-option, .menu > ul .lateral-menu-option.out-of-menu-option, .menu > ul .lateral-menu-option-discrete.out-of-menu-option {
+      font-size: x-small;
+      margin-top: 20px; }
+  /* line 88, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
   .menu > ul .lateral-menu-option, .menu > ul .lateral-menu-option:active, .menu > ul .lateral-menu-option-discrete {
     float: left;
     width: 100%; }
-  /* line 89, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+  /* line 93, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
   .menu > ul .lateral-menu-option-discrete {
     border: 0; }
-  /* line 93, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+  /* line 97, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
   .menu > ul .menu-option--selected, .menu > ul .lateral-menu-option--selected {
     background: #b24c09;
     color: #fdfdfd;
     border: 1px solid transparent; }
-  /* line 99, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+  /* line 103, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
   .menu > ul .menu-option:hover, .menu > ul .lateral-menu-option:hover {
     background: #e3610c;
     color: #fdfdfd;
     border: 1px solid transparent; }
-  /* line 105, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+  /* line 109, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
   .menu > ul .menu-option--selected, .menu > ul .lateral-menu-option--selected {
     font-weight: bold; }
-    /* line 108, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+    /* line 112, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
     .menu > ul .menu-option--selected span, .menu > ul .lateral-menu-option--selected span {
       vertical-align: baseline; }
-    /* line 112, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+    /* line 116, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
     .menu > ul .menu-option--selected:active, .menu > ul .lateral-menu-option--selected:active {
       margin: 0px; }
 
-/* line 119, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+/* line 123, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
 .menu-corner {
   z-index: 1000;
   position: absolute;
@@ -478,11 +485,11 @@ fieldset {
   right: 80px;
   display: none; }
   @media screen and (min-width: 41em) {
-    /* line 119, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+    /* line 123, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
     .menu-corner {
       right: 20px;
       display: block; } }
-  /* line 135, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+  /* line 139, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
   .menu-corner > ul > li {
     display: inline;
     margin: 5px;
@@ -490,17 +497,17 @@ fieldset {
     cursor: default;
     padding-bottom: 5px;
     padding-top: 5px; }
-    /* line 143, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+    /* line 147, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
     .menu-corner > ul > li.menu-option > a {
       color: #cb570a; }
-    /* line 147, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+    /* line 151, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
     .menu-corner > ul > li.menu-option-current {
       border-bottom: 2px dotted #b24c09;
       border-top: 2px dotted #b24c09; }
-      /* line 150, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+      /* line 154, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
       .menu-corner > ul > li.menu-option-current a {
         color: #b24c09; }
-    /* line 155, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+    /* line 159, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
     .menu-corner > ul > li > ul {
       border: solid 1px #f79a5e;
       opacity: 0.9;
@@ -511,64 +518,68 @@ fieldset {
       border-bottom-left-radius: 7px;
       border-bottom-right-radius: 7px;
       z-index: 3; }
-      /* line 166, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+      /* line 170, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
       .menu-corner > ul > li > ul > li span {
         padding: 8px;
         white-space: nowrap;
         width: 100%;
         color: #cb570a;
         background: #fdfdfd; }
-        /* line 173, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+        /* line 177, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
         .menu-corner > ul > li > ul > li span:before {
           margin-right: 5px; }
-        /* line 178, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+        /* line 182, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
         .menu-corner > ul > li > ul > li span.fa-graduation-cap:before {
           margin-right: 2px;
           margin-left: -2px; }
-        /* line 183, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+        /* line 187, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
         .menu-corner > ul > li > ul > li span:hover {
           font-weight: bold;
           color: #fdfdfd;
           background: #e3610c; }
-      /* line 190, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+      /* line 194, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
       .menu-corner > ul > li > ul > li:last-child span {
         border-bottom-left-radius: 7px;
         border-bottom-right-radius: 7px; }
-  /* line 199, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+  /* line 203, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
   .menu-corner li.menu-option.needsclick.menu-option:last-child {
     margin-left: 10px;
     background-color: #fdfdfd;
     padding: 8px;
     border: 1px solid #e9e9e9; }
-    /* line 205, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+    /* line 209, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
     .menu-corner li.menu-option.needsclick.menu-option:last-child i {
       padding-right: 25px; }
-      /* line 207, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+      /* line 211, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
       .menu-corner li.menu-option.needsclick.menu-option:last-child i:before {
         font-size: 25px;
         position: absolute;
         top: 4px; }
-    /* line 214, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+    /* line 218, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
     .menu-corner li.menu-option.needsclick.menu-option:last-child .js-menu-submenu-user {
       top: 32px; }
 
-/* line 221, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+/* line 225, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
 .side-menu li {
   margin-bottom: 15px;
   cursor: pointer; }
-  /* line 226, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+  /* line 230, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
   .side-menu li a:before {
     margin-right: 5px;
     font-weight: normal; }
-  /* line 231, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+  /* line 235, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
   .side-menu li a.fa-graduation-cap:before {
     margin-right: 2px;
     margin-left: -2px; }
-  /* line 236, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+  /* line 240, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
   .side-menu li a.selected-option, .side-menu li a:hover {
     font-weight: bold; }
 
-/* line 245, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+/* line 247, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+a:before {
+  margin-right: 5px; }
+
+/* line 253, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
 .mobile-menu {
   cursor: pointer;
   position: absolute;
@@ -576,35 +587,35 @@ fieldset {
   right: 20px;
   font-size: 50px; }
   @media screen and (min-width: 41em) {
-    /* line 245, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+    /* line 253, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
     .mobile-menu {
       display: none; } }
 
-/* line 257, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+/* line 265, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
 .mobile-menu--mini {
   font-size: 30px; }
 
-/* line 262, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+/* line 270, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
 .submenu ul {
   margin-bottom: 20px;
   float: right; }
-  /* line 266, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+  /* line 274, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
   .submenu ul .menu-option {
     padding: 4px 8px 4px 8px; }
 
-/* line 271, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+/* line 279, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
 .secondary-menu {
   display: block !important;
   visibility: visible !important;
   margin-top: 0px !important; }
-  /* line 276, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+  /* line 284, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
   .secondary-menu ul > li.lateral-menu-option {
     margin-bottom: 0px;
     border-style: dotted;
     border-radius: 0px !important;
     font-size: 14px; }
 
-/* line 284, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
+/* line 292, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_navigation.scss */
 .back-top-button {
   position: fixed;
   left: 50px;

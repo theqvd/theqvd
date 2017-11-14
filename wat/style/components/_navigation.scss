@@ -78,7 +78,11 @@
                     margin-top: 1px;
                 }
             }
-
+        
+            &.out-of-menu-option {
+                font-size: x-small;
+                margin-top: 20px;
+            }
         }
         
         .lateral-menu-option, .lateral-menu-option:active, .lateral-menu-option-discrete {
@@ -238,6 +242,10 @@
             }
         }
     }
+}
+
+a:before {
+    margin-right: 5px;
 }
 
 // Mobile

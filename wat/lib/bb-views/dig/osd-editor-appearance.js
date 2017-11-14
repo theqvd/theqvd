@@ -8,15 +8,7 @@ Wat.Views.OSDAppearenceEditorView = Wat.Views.OSDEditorView.extend({
     },
     
     dialogEvents: {
-        'click .input[type="radio"][name="wallpaper"]': 'changeAssetSelector',
-        'click .js-wallpaper-name': 'clickAssetName',
-        'change .js-asset-check': 'changeAssetManagerSelector',
         'change .js-asset-selector': 'changeAssetSelector',
-        'click .js-upload-asset': 'createWallpaper',
-        'click .js-delete-selected-asset': 'deleteWallpaper',
-        'click .js-show-upload': 'showUploadControl',
-        'click .js-hide-upload': 'hideUploadControl',
-        'change .js-change-mode': 'changeMode',
     },
     
     render: function () {
@@ -37,15 +29,6 @@ Wat.Views.OSDAppearenceEditorView = Wat.Views.OSDEditorView.extend({
                 );
 
                 $('.bb-os-conf-appearance').html(template);
-
-                Wat.I.chosenElement('select.js-change-mode', 'single100');
-
-                var template = _.template(
-                    Wat.TPL.osConfigurationEditorAssetUploadControl, {
-                    }
-                );
-
-                $('.' + that.cid + ' .bb-upload-control').html(template);
 
                 that.renderAssetsControl({
                     assetType: 'wallpaper',
@@ -76,6 +59,53 @@ Wat.Views.OSDAppearenceEditorView = Wat.Views.OSDEditorView.extend({
     // Functions for wallpapers configuration on OSD
     ////////////////////////////////////////////////////
     
+    changeAssetSelector: function (e) {
+        var opt = $(e.target).find('option:checked');
+        
+        Wat.DIG.updateAssetPreview(opt);
+        
+        var pluginId = $(opt).attr('data-plugin-id');
+        
+        var setCallback = function () {};
+        
+        switch(pluginId) {
+            case 'wallpaper':
+                    var id = $(opt).attr('data-id');
+                    var name = $(opt).attr('data-name');
+                    var url = $(opt).attr('data-url');
+                    setCallback = this.afterSetWallpaper;
+                break;
+            default:
+                return;
+        }
+        
+        // If new option is None, element will be deleted
+        if ($(opt).attr('data-none')) {
+            // Save plugin element
+            Wat.DIG.deletePluginListElement({
+                pluginId: 'wallpaper',
+                osdId: Wat.CurrentView.OSDmodel.id,
+                attributes: {
+                    pluginId: pluginId,
+                    id: Wat.CurrentView.OSDmodel.pluginData.wallpaper.get('id')
+                }
+            }, setCallback, function () {});
+            
+            return;
+        }
+        
+        // Save plugin element
+        Wat.DIG.setPluginListElement({
+            pluginId: pluginId,
+            osdId: Wat.CurrentView.OSDmodel.id,
+            attributes: {
+                id: id,
+                name: name,
+                url: url
+            }
+        }, setCallback, function () {});
+    },
+    
     afterSetWallpaper: function (e) {
         var opt = $('.js-asset-selector>option:checked');
         if (e.responseText) {
@@ -83,91 +113,5 @@ Wat.Views.OSDAppearenceEditorView = Wat.Views.OSDEditorView.extend({
         }
         
         Wat.I.M.showMessage({message: i18n.t('Successfully updated'), messageType: 'success'});
-    },
-    
-    ////////////////////////////////////////////////////
-    // Functions for wallpapers (assets) management
-    ////////////////////////////////////////////////////
-    
-    createWallpaper: function (e) {
-        var that = this;
-        
-        var name = $('.' + this.cid + ' input[name="asset_name"]').val();
-        
-        if (!name) {
-            Wat.I.M.showMessage({message: 'Nothing to do', messageType: 'info'});
-            return;
-        }
-        
-        this.assetModel = new Wat.Models.Asset({
-            name: name,
-            assetType: 'wallpaper'
-        });
-        
-        this.assetModel.save().complete(
-            function (e) {
-                that.uploadWallpaper(that.assetModel.id);
-            }
-        );
-    },
-    
-    uploadWallpaper: function (assetId) {
-        var that = this;
-        
-        this.assetFileModel = new Wat.Models.AssetFile({
-            id: assetId
-        });
-        
-        var file = $('.' + this.cid + ' input[name="asset_file"]')[0].files[0];
-        
-        if (!file) {
-            Wat.I.M.showMessage({message: 'Nothing to do', messageType: 'info'});
-            return;
-        }
-        
-        var data = new FormData();
-        data.append('fileUpload', file);
-        
-        this.assetFileModel.save({
-            data: data,
-        }).complete(function () {
-            that.renderAssetsControl({ 
-                assetType: 'wallpaper',
-                pluginId: 'wallpaper',
-                afterRender: function () {
-                    // Select uploaded element
-                    $('.' + this.cid + ' [data-id="' + assetId + '"]>td>input.js-asset-check').trigger('change').prop('checked', true);
-                }
-            });
-            
-            Wat.I.M.showMessage({message: i18n.t('Successfully uploaded'), messageType: 'success'});
-            
-            // Hide upload control
-            that.hideUploadControl();
-        });
-    },
-    
-    deleteWallpaper: function (e) {
-        var that = this;
-        
-        var id = $('.' + this.cid + ' .js-asset-check:checked').val();
-        
-        var assetModel = new Wat.Models.Asset({
-            id: id
-        });
-        
-        assetModel.destroy({
-            success: function () {
-                that.renderAssetsControl({ 
-                    assetType: 'wallpaper',
-                    pluginId: 'wallpaper'
-                });
-                
-                Wat.I.M.showMessage({message: i18n.t('Successfully deleted'), messageType: 'success'});
-            },
-            error: function () {
-                Wat.I.M.showMessage({message: i18n.t('Error deleting'), messageType: 'error'});
-            }
-        });
     },
 });

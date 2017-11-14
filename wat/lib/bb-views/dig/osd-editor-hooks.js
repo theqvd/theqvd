@@ -9,20 +9,11 @@ Wat.Views.OSDHooksEditorView = Wat.Views.OSDEditorView.extend({
     
     dialogEvents: {
         'change .js-starting-script-mode': 'changeHookMode',
-        'click .js-script-name': 'clickAssetName',
         'click .js-add-starting-script': 'addHook',
         'click .js-delete-hook': 'deleteHook',
         'click .js-save-hook': 'saveHook',
-        'click .js-show-upload': 'showUploadControl',
-        'click .js-hide-upload': 'hideUploadControl',
-        'click .js-upload-asset': 'createScript',
-        'click .js-delete-selected-asset': 'deleteScript',
         'click .js-button-open-hook-configuration': 'openHookConfiguration',
-        'click .js-button-close-hook-configuration': 'closeHookConfiguration',
-        'change .js-asset-check': 'changeAssetManagerSelector',
-        'change .js-asset-selector': 'changeAssetSelector',
-        'change .js-change-mode': 'changeMode',
-        'change input[name="asset_file"]': 'loadFile'
+        'click .js-button-close-hook-configuration': 'closeHookConfiguration'
     },
     
     ////////////////////////////////////////////////////
@@ -47,15 +38,6 @@ Wat.Views.OSDHooksEditorView = Wat.Views.OSDEditorView.extend({
         );
         
         $('.bb-os-conf-hooks').html(template);
-        
-        Wat.I.chosenElement('select.js-change-mode', 'single100');
-        
-        var template = _.template(
-            Wat.TPL.osConfigurationEditorAssetUploadControl, {
-            }
-        );
-        
-        $('.' + that.cid + ' .bb-upload-control').html(template);
         
         Wat.CurrentView.OSDmodel.pluginData.hook.fetch({
             success: function () {
@@ -212,19 +194,6 @@ Wat.Views.OSDHooksEditorView = Wat.Views.OSDEditorView.extend({
         $('.' + this.cid + ' .js-os-conf-hooks-rows-editor--new, .js-os-conf-hooks-rows-editor--edit').hide();
     },
     
-    showManageMode: function (e) {
-        Wat.Views.OSDEditorView.prototype.showManageMode.apply(this, [e]);
-        
-        $('.' + this.cid + ' .js-preview').show();
-    },
-    
-    // Set filename as script name when load file
-    loadFile: function (e) {
-        var filename = $(e.target)[0].files[0].name;
-        
-        $('.' + this.cid + ' input[name="asset_name"]').val(filename);
-    },
-    
     ////////////////////////////////////////////////////
     // Functions for hooks management
     ////////////////////////////////////////////////////
@@ -296,98 +265,6 @@ Wat.Views.OSDHooksEditorView = Wat.Views.OSDEditorView.extend({
         Wat.CurrentView.OSDmodel.pluginData.hook.clear();
         
         Wat.CurrentView.editorView.softwareEditorView.sectionViews.hooks.render();
-    },
-    
-    ////////////////////////////////////////////////////
-    // Functions for scripts (assets) management
-    ////////////////////////////////////////////////////
-    
-    createScript: function (e) {
-        var that = this;
-        
-        var name = $('.' + this.cid + ' input[name="asset_name"]').val();
-        
-        if (!name) {
-            Wat.I.M.showMessage({message: 'Nothing to do', messageType: 'info'});
-            return;
-        }
-        
-        this.assetModel = new Wat.Models.Asset({
-            name: name,
-            assetType: 'script'
-        });
-        
-        this.assetModel.save().complete(
-            function (e) {
-                that.uploadScript(that.assetModel.id);
-            }
-        );
-    },
-    
-    uploadScript: function (assetId) {
-        var that = this;
-        
-        this.assetFileModel = new Wat.Models.AssetFile({
-            id: assetId
-        });
-        
-        var file = $('.' + this.cid + ' input[name="asset_file"]')[0].files[0];
-        
-        if (!file) {
-            Wat.I.M.showMessage({message: 'Nothing to do', messageType: 'info'});
-            return;
-        }
-        
-        var data = new FormData();
-        data.append('fileUpload', file);
-        
-        this.assetFileModel.save({
-            data: data,
-        }).complete(function () {
-            that.renderAssetsControl({ 
-                assetType: 'script',
-                pluginId: 'hook',
-                afterRender: function () {
-                    // Select uploaded element
-                    $('.' + this.cid + ' [data-id="' + assetId + '"]>td>input.js-asset-check').trigger('change').prop('checked', true);
-                }
-            });
-            
-            Wat.I.M.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
-            
-            // Hide upload control
-            that.hideUploadControl();
-            
-            // Reload combo list with available scripts
-            that.renderAssetsControl({
-                assetType: 'script',
-                pluginId: 'hook'
-            });
-        });
-    },
-    
-    deleteScript: function (e) {
-        var that = this;
-        
-        var id = $('.' + this.cid + ' .js-asset-check:checked').val();
-        
-        var assetModel = new Wat.Models.Asset({
-            id: id
-        });
-        
-        assetModel.destroy({
-            success: function () {
-                that.renderAssetsControl({ 
-                    assetType: 'script',
-                    pluginId: 'hook'
-                });
-                
-                Wat.I.M.showMessage({message: i18n.t('Successfully deleted'), messageType: 'success'});
-            },
-            error: function () {
-                Wat.I.M.showMessage({message: i18n.t('Error deleting'), messageType: 'error'});
-            }
-        });
     },
     
     changeAssetManagerSelector: function(e) {

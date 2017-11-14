@@ -391,14 +391,17 @@ Wat.I.T = {
                     osConfigurationEditorHooksRowsEdit: {
                         name: 'editor/osd-hooks-rows-edit'
                     },
-                    osConfigurationEditorAssetOptions: {
-                        name: 'editor/osd-asset-options'
+                    osConfigurationEditorAssets: {
+                        name: 'editor/osd-assets'
                     },
-                    osConfigurationEditorAssetRows: {
-                        name: 'editor/osd-asset-rows'
+                    osConfigurationEditorAssetsOptions: {
+                        name: 'editor/osd-assets-options'
                     },
-                    osConfigurationEditorAssetUploadControl: {
-                        name: 'editor/osd-asset-upload-control'
+                    osConfigurationEditorAssetsRows: {
+                        name: 'editor/osd-assets-rows'
+                    },
+                    osConfigurationEditorAssetsUploadControl: {
+                        name: 'editor/osd-assets-upload-control'
                     },
                     packageBlockWrapper: {
                         name: 'list/package-block-wrapper'

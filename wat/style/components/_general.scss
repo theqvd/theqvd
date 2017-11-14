@@ -19,7 +19,7 @@ body {
     height: 100vh !important;
 }
 
-a, a:active, a:hover {
+a {
     color: $col_links_text;
     text-decoration: none;
     font-weight: bold;
@@ -29,7 +29,8 @@ a, a:active, a:hover {
     }
 }
 
-a:hover {
+a:hover, a:active {
+    color: $col_links_text;
     i:before {
         color: $col_blacker;
     }

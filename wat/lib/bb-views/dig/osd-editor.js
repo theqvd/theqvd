@@ -9,6 +9,7 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
     
     dialogEvents: {
         'click .js-os-editor-menu li': 'clickOSEditorMenu',
+        'click .js-go-to-assets-management': 'goToAssetsManagement',
     },
     
     ////////////////////////////////////////////////////
@@ -35,6 +36,7 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
             shortcuts: new Wat.Views.OSDShortcutsEditorView({massive: this.massive}),
             appearance: new Wat.Views.OSDAppearenceEditorView({massive: this.massive}),
             hooks: new Wat.Views.OSDHooksEditorView({massive: this.massive}),
+            assets: new Wat.Views.OSDAssetsEditorView({massive: this.massive}),
         };
         
         Wat.I.chosenElement('select.js-app-to-shortcut', 'single100');
@@ -54,7 +56,7 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
         assets.fetch({
             complete: function () {
                 var template = _.template(
-                    Wat.TPL.osConfigurationEditorAssetOptions, {
+                    Wat.TPL.osConfigurationEditorAssetsOptions, {
                         models: assets.models,
                         assetType: opts.assetType,
                         pluginId: opts.pluginId
@@ -74,7 +76,7 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
                 Wat.DIG.updateAssetPreview($('.' + that.cid + ' select.js-asset-selector>option:checked'));
                 
                 var template = _.template(
-                    Wat.TPL.osConfigurationEditorAssetRows, {
+                    Wat.TPL.osConfigurationEditorAssetsRows, {
                         models: assets.models,
                         assetType: opts.assetType,
                         pluginId: opts.pluginId
@@ -119,47 +121,11 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
     // Functions for single controls
     ////////////////////////////////////////////////////
     
-    changeMode: function (e) {
-        switch($(e.target).val()) {
-            case 'manage':
-                this.showManageMode();
-                break;
-            case 'selection':
-                this.showSelectMode();
-                break;
-        }
-    },
-    
     showSelectMode: function (e) {
-        this.hideUploadControl();
         $('.' + this.cid + ' .js-upload-mode').hide();
         $('.' + this.cid + ' .js-select-mode').show();
         
         $('.' + this.cid + ' .js-change-mode').val('selection').trigger('chosen:updated');
-    },
-    
-    showManageMode: function (e) {
-        $('.' + this.cid + ' .js-upload-mode').show();
-        $('.' + this.cid + ' .js-select-mode').hide();
-        
-        $('.' + this.cid + ' input[name="asset_name"]').val('');
-        $('.' + this.cid + ' input[name="asset_file"]').val('');
-        
-        $('.' + this.cid + ' .js-change-mode').val('manage').trigger('chosen:updated');
-        $('.' + this.cid + ' .js-asset-check:checked').trigger('change');
-    },
-    
-    showUploadControl: function (e) {
-        $('.' + this.cid + ' .js-upload-control').show();
-        $('.' + this.cid + ' .js-asset-switch-buttonset').hide();
-        $('.' + this.cid + ' .js-osf-conf-editor').hide();
-    },
-    
-    hideUploadControl: function (e) {
-        $('.' + this.cid + ' .js-upload-control').hide();
-        $('.' + this.cid + ' .js-asset-switch-buttonset').show();
-        $('.' + this.cid + ' .js-osf-conf-editor').show();
-        this.showManageMode();
     },
     
     changeAssetManagerSelector: function (e) {
@@ -171,55 +137,10 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
         Wat.DIG.updateAssetPreview(row);
     },
     
-    changeAssetSelector: function (e) {
-        var opt = $(e.target).find('option:checked');
+    goToAssetsManagement: function (e) {
+        var assetType = $(e.target).attr('data-asset-type');
+        $('.lateral-menu-option[data-target="assets"]').trigger('click');
         
-        Wat.DIG.updateAssetPreview(opt);
-        
-        var pluginId = $(opt).attr('data-plugin-id');
-        
-        var setCallback = function () {};
-        
-        switch(pluginId) {
-            case 'wallpaper':
-                    var id = $(opt).attr('data-id');
-                    var name = $(opt).attr('data-name');
-                    var url = $(opt).attr('data-url');
-                    setCallback = this.afterSetWallpaper;
-                break;
-            default:
-                return;
-        }
-        
-        // If new option is None, element will be deleted
-        if ($(opt).attr('data-none')) {
-            // Save plugin element
-            Wat.DIG.deletePluginListElement({
-                pluginId: 'wallpaper',
-                osdId: Wat.CurrentView.OSDmodel.id,
-                attributes: {
-                    pluginId: pluginId,
-                    id: Wat.CurrentView.OSDmodel.pluginData.wallpaper.get('id')
-                }
-            }, setCallback, function () {});
-            
-            return;
-        }
-        
-        // Save plugin element
-        Wat.DIG.setPluginListElement({
-            pluginId: pluginId,
-            osdId: Wat.CurrentView.OSDmodel.id,
-            attributes: {
-                id: id,
-                name: name,
-                url: url
-            }
-        }, setCallback, function () {});
-    },
-    
-    clickAssetName: function (e) {
-        // Select this script
-        $(e.target).parent().find('input[type="radio"]').trigger('click');
+        $('.js-change-mode').val(assetType).trigger('chosen:updated').trigger('change');
     }
 });
