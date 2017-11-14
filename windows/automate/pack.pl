@@ -55,5 +55,7 @@ else {
     $p->make_installer(type => $opt_t, update => 1);
 }
 
+=head1 NAME
 
+qvd-automate-packer
 
