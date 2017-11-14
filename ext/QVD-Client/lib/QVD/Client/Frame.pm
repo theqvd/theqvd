@@ -434,6 +434,7 @@ sub RunWorkerThread {
         if ($@) {
             my $msg = $@;
             ERROR "Unable to connect to VM: $msg";
+            DEBUG "Notifying master thread...";
             $self->proxy_connection_error(message => $msg);
         }
         DEBUG "Slave thread waiting for \%connect_info";
@@ -477,12 +478,14 @@ sub proxy_list_of_vm_loaded {
 
 sub proxy_connection_status {
     my ($self, $status) = @_;
+    DEBUG("proxy connection status changed to $status, notifying master thread");
     Wx::PostEvent($self, new Wx::PlThreadEvent(-1, EVT_CONN_STATUS, $status));
 }
 
 sub proxy_connection_error {
     my $self = shift;
     my %args = @_;
+    DEBUG("proxy connection error: @_");
     my $message :shared = $args{message};
     my $evt = new Wx::PlThreadEvent(-1, EVT_CONNECTION_ERROR, $message);
     Wx::PostEvent($self, $evt);
@@ -1373,7 +1376,6 @@ sub start_file_sharing {
         return;
     }
     INFO "Exporting local shares into remote VM";
-
     my @errors;
     for my $share (@{ $self->{shares} }) {
         INFO "Starting folder sharing for $share";
