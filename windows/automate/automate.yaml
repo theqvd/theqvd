@@ -62,6 +62,8 @@ setup:
       - name: Log::Log4perl
         test: no
       - name: Win32::LongPath
+      - name: Net::Server
+        test: no
       - name: Data::UUID
         url: https://github.com/salva/p5-Data-UUID.git
         branch: master

@@ -134,7 +134,8 @@ else {
     my @qvd_client_modules = qw(QVD::Client QVD::Config::Core QVD::Config
                                 QVD::HTTP QVD::HTTPC QVD::HTTPD
                                 QVD::Log QVD::SimpleRPC QVD::URI
-                                IO::Socket::Forwarder);
+                                IO::Socket::Forwarder
+                                Net::Server Net::Server::Fork);
 
     my $icon = $installer_path->child('pixmaps/qvd.ico')->stringify;
 
