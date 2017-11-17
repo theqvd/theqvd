@@ -79,6 +79,7 @@ build_nxproxy();
 build_win_sftp_server();
 build_qvd_slaveserver_wrapper();
 build_qvd_client();
+build_qvd_automate();
 
 exit(0);
 
@@ -643,6 +644,10 @@ sub build_perl_locale_gettext {
 
 sub build_qvd_client {
     build_from_repos('qvd-client');
+}
+
+sub build_qvd_automate {
+    build_from_repos('qvd-automate');
 }
 
 sub next_temp {
