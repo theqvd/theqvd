@@ -16,3 +16,10 @@
         </span>
     </div>
 </div>
+<% if (state == 'generating' || state == 'uploading') { %>
+    <fieldset class="js-progressbar-log-wrapper" data-id="<%= id %>" style="padding: 0px;">
+    <legend class="center" data-i18n="Log"></legend>
+        <div class="js-progressbar-log progressbar-log">
+    </fieldset>
+<% } %>
+</div>

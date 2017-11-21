@@ -279,3 +279,15 @@ fieldset {
     margin-bottom: 5px;
     font-weight: bold;
 }
+
+.progressbar-log {
+    width: 90%;
+    padding:3px;
+    border: 1px solid #666;
+    background: #222;
+    color: #eee;
+    height: 100px;
+    overflow: auto;
+    font-size: x-small;
+    margin: 10px 5%;
+}

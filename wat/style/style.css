@@ -381,6 +381,18 @@ fieldset {
   margin-bottom: 5px;
   font-weight: bold; }
 
+/* line 283, /home/zarzuelo/code/gotham/qvd-src/wat/style/components/_general.scss */
+.progressbar-log {
+  width: 90%;
+  padding: 3px;
+  border: 1px solid #666;
+  background: #222;
+  color: #eee;
+  height: 100px;
+  overflow: auto;
+  font-size: x-small;
+  margin: 10px 5%; }
+
 /********************************************************************
 *********************************************************************
 *********************************************************************

@@ -56,6 +56,15 @@ Wat.WS.changeWebsocketDi = function (id, field, data, row) {
             }
             
             $('[data-id="' + id + '"] .js-progress-icon--' + data).attr('title', statusStr);
+            // Avoid log repeated messages
+            var lastMsg = $('[data-id="' + id + '"] .js-progressbar-log').attr('data-last-msg');
+            if (lastMsg != row['status_message']) {
+                var logDT = new Date();
+                var logTimeStr = logDT.toTimeString().substr(0,8);
+                $('[data-id="' + id + '"] .js-progressbar-log').prepend(logTimeStr + ' - ' + row['status_message'] + '<br>');
+                $('[data-id="' + id + '"] .js-progressbar-log').attr('data-last-msg', row['status_message']);
+            }
+            
             $('[data-wsupdate="state-text"][data-id="' + id + '"]').html(statusStr);
             
             // Icons for autopublish and expiration time
@@ -66,6 +75,7 @@ Wat.WS.changeWebsocketDi = function (id, field, data, row) {
             switch(data) {
                 case 'published':
                     $('[data-id="' + id + '"] .js-expiration-icon').hide();
+                    $('[data-id="' + id + '"] .js-progressbar-log-wrapper').hide();
                 case 'ready':
                     $('[data-id="' + id + '"] .js-auto-publish-icon').hide();
                     break;
