@@ -805,7 +805,8 @@ sub update_di_status {
         # Update DI state to generating
         my $percentage = $tx->res->json->{percent};
         my $elapsed_time = $tx->res->json->{elapsedTime};
-        $di_runtime->update({ percentage => $percentage, elapsed_time => $elapsed_time });
+        my $message = $tx->res->json->{message};
+        $di_runtime->update({ percentage => $percentage, elapsed_time => $elapsed_time, status_message => $message });
         
         # Upload DI image file
         my $status = $tx->res->json->{status};
@@ -815,7 +816,6 @@ sub update_di_status {
             my $update_time_in_seconds = 5;
             $c->download_image_from_url($file_url, $di_runtime->di_id, $di_runtime->auto_publish, $update_time_in_seconds);
         } elsif ($status eq 'ERROR') {
-            my $message = $tx->res->json->{message};
             $c->qvd_admin4_api->qvd_api->di_state_update($di_runtime->di_id, 'fail', $message);
         }
     } else {
