@@ -329,6 +329,11 @@ sub _start_kvm {
         push @kvm_args, -drive => $hdb;
     }
 
+    if ($self->_cfg('vm.kvm.ballooning')) {
+        DEBUG "Ballooning enabled";
+        push @kvm_args, -balloon => 'virtio';
+    }
+
     my $cpus = $self->_cfg('vm.kvm.cpus');
     push @kvm_args, -smp => "cpus=$cpus";
 
