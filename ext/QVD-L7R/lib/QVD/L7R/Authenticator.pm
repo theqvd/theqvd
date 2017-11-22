@@ -205,12 +205,16 @@ sub authenticate_bearer {
     for (@{$auth->{plugins}}) { 
         if($_->authenticate_bearer($auth, $token, $l7r)) {
             if(my $user = rs( User )->find( { id => $auth->{user_id} } )) {
+                my $user_name = $user->login;
+                my $tenant_name = $user->tenant_name;
                 $auth->{user} = $user;
                 $auth->{user_id} = $auth->{user}->id;
                 $auth->{authenticated} = 1;
+                $auth->{params}{'qvd.vm.user.name'} = $user_name;
+                DEBUG "User $user_name in tenant $tenant_name was authenticated with bearer";
                 return 1;
             } else {
-                DEBUG "User $auth->{normalized_login} is authenticated but not registered in QVD database";
+                DEBUG "Token $token is authenticated but related user is not registered in QVD database";
             }
         }
     }
