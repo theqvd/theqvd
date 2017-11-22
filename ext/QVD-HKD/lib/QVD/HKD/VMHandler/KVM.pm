@@ -285,7 +285,7 @@ sub _start_kvm {
     push @kvm_args, (-net => $nic, -net => 'tap,vlan=0,fd=3');
 
     if ($self->_cfg('vm.serial.capture')) {
-        if (defined $self->{serial_port}) {
+        if ($self->{serial_port}) {
             DEBUG "Using serial port '$self->{serial_port}'";
             push @kvm_args, -serial => "telnet::$self->{serial_port},server,nowait,nodelay";
         } else {
