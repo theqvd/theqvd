@@ -511,10 +511,16 @@ sub di_publish {
     my $vms = $di_runtime->di->related_vms;
     for my $vm (@$vms) {
         if ($vm->vm_runtime->vm_state eq 'running') {
-            my $expiration_date_soft = DateTime->now->add( seconds => $di_runtime->expiration_time_soft );
-            my $expiration_date_hard = DateTime->now->add( seconds => $di_runtime->expiration_time_hard );
-            $vm->vm_runtime->update({ vm_expiration_soft => $expiration_date_soft,
-                vm_expiration_hard => $expiration_date_hard })
+            my %update_expirations = ();
+            if(defined($di_runtime->expiration_time_soft)) {
+                $update_expirations{vm_expiration_soft} = DateTime->now->add( seconds => $di_runtime->expiration_time_soft );
+            }
+            if(defined($di_runtime->expiration_time_hard)) {
+                $update_expirations{vm_expiration_hard} = DateTime->now->add( seconds => $di_runtime->expiration_time_hard );
+            }
+            if(%update_expirations) {
+                $vm->vm_runtime->update(\%update_expirations);
+            }
         }
     }
 }
