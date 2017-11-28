@@ -535,6 +535,21 @@ sub di_state_update {
     
     # TODO: Check transitions between states
     
+    if(not defined($message)) {
+        my $status_messages = {
+            new            => 'New image was registered',
+            generating     => 'Image is being generated',
+            fail           => 'Image creation failed',
+            uploading      => 'Image is being uploaded',
+            upload_stalled => 'Uploading image lasted too much',
+            verifying      => 'Image validity is being verified',
+            ready          => 'Image is ready for publishing',
+            published      => 'Image is published',
+            retired        => 'Image is not available'
+        };
+        $message = $status_messages->{$state} // '';
+    }
+    
     my $di_runtime = $self->db->resultset('DI_Runtime')->find({di_id => $di_id});
     $di_runtime->update({state => $state, state_ts => time, status_message => $message });
 }
