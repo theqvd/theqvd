@@ -967,7 +967,9 @@ sub _run {
             $slave_cmd = File::Spec->rel2abs($slave_cmd, $QVD::Client::App::app_dir);
             if (-x $slave_cmd ) {
                 DEBUG("Slave command is '$slave_cmd'");
+                # We keep QVD_SLAVE_CMD for retrocompatibility
                 $self->{client_delegate}->proxy_set_environment( QVD_SLAVE_CMD => $slave_cmd );
+                $self->{client_delegate}->proxy_set_environment( NX_SLAVE_CMD => $slave_cmd );
             } else {
                 WARN("Slave command '$slave_cmd' not found or not executable.");
             }
