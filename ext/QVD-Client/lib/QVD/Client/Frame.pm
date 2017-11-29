@@ -606,6 +606,11 @@ sub OnTabChange {
     # We only save settings when we're leaving the settings tab
     if ( $self->{tab_ctl}->GetPageText($event->GetOldSelection()) eq 'Settings' ){
         $self->SaveConfiguration();
+        if ( $self->{worker_thread} && $self->{worker_thread}->is_running() ){
+            undef %connect_info ;
+            cond_signal(%connect_info);
+            $self->{worker_thread}->join();
+        }
     } 
 
 }
