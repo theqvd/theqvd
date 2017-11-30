@@ -459,6 +459,8 @@ sub _fork_monitor {
 
                     $ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000) if $enable_audio;
                     $ENV{NX_CLIENT} = $nxdiag;
+                    $ENV{NX_SLAVE_CMD} = $command_slave if $command_slave;
+                    # Keep QVD_SLAVE_CMD for retrocompatibility
                     $ENV{QVD_SLAVE_CMD} = $command_slave if $command_slave;
 
                     # FIXME: Include VM name in -name argument.
