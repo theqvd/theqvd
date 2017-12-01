@@ -11,7 +11,6 @@ Wat.Views.OSDShortcutsEditorView = Wat.Views.OSDEditorView.extend({
         'click .js-save-shortcut': 'saveShortcut',
         'click .js-button-open-shortcut-configuration': 'openShortcutConfiguration',
         'click .js-button-close-shortcut-configuration': 'closeShortcutConfiguration',
-        'change .js-list-shortcuts .js-asset-selector[data-asset-type="icon"]': 'changeIcon'
     },
     
     render: function () {
@@ -66,17 +65,6 @@ Wat.Views.OSDShortcutsEditorView = Wat.Views.OSDEditorView.extend({
     
     afterLoadSection: function () {
         this.showSelectMode();
-    },
-    
-    ////////////////////////////////////////////////////
-    // Functions for interface changes
-    ////////////////////////////////////////////////////
-    
-    changeIcon: function (e) {
-        var shortcutId = $(e.target).attr('data-id');
-        var iconUrl = $(e.target).find('option:selected').attr('data-url');
-        
-        $('.js-icon-bg[data-id="' + shortcutId + '"]').css('background-image', 'url(' + iconUrl + ')');
     },
     
     ////////////////////////////////////////////////////
@@ -202,6 +190,7 @@ Wat.Views.OSDShortcutsEditorView = Wat.Views.OSDEditorView.extend({
                 
                 $('.' + that.cid + ' .js-os-conf-shortcuts-rows-editor').show();
                 $('.' + that.cid + ' .js-asset-switch-buttonset').hide();
+                $('.' + that.cid + ' .js-asset-selector').chosenImage();
             }
         });
     },

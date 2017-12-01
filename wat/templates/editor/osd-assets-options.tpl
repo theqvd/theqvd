@@ -16,6 +16,7 @@
         data-name="<%= model.get('name') %>"
         data-asset-type="<%= assetType %>"
         data-plugin-id="<%= pluginId %>"
+        <%= assetType == 'icon' ? 'data-img-src="' + model.get('url') + '"' : '' %>
     >
         <%= model.get('name') %>
     </option>
