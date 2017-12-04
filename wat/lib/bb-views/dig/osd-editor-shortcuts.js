@@ -176,7 +176,6 @@ Wat.Views.OSDShortcutsEditorView = Wat.Views.OSDEditorView.extend({
             pluginId: 'shortcut',
             afterRender: function () {
                 $('.' + that.cid + ' .js-osf-conf-editor').hide();
-                
                 if (id > 0) {
                     $('.' + that.cid + ' .js-shortcut-name-edition').html(shortcut.name);
                     $('.' + that.cid + ' .js-os-conf-shortcuts-rows-editor--edit').show();

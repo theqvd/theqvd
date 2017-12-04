@@ -101,59 +101,6 @@ Wat.DIG = {
         });
     },
     
-    updateAssetPreview: function (opt) {
-        var controlId = $(opt).attr('data-asset-type');
-        var assetId = $(opt).val();
-        var type = $(opt).attr('data-type');
-        var url = $(opt).attr('data-url');
-        var pluginId = $(opt).attr('data-plugin-id');
-        var name = $(opt).attr('data-name');
-        
-        switch (type) {
-            case 'script':
-                var defaultText = "#!/bin/bash\n\nSTR=\"Hello World!\"\necho $STR";
-                $.ajax ( {
-                    url: url,
-                    complete: function (e) {
-                        // Mock if error
-                        var responseText = e.responseText || defaultText;
-                        $('[data-preview-id="' + controlId + '"]').html(responseText.replace(/\n/g,"<br>").replace('World', url)).show();
-                    },
-                });
-                break;
-            case 'icon':
-                if (assetId) {
-                    $('[data-preview-id="' + controlId + '"]').html('<img src="' + url + '" style="width: 32px; display: block; margin: 50px auto;"></img>');
-                }
-                else {
-                    $('[data-preview-id="' + controlId + '"]').html('');
-                }
-                break;
-            case 'wallpaper':
-                $('[data-preview-id="' + controlId + '"]').html('<img src="' + url + '" style="width: 90%; display: block; margin: 0 auto;"></img>');
-                break;
-            default:
-                if ($(opt).attr('data-none')) {
-                    $('[data-preview-id="' + controlId + '"]').html('');
-                }
-        }
-        
-        switch (type) {
-            case 'icon':
-            case 'wallpaper':
-                // Show loading message for preview image until it is loaded
-                if (assetId) {
-                    $('.js-preview img').hide();
-                    $('.js-data-preview-message').show();
-                }
-                $('.js-preview img').on('load', function () {
-                    $('.js-preview img').show();
-                    $('.js-data-preview-message').hide();
-                });
-                break;
-        }
-    },
-    
     // Render OS Details template and return it
     // model: Backbone model of the OSD
     // options: Options of the rendering

@@ -8,7 +8,7 @@ Wat.Views.PackageListView = Wat.Views.ListView.extend({
         'click .js-delete-package-btn': 'deletePackage',
         'click .js-order-package-down': 'sortDown',
         'click .js-order-package-up': 'sortUp',
-        'keypress [name="packages_search"]': 'typeSearch',
+        'keyup [name="packages_search"]': 'typeSearch',
         'change select[name="packages-installed-filter"]': 'filter'
     },
     
@@ -88,10 +88,13 @@ Wat.Views.PackageListView = Wat.Views.ListView.extend({
         item.insertBefore(itemPrev);
     },
     
+    // Wait after last character typed to filter
     typeSearch: function (e) {
-        if (e.keyCode == 13) {
-            this.filter();
+        if (this.keyPressedTimeout) {
+            clearTimeout(this.keyPressedTimeout);
         }
+        
+        this.keyPressedTimeout = setTimeout(this.filter, 1000);
     },
     
     filter: function () {

@@ -36,7 +36,6 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
             shortcuts: new Wat.Views.OSDShortcutsEditorView({massive: this.massive}),
             appearance: new Wat.Views.OSDAppearenceEditorView({massive: this.massive}),
             hooks: new Wat.Views.OSDHooksEditorView({massive: this.massive}),
-            assets: new Wat.Views.OSDAssetsEditorView({massive: this.massive}),
         };
         
         Wat.I.chosenElement('select.js-app-to-shortcut', 'single100');
@@ -63,17 +62,17 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
                     }
                 );
                 
-                $('select.bb-os-conf-' + opts.assetType + '-assets').html(template);
+                $('.' + that.cid + ' select.bb-os-conf-' + opts.assetType + '-assets').html(template);
                 Wat.I.chosenElement('select.bb-os-conf-' + opts.assetType + '-assets', 'single100');
                 
                 var currentAssetId = Wat.CurrentView.OSDmodel.pluginData[opts.pluginId].get('id');
                 if (currentAssetId) {
-                    $('select.bb-os-conf-' + opts.assetType + '-assets>option[data-id="' + currentAssetId + '"]').prop('selected','selected');
+                    $('.' + that.cid + ' select.bb-os-conf-' + opts.assetType + '-assets>option[data-id="' + currentAssetId + '"]').prop('selected','selected');
                 }
-                $('select.bb-os-conf-' + opts.assetType + '-assets').trigger('chosen:updated');
+                $('.' + that.cid + ' select.bb-os-conf-' + opts.assetType + '-assets').trigger('chosen:updated');
                 
                 // Update preview of the selected asset
-                Wat.DIG.updateAssetPreview($('.' + that.cid + ' select.js-asset-selector>option:checked'));
+                that.updateAssetPreview($('.' + that.cid + ' select.js-asset-selector>option:checked'));
                 
                 var template = _.template(
                     Wat.TPL.osConfigurationEditorAssetsRows, {
@@ -102,6 +101,11 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
     
     clickOSEditorMenu: function (e) {
         target = $(e.target).attr('data-target') || $(e.target).parent().attr('data-target');
+        
+        if (target == 'assets') {
+            this.goToAssetsManagement();
+            return;
+        }
         
         $('li.lateral-menu-option').removeClass('lateral-menu-option--selected');
         $('li.js-lateral-menu-sub-div').hide();
@@ -134,13 +138,94 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
         $('tr').removeClass('selected-row');
         $(row).addClass('selected-row');
         
-        Wat.DIG.updateAssetPreview(row);
+        this.updateAssetPreview(row);
     },
     
     goToAssetsManagement: function (e) {
-        var assetType = $(e.target).attr('data-asset-type');
-        $('.lateral-menu-option[data-target="assets"]').trigger('click');
+        var that = this;
+        var assetType = e ? $(e.target).attr('data-asset-type') : 'icon';
         
-        $('.js-change-mode').val(assetType).trigger('chosen:updated').trigger('change');
-    }
+        var dialogConf = {
+            title: "Assets management",
+            buttons : {
+                "Close": function () {
+                    Wat.I.closeDialog($(this));
+                    
+                    // Send primary dialog to front again
+                    $('.ui-dialog').eq(0).css('z-index','');
+                }
+            },
+            buttonClasses: ['fa fa-check js-button-close'],
+            
+            fillCallback: function (target) {
+                $(target).addClass('bb-os-conf-assets').css('padding','30px');
+                that.sectionViews.assets = new Wat.Views.OSDAssetsEditorView({massive: this.massive});
+                
+                $('.js-change-mode').val(assetType).trigger('chosen:updated').trigger('change');
+            }
+        };
+        
+        Wat.CurrentView.assetsDialog = Wat.I.dialog(dialogConf);
+
+        // Add secondary dialog class to new dialog to give different look
+        Wat.CurrentView.assetsDialog.parent().addClass('ui-dialog-secondary');
+        Wat.CurrentView.assetsDialog.dialog("option", "position", {my: "center", at: "center", of: window});
+        // Send primary dialog to back because jquery ui doesnt handle it properly
+        $('.ui-dialog').eq(0).css('z-index','100');
+    },
+    
+    updateAssetPreview: function (opt) {
+        var that = this;
+        
+        var controlId = $(opt).attr('data-asset-type');
+        var assetId = $(opt).val();
+        var type = $(opt).attr('data-type');
+        var url = $(opt).attr('data-url');
+        var pluginId = $(opt).attr('data-plugin-id');
+        var name = $(opt).attr('data-name');
+        
+        switch (type) {
+            case 'script':
+                var defaultText = "#!/bin/bash\n\nSTR=\"Hello World!\"\necho $STR";
+                $.ajax ( {
+                    url: url,
+                    complete: function (e) {
+                        // Mock if error
+                        var responseText = e.responseText || defaultText;
+                        $('.' + that.cid + ' [data-preview-id="' + controlId + '"]').html(responseText.replace(/\n/g,"<br>").replace('World', url)).show();
+                    },
+                });
+                break;
+            case 'icon':
+                if (assetId) {
+                    $('.' + that.cid + ' [data-preview-id="' + controlId + '"]').html('<img src="' + url + '" style="width: 32px; display: block; margin: 50px auto;"></img>');
+                }
+                else {
+                    $('.' + that.cid + ' [data-preview-id="' + controlId + '"]').html('');
+                }
+                break;
+            case 'wallpaper':
+                $('.' + that.cid + ' [data-preview-id="' + controlId + '"]').html('<img src="' + url + '" style="width: 90%; display: block; margin: 0 auto;"></img>');
+                break;
+            default:
+                if ($(opt).attr('data-none')) {
+                    $('.' + that.cid + ' [data-preview-id="' + controlId + '"]').html('');
+                }
+        }
+        
+        switch (type) {
+            case 'icon':
+            case 'wallpaper':
+                // Show loading message for preview image until it is loaded
+                if (assetId) {
+                    $('.' + that.cid + ' .js-preview img').hide();
+                    $('.' + that.cid + ' .js-data-preview-message').show();
+                }
+                $('.js-preview img').on('load', function () {
+                    $('.' + that.cid + ' .js-preview img').show();
+                    $('.' + that.cid + ' .js-data-preview-message').hide();
+                });
+                break;
+        }
+    },
 });

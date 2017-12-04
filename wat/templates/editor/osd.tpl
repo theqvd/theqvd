@@ -46,7 +46,5 @@
         <td class="col-width-80 js-os-editor-panel os-editor-panel bb-os-conf-appearance" style="display: none;" data-target="appearance"></td>
         
         <td class="col-width-80 js-os-editor-panel os-editor-panel bb-os-conf-hooks" style="display: none;" data-target="hooks"></td>
-        
-        <td class="col-width-80 js-os-editor-panel os-editor-panel bb-os-conf-assets" style="display: none;" data-target="assets"></td>
     </tr>
 </table>

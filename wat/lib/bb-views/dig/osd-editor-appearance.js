@@ -52,7 +52,7 @@ Wat.Views.OSDAppearenceEditorView = Wat.Views.OSDEditorView.extend({
         Wat.Views.OSDEditorView.prototype.showSelectMode.apply(this, [e]);
         
         var opt = $('.' + this.cid + ' .js-asset-selector>option:checked');
-        Wat.DIG.updateAssetPreview(opt);
+        this.updateAssetPreview(opt);
     },
     
     ////////////////////////////////////////////////////
@@ -62,7 +62,7 @@ Wat.Views.OSDAppearenceEditorView = Wat.Views.OSDEditorView.extend({
     changeAssetSelector: function (e) {
         var opt = $(e.target).find('option:checked');
         
-        Wat.DIG.updateAssetPreview(opt);
+        this.updateAssetPreview(opt);
         
         var pluginId = $(opt).attr('data-plugin-id');
         

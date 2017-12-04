@@ -32,6 +32,8 @@ Wat.Views.OSDAssetsEditorView = Wat.Views.OSDEditorView.extend({
         
         $('.bb-os-conf-assets').html(template);
         
+        this.renderModeAssets();
+        
         Wat.I.chosenElement('select.js-change-mode', 'single100');
     },
     
@@ -46,9 +48,25 @@ Wat.Views.OSDAssetsEditorView = Wat.Views.OSDEditorView.extend({
     changeMode: function (e) {
         var assetType = $(e.target).val();
         
+        this.renderModeAssets();
+        
         $('table[data-asset-type] input[name="' + assetType + '"]').eq(0).trigger('click').trigger('change');
         $('.js-upload-mode').hide();
         $('.js-upload-mode[data-asset-type="' + assetType + '"]').show();
+    },
+    
+    renderModeAssets: function () {
+        var assetType = $('.js-change-mode option:selected').val();
+        var pluginId = $('.js-change-mode option:selected').attr('data-plugin-id');
+        
+        this.renderAssetsControl({ 
+            assetType: assetType,
+            pluginId: pluginId,
+            afterRender: function () {
+                // Select uploaded element
+                $('.' + this.cid + 'table[data-asset-type] input[name="' + assetType + '"]:first-child').trigger('click');
+            }
+        });
     },
     
     showUploadControl: function (e) {
@@ -173,7 +191,7 @@ Wat.Views.OSDAssetsEditorView = Wat.Views.OSDEditorView.extend({
     changeAssetSelector: function (e) {
         var opt = $(e.target).find('option:checked');
         
-        Wat.DIG.updateAssetPreview(opt);
+        this.updateAssetPreview(opt);
     },
     
     clickAssetName: function (e) {

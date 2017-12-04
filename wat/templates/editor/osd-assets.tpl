@@ -5,9 +5,9 @@
         <a class="button fright fa fa-upload js-show-upload js-upload-mode hidden" data-asset-type="script" data-plugin-id="hook" style="margin-right: 10px;" data-i18n="Upload script">Upload script</a>
         <div class="fleft col-width-40">
             <select class="js-change-mode col-width-40">
-                <option value="icon" data-i18n="Icons" selected="selected">Icons</option>
-                <option value="wallpaper" data-i18n="Wallpapers">Wallpapers</option>
-                <option value="script" data-i18n="Scripts">Scripts</option>
+                <option value="icon" data-plugin-id="shortcut" data-i18n="Icons" selected="selected">Icons</option>
+                <option value="wallpaper" data-plugin-id="wallpaper" data-i18n="Wallpapers">Wallpapers</option>
+                <option value="script" data-plugin-id="hook" data-i18n="Scripts">Scripts</option>
             </select>
         </div>
     </div>
