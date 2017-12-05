@@ -276,6 +276,7 @@ Wat.A = {
     //          - params.order_by: API order by that will be used to fill select combo
     //          - params.nameAsId: Boolean that specifies if name of the options will be taken as Id too
     //          - params.group: HTML native optgroup where the options will be grouped
+    //          - params.orderFirst: Array with the options that will be first
     //      afterCallBack: Function to be executed after filling
     fillSelect: function (params, afterCallBack) {
         if (params.controlSelector) {
@@ -378,6 +379,18 @@ Wat.A = {
                 success: function (data) {
                     if (Wat.C.sessionExpired(data)) {
                         return;
+                    }
+                    
+                    // Order required elements to first position
+                    if (params.orderFirst) {
+                        $.each(params.orderFirst.reverse(), function (iF, field) {
+                            $.each(data.rows, function (iO, option) {
+                                if (option.name == field) {
+                                    var opt = data.rows.splice(iO, 1)[0];
+                                    data.rows.unshift(opt);
+                                }
+                            });
+                        });
                     }
                     
                     $.each($(controlSelector), function () {

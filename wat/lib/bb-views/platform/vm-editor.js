@@ -275,7 +275,8 @@ Wat.Views.VMEditorView = Wat.Views.EditorView.extend({
                 'osf_id': $('[name="osf_id"]').val()
             },
             'nameAsId': true,
-            'chosenType': 'advanced100'
+            'chosenType': 'advanced100',
+            'orderFirst': ['head', 'default']
         };
 
         Wat.A.fillSelect(params);
