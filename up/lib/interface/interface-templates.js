@@ -51,14 +51,6 @@ Up.I.T = {
 
                 templates["list-grid_desktops"] = {
                     name: 'desktops/desktops-grid'
-                };  
-
-                templates["list-list_desktops"] = {
-                    name: 'desktops/desktops-list'
-                };
-                
-                templates["list-list_desktops"] = {
-                    name: 'desktops/desktops-list'
                 };
                 break;
             case 'spyDesktop':

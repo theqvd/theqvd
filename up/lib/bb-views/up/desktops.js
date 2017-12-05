@@ -24,7 +24,6 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
     
     // This events will be added to view events
     listEvents: {
-        'click .js-change-viewmode': 'changeViewMode',
         'click .js-desktop-settings-btn': 'editDesktopSettings',
         'click .js-unblocked .js-desktop-connect-btn': 'connectDesktop',
         'change select[name="active_configuration_select"]': 'changeActiveConf',
@@ -100,15 +99,6 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
     afterRender: function () {
         Up.Views.ListView.prototype.afterRender.apply(this, []);        
         Up.WS.openWebsocket('desktops', Up.WS.changeWebsocketDesktops);
-    },
-    
-    // Change view mode when click on the view mode button and render list
-    changeViewMode: function (e) {
-        this.viewMode = $(e.target).attr('data-viewmode');
-        $('.js-change-viewmode').removeClass('disabled');
-        $(e.target).addClass('disabled');
-        
-        this.renderList();
     },
     
     changeActiveConf: function (e) {
