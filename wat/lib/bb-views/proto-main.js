@@ -29,7 +29,10 @@ Wat.Views.MainView = Backbone.View.extend({
         
         // Add the commonly used templates
         this.addCommonTemplates();
-
+        
+        // Reset sideViews
+        this.sideViews = [];
+        
         var that = this;
         this.render = _.wrap(this.render, function(render) { 
             that.beforeRender(); 
