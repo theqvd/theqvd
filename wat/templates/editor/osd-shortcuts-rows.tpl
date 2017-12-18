@@ -7,7 +7,7 @@
 <%
 $.each(shortcuts, function (iSc, sc) {
 %>
-    <tr data-form-list="shortcuts" class="<%= cid %>" data-id="<%= sc.id %>">
+    <tr data-form-list="shortcuts" class="<%= cid %>" data-id="<%= sc.id %>" data-shortcut-name="<%= sc.name %>">
         <td class="col-width-10 center">
             <button class="button2 button-icon--desktop js-button-open-shortcut-configuration fa fa-pencil" href="javascript:" data-i18n="[title]Edit" data-id="<%= sc.id %>" style="margin: 10px auto;">
             </button>

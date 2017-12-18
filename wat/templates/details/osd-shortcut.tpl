@@ -4,7 +4,7 @@
         var scIcon = assets.findWhere({id: sc.idAsset});
         sc.iconUrl = scIcon.get('url');
         %>
-            <div class="setting-row" style="clear: both;">
+            <div class="setting-row js-shortcut-details" data-shortcut="<%= sc.name %>" style="clear: both;">
                 <span class="settings-box-element-shortcut">
                     <div class="icon-bg fleft" style="background-image: url(<%= sc.iconUrl %>); height: 32px; width: 32px;">
                         <i class="fa fa-share shortcut"></i>

@@ -7,7 +7,7 @@
 <tr class="<%= cid %>" data-id="<%= hook.id %>">
     <td class="col-width-50">
         <div data-i18n="Script" class="left">Script</div>
-        <select data-id="<%= hook.id %>" class="js-hook bb-os-conf-hook js-os-conf-hook" data-asset-type="icon">
+        <select name="asset_selector_script" data-id="<%= hook.id %>" class="js-hook bb-os-conf-hook js-os-conf-hook" data-asset-type="script">
             <option data-i18n="Loading scripts">Loading scripts</option>
         </select>
         <div>
@@ -16,7 +16,7 @@
     </td>
     <td class="col-width-50">
         <div data-i18n="Hook type" class="left">Hook type</div>
-        <select data-id="<%= hook.id %>" class="js-hook-type" data-asset-type="icon">
+        <select name="hook_type" data-id="<%= hook.id %>" class="js-hook-type" data-asset-type="icon">
             <% $.each(hookTypes, function (iHT, ht) { %>
                 <option data-i18n="<%= ht %>" <%= ht == hook.hookType ? 'selected="selected"' : '' %>><%= ht %></option>
             <% }); %>

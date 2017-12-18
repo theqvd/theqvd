@@ -3,7 +3,7 @@ var pkgCollection = pluginData;
 
 $.each(pkgCollection.models, function (i, pkgModel) {
     %>
-    <div>
+    <div class="js-package-details" data-package="<%= pkgModel.get('name') %>">
         <span>- <%= pkgModel.get('name') %><span>
         <div class="second_row"><%= pkgModel.get('description') %></div>
     </div>

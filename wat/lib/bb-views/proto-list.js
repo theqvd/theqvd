@@ -1384,7 +1384,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         
         // When press enter
-        if (e.keyCode == 13) {
+        if (e.keyCode == KEYCODE_ENTER) {
             if (inputContent && this.collection.offset != inputContent) {
                 // Show loading animation while loading
                 $('.' + this.cid).find('.list td').html(HTML_MICRO_LOADING);

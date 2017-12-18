@@ -216,7 +216,7 @@ CLASS_ICON_BY_QVD_OBJ = {
 QVD_OBJS_WITH_PROPERTIES = ['user', 'vm', 'host', 'osf', 'di'];
 QVD_OBJS_CLASSIFIED_BY_TENANT = ['user', 'vm', 'osf', 'di', 'administrator', 'log', 'role', 'property'];
 QVD_OBJS_CREATABLE = ['user', 'vm', 'host', 'osf', 'di', 'administrator', 'role', 'tenant'];
-QVD_OBJS_EDITABLE = ['user', 'vm', 'host', 'osf', 'di', 'administrator', 'role', 'tenant', 'package'];
+QVD_OBJS_EDITABLE = ['user', 'vm', 'host', 'osf', 'di', 'administrator', 'role', 'tenant', 'configwat', 'package'];
 QVD_OBJS_MASSIVE_EDITABLE = ['user', 'vm', 'host', 'osf', 'di', 'administrator', 'role', 'tenant'];
 QVD_OBJS_EXIST_IN_SUPERTENANT = ['role', 'administrator', 'property'];
 QVD_OBJS_EXIST_OUT_TENANT = ['role'];
@@ -399,3 +399,6 @@ DICTIONARY_STATES = {
 
 // DIG (Disk Image Generator)
 OSF_DISTRO_COMMON_ID = -1;
+
+// Key codes
+KEYCODE_ENTER = 13;

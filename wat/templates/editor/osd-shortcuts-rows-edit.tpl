@@ -1,7 +1,7 @@
 <tr class="<%= cid %>" data-id="<%= shortcut.id %>">
     <td class="col-width-50">
         <div data-i18n="Icon" class="left">Icon</div>
-        <select data-id="<%= shortcut.id %>" class="bb-os-conf-icon-assets bb-os-conf-icon-type-options js-asset-selector asset-selector list" data-asset-type="icon">
+        <select name="asset_selector_icon" data-id="<%= shortcut.id %>" class="bb-os-conf-icon-assets bb-os-conf-icon-type-options js-asset-selector asset-selector list" data-asset-type="icon">
             <option data-i18n="Loading icons">Loading icons</option>
         </select>
         <div>

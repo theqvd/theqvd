@@ -150,7 +150,7 @@ Wat.B = {
         
         pushKeyOnLoginInput: function (e) {
             // If press enter, trigger login button
-            if (e.which == 13 ) {
+            if (e.which == KEYCODE_ENTER) {
                 $('.js-login-button').trigger('click');
             }
         }

@@ -38,6 +38,10 @@ Wat.Views.PackageListView = Wat.Views.ListView.extend({
     renderList: function () {
         Wat.Views.ListView.prototype.renderList.apply(this, []);
         Wat.I.chosenElement('[name="packages-installed-filter"]', 'single');
+        
+        // Set focus on the end of search input
+        var packages_search = $('input[name="packages_search"]').val();
+        $('input[name="packages_search"]').focus().val(packages_search);
     },
     
     addPackage: function (e) {
@@ -94,7 +98,12 @@ Wat.Views.PackageListView = Wat.Views.ListView.extend({
             clearTimeout(this.keyPressedTimeout);
         }
         
-        this.keyPressedTimeout = setTimeout(this.filter, 1000);
+        if (e.keyCode == KEYCODE_ENTER) {
+            this.filter();
+        }
+        else {
+            this.keyPressedTimeout = setTimeout(this.filter, 1000);
+        }
     },
     
     filter: function () {

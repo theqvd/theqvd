@@ -5,7 +5,7 @@
 <% } %>
 
 <%  $.each(hooks, function (iHook, hook) { %>
-    <tr data-form-list="hooks" data-id="<%= hook.id %>">
+    <tr data-form-list="hooks" data-id="<%= hook.id %>" data-hook-name="<%= hook.name %>">
         <td class="col-width-10 center" style="vertical-align: middle;">
             <button class="button2 button-icon--desktop js-button-open-hook-configuration fa fa-pencil" href="javascript:" data-i18n="[title]Edit" data-id="<%= hook.id %>" style="margin: 10px auto;">
             </button>

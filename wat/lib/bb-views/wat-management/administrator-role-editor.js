@@ -41,7 +41,7 @@ Wat.Views.AdministratorRoleEditorView = Wat.Views.EditorView.extend({
                 COMMON_TENANT_ID,
             ];
         }
-        else if (!Wat.CurrentView.model || (Wat.CurrentView.selectedItems && Wat.CurrentView.selectedItems.length > 1)) {
+        else if (Wat.CurrentView.viewKind == 'list') {
             // If we are in list view, we check tenant of the selected elements
             
             var selectedTenants = [];

@@ -1,4 +1,4 @@
-<div class="fleft setting-row os-row js-os-row">
+<div class="fleft setting-row os-row js-os-row js-os-details" data-os="<%= pluginData.get('name') %>">
     <div class="settings-box-element-value" >
         <span class="os-name"><%= pluginData.get('name') %></span>
     </div>

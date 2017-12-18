@@ -13,7 +13,7 @@ else {
     <div>
         <span data-i18n="Wallpaper"></span>
     </div>
-    <div>
+    <div class="js-wallpaper-details" data-wallpaper="<%= pluginData.get('name') %>">
         <img src="<%= wpUrl %>" style="width: 300px;" title="<%= pluginData.get('name') %>"/>
     </div>
 <%

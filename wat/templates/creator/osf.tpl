@@ -2,7 +2,7 @@
     <tr data-tab-field="general">
         <td data-i18n="Name" class="mandatory-label"></td>
         <td>
-            <input type="text" name="name" value="" data-required>
+            <input id="name" type="text" name="name" value="" data-required>
         </td>
     </tr>
     <tr data-tab-field="general">

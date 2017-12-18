@@ -2,7 +2,7 @@
     var hooks = pluginData.attributes;
     $.each(hooks, function (i, hook) {
         %>
-            <div>
+            <div class="js-hook-details" data-hook="<%= hook.name %>">
                 <span>- <%= hook.name %><span>
                 <div class="second_row"><%= hook.hookType %></div>
             </div>

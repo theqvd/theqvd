@@ -4,7 +4,7 @@
             <td class="col-width-60 js-select-mode select-mode">
                 <div class="editor-title" data-i18n="Wallpaper">Wallpaper</div>
                 <div class="asset-selector-wrapper">
-                    <select class="bb-os-conf-wallpaper-assets bb-os-conf-wallpaper-type-options js-asset-selector asset-selector list" data-asset-type="<%= assetType %>">
+                    <select name="asset_selector_wallpaper" class="bb-os-conf-wallpaper-assets bb-os-conf-wallpaper-type-options js-asset-selector asset-selector list" data-asset-type="<%= assetType %>">
                         <option data-i18n="Loading wallpapers">Loading wallpapers</option>
                     </select>
                 </div>
