@@ -1,17 +1,16 @@
 #!/usr/bin/perl
 use strict;
-use warnings FATAL => 'all';
-use QVD::UP::H5GW::SessionManager;
 
 BEGIN {
     $QVD::Config::USE_DB = 1;
-    @QVD::Config::FILES = (
+    @QVD::Config::Core::FILES = (
         '/etc/qvd/up-api.conf',
         ($ENV{HOME} || $ENV{APPDATA}).'/.qvd/up-api.conf',
         'qvd-up-api.conf',
     );
 }
 
+use QVD::UP::H5GW::SessionManager;
 use Mojolicious::Lite;
 use MojoX::Session;
 use Mojo::Pg;
