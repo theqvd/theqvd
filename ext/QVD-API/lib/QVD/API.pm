@@ -1707,7 +1707,7 @@ sub config_ssl {
 	};
 }
 
-sub config_wat_get_details
+sub config_wat_get_list
 {
 	my ($self,$request) = @_;
 

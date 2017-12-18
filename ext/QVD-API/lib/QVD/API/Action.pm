@@ -70,11 +70,11 @@ my $ACTIONS = {
 		admin4method => 'config_delete'
 	},
 
-	config_wat_get_details => {
+	config_wat_get_list => {
 		type_of_action =>  'details',
 	qvd_object => 'Wat_Setups_By_Tenant',
 	acls => [qr/^(config\.wat)/],
-		admin4method => 'config_wat_get_details'
+		admin4method => 'config_wat_get_list'
 	},
 
 	config_wat_update => {
