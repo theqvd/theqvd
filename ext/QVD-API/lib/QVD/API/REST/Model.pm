@@ -675,7 +675,7 @@ my $AVAILABLE_FILTERS = {
         
         DI => [qw(id disk_image description version osf_id osf_name blocked tags
             properties creation_date creation_admin_id creation_admin_name
-            state state_ts elapsed_time auto_publish foreign_id
+            state state_ts elapsed_time auto_publish foreign_id tenant_id
             expiration_time_soft expiration_time_hard
             percentage error_code status_message)],
         
