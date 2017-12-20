@@ -115,7 +115,7 @@ Wat.Views.PackageListView = Wat.Views.ListView.extend({
         // Reset pagination befor filter
         currentView.collection.offset = 1;
         
-        currentView.collection.filters.search = $('input[name="packages_search"]').val();
+        currentView.collection.filters.search = encodeURIComponent($('input[name="packages_search"]').val());
         if ($('select[name="packages-installed-filter"]').val() == 'installed') {
             currentView.collection.filters.installed = true;
         }

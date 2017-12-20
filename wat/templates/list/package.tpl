@@ -1,5 +1,5 @@
 <div>
-    <input type="text" name="packages_search" class="fleft col-width-30 configuration-block" style="margin-right: 15px;" data-i18n="[placeholder]Search" value="<%= filters.search %>">
+    <input type="text" name="packages_search" class="fleft col-width-30 configuration-block" style="margin-right: 15px;" data-i18n="[placeholder]Search" value="<%= filters.search ? decodeURIComponent(filters.search) : '' %>">
 </div>
 <div>
     <select name="packages-installed-filter">
