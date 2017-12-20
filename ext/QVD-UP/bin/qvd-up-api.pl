@@ -175,11 +175,12 @@ any [ qw(POST) ] => '/api/login' => sub {
 
     my $ua = Mojo::UserAgent->new;
     my $l7r_vm_list_url = (cfg('l7r.use_ssl') ? "https" : "http") . "://" . cfg('up.api.l7r.address') .
-        ":" . cfg('l7r.port') . "/qvd/list_of_vm";
+        ":" . cfg('l7r.port') . "/qvd/authenticate_user?store_auth=1";
     my $auth_tx = $ua->cert( $cert_path )->key( $key_path )->
         get( $l7r_vm_list_url => { Authorization => $authorization } );
 
     my $http_code = $auth_tx->res->code // 502;
+    my $http_json = $auth_tx->res->json // {};
     my $http_message = $auth_tx->res->message // "Authentication server unavailable";
 
     return $c->render_error(message => $http_message, code => $http_code)
@@ -217,6 +218,7 @@ any [ qw(POST) ] => '/api/login' => sub {
     $session->data( tenant_name => $tenant );
     $session->data( login => $login );
     $session->data( user_id => $user_obj->id );
+    $session->data( auth_params_id => $http_json->{auth_params_id} );
     $session->flush;
 
     my $json = { };
@@ -457,7 +459,8 @@ group {
             token => generate_sid(),
             expiration => time + cfg('up.api.l7r.session.expiration'),
             user_id => $session_up->data->{user_id},
-            vm_id =>  $vm_id
+            vm_id =>  $vm_id,
+            auth_params_id => $session_up->data->{auth_params_id},
         } );
         my $token = encode_base64($session_l7r->token);
         chomp($token);
