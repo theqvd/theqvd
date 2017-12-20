@@ -43,6 +43,8 @@ my $installer_type = 'zip';
 my $output_dir;
 my $update;
 my $subsystem = 'windows';
+my $mingw32 = 'c:\\msys32\\mingw32';
+
 
 GetOptions('log-file|log|l=s' => \$log_file,
            'log-level|L=s' => \$log_level,
@@ -59,6 +61,7 @@ GetOptions('log-file|log|l=s' => \$log_file,
            'ghostscript|gs=s' => \$ghostscript,
            'cygwin=s' => \$cygwin,
            'cygdrive=s' => \$cygdrive,
+           'mingw32=s' => \$mingw32,
            'qvd-version|V=s' => \$qvd_version,
            'output-dir|output|o=s' => \$output_dir,
            'guid=s' => \$guid,
@@ -98,6 +101,18 @@ else {
     defined $ghostscript or die "ghostscript not found";
     -d $ghostscript or die "$ghostscript not found";
     my $ghostscript_path = path($ghostscript)->realpath;
+    my $mingw32_path = path($mingw32)->realpath;
+    -d $mingw32_path or die "$mingw32 not found";
+
+    my ($pulseaudio_pulse_path) = $pulseaudio_path->child('lib')->children(qr/^pulse-/i);
+    $pulseaudio_pulse_path // die "PulseAudio modules path not found";
+
+    my @pulse_search_path = ($pulseaudio_path->child('bin'),
+                             $pulseaudio_path->child('lib', 'bin'),
+                             $pulseaudio_pulse_path->child('bin'),
+                             $pulseaudio_pulse_path->child('modules'),
+                             $mingw32_path->child('bin'),
+                            );
 
     my @extra_exes = ( { path => $nx_libs_path->child('libexec/nxproxy.exe'),
                          search_path => $nx_libs_path->child('bin'),
@@ -106,10 +121,6 @@ else {
                          cygwin => 1 },
                        { path => $win_sftp_server_path->child('win-sftp-server.exe'),
                          subsystem => 'windows' },
-                       { path => $pulseaudio_path->child('bin', 'pulseaudio.exe'),
-                         subdir => 'pulseaudio',
-                         subsystem => 'windows',
-                         scan_deps => 0 },
                        { path => $slaveserver_wrapper_path->child('qvd-slaveserver-wrapper.exe'),
                          subsystem => 'windows',
                          subdir => 'bin',
@@ -123,13 +134,26 @@ else {
                        { path => $ghostscript_path->child('bin', 'gswin32.exe'),
                          subdir => 'ghostscript/bin',
                          subsystem => 'windows' },
+                       { path => $pulseaudio_path->child('bin', 'pulseaudio.exe'),
+                         subdir => 'pulseaudio',
+                         subsystem => 'windows',
+                         search_path => \@pulse_search_path },
                      );
+
+    my @extra_dlls = map( { path => $_,
+                            subdir => 'pulseaudio',
+                            search_path => \@pulse_search_path },
+                          $pulseaudio_pulse_path->child('modules')->children(qr/\.dll$/i) );
 
     my @extra_dirs = ( { path => $installer_path->child('pixmaps'), subdir => 'pixmaps' },
                        { path => $vcxsrv_path, subdir => 'vcxsrv' },
-                       { path => $pulseaudio_path, subdir => 'pulseaudio', skip => 'bin/pulseaudio.exe' },
+                       # { path => $pulseaudio_path, subdir => 'pulseaudio', skip => 'bin/pulseaudio.exe' },
                        { path => $ghostscript_path, subdir => 'ghostscript', skip => 'bin/gswin32.exe' },
                      );
+
+    my @extra_files = map ( { path => $_,
+                              subdir => 'pulseaudio' },
+                            $pulseaudio_path->child('etc', 'pulse')->children(qr/\.pa$/i) );
 
     my @qvd_client_modules = qw(QVD::Client QVD::Config::Core QVD::Config
                                 QVD::HTTP QVD::HTTPC QVD::HTTPD
@@ -166,6 +190,8 @@ else {
                                     X11::Protocol::Ext::XC_MISC)],
                 extra_exe => \@extra_exes,
                 extra_dir => \@extra_dirs,
+                extra_file => \@extra_files,
+                extra_dll => \@extra_dlls,
                 merge => [ { path => 'vcxsrv/vcxsrv.exe', firewall_allow => 'localhost' },
                            { path => 'pulseaudio/pulseaudio.exe', firewall_allow => 'localhost' } ],
                 keep_work_dir => $keep_work_dir,
