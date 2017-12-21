@@ -153,7 +153,8 @@ else {
 
     my @extra_files = map ( { path => $_,
                               subdir => 'pulseaudio' },
-                            $pulseaudio_path->child('etc', 'pulse')->children(qr/\.pa$/i) );
+                            $pulseaudio_path->child('etc', 'pulse')->children(qr/\.pa$/i),
+                            $qvd_src_path->child('windows', 'qvd.pa'));
 
     my @qvd_client_modules = qw(QVD::Client QVD::Config::Core QVD::Config
                                 QVD::HTTP QVD::HTTPC QVD::HTTPD

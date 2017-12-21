@@ -1,0 +1,2 @@
+load-module module-waveout
+load-module module-native-protocol-tcp auth-anonymous=1 listen=127.0.0.1 port=4713
