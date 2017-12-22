@@ -124,6 +124,9 @@ Up.I.T = {
                 templates = {
                     settingsEditor: {
                         name: 'settings/settings-editor'
+                    },
+                    settingsEditorParameters: {
+                        name: 'settings/settings-editor-parameters'
                     }
                 }
 

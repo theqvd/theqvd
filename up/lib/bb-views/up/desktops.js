@@ -19,14 +19,14 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
         // Spy mouse over elements to avoid fails with mouseleave events
         Up.I.L.spyMouseOver('.js-grid-cell-area', this.hideGridIcon);
         
-        Up.Views.ListView.prototype.initialize.apply(this, [params]);        
+        Up.Views.ListView.prototype.initialize.apply(this, [params]);
     },
     
     // This events will be added to view events
     listEvents: {
         'click .js-desktop-settings-btn': 'editDesktopSettings',
         'click .js-unblocked .js-desktop-connect-btn': 'connectDesktop',
-        'change select[name="active_configuration_select"]': 'changeActiveConf',
+        'change select[name="active_configuration_select"]': 'activeWorkspaceFromDesktops',
         'mouseover .js-unblocked .js-grid-cell-area': 'showGridIcon',
         'mouseout .js-grid-cell-area': 'hideGridIcon'
     },
@@ -47,14 +47,13 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
     },
     
     // Extend renderListBlock to fill active configuration select
-    renderListBlock: function (params) {  
-        Up.Views.ListView.prototype.renderListBlock.apply(this, []);
-        
-        // Load Workspaces on select control
+    renderListBlock: function (params) {
         var that = this;
         
-        this.wsCollection.fetch({      
+        // Load Workspaces on select control
+        this.wsCollection.fetch({
             complete: function () {
+                Up.Views.ListView.prototype.renderListBlock.apply(that, []);
                 
                 var template = _.template(
                     Up.TPL.workspacesSelectOption, {
@@ -68,7 +67,7 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
                 Up.I.Chosen.element('select[name="active_configuration_select"]', 'single');
                 Up.T.translate();
             }
-        });      
+        });
     },
     
     // Render only the list. Usefull to functions such as pagination, sorting and filtering where is not necessary render controls
@@ -99,21 +98,6 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
     afterRender: function () {
         Up.Views.ListView.prototype.afterRender.apply(this, []);        
         Up.WS.openWebsocket('desktops', Up.WS.changeWebsocketDesktops);
-    },
-    
-    changeActiveConf: function (e) {
-        var selectedId = $('select[name="active_configuration_select"]').val();
-        
-        var model = Up.CurrentView.wsCollection.where({id: parseInt(selectedId)})[0];
-        
-        var settings = model.get('settings');
-        
-        if (!settings) {            
-            Up.CurrentView.firstEditWorkspace(model);
-        }
-        else {
-            Up.CurrentView.activeWorkspace(e, model, function() {});
-        }
     },
     
     setAllDesktopsState: function (models) {
@@ -226,5 +210,12 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
                 return;
             }
         }, 1000);
+    },
+    
+    activeWorkspaceFromDesktops: function (e) {
+        var selectedId = parseInt($(e.target).val());
+        var model = Up.CurrentView.wsCollection.findWhere({id: selectedId});
+        
+        this.activeWorkspace(model, function () {});
     }
 });
