@@ -147,9 +147,6 @@ Up.L = {
         Up.C.tenantID = that.retrievedData.tenant_id;
         Up.C.tenantName = that.retrievedData.tenant_name;
         
-        // Store admin ID
-        Up.C.adminID = that.retrievedData.admin_id;   
-        
         // Store time lag between server and client
         var currentDate = new Date();
         var serverDate = new Date(that.retrievedData.server_datetime);

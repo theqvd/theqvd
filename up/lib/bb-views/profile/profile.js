@@ -17,9 +17,6 @@ Up.Views.ProfileView = Up.Views.MainView.extend({
                 
         Up.I.Chosen.configuration();
         
-        params.id = Up.C.adminID;
-        this.id = Up.C.adminID;
-        
         this.model = new Up.Models.Profile(params);
         
         // Extend the common events

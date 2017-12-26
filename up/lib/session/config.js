@@ -28,7 +28,6 @@ Up.C = {
     
     // Current admin IDs
     tenantID: -1,
-    adminID: -1,
     
     // Abort old requests when navigate or not
     abortOldRequests: true,
