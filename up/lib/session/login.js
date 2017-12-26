@@ -169,20 +169,17 @@ Up.L = {
     afterLogin: function () {
         // Load translation file
         Up.T.initTranslate();
-
+        
         // Interface configuration
         Up.I.renderMain();
-
+        
         if (Up.C.showServerClock) {
             // Start server clock
             Up.I.startServerClock();
         }
-
-        // Binding events manually because backbone doesnt allow bind events to dialogs loaded dinamically
-        Up.B.bindCommonEvents();
         
         // If the router isnt instantiate, do it
-        if (Up.Router.upRouter == undefined) {          
+        if (Up.Router.upRouter == undefined) {
             // Instantiate the router
             Up.Router.upRouter = new Up.Router;
         }
