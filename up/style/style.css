@@ -1683,7 +1683,7 @@ body {
       .wrapper .content .grid-cell .grid-cell-icon, .wrapper .content .grid-cell .grid-cell-blocked-icon {
         position: absolute;
         font-size: 54px;
-        top: 50px;
+        top: 60px;
         left: 67px;
         width: 80px;
         height: 80px;
@@ -1749,9 +1749,15 @@ body {
         color: #EBEBEB;
         word-break: break-all;
         height: 36px; }
+      /* line 225, /home/zarzuelo/code/testing/qvd-src/up/style/components/_layout-list.scss */
+      .wrapper .content .grid-cell .vm-screenshot {
+        background: url("../images/screenshot-example.png"); }
+      /* line 229, /home/zarzuelo/code/testing/qvd-src/up/style/components/_layout-list.scss */
+      .wrapper .content .grid-cell .vm-screenshot-off {
+        background: #4d4d4d; }
       /* line 234, /home/zarzuelo/code/testing/qvd-src/up/style/components/_layout-list.scss */
       .wrapper .content .grid-cell .vm-screenshot, .wrapper .content .grid-cell .vm-screenshot-off {
-        background-size: auto 100%;
+        background-size: 100% 100%;
         background-position: center;
         background-repeat: no-repeat;
         width: 100%;
@@ -1763,21 +1769,24 @@ body {
           .wrapper .content .grid-cell .vm-screenshot, .wrapper .content .grid-cell .vm-screenshot-off {
             margin-top: 5px;
             margin-bottom: 5px; } }
-    /* line 254, /home/zarzuelo/code/testing/qvd-src/up/style/components/_layout-list.scss */
+      /* line 251, /home/zarzuelo/code/testing/qvd-src/up/style/components/_layout-list.scss */
+      .wrapper .content .grid-cell .vm-screenshot--hover {
+        opacity: 0.4; }
+    /* line 258, /home/zarzuelo/code/testing/qvd-src/up/style/components/_layout-list.scss */
     .wrapper .content .row-desktop.row-connected td:first-child, .wrapper .content .row-desktop.row-reconnecting td:first-child {
       background: #6dad3c;
       color: #EBEBEB; }
-    /* line 260, /home/zarzuelo/code/testing/qvd-src/up/style/components/_layout-list.scss */
+    /* line 264, /home/zarzuelo/code/testing/qvd-src/up/style/components/_layout-list.scss */
     .wrapper .content .row-desktop.blocked {
       opacity: 0.5; }
-    /* line 265, /home/zarzuelo/code/testing/qvd-src/up/style/components/_layout-list.scss */
+    /* line 269, /home/zarzuelo/code/testing/qvd-src/up/style/components/_layout-list.scss */
     .wrapper .content div.list {
       padding-right: 10px; }
       @media screen and (min-width: 41em) {
-        /* line 265, /home/zarzuelo/code/testing/qvd-src/up/style/components/_layout-list.scss */
+        /* line 269, /home/zarzuelo/code/testing/qvd-src/up/style/components/_layout-list.scss */
         .wrapper .content div.list {
           margin-left: 55px; } }
-    /* line 273, /home/zarzuelo/code/testing/qvd-src/up/style/components/_layout-list.scss */
+    /* line 277, /home/zarzuelo/code/testing/qvd-src/up/style/components/_layout-list.scss */
     .wrapper .content .section-container {
       padding: 35px 65px 0px 65px;
       width: 100%; }
