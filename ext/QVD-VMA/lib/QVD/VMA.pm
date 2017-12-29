@@ -521,7 +521,7 @@ sub _fork_monitor {
                 say "Unable to start X server: " .($@ || $!);
                 POSIX::_exit(1);
             }
-
+            
             while(defined (my $line = <$out>)) {
                 given ($line) {
                     when (/Info: Agent running with pid '(\d+)'/) {
@@ -532,19 +532,21 @@ sub _fork_monitor {
                         my $state = lc $1;
                         if ($state eq 'suspended') {
                             _umount_remote_shares($props{'qvd.vm.user.home'});
+                            _suspend_pulseaudio($pulse_proc, $props{'qvd.vm.user.name'});
                         }
-                        DEBUG "Session $1, calling hooks";
+                        DEBUG "Session $state, calling hooks";
                         _save_nxagent_state_and_call_hook $state;
                     }
                     when (/Session: Session (\w+) at/) {
                         my $state = lc $1;
                         if ($state eq 'suspended') {
                             _umount_remote_shares($props{'qvd.vm.user.home'});
+                            _suspend_pulseaudio($pulse_proc, $props{'qvd.vm.user.name'});
                         }
-                        DEBUG "Session $1, calling hooks";
+                        DEBUG "Session $state, calling hooks";
                         _save_nxagent_state_and_call_hook $state;
     
-                        if ( $1 =~ /term|abort|suspend/i ) {
+                        if ( $state =~ /term|abort|suspend/i ) {
                             _stop_process($pulse_proc, "PulseAudio");
                             undef $pulse_proc;
                         }
@@ -567,7 +569,14 @@ sub _fork_monitor {
                         DEBUG "Multimedia channel opened on port $pa_port";
 
                         if ( $enable_audio ) {
+                            if ( $pulse_proc ) {
+                                DEBUG "PulseAudio already running under pid $pulse_proc, reestablishing channel";
+                                _bgrun({user => $props{'qvd.vm.user.name'}}, "pacmd", "load-module", "module-tunnel-sink-new", "sink_name=QVD_Audio",
+                                                                             "server=tcp:127.0.0.1:7100", "sink=\@DEFAULT_SINK\@", "compression=opus");
+                            } else {
+                                DEBUG "PulseAudio not running, starting";
                                 $pulse_proc = _start_pulseaudio($pa_port, $props{'qvd.vm.user.name'});
+                            }
                         }
                     }
                 }
@@ -988,6 +997,17 @@ sub _bgrun {
     }
 
 }
+
+sub _suspend_pulseaudio {
+    my ($pid, $user) = @_;
+    if ( $pid ) {
+        DEBUG "Suspending PulseAudio for user $user";
+        _bgrun({user => $user}, "pacmd", "unload-module", "module-tunnel-sink-new");
+    } else {
+        DEBUG "PulseAudio not running, not suspending";
+    }
+}
+
 sub _run {
 	my @cmd = @_;
 	my $cmdstr = join(' ', @cmd);
