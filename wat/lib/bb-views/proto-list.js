@@ -565,7 +565,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         var view = embeddedView ? Wat.CurrentView.embeddedViews[embeddedView] : Wat.CurrentView;
         
-        Wat.I.updateSelectedItems(this.selectedItems.length, view);
+        Wat.I.updateSelectedItemsMenu(this.selectedItems.length, view);
     },
     
     // Set as checked all the checkboxes of a list and store the IDs
@@ -594,7 +594,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                                 that.selectedItems.push(parseInt($(checkbox).attr('data-id')));
                             });
                             Wat.I.closeDialog($(this));
-                            Wat.I.updateSelectedItems(that.selectedItems.length, view);
+                            Wat.I.updateSelectedItemsMenu(that.selectedItems.length, view);
                         },
                         "Select all": function () {
                             $('.js-check-it[data-check-id="' + checkId + '"]').prop("checked", true);
@@ -614,12 +614,12 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 $.each($('.js-check-it[data-check-id="' + checkId + '"]'), function (iCheckbox, checkbox) {
                     that.selectedItems.push(parseInt($(checkbox).attr('data-id')));
                 });
-                Wat.I.updateSelectedItems(that.selectedItems.length, view);
+                Wat.I.updateSelectedItemsMenu(that.selectedItems.length, view);
             }
         } else {
             $('.js-check-it[data-check-id="' + checkId + '"]').prop("checked", false);
             this.resetSelectedItems ();
-            Wat.I.updateSelectedItems(this.selectedItems.length, view);
+            Wat.I.updateSelectedItemsMenu(this.selectedItems.length, view);
         }
     },
     
@@ -634,7 +634,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         }
         
         Wat.I.closeDialog(that.dialog);
-        Wat.I.updateSelectedItems(that.selectedItems.length);
+        Wat.I.updateSelectedItemsMenu(that.selectedItems.length);
         that.selectedAll = true;
     },
     
@@ -856,7 +856,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         this.paginationUpdate();
         this.shownElementsLabelUpdate();
         
-        Wat.I.updateSelectedItems(this.selectedItems.length, this);
+        Wat.I.updateSelectedItemsMenu(this.selectedItems.length, this);
         
         // Open websockets for live fields
         if (this.liveFields) {

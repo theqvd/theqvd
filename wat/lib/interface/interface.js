@@ -706,8 +706,8 @@ Wat.I = {
     },
     
     
-    // Update the indicator of selected items situated under the list table
-    updateSelectedItems: function (selectedItems, that) {
+    // Update the options panel depending on the selected items
+    updateSelectedItemsMenu: function (selectedItems, that) {
         var that = that || Wat.CurrentView;
         
         if (selectedItems == 0) {
@@ -716,23 +716,19 @@ Wat.I = {
         else {
             this.showSelectedItemsMenu(that.selectedActions, that.cid);
             
-            if (selectedItems == 1) {
-                $('.js-only-massive[data-cid="' + that.cid + '"]').hide();
-                $('.js-only-one[data-cid="' + that.cid + '"]').show();
-            }
-            else {
-                $('.js-only-one[data-cid="' + that.cid + '"]').hide();
-                $('.js-only-massive[data-cid="' + that.cid + '"]').show();
-            }
-            
-            this.checkVisibilityConditions(that);
+            this.applyVisibilityConditions(that, selectedItems);
         }
         
+        // Update selected items indicator
         $('.elements-selected[data-cid="' + that.cid + '"]').html(selectedItems);
     },
     
-    checkVisibilityConditions: function (that) {
+    applyVisibilityConditions: function (that, selectedItems) {
         var that = that || Wat.CurrentView;
+        var selectedItems = selectedItems || that.selectedItems.length;
+            
+        $('.js-selected-actions-button').show();
+        
         if ($('[data-visibility-conditioned]').length > 0) {
             $.each($('[data-visibility-conditioned]'), function (i, element) {
                 var conditionType = $(element).attr('data-visibility-cond-type');
@@ -796,6 +792,15 @@ Wat.I = {
                     $(element).show();
                 }
             });
+        }
+            
+        if (selectedItems == 1) {
+            $('.js-only-massive[data-cid="' + that.cid + '"]').hide();
+            //$('.js-only-one[data-cid="' + that.cid + '"]').show();
+        }
+        else {
+            $('.js-only-one[data-cid="' + that.cid + '"]').hide();
+            //$('.js-only-massive[data-cid="' + that.cid + '"]').show();
         }
     },
 

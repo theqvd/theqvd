@@ -212,7 +212,7 @@ Wat.WS = {
             
             $.each(row, function (field, value) {
                 // Check visibility conditions of the selected items dialog. Usefull when this dialog is opened during websockets changes
-                Wat.I.checkVisibilityConditions();
+                Wat.I.applyVisibilityConditions();
                 
                 switch (qvdObj) {
                     case 'vm':
