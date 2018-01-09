@@ -24,6 +24,8 @@ Wat.Views.OSDPackagesEditorView = Wat.Views.OSDEditorView.extend({
     },
     
     renderPackages: function() {
+        $('.bb-packages-wrapper').html(HTML_MODAL_LOADING);
+        
         var params = {};
         params.whatRender = 'list';
         params.listContainer = '.bb-packages-wrapper';

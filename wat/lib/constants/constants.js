@@ -246,6 +246,7 @@ DEFAULT_OSF_MEMORY = 256;
 UNCLASSIFIED_CONFIG_CATEGORY = 'unclassified';
 
 // Html pieces
+HTML_MODAL_LOADING = '<div class="modal-loading"><i class="fa fa-gear fa-spin"></i></div>';
 HTML_MICRO_LOADING = '<div class="micro-loading"><i class="fa fa-gear fa-spin"></i></div>';
 HTML_MINI_LOADING = '<div class="mini-loading"><i class="fa fa-gear fa-spin"></i></div>';
 HTML_LOADING = '<div class="loading"><i class="fa fa-gear fa-spin"></i></div>';

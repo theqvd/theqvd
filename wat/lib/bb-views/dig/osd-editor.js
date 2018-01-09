@@ -29,13 +29,22 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
         
         $(this.el).html(template);
         
-        // Render sections
+        // Sections data to be rendered on demand
+        this.sectionClasses = {
+            settings: Wat.Views.OSDSettingsEditorView,
+            packages: Wat.Views.OSDPackagesEditorView,
+            shortcuts: Wat.Views.OSDShortcutsEditorView,
+            appearance: Wat.Views.OSDAppearenceEditorView,
+            hooks: Wat.Views.OSDHooksEditorView,
+        };
+        
+        // Section views. Only default one is rendered in first place
         this.sectionViews = {
             settings: new Wat.Views.OSDSettingsEditorView({massive: this.massive}),
-            packages: new Wat.Views.OSDPackagesEditorView({massive: this.massive}),
-            shortcuts: new Wat.Views.OSDShortcutsEditorView({massive: this.massive}),
-            appearance: new Wat.Views.OSDAppearenceEditorView({massive: this.massive}),
-            hooks: new Wat.Views.OSDHooksEditorView({massive: this.massive}),
+            packages: {},
+            shortcuts: {},
+            appearance: {},
+            hooks: {},
         };
         
         Wat.I.chosenElement('select.js-app-to-shortcut', 'single100');
@@ -112,7 +121,15 @@ Wat.Views.OSDEditorView = Wat.Views.DialogView.extend({
         $('.js-os-editor-panel').hide();
         $('li.lateral-menu-option[data-target="' + target + '"]').addClass('lateral-menu-option--selected');
         $('li.js-lateral-menu-sub-div[data-from-menu="' + target +'"]').show();
+        $('li.js-lateral-menu-sub-div[data-from-menu="' + target +'"]').html('loading');
         $('.js-os-editor-panel[data-target="' + target + '"]').show();
+        
+        // First time that a section is loaded, class is instantiated
+        if (Object.keys(this.sectionViews[target]).length === 0) {
+            var sClass = this.sectionClasses[target];
+            
+            this.sectionViews[target] = new sClass({massive: this.massive});
+        }
         
         this.sectionViews[target].afterLoadSection();
     },

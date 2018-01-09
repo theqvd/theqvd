@@ -29,6 +29,8 @@ Wat.Views.OSDShortcutsEditorView = Wat.Views.OSDEditorView.extend({
         
         $('.bb-os-conf-shortcuts').html(template);
         
+        Wat.T.translate();
+        
         Wat.CurrentView.OSDmodel.pluginData.shortcut.fetch({
             success: function () {
                 // Render rows with existent shortcuts

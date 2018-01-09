@@ -39,6 +39,8 @@ Wat.Views.OSDHooksEditorView = Wat.Views.OSDEditorView.extend({
         
         $('.bb-os-conf-hooks').html(template);
         
+        Wat.T.translate();
+        
         Wat.CurrentView.OSDmodel.pluginData.hook.fetch({
             success: function () {
                 // Fetch scripts and load images on list

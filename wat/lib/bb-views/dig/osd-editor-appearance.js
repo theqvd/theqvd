@@ -27,9 +27,11 @@ Wat.Views.OSDAppearenceEditorView = Wat.Views.OSDEditorView.extend({
                         cid: that.cid
                     }
                 );
-
+                
                 $('.bb-os-conf-appearance').html(template);
-
+                
+                Wat.T.translate();
+                
                 that.renderAssetsControl({
                     assetType: 'wallpaper',
                     pluginId: 'wallpaper'

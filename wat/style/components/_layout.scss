@@ -230,6 +230,19 @@ body {
     line-height: 0;
 }
 
+.modal-loading {
+    width: 100%;
+    margin-top: 50px;
+    text-align: center;
+    color: darken($col_whiter, 10);
+    
+    i {
+        font-size: 50px !important;
+        line-height: 50px !important;
+        width: 50px !important;
+    }
+}
+
 .side-component {
     .mini-loading {
         color: darken($col_whiter, 20);
