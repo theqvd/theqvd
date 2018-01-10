@@ -707,26 +707,22 @@ Wat.I = {
     
     
     // Update the options panel depending on the selected items
-    updateSelectedItemsMenu: function (selectedItems, that) {
-        var that = that || Wat.CurrentView;
-        
-        if (selectedItems == 0) {
+    updateSelectedItemsMenu: function (that) {
+        if (that.selectedItems.length == 0) {
             this.hideSelectedItemsMenu(that.cid);
         }
         else {
             this.showSelectedItemsMenu(that.selectedActions, that.cid);
             
-            this.applyVisibilityConditions(that, selectedItems);
+            this.applyVisibilityConditions(that);
         }
         
         // Update selected items indicator
-        $('.elements-selected[data-cid="' + that.cid + '"]').html(selectedItems);
+        $('.elements-selected[data-cid="' + that.cid + '"]').html(that.selectedItems.length);
     },
     
-    applyVisibilityConditions: function (that, selectedItems) {
-        var that = that || Wat.CurrentView;
-        var selectedItems = selectedItems || that.selectedItems.length;
-            
+    applyVisibilityConditions: function (that) {
+        // Reset all buttons visibility and then apply conditions
         $('.js-selected-actions-button').show();
         
         if ($('[data-visibility-conditioned]').length > 0) {
@@ -794,13 +790,11 @@ Wat.I = {
             });
         }
             
-        if (selectedItems == 1) {
+        if (that.selectedItems.length == 1) {
             $('.js-only-massive[data-cid="' + that.cid + '"]').hide();
-            //$('.js-only-one[data-cid="' + that.cid + '"]').show();
         }
         else {
             $('.js-only-one[data-cid="' + that.cid + '"]').hide();
-            //$('.js-only-massive[data-cid="' + that.cid + '"]').show();
         }
     },
 
