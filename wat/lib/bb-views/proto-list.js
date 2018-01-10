@@ -1141,7 +1141,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
             },
             Update: function () {
                 that.dialog = $(this);
-                that.updateMassiveElement($(this), that.selectedItems);
+                that.editorView.updateMassiveElement($(this), that.selectedItems);
             }
         };
         
