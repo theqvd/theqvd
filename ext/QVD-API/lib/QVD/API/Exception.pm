@@ -86,6 +86,7 @@ my $code2message_mapper = {
     5120 => 'Unable to stop VM in current state',
     5130 => 'Unable to start VM in current state',
     5140 => 'Unable to assign host, no host available',
+    5200 => 'Unable to delete current administrator',
 
     6100 => 'Syntax errors in input json',
     6210 => 'Inappropiate filter for this action',

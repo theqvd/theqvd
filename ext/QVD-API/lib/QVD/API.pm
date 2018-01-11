@@ -317,6 +317,26 @@ sub di_delete {
                                              di_delete_disk_image)]} );
 }
 
+# Ad hoc function to admin_delete action of API
+
+sub admin_delete {
+    my ($self, $request) = @_;
+    
+    my $results = $self->select($request);
+    
+    for my $admin (@{$results->{rows}}) {
+        if($request->administrator->name eq $admin->name) {
+            QVD::API::Exception->throw(code => 5200, query => 'delete');
+        }
+    }
+    
+    $self->delete($request);
+    
+    $results->{rows} = [];
+    
+    return $results;
+}
+
 # It deletes config tokens in the database only when tokens
 # are custom tokens (they are present neither in Defaults.pm nor in config files) 
  

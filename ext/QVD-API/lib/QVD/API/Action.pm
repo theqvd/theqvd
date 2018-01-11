@@ -541,8 +541,8 @@ my $ACTIONS = {
 
 	administrator_delete => {
 		type_of_action => 'delete',
-		  admin4method => 'delete',
-		  acls => [qr/^administrator\.delete\./,qr/^tenant\.purge\.$/],
+		admin4method => 'admin_delete',
+		acls => [qr/^administrator\.delete\./,qr/^tenant\.purge\.$/],
 		qvd_object => 'Administrator'
 	},
 
