@@ -124,6 +124,7 @@ my $code2message_mapper = {
     7230 => 'This role has already been assigned',
     7310 => 'Unable to remove VM - This VM is running',
     7320 => 'Unable to remove DI - There are VMs running with it',
+    7321 => 'Unable to remove Host - The host is running',
     7330 => 'Unable to reassign a Tag fixed to another DI',
     7340 => 'Fixed, Head and Default Tags cannot be deleted',
     7350 => 'Forbidden role assignment, inherited role inherits from inheritor',

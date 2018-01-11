@@ -309,7 +309,7 @@ my $ACTIONS = {
 
 	host_delete => {
 		type_of_action => 'delete',
-		 admin4method => 'delete',
+		 admin4method => 'host_delete',
 		 acls => [qr/^host\.delete\.$/],
 		qvd_object => 'Host'
 	},

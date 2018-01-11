@@ -317,6 +317,14 @@ sub di_delete {
                                              di_delete_disk_image)]} );
 }
 
+# Ad hoc function to host_delete action of API
+
+sub host_delete
+{
+    my ($self,$request) = @_;
+    $self->delete($request, {conditions => [qw(host_is_not_running)]} );
+}
+
 # Ad hoc function to admin_delete action of API
 
 sub admin_delete {
@@ -1116,6 +1124,15 @@ sub di_no_dependant_vms
 					  { join => [qw(di)] });
         QVD::API::Exception->throw(code => 7120, query => 'delete') 
 	    if $rs->count;
+}
+
+# Check if a host is not running
+
+sub host_is_not_running
+{
+    my ($self,$host) = @_;
+    QVD::API::Exception->throw(code => 7321, query => 'delete')
+        unless $host->runtime->state ne "running";
 }
 
 # When deleting a di with head or default tags, 
