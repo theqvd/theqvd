@@ -227,33 +227,38 @@ sub get_acls_in_roles
 
 sub update
 {
-	my ($self,$request,$modifiers) = @_;
+    my ($self,$request,$modifiers) = @_;
     my $result = $self->select($request);
     QVD::API::Exception->throw(code => 1300) unless $result->{total};
-	$modifiers //= {};
-	my $conditions = $modifiers->{conditions} // [];
-
+    $modifiers //= {};
+    my $conditions = $modifiers->{conditions} // [];
+    
     my $failures;
     for my $obj (@{$result->{rows}})
     {
-		eval {
-			$DB->txn_do( sub {
-				$self->$_($obj) for @$conditions;
-				  # Update the main object
-				  $obj->update($request->arguments);                 
-                                  # Update tables related to the main object (i.e. vm_runtimes for vms)
-				  $self->update_related_objects($request,$obj);      
-                                  # Assign and unassign other objects to the main objects (i.e. tags for dis, acls for roles, properties for vms...)
-				$self->exec_nested_queries($request,$obj);
-			} )
-		};
-	$failures->{$obj->id} = QVD::API::Exception->new(exception => $@, query => 'update')->json if $@; 
-
-	$self->report_in_log($request,$obj,$failures && exists $failures->{$obj->id} ? $failures->{$obj->id}->{status} : 0);
+        eval {
+            $DB->txn_do( sub {
+                $self->$_($obj) for @$conditions;
+                # Update the main object
+                $obj->update($request->arguments);
+                # Update tables related to the main object (i.e. vm_runtimes for vms)
+                $self->update_related_objects($request,$obj);
+                # Assign and unassign other objects to the main objects (i.e. tags for dis, acls for roles, properties for vms...)
+                $self->exec_nested_queries($request,$obj);
+            } )
+        };
+        my $status = 0;
+        if($@) {
+            my $exception = QVD::API::Exception->new(exception => $@, query => 'update');
+            $status = $exception->code;
+            $failures->{$obj->id} = $exception;
+        }
+        
+        $self->report_in_log($request,$obj,$status);
     }
-
-    QVD::API::Exception->throw(failures => $failures) 
-	if defined $failures; 
+    
+    QVD::API::Exception->throw(failures => $failures)
+        if defined $failures;
     $result->{rows} = [];
     $result;
 }
@@ -273,26 +278,32 @@ sub update_related_objects
 
 sub delete
 {
-	my ($self,$request,$modifiers) = @_;
+    my ($self,$request,$modifiers) = @_;
     my $result = $self->select($request,$modifiers);
     QVD::API::Exception->throw(code => 1300) unless $result->{total};
-
-	$modifiers //= {};
-	my $conditions = $modifiers->{conditions} // [];
+    
+    $modifiers //= {};
+    my $conditions = $modifiers->{conditions} // [];
     my $failures;
     for my $obj (@{$result->{rows}})
     {
-		eval {
-			$self->$_($obj) for @$conditions;
-			$obj->delete;
-		};
-
-	$failures->{$obj->id} = QVD::API::Exception->new(exception => $@,query => 'delete')->json if $@;
-    	$self->report_in_log($request,$obj,$failures && exists $failures->{$obj->id} ? $failures->{$obj->id}->{status} : 0);
+        eval {
+            $self->$_($obj) for @$conditions;
+            $obj->delete;
+        };
+    
+        my $status = 0;
+        if($@) {
+            my $exception = QVD::API::Exception->new(exception => $@, query => 'delete');
+            $status = $exception->code;
+            $failures->{$obj->id} = $exception;
+        }
+        
+        $self->report_in_log($request,$obj,$status);
     }
-    QVD::API::Exception->throw(failures => $failures) 
-	if defined $failures; 
-
+    QVD::API::Exception->throw(failures => $failures)
+        if defined $failures;
+    
     $result->{rows} = [];
     $result;
 }
@@ -583,20 +594,24 @@ sub vm_user_disconnect
 {
     my ($self,$request) = @_;
     my $result = $self->select($request);
-
+    
     my $failures;
     for my $vm (@{$result->{rows}})
     {
-	eval { $vm->vm_runtime->send_user_abort  };   
-	
-	$failures->{$vm->id} = QVD::API::Exception->new(
-	    code => 5110, object => $vm->vm_runtime->user_state)->json if $@; 
-
-	$self->report_in_log($request,$vm,$failures && exists $failures->{$vm->id} ? $failures->{$vm->id}->{status} : 0);
+        eval { $vm->vm_runtime->send_user_abort  };
+    
+        my $status = 0;
+        if($@) {
+            my $exception = QVD::API::Exception->new(code => 5110, object => $vm->vm_runtime->user_state);
+            $status = $exception->code;
+            $failures->{$vm->id} = $exception;
+        }
+        
+        $self->report_in_log($request,$vm,$status);
     }
-    QVD::API::Exception->throw(failures => $failures) 
-	if defined $failures;  
-
+    QVD::API::Exception->throw(failures => $failures)
+        if defined $failures;
+    
     $result->{rows} = [];
     $result;
 }
@@ -604,31 +619,37 @@ sub vm_user_disconnect
 sub vm_start
 {
     my ($self,$request) = @_;
-
+    
     my $result = $self->select($request);
     my ($failures, %host);
-
+    
     for my $vm (@{$result->{rows}})
     {
-		eval {
-			$DB->txn_do( sub {
-		  $vm->vm_runtime->can_send_vm_cmd('start')  ||
-		  QVD::API::Exception->throw(code => 5130, 
-					      object => $vm->vm_runtime->vm_state);
-		  $self->vm_assign_host($vm->vm_runtime);
-		  $vm->vm_runtime->send_vm_start;
-		  $host{$vm->vm_runtime->host_id}++;}
-			) };
-
-	$failures->{$vm->id} = QVD::API::Exception->new(exception => $@)->json if $@; 
-	$self->report_in_log($request,$vm,$failures && exists $failures->{$vm->id} ? $failures->{$vm->id}->{status} : 0);
+        eval {
+            $DB->txn_do( sub {
+                $vm->vm_runtime->can_send_vm_cmd('start')  ||
+                    QVD::API::Exception->throw(code => 5130,
+                        object => $vm->vm_runtime->vm_state);
+                $self->vm_assign_host($vm->vm_runtime);
+                $vm->vm_runtime->send_vm_start;
+                $host{$vm->vm_runtime->host_id}++;}
+            ) };
+    
+        my $status = 0;
+        if($@) {
+            my $exception = QVD::API::Exception->new(exception => $@);
+            $status = $exception->code;
+            $failures->{$vm->id} = $exception;
+        }
+        
+        $self->report_in_log($request,$vm,$status);
     }
-
+    
     notify("qvd_admin4_vm_start");
     notify("qvd_cmd_for_vm_on_host$_") for keys %host;
-    QVD::API::Exception->throw(failures => $failures) 
-	if defined $failures;  
-
+    QVD::API::Exception->throw(failures => $failures)
+        if defined $failures;
+    
     $result->{rows} = [];
     $result;
 }
@@ -636,32 +657,38 @@ sub vm_start
 sub vm_stop
 {
     my ($self,$request) = @_;
-
+    
     my $result = $self->select($request);
     my ($failures, %host);
-
+    
     for my $vm (@{$result->{rows}})
     {
-		eval {
-			$DB->txn_do( sub {
-		  $vm->vm_runtime->send_vm_stop;
-		  $host{$vm->vm_runtime->host_id}++; }
-			) };
-       
-	$failures->{$vm->id} = QVD::API::Exception->new(
-	    code => 5120, object => $vm->vm_runtime->vm_state)->json if $@; 
-	$self->report_in_log($request,$vm,$failures && exists $failures->{$vm->id} ? $failures->{$vm->id}->{status} : 0);
-	$vm->vm_runtime->update({ vm_cmd => undef })
-	    if $vm->vm_runtime->vm_state eq 'stopped' &&
-	    $vm->vm_runtime->vm_cmd                   &&
-	    $vm->vm_runtime->vm_cmd eq 'start'; 
+        eval {
+            $DB->txn_do( sub {
+                $vm->vm_runtime->send_vm_stop;
+                $host{$vm->vm_runtime->host_id}++; }
+            ) };
+    
+        my $status = 0;
+        if($@) {
+            my $exception = QVD::API::Exception->new(code => 5120, object => $vm->vm_runtime->vm_state);
+            $status = $exception->code;
+            $failures->{$vm->id} = $exception;
+        }
+        
+        $self->report_in_log($request,$vm,$status);
+        
+        $vm->vm_runtime->update({ vm_cmd => undef })
+            if $vm->vm_runtime->vm_state eq 'stopped' &&
+                $vm->vm_runtime->vm_cmd                   &&
+                $vm->vm_runtime->vm_cmd eq 'start';
     }
-
+    
     notify("qvd_admin4_vm_stop");
     notify("qvd_cmd_for_vm_on_host$_") for keys %host;
-    QVD::API::Exception->throw(failures => $failures) 
-	if defined $failures;  
-
+    QVD::API::Exception->throw(failures => $failures)
+        if defined $failures;
+    
     $result->{rows} = [];
     $result;
 }
