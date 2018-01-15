@@ -301,6 +301,10 @@ Wat.Views.MainView = Backbone.View.extend({
                     return;
                 }
                 
+                if (Wat.I.isDialogButtonDisabled('create')) {
+                    return;
+                }
+                
                 that.dialog = $(this);
                 Wat.CurrentView.editorView.createElement($(this));
                 
@@ -356,6 +360,11 @@ Wat.Views.MainView = Backbone.View.extend({
                 var valid = Wat.CurrentView.editorView.validateForm();
                 
                 if (!valid) {
+                    return;
+                }
+
+                
+                if (Wat.I.isDialogButtonDisabled('update')) {
                     return;
                 }
                 

@@ -20,6 +20,8 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
     },
     
     renderCreate: function (target, that) {
+        Wat.I.disableDialogButton('create');
+        
         if (Wat.CurrentView.qvdObj == 'osf') {
             this.model = new Wat.Models.DI();
         }
@@ -42,8 +44,8 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
             'chosenType': 'advanced100'
         };
         
-        Wat.A.fillSelect(params); 
-
+        Wat.A.fillSelect(params);
+        
         // If main view is osf view, we are creating a disk image from osf details view. 
         // OSF and tenant (if exists) controls will be removed
         if (Wat.CurrentView.qvdObj == 'osf') {
@@ -317,6 +319,8 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
     toggleSoftwareFields: function (osfId) {
         var that = this;
         
+        Wat.I.disableDialogButton('create');
+        
         var osfModel = new Wat.Models.OSF({ id: osfId });
         
         osfModel.fetch ({
@@ -338,11 +342,18 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
                             mode : 'shrinked',
                             container: '.' + that.cid
                         });
+                        
+                        // If OSD name is not available in the model, means that query has failed, so element cannot be created and creation button will not be enabled
+                        if (OSDmodel.get('name')) {
+                            Wat.I.enableDialogButton('create');
+                        }
                     });
                 }
                 else { 
                     $('.js-osd-row').addClass('hidden-by-conf');
                     $('.js-custom-image-row').removeClass('hidden-by-conf');
+                    
+                    Wat.I.enableDialogButton('create');
                 }
             }
         });

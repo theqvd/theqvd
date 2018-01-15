@@ -1207,5 +1207,28 @@ Wat.I = {
         }
         
         return visibilityConditionAttrs;
+    },
+    
+    isDialogButtonDisabled: function (code) {
+        var button = this.getDialogButtonFromCode(code);
+        
+        return $(button).hasClass('disabled');
+    },
+    
+    disableDialogButton: function (code) {
+        var button = this.getDialogButtonFromCode(code);
+        
+        $(button).addClass('disabled');
+    },
+    
+    enableDialogButton: function (code) {
+        var button = this.getDialogButtonFromCode(code);
+        
+        $(button).removeClass('disabled');
+    },
+    
+    // Return dialog buttonsets button using js-button-CODE class to locate it
+    getDialogButtonFromCode: function (code) {
+        return $('.ui-dialog-buttonset button .js-button-' + code).closest('button');
     }
 }
