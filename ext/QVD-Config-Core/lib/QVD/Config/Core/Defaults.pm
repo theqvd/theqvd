@@ -770,3 +770,7 @@ internal.l7r.nothing.timeout.run_forwarder = 5
 internal.untar-dis.lock.path = ${path.run}/untar-dis.lock
 
 wat.multitenant = 1
+
+## Disk Image Generator (DIG) parameters
+api.proxy.dig.address = http://localhost:9000
+api.proxy.dig.enabled = 0
