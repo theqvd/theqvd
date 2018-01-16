@@ -808,6 +808,15 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         clearInterval(that.interval);
         
+        var isEmbedded = that.cid != Wat.CurrentView.cid;
+        
+        var enabledCreation = true;
+        if (isEmbedded) {
+            if (that.listActionButton && that.listActionButton.isEnabledByParentId && !that.listActionButton.isEnabledByParentId(Wat.CurrentView.model.get('id'))) {
+                enabledCreation = false;
+            }
+        }
+        
         // Fill the list
         var template = _.template(
             Wat.TPL.listCommonBlock, {
@@ -815,7 +824,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 selectedActions: that.selectedActions,
                 listActionButton: that.listActionButton,
                 cid: this.cid,
-                qvdObj: this.qvdObj
+                qvdObj: this.qvdObj,
+                enabledCreation: enabledCreation
             }
         );
         

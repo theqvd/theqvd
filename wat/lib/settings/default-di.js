@@ -544,7 +544,8 @@ Wat.I.listActionButton[qvdObj] = {
             'name': 'new_di_button',
             'value': 'New Disk image',
             'link': 'javascript:',
-            'acl': 'di.create.'
+            'acl': 'di.create.',
+            'isEnabledByParentId': Wat.C.isOsfDigEnabled
         };
 
 // Breadcrumbs configuration on list view

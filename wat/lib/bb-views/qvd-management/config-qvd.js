@@ -549,6 +549,11 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
                         Wat.I.renderFooter();
                     }, that);
                 }
+                
+                // Refresh DIG configuration after create/update any dig token
+                if (that.retrievedData.rows[0].key.substring(0,13) == 'api.proxy.dig') {
+                    Wat.C.getDigConfig(function () {});
+                }
             }
         },
     

@@ -52,7 +52,7 @@
                  }); 
              %>
         </div>
-        <% if (listActionButton !== null && Wat.C.checkACL(listActionButton.acl)) { %>
+        <% if (enabledCreation && listActionButton !== null && Wat.C.checkACL(listActionButton.acl)) { %>
             <div class="action-new-item">
                 <a class="js-traductable_button js-button-new actions_button button fa fa-plus-circle" data-qvd-obj="<%= qvdObj %>" name="<%= listActionButton.name %>" href="<%= listActionButton.link %>" data-i18n="<%= listActionButton.value %>"></a>
             </div>

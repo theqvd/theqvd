@@ -43,6 +43,9 @@ Wat.C = {
     // Show a clock with server's time
     showServerClock: false,
     
+    // Availability of Disk Image Generator system
+    digEnabled: false,
+    
     // Init Api address configuration
     initApiAddress: function () {
         var apiPath = '/api/';
@@ -643,5 +646,59 @@ Wat.C = {
         // if auto get first two characters from i18n language to get ISO 639-1 format. 
         // Example: Convert 'en_US' to 'en'
         return lan == "auto" ? window.i18n.lng().substr(0, 2) : lan;
+    },
+    
+    // Retrieve from API the DIG enable parameter, store it on digEnabled configuration variable and execute callback function
+    getDigConfig: function (callback) {
+        var filter = {
+            key: 'api.proxy.dig.enabled'
+        };
+        
+        if (Wat.C.isSuperadmin()) {
+            filter['tenant_id'] = -1;
+        }
+        
+        // Retrieve from API current prefix tokens
+        Wat.A.performAction('config_get', {}, filter, {}, function (result) {
+            Wat.C.digEnabled = result.retrievedData.rows[0] ? parseInt(result.retrievedData.rows[0].operative_value) : 0;
+            
+            callback();
+        }, this);
+    },
+    
+    isDIGEnabled: function () {
+        return Wat.C.digEnabled;
+    },
+    
+    isOsfDigEnabled: function (osfIdList, that) {
+        // Convert to array to just one id cases
+        var osfIdList = [osfIdList];
+        
+        var view = that || Wat.U.getViewFromQvdObj('osf');
+        
+        // Get number of OSFs with assigned OSD
+        var nOsfsWithOsd = 0;
+        $.each(osfIdList, function (i, osfId) {
+            switch (view.viewKind) {
+                case 'details':
+                    var osdId = view.model.get('osd_id');
+                    break;
+                case 'list':
+                    var osdId = view.collection.findWhere({id: parseInt(osfId)}).get('osd_id');
+                    break;
+            }
+            
+            if (osdId) {
+                nOsfsWithOsd++;
+            }
+        });
+        
+        // If DIG is not enabled and one or more OSF have assigned OSD, DI creation will be disabled (will not appear)
+        if (!Wat.C.isDIGEnabled() && nOsfsWithOsd > 0) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 }

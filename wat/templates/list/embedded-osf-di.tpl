@@ -5,7 +5,9 @@
                 <input type="checkbox" class="check_all" data-check-id="<%= osfId %>" data-embedded-view="di">
             </th>
             <th colspan=4>
-                <a class="js-traductable_button js-button-new actions_button button fa fa-plus-circle" data-qvd-obj="di" name="new_di_button" href="javascript:" data-i18n="New Disk image" data-osf-id="<%= osfId %>"></a>
+                <% if (enabledCreation && Wat.C.checkACL('di.create.')) { %>
+                    <a class="js-traductable_button js-button-new actions_button button fa fa-plus-circle" data-qvd-obj="di" name="new_di_button" href="javascript:" data-i18n="New Disk image" data-osf-id="<%= osfId %>"></a>
+                <% } %>
             </th>
         </tr>
     </thead>

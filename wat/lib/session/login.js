@@ -216,15 +216,19 @@ Wat.L = {
         
         // Configure visability
         Wat.C.configureVisibility();
-        if (Wat.CurrentView.qvdObj == 'login') {
-            Wat.L.logIn(that.sid, that.login);
-                
-            Wat.I.renderMain();
+        
+        // Get from database DIG enable parameter and store it in configuration
+        Wat.C.getDigConfig(function () {
+            if (Wat.CurrentView.qvdObj == 'login') {
+                Wat.L.logIn(that.sid, that.login);
 
-            Wat.Router.watRouter.performRoute('', Wat.Views.HomeView);
-        }
-                
-        Wat.L.afterLogin ();
+                Wat.I.renderMain();
+
+                Wat.Router.watRouter.performRoute('', Wat.Views.HomeView);
+            }
+
+            Wat.L.afterLogin();
+        });
     },
     
     afterLogin: function () {
@@ -253,9 +257,9 @@ Wat.L = {
         if (Wat.L.isLogged()) {
             Wat.I.setCustomizationFields();
         }
-
+        
         // If the router isnt instantiate, do it
-        if (Wat.Router.watRouter == undefined) {          
+        if (Wat.Router.watRouter == undefined) {
             // Instantiate the router
             Wat.Router.watRouter = new Wat.Router;
         }

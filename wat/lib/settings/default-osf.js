@@ -234,7 +234,8 @@ Wat.I.editorCategories[qvdObj] = [
     },
     {
         code: 'software',
-        text: 'Software'
+        text: 'Software',
+        isEnabled: Wat.C.isDIGEnabled
     }
 ];
     
@@ -357,7 +358,8 @@ Wat.I.selectedActions[qvdObj] = {
         'text': 'New Disk image',
         'iconClass': CLASS_ICON_DIS,
         'acls': 'di.create.',
-        'otherClass': 'js-only-one'
+        'otherClass': 'js-only-one',
+        'isEnabledById': Wat.C.isOsfDigEnabled
     },
     'delete': {
         'text': 'Delete',

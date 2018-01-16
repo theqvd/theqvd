@@ -1,6 +1,11 @@
 <a class="fright fa fa-times button button-icon js-uncheck-all desktop" style="font-size: 0.8em;" data-cid="<%= cid %>"></a>
 <div data-i18n="Actions over selected items" class="title desktop"></div>
-        <% $.each(selectedActions, function(action, actionConfig) { %>
+        <% 
+        $.each(selectedActions, function(action, actionConfig) { 
+            if (actionConfig.isEnabledById != undefined && !actionConfig.isEnabledById(selectedItems)) {
+                return;
+            }
+        %>
     <% 
         var visibilityConditionAttrs = Wat.I.getVisibilityConditionAttrs(actionConfig.visibilityCondition);
     %>

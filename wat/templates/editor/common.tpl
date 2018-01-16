@@ -1,7 +1,12 @@
 <div class="<%= cid %>">
     <% if (editorCategories) { %>
         <ul class="editor-tabs js-editor-tabs">
-            <% $.each(editorCategories, function (iCat, cat) { %>
+            <% 
+            $.each(editorCategories, function (iCat, cat) { 
+                if (cat.isEnabled != undefined && !cat.isEnabled()) {
+                    return;
+                }
+            %>
                 <li data-tab="<%= cat.code %>" data-i18n="<%= cat.text %>"><%= cat.text %></li>
             <% }); %>
         </ul>

@@ -812,6 +812,7 @@ Wat.I = {
         var template = _.template(
             Wat.TPL.selectedOptionsMenu, {
                 selectedActions: selectedActions,
+                selectedItems: Wat.CurrentView.selectedItems,
                 cid: cid
             });
         

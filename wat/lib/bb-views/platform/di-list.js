@@ -109,12 +109,15 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
     renderEmbeddedList: function () {
         var that = this;
         
+        var osfId = $('.dis-subrow').attr('data-dis-row');
+        
         this.template = _.template(
             Wat.TPL.embedded_osf_di, {
                 cid: this.cid,
                 models: this.collection.models,
                 selectedActions: Wat.C.purgeConfigData(Wat.I.selectedActions.di),
-                osfId: $('.dis-subrow').attr('data-dis-row'),
+                osfId: osfId,
+                enabledCreation: Wat.C.isOsfDigEnabled(osfId),
                 shrinkFactor: 3
             }
         );

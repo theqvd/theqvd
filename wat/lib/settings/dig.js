@@ -113,7 +113,7 @@ Wat.DIG = {
         options = options || {};
         options.container = options.container || '';
         
-        if (model === undefined) {
+        if (model === undefined || (Wat.CurrentView.model && !Wat.C.isOsfDigEnabled(Wat.CurrentView.model.get('id')))) {
             var template = $.i18n.t('Software information not available');
             $(options.container + ' .bb-os-configuration').html(template);
         }
