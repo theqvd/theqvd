@@ -97,6 +97,7 @@ my %lang_codes = qw/
     0403 ca        040C fr        043A mt        2C0A es-ar
     /;
 
+my $usbroot = "/sys/bus/usb/devices";
 
 sub new {
     my( $class, $parent, $id, $title, $pos, $size, $style, $name ) = @_;
@@ -710,6 +711,7 @@ sub OnConnectionStatusChanged {
     } elsif ($status eq 'FORWARDING') {
         $self->start_file_sharing();
         $self->start_remote_mounts();
+        $self->start_device_sharing();
     } elsif ($status eq 'CLOSED') {
         $self->{timer}->Stop();
         $self->Destroy() if ( core_cfg('client.auto_connect',0) ); # We don't want to let the user do anything else if this was autoconnected session (don't let him change a config that won't be saved..)
@@ -1433,6 +1435,100 @@ sub start_file_sharing {
         $dialog->ShowModal();
         $dialog->Destroy();
     }
+}
+
+sub start_device_sharing {
+    my ($self) = @_;
+
+    if (core_cfg('client.slave.enable') && core_cfg('client.usb.enable')) {
+
+        INFO "USBIP sharing starting";
+        use QVD::Client::SlaveClient;
+        my @devs = map { $_ } split(/,/, core_cfg('client.usb.share_list'));
+        foreach my $devid (@devs) {
+            my $busid = $self->get_busid ($devid);
+            unless ($busid){
+                ERROR "Can't find busid for device $devid";
+                return;
+            }
+            for (my $conn_attempt = 0; $conn_attempt < 10; $conn_attempt++) {
+            local $@;
+            my $client = QVD::Client::SlaveClient->new();
+            eval { $client->handle_usbip($busid) };
+                if ($@) {
+                    if ($@ =~ 'ECONNREFUSED' || $@ =~ 'EPIPE' ) {
+                        sleep 1;
+                        next;
+                    }
+                    ERROR $@;
+                } else {
+                    DEBUG("Device sharing started for dev: $devid connected at bus: $busid");
+                }
+                last;
+            }
+        }
+
+    }
+}
+
+sub get_busid {
+    my ($self,$devid) = @_;
+    my %all_devices;
+
+    opendir my $device_dir , $usbroot
+        or do { ERROR "Can't open $usbroot" ; return 0; };
+    while ( defined(my $busid = readdir($device_dir)) ){
+        my $index = $self->_read_devid($busid);
+        if ($index) {
+            $all_devices{ $index } = $busid;
+        }
+    }
+    closedir $device_dir
+        or do { ERROR "Can't close $usbroot" ; return 0; } ;
+
+    if ( defined $all_devices{$devid} ){
+        return $all_devices{$devid};
+    }else{
+        return;
+    }
+}
+
+sub _read_devid {
+    my ($self,$busid) = @_;
+    my $vendorid;
+    my $productid;
+    my $serial;
+
+    if ( -f "$usbroot/$busid/idVendor" ){
+        $vendorid = $self->_read_line("$usbroot/$busid/idVendor");
+    }else{ return; }
+    
+    if ( -f "$usbroot/$busid/idProduct" ){
+        $productid = $self->_read_line("$usbroot/$busid/idProduct");
+    }else{ return; }
+    
+    if ( -f "$usbroot/$busid/serial" ){
+        $serial = $self->_read_line("$usbroot/$busid/serial");
+    }
+
+    chomp $vendorid;
+    chomp $serial;
+    chomp $productid;
+
+    return $serial ? "$vendorid:$productid\@$serial" : "$vendorid:$productid";
+}
+
+sub _read_line {
+    my ($self,$file) = @_;
+    my $result;
+
+    open my $file, '<', $file
+        or do { ERROR "Can't open $file"; return; };
+    $result = <$file>;
+    close $file
+        or do { ERROR "Can't close $file"; return; };
+
+    return $result;
 }
 
 sub start_remote_mounts {

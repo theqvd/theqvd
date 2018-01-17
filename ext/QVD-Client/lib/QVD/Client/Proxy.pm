@@ -968,20 +968,6 @@ sub _run {
             }
         }
 
-        if ( core_cfg('client.slave.enable') && core_cfg('client.usb.enable') ) {
-            DEBUG "USB sharing enabled";
-
-            my $usb = QVD::Client::USB::instantiate( core_cfg('client.usb.implementation' ) );
-
-            if ( core_cfg('client.usb.share_all') and $usb->can_autoshare ) {
-		$usb->set_autoshare(1);
-            } else {
-		$usb->set_autoshare(0) if $usb->can_autoshare;
-		my @devs = map { [ $_ ] } split(/,/, core_cfg('client.usb.share_list'));
-		$usb->share_list_only(@devs);
-            }
-        }
-
         $x11_proc = $self->_start_x11( fullscreen => $opts{fullscreen} );
 
         if ($self->{audio}) {

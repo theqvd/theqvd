@@ -6,6 +6,8 @@ use QVD::Config::Core qw(core_cfg);
 use QVD::HTTP::Headers qw(header_lookup);
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::Log;
+use Linux::USBIP;
+use Socket qw/SOL_SOCKET SO_REUSEADDR SO_KEEPALIVE/;
 use strict;
 
 my $command_sftp_server = core_cfg('command.sftp-server');
@@ -102,6 +104,45 @@ sub handle_mount {
         exec @cmd or die "Unable to exec " . join(' ', @cmd) . ": $^E";
     }
 
+}
+
+sub handle_usbip {
+    my ($self, $device) = @_;
+
+    INFO "Starting usbip sharing for device: $device";
+
+    DEBUG "Binding and exporting usb device";
+    my $usbip = Linux::USBIP->new();
+    $usbip->bind($device) or die "Cannot bind device due to: ".$usbip->{error_msg};
+
+
+    DEBUG "Requesting protocol switch";
+    my ($code, $msg, $headers, $data) =
+    $self->{httpc}->make_http_request(POST => '/usbip',
+        headers => [
+            "Authorization: Basic $self->{auth_key}",
+            'Connection: Upgrade', 
+            "Upgrade: qvd:usbip/1.0"
+        ]);
+
+    if ($code != HTTP_SWITCHING_PROTOCOLS) {
+        die "Server replied $code $msg $data";
+    }
+
+    DEBUG "Switched protocols. Exporting device...";
+
+
+    my $sock = $self->{httpc}->{socket};
+    $sock->setsockopt(SOL_SOCKET,SO_REUSEADDR,1) or die "Cannot set socket options: SO_REUSEADDR";
+    $sock->setsockopt(SOL_SOCKET,SO_KEEPALIVE,1) or die "Cannot set socket options: SO_KEEPALIVE";
+
+    my $export_data = $usbip->export_dev($device,fileno $sock);
+    $export_data or die "Cannot export device: ".$usbip->{error_msg};
+
+    print $sock $export_data."\n";
+
+    DEBUG "Device exported and data sent to server";
+   
 }
 
 1;
