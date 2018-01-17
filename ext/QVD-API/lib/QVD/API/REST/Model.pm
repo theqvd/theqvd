@@ -563,32 +563,27 @@ my $NESTED_QUERIES_TO_ADMIN4_MAPPER = {
 	User => {
 		__properties__ => 'custom_properties_set',
 	      __properties_changes__set => 'custom_properties_set',
-		__properties_changes__delete => 'custom_properties_del'
 	},
   
 	VM => {
 		__properties__ => 'custom_properties_set',
 	    __properties_changes__set => 'custom_properties_set',
-		__properties_changes__delete => 'custom_properties_del'
 	},
     
 	Host => {
 		__properties__ => 'custom_properties_set',
 	      __properties_changes__set => 'custom_properties_set',
-		__properties_changes__delete => 'custom_properties_del'
 	},
   
 	OSF => {
 		__properties__ => 'custom_properties_set',
 	     __properties_changes__set => 'custom_properties_set',
-		__properties_changes__delete => 'custom_properties_del'
 	},
   
 	DI => {
 		__properties__ => 'custom_properties_set',
 	    __tags__ => 'tags_create',
 	    __properties_changes__set => 'custom_properties_set',
-	    __properties_changes__delete => 'custom_properties_del', 
 	    __tags_changes__create => 'tags_create',
 		__tags_changes__delete => 'tags_delete'
 	},
@@ -2412,11 +2407,6 @@ sub type_of_action_log_style
 {
     my $self = shift;
     $TYPES_OF_ACTION_TO_LOG_MAPPER->{$self->type_of_action};    
-}
-
-sub get_property_list_name {
-	my $self = shift;
-	return "QVD_Object_Property_List";
 }
 
 #########################################
