@@ -96,436 +96,98 @@ our $COMMON_USAGE_TEXT = "
 ## VARIABLES ##
 ###############
 
-# Filters available in CLI and translation into API format
-# The typical translation is qvd-object => qvd-object_name
-# (i.e., for vms: osf => osf_name)
 
-my $FILTERS = {
-	vm => {
-		storage => 'storage',
-	    id => 'id', 
-	    name => 'name', 
-	    user => 'user_name', 
-	    osf => 'osf_name', 
-	    tag => 'di_tag', 
-	    blocked => 'blocked', 
-	    expiration_soft => 'expiration_soft', 
-	    expiration_hard => 'expiration_hard', 
-	    state => 'state', 
-	    host =>  'host_name', 
-	    di => 'di_name', 
-	    user_state => 'user_state', 
-	    ip => 'ip', 
-	    ssh_port => 'ssh_port', 
-	    vnc_port => 'vnv_port', 
-	    serial_port => 'serial_port',
-	    tenant =>  'tenant_name', 
-	    ip_in_use => 'ip_in_use', 
-	    di_in_use => 'di_name_in_use', 
-	    creation_date => 'creation_date', 
-	    creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
-
-	user => {
-		id => 'id',
-	      name => 'name', 
-	      blocked => 'blocked', 
-	      tenant => 'tenant_name', 
-	      creation_date => 'creation_date',
-	      creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
-
-	host => {
-		id => 'id',
-	      name => 'name', 
-	      address => 'address', 
-	      blocked => 'blocked', 
-	      frontend => 'frontend', 
-	      backend => 'backend', 
-	      state => 'state',
-	      creation_date => 'creation_date', 
-	      creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
-
-	osf => {
-		id => 'id',
-	     name => 'name', 
-	     overlay => 'overlay', 
-	     user_storage => 'user_storage', 
-	     memory => 'memory', 
-	     tenant =>  'tenant_name',
-	     creation_date => 'creation_date', 
-	     creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
-
-	di => {
-		id => 'id',
-	    name => 'disk_image', 
-	    version => 'version', 
-	    osf => 'osf_name', 
-	    tenant => 'tenant_name', 
-	    blocked => 'blocked', 
-	    tag => 'tag',
-	    creation_date => 'creation_date', 
-	    creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
-
-	tenant => {
-		id => 'id',
-		name => 'name', 
-		language => 'language', 
-		block => 'block',
-		blocked => 'blocked',
-		creation_date => 'creation_date', 
-		creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
-
-	config => {
-		tenant => 'tenant_id',
-		key_re => 'key_re'
-	},
-
-	admin => {
-		id => 'id',
-	       name => 'name', 
-	       tenant => 'tenant_name', 
-	       language => 'language', 
-	       block => 'block',
-	       creation_date => 'creation_date', 
-	       last_update_date => 'last_update_date', 
-	       creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
-
-	role => {
-		id => 'id',
-	      name => 'name', 
-	      fixed => 'fixed', 
-	      internal => 'internal', 
-	      creation_date => 'creation_date', 
-	      creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
-
-	acl => {
-		id => 'id',
-	     name => 'name', 
-	     role => 'role_id', 
-	     admin => 'admin_id', 
-		operative => 'operative'
-	},
-
-	log => {
-		id => 'id',
-	     admin_id => 'admin_id', 
-	     admin_name => 'admin_name', 
-	     tenant_id => 'tenant_id', 
-	     tenant_name => 'tenant_name', 
-	     action => 'action',  
-	     arguments => 'arguments',  
-	     object_id => 'object_id', 
-	     object_name => 'object_name', 
-	     time => 'time', 
-	     status => 'status', 
-	     source => 'source', 
-	     ip => 'ip', 
-	     type_of_action => 'type_of_action', 
-	     qvd_object => 'qvd_object', 
-		superadmin => 'superadmin'
-	},
-
-};
-
-# Available order criteria in CLI and translation into
-# API format
-
-my $ORDER = {
-	vm => {
-		storage => 'storage',
-	    id => 'id', 
-	    name => 'name', 
-	    user => 'user_name', 
-	    osf => 'osf_name', 
-	    tag => 'di_tag', 
-	    blocked => 'blocked', 
-	    expiration_soft => 'expiration_soft', 
-	    expiration_hard => 'expiration_hard', 
-	    state => 'state', 
-	    host =>  'host_name', 
-	    di => 'di_name', 
-	    user_state => 'user_state', 
-	    ip => 'ip', 
-	    ssh_port => 'ssh_port', 
-	    vnc_port => 'vnv_port', 
-	    serial_port => 'serial_port',
-	    tenant =>  'tenant_name', 
-	    ip_in_use => 'ip_in_use', 
-	    creation_date => 'creation_date', 
-            creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
-
-	user => {
-		id => 'id',
-	      name => 'name', 
-	      blocked => 'blocked', 
-	      tenant => 'tenant_name', 
-	      creation_date => 'creation_date', 
-	      creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
-
-	host => {
-		id => 'id',
-	      name => 'name', 
-	      address => 'address', 
-	      blocked => 'blocked', 
-	      frontend => 'frontend', 
-	      backend => 'backend',
-	      state => 'state',
-	      creation_date => 'creation_date', 
-	      creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
-
-	osf => {
-		id => 'id',
-	     name => 'name', 
-	     overlay => 'overlay', 
-	     user_storage => 'user_storage', 
-	     memory => 'memory', 
-	     tenant =>  'tenant_name',
-	     creation_date => 'creation_date', 
-	     creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
-
-	di => {
-		id => 'id',
-	    name => 'disk_image', 
-	    version => 'version', 
-	    osf => 'osf_name', 
-	    tenant => ' tenant_name', 
-	    blocked => 'blocked', 
-	    tag => 'tag',
-	    creation_date => 'creation_date', 
-	    creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
-
-	tenant => {
-		id => 'id',
-		name => 'name', 
-		language => 'language', 
-		block => 'block', 
-		blocked => 'blocked',
-		creation_date => 'creation_date', 
-		creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
-
-	admin => {
-		id => 'id',
-	       name => 'name', 
-	       tenant => 'tenant_name', 
-	       language => 'language', 
-	       block => 'block',
-	       creation_date => 'creation_date', 
-	       creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
-
-	role => {
-		id => 'id',
-	      name => 'name', 
-	      fixed => 'fixed', 
-	      internal => 'internal', 
-	      creation_date => 'creation_date', 
-	      creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
-
-    acl => { id => 'id', name => 'name' },
-
-	log => {
-		id => 'id',
-	     admin_id => 'admin_id', 
-	     admin_name => 'admin_name', 
-	     tenant_id => 'tenant_id', 
-	     tenant_name => 'tenant_name', 
-	     action => 'action',  
-	     arguments => 'arguments',  
-	     object_id => 'object_id', 
-	     object_name => 'object_name', 
-	     time => 'time', 
-	     status => 'status', 
-	     source => 'source', 
-	     ip => 'ip', 
-	     type_of_action => 'type_of_action', 
-	     qvd_object => 'qvd_object', 
-		superadmin => 'superadmin'
-	},
-};
-
-# Available fields to retrieve and translation into
-# API format
+# Alias for retrieved fields
 
 my $FIELDS = {
-	vm => {
-		storage => 'storage',
-	    id => 'id', 
-	    name => 'name', 
-	    user => 'user_name', 
-	    osf => 'osf_name', 
-	    tag => 'di_tag', 
-	    blocked => 'blocked', 
-	    expiration_soft => 'expiration_soft', 
-	    expiration_hard => 'expiration_hard', 
-	    state => 'state', 
-	    host =>  'host_name', 
-	    di => 'di_name', 
-	    user_state => 'user_state', 
-	    ip => 'ip', 
-	    mac => 'mac', 
-	    ssh_port => 'ssh_port', 
-	    vnc_port => 'vnv_port', 
-	    serial_port => 'serial_port', 
-	    tenant =>  'tenant_name', 
-	    ip_in_use => 'ip_in_use', 
-	    di_in_use => 'di_name_in_use',
-	    creation_date => 'creation_date', 
-	    creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
+    vm => {
+        user => 'user_name',
+        osf => 'osf_name',
+        tag => 'di_tag',
+        host =>  'host_name',
+        di => 'di_name',
+        tenant =>  'tenant_name',
+        di_in_use => 'di_name_in_use',
+    },
+    
+    user => {
+        tenant => 'tenant_name',
+    },
+    
+    host => {
+        ip_address => 'address',
+    },
+    
+    osf => {
+        tenant =>  'tenant_name',
+    },
+    
+    di => {
+        name => 'disk_image',
+        osf => 'osf_name',
+        tenant => 'tenant_name',
+    },
+    
+    tenant => {
+    },
+    
+    config => {
+    },
+    
+    admin => {
+        tenant => 'tenant_name',
+    },
+    
+    role => {
+    },
+    
+    acl => {
+    },
+    
+    log => {
+    },
+    
+};
 
-	user => {
-		id => 'id',
-	      name => 'name', 
-	      tenant => 'tenant_name', 
-	      blocked => 'blocked', 
-	      number_of_vms => 'number_of_vms', 
-	      number_of_vms_connected => 'number_of_vms_connected', 
-	      creation_date => 'creation_date', 
-	      creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
+# Alias for filters
 
-	host => {
-		id => 'id',
-	      name => 'name', 
-	      address => 'address', 
-	      blocked => 'blocked', 
-	      frontend => 'frontend', 
-	      backend => 'backend', 
-	      state => 'state', 
-	      number_of_vms_connected => 'number_of_vms_connected', 
-	      creation_date => 'creation_date', 
-	      creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
+my $FILTERS = $FIELDS;
 
-	osf => {
-		id => 'id',
-	     name => 'name', 
-	     overlay => 'overlay', 
-	     user_storage => 'user_storage', 
-	     memory => 'memory', 
-	     tenant =>  'tenant_name', 
-	     number_of_vms => 'number_of_vms', 
-	     number_of_dis => 'number_of_dis', 
-	     creation_date => 'creation_date', 
-	     creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
+# Alias for order fields
 
-	di => {
-		id => 'id',
-	    name => 'disk_image', 
-	    tenant => 'tenant_name', 
-	    version => 'version', 
-	    osf => 'osf_name', 
-	    blocked => 'blocked', 
-	    tags => 'tags',
-	    creation_date => 'creation_date', 
-	    creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
+my $ORDER = $FIELDS;
 
-	tenant => {
-		id => 'id',
-		name => 'name', 
-		language => 'language', 
-		block => 'block', 
-		blocked => 'blocked',
-		creation_date => 'creation_date', 
-		creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
+# Alias for arguments
 
-	config => {
-		key => 'key',
-		value => 'operative_value', 
-		default => 'default_value'
-	},
-
-	admin => {
-		id => 'id',
-	       name => 'name', 
-	       roles => 'roles', 
-	       tenant => 'tenant_name', 
-	       language => 'language', 
-	       block => 'block',
-	       creation_date => 'creation_date', 
-	       creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
-
-	role => {
-		id => 'id',
-	      name => 'name', 
-	      fixed => 'fixed', 
-	      internal => 'internal', 
-	      roles => 'roles', 
-	      acls => 'acls',
-	      creation_date => 'creation_date', 
-	      creation_admin_id => 'creation_admin_id', 
-		creation_admin_name => 'creation_admin_name'
-	},
-
-    acl => { id => 'id', name => 'name' },
-
-	log => {
-		id => 'id',
-	     admin_id => 'admin_id', 
-	     admin_name => 'admin_name', 
-	     tenant_id => 'tenant_id', 
-	     tenant_name => 'tenant_name', 
-	     action => 'action',  
-	     arguments => 'arguments',  
-	     object_id => 'object_id', 
-	     object_name => 'object_name', 
-	     time => 'time', 
-	     status => 'status', 
-	     source => 'source', 
-	     ip => 'ip', 
-	     type_of_action => 'type_of_action', 
-	     qvd_object => 'qvd_object', 
-	     deleted_object => 'deleted_object', 
-	     deleted_admin => 'deleted_admin', 
-		superadmin => 'superadmin'
-	},
-
-    property => {
-        id => 'id',
-        key => 'key',
-        description => 'description'
-    }
+my $ARGUMENTS = {
+    vm => {
+        tag => 'di_tag',
+    },
+    
+    user => {
+    },
+    
+    host => {
+        ip_address => 'address',
+    },
+    
+    osf => {
+    },
+    
+    di => {
+    },
+    
+    tenant => {
+    },
+    
+    config => {
+    },
+    
+    admin => {
+    },
+    
+    role => {
+    },
 };
 
 # For every field to retrieve, a callback can be specified.
@@ -563,84 +225,6 @@ my $FIELDS_CBS = {
 					       (map { "$_ (-)" } @{$acls->{negative}})); 
 			return join "\n", @acls;
 		}
-	},
-};
-
-# Available arguments in CLI and translation into
-# API format
-
-my $ARGUMENTS = {
-	vm => {
-		name => 'name',
-	    ip => 'ip', 
-	    tenant => 'tenant_id', 
-	    blocked => 'blocked', 
-	    expiration_soft => 'expiration_soft',
-	    expiration_hard => 'expiration_hard', 
-	    storage => 'storage', 
-	    tag => 'di_tag', 
-	    user => 'user_id', 
-	    osf => 'osf_id', 
-	}, # For nested queries in API
-
-	user => {
-		name => 'name',
-	      password => 'password', 
-	      blocked => 'blocked', 
-	      tenant => 'tenant_id',
-	},
-
-	host => {
-		name => 'name',
-	      address => 'address', 
-	      frontend => 'frontend', 
-	      backend => 'backend', 
-	      blocked => 'blocked',
-	},
-
-	osf => {
-		name => 'name',
-	     memory => 'memory', 
-	     user_storage => 'user_storage', 
-	     overlay => 'overlay', 
-	     tenant => 'tenant_id',
-	},
-
-	di => {
-		blocked => 'blocked',
-	    name => 'disk_image',  
-	    version => 'version', 
-		__tags_changes__ => '__tags_changes__',  # For nested queries in API
-	},
-
-	tenant => {
-		name => 'name',
-		language => 'language', 
-		block => 'block',
-		blocked => 'blocked',
-	},
-
-	config => {
-		key => 'key',
-		value => 'value',
-		tenant => 'tenant_id',
-	},
-
-	admin => {
-		name => 'name',
-	       password => 'password', 
-	       tenant => 'tenant_id', 
-	       language => 'language', 
-	       block => 'block',
-		__roles_changes__ => '__roles_changes__', # For nested queries in API
-	},
-
-	role => {
-		name => 'name',
-	      fixed => 'fixed', 
-	      internal => 'internal',
-	      __roles_changes__ => '__roles_changes__', # For nested queries in API
-		__acls_changes__ => '__acls_changes__', # For nested queries in API
 	},
 };
 
@@ -1021,7 +605,7 @@ sub print_table
 {
 	my ($self, $res, $parsing) = @_;
 
-	my @fields = $self->get_fields($parsing, $res);
+	my @fields = $self->get_fields_from_response($parsing, $res);
 
 	my $n = 0;
 	my @values = ();
@@ -1295,9 +879,16 @@ sub get_action
 sub get_filters
 {
     my ($self,$parsing) = @_;
-
-    # FIXME: Replace keywords with the API ones
-    return $parsing->filters->hash // {};
+    my $filters_input = $parsing->filters->hash // {};
+    my $filters_output = {};
+    
+    while (my ($key,$value) = each %$filters_input)
+    {
+        my $filter_name = eval { $FILTERS->{$parsing->qvd_object}->{$key} } // $key;
+        $filters_output->{$filter_name} = $value;
+    }
+    
+    return $filters_output;
 }
 
 # Normalizes the arguments in a request according the
@@ -1306,16 +897,16 @@ sub get_filters
 sub get_arguments
 {
     my ($self,$parsing) = @_;
-    my $arguments = $parsing->arguments // {};
-    my $out = {};
+    my $arguments_input = $parsing->arguments // {};
+    my $arguments_output = {};
 
-    while (my ($k,$v) = each %$arguments)
+    while (my ($key,$value) = each %$arguments_input)
     {
-        my $normalized_k = $ARGUMENTS->{$parsing->qvd_object}->{$k} // $k;
-        $out->{$normalized_k} = $v;
+        my $argument_name = eval { $ARGUMENTS->{$parsing->qvd_object}->{$key} } // $key;
+        $arguments_output->{$argument_name} = $value;
     }
 
-    $out;
+    return $arguments_output;
 }
 
 # Normalizes the ordering in a request according the
@@ -1324,24 +915,24 @@ sub get_arguments
 sub get_order
 {
     my ($self,$parsing) = @_;
-
+    
     my $order = $parsing->order // {};
-    my $out = [];
-    my $criteria = $order->{field} // []; 
-
-    for my $criteria (@$criteria)
+    my $criteria = $order->{field} // [];
+    my $order_fields = [];
+    
+    for my $criterium (@$criteria)
     {
-	$criteria = eval { $ORDER->{$parsing->qvd_object}->{$criteria} } // $criteria;
-	push @$out, $criteria;
+        my $order_field = eval { $ORDER->{$parsing->qvd_object}->{$criterium} } // $criterium;
+        push @$order_fields, $order_field;
     }
     my $direction = $order->{order} // '-asc';
-
-    { order => $direction, field => $out };
+    
+    { order => $direction, field => $order_fields };
 }
 
 # It returns the list of fields that must be retrieved by 
 # an action
-sub get_fields
+sub get_fields_from_response
 {
     my ($self,$parsing,$api_res) = @_;
 
@@ -1367,18 +958,19 @@ sub get_fields
 # Normalizes the fields to retrieve in a request according the
 # info in the class variables of this class. Returns the
 # hash of normalized fields
-sub get_fields_for_api
+sub get_fields
 {
-    my ($self,$parsing,$api_res) = @_;
-
-    my @asked_fields = @{$parsing->fields};
-    for my $asked_field (@asked_fields)
+    my ($self,$parsing) = @_;
+    my $fields_input = $parsing->fields // {};
+    my $fields_output = [];
+    
+    for my $key (@$fields_input)
     {
-	$asked_field = eval {
-	    $FIELDS->{$parsing->qvd_object}->{$asked_field} 
-	} // $asked_field;
-    } 
-    \@asked_fields;
+        my $field_name = eval { $FIELDS->{$parsing->qvd_object}->{$key} } // $key;
+        push @$fields_output, $field_name;
+    }
+    
+    return $fields_output;
 }
 
 # For a certain field retrieved by the API, it may need to be
@@ -1411,7 +1003,7 @@ sub make_api_query
     return {
         action => $self->get_action($parsing),
         filters => $self->get_filters($parsing),
-        fields => $self->get_fields_for_api($parsing),
+        fields => $self->get_fields($parsing),
         order_by => $self->get_order($parsing),
         arguments => $self->get_arguments($parsing)
     };

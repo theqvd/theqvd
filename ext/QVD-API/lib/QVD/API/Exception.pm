@@ -159,6 +159,21 @@ my $exception2code_mapper = {
     'DBIx::Error::CheckViolation' => { default => 1100 },
 };
 
+sub figure_out_object_from_exception {
+    my $self = shift;
+    
+    my $message = $self->get_additional_info;
+    my $object = undef;
+    
+    if(eval { $self->exception->isa('DBIx::Error::DataException') }) {
+        if($message =~ qr/invalid input syntax for \w+?\: \"(\w+)\"/) {
+            $object = $1;
+        }
+    }
+    
+    return $object;
+}
+
 
 sub BUILD
 {
@@ -186,6 +201,7 @@ sub BUILD
                 $self->{_stack_trace} = extract_stack_trace($self->exception)->as_string;
             } elsif($exception_type =~ /^DBIx::Error/) {
                 $self->{additional_info} = $self->exception->message;
+                $self->{object} = $self->figure_out_object_from_exception;
                 $self->{_stack_trace} = $self->exception->stack_trace->as_string;
             } else {
                 $self->{additional_info} = "".$self->exception;
