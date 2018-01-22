@@ -473,34 +473,39 @@ sub qvd_property_action {
 
 sub create
 {
-	my ($self,$request,$modifiers) = @_;
+    my ($self,$request,$modifiers) = @_;
     my $result;
-
-	$modifiers //= {};
-	my @conditions = @{$modifiers->{conditions} // []};
-	my %arguments = (%{$request->arguments}, %{$modifiers->{'arguments'} // {}});
-
+    
+    $modifiers //= {};
+    my @conditions = @{$modifiers->{conditions} // []};
+    my %arguments = (%{$request->arguments}, %{$modifiers->{'arguments'} // {}});
+    
     my $obj;
-    eval 
+    eval
     {
-		$DB->txn_do(
-			sub {
-				$self->$_($request) for @conditions;
-				$obj = $DB->resultset($request->table)->create(\%arguments);
-                           # Create tables related to the main object (i.e. vm_runtimes for vms)
-			   $self->create_related_objects($request,$obj);
-                           # Assign and unassign other objects to the main objects (i.e. tags for dis, acls for roles, properties for vms...)
-			   $self->exec_nested_queries($request,$obj);
-				$result->{rows} = [ $obj ]
-			}
-		)
+        $DB->txn_do(
+            sub {
+                $self->$_($request) for @conditions;
+                $obj = $DB->resultset($request->table)->create(\%arguments);
+                # Create tables related to the main object (i.e. vm_runtimes for vms)
+                $self->create_related_objects($request,$obj);
+                # Assign and unassign other objects to the main objects (i.e. tags for dis, acls for roles, properties for vms...)
+                $self->exec_nested_queries($request,$obj);
+                $result->{rows} = [ $obj ]
+            }
+        )
     };
     
-    print $@ if $@;
-    my $e = $@ ? QVD::API::Exception->new(exception => $@, query => 'create') : undef;
-    $self->report_in_log($request,$obj, $e ? $e->code : 0);
-
-    $e->throw if $e;
+    my $status = 0;
+    my $exception;
+    if($@) {
+        $exception = QVD::API::Exception->new(exception => $@, query => 'create');
+        $status = $exception->code;
+    }
+    $self->report_in_log($request, $obj, $status);
+    
+    $exception->throw if $exception;
+    
     $result->{total} = 1;
     $result->{extra} = {};
     
@@ -520,26 +525,66 @@ sub create_related_objects
 
 # Ad hoc function to di_create action of API
 
+sub vm_create
+{
+    my ($self,$request) = @_;
+    
+    my $tenant_osf = $self->db->resultset('OSF')->find({ id => $request->arguments->{osf_id} })->tenant_id;
+    my $tenant_user = $self->db->resultset('User')->find({ id => $request->arguments->{user_id} })->tenant_id;
+    
+    unless ($request->administrator->is_superadmin) {
+        # Check provided qvd objects are included in the current administrator tenant
+        my $tenant_admin = $request->administrator->tenant_id;
+        
+        if($tenant_admin != $tenant_osf) {
+            QVD::API::Exception->throw(code => 7110, object => 'osf_id')
+        }
+    
+        if($tenant_admin != $tenant_user) {
+            QVD::API::Exception->throw(code => 7110, object => 'user_id')
+        }
+    } else {
+        # Check provided qvd objects belongs to the same tenant
+        if ($tenant_osf != $tenant_user) {
+            QVD::API::Exception->throw(code => 7300)
+        }
+    }
+    
+    my $result = $self->create($request);
+    
+    return $result;
+}
+
 sub di_create
 {
     my ($self,$request) = @_;
-
+    
+    unless ($request->administrator->is_superadmin) {
+        # Check provided qvd objects are included in the current administrator tenant
+        my $tenant_admin = $request->administrator->tenant_id;
+        my $tenant_osf = $self->db->resultset('OSF')->find({ id => $request->arguments->{osf_id} })->tenant_id;
+        
+        if($tenant_admin != $tenant_osf) {
+            QVD::API::Exception->throw(code => 7110, object => 'osf_id')
+        }
+    }
+        
     my $result = $self->create($request);
     my $di = @{$result->{rows}}[0];
-
+    
     eval
     {
-	$di->osf->delete_tag('head');
-	$di->osf->delete_tag($di->version);
-	$DB->resultset('DI_Tag')->create({di_id => $di->id, tag => $di->version, fixed => 1});
-	$DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'head'});
-	$DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'default'})
-	    unless $di->osf->di_by_tag('default');
+        $di->osf->delete_tag('head');
+        $di->osf->delete_tag($di->version);
+        $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => $di->version, fixed => 1});
+        $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'head'});
+        $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'default'})
+            unless $di->osf->di_by_tag('default');
     };
-
+    
     QVD::API::Exception->throw(exception => $@,
-				  query => 'tags') if $@;
-
+        query => 'tags') if $@;
+    
     $di->update({path => $di->id . '-' . $di->path});
     
     $result;

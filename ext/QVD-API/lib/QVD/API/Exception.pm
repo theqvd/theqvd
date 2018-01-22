@@ -124,6 +124,7 @@ my $code2message_mapper = {
     7211 => 'This property is already defined as global',
     7220 => 'This acl has already been assigned',
     7230 => 'This role has already been assigned',
+    7300 => 'Unable to create VM with OSF and User from different tenants',
     7310 => 'Unable to remove VM - This VM is running',
     7320 => 'Unable to remove DI - There are VMs running with it',
     7321 => 'Unable to remove Host - The host is running',

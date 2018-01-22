@@ -223,8 +223,8 @@ my $ACTIONS = {
 
 	vm_create => {
 		type_of_action => 'create',
-	       admin4method => 'create',
-	       acls => [qr/^vm\.create\./],
+		admin4method => 'vm_create',
+		acls => [qr/^vm\.create\./],
 		qvd_object => 'VM'
 	},
 
