@@ -72,6 +72,7 @@ sub option_spec {
 		[ 'format|f=s'     => 'Output format' ],
 		[ 'insecure'       => 'Trust any certificate'],
 		[ 'ca=s'           => 'CA certificate path'],
+		[ 'help'           => 'Print usage information'],
 }
 
 sub command_map {
@@ -103,6 +104,11 @@ sub command_map {
 
 sub init {
 	my ($self, $opts) = @_;
+
+	if($opts->help) {
+		print $self->usage . "\n";
+		exit(0);
+	}
 
 	my ($url, $tenant_name, $login, $password, $insecure, $ca_cert_path, $output_format);
 	$url = Mojo::URL->new($opts->url // cfg('qa.url'));
