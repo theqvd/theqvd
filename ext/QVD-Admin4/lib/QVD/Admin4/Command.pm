@@ -132,6 +132,8 @@ my $FIELDS = {
     },
     
     config => {
+        default => 'default_value',
+        value => 'operative_value'
     },
     
     admin => {
