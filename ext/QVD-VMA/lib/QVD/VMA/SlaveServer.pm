@@ -42,6 +42,7 @@ my $open_command = core_cfg('command.open_file');
 my $command_sshfs = core_cfg('command.sshfs');
 my $authentication_key;
 my $command_sftp_server = core_cfg('command.sftp-server');
+my $command_usbip = core_cfg('vma.slave.command.usbip');
 
 BEGIN {
     my $slave_conf = core_cfg('internal.vma.slave.config');
@@ -65,6 +66,7 @@ sub new {
     $self->set_http_request_processor(\&handle_put_share, PUT => '/shares/*');
     $self->set_http_request_processor(\&handle_get_share, GET => '/shares/*');
     $self->set_http_request_processor(\&handle_open, POST => '/open/*');
+    $self->set_http_request_processor(\&handle_usbip, POST => '/usbip/*');
     bless $self, $class;
 }
 
@@ -218,6 +220,30 @@ sub handle_open {
 	exec @cmd;
         die "Unable to exec: $^E";
     }
+}
+
+sub handle_usbip {
+    my ($self, $method, $url, $headers) = @_;
+    $self->auth($headers);
+
+    $self->send_http_error(HTTP_BAD_REQUEST)
+        unless header_eq_check($headers, Connection => 'Upgrade')
+            and header_lookup($headers, 'Upgrade');
+
+    my $protocol = header_lookup($headers, 'Upgrade');
+    unless ($protocol =~ m!qvd:usbip/1.0(?:;charset=(.*))?!) {
+	    $self->send_http_error(HTTP_BAD_REQUEST);
+        return;
+    }
+    DEBUG "Headers OK";
+
+    $self->send_http_response(HTTP_SWITCHING_PROTOCOLS);
+
+    INFO "Running usbip setuid command with socket: ".fileno STDIN;
+
+    exec($command_usbip)
+        or die "Unable to exec $command_usbip: $^E";
+
 }
 
 'QVD-VMA'

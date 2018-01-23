@@ -1,0 +1,53 @@
+#!/usr/lib/qvd/bin/perl
+
+use warnings;
+use strict;
+
+use QVD::Config;
+use QVD::Config::Core qw(core_cfg set_core_cfg);
+use Linux::USBIP;
+
+BEGIN {
+    my $user_dir = File::Spec->rel2abs(File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
+	mkdir $user_dir;
+    set_core_cfg('client.log.filename', File::Spec->join($user_dir, 'qvd-vma-slaveserver.log'))
+        unless defined core_cfg('client.log.filename', 0);
+    set_core_cfg('log.level', 'DEBUG');
+    $QVD::Log::DAEMON_NAME = 'vma-slaveserver';
+
+}
+
+use QVD::Log;
+INFO "Slave server started";
+$SIG{__WARN__} = sub { WARN "@_"; };
+$SIG{__DIE__} = sub { ERROR "@_"; };
+
+# Some parameters
+my $socket = fileno STDIN;
+my $run_path = core_cfg("path.run");
+
+# Check nxagent is my parent
+INFO "Parent pid: ".getppid;
+open my $ppid_file , '<',"$run_path/nxagent.pid" or die "No nxagent pid";
+my $ppid = <$ppid_file>;
+close $ppid_file or DEBUG "Couldn't close $ppid_file: $!";
+chomp $ppid;
+getppid == $ppid or die "Won't exec if I'm not nxagent's child";
+
+# Now do my job
+INFO "Reading device data";
+
+my $data = <STDIN>;
+$data or die "No device to attach";
+chomp $data;
+
+my ($devid, $speed) = split(' ',$data);
+
+INFO "Attaching with Device Data: $data";
+
+my $usbip = Linux::USBIP->new();
+
+INFO "usbip->attach($socket, $devid, $speed)";
+$usbip->attach($socket, $devid, $speed) or die "Couldn't import device: ".$usbip->{error_msg};
+
+INFO "Device connected";

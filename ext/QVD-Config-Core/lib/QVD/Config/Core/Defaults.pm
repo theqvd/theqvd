@@ -602,6 +602,8 @@ vma.audio.enable = 0
 vma.slave.enable = 0
 ## slave shell to execute to client requests
 vma.slave.command = ${path.qvd.bin}/qvd-vma-slaveserver
+## usbip command with setuid root for slave server
+vma.slave.command.usbip = ${path.qvd.bin}/qvd-vma-slaveserver-usbip
 ## enables the printing channel in nxagent
 vma.printing.enable = 0
 ## path to the VMA PID file
