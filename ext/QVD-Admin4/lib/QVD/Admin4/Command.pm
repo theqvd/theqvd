@@ -151,10 +151,6 @@ my $FIELDS = {
     
 };
 
-# Alias for filters
-
-my $FILTERS = $FIELDS;
-
 # Alias for order fields
 
 my $ORDER = $FIELDS;
@@ -881,16 +877,7 @@ sub get_action
 sub get_filters
 {
     my ($self,$parsing) = @_;
-    my $filters_input = $parsing->filters->hash // {};
-    my $filters_output = {};
-    
-    while (my ($key,$value) = each %$filters_input)
-    {
-        my $filter_name = eval { $FILTERS->{$parsing->qvd_object}->{$key} } // $key;
-        $filters_output->{$filter_name} = $value;
-    }
-    
-    return $filters_output;
+    return $parsing->filters // {};
 }
 
 # Normalizes the arguments in a request according the
