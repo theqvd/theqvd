@@ -117,6 +117,7 @@ sub run
             $self->get_app->cache->get('api_staging_path'),
             $self->make_api_query($parsing)
         );
+        $self->check_api_result($res);
         $self->print_table($res,$parsing);
     }
     elsif ($parsing->command eq 'can')

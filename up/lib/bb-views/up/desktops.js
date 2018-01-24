@@ -19,15 +19,14 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
         // Spy mouse over elements to avoid fails with mouseleave events
         Up.I.L.spyMouseOver('.js-grid-cell-area', this.hideGridIcon);
         
-        Up.Views.ListView.prototype.initialize.apply(this, [params]);        
+        Up.Views.ListView.prototype.initialize.apply(this, [params]);
     },
     
     // This events will be added to view events
     listEvents: {
-        'click .js-change-viewmode': 'changeViewMode',
         'click .js-desktop-settings-btn': 'editDesktopSettings',
         'click .js-unblocked .js-desktop-connect-btn': 'connectDesktop',
-        'change select[name="active_configuration_select"]': 'changeActiveConf',
+        'change select[name="active_configuration_select"]': 'activeWorkspaceFromDesktops',
         'mouseover .js-unblocked .js-grid-cell-area': 'showGridIcon',
         'mouseout .js-grid-cell-area': 'hideGridIcon'
     },
@@ -40,22 +39,56 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
     },
     
     showGridIcon: function (e) {
-        $('.js-grid-cell-icon.js-grid-cell-hiddeable[data-id="' + $(e.target).attr('data-id') + '"]').show();
-    },  
+        var desktopId = $(e.target).attr('data-id');
+        var desktopState = $('.js-grid-cell[data-id="' + desktopId + '"]').attr('data-state');
+        
+        switch(desktopState) {
+            case 'connected':
+                var action = 'reconnect';
+                break;
+            case 'connecting':
+            case 'reconnecting':
+                // In case of desktops in process of connection doesnt show any icon
+                return;
+                break;
+            default:
+                var action = 'connect';
+                break;
+        }
+        
+        // Hide all possible shown icons and show hovered one
+        $('.js-grid-cell-icon.js-grid-cell-hiddeable').hide();
+        $('.js-grid-cell-icon.js-grid-cell-hiddeable[data-id="' + desktopId + '"][data-action="' + action + '"]').show();
+        
+        // Switch hover class to screenshot layers too
+        $('.js-grid-cell[data-state="connected"] .js-vm-screenshot, .js-gird-cell[data-state="disconnected"] .js-vm-screenshot').removeClass('vm-screenshot--hover');
+        $('.js-vm-screenshot[data-id="' + desktopId + '"]').addClass('vm-screenshot--hover');
+    },
     
     hideGridIcon: function (e) {
-        $('.js-grid-cell-icon.js-grid-cell-hiddeable[data-id="' + $(e.target).attr('data-id') + '"]').hide();
+        var desktopId = $(e.target).attr('data-id');
+        var desktopState = $('.js-grid-cell[data-id="' + desktopId + '"]').attr('data-state');
+        
+        switch(desktopState) {
+            case 'connecting':
+            case 'reconnecting':
+                // In case of desktops in process of connection doesnt hide any icon
+                break;
+                return;
+        }
+        
+        $('.js-grid-cell-icon.js-grid-cell-hiddeable[data-id="' + desktopId + '"]').hide();
+        $('.js-vm-screenshot[data-id="' + desktopId + '"]').removeClass('vm-screenshot--hover');
     },
     
     // Extend renderListBlock to fill active configuration select
-    renderListBlock: function (params) {  
-        Up.Views.ListView.prototype.renderListBlock.apply(this, []);
-        
-        // Load Workspaces on select control
+    renderListBlock: function (params) {
         var that = this;
         
-        this.wsCollection.fetch({      
+        // Load Workspaces on select control
+        this.wsCollection.fetch({
             complete: function () {
+                Up.Views.ListView.prototype.renderListBlock.apply(that, []);
                 
                 var template = _.template(
                     Up.TPL.workspacesSelectOption, {
@@ -69,7 +102,7 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
                 Up.I.Chosen.element('select[name="active_configuration_select"]', 'single');
                 Up.T.translate();
             }
-        });      
+        });
     },
     
     // Render only the list. Usefull to functions such as pagination, sorting and filtering where is not necessary render controls
@@ -102,30 +135,6 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
         Up.WS.openWebsocket('desktops', Up.WS.changeWebsocketDesktops);
     },
     
-    // Change view mode when click on the view mode button and render list
-    changeViewMode: function (e) {
-        this.viewMode = $(e.target).attr('data-viewmode');
-        $('.js-change-viewmode').removeClass('disabled');
-        $(e.target).addClass('disabled');
-        
-        this.renderList();
-    },
-    
-    changeActiveConf: function (e) {
-        var selectedId = $('select[name="active_configuration_select"]').val();
-        
-        var model = Up.CurrentView.wsCollection.where({id: parseInt(selectedId)})[0];
-        
-        var settings = model.get('settings');
-        
-        if (!settings) {            
-            Up.CurrentView.firstEditWorkspace(model);
-        }
-        else {
-            Up.CurrentView.activeWorkspace(e, model, function() {});
-        }
-    },
-    
     setAllDesktopsState: function (models) {
         var that = this;
         $.each(models, function (iModel, model) {
@@ -134,38 +143,42 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
     },
     
     setDesktopState: function (id, newState) {
-        // Grid view
-        if (Up.I.isMobile()) {
-            var iconDivMobile = $('.js-desktop-connect-btn.mobile[data-id="' + id + '"]');
-        }
-        else {
-            var iconDiv = $('.js-grid-cell-icon[data-id="' + id + '"]');
-            var areaDiv = $('.js-unblocked .js-grid-cell-area[data-id="' + id + '"]');
-        }
-        var stateDiv = $('.js-desktop-state[data-id="' + id + '"]');
-        
         var cellDiv = $('.js-grid-cell[data-id="' + id + '"]');
-        var cellCurrentState = $(cellDiv).attr('data-state');
+        
         $(cellDiv).removeClass('grid-disconnected js-grid-disconnected grid-connected js-grid-connected grid-connecting js-grid-connecting grid-reconnecting js-grid-reconnecting');
+        var currentState = $(cellDiv).attr('data-state');
 
-        // List view
-        var cellRow = $('.js-row-desktop[data-id="' + id + '"]');
-        var rowCurrentState = $(cellRow).attr('data-state');
-        $(cellRow).removeClass('row-disconnected js-row-disconnected row-connected js-row-connected row-connecting js-row-connecting row-reconnecting js-row-reconnecting');
-        
-        // Depending on the current view, state will be retrieved from one or another
-        var currentState = cellCurrentState || rowCurrentState;
-        
         // When try to connect to connected desktop, establish "fake ui state" reconnecting 
         if (newState == 'connecting' && (currentState == 'connected' || currentState == 'reconnecting')) {
             newState = 'reconnecting';
         }
         
+        var actionAttr = '';
+        switch(newState) {
+            case 'connecting':
+                var actionAttr = '[data-action="connect"]';
+                break;
+            case 'reconnecting':
+                var actionAttr = '[data-action="reconnect"]';
+                break;
+        }
+        
+        // Grid view
+        if (Up.I.isMobile()) {
+            var iconDivMobile = $('.js-desktop-connect-btn.mobile[data-id="' + id + '"]');
+        }
+        else {
+            var iconDiv = $('.js-grid-cell-icon[data-id="' + id + '"]' + actionAttr);
+            var screenshotDiv = $('.js-vm-screenshot[data-id="' + id + '"]');
+            var areaDiv = $('.js-unblocked .js-grid-cell-area[data-id="' + id + '"]');
+        }
+        var stateDiv = $('.js-desktop-state[data-id="' + id + '"]');
+        
+        
         // Update DOM new state
         $(cellDiv).attr('data-state', newState);
-        $(cellRow).attr('data-state', newState);
         
-        // Change Interfce with style and animations
+        // Change Interface with style and animations
         switch(newState) {
             case 'connected':
             case 'disconnected':
@@ -174,8 +187,15 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
                 }
                 else {
                     $(iconDiv).addClass('js-grid-cell-hiddeable').removeClass('animated faa-flash').hide();
+                    $(screenshotDiv).removeClass('vm-screenshot--hover');
                 }
                 $(stateDiv).removeClass('animated faa-flash');
+                
+                if (!Up.I.isMobile()) {
+                    // Screenshot div toggle
+                    $('.js-vm-screenshot[data-id="' + id + '"]').hide();
+                    $('.js-vm-screenshot[data-id="' + id + '"][data-state="' + newState + '"]').show();
+                }
                 break;
             case 'connecting':
             case 'reconnecting':
@@ -184,6 +204,7 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
                 }
                 else {
                     $(iconDiv).removeClass('js-grid-cell-hiddeable').addClass('animated faa-flash').show();
+                    $(screenshotDiv).addClass('vm-screenshot--hover');
                 }
                 $(stateDiv).addClass('animated faa-flash');
                 break;
@@ -201,7 +222,6 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
             Up.T.translate();
         }
 
-        $(cellRow).addClass('row-' + newState + ' js-row-' + newState);
         $(cellDiv).addClass('grid-' + newState + ' js-grid-' + newState);
         $(stateDiv).attr('data-i18n', Up.I.getStateString(newState)).html($.i18n.t(Up.I.getStateString(newState)));
         
@@ -236,5 +256,12 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
                 return;
             }
         }, 1000);
+    },
+    
+    activeWorkspaceFromDesktops: function (e) {
+        var selectedId = parseInt($(e.target).val());
+        var model = Up.CurrentView.wsCollection.findWhere({id: selectedId});
+        
+        this.activeWorkspace(model, function () {});
     }
 });

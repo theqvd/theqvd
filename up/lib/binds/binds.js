@@ -21,7 +21,7 @@ Up.B = {
     settingsBinds: {
         changeDisableSettings: function (e) {
             var enable = $(e.target).is(':checked');
-                                 
+            
             if (enable) {
                 $('.js-form-field--setting').removeAttr('disabled');
                 $('.js-form-field--settingrow').removeClass('disabled-row');
@@ -34,6 +34,8 @@ Up.B = {
             else {
                 $('.js-form-field--setting').attr('disabled', 'disabled');
                 $('.js-form-field--settingrow').addClass('disabled-row');
+                
+                Up.I.renderEditionModeParameters(Up.CurrentView.modelInEdition, 0);
             }
             
             $('select.js-form-field--setting').trigger('chosen:updated');
@@ -42,36 +44,9 @@ Up.B = {
         changeClientSelector: function (e) {
             var client = $(e.target).val();
             
-            switch (client) {
-                case 'html5':
-                    if ($('.js-disable-settings-check').length == 0 || $('.js-disable-settings-check').is(':checked')) {
-                        $('.js-form-field--setting').attr('disabled', 'disabled');
-                        $('.js-form-field--settingrow').addClass('disabled-row');
-                        
-                        $.each(HTML5_SETTINGS, function (settingIndex, settingName) {
-                            $('.js-form-field--setting[name="' + settingName + '"]').removeAttr('disabled');
-                            $('.js-form-field--settingrow[data-field-name="' + settingName + '"]').removeClass('disabled-row');
-                            
-                            // Checkbox controls will be triggered to preserve disabled associated list if exists
-                            if ($('.js-form-field--setting[name="' + settingName + '"]').attr('type') == 'checkbox') {
-                                $('.js-form-field--setting[name="' + settingName + '"]').trigger('change');
-                            }
-                        });
-                    }
-                    break;
-                case 'classic':
-                    $.each(HTML5_SETTINGS, function (settingIndex, settingName) {
-                         $('.js-form-field--setting').removeAttr('disabled');
-                         $('.js-form-field--settingrow').removeClass('disabled-row');
-
-                        // When enable settings trigger change events on shared switchers to preserve disabled shared lists if necessary
-                        $('.js-share-folders-check').trigger('change');
-                        $('.js-share-usb-check').trigger('change');
-                    });
-                    break;
-            }
-            
-            $('select.js-form-field--setting').trigger('chosen:updated');
+            $('[data-client-mode]').hide();
+            $('[data-client-mode="both"]').show();
+            $('[data-client-mode="' + client + '"]').show();
         }
     },
     

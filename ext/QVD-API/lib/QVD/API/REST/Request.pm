@@ -209,8 +209,7 @@ sub BUILD
 
     $self->forze_tenant_assignment_in_creation 
         if $type_of_action =~ /^create(_or_update)?$/ &&
-            $self->qvd_object_model->directly_tenant_related &&
-            $qvd_object ne 'Tenant';
+            $self->qvd_object_model->directly_tenant_related;
 
 # This method adds filters in order to avoid selecting
 # objects the admin doesn't have acls for. These acls
@@ -292,23 +291,20 @@ sub check_update_arguments_validity_in_json
     my $self = shift;
     my $admin = $self->qvd_object_model->current_qvd_administrator;
 
-    $self->qvd_object_model->available_argument($_) || 
-	QVD::API::Exception->throw(code => 6230, object => $_)
-	for $self->json_wrapper->arguments_list;
+    # An operation is considered massive if it is applied over more than one
+    # object. For this kind of action, the 'id' is a mandatory filter
+    # and it is the only filter available. So it can be known the amount of objects
+    # will be involved by using that filter.
 
-# An operation is considered massive if it is applied over more than one 
-# object. For this kind of action, the 'id' is a mandatory filter
-# and it is the only filter available. So it can be known the amount of objects
-# will be involved by using that filter.
+    for my $arg ($self->json_wrapper->arguments_list)
+    {
+        QVD::API::Exception->throw(code => 6230, object => $arg) unless
+            ($self->qvd_object_model->available_argument($arg) || $self->qvd_object_model->has_property( $arg ));
 
-    my $id = $self->json_wrapper->get_filter_value('id');
-    my ($method,$code) = ref($id) && scalar @$id > 1 ? 
-	('get_acls_for_argument_in_massive_update',4240) : 
-	('get_acls_for_argument_in_update',4230) ;
+        QVD::API::Exception->throw(code => 4230, object => $arg) unless
+            $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_argument_in_update($arg));
+    }
 
-    $admin->re_is_allowed_to($self->qvd_object_model->$method($_)) || 
-	QVD::API::Exception->throw(code => $code, object => $_) 
-	for $self->json_wrapper->arguments_list
 }
 
 sub check_create_arguments_validity_in_json
@@ -395,7 +391,8 @@ sub check_fields_validity_in_json # Fields to retrieve
 
     for my $field ($self->json_wrapper->fields_list) {
         QVD::API::Exception->throw(code => 6250, object => $field)
-            unless $self->qvd_object_model->available_field($field);
+            unless ($self->qvd_object_model->available_field($field) ||
+                $self->qvd_object_model->has_property($field));
 
         QVD::API::Exception->throw(code => 4250, object => $field)
             unless $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_field($field));
@@ -601,10 +598,6 @@ sub get_dbi_format_filters {
             $filters_dbi->set_filter_key($filter_path, $key_dbix.".value");
             my $value_path = QVD::API::REST::Filter::filter_basedir_from_path($filter_path);
             $filters_dbi->add_filter($value_path, { '=' => $key }, "properties_list$prop_suffix.key");
-            # In case there are other properties with the same name in other tenants, the tenant_id
-            # is required to be specified
-            $filters_dbi->add_filter($value_path, { '=' => $self->administrator->tenant_id },
-                "properties_list$prop_suffix.tenant_id");
         }
         else
         {
@@ -634,17 +627,25 @@ sub set_arguments_in_request
 
     for my $key ($self->json_wrapper->arguments_list)
     {
-	my $key_dbix_format = 
-	    $self->qvd_object_model->map_argument_to_dbix_format($key);
+        my $tenant_id = $self->administrator->tenant_id;
+        if($self->qvd_object_model->has_property($key)){
+            my $admin4method = $self->qvd_object_model->map_nested_query_to_admin4("__properties__");
+            my $value = $self->json_wrapper->get_argument_value($key, $tenant_id);
+            $self->set_nested_query($admin4method, { $key => $value });
+            $self->json_wrapper->forze_argument_deletion($key);
+        } else {
+            my $key_dbix_format =
+                $self->qvd_object_model->map_argument_to_dbix_format($key);
 
-	my $value = $self->json_wrapper->get_argument_value($key);
-	my $value_normalized =  $self->qvd_object_model->normalize_value($key,$value);
+            my $value = $self->json_wrapper->get_argument_value($key);
+            my $value_normalized = $self->qvd_object_model->normalize_value($key, $value);
 
-	$self->instantiate_argument($key_dbix_format,$value_normalized); 
+            $self->instantiate_argument($key_dbix_format, $value_normalized);
+        }
     }
 
-    $self->set_arguments_in_request_with_defaults if 
-	$self->qvd_object_model->type_of_action =~ /^create(_or_update)?$/;
+    $self->set_arguments_in_request_with_defaults if
+        $self->qvd_object_model->type_of_action =~ /^create(_or_update)?$/;
 }
 
 sub set_arguments_in_request_with_defaults
@@ -708,11 +709,14 @@ sub set_nested_queries_in_request
 sub set_tables_to_join_in_request
 {
     my $self = shift;
-    $self->add_to_join($_) 
-	for @{$self->qvd_object_model->dbix_join_value};
-
-    $self->add_to_prefetch($_) 
-	for @{$self->qvd_object_model->dbix_prefetch_value};
+    $self->add_to_join($_)
+        for @{$self->qvd_object_model->dbix_join_value};
+    
+    $self->add_to_prefetch($_)
+        for @{$self->qvd_object_model->dbix_prefetch_value};
+    
+    # Joining tables might returns duplicated rows, so they shall be ommited by adding distinct
+    $self->modifiers->{distinct} = 1;
 }
 
 sub set_related_views_in_request

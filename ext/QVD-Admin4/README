@@ -37,7 +37,6 @@ This module requires these other modules and libraries:
     Mojo::UserAgent
     Moo
     POSIX
-    QVD::API::REST::Filter
     QVD::Admin4::Command
     QVD::Admin4::Grammar
     QVD::Admin4::Grammar::Response

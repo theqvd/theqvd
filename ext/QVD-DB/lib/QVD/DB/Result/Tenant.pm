@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use constant COMMON_TENANT_ID => -1;
+use constant SUPERADMIN_TENANT_ID => 0;
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('tenants');

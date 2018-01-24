@@ -223,8 +223,8 @@ my $ACTIONS = {
 
 	vm_create => {
 		type_of_action => 'create',
-	       admin4method => 'create',
-	       acls => [qr/^vm\.create\./],
+		admin4method => 'vm_create',
+		acls => [qr/^vm\.create\./],
 		qvd_object => 'VM'
 	},
 
@@ -309,7 +309,7 @@ my $ACTIONS = {
 
 	host_delete => {
 		type_of_action => 'delete',
-		 admin4method => 'delete',
+		 admin4method => 'host_delete',
 		 acls => [qr/^host\.delete\.$/],
 		qvd_object => 'Host'
 	},
@@ -541,8 +541,8 @@ my $ACTIONS = {
 
 	administrator_delete => {
 		type_of_action => 'delete',
-		  admin4method => 'delete',
-		  acls => [qr/^administrator\.delete\./,qr/^tenant\.purge\.$/],
+		admin4method => 'admin_delete',
+		acls => [qr/^administrator\.delete\./,qr/^tenant\.purge\.$/],
 		qvd_object => 'Administrator'
 	},
 
@@ -776,14 +776,14 @@ my $ACTIONS = {
 
 	property_create => {
 		type_of_action => 'create',
-		 admin4method => 'create',
+		 admin4method => 'property_create',
         acls => [qr/^property\.see-main\./],
 		qvd_object => 'Property_List'
 	},
 
 	property_update => {
 		type_of_action => 'update',
-		 admin4method => 'update',
+		 admin4method => 'property_update',
         acls => [qr/^property\.see-main\./],
 		qvd_object => 'Property_List'
 	},

@@ -247,7 +247,8 @@ sub _allocate_os_disk {
 
 sub _allocate_user_disk {
     my $self = shift;
-    my $size = $self->{user_storage_size};
+    # Convert size from MB to bytes
+    my $size = $self->{user_storage_size} * 1048576;
     unless ($size) {
         DEBUG 'Not allocating user storage';
         return $self->_on_done;
@@ -284,7 +285,7 @@ sub _start_kvm {
     push @kvm_args, (-net => $nic, -net => 'tap,vlan=0,fd=3');
 
     if ($self->_cfg('vm.serial.capture')) {
-        if (defined $self->{serial_port}) {
+        if ($self->{serial_port}) {
             DEBUG "Using serial port '$self->{serial_port}'";
             push @kvm_args, -serial => "telnet::$self->{serial_port},server,nowait,nodelay";
         } else {
@@ -326,6 +327,11 @@ sub _start_kvm {
         $hdb .= ',if=virtio' if $use_virtio;
         DEBUG "Using user storage '$self->{user_image_path}' ($hdb) for VM '$self->{vm_id}'";
         push @kvm_args, -drive => $hdb;
+    }
+
+    if ($self->_cfg('vm.kvm.ballooning')) {
+        DEBUG "Ballooning enabled";
+        push @kvm_args, -balloon => 'virtio';
     }
 
     my $cpus = $self->_cfg('vm.kvm.cpus');

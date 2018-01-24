@@ -77,8 +77,14 @@ if($pid == 0) {
     exec("xinit", $client_bin, @client_args, "--", $xvfb_bin, @xvfb_args);
 } else {
     alarm 1;
-    while(my $msg = <$fh>) {
-        last if ($msg =~ /Established X server connection./);
+    my $established = 0;
+    while(!$established) {
+        open(my $aux_fh, "<", $nx2v_log);
+        while(my $msg = <$aux_fh>) {
+            $established = 1 if ($msg =~ /Established X server connection./);
+        }
+        close($aux_fh);
+        sleep(1);
     }
     alarm 0;
 }

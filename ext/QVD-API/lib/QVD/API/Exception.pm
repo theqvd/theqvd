@@ -1,5 +1,7 @@
 package QVD::API::Exception;
 use Moo;
+use Devel::StackTrace;
+use Devel::StackTrace::Extract qw(extract_stack_trace);
 use  5.010;
 
 with 'Throwable';
@@ -17,11 +19,7 @@ with 'Throwable';
 #              can be built from this multiple report
 
 has 'code', is => 'ro', isa => sub { die "Invalid type for attribute code" if ref(+shift); };
-has 'exception', is => 'ro', isa => sub {
-    my $type = ref(+shift);
-    die "Invalid type for attribute exception" 
-        unless $type eq 'QVD::API::Exception' || $type eq 'SCALAR';
-};
+has 'exception', is => 'ro';
 has 'failures', is => 'ro', isa => sub {
 	die "Invalid type for attribute failures" unless ref(+shift) eq 'HASH';
 };
@@ -39,6 +37,10 @@ has 'object', is => 'ro', isa => sub { die "Invalid type for attribute object" i
 # When throwing an exception, it can be specified a custom message for the
 # exception, that can be used to provide additional information
 has 'additional_info', is => 'ro', isa => sub {};
+
+## Private variables
+
+has '_stack_trace', is => 'ro';
 
 ## CLASS VARIABLES
 
@@ -86,6 +88,7 @@ my $code2message_mapper = {
     5120 => 'Unable to stop VM in current state',
     5130 => 'Unable to start VM in current state',
     5140 => 'Unable to assign host, no host available',
+    5200 => 'Unable to delete current administrator',
 
     6100 => 'Syntax errors in input json',
     6210 => 'Inappropiate filter for this action',
@@ -118,14 +121,16 @@ my $code2message_mapper = {
     7120 => 'Unable to remove, other items depend on it',
     7200 => 'This element already exists',
     7210 => 'This property already exists',
+    7211 => 'This property is already defined as global',
     7220 => 'This acl has already been assigned',
     7230 => 'This role has already been assigned',
+    7300 => 'Unable to create VM with OSF and User from different tenants',
     7310 => 'Unable to remove VM - This VM is running',
     7320 => 'Unable to remove DI - There are VMs running with it',
+    7321 => 'Unable to remove Host - The host is running',
     7330 => 'Unable to reassign a Tag fixed to another DI',
     7340 => 'Fixed, Head and Default Tags cannot be deleted',
     7350 => 'Forbidden role assignment, inherited role inherits from inheritor',
-    7360 => 'Incompatible expiration dates - Soft date must precede the hard one',
     7370 => 'Unable to remove a core config item',
     7373 => 'Unable to switch to monotenant mode - More than one tenant in the system',
     7382 => 'Cannot create new configuration token',
@@ -152,33 +157,63 @@ my $exception2code_mapper = {
 
     'DBIx::Error::UniqueViolation' => { default => 7200, properties => 7210, acls => 7220, roles => 7230},
 
-    'DBIx::Error::CheckViolation' => { default => 1100, vm_runtimes_consisten_expiration_dates => 7360},
+    'DBIx::Error::CheckViolation' => { default => 1100 },
 };
+
+sub figure_out_object_from_exception {
+    my $self = shift;
+    
+    my $message = $self->get_additional_info;
+    my $object = undef;
+    
+    if(eval { $self->exception->isa('DBIx::Error::DataException') }) {
+        if($message =~ qr/invalid input syntax for \w+?\: \"(\w+)\"/) {
+            $object = $1;
+        }
+    }
+    
+    return $object;
+}
 
 
 sub BUILD
 {
     my $self = shift;
-    
-    my $code_defined = defined($self->code);
-    my $exception_defined = defined($self->exception);
-    my $failures_defined = defined($self->failures);
 
     # This object is recursive if a QVD::API::Exception object was
     # provided via the exception parameter. In that case, this object
     # is built from that one
-
-    if($code_defined){
-        $self->set_default_code("Unknown code ".$self->code)
-            unless code_exists($self->code);
-    } elsif($exception_defined) {
-        if(ref($self->exception) eq 'QVD::API::Exception') {
+    
+    if(defined($self->code)){
+        unless(code_exists($self->code)) {
+            $self->{code} = get_default_code_number();
+            $self->{additional_info} = "Unknown code " . $self->code;
+        }
+        $self->{_stack_trace} = Devel::StackTrace->new()->as_string;
+    } elsif(defined($self->exception)) {
+        my $exception_type = ref($self->exception);
+        if($exception_type eq 'QVD::API::Exception') {
             $self->rebuild_recursively;
         } else {
-            $self->figure_out_code_from_exception;
+            # It can be: string, Mojo::Exception or DBIx::Error
+            $self->{code} = $self->figure_out_code_from_exception;
+            if($exception_type =~ /^Mojo::Exception/) {
+                $self->{additional_info} = $self->exception->message;
+                $self->{_stack_trace} = extract_stack_trace($self->exception)->as_string;
+            } elsif($exception_type =~ /^DBIx::Error/) {
+                $self->{additional_info} = $self->exception->message;
+                $self->{object} = $self->figure_out_object_from_exception;
+                $self->{_stack_trace} = $self->exception->stack_trace->as_string;
+            } else {
+                $self->{additional_info} = "".$self->exception;
+                $self->{_stack_trace} = Devel::StackTrace->new()->as_string;
+            }
+            chomp($self->{additional_info});
         }
-    } elsif($failures_defined) {
-        $self->figure_out_code_from_failures;
+    } elsif(defined($self->failures)) {
+        $self->{code} = $self->figure_out_code_from_failures;
+        $self->{additional_info} = "";
+        $self->{_stack_trace} = Devel::StackTrace->new()->as_string;
     } else {
         # At least one of these parameters must be  provided
         # in order to build a proper exception
@@ -193,15 +228,6 @@ sub code_exists
     return defined($code2message_mapper->{$code});
 }
 
-# Set the default code to the exception and additional message optionally
-sub set_default_code
-{
-    my $self = shift;
-    my $info = shift;
-    $self->{additional_info} = $info;
-    $self->{code} = get_default_code_number();
-}
-
 # Sets object info from the info of another 
 # object of the same class
 
@@ -212,6 +238,8 @@ sub rebuild_recursively
     $self->{query} = $self->exception->query;
     $self->{object} = $self->exception->object;
     $self->{additional_info} = $self->exception->additional_info;
+    $self->{_stack_trace} = $self->exception->_stack_trace;
+    $self->{failures} = $self->exception->failures;
 
     # This replacement shall be the last one, because others variables depends on it
     $self->{exception} = $self->exception->exception;
@@ -224,11 +252,11 @@ sub message
     my $self = shift;
     my $message = $code2message_mapper->{$self->code};
     $message .= " (".$self->object.")" if defined $self->object;
-    $message; 
+    $message;
 }
 
 sub get_default_additional_info_text {
-	return "No additional information";
+    return "No additional information";
 }
 
 sub get_default_code_number
@@ -237,43 +265,52 @@ sub get_default_code_number
 }
 
 sub get_additional_info {
-	my $self = shift;
-	my $text = (defined $self->additional_info) ? $self->additional_info : get_default_additional_info_text();
-	return $text;
+    my $self = shift;
+    my $text = (defined $self->additional_info) ? $self->additional_info : get_default_additional_info_text();
+    return $text;
+}
+
+sub get_stack_trace {
+    my $self = shift;
+    
+    my $stack_trace = $self->_stack_trace;
+    
+    if(defined($self->failures)) {
+        while(my ($key, $exception) = each %{$self->failures}) {
+            $stack_trace .= "\n- Stack trace for failure $key\n\n";
+            $stack_trace .= $exception->get_stack_trace;
+        }
+    }
+    
+    return $stack_trace;
 }
 
 sub figure_out_code_from_exception
 {
     my $self = shift;
     
-    my $e = 'default';
-
-    if (my $exception = $self->exception)
-    {
-	for my $class (keys %$exception2code_mapper)
-	{
-	    if (eval { $exception->isa($class) })
-	    {
-		$e = $class;
-		last;
-	    }
-	}
-    }
-
-    my ($q) = $e eq 'DBIx::Error::CheckViolation' ?
-	$self->exception->message  =~ /^.+?violates check constraint "([^"]+)"/ :
-	$self->query;
-    $q //= 'default';
-    $q = 'default' unless exists $exception2code_mapper->{$e}->{$q}; 	
+    my $exception_class = 'default';
     
-    $self->{code} = $exception2code_mapper->{$e}->{$q}; 
+    for my $class (keys %$exception2code_mapper)
+    {
+        if (eval { $self->exception->isa($class) })
+        {
+            $exception_class = $class;
+            last;
+        }
+    }
+    
+    my $exception_query = $self->query // 'default';
+    $exception_query = 'default' unless exists $exception2code_mapper->{$exception_class}->{$exception_query};
+    
+    return $exception2code_mapper->{$exception_class}->{$exception_query};
 }
 
 
 sub figure_out_code_from_failures
 {
     my $self = shift;
-    $self->{code} = 1200;
+    return 1200;
 }
 
 # Provides the exception info in JSON format.
@@ -285,12 +322,20 @@ sub figure_out_code_from_failures
 sub json
 {
     my $self = shift;
-	return {
-		status => $self->code,
-		message => $self->message(),
-		additional_info => $self->get_additional_info(),
-		$self->failures ? (failures => $self->failures) : (),
-	};
+    
+    my $json = {
+        status => $self->code,
+        message => $self->message(),
+        additional_info => $self->get_additional_info(),
+    };
+    if (defined($self->failures)) {
+        $json->{failures} = {};
+        while (my ($key, $exception) = each %{$self->failures}) {
+            $json->{failures}->{$key} = $exception->json;
+        }
+    }
+    
+    return $json;
 }
 
 1;

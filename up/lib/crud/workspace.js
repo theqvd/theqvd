@@ -1,23 +1,16 @@
 // Workspaces CRUD functions
 Up.CRUD.workspaces = {
-    activeWorkspace: function (e, model, afterCallback) {
-        if (e) {
-            var selectedId = parseInt($(e.target).attr('data-id'));
-        }
-        var afterCallback = afterCallback || Up.CurrentView.render;
-        
-        var model = model || Up.CurrentView.collection.where({id: selectedId})[0];
-        
-        var params = {'active': true};
+    activeWorkspace: function (model, afterCallback) {
+        var params = {'active': 1};
         model.set(params);
         
         var messages = {
             'success': 'Workspace activated successfully',
             'error': 'Error activating Workspace'
         };
-                    
+        
         Up.CurrentView.saveModel({id: model.get('id')}, params, messages, afterCallback, model, 'update');
-    },  
+    },
     
     deleteWorkspace: function (e) {
         Up.I.confirm('dialog/confirm-undone', this.applyDeleteWorkspace, e);
@@ -107,10 +100,9 @@ Up.CRUD.workspaces = {
                 Up.I.renderEditionMode(model, target);
             },
         }
-
+        
         Up.I.dialog(dialogConf);
     },
-    
     
     cloneWorkspace: function (e) {
         var selectedId = $(e.target).attr('data-id');
@@ -119,44 +111,5 @@ Up.CRUD.workspaces = {
         model.set({name: model.get('name') + ' (copy)', fixed: false});
         
         Up.CurrentView.newWorkspace(e, model);
-    },
-    
-    firstEditWorkspace: function (model) {
-        var that = this;
-        var dialogConf = {
-            title: $.i18n.t('First Workspace configuration') + ': ' + model.get('name'),
-            buttons : {
-                "Reset form": function () {
-                    Up.I.resetForm(this);
-                },
-                "Cancel": function () {
-                    // If cancel, check previous workspace active as actived
-                    var modelActive = Up.CurrentView.wsCollection.where({active: 1})[0];
-                    
-                    $('[name="active_configuration_select"]').val(modelActive.get('id'));
-                    $('[name="active_configuration_select"]').trigger('chosen:updated');
-                    
-                    // Close dialog
-                    Up.I.closeDialog($(this));
-                },
-                "Save": function () {
-                    var params = Up.I.parseForm(this);
-                    
-                    model.set(params);
-                    
-                    Up.CurrentView.saveModel({id: model.get('id')}, params, {}, function () {
-                        Up.CurrentView.activeWorkspace(null, model, function() {});
-                    }, model, 'update');
-                    
-                    Up.I.closeDialog($(this));
-                }
-            },
-            buttonClasses : [CLASS_ICON_RESET, CLASS_ICON_CANCEL, CLASS_ICON_SAVE],
-            fillCallback : function (target) { 
-                Up.I.renderEditionMode(model, target);
-            },
-        }
-
-        Up.I.dialog(dialogConf);
-    },   
+    }
 }

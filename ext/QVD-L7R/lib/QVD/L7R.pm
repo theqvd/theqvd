@@ -9,6 +9,7 @@ use Carp;
 use feature 'switch';
 use URI::Split qw(uri_split);
 use MIME::Base64 'decode_base64';
+use Socket qw(IPPROTO_TCP TCP_NODELAY);
 use IO::Socket::Forwarder qw(forward_sockets);
 
 use QVD::Config;
@@ -75,6 +76,8 @@ sub post_configure_hook {
     my $l7r = shift;
     $l7r->set_http_request_processor(\&connect_to_vm_processor,
                                      GET => '/qvd/connect_to_vm');
+    $l7r->set_http_request_processor(\&authenticate_user,
+                                     GET => '/qvd/authenticate_user');
     $l7r->set_http_request_processor(\&list_of_vm_processor,
                                      GET => '/qvd/list_of_vm');
     $l7r->set_http_request_processor(\&ping_processor,
@@ -100,6 +103,31 @@ sub ping_processor {
     } else {
         $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, "Server is $server_state");
     }
+}
+
+sub authenticate_user {
+    my ($l7r, $method, $url, $headers) = @_;
+    
+    my $auth = $l7r->_authenticate_user($headers);
+    
+    my $query = (uri_split $url)[3];
+    my %params = uri_query_split $query;
+    
+    my $response = {};
+    
+    $auth->before_list_of_vms;
+    
+    # Store auth paramaters if needed
+    my $store_auth_params = $params{store_auth} // 0;
+    if($store_auth_params) {
+        txn_do {
+            my $uas = rs('User_Auth_Parameters')->create({ parameters => $l7r->json->encode($auth->{params}) });
+            $response->{auth_params_id} = $uas->id;
+        };
+    }
+    
+    $l7r->send_http_response_with_body( HTTP_OK, 'application/json', [],
+        $l7r->json->encode($response) );
 }
 
 sub list_of_vm_processor {
@@ -528,6 +556,8 @@ sub _run_forwarder {
                                        Proto => 'tcp',
                                        KeepAlive => 1)
         or LOGDIE "Unable to connect to X server  on VM VM_ID: " . $vm->id .  ": $!";
+    setsockopt($socket, IPPROTO_TCP, TCP_NODELAY, 1) or WARN "Cannot set TCP_NODELAY";
+
     txn_do { $this_host->counters->incr_nx_ok; };
 
     DEBUG "Socket connected to X server on VM VM_ID: " . $vm->id;

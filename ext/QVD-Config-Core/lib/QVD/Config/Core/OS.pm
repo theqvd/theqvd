@@ -30,8 +30,16 @@ sub detect_os {
         if ($^O =~ /^linux/i) {
             if (my %osr = __parse_file($os_release_path)) {
                 $os = $osr{name};
-                $version = $osr{version_id};
-                $revision = ($osr{version} =~ /^\s*$version\.(\d+)/) ? $1 : 0;
+                if ($osr{id} eq 'ubuntu') {
+                    $version = $osr{version_id};
+                    $revision = ($osr{version} =~ /^\s*$version\.(\d+)/) ? $1 : 0;
+                }
+                else {
+                    if ($osr{version_id} =~ /^(\d+)(?:\.(\d+))?/) {
+                        $version = $1;
+                        $revision = $2 // '0';
+                    }
+                }
             }
             elsif (my %sv = __parse_file($suse_version_path)) {
                 $os = 'suse';

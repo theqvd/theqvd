@@ -66,11 +66,21 @@ sub open {
                 $stream->on(read => sub {
                         my ($stream, $bytes) = @_;
                         DEBUG term_escape "-- <<< VMA ($bytes)\n";
-                        $stream->stop();
-                        $stream->unsubscribe('read');
-                        if ($bytes =~ /101/){
+
+                        my $invalid_message = 1;
+                        if ($bytes =~ /HTTP\/1.1 102 Processing/) {
+                            INFO "Processing request message received";
+                            $invalid_message = 0;
+                        }
+                        if ($bytes =~ /HTTP\/1.1 101 Switching Protocols/) {
+                            INFO "Switching protocol message received";
+                            $invalid_message = 0;
+                            $stream->stop();
+                            $stream->unsubscribe('read');
                             $cb->($stream);
-                        } else {
+                        }
+                        if ($invalid_message) {
+                            ERROR "Invalid response received when upgrading to VNC";
                             $tx->finish;
                         }
                     });
@@ -86,12 +96,12 @@ sub open {
             $stream->timeout(0);
 
             $stream->on(error => sub {
-                DEBUG term_escape "TCP error: $_[1]";
-                $stream->emit('close');
+                ERROR "TCP error: $_[1]";
+                $stream->close;
             });
 
             $stream->on(close => sub {
-                DEBUG term_escape "TCP connection closed";
+                INFO "TCP connection closed";
                 $tx->finish;
             });
 
@@ -105,6 +115,12 @@ sub open {
                 my ($tx, $bytes) = @_;
                 DEBUG term_escape "-- TCP <<< WebSocket ($bytes)\n";
                 $stream->write($bytes);
+            });
+    
+            $tx->on(finish => sub {
+                my ($tx) = @_;
+                INFO "Incoming TCP connection closed";
+                $stream->close;
             });
 
             $stream->start;

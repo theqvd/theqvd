@@ -8,8 +8,6 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
     initialize: function (params) {
         var that = this;
         
-        Up.B.bindCommonEvents();
-        
         // Store temporal token
         that.token = params.token;
         that.id = params.id;

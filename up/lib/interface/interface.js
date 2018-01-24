@@ -772,27 +772,19 @@ Up.I = {
         })
         
         return params;
-    },  
+    },
     
     resetForm: function (context) {
-        $.each($(context).find('.js-form-field'), function (iField, field) {
-            var fieldName = $(field).attr('name');
-            var fieldType = $(field).attr('type');
-            switch (fieldType) {
-                case 'checkbox':
-                    if ($(field).is(':checked')) {
-                        $(field).prop('checked', '');
-                        $(field).trigger('change');
-                    }
-                    break;
-                default:
-                    $(field).val('');
-                    if ($(field).prop('tagName')) {
-                        $(field).trigger('chosen:updated');
-                    }
-                    break;
-            }
-        })
+        Up.I.renderEditionModeParameters(Up.CurrentView.modelInEdition, Up.CurrentView.modelInEdition.get('settings_enabled'));
+        
+        // Restore name and settings enabled checkbox
+        var nameCtl = $(context).find('.js-form-field[name="name"]');
+        var nameValue = $(nameCtl).attr('data-original-value');
+        $(nameCtl).val(nameValue);
+        
+        var settingsEnabledCtl = $(context).find('.js-form-field[name="settings_enabled"]');
+        var settingsEnabledChecked = parseInt($(settingsEnabledCtl).attr('data-original-checked')) ? true : false;
+        $(settingsEnabledCtl).prop('checked',settingsEnabledChecked);
     },
     
     setMenuOptionSelected: function (dataTarget) {
@@ -802,18 +794,47 @@ Up.I = {
     
     // Render edition
     renderEditionMode: function (model, target) {
-        // List of settings
+        Up.CurrentView.modelInEdition = model.clone();
+        
         var canBeDisabled = typeof model.get('settings_enabled') != 'undefined';
+        
+        // List of settings
         var template = _.template(
             Up.TPL.settingsEditor, {
                 model: model,
                 canBeDisabled: canBeDisabled,
-                settingsDisabledList: Up.I.getSettingsDisabledList(model),
                 cid: Up.CurrentView.cid
             }
         );
         
         target.html(template);
+        
+        this.renderEditionModeParameters(model, !canBeDisabled || model.get('settings_enabled'));
+    },
+    
+    renderEditionModeParameters: function (model, settingsEnabled) {
+        var settings = model.get('settings');
+        
+        // Active workspace
+        if (Up.CurrentView.wsCollection && !settingsEnabled) {
+            var activatedWorkspace = Up.CurrentView.wsCollection.findWhere({'active': 1});
+            var settings = activatedWorkspace.get('settings');
+        }
+        
+        var template = _.template(
+            Up.TPL.settingsEditorParameters, {
+                settings: settings,
+                settingsEnabled: settingsEnabled
+            }
+        );
+        
+        $('.bb-editor-parameters').html(template);
+        
+        var client = settings.client.value;
+
+        $('[data-client-mode]').hide();
+        $('[data-client-mode="both"]').show();
+        $('[data-client-mode="' + client + '"]').show();
         
         Up.I.Chosen.element($('select[name="connection"]'), 'single100');
         Up.I.Chosen.element($('select[name="client"]'), 'single100');
@@ -856,24 +877,6 @@ Up.I = {
     
     isDialogOpen: function () {
         return Up.CurrentView.dialogs.length ? true : false;
-    },
-    
-    getSettingsDisabledList: function (model) {
-        var canBeDisabled = typeof model.get('settings_enabled') != 'undefined';
-
-        var settingsDisabled = canBeDisabled && !model.get('settings_enabled');
-        var html5_client = model.get('settings') && model.get('settings').client.value == 'html5';
-        
-        var settingsDisabledList = {};
-        $.each (['connection', 'audio', 'printers', 'fullscreen', 'share_folders', 'share_usb'], function (i, v) {
-            settingsDisabledList[v] = settingsDisabled || (html5_client && $.inArray(v, HTML5_SETTINGS) == -1);
-        });
-
-        settingsDisabledList['share_folders_list'] = !model.get('settings') || !parseInt(model.get('settings').share_folders.value) || settingsDisabledList['share_folders'];
-        settingsDisabledList['share_usb_list'] = !model.get('settings') || !parseInt(model.get('settings').share_usb.value) || settingsDisabledList['share_usb'];
-        settingsDisabledList['client'] = settingsDisabled;
-
-        return settingsDisabledList;
     },
     
     updateProgressMessage: function (text, awIcon) {

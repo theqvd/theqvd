@@ -58,6 +58,8 @@ sub usage_text {
         admin (Intended to QVD administrators management)
     
         config (Intended to QVD configuration management)
+
+        property (Intended to QVD configuration management)
     ";
 }
 
@@ -70,6 +72,7 @@ sub option_spec {
 		[ 'format|f=s'     => 'Output format' ],
 		[ 'insecure'       => 'Trust any certificate'],
 		[ 'ca=s'           => 'CA certificate path'],
+		[ 'help'           => 'Print usage information'],
 }
 
 sub command_map {
@@ -88,6 +91,7 @@ sub command_map {
 		host     => 'QVD::Admin4::Command::Host',
 		osf      => 'QVD::Admin4::Command::OSF',
 		di       => 'QVD::Admin4::Command::DI',
+		property => 'QVD::Admin4::Command::Property',
 		login    => 'QVD::Admin4::Command::Login',
 		logout   => 'QVD::Admin4::Command::Logout',
 		password => 'QVD::Admin4::Command::Password',
@@ -100,6 +104,11 @@ sub command_map {
 
 sub init {
 	my ($self, $opts) = @_;
+
+	if($opts->help) {
+		print $self->usage . "\n";
+		exit(0);
+	}
 
 	my ($url, $tenant_name, $login, $password, $insecure, $ca_cert_path, $output_format);
 	$url = Mojo::URL->new($opts->url // cfg('qa.url'));

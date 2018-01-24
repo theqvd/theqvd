@@ -130,7 +130,7 @@
     .grid-cell-icon, .grid-cell-blocked-icon {
         position: absolute;
         font-size: 54px;
-        top: 50px;
+        top: 60px;
         left: 67px;
         width: 80px;
         height: 80px;
@@ -223,16 +223,16 @@
     }
     
     .vm-screenshot {
-        //background: url('../images/screenshot-test.png');
-    }  
+        background: url('../images/screenshot-example.png');
+    }
     
     .vm-screenshot-off {
-        
+        background: lighten($col_blacker, 10);
     }
     
 
     .vm-screenshot, .vm-screenshot-off {
-        background-size: auto 100%;
+        background-size: 100% 100%;
         background-position: center; 
         background-repeat: no-repeat;
         
@@ -246,6 +246,10 @@
         }
         
         position: relative;
+    }
+        
+    .vm-screenshot--hover {
+        opacity: 0.4;
     }
 }
 

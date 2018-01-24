@@ -32,6 +32,11 @@ use QVD::Config;
 use QVD::Log;
 use QVD::HTTP::Headers qw(header_eq_check);
 use QVD::HTTP::StatusCodes ();
+use Time::HiRes qw(sleep);
+
+$SIG{__WARN__} = sub { WARN "WARN: @_"; };
+$SIG{__DIE__} = sub { ERROR "DIE: @_"; };
+
 
 use parent 'QVD::SimpleRPC::Server';
 
@@ -49,6 +54,7 @@ my $enable_printing = cfg('vma.printing.enable');
 my $printing_conf   = cfg('internal.vma.printing.config');
 my $slave_conf      = cfg('internal.vma.slave.config');
 my $nxagent_conf    = cfg('internal.vma.nxagent.config');
+my $pulse_conf      = cfg('internal.vma.pulseaudio.config');
 
 my $nxagent_args_extra   = cfg('command.nxagent.args.extra');
 my $x_session_args_extra = cfg('command.x-session.args.extra');
@@ -145,9 +151,9 @@ sub _call_hook {
     my $name = shift;
     my $file = shift;
     my $detach = shift;
-    
+
     if (length $file) {
-        DEBUG "calling hook '$file' for $name" ; 
+        DEBUG "calling hook '$file' for $name" ;
         my $pid = fork;
         if (!$pid) {
             defined $pid or die "fork failed: $!\n";
@@ -453,7 +459,7 @@ sub _umount_remote_shares {
 }
 
 sub _fork_monitor {
-    my %props = _fill_props @_;
+    my %props = _fill_props(@_);
     my $log = _open_log('nxagent');
     my $logfd = fileno $log;
     select $log;
@@ -465,6 +471,8 @@ sub _fork_monitor {
 
     $SIG{CHLD} = 'IGNORE';
     my $pid = fork;
+    my $pulse_proc;
+
     if (!$pid) {
         defined $pid or die "Unable to start monitor, fork failed: $!\n";
         undef $SIG{CHLD};
@@ -491,8 +499,9 @@ sub _fork_monitor {
                     _call_action_hook(connect => %props);
                     _make_nxagent_config(%props);
 
-                    $ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000) if $enable_audio;
                     $ENV{NX_CLIENT} = $nxdiag;
+                    $ENV{NX_SLAVE_CMD} = $command_slave if $command_slave;
+                    # Keep QVD_SLAVE_CMD for retrocompatibility
                     $ENV{QVD_SLAVE_CMD} = $command_slave if $command_slave;
 
                     # FIXME: Include VM name in -name argument.
@@ -519,16 +528,28 @@ sub _fork_monitor {
                         DEBUG "Agent running";
                         _save_nxagent_pid $1;
                     }
-                    when (/Session: (\w+) session at/ or
-                          /Session: Session (\w+) at/) {
+                    when (/Session: (\w+) session at/) {
                         my $state = lc $1;
                         if ($state eq 'suspended') {
                             _umount_remote_shares($props{'qvd.vm.user.home'});
                         }
-                        DEBUG "Session $state, calling hooks";
+                        DEBUG "Session $1, calling hooks";
                         _save_nxagent_state_and_call_hook $state;
                     }
-                    when (/Listening to slave connections on port '(\d+)'/) {
+                    when (/Session: Session (\w+) at/) {
+                        my $state = lc $1;
+                        if ($state eq 'suspended') {
+                            _umount_remote_shares($props{'qvd.vm.user.home'});
+                        }
+                        DEBUG "Session $1, calling hooks";
+                        _save_nxagent_state_and_call_hook $state;
+    
+                        if ( $1 =~ /term|abort|suspend/i ) {
+                            _stop_process($pulse_proc, "PulseAudio");
+                            undef $pulse_proc;
+                        }
+                    }
+                    when (/Listening to slave connections on port '(?:tcp:\w+:)?(\d+)'/) {
                         DEBUG "Slave channel opened";
 
                         if ( $props{'qvd.client.usb.enabled' } ) {
@@ -541,10 +562,46 @@ sub _fork_monitor {
                             }
                         }
                     }
+                    when (/Listening to multimedia connections on port '(?:tcp:\w+:)?(\d+)'/ ) {
+                        my $pa_port = $1;
+                        DEBUG "Multimedia channel opened on port $pa_port";
+
+                        if ( $enable_audio ) {
+                                $pulse_proc = _start_pulseaudio($pa_port, $props{'qvd.vm.user.name'});
+                        }
+                    }
                 }
                 print $line;
+
+                if ( $pulse_proc ) {
+                    my $ret = waitpid($pulse_proc, WNOHANG );
+
+                    if ( $ret ) {
+                        undef $pulse_proc;
+                        ERROR "PulseAudio terminated with code " . ($? >> 8);
+                    }
+                }
             }
             print "out closed";
+
+            if ($pulse_proc) {
+                INFO "Stopping PulseAudio with pid $pulse_proc";
+                kill 'TERM', $pulse_proc;
+                my $tries = 10;
+                my $killed;
+                while($tries > 0 && (!$killed || $killed <= 0)) {
+                    $killed = waitpid($pulse_proc, WNOHANG);
+                    break if $killed;
+                    $tries--;
+                }
+
+                if (!$killed) {
+                    WARN "PulseAudio did not exit, terminating forcefully";
+                    kill 'KILL', $pulse_proc;
+                    waitpid($pulse_proc, 0);
+               }
+            }
+
         };
         DEBUG $@ if $@;
         _delete_nxagent_state_and_pid_and_call_hook;
@@ -767,7 +824,7 @@ sub _start_usbip {
    my ($port) = @_;
    DEBUG "Starting USBIP";
    my @cmd;
-   
+
    eval {
        DEBUG "Creating SlaveClient object";
        require QVD::SlaveClient;
@@ -787,6 +844,84 @@ sub _start_usbip {
            ERROR "Error while setting up USBIP: $@";
        }
    }
+
+}
+
+sub _start_pulseaudio {
+    my ($port, $user) = @_;
+    my $proc;
+
+    INFO "Starting PulseAudio on port $port, user $user";
+
+    # Make sure that we don't break the session if something goes wrong here.
+    eval {
+        my ($buf, $ofh, $ifh);
+        my $packaged_pulse_conf = cfg('path.qvd.etc') . "/pulse/default.pa";
+
+        DEBUG "Reading $packaged_pulse_conf";
+        if (!open($ifh, '<', $packaged_pulse_conf) ) {
+            ERROR "Failed to open $packaged_pulse_conf: $!";
+            return undef;
+        }
+
+        local $/;
+        undef $/;
+        $buf = <$ifh>;
+        close $ifh;
+
+        DEBUG "Writing $pulse_conf";
+        if (!open($ofh, '>', $pulse_conf)) {
+            ERROR "Failed to create $pulse_conf: $!";
+            return undef;
+        }
+
+        print $ofh "$buf\n";
+        print $ofh "load-module module-tunnel-sink-new sink_name=QVD_Audio " .
+                   "server=tcp:127.0.0.1:$port sink=\@DEFAULT_SINK\@ compression=opus\n";
+        close $ofh;
+
+        my @cmd = (cfg('path.qvd.bin') . "/pulseaudio",
+                   "-vv", "--log-target=file:/tmp/qvd-pulseaudio-$user.log",
+                   "-n", "-F", $pulse_conf, "--exit-idle-time", "-1");
+
+        INFO "Executing PulseAudio";
+        DEBUG "Arguments: " . join(' ', @cmd);
+
+        $proc = _bgrun({ user => $user }, @cmd);
+
+        if (!$proc) {
+            ERROR "Failed to start pulseaudio: $!";
+            return undef;
+        }
+    };
+    if ( $@ ) {
+        ERROR "Error while starting PulseAudio: $@";
+        return undef;
+    }
+
+    return $proc;
+}
+
+sub _stop_process {
+    my ($pid, $name) = @_;
+    return unless ($pid);
+
+    my $tries = 10;
+    my $killed;
+
+    INFO "Stopping $name with pid $pid";
+    kill 'TERM', $pid;
+
+    while($tries-- > 0) {
+        $killed = waitpid($pid, WNOHANG);
+        break if $killed;
+    }
+
+    if (!$killed) {
+        WARN "$name did not exit, terminating forcefully";
+        kill 'KILL', $pid;
+        waitpid($pid, 0);
+    }
 
 }
 
@@ -833,12 +968,32 @@ sub HTTP_vnc_connect {
     _vnc_connect($httpd, $headers);
 }
 
+sub _bgrun {
+    my ($opts, @cmd) = @_;
+
+    local $SIG{CHLD};
+    undef $SIG{CHLD};
+
+    my $pid = fork();
+    if ( !$pid ) {
+        die "Fork failed: $!" unless (defined $pid);
+        if ( $opts->{user} ) {
+            _become_user($opts->{user});
+            _set_environment();
+        }
+
+        exec(@cmd) or POSIX::exit(1);
+    } else {
+        return $pid;
+    }
+
+}
 sub _run {
 	my @cmd = @_;
 	my $cmdstr = join(' ', @cmd);
-	
+
 	DEBUG "Going to run command '$cmdstr'";
-	
+
 	my $ret = system(@cmd);
 	if ( $ret == -1 ) {
 		ERROR "Failed to execute '$cmdstr': $!\n";

@@ -22,6 +22,8 @@ WriteMakefile(
         'DateTime' => 0,
         'DBIx::Error' => 0,
         'Deep::Encode' => 0,
+        'Devel::StackTrace' => 0,
+        'Devel::StackTrace::Extract' => 0,
         'File::Slurp' => 0,
         'List::Util' => 1.33,
         'Mojo::ByteStream' => 0,,

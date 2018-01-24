@@ -7,6 +7,7 @@ use 5.010;
 use Crypt::OpenSSL::X509;
 use File::Path 'make_path';
 use File::Spec;
+use Socket qw(IPPROTO_TCP TCP_NODELAY);
 use IO::Socket::INET;
 use IO::Socket::SSL;
 use IO::Socket::Forwarder qw(forward_sockets);
@@ -20,6 +21,7 @@ use QVD::Log;
 use QVD::Client::USB;
 use QVD::Client::USB::USBIP;
 use QVD::Client::USB::IncentivesPro;
+use QVD::Client::PulseAudio;
 use Time::HiRes qw(sleep);
 use Carp;
 
@@ -873,7 +875,7 @@ sub _run {
 
     my %o;
     my $slave_port_file = $QVD::Client::App::user_dir.'/slave-port';
-    my ($nxproxy_proc, $x11_proc, $pa_proc);
+    my ($nxproxy_proc, $x11_proc, $pa_proc, $qvd_pa);
     eval {
         # Erase any previously set value. This is only for nxproxy, may break other things
         $self->{client_delegate}->proxy_set_environment( DYLD_LIBRARY_PATH => "" );
@@ -889,30 +891,79 @@ sub _run {
         }
 
         # Call pulseaudio in Windows or Darwin
-        if ( $self->{audio} && ( $WINDOWS || $DARWIN ) ) {
-            my $pa_exe = File::Spec->rel2abs(core_cfg($WINDOWS
-                                                      ? 'command.windows.pulseaudio'
-                                                      : 'command.darwin.pulseaudio'),
-                                             $QVD::Client::App::app_dir);
-            my $pa_cfg = File::Spec->rel2abs(core_cfg($WINDOWS
-                                                      ? 'command.windows.pulseaudio.default.pa'
-                                                      : 'command.darwin.pulseaudio.default.pa'),
-                                             $QVD::Client::App::app_dir);
-            my $pa_log = File::Spec->rel2abs("pulseaudio.log", $QVD::Client::App::user_dir);
-            my @pa = ($pa_exe,
-                      "--file=$pa_cfg",
-                      '--log-level=debug',
-                      '--high-priority=yes',
-                      '--use-pid-file=no',
-                      '--daemonize=no',
-                      '--system=no',
-                      '--disallow-exit=yes',
-                      '--exit-idle-time=-1',
-                      "--log-target=file:$pa_log");
+        if ( $self->{audio} ) {
+            if ( $WINDOWS || $DARWIN ) {
+                my $pa_exe = File::Spec->rel2abs(core_cfg($WINDOWS
+                        ? 'command.windows.pulseaudio'
+                        : 'command.darwin.pulseaudio'),
+                    $QVD::Client::App::app_dir);
+                my $pa_cfg = File::Spec->rel2abs(core_cfg($WINDOWS
+                        ? 'command.windows.pulseaudio.default.pa'
+                        : 'command.darwin.pulseaudio.default.pa'),
+                    $QVD::Client::App::app_dir);
+                my $pa_log = File::Spec->rel2abs("pulseaudio.log", $QVD::Client::App::user_dir);
+                my @pa = ($pa_exe,
+                    "--file=$pa_cfg",
+                    '--log-level=debug',
+                    '--high-priority=yes',
+                    '--use-pid-file=no',
+                    '--daemonize=no',
+                    '--system=no',
+                    '--disallow-exit=yes',
+                    '--exit-idle-time=-1',
+                    "--log-target=file:$pa_log");
 
-            DEBUG("Starting pulseaudio: @pa");
-            $pa_proc = Proc::Background->new(@pa) or
+                DEBUG("Starting pulseaudio: @pa");
+                $pa_proc = Proc::Background->new(@pa) or
                 WARN("Pulseaudio failed to start, ignoring error");
+            } else {
+                # Linux
+                INFO "Sound enabled, running on Linux";
+    
+                my $syspa = QVD::Client::PulseAudio->new();
+                my $qvdpa_needed;
+    
+                DEBUG "Checking system PulseAudio";
+    
+                if (! $syspa->is_running ) {
+                    # Since every current Linux distro uses PA, supporting systems
+                    # without it seems unnecessary and would need testing.
+                    #
+                    # For now, we don't handle this scenario, though QVDPA could
+                    # probably deal with it.
+                    ERROR "Local PulseAudio is not running";
+                } else {
+                    DEBUG "Checking whether system PA supports Opus";
+    
+                    if ( $syspa->is_opus_supported ) {
+                        # Great, this makes things easier
+                        # 
+                        INFO "System PA supports Opus, setting it up";
+                        $syspa->cmd("load-module", "module-native-protocol-tcp",
+                                    "auth-anoymous=1", "listen=127.0.01", "port=4713");
+                    } else {
+                        # Chain our own PA
+                        INFO "System PA does not support Opus, chaining QVDPA";
+                        DEBUG "Setting up native protocol on local PA";
+                        $syspa->cmd("load-module", "module-native-protocol-tcp",
+                                    "auth-anonymous=1",
+                                    "listen=127.0.0.1",
+                                    "port=52001");
+    
+                        $qvd_pa = QVD::Client::PulseAudio->start(
+                           env_func => sub { $self->{client_delegate}->proxy_set_environment(@_) }
+                        );
+    
+                        $qvd_pa->cmd("load-module", "module-native-protocol-tcp",
+                                    "auth-anonymous=1", "listen=127.0.0.1", "port=4713");
+                        $qvd_pa->cmd("load-module", "module-tunnel-sink-new",
+                                    "sink_name=QVD", "server=tcp:127.0.0.1:52001",
+                                    "sink=\@DEFAULT_SINK\@");
+                    }
+                }
+    
+                sleep(20);
+            }
         }
 
         if ( core_cfg('client.slave.enable') && core_cfg('client.usb.enable') ) {
@@ -995,7 +1046,9 @@ sub _run {
                 #$self->{client_delegate}->proxy_set_environment(QVD_SLAVE_ARG1 => $slave_cmd);
             }
             elsif (-x $slave_cmd ) {
-                $self->{client_delegate}->proxy_set_environment(NX_SLAVE_CMD => $slave_cmd);
+                # We keep QVD_SLAVE_CMD for retrocompatibility
+                $self->{client_delegate}->proxy_set_environment( QVD_SLAVE_CMD => $slave_cmd );
+                $self->{client_delegate}->proxy_set_environment( NX_SLAVE_CMD => $slave_cmd );
             } else {
                 WARN("Slave command '$slave_cmd' not found or not executable.");
             }
@@ -1034,6 +1087,7 @@ sub _run {
             $nxproxy_proc->alive or _logdie "nxproxy has terminated unexpectedly";
         }
         $local_socket or _logdie "connection from nxproxy failed";
+        setsockopt($local_socket, IPPROTO_TCP, TCP_NODELAY, 1) or WARN "Cannot set TCP_NODELAY";
 
         DEBUG("Connection accepted, forwarding socket\n");
         if ($WINDOWS) {
@@ -1060,6 +1114,11 @@ sub _run {
         $self->_stop_proc(nxproxy => $nxproxy_proc);
         $self->_stop_proc(PulseAudio => $pa_proc);
         $self->_stop_proc(X11 => $x11_proc);
+
+	if ($qvd_pa) {
+		$qvd_pa->stop;
+		undef $qvd_pa;
+	}
     };
 
     die $@ if $@;

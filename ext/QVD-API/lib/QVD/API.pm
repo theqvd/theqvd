@@ -227,33 +227,38 @@ sub get_acls_in_roles
 
 sub update
 {
-	my ($self,$request,$modifiers) = @_;
+    my ($self,$request,$modifiers) = @_;
     my $result = $self->select($request);
     QVD::API::Exception->throw(code => 1300) unless $result->{total};
-	$modifiers //= {};
-	my $conditions = $modifiers->{conditions} // [];
-
+    $modifiers //= {};
+    my $conditions = $modifiers->{conditions} // [];
+    
     my $failures;
     for my $obj (@{$result->{rows}})
     {
-		eval {
-			$DB->txn_do( sub {
-				$self->$_($obj) for @$conditions;
-				  # Update the main object
-				  $obj->update($request->arguments);                 
-                                  # Update tables related to the main object (i.e. vm_runtimes for vms)
-				  $self->update_related_objects($request,$obj);      
-                                  # Assign and unassign other objects to the main objects (i.e. tags for dis, acls for roles, properties for vms...)
-				$self->exec_nested_queries($request,$obj);
-			} )
-		};
-	$failures->{$obj->id} = QVD::API::Exception->new(exception => $@, query => 'update')->json if $@; 
-
-	$self->report_in_log($request,$obj,$failures && exists $failures->{$obj->id} ? $failures->{$obj->id}->{status} : 0);
+        eval {
+            $DB->txn_do( sub {
+                $self->$_($obj) for @$conditions;
+                # Update the main object
+                $obj->update($request->arguments);
+                # Update tables related to the main object (i.e. vm_runtimes for vms)
+                $self->update_related_objects($request,$obj);
+                # Assign and unassign other objects to the main objects (i.e. tags for dis, acls for roles, properties for vms...)
+                $self->exec_nested_queries($request,$obj);
+            } )
+        };
+        my $status = 0;
+        if($@) {
+            my $exception = QVD::API::Exception->new(exception => $@, query => 'update');
+            $status = $exception->code;
+            $failures->{$obj->id} = $exception;
+        }
+        
+        $self->report_in_log($request,$obj,$status);
     }
-
-    QVD::API::Exception->throw(failures => $failures) 
-	if defined $failures; 
+    
+    QVD::API::Exception->throw(failures => $failures)
+        if defined $failures;
     $result->{rows} = [];
     $result;
 }
@@ -273,26 +278,32 @@ sub update_related_objects
 
 sub delete
 {
-	my ($self,$request,$modifiers) = @_;
-    my $result = $self->select($request);
+    my ($self,$request,$modifiers) = @_;
+    my $result = $self->select($request,$modifiers);
     QVD::API::Exception->throw(code => 1300) unless $result->{total};
-
-	$modifiers //= {};
-	my $conditions = $modifiers->{conditions} // [];
+    
+    $modifiers //= {};
+    my $conditions = $modifiers->{conditions} // [];
     my $failures;
     for my $obj (@{$result->{rows}})
     {
-		eval {
-			$self->$_($obj) for @$conditions;
-			$obj->delete;
-		};
-
-	$failures->{$obj->id} = QVD::API::Exception->new(exception => $@,query => 'delete')->json if $@;
-    	$self->report_in_log($request,$obj,$failures && exists $failures->{$obj->id} ? $failures->{$obj->id}->{status} : 0);
+        eval {
+            $self->$_($obj) for @$conditions;
+            $obj->delete;
+        };
+    
+        my $status = 0;
+        if($@) {
+            my $exception = QVD::API::Exception->new(exception => $@, query => 'delete');
+            $status = $exception->code;
+            $failures->{$obj->id} = $exception;
+        }
+        
+        $self->report_in_log($request,$obj,$status);
     }
-    QVD::API::Exception->throw(failures => $failures) 
-	if defined $failures; 
-
+    QVD::API::Exception->throw(failures => $failures)
+        if defined $failures;
+    
     $result->{rows} = [];
     $result;
 }
@@ -315,6 +326,34 @@ sub di_delete {
                                              di_no_dependant_vms
                                              di_no_head_default_tags
                                              di_delete_disk_image)]} );
+}
+
+# Ad hoc function to host_delete action of API
+
+sub host_delete
+{
+    my ($self,$request) = @_;
+    $self->delete($request, {conditions => [qw(host_is_not_running)]} );
+}
+
+# Ad hoc function to admin_delete action of API
+
+sub admin_delete {
+    my ($self, $request) = @_;
+    
+    my $results = $self->select($request);
+    
+    for my $admin (@{$results->{rows}}) {
+        if($request->administrator->name eq $admin->name) {
+            QVD::API::Exception->throw(code => 5200, query => 'delete');
+        }
+    }
+    
+    $self->delete($request);
+    
+    $results->{rows} = [];
+    
+    return $results;
 }
 
 # It deletes config tokens in the database only when tokens
@@ -373,104 +412,100 @@ sub reset_admin_views
 
 ### Manage properties ###
 
+sub property_create {
+    my ($self, $request, $modifiers) = @_;
+
+    $self->check_property_name_is_not_registered($request->arguments->{key}, $request->arguments->{tenant_id});
+
+    return $self->create($request, $modifiers);
+}
+
+sub property_update {
+    my ($self, $request, $modifiers) = @_;
+
+    $self->check_property_name_is_not_registered($request->arguments->{key}, $request->arguments->{tenant_id});
+
+    return $self->update($request, $modifiers);
+}
+
 sub user_property_action {
 	my ($self, $request) = @_;
-	return $self->property_action($request, 'user');
+	return $self->qvd_property_action($request, 'user');
 }
 
 sub host_property_action {
 	my ($self, $request) = @_;
-	return $self->property_action($request, 'host');
+	return $self->qvd_property_action($request, 'host');
 }
 
 sub vm_property_action {
 	my ($self, $request) = @_;
-	return $self->property_action($request, 'vm');
+	return $self->qvd_property_action($request, 'vm');
 }
 
 sub osf_property_action {
 	my ($self, $request) = @_;
-	return $self->property_action($request, 'osf');
+	return $self->qvd_property_action($request, 'osf');
 }
 
 sub di_property_action {
 	my ($self, $request) = @_;
-	return $self->property_action($request, 'di');
+	return $self->qvd_property_action($request, 'di');
 }
 
-sub property_action {
+sub qvd_property_action {
 	my ($self, $request, $object) = @_;
 	my $action = $request->get_type_of_action();
 	my $outcome;
 
 	if ($action eq 'list') {
-		$outcome = $self->property_get_list($request, {qvd_object => $object} );
+		$outcome = $self->select($request, { filters => { qvd_object => $object } });
 	} elsif ($action eq 'create' || $action eq 'update') {
-		$outcome = $self->property_create_or_update($request, {qvd_object => $object});
+		$outcome = $self->create_or_update($request, { arguments => { qvd_object => $object } });
 	} elsif ($action eq 'delete') {
-		$outcome = $self->property_delete($request, ["is_${object}_property"]);
+		$outcome = $self->delete($request, { filters => { qvd_object => $object } });
 	}
 
 	return $outcome;
 }
 
-sub property_get_list {
-	my ($self, $request, $filters) = @_;
-
-	my $result = $self->select($request, { filters => $filters } );
-
-	return $result;
-}
-
-sub property_create_or_update {
-	my ($self, $request, $arguments) = @_;
-
-	my $result = $self->create_or_update($request, { arguments => $arguments } );
-
-	return $result;
-}
-
-sub property_delete {
-	my ($self, $request, $conditions) = @_;
-
-	my $result = $self->delete($request, { conditions => $conditions } );
-
-	return $result;
-}
-
-
 # FOR REGULAR CREATE ACTIONS
 
 sub create
 {
-	my ($self,$request,$modifiers) = @_;
+    my ($self,$request,$modifiers) = @_;
     my $result;
-
-	$modifiers //= {};
-	my @conditions = @{$modifiers->{conditions} // []};
-	my %arguments = (%{$request->arguments}, %{$modifiers->{'arguments'} // {}});
-
+    
+    $modifiers //= {};
+    my @conditions = @{$modifiers->{conditions} // []};
+    my %arguments = (%{$request->arguments}, %{$modifiers->{'arguments'} // {}});
+    
     my $obj;
-    eval 
+    eval
     {
-		$DB->txn_do(
-			sub {
-				$self->$_($request) for @conditions;
-				$obj = $DB->resultset($request->table)->create(\%arguments);
-                           # Create tables related to the main object (i.e. vm_runtimes for vms)
-			   $self->create_related_objects($request,$obj);
-                           # Assign and unassign other objects to the main objects (i.e. tags for dis, acls for roles, properties for vms...)
-			   $self->exec_nested_queries($request,$obj);
-				$result->{rows} = [ $obj ]
-			}
-		)
+        $DB->txn_do(
+            sub {
+                $self->$_($request) for @conditions;
+                $obj = $DB->resultset($request->table)->create(\%arguments);
+                # Create tables related to the main object (i.e. vm_runtimes for vms)
+                $self->create_related_objects($request,$obj);
+                # Assign and unassign other objects to the main objects (i.e. tags for dis, acls for roles, properties for vms...)
+                $self->exec_nested_queries($request,$obj);
+                $result->{rows} = [ $obj ]
+            }
+        )
     };
     
-    print $@ if $@;
-    my $e = $@ ? QVD::API::Exception->new(exception => $@, query => 'create') : undef;
-    $self->report_in_log($request,$obj, $e ? $e->code : 0);
-
-    $e->throw if $e;
+    my $status = 0;
+    my $exception;
+    if($@) {
+        $exception = QVD::API::Exception->new(exception => $@, query => 'create');
+        $status = $exception->code;
+    }
+    $self->report_in_log($request, $obj, $status);
+    
+    $exception->throw if $exception;
+    
     $result->{total} = 1;
     $result->{extra} = {};
     
@@ -490,26 +525,66 @@ sub create_related_objects
 
 # Ad hoc function to di_create action of API
 
+sub vm_create
+{
+    my ($self,$request) = @_;
+    
+    my $tenant_osf = $self->db->resultset('OSF')->find({ id => $request->arguments->{osf_id} })->tenant_id;
+    my $tenant_user = $self->db->resultset('User')->find({ id => $request->arguments->{user_id} })->tenant_id;
+    
+    unless ($request->administrator->is_superadmin) {
+        # Check provided qvd objects are included in the current administrator tenant
+        my $tenant_admin = $request->administrator->tenant_id;
+        
+        if($tenant_admin != $tenant_osf) {
+            QVD::API::Exception->throw(code => 7110, object => 'osf_id')
+        }
+    
+        if($tenant_admin != $tenant_user) {
+            QVD::API::Exception->throw(code => 7110, object => 'user_id')
+        }
+    } else {
+        # Check provided qvd objects belongs to the same tenant
+        if ($tenant_osf != $tenant_user) {
+            QVD::API::Exception->throw(code => 7300)
+        }
+    }
+    
+    my $result = $self->create($request);
+    
+    return $result;
+}
+
 sub di_create
 {
     my ($self,$request) = @_;
-
+    
+    unless ($request->administrator->is_superadmin) {
+        # Check provided qvd objects are included in the current administrator tenant
+        my $tenant_admin = $request->administrator->tenant_id;
+        my $tenant_osf = $self->db->resultset('OSF')->find({ id => $request->arguments->{osf_id} })->tenant_id;
+        
+        if($tenant_admin != $tenant_osf) {
+            QVD::API::Exception->throw(code => 7110, object => 'osf_id')
+        }
+    }
+        
     my $result = $self->create($request);
     my $di = @{$result->{rows}}[0];
-
+    
     eval
     {
-	$di->osf->delete_tag('head');
-	$di->osf->delete_tag($di->version);
-	$DB->resultset('DI_Tag')->create({di_id => $di->id, tag => $di->version, fixed => 1});
-	$DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'head'});
-	$DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'default'})
-	    unless $di->osf->di_by_tag('default');
+        $di->osf->delete_tag('head');
+        $di->osf->delete_tag($di->version);
+        $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => $di->version, fixed => 1});
+        $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'head'});
+        $DB->resultset('DI_Tag')->create({di_id => $di->id, tag => 'default'})
+            unless $di->osf->di_by_tag('default');
     };
-
+    
     QVD::API::Exception->throw(exception => $@,
-				  query => 'tags') if $@;
-
+        query => 'tags') if $@;
+    
     $di->update({path => $di->id . '-' . $di->path});
     
     $result;
@@ -564,20 +639,24 @@ sub vm_user_disconnect
 {
     my ($self,$request) = @_;
     my $result = $self->select($request);
-
+    
     my $failures;
     for my $vm (@{$result->{rows}})
     {
-	eval { $vm->vm_runtime->send_user_abort  };   
-	
-	$failures->{$vm->id} = QVD::API::Exception->new(
-	    code => 5110, object => $vm->vm_runtime->user_state)->json if $@; 
-
-	$self->report_in_log($request,$vm,$failures && exists $failures->{$vm->id} ? $failures->{$vm->id}->{status} : 0);
+        eval { $vm->vm_runtime->send_user_abort  };
+    
+        my $status = 0;
+        if($@) {
+            my $exception = QVD::API::Exception->new(code => 5110, object => $vm->vm_runtime->user_state);
+            $status = $exception->code;
+            $failures->{$vm->id} = $exception;
+        }
+        
+        $self->report_in_log($request,$vm,$status);
     }
-    QVD::API::Exception->throw(failures => $failures) 
-	if defined $failures;  
-
+    QVD::API::Exception->throw(failures => $failures)
+        if defined $failures;
+    
     $result->{rows} = [];
     $result;
 }
@@ -585,31 +664,37 @@ sub vm_user_disconnect
 sub vm_start
 {
     my ($self,$request) = @_;
-
+    
     my $result = $self->select($request);
     my ($failures, %host);
-
+    
     for my $vm (@{$result->{rows}})
     {
-		eval {
-			$DB->txn_do( sub {
-		  $vm->vm_runtime->can_send_vm_cmd('start')  ||
-		  QVD::API::Exception->throw(code => 5130, 
-					      object => $vm->vm_runtime->vm_state);
-		  $self->vm_assign_host($vm->vm_runtime);
-		  $vm->vm_runtime->send_vm_start;
-		  $host{$vm->vm_runtime->host_id}++;}
-			) };
-
-	$failures->{$vm->id} = QVD::API::Exception->new(exception => $@)->json if $@; 
-	$self->report_in_log($request,$vm,$failures && exists $failures->{$vm->id} ? $failures->{$vm->id}->{status} : 0);
+        eval {
+            $DB->txn_do( sub {
+                $vm->vm_runtime->can_send_vm_cmd('start')  ||
+                    QVD::API::Exception->throw(code => 5130,
+                        object => $vm->vm_runtime->vm_state);
+                $self->vm_assign_host($vm->vm_runtime);
+                $vm->vm_runtime->send_vm_start;
+                $host{$vm->vm_runtime->host_id}++;}
+            ) };
+    
+        my $status = 0;
+        if($@) {
+            my $exception = QVD::API::Exception->new(exception => $@);
+            $status = $exception->code;
+            $failures->{$vm->id} = $exception;
+        }
+        
+        $self->report_in_log($request,$vm,$status);
     }
-
+    
     notify("qvd_admin4_vm_start");
     notify("qvd_cmd_for_vm_on_host$_") for keys %host;
-    QVD::API::Exception->throw(failures => $failures) 
-	if defined $failures;  
-
+    QVD::API::Exception->throw(failures => $failures)
+        if defined $failures;
+    
     $result->{rows} = [];
     $result;
 }
@@ -617,32 +702,38 @@ sub vm_start
 sub vm_stop
 {
     my ($self,$request) = @_;
-
+    
     my $result = $self->select($request);
     my ($failures, %host);
-
+    
     for my $vm (@{$result->{rows}})
     {
-		eval {
-			$DB->txn_do( sub {
-		  $vm->vm_runtime->send_vm_stop;
-		  $host{$vm->vm_runtime->host_id}++; }
-			) };
-       
-	$failures->{$vm->id} = QVD::API::Exception->new(
-	    code => 5120, object => $vm->vm_runtime->vm_state)->json if $@; 
-	$self->report_in_log($request,$vm,$failures && exists $failures->{$vm->id} ? $failures->{$vm->id}->{status} : 0);
-	$vm->vm_runtime->update({ vm_cmd => undef })
-	    if $vm->vm_runtime->vm_state eq 'stopped' &&
-	    $vm->vm_runtime->vm_cmd                   &&
-	    $vm->vm_runtime->vm_cmd eq 'start'; 
+        eval {
+            $DB->txn_do( sub {
+                $vm->vm_runtime->send_vm_stop;
+                $host{$vm->vm_runtime->host_id}++; }
+            ) };
+    
+        my $status = 0;
+        if($@) {
+            my $exception = QVD::API::Exception->new(code => 5120, object => $vm->vm_runtime->vm_state);
+            $status = $exception->code;
+            $failures->{$vm->id} = $exception;
+        }
+        
+        $self->report_in_log($request,$vm,$status);
+        
+        $vm->vm_runtime->update({ vm_cmd => undef })
+            if $vm->vm_runtime->vm_state eq 'stopped' &&
+                $vm->vm_runtime->vm_cmd                   &&
+                $vm->vm_runtime->vm_cmd eq 'start';
     }
-
+    
     notify("qvd_admin4_vm_stop");
     notify("qvd_cmd_for_vm_on_host$_") for keys %host;
-    QVD::API::Exception->throw(failures => $failures) 
-	if defined $failures;  
-
+    QVD::API::Exception->throw(failures => $failures)
+        if defined $failures;
+    
     $result->{rows} = [];
     $result;
 }
@@ -718,20 +809,35 @@ sub custom_properties_set
 {
     my ($self,$props,$obj,$request) = @_;
 
-    my $class = ref($obj);     # FIX ME.  Can be improved the identification of the class?
+    my $class = ref($obj);     # FIXME.  Can be improved the identification of the class?
     $class =~ s/^QVD::DB::Result::(.+)$/$1/;
 
-    while (my ($key,$value) = each %$props)
-    { 
-	$key = undef if defined $key && $key eq ''; 
-    
-	my $t = $class . "_Property";
-	my $k = lc($class) . "_id";
-	my $a = {property_id => $key, value => $value, $k => $obj->id};
+    while (my ($prop_name,$prop_value) = each %$props)
+    {
+        my @rows = ();
+        eval {
+            my @tenant_ids = ($obj->tenant_id);
+            push @tenant_ids, $request->administrator->tenant_id if $request->administrator->is_superadmin();
 
-	eval { $DB->resultset($t)->update_or_create($a) };
-	QVD::API::Exception->throw(exception => $@, 
-				      query => 'properties') if $@;
+            @rows = $DB->resultset('QVD_Object_Property_List')->search(
+                {
+                    "properties_list.tenant_id" => { '-or' => { '=' => \@tenant_ids } },
+                    "properties_list.key" => { '=' => $prop_name }
+                },
+                { join => 'properties_list' }
+            )->all();
+        };
+        QVD::API::Exception->throw(exception => $@, query => 'properties') if $@;
+
+        QVD::API::Exception->throw(exception => $@, query => 'properties') if @rows != 1;
+        my $prop_id = $rows[0]->id;
+
+        my $table = $class . "_Property";
+        my $key = lc($class) . "_id";
+        my $tuple = {property_id => $prop_id, value => $prop_value, $key => $obj->id};
+
+        eval { $DB->resultset($table)->update_or_create($tuple) };
+        QVD::API::Exception->throw(exception => $@, query => 'properties') if $@;
     }
 }
 
@@ -1092,6 +1198,15 @@ sub di_no_dependant_vms
 	    if $rs->count;
 }
 
+# Check if a host is not running
+
+sub host_is_not_running
+{
+    my ($self,$host) = @_;
+    QVD::API::Exception->throw(code => 7321, query => 'delete')
+        unless $host->runtime->state ne "running";
+}
+
 # When deleting a di with head or default tags, 
 # it reassigns head and default tags to other di 
 
@@ -1187,6 +1302,31 @@ sub check_admin_is_allowed_to_config
     }
 
     return 1;
+}
+
+sub check_property_name_is_not_registered {
+    my ($self,$property_name,$tenant_id) = @_;
+
+    my $is_superadmin_property = ($tenant_id == QVD::DB::Result::Tenant::SUPERADMIN_TENANT_ID);
+    my $filter = {
+        key => $property_name
+    };
+    $filter->{tenant_id} = { '-or' => { '=' => [ $tenant_id, QVD::DB::Result::Tenant::SUPERADMIN_TENANT_ID ] } }
+        if !$is_superadmin_property;
+
+    my @rows  = ();
+    eval {
+        @rows = $DB->resultset('Property_List')->search($filter)->all();
+    };
+    QVD::API::Exception->throw(exception => $@, query => 'select') if $@;
+
+    if(@rows > 0) {
+        if($rows[0]->tenant_id == QVD::DB::Result::Tenant::SUPERADMIN_TENANT_ID) {
+            QVD::API::Exception->throw(code => 7211);
+        } else {
+            QVD::API::Exception->throw(code => 7210);
+        }
+    }
 }
 
 ######################################
@@ -1621,32 +1761,6 @@ sub assign_property_to_objects {
 		}
 	}
 
-}
-
-# FIXME: These functions shall be removed and use the methods of the object
-sub is_user_property {
-	my ($self, $property) = @_;
-	return ($property->is_user_property());
-}
-
-sub is_host_property {
-	my ($self, $property) = @_;
-	return ($property->is_host_property());
-}
-
-sub is_osf_property {
-	my ($self, $property) = @_;
-	return ($property->is_osf_property());
-}
-
-sub is_vm_property {
-	my ($self, $property) = @_;
-	return ($property->is_vm_property());
-}
-
-sub is_di_property {
-	my ($self, $property) = @_;
-	return ($property->is_di_property());
 }
 
 sub myadmin_update {

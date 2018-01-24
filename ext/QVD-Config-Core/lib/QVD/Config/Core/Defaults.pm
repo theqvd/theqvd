@@ -98,6 +98,7 @@ path.vma.run.printing = ${path.run}/printing
 path.api.ssl = /etc/qvd/api/certs
 path.api.ssl.key = ${path.api.ssl}/key.pem
 path.api.ssl.cert = ${path.api.ssl}/cert.pem
+path.api.pid_file = ${path.run}/qvd-api.pid
 
 path.up.api.ssl = /etc/qvd/api/certs
 path.up.api.ssl.key = ${path.up.api.ssl}/key.pem
@@ -114,6 +115,7 @@ path.client.pixmaps = pixmaps
 path.client.pixmaps.alt = /usr/share/pixmaps
 
 path.qvd.bin = /usr/lib/qvd/bin
+path.qvd.etc = /usr/lib/qvd/etc
 path.usb.database = /usr/share/hwdata/usb.ids
 
 ## paths to external executables
@@ -125,6 +127,7 @@ command.open_file = xdg-open
 command.sftp-server = /usr/lib/openssh/sftp-server
 @sles-11@command.sftp-server = /usr/lib64/ssh/sftp-server
 @sles-12@command.sftp-server = /usr/lib/ssh/sftp-server
+@centos@command.sftp-server = /usr/libexec/openssh/sftp-server
 command.nxagent = /usr/bin/nxagent
 command.nxdiag = ${path.qvd.bin}/nxdiag.pl
 command.x-session = /etc/X11/Xsession
@@ -138,9 +141,9 @@ command.groupdel = /usr/sbin/groupdel
 command.tar = tar
 command.umount = umount
 command.mount = mount
-command.version.mount.overlayfs = 1
-@ubuntu-14.04@command.version.mount.overlayfs = 2
-@ubuntu-14.04.3@command.version.mount.overlayfs = 1
+command.version.mount.overlayfs = 2
+@ubuntu-14.04.1@command.version.mount.overlayfs = 1
+@ubuntu-14.04.2@command.version.mount.overlayfs = 1
 command.rm = rm
 command.unionfs-fuse = ${path.qvd.bin}/unionfs
 command.lxc-destroy = ${path.qvd.bin}/lxc-destroy
@@ -174,7 +177,6 @@ client.use.win-sftp-server = 1
 
 command.nxagent.args.extra =
 command.x-session.args.extra =
-command.sftp-server = /usr/lib/openssh/sftp-server
 
 command.qvd-lxc-autodev = ${path.qvd.bin}/qvd-lxc-autodev
 
@@ -540,6 +542,9 @@ vm.lxc.cpuset.size = 4
 ## Virtual machines number of CPUs
 vm.kvm.cpus = 2
 
+## Virtual machines enable memory ballooning
+vm.kvm.ballooning = 0
+
 ## these two specify the VNC availability and options for KVM's VNC support
 vm.vnc.redirect = 0
 vm.vnc.opts =
@@ -703,6 +708,7 @@ internal.vma.on_printing.stopped = ${path.qvd.bin}/qvd-printing
 internal.vma.printing.config = ${path.run}/printing.conf
 internal.vma.slave.config = ${path.run}/slave.conf
 internal.vma.nxagent.config = ${path.run}/nxagent.conf
+internal.vma.pulseaudio.config = ${path.run}/default.pa
 
 # TODO: some of these DB settings may not be used anymore, cleanup them!
 internal.database.client.connect.timeout = 20

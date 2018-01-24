@@ -6,6 +6,8 @@ use QVD::Config::Network qw(nettop_n netstart_n net_aton net_ntoa);
 use QVD::Config;
 use File::Basename qw(basename);
 use QVD::DB::Simple qw(db);
+use QVD::DB::Common qw(ENUMERATES);
+use QVD::API::Exception;
 use Clone qw(clone);
 
 # This class implements a store with all the info needed about 
@@ -62,8 +64,15 @@ my $TYPES_OF_ACTION_TO_LOG_MAPPER = {
 
 # List of QVD objects directly assigned to a tenant.
 
-my $DIRECTLY_TENANT_RELATED = [qw(User Administrator Role OSF Config
-	Views_Setup_Attributes_Tenant)];
+my $DIRECTLY_TENANT_RELATED = [qw(
+    User
+    Administrator
+    Role
+    OSF
+    Config
+    Views_Setup_Attributes_Tenant
+    Property_List)
+];
 
 # Mappers for identity operators between API and DBIx::Class
 # The majority of operators are just the same
@@ -675,7 +684,7 @@ my $AVAILABLE_FILTERS = {
 
 		QVD_Object_Property_List => [qw(tenant_id)],
 
-		Property_List => [qw(tenant_id)]
+		Property_List => [qw(tenant_id id key description)]
 	},
 
 	all_ids => {
@@ -747,8 +756,9 @@ my $AVAILABLE_FILTERS = {
 		Views_Setup_Properties_Tenant => [qw(tenant_id qvd_object)],
 		Views_Setup_Attributes_Tenant => [qw(tenant_id qvd_object)],
 		Views_Setup_Properties_Administrator => [qw(qvd_object)],
-		Views_Setup_Attributes_Administrator => [qw(qvd_object)]
-	}, # Every admin is able to delete just its own views, so you cannot filter by admin or id. Suitable admin_id forzed in Request.pm
+		Views_Setup_Attributes_Administrator => [qw(qvd_object)],
+		QVD_Object_Property_List => [qw(id tenant_id property_id)],
+    }, # Every admin is able to delete just its own views, so you cannot filter by admin or id. Suitable admin_id forzed in Request.pm
 
 	update => {
 		default => [qw(id tenant_id)],
@@ -958,6 +968,7 @@ my $MANDATORY_FILTERS =
 			Views_Setup_Attributes_Tenant => [qw()],
 			Views_Setup_Properties_Administrator => [qw()],
 			Views_Setup_Attributes_Administrator => [qw()],
+			QVD_Object_Property_List => [qw()], # FIXME: property_id shall be mandatory
 		},
 
 		update=> {
@@ -1028,7 +1039,7 @@ my $AVAILABLE_ORDER_CRITERIA = {
     
     QVD_Object_Property_List => [qw(id key property_id)],
     
-    Property_List => [qw(id property_id tenant_id key description )]
+    Property_List => [qw(id tenant_id key description )]
 };
 
 # Default order criteria for every kind of action
@@ -1724,8 +1735,6 @@ sub BUILD
 
     $self->initialize_info_model; # Creates a new hash reference to allocate 'model_info'
 
-    $self->custom_properties_keys; # Sets in $self->{custom_properties_keys} a list with all
-                                   # custom properties related to the action requested to API
     $self->set_info_by_type_of_action_and_qvd_object(
 	'unambiguous_filters',$UNAMBIGUOUS_FILTERS);
 
@@ -1826,30 +1835,36 @@ sub initialize_info_model
 
 # It sets custom properties
 
-sub custom_properties_keys
+sub custom_properties_info
 {
     my $self = shift;
-    return @{$self->{custom_properties_keys}} 
-    if defined $self->{custom_properties_keys}; 
-    $self->{custom_properties_keys} =
-	[ $self->get_custom_properties_keys ];
-    @{$self->{custom_properties_keys}};
-}
 
-# Takes custom properties from DB
+    unless (defined($self->{custom_properties_info}) ) {
+        my %properties_info = ();
 
-sub get_custom_properties_keys
-{
-    my $self = shift;
-    my $qvd_object_table = $self->qvd_object;
-    my $properties_table = $qvd_object_table."_Property";
-    my @properties_keys;
-    
-    eval { my %properties_keys = map {$_->key => 1 } 
-	   $self->db->resultset($properties_table)->search()->all;
-	   @properties_keys = keys %properties_keys };
+        # FIXME: The qvd_object shall be obtained from the request to avoid the lower case conversion
+        # However this change requires to move all properties related functions to Request.pm
+        my $qvd_object = lc($self->qvd_object);
 
-    @properties_keys;
+        # Get properties only if qvd_object is a valid value
+        my $qvd_object_enum_list =
+            ENUMERATES()->{$self->db->source('QVD_Object_Property_List')->column_info('qvd_object')->{data_type}};
+        my $qvd_object_is_valid = (grep {$_ eq $qvd_object} @$qvd_object_enum_list) ? 1 : 0;
+
+        if($qvd_object_is_valid) {
+            my @rows = ();
+            eval {
+                @rows = $self->db->resultset('QVD_Object_Property_List')->search({ qvd_object => $qvd_object })->all;
+            };
+            QVD::API::Exception->throw(exception => $@, query => 'select') if $@;
+
+            %properties_info = map { $_->key => { $_->tenant_id => $_->property_id } } @rows;
+        }
+
+        $self->{custom_properties_info} = \%properties_info;
+    }
+
+    return $self->{custom_properties_info};
 }
 
 # It sets info from variables that clasify
@@ -1910,10 +1925,13 @@ sub set_tenant_fields
 
 sub has_property
 {
-    my ($self,$prop) = @_;
-    my %props = map { $_ => 1 } $self->custom_properties_keys;
-
-    return exists $props{$prop} ? return 1 : return 0;
+    my ($self, $property_name) = @_;
+    if ($self->current_qvd_administrator->is_superadmin()) {
+        return defined($self->custom_properties_info->{$property_name});
+    } else {
+        my $tenant_id = $self->current_qvd_administrator->tenant_id;
+        return defined($self->custom_properties_info->{$property_name}->{$tenant_id});
+    }
 }
 
 sub related_views_in_db

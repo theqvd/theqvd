@@ -108,7 +108,7 @@ sub _calculate_attrs {
     $self->{vma_port}    = $self->_cfg('internal.vm.port.vma');
     $self->{x_port}      = $self->_cfg('internal.nxagent.display') + 4000;
     $self->{ssh_port}    = $self->_cfg('internal.vm.port.ssh');
-    $self->{vnc_port}    = $self->_cfg('vm.vnc.redirect')              ? $self->_allocate_tcp_port : 0;
+    $self->{vnc_port}    = $self->_cfg('vm.vnc.redirect')              ? $self->_allocate_tcp_port(5900) : 0;
     $self->{serial_port} = $self->_cfg('vm.serial.redirect')           ? $self->_allocate_tcp_port : 0;
     $self->{mon_port}    = $self->_cfg('internal.vm.monitor.redirect') ? $self->_allocate_tcp_port : 0;
     $self->{gateway}     = $self->_cfg('vm.network.gateway');
