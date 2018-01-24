@@ -325,11 +325,16 @@ sub process_request {
     binmode $self->{server}{client};
     $self->{server}{client}->autoflush();
     $self->{server}{client}->blocking(1);
-
-    $self->{server}{fd_out} = IO::Handle->new_from_fd(fileno(STDOUT), '+>');
-    binmode $self->{server}{fd_out};
-    $self->{server}{fd_out}->autoflush();
-    $self->{server}{fd_out}->blocking(1);
+    
+    if ($self->{server}{SSL}) {
+        $self->{server}{fd_out} = $self->{server}{client};
+    }
+    else {
+        $self->{server}{fd_out} = IO::Handle->new_from_fd(fileno(STDOUT), '+>');
+        binmode $self->{server}{fd_out};
+        $self->{server}{fd_out}->autoflush();
+        $self->{server}{fd_out}->blocking(1);
+    }
 
     $self->QVD::HTTPD::Impl::process_request(@_);
 }
