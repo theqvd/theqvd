@@ -14,6 +14,7 @@ use Encode;
 use POSIX qw(setlocale);
 use QVD::Client::USB::USBIP;
 use QVD::Client::USB::IncentivesPro;
+use Linux::USBIP;
 
 use constant EVT_LIST_OF_VM_LOADED => Wx::NewEventType;
 use constant EVT_CONNECTION_ERROR  => Wx::NewEventType;
@@ -98,6 +99,7 @@ my %lang_codes = qw/
     /;
 
 my $usbroot = "/sys/bus/usb/devices";
+my @usbip_shared_buses;
 
 sub new {
     my( $class, $parent, $id, $title, $pos, $size, $style, $name ) = @_;
@@ -714,6 +716,7 @@ sub OnConnectionStatusChanged {
         $self->start_device_sharing();
     } elsif ($status eq 'CLOSED') {
         $self->{timer}->Stop();
+        $self->stop_device_sharing();
         $self->Destroy() if ( core_cfg('client.auto_connect',0) ); # We don't want to let the user do anything else if this was autoconnected session (don't let him change a config that won't be saved..)
         $self->{progress_bar}->SetValue(0);
         $self->{progress_bar}->SetRange(100);
@@ -1462,10 +1465,28 @@ sub start_device_sharing {
                     }
                     ERROR $@;
                 } else {
+                    push @usbip_shared_buses,$busid;
                     DEBUG("Device sharing started for dev: $devid connected at bus: $busid");
                 }
                 last;
             }
+        }
+
+    }
+}
+
+sub stop_device_sharing {
+    my ($self) = @_;
+
+    if (core_cfg('client.slave.enable') && core_cfg('client.usb.enable')) {
+
+        my $usbip = Linux::USBIP->new();
+
+        INFO "USBIP sharing stopping";
+        foreach my $busid (@usbip_shared_buses) {
+            $usbip->unbind($busid) 
+              or ERROR "Can't unbind $busid: ".$usbip->{error_msg};
+            DEBUG "Device with busid: $busid was successfully unbound from usbip driver";
         }
 
     }
