@@ -12,8 +12,7 @@ use Locale::gettext;
 use FindBin;
 use Encode;
 use POSIX qw(setlocale);
-use QVD::Client::USB::USBIP;
-use QVD::Client::USB::IncentivesPro;
+use QVD::Client::USB qw/list_devices get_busid/;
 use Linux::USBIP;
 
 use constant EVT_LIST_OF_VM_LOADED => Wx::NewEventType;
@@ -1124,9 +1123,8 @@ sub OnSetEnvironment {
 
 sub load_usb_devices {
     my ($self) = shift;
-
-    my $usb = QVD::Client::USB::instantiate( core_cfg('client.usb.implementation') );
-    my @devices = @{ $usb->list_devices };
+    
+    my @devices = list_devices();
     my @selected;
 
     foreach my $d ( @devices ){
@@ -1449,7 +1447,7 @@ sub start_device_sharing {
         use QVD::Client::SlaveClient;
         my @devs = map { $_ } split(/,/, core_cfg('client.usb.share_list'));
         foreach my $devid (@devs) {
-            my $busid = $self->get_busid ($devid);
+            my $busid = get_busid($devid);
             unless ($busid){
                 ERROR "Can't find busid for device $devid";
                 return;
@@ -1490,66 +1488,6 @@ sub stop_device_sharing {
         }
 
     }
-}
-
-sub get_busid {
-    my ($self,$devid) = @_;
-    my %all_devices;
-
-    opendir my $device_dir , $usbroot
-        or do { ERROR "Can't open $usbroot" ; return 0; };
-    while ( defined(my $busid = readdir($device_dir)) ){
-        my $index = $self->_read_devid($busid);
-        if ($index) {
-            $all_devices{ $index } = $busid;
-        }
-    }
-    closedir $device_dir
-        or do { ERROR "Can't close $usbroot" ; return 0; } ;
-
-    if ( defined $all_devices{$devid} ){
-        return $all_devices{$devid};
-    }else{
-        return;
-    }
-}
-
-sub _read_devid {
-    my ($self,$busid) = @_;
-    my $vendorid;
-    my $productid;
-    my $serial;
-
-    if ( -f "$usbroot/$busid/idVendor" ){
-        $vendorid = $self->_read_line("$usbroot/$busid/idVendor");
-    }else{ return; }
-    
-    if ( -f "$usbroot/$busid/idProduct" ){
-        $productid = $self->_read_line("$usbroot/$busid/idProduct");
-    }else{ return; }
-    
-    if ( -f "$usbroot/$busid/serial" ){
-        $serial = $self->_read_line("$usbroot/$busid/serial");
-    }
-
-    chomp $vendorid;
-    chomp $serial;
-    chomp $productid;
-
-    return $serial ? "$vendorid:$productid\@$serial" : "$vendorid:$productid";
-}
-
-sub _read_line {
-    my ($self,$file) = @_;
-    my $result;
-
-    open my $file, '<', $file
-        or do { ERROR "Can't open $file"; return; };
-    $result = <$file>;
-    close $file
-        or do { ERROR "Can't close $file"; return; };
-
-    return $result;
 }
 
 sub start_remote_mounts {

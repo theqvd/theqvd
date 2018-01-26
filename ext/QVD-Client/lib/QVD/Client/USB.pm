@@ -1,7 +1,13 @@
 package QVD::Client::USB;
+use Exporter 'import';
+@EXPORT_OK = qw/list_devices get_busid/;
+
 use strict;
 use QVD::Log;
-use Data::Dumper;
+
+
+our $usbroot = "/sys/bus/usb/devices";
+our @files = ( '/var/lib/usbutils/usb.ids','/usr/share/hwdata/usb.ids');
 
 =head1 NAME
 
@@ -9,292 +15,216 @@ QVD::Client::USB
 
 =head1 SYNOPSIS
 
-USB over IP sharing base module
+USB hardware information module
 
 =head1 DESCRIPTION
 
-This module defines the interface for USB sharing.
-
-Currently two implementations are supported:
+This module lets the Client interrogate the linux system about USB hardware available for sharing with the vm desktop.
 
 =over 4
-
-=item * QVD::Client::USB::USBIP, integrated into recent Linux kernels
-
-=item * QVD::Client::USB::IncentivesPro, closed source
-
-=back
 
 =head1 FUNCTIONS
 
 =cut
 
-sub new {
-	my $self = {};
-	my $class = shift;
+=head2 list_devices()
 
-	$self->{device_list} = [];
-	$self->{device_hash} = {};
-	$self->{shared_list} = [];
-	$self->{needs_refresh} = 1;
-	
-	bless $self, $class;
-
-	#$self->refresh;
-	return $self;
-}
-
-=head2 instantiate($subclass)
-
-Dynamically loads and instantiates an USB over IP implementation.
-
-Currently two are available: USBIP and IncentivesPro.
+Returns the list of current devices
 
 =cut
-
-sub instantiate {
-	my ($subclass) = @_;
-	
-	my $classname = "QVD::Client::USB::$subclass";
-	
-	my $class = eval "use $classname; $classname->new();";
-	
-	if ( defined $class ) {
-		if ( !$class->isa( "QVD::Client::USB" ) ) {
-			die "Loaded $classname, but it wasn't a QVD::Client::USB";
-		}
-	} else {
-		die "Failed to load $classname: $@";
-	}
-	
-	return $class;
-}
-
-=head2 refresh()
-
-Refreshes the current list of USB devices.
-
-=cut
-
-sub refresh {
-	my ($self) = @_;
-	my $devices = $self->int_get_devices;
-
-
-	$self->{device_list} = $devices;
-	$self->{shared_list} = [];
-	$self->{device_hash} = {};
-	$self->{needs_refresh} = 0;
-
-	
-	foreach my $dev (@$devices) {
-		my $id = $self->get_device_id( $dev->{vid}, $dev->{pid}, $dev->{serial} );
-		
-		$dev->{key} = $id;
-		#my $id = $dev->{vid} . ":" . $dev->{pid};
-		#$id .= "\@" . $dev->{serial} if ( defined $dev->{serial} );
-		
-		$self->{device_hash}->{$id} = $dev;
-
-		if ( $dev->{shared} ) {
-			push @{ $self->{shared_list} }, $dev;
-		}
-	}
-}
-
-sub int_get_devices {
-}
-
-=head2
-
-Returns the list of current devices, as an arrayref of hashref
-
-=cut
-
 
 sub list_devices {
-	my ($self) = @_;
-	
-	$self->refresh if ( $self->{needs_refresh} );
-	return $self->{device_list};
+    my @devices;
+
+    opendir my $device_dir , $usbroot
+        or do { ERROR "Can't open $usbroot" ; return 0; };
+    while ( defined(my $busid = readdir($device_dir)) ){
+
+        my $device_class;
+        my $manufacturer;
+        my $product;
+        my $vendorid;
+        my $productid;
+        my $serial;
+
+        # Ignore hubs
+        if ( -f "$usbroot/$busid/bDeviceClass" ){
+            $device_class = _read_line("$usbroot/$busid/bDeviceClass");
+        }else{
+            ERROR "Device doesn't have bDeviceClass";
+            next;
+        }
+        chomp $device_class;
+        next if ($device_class == '09');
+
+        # idVendor and idProduct MUST exist
+        if ( -f "$usbroot/$busid/idVendor" ){
+            $vendorid = _read_line("$usbroot/$busid/idVendor");
+        }else{
+            ERROR "Device doesn't have idVendor";
+            next;
+        }
+
+        if ( -f "$usbroot/$busid/idProduct" ){
+            $productid = _read_line("$usbroot/$busid/idProduct");
+        }else{
+            ERROR "Device doesn't have idProduct";
+            next;
+        }
+
+        # String manufacturer and product name may not exist. That goes for the serial too.
+        if ( -f "$usbroot/$busid/manufacturer" ){
+            $manufacturer = _read_line("$usbroot/$busid/manufacturer");
+        }
+
+        if ( -f "$usbroot/$busid/product" ){
+            $product = _read_line("$usbroot/$busid/product");
+        }
+
+        if ( -f "$usbroot/$busid/serial" ){
+            $serial = _read_line("$usbroot/$busid/serial");
+        }
+
+        # Try to get the names from usb.ids file
+        unless ($manufacturer && $product){
+            ($manufacturer,$product) = _get_names_from_file($vendorid,$productid);
+        }
+
+        push @devices,{
+                        vendor => $manufacturer,
+                        product => $product,
+                        vid => $vendorid,
+                        pid => $productid,
+                        serial => $serial
+                      };
+    }
+
+    return @devices;
+
 }
 
+=head2 get_busid($devid)
 
-=head2
-
-Returns the list of currently shared devices
+Get the busid the device is connected to
 
 =cut
 
-sub list_shared_devices {
-	my ($self) = @_;
-	
-	$self->refresh if ( $self->{needs_refresh} );
-	return $self->{shared_list};
+sub get_busid {
+    my $devid = shift;
+    my %all_devices;
+
+    opendir my $device_dir , $usbroot
+        or do { ERROR "Can't open $usbroot" ; return 0; };
+    while ( defined(my $busid = readdir($device_dir)) ){
+        my $index = _read_devid_from_bus($busid);
+        if ($index) {
+            $all_devices{ $index } = $busid;
+        }
+    }
+    closedir $device_dir
+        or do { ERROR "Can't close $usbroot" ; return 0; };
+
+    if ( defined $all_devices{$devid} ){
+        return $all_devices{$devid};
+    }else{
+        return;
+    }
 }
 
-=head2
+=head2_read_devid_from_bus($busid)
 
-Checks whether an USB device exists
+Read device id connected to busid
 
 =cut
 
-sub device_exists {
-	my ($self, $vid, $pid) = @_;
-	my $dev = $self->get_device($vid, $pid);
-	
-	return defined $dev;
+sub _read_devid_from_bus {
+    my $busid = shift;
+    my $vendorid;
+    my $productid;
+    my $serial;
+
+    if ( -f "$usbroot/$busid/idVendor" ){
+        $vendorid = _read_line("$usbroot/$busid/idVendor");
+    }else{ return; }
+
+    if ( -f "$usbroot/$busid/idProduct" ){
+        $productid = _read_line("$usbroot/$busid/idProduct");
+    }else{ return; }
+
+    if ( -f "$usbroot/$busid/serial" ){
+        $serial = _read_line("$usbroot/$busid/serial");
+    }
+
+    return $serial ? "$vendorid:$productid\@$serial" : "$vendorid:$productid";
 }
 
-=head2 get_device_id($vid, $pid, $serial)
+sub _read_line {
+    my $file = shift;
+    my $result;
 
-Obtains an unique identifier for a device. 
+    open my $file, '<', $file
+        or do { ERROR "Can't open $file"; return; };
+    $result = <$file>;
+    close $file
+        or do { ERROR "Can't close $file"; return; };
+    chomp $result;
 
-Returns a string in the form of $vid:$pid@serial
+    return $result;
+}
 
-This function accepts all the parts together or separately. Eg, both of these
-ways of calling it are acceptable:
+=head2 _get_names_from_file($vendorid,$productid)
 
-    $usb->get_device_id("0123", "ABCD", "1234567");
-    $usb->get_device_id("0123:ABCD@1234567");
-
-
-The same goes for any function that takes device identifiers as an argument.
+Try to get product vendor and name
 
 =cut
 
-sub get_device_id {
-	my ($self, $vid, $pid, $serial) = @_;
-	
-	if ( $vid =~ /:/ ) {
-		($vid, $pid) = split(/:/, $vid);
-		($pid, $serial) = split(/@/, $pid) if ($pid =~ /@/);
-	}
-	
-	$vid = lc($vid);
-	$pid = lc($pid);
-	
-	foreach my $str ($vid, $pid, $serial) {
-		$str =~ s/^\s+//;
-		$str =~ s/\s+$//;
-	}
-	
-	$self->refresh if ( $self->{needs_refresh} );
-	my $key = "$vid:$pid";
-	$key .= "\@${serial}" if (defined $serial);
-	return $key;
+sub _get_names_from_file {
+    my ($vendorid,$productid) = @_;
+    my %hwdata;
+
+    foreach my $file (@files){
+        if ( -f $file ){
+            %hwdata = _parse_hwdata($file);
+            last;
+        }
+    }
+
+    my $vendor = defined($hwdata{$vendorid}) ? $hwdata{$vendorid}->{name} : 'unknown';
+    my $product = defined($hwdata{$vendorid}->{products}->{$productid}) ? $hwdata{$vendorid}->{products}->{$productid} : 'unknown';
+
+    return ($vendor,$product);
 }
 
-=head2 get_device($vid, $pid, $serial)
+=head2 _parse_hwdata($file)
 
-Returns an arrayref with device information, or undef if not found.
+Parse an usb.ids file.
 
 =cut
 
-sub get_device {
-	my ($self, $vid, $pid, $serial) = @_;
-	
-	my $key = $self->get_device_id( $vid, $pid, $serial );
-	
-	if ( exists $self->{device_hash}->{$key} ) {
-		return $self->{device_hash}->{$key};
-	} else {
-		return undef;
-	}
-}
+sub _parse_hwdata {
+    my $file = shift;
+    my %hwdata;
 
-=head2 share($vid, $pid, $serial)
+    open my $fd, '<',$file
+        or do { warn "Can't open $file: ".$!;
+                return;
+              };
 
-Shares the indicated device
+    my $last_seen;
+    while ( my $line = <$fd> ){
+    
+        if ($line =~ m/^([\d,a,b,c,d,e,f]{4})  (.*)\n/){
+             $hwdata{$1} = { name => $2, products => {} };
+             $last_seen = $1; 
+        };  
+    
+        if ($line =~ m/^\t([\d,a,b,c,d,e,f]{4})  (.*)\n/){
+            $hwdata{$last_seen}->{products}->{$1} = $2; 
+        }   
+    
+    }
 
-=cut
-
-sub share {
-}
-
-=head2 unshare($vid, $pid, $serial)
-
-Unshares the indicated device
-
-=cut
-
-sub unshare {
-}
-
-
-=head2 share_list_only([$vid, $pid, $serial], [$vid, $pid, $serial], ...)
-
-Shares the devices specified in the list, and unshares any unlisted ones.
-
-=cut
-
-
-sub share_list_only {
-	my ($self, @list) = @_;
-	my %shared_ids;
-	
-	my $ret = 1;
-	my @failed;
-	
-	# Ensure the data is up to date
-	$self->refresh;
-		
-		
-	foreach my $elem (@list) {
-		my $key = $self->get_device_id( @$elem );
-		DEBUG "Going to share device $key";
-		
-		my $dev = $self->get_device( $key );
-		if ( $dev ) {
-			$shared_ids{$key} = 1;
-			if ( !$dev->{shared} ) {
-				DEBUG "Sharing device $key";
-				$self->share(@$elem);
-			} else {
-				DEBUG "Device $key is already shared, skipping";
-			}
-		} else {
-			WARN "Was asked to share device $key, but the device is not present";
-			$ret = 1;
-			push @failed, $key;
-		}
-	}
-	
-	foreach my $dev ( @{$self->list_devices} ) {
-		my $key = $dev->{key};
-		if ( !exists $shared_ids{$key} && $dev->{shared} ) {
-			DEBUG "Unsharing currently shared device $key, not in current list";
-			$self->unshare( $key );
-		}
-	}
-	
-	return ($ret, @failed);
-}
-
-=head2 can_autoshare()
-
-Returns true if the module can automatically share USB devices.
-Returns false if the module requires that each device be shared specifically.
-
-This is important for the VMA side. An implementation with autoshare can let
-the VM connect any system device it asks when in autoshare mode. An implementation
-without must list the devices to share, and those unlisted will be unavailable to
-the VM.
-
-=cut
-
-sub can_autoshare {
-	return 0;
-}
-
-=head2 set_autoshare(bool)
-
-Sets autoshare mode.
-
-=cut
-
-sub set_autoshare {
-	die "Autosharing not supported by this module";
+    return %hwdata;
 }
  
 1;
