@@ -648,33 +648,15 @@ Wat.C = {
         return lan == "auto" ? window.i18n.lng().substr(0, 2) : lan;
     },
     
-    // Retrieve from API the DIG enable parameter, store it on digEnabled configuration variable and execute callback function
-    getDigConfig: function (callback) {
-        var filter = {
-            key: 'api.proxy.dig.enabled'
-        };
-        
-        if (Wat.C.isSuperadmin()) {
-            filter['tenant_id'] = -1;
-        }
-        
-        // Retrieve from API current prefix tokens
-        Wat.A.performAction('config_get', {}, filter, {}, function (result) {
-            Wat.C.digEnabled = result.retrievedData.rows[0] ? parseInt(result.retrievedData.rows[0].operative_value) : 0;
-            
-            callback();
-        }, this);
-    },
-    
     isDIGEnabled: function () {
-        return Wat.C.digEnabled;
+        return parseInt(Wat.C.publicConfig.dig.enabled);
     },
     
-    isOsfDigEnabled: function (osfIdList, that) {
+    isOsfDigEnabled: function (osfIdList) {
         // Convert to array to just one id cases
         var osfIdList = [osfIdList];
         
-        var view = that || Wat.U.getViewFromQvdObj('osf');
+        var view = Wat.U.getViewFromQvdObj('osf');
         
         // Get number of OSFs with assigned OSD
         var nOsfsWithOsd = 0;
@@ -693,8 +675,8 @@ Wat.C = {
             }
         });
         
-        // If DIG is not enabled and one or more OSF have assigned OSD, DI creation will be disabled (will not appear)
-        if (!Wat.C.isDIGEnabled() && nOsfsWithOsd > 0) {
+        // Just for Osfs with OSD, If it is disabled by ACLs or DIG is not enabled, DI generation will be disabled (will not appear)
+        if (nOsfsWithOsd > 0 && (!Wat.C.checkACL('di.create.generation') || !Wat.C.isDIGEnabled())) {
             return false;
         }
         else {

@@ -101,11 +101,11 @@ Wat.B = {
                 $(firstLink).trigger('mouseleave');
             }
         });
-        this.bindEvent('click', 'td.cell-link', function (e) { 
-            var firstLink = $(e.target).find('a')[0];
+        this.bindEvent('click', 'td.cell-link', function (e) {
+            var firstLink = $(e.target).closest('td').find('a')[0];
+            
             if (firstLink) {
                 location = $(firstLink).attr('href');
-                $(firstLink).trigger('click');
             }
         });
         this.bindEvent('click', 'td.cell-check, th.cell-check', function (e) { 
@@ -568,6 +568,7 @@ Wat.B = {
                 'actionAuto': 'osf',
                 'selectedId': '',
                 'controlName': 'osf_id',
+                'extraFields': ['osd_id']
                 
             };
             
@@ -586,6 +587,11 @@ Wat.B = {
 
                 // Trigger change event to update tags
                 $('[name="osf_id"]').trigger('change');
+                
+                // Di creation could be restricted for some OSFs
+                if (Wat.CurrentView.editorView.qvdObj == 'di') {
+                    Wat.CurrentView.editorView.restrictOsfsWithDisabledDiCreation();
+                }
             }); 
         },
         

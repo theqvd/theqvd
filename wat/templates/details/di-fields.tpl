@@ -54,7 +54,7 @@ switch (dFieldCode) {
     case 'auto_publish':
         if (model.get('auto_publish')) {
         %>
-            <span data-i18n="When finish generation"></span>
+            <span data-i18n="When publish"></span>
         <%
         }
         else {
@@ -71,12 +71,12 @@ switch (dFieldCode) {
         }
         else if (model.get('expiration_time_hard') === 0) {
         %>
-            <span data-i18n="When finish generation"></span>
+            <span data-i18n="When publish"></span>
         <%
         }
         else if (model.get('expiration_time_hard') > 0) {
             var expirationTime = Wat.U.secondsToHms(model.get('expiration_time_hard'), 'strLong');
-            print(i18n.t('__time__ after generation', {
+            print(i18n.t('__time__ after publication', {
                         time: expirationTime
                     }));
         }

@@ -162,10 +162,17 @@ Wat.I.T = {
                     };
                 }
                 
-                if (params.qvdObj == 'osf') {
-                    templates["editorNew_di"] = {
-                        name: 'creator/di'
-                    };
+                switch (params.qvdObj) {
+                    case 'osf':
+                        templates["editorNew_di"] = {
+                            name: 'creator/di'
+                        };
+                        break;
+                    case 'di':
+                        templates["diInfoIcons"] = {
+                            name: 'list/di-info-icons'
+                        };
+                        break;
                 }
                 
                 templates["list_" + params.qvdObj] = {

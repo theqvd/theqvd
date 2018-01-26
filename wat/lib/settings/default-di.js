@@ -288,7 +288,6 @@ Wat.I.detailsFields[qvdObj] = {
                 'fields': [
                     'auto_publish'
                 ],
-                'acls': 'di.see.creation-date',
                 'display': false,
                 'icon': 'fa fa-rocket'
             },
@@ -423,8 +422,7 @@ Wat.I.formFilters[qvdObj] = {
             }
                     ],
         'displayMobile': false,
-        'displayDesktop': true,
-        'acls': 'di.see-main.'
+        'displayDesktop': true
     },
     'administrator': {
         'filterField': 'creation_admin_id',
@@ -523,6 +521,7 @@ Wat.I.selectedActions[qvdObj] = {
     },
     'publish': {
         'text': 'Publish',
+        'acls': 'di.update.publish',
         'iconClass': 'fa fa-rocket',
         'visibilityCondition': {
             'type': 'eq',

@@ -23,6 +23,7 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
         this.selectedItems = [];
         
         var id = $(e.target).attr('data-id');
+        var osdId = $(e.target).closest('tr').attr('data-osd-id');
         var parentRow = $(e.target).closest('tr');
         var parentRowCols = $(e.target).closest('tr').find('td').length;
         
@@ -49,7 +50,7 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
             $(e.target).addClass(CLASS_ICON_BUTTON_SUBROW_CLOSE);
             
             // Add subrow
-            $(parentRow).after('<tr data-dis-row="' + id + '"><td colspan=' + parentRowCols + ' class="dis-subrow" data-dis-row="' + id + '"><div class="bb-list list-wrapper">' + HTML_LOADING + '</div></td></tr>');
+            $(parentRow).after('<tr data-dis-row="' + id + '" data-osd-id="' + osdId + '"><td colspan=' + parentRowCols + ' class="dis-subrow" data-dis-row="' + id + '" data-osd-id="' + osdId + '"><div class="bb-list list-wrapper">' + HTML_LOADING + '</div></td></tr>');
             
             var params = {};
             params.whatRender = 'list';
@@ -105,5 +106,5 @@ Wat.Views.OSFListView = Wat.Views.ListView.extend({
                 }
             });
         }, 'ws', 'list');
-    },
+    }
 });

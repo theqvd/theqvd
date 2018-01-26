@@ -217,18 +217,15 @@ Wat.L = {
         // Configure visability
         Wat.C.configureVisibility();
         
-        // Get from database DIG enable parameter and store it in configuration
-        Wat.C.getDigConfig(function () {
-            if (Wat.CurrentView.qvdObj == 'login') {
-                Wat.L.logIn(that.sid, that.login);
-
-                Wat.I.renderMain();
-
-                Wat.Router.watRouter.performRoute('', Wat.Views.HomeView);
-            }
-
-            Wat.L.afterLogin();
-        });
+        if (Wat.CurrentView.qvdObj == 'login') {
+            Wat.L.logIn(that.sid, that.login);
+            
+            Wat.I.renderMain();
+            
+            Wat.Router.watRouter.performRoute('', Wat.Views.HomeView);
+        }
+        
+        Wat.L.afterLogin();
     },
     
     afterLogin: function () {

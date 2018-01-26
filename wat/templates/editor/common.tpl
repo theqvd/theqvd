@@ -6,6 +6,9 @@
                 if (cat.isEnabled != undefined && !cat.isEnabled()) {
                     return;
                 }
+                if (cat.acls != undefined && !Wat.C.checkACL(cat.acls, cat.aclsLogic)) {
+                    return;
+                }
             %>
                 <li data-tab="<%= cat.code %>" data-i18n="<%= cat.text %>"><%= cat.text %></li>
             <% }); %>

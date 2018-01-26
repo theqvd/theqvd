@@ -114,7 +114,7 @@
         <%
         }
         _.each(models, function(model) { %>
-            <tr class="row-<%= model.get('id') %>" data-id="<%= model.get('id') %>" data-name="<%= model.get('name') %>">
+            <tr class="row-<%= model.get('id') %>" data-id="<%= model.get('id') %>" data-osd-id="<%= model.get('osd_id') %>" data-name="<%= model.get('name') %>">
                 <% 
                     $.each(columns, function(name, col) {
                         if (col.display == false) {

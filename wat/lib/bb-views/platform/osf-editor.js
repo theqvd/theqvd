@@ -231,6 +231,14 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
                 Wat.CurrentView.OSDmodel.destroy();
                 break;
         }
+        
+        // Cleanup OSD model after close OSF editor to avoid errors
+        Wat.CurrentView.OSDmodel = undefined;
+    },
+    
+    afterEditElementDialogAction: function (action) {
+        // Cleanup OSD model after close OSF editor to avoid errors
+        Wat.CurrentView.OSDmodel = undefined;
     },
     
     updateMassiveElement: function (dialog, id) {

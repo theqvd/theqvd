@@ -82,7 +82,8 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
                 'actionAuto': 'osf',
                 'selectedId': $('.' + this.cid + ' .filter select[name="osf"]').val(),
                 'controlName': 'osf_id',
-                'chosenType': 'advanced100'
+                'chosenType': 'advanced100',
+                'extraFields': ['osd_id']
             };
 
             // If exist tenant control (in superadmin cases) show osfs of selected tenant
@@ -92,7 +93,7 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
                 Wat.I.chosenElement('select[name="osf_id"]', 'advanced100');
             }
             else {
-                Wat.A.fillSelect(params);
+                Wat.A.fillSelect(params, this.restrictOsfsWithDisabledDiCreation);
             }
         }
         
@@ -101,6 +102,21 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
         Wat.I.chosenElement('select[name="expire_vms"]', 'single100');
         $('[name="expire_vms_hours"]').spinner();
         $('[name="expire_vms_minutes"]').spinner();
+    },
+    
+    // Remove OSFs with restricted DI creation from select control
+    restrictOsfsWithDisabledDiCreation: function () {
+        if (!Wat.C.checkACL('di.create.generation') || !Wat.C.isDIGEnabled()) {
+            $.each($('.' + this.cid + ' select[name="osf_id"] option'), function (iOpt, opt) {
+                var osdId = $(opt).attr('data-osd_id') || 0;
+                
+                if (osdId) {
+                    $(this).remove();
+                }
+            });
+            
+            $('.' + this.cid + ' select[name="osf_id"]').trigger('chosen:updated');
+        }
     },
     
     renderUpdate: function (target, that) {
@@ -166,6 +182,7 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
         
         if (osdId) {
             switch (context.find('select[name="publish"]').val()) {
+                default:
                 case 'no':
                     arguments["auto_publish"] = false;
                     break;
@@ -175,6 +192,7 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
             }
             
             switch (context.find('select[name="expire_vms"]').val()) {
+                default:
                 case 'no':
                     // No send expiration parameters
                     break;
@@ -279,30 +297,34 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
         var osdId = context.find('input[name="osd_id"]').val();
         
         if (osdId) {
-            switch (context.find('select[name="publish"]').val()) {
-                case 'no':
-                    arguments["auto_publish"] = false;
-                    break;
-                case 'when_finish':
-                    arguments["auto_publish"] = true;
-                    break;
+            if (Wat.C.checkACL('di.update.auto-publish')) {
+                switch (context.find('select[name="publish"]').val()) {
+                    case 'no':
+                        arguments["auto_publish"] = false;
+                        break;
+                    case 'when_finish':
+                        arguments["auto_publish"] = true;
+                        break;
+                }
             }
             
-            switch (context.find('select[name="expire_vms"]').val()) {
-                case 'no':
-                    arguments["expiration_time_soft"] = null;
-                    arguments["expiration_time_hard"] = null;
-                    break;
-                case 'when_finish':
-                    arguments["expiration_time_soft"] = 0;
-                    arguments["expiration_time_hard"] = 0;
-                    break;
-                case 'after_finish':
-                    arguments["expiration_time_soft"] = 0;
-                    var hours = parseInt(context.find('input[name="expire_vms_hours"]').val());
-                    var minutes = parseInt(context.find('input[name="expire_vms_minutes"]').val());
-                    arguments["expiration_time_hard"] = ((hours * 60) + minutes) * 60;
-                    break;
+            if (Wat.C.checkACL('di.update.vms-expiration')) {
+                switch (context.find('select[name="expire_vms"]').val()) {
+                    case 'no':
+                        arguments["expiration_time_soft"] = null;
+                        arguments["expiration_time_hard"] = null;
+                        break;
+                    case 'when_finish':
+                        arguments["expiration_time_soft"] = 0;
+                        arguments["expiration_time_hard"] = 0;
+                        break;
+                    case 'after_finish':
+                        arguments["expiration_time_soft"] = 0;
+                        var hours = parseInt(context.find('input[name="expire_vms_hours"]').val());
+                        var minutes = parseInt(context.find('input[name="expire_vms_minutes"]').val());
+                        arguments["expiration_time_hard"] = ((hours * 60) + minutes) * 60;
+                        break;
+                }
             }
         }
         

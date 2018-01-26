@@ -34,9 +34,10 @@
                     </tr>
                 <%
             }
-            
+            var cleanName = model.get('disk_image').substr(model.get('disk_image').indexOf('-')+1);
     %>
-        <tr class="js-di-row-state di-row-state di-row-state--<%= model.get('state') %> <%= shrinkFactor <= iModel ? 'hidden' : '' %> js-shrinked-row" data-id="<%= model.get('id') %>" data-osf-id="<%= model.get('osf_id') %>">
+    
+        <tr class="js-di-row-state di-row-state di-row-state--<%= model.get('state') %> <%= shrinkFactor <= iModel ? 'hidden' : '' %> js-shrinked-row" data-id="<%= model.get('id') %>" data-osf-id="<%= model.get('osf_id') %>" data-name="<%= cleanName %>">
             <td class="cell-check">
                 <input type="checkbox" 
                     class="check-it js-check-it" 
@@ -46,77 +47,7 @@
                     data-embedded-view="di"
                 >
             </td>
-            <td class="desktop max-1-icons" data-id="<%= model.get('id') %>">
-                <% $.each(Wat.I.detailsFields.di.general.fieldList.state.options, function (key, values) { %>
-                    <i class="<%= values.icon %> js-progress-icon js-progress-icon--<%= key %> <%= model.get('state') != key ? 'hidden' : '' %>" data-i18n="[title]<%= values.text %>"></i>
-                <% }); %>
-                
-                <%
-                var hiddenIfPublished = '';
-                var hiddenIfReadyOrPublished = '';
-                var hiddenIfNotPublished = '';
-                switch (model.get('state')) {
-                    case 'published':
-                        hiddenIfPublished = 'hidden';
-                        hiddenIfReadyOrPublished = 'hidden';
-                        break;
-                    case 'ready':
-                        hiddenIfReadyOrPublished = 'hidden';
-                        hiddenIfNotPublished = 'hidden';
-                        break;
-                    default:
-                        hiddenIfNotPublished = 'hidden';
-                        break;
-                }
-                %>
-                
-                <%
-                if (model.get('state') != 'published') {
-                %>
-                    <i class="fa fa-road js-future-tags-icon <%= hiddenIfPublished %>" data-model-function="renderFutureTags" data-id="<%= model.get('id') %>"></i>
-                <%
-                }
-                
-                if (model.get('tags')) {
-                %>
-                    <i class="fa fa-tags js-tags-icon <%= hiddenIfNotPublished %>" data-model-function="renderTags" data-id="<%= model.get('id') %>"></i>
-                <%
-                }
-
-                if (model.get('head')) {
-                %>
-                    <i class="fa fa-flag-o js-head-icon <%= hiddenIfNotPublished %>" title="head"></i>
-                <%
-                }
-
-                if (model.get('default')) {
-                %>
-                    <i class="fa fa-home js-default-icon <%= hiddenIfNotPublished %>" title="default"></i>
-                <%
-                }
-
-                if (model.get('blocked')) {
-                %>
-                    <i class="fa fa-lock" data-i18n="[title]Blocked" title="<%= i18n.t('Blocked') %>"></i>
-                <%
-                }
-
-                if (model.get('auto_publish')) {
-                %>
-                    <i class="fa fa-rocket js-auto-publish-icon <%= hiddenIfReadyOrPublished %>" data-i18n="[title]Will be published after generation" title="<%= i18n.t('Will be published after generation') %>"></i>
-                <%
-                }
-                
-                if (model.get('expiration_time_hard') != null) {
-                    var expirationTime = Wat.U.secondsToHms(model.get('expiration_time_hard'), 'strLong');
-                %>
-                    <i class="fa fa-hourglass-half js-expiration-icon <%= hiddenIfPublished %>" title="<%= i18n.t('Affected machines will expire') %>: <%= i18n.t('__time__ after generation', {
-                        time: expirationTime
-                    }) %>"></i>
-                <%
-                }
-                %>
-            </td>
+            <td class="desktop max-1-icons bb-di-info" data-id="<%= model.get('id') %>"></td>
             <td class="col-width-40">
                 <%= model.get('version') %>
                 <% if (model.get('state') != 'generating' && model.get('state') != 'new') { %>

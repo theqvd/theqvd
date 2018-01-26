@@ -11,23 +11,27 @@
     </tr>
     <%
     }
-    if (model.get('state') != 'published' && model.get('state') != 'ready') { 
+    if (model.get('state') != 'published' && model.get('state') != 'ready' && Wat.C.checkACL('di.update.auto-publish')) { 
     %>
         <tr class="js-osd-row" data-tab-field="image">
             <td data-i18n="Auto-publish"></td>
             <td>
                 <select class="" id="publish" name="publish" data-any-selected>
                     <option value="no" data-i18n="No" <%= model.get('auto_publish') ? '' : 'selected="selected"' %>></option>
-                    <option value="when_finish" data-i18n="When finish generation" <%= model.get('auto_publish') ? 'selected="selected"' : '' %>></option>
+                    <option value="when_finish" data-i18n="When publish" <%= model.get('auto_publish') ? 'selected="selected"' : '' %>></option>
                 </select>
             </td>
         </tr>
+    <%
+    }
+    if (model.get('state') != 'published' && Wat.C.checkACL('di.update.vms-expiration')) { 
+    %>
         <tr class="js-osd-row" data-tab-field="image">
             <td data-i18n="Expire affected machines"></td>
             <td>
                 <select class="" id="expire_vms" name="expire_vms" data-any-selected>
                     <option value="no" data-i18n="No" <%= model.get('expiration_time_hard') === null ? 'selected="selected"' : '' %>></option>
-                    <option value="when_finish" data-i18n="When finish generation" <%= model.get('expiration_time_hard') === 0 ? 'selected="selected"' : '' %>></option>
+                    <option value="when_finish" data-i18n="When publish" <%= model.get('expiration_time_hard') === 0 ? 'selected="selected"' : '' %>></option>
                     <option value="after_finish" data-i18n="Schedule" <%= model.get('expiration_time_hard') > 0 ? 'selected="selected"' : '' %>></option>
                 </select>
             </td>

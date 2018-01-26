@@ -235,6 +235,7 @@ Wat.I.editorCategories[qvdObj] = [
     {
         code: 'software',
         text: 'Software',
+        acls: 'di.create.generation',
         isEnabled: Wat.C.isDIGEnabled
     }
 ];

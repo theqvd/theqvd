@@ -277,6 +277,7 @@ Wat.A = {
     //          - params.nameAsId: Boolean that specifies if name of the options will be taken as Id too
     //          - params.group: HTML native optgroup where the options will be grouped
     //          - params.orderFirst: Array with the options that will be first
+    //          - params.extraFields: Array with extra fields to be retrieved and setted as option attributes
     //      afterCallBack: Function to be executed after filling
     fillSelect: function (params, afterCallBack) {
         if (params.controlSelector) {
@@ -340,6 +341,11 @@ Wat.A = {
                 }
                 
                 params.fields = ['id', nameField];
+                
+                if (params.extraFields) {
+                    params.fields = params.fields.concat(params.extraFields);
+                }
+                
                 params.order_by = {
                     field: nameField,
                     order: '-asc'
@@ -433,8 +439,17 @@ Wat.A = {
                             if (params.selectedId !== undefined && params.selectedId == id) {
                                 selected = 'selected="selected"';
                             }
-
-                            var optionHTML = '<option value="' + id + '" ' + selected + '>' +  
+                            
+                            // Build attributes with fields to be retrieved from DOM
+                            var extraFieldsAttrs = '';
+                            if (params.extraFields) {
+                                $.each(params.extraFields, function (iEField, extraField) {
+                                    var extraFieldValue = option[extraField] == null ? '' : option[extraField];
+                                    extraFieldsAttrs += ' data-' + extraField + '="' + extraFieldValue + '" ';
+                                });
+                            }
+                            
+                            var optionHTML = '<option value="' + id + '" ' + extraFieldsAttrs + selected + '>' +  
                                                                         _.escape(name) + 
                                                                         '<\/option>';
                                                         

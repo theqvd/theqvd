@@ -113,12 +113,12 @@ Wat.DIG = {
         options = options || {};
         options.container = options.container || '';
         
-        if (model === undefined || (Wat.CurrentView.model && !Wat.C.isOsfDigEnabled(Wat.CurrentView.model.get('id')))) {
-            var template = $.i18n.t('Software information not available');
+        if (model === undefined || (Wat.CurrentView.model && Wat.CurrentView.model.get('id') && !Wat.C.isOsfDigEnabled(Wat.CurrentView.model.get('id')))) {
+            var template = '<span class="os-configuration js-not-configuration-message">' + $.i18n.t('Software information not available') + '</span>';
             $(options.container + ' .bb-os-configuration').html(template);
         }
         else if (model === false || model.get('error')) {
-            var template = $.i18n.t('Error retrieving software information');
+            var template = '<span class="os-configuration js-not-configuration-message">' + $.i18n.t('Error retrieving software information') + '</span>';
             $(options.container + ' .bb-os-configuration').html(template);
         }
         else {

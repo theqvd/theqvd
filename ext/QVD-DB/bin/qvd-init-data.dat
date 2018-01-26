@@ -435,8 +435,10 @@ id	name	description
 329	tenant.purge.	Delete all the elements of a tenant
 330	vm.spy.	Spy QVD option to see the VM activity via VNC
 331	vm.spy.interactive	Interactive mode on Spy QVD feature to take desktop control
-332	di.see.generation	See DI generation parameters
-333	di.update.generation	Update DI generation parameters
+332	di.create.generation	Generate disk images (Using DIG)
+333	di.update.auto-publish	Set if disk images will be auto published after generation
+334	di.update.vms-expiration	Set if affected vms will expire after disk image generation
+335	di.update.publish	Publish generated disk images
 
 ### ACL_Role_Relation ###
 id	acl_id	role_id	positive
@@ -778,8 +780,10 @@ id	acl_id	role_id	positive
 335	329	45	t
 336	331	63	t
 337	330	63	t
-338	332	11	t
+338	332	7	t
 339	333	12	t
+340	334	12	t
+341	335	12	t
 
 ### Role_Administrator_Relation ###
 id	role_id	administrator_id

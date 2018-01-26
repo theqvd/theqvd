@@ -773,4 +773,4 @@ wat.multitenant = 1
 
 ## Disk Image Generator (DIG) parameters
 api.proxy.dig.address = http://localhost:9000
-api.proxy.dig.enabled = 0
+api.public.dig.enabled = 0

@@ -60,22 +60,27 @@
     </tr>
     <% 
     }
+    if (Wat.C.checkACL('di.update.auto-publish')) { 
     %>
     <tr class="js-osd-row" data-tab-field="image">
         <td data-i18n="Auto-publish"></td>
         <td>
             <select class="" id="publish" name="publish" data-any-selected>
                 <option value="no" data-i18n="No"></option>
-                <option value="when_finish" data-i18n="When finish generation"></option>
+                <option value="when_finish" data-i18n="When publish"></option>
             </select>
         </td>
     </tr>
+    <% 
+    }
+    if (Wat.C.checkACL('di.update.vms-expiration')) { 
+    %>
     <tr class="js-osd-row" data-tab-field="image">
         <td data-i18n="Expire affected machines"></td>
         <td>
             <select class="" id="expire_vms" name="expire_vms" data-any-selected>
                 <option value="no" data-i18n="No"></option>
-                <option value="when_finish" data-i18n="When finish generation"></option>
+                <option value="when_finish" data-i18n="When publish"></option>
                 <option value="after_finish" data-i18n="Schedule"></option>
             </select>
         </td>
@@ -92,6 +97,7 @@
         </td>
     </tr>
     <%
+    }
     if (Wat.C.checkACL('di.create.default')) { 
     %>
     <tr data-tab-field="image">

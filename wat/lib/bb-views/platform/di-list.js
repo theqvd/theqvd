@@ -16,6 +16,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         
         this.execModelFunctions();
         
+        this.renderInfo();
         this.renderProgressBars();
         
         Wat.T.translate();
@@ -110,6 +111,10 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         var that = this;
         
         var osfId = $('.dis-subrow').attr('data-dis-row');
+        var osdId = $('.dis-subrow').attr('data-osd-id');
+        
+        // Creation is enabled for old OSFs and dig OSFs if dig is enabled
+        var enabledCreation = !osdId || Wat.C.isOsfDigEnabled(osfId);
         
         this.template = _.template(
             Wat.TPL.embedded_osf_di, {
@@ -117,7 +122,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
                 models: this.collection.models,
                 selectedActions: Wat.C.purgeConfigData(Wat.I.selectedActions.di),
                 osfId: osfId,
-                enabledCreation: Wat.C.isOsfDigEnabled(osfId),
+                enabledCreation: enabledCreation,
                 shrinkFactor: 3
             }
         );
@@ -126,6 +131,7 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
         
         this.execModelFunctions();
         
+        this.renderInfo();
         this.renderProgressBars();
         
         Wat.T.translateAndShow();
@@ -170,5 +176,41 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
     unshrinkRows: function () {
         $('tr.js-rows-unshrink-row').remove();
         $('tr.js-shrinked-row').show();
+    },
+    
+    renderInfo: function () {
+        var that = this;
+        
+        $.each(this.collection.models, function (i, model) {
+            var hiddenIfPublished = '';
+            var hiddenIfReadyOrPublished = '';
+            var hiddenIfNotPublished = '';
+            switch (model.get('state')) {
+                case 'published':
+                    hiddenIfPublished = 'hidden';
+                    hiddenIfReadyOrPublished = 'hidden';
+                    break;
+                case 'ready':
+                    hiddenIfReadyOrPublished = 'hidden';
+                    hiddenIfNotPublished = 'hidden';
+                    break;
+                default:
+                    hiddenIfNotPublished = 'hidden';
+                    break;
+            }
+            
+            var template = _.template(
+                Wat.TPL['diInfoIcons'], {
+                    model: model,
+                    infoRestrictions: that.infoRestrictions,
+                    statesList: Wat.I.detailsFields.di.general.fieldList.state.options,
+                    hiddenIfPublished: hiddenIfPublished,
+                    hiddenIfReadyOrPublished: hiddenIfReadyOrPublished,
+                    hiddenIfNotPublished: hiddenIfNotPublished
+                }
+            );
+
+            $('.bb-di-info[data-id="' + model.get('id') + '"]').html(template);
+        });
     }
 });
