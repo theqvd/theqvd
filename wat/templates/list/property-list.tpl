@@ -13,7 +13,9 @@
             <th data-i18n="Description" class="col-width-100"></th>
             <th data-i18n="Users"></th>
             <th data-i18n="Virtual machines"></th>
-            <th data-i18n="Nodes"></th>
+            <% if (hostPropertiesEnabled) { %>
+                <th data-i18n="Nodes"></th>
+            <% } %>
             <th data-i18n="OS Flavours"></th>
             <th data-i18n="Disk images"></th>
         </tr>
@@ -46,7 +48,9 @@
             <td><%= prop.get('description') %></td>
             <td class="center <%= prop.get('in_user') ? '' : 'second_row' %> cell-check"><input type="checkbox" name="property-check" <%= prop.get('in_user') ? 'checked' : '' %> data-qvd-object="user" data-property-id="<%= prop.get('property_id') %>"  data-property-in-id="<%= prop.get('in_user') %>"></td>
             <td class="center <%= prop.get('in_vm') ? '' : 'second_row' %> cell-check"><input type="checkbox" name="property-check" <%= prop.get('in_vm') ? 'checked' : '' %> data-qvd-object="vm" data-property-id="<%= prop.get('property_id') %>"  data-property-in-id="<%= prop.get('in_vm') %>"></td>
-            <td class="center <%= prop.get('in_host') ? '' : 'second_row' %> cell-check"><input type="checkbox" name="property-check" <%= prop.get('in_host') ? 'checked' : '' %> data-qvd-object="host" data-property-id="<%= prop.get('property_id') %>"  data-property-in-id="<%= prop.get('in_host') %>"></td>
+            <% if (hostPropertiesEnabled) { %>
+                <td class="center <%= prop.get('in_host') ? '' : 'second_row' %> cell-check"><input type="checkbox" name="property-check" <%= prop.get('in_host') ? 'checked' : '' %> data-qvd-object="host" data-property-id="<%= prop.get('property_id') %>"  data-property-in-id="<%= prop.get('in_host') %>"></td>
+            <% } %>
             <td class="center <%= prop.get('in_osf') ? '' : 'second_row' %> cell-check"><input type="checkbox" name="property-check" <%= prop.get('in_osf') ? 'checked' : '' %> data-qvd-object="osf" data-property-id="<%= prop.get('property_id') %>"  data-property-in-id="<%= prop.get('in_osf') %>"></td>
             <td class="center <%= prop.get('in_di') ? '' : 'second_row' %> cell-check"><input type="checkbox" name="property-check" <%= prop.get('in_di') ? 'checked' : '' %> data-qvd-object="di" data-property-id="<%= prop.get('property_id') %>"  data-property-in-id="<%= prop.get('in_di') %>"></td>
         </tr>

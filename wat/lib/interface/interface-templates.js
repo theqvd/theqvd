@@ -240,6 +240,9 @@ Wat.I.T = {
                     },
                     editor_property: {
                         name: 'editor/property'
+                    },
+                    editorPropertyObjects: {
+                        name: 'editor/property-objects'
                     }
                 }
                 break;

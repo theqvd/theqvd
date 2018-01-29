@@ -1,4 +1,4 @@
-<div class="editor-container <%= cid %> js-editor-container-<%= editorMode %>">
+<div class="editor-container <%= cid %> js-editor-container js-editor-container-<%= editorMode %>" data-qvd-obj="<%= qvdObj %>">
     <table class="editor-table js-editor-table <%= editorMode == "massive_edit" ? 'massive-editor-table js-massive-editor-table' : '' %> alternate">
          <%
          if (editorMode == "massive_edit") {
@@ -32,6 +32,7 @@
         %>
         
         <tbody class="bb-editor"></tbody>
+        <tbody class="bb-editor-extra js-editor-extra"></tbody>
         <tbody class="bb-custom-properties custom-properties"></tbody>
     </table>
 </div>
