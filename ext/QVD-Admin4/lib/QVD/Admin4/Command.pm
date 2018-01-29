@@ -454,7 +454,7 @@ sub _cmd
 
     my $filters = $self->get_filters($parsing);
 
-    unless (keys %$filters) {
+    unless (keys %$filters or $parsing->qvd_object eq 'config') {
         print STDERR "Are you sure you want to apply this operation to all the elements? (y/n)\n";
         chomp(my $response = <STDIN>);
         if($response ne 'y') {
