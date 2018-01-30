@@ -24,21 +24,7 @@ Wat.Views.RoleEditorView = Wat.Views.AdministratorRoleEditorView.extend({
         Wat.CurrentView.model = new Wat.Models.Role();
         $('.ui-dialog-titlebar').html($.i18n.t('New Role'));
         
-        Wat.Views.EditorView.prototype.renderCreate.apply(this, [target, that]);
-        
-        if ($('[name="tenant_id"]').length > 0) {
-            // When tenant id is present attach change events. Roles will be filled once the events were triggered
-            Wat.B.bindEvent('change', 'select[name="tenant_id"]', function () {
-                that.fetchAndRenderRoles({
-                    forcedTenantId: $('select[name="tenant_id"]').val()
-                });
-            });
-        }
-        else {
-            this.fetchAndRenderRoles({
-                forcedTenantId: Wat.C.tenantID
-            });
-        }
+        Wat.Views.AdministratorRoleEditorView.prototype.renderCreate.apply(this, [target, that]);
     },
     
     renderUpdate: function (target, that) {

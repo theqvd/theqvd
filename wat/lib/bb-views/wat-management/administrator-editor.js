@@ -22,7 +22,7 @@ Wat.Views.AdminEditorView = Wat.Views.AdministratorRoleEditorView.extend({
         Wat.CurrentView.model = new Wat.Models.Admin();
         $('.ui-dialog-titlebar').html($.i18n.t('New Administrator'));
         
-        Wat.Views.EditorView.prototype.renderCreate.apply(this, [target, that]);
+        Wat.Views.AdministratorRoleEditorView.prototype.renderCreate.apply(this, [target, that]);
         
         Wat.I.chosenElement('[name="language"]', 'single100');
     },

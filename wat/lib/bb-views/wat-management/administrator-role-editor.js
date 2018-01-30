@@ -206,5 +206,25 @@ Wat.Views.AdministratorRoleEditorView = Wat.Views.EditorView.extend({
         });
         
         this.renderRoles();
-    }
+    },
+    
+    renderCreate: function (target, that) {
+        Wat.Views.EditorView.prototype.renderCreate.apply(this, [target, that]);
+        
+        if ($('[name="tenant_id"]').length > 0) {
+            var editorView = this;
+            
+            // When tenant id is present attach change events. Roles will be filled once the events were triggered
+            Wat.B.bindEvent('change', 'select[name="tenant_id"]', function (e) {
+                editorView.fetchAndRenderRoles({
+                    forcedTenantId: $(e.target).val()
+                });
+            });
+        }
+        else {
+            this.fetchAndRenderRoles({
+                forcedTenantId: Wat.C.tenantID
+            });
+        }
+    },
 });
