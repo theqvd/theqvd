@@ -455,10 +455,16 @@ sub _cmd
     my $filters = $self->get_filters($parsing);
 
     unless (keys %$filters or $parsing->qvd_object eq 'config') {
-        print STDERR "Are you sure you want to apply this operation to all the elements? (y/n)\n";
-        chomp(my $response = <STDIN>);
-        if($response ne 'y') {
-            CLI::Framework::Exception->throw('Operation aborted');
+        if ($self->get_app->is_interactive_mode_enabled()) {
+            print STDERR "Are you sure you want to apply this operation to all the elements? (y/n)\n";
+            chomp(my $response = <STDIN>);
+            if($response ne 'y') {
+                CLI::Framework::Exception->throw('Operation aborted');
+            }
+        } else {
+            if(!$self->get_app->is_force_enabled()) {
+                CLI::Framework::Exception->throw('Use --force flag to perform operations with no filters');
+            }
         }
     }
 
