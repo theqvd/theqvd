@@ -921,7 +921,6 @@ sub _run {
                 INFO "Sound enabled, running on Linux";
     
                 my $syspa = QVD::Client::PulseAudio->new();
-                my $qvdpa_needed;
     
                 DEBUG "Checking system PulseAudio";
     
@@ -936,12 +935,10 @@ sub _run {
                     DEBUG "Checking whether system PA supports Opus";
     
                     if ( $syspa->is_opus_supported ) {
-                        # Great, this makes things easier
-                        # 
                         INFO "System PA supports Opus, setting it up";
                         $syspa->cmd("load-module", "module-native-protocol-tcp",
                                     "auth-anoymous=1", "listen=127.0.01", "port=4713");
-                    } else {
+                    } elsif ( $syspa->is_qvd_pulseaudio_installed() ) {
                         # Chain our own PA
                         INFO "System PA does not support Opus, chaining QVDPA";
                         DEBUG "Setting up native protocol on local PA";
@@ -960,9 +957,8 @@ sub _run {
                                     "sink_name=QVD", "server=tcp:127.0.0.1:52001",
                                     "sink=\@DEFAULT_SINK\@");
                     }
+                    sleep(20);
                 }
-    
-                sleep(20);
             }
         }
 
@@ -1037,13 +1033,10 @@ sub _run {
             DEBUG("Slave command is '$slave_cmd'");
             if ($WINDOWS) {
                 my $wrapper = File::Spec->rel2abs(core_cfg('client.slave.wrapper'), $QVD::Client::App::app_dir);
-                my $perl = File::Spec->rel2abs($^X, $QVD::Client::App::app_dir);
                 DEBUG("NX_SLAVE_CMD=$wrapper");
                 $self->{client_delegate}->proxy_set_environment(NX_SLAVE_CMD => $wrapper);
                 DEBUG("QVD_SLAVE_CMD=$slave_cmd");
                 $self->{client_delegate}->proxy_set_environment(QVD_SLAVE_CMD => $slave_cmd);
-                #DEBUG("QVD_SLAVE_ARG1=$slave_cmd");
-                #$self->{client_delegate}->proxy_set_environment(QVD_SLAVE_ARG1 => $slave_cmd);
             }
             elsif (-x $slave_cmd ) {
                 # We keep QVD_SLAVE_CMD for retrocompatibility

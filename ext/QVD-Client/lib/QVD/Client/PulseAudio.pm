@@ -16,6 +16,10 @@ sub new {
 	die "No implementation for OS '$^O'";
 }
 
+sub is_qvd_pulseaudio_installed {
+	return 0;
+}
+
 sub start {
 	my ($class, %params) = @_;
 

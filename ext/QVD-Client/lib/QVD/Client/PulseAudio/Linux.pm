@@ -1,6 +1,7 @@
 package QVD::Client::PulseAudio::Linux;
 use base 'QVD::Client::PulseAudio::Base';
 use QVD::Log;
+use QVD::Config::Core;
 
 use IO::Socket::UNIX;
 use Proc::Background;
@@ -39,11 +40,22 @@ sub _setenv {
 	}
 }
 
+sub is_qvd_pulseaudio_installed {
+	my ($self) = @_;
+	my $cmd = core_cfg('command.qvd-pulseaudio');
+
+	DEBUG "Checking if qvd-pulseaudio is installed at $cmd";
+	my $ret = -x $cmd;
+
+	DEBUG "Result: qvd-pulseaudio " . ($ret ? "is" : "is not") . " installed";
+	return $ret;
+}
+
 sub start {
 	my ($self) = @_;
 
 	my $pulsehome = "$ENV{HOME}/.qvd/pulse";
-	my @args = ("/usr/lib/qvd/bin/pulseaudio",
+	my @args = (core_cfg('command.qvd-pulseaudio'),
 	            "-n",
 	            "-F", "/usr/lib/qvd/etc/pulse/default.pa",
 	            "-v",
