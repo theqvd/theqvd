@@ -232,6 +232,9 @@ Wat.I.T = {
                     property: {
                         name: 'list/property'
                     },
+                    propertyObjSelector: {
+                        name: 'list/property-obj-selector'
+                    },
                     listProperty: {
                         name: 'list/property-list'
                     },

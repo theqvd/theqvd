@@ -43,7 +43,6 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
         // Fill the html with the template and the model
         this.template = _.template(
             Wat.TPL.property, {
-                selectedObj: this.selectedObj,
                 selectedTenant: this.selectedTenant,
                 limitByACLs: false,
                 cid: this.cid,
@@ -52,6 +51,10 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
         );
 
         $(this.el).html(this.template);
+        
+        // Render Objects selector first time
+        // Selected tenant will be the current administrator tenant by default
+        this.renderObjSelector(Wat.C.tenantID);
         
         Wat.T.translateAndShow();
         
@@ -88,6 +91,20 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
         });
         
         this.printBreadcrumbs(this.breadcrumbs, '');
+    },
+    
+    renderObjSelector: function (selectedTenantId) {
+        // Host properties are only allowed to be managed by superadministrators in supertenant
+        var hostPropertiesEnabled = Wat.C.isSuperadmin() && selectedTenantId == 0;
+        
+        var template = _.template(
+            Wat.TPL.propertyObjSelector, {
+                selectedObj: this.selectedObj,
+                hostPropertiesEnabled: hostPropertiesEnabled
+            }
+        );
+
+        $('.bb-property-obj-selector').html(template);
     },
     
     renderPropertyList: function (that) {
@@ -154,6 +171,8 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
                 that.renderPropertyList(that);
             }
         });
+        
+        that.renderObjSelector(newSelectedTenant);
     },
     
     checkProperty: function (e) {
