@@ -42,7 +42,7 @@ my $open_command = core_cfg('command.open_file');
 my $command_sshfs = core_cfg('command.sshfs');
 my $authentication_key;
 my $command_sftp_server = core_cfg('command.sftp-server');
-my $command_usbip = core_cfg('vma.slave.command.usbip');
+my $command_usbip = core_cfg('vma.slave.command.qvd-vma-slaveserver-usbip');
 
 BEGIN {
     my $slave_conf = core_cfg('internal.vma.slave.config');
@@ -66,7 +66,7 @@ sub new {
     $self->set_http_request_processor(\&handle_put_share, PUT => '/shares/*');
     $self->set_http_request_processor(\&handle_get_share, GET => '/shares/*');
     $self->set_http_request_processor(\&handle_open, POST => '/open/*');
-    $self->set_http_request_processor(\&handle_usbip, POST => '/usbip/*');
+    $self->set_http_request_processor(\&handle_usbip, POST => '/usbip');
     bless $self, $class;
 }
 
