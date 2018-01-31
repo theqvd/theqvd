@@ -65,14 +65,17 @@ sub usage_text {
 
 
 sub option_spec {
-	[ 'url|u=s'        => 'API url. Example: http://127.0.0.1:3000/api' ],
-		[ 'tenant|t=s'     => 'API admin tenant name' ],
-		[ 'login|l=s'      => 'API admin login' ],
-		[ 'password|p=s'   => 'API admin password' ],
-		[ 'format|f=s'     => 'Output format' ],
-		[ 'insecure'       => 'Trust any certificate'],
-		[ 'ca=s'           => 'CA certificate path'],
-		[ 'help'           => 'Print usage information'],
+    (
+        [ 'url|u=s'        => 'API url. Example: http://127.0.0.1:3000/api' ],
+        [ 'tenant|t=s'     => 'API admin tenant name' ],
+        [ 'login|l=s'      => 'API admin login' ],
+        [ 'password|p=s'   => 'API admin password' ],
+        [ 'format|f=s'     => 'Output format' ],
+        [ 'insecure'       => 'Trust any certificate'],
+        [ 'force'          => 'Force certain actions'],
+        [ 'ca=s'           => 'CA certificate path'],
+        [ 'help'           => 'Print usage information']
+    )
 }
 
 sub command_map {
@@ -110,13 +113,14 @@ sub init {
 		exit(0);
 	}
 
-	my ($url, $tenant_name, $login, $password, $insecure, $ca_cert_path, $output_format);
+	my ($url, $tenant_name, $login, $password, $insecure, $ca_cert_path, $output_format, $force);
 	$url = Mojo::URL->new($opts->url // cfg('qa.url'));
 	$url->path->leading_slash(1)->trailing_slash(1)->canonicalize;
 	$tenant_name = $opts->tenant // cfg('qa.tenant');
 	$login = $opts->login // cfg('qa.login');
 	$password = $opts->password // cfg('qa.password');
 	$insecure = $opts->insecure // cfg('qa.insecure');
+	$force = $opts->force // 0;
 	$ca_cert_path = $opts->ca // cfg('qa.ca');
 	my @output_formats = ('TABLE', 'CSV');
 	$output_format = $opts->format //cfg('qa.format');
@@ -175,14 +179,12 @@ sub init {
 	$self->cache->set( password => undef );
 	$self->cache->set( block => 25 ); # FIXME. Default block value should be taken from a config file or sth.
 	$self->cache->set( display_mode => $output_format );
+	$self->cache->set( force => $force );
 	$self->cache->set( exit_code => 0 );
 
-
-	if (not $self->is_interactive_mode_enabled()){
-		$self->cache->set( tenant_name => $tenant_name );
-		$self->cache->set( login => $login );
-		$self->cache->set( password => $password );
-	}
+	$self->cache->set( tenant_name => $tenant_name );
+	$self->cache->set( login => $login );
+	$self->cache->set( password => $password );
 
 }
 
@@ -245,6 +247,11 @@ sub read_cmd {
 			if $command_request =~ /\S/ and !$term->Features->{autohistory};
 	}
 	return 1;
+}
+
+sub is_force_enabled {
+    my $self = shift;
+    return $self->cache->get('force') // 0;
 }
 
 sub is_interactive_mode_enabled {

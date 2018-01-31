@@ -128,7 +128,11 @@ sub _create_socket {
     else {
         $s = IO::Socket::INET->new(PeerAddr => $target, Blocking => 0);
     }
-    $s or croak "Unable to connect to $target: " . ($SSL ? $IO::Socket::SSL::SSL_ERROR : $!);
+    if ( !$s ) {
+        my ($const) = grep { $!{$_} } keys %!;
+        croak "Unable to connect to $target: $const ($!)" . ($SSL ? " [SSL error $IO::Socket::SSL::SSL_ERROR]" : "");
+    }
+
     $self->{socket} = $s;
 }
 

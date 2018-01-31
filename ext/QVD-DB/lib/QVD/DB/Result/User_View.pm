@@ -1,7 +1,7 @@
 package QVD::DB::Result::User_View;
 
 use base qw/DBIx::Class::Core/;
-use Mojo::JSON qw(decode_json);
+use Mojo::JSON qw(from_json);
 
 __PACKAGE__->table_class('DBIx::Class::ResultSource::View');
 
@@ -44,9 +44,9 @@ sub properties
 {
     my $self = shift;
     my $property = shift;
-    my $properties = decode_json($self->properties_json);
+    my $properties = from_json($self->properties_json);
     my $out = { map { $_->{property_id} => { key => $_->{key}, value => $_->{value}, tenant_id => $_->{tenant_id}} } grep { defined $_->{key}  } @$properties };
-    defined $property ? return $out->{$property} : return $out; 
+    defined $property ? return $out->{$property} : return $out;
 }
 
 1;

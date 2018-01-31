@@ -453,11 +453,23 @@ sub _cmd
     # be deleted/updated
 
     my $filters = $self->get_filters($parsing);
+
+    unless (keys %$filters or $parsing->qvd_object eq 'config') {
+        if ($self->get_app->is_interactive_mode_enabled()) {
+            print STDERR "Are you sure you want to apply this operation to all the elements? (y/n)\n";
+            chomp(my $response = <STDIN>);
+            if($response ne 'y') {
+                CLI::Framework::Exception->throw('Operation aborted');
+            }
+        } else {
+            if(!$self->get_app->is_force_enabled()) {
+                CLI::Framework::Exception->throw('Use --force flag to perform operations with no filters');
+            }
+        }
+    }
+
     my $ids = eval { $self->ask_for_ids($parsing->qvd_object, $filters) };
     $filters = { id => { '=' => $ids }} if defined $ids;
-
-    # TODO: Check if any of the arguments is a property
-    my @properties = (); # Get list of properties for object
 
     # It performs the update/delete over the objects with those ids
 
