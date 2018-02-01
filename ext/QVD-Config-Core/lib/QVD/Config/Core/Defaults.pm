@@ -165,6 +165,7 @@ command.nxproxy = /usr/bin/nxproxy
 command.btrfs = /sbin/btrfs
 command.ip = /sbin/ip
 command.x11vnc = /usr/bin/x11vnc
+command.qvd-pulseaudio = ${path.qvd.bin}/pulseaudio
 command.qvd-l7r-slave = ${path.qvd.bin}/qvd-l7r-slave
 command.windows.xming = Xming\\Xming.exe
 command.windows.vcxsrv = VcxSrv\\vcxsrv.exe
