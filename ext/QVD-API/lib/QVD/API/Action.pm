@@ -152,14 +152,14 @@ my $ACTIONS = {
 	user_create_property_list => {
 		type_of_action => 'create',
 		admin4method => 'user_property_action',
-		 acls => [qr/^property\.manage\.user$/],
+		 acls => [qr/^property\.manage\.$/],
 		qvd_object => 'QVD_Object_Property_List'
 	},
 
 	user_delete_property_list => {
 		type_of_action => 'delete',
 		admin4method => 'user_property_action',
-		 acls => [qr/^property\.manage\.user$/],
+		 acls => [qr/^property\.manage\.$/],
 		qvd_object => 'QVD_Object_Property_List'
 	},
 
@@ -245,14 +245,14 @@ my $ACTIONS = {
 	vm_create_property_list => {
 		type_of_action => 'create',
 		admin4method => 'vm_property_action',
-		 acls => [qr/^property\.manage\.vm$/],
+		 acls => [qr/^property\.manage\.$/],
 		qvd_object => 'QVD_Object_Property_List'
 	},
 
 	vm_delete_property_list => {
 		type_of_action => 'delete',
 		admin4method => 'vm_property_action',
-		 acls => [qr/^property\.manage\.vm$/],
+		 acls => [qr/^property\.manage\.$/],
 		qvd_object => 'QVD_Object_Property_List'
 	},
 
@@ -324,14 +324,14 @@ my $ACTIONS = {
 	host_create_property_list => {
 		type_of_action => 'create',
 		admin4method => 'host_property_action',
-		 acls => [qr/^property\.manage\.host$/],
+		 acls => [qr/^property\.manage\.$/],
 		qvd_object => 'QVD_Object_Property_List'
 	},
 
 	host_delete_property_list => {
 		type_of_action => 'delete',
 		admin4method => 'host_property_action',
-		 acls => [qr/^property\.manage\.host$/],
+		 acls => [qr/^property\.manage\.$/],
 		qvd_object => 'QVD_Object_Property_List'
 	},
 
@@ -396,14 +396,14 @@ my $ACTIONS = {
 	osf_create_property_list => {
 		type_of_action => 'create',
 		admin4method => 'osf_property_action',
-		 acls => [qr/^property\.manage\.osf$/],
+		 acls => [qr/^property\.manage\.$/],
 		qvd_object => 'QVD_Object_Property_List'
 	},
 
 	osf_delete_property_list => {
 		type_of_action => 'delete',
 		admin4method => 'osf_property_action',
-		 acls => [qr/^property\.manage\.osf$/],
+		 acls => [qr/^property\.manage\.$/],
 		qvd_object => 'QVD_Object_Property_List'
 	},
 
@@ -466,14 +466,14 @@ my $ACTIONS = {
 	di_create_property_list => {
 		type_of_action => 'create',
 		admin4method => 'di_property_action',
-		 acls => [qr/^property\.manage\.di$/],
+		 acls => [qr/^property\.manage\.$/],
 		qvd_object => 'QVD_Object_Property_List'
 	},
 
 	di_delete_property_list => {
 		type_of_action => 'delete',
 		admin4method => 'di_property_action',
-		 acls => [qr/^property\.manage\.di$/],
+		 acls => [qr/^property\.manage\.$/],
 		qvd_object => 'QVD_Object_Property_List'
 	},
     

@@ -155,7 +155,8 @@ Wat.Views.MainView = Backbone.View.extend({
                         isSuperadmin: isSuperadmin,
                         editorMode: editorMode,
                         blocked: that.model ? that.model.attributes.blocked : 0,
-                        cid: that.cid
+                        cid: that.cid,
+                        qvdObj: that.qvdObj
                     }
                 );
         

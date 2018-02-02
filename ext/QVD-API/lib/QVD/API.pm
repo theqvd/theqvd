@@ -416,7 +416,10 @@ sub property_create {
     my ($self, $request, $modifiers) = @_;
 
     $self->check_property_name_is_not_registered($request->arguments->{key}, $request->arguments->{tenant_id});
-
+    
+    QVD::API::Exception->throw(code => 7215)
+        if $request->arguments->{tenant_id} == -1;
+        
     return $self->create($request, $modifiers);
 }
 
@@ -454,19 +457,22 @@ sub di_property_action {
 }
 
 sub qvd_property_action {
-	my ($self, $request, $object) = @_;
-	my $action = $request->get_type_of_action();
-	my $outcome;
-
-	if ($action eq 'list') {
-		$outcome = $self->select($request, { filters => { qvd_object => $object } });
-	} elsif ($action eq 'create' || $action eq 'update') {
-		$outcome = $self->create_or_update($request, { arguments => { qvd_object => $object } });
-	} elsif ($action eq 'delete') {
-		$outcome = $self->delete($request, { filters => { qvd_object => $object } });
-	}
-
-	return $outcome;
+    my ($self, $request, $object) = @_;
+    my $action = $request->get_type_of_action();
+    my $outcome;
+    
+    if ($action eq 'list') {
+        # Action to retrieve properties of a certain qvd object
+        $outcome = $self->select($request, { filters => { qvd_object => $object } });
+    } elsif ($action eq 'create') {
+        # Action to assign a property to a qvd object
+        $outcome = $self->assign_property($request->administrator, $request->arguments->{property_id}, $object);
+    } elsif ($action eq 'delete') {
+        # Action to unassign a property from a qvd object
+        $outcome = $self->delete($request, { filters => { qvd_object => $object } });
+    }
+    
+    return $outcome;
 }
 
 # FOR REGULAR CREATE ACTIONS
@@ -809,49 +815,39 @@ sub custom_properties_set
 {
     my ($self,$props,$obj,$request) = @_;
 
-    my $class = ref($obj);     # FIXME.  Can be improved the identification of the class?
-    $class =~ s/^QVD::DB::Result::(.+)$/$1/;
+    my $class = $request->table;
+    my $table = $class . "_Property";
+    my $obj_id_name = lc($class) . "_id";
 
     while (my ($prop_name,$prop_value) = each %$props)
     {
         my @rows = ();
         eval {
-            my @tenant_ids = ($obj->tenant_id);
-            push @tenant_ids, $request->administrator->tenant_id if $request->administrator->is_superadmin();
-
+            my $filter = {
+                "me.qvd_object" => { '=' => lc($class) },
+                "properties_list.key" => { '=' => $prop_name }
+            };
+            unless($request->administrator->is_superadmin()) {
+                if ($class eq 'Host') {
+                    QVD::API::Exception->throw(code => 7213);
+                } else {
+                    $filter->{'properties_list.tenant_id'} = $obj->tenant_id;
+                }
+            }
             @rows = $DB->resultset('QVD_Object_Property_List')->search(
-                {
-                    "properties_list.tenant_id" => { '-or' => { '=' => \@tenant_ids } },
-                    "properties_list.key" => { '=' => $prop_name }
-                },
+                $filter,
                 { join => 'properties_list' }
             )->all();
         };
         QVD::API::Exception->throw(exception => $@, query => 'properties') if $@;
 
-        QVD::API::Exception->throw(exception => $@, query => 'properties') if @rows != 1;
+        QVD::API::Exception->throw(code => 1100, query => 'properties') if @rows != 1;
         my $prop_id = $rows[0]->id;
 
-        my $table = $class . "_Property";
-        my $key = lc($class) . "_id";
-        my $tuple = {property_id => $prop_id, value => $prop_value, $key => $obj->id};
+        my $tuple = {property_id => $prop_id, value => $prop_value, $obj_id_name => $obj->id};
 
         eval { $DB->resultset($table)->update_or_create($tuple) };
         QVD::API::Exception->throw(exception => $@, query => 'properties') if $@;
-    }
-}
-
-sub custom_properties_del
-{
-    my ($self,$props,$obj,$request) = @_;
-
-    for my $key (@$props)
-    {
-	$key = undef if defined $key && $key eq '';
-	eval { $obj->search_related('properties', 
-				    {key => $key})->delete_all };
-	QVD::API::Exception->throw(exception => $@, 
-				      query => 'properties') if $@;	
     }
 }
 
@@ -1747,20 +1743,42 @@ sub config_wat_update
 }
 
 sub assign_property_to_objects {
+    my ($self, $obj_names, $property, $request) = @_;
+    
+    for my $obj_name (@$obj_names) {
+        $self->assign_property($request->administrator, $property->id, $obj_name);
+    }
+}
 
-	my ($self, $obj_names, $property, $request) = @_;
-
-	my $property_list_table_name = $request->qvd_object_model->get_property_list_name();
-
-	for my $obj_name (@$obj_names) {
-			try {
-			$DB->resultset($property_list_table_name)->create({property_id => $property->id, qvd_object => $obj_name});
-			} catch {
-			QVD::API::Exception->throw(exception => $_, query => 'create',
-				text => sprintf("id: %s, obj: %s ", $property->id, $obj_name));
-		}
-	}
-
+sub assign_property {
+    my ($self, $administrator, $property_id, $qvd_obj) = @_;
+    
+    eval {
+        my @properties = $self->_db->resultset("Property_List")->search( { id => $property_id } )->all;
+    
+        QVD::API::Exception->throw(code => 1100)
+            if(@properties != 1);
+        my $property = $properties[0];
+        
+        if($qvd_obj eq 'host') {
+            QVD::API::Exception->new(code => 7212)->throw
+                unless $administrator->is_superadmin();
+            QVD::API::Exception->throw(code => 7214)
+                if $property->tenant_id != 0;
+        }
+        
+        $self->_db->resultset("QVD_Object_Property_List")->create( {
+            property_id => $property->id,
+            qvd_object => $qvd_obj
+        } );
+    };
+    QVD::API::Exception->throw(exception => $@, query => 'create') if $@;
+    
+    return {
+        rows => [],
+        total => 1,
+        extra => {},
+    }
 }
 
 sub myadmin_update {

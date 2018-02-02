@@ -1124,7 +1124,8 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                         isSuperadmin: Wat.C.isSuperadmin(),
                         blocked: undefined,
                         properties: [],
-                        cid: that.cid
+                        cid: that.cid,
+                        qvdObj: that.qvdObj
                     }
                 );
         

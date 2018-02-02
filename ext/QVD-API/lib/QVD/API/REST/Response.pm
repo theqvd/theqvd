@@ -109,7 +109,7 @@ sub _get_property_value
 
     my $properties = $self->data->{extra}->{$dbix_object->id}->properties;
     for my $prop_id (keys %$properties) {
-        if ($properties->{$prop_id}->{key} eq $property && $properties->{$prop_id}->{tenant_id} != 0)
+        if ($properties->{$prop_id}->{key} eq $property)
         {
             return $properties->{$prop_id}->{value};
         }

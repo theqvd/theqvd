@@ -43,7 +43,6 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
         // Fill the html with the template and the model
         this.template = _.template(
             Wat.TPL.property, {
-                selectedObj: this.selectedObj,
                 selectedTenant: this.selectedTenant,
                 limitByACLs: false,
                 cid: this.cid,
@@ -52,6 +51,10 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
         );
 
         $(this.el).html(this.template);
+        
+        // Render Objects selector first time
+        // Selected tenant will be the current administrator tenant by default
+        this.renderObjSelector(Wat.C.tenantID);
         
         Wat.T.translateAndShow();
         
@@ -90,13 +93,31 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
         this.printBreadcrumbs(this.breadcrumbs, '');
     },
     
-    renderPropertyList: function (that) { 
+    renderObjSelector: function (selectedTenantId) {
+        // Host properties are only allowed to be managed by superadministrators in supertenant
+        var hostPropertiesEnabled = Wat.C.isSuperadmin() && selectedTenantId == 0;
+        
+        var template = _.template(
+            Wat.TPL.propertyObjSelector, {
+                selectedObj: this.selectedObj,
+                hostPropertiesEnabled: hostPropertiesEnabled
+            }
+        );
+
+        $('.bb-property-obj-selector').html(template);
+    },
+    
+    renderPropertyList: function (that) {
+        // Host properties are only available for superadmins configuring supertenant
+        var hostPropertiesEnabled = Wat.C.isSuperadmin() && this.selectedTenant == 0;
+        
         this.template = _.template(
             Wat.TPL.listProperty, {
                 model: this.model,
                 cid: this.cid,
                 properties: that.collection,
-                selectedObj: $('select[name="obj-qvd-select"]').val()
+                selectedObj: $('select[name="obj-qvd-select"]').val(),
+                hostPropertiesEnabled: hostPropertiesEnabled
             }
         );
 
@@ -150,6 +171,8 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
                 that.renderPropertyList(that);
             }
         });
+        
+        that.renderObjSelector(newSelectedTenant);
     },
     
     checkProperty: function (e) {
@@ -235,6 +258,50 @@ Wat.Views.PropertyView = Wat.Views.MainView.extend({
         
         this.dialogConf.title = $.i18n.t('Edit property');
         Wat.Views.MainView.prototype.openEditElementDialog.apply(this, [e]);
+    },
+    
+    fillEditor: function (target, that) {
+        // When admin is a superadmin, the change of the tenant selector will trigger the property objects renderization
+        if (Wat.C.isSuperadmin()) {
+            Wat.B.bindEvent('change', '[name="tenant_id"]', that.renderPropertiesObjects);
+        }
+        
+        Wat.Views.MainView.prototype.fillEditor.apply(this, [target, that]);
+        
+        // When admin is not a superadmin, the property objects will be renderized once
+        if (!Wat.C.isSuperadmin()) {
+            that.renderPropertiesObjects();
+        }
+    },
+    
+    renderPropertiesObjects: function () {
+        // Host properties are only allowed to be managed by superadministrators in supertenant
+        var hostPropertiesEnabled = Wat.C.isSuperadmin() && $('select[name="tenant_id"]').val() == 0;
+        
+        // Objects editor have checked the filtered objects initially
+        var selectedObj = $('select[name="obj-qvd-select"]').val();
+        var checkedObjs = {
+            user: selectedObj == 'all',
+            vm: selectedObj == 'all',
+            host: selectedObj == 'all',
+            osf: selectedObj == 'all',
+            di: selectedObj == 'all'
+        };
+        
+        if (selectedObj != 'all') {
+            checkedObjs[selectedObj] = true;
+        }
+        
+        var template = _.template(
+            Wat.TPL.editorPropertyObjects, {
+                hostPropertiesEnabled: hostPropertiesEnabled,
+                checkedObjs: checkedObjs
+            }
+        );
+        
+        $('.js-editor-container[data-qvd-obj="property"] .bb-editor-extra').html(template);
+        
+        Wat.T.translate();
     },
     
     createElement: function () {
