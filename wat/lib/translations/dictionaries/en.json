@@ -989,6 +989,6 @@
     "Cannot create new configuration token": "Cannot create new configuration token",
     "Error while accessing to Disk Image Generator": "Error while accessing to Disk Image Generator",
     "Configuration parameter is not defined": "Configuration parameter is not defined",
-    "OSD is not defined for specified OSF": "OSD is not defined for specified OSF"
+    "OSD is not defined for specified OSF": "OSD is not defined for specified OSF",
     "Configuration token value is already set to the default one": "Configuration token value is already set to the default one"
 }
