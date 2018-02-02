@@ -282,7 +282,6 @@ Wat.Views.MainView = Backbone.View.extend({
     // Open element for creation forms
     openNewElementDialog: function (e) {
         var that = this;
-        
         // Avoid open dialogs relative to another qvd objets in screens with embedded views
         if (e && $(e.target).attr('data-qvd-obj') != this.qvdObj) {
             return;

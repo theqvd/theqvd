@@ -14,7 +14,7 @@
             <% }); %>
         </ul>
     <% } %>
-    <div class="editor-container js-editor-container-<%= editorMode %> <%= cid %>">
+    <div class="editor-container <%= cid %> js-editor-container js-editor-container-<%= editorMode %>" data-qvd-obj="<%= qvdObj %>">
         <table class="editor-table js-editor-table <%= editorMode == "massive_edit" ? 'massive-editor-table js-massive-editor-table' : '' %> alternate">
              <%
              if (editorMode == "massive_edit") {

@@ -58,7 +58,8 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
                         blocked: undefined,
                         properties: [],
                         editorCategories: Wat.I.editorCategories[this.qvdObj],
-                        cid: this.cid
+                        cid: this.cid,
+                        qvdObj: that.qvdObj
                     }
                 );
         
@@ -125,7 +126,8 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
                         editorMode: editorMode,
                         blocked: that.model ? that.model.attributes.blocked : 0,
                         editorCategories: Wat.I.editorCategories[this.qvdObj],
-                        cid: this.cid
+                        cid: this.cid,
+                        qvdObj: that.qvdObj
                     }
                 );
         
