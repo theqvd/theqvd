@@ -956,8 +956,8 @@ sub _run {
                         $qvd_pa->cmd("load-module", "module-tunnel-sink-new",
                                     "sink_name=QVD", "server=tcp:127.0.0.1:52001",
                                     "sink=\@DEFAULT_SINK\@");
+                        sleep(20);
                     }
-                    sleep(20);
                 }
             }
         }
