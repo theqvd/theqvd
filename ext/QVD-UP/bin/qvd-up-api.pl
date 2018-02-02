@@ -1,17 +1,17 @@
 #!/usr/bin/perl
 use strict;
-use warnings FATAL => 'all';
-use QVD::UP::H5GW::SessionManager;
 
 BEGIN {
     $QVD::Config::USE_DB = 1;
-    @QVD::Config::FILES = (
+    @QVD::Config::Core::FILES = (
         '/etc/qvd/up-api.conf',
         ($ENV{HOME} || $ENV{APPDATA}).'/.qvd/up-api.conf',
         'qvd-up-api.conf',
     );
 }
 
+use QVD::UP::H5GW::SessionManager;
+use QVD::UP::API;
 use Mojolicious::Lite;
 use MojoX::Session;
 use Mojo::Pg;
@@ -175,11 +175,12 @@ any [ qw(POST) ] => '/api/login' => sub {
 
     my $ua = Mojo::UserAgent->new;
     my $l7r_vm_list_url = (cfg('l7r.use_ssl') ? "https" : "http") . "://" . cfg('up.api.l7r.address') .
-        ":" . cfg('l7r.port') . "/qvd/list_of_vm";
+        ":" . cfg('l7r.port') . "/qvd/authenticate_user?store_auth=1";
     my $auth_tx = $ua->cert( $cert_path )->key( $key_path )->
         get( $l7r_vm_list_url => { Authorization => $authorization } );
 
     my $http_code = $auth_tx->res->code // 502;
+    my $http_json = $auth_tx->res->json // {};
     my $http_message = $auth_tx->res->message // "Authentication server unavailable";
 
     return $c->render_error(message => $http_message, code => $http_code)
@@ -195,6 +196,20 @@ any [ qw(POST) ] => '/api/login' => sub {
 
     return $c->render_error(message => "Unauthorized", code => 401)
         unless defined $user_obj;
+        
+    # Create default workspace if needed
+    if(scalar @{get_workspaces($user_obj->id)} == 0) {
+        my $default_settings = {
+            audio => { value => 0 },
+            client => { value => 'html5' },
+            printers => { value => 0 },
+            connection => { value => 'adsl' },
+            share_usb => { value => 0 },
+            share_folders => { value => 0 },
+            fullscreen => { value => 0 }
+        };
+        create_workspace($user_obj->id, 'Default', 1, $default_settings, 1)
+    }
 
     my $session = create_up_session_handler( $c->tx, db );
 
@@ -203,6 +218,7 @@ any [ qw(POST) ] => '/api/login' => sub {
     $session->data( tenant_name => $tenant );
     $session->data( login => $login );
     $session->data( user_id => $user_obj->id );
+    $session->data( auth_params_id => $http_json->{auth_params_id} );
     $session->flush;
 
     my $json = { };
@@ -443,7 +459,8 @@ group {
             token => generate_sid(),
             expiration => time + cfg('up.api.l7r.session.expiration'),
             user_id => $session_up->data->{user_id},
-            vm_id =>  $vm_id
+            vm_id =>  $vm_id,
+            auth_params_id => $session_up->data->{auth_params_id},
         } );
         my $token = encode_base64($session_l7r->token);
         chomp($token);
@@ -483,13 +500,10 @@ group {
     any [qw(GET)] => '/api/workspaces' => sub {
         my $c = shift;
 
-        my $user = rs('User')->find($c->stash('session')->data->{user_id});
-
-        my $workspaces = [ map { workspace_to_hash($_) } 
-            ($user->workspaces->search({}, { order_by => { -asc => 'id' } })->all) 
-        ];
+        my $user_id = $c->stash('session')->data->{user_id};
+        my $workspaces = get_workspaces($user_id);
         
-        return $c->render_response(json => $workspaces);
+        return $c->render_response(json => [ map { workspace_to_hash($_) } @{$workspaces} ] );
     };
 
     any [qw(GET)] => '/api/workspaces/:id' => [id => qr/\d+/] => sub {
@@ -498,7 +512,7 @@ group {
         my $ws_id = $c->param('id');
         my $user_id = $c->stash->{session}->data->{user_id};
 
-        my $workspace = rs('Workspace')->single({id => $ws_id, user_id => $user_id});
+        my $workspace = get_workspace($user_id, $ws_id);
         return $c->render_error(message => "Invalid Workspace", code => 400) unless defined($workspace);
 
         return $c->render_response(json => workspace_to_hash($workspace));
@@ -516,45 +530,15 @@ group {
                 $json,
                 {
                     name       => { mandatory => 1, type => 'STRING' },
-                    active     => { mandatory => 0, type => 'BOOL' },
-                    settings   => { mandatory => 0, type => 'ALL_PARAMETERS' },
+                    active     => { mandatory => 1, type => 'BOOL' },
+                    settings   => { mandatory => 1, type => 'ALL_PARAMETERS' },
                 }
             );
 
         return $c->render_error(message => "Cannot activate workspaces with no settings", code => 400)
             if $json->{active} && !defined($json->{settings});
-
-        my $args = {};
-        $args->{name} = $_ if defined($_ = $json->{name});
-        $args->{active} = $_ if defined($_ = $json->{active});
             
-        my $active_workspaces = rs('Workspace')->search({user_id => $user_id, active => 1});
-        if ($args->{active}) {
-            $active_workspaces->update({active => 0});
-        } elsif (scalar($active_workspaces->all()) == 0) {
-            $args->{active} = 1;
-        }
-
-        my $workspace = rs('Workspace')->create({
-                user_id => $user_id,
-                %$args
-            });
-        # DBIx::Class do not assign default values in creation and have to be fetched
-        $workspace->discard_changes;
-
-        for my $param (keys %{$json->{settings}}) {
-            my $setting = rs( 'Workspace_Setting' )->create( {
-                    workspace_id => $workspace->id,
-                    parameter    => $param,
-                    value        => $json->{settings}->{$param}->{value},
-                } );
-            for my $item (@{$json->{settings}->{$param}->{list} // [ ]}) {
-                rs( 'Workspace_Setting_Collection' )->create( {
-                        setting_id => $setting->id,
-                        item_value => $item
-                    } );
-            }
-        }
+        my $workspace = create_workspace($user_id, $json->{name}, $json->{active}, $json->{settings}, 0);
 
         return $c->render_response(json => workspace_to_hash($workspace));
     };

@@ -79,6 +79,7 @@ typedef unsigned long gid_t;
 
 #define	FMT_SCALED_STRSIZE	7
 
+#if 0
 /* The passwd structure.  */
 struct passwd
 {
@@ -92,7 +93,7 @@ struct passwd
 };
 
 typedef long fd_mask;
-
+#endif
 #define	S_ISUID	04000	/* Set user ID on execution.  */
 #define	S_ISGID	02000	/* Set group ID on execution.  */
 #define	S_ISVTX	01000	/* Save swapped text after use (sticky).  */

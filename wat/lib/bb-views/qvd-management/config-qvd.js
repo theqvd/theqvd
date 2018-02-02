@@ -147,7 +147,8 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
                 cid: this.cid,
                 configTokens: this.configTokens,
                 prefixes: this.prefixes,
-                selectedPrefix: this.currentTokensPrefix
+                selectedPrefix: this.currentTokensPrefix,
+                isCreationAllowed: Wat.C.isSuperadmin()
             }
         );
 

@@ -271,6 +271,9 @@ Wat.I.T = {
                     property: {
                         name: 'list/property'
                     },
+                    propertyObjSelector: {
+                        name: 'list/property-obj-selector'
+                    },
                     listProperty: {
                         name: 'list/property-list'
                     },
@@ -279,6 +282,9 @@ Wat.I.T = {
                     },
                     editor_property: {
                         name: 'editor/property'
+                    },
+                    editorPropertyObjects: {
+                        name: 'editor/property-objects'
                     }
                 }
                 break;

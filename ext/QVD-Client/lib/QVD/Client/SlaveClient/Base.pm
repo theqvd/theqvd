@@ -14,12 +14,18 @@ sub new {
     my $port = delete $opts{'slave.port'};
     my $key = delete $opts{'slave.key'};
 
-    my $self = { 
-        auth_key => $key,
-        httpc => QVD::HTTPC->new("$host:$port", %opts)
-    };
+    my $self = { auth_key => $key,
+                 host => $host,
+                 port => $port,
+                 extra_opts => \%opts };
     bless $self, $class;
     $self
+}
+
+sub httpc {
+    my $self = shift;
+    $self->{httpc} //= QVD::HTTPC->new(join(':', $self->{host}, $self->{port}),
+                                       %{$self->{extra_opts}});
 }
 
 sub dispatch {
@@ -61,8 +67,8 @@ sub handle_open {
     }
 
     my ($code, $msg, $headers, $data) =
-    $self->{httpc}->make_http_request(POST => '/open/'.$path, headers => \@headers);
-    
+    $self->httpc->make_http_request(POST => '/open/'.$path, headers => \@headers);
+
     if ($code != HTTP_OK) {
         die "Server replied $code $msg $data";
     }

@@ -93,6 +93,8 @@ path.ssl.ca.system.file = SYSTEM_DEFAULT
 
 path.ssl.ca.personal = certs
 
+path.vma.run.printing = ${path.run}/printing
+
 path.api.ssl = /etc/qvd/api/certs
 path.api.ssl.key = ${path.api.ssl}/key.pem
 path.api.ssl.cert = ${path.api.ssl}/cert.pem
@@ -113,6 +115,7 @@ path.client.pixmaps = pixmaps
 path.client.pixmaps.alt = /usr/share/pixmaps
 
 path.qvd.bin = /usr/lib/qvd/bin
+path.qvd.etc = /usr/lib/qvd/etc
 path.usb.database = /usr/share/hwdata/usb.ids
 
 ## paths to external executables
@@ -162,12 +165,16 @@ command.nxproxy = /usr/bin/nxproxy
 command.btrfs = /sbin/btrfs
 command.ip = /sbin/ip
 command.x11vnc = /usr/bin/x11vnc
+command.qvd-pulseaudio = ${path.qvd.bin}/pulseaudio
 command.qvd-l7r-slave = ${path.qvd.bin}/qvd-l7r-slave
 command.windows.xming = Xming\\Xming.exe
 command.windows.vcxsrv = VcxSrv\\vcxsrv.exe
 command.windows.pulseaudio = pulseaudio\\pulseaudio.exe
-command.windows.nxproxy = nx\\nxproxy.exe
+command.windows.pulseaudio.default.pa = pulseaudio\\qvd.pa
+command.windows.nxproxy = bin\\nxproxy.exe
 command.windows.sftp-server = bin/sftp-server.exe
+command.windows.win-sftp-server = win-sftp-server.exe
+client.use.win-sftp-server = 1
 
 command.nxagent.args.extra =
 command.x-session.args.extra =
@@ -177,12 +184,27 @@ command.qvd-lxc-autodev = ${path.qvd.bin}/qvd-lxc-autodev
 command.darwin.x11 = XQuartz.app
 command.darwin.nxproxy = bin/nxproxy
 command.darwin.pulseaudio = bin/pulseaudio
+command.darwin.pulseaudio.default.pa = etc/pulse/default.pa
 command.darwin.sftp-server = /usr/libexec/sftp-server
 
 command.usbsrv = /usr/local/bin/usbsrv
 command.usbclnt = /usr/local/bin/usbclnt
 command.usbip = /usr/bin/usbip
 command.slaveclient = ${path.qvd.bin}/qvd-slaveclient
+
+@mswin@command.gsprint = gsview/gsprint.exe
+@mswin@command.ghostscript = ghostscript/bin/gswin32.exe
+
+# VMA commands
+command.lpadmin = /usr/sbin/lpadmin
+command.lpstat = /usr/bin/lpstat
+command.smbclient = /usr/bin/smbclient
+command.cupsenable = /usr/sbin/cupsenable
+command.cupsaccept = /usr/sbin/cupsaccept
+
+command.systemctl = /bin/systemctl
+command.init_d.cups = /etc/init.d/cups
+
 
 ## whether to remember password after successful connection
 client.remember_password = 0
@@ -207,7 +229,7 @@ client.nxproxy.extra_args =
 client.nxagent.extra_args =
 
 ## Extra arguments for sshfs. These have been determined as reasonable defaults.
-client.sshfs.extra_args=-o atomic_o_trunc -o idmap=user
+client.sshfs.extra_args=
 
 ## Extra arguments for Windows X servers
 client.xming.extra_args=-multiwindow -notrayicon -nowinkill -clipboard +bs -wm
@@ -337,7 +359,9 @@ client.ssl.error_timeout=5
 client.ssl.ocsp_mode=SSL_OCSP_TRY_STAPLE|SSL_OCSP_FAIL_HARD
 
 ## slave shell
-client.slave.command = ${path.qvd.bin}/qvd-client-slaveserver
+client.slave.command = ${path.qvd.bin}/
+@mswin@client.slave.command = qvd-client-slaveserver
+@mswin@client.slave.wrapper = bin/qvd-slaveserver-wrapper.exe
 client.slave.client = ${path.qvd.bin}/qvd-slaveclient
 # enable commands used for benchmarking and testing the functionality
 # of the slave channel
@@ -588,6 +612,11 @@ vma.user.home.drive = /dev/vdb
 vma.user.home.fs = ext4
 ## where to mount the homes device
 vma.user.home.path = /home
+
+## where shares from the client are mounted
+# must start by "~/"
+vma.user.shares.path = ~/Redirected
+
 ## default user name and groups it will belong to
 vma.user.default.name = qvd
 vma.user.default.groups =
@@ -680,6 +709,7 @@ internal.vma.on_printing.stopped = ${path.qvd.bin}/qvd-printing
 internal.vma.printing.config = ${path.run}/printing.conf
 internal.vma.slave.config = ${path.run}/slave.conf
 internal.vma.nxagent.config = ${path.run}/nxagent.conf
+internal.vma.pulseaudio.config = ${path.run}/default.pa
 
 # TODO: some of these DB settings may not be used anymore, cleanup them!
 internal.database.client.connect.timeout = 20
@@ -766,6 +796,12 @@ internal.hkd.nothing.timeout.on_state.zombie = 100
 internal.l7r.nothing.timeout.x_start = 5
 internal.l7r.nothing.timeout.x_state = 5
 internal.l7r.nothing.timeout.run_forwarder = 5
+
+internal.client.xserver.startup.timeout = 30
+
+internal.vma.printing.timeout = 120
+internal.vma.use.systemctl = 1
+internal.vma.systemd.cups = 'cups'
 
 internal.untar-dis.lock.path = ${path.run}/untar-dis.lock
 

@@ -1,0 +1,239 @@
+run:
+  do:
+    - build
+  workdir: c:/temp
+  msys:
+    prefix: c:/msys32/
+    wrapper: usr/bin/bash --login -c
+  mingw32:
+    prefix: mingw32
+  perl:
+    prefix: c:/strawberry/
+  perl_sh:
+    wrapper: usr/bin/sh -c
+  cygwin:
+    wrapper: bin/bash --login -c
+    prefix: c:/cygwin/
+  vcxsrv:
+    prefix: c:/vcxsrv/
+  ghostscript:
+    prefix: c:/ghostscript/
+  gsview:
+    prefix: c:/gsview/
+  wix:
+    prefix: c:/wix/
+
+setup:
+  msys:
+    url: http://repo.msys2.org/distrib/i686/msys2-i686-20161025.exe
+    autoinstall-script-url: https://raw.githubusercontent.com/msys2/msys2-installer/master/auto-install.js
+    product: MSYS2
+    commands:
+      update:
+        - pacman -Syu --noconfirm
+        - pacman -Su --noconfirm
+      install: pacman -S --noconfirm --needed
+      uninstall: maintenancetool.exe
+    packages:
+      - perl
+      - git
+      - make
+      - msys2-devel
+      - mingw-w64-i686-toolchain
+      - mingw-w64-i686-libtool
+      - intltool
+      - autoconf
+      - automake
+      - tar
+      - mingw-w64-i686-libsndfile
+      - mingw-w64-i686-pcre
+      - libtool
+      - nasm
+      - unzip
+
+  perl:
+    url: http://strawberryperl.com/download/5.26.1.1/strawberry-perl-5.26.1.1-32bit.msi
+    product: Strawberry Perl
+    modules:
+      - name: Config::Properties
+      - name: Config::AutoConf
+      - name: Wx
+      - name: Log::Dispatch::FileRotate
+      - name: Log::Log4perl
+        test: no
+      - name: Win32::LongPath
+      - name: Net::Server
+        test: no
+      - name: Data::UUID
+        url: https://github.com/salva/p5-Data-UUID.git
+        branch: master
+      - name: Data::GUID
+      - name: X11::Protocol
+        test: no
+      - name: X11::Auth
+      - name: XML::FromPerl
+        url: https://github.com/salva/p5-XML-FromPerl.git
+        branch: master
+      - name: Win32::Ldd
+        url: https://github.com/salva/p5-Win32-Ldd.git
+        branch: master
+      - name: Win32::Packer
+        url: https://github.com/salva/p5-Win32-Packer.git
+        branch: master
+      - name: Win32::EnumPrinters
+        url: https://github.com/salva/p5-Win32-EnumPrinters.git
+        branch: master
+      - name: Proc::Background
+        url: https://github.com/salva/p5-Proc-Background.git
+        branch: master
+
+  cygwin:
+    url: https://www.cygwin.com/setup-x86.exe
+    site: http://cygwin.netbet.org/
+    product: Cygwin
+    packages:
+      - git
+      - gcc-g++
+      - gcc-core
+      - bash
+      - binutils
+      - libtool
+      - autoconf
+      - automake
+      - pkg-config
+      - make
+      - libjpeg-devel
+      - libpng-devel
+      - xorg-server-devel
+      - imake
+
+  vcxsrv:
+    url: https://kent.dl.sourceforge.net/project/vcxsrv/vcxsrv/1.19.3.3/vcxsrv.1.19.3.3.installer.exe
+    product: VcXsrv
+
+  ghostscript:
+    url: https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs922/gs922w32.exe
+    product: Ghostscript
+
+  gsview:
+    url: http://pages.cs.wisc.edu/~ghost/gsview/download/gsv50w32.exe
+    product: GSview
+
+  wix:
+    url: https://github.com/wixtoolset/wix3/releases/download/wix311rtm/wix311.exe
+    product: Wix Toolset
+
+  net35:
+    product: .Net 3.5
+    command: DISM /Online /Enable-Feature /FeatureName:NetFx3 /All 
+
+build:
+  pulseaudio:
+    repository:
+      url: https://github.com/theqvd/pulseaudio.git
+      branch: opus
+    build:
+      env: mingw32
+      commands:
+        clean: git clean -dfx
+        bootstrap: NOCONFIGURE=1 ./bootstrap.sh
+        configure: ./configure --disable-nls --disable-rpath --disable-largefile --disable-memfd --disable-x11 --disable-tests --disable-oss-output --disable-oss-wrapper --disable-alsa --disable-esound --disable-solaris --disable-coreaudio-output --disable-glib2 --disable-gtk3 --disable-gconf --disable-avahi --disable-jack --disable-asyncns --disable-tcpwrap --disable-lirc --disable-dbus --disable-bluez4 --disable-bluez5 --disable-bluez5-ofono-headset --disable-bluez5-native-headset --disable-udev --disable-hal-compat --disable-ipv6 --disable-openssl --disable-systemd-daemon --disable-systemd-login --disable-systemd-journal --disable-manpages --disable-per-user-esound-socket --disable-default-build-tests --disable-legacy-database-entry-format --without-libiconv-prefix --without-libintl-prefix --prefix=$PULSEAUDIO_OUTDIR_MSYS
+        make: make
+        install: make install
+
+  win-sftp-server:
+    repository:
+      url: https://github.com/salva/win-sftp-server.git
+      branch: master
+    build:
+      env: mingw32
+      commands:
+        clean: git clean -dfx
+        make: make
+        install: cp win-sftp-server.exe $WIN_SFTP_SERVER_OUTDIR_MSYS/win-sftp-server.exe
+
+  nxproxy:
+    repository:
+      url: https://github.com/ArcticaProject/nx-libs.git
+      # branch: 9193d11eeeea933e293acd5e0f03fa4e9887186b
+      branch: 3.6.x
+      #url: https://github.com/salva/nx-libs.git
+      #branch: fix-cygwin-compilation
+
+    build:
+      env: cygwin
+      commands:
+        clean: git clean -dfx
+    children:
+      - name: nxcomp
+        build:
+          commands:
+            bootstrap: autoreconf -vfi
+            configure: ./configure --prefix=$NXPROXY_OUTDIR_CYGWIN
+            make: make
+            install: make install
+      - name: nxproxy
+        build:
+          commands:
+            bootstrap: autoreconf -vfi
+            configure: ./configure --prefix=$NXPROXY_OUTDIR_CYGWIN
+            make: make
+            install: make install
+
+  qvd-slaveserver-wrapper:
+    repository:
+      url: https://github.com/theqvd/theqvd.git
+      branch: client-cleanup
+    build:
+      env: cygwin
+      subdir: windows/qvd-slaveserver-wrapper
+      commands:
+        make: make -f Makefile.cygwin
+        install: cp qvd-slaveserver-wrapper.exe $QVD_SLAVESERVER_WRAPPER_OUTDIR_CYGWIN/qvd-slaveserver-wrapper.exe
+
+  perl-libgettext:
+    repository:
+      url: http://ftp.gnu.org/pub/gnu/gettext/gettext-0.19.8.1.tar.gz
+    build:
+      env: perl_sh
+      subdir: gettext-0.19.8.1/gettext-runtime
+      commands:
+        configure: ./configure --prefix=$PERL_PREFIX_MSYS/c
+    children:
+      - name: intl
+        build:
+          commands:
+            make: make
+            install: make install
+
+  perl-locale-gettext:
+    repository:
+      url: https://github.com/salva/p5-Locale-gettext.git
+      branch: fix_win_tests
+    build:
+      env: perl_sh
+      commands:
+        configure: perl Makefile.PL
+        make: gmake
+        test: gmake test
+        install: gmake install
+
+  qvd-client:
+    repository:
+      url: https://github.com/theqvd/theqvd.git
+      branch: client-cleanup
+    build:
+      env: perl
+      subdir: windows/installer
+      commands:
+        make: perl packer.pl --log-level=trace --installer-type=msi --keep-work-dir --nx-libs=%NXPROXY_OUTDIR% --pulseaudio=%PULSEAUDIO_OUTDIR% --gsview=%GSVIEW_PREFIX%\gsview --ghostscript=%GHOSTSCRIPT_PREFIX% --vcxsrv=%VCXSRV_PREFIX% --win-sftp-server=%WIN_SFTP_SERVER_OUTDIR% --slaveserver-wrapper=%QVD_SLAVESERVER_WRAPPER_OUTDIR% --output-dir=%QVD_CLIENT_OUTDIR% --subsystem=windows
+
+  qvd-automate:
+    repository:
+      url: https://github.com/theqvd/theqvd.git
+      branch: client-cleanup
+    build:
+      env: perl
+      subdir: windows/automate
+      commands:
+        make: perl packer.pl -t msi -o %QVD_AUTOMATE_OUTDIR%

@@ -166,8 +166,14 @@ under sub {
 
     my $stdout_file = $c->qvd_admin4_api->_cfg('api.stdout.filename');
     my $stderr_file = $c->qvd_admin4_api->_cfg('api.stderr.filename');
-    open STDOUT, ">>", $stdout_file if defined($stdout_file);
-    open STDERR, ">>", $stderr_file if defined($stderr_file);
+    if (defined($stdout_file)) {
+        open STDOUT, ">>", $stdout_file if defined($stdout_file);
+        STDOUT->autoflush(1);
+    }
+    if (defined($stderr_file)) {
+        open STDERR, ">>", $stderr_file if defined($stderr_file);
+        STDOUT->autoflush(1);
+    }
 
     return 1;
 };
@@ -487,7 +493,7 @@ sub log_qvd_exception {
     my $controller = shift;
     my $exception = shift;
     if(ref($exception) eq "QVD::API::Exception") {
-        $controller->app->log->debug($exception->stack_trace);
+        $controller->app->log->debug($exception->get_stack_trace);
     } else {
         $controller->app->log->debug($exception);
         $exception = QVD::API::Exception->new(code => 1100);

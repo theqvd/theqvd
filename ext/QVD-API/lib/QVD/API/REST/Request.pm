@@ -209,8 +209,7 @@ sub BUILD
 
     $self->forze_tenant_assignment_in_creation 
         if $type_of_action =~ /^create(_or_update)?$/ &&
-            $self->qvd_object_model->directly_tenant_related &&
-            $qvd_object ne 'Tenant';
+            $self->qvd_object_model->directly_tenant_related;
 
 # This method adds filters in order to avoid selecting
 # objects the admin doesn't have acls for. These acls

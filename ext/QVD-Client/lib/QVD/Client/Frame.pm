@@ -42,7 +42,7 @@ use constant X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT           => 18;
 use constant X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN             => 19;
 use constant X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY     => 20;
 use constant X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE       => 21;
-use constant X509_V_ERR_CERT_CHAIN_TOO_LONG                   => 22; 
+use constant X509_V_ERR_CERT_CHAIN_TOO_LONG                   => 22;
 use constant X509_V_ERR_CERT_REVOKED                          => 23;
 use constant X509_V_ERR_INVALID_CA                            => 24;
 use constant X509_V_ERR_PATH_LENGTH_EXCEEDED                  => 25;
@@ -95,7 +95,7 @@ my %lang_codes = qw/
     0402 bg        0429 fa        042F mk        240A es-co
     0423 be        040B fi        043E ms        280A es-pe
     0403 ca        040C fr        043A mt        2C0A es-ar
-/;
+    /;
 
 
 sub new {
@@ -108,82 +108,82 @@ sub new {
     $name   = ""                 unless defined $name;
 
     my ($tab_ctl, $tab_sizer, $settings_panel);
-     
+
     $style = wxCAPTION|wxCLOSE_BOX|wxSYSTEM_MENU|wxMINIMIZE_BOX
         unless defined $style;
 
     my $self = $class->SUPER::new( $parent, $id, $title, $pos, $size, $style, $name );
 
 
-	
+
     if ( core_cfg('client.locale') ) {
-		my $loc = core_cfg('client.locale');
-		INFO "Overriding system locale with config file setting: $loc";
-		setlocale(&POSIX::LC_ALL, $loc);	
-	}
-    
+        my $loc = core_cfg('client.locale');
+        INFO "Overriding system locale with config file setting: $loc";
+        setlocale(&POSIX::LC_ALL, $loc);
+    }
+
     $self->{domain} = Locale::gettext->domain("qvd-gui-client");
-	my $bin = $FindBin::RealBin;
-	my $rootdir = "$bin/..";
-	my $localepath = "$rootdir/share/locale";
+    my $bin = $FindBin::RealBin;
+    my $rootdir = "$bin/..";
+    my $localepath = "$rootdir/share/locale";
 
-	if ( -f "$rootdir/Build.PL" ) {
-		DEBUG "Running from source tree, using in-tree locale";
-		require Locale::Msgfmt;
-		require File::Path;
+    if ( -f "$rootdir/Build.PL" ) {
+        DEBUG "Running from source tree, using in-tree locale";
+        require Locale::Msgfmt;
+        require File::Path;
 
 
-		my @po_files = glob("$rootdir/po/*.po");
+        my @po_files = glob("$rootdir/po/*.po");
 
-		foreach my $po_file (@po_files) {
-				my ($lang) = ( $po_file =~ /po\/(.*?)\.po$/ );
-				my $d = "$localepath/$lang/LC_MESSAGES";
-				File::Path::mkpath($d) unless (-d $d);
-				DEBUG "Generating locale: $po_file => $d/qvd-gui-client.mo";
-				eval {
-					Locale::Msgfmt::msgfmt({ in => $po_file, out => "$d/qvd-gui-client.mo" });
-				};
-				if ( $@ ) {
-					WARN "Failed to convert locale from $po_file to $d/qvd-gui-client.mo";
-				}
-				
-		}
-	} else {
-		DEBUG "Running from installed package, using installed locale";
-	}
+        foreach my $po_file (@po_files) {
+            my ($lang) = ( $po_file =~ /po\/(.*?)\.po$/ );
+            my $d = "$localepath/$lang/LC_MESSAGES";
+            File::Path::mkpath($d) unless (-d $d);
+            DEBUG "Generating locale: $po_file => $d/qvd-gui-client.mo";
+            eval {
+                Locale::Msgfmt::msgfmt({ in => $po_file, out => "$d/qvd-gui-client.mo" });
+            };
+            if ( $@ ) {
+                WARN "Failed to convert locale from $po_file to $d/qvd-gui-client.mo";
+            }
 
-	if ( ! -d $localepath ) {
-	    DEBUG "$localepath not found, trying alternative path";
-		$localepath = "$rootdir/locale";
-	}
-	
-	DEBUG "Locale path is $localepath";
-	bindtextdomain("qvd-gui-client", $localepath);
-	
+        }
+    } else {
+        DEBUG "Running from installed package, using installed locale";
+    }
+
+    if ( ! -d $localepath ) {
+        DEBUG "$localepath not found, trying alternative path";
+        $localepath = "$rootdir/locale";
+    }
+
+    DEBUG "Locale path is $localepath";
+    bindtextdomain("qvd-gui-client", $localepath);
+
     if ( core_cfg('client.show.settings') ) {
         $tab_ctl = Wx::Notebook->new($self, -1, wxDefaultPosition, wxDefaultSize, 0, "tab");
         $self->{tab_ctl} = $tab_ctl;
     }
-    
+
     my $panel = $self->{panel} = Wx::Panel->new($tab_ctl // $self, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL ); # / broken highlighter
 
     $panel->SetBackgroundColour(Wx::Colour->new(217,217,217));
 
-    
+
     if ( $tab_ctl ) {
         $tab_ctl->AddPage( $panel, $self->_t("Connect") );
-        
+
         $tab_sizer = Wx::BoxSizer->new(wxVERTICAL);
         $tab_sizer->Add($tab_ctl);
-        
-        
+
+
         $settings_panel = Wx::Panel->new($tab_ctl, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
         $self->{settings_panel} = $settings_panel;
         $settings_panel->SetBackgroundColour(Wx::Colour->new(255,255,255));
         $tab_ctl->AddPage( $settings_panel, $self->_t("Settings"));
         my $settings_sizer = Wx::GridBagSizer->new(0,0);
         $settings_panel->SetSizer($settings_sizer);
-        
+
         ###############################
 
         my $this_text = Wx::StaticText->new($settings_panel, -1, $self->_t("Options"));
@@ -208,9 +208,9 @@ sub new {
         ###############################
 
         if (!core_cfg('client.force.host.name', 0) or !core_cfg('client.force.link', 0) ) {
-        my $this_text = Wx::StaticText->new($settings_panel, -1, $self->_t("Connectivity"));
-        $this_text->SetFont(Wx::Font->new(10,wxDEFAULT,wxDEFAULT,wxBOLD,0,""));
-        $settings_sizer->Add( $this_text ,Wx::GBPosition->new(4,0), Wx::GBSpan->new(1,1), wxTOP|wxLEFT|wxEXPAND, 10);
+            my $this_text = Wx::StaticText->new($settings_panel, -1, $self->_t("Connectivity"));
+            $this_text->SetFont(Wx::Font->new(10,wxDEFAULT,wxDEFAULT,wxBOLD,0,""));
+            $settings_sizer->Add( $this_text ,Wx::GBPosition->new(4,0), Wx::GBSpan->new(1,1), wxTOP|wxLEFT|wxEXPAND, 10);
         }
 
         if (!core_cfg('client.force.host.name', 0)) {
@@ -226,19 +226,19 @@ sub new {
             $settings_sizer->Add($self->{link},Wx::GBPosition->new(6,1), Wx::GBSpan->new(1,3), wxLEFT|wxRIGHT, 10);
             $self->{link}->AppendItems(\@link_options);
 
-        my $link_select;
-        if ( core_cfg('client.link') eq "lan" || core_cfg('client.link') eq "local") {
+            my $link_select;
+            if ( core_cfg('client.link') eq "lan" || core_cfg('client.link') eq "local") {
                 $link_select = 0 ;
-        }
-        elsif ( core_cfg('client.link') eq "adsl" || core_cfg('client.link') eq "wan" ) {
+            }
+            elsif ( core_cfg('client.link') eq "adsl" || core_cfg('client.link') eq "wan" ) {
                 $link_select = 1 ;
-        }
-        elsif ( core_cfg('client.link') eq "modem" || core_cfg('client.link') eq "isdn") {
+            }
+            elsif ( core_cfg('client.link') eq "modem" || core_cfg('client.link') eq "isdn") {
                 $link_select = 2;
-        }
-        else {
+            }
+            else {
                 $link_select = 1;
-        }
+            }
             $self->{link}->Select($link_select);
         }
 
@@ -277,20 +277,20 @@ sub new {
             $self->{usb_redirection} = Wx::CheckBox->new($settings_panel, -1, "", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, wxDefaultValidator, "checkBox");
             $self->{usb_redirection}->SetValue( core_cfg("client.usb.enable" ) );
             $settings_sizer->Add($self->{usb_redirection},Wx::GBPosition->new(10,1), Wx::GBSpan->new(1,1),wxALL,0);
-        
+
             $self->{usbip_device_list} = Wx::CheckListBox->new($settings_panel, -1, wxDefaultPosition, [400,130] ,  [] , wxLB_EXTENDED|wxLB_NEEDED_SB , wxDefaultValidator, "usbip_devices");
             $settings_sizer->Add($self->{usbip_device_list},Wx::GBPosition->new(11,0), Wx::GBSpan->new(1,4), wxLEFT|wxRIGHT|wxEXPAND , 10);
 
-        
+
         }
 
         # Register all events related to settings tab
         Wx::Event::EVT_BUTTON($self, $self->{share_add}->GetId, \&share_add);
         Wx::Event::EVT_BUTTON($self, $self->{share_del}->GetId, \&share_del);
-    
+
         Wx::Event::EVT_CHECKBOX($self, $self->{share_enable}->GetId, \&OnClickSharedFolders);
         Wx::Event::EVT_CHECKBOX($self, $self->{usb_redirection}->GetId, \&OnClickUSBShare) if defined($self->{usb_redirection});
-    
+
         Wx::Event::EVT_NOTEBOOK_PAGE_CHANGED($self, $self->{tab_ctl}->GetId, \&OnTabChange);
 
 
@@ -299,9 +299,9 @@ sub new {
     my $ver_sizer  = Wx::BoxSizer->new(wxVERTICAL);
 
     my $bm_logo_big = Wx::Bitmap->new(File::Spec->join($QVD::Client::App::pixmaps_dir, 'qvd-big.png'),
-                                      wxBITMAP_TYPE_ANY);
+        wxBITMAP_TYPE_ANY);
     $ver_sizer->Add( Wx::StaticBitmap->new($panel, -1, $bm_logo_big),
-                     0, wxTOP|wxALIGN_CENTER_HORIZONTAL, 100 );
+        0, wxTOP|wxALIGN_CENTER_HORIZONTAL, 100 );
 
 
     my $grid_sizer = Wx::GridSizer->new(1, 1, -5, 0);
@@ -321,31 +321,31 @@ sub new {
     }
 
     if ($DARWIN && !core_cfg('client.darwin.screen_resolution.verified')) {
-	my @min_res = split(/x/, core_cfg('client.darwin.screen_resolution.min'));
-	my $res_ok;
+        my @min_res = split(/x/, core_cfg('client.darwin.screen_resolution.min'));
+        my $res_ok;
 
-	DEBUG "Verifying screen resolution on Darwin. Min resolution is " . join('x', @min_res);
+        DEBUG "Verifying screen resolution on Darwin. Min resolution is " . join('x', @min_res);
 
         foreach my $res ( get_osx_resolutions() ) {
-	    DEBUG "Found screen with " . join('x', @$res) . " resolution";
+            DEBUG "Found screen with " . join('x', @$res) . " resolution";
 
-	    if ( $res->[0] >= $min_res[0] && $res->[1] >= $min_res[1] ) {
-	        DEBUG "This resolution is good";
-	        $res_ok=1;
-		last;
-	    } else {
+            if ( $res->[0] >= $min_res[0] && $res->[1] >= $min_res[1] ) {
+                DEBUG "This resolution is good";
+                $res_ok=1;
+                last;
+            } else {
                 DEBUG "This resolution is too low";
             }
-	}
+        }
 
-	if ( !$res_ok ) {
-		DEBUG "Only low resolution displays were found, defaulting to low res geometry";
-		set_core_cfg('client.geometry', core_cfg('client.darwin.screen_resolution.low_res_geometry'));
-	} else {
-		DEBUG "High resolution display found";
-	}
+        if ( !$res_ok ) {
+            DEBUG "Only low resolution displays were found, defaulting to low res geometry";
+            set_core_cfg('client.geometry', core_cfg('client.darwin.screen_resolution.low_res_geometry'));
+        } else {
+            DEBUG "High resolution display found";
+        }
 
-	set_core_cfg('client.darwin.screen_resolution.verified', 1);
+        set_core_cfg('client.darwin.screen_resolution.verified', 1);
     }
 
     # port goes here!
@@ -369,19 +369,19 @@ sub new {
     $self->SetTitle("QVD");
     my $icon = Wx::Icon->new();
     my $bm_logo_small = Wx::Bitmap->new(File::Spec->join($QVD::Client::App::pixmaps_dir, 'qvd-small.png'),
-                                        wxBITMAP_TYPE_ANY);
+        wxBITMAP_TYPE_ANY);
     $icon->CopyFromBitmap($bm_logo_small);
     $self->SetIcon($icon);
 
     $panel->SetSizer($ver_sizer);
 
     if ( $tab_ctl ) {
-         $ver_sizer->Fit($tab_ctl);
-         $tab_sizer->Fit($self);
-         $self->OnClickSharedFolders();
-         $self->OnClickUSBShare() if defined($self->{usb_redirection});
+        $ver_sizer->Fit($tab_ctl);
+        $tab_sizer->Fit($self);
+        $self->OnClickSharedFolders();
+        $self->OnClickUSBShare() if defined($self->{usb_redirection});
     } else {
-         $ver_sizer->Fit($self);
+        $ver_sizer->Fit($self);
     }
 
     $self->Center;
@@ -411,13 +411,13 @@ sub new {
     $self->load_share_list();
     $self->load_usb_devices() if defined($self->{usb_redirection});
 
-	if( $ENV{QVD_PP_BUILD} ) {
-		INFO "Being called from PP build. Exiting.";
-		$self->Close();
-		$self->Destroy();
-		exit(0);
-	}
-	
+    if( $ENV{QVD_PP_BUILD} ) {
+        INFO "Being called from PP build. Exiting.";
+        $self->Close();
+        $self->Destroy();
+        exit(0);
+    }
+
     return $self;
 }
 
@@ -434,6 +434,7 @@ sub RunWorkerThread {
         if ($@) {
             my $msg = $@;
             ERROR "Unable to connect to VM: $msg";
+            DEBUG "Notifying master thread...";
             $self->proxy_connection_error(message => $msg);
         }
         DEBUG "Slave thread waiting for \%connect_info";
@@ -477,12 +478,14 @@ sub proxy_list_of_vm_loaded {
 
 sub proxy_connection_status {
     my ($self, $status) = @_;
+    DEBUG("proxy connection status changed to $status, notifying master thread");
     Wx::PostEvent($self, new Wx::PlThreadEvent(-1, EVT_CONN_STATUS, $status));
 }
 
 sub proxy_connection_error {
     my $self = shift;
     my %args = @_;
+    DEBUG("proxy connection error: @_");
     my $message :shared = $args{message};
     my $evt = new Wx::PlThreadEvent(-1, EVT_CONNECTION_ERROR, $message);
     Wx::PostEvent($self, $evt);
@@ -508,9 +511,9 @@ sub proxy_set_environment {
 
 sub OnClickConnect {
     my( $self, $event ) = @_;
-    
+
     $self->SaveConfiguration() unless ( core_cfg('client.auto_connect',0) );
-    
+
     $self->{state} = "";
     %connect_info = (
         link          => core_cfg('client.force.link', 0) // core_cfg('client.link'),
@@ -537,8 +540,8 @@ sub OnClickConnect {
     $connect_info{port} = $1 if $connect_info{host} =~ s/:(\d+)$//;
 
     my $remember_password = ( $self->{remember_pass}
-                              ? $self->{remember_pass}->GetValue
-                              : core_cfg("client.remember_password") );
+        ? $self->{remember_pass}->GetValue
+        : core_cfg("client.remember_password") );
 
     unless (core_cfg('client.remember_username')) {
         $self->{username}->SetValue('');
@@ -611,7 +614,7 @@ sub OnTabChange {
             cond_signal(%connect_info);
             $self->{worker_thread}->join();
         }
-    } 
+    }
 
 }
 
@@ -621,7 +624,35 @@ sub OnConnectionError {
     $self->{progress_bar}->SetValue(0);
     $self->{progress_bar}->SetRange(100);
     my $message = $event->GetData;
-    my $dialog = Wx::MessageDialog->new($self, $message, $self->_t("Connection error"), wxOK | wxICON_ERROR);
+    my $msg = "";
+
+    if ( $message =~ /Unable to connect to (.*?:\d+): (\w+) \((.*?)\) (\[.*?\])/ ) {
+        my ($ehost, $err, $errmsg, $sslerr) = ($1,$2,$3,$4);
+        $sslerr =~ s/^\[//;
+        $sslerr =~ s/\]$//;
+        DEBUG "Connection error on host '$ehost', error '$err', message '$errmsg', SSL error '$sslerr'";
+
+        if ( $sslerr && $sslerr !~ /IO::Socket::INET configuration failed/ ) {
+            # "IO::Socket::INET configuration failed" means something went wrong in the IO::Socket::INET
+            # layer, so there's nothing interesting to say about SSL.
+            $msg .= sprintf($self->_t("Error establishing a SSL connection"), $sslerr) . "\n\n";
+        }
+
+        $msg .= sprintf($self->_t("Error when trying to connect to %s:"), $ehost) . "\n$errmsg";
+        $msg .= "\n\n" . $self->_t("Make sure your connection settings are correct, and that the server is accepting connections.");
+    } else {
+        $msg = $message;
+    }
+
+    my $translated = $msg;
+
+    if ( $msg =~ /The server has rejected your login/ ) {
+        $translated = $self->_t("The server has rejected your login. Please verify that your username and password are correct");
+    } else {
+        WARN "Untranslated connection error: $msg";
+    }
+
+    my $dialog = Wx::MessageDialog->new($self, $msg, $self->_t("Connection error"), wxOK | wxICON_ERROR);
     DEBUG "Showing error to user";
     $dialog->ShowModal();
     $dialog->Destroy();
@@ -636,21 +667,21 @@ sub OnListOfVMLoaded {
     {
         lock($vm_id);
         my $dialog = new Wx::SingleChoiceDialog(
-            $self, 
-            $self->_t("Select virtual machine:"), 
-            $self->_t("Select virtual machine"), 
-            [
-                map { 
-                    if ($_->{blocked}) {
-                        $_->{name}.$self->_t(" (blocked)");
-                    } else {
-                        $_->{name};
-                        
-                    }
-                } @$vm_data
-            ],
-            [ map { $_->{id} } @$vm_data ],
-        );
+                $self,
+                $self->_t("Select virtual machine:"),
+                $self->_t("Select virtual machine"),
+                [
+                    map {
+                        if ($_->{blocked}) {
+                            $_->{name}.$self->_t(" (blocked)");
+                        } else {
+                            $_->{name};
+
+                        }
+                    } @$vm_data
+                ],
+                [ map { $_->{id} } @$vm_data ],
+            );
         $self->{timer}->Stop();
         $dialog->ShowModal();
         $vm_id = $dialog->GetSelectionClientData();
@@ -663,6 +694,9 @@ sub OnListOfVMLoaded {
 sub OnConnectionStatusChanged {
     my ($self, $event) = @_;
     my $status = $event->GetData();
+
+    DEBUG "OnConnectionStatusChanged($status)";
+    
     if ($status eq 'CONNECTING') {
         $self->EnableControls(0);
         $self->{timer}->Start(50, 0);
@@ -755,12 +789,12 @@ sub OnUnknownCert {
 
             foreach my $error (@{ $cert->{errors} }) {
                 my $e = $error->{err_no};
-    
+
                 # Net::SSLeay doesn't seem to have error constants. Values taken from:
                 # http://www.openssl.org/docs/apps/verify.html#
-       
+
                 $err_desc = sprintf($self->_t("Error #%s:"), $e) . " ";
-    
+
                 if ( $e == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT ) {
                     $err_desc .= $self->_t("Unable to find issuer's certificate.");
                     _add_advice(\@advice, $self->_t("If you are using your own CA, see the documentation on how to make the client use your certificate."));
@@ -796,51 +830,51 @@ sub OnUnknownCert {
                 } elsif ( $e == 1001 ) {
                     my @hostnames = ( $cert->{subject}->{cn} );
                     my $str_hostnames = "";
-    
+
                     # If SubjectAltName is present, the clients are supposed to ignore the Common Name.
                     #
                     # TODO: Perhaps check if SubjectAltName includes the CN, and warn if it doesn't. But
                     # this is really an improperly created certificate, so the value of telling the user
                     # that is limited.
-     
+
                     if ( exists $cert->{extensions}->{altnames} ) {
                         @hostnames = ();
-    
+
                         foreach my $ent ( @{ $cert->{extensions}->{altnames} } ) {
-                           push @hostnames, values(%$ent);
+                            push @hostnames, values(%$ent);
                         }
                     }
-    
+
                     while(@hostnames) {
                         if ( $str_hostnames ) {
                             if ( scalar @hostnames > 1 ) {
-                               $str_hostnames .= ", ";
+                                $str_hostnames .= ", ";
                             } else {
-                               $str_hostnames .= " " . $self->_t("and") . " ";
+                                $str_hostnames .= " " . $self->_t("and") . " ";
                             }
                         }
-      
+
                         $str_hostnames .= shift(@hostnames);
                     }
-    
+
                     $err_desc .= sprintf($self->_t("Hostname verification failed.\nThe cert is only valid for %s"), $str_hostnames);
-                    _add_advice(\@advice, $self->_t("This certificate belongs to another host. ". 
-                                                    "This is a sign of either misconfiguration or an ongoing attempt to compromise security."));
+                    _add_advice(\@advice, $self->_t("This certificate belongs to another host. ".
+                            "This is a sign of either misconfiguration or an ongoing attempt to compromise security."));
                     $no_ok_button = 1 unless core_cfg('client.ssl.allow_bad_host');
                 } elsif ( $e == 1002 ) {
                     # sig_algo contains something like: md5WithRSAEncryption. 
                     # Extract the hash part from it.
                     my $hash = $cert->{sig_algo};
                     $hash =~ m/^(\w+\d+)/;
-    
+
                     $err_desc .= sprintf($self->_t("Insecure hash algorithm: %s"), $1);
                     _add_advice(\@advice, $self->_t("This certificate uses a deprecated and insecure hash algorithm. ".
-                                                    "It should be replaced with a new one as soon as possible."));
+                            "It should be replaced with a new one as soon as possible."));
                     $no_ok_button = 1 unless core_cfg('client.ssl.allow_insecure_sign_algo');
                 } elsif ( $e == 1003 ) {
                     $err_desc .= sprintf($self->_t("Weak key: %s bits"), $cert->{bit_length});
                     _add_advice(\@advice, $self->_t("This certificate uses a weak key and can be broken by brute force. ".
-                                                    "It should be replaced with a stronger one as soon as possible."));
+                            "It should be replaced with a stronger one as soon as possible."));
                     $no_ok_button = 1 unless core_cfg('client.ssl.allow_weak_key');
                 } elsif ( $e == 2001 ) {
                     $err_desc .= $self->_t("The certificate has been revoked");
@@ -848,15 +882,15 @@ sub OnUnknownCert {
                     $no_ok_button = 1 unless core_cfg('client.ssl.allow_revoked');
                 } elsif ( $e == 2100 ) {
                     $err_desc .= $self->_t("OCSP server internal error");
-                   _add_advice(\@advice, $self->_t("The OCSP server returned an internal error. It wasn't possible to determine whether the certificate has been revoked. This may be a temporary error, and can be ignored."));
+                    _add_advice(\@advice, $self->_t("The OCSP server returned an internal error. It wasn't possible to determine whether the certificate has been revoked. This may be a temporary error, and can be ignored."));
                     $no_ok_button = 1 unless core_cfg('client.ssl.allow_ocsp_server_failure');
                 } elsif ( $e == 2101 ) {
                     $err_desc .= $self->_t("Failed to make OCSP request");
-                   _add_advice(\@advice, $self->_t("It wasn't possible to contact the OCSP server to determine whether the certificate has been revoked. This is likely a temporary error, and can be ignored."));
+                    _add_advice(\@advice, $self->_t("It wasn't possible to contact the OCSP server to determine whether the certificate has been revoked. This is likely a temporary error, and can be ignored."));
                     $no_ok_button = 1 unless core_cfg('client.ssl.allow_ocsp_server_failure');
                 } elsif ( $e == 2102 ) {
                     $err_desc .= $self->_t("OCSP signer certificate not found");
-                   _add_advice(\@advice, $self->_t("The OCSP server uses an unrecognized certificate. This may be a misconfiguration, and can be ignored."));
+                    _add_advice(\@advice, $self->_t("The OCSP server uses an unrecognized certificate. This may be a misconfiguration, and can be ignored."));
                     $no_ok_button = 1 unless core_cfg('client.ssl.allow_ocsp_server_failure');
                 } elsif ( $e == 2103 ) {
                     $err_desc .= $self->_t("OCSP server certificate lacks OCSP extension");
@@ -879,53 +913,53 @@ sub OnUnknownCert {
                     $err_desc .= sprintf($self->_t("Unrecognized SSL error."), $e);
                     $no_ok_button = 1 unless core_cfg('client.ssl.allow_unknown_error');
                 }
-    
+
                 my $hsizer = Wx::BoxSizer->new(wxHORIZONTAL);
                 my $excl = Wx::StaticText->new($info_panel, -1, "    !");
                 my $excl = Wx::StaticText->new($info_panel, -1, "    " . chr(0x26A0));
-    
+
                 $font = $excl->GetFont();
                 $font->SetWeight(wxFONTWEIGHT_BOLD);
                 $excl->SetFont($font);
                 $excl->SetForegroundColour(wxRED);
                 $hsizer->Add($excl, 0, wxALL, 5);
-    
-    
-     
+
+
+
                 $hsizer->Add(Wx::StaticText->new($info_panel, -1, $err_desc), 0, wxALL, 5);
                 $problems_sizer->Add($hsizer, 0, wxALL, 0);
-             }
+            }
         }
-         
 
-         my $info = [];
-         push @$info,  { $self->_t("Certificate for") => _format_aligned( _cert_fullname($cert, $cert->{subject}), "\t") };
-         push @$info,  { $self->_t("Issued by") => _format_aligned( _cert_fullname($cert, $cert->{issuer}), "\t") };
 
-         if ( exists $cert->{extensions}->{altnames} ) {
-             push @$info, { $self->_t("Alternative names") => _format_aligned($cert->{extensions}->{altnames}, "\t") };
-         }
+        my $info = [];
+        push @$info,  { $self->_t("Certificate for") => _format_aligned( _cert_fullname($cert, $cert->{subject}), "\t") };
+        push @$info,  { $self->_t("Issued by") => _format_aligned( _cert_fullname($cert, $cert->{issuer}), "\t") };
 
-         if ( exists $cert->{extensions}->{cert_type} ) {
-             my $ct = $cert->{extensions}->{cert_type};
-             push @$info, { $self->_t("Uses") => join(", ", grep { $ct->{$_} } keys %$ct) };
-         }
+        if ( exists $cert->{extensions}->{altnames} ) {
+            push @$info, { $self->_t("Alternative names") => _format_aligned($cert->{extensions}->{altnames}, "\t") };
+        }
 
-         push @$info, { $self->_t("Bit length") => $cert->{bit_length} };
-         push @$info, { $self->_t("Signature algorithm") => $cert->{sig_algo} };
+        if ( exists $cert->{extensions}->{cert_type} ) {
+            my $ct = $cert->{extensions}->{cert_type};
+            push @$info, { $self->_t("Uses") => join(", ", grep { $ct->{$_} } keys %$ct) };
+        }
 
-         foreach my $algo ( keys %{ $cert->{fingerprint} } ) {
-             push @$info,  {  $self->_t("Fingerprint") . " ($algo)" => $cert->{fingerprint}->{$algo} };
-         }
-         push @$info,  { $self->_t("Hash")        => $cert->{hash} };
-         push @$info,  { $self->_t("Serial")      => $cert->{serial} };
-         push @$info,  { $self->_t("Valid from")  => $cert->{not_before} };
-         push @$info,  { $self->_t("Valid until") => $cert->{not_after} };
+        push @$info, { $self->_t("Bit length") => $cert->{bit_length} };
+        push @$info, { $self->_t("Signature algorithm") => $cert->{sig_algo} };
 
-         if ( $cert_data ){
-             $cert_data .= "\n---\n\n";
-         }
-         $cert_data .= _format_aligned($info);
+        foreach my $algo ( keys %{ $cert->{fingerprint} } ) {
+            push @$info,  {  $self->_t("Fingerprint") . " ($algo)" => $cert->{fingerprint}->{$algo} };
+        }
+        push @$info,  { $self->_t("Hash")        => $cert->{hash} };
+        push @$info,  { $self->_t("Serial")      => $cert->{serial} };
+        push @$info,  { $self->_t("Valid from")  => $cert->{not_before} };
+        push @$info,  { $self->_t("Valid until") => $cert->{not_after} };
+
+        if ( $cert_data ){
+            $cert_data .= "\n---\n\n";
+        }
+        $cert_data .= _format_aligned($info);
 
     }
 
@@ -983,7 +1017,7 @@ sub OnUnknownCert {
     if ( $but_ok ) {
         $but_ok->SetDefault;
     } else {
-         $but_cancel->SetDefault;
+        $but_cancel->SetDefault;
     }
 
 
@@ -995,7 +1029,7 @@ sub OnUnknownCert {
 
         Wx::Event::EVT_TIMER($dialog, -1, \&OnCertDialogTimer);
         my $timer = Wx::Timer->new($dialog);
-        $dialog->{accept_countdown} = $timeout; 
+        $dialog->{accept_countdown} = $timeout;
         $dialog->{ok_button} = $but_ok;
         $dialog->{save_button} = $but_ok_permanent;
         $dialog->{ok_orig_text} = $but_ok->GetLabel();
@@ -1016,7 +1050,7 @@ sub OnUnknownCert {
     $dialog->ShowModal();
 
     if ( $dialog->{timer} ) {
-       $dialog->{timer}->Stop();
+        $dialog->{timer}->Stop();
     }
 
     $self->{timer}->Start();
@@ -1085,15 +1119,15 @@ sub OnSetEnvironment {
 
 sub load_usb_devices {
     my ($self) = shift;
-    
+
     my $usb = QVD::Client::USB::instantiate( core_cfg('client.usb.implementation') );
     my @devices = @{ $usb->list_devices };
     my @selected;
-    
+
     foreach my $d ( @devices ){
-    	
-        my $dev = $d->{vendor} . " " . $d->{product} 
-            .  " (" . $d->{vid} . ":" . $d->{pid} 
+
+        my $dev = $d->{vendor} . " " . $d->{product}
+            .  " (" . $d->{vid} . ":" . $d->{pid}
             . ( $d->{serial} ? '@' . $d->{serial} : "") . ")";
         push @{$self->{usb_devices}} , $dev;
     }
@@ -1102,36 +1136,36 @@ sub load_usb_devices {
 
 
 
-	# Build selection list from our saved config
+    # Build selection list from our saved config
 
-	my $cursel = core_cfg('client.usb.share_list', '');
-	my @parts = split(/,/, $cursel);
+    my $cursel = core_cfg('client.usb.share_list', '');
+    my @parts = split(/,/, $cursel);
 
-	foreach my $part (@parts) {
-		my ($v, $p, $id);
-		$part =~ s/^\s+//;
-		$part =~ s/\s+$//;
+    foreach my $part (@parts) {
+        my ($v, $p, $id);
+        $part =~ s/^\s+//;
+        $part =~ s/\s+$//;
 
-		($v, $p) = split(/:/, $part);
-		($p, $id) = split(/@/, $p) if ( $p =~ /@/ );
+        ($v, $p) = split(/:/, $part);
+        ($p, $id) = split(/@/, $p) if ( $p =~ /@/ );
 
-                my $is_connected=0;
-		for(my $i=0;$i<=scalar @devices;$i++) {
-			my $d = $devices[$i];
-			if ( $d->{vid} eq $v && $d->{pid} eq $p && (!defined $id || $d->{serial} eq $id)) {
-				push @selected, $i;
-                                $is_connected=1;
-			}
-		}
-                if ( ! $is_connected ) {
-                    # Make sure we don't forget about devices although they're not connected now
-                    push @{$self->{disconnected_usb_devices}}, $v.":".$p.( defined $id ? "@".$id : '');
-                }
-	}
+        my $is_connected=0;
+        for(my $i=0;$i<=scalar @devices;$i++) {
+            my $d = $devices[$i];
+            if ( $d->{vid} eq $v && $d->{pid} eq $p && (!defined $id || $d->{serial} eq $id)) {
+                push @selected, $i;
+                $is_connected=1;
+            }
+        }
+        if ( ! $is_connected ) {
+            # Make sure we don't forget about devices although they're not connected now
+            push @{$self->{disconnected_usb_devices}}, $v.":".$p.( defined $id ? "@".$id : '');
+        }
+    }
 
-	foreach my $i (@selected){
-		$self->{usbip_device_list}->Check($i,1);
-	}
+    foreach my $i (@selected){
+        $self->{usbip_device_list}->Check($i,1);
+    }
 
 }
 
@@ -1145,10 +1179,10 @@ sub share_del {
 
 sub share_add {
     my ($self) = @_;
-    my $dialog = Wx::DirDialog->new($self, $self->_t("Select the folder to share"), "");  
+    my $dialog = Wx::DirDialog->new($self, $self->_t("Select the folder to share"), "");
     $dialog->ShowModal();
     my $selected = $dialog->GetPath();
-    
+
     if ( $selected ) {
         push @{ $self->{shares} }, $selected;
         $self->update_share_list();
@@ -1185,7 +1219,7 @@ sub update_share_list() {
 
 sub DetectKeyboard {
 
-    my $log = Log::Log4perl->get_logger("QVD::Client::Frame"); 
+    my $log = Log::Log4perl->get_logger("QVD::Client::Frame");
 
     if ($^O eq 'MSWin32' ) {
         require Win32::API;
@@ -1201,17 +1235,17 @@ sub DetectKeyboard {
         DEBUG "Detected layout $layout, assuming pc105 keyboard";
         return "pc105/$layout";
     } else {
-	# See http://www.nomachine.com/tr/view.php?id=TR02H02326
-	my $user = getpwuid($>);
-	if (defined $user and length $user){
+        # See http://www.nomachine.com/tr/view.php?id=TR02H02326
+        my $user = getpwuid($>);
+        if (defined $user and length $user){
             my $xhost = core_cfg('command.xhost') ;
             my $xhostparam = core_cfg('command.xhost.family') eq "local" ? "+local:" : "+si:localuser:$user" ;
             system $xhost, $xhostparam;
             DEBUG("xhost $xhostparam executed for $user");
-	}
-	else {
+        }
+        else {
             WARN("Cannot execute xhost for $user");
-	}
+        }
 
         require X11::Protocol;
         my $x11 = X11::Protocol->new;
@@ -1262,22 +1296,22 @@ sub SaveConfiguration {
                 $usb_list .= "," if ( $usb_list );
                 $usb_list .= $usb ;
             }
-	}
+        }
         # If it is in the disconnected list, it was checked before. Don't forget about it
         foreach my $disconnected ( @{ $self->{disconnected_usb_devices} } ){
             $usb_list .= "," if ( $usb_list );
             $usb_list .= $disconnected;
         }
-	set_core_cfg('client.usb.share_list', ($usb_list ? $usb_list : "") );
-        set_core_cfg('client.usb.enable', $self->{usb_redirection}->GetValue()); 
+        set_core_cfg('client.usb.share_list', ($usb_list ? $usb_list : "") );
+        set_core_cfg('client.usb.enable', $self->{usb_redirection}->GetValue());
     }
-    
+
     # The widgets only exist if the settings tab is enabled.
     set_core_cfg('client.audio.enable', $self->{audio}->GetValue())       if ( $self->{audio} );
     set_core_cfg('client.printing.enable', $self->{printing}->GetValue()) if ( $self->{printing} );
     set_core_cfg('client.fullscreen', $self->{fullscreen}->GetValue())    if ( $self->{fullscreen} );
     set_core_cfg('client.slave.enable', $self->{forwarding}->GetValue())  if ( $self->{forwarding} );
-    
+
     #set_core_cfg('client.geometry', $self->{geometry}->GetValue());
 
     set_core_cfg('client.file_sharing.enable', $self->{share_enable}->IsChecked() ? 1 : 0) if ($self->{share_enable});
@@ -1290,19 +1324,17 @@ sub SaveConfiguration {
 
     set_core_cfg("client.share.$share_num", "");
 
-
-
     local $@;
-    eval { save_core_cfg($QVD::Client::App::user_config_filename) };
+    eval { save_core_cfg($QVD::Client::App::user_config_fn) };
     if ($@) {
         my $message = $@;
-        my $dialog = Wx::MessageDialog->new($self, $message, 
+        my $dialog = Wx::MessageDialog->new($self, $message,
             $self->_t("Error saving configuration"), wxOK | wxICON_ERROR);
         $dialog->ShowModal();
         $dialog->Destroy();
     }
     else {
-        INFO "Configuration saved to $QVD::Client::App::user_config_filename";
+        INFO "Configuration saved to $QVD::Client::App::user_config_fn";
     }
 }
 
@@ -1311,7 +1343,7 @@ sub load_share_list {
     my ($self) = @_;
     $self->{shares} = [];
 
- 
+
     if ( core_cfg("client.share.0", 0) ne "" ) {
         my $num = 0;
         my $dir;
@@ -1337,7 +1369,7 @@ sub load_share_list {
                     DEBUG "Not sharing $drive: not removable nor CD-ROM. Type: $dt";
                     next;
                 }
-                
+
                 push @{$self->{shares}}, $drive;
             }
         } else {
@@ -1347,93 +1379,113 @@ sub load_share_list {
             push @{$self->{shares}}, '/Volumes' if -e '/Volumes'; # For OS X
         }
     }
- 
+ DEBUG "Shares: @{$self->{shares}}";
     $self->update_share_list() if ( defined $self->{tab_ctl} );
 
 }
 
+sub _slave_client_invoke {
+    my $self = shift;
+    my $method = shift;
+
+    require QVD::Client::SlaveClient;
+    for (reverse 0..10) {
+        eval { QVD::Client::SlaveClient->new()->$method(@_) };
+        last unless $@ =~ /ECONNREFUSED|EPIPE/;
+        DEBUG "Unable to mount share: $@";
+        sleep 1 if $_;
+    }
+
+    if ($@) {
+        ERROR $@;
+        $@ =~ /\bServer\s+replied\s+(\d+)\b/i;
+        return ($1 // 500);
+    }
+    return 200;
+}
 
 sub start_file_sharing {
-    my ($self) = @_;
+    my $self = shift;
 
-    my $slave_client_proc;
-    if (core_cfg('client.slave.enable', 1) && core_cfg('client.file_sharing.enable', 1)) {
-
-        use QVD::Client::SlaveClient;
-        for my $share (@{ $self->{shares} }) {
-            INFO("Starting folder sharing for $share");
-            for (my $conn_attempt = 0; $conn_attempt < 10; $conn_attempt++) {
-                local $@;
-                my $client = QVD::Client::SlaveClient->new();
-                eval { $client->handle_share($share) };
-                if ($@) {
-                    if ($@ =~ 'ECONNREFUSED' || $@ =~ 'EPIPE' ) {
-                        sleep 1;
-                        next;
-                    }
-                    ERROR $@;
-                } else {
-                    DEBUG("Folder sharing started for $share");
-                }
-                last;
-            }
+    unless (core_cfg('client.slave.enable') and
+            core_cfg('client.file_sharing.enable')) {
+        INFO "Slave channel or file sharing is disabled, not exporting local shares into the remote VM";
+        return;
+    }
+    INFO "Exporting local shares into remote VM";
+    my @errors;
+    for my $share (@{ $self->{shares} }) {
+        INFO "Starting folder sharing for $share";
+        local $@;
+        my $code = $self->_slave_client_invoke(handle_share => $share);
+        if ($code == 200) {
+            DEBUG "Share $share exported into VM";
         }
+        else {
+            ERROR "Unable to mount share $share: [$code] $@";
+            my $message = sprintf($self->_t("Failed to mount share %s:"), $share) . ' ' . $@;
+            push @errors, $message;
+        }
+    }
+    if (@errors) {
+        my $dialog = Wx::MessageDialog->new($self, join("\n", @errors),
+                                            $self->_t("File sharing error."), wxOK | wxICON_ERROR);
+        $dialog->ShowModal();
+        $dialog->Destroy();
     }
 }
 
 sub start_remote_mounts {
-	my ($self) = @_;
-	my $num = 0;
+	my $self = shift;
 
-    if (core_cfg('client.slave.enable', 1)) {
-		INFO("Starting remote mounts");
-    } else {
-		INFO("Slave channel disabled, remote mounts (if any are configured) won't be started");
+    unless (core_cfg('client.slave.enable')) {
+		INFO"Slave channel disabled, remote mounts  won't be started";
 		return;
-	}
+	}INFO "Starting remote mounts";
 
-	while(1) {
-		my $remote_dir = core_cfg("client.mount.$num.remote", 0);
-		my $local_dir  = core_cfg("client.mount.$num.local", 0);
-		
-		last unless ( $local_dir && $remote_dir );
-
-		use QVD::Client::SlaveClient;
-		INFO("Mounting remote directory $remote_dir at $local_dir");
-
-		for (my $conn_attempt = 0; $conn_attempt < 10; $conn_attempt++) {
-			local $@;
-			my $client = QVD::Client::SlaveClient->new();
-			eval { $client->handle_mount($remote_dir, $local_dir) };
-			if ($@) {
-				if ($@ =~ 'ECONNREFUSED' || $@ =~ 'EPIPE' ) {
-					sleep 1;
+	my @errors;
+    for my $num (map /^client\.mount\.(\d+)\.remote$/, core_cfg_keys) {
+        local $@;
+		my $remote_dir = core_cfg("client.mount.$num.remote", 0)// next;
+		my $local_dir  = core_cfg("client.mount.$num.local", 0)//
 					next;
-				}
-				ERROR $@;
+				
 
-				my $message = sprintf($self->_t("Failed to mount remote folder %s at %s:"), $remote_dir, $local_dir) . "\n\n";
-				if ( $@ =~ /Server replied 404/ ) {
-					$message .= sprintf($self->_t("Path %s was not found on the VM"), $remote_dir);
-				} elsif ( $@ =~ /Server replied 403/ ) {
-					$message .= sprintf($self->_t("Path %s is forbidden on the VM"), $remote_dir);
+                my $message = sprintf($self->_t("Failed to mount remote folder %s at %s:"), $remote_dir, $local_dir) . "\n\n";
+                if ( $@ =~ /Server replied 404/ ) {
+                    $message .= sprintf($self->_t("Path %s was not found on the VM"), $remote_dir);
+                } elsif ( $@ =~ /Server replied 403/ ) {
+                    $message .= sprintf($self->_t("Path %s is forbidden on the VM"), $remote_dir);
                 } elsif ( $@ =~ /Server replied 501/ ) {
-					$message .= $self->_t("VM lacks file sharing support. Please install the qvd-sshfs package.");
-				} else {
-					$message .= $self->_t("Unrecognized error, full error message follows:") .  "\n\n$@";
-				}
+                    $message .= $self->_t("VM lacks file sharing support. Please install the qvd-sshfs package.");
+                } else {
+                    $message .= $self->_t("Unrecognized error, full error message follows:") .  "\n\n$@";
+                }
 
-				my $dialog = Wx::MessageDialog->new($self, $message, $self->_t("File sharing error."), wxOK | wxICON_ERROR);
+				INFO "Mounting remote directory $remote_dir at $local_dir";
+
+        my $code = $self->_slave_client_invoke(handle_mount => $remote_dir, $local_dir);
+
+        if ($code == 200) {
+            DEBUG "Remote directory $remote_dir mounted at $local_dir";
+        }
+        else {
+            ERROR "Unable to mount remote directory $remote_dir at $local_dir: [$code] $@";
+            my $reason = (($code == 404) ? sprintf($self->_t("Path %s was not found on the VM"), $remote_dir) :
+                          ($code == 403) ? sprintf($self->_t("Path %s is forbidden on the VM"), $remote_dir)  :
+                          ($code == 501) ? $self->_t("VM lacks file sharing support. Please install the qvd-sshfs package.") :
+                          $self->_t("Unrecognized error, full error message follows:")."\n\n$@");
+            my $message = sprintf($self->_t("Failed to mount remote folder %s at %s:"),
+                                  $remote_dir, $local_dir)." ".$reason;
+            push @errors, $message;
+        }
+    }
+    if (@errors) {my $dialog = Wx::MessageDialog->new($self, join("\n", @errors), $self->_t("File sharing error."), wxOK | wxICON_ERROR);
 				$dialog->ShowModal();
 				$dialog->Destroy();
-
-			} else {
-				DEBUG("Remote directory $remote_dir mounted at $local_dir");
-			}
-			last;
-		}
-	
-		$num++;
+}
+			 else {
+				DEBUG"All remote mounts started";
 	}
 }
 
@@ -1450,86 +1502,86 @@ sub get_osx_resolutions {
 }
 
 sub _t {
-	my ($self, @args) = @_;
-	return $self->{domain}->get(@args);
+    my ($self, @args) = @_;
+    return $self->{domain}->get(@args);
 }
 
 sub _cert_name {
-        my ($cert, $object) = @_;
-        my $ret;
-        if ( exists $cert->{extensions}->{cert_type} ) {
-            my $ct = $cert->{extensions}->{cert_type};
-            $ret = "[" . join(", ", grep { $ct->{$_} } keys %$ct) . "] ";
-        }
- 
-        $ret .= "$object->{cn}";
-        return $ret;     
+    my ($cert, $object) = @_;
+    my $ret;
+    if ( exists $cert->{extensions}->{cert_type} ) {
+        my $ct = $cert->{extensions}->{cert_type};
+        $ret = "[" . join(", ", grep { $ct->{$_} } keys %$ct) . "] ";
+    }
+
+    $ret .= "$object->{cn}";
+    return $ret;
 }
 
 sub _cert_fullname {
-        my ($cert, $object) = @_;
-        my @ret;
-        my $types;
+    my ($cert, $object) = @_;
+    my @ret;
+    my $types;
 
-        # Keeps things sorted
-        push @ret, { 'Common Name (CN)'        => $object->{cn} };
-        push @ret, { 'Organization (O)'        => $object->{o}  };
-        push @ret, { 'Organizational Unit (OU)'=> $object->{ou} };
-        push @ret, { 'Location (L)'            => $object->{l}  };
-        push @ret, { 'Country (C)'             => $object->{c}  };
+    # Keeps things sorted
+    push @ret, { 'Common Name (CN)'        => $object->{cn} };
+    push @ret, { 'Organization (O)'        => $object->{o}  };
+    push @ret, { 'Organizational Unit (OU)'=> $object->{ou} };
+    push @ret, { 'Location (L)'            => $object->{l}  };
+    push @ret, { 'Country (C)'             => $object->{c}  };
 
-        return \@ret;     
+    return \@ret;
 }
 
 sub _format_aligned {
-        my ($data, $indent) = @_;
-        my $maxlen = 0;
-        my $ret;
-        $indent //= "";
+    my ($data, $indent) = @_;
+    my $maxlen = 0;
+    my $ret;
+    $indent //= "";
 
-        foreach my $row (@$data) {
-            my ($k) = keys(%{$row});
-            $maxlen = length($k) if ( $maxlen < length($k));
+    foreach my $row (@$data) {
+        my ($k) = keys(%{$row});
+        $maxlen = length($k) if ( $maxlen < length($k));
+    }
+
+    foreach my $row (@$data) {
+        my ($k) = keys(%{$row});
+        my $v = $row->{$k};
+
+        $ret .= $indent . $k . (" " x ($maxlen-length($k))) . ": ";
+        if ( $v =~ /\n/ ) {
+            $ret .= "\n";
         }
 
-        foreach my $row (@$data) {
-            my ($k) = keys(%{$row});
-            my $v = $row->{$k};
+        if ( $v =~ /^([A-F0-9]{2}:?)+$/i ) {
+            # Format fingerprints in a more readable way
+            my @bytes = split(/:/, $v);
+            my $count;
+            while(my $byte = shift @bytes) {
+                $ret .= "$byte ";
+                $count++;
 
-            $ret .= $indent . $k . (" " x ($maxlen-length($k))) . ": ";
-            if ( $v =~ /\n/ ) {
-                $ret .= "\n";
-            }
-             
-            if ( $v =~ /^([A-F0-9]{2}:?)+$/i ) {
-                # Format fingerprints in a more readable way
-                my @bytes = split(/:/, $v);
-                my $count;
-                while(my $byte = shift @bytes) {
-                    $ret .= "$byte ";
-                    $count++;
-
-                    $ret .= " " if ( $count % 4 == 0);
-                    $ret .= " " if ( $count % 8 == 0);
-                    $ret .= "\n" . (" "x($maxlen+2)) if ( $count % 16 == 0 && scalar @bytes);
-                }
-
-                $ret .= "\n"; # unless ( $count % 16 == 0 ); # Already added a newline in the loop
-            } else {
-                $ret .= "$v\n";
+                $ret .= " " if ( $count % 4 == 0);
+                $ret .= " " if ( $count % 8 == 0);
+                $ret .= "\n" . (" "x($maxlen+2)) if ( $count % 16 == 0 && scalar @bytes);
             }
 
+            $ret .= "\n"; # unless ( $count % 16 == 0 ); # Already added a newline in the loop
+        } else {
+            $ret .= "$v\n";
         }
 
-        return $ret;
+    }
+
+    return $ret;
 }
 
 sub _add_advice {
-	my ($aref, $advice) = @_;
-	foreach my $line (@$aref) {
-		return if $line eq $advice;
-	}
+    my ($aref, $advice) = @_;
+    foreach my $line (@$aref) {
+        return if $line eq $advice;
+    }
 
-	push @$aref, $advice;
+    push @$aref, $advice;
 }
 1;

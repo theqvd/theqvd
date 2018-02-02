@@ -3,6 +3,8 @@ package QVD::L7R::Authenticator;
 use strict;
 use warnings;
 
+use JSON;
+
 use QVD::Config;
 use QVD::Log;
 use QVD::DB::Simple;
@@ -202,20 +204,31 @@ sub authenticate_bearer {
 
     DEBUG "authenticate_bearer('$token')";
 
-    for (@{$auth->{plugins}}) { 
-        if($_->authenticate_bearer($auth, $token, $l7r)) {
-            if(my $user = rs( User )->find( { id => $auth->{user_id} } )) {
-                my $user_name = $user->login;
-                my $tenant_name = $user->tenant_name;
-                $auth->{user} = $user;
-                $auth->{user_id} = $auth->{user}->id;
-                $auth->{authenticated} = 1;
-                $auth->{params}{'qvd.vm.user.name'} = $user_name;
-                DEBUG "User $user_name in tenant $tenant_name was authenticated with bearer";
-                return 1;
-            } else {
-                DEBUG "Token $token is authenticated but related user is not registered in QVD database";
-            }
+    for (@{$auth->{plugins}}) {
+        if ($_->authenticate_bearer($auth, $token, $l7r)) {
+            my $is_authenticated = 0;
+            txn_do {
+                if (my $user = rs( User )->find( { id => $auth->{user_id} } )) {
+                    my $user_name = $user->login;
+                    my $tenant_name = $user->tenant_name;
+                    $auth->{user} = $user;
+                    $auth->{user_id} = $auth->{user}->id;
+                    $auth->{authenticated} = 1;
+                    DEBUG "User $user_name in tenant $tenant_name was authenticated with bearer";
+    
+                    my $auth_params = $auth->{session}->auth_params;
+                    if (defined($auth_params)) {
+                        my $user_auth_params = decode_json($auth_params->parameters);
+                        @{$auth->{params}}{keys %$user_auth_params} = values %$user_auth_params;
+                        DEBUG "Auth parameters ".$auth_params->id." were set for $user_name";
+                    }
+    
+                    $is_authenticated = 1;
+                } else {
+                    DEBUG "Token $token is authenticated but related user is not registered in QVD database";
+                }
+            };
+            return $is_authenticated;
         }
     }
 

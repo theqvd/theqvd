@@ -1,0 +1,5 @@
+
+all: qvd-slaveserver-wrapper
+
+clean:
+	rm *.exe

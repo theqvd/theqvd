@@ -24,7 +24,10 @@ Up.Views.MainView = Backbone.View.extend({
         
         // Add the commonly used templates
         this.addCommonTemplates();
-
+        
+        // Bind common events
+        Up.B.bindCommonEvents();
+        
         var that = this;
         this.render = _.wrap(this.render, function(render) { 
             that.beforeRender(); 

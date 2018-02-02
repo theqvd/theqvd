@@ -1,0 +1,307 @@
+`configure' configures pulseaudio 10.0-233-gf724 to adapt to many kinds of systems.
+
+Usage: ./configure [OPTION]... [VAR=VALUE]...
+
+To assign environment variables (e.g., CC, CFLAGS...), specify them as
+VAR=VALUE.  See below for descriptions of some of the useful variables.
+
+Defaults for the options are specified in brackets.
+
+Configuration:
+  -h, --help              display this help and exit
+      --help=short        display options specific to this package
+      --help=recursive    display the short help of all the included packages
+  -V, --version           display version information and exit
+  -q, --quiet, --silent   do not print `checking ...' messages
+      --cache-file=FILE   cache test results in FILE [disabled]
+  -C, --config-cache      alias for `--cache-file=config.cache'
+  -n, --no-create         do not create output files
+      --srcdir=DIR        find the sources in DIR [configure dir or `..']
+
+Installation directories:
+  --prefix=PREFIX         install architecture-independent files in PREFIX
+                          [/usr/local]
+  --exec-prefix=EPREFIX   install architecture-dependent files in EPREFIX
+                          [PREFIX]
+
+By default, `make install' will install all the files in
+`/usr/local/bin', `/usr/local/lib' etc.  You can specify
+an installation prefix other than `/usr/local' using `--prefix',
+for instance `--prefix=$HOME'.
+
+For better control, use the options below.
+
+Fine tuning of the installation directories:
+  --bindir=DIR            user executables [EPREFIX/bin]
+  --sbindir=DIR           system admin executables [EPREFIX/sbin]
+  --libexecdir=DIR        program executables [EPREFIX/libexec]
+  --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
+  --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
+  --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+  --libdir=DIR            object code libraries [EPREFIX/lib]
+  --includedir=DIR        C header files [PREFIX/include]
+  --oldincludedir=DIR     C header files for non-gcc [/usr/include]
+  --datarootdir=DIR       read-only arch.-independent data root [PREFIX/share]
+  --datadir=DIR           read-only architecture-independent data [DATAROOTDIR]
+  --infodir=DIR           info documentation [DATAROOTDIR/info]
+  --localedir=DIR         locale-dependent data [DATAROOTDIR/locale]
+  --mandir=DIR            man documentation [DATAROOTDIR/man]
+  --docdir=DIR            documentation root [DATAROOTDIR/doc/pulseaudio]
+  --htmldir=DIR           html documentation [DOCDIR]
+  --dvidir=DIR            dvi documentation [DOCDIR]
+  --pdfdir=DIR            pdf documentation [DOCDIR]
+  --psdir=DIR             ps documentation [DOCDIR]
+
+Program names:
+  --program-prefix=PREFIX            prepend PREFIX to installed program names
+  --program-suffix=SUFFIX            append SUFFIX to installed program names
+  --program-transform-name=PROGRAM   run sed PROGRAM on installed program names
+
+System types:
+  --build=BUILD     configure for building on BUILD [guessed]
+  --host=HOST       cross-compile to build programs to run on HOST [BUILD]
+
+Optional Features:
+  --disable-option-checking  ignore unrecognized --enable/--with options
+  --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
+  --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --enable-silent-rules   less verbose build output (undo: "make V=1")
+  --disable-silent-rules  verbose build output (undo: "make V=0")
+  --enable-dependency-tracking
+                          do not reject slow dependency extractors
+  --disable-dependency-tracking
+                          speeds up one-time build
+  --disable-nls           do not use Native Language Support
+  --disable-rpath         do not hardcode runtime library paths
+  --disable-atomic-arm-linux-helpers
+                          use inline asm or libatomic_ops instead
+  --enable-atomic-arm-memory-barrier
+                          only really needed in SMP arm systems
+  --enable-neon-opt       Enable NEON optimisations on ARM CPUs that support
+                          it
+  --enable-static[=PKGS]  build static libraries [default=no]
+  --enable-shared[=PKGS]  build shared libraries [default=yes]
+  --enable-fast-install[=PKGS]
+                          optimize for fast installation [default=yes]
+  --disable-libtool-lock  avoid locking (might break parallel builds)
+  --disable-largefile     omit support for large files
+  --disable-memfd         Disable Linux memfd shared memory
+  --disable-x11           Disable optional X11 support
+  --disable-tests         Disable unit tests
+  --enable-samplerate     Enable optional libsamplerate support (DEPRECATED)
+  --disable-oss-output    Disable optional OSS output support
+  --disable-oss-wrapper   Disable optional OSS wrapper support
+  --disable-coreaudio-output
+                          Disable optional CoreAudio output support
+  --disable-alsa          Disable optional ALSA support
+  --disable-esound        Disable optional EsounD support
+  --disable-solaris       Disable optional Solaris audio support
+  --disable-waveout       Disable optional WaveOut audio support
+  --disable-glib2         Disable optional GLib 2 support
+  --disable-gtk3          Disable optional Gtk+ 3 support
+  --disable-gconf         Disable optional GConf support
+  --disable-avahi         Disable optional Avahi support
+  --disable-jack          Disable optional JACK support
+  --disable-asyncns       Disable optional Async DNS support
+  --disable-tcpwrap       Disable optional TCP wrappers support
+  --disable-lirc          Disable optional LIRC support
+  --disable-dbus          Disable optional D-Bus support
+  --disable-bluez4        Disable optional BlueZ 4 support
+  --disable-bluez5        Disable optional BlueZ 5 support
+  --disable-bluez5-ofono-headset
+                          Disable optional ofono headset backend support
+                          (Bluez 5)
+  --disable-bluez5-native-headset
+                          Disable optional native headset backend support
+                          (Bluez 5)
+  --disable-udev          Disable optional UDEV support
+  --disable-hal-compat    Disable optional HAL->udev transition compatibility
+                          support
+  --disable-ipv6          Disable optional IPv6 support
+  --disable-openssl       Disable OpenSSL support (used for Airtunes/RAOP)
+  --enable-gcov           Enable optional gcov coverage analysis
+  --enable-orc            use Orc if installed
+  --disable-systemd-daemon
+                          Disable optional systemd daemon (socket activation)
+                          support
+  --disable-systemd-login Disable optional systemd login support
+  --disable-systemd-journal
+                          Disable optional systemd journal support
+  --disable-manpages      Disable building and installation of man pages
+  --disable-per-user-esound-socket
+                          Use global esound socket directory /tmp/.esd/socket.
+  --enable-mac-universal  Build Mac universal binaries
+  --enable-webrtc-aec     Enable the optional WebRTC-based echo canceller
+  --enable-adrian-aec     Enable Adrian's optional echo canceller
+  --disable-default-build-tests
+                          Build test programs only during make check
+  --disable-legacy-database-entry-format
+                          Try to load legacy (< 1.0) database files (card,
+                          device and volume restore).
+  --enable-static-bins    Statically link executables.
+  --enable-force-preopen  Preopen modules, even when dlopen() is supported.
+
+Optional Packages:
+  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-gnu-ld           assume the C compiler uses GNU ld default=no
+  --with-libiconv-prefix[=DIR]  search for libiconv in DIR/include and DIR/lib
+  --without-libiconv-prefix     don't search for libiconv in includedir and libdir
+  --with-libintl-prefix[=DIR]  search for libintl in DIR/include and DIR/lib
+  --without-libintl-prefix     don't search for libintl in includedir and libdir
+  --with-pic[=PKGS]       try to use only PIC/non-PIC objects [default=use
+                          both]
+  --with-aix-soname=aix|svr4|both
+                          shared library versioning (aka "SONAME") variant to
+                          provide on AIX, [default=aix].
+  --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
+  --with-sysroot[=DIR]    Search for dependent libraries within DIR (or the
+                          compiler's sysroot if not specified).
+  --without-caps          Omit support for dropping capabilities.
+  --with-database=auto|tdb|gdbm|simple
+                          Choose database backend.
+  --with-pulsedsp-location
+                          Specify location where OSS wrapper will be installed
+  --without-fftw          Omit FFTW-using modules (equalizer)
+  --without-speex         Omit speex (resampling, AEC)
+  --without-opus          Omit opus (transcoding, tunnel)
+  --without-soxr          Omit soxr (resampling)
+  --with-systemduserunitdir=DIR
+                          Directory for systemd user service files
+  --with-system-user=<user>
+                          User for running the PulseAudio daemon as a
+                          system-wide instance (pulse)
+  --with-system-group=<group>
+                          Group for running the PulseAudio daemon as a
+                          system-wide instance (pulse)
+  --with-access-group=<group>
+                          Group which is allowed access to a system-wide
+                          PulseAudio daemon (pulse-access)
+  --with-mac-version-min=<version>
+                          Defines the earliest version of MacOS X that the
+                          executables will run on.
+  --with-mac-sysroot=<path>
+                          SDK basedir to use as the logical root directory for
+                          headers and libraries.
+  --with-preopen-mods     Modules to preopen in daemon (default: all).
+  --with-module-dir       Directory where to install the modules to (defaults
+                          to ${libdir}/pulse-${PA_MAJORMINOR}/modules
+  --with-udev-rules-dir   Directory where to install udev rules to (defaults
+                          to /lib/udev/rules.d)
+  --with-bash-completion-dir=DIR
+                          Directory for bash completion files
+  --with-zsh-completion-dir
+                          Zsh completions directory (defaults to
+                          ${datadir}/zsh/site-functions)
+
+Some influential environment variables:
+  CC          C compiler command
+  CFLAGS      C compiler flags
+  LDFLAGS     linker flags, e.g. -L<lib dir> if you have libraries in a
+              nonstandard directory <lib dir>
+  LIBS        libraries to pass to the linker, e.g. -l<library>
+  CPPFLAGS    (Objective) C/C++ preprocessor flags, e.g. -I<include dir> if
+              you have headers in a nonstandard directory <include dir>
+  CXX         C++ compiler command
+  CXXFLAGS    C++ compiler flags
+  CPP         C preprocessor
+  PKG_CONFIG  path to pkg-config utility
+  PKG_CONFIG_PATH
+              directories to add to pkg-config's search path
+  PKG_CONFIG_LIBDIR
+              path overriding pkg-config's built-in search path
+  LT_SYS_LIBRARY_PATH
+              User-defined run-time library search path.
+  CXXCPP      C++ preprocessor
+  X11_CFLAGS  C compiler flags for X11, overriding pkg-config
+  X11_LIBS    linker flags for X11, overriding pkg-config
+  LIBCHECK_CFLAGS
+              C compiler flags for LIBCHECK, overriding pkg-config
+  LIBCHECK_LIBS
+              linker flags for LIBCHECK, overriding pkg-config
+  LIBSNDFILE_CFLAGS
+              C compiler flags for LIBSNDFILE, overriding pkg-config
+  LIBSNDFILE_LIBS
+              linker flags for LIBSNDFILE, overriding pkg-config
+  LIBSAMPLERATE_CFLAGS
+              C compiler flags for LIBSAMPLERATE, overriding pkg-config
+  LIBSAMPLERATE_LIBS
+              linker flags for LIBSAMPLERATE, overriding pkg-config
+  TDB_CFLAGS  C compiler flags for TDB, overriding pkg-config
+  TDB_LIBS    linker flags for TDB, overriding pkg-config
+  ASOUNDLIB_CFLAGS
+              C compiler flags for ASOUNDLIB, overriding pkg-config
+  ASOUNDLIB_LIBS
+              linker flags for ASOUNDLIB, overriding pkg-config
+  GLIB20_CFLAGS
+              C compiler flags for GLIB20, overriding pkg-config
+  GLIB20_LIBS linker flags for GLIB20, overriding pkg-config
+  GTK30_CFLAGS
+              C compiler flags for GTK30, overriding pkg-config
+  GTK30_LIBS  linker flags for GTK30, overriding pkg-config
+  GCONF_CFLAGS
+              C compiler flags for GCONF, overriding pkg-config
+  GCONF_LIBS  linker flags for GCONF, overriding pkg-config
+  AVAHI_CFLAGS
+              C compiler flags for AVAHI, overriding pkg-config
+  AVAHI_LIBS  linker flags for AVAHI, overriding pkg-config
+  JACK_CFLAGS C compiler flags for JACK, overriding pkg-config
+  JACK_LIBS   linker flags for JACK, overriding pkg-config
+  LIBASYNCNS_CFLAGS
+              C compiler flags for LIBASYNCNS, overriding pkg-config
+  LIBASYNCNS_LIBS
+              linker flags for LIBASYNCNS, overriding pkg-config
+  DBUS_CFLAGS C compiler flags for DBUS, overriding pkg-config
+  DBUS_LIBS   linker flags for DBUS, overriding pkg-config
+  SBC_CFLAGS  C compiler flags for SBC, overriding pkg-config
+  SBC_LIBS    linker flags for SBC, overriding pkg-config
+  BLUEZ_CFLAGS
+              C compiler flags for BLUEZ, overriding pkg-config
+  BLUEZ_LIBS  linker flags for BLUEZ, overriding pkg-config
+  UDEV_CFLAGS C compiler flags for UDEV, overriding pkg-config
+  UDEV_LIBS   linker flags for UDEV, overriding pkg-config
+  OPENSSL_CFLAGS
+              C compiler flags for OPENSSL, overriding pkg-config
+  OPENSSL_LIBS
+              linker flags for OPENSSL, overriding pkg-config
+  FFTW_CFLAGS C compiler flags for FFTW, overriding pkg-config
+  FFTW_LIBS   linker flags for FFTW, overriding pkg-config
+  LIBSPEEX_CFLAGS
+              C compiler flags for LIBSPEEX, overriding pkg-config
+  LIBSPEEX_LIBS
+              linker flags for LIBSPEEX, overriding pkg-config
+  LIBOPUS_CFLAGS
+              C compiler flags for LIBOPUS, overriding pkg-config
+  LIBOPUS_LIBS
+              linker flags for LIBOPUS, overriding pkg-config
+  LIBSOXR_CFLAGS
+              C compiler flags for LIBSOXR, overriding pkg-config
+  LIBSOXR_LIBS
+              linker flags for LIBSOXR, overriding pkg-config
+  ORC_CFLAGS  C compiler flags for ORC, overriding pkg-config
+  ORC_LIBS    linker flags for ORC, overriding pkg-config
+  SYSTEMD_CFLAGS
+              C compiler flags for SYSTEMD, overriding pkg-config
+  SYSTEMD_LIBS
+              linker flags for SYSTEMD, overriding pkg-config
+  SYSTEMDDAEMON_CFLAGS
+              C compiler flags for SYSTEMDDAEMON, overriding pkg-config
+  SYSTEMDDAEMON_LIBS
+              linker flags for SYSTEMDDAEMON, overriding pkg-config
+  SYSTEMDLOGIN_CFLAGS
+              C compiler flags for SYSTEMDLOGIN, overriding pkg-config
+  SYSTEMDLOGIN_LIBS
+              linker flags for SYSTEMDLOGIN, overriding pkg-config
+  SYSTEMDJOURNAL_CFLAGS
+              C compiler flags for SYSTEMDJOURNAL, overriding pkg-config
+  SYSTEMDJOURNAL_LIBS
+              linker flags for SYSTEMDJOURNAL, overriding pkg-config
+  WEBRTC_CFLAGS
+              C compiler flags for WEBRTC, overriding pkg-config
+  WEBRTC_LIBS linker flags for WEBRTC, overriding pkg-config
+
+Use these variables to override the choices made by `configure' or to help
+it to find libraries and programs with nonstandard names/locations.
+
+Report bugs to <pulseaudio-discuss (at) lists (dot) freedesktop (dot) org>.
+pulseaudio home page: <http://pulseaudio.org/>.

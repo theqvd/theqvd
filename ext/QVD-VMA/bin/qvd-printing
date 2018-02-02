@@ -1,50 +1,289 @@
-#!/usr/bin/perl
-use LWP::Simple;               
-use JSON qw( decode_json );    
-use Data::Dumper;
-use strict;                     
-use warnings;                 
+#!/usr/lib/qvd/bin/perl
 
+use strict;
+use warnings;
+use 5.010;
+
+use QVD::VMA::Setup;
+use QVD::Config::Core;
+use QVD::Log;
+use URI::Escape qw(uri_escape);
+
+use LWP::Simple;
+use Data::Dumper;
+
+my $lpadmin = core_cfg('command.lpadmin');
+my $lpstat = core_cfg('command.lpstat');
+my $smbclient = core_cfg('command.smbclient');
+my $cupsenable = core_cfg('command.cupsenable');
+my $cupsaccept = core_cfg('command.cupsaccept');
+my $systemctl = core_cfg('command.systemctl');
+my $init_d_cups = core_cfg('command.init_d.cups');
+
+my $timeout = core_cfg('internal.vma.printing.timeout');
+
+DEBUG "qvd-printing hook called with arguments: @ARGV";
 
 my %params = @ARGV;
-my $lpadmin = '/usr/sbin/lpadmin';
-	# Remove all printers that might already be configured
-	my @printers = map { /^([^ ]+)/, $1} `lpstat -a`;
-	for my $prt (@printers) {
-	    next unless $prt =~ /^QVD-/;
-	    system($lpadmin, "-x", $prt);
-	}
 
-	if ($params{'qvd.hook.on_printing'} eq 'connected') {
-		my $client_os = $params{'qvd.client.os'};
-		my $prt_port = $params{'qvd.printing.port'};
-		if ($params{'qvd.client.os'} eq 'windows') {
-			my @lst = grep /^Printer/, `smbclient -L 127.0.0.1 -p $prt_port -gN`;
-			my %printers = map { /^Printer\|([^|]+)\|(.*)$/, $1 => $2} @lst;
-			while (my ($k, $v) = each(%printers)) {
-				(my $d = $v) =~ tr/[A-Za-z0-9]/_/c;
-				$k =~ s/ /%20/g;
-				system($lpadmin, "-p", "QVD-$d", "-D", "$v", "-v", "smb://LOCALHOST:$prt_port/$k",  "-E");
+_remove_all_qvd_printers(); # we remove then in every call.
+
+if ($params{'qvd.hook.on_printing'} eq 'connected') {
+    my $client_os = $params{'qvd.client.os'};
+    my $ptr_port = $params{'qvd.printing.port'};
+
+    my $flavor = $params{'qvd.client.printing.flavor'} //
+        ($client_os eq 'windows' ? 'cifs' : 'ipp');
+
+    if ($flavor eq 'cifs') {
+        if (open my $fh, '-|', $smbclient, -L => '127.0.0.1', -p => $ptr_port, '-gN') {
+            my %ptrs;
+            while (<$fh>) {
+                if (my ($target, $desc) = /^Printer\|([^|]+)\|(.*)$/) {
+                    $ptrs{$desc} = $target;
+                }
+            }
+
+            for my $desc (keys %ptrs) {
+                my $name = "QVD-$desc";
+                $name =~ tr/[A-Za-z0-9\-]/_/c;
+                INFO "Registering printer '$name'";
+                system($lpadmin,
+                       -p => $name,
+                       -D => $desc,
+                       -v => "smb://LOCALHOST:$ptr_port/".uri_escape($ptrs{$desc}),
+                       '-E')
+                    and ERROR "Unable to register printer '$desc', lpadmin failed";
+            }
+        }
+        else {
+            ERROR "Unable to retrieve printer list, smbclient failed: $!";
+        }
+    }
+    elsif ($flavor eq 'ipp') {
+        my $default_set;
+        if (open my $fh, '-|', 'lpstat', -h => "127.0.0.1:$ptr_port", '-a') {
+            if (my ($ptr) = /^(\S+)/) {
+                INFO "Registering printer 'QVD-$ptr'";
+                if (system($lpadmin,
+                           -p => "QVD-$ptr",
+                           -v => "ipp://127.0.0.1:$ptr_port/printers/$ptr",
+                           '-E') == 0) {
+                    # Set the first printer as the default
+                    # one. Otherwise the lp tools complain there is
+                    # "no default destination available" when trying
+                    # to print without specifying a printer. Newer
+                    # software using CUPS doesn't seem to care.
+                    system($lpadmin, "-d", "QVD-$ptr")
+                        unless $default_set++;
+                }
+                else {
+                    ERROR "Unable to register printer '$ptr', lpadmin failed: $?";
+                }
+            }
+        }
+    }
+    elsif ($flavor eq 'slave4') {
+        require QVD::SimpleRPC::Client;
+        my $slave_port = $params{'qvd.slave.port'};
+        my $slavec = QVD::SimpleRPC::Client->new("http://localhost:$slave_port/",
+                                                 timeout => $timeout);
+
+        my $work_dir = core_cfg('path.vma.run.printing');
+        _mkpath($work_dir);
+        my $ppd_dir = "$work_dir/ppd";
+        _mkpath($ppd_dir);
+
+        if (my @ptrs = eval { @{$slavec->printer->{Printers}} }) {
+            for my $ptr (@ptrs) {
+                my $qvd_id = "QVD-$ptr->{qvd_id}";
+
+                INFO "Registering printer '$qvd_id'";
+
+                my $ppd_fn = "$ppd_dir/print_${qvd_id}_driver.ppd";
+                if (_write_ppd($ppd_fn,
+                               name => $ptr->{name},
+                               duplex => _json_boolean($ptr->{duplex}),
+                               color => _json_boolean($ptr->{color}))) {
+		    for my $cmd ([$lpadmin, -p => $qvd_id, -v => 'tea4cups://', -P => $ppd_fn,
+				  -D => $ptr->{name}, -L => "QVD Client"],
+				 [$cupsenable, $qvd_id],
+				 [$cupsaccept, $qvd_id]) {
+			DEBUG "Running cmd @$cmd";
+			if (system @$cmd) {
+			    ERROR "Unable to register printer '$qvd_id' ('$ptr->{name}'), command '$cmd->[0]' failed: $?";
+			    last;
 			}
-		} else {
-			my @printers = map { /^([^ ]+)/, $1} `lpstat -h 127.0.0.1:$prt_port -a`;
-			my $default_set;
+		    }
+                }
+            }
+        }
+        else {
+            INFO "No remote printers found";
+        }
+    }
+}
 
-			for my $prt (@printers) {
-				system($lpadmin, "-p", "QVD-$prt", "-v", "ipp://127.0.0.1:$prt_port/printers/$prt", "-E");
+sub _mkpath {
+    my ($path, $mask) = @_;
+    $mask ||= 0755;
+    my @dirs;
+    my @parts = File::Spec->splitdir(File::Spec->rel2abs($path));
+    while (@parts) {
+        my $dir = File::Spec->join(@parts);
+        if (-d $dir) {
+            -d $_ or mkdir $_, $mask or return for @dirs;
+            return -d $path;
+        }
+        unshift @dirs, $dir;
+        pop @parts;
+    }
+    return;
+}
 
-				if (!$default_set) {
-					# Set the first printer as the default one. Otherwise the lp tools
-					# complain there is "no default destination available" when trying
-					# to print without specifying a printer.
-					#
-					# Newer software that uses CUPS doesn't seem to care.
+sub _json_boolean {
+    my $v = shift;
+    return 1 if defined $v and $v =~ /^\s*(?:true|yes|1)\s*$/i;
+    0;
+}
 
-					system($lpadmin, "-d", "QVD-$prt");
-					$default_set = 1;
-				}
-			}
-		}
-	}		
+sub _remove_all_qvd_printers {
+    # Remove all QVD printers that might already be configured
+    if (open my $fh, '-|', $lpstat, '-a') {
+        while (<$fh>) {
+            if (my ($ptr) = /^(QVD-\S+)/) {
+                INFO "Removing printer $ptr";
+                system $lpadmin, -x => $ptr
+                    and ERROR "Unable to remove printer '$ptr', lpadmin failed: $?";
+            }
+        }
+    }
+    else {
+        ERROR "Unable to run lpstat: $!";
+    }
+}
 
+sub _write_ppd {
+    my ($fn, %opts) = @_;
 
+    open my $fh, '>', $fn or do {
+        ERROR "Unable to create file '$fn': $!";
+        return;
+    };
+
+    my ($color_device, $default_color_space) = ($opts{color}
+                                                ? ('True', 'CMYK')
+                                                : ('False', 'Gray'));
+
+    print {$fh} <<EOP;
+*PPD-Adobe: 4.3
+*%%%% Created by the CUPS PPD Compiler CUPS v2.1.4.
+*FormatVersion: "4.3"
+*FileVersion: "1.0"
+*LanguageVersion: English
+*LanguageEncoding: ISOLatin1
+*PCFileName: "$fn"
+
+*Product: "($opts{name})"
+*Manufacturer: "Foo"
+*ModelName: "FooJet 2000"
+*ShortNickName: "$opts{name}"
+*NickName: "$opts{name}, 1.0"
+*PSVersion: "(3010.000) 0"
+*LanguageLevel: "3"
+
+*%%%% Color config.
+*ColorDevice: $color_device
+*DefaultColorSpace: $default_color_space
+EOP
+
+    print {$fh} <<EOP if $opts{duplex};
+*%%%% %====Duplex===.
+*OpenUI *Duplex: PickOne
+*OrderDependency: 25 AnySetup *Duplex
+*DefaultDuplex: None
+*Duplex DuplexTumble: "<</Duplex true /Tumble true>>setpagedevice"
+*Duplex DuplexNoTumble: "<</Duplex false /Tumble false>>setpagedevice"
+*Duplex None: "<</Duplex false /Tumble false>>setpagedevice"
+*CloseUI: *Duplex
+EOP
+
+    print {$fh} <<EOP;
+*FileSystem: False
+*Throughput: "1"
+*LandscapeOrientation: Plus90
+*TTRasterizer: Type42
+*cupsVersion: 2.1
+*cupsModelNumber: 0
+*cupsManualCopies: False
+*cupsLanguages: "en"
+*OpenUI *PageSize/Media Size: PickOne
+*OrderDependency: 10 AnySetup *PageSize
+*DefaultPageSize: Letter
+*PageSize Letter/US Letter: "<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*PageSize A4/A4: "<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageSize
+*OpenUI *PageRegion/Media Size: PickOne
+*OrderDependency: 10 AnySetup *PageRegion
+*DefaultPageRegion: Letter
+*PageRegion Letter/US Letter: "<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*PageRegion A4/A4: "<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageRegion
+*DefaultImageableArea: Letter
+*ImageableArea Letter/US Letter: "0 0 612 792"
+*ImageableArea A4/A4: "0 0 595 842"
+*DefaultPaperDimension: Letter
+*PaperDimension Letter/US Letter: "612 792"
+*PaperDimension A4/A4: "595 842"
+*OpenUI *Resolution/Resolution: PickOne
+*OrderDependency: 10 AnySetup *Resolution
+*DefaultResolution: 600dpi
+*Resolution 600dpi/600 DPI: "<</HWResolution[600 600]/cupsBitsPerColor 8/cupsRowCount 0/cupsRowFeed 0/cupsRowStep 0/cupsColorSpace 3>>setpagedevice"
+*CloseUI: *Resolution
+*DefaultFont: Courier
+*Font AvantGarde-Book: Standard "(1.05)" Standard ROM
+*Font AvantGarde-BookOblique: Standard "(1.05)" Standard ROM
+*Font AvantGarde-Demi: Standard "(1.05)" Standard ROM
+*Font AvantGarde-DemiOblique: Standard "(1.05)" Standard ROM
+*Font Bookman-Demi: Standard "(1.05)" Standard ROM
+*Font Bookman-DemiItalic: Standard "(1.05)" Standard ROM
+*Font Bookman-Light: Standard "(1.05)" Standard ROM
+*Font Bookman-LightItalic: Standard "(1.05)" Standard ROM
+*Font Courier: Standard "(1.05)" Standard ROM
+*Font Courier-Bold: Standard "(1.05)" Standard ROM
+*Font Courier-BoldOblique: Standard "(1.05)" Standard ROM
+*Font Courier-Oblique: Standard "(1.05)" Standard ROM
+*Font Helvetica: Standard "(1.05)" Standard ROM
+*Font Helvetica-Bold: Standard "(1.05)" Standard ROM
+*Font Helvetica-BoldOblique: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow-Bold: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow-BoldOblique: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow-Oblique: Standard "(1.05)" Standard ROM
+*Font Helvetica-Oblique: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-Bold: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-BoldItalic: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-Italic: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-Roman: Standard "(1.05)" Standard ROM
+*Font Palatino-Bold: Standard "(1.05)" Standard ROM
+*Font Palatino-BoldItalic: Standard "(1.05)" Standard ROM
+*Font Palatino-Italic: Standard "(1.05)" Standard ROM
+*Font Palatino-Roman: Standard "(1.05)" Standard ROM
+*Font Symbol: Special "(001.005)" Special ROM
+*Font Times-Bold: Standard "(1.05)" Standard ROM
+*Font Times-BoldItalic: Standard "(1.05)" Standard ROM
+*Font Times-Italic: Standard "(1.05)" Standard ROM
+*Font Times-Roman: Standard "(1.05)" Standard ROM
+*Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
+*Font ZapfDingbats: Special "(001.005)" Special ROM
+*%%%% End of "$fn".
+EOP
+
+    unless (close $fh) {
+        ERROR "Unable to write PPD into $fn: $!";
+        return;
+    }
+
+    DEBUG "PPD file correctly written at $fn";
+    return 1;
+}

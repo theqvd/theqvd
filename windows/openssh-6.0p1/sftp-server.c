@@ -1509,6 +1509,8 @@ sftp_server_usage(void)
 	exit(1);
 }
 
+typedef char * LPCTSTR;
+
 int
 sftp_server_main(int argc, char **argv, struct passwd *user_pw)
 {

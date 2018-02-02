@@ -22,7 +22,6 @@ WriteMakefile(
         'Mojo::URL' => 0,
         'Mojo::UserAgent' => 0,
         'Moo' => 0,
-        'QVD::API::REST::Filter' => 0,
         'QVD::Config' => 0,
         'Term::ReadKey' => 0,
         'Text::SimpleTable::AutoWidth' => 0,

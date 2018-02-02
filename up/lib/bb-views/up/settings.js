@@ -8,7 +8,7 @@ Up.Views.SettingsView = Up.Views.ListView.extend({
     
     settingsEvents: {
         'click .js-delete-workspace-btn': 'deleteWorkspace',
-        'click .js-active-workspace-btn.js-button-activable': 'activeWorkspace',
+        'click .js-active-workspace-btn.js-button-activable': 'activeWorkspaceFromSettings',
         'click .js-button-settings-conf': 'editWorkspace',
         'click .js-button-settings-options': 'optionsWorkspace',
         'click .js-new-workspace-btn': 'newWorkspace',
@@ -80,7 +80,7 @@ Up.Views.SettingsView = Up.Views.ListView.extend({
             Up.TPL.settingsOptions, {
                 model: model,
                 canBeDisabled: canBeDisabled,
-                settingsDisabledList: Up.I.getSettingsDisabledList(model)
+                settingsEnabled: model.get('settings_enabled')
             }
         );
         
@@ -103,5 +103,12 @@ Up.Views.SettingsView = Up.Views.ListView.extend({
     
     loadSettingsSection: function (e) {
         this.renderList();
+    },
+    
+    activeWorkspaceFromSettings: function (e) {
+        var selectedId = parseInt($(e.target).attr('data-id'));
+        var model = Up.CurrentView.collection.findWhere({id: selectedId});
+        
+        this.activeWorkspace(model, Up.CurrentView.render);
     }
 });

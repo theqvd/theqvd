@@ -43,6 +43,9 @@ Wat.WS.changeWebsocketVm = function (id, field, data, viewType, row) {
                         Wat.CurrentView.restarting = false;
                         Wat.CurrentView.startVM();
                     }
+                    
+                    // Hide execution imagen warning icon
+                    $('.js-execution-image-warning[data-id="' + id + '"]').hide();
                     break;
                 case 'starting':
                     $('[data-wsupdate="state"][data-id="' + id + '"]').attr('class', CLASS_ICON_STATUS_STARTING);

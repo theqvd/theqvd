@@ -295,14 +295,3 @@ Wat.C.aclGroups.statisticsBlockedObjects = [
     'host.stats.blocked',
     'di.stats.blocked'
 ];
-
-///////////////////////////////
-// Properties
-///////////////////////////////
-Wat.C.aclGroups.propertiesManagement = [
-    'property.manage.user',
-    'property.manage.vm',
-    'property.manage.host',
-    'property.manage.osf',
-    'property.manage.di'
-];

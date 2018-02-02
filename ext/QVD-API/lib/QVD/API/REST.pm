@@ -127,69 +127,81 @@ sub process_query
 {
    my ($self,$json) = @_;
    my ($response,$json_wrapper,$action,$qvd_object_model);
-
-   try {
-
-# Creates an action related to the input query
-# with all the info in the system for that action
-
-       $json_wrapper = QVD::API::REST::JSON->new(json => $json);
-
-       $action = QVD::API::Action->new(name => $json_wrapper->action);
-
-       $qvd_object_model = $self->get_qvd_object_model($action) if $action->qvd_object;
-
-# Checks if the asked action is available for the current admin
-
-       eval { QVD::API::Exception->throw(code => 4210) 
-		  unless $action->available_for_admin($self->administrator) };
-
-       my $e = $@ ? QVD::API::Exception->new(exception => $@) : undef;
-
-       QVD::API::LogReport->new(
-
-	   action => { action => $action->name,
-		       type_of_action => $qvd_object_model->type_of_action_log_style },
-	   qvd_object => $qvd_object_model->qvd_object_log_style,
-	   tenant => $self->administrator->tenant,
-	   object => undef,
-	   administrator => $self->administrator,
-	   ip => $json_wrapper->get_parameter_value('remote_address'),
-	   source => $json_wrapper->get_parameter_value('source'),
-	   arguments => {},
-	   status => $e->code 
-	   
-	   )->report if $e && $qvd_object_model;
     
-       $e->throw if $e;
-
-# Gets the method that must be executed in order to execute the
-# requested action
-
-       my $restmethod = $action->restmethod;
-
-# Executes that method and builds the answer
-	
-       my $result = $self->$restmethod($action,$json_wrapper,$qvd_object_model);
-
-       my %args = (
-           status => 0,
-           data => $result
-       );
-       $args{json_wrapper} = $json_wrapper;
-       $args{qvd_object_model} = $qvd_object_model
-           if $qvd_object_model;
-       $args{administrator} = $self->administrator;
-
-       $response = QVD::API::REST::Response->new(%args);
-
-   } catch ( QVD::API::Exception $err ) {
-       $response = $err;
-
-   } catch ($err) {
-       print $err;
-       $response = QVD::API::Exception->new(code => 1100);
-   }
+    try {
+        
+        # Creates an action related to the input query
+        # with all the info in the system for that action
+        
+        $json_wrapper = QVD::API::REST::JSON->new(json => $json);
+        
+        $action = QVD::API::Action->new(name => $json_wrapper->action);
+        
+        $qvd_object_model = $self->get_qvd_object_model($action) if $action->qvd_object;
+        
+        # Checks if the asked action is available for the current admin
+        
+        eval { QVD::API::Exception->throw(code => 4210)
+            unless $action->available_for_admin($self->administrator) };
+        
+        my $e = $@ ? QVD::API::Exception->new(exception => $@) : undef;
+        
+        QVD::API::LogReport->new(
+            
+            action => {
+                action => $action->name, 
+                type_of_action => $qvd_object_model->type_of_action_log_style
+            },
+            qvd_object => $qvd_object_model->qvd_object_log_style,
+            tenant => $self->administrator->tenant,
+            object => undef,
+            administrator => $self->administrator,
+            ip => $json_wrapper->get_parameter_value('remote_address'),
+            source => $json_wrapper->get_parameter_value('source'),
+            arguments => {},
+            status => $e->code
+        
+        )->report if $e && $qvd_object_model;
+        
+        $e->throw if $e;
+        
+        # Gets the method that must be executed in order to execute the
+        # requested action
+        
+        my $restmethod = $action->restmethod;
+        
+        # Executes that method and builds the answer
+        
+        my $result = $self->$restmethod($action,$json_wrapper,$qvd_object_model);
+        
+        my %args = (
+            status => 0,
+            data => $result
+        );
+        $args{json_wrapper} = $json_wrapper;
+        $args{qvd_object_model} = $qvd_object_model
+            if $qvd_object_model;
+        $args{administrator} = $self->administrator;
+        
+        $response = QVD::API::REST::Response->new(%args);
+        
+    } catch ( QVD::API::Exception $exception ) {
+        print STDOUT "[ERROR] QVD API Exception throwed\n";
+        print STDOUT "[ERROR] " . $exception->message . " : " . $exception->get_additional_info . "\n";
+        print STDERR ">>>>>>>>> STACK TRACE >>>>>>>>>\n";
+        print STDERR $exception->get_stack_trace;
+        print STDERR "<<<<<<<<< STACK TRACE <<<<<<<<<\n";
+        $response = $exception;
+    } catch ($err) {
+        # These exceptions are not expected at all and should be captured if possible
+        my $exception = QVD::API::Exception->new(exception => $err);
+        print STDOUT "[ERROR] Unexpected Exception throwed\n";
+        print STDOUT "[ERROR] " . $exception->message . " : " . $exception->get_additional_info . "\n";
+        print STDERR ">>>>>>>>> STACK TRACE >>>>>>>>>\n";
+        print STDERR $exception->get_stack_trace;
+        print STDERR "<<<<<<<<< STACK TRACE <<<<<<<<<\n";
+        $response = $exception;
+    }
 
    $response->json;
 }

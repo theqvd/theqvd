@@ -215,7 +215,7 @@ Up.CRUD.desktops = {
                     Up.I.closeDialog($(this));
                 }
             },
-            buttonClasses : [CLASS_ICON_CANCEL, CLASS_ICON_CLIENT_DOWNLOAD, CLASS_ICON_DESKTOP_CONNECTED],
+            buttonClasses : [CLASS_ICON_CANCEL, CLASS_ICON_CLIENT_DOWNLOAD, CLASS_ICON_DESKTOP_CONNECT],
             fillCallback : function (target) {
                 // Abort connection animation
                 Up.CurrentView.setDesktopState(selectedId, 'disconnected');

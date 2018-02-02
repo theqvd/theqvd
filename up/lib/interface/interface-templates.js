@@ -51,14 +51,6 @@ Up.I.T = {
 
                 templates["list-grid_desktops"] = {
                     name: 'desktops/desktops-grid'
-                };  
-
-                templates["list-list_desktops"] = {
-                    name: 'desktops/desktops-list'
-                };
-                
-                templates["list-list_desktops"] = {
-                    name: 'desktops/desktops-list'
                 };
                 break;
             case 'spyDesktop':
@@ -132,6 +124,9 @@ Up.I.T = {
                 templates = {
                     settingsEditor: {
                         name: 'settings/settings-editor'
+                    },
+                    settingsEditorParameters: {
+                        name: 'settings/settings-editor-parameters'
                     }
                 }
 

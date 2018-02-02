@@ -3,47 +3,32 @@ package QVD::Client::SlaveServer;
 use strict;
 use warnings;
 
-BEGIN {
-    @QVD::Config::Core::FILES = ( ($ENV{HOME} || $ENV{APPDATA}).'/.qvd/qvd-client-slaveserver.conf' );
-}
-
-use QVD::Config::Core qw(core_cfg set_core_cfg);
-use File::Spec;
-use IO::Select;
-
-our $WINDOWS;
-
-BEGIN {
-    $WINDOWS = ($^O eq 'MSWin32');
-
-    my $user_dir = File::Spec->rel2abs($WINDOWS
-        ? File::Spec->join($ENV{APPDATA}, 'QVD')
-        : File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
-    mkdir $user_dir;
-
-    set_core_cfg('client-slaveserver.log.filename', File::Spec->join($user_dir, 'qvd-client-slaveserver.log'))
-        unless defined core_cfg('client-slaveserver.log.filename', 0);
-    $QVD::Log::DAEMON_NAME = 'client-slaveserver';
-
-	$SIG{PIPE} = sub { die "SIGPIPE"; };
-
-}
-
 our $VERSION = '3.5';
 
+use QVD::Client::Setup;
+
+BEGIN {
+    require parent;
+    parent->import($WINDOWS
+                   ? 'QVD::Client::SlaveServer::Windows'
+                   : 'QVD::Client::SlaveServer::Unix');
+    require QVD::HTTPD;
+    push our(@ISA), 'QVD::HTTPD::INET';
+}
+
 use QVD::Log;
+use QVD::Config::Core qw(core_cfg);
+use IO::Select;
 use QVD::HTTP::Headers qw(header_eq_check header_lookup);
 use QVD::HTTP::StatusCodes qw(:all);
-use QVD::HTTPD;
+
 use File::Spec;
 use URI::Split qw(uri_split);
 use URI;
 use QVD::Client::SlaveServer::Nsplugin;
-use base 'QVD::HTTPD::INET';
 use QVD::Client::USB::USBIP;
 
-
-my $socat = "/usr/bin/socat";
+$SIG{PIPE} = sub { die "SIGPIPE"; };
 
 sub new {
     my ($class) = @_;
@@ -55,8 +40,11 @@ sub new {
     $self->set_http_request_processor(\&handle_get_nsplugin  , GET  => '/nsplugin');
     $self->set_http_request_processor(\&handle_usbip         , POST => '/usbip/connect');
     $self->set_http_request_processor(\&handle_usbip_devices , GET  => '/usbip/shared_devices');
-    $self->set_http_request_processor(\&handle_usbip_check   , GET  => '/usbip/portcheck');    
-    
+    $self->set_http_request_processor(\&handle_usbip_check   , GET  => '/usbip/portcheck');
+
+    $self->set_http_request_processor(\&handle_printer       , GET  => '/printer');
+    $self->set_http_request_processor(\&handle_printer_printjob , POST => '/printer/*/printjob');
+
     if ( core_cfg('client.slave.debug_commands' ) ) {
         $self->set_http_request_processor(\&handle_echo   , POST => '/echo');
         $self->set_http_request_processor(\&handle_discard, POST => '/discard');
@@ -176,51 +164,51 @@ sub handle_fastgen {
 	
 	my $char = $self->_url_to_port($url);
 	if (!$char && $char < 0 || $char > 255 ) {
-		$self->send_http_error(HTTP_BAD_REQUEST, "Character number must be between 0 and 255");
-		return;
+            $self->throw_http_error(HTTP_BAD_REQUEST, "Character number must be between 0 and 255");
 	}
 	
 	$self->send_http_response(HTTP_SWITCHING_PROTOCOLS);
 	
 	my $buf = chr($char) x 1024;
 	while( syswrite(STDOUT, $buf) ) {
-		# nothing
+            # nothing
 	}
 
 }
 
 
 sub handle_connect {
-    my ($self, $method, $url, $headers) = @_;
+    my ($self, $method, $url, $headers, $captures) = @_;
 
-    my $port = $self->_url_to_port($url);
+    my $port = $captures->[0];
+    $self->throw_http_error(HTTP_BAD_REQUEST, "Bad port number")
+        unless defined $port and $port =~ /^\w+$/;
 
-    unless ($port) {
-        $self->send_http_error(HTTP_BAD_REQUEST, "Bad port number");
-        return;
-    }
+    _tcp_connect($port);
 
-    my $pid = fork();
-    if ($pid) {
-        $self->send_http_response(HTTP_SWITCHING_PROTOCOLS);
-        wait;
-    } else {
-        INFO "Connecting to tcp:localhost:$port,nonblock,reuseaddr,nodelay,retry=5";
-        my @cmd = ($socat, "-", "tcp:localhost:$port,nonblock,reuseaddr,nodelay,retry=5");
-        exec @cmd;
-        die "Unable to exec: $^E";
+    if (0) {
+        # move to Unix backend
+
+        my $socat = core_cfg('command.socat');
+
+        my $pid = fork();
+        if ($pid) {
+            $self->send_http_response(HTTP_SWITCHING_PROTOCOLS);
+            wait;
+        } else {
+            INFO "Connecting to tcp:localhost:$port,nonblock,reuseaddr,nodelay,retry=5";
+            my @cmd = ($socat, "-", "tcp:localhost:$port,nonblock,reuseaddr,nodelay,retry=5");
+            exec @cmd;
+            die "Unable to exec: $^E";
+        }
     }
 }
 
 sub handle_port_check {
     my ($self, $method, $url, $headers) = @_;
 
-    my $port = $self->_url_to_port($url);
-
-    unless ($port) {
-        $self->send_http_error(HTTP_BAD_REQUEST, "Bad port number");
-        return;
-    }
+    my $port = $self->_url_to_port($url) ||
+        $self->throw_http_error(HTTP_BAD_REQUEST, "Bad port number");
 
     my $sock = new IO::Socket::INET( PeerAddr => 'localhost',
                                      PeerPort => $port,
@@ -229,16 +217,16 @@ sub handle_port_check {
     if ( $sock ) {
         $self->send_http_response(HTTP_OK);
     } else {
-        $self->send_http_error(HTTP_FORBIDDEN, $!);
+        $self->throw_http_error(HTTP_FORBIDDEN, $!);
     }
 }
 
 sub handle_get_nsplugin {
     my ($httpd, $method, $url, $headers) = @_;
 
-    $httpd->send_http_error(HTTP_BAD_REQUEST)
-        unless header_eq_check($headers, Connection => 'Upgrade')
-           and header_eq_check($headers, Upgrade => 'qvd:slave/1.0');
+    $httpd->throw_http_error(HTTP_BAD_REQUEST)
+        unless ( header_eq_check($headers, Connection => 'Upgrade') and
+                 header_eq_check($headers, Upgrade => 'qvd:slave/1.0') );
 
     my $uri = URI->new($url);
     my %query = $uri->query_form();
@@ -258,7 +246,7 @@ sub handle_usbip_check {
 
 sub handle_usbip {
 	my ($httpd, $method, $url, $headers) = @_;
-	
+
 	# Connecting to usbipd is just port redirection.
 	# We use a dedicated command here so that VMA doesn't need to know
 	# the port.
@@ -269,17 +257,49 @@ sub handle_usbip {
 
 sub handle_usbip_devices {
 	my ($self, $method, $url, $headers) = @_;
-	
+
 	my $usb = QVD::Client::USB::USBIP->new();
 	my @ids;
-	
+
 	foreach my $dev ( @{$usb->list_shared_devices} ) {
 		push @ids, $dev->{busid};
 	}
-	
+
 	$self->send_http_response_with_body(HTTP_OK, 'text/plain', [], join("\n", @ids));
 }
 
+sub handle_printer {
+    my ($self, $method, $url, $headers) = @_;
+    $self->send_http_response_with_body(HTTP_OK, 'application/json', [],
+                                        $self->json->encode({Printers => [ $self->_printers ]}));
+}
+
+sub handle_printer_printjob {
+    my ($self, $method, $url, $headers, $captures) = @_;
+    my $printer_name = $captures->[0] // do {
+        ERROR "printer name missing from end-point";
+        $self->_throw_http_error(HTTP_BAD_REQUEST, "Bad printer name");
+    };
+
+    my $fn = $self->save_content_into_temp_file($headers);
+
+    $self->send_http_response(HTTP_PROCESSING,
+                             "X-QVD-SlaveServer-Info: Document is being queued for printing");
+    my $rc = $self->_print_file($printer_name, $fn);
+    unlink $fn;
+
+    if ($rc) {
+        DEBUG "File $fn printed to $printer_name";
+        # FIXME: we return the printer name as plain text here, really?
+        $self->send_http_response_with_body(HTTP_OK, 'text/plain', [], $printer_name);
+    }
+    else {
+        ERROR "Unable to send file $fn to printer $printer_name";
+        $self->send_http_error(HTTP_INTERNAL_SERVER_ERROR,
+                               "Unable to enqueue docuement for printing");
+    }
+
+}
 
 'QVD-Client'
 

@@ -8,14 +8,16 @@ use Session::Token;
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('user_tokens');
 __PACKAGE__->add_columns(
-    token      => { data_type => 'varchar(256)' },
-    user_id    => { data_type => 'integer' },
-    vm_id      => { data_type => 'integer', is_nullable => 1 },
-    expiration => { data_type => 'integer' }
+    token          => { data_type => 'varchar(256)' },
+    user_id        => { data_type => 'integer' },
+    vm_id          => { data_type => 'integer', is_nullable => 1 },
+    expiration     => { data_type => 'integer' },
+    auth_params_id => { data_type => 'integer', is_nullable => 1 },
 );
 
 __PACKAGE__->belongs_to(user => 'QVD::DB::Result::User', 'user_id');
 __PACKAGE__->belongs_to(vm  => 'QVD::DB::Result::VM',  'vm_id');
+__PACKAGE__->belongs_to(auth_params  => 'QVD::DB::Result::User_Auth_Parameters',  'auth_params_id');
 
 __PACKAGE__->set_primary_key('token');
 

@@ -48,6 +48,7 @@
             %>
 
             <tbody class="bb-editor"></tbody>
+            <tbody class="bb-editor-extra js-editor-extra"></tbody>
             <tbody class="bb-custom-properties custom-properties"></tbody>
             <% if (editorCategories) { %>
                 <tbody>

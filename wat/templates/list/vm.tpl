@@ -151,7 +151,7 @@
                                                     <%
                                                     if (model.get('di_id') != model.get('di_id_in_use')) {
                                                     %>
-                                                        <i class="fa fa-warning warning" title="" data-id="<%= model.get('id') %>" data-i18n="[title]The execution image is different than the assigned image"></i>
+                                                        <i class="fa fa-warning warning js-execution-image-warning" title="" data-id="<%= model.get('id') %>" data-i18n="[title]The execution image is different than the assigned image"></i>
                                                     <%
                                                     }
                                                 break;

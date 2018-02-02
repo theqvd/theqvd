@@ -273,11 +273,6 @@ id	name	description
 167	osf.update.name	Update OS Flavour's name
 168	osf.update.properties	Update properties when update OSFs
 169	osf.update.user-storage	Update OS Flavour's user storage
-170	property.manage.di	Manage disk image's custom properties
-171	property.manage.host	Manage node's custom properties
-172	property.manage.osf	Manage OSF's custom properties
-173	property.manage.user	Manage user's custom properties
-174	property.manage.vm	Manage virtual machines's custom properties
 175	property.see-main.	Access to properties's main section
 176	role.create.	Create roles
 177	role.delete.	Delete roles
@@ -439,6 +434,7 @@ id	name	description
 333	di.update.auto-publish	Set if disk images will be auto published after generation
 334	di.update.vms-expiration	Set if affected vms will expire after disk image generation
 335	di.update.publish	Publish generated disk images
+336	property.manage.	Manage custom properties
 
 ### ACL_Role_Relation ###
 id	acl_id	role_id	positive
@@ -614,11 +610,6 @@ id	acl_id	role_id	positive
 169	167	29	t
 170	168	29	t
 171	169	29	t
-172	170	30	t
-173	171	30	t
-174	172	30	t
-175	173	30	t
-176	174	30	t
 177	175	30	t
 178	176	37	t
 179	177	38	t
@@ -784,6 +775,7 @@ id	acl_id	role_id	positive
 339	333	12	t
 340	334	12	t
 341	335	12	t
+342	336	30	t
 
 ### Role_Administrator_Relation ###
 id	role_id	administrator_id

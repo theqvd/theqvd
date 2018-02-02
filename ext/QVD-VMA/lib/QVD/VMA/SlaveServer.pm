@@ -11,9 +11,11 @@ use QVD::HTTP::StatusCodes qw(:all);
 use QVD::HTTPD;
 use File::Spec;
 
+my $home;
 
 BEGIN {
-    my $user_dir = File::Spec->rel2abs(File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
+    $home = File::Spec->rel2abs((getpwuid $>)[7] // $ENV{HOME});
+    my $user_dir = File::Spec->join($home, '.qvd');
 	mkdir $user_dir;
     set_core_cfg('client.log.filename', File::Spec->join($user_dir, 'qvd-vma-slaveserver.log'))
         unless defined core_cfg('client.log.filename', 0);
@@ -28,10 +30,14 @@ $SIG{__WARN__} = sub { WARN "@_"; };
 $SIG{__DIE__} = sub { ERROR "@_"; };
 
 
-
 use base 'QVD::HTTPD::INET';
 
-my $mount_root = $ENV{HOME}.'/Redirected';
+my $shares_path = core_cfg('vma.user.shares.path');
+$shares_path =~ s{^\~/}{$home/} or do {
+    ERROR "vma.user.shares.path doesn't point inside the user home directory";
+    exit -1;
+};
+
 my $open_command = core_cfg('command.open_file');
 my $command_sshfs = core_cfg('command.sshfs');
 my $authentication_key;
@@ -78,12 +84,10 @@ sub auth {
 }
 
 sub _url_to_mount_point {
-    my ($url) = @_;
-    chop $url if $url =~ /[\/\\]$/;  # remove dir separator if last character
-
-    (my $mount_dir = $url) =~ s/.*[\/\\]//; # pick last part of path
-    $mount_dir = 'ROOT' if ($mount_dir eq '');
-    return $mount_dir;
+    my $url = shift;
+    $url =~ s/[\:\/\\]+$//;  # remove trailing \,  / and : characters
+    $url =~ s/^.*[\/\\]//; # pick last part of path
+    length($url) ? $url : 'Root';
 }
 
 sub _url_to_path {
@@ -109,8 +113,8 @@ sub handle_put_share {
 
     my $mount_dir = _url_to_mount_point($url);
 
-    mkdir $mount_root unless -d $mount_root;
-    my $mount_point = $mount_root.'/'.$mount_dir;
+    mkdir $shares_path unless -d $shares_path;
+    my $mount_point = $shares_path.'/'.$mount_dir;
 
     if (-e $mount_point) {
 	# Make sure mount point is empty
@@ -123,20 +127,19 @@ sub handle_put_share {
         "X-QVD-Share-Ticket: $mount_dir"
     );
 
-    my $pid = fork();
-    if ($pid) {
-        wait;
-        rmdir $mount_point;
-    } else {
-	my @cmd = ($command_sshfs => "qvd-client:", $mount_point, -o => 'slave');
-	push @cmd, split(/\s+/, core_cfg('vma.sshfs.extra_args'));
-	push @cmd, -o => "modules=iconv,from_code=$charset" if ($charset);
-	my $cmdstr = join(' ', @cmd);
-	
-	DEBUG "Going to run sshfs: $cmdstr";
-	exec @cmd;
-        die "Unable to exec $cmdstr: $^E";
-    }
+    my @cmd = ($command_sshfs => "qvd-client:", $mount_point,
+               -o => 'slave',
+               -o => 'atomic_o_trunc',
+               -o => "uid=$>",
+               split(/\s+/, core_cfg('vma.sshfs.extra_args')));
+
+    push @cmd, -o => "modules=iconv,from_code=$charset,to_code=utf-8"
+        if defined $charset and $charset ne 'utf-8';
+
+    DEBUG "Going to exec sshfs: @cmd";
+    do { exec @cmd };
+    ERROR "Unable to exec @cmd: $^E";
+    exit(1);
 }
 
 sub handle_get_share {
@@ -188,7 +191,7 @@ sub handle_get_share {
     if ($pid > 0) {
         wait;
     } else {
-        chdir $dir or die "Unable to chdir to $dir: $^E";                                                                                                  
+        chdir $dir or die "Unable to chdir to $dir: $^E";
         exec($command_sftp_server, '-e')
             or die "Unable to exec $command_sftp_server: $^E";
     }
@@ -201,7 +204,7 @@ sub handle_open {
 
     my $mount_dir = header_lookup($headers, 'X-QVD-Share-Ticket');
     my $rel_path = ($url =~ m!/open/(.*)!, $1);
-    my $abs_path = "$mount_root/$mount_dir/$rel_path";
+    my $abs_path = "$shares_path/$mount_dir/$rel_path";
 
     $self->send_http_error(HTTP_NOT_FOUND) unless -e $abs_path;
 
