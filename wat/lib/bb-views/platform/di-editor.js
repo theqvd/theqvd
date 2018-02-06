@@ -351,7 +351,7 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
                 
                 $('input[name="osd_id"]').val(osdId);
                 
-                if (osdId) {
+                if (osdId && Wat.C.isDIGEnabled()) {
                     $('.js-custom-image-row').hide().addClass('hidden-by-conf');
                     $('.js-osd-row').removeClass('hidden-by-conf');
                     

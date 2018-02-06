@@ -18,7 +18,7 @@ Wat.Views.OSFDetailsView = Wat.Views.DetailsView.extend({
                 // If OSF were created using DIG, retrieve OS info from DIG
                 var osdID = this.model.get('osd_id');
 
-                if (osdID) {
+                if (osdID && Wat.C.isDIGEnabled()) {
                     Wat.DIG.fetchOSD(osdID, function (OSDmodel) {
                         that.OSDmodel = OSDmodel;
 

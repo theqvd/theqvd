@@ -164,22 +164,21 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
         
         Wat.Views.EditorView.prototype.renderCreate.apply(this, [target, that]);
         
-        Wat.I.chosenElement('select[name="os_distro_select"]','single100');
-        
-        // Create OSD
-        Wat.DIG.createOSD(function (OSDmodel) {
-            Wat.CurrentView.OSDmodel = OSDmodel;
-            
-            var osList = Wat.CurrentView.OSDmodel.getPluginAttrOptions('os.distro', function (osList) {
-                $.each (osList, function (id, distro) {
-                    var opt = document.createElement("OPTION");
-                    $(opt).val(id).html(distro.value);
-                    $('select[name="os_distro_select"').append(opt);
+        if (Wat.C.isDIGEnabled()) {
+            // Create OSD
+            Wat.DIG.createOSD(function (OSDmodel) {
+                Wat.CurrentView.OSDmodel = OSDmodel;
+                var osList = Wat.CurrentView.OSDmodel.getPluginAttrOptions('os.distro', function (osList) {
+                    $.each (osList, function (id, distro) {
+                        var opt = document.createElement("OPTION");
+                        $(opt).val(id).html(distro.value);
+                        $('select[name="os_distro_select"').append(opt);
+                    });
+                    
+                    $('select[name="os_distro_select"').trigger('chosen:updated');
                 });
-
-                $('select[name="os_distro_select"').trigger('chosen:updated');
             });
-        });
+        }
     },
     
     renderUpdate: function (target, that) {
@@ -189,7 +188,7 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
         
         // If OSF were created using DIG, retrieve OS info from DIG
         var osdId = this.model.get('osd_id');
-        if (osdId) {
+        if (osdId && Wat.C.isDIGEnabled()) {
             Wat.DIG.fetchOSD(osdId, function (OSDmodel) {
                 if (OSDmodel.get('error')) {
                     $('.bb-os-configuration-editor').html('<div class="center" data-i18n="Error retrieving software information"></div>');
