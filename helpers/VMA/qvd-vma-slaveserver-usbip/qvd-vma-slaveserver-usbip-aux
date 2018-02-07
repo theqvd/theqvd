@@ -3,14 +3,14 @@
 use warnings;
 use strict;
 
+BEGIN {
+    $QVD::Config::USE_DB = 0;
+    @QVD::Config::Core::FILES = ('/etc/qvd/vma.conf');
+}
+
 use QVD::Config;
 use QVD::Config::Core qw(core_cfg set_core_cfg);
 use Linux::USBIP;
-
-BEGIN {
-    $QVD::Log::DAEMON_NAME = 'vma-slaveserver';
-
-}
 
 use QVD::Log;
 INFO "Slave server started";
