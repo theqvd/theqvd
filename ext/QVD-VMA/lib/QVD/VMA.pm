@@ -472,6 +472,8 @@ sub _fork_monitor {
     $SIG{CHLD} = 'IGNORE';
     my $pid = fork;
     my $pulse_proc;
+    
+    my $enable_audio_compression = $props{'qvd.client.audio.compression.enable'} // 0;
 
     if (!$pid) {
         defined $pid or die "Unable to start monitor, fork failed: $!\n";
@@ -499,6 +501,12 @@ sub _fork_monitor {
                     _call_action_hook(connect => %props);
                     _make_nxagent_config(%props);
 
+                    # FIXME: This is needed while there is no QVD pulseaudio launched.
+                    # However QVD pulseaudio shall be launched in any case as a mixer of every
+                    # sound connection.
+                    if ($enable_audio && !$enable_audio_compression) {
+                        $ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000)
+                    }
                     $ENV{NX_CLIENT} = $nxdiag;
                     $ENV{NX_SLAVE_CMD} = $command_slave if $command_slave;
                     # Keep QVD_SLAVE_CMD for retrocompatibility
@@ -568,7 +576,7 @@ sub _fork_monitor {
                         my $pa_port = $1;
                         DEBUG "Multimedia channel opened on port $pa_port";
 
-                        if ( $enable_audio ) {
+                        if ( $enable_audio && $enable_audio_compression ) {
                             if ( $pulse_proc ) {
                                 DEBUG "PulseAudio already running under pid $pulse_proc, reestablishing channel";
                                 _bgrun({user => $props{'qvd.vm.user.name'}}, "pacmd", "load-module", "module-tunnel-sink-new", "sink_name=QVD_Audio",

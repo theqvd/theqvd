@@ -52,6 +52,7 @@ sub new {
     my $self = {
         client_delegate => $cli,
         audio           => delete $opts{audio},
+        compress_audio  => core_cfg('client.audio.compression.enable'),
         extra           => delete $opts{extra},
         printing        => delete $opts{printing},
         usb             => delete $opts{usb},
@@ -657,6 +658,7 @@ print "auth-type: ".$auth_type."\n";
         'qvd.client.printing.enabled'   => $self->{printing},
         'qvd.client.usb.enabled'        => $self->{usb},
         'qvd.client.usb.implementation' => $self->{usb_impl},
+        'qvd.client.audio.compression.enable' => $self->{compress_audio},
     );
 
     if ( $WINDOWS ) {
@@ -932,31 +934,35 @@ sub _run {
                     # probably deal with it.
                     ERROR "Local PulseAudio is not running";
                 } else {
-                    DEBUG "Checking whether system PA supports Opus";
-    
-                    if ( $syspa->is_opus_supported ) {
-                        INFO "System PA supports Opus, setting it up";
-                        $syspa->cmd("load-module", "module-native-protocol-tcp",
-                                    "auth-anoymous=1", "listen=127.0.01", "port=4713");
-                    } elsif ( $syspa->is_qvd_pulseaudio_installed() ) {
-                        # Chain our own PA
-                        INFO "System PA does not support Opus, chaining QVDPA";
-                        DEBUG "Setting up native protocol on local PA";
-                        $syspa->cmd("load-module", "module-native-protocol-tcp",
-                                    "auth-anonymous=1",
-                                    "listen=127.0.0.1",
-                                    "port=52001");
-    
-                        $qvd_pa = QVD::Client::PulseAudio->start(
-                           env_func => sub { $self->{client_delegate}->proxy_set_environment(@_) }
-                        );
-    
-                        $qvd_pa->cmd("load-module", "module-native-protocol-tcp",
-                                    "auth-anonymous=1", "listen=127.0.0.1", "port=4713");
-                        $qvd_pa->cmd("load-module", "module-tunnel-sink-new",
-                                    "sink_name=QVD", "server=tcp:127.0.0.1:52001",
-                                    "sink=\@DEFAULT_SINK\@");
-                        sleep(20);
+                    if ( $self->{compress_audio} ) {
+                        DEBUG "Checking whether system PA supports Opus";
+
+                        if ( $syspa->is_opus_supported ) {
+                            INFO "System PA supports Opus, setting it up";
+                            $syspa->cmd("load-module", "module-native-protocol-tcp",
+                                "auth-anoymous=1", "listen=127.0.01", "port=4713");
+                        } elsif ( $syspa->is_qvd_pulseaudio_installed() ) {
+                            # Chain our own PA
+                            INFO "System PA does not support Opus, chaining QVDPA";
+                            DEBUG "Setting up native protocol on local PA";
+                            $syspa->cmd("load-module", "module-native-protocol-tcp",
+                                "auth-anonymous=1",
+                                "listen=127.0.0.1",
+                                "port=52001");
+        
+                            $qvd_pa = QVD::Client::PulseAudio->start(
+                                env_func => sub { $self->{client_delegate}->proxy_set_environment(@_) }
+                            );
+        
+                            $qvd_pa->cmd("load-module", "module-native-protocol-tcp",
+                                "auth-anonymous=1", "listen=127.0.0.1", "port=4713");
+                            $qvd_pa->cmd("load-module", "module-tunnel-sink-new",
+                                "sink_name=QVD", "server=tcp:127.0.0.1:52001",
+                                "sink=\@DEFAULT_SINK\@");
+                            sleep(20);
+                        } else {
+                            ERROR "Cannot start a pulseaudio with opus compression enabled";
+                        }
                     }
                 }
             }

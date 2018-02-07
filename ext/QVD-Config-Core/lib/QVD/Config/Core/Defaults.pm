@@ -241,6 +241,8 @@ client.geometry = 1024x768
 client.fullscreen =
 ## enable the Pulse audio server in the client
 client.audio.enable =
+## enable audio compression with opus ##
+client.audio.compression.enable = 0
 ## something regarding an NX channel
 client.printing.enable = 1
 ## Enable sharing client-side folders towards the VM
