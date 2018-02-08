@@ -93,7 +93,13 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
                 Wat.I.chosenElement('select[name="osf_id"]', 'advanced100');
             }
             else {
-                Wat.A.fillSelect(params, this.restrictOsfsWithDisabledDiCreation);
+                var that = this;
+                Wat.A.fillSelect(params, function () {
+                    that.restrictOsfsWithDisabledDiCreation();
+                    
+                    var selectedOsfId = $('.' + this.cid + ' .filter select[name="osf"]').val();
+                    that.toggleSoftwareFields(selectedOsfId);
+                });
             }
         }
         
