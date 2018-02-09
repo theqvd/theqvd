@@ -1450,7 +1450,7 @@ sub start_device_sharing {
                 ERROR "Can't find busid for device $devid";
                 return;
             }
-            for (my $conn_attempt = 0; $conn_attempt < 10; $conn_attempt++) {
+            for my $conn_attempt (0..10) {
             local $@;
             my $client = QVD::Client::SlaveClient->new();
             eval { $client->handle_usbip($busid) };

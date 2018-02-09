@@ -37,7 +37,7 @@ sub list_devices {
     my @devices;
 
     opendir my $device_dir , $usbroot
-        or do { ERROR "Can't open $usbroot" ; return 0; };
+        or do { ERROR "Can't open $usbroot" ; return; };
     while ( defined(my $busid = readdir($device_dir)) ){
 
         my $device_class;
@@ -111,24 +111,20 @@ Get the busid the device is connected to
 
 sub get_busid {
     my $devid = shift;
-    my %all_devices;
+    my $target_busid;
 
     opendir my $device_dir , $usbroot
-        or do { ERROR "Can't open $usbroot" ; return 0; };
+        or do { ERROR "Can't open $usbroot" ; return; };
+
     while ( defined(my $busid = readdir($device_dir)) ){
-        my $index = _read_devid_from_bus($busid);
-        if ($index) {
-            $all_devices{ $index } = $busid;
+        if ( $devid eq _read_devid_from_bus($busid)) {
+            $target_busid = $busid;
         }
     }
     closedir $device_dir
-        or do { ERROR "Can't close $usbroot" ; return 0; };
+        or ERROR "Can't close $usbroot";
 
-    if ( defined $all_devices{$devid} ){
-        return $all_devices{$devid};
-    }else{
-        return;
-    }
+    return $target_busid;
 }
 
 =head2_read_devid_from_bus($busid)
@@ -143,17 +139,13 @@ sub _read_devid_from_bus {
     my $productid;
     my $serial;
 
-    if ( -f "$usbroot/$busid/idVendor" ){
-        $vendorid = _read_line("$usbroot/$busid/idVendor");
-    }else{ return; }
+    $vendorid = _read_line("$usbroot/$busid/idVendor");
+    $vendorid or return;
 
-    if ( -f "$usbroot/$busid/idProduct" ){
-        $productid = _read_line("$usbroot/$busid/idProduct");
-    }else{ return; }
+    $productid = _read_line("$usbroot/$busid/idProduct");
+    $productid or return;
 
-    if ( -f "$usbroot/$busid/serial" ){
-        $serial = _read_line("$usbroot/$busid/serial");
-    }
+    $serial = _read_line("$usbroot/$busid/serial");
 
     return $serial ? "$vendorid:$productid\@$serial" : "$vendorid:$productid";
 }
@@ -166,7 +158,7 @@ sub _read_line {
         or do { ERROR "Can't open $file"; return; };
     $result = <$file>;
     close $file
-        or do { ERROR "Can't close $file"; return; };
+        or do { ERROR "Can't close $file";};
     chomp $result;
 
     return $result;
