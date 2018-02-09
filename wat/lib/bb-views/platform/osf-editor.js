@@ -165,6 +165,8 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
         Wat.Views.EditorView.prototype.renderCreate.apply(this, [target, that]);
         
         if (Wat.C.isDIGEnabled()) {
+            Wat.I.chosenElement('select[name="os_distro_select"]','single100');
+            
             // Create OSD
             Wat.DIG.createOSD(function (OSDmodel) {
                 Wat.CurrentView.OSDmodel = OSDmodel;

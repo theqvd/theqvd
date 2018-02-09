@@ -443,6 +443,7 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
         $.ajax({
             url: encodeURI(url), 
             data: data,
+            dataType: 'json',
             type: 'POST',
             xhr: function() {  // Custom XMLHttpRequest
                 var myXhr = $.ajaxSettings.xhr();
@@ -456,14 +457,19 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
             processData: false,
             contentType: false, // Setting contentType as false 'multipart/form-data' and boundary will be sent
 
-        }).success(function() {
+        }).success(function(e) {
             Wat.I.loadingUnblock();
             
-            var realView = Wat.I.getRealView(that);
-            realView.fetchList();
-            realView.checkMachinesChanges(that);
+            if (e.status == STATUS_SUCCESS) {
+                var realView = Wat.I.getRealView(that);
+                realView.fetchList();
+                realView.checkMachinesChanges(that);
 
-            Wat.I.M.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
+                Wat.I.M.showMessage({message: i18n.t('Successfully created'), messageType: 'success'});
+            }
+            else {
+                Wat.I.M.showMessage({message: e.message, messageType: 'error'});
+            }
         }).fail(function(data) {
             Wat.I.loadingUnblock();
             Wat.I.M.showMessage({message: i18n.t('Error creating'), messageType: 'error'});

@@ -148,7 +148,8 @@ package MojoX::Session::Transport::WAT
     
     sub set {
         my ($self, $sid, $expires) = @_;
-        my $cookie = Mojo::Cookie::Response->new(name => 'sid', value => $sid, expires => $expires, httponly => 1, secure => 1);
+        my $cookie = Mojo::Cookie::Response->new(name => 'sid', value => $sid,
+            expires => $expires, httponly => 1, secure => 1, path => '/api/');
         $self->tx->res->cookies($cookie);
         return 1;
     }
@@ -982,42 +983,34 @@ sub update_session
 sub report_di_problem_in_log
 {
     my ($c,%args) = @_;
-
-    my ($json,$tx,$code) = @args{qw(json tx code)}; 
-
-    my $sid = $c->tx ? $c->tx->res->headers->header('sid') :
-	$tx->res->headers->header('sid');
-
-    my $remote_address = $c->tx ? $c->tx->remote_address :
-	$tx->remote_address;
-
-    my %session_args = (
-	store  => [dbi => {dbh => QVD::DB::Simple->db()->storage->dbh}],
-	transport => MojoX::Session::Transport::WAT->new(),
-	tx => $c->tx);
-
-    my $session = MojoX::Session->new(%session_args);
-
-
-    $session->load($sid);
-
+    
+    my ($json, $code) = @args{qw(json code)};
+    
+    my $session =  $c->stash('session');
+    
     QVD::API::LogReport->new(
-	
-	action => { action => 'di_create',
-		    type_of_action => 'create' },
-	qvd_object => 'di',
-	tenant => { tenant_id => $session->data('tenant_id'), 
-		    tenant_name => $session->data('tenant_name')  },
-	object => undef,
-	administrator => { administrator_id => $session->data('admin_id'), 
-			   administrator_name => $session->data('admin_name'), 
-			   superadmin => $session->data('superadmin')},
-	ip => $c->tx->remote_address,
-	source => eval { $json->{parameters}->{source} } // undef,
-	arguments => eval { $json->{arguments} } // {},
-	status => $code
-	
-	)->report;
+        
+        action => {
+            action => 'di_create',
+            type_of_action => 'create'
+        },
+        qvd_object => 'di',
+        tenant => {
+            tenant_id => $session->data('tenant_id'),
+            tenant_name => $session->data('tenant_name')
+        },
+        object => undef,
+        administrator => {
+            administrator_id => $session->data('admin_id'),
+            administrator_name => $session->data('admin_name'),
+            superadmin => $session->data('superadmin')
+        },
+        ip => $c->tx->remote_address,
+        source => eval { $json->{parameters}->{source} } // undef,
+        arguments => eval { $json->{arguments} } // {},
+        status => $code
+    
+    )->report;
 }
 
 __END__
