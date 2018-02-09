@@ -51,7 +51,7 @@ sub list_devices {
         if ( -f "$usbroot/$busid/bDeviceClass" ){
             $device_class = _read_line("$usbroot/$busid/bDeviceClass");
         }else{
-            ERROR "Device doesn't have bDeviceClass";
+            DEBUG "Device doesn't have bDeviceClass";
             next;
         }
         chomp $device_class;
@@ -189,8 +189,10 @@ sub _get_names_from_file {
         }
     }
 
+    WARN "hwdata parsing failed. Couldn't obtain data" unless (%hwdata);
+
     my $vendor = defined($hwdata{$vendorid}) ? $hwdata{$vendorid}->{name} : 'unknown';
-    my $product = defined($hwdata{$vendorid}->{products}->{$productid}) ? $hwdata{$vendorid}->{products}->{$productid} : 'unknown';
+    my $product = $hwdata{$vendorid}->{products}->{$productid} // 'unknown';
 
     return ($vendor,$product);
 }
@@ -213,7 +215,7 @@ sub _parse_hwdata {
     my $last_seen;
     while ( my $line = <$fd> ){
     
-        if ($line =~ m/^([\d,a,b,c,d,e,f]{4})  (.*)\n/){
+        if ($line =~ m/^([\d,a,b,c,d,e,f]{4})  (.*)$/){
              $hwdata{$1} = { name => $2, products => {} };
              $last_seen = $1; 
         };  
