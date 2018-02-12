@@ -182,23 +182,7 @@ under sub {
 # This url retrieves general info about the API.
 # This url can be accessed without authentication
 
-any [qw(POST GET)] => '/api/info' => sub {
-  my $c = shift;
-
-  QVD::Config::reload();
-  my $utc_time = gmtime();
-
-	my $json = {
-		status => 0,
-		server_datetime => $utc_time,
-		multitenant => $c->qvd_admin4_api->_cfg('wat.multitenant'),
-		version => { database => $c->qvd_admin4_api->database_version },
-		public_configuration => cfg_tree('api.public'),
-		auth => { separators => [ split('', cfg('l7r.auth.plugin.default.separators')) ] },
-	};
-
-  $c->render(json => $json );
-};
+any [qw(POST GET)] => '/api/info' => sub { shift->qvd_api_call(\&api_public_information) };
 
 any [qw(POST)] => '/api/di/notify' => sub { shift->qvd_api_call(\&update_di_status) };
 
@@ -264,49 +248,10 @@ group {
 
     # This is the main url in the API
 
-    any [qw(POST GET)] => '/api' => sub {
-
-        my $c = shift;
-
-        $c->inactivity_timeout(30000);     
-        my $json = $c->get_input_json;
-        my $response = $c->process_api_query($json);
-            
-        if ($json->{action} eq "current_admin_setup") {
-            $response->{sid} = $c->stash('session')->sid;
-        }
-
-        # Retrieving the right encode is tricky.
-        # With this system accents and so on are supported.
-        # WARNING: we're rendering in json text mode. The json mode break the accents
-        # Maybe a problem in Mojo?
-
-        deep_utf8_decode($response);
-        $c->render(text => b(encode_json($response))->decode('UTF-8'));
-    };
+    any [qw(POST GET)] => '/api' => sub { shift->qvd_api_call(\&standard_api_call) };
 
     # Log out url
-    any [qw(POST GET)] => '/api/logout' => sub {
-    
-        my $c = shift;
-    
-        $c->inactivity_timeout(30000);
-    
-        my $session = $c->stash('session');
-        $session->expire;
-        $session->clear;
-    
-        my $code = $session->flush ? 0000 : 3600;
-        my $exception = QVD::API::Exception->new(code => $code);
-    
-        my $response = {
-            status => $exception->code,
-            message => $exception->message
-        };
-    
-        $c->render(text => b(encode_json($response))->decode('UTF-8'));
-    };
-
+    any [qw(POST GET)] => '/api/logout' => sub { shift->qvd_api_call(\&api_logout) };
 
     # This websocket is intended to report the current state of the system in real time
     # number of vms running, number vms in a host and so on.
@@ -493,17 +438,70 @@ sub qvd_api_call {
 sub log_qvd_exception {
     my $controller = shift;
     my $exception = shift;
-    if(ref($exception) eq "QVD::API::Exception") {
-        $controller->app->log->debug($exception->get_stack_trace);
-    } else {
-        $controller->app->log->debug($exception);
-        $exception = QVD::API::Exception->new(code => 1100);
+    
+    if(ref($exception) ne "QVD::API::Exception") {
+        $controller->app->log->error("Unexpected Exception throwed");
+        $exception = QVD::API::Exception->new(exception => $exception);
     }
+    
     $controller->app->log->error("Exception " . $exception->code . " : " . $exception->message);
+    $controller->app->log->debug(">>>>>>>>> STACK TRACE >>>>>>>>>\n" .
+        $exception->get_stack_trace .
+        "<<<<<<<<< STACK TRACE <<<<<<<<<");
+    
     return $exception;
 }
 
 #### API callbacks ####
+
+sub api_public_information {
+    my $c = shift;
+    
+    QVD::Config::reload();
+    my $utc_time = gmtime();
+    
+    my $response = {
+        status => 0,
+        server_datetime => $utc_time,
+        multitenant => $c->qvd_admin4_api->_cfg('wat.multitenant'),
+        version => { database => $c->qvd_admin4_api->database_version },
+        public_configuration => cfg_tree('api.public'),
+        auth => { separators => [ split('', cfg('l7r.auth.plugin.default.separators')) ] },
+    };
+    
+    return $response;
+}
+
+sub standard_api_call {
+    my $c = shift;
+    
+    my $json = $c->get_input_json;
+    my $response = $c->process_api_query($json);
+    
+    if ($json->{action} eq "current_admin_setup") {
+        $response->{sid} = $c->stash('session')->sid;
+    }
+    
+    return $response;
+}
+
+sub api_logout {
+    my $c = shift;
+    
+    my $session = $c->stash('session');
+    $session->expire;
+    $session->clear;
+    
+    my $code = $session->flush ? 0000 : 3600;
+    my $exception = QVD::API::Exception->new(code => $code);
+    
+    my $response = {
+        status => $exception->code,
+        message => $exception->message
+    };
+    
+    return $response;
+}
 
 sub generate_di {
     my $c = shift;
