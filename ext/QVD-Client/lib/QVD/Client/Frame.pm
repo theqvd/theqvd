@@ -1447,27 +1447,26 @@ sub start_device_sharing {
         foreach my $devid (@devs) {
             my $busid = get_busid($devid);
             unless ($busid){
-                ERROR "Can't find busid for device $devid";
-                return;
+                DEBUG "Can't find busid for device $devid";
+                next;
             }
             for my $conn_attempt (0..10) {
-            local $@;
-            my $client = QVD::Client::SlaveClient->new();
-            eval { $client->handle_usbip($busid) };
-                if ($@) {
-                    if ($@ =~ 'ECONNREFUSED' || $@ =~ 'EPIPE' ) {
-                        sleep 1;
-                        next;
+                local $@;
+                my $client = QVD::Client::SlaveClient->new();
+                eval { $client->handle_usbip($busid) };
+                    if ($@) {
+                        if ($@ =~ 'ECONNREFUSED' || $@ =~ 'EPIPE' ) {
+                            sleep 1;
+                            next;
+                        }
+                        ERROR $@;
+                    } else {
+                        push @{$self->{usbip_shared_buses}},$busid;
+                        DEBUG("Device sharing started for dev: $devid connected at bus: $busid");
                     }
-                    ERROR $@;
-                } else {
-                    push $self->{usbip_shared_buses},$busid;
-                    DEBUG("Device sharing started for dev: $devid connected at bus: $busid");
-                }
                 last;
             }
         }
-
     }
 }
 
@@ -1479,7 +1478,7 @@ sub stop_device_sharing {
         my $usbip = Linux::USBIP->new();
 
         INFO "USBIP sharing stopping";
-        foreach my $busid (shift $self->{usbip_shared_buses}) {
+        foreach my $busid (@{$self->{usbip_shared_buses}}) {
             $usbip->unbind($busid) 
               or ERROR "Can't unbind $busid: ".$usbip->{error_msg};
             DEBUG "Device with busid: $busid was successfully unbound from usbip driver";

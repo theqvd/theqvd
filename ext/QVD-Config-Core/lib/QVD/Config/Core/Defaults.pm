@@ -116,7 +116,8 @@ path.client.pixmaps.alt = /usr/share/pixmaps
 
 path.qvd.bin = /usr/lib/qvd/bin
 path.qvd.etc = /usr/lib/qvd/etc
-path.usb.database = /usr/share/hwdata/usb.ids
+path.usb.database = /usr/share/hwdata/usb.ids,/var/lib/usbutils/usb.ids
+path.usb.usbroot = /sys/bus/usb/devices
 
 ## paths to external executables
 command.kvm = kvm

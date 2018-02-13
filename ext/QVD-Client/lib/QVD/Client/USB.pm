@@ -4,10 +4,11 @@ use Exporter 'import';
 
 use strict;
 use QVD::Log;
+use QVD::Config::Core;
 
 
-our $usbroot = "/sys/bus/usb/devices";
-our @files = ( '/var/lib/usbutils/usb.ids','/usr/share/hwdata/usb.ids');
+our $usbroot = core_cfg('path.usb.usbroot');
+our @files = split ',' , core_cfg('path.usb.database');
 
 =head1 NAME
 
@@ -49,7 +50,7 @@ sub list_devices {
 
         # Ignore hubs
         if ( -f "$usbroot/$busid/bDeviceClass" ){
-            $device_class = _read_line("$usbroot/$busid/bDeviceClass");
+            $device_class = _read_line("$usbroot/$busid/bDeviceClass",1);
         }else{
             DEBUG "Device doesn't have bDeviceClass";
             next;
@@ -59,16 +60,16 @@ sub list_devices {
 
         # idVendor and idProduct MUST exist
         if ( -f "$usbroot/$busid/idVendor" ){
-            $vendorid = _read_line("$usbroot/$busid/idVendor");
+            $vendorid = _read_line("$usbroot/$busid/idVendor",1);
         }else{
-            ERROR "Device doesn't have idVendor";
+            DEBUG "Device doesn't have idVendor";
             next;
         }
 
         if ( -f "$usbroot/$busid/idProduct" ){
-            $productid = _read_line("$usbroot/$busid/idProduct");
+            $productid = _read_line("$usbroot/$busid/idProduct",1);
         }else{
-            ERROR "Device doesn't have idProduct";
+            DEBUG "Device doesn't have idProduct";
             next;
         }
 
@@ -139,11 +140,9 @@ sub _read_devid_from_bus {
     my $productid;
     my $serial;
 
-    $vendorid = _read_line("$usbroot/$busid/idVendor");
-    $vendorid or return;
+    $vendorid = _read_line("$usbroot/$busid/idVendor") // return;
 
-    $productid = _read_line("$usbroot/$busid/idProduct");
-    $productid or return;
+    $productid = _read_line("$usbroot/$busid/idProduct") // return;
 
     $serial = _read_line("$usbroot/$busid/serial");
 
@@ -151,11 +150,11 @@ sub _read_devid_from_bus {
 }
 
 sub _read_line {
-    my $file = shift;
+    my ($file,$fatal) = @_;
     my $result;
 
     open my $file, '<', $file
-        or do { ERROR "Can't open $file"; return; };
+        or do { ERROR "Can't open $file" if $fatal; return; };
     $result = <$file>;
     close $file
         or do { ERROR "Can't close $file";};
@@ -200,7 +199,7 @@ sub _parse_hwdata {
     my %hwdata;
 
     open my $fd, '<',$file
-        or do { warn "Can't open $file: ".$!;
+        or do { WARN "Can't open $file: ".$!;
                 return;
               };
 
