@@ -107,8 +107,15 @@ Up.CRUD.workspaces = {
     cloneWorkspace: function (e) {
         var selectedId = $(e.target).attr('data-id');
         
-        var model = Up.CurrentView.collection.where({id: parseInt(selectedId)})[0].clone();
-        model.set({name: model.get('name') + ' (copy)', fixed: false, active: false});
+        var model = Up.CurrentView.collection.findWhere({id: parseInt(selectedId)}).clone();
+        
+        // Append ' (copy)' to the cloned workspace many times as necessary to not collide with another workspace
+        var newName = model.get('name') + ' (copy)';
+        while(Up.CurrentView.collection.findWhere({name: newName}) !== undefined) {
+            newName += ' (copy)';
+        }
+        
+        model.set({name: newName, fixed: false, active: false});
         
         Up.CurrentView.newWorkspace(e, model);
     }
