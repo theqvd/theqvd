@@ -1,5 +1,5 @@
 <% $.each(collection.models, function (modId, model) { %>
-    <tr class="desktop-row">
+    <tr class="desktop-row" data-name="<%= model.get('name') %>">
         <td class="cell-link <%= model.get('active') ? 'activated-cell' : '' %>">
             <a href="javascript:" class="js-button-settings-conf" data-id="<%= model.get('id') %>" data-i18n="[title]Edit">
                 <i class="<%= CLASS_ICON_EDIT %> fleft" data-id="<%= model.get('id') %>"></i>

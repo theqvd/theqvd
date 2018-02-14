@@ -108,7 +108,7 @@ Up.CRUD.workspaces = {
         var selectedId = $(e.target).attr('data-id');
         
         var model = Up.CurrentView.collection.where({id: parseInt(selectedId)})[0].clone();
-        model.set({name: model.get('name') + ' (copy)', fixed: false});
+        model.set({name: model.get('name') + ' (copy)', fixed: false, active: false});
         
         Up.CurrentView.newWorkspace(e, model);
     }
