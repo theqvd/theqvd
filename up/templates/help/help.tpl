@@ -5,10 +5,7 @@
                 <th data-i18n="Documentation"></th>
             </tr>
             <tr>
-                <td class="cell-link"><a href="#documentation/stepbystep" class="<%= CLASS_ICON_DOCUMENTATION %>">Guía paso a paso</a></td>
-            </tr>
-            <tr>
-                <td class="cell-link"><a href="#documentation/user" class="<%= CLASS_ICON_DOCUMENTATION %>">Manual de usuario</a></td>
+                <td class="cell-link"><a href="#documentation/user" class="<%= CLASS_ICON_DOCUMENTATION %>" data-i18n="User manual"></a></td>
             </tr>
             <tr>
                 <th data-i18n="About"></th>

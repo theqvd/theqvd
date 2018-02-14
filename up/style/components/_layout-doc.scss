@@ -21,12 +21,10 @@
 
 
 .doc-block {
-    width: 90%;
+    width: 100%;
     
-    @include in(desktop) {
-        width: ($width_doc_content - 2) * 1%;
-        width: 95%;
-    }
+    background: $col_whiter;
+    padding: 20px;
     
     height: auto;
 

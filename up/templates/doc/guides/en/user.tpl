@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="generator" content="AsciiDoc 8.6.9">
-<title>Manual de usuario del portal de usuario de QVD</title>
+<title>User manual of the QVD user portal</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -802,7 +802,7 @@ asciidoc.install(3);
 </head>
 <body class="book">
 <div id="header">
-<h1>Manual de usuario del portal de usuario de QVD</h1>
+<h1>User manual of the QVD user portal</h1>
 <span id="author">QVD Docs Team</span><br>
 <span id="email" class="monospaced">&lt;<a href="mailto:documentation@theqvd.com">documentation@theqvd.com</a>&gt;</span><br>
 <div id="toc">
@@ -812,43 +812,43 @@ asciidoc.install(3);
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_introduccion">1. Introducción</h2>
+<h2 id="_introduction">1. Introduction</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>El portal de usuario de QVD es una herramienta web para conectarse a los Escritorios Virtuales de QVD.</p></div>
-<div class="paragraph"><p>Además de la conexión a los escritorios, también proporciona una utilidad avanzada de configuración, pudiendo guardar pre-configuraciones, y un entorno de trabajo en el que conectarse a diferentes escritorios sin tener que introducir las credenciales cada vez.</p></div>
+<div class="paragraph"><p>The QVD user portal is a web tool to being connected to the QVD Virtual Desktops.</p></div>
+<div class="paragraph"><p>In addition to the desktops connection, an advanced configuration tool is provided, being able to save presets, and a work environment where being connected to different desktops without have to introduce the credentials every time.</p></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_metodos_de_conexion">2. Métodos de conexión</h2>
+<h2 id="_connection_methods">2. Connection methods</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>El User Portal tiene 2 métodos de conectarse a los Escritorios Virtuales.</p></div>
+<div class="paragraph"><p>The User Portal have 2 methods to be connected to the Virtual Desktops.</p></div>
 <div class="sect2">
-<h3 id="_cliente_pesado">2.1. Cliente pesado</h3>
-<div class="paragraph"><p>Para utilizar este método será necesario tener instalado el cliente de QVD en el ordenador del usuario. El User Portal se encargará de arrancar en segundo plano el cliente enviándole los parámetros de configuración.</p></div>
+<h3 id="_heavy_client">2.1. Heavy client</h3>
+<div class="paragraph"><p>To use this method will be necessary to have installed the QVD client in the user computer. The User Portal will handle the background starting of the client, sending to it the configuration parameters.</p></div>
 </div>
 <div class="sect2">
-<h3 id="_cliente_html5">2.2. Cliente HTML5</h3>
-<div class="paragraph"><p>La conexión se realiza íntegramente con la aplicación web, sin necesidad de instalar componente alguno en el sistema.</p></div>
-<div class="paragraph"><p>Funcionalidades no disponibles en este modo:</p></div>
+<h3 id="_html5_client">2.2. HTML5 client</h3>
+<div class="paragraph"><p>The connection is performed entirely using the web application, without the needy of install any component on the system.</p></div>
+<div class="paragraph"><p>Not available features on this method:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Sonido
+Sound
 </p>
 </li>
 <li>
 <p>
-Carpetas compartidas
+Shared folders
 </p>
 </li>
 <li>
 <p>
-Dispositivos USB
+USB devices
 </p>
 </li>
 <li>
 <p>
-Impresión
+Printing
 </p>
 </li>
 </ul></div>
@@ -856,63 +856,63 @@ Impresión
 </div>
 </div>
 <div class="sect1">
-<h2 id="_elementos_del_up">3. Elementos del UP</h2>
+<h2 id="_elements_of_the_up">3. Elements of the UP</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>En esta sección veremos los diferentes elementos del Portal de Usuario.</p></div>
+<div class="paragraph"><p>In this section will see the different elements of the User Portal.</p></div>
 <div class="sect2">
-<h3 id="_usuario">3.1. Usuario</h3>
-<div class="paragraph"><p>Es el Usuario de QVD con cuyas credenciales accede al Portal de Usuario para visualizar y conectarse a sus Escritorios Virtuales.</p></div>
+<h3 id="_user">3.1. User</h3>
+<div class="paragraph"><p>It is the QVD User whose credentials he/she access to the User Portal to visualize and connect to his/her Virtual Desktops.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Las credenciales son las mismas que utiliza en el Cliente pesado de QVD
+The credentials are the same used in the QVD heavy client
 </p>
 </li>
 </ul></div>
 </div>
 <div class="sect2">
-<h3 id="_escritorios_virtuales">3.2. Escritorios virtuales</h3>
-<div class="paragraph"><p>Los Escritorios Virtuales son los escritorios asociados al usuario que accede al Portal de Usuario. Estos escritorios corresponden a Máquinas Virtuales desplegadas y administradas en QVD.</p></div>
+<h3 id="_virtual_desktop">3.2. Virtual desktop</h3>
+<div class="paragraph"><p>The Virtual Desktops are the associated desktops to the user who access to the User Portal. These desktops correspond with deployed and administered Virtual Machines in QVD.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_workspaces">3.3. Workspaces</h3>
-<div class="paragraph"><p>Son los <em>presets</em> de parámetros de configuración bajo los que el usuario se conecta a los escritorios.</p></div>
-<div class="paragraph"><p>Tener configuraciones diferentes guardadas es de utilidad para cuando el usuario se conecta a sus escritorios desde diferentes localizaciones, con distintas velocidades de conexión, etc.</p></div>
+<div class="paragraph"><p>They are configuration parameter <em>presets</em> under which user is connected to the desktops.</p></div>
+<div class="paragraph"><p>To have different configurations stored is usefull when the user connects to his desktops from different locations, with different connection speeds, etc.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Por defecto, un usuario tiene siempre un Workspace predefinido.
+By default, a user will have always a predefine Workspace.
 </p>
 </li>
 <li>
 <p>
-Cada usuario puede crear y editar los Workspaces que desee.
+Each user can create and edit the Workspaces that he wants.
 </p>
 </li>
 <li>
 <p>
-Siempre habrá un Workspace definido como activo. Siendo la <strong>Configuración activa</strong> que veremos en otro apartado.
+Always will be a Workspace defined as active. Being the <strong>Active configuration</strong> that will be treated in other section.
 </p>
 </li>
 </ul></div>
 </div>
 <div class="sect2">
-<h3 id="_configuracion_activa">3.4. Configuración activa</h3>
-<div class="paragraph"><p>La configuración activa del UP es un Workspace cuyos parámetros son utilizados en la conexión de los Escritorios Virtuales <strong>por defecto</strong>.</p></div>
+<h3 id="_active_configuration">3.4. Active configuration</h3>
+<div class="paragraph"><p>The UP active configuration is a Workspace whose parameters are used on the Vistual Desktops connection <strong>by default</strong>.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Se puede cambiar el Workspace establecido como configuración activa desde la pantalla de Escritorios Virtuales así como desde la pantalla de Ajustes.
+Is possible to change the Workspace setted as active configuration from the Virtual Desktops screen as well as the Settings screen.
 </p>
 </li>
 <li>
 <p>
-La configuración activa se guarda entre sesiones para un usuario.
+The active configuration is stored between user sessions.
 </p>
 </li>
 <li>
 <p>
-La configuración activa se verá sobrescrita por aquellos escritorios que tengan definidos ajustes de conexión.
+The active configuration will be overwritted by those desktops whose connection settings were defined.
 </p>
 </li>
 </ul></div>
@@ -920,72 +920,72 @@ La configuración activa se verá sobrescrita por aquellos escritorios que tenga
 </div>
 </div>
 <div class="sect1">
-<h2 id="_paso_a_paso">4. Paso a paso</h2>
+<h2 id="_step_by_step">4. Step by step</h2>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_login">4.1. Login</h3>
-<div class="paragraph"><p>En la pantalla de login se introducirán las credenciales del usuario, siendo estas las mismas que se utilizan en el cliente clásico de QVD.</p></div>
+<div class="paragraph"><p>In the login screen the user credentials will be introduced, wich are the same used in the classic QVD client.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/up_section_login.png" alt="up_section_login.png" width="960px">
 </span></p></div>
-<div class="paragraph"><p>Tras introducir correctamente las credenciales se tendrá acceso a la aplicación, siendo la sección de Escritorios Virtuales la página principal.</p></div>
-<div class="paragraph"><p>A la izquierda se sitúa el menú con las diferentes secciones de la aplicación.</p></div>
+<div class="paragraph"><p>After introduce the credentials correctly, the access to the application will be granted, being the Virtual Desktops section the main page.</p></div>
+<div class="paragraph"><p>On the left will be located the menu with the different application sections.</p></div>
 </div>
 <div class="sect2">
-<h3 id="_escritorios_virtuales_2">4.2. Escritorios Virtuales</h3>
-<div class="paragraph"><p>En esta sección se muestran los Escritorios Virtuales asociados en QVD al Usuario que inicia sesión.</p></div>
+<h3 id="_virtual_desktops">4.2. Virtual desktops</h3>
+<div class="paragraph"><p>On this section we got the Virtual Desktops associated in QVD to the User whose start session.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/up_section_desktops.png" alt="up_section_desktops.png" width="960px">
 </span></p></div>
 <div class="sect3">
-<h4 id="_configuracion_activa_2">4.2.1. Configuración activa</h4>
-<div class="paragraph"><p>En la parte superior izquierda se encuentra un combo de selección del Workspace cuya configuración será la <em>Configuración activa</em>.</p></div>
+<h4 id="_active_configuration_2">4.2.1. Active configuration</h4>
+<div class="paragraph"><p>In the upper left there is a selection combo with the Workspace whose configuration will be the <em>Active configuration</em>.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/up_active_configuration_control.png" alt="up_active_configuration_control.png" width="600px">
 </span></p></div>
-<div class="paragraph"><p>La <em>Configuración activa</em> será la configuración con la que se realizarán las conexiones de aquellos escritorios que no tengan una configuración propia.</p></div>
-<div class="paragraph"><p>La configuración propia de un escritorio la veremos en el apartado de ajustes de conexión.</p></div>
+<div class="paragraph"><p>The <em>Active configuration</em> will be the configuration used for the connection of the desktops without own settings.</p></div>
+<div class="paragraph"><p>The desktop own settings will be treated in the Connection settings section.</p></div>
 </div>
 <div class="sect3">
-<h4 id="_lista_de_escritorios">4.2.2. Lista de escritorios</h4>
-<div class="paragraph"><p>La parte principal de esta sección es la lista de Escritorios Virtuales.</p></div>
-<div class="paragraph"><p>Cada escritorio tiene <em>datos informativos</em> como su nombre, identificador y estado. Además dispone de <em>áreas de interacción</em> para realizar acciones como conectarse al escritorio o editar su configuración.</p></div>
+<h4 id="_desktops_list">4.2.2. Desktops list</h4>
+<div class="paragraph"><p>The main block of this section is the Virtual Desktops list.</p></div>
+<div class="paragraph"><p>Each desktop has <em>informative data</em> as his name, identifier and status. In addition, it has <em>interaction areas</em> to perform actions such as connect to the desktop or edit its configuration.</p></div>
 <div class="sect4">
-<h5 id="_datos_informativos">Datos informativos</h5>
+<h5 id="_informative_data">Informative data</h5>
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>Nombre</strong>: El nombre de los escritorios viene predefinido pero puede ser editado por el usuario.
+<strong>Name</strong>: The name of the desktops is predefined but can be edited by the user.
 </p>
 </li>
 <li>
 <p>
-<strong>Identificador</strong>: El ID de los escritorios solamente se muestra a efectos de futuras incidencias en las que se le pueda solicitar al usuario.
+<strong>Identifier</strong>: The ID of the desktops is only shown just in case in future incidents can be requested to the user.
 </p>
 </li>
 <li>
 <p>
-<strong>Estado</strong>: El estado muestra si el usuario está conectado o no al escritorio. Los diferentes estados posibles son:
+<strong>Status</strong>: The status shows if the user is connected or not to the desktop. The different posible status are:
 </p>
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>Desconectado</strong>: El usuario está desconectado.
+<strong>Disconnected</strong>: The user is disconnected.
 </p>
 </li>
 <li>
 <p>
-<strong>Conectando</strong>: El usuario está conectándose.
+<strong>Connecting</strong>: The user is being connecting.
 </p>
 </li>
 <li>
 <p>
-<strong>Conectado</strong>: El usuario está conectado.
+<strong>Connected</strong>: The user is connected.
 </p>
 </li>
 <li>
 <p>
-<strong>Reconectando</strong>: El escritorio está reiniciando la sesión para reconectar al usuario. Útil en caso de dejar el usuario conectado en otra máquina o bloqueo del sistema.
+<strong>Reconnecting</strong>: The desktop is resetting the connection to reconnect the user. Useful in case of having the user connected from other computer or blocking of the system.
 </p>
 </li>
 </ul></div>
@@ -993,24 +993,24 @@ La configuración activa se verá sobrescrita por aquellos escritorios que tenga
 </ul></div>
 </div>
 <div class="sect4">
-<h5 id="_areas_de_interacion">Áreas de interación</h5>
-<div class="paragraph"><p>Los Escritorios Virtuales están representados como cajas, en las cuales la mayoría de la superficie servirá como botón de conexión. El resto de la caja, con forma de rectángulo en la parte inferior, dispone de información de conexión y un botón de ajustes.</p></div>
+<h5 id="_interaction_areas">Interaction areas</h5>
+<div class="paragraph"><p>The Virtual Desktops are represented as boxes, in wich most of the surface will serve as connection button. The rest of the box, with rectangle shape on the bottom, have connection information and a settings button.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/up_desktop_areas.png" alt="up_desktop_areas.png" width="300px">
 </span></p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>Conexión/Reconexión</strong>
+<strong>Connection/Reconnection</strong>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>Para conectarse a un Escritorio Virtual hay que hacer click en cualquier parte de la caja que representa el Escritorio excepto en el rectángulo inferior. Al pasar el ratón por encima observamos la aparición del icono de conexión.</p></div>
-<div class="paragraph"><p>Al hacer click en <em>Conectar</em> el escritorio pasará a estado <em>Conectando</em>  En el momento en que se produzca la conexión el estado pasará a <em>Conectado</em>.</p></div>
+<div class="paragraph"><p>To being connected to a Virtual Desktop you have to click on any part of the box that represents the Desktop but the bottom rectangle. When we move the mouse over it we observe the appearance of the connection icon.</p></div>
+<div class="paragraph"><p>When you click on <em>Connect</em>, the desktop will change to the status <em>Connecting</em>  When the connection will be established, the status will change to <em>Connected</em>.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/up_desktop_connect_flow.png" alt="up_desktop_connect_flow.png" width="960px">
 </span></p></div>
-<div class="paragraph"><p>Cuando el escritorio está en estado <em>Conectado</em> el mismo área que sirve para hacer la conexión, servirá para que el usuario se <em>Reconecte</em> al Escritorio. Igualmente, al pasar el ratón por encima observamos la aparición del icono de reconexión.</p></div>
+<div class="paragraph"><p>When the desktop is in status <em>Connected</em> the same area used to make the connection, will serve to the user to the user to <em>Reconnect</em> to the Desktop. In the same way, when you move the mouse over it we observe the appearance of the reconnection icon.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/up_desktop_reconnect_flow.png" alt="up_desktop_reconnect_flow.png" width="960px">
 </span></p></div>
@@ -1018,11 +1018,11 @@ La configuración activa se verá sobrescrita por aquellos escritorios que tenga
 </li>
 <li>
 <p>
-<strong>Configuración de ajustes de conexión</strong>
+<strong>Connection settings configuration</strong>
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>En la esquina inferior izquierda de las cajas que representan los Escritorios Virtuales hay un botón para acceder a los ajustes de configuración del escritorio.</p></div>
+<div class="paragraph"><p>In the lower left corner of the boxes that represent the Virtual Desktops there is a button to access to the desktop configuration settings.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/up_desktop_settings_hover.png" alt="up_desktop_settings_hover.png" width="300px">
 </span></p></div>
@@ -1032,52 +1032,52 @@ La configuración activa se verá sobrescrita por aquellos escritorios que tenga
 </div>
 </div>
 <div class="sect3">
-<h4 id="_ajustes_de_conexion_de_un_escritorio_virtual">4.2.3. Ajustes de conexión de un Escritorio Virtual</h4>
-<div class="paragraph"><p>Cuando hacemos click en el botón de ajustes de conexión en un Escritorio Virtual se abrirá una ventana modal con diferentes opciones:</p></div>
+<h4 id="_virtual_desktop_connection_settings">4.2.3. Virtual desktop connection settings</h4>
+<div class="paragraph"><p>When we click on the connection settings button of a Virtual Desktop, a modal window with different options will emerge:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>Nombre</strong>: Con este campo, el usuario podrá personalizar el nombre del Escritorio. Este nombre será visible solamente por el usuario.
+<strong>Name</strong>: With this field, the user can customize the Desktop name. This name will be visible only by the user.
 </p>
 </li>
 <li>
 <p>
-<strong>Activar ajustes propios</strong>: Si esta opción está desactivada, las siguientes opciones estarán desactivadas y corresponderán con la configuración activa en el momento.
+<strong>Enable own settings</strong>: If this option is disabled, the following options will be disabled too and it will be taken from the current active configuration.
 </p>
 <div class="openblock">
 <div class="content">
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/up_desktop_settings_disabled.png" alt="up_desktop_settings_disabled.png" width="960px">
 </span></p></div>
-<div class="paragraph"><p>De este modo se entiende qué configuración afecta al escritorio y se da la opción de sobreescribirla con ajustes propios.</p></div>
-<div class="paragraph"><p>Si se activa, las opciones se desbloquarán y se podrán cambiar, sobreescribiendo así la configuración activa con ajustes propios específicos para ese escritorio.</p></div>
+<div class="paragraph"><p>In this way it is understood wich configuration affect the desktop and is possible to overwrite it with own settings is possible.</p></div>
+<div class="paragraph"><p>If it is enabled, the options will be unblocked and it will can be edited, overwriting in this way the active configuration with specific own settings on this desktop.</p></div>
 </div></div>
 </li>
 <li>
 <p>
-<strong>Cliente</strong>: Esta opción indicará qué tipo de cliente se abrirá al conectarse al escritorio.
+<strong>Client</strong>: This option will determine what type of client will be used to establish the connection to the desktop.
 </p>
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>HTML5</strong>: Se abrirá el cliente en una pestaña del navegador.
+<strong>HTML5</strong>: The client will be openened in a tab of the browser.
 </p>
 </li>
 <li>
 <p>
-<strong>Cliente clásico</strong>: Se abrirá el cliente pesado.
+<strong>Classic client</strong>: The heavy client will be used.
 </p>
 </li>
 </ul></div>
 </li>
 </ul></div>
-<div class="paragraph"><p>Según el tipo de cliente escogido se mostrarán unas opciones determinadas.</p></div>
+<div class="paragraph"><p>Depending on the type of the client selected, specific options will shown.</p></div>
 <div class="sect4">
-<h5 id="_opciones_para_el_cliente_clasico">Opciones para el Cliente Clásico</h5>
+<h5 id="_options_for_the_classic_client">Options for the Classic Client</h5>
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>Tipo de conexión</strong>: Según la calidad de la conexión podremos escoger un tipo de conexión de las disponibles en un combo de selección.
+<strong>Connection type</strong>: Según la calidad de la conexión podremos escoger un tipo de conexión de las disponibles en un combo de selección.
 </p>
 <div class="ulist"><ul>
 <li>
@@ -1099,27 +1099,27 @@ Local
 </li>
 <li>
 <p>
-<strong>Activar audio</strong>: Esta opción activará el audio en el Escritorio Virtual.
+<strong>Enable audio</strong>: This option will enable the audio on the Virtual Desktop.
 </p>
 </li>
 <li>
 <p>
-<strong>Activar impresión</strong>: Esta opción activará la impresión en el Escritorio Virtual.
+<strong>Enable printing</strong>: This option will enable the printing on the Virtual Desktop.
 </p>
 </li>
 <li>
 <p>
-<strong>Visualización a pantalla completa</strong>: Esta opción activará la pantalla completa en cliente pesado.
+<strong>Full screen visualization</strong>: This option will enable full screen mode in the heavy client.
 </p>
 </li>
 <li>
 <p>
-<strong>Compartir carpetas</strong>: Al activar esta opción aparecerá una caja de texto para especificar las rutas (una por línea) de las carpetas locales que se desean compartir con el escritorio.
+<strong>Share folders</strong>: When enable this option a text box will appear to specify the path (one per line) of the local folders that you want to share with the desktop.
 </p>
 </li>
 <li>
 <p>
-<strong>Compartir USB</strong>: Al activar esta opción aparecerá una caja de texto para especificar los IDs (uno por línea) de los dispositivos USB que se desean compartir con el escritorio.
+<strong>Share USB</strong>:  When enable this option a text box will appear to specify the IDs (one per line) of the USB devices that you want to share with the desktop.
 </p>
 </li>
 </ul></div>
@@ -1128,11 +1128,11 @@ Local
 </span></p></div>
 </div>
 <div class="sect4">
-<h5 id="_opciones_para_el_cliente_html5">Opciones para el Cliente HTML5</h5>
+<h5 id="_options_for_the_html5_client">Options for the HTML5 Client</h5>
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>Visualización a pantalla completa</strong>: Esta opción activará la pantalla completa en el Navegador.
+<strong>Full screen visualization</strong>: This option will enable the browser full screen mode.
 </p>
 </li>
 </ul></div>
@@ -1143,48 +1143,48 @@ Local
 </div>
 </div>
 <div class="sect2">
-<h3 id="_ajustes">4.3. Ajustes</h3>
+<h3 id="_settings">4.3. Settings</h3>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/up_section_settings.png" alt="up_section_settings.png" width="960px">
 </span></p></div>
-<div class="paragraph"><p>En esta sección se encuentra la gestión de Workspaces.</p></div>
-<div class="paragraph"><p>Se dispone de un listado con los Workspaces asociados al usuario junto con opciones de creado, clonado, borrado y activación.</p></div>
-<div class="paragraph"><p>Por defecto viene un Workspace <strong>Default</strong> que se puede editar pero no se puede borrar.</p></div>
+<div class="paragraph"><p>This section contains the Workspaces management.</p></div>
+<div class="paragraph"><p>There is a list of the Workspaces associated to the user wit the options of creation, clonation, deletion and activation.</p></div>
+<div class="paragraph"><p>By default there is a Workspace named <strong>Default</strong> that can be edited but it is not possible to be deleted.</p></div>
 <div class="sect3">
-<h4 id="_crear_nuevo_workspace">4.3.1. Crear nuevo Workspace</h4>
-<div class="paragraph"><p>En el inferior de la lista se encuentra un botón para crear un Workspace desde cero.</p></div>
-<div class="paragraph"><p>Al crear un Workspace aparecerá una ventana modal con los siguientes campos:</p></div>
+<h4 id="_create_new_workspace">4.3.1. Create new Workspace</h4>
+<div class="paragraph"><p>On the bottom of the list there is a button to create a Workspace from the scratch.</p></div>
+<div class="paragraph"><p>When creating a Workspace a modal window will emerge with the following fields:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>Nombre</strong>: Nombre del Workspace
+<strong>Name</strong>: Nombre del Workspace
 </p>
 </li>
 <li>
 <p>
-<strong>Cliente</strong>: Esta opción indicará qué tipo de cliente se abrirá al conectarse al escritorio.
+<strong>Client</strong>: This option will determine what type of client will be used to establish the connection to the desktop.
 </p>
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>HTML5</strong>: Se abrirá el cliente en una pestaña del navegador.
+<strong>HTML5</strong>: The client will be openened in a tab of the browser.
 </p>
 </li>
 <li>
 <p>
-<strong>Cliente clásico</strong>: Se abrirá el cliente pesado.
+<strong>Classic client</strong>: The heavy client will be used.
 </p>
 </li>
 </ul></div>
 </li>
 </ul></div>
-<div class="paragraph"><p>Según el tipo de cliente escogido se mostrarán unas opciones determinadas.</p></div>
+<div class="paragraph"><p>Depending on the type of the client selected, specific options will shown.</p></div>
 <div class="sect4">
-<h5 id="_opciones_para_el_cliente_clasico_2">Opciones para el Cliente Clásico</h5>
+<h5 id="_options_for_the_classic_client_2">Options for the Classic Client</h5>
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>Tipo de conexión</strong>: Según la calidad de la conexión podremos escoger un tipo de conexión de las disponibles en un combo de selección.
+<strong>Connection type</strong>: Según la calidad de la conexión podremos escoger un tipo de conexión de las disponibles en un combo de selección.
 </p>
 <div class="ulist"><ul>
 <li>
@@ -1206,27 +1206,27 @@ Local
 </li>
 <li>
 <p>
-<strong>Activar audio</strong>: Esta opción activará el audio en el Escritorio Virtual.
+<strong>Enable audio</strong>: This option will enable the audio on the Virtual Desktop.
 </p>
 </li>
 <li>
 <p>
-<strong>Activar impresión</strong>: Esta opción activará la impresión en el Escritorio Virtual.
+<strong>Enable printing</strong>: This option will enable the printing on the Virtual Desktop.
 </p>
 </li>
 <li>
 <p>
-<strong>Visualización a pantalla completa</strong>: Esta opción activará la pantalla completa en cliente pesado.
+<strong>Full screen visualization</strong>: This option will enable full screen mode in the heavy client.
 </p>
 </li>
 <li>
 <p>
-<strong>Compartir carpetas</strong>: Al activar esta opción aparecerá una caja de texto para especificar las rutas (una por línea) de las carpetas locales que se desean compartir con el escritorio.
+<strong>Share folders</strong>: When enable this option a text box will appear to specify the path (one per line) of the local folders that you want to share with the desktop.
 </p>
 </li>
 <li>
 <p>
-<strong>Compartir USB</strong>: Al activar esta opción aparecerá una caja de texto para especificar los IDs (uno por línea) de los dispositivos USB que se desean compartir con el escritorio.
+<strong>Share USB</strong>:  When enable this option a text box will appear to specify the IDs (one per line) of the USB devices that you want to share with the desktop.
 </p>
 </li>
 </ul></div>
@@ -1235,11 +1235,11 @@ Local
 </span></p></div>
 </div>
 <div class="sect4">
-<h5 id="_opciones_para_el_cliente_html5_2">Opciones para el Cliente HTML5</h5>
+<h5 id="_options_for_the_html5_client_2">Options for the HTML5 Client</h5>
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>Visualización a pantalla completa</strong>: Esta opción activará la pantalla completa en el Navegador.
+<strong>Full screen visualization</strong>: This option will enable the browser full screen mode.
 </p>
 </li>
 </ul></div>
@@ -1249,97 +1249,97 @@ Local
 </div>
 </div>
 <div class="sect3">
-<h4 id="_clonar_workspace_existente">4.3.2. Clonar Workspace existente</h4>
-<div class="paragraph"><p>Esta opción es para crear un Workspace a partir de otro.</p></div>
+<h4 id="_clone_existing_workspace">4.3.2. Clone existing Workspace</h4>
+<div class="paragraph"><p>This option is used to create a Workspace based on another.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/up_settings_button_clone.png" alt="up_settings_button_clone.png" width="300px">
 </span></p></div>
-<div class="paragraph"><p>Al igual que con el botón de crear nuevo Workspace, aparecerá una ventana modal con el formulario con los atributos del Workspace, solo que en este caso aparecerán por defecto rellenados con la configuración del Workspace origen de la clonación.</p></div>
+<div class="paragraph"><p>As with the new Workspace button, a modal window will emerge containing the form with the Workspace attributes. In this case, the fields will be filled by default with the origin Workspace configuration.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/up_settings_clone.png" alt="up_settings_clone.png" width="960px">
 </span></p></div>
 </div>
 <div class="sect3">
-<h4 id="_establecer_workspace_como_activo">4.3.3. Establecer Workspace como activo</h4>
-<div class="paragraph"><p>Con esta opción se establece un Workspace como la configuración activa del User Portal.</p></div>
+<h4 id="_set_workspace_as_active">4.3.3. Set Workspace as active</h4>
+<div class="paragraph"><p>With this option a Workspace is setted as the configuration active of the User Portal.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/up_settings_button_active.png" alt="up_settings_button_active.png" width="300px">
 </span></p></div>
-<div class="paragraph"><p>Esta configuración será la utilizada en la conexión por los Escritorios Virtuales salvo que tengan su configuración propia activada.</p></div>
+<div class="paragraph"><p>This configuration will be used in the Virtual Desktops connection unless for the Desktops with own configuration enabled.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Sólo un Workspace puede estar establecido como configuración activa.
+Only one Workspace can be setted as active configuration.
 </p>
 </li>
 </ul></div>
 </div>
 <div class="sect3">
-<h4 id="_eliminar_workspace">4.3.4. Eliminar Workspace</h4>
-<div class="paragraph"><p>Con esta opción se eliminará permanentemente un Workspace.</p></div>
+<h4 id="_delete_workspace">4.3.4. Delete Workspace</h4>
+<div class="paragraph"><p>With this option a Workspace will be deleted permanently.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/up_settings_button_delete.png" alt="up_settings_button_delete.png" width="300px">
 </span></p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Si se elimina el Workspace activo, pasará a ser activo el Workspace <em>Default</em>.
+If the active Workspace is selected, the Workspace <em>Default</em> will be the active on.
 </p>
 </li>
 <li>
 <p>
-El Workspace <em>Default</em> no dispone de esta opción al ser un Workspace proporcionado por la aplicación por defecto.
+The Workspace <em>Default</em> doesn&#8217;t have this option due to be a Workspace provided by the application by default.
 </p>
 </li>
 </ul></div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_descarga_de_clientes">4.4. Descarga de clientes</h3>
-<div class="paragraph"><p>Esta sección contiene una relación de links a los diferentes clientes de QVD disponibles en la web.</p></div>
+<h3 id="_clients_download">4.4. Clients download</h3>
+<div class="paragraph"><p>This section contains a list of links to the different QVD clients available on the web.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/up_section_downloads.png" alt="up_section_downloads.png" width="960px">
 </span></p></div>
 </div>
 <div class="sect2">
-<h3 id="_informacion_de_conexion">4.5. Información de conexión</h3>
-<div class="paragraph"><p>En esta sección se muestran los datos de la última conexión del usuario a un escritorio virtual.</p></div>
+<h3 id="_connection_information">4.5. Connection information</h3>
+<div class="paragraph"><p>This section contains the data of the last connection of the user to a virtual desktop.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/up_section_info.png" alt="up_section_info.png" width="960px">
 </span></p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Geolocalización
+Geolocation
 </p>
 <div class="ulist"><ul>
 <li>
 <p>
-Coordenadas
+Coordinates
 </p>
 <div class="ulist"><ul>
 <li>
 <p>
-Latitud
+Latitude
 </p>
 </li>
 <li>
 <p>
-Longitud
+Longitude
 </p>
 </li>
 </ul></div>
 </li>
 <li>
 <p>
-Mapa (Open Street Map)
+Map (Open Street Map)
 </p>
 </li>
 </ul></div>
 </li>
 <li>
 <p>
-Navegador
+Browser
 </p>
 <div class="ulist"><ul>
 <li>
@@ -1366,7 +1366,7 @@ etc
 </li>
 <li>
 <p>
-Sistema operativo
+Operating system
 </p>
 <div class="ulist"><ul>
 <li>
@@ -1403,17 +1403,17 @@ etc
 </li>
 <li>
 <p>
-Dispositivo
+Device
 </p>
 <div class="ulist"><ul>
 <li>
 <p>
-Escritorio
+Desktop
 </p>
 </li>
 <li>
 <p>
-Móvil
+Mobile
 </p>
 </li>
 <li>
@@ -1426,12 +1426,12 @@ etc
 </ul></div>
 </div>
 <div class="sect2">
-<h3 id="_ayuda">4.6. Ayuda</h3>
-<div class="paragraph"><p>En la sección ayuda se tiene acceso a los distintos manuales de la aplicación.</p></div>
+<h3 id="_help">4.6. Help</h3>
+<div class="paragraph"><p>This section contains the access to the different manuals of the application.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/up_section_help.png" alt="up_section_help.png" width="960px">
 </span></p></div>
-<div class="paragraph"><p>Además se dispone la información de versionado y licencia.</p></div>
+<div class="paragraph"><p>In addition it contains the version and license information.</p></div>
 </div>
 </div>
 </div>
@@ -1439,7 +1439,7 @@ etc
 <div id="footnotes"><hr></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-02-14 13:44:44 CET
+Last updated 2018-02-14 13:43:25 CET
 </div>
 </div>
 </body>

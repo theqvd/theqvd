@@ -1797,26 +1797,16 @@ body {
         /* line 1, /home/zarzuelo/code/testing/qvd-src/up/style/components/_layout-doc.scss */
         .wrapper .content .doc-side {
           width: 16%;
-          height: auto;
-          float: left;
-          padding-right: 2%;
-          margin-right: 2%;
-          border-right: 1px dotted #c5c5c5; } }
+          height: auto; } }
     /* line 23, /home/zarzuelo/code/testing/qvd-src/up/style/components/_layout-doc.scss */
     .wrapper .content .doc-block {
-      width: 90%;
+      width: 100%;
+      background: #EBEBEB;
+      padding: 20px;
       height: auto;
-      float: right;
-      padding-right: 2%;
-      margin-right: 2%;
       margin-bottom: 60px; }
-      @media screen and (min-width: 41em) {
-        /* line 23, /home/zarzuelo/code/testing/qvd-src/up/style/components/_layout-doc.scss */
-        .wrapper .content .doc-block {
-          width: 80%;
-          width: 95%; } }
       @media only screen and (max-width: 41em) {
-        /* line 46, /home/zarzuelo/code/testing/qvd-src/up/style/components/_layout-doc.scss */
+        /* line 44, /home/zarzuelo/code/testing/qvd-src/up/style/components/_layout-doc.scss */
         .wrapper .content .doc-block .sect2, .wrapper .content .doc-block .sect3 {
           overflow: scroll; } }
     /* line 12, /home/zarzuelo/code/testing/qvd-src/up/style/components/_layout-login.scss */
