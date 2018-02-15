@@ -33,9 +33,6 @@ Up.CRUD.workspaces = {
         var dialogConf = {
             title: $.i18n.t('Edit Workspace') + ': ' + model.get('name'),
             buttons : {
-                "Reset form": function () {
-                    Up.I.resetForm(this);
-                },
                 "Cancel": function () {
                     // Close dialog
                     Up.I.closeDialog($(this));

@@ -9,7 +9,7 @@ Up.CRUD.desktops = {
             title: $.i18n.t('Desktop settings') + ': ' + model.get('name'),
             buttons : {
                 "Reset form": function () {
-                    Up.I.resetForm(this);
+                    that.resetForm(this);
                 },
                 "Cancel": function () {
                     // Close dialog
@@ -230,5 +230,18 @@ Up.CRUD.desktops = {
         }
 
         Up.I.dialog(dialogConf);
-    }
+    },
+    
+    resetForm: function (context) {
+        Up.I.renderEditionModeParameters(Up.CurrentView.modelInEdition, Up.CurrentView.modelInEdition.get('settings_enabled'));
+        
+        // Restore name and settings enabled checkbox
+        var nameCtl = $(context).find('.js-form-field[name="name"]');
+        var nameValue = $(nameCtl).attr('data-original-value');
+        $(nameCtl).val(nameValue);
+        
+        var settingsEnabledCtl = $(context).find('.js-form-field[name="settings_enabled"]');
+        var settingsEnabledChecked = parseInt($(settingsEnabledCtl).attr('data-original-checked')) ? true : false;
+        $(settingsEnabledCtl).prop('checked',settingsEnabledChecked);
+    },
 }

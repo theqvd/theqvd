@@ -774,19 +774,6 @@ Up.I = {
         return params;
     },
     
-    resetForm: function (context) {
-        Up.I.renderEditionModeParameters(Up.CurrentView.modelInEdition, Up.CurrentView.modelInEdition.get('settings_enabled'));
-        
-        // Restore name and settings enabled checkbox
-        var nameCtl = $(context).find('.js-form-field[name="name"]');
-        var nameValue = $(nameCtl).attr('data-original-value');
-        $(nameCtl).val(nameValue);
-        
-        var settingsEnabledCtl = $(context).find('.js-form-field[name="settings_enabled"]');
-        var settingsEnabledChecked = parseInt($(settingsEnabledCtl).attr('data-original-checked')) ? true : false;
-        $(settingsEnabledCtl).prop('checked',settingsEnabledChecked);
-    },
-    
     setMenuOptionSelected: function (dataTarget) {
         $('.menu-option').removeClass('menu-option--current');
         $('[data-target="' + dataTarget + '"]').addClass('menu-option--current');
