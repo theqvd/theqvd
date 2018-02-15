@@ -6,13 +6,34 @@ Up.Models.Workspace = Up.Models.Model.extend({
         fixed: false,
         active: false,
         settings: {
-            client: 'classic',
-            connection: 'adsl',
-            audio: false,
-            printers: false,
-            fullscreen: false,
-            share_folders: false,
-            share_usb: false
+            client: {
+                list: [],
+                value : 'classic'
+            },
+            connection: {
+                list: [],
+                value : 'adsl'
+            },
+            audio: {
+                list: [],
+                value : false
+            },
+            printers: {
+                list: [],
+                value : false
+            },
+            fullscreen: {
+                list: [],
+                value : false
+            },
+            share_folders: {
+                list: [],
+                value : false
+            },
+            share_usb: {
+                list: [],
+                value : false
+            }
         }
     }
 
