@@ -118,7 +118,7 @@ sub handle_usbip {
 
     DEBUG "Requesting protocol switch";
     my ($code, $msg, $headers, $data) =
-    $self->{httpc}->make_http_request(POST => '/usbip',
+    $self->httpc->make_http_request(POST => '/usbip',
         headers => [
             "Authorization: Basic $self->{auth_key}",
             'Connection: Upgrade', 
