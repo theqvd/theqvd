@@ -68,6 +68,7 @@ my $build = $mod->new (
         'X11::Protocol' => 0,
         'Locale::gettext' => 0,
         'Locale::Msgfmt' => 0,
+        'Linux::USBIP' => 0,
     },
     xpm_files    => {
         'pixmaps/qvd.xpm' => 'pixmaps/qvd.xpm',
