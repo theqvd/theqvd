@@ -61,25 +61,25 @@ if ($params{'qvd.hook.on_printing'} eq 'connected') {
         }
     }
     elsif ($flavor eq 'ipp') {
+        my @printers = map { /^([^ ]+)/, $1} `lpstat -h 127.0.0.1:$ptr_port -a`;
         my $default_set;
-        if (open my $fh, '-|', 'lpstat', -h => "127.0.0.1:$ptr_port", '-a') {
-            if (my ($ptr) = /^(\S+)/) {
+
+        for my $ptr (@printers) {
+            if (system($lpadmin,
+                -p => "QVD-$ptr",
+                -v => "ipp://127.0.0.1:$ptr_port/printers/$ptr",
+                '-E') == 0) {
                 INFO "Registering printer 'QVD-$ptr'";
-                if (system($lpadmin,
-                           -p => "QVD-$ptr",
-                           -v => "ipp://127.0.0.1:$ptr_port/printers/$ptr",
-                           '-E') == 0) {
-                    # Set the first printer as the default
-                    # one. Otherwise the lp tools complain there is
-                    # "no default destination available" when trying
-                    # to print without specifying a printer. Newer
-                    # software using CUPS doesn't seem to care.
-                    system($lpadmin, "-d", "QVD-$ptr")
-                        unless $default_set++;
-                }
-                else {
-                    ERROR "Unable to register printer '$ptr', lpadmin failed: $?";
-                }
+                # Set the first printer as the default
+                # one. Otherwise the lp tools complain there is
+                # "no default destination available" when trying
+                # to print without specifying a printer. Newer
+                # software using CUPS doesn't seem to care.
+                system($lpadmin, "-d", "QVD-$ptr")
+                    unless $default_set++;
+            }
+            else {
+                ERROR "Unable to register printer '$ptr', lpadmin failed: $?";
             }
         }
     }
