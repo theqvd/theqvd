@@ -154,12 +154,8 @@ build:
 
   nxproxy:
     repository:
-      url: https://github.com/ArcticaProject/nx-libs.git
-      # branch: 9193d11eeeea933e293acd5e0f03fa4e9887186b
-      branch: 3.6.x
-      #url: https://github.com/salva/nx-libs.git
-      #branch: fix-cygwin-compilation
-
+      url: https://github.com/theqvd/nx-libs.git
+      branch: 3.5.99.10.1
     build:
       env: cygwin
       commands:
@@ -183,7 +179,7 @@ build:
   qvd-slaveserver-wrapper:
     repository:
       url: https://github.com/theqvd/theqvd.git
-      branch: client-cleanup
+      branch: master
     build:
       env: cygwin
       subdir: windows/qvd-slaveserver-wrapper
@@ -221,7 +217,7 @@ build:
   qvd-client:
     repository:
       url: https://github.com/theqvd/theqvd.git
-      branch: client-cleanup
+      branch: master
     build:
       env: perl
       subdir: windows/installer
@@ -231,7 +227,7 @@ build:
   qvd-automate:
     repository:
       url: https://github.com/theqvd/theqvd.git
-      branch: client-cleanup
+      branch: master
     build:
       env: perl
       subdir: windows/automate
