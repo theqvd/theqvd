@@ -43,6 +43,7 @@ my $build = Module::Build->new(
 		'QVD::HTTP::StatusCodes' => 0,
 		'QVD::HTTPD' => 0,
         'QVD::SimpleRPC::Server' => 0,
+        'Linux::USBIP' => 0,
     },
     etc_files=> {
         "etc/vma_defaults.conf"  => "$vma_dst/qvd-vma",
