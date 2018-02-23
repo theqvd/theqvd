@@ -1,0 +1,30 @@
+=== qvd-vma-slaveserver-usbip ===
+
+This is a C wrapper with setuid root for running QVD-VMA usbip related activities
+with the correct permissions.
+
+Makefile instructions:
+
+make
+^^^^
+Compile binary.
+
+make deb
+^^^^^^^^
+Compile binary and make debian package.
+Requires root due to setting special permissions.
+
+make rpm
+^^^^^^^^
+Compile binary and make rpm package.
+Requires root due to setting special permissions.
+
+make packages
+^^^^^^^^^^^^^
+Compile binary and make debian and rpm packages.
+Requires root due to setting special permissions.
+
+make clean
+^^^^^^^^^^
+Delete all files created by previous compilations.
+Probably requires root, given packages are created with root.
