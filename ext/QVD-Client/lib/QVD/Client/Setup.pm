@@ -44,11 +44,14 @@ BEGIN {
     $app_dir = core_cfg('path.client.installation', 0);
     unless ($app_dir) {
         my ($drive, $dir, $file) = File::Spec->splitpath(File::Spec->rel2abs($0));
-        my $bin_dir = File::Spec->catpath($drive, $dir);
+        my $bin_dir;
+
         if ($WINDOWS) {
+            $bin_dir = File::Spec->catpath($drive, $dir);
             $app_dir = $bin_dir;
         }
         else {
+            $bin_dir = $dir;
             my @dirs = File::Spec->splitdir($bin_dir);
             $app_dir = File::Spec->catdir( @dirs[0..$#dirs-1] );
         }

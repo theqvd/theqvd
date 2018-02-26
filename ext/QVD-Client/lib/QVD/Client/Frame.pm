@@ -247,9 +247,9 @@ sub new {
         # Sharing
         ########################
 
-        my $this_text = Wx::StaticText->new($settings_panel, -1, $self->_t("Share"));
-        $this_text->SetFont(Wx::Font->new(10,wxDEFAULT,wxDEFAULT,wxBOLD,0,""));
-        $settings_sizer->Add( $this_text ,Wx::GBPosition->new(7,0), Wx::GBSpan->new(1,1), wxTOP|wxLEFT|wxEXPAND, 10);
+        my $share_text = Wx::StaticText->new($settings_panel, -1, $self->_t("Share"));
+        $share_text->SetFont(Wx::Font->new(10,wxDEFAULT,wxDEFAULT,wxBOLD,0,""));
+        $settings_sizer->Add( $share_text ,Wx::GBPosition->new(7,0), Wx::GBSpan->new(1,1), wxTOP|wxLEFT|wxEXPAND, 10);
 
         $settings_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Enable shared folders")),Wx::GBPosition->new(8,0), Wx::GBSpan->new(1,1), wxLEFT, 10);
         $self->{share_enable} = Wx::CheckBox->new($settings_panel, -1, "", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, wxDefaultValidator, "checkBox");
@@ -917,7 +917,6 @@ sub OnUnknownCert {
                 }
 
                 my $hsizer = Wx::BoxSizer->new(wxHORIZONTAL);
-                my $excl = Wx::StaticText->new($info_panel, -1, "    !");
                 my $excl = Wx::StaticText->new($info_panel, -1, "    " . chr(0x26A0));
 
                 $font = $excl->GetFont();
@@ -1168,14 +1167,6 @@ sub load_usb_devices {
         $self->{usbip_device_list}->Check($i,1);
     }
 
-}
-
-sub share_del {
-    my ($self) = @_;
-
-    my ($first_selection) = $self->{share_list}->GetSelections();
-    $self->{share_list}->Delete($first_selection);
-    splice @{$self->{shares}}, $first_selection,1;
 }
 
 sub share_add {

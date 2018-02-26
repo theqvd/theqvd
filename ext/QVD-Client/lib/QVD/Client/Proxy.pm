@@ -498,15 +498,15 @@ sub _parse_flags {
         $const =~ s/\s+$//;
 
         DEBUG "Checking constant $const";
-        my $func_defined = eval "use $module; defined &$module::$const";
+        my $func_defined = eval "use ${module}; defined &${module}::${const}";
         if ( $@ ) {
-            ERROR "Error when checking $module::$const: $@";
+            ERROR "Error when checking ${module}::${const}: $@";
         } else {
             if ( $func_defined ) {
                 DEBUG "Constant found: '$const'";
-                my $ret = eval "use $module; $module::$const();";
+                my $ret = eval "use $module; ${module}::${const}();";
                 if ($@) {
-                    ERROR "Error when calling $module::$const: $@";
+                    ERROR "Error when calling ${module}::${const}: $@";
                 } else {
                     $result |= $ret;
                     DEBUG "Constant's value: $ret";
@@ -568,13 +568,11 @@ print "auth-type: ".$auth_type."\n";
 
     if ($code != HTTP_OK) {
         my $message;
-        given ($code) {
-            when (HTTP_UNAUTHORIZED) {
-                $message = "The server has rejected your login. Please verify that your username and password are correct.";
-            }
-            when (HTTP_SERVICE_UNAVAILABLE) {
-                $message = "The server is under maintenance. Retry later.\nThe server said: $body";
-            }
+
+        if ( $code == HTTP_UNAUTHORIZED ) {
+            $message = "The server has rejected your login. Please verify that your username and password are correct.";
+        } elsif ( $code == HTTP_SERVICE_UNAVAILABLE ) {
+            $message = "The server is under maintenance. Retry later.\nThe server said: $body";
         }
         $message ||= "$host replied with $msg";
         INFO("Connection error: $message");
@@ -956,7 +954,6 @@ sub _run {
                             $qvd_pa->cmd("load-module", "module-tunnel-sink-new",
                                 "sink_name=QVD", "server=tcp:127.0.0.1:52001",
                                 "sink=\@DEFAULT_SINK\@");
-                            sleep(20);
                         } else {
                             ERROR "Cannot start a pulseaudio with opus compression enabled";
                         }

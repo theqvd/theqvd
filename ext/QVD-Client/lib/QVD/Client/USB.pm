@@ -153,10 +153,10 @@ sub _read_line {
     my ($file,$fatal) = @_;
     my $result;
 
-    open my $file, '<', $file
+    open my $fh, '<', $file
         or do { ERROR "Can't open $file" if $fatal; return; };
-    $result = <$file>;
-    close $file
+    $result = <$fh>;
+    close $fh
         or do { ERROR "Can't close $file";};
     chomp $result;
 

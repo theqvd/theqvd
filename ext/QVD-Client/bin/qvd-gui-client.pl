@@ -36,8 +36,23 @@ $pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps.alt'), $app_dir
 INFO "pixmaps_dir: $pixmaps_dir";
 
 $SIG{PIPE} = 'IGNORE';
-$SIG{__WARN__} = sub { WARN "@_"; };
-$SIG{__DIE__} = sub { ERROR "@_"; die (@_) };
+
+$SIG{__WARN__} = sub {
+    local $Log::Log4perl::caller_depth =
+          $Log::Log4perl::caller_depth + 1;
+    WARN "@_";
+};
+
+$SIG{__DIE__} = sub {
+    local $Log::Log4perl::caller_depth =
+          $Log::Log4perl::caller_depth + 1;
+
+    if ( $^S ) {
+        DEBUG "die called inside eval: @_";
+    } else {
+        LOGDIE "@_";
+    }
+};
 
 use QVD::Client::Frame;
 use parent 'Wx::App';

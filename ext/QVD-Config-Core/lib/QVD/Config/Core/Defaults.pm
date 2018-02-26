@@ -362,7 +362,7 @@ client.ssl.error_timeout=5
 client.ssl.ocsp_mode=SSL_OCSP_TRY_STAPLE|SSL_OCSP_FAIL_HARD
 
 ## slave shell
-client.slave.command = ${path.qvd.bin}/
+client.slave.command = ${path.qvd.bin}/qvd-client-slaveserver
 @mswin@client.slave.command = qvd-client-slaveserver
 @mswin@client.slave.wrapper = bin/qvd-slaveserver-wrapper.exe
 client.slave.client = ${path.qvd.bin}/qvd-slaveclient
