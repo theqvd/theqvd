@@ -63,8 +63,8 @@ if ($^O eq 'darwin') {
 sub new {
     my ($class) = @_;
     my $self = $class->SUPER::new();
-    $self->set_http_request_processor(\&handle_put_share, PUT => '/shares/*');
-    $self->set_http_request_processor(\&handle_get_share, GET => '/shares/*');
+    $self->set_http_request_processor(\&handle_put_share, PUT => '/shares/**');
+    $self->set_http_request_processor(\&handle_get_share, GET => '/shares/**');
     $self->set_http_request_processor(\&handle_open, POST => '/open/*');
     $self->set_http_request_processor(\&handle_usbip, POST => '/usbip');
     bless $self, $class;
