@@ -458,6 +458,9 @@ api.group = root
 api.stdout.filename = /dev/null
 api.stderr.filename = /dev/null
 
+# QVD API log levels: debug, info, warn, error, fatal
+api.log.level = error
+
 # QVD User Portal API parameters
 up.api.url = https://*:4433
 up.api.user = root

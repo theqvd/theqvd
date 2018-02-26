@@ -3,7 +3,6 @@
 BEGIN {
 	$QVD::Config::USE_DB = 1;
 	@QVD::Config::Core::FILES = (
-		'/etc/qvd/node.conf',
 		'/etc/qvd/api.conf',
 		($ENV{HOME} || $ENV{APPDATA}).'/.qvd/api.conf',
 		'qvd-api.conf',
@@ -123,7 +122,9 @@ app->hook(after_render => sub {
 
 # Intended to store log info about the API
 
-app->log( Mojo::Log->new( path => app->qvd_admin4_api->_cfg('log.api.filename'), level => 'debug' ) );
+app->log( Mojo::Log->new(
+    path  => app->qvd_admin4_api->_cfg('log.api.filename'),
+    level => app->qvd_admin4_api->_cfg('api.log.level') ) );
 
 # Package that implements an ad hoc transport system for the sessions manager (MojoX::Session) 
 # According to MojoX::Session specifications, it must provide methods intended to get the session
