@@ -7,19 +7,20 @@ qvd-vma-slaveserver-usbip: qvd-vma-slaveserver-usbip.c
 
 .PHONY: deb
 
-deb: qvd-vma-slaveserver-usbip
+deb: check-env qvd-vma-slaveserver-usbip
 	mkdir -p build/usr/lib/qvd/bin/
-	cp -R DEBIAN build/
 	mkdir debian-package/
+	cp -R DEBIAN build/
+	echo "Version: $(QVD_VERSION)-$(QVD_RELEASE)" >> build/DEBIAN/control
 	cp qvd-vma-slaveserver-usbip build/usr/lib/qvd/bin/
 	chown -R root:root build
 	dpkg-deb --build build debian-package
 
 .PHONY: rpm
 
-rpm: qvd-vma-slaveserver-usbip
+rpm: check-env qvd-vma-slaveserver-usbip
 	mkdir -p rpm-package $(rpmbuild)/BUILD $(rpmbuild)/BUILDROOT $(rpmbuild)/RPMS $(rpmbuild)/SOURCES $(rpmbuild)/SRPMS
-	rpmbuild -D '_topdir $(rpmbuild)' -D 'sourcedir $(datadir)' -D 'qvd_version 4.1.0' -D 'release 0.1' -bb SPECS/qvd-vma-slaveserver-usbip.spec
+	rpmbuild -D '_topdir $(rpmbuild)' -D 'sourcedir $(datadir)' -D 'qvd_version $(QVD_VERSION)' -D 'release $(QVD_RELEASE)' -bb SPECS/qvd-vma-slaveserver-usbip.spec
 	cp $(rpmbuild)/RPMS/x86_64/qvd-vma-slaveserver-usbip*.rpm rpm-package/
 
 .PHONY: packages
@@ -34,3 +35,13 @@ clean:
 	rm -Rf debian-package
 	rm -Rf rpm-package
 	rm -Rf $(rpmbuild)
+
+.PHONY: check-env
+
+check-env:
+ifndef QVD_VERSION
+	$(error Environment variable QVD_VERSION is undefined: cannot make packages)
+endif
+ifndef QVD_RELEASE
+	$(error Environment variable QVD_RELEASE is undefined: cannot make packages)
+endif

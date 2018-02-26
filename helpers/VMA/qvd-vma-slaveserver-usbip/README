@@ -13,16 +13,19 @@ make deb
 ^^^^^^^^
 Compile binary and make debian package.
 Requires root due to setting special permissions.
+Expects QVD_VERSION and QVD_RELEASE environment variables.
 
 make rpm
 ^^^^^^^^
 Compile binary and make rpm package.
 Requires root due to setting special permissions.
+Expects QVD_VERSION and QVD_RELEASE environment variables.
 
 make packages
 ^^^^^^^^^^^^^
 Compile binary and make debian and rpm packages.
 Requires root due to setting special permissions.
+Expects QVD_VERSION and QVD_RELEASE environment variables.
 
 make clean
 ^^^^^^^^^^
