@@ -56,7 +56,7 @@ my $QVD_OBJECTS_TO_LOG_MAPPER = {
 # the 'type_of_action' column in the log table of DB
 
 my $TYPES_OF_ACTION_TO_LOG_MAPPER = {
-    list => 'see', details => 'see', tiny => 'see', all_ids => 'see',
+    list => 'see',
     delete => 'delete', update => 'update', 
     create_or_update => 'create_or_update', exec => 'exec', 
     state => 'see', create => 'create' 
@@ -90,8 +90,6 @@ my $UNAMBIGUOUS_FILTERS = {
 		Operative_Acls_In_Administrator => [qw(admin_id)]
 	},
 
-    details => { default => [qw(id)] },
-
     update => { default => [qw(id)] },
 
     delete => { default => [qw(id)] },
@@ -109,15 +107,6 @@ my $RELATED_VIEWS_IN_DB = {
 	      Host => [qw(Host_View)],
 	      OSF => [qw(OSF_View)],
 	      DI => [qw(DI_View)],
-		Role => [qw(Role_View)],
-	},
-
-	details => {
-		User => [qw(User_View)],
-		 VM => [qw(VM_View)],
-		 Host => [qw(Host_View)],
-		 OSF => [qw(OSF_View)],
-		 DI => [qw(DI_View)],
 		Role => [qw(Role_View)],
 	},
 };
@@ -686,72 +675,10 @@ my $AVAILABLE_FILTERS = {
 
 		QVD_Object_Property_List => [qw(tenant_id)],
 
-		Property_List => [qw(tenant_id id key description)]
-	},
-
-	all_ids => {
-		default => [],
-
-		 VM => [qw(storage id name description user_id user_name  osf_id osf_name di_tag blocked expiration_soft 
-                           expiration_hard state host_id host_name di_name di_id user_state ip next_boot_ip ssh_port 
-                           vnc_port serial_port tenant_id tenant_name  creation_date creation_admin_id creation_admin_name ip_in_use di_id_in_use )],
-
-		 DI_Tag => [qw(osf_id di_id name id tenant_id tenant_name)],
-
-		 User => [qw(id name description blocked creation_date creation_admin_id creation_admin_name tenant_id tenant_name )],
-
-		 Host => [qw(id name description address blocked frontend backend state vm_id creation_date creation_admin_id creation_admin_name)],
+		Property_List => [qw(tenant_id id key description)],
         
-        DI => [qw(id disk_image description version osf_id osf_name blocked tags
-            properties creation_date creation_admin_id creation_admin_name
-            state state_ts elapsed_time auto_publish foreign_id
-            expiration_time_soft expiration_time_hard
-            percentage error_code status_message)],
-        
-		 OSF => [qw(id name description overlay user_storage memory vm_id di_id  tenant_id tenant_name creation_date creation_admin_id creation_admin_name)],
-
-		 ACL => [qw(id name description role_id admin_id description )],
-
-		 Role => [qw(name id description fixed internal tenant_id tenant_name creation_date creation_admin_id creation_admin_name)],
-
-		Tenant => [qw(id name description language block blocked creation_date creation_admin_id creation_admin_name)],
-
-		 Administrator => [qw(id name description tenant_id tenant_name language block creation_date creation_admin_id creation_admin_name)],
-
-		Views_Setup_Properties_Tenant => [qw(id tenant_id tenant_name qvd_obj_prop_id key visible view_type device_type qvd_object)],
-
-		Views_Setup_Attributes_Tenant => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object)],
-
-		Views_Setup_Properties_Administrator => [qw(id admin_id qvd_obj_prop_id key visible view_type device_type qvd_object)],
-
-		Views_Setup_Attributes_Administrator => [qw(id admin_id field visible view_type device_type qvd_object)],
-
-	         Operative_Acls_In_Role => [qw(acl_name role_id operative id name description)],
-			   
-	         Operative_Acls_In_Administrator => [qw(acl_name admin_id operative id name description)],
-
-		 Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
-
-		Operative_Views_In_Administrator => [qw(tenant_id field visible view_type device_type qvd_object property)],
-	},
-
-	details => {
-		default => [qw(id tenant_id)],
-		Host => [qw(id)],
-		Role => [qw(id)],
-		ACL => [qw(id)],
-		Tenant => [qw(id)],
-		Wat_Setups_By_Tenant => [qw()]
-	},
-		
-	tiny => {
-		default => [qw(tenant_id)],
-		Host => [qw()],
-		Role => [qw(internal fixed tenant_id)],
-		ACL => [qw(name)],
-		Tenant => [qw(id)],
-		DI_Tag => [qw(tenant_id osf_id)]
-	},
+        Wat_Setups_By_Tenant => [qw()]
+    },
 
 	delete => {
 		default => [qw(id tenant_id)],
@@ -855,87 +782,10 @@ my $AVAILABLE_FIELDS = {
 
 		QVD_Object_Property_List => [qw(id property_id key description)],
 
-		Property_List => [qw(id property_id tenant_id key description in_user in_vm in_host in_osf in_di)]
-	},
-
-	details => {
-		default => [],
-
-		 Log => [qw(id admin_id admin_name tenant_id tenant_name action arguments object_id object_name time antiquity status source ip type_of_action qvd_object object_deleted admin_deleted superadmin)],
-
-		 OSF => [qw(id name description overlay user_storage memory  number_of_vms number_of_dis properties creation_date creation_admin_id creation_admin_name osd_id)],
-		 
-		 Role => [qw(name description id fixed internal acls roles creation_date creation_admin_id creation_admin_name)],
-        
-        DI => [qw(id disk_image description version osf_id osf_name blocked tags
-            properties creation_date creation_admin_id creation_admin_name
-            state state_ts elapsed_time auto_publish foreign_id
-            expiration_time_soft expiration_time_hard
-            percentage error_code status_message)],
-        
-		 VM => [qw(storage id name description user_id user_name osf_id osf_name di_tag blocked expiration_soft expiration_hard 
-                           time_until_expiration_soft time_until_expiration_hard state host_id host_name  di_id user_state ip mac next_boot_ip ssh_port vnc_port serial_port 
-                           creation_date creation_admin_id creation_admin_name di_version di_name di_id properties ip_in_use di_id_in_use di_name_in_use di_version_in_use )],
-
-		 ACL => [qw(id name description)],
-
-		 Administrator => [qw(name description roles id language block creation_date creation_admin_id creation_admin_name)],
-
-		Tenant => [qw(id name description language block blocked creation_date creation_admin_id creation_admin_name)],
-
-		 User => [qw(id name description blocked  creation_date creation_admin_id creation_admin_name number_of_vms number_of_vms_connected  properties )],
-
-		 Host => [qw(id name description address blocked frontend backend state creation_admin_id creation_admin_name creation_date 
-                             number_of_vms_connected properties )],
-
-		 DI_Tag => [qw(di_id osf_id name id )],
-
-		Views_Setup_Properties_Tenant => [qw(id tenant_id tenant_name qvd_obj_prop_id key visible view_type device_type qvd_object)],
-
-		Views_Setup_Attributes_Tenant => [qw(id tenant_id tenant_name field visible view_type device_type qvd_object)],
-
-        	 Operative_Acls_In_Role => [qw(id name roles operative description)],
-
-	         Operative_Acls_In_Administrator => [qw(id name roles operative description)],
-
-		 Operative_Views_In_Tenant => [qw(tenant_id field visible view_type device_type qvd_object property)],
-
-		Views_Setup_Properties_Administrator => [qw(id tenant_id tenant_name admin_id admin_name qvd_obj_prop_id key
-			visible view_type device_type qvd_object)],
-
-		Views_Setup_Attributes_Administrator => [qw(id tenant_id tenant_name admin_id admin_name field
-			visible view_type device_type qvd_object)],
-
-		 Operative_Views_In_Administrators => [qw(tenant_id field visible view_type device_type qvd_object property)],
-
+		Property_List => [qw(id property_id tenant_id key description in_user in_vm in_host in_osf in_di)],
+    
 		Wat_Setups_By_Tenant => [qw( block language )],
 	},
-
-	tiny => {
-		default => [qw(id name)],
-
-		Administrator => [qw(tenant_name id name)],
-
-		User => [qw(tenant_name id name)],
-
-		OSF => [qw(tenant_name id name)],
-
-		VM => [qw(tenant_name id name)],
-
-		DI => [qw(tenant_name id disk_image)],
-
-		Role => [qw(tenant_name id name)],
-
-		Views_Setup_Properties_Tenant => [qw(id)],
-
-		Views_Setup_Attributes_Tenant => [qw(id)],
-
-		Views_Setup_Properties_Administrator => [qw(id)],
-
-		Views_Setup_Attributes_Administrator => [qw(id)],
-	},
-
-    all_ids => { default => [qw(id)]},
 
 	state => {
 		User => [qw(number_of_vms_connected)],
@@ -963,17 +813,9 @@ my $MANDATORY_FILTERS =
 			default => [qw()],
             Config => [qw()],
             Operative_Acls_In_Role => [qw(role_id)], 
-			Operative_Acls_In_Administrator => [qw()]
-		}, # FIX ME. HAS DEFAULT VALUE IN Request.pm. DEFAULT SYSTEM FOR FILTERS NEEDED
-
-		details => {
-			default => [qw(id)],
-		Wat_Setups_By_Tenant => [ qw() ],
-		 Operative_Acls_In_Role => [qw(role_id)], 
-			Operative_Acls_In_Administrator => [qw()]
-		}, # FIX ME. HAS DEFAULT VALUE IN Request.pm. DEFAULT SYSTEM FOR FILTERS NEEDED
-
-		tiny => { default => [qw()] },
+			Operative_Acls_In_Administrator => [qw()],
+            Wat_Setups_By_Tenant => [ qw() ]
+        }, # FIX ME. HAS DEFAULT VALUE IN Request.pm. DEFAULT SYSTEM FOR FILTERS NEEDED
 
 		delete => {
 			default => [qw(id)],
@@ -996,12 +838,6 @@ my $MANDATORY_FILTERS =
 		exec => { default => [qw()] },
 
 		state => { default => [qw(id)] },
-
-		all_ids => {
-			default => [qw()],
-		 Operative_Acls_In_Role => [qw(role_id)], 
-			Operative_Acls_In_Administrator => [qw()]
-		}, # FIX ME. HAS DEFAULT VALUE IN Request.pm. DEFAULT SYSTEM FOR FILTERS NEEDED
 	};
 
 my $AVAILABLE_ORDER_CRITERIA = {
@@ -1059,15 +895,6 @@ my $AVAILABLE_ORDER_CRITERIA = {
 # Default order criteria for every kind of action
 
 my $DEFAULT_ORDER_CRITERIA = {
-	tiny => {
-		default =>  [qw(name)],
-	      DI => [qw(disk_image)],
-		Views_Setup_Properties_Tenant => [qw(key)],
-		Views_Setup_Attributes_Tenant => [qw(field)],
-		Views_Setup_Properties_Administrator => [qw(key)],
-		Views_Setup_Attributes_Administrator => [qw(field)],
-		Config => [qw(key)]
-	},
 
 	list => {
 		default =>  [qw()],
@@ -1710,23 +1537,6 @@ my $DBIX_PREFETCH_VALUE = {
 		Views_Setup_Properties_Administrator => [ { administrator => 'tenant' }],
 		Views_Setup_Attributes_Administrator => [ { administrator => 'tenant' }],
 	},
-
-	details => {
-		Log => [qw(deletion_log_entry administrator)],
-		Role => [qw(tenant creation_log_entry)],
-		User => [qw(tenant creation_log_entry)],
-		VM => ['di', 'osf', { vm_runtime => qw(host) }, { user => 'tenant' }, qw(creation_log_entry)],
-		Host => ['runtime', qw(creation_log_entry)],
-		OSF => [ qw(tenant creation_log_entry)],
-		DI => [{osf => 'tenant'}, qw(creation_log_entry)],
-		DI_Tag => [{di => {osf => 'tenant'}}],
-		Administrator => [qw(tenant wat_setups creation_log_entry)],
-		Tenant => [qw(wat_setups creation_log_entry)],
-		Views_Setup_Properties_Tenant => [ qw()],
-		Views_Setup_Attributes_Tenant => [ qw(tenant)],
-		Views_Setup_Properties_Administrator => [ { administrator => 'tenant' }],
-		Views_Setup_Attributes_Administrator => [ { administrator => 'tenant' }],
-	}
 };
 
 # This is for creation actions. When creating
@@ -1934,7 +1744,7 @@ sub set_tenant_fields
 {
     my $self = shift;
 
-    return unless $self->type_of_action =~ /^list|details$/;
+    return unless $self->type_of_action eq 'list';
 
     return unless $self->current_qvd_administrator->is_superadmin;
 

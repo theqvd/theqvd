@@ -1,9 +1,8 @@
 Up.B = {
     bindCommonEvents: function () {
-        this.bindMessageEvents();  
-        this.bindEditorEvents();  
-        this.bindNavigationEvents();  
-        this.bindFormEvents(); 
+        this.bindMessageEvents();
+        this.bindNavigationEvents();
+        this.bindFormEvents();
     },
     
     bindListEvents: function () {
@@ -103,28 +102,6 @@ Up.B = {
         this.bindEvent('click', '.js-dialog-container .chosen-container', this.formBinds.checkDialogSizeChange);
     },
     
-    bindEditorEvents: function () {
-        // Common Editor  
-            // Hide property help when write on text input
-            this.bindEvent('focus', '.custom-properties>tr>td input', this.editorBinds.hidePropertyHelp);
-
-            // Active focus on property input when click on help message becaus it is over it
-            this.bindEvent('click', '.property-help', this.editorBinds.focusPropertyField);
-
-            // Toggle controls for expire fields (it's only needed for vm form, but it can be accesible from two views: list and details)
-            this.bindEvent('change', 'input[name="expire"]', this.editorBinds.toggleExpire);
-        
-        // Virtual Machines Editor
-        
-            // Toggle controls for disk images tags retrieving when select osf (it's only needed for vm form, but it can be accesible from two views: list and details)
-            this.bindEvent('change', 'select[name="osf_id"]', this.editorBinds.fillDITags, this);
-        
-        // User editor
-                
-            // Toggle controls for new password
-            this.bindEvent('change', 'input[name="change_password"]', this.userEditorBinds.toggleNewPassword);
-    },
-    
     bindNavigationEvents: function () {
         this.bindEvent('click', '.menu-option[data-target]', this.navigationBinds.clickMenu);
         
@@ -165,9 +142,6 @@ Up.B = {
         // On any scroll
         $(window).off('scroll');
         $(window).on('scroll', this.navigationBinds.onScroll);
-        
-        // Kind of image source in DI creation
-        this.bindEvent('change', 'select[name="images_source"]', this.navigationBinds.toggleImagesource);   
         
         // Propagate click in cells with links
         this.bindEvent('mouseenter', 'td.cell-link', function (e) { 
@@ -237,7 +211,7 @@ Up.B = {
     bindLoginEvents: function () {
         this.bindEvent('click', '.js-login-button', this.loginBinds.tryLogIn);
         
-        this.bindEvent('keydown', 'input[name="admin_user"], input[name="admin_password"], input[name="admin_tenant"]', this.loginBinds.pushKeyOnLoginInput);
+        this.bindEvent('keydown', 'input[name="admin_user"], input[name="admin_password"]', this.loginBinds.pushKeyOnLoginInput);
     },
     
     loginBinds: {
@@ -419,28 +393,6 @@ Up.B = {
             window.location.reload();
         },
         
-        toggleImagesource: function (e) {
-            var selectedSource = $(e.target).val();
-            
-            switch (selectedSource) {
-                case 'computer':
-                    $('.image_computer_row').show();
-                    $('.image_staging_row').hide();
-                    $('.image_url_row').hide();
-                    break;
-                case 'staging':
-                    $('.image_computer_row').hide();
-                    $('.image_staging_row').show();
-                    $('.image_url_row').hide();
-                    break;
-                case 'url':
-                    $('.image_computer_row').hide();
-                    $('.image_staging_row').hide();
-                    $('.image_url_row').show();
-                    break;
-            }
-        },
-        
         onScroll: function () {
             if ($('.js-back-top-button').length) {
                 if ($(window).scrollTop() > $(window).height()) {
@@ -542,96 +494,6 @@ Up.B = {
                 Up.I.M.setMessageTimeout();
             }
         }
-    },
-    
-    // Callbacks of the events binded on editor
-    editorBinds: {
-        hidePropertyHelp: function () {
-            $(this).parent().find('.property-help').hide();
-        },
-
-        focusPropertyField: function () {
-            $(this).parent().find('input').focus();
-        },
-        
-        toggleExpire: function () {
-            $('.expiration_row').toggle();
-        },
-        
-        // Fill the select combo with the available tags in the disk images of an OSF
-        fillDITags: function (event) {
-            var that = event.data;
-            
-            $('[name="di_tag"]').find('option').remove();
-            
-            // Fill DI Tags select on virtual machines creation form
-            var params = {
-                'action': 'tag_tiny_list',
-                'selectedId': '',
-                'controlName': 'di_tag',
-                'filters': {
-                    'osf_id': $('[name="osf_id"]').val()
-                },
-                'nameAsId': true,
-                'chosenType': 'advanced100'
-            };
-
-            Up.A.fillSelect(params);
-        },
-        
-        filterTenantOSFs: function () {
-            var params = {
-                'action': 'osf_tiny_list',
-                'selectedId': '',
-                'controlName': 'osf_id',
-                
-            };
-            
-            if ($(this).val() > 0) {
-                params.filters =  {
-                    'tenant_id': $(this).val()
-                };
-            }
-
-            // Remove all osf options and fill filtering with new selected tenant
-            $('[name="osf_id"] option').remove();
-            
-            Up.A.fillSelect(params, function () {
-                // Update chosen control for osf
-                Up.I.Chosen.updateControls('[name="osf_id"]');
-
-                // Trigger change event to update tags
-                $('[name="osf_id"]').trigger('change');
-            }); 
-        },
-        
-        filterTenantUsers: function () {
-            var params = {
-                'action': 'user_tiny_list',
-                'selectedId': '',
-                'controlName': 'user_id'
-            };
-
-            if ($(this).val() > 0) {
-                params.filters =  {
-                    'tenant_id': $(this).val()
-                };
-            }
-            
-            // Remove all osf options and fill filtering with new selected tenant
-            $('[name="user_id"] option').remove();
-            
-            Up.A.fillSelect(params, function () {
-                // Update chosen control for user
-                Up.I.Chosen.updateControls('[name="user_id"]');
-            }); 
-        },
-        
-        updatePropertyRows: function () {
-            $('.js-editor-property-row').hide();
-            $('.js-editor-property-row[data-tenant-id="' + $('[name="tenant_id"]').val() + '"]').show();
-            $('.js-editor-property-row[data-tenant-id="' + SUPERTENANT_ID + '"]').show();
-        },
     },
     
     userEditorBinds: {

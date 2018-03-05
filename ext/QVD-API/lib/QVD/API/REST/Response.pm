@@ -49,11 +49,6 @@ sub _process_data_array
 
     my $processed_elements = [ map { $self->_process_element($_) } @{$elements} ];
 
-    # ad hoc mapping for all_ids actions
-
-    $processed_elements = $self->_map_result_to_list_of_ids($processed_elements)
-        if $self->qvd_object_model->type_of_action eq 'all_ids';
-    
     return $processed_elements;
 }
 
@@ -149,16 +144,6 @@ sub json
 {
     my $self = shift;
     return clone ($self->data);
-}
-
-# ad hoc mapping for all_ids actions
-
-sub _map_result_to_list_of_ids
-{
-    my $self = shift;
-    my $list = shift;
-    
-    return [ map { $_->{id} } @{$list} ];
 }
 
 1;

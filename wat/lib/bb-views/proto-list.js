@@ -599,7 +599,7 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                         "Select all": function () {
                             $('.js-check-it[data-check-id="' + checkId + '"]').prop("checked", true);
                             that.dialog = $(this);
-                            Wat.A.performAction(that.qvdObj + '_all_ids', {}, that.collection.filters, {}, that.storeAllSelectedIds, that);
+                            Wat.A.performAction(that.qvdObj + '_get_list', {}, that.collection.filters, {}, that.storeAllSelectedIds, that, ['id']);
                         }
                     },
                     buttonClasses : ['fa fa-eye', 'fa fa-th'],
@@ -626,11 +626,14 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
     storeAllSelectedIds: function (that) {
         var maxSelectableItems = 2000;
         
+        // Convert retrieved data from hash to array of ids
+        var ids = that.retrievedData.rows.map(function(e) {return e.id});
+        
         if (that.retrievedData.rows.length > maxSelectableItems) {
-            that.selectedItems = that.retrievedData.rows.slice(0, maxSelectableItems);
+            that.selectedItems = ids.slice(0, maxSelectableItems);
         }
         else {
-            that.selectedItems = that.retrievedData.rows;
+            that.selectedItems = ids;
         }
         
         Wat.I.closeDialog(that.dialog);
@@ -1238,13 +1241,11 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
                 break;
             case 'massive_changes':
             case 'changes':
-                // The function that will open the Massive changes dialog is: openMassiveChangesDialog
-                // Each qvd object have the option of do things before with setupMassiveChangesDialog and after with configureMassiveEditor                
                 if (elementsOutOfView) {
-                    Wat.I.confirm('dialog/confirm-out-of-view', that.setupMassiveChangesDialog, that, loadingBlock);
+                    Wat.I.confirm('dialog/confirm-out-of-view', that.openMassiveChangesDialog, that, loadingBlock);
                 }
                 else {
-                    that.setupMassiveChangesDialog(that);
+                    that.openMassiveChangesDialog(that);
                 }
                 break;
             // Used in VMs
@@ -1352,11 +1353,6 @@ Wat.Views.ListView = Wat.Views.MainView.extend({
         
         $('.' + view.cid + ' .js-check-it').prop('checked', false);
         $('.' + view.cid + ' .check_all').prop('checked', false);
-    },
-    
-    setupMassiveChangesDialog: function (that) {
-        that.openMassiveChangesDialog(that);
-        // Overrided from specific list view if necessary
     },
     
     // Additional changes on massive editor interface after render it

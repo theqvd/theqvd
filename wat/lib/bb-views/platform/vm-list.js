@@ -70,18 +70,6 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         that.resetSelectedItems ();
     },
     
-    
-    setupMassiveChangesDialog: function (that) {
-        // If the edition is performed over one single element, call single editor
-        if (that.selectedItems.length == 1) {
-            that.editingFromList = true;
-            this.openEditElementDialog(that);
-            return;
-        }
-        
-        Wat.A.performAction('osf_all_ids', {}, {"vm_id": that.selectedItems}, {}, that.openMassiveChangesDialog, that);
-    },
-    
     // Extend massive configurator to fill Tag select on virtual machines
     configureMassiveEditor: function (that) {
         Wat.Views.ListView.prototype.configureMassiveEditor.apply(this, [that]);

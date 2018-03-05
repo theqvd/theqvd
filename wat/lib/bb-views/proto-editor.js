@@ -98,7 +98,8 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
             Wat.A.performAction(that.qvdObj + '_get_property_list', {}, filters, {}, this.renderProperties, that, undefined, {"field":"key","order":"-asc"});
         }
         
-        that.configureMassiveEditor (that);
+        // Each qvd object have the option of do things after render
+        that.configureMassiveEditor(that);
         
         this.setupEditorTabs();
     },

@@ -26,14 +26,7 @@ my $ACTIONS = {
 	log_get_list => {
 		type_of_action => 'list',
 		  admin4method => 'select',
-		  acls => [qr/^(log\.see-(main|details)\.|(administrator|di|host|osf|role|tenant|user|vm)\.see\.log)$/],
-		qvd_object => 'Log'
-	},
-
-	log_get_details => {
-		type_of_action => 'list',
-		    admin4method => 'select',
-		    acls => [qr/^log\.see-details\./],
+		  acls => [qr/^(log\.see-main\.|(administrator|di|host|osf|role|tenant|user|vm)\.see\.log)$/],
 		qvd_object => 'Log'
 	},
 
@@ -71,7 +64,7 @@ my $ACTIONS = {
 	},
 
 	config_wat_get_list => {
-		type_of_action =>  'details',
+		type_of_action =>  'list',
 	qvd_object => 'Wat_Setups_By_Tenant',
 	acls => [qr/^(config\.wat)/],
 		admin4method => 'config_wat_get_list'
@@ -89,28 +82,6 @@ my $ACTIONS = {
 		  admin4method => 'select',
 		  channels => [qw(user_created user_deleted user_changed vm_created vm_deleted)],
 		  acls => [qr/^(user\.see-main\.)$/, qr/^tenant\.see\.user-list$/],
-		qvd_object => 'User'
-	},
-
-	user_tiny_list => {
-		type_of_action => 'tiny',
-		   admin4method => 'select',
-		   acls => [qr/^vm\.(create\.|filter\.user)$/,qr/^tenant\.purge\.$/],
-		qvd_object => 'User'
-	},
-
-	user_all_ids => {
-		type_of_action => 'all_ids',
-		  admin4method => 'select',
-		  acls => [qr/^(user\.[^.]+-massive\.|user\.see-main\.)$/],
-		qvd_object => 'User'
-	},
-
-	user_get_details => {
-	type_of_action => 'details',
-	admin4method => 'select',
-	channels => [qw(user_created user_deleted user_changed vm_created vm_deleted)],
-		      acls => [qr/^user\.see-details\./],
 		qvd_object => 'User'
 	},
 
@@ -168,28 +139,6 @@ my $ACTIONS = {
 		 admin4method => 'select',
 		 channels => [qw(vm_created vm_removed vm_changed user_created user_deleted)],
 		 acls => [qr/^(vm\.see-main\.|[^.]+\.see\.vm-list)$/],
-		qvd_object => 'VM'
-	},
-
-	vm_all_ids => {
-		type_of_action => 'all_ids',
-		admin4method => 'select',
-		acls => [qr/^vm\.[^.]+-massive\.|(vm\.see-main\.|[^.]+\.see\.vm-list)/],
-		qvd_object => 'VM'
-	},
-
-	vm_tiny_list => {
-		type_of_action => 'tiny',
-		  admin4method => 'select',
-		   acls => [qr/^(host|osf)\.filter\.vm$/,qr/^tenant\.purge\.$/],
-		qvd_object => 'VM'
-	},
-
-	vm_get_details => {
-		type_of_action => 'details',
-		    admin4method => 'select',
-		    channels => [qw(vm_created vm_removed vm_changed user_created user_deleted)],
-		    acls => [qr/^vm\.see-details\./],
 		qvd_object => 'VM'
 	},
 
@@ -264,28 +213,6 @@ my $ACTIONS = {
 		qvd_object => 'Host'
 	},
 
-	host_all_ids => {
-		type_of_action => 'all_ids',
-		  admin4method => 'select',
-		  acls => [qr/^host\.[^.]+-massive\./, qr/^host\.see-main\.$/],
-		qvd_object => 'Host'
-	},
-
-	host_tiny_list => {
-		type_of_action => 'tiny',
-		    admin4method => 'select',
-		    acls => [qr/^vm\.filter\.host$/],
-		qvd_object => 'Host'
-	},
-
-	host_get_details => {
-		type_of_action => 'details',
-		      admin4method => 'select',
-		      channels => [qw(host_created host_deleted host_changed vm_created vm_deleted)],
-		      acls => [qr/^host\.see-details\./],
-		qvd_object => 'Host'
-	},
-
 	host_get_state => {
 		type_of_action => 'state',
 		    admin4method => 'select',
@@ -343,28 +270,6 @@ my $ACTIONS = {
 		qvd_object => 'OSF'
 	},
 
-	osf_all_ids => {
-		type_of_action => 'all_ids',
-		 admin4method => 'select',
-		 acls => [qr/^osf\.[^.]+-massive\.|osf\.see-main\./],
-		qvd_object => 'OSF'
-	},
-
-	osf_tiny_list => {
-		type_of_action => 'tiny',
-		   admin4method => 'select',
-		acls => [qr/^(di|vm)\.(create\.|filter\.osf)$/,qr/^tenant\.purge\.$/],
-		qvd_object => 'OSF'
-	},
-
-	osf_get_details => {
-		type_of_action => 'details',
-		     admin4method => 'select',
-		     channels => [qw(vm_created vm_deleted vm_changed di_created di_deleted)],
-		     acls => [qr/^osf\.see-details\./],
-		qvd_object => 'OSF'
-	},
-
 	osf_update => {
 		type_of_action => 'update',
 		 admin4method => 'update',
@@ -415,27 +320,6 @@ my $ACTIONS = {
 		qvd_object => 'DI'
 	},
 
-	di_all_ids => {
-		type_of_action => 'all_ids',
-		admin4method => 'select',
-		acls => [qr/^di\.[^.]+-massive\.|(di\.see-main\.|[^.]+\.see\.di-list)/],
-		qvd_object => 'DI'
-	},
-
-	di_tiny_list => {
-		type_of_action => 'tiny',
-		  admin4method => 'select',
-		  acls => [qr/^osf\.filter\.di$/,qr/^tenant\.purge\.$/],
-		qvd_object => 'DI'
-	},
-
-	di_get_details => {
-		type_of_action => 'details',
-		    admin4method => 'select',
-		    acls => [qr/^di\.see-details\./],
-		qvd_object => 'DI'
-	},
-
 	di_update => {
 		type_of_action => 'update',
 	       admin4method => 'update',
@@ -477,13 +361,6 @@ my $ACTIONS = {
 		 acls => [qr/^property\.manage\.$/],
 		qvd_object => 'QVD_Object_Property_List'
 	},
-    
-    tag_tiny_list => {
-        type_of_action => 'tiny',
-        admin4method => 'select',
-        qvd_object => 'DI_Tag',
-        acls => [qr/^vm\.create\.$/, qr/^vm\.update\.$/],
-    },
 
     tag_get_list => {
         type_of_action => 'list',
@@ -496,27 +373,6 @@ my $ACTIONS = {
 		type_of_action => 'list',
 		    admin4method => 'select',
 		    acls => [qr/^administrator\.see-main\./],
-		qvd_object => 'Administrator'
-	},
-
-	administrator_tiny_list => {
-		type_of_action => 'tiny',
-		    admin4method => 'select',
-		    acls => [qr/^log\.filter\.administrator|[^.]+\.filter\.created-by/,qr/^tenant\.purge\.$/],
-		qvd_object => 'Administrator'
-	},
-
-	administrator_get_details => {
-		type_of_action => 'details',
-		       admin4method => 'select',
-		       acls => [qr/^administrator\.see-details\./],
-		qvd_object => 'Administrator'
-	},
-
-	administrator_all_ids => {
-		type_of_action => 'all_ids',
-		   admin4method => 'select',
-		   acls => [qr/^administrator\.[^.]+-massive\.|administrator\.see-main\./],
 		qvd_object => 'Administrator'
 	},
 
@@ -547,31 +403,10 @@ my $ACTIONS = {
 		qvd_object => 'Administrator'
 	},
 
-	tenant_tiny_list => {
-		type_of_action => 'tiny',
-		      admin4method => 'select',
-		qvd_object => 'Tenant',
-        acls => [qr/^tenant\.see-main\.$/]
-    },
-
 	tenant_get_list => {
 		type_of_action => 'list',
 		     admin4method => 'select',
 		     acls => [qr/^tenant\.see-main\.$/],
-		qvd_object => 'Tenant'
-	},
-
-	tenant_get_details => {
-		type_of_action => 'details',
-			admin4method => 'select',
-			acls => [qr/^(tenant\.see-details)\.$/],
-		qvd_object => 'Tenant'
-	},
-
-	tenant_all_ids => {
-		type_of_action => 'all_ids',
-		    admin4method => 'select',
-		    acls => [qr/^tenant\.[^.]+-massive\.|tenant\.see-main\./],
 		qvd_object => 'Tenant'
 	},
 
@@ -608,27 +443,6 @@ my $ACTIONS = {
 		   admin4method => 'select',
 		   acls => [qr/^role\.see-main\.$/],
 		qvd_object => 'Role'
-	},
-
-	role_get_details => {
-		type_of_action => 'details',
-		      admin4method => 'select',
-		   acls => [qr/^role\.see-details\.$/],
-		qvd_object => 'Role'
-	},
-
-	role_all_ids => {
-		type_of_action => 'all_ids',
-		  admin4method => 'select',
-		  acls => [qr/^role\.[^.]+-massive\./, qr/^role\.see-main\.$/],
-		qvd_object => 'Role'
-	},
-
-	acl_tiny_list => {
-		type_of_action => 'tiny',
-		   admin4method => 'select',
-		   acls => [qr/^(role|administrator)\.see\.acl-list$/],
-		qvd_object => 'ACL'
 	},
 
 	acl_get_list => {
