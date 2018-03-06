@@ -87,7 +87,6 @@ my $code2message_mapper = {
     4220 => 'Forbidden filter for this administrator',
     4221 => 'Forbidden filter value for this administrator',
     4230 => 'Forbidden argument for this administrator',
-    4240 => 'Forbidden massive action for this administrator',
     4250 => 'Forbidden field for this administrator',
     4260 => 'Forbidden sorted by field for this administrator',
     

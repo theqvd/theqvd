@@ -107,7 +107,6 @@ id	name	description
 1	administrator.create.	Create administrators
 2	administrator.create.language	Set language on administrator creation
 3	administrator.delete.	Delete administrators
-4	administrator.delete-massive.	Delete administrators (massive)
 5	administrator.filter.created-by	Filter administrators by creator
 6	administrator.filter.creation-date	Filter administrators by creation date
 7	administrator.filter.name	Filter administrators by name
@@ -125,8 +124,6 @@ id	name	description
 19	administrator.update.assign-role	Assign-Unassign administrator's roles
 20	administrator.update.description	Update administrator's description
 21	administrator.update.language	Update administrator's language
-22	administrator.update-massive.description	Update administrator's description (massive)
-23	administrator.update-massive.language	Update administrator's language (massive)
 24	administrator.update.password	Change administrator's password
 25	config.qvd.	QVD's configuration management
 26	config.wat.	WAT's configuration management
@@ -136,7 +133,6 @@ id	name	description
 30	di.create.tags	Set tags on disk images creation
 31	di.create.version	Set version on disk images creation
 32	di.delete.	Delete disk images
-33	di.delete-massive.	Delete disk images (massive)
 34	di.filter.block	Filter disk images by blocking state
 35	di.filter.created-by	Filter disk images by creator
 36	di.filter.creation-date	Filter disk images by creation date
@@ -167,16 +163,11 @@ id	name	description
 61	di.update.block	Block-Unblock disk images
 62	di.update.default	Set disk images as default
 63	di.update.description	Update disk image's description
-64	di.update-massive.block	Block-Unblock disk images (massive)
-65	di.update-massive.description	Update disk image's description (massive)
-66	di.update-massive.properties	Update properties when update disk images (massive)
-67	di.update-massive.tags	Update disk image's tags (massive)
 68	di.update.properties	Update properties when update disk images
 69	di.update.tags	Update disk image's tags
 70	host.create.	Create nodes
 71	host.create.properties	Set properties on nodes in creation
 72	host.delete.	Delete nodes
-73	host.delete-massive.	Delete nodes (massive)
 74	host.filter.block	Filter nodes by blocking state
 75	host.filter.created-by	Filter nodes by creator
 76	host.filter.creation-date	Filter nodes by creation date
@@ -208,10 +199,6 @@ id	name	description
 102	host.update.address	Update node's address
 103	host.update.block	Block-Unblock nodes
 104	host.update.description	Update node's description
-105	host.update-massive.block	Block-Unblock nodes (massive)
-106	host.update-massive.description	Update node's description (massive)
-107	host.update-massive.properties	Update properties when update nodes (massive)
-108	host.update-massive.stop-vms	Stop all virtual machines of a node (massive)
 109	host.update.name	Update node's name
 110	host.update.properties	Update properties when update nodes
 111	host.update.stop-vms	Stop all virtual machines of a node
@@ -232,7 +219,6 @@ id	name	description
 126	osf.create.properties	Set properties in OS Flavour's creation
 127	osf.create.user-storage	Set user storage in OS Flavour's creation
 128	osf.delete.	Delete OS Flavours
-129	osf.delete-massive.	Delete OS Flavours (massive)
 130	osf.filter.created-by	Filter OS Flavours by creator
 131	osf.filter.creation-date	Filter OS Flavours by creation date
 132	osf.filter.di	Filter OS Flavours by disk image
@@ -265,10 +251,6 @@ id	name	description
 159	osf.see.vms-info	See number of OS Flavour's virtual machines
 160	osf.stats.summary	See statistics of number of OS Flavours
 161	osf.update.description	Update OS Flavour's description
-162	osf.update-massive.description	Update OS Flavour's description (massive)
-163	osf.update-massive.memory	Update OS Flavour's memory (massive)
-164	osf.update-massive.properties	Update properties when update OSFs (massive)
-165	osf.update-massive.user-storage	Update OS Flavour's user storage (massive)
 166	osf.update.memory	Update OS Flavour's memory
 167	osf.update.name	Update OS Flavour's name
 168	osf.update.properties	Update properties when update OSFs
@@ -276,7 +258,6 @@ id	name	description
 175	property.see-main.	Access to properties's main section
 176	role.create.	Create roles
 177	role.delete.	Delete roles
-178	role.delete-massive.	Delete roles (massive)
 179	role.filter.created-by	Filter roles by creator
 180	role.filter.creation-date	Filter roles by creation date
 181	role.filter.name	Filter role by name
@@ -293,11 +274,9 @@ id	name	description
 192	role.update.assign-acl	Assign-Unassign role's ACLs
 193	role.update.assign-role	Assign-Unassign role's inherited roles
 194	role.update.description	Update role's description
-195	role.update-massive.description	Update role's description (massive)
 196	role.update.name	Update role's name
 197	tenant.create.	Create tenants
 198	tenant.delete.	Delete tenants
-199	tenant.delete-massive.	Delete tenants (massive)
 200	tenant.filter.block	Filter tenants by blocking status
 201	tenant.filter.created-by	Filter tenants by creator
 202	tenant.filter.creation-date	Filter tenants by creation date
@@ -326,15 +305,10 @@ id	name	description
 225	tenant.update.blocksize	Update tenant's block size
 226	tenant.update.description	Update tenant's description
 227	tenant.update.language	Update tenant's language
-228	tenant.update-massive.block	Block-Unblock tenants (massive)
-229	tenant.update-massive.blocksize	Update tenant's block size (massive)
-230	tenant.update-massive.description	Update tenant's description (massive)
-231	tenant.update-massive.language	Update tenant's language (massive)
 232	tenant.update.name	Update tenant's name
 233	user.create.	Create users
 234	user.create.properties	Set properties on users in creation
 235	user.delete.	Delete users
-236	user.delete-massive.	Delete users (massive)
 237	user.filter.block	Filter users by blocking state
 238	user.filter.created-by	Filter users by creator
 239	user.filter.creation-date	Filter users by creation date
@@ -360,9 +334,6 @@ id	name	description
 259	user.stats.summary	See statistics of number of blocked users
 260	user.update.block	Block-Unblock users
 261	user.update.description	Update user's description
-262	user.update-massive.block	Block-Unblock users (massive)
-263	user.update-massive.description	Update user's description (massive)
-264	user.update-massive.properties	Update properties when update users (massive)
 265	user.update.password	Update user's password
 266	user.update.properties	Update properties when update users
 267	views.see-main.	Access to default view's main section
@@ -373,7 +344,6 @@ id	name	description
 272	vm.create.di-tag	Set tag in virtual macine's creation
 273	vm.create.properties	Set properties in virtual machine's creation
 274	vm.delete.	Delete virtual machines
-275	vm.delete-massive.	Delete virtual machines (massive)
 276	vm.filter.block	Filter virtual machines by blocking state
 277	vm.filter.created-by	Filter virtual machines by creator
 278	vm.filter.creation-date	Filter virtual machines by creation date
@@ -417,13 +387,6 @@ id	name	description
 316	vm.update.disconnect-user	Disconnect user from virtual machine
 317	vm.update.di-tag	Update virtual machine's tag
 318	vm.update.expiration	Update virtual machine's expiration
-319	vm.update-massive.block	Block-Unblock virtual machines (massive)
-320	vm.update-massive.description	Update virtual machine's description (massive)
-321	vm.update-massive.disconnect-user	Disconnect user from virtual machine (massive)
-322	vm.update-massive.di-tag	Update virtual machine's tag (massive)
-323	vm.update-massive.expiration	Update virtual machine's expiration (massive)
-324	vm.update-massive.properties	Update properties when update virtual machines (massive)
-325	vm.update-massive.state	Start-Stop virtual machines (massive)
 326	vm.update.name	Update virtual machine's name
 327	vm.update.properties	Update properties when update virtual machines
 328	vm.update.state	Start-Stop virtual machines
@@ -442,7 +405,6 @@ id	acl_id	role_id	positive
 1	1	1	t
 2	2	1	t
 3	3	2	t
-4	4	2	t
 5	5	5	t
 6	6	5	t
 7	7	5	t
@@ -460,8 +422,6 @@ id	acl_id	role_id	positive
 19	19	4	t
 20	20	6	t
 21	21	6	t
-22	22	6	t
-23	23	6	t
 24	24	6	t
 25	25	30	t
 26	26	66	t
@@ -471,7 +431,6 @@ id	acl_id	role_id	positive
 30	30	7	t
 31	31	7	t
 32	32	8	t
-33	33	8	t
 34	34	11	t
 35	35	11	t
 36	36	11	t
@@ -502,16 +461,11 @@ id	acl_id	role_id	positive
 61	61	10	t
 62	62	10	t
 63	63	12	t
-64	64	10	t
-65	65	12	t
-66	66	12	t
-67	67	12	t
 68	68	12	t
 69	69	12	t
 70	70	15	t
 71	71	15	t
 72	72	16	t
-73	73	16	t
 74	74	19	t
 75	75	19	t
 76	76	19	t
@@ -543,10 +497,6 @@ id	acl_id	role_id	positive
 102	102	20	t
 103	103	18	t
 104	104	20	t
-105	105	18	t
-106	106	20	t
-107	107	20	t
-108	108	18	t
 109	109	20	t
 110	110	20	t
 111	111	18	t
@@ -567,7 +517,6 @@ id	acl_id	role_id	positive
 126	126	24	t
 127	127	24	t
 128	128	25	t
-129	129	25	t
 130	130	28	t
 131	131	28	t
 132	132	28	t
@@ -602,10 +551,6 @@ id	acl_id	role_id	positive
 161	159	28	t
 162	160	28	t
 163	161	29	t
-164	162	29	t
-165	163	29	t
-166	164	29	t
-167	165	29	t
 168	166	29	t
 169	167	29	t
 170	168	29	t
@@ -613,7 +558,6 @@ id	acl_id	role_id	positive
 177	175	30	t
 178	176	37	t
 179	177	38	t
-180	178	38	t
 181	179	41	t
 182	180	41	t
 183	181	41	t
@@ -630,11 +574,9 @@ id	acl_id	role_id	positive
 194	192	40	t
 195	193	40	t
 196	194	42	t
-197	195	42	t
 198	196	42	t
 199	197	44	t
 200	198	45	t
-201	199	45	t
 202	201	48	t
 203	202	48	t
 204	203	48	t
@@ -661,15 +603,11 @@ id	acl_id	role_id	positive
 225	226	49	t
 226	227	49	t
 227	227	43	t
-228	229	49	t
-229	230	49	t
-230	231	49	t
 231	232	43	t
 232	232	49	t
 233	233	51	t
 234	234	51	t
 235	235	52	t
-236	236	52	t
 237	237	55	t
 238	238	55	t
 239	239	55	t
@@ -696,9 +634,6 @@ id	acl_id	role_id	positive
 260	259	55	t
 261	260	54	t
 262	261	56	t
-263	262	54	t
-264	263	56	t
-265	264	56	t
 266	265	56	t
 267	266	56	t
 268	267	59	t
@@ -709,7 +644,6 @@ id	acl_id	role_id	positive
 273	272	60	t
 274	273	60	t
 275	274	61	t
-276	275	61	t
 277	276	64	t
 278	277	64	t
 279	278	64	t
@@ -753,18 +687,10 @@ id	acl_id	role_id	positive
 317	316	63	t
 318	317	65	t
 319	318	65	t
-320	319	63	t
-321	320	65	t
-322	321	63	t
-323	322	65	t
-324	323	65	t
-325	324	65	t
-326	325	63	t
 327	326	21	f
 328	326	65	t
 329	327	65	t
 330	328	63	t
-331	228	47	t
 332	224	47	t
 333	200	48	t
 334	204	48	t

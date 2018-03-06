@@ -104,11 +104,6 @@ sub BUILD
 
     $self->check_fields_validity_in_json;
 
-# It checks if the current admin is allowed to delete
-
-    $self->check_acls_for_deleting 
-        if $type_of_action eq 'delete';
-
 # It checks if the filters in the input query
 # are available in the system and if the current
 # admin is allowed to use them
@@ -271,38 +266,14 @@ sub check_filters_validity_in_json
     }
 }
 
-# When needed, it checks if the admin can perform massive
-# deletions. An operation is massive if more than one
-# object are involved 
-
-sub check_acls_for_deleting
-{
-    my $self = shift;
-    my $id = $self->json_wrapper->get_filter_value('id');
-    return unless ref($id) && scalar @$id > 1;
-
-    my $admin = $self->qvd_object_model->current_qvd_administrator;
-    $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_delete_massive) 
-	|| QVD::API::Exception->throw(code => 4240);
-}
-
 sub check_update_arguments_validity_in_json
 {
     my $self = shift;
-    my $admin = $self->qvd_object_model->current_qvd_administrator;
-
-    # An operation is considered massive if it is applied over more than one
-    # object. For this kind of action, the 'id' is a mandatory filter
-    # and it is the only filter available. So it can be known the amount of objects
-    # will be involved by using that filter.
 
     for my $arg ($self->json_wrapper->arguments_list)
     {
         QVD::API::Exception->throw(code => 6230, object => $arg) unless
             ($self->qvd_object_model->available_argument($arg) || $self->qvd_object_model->has_property( $arg ));
-
-        QVD::API::Exception->throw(code => 4230, object => $arg) unless
-            $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_argument_in_update($arg));
     }
 
 }

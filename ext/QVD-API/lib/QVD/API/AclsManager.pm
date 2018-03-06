@@ -9,7 +9,6 @@ has 'object', is => 'ro', isa => sub {die "Invalid type for attribute subaction"
 
 my @DOMAINS = qw(vm host osf di user administrator config role tenant views);
 my @ACTIONS = qw(see update delete create filter customize manage);
-my @SUBACTIONS = qw(see-details see-list update-massive delete-massive filter-desktop filter-mobile);
 
 sub parse
 {

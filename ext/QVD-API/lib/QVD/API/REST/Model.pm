@@ -432,76 +432,6 @@ my $ACLS_FOR_ARGUMENTS_IN_UPDATE = {
 
 };
 
-# Acls needed to perform massive updates for every field in actions regarding
-# a certain QVD object
-
-my $ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE = {
-	User => {
-		'***delete***' => [qr/^user\.delete-massive\.$/], # MAYBE A NEW VARIABLE?
-	      blocked => [qr/^user\.update-massive\.block$/],
-	      description => [qr/^user\.update-massive\.description$/],
-		__properties_changes__set => [qr/^user\.update-massive\.properties$/],
-        __properties_changes__delete => [qr/^user\.update-massive\.properties$/]
-    },
-
-	VM => {
-		'***delete***' => [qr/^vm\.delete-massive\.$/],
-	    blocked => [qr/^vm\.update-massive\.block$/],
-	    expiration_soft => [qr/^vm\.update-massive\.expiration$/],
-	    expiration_hard => [qr/^vm\.update-massive\.expiration$/],
-	    di_tag => [qr/^vm\.update-massive\.di-tag$/],
-	    description => [qr/^vm\.update-massive\.description$/],
-	    __properties_changes__set => [qr/^vm\.update-massive\.properties-(cre|upd)ate$/],
-		__properties_changes__delete => [qr/^vm\.update-massive\.properties-delete$/]
-	},
-
-	Host => {
-		'***delete***' => [qr/^host\.delete-massive\.$/],
-	      blocked => [qr/^host\.update-massive\.block$/],
-	      description => [qr/^host\.update-massive\.description$/],
-	      __properties_changes__set => [qr/^host\.update-massive\.properties-(cre|upd)ate$/],
-		__properties_changes__delete => [qr/^host\.update-massive\.properties-delete$/]
-	},
-	
-	OSF => {
-		'***delete***' => [qr/^osf\.delete-massive\.$/],
-	     memory => [qr/^osf\.update-massive\.memory$/],
-	     user_storage => [qr/^osf\.update-massive\.user-storage$/],
-	     description => [qr/^osf\.update-massive\.description$/],
-	     __properties_changes__set => [qr/^osf\.update-massive\.properties-(cre|upd)ate$/],
-		__properties_changes__delete => [qr/^osf\.update-massive\.properties-delete$/]
-	},
-	
-	DI => {
-		'***delete***' => [qr/^di\.delete-massive\.$/],
-	    blocked => [qr/^di\.update-massive\.block$/],
-	    description => [qr/^di\.update-massive\.description$/],
-	    __properties_changes__set => [qr/^di\.update-massive\.properties-(cre|upd)ate$/],
-	    __properties_changes__delete => [qr/^di\.update-massive\.properties-delete$/],
-	    __tags_changes__create => [qr/^di\.update-massive\.tags$/],
-		__tags_changes__delete => [qr/^di\.update-massive\.tags-delete$/]
-	},
-	
-	Tenant => {
-		'***delete***' => [qr/^tenant\.delete-massive\.$/],
-	        block => [qr/^tenant\.update-massive\.blocksize$/],
-	        description => [qr/^tenant\.update-massive\.description$/],
-		language => [qr/^tenant\.update-massive\.language$/],
-		blocked => [qr/^tenant\.update-massive\.block$/],
-	},
-
-	Role => {
-		'***delete***' => [qr/^role\.delete-massive\.$/],
-		description => [qr/^role\.update-massive\.description$/]
-	},
-
-	Administrator => {
-		'***delete***' => [qr/^administrator\.delete-massive\.$/],
-		description => [qr/^administrator\.update-massive\.description$/],
-	}
-
-};
-
 # Acls needed to set every field in creation for actions regarding
 # a certain QVD object
 
@@ -2178,13 +2108,6 @@ sub get_acls_for_argument_in_update
     my ($self,$arg) = @_;
     $self->get_acls($ACLS_FOR_ARGUMENTS_IN_UPDATE,$arg);
 }
-    
-sub get_acls_for_argument_in_massive_update
-{
-    my ($self,$arg) = @_;
-    $self->get_acls(
-	$ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE,$arg);
-}
 
 sub get_acls_for_nested_query_in_creation
 {
@@ -2198,20 +2121,6 @@ sub get_acls_for_nested_query_in_update
     my ($self,$nq) = @_;
     $self->get_acls(
 	$ACLS_FOR_ARGUMENTS_IN_UPDATE,$nq);
-}
-    
-sub get_acls_for_nested_query_in_massive_update
-{
-    my ($self,$nq) = @_;
-    $self->get_acls(
-	$ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE,$nq);
-}
-
-sub get_acls_for_delete_massive
-{
-    my $self = shift;
-    $self->get_acls(
-	$ACLS_FOR_ARGUMENTS_IN_MASSIVE_UPDATE,'***delete***');
 }
 
 sub get_acls

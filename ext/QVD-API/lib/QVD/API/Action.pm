@@ -152,21 +152,21 @@ my $ACTIONS = {
 	vm_user_disconnect => {
 		type_of_action => 'exec',
 			admin4method => 'vm_user_disconnect',
-			acls => [qr/^vm\.update(-massive)?\.disconnect-user$/],
+			acls => [qr/^vm\.update\.disconnect-user$/],
 		qvd_object => 'VM'
 	},
 
 	vm_start => {
 		type_of_action => 'exec',
 	      admin4method => 'vm_start',
-	     acls => [qr/^vm\.update(-massive)?\.state$/],
+	     acls => [qr/^vm\.update\.state$/],
 		qvd_object => 'VM'
 	},
 
 	vm_stop => {
 		type_of_action => 'exec',
 	     admin4method => 'vm_stop',
-	     acls => [qr/^(vm\.update(-massive)?\.state|host\.update(-massive)?\.stop-vms)$/],
+	     acls => [qr/^(vm\.update\.state|host\.update\.stop-vms)$/],
 		qvd_object => 'VM'
 	},
 
