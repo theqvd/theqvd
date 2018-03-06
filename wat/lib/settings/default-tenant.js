@@ -190,7 +190,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'tenant.filter.block'
+        'acls': 'tenant.see.block'
     },
     'administrator': {
         'filterField': 'creation_admin_id',
@@ -207,7 +207,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'tenant.filter.created-by',
+        'acls': 'tenant.see.created-by',
     },
     'antiquity': {
         'filterField': 'creation_date',
@@ -219,7 +219,7 @@ Wat.I.formFilters[qvdObj] = {
         'options': ANTIQUITY_OPTIONS,
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'tenant.filter.creation-date'
+        'acls': 'tenant.see.creation-date'
     },
     'min_date': {
         'filterField': 'creation_date',
@@ -229,7 +229,7 @@ Wat.I.formFilters[qvdObj] = {
         'class': 'datepicker-past date-filter',
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'tenant.filter.creation-date'
+        'acls': 'tenant.see.creation-date'
     },
     'max_date': {
         'filterField': 'creation_date',
@@ -239,7 +239,7 @@ Wat.I.formFilters[qvdObj] = {
         'class': 'datepicker-past date-filter',
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'tenant.filter.creation-date'
+        'acls': 'tenant.see.creation-date'
     }
 };
 

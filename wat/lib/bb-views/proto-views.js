@@ -434,7 +434,7 @@ Wat.Views.ViewsView = Wat.Views.MainView.extend({
                 'noTranslatable': true,
                 'property': true,
                 'property_id': prop.get('in_' + qvdObj),
-                'acls': qvdObj + '.filter.properties'
+                'acls': qvdObj + '.see.properties'
             };
         });
     },

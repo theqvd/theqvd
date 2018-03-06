@@ -185,7 +185,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'administrator.filter.created-by',
+        'acls': 'administrator.see.created-by',
     },
     'antiquity': {
         'filterField': 'creation_date',
@@ -197,7 +197,7 @@ Wat.I.formFilters[qvdObj] = {
         'options': ANTIQUITY_OPTIONS,
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'administrator.filter.creation-date'
+        'acls': 'administrator.see.creation-date'
     },
     'min_date': {
         'filterField': 'creation_date',
@@ -207,7 +207,7 @@ Wat.I.formFilters[qvdObj] = {
         'class': 'datepicker-past date-filter',
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'administrator.filter.creation-date'
+        'acls': 'administrator.see.creation-date'
     },
     'max_date': {
         'filterField': 'creation_date',
@@ -217,7 +217,7 @@ Wat.I.formFilters[qvdObj] = {
         'class': 'datepicker-past date-filter',
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'administrator.filter.creation-date'
+        'acls': 'administrator.see.creation-date'
     }
 };
 

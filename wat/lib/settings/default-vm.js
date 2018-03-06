@@ -434,8 +434,7 @@ Wat.I.formFilters[qvdObj] = {
         'type': 'text',
         'text': 'Name',
         'displayMobile': true,
-        'displayDesktop': true,
-        'acls': 'vm.filter.name'
+        'displayDesktop': true
     },
     'state': {
         'filterField': 'state',
@@ -476,7 +475,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'vm.filter.state'
+        'acls': 'vm.see.state'
     },
     'user': {
         'filterField': 'user_id',
@@ -493,7 +492,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'vm.filter.user',
+        'acls': 'vm.see.user',
         'tenantDepent': true
     },
     'osf': {
@@ -511,7 +510,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'vm.filter.osf',
+        'acls': 'vm.see.osf',
         'tenantDepent': true
     },
     'host': {
@@ -529,7 +528,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'vm.filter.host'
+        'acls': 'vm.see.host'
     },
     'blocked': {
         'filterField': 'blocked',
@@ -554,7 +553,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'vm.filter.block'
+        'acls': 'vm.see.block'
     },
     'administrator': {
         'filterField': 'creation_admin_id',
@@ -571,7 +570,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'vm.filter.created-by',
+        'acls': 'vm.see.created-by',
     },
     'expiration_hard': {
         'filterField': 'expiration_hard',
@@ -583,7 +582,7 @@ Wat.I.formFilters[qvdObj] = {
         'options': ANTIQUITY_OPTIONS,
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'vm.filter.expiration-date'
+        'acls': 'vm.see.expiration'
     },
     'antiquity': {
         'filterField': 'creation_date',
@@ -595,7 +594,7 @@ Wat.I.formFilters[qvdObj] = {
         'options': ANTIQUITY_OPTIONS,
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'vm.filter.creation-date'
+        'acls': 'vm.see.creation-date'
     },
     'min_date': {
         'filterField': 'creation_date',
@@ -605,7 +604,7 @@ Wat.I.formFilters[qvdObj] = {
         'class': 'datepicker-past date-filter',
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'vm.filter.creation-date'
+        'acls': 'vm.see.creation-date'
     },
     'max_date': {
         'filterField': 'creation_date',
@@ -615,7 +614,7 @@ Wat.I.formFilters[qvdObj] = {
         'class': 'datepicker-past date-filter',
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'vm.filter.creation-date'
+        'acls': 'vm.see.creation-date'
     }
 };
 

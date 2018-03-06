@@ -210,8 +210,7 @@ Wat.I.formFilters[qvdObj] = {
         'type': 'text',
         'text': 'Name',
         'displayMobile': true,
-        'displayDesktop': true,
-        'acls': 'host.filter.name'
+        'displayDesktop': true
     },
     'state': {
         'filterField': 'state',
@@ -252,7 +251,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'host.filter.state'
+        'acls': 'host.see.state'
     },
     'vm': {
         'filterField': 'vm_id',
@@ -269,7 +268,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'host.filter.vm'
+        'acls': 'host.see.vm-list'
     },
     'blocked': {
         'filterField': 'blocked',
@@ -294,7 +293,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'host.filter.block'
+        'acls': 'host.see.block'
     },
     'administrator': {
         'filterField': 'creation_admin_id',
@@ -311,7 +310,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'host.filter.created-by',
+        'acls': 'host.see.created-by',
     },
     'antiquity': {
         'filterField': 'creation_date',
@@ -323,7 +322,7 @@ Wat.I.formFilters[qvdObj] = {
         'options': ANTIQUITY_OPTIONS,
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'host.filter.creation-date'
+        'acls': 'host.see.creation-date'
     },
     'min_date': {
         'filterField': 'creation_date',
@@ -333,7 +332,7 @@ Wat.I.formFilters[qvdObj] = {
         'class': 'datepicker-past date-filter',
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'host.filter.creation-date'
+        'acls': 'host.see.creation-date'
     },
     'max_date': {
         'filterField': 'creation_date',
@@ -343,7 +342,7 @@ Wat.I.formFilters[qvdObj] = {
         'class': 'datepicker-past date-filter',
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'host.filter.creation-date'
+        'acls': 'host.see.creation-date'
     }
 };
 

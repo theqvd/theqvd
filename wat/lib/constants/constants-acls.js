@@ -37,7 +37,6 @@ ACL_ACTIONS = {
     "see-details": "See details view",
     "see-main": "See main section",
     "update": "Update",
-    "filter": "Filters",
     "stats": "Statistics",
     "manage": "Manage"
 }
@@ -49,7 +48,6 @@ ACL_ACTIONS_PATTERNS = {
     "see-details": "%.see-details.%",
     "see-main": "%.see-main.%",
     "update": "%.update.%",
-    "filter": "%.filter.%",
     "stats": "%.stats.%",
     "manage": "%.manage.%"
 }

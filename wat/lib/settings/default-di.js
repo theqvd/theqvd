@@ -325,8 +325,7 @@ Wat.I.formFilters[qvdObj] = {
         'type': 'text',
         'text': 'Disk image',
         'displayMobile': true,
-        'displayDesktop': true,
-        'acls': 'di.filter.disk-image'
+        'displayDesktop': true
     },
     'osf': {
         'name': 'osf',
@@ -345,7 +344,7 @@ Wat.I.formFilters[qvdObj] = {
                 'selected': true
             }
                     ],
-        'acls': 'di.filter.osf'
+        'acls': 'di.see.osf'
     },
     'blocked': {
         'filterField': 'blocked',
@@ -370,7 +369,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'di.filter.block'
+        'acls': 'di.see.block'
     },
     'state': {
         'filterField': 'state',
@@ -439,7 +438,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'di.filter.created-by',
+        'acls': 'di.see.created-by',
     },
     'antiquity': {
         'filterField': 'creation_date',
@@ -451,7 +450,7 @@ Wat.I.formFilters[qvdObj] = {
         'options': ANTIQUITY_OPTIONS,
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'di.filter.creation-date'
+        'acls': 'di.see.creation-date'
     },
     'min_date': {
         'filterField': 'creation_date',
@@ -461,7 +460,7 @@ Wat.I.formFilters[qvdObj] = {
         'class': 'datepicker-past date-filter',
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'di.filter.creation-date'
+        'acls': 'di.see.creation-date'
     },
     'max_date': {
         'filterField': 'creation_date',
@@ -471,7 +470,7 @@ Wat.I.formFilters[qvdObj] = {
         'class': 'datepicker-past date-filter',
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'di.filter.creation-date'
+        'acls': 'di.see.creation-date'
     }
 };
 

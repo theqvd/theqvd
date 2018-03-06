@@ -99,8 +99,7 @@ Wat.I.formFilters[qvdObj] = {
         'transform': 'dateGreatThanPast',
         'options': ANTIQUITY_OPTIONS,
         'displayMobile': false,
-        'displayDesktop': false,
-        'acls': 'log.filter.date'
+        'displayDesktop': false
     },
     'min_date': {
         'filterField': 'time',
@@ -109,8 +108,7 @@ Wat.I.formFilters[qvdObj] = {
         'transform': 'dateMin',
         'class': 'datepicker-past date-filter',
         'displayMobile': false,
-        'displayDesktop': true,
-        'acls': 'log.filter.date'
+        'displayDesktop': true
     },
     'max_date': {
         'filterField': 'time',
@@ -119,8 +117,7 @@ Wat.I.formFilters[qvdObj] = {
         'transform': 'dateMax',
         'class': 'datepicker-past date-filter',
         'displayMobile': false,
-        'displayDesktop': true,
-        'acls': 'log.filter.date'
+        'displayDesktop': true
     },
     'source': {
         'filterField': 'source',
@@ -138,8 +135,7 @@ Wat.I.formFilters[qvdObj] = {
             }
                     ],
         'displayMobile': false,
-        'displayDesktop': true,
-        'acls': 'log.filter.source'
+        'displayDesktop': true
     },
     'administrator': {
         'filterField': 'admin_id',
@@ -155,8 +151,7 @@ Wat.I.formFilters[qvdObj] = {
             }
                     ],
         'displayMobile': false,
-        'displayDesktop': true,
-        'acls': 'log.filter.administrator'
+        'displayDesktop': true
     },
     'action': {
         'filterField': 'type_of_action',
@@ -172,8 +167,7 @@ Wat.I.formFilters[qvdObj] = {
             }
                     ],
         'displayMobile': false,
-        'displayDesktop': true,
-        'acls': 'log.filter.action'
+        'displayDesktop': true
     },
     'object': {
         'filterField': 'qvd_object',
@@ -189,8 +183,7 @@ Wat.I.formFilters[qvdObj] = {
             }
                     ],
         'displayMobile': false,
-        'displayDesktop': true,
-        'acls': 'log.filter.object'
+        'displayDesktop': true
     },
     'response': {
         'filterField': 'status',
@@ -216,7 +209,6 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'log.filter.response',
         'displayMobile': true,
         'displayDesktop': true
     }

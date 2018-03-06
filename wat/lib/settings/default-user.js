@@ -176,8 +176,7 @@ Wat.I.formFilters[qvdObj] = {
         'type': 'text',
         'text': 'Name',
         'displayMobile': true,
-        'displayDesktop': true,
-        'acls': 'user.filter.name'
+        'displayDesktop': true
     },
     'blocked': {
         'filterField': 'blocked',
@@ -202,7 +201,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': true,
-        'acls': 'user.filter.block'
+        'acls': 'user.see.block'
     },
     'administrator': {
         'filterField': 'creation_admin_id',
@@ -220,7 +219,7 @@ Wat.I.formFilters[qvdObj] = {
                     ],
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'user.filter.created-by',
+        'acls': 'user.see.created-by',
     },
     'antiquity': {
         'filterField': 'creation_date',
@@ -232,7 +231,7 @@ Wat.I.formFilters[qvdObj] = {
         'options': ANTIQUITY_OPTIONS,
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'user.filter.creation-date'
+        'acls': 'user.see.creation-date'
     },
     'min_date': {
         'filterField': 'creation_date',
@@ -242,7 +241,7 @@ Wat.I.formFilters[qvdObj] = {
         'class': 'datepicker-past date-filter',
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'user.filter.creation-date'
+        'acls': 'user.see.creation-date'
     },
     'max_date': {
         'filterField': 'creation_date',
@@ -252,7 +251,7 @@ Wat.I.formFilters[qvdObj] = {
         'class': 'datepicker-past date-filter',
         'displayMobile': false,
         'displayDesktop': false,
-        'acls': 'user.filter.creation-date'
+        'acls': 'user.see.creation-date'
     }
 };
 
