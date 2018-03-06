@@ -111,135 +111,22 @@ my $RELATED_VIEWS_IN_DB = {
 	},
 };
 
-# Arguments names related to the DBIx module
-my $ARGUMENT_NAME_TO_QVD_OBJECT = {
-	vm => 'VM',
-	osf => 'OSF',
-	user => 'User',
-	host => 'Host',
-	role => 'Role',
-	di => 'DI',
-};
-
-# Acls needed for using every filter in actions regarding
-# a certain QVD object
-
-my $ACLS_FOR_FILTERS = {
-    VM => {
-        description => [qr/^vm\.filter\.description$/],
-        user_id => [qr/^vm\.filter\.user|user\.see\.vm-list$/],
-        user_name => [qr/^vm\.filter\.user$/],
-        user => [qr/^vm\.filter\.user$/],
-        osf_id => [qr/^vm\.filter\.osf|osf\.see\.vm-list$/],
-        osf_name => [qr/^vm\.filter\.osf$/],
-        osf => [qr/^vm\.filter\.osf$/],
-        di_id => [qr/^vm\.see\.di|di\.see\.vm-list$/],
-        di_name => [qr/^vm\.see\.di$/],
-        di_id_in_use => [qr/^vm\.see\.di$/],
-        host_id => [qr/^vm\.filter\.host|host\.see\.vm-list$/],
-        host_name => [qr/^vm\.filter\.host$/],
-        host => [qr/^vm\.filter\.host$/],
-        state => [qr/^vm\.filter\.state$/],
-        user_state => [qr/^vm\.filter\.user$/],
-        expiration_soft => [qr/^vm\.filter\.expiration-date$/],
-        expiration_hard => [qr/^vm\.filter\.expiration-date$/],
-        creation_date => [qr/^vm\.filter\.creation-date$/],
-        creation_admin_id => [qr/^vm\.filter\.created-by$/],
-        creation_admin_name => [qr/^vm\.filter\.created-by$/]
-    },
-
-    User => {
-        description => [qr/^user\.filter\.description$/],
-        blocked => [qr/^user\.filter\.block$/],
-        creation_date => [qr/^user\.filter\.creation-date$/],
-        creation_admin_id => [qr/^user\.filter\.created-by$/],
-        creation_admin_name => [qr/^user\.filter\.created-by$/],
-        properties => [qr/^user\.filter\.properties$/]
-    },
-
-    Host => {
-        vm_id => [qr/^host\.filter\.vm$/],
-        state => [qr/^host\.filter\.state$/],
-        blocked => [qr/^host\.filter\.block$/],
-        creation_date => [qr/^host\.filter\.creation-date$/],
-        creation_admin_id => [qr/^host\.filter\.created-by$/],
-        creation_admin_name => [qr/^host\.filter\.created-by$/]
-    },
-
-    DI => {
-        osf_id => [qr/^di\.filter\.osf|osf\.see\.di-list$/],
-        osf_name => [qr/^di\.filter\.osf$/],
-        osf => [qr/^di\.filter\.osf$/]
-    },
-
-    OSF => {
-        vm_id => [qr/^osf\.filter\.vm$/],
-        di_id => [qr/^osf\.filter\.di$/],
-        creation_date => [qr/^osf\.filter\.creation-date$/],
-        creation_admin_id => [qr/^osf\.filter\.created-by$/],
-        creation_admin_name => [qr/^osf\.filter\.created-by$/]
-    },
-
-    Administrator => {
-        creation_date => [qr/^administrator\.filter\.creation-date$/],
-        creation_admin_id => [qr/^administrator\.filter\.created-by/],
-        creation_admin_name => [qr/^administrator\.filter\.created-by/],
-    },
-
-    Role => {
-        creation_date => [qr/^role\.filter\.creation-date$/],
-        creation_admin_id => [qr/^role\.filter\.created-by$/],
-        creation_admin_name => [qr/^role\.filter\.created-by$/]
-    },
-
-    Tenant => {
-        blocked => [qr/^tenant\.filter\.block$/],
-        creation_date => [qr/^tenant\.filter\.creation-date$/],
-        creation_admin_id => [qr/^tenant\.filter\.created-by$/],
-        creation_admin_name => [qr/^tenant\.filter\.created-by$/]
-    }
-};
-
-# Acls needed for using a certain value of filters in actions regarding
-# a certain QVD object
-
-my $ACLS_FOR_FILTER_VALUES = {
-	list => {
-		Log => {
-			qvd_object => {
-				vm => [qr/^vm\.see-main\.$/],
-					   user => [qr/^user\.see-main\.$/],
-					   osf => [qr/^osf\.see-main\.$/],
-					   di => [qr/^di\.see-main\.$/],
-					   host => [qr/^host\.see-main\.$/],
-					   tenant => [qr/^tenant\.see-main\.$/],
-					   administrator => [qr/^administrator\.see-main\.$/], 
-					   role => [qr/^role\.see-main\.$/],
-					   acl => [qr/^administrator\.see\.acl-list$/],
-					   config => [qr/^config\.qvd\.$/],
-					   tenant_view => [qr/^views\.see-main\.$/],
-				admin_view => [qr/^views\.see-main\.$/],
-			}
-		}
-	},
-};
-
 # Acls needed for retrieving every field in actions regarding
 # a certain QVD object
 
 my $ACLS_FOR_FIELDS = {
-	OSF => {
-		creation_admin_id => [qr/^osf\.see\.created-by$/],
-	     creation_admin_name => [qr/^osf\.see\.created-by$/],
-	     creation_date => [qr/^osf\.see\.creation-date$/],
-	     overlay => [qr/^osf\.see\.overlay$/],
-	     user_storage => [qr/^osf\.see\.user-storage$/],
-	     memory => [qr/^osf\.see\.memory$/],
-	     number_of_vms => [qr/^osf\.see\.vms-info$/],
-	     number_of_dis => [qr/^osf\.see\.dis-info$/],
-	     properties => [qr/^osf\.see\.properties$/],
-		description => [qr/^osf\.see\.description$/]
-	},
+    OSF => {
+        creation_admin_id => [qr/^osf\.see\.created-by$/],
+        creation_admin_name => [qr/^osf\.see\.created-by$/],
+        creation_date => [qr/^osf\.see\.creation-date$/],
+        overlay => [qr/^osf\.see\.overlay$/],
+        user_storage => [qr/^osf\.see\.user-storage$/],
+        memory => [qr/^osf\.see\.memory$/],
+        number_of_vms => [qr/^osf\.see\.vms-info$/],
+        number_of_dis => [qr/^osf\.see\.dis-info$/],
+        properties => [qr/^osf\.see\.properties$/],
+        description => [qr/^osf\.see\.description$/]
+    },
 
     Role => {
         roles => [qr/^role\.see\.(acl-list|(acl-list|inherited)-roles)$/],
@@ -308,28 +195,28 @@ my $ACLS_FOR_FIELDS = {
         creation_admin_name => [qr/^administrator\.see\.created-by$/]
     },
 
-	User => {
-		blocked => [qr/^user\.see\.block$/],
-	      creation_admin_id => [qr/^user\.see\.created-by$/],
-	      creation_admin_name => [qr/^user\.see\.created-by$/],
-	      creation_date => [qr/^user\.see\.creation-date$/],
-	      number_of_vms => [qr/^user\.see\.vms-info$/],
-	      number_of_vms_connected => [qr/^user\.see\.vm-list-state$/],
-	      properties => [qr/^user\.see\.properties$/],
-		description => [qr/^user\.see\.description$/]
-	},
+    User => {
+        blocked => [qr/^user\.see\.block$/],
+        creation_admin_id => [qr/^user\.see\.created-by$/],
+        creation_admin_name => [qr/^user\.see\.created-by$/],
+        creation_date => [qr/^user\.see\.creation-date$/],
+        number_of_vms => [qr/^user\.see\.vms-info$/],
+        number_of_vms_connected => [qr/^user\.see\.vm-list-state$/],
+        properties => [qr/^user\.see\.properties$/],
+        description => [qr/^user\.see\.description$/]
+    },
 
-	Host => {
-		address => [qr/^host\.see\.address$/],
-	      blocked => [qr/^host\.see\.block$/],
-	      state => [qr/^host\.see\.state$/],
-	      creation_admin_id => [qr/^host\.see\.created-by$/],
-	      creation_admin_name => [qr/^host\.see\.created-by$/],
-	      creation_date => [qr/^host\.see\.creation-date$/],
-	      number_of_vms_connected => [qr/^host\.see\.vms-info$/],
-	      properties => [qr/^host\.see\.properties$/],
-		description => [qr/^host\.see\.description$/]
-	},
+    Host => {
+        address => [qr/^host\.see\.address$/],
+        blocked => [qr/^host\.see\.block$/],
+        state => [qr/^host\.see\.state$/],
+        creation_admin_id => [qr/^host\.see\.created-by$/],
+        creation_admin_name => [qr/^host\.see\.created-by$/],
+        creation_date => [qr/^host\.see\.creation-date$/],
+        number_of_vms_connected => [qr/^host\.see\.vms-info$/],
+        properties => [qr/^host\.see\.properties$/],
+        description => [qr/^host\.see\.description$/]
+    },
 
     Tenant => {
         description => [qr/^tenant\.see\.description$/],
@@ -341,6 +228,11 @@ my $ACLS_FOR_FIELDS = {
         creation_admin_name => [qr/^tenant\.see\.created-by$/]
     }
 };
+
+# Acls needed for using every filter in actions regarding
+# a certain QVD object
+
+my $ACLS_FOR_FILTERS = $ACLS_FOR_FIELDS;
 
 # Acls needed to order by every field in actions regarding
 # a certain QVD object
@@ -2060,29 +1952,6 @@ sub get_acls_for_filter
 {
     my ($self,$filter) = @_;
     $self->get_acls($ACLS_FOR_FILTERS,$filter);
-}
-
-sub get_acls_for_filter_value
-{
-    my ($self,$filter,$value) = @_;
-    $self->get_acls($ACLS_FOR_FILTER_VALUES,$filter,$value);
-}
-
-sub get_filters_with_acls_for_values
-{
-    my $self = shift;
-
-    return () unless defined $ACLS_FOR_FILTER_VALUES->{$self->type_of_action};
-    return () unless defined $ACLS_FOR_FILTER_VALUES->{$self->type_of_action}->{$self->qvd_object};
-    return keys %{$ACLS_FOR_FILTER_VALUES->{$self->type_of_action}->{$self->qvd_object}}; 
-}
-
-sub get_filter_values_with_acls
-{
-    my ($self,$filter) = @_;
-    return () unless defined $ACLS_FOR_FILTER_VALUES->{$self->type_of_action};
-    return () unless defined $ACLS_FOR_FILTER_VALUES->{$self->type_of_action}->{$self->qvd_object};
-    return keys %{$ACLS_FOR_FILTER_VALUES->{$self->type_of_action}->{$self->qvd_object}->{$filter}}; 
 }
 
 sub get_acls_for_field

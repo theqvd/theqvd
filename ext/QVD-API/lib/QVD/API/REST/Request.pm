@@ -206,17 +206,6 @@ sub BUILD
         if $type_of_action =~ /^create(_or_update)?$/ &&
             $self->qvd_object_model->directly_tenant_related;
 
-# This method adds filters in order to avoid selecting
-# objects the admin doesn't have acls for. These acls
-# are assigned to filter values
-
-# i.e. an admin allowed to use the 'log' table with the 
-# filter 'qvd_object' may not be allowed to select
-# 'log' entries with 'qvd_object' = 'vm'. In that case, 
-# a filter is added to avoid retrieving log entries with 
-# qvd_object=vm
- 
-    $self->forze_filtering_by_acls_for_filter_values;
 }
 
 ###############
@@ -431,46 +420,6 @@ sub forze_filtering_tenants_by_tenant
 
     $self->filters->add_filter('id', \@ids);
 }
-
-# This method adds filters in order to avoid selecting
-# objects the admin doesn't have acls for. These acls
-# are assigned to filter values
-
-# i.e. an admin allowed to use the 'log' table with the 
-# filter 'qvd_object' may not be allowed to select
-# 'log' entries with 'qvd_object' = 'vm'. In that case, 
-# a filter is added to avoid retrieving log entries with 
-# qvd_object=vm
-
-sub forze_filtering_by_acls_for_filter_values
-{
-    my $self = shift;
-
-    for my $filter ($self->qvd_object_model->get_filters_with_acls_for_values) # Filters whose values may have 
-    {                                                                          # acls associated
-        my @forbidden_values;
-        
-        for my $value ($self->qvd_object_model->get_filter_values_with_acls($filter)) # Values of a filter that may
-        {                                                                             # have acls associated
-            my @acls = $self->qvd_object_model->get_acls_for_filter_value($filter,$value);
-            push @forbidden_values, $value unless $self->administrator->re_is_allowed_to(@acls);
-        }
-        
-        my @requested_values = ($self->json_wrapper->get_filter_value($filter)) // ();
-        
-        for my $requested_value (@requested_values)
-        {
-            for my $forbidden_value (@forbidden_values)
-            {
-                QVD::API::Exception->throw(code => 4221, object => $requested_value)
-                    if $requested_value eq $forbidden_value;
-            }
-        }
-        
-        $self->filters->add_filter('-not',{ $filter => \@forbidden_values });
-    }
-}
-
 
 sub forze_tenant_assignment_in_creation
 {
