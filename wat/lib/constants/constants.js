@@ -41,7 +41,6 @@ ALL_STATUS = {
     4210: 'Forbidden action for this administrator',
     4220: 'Forbidden filter for this administrator',
     4230: 'Forbidden argument for this administrator',
-    4240: 'Forbidden massive action for this administrator',
     4250: 'Forbidden field for this administrator',
 
     5110: 'Unable to disconnect user in current state',
@@ -111,7 +110,6 @@ STATUS_UNAVAILABLE_ACTION = 4100;
 STATUS_FORBIDDEN_ACTION = 4210;
 STATUS_FORBIDDEN_FILTER = 4220;
 STATUS_FORBIDDEN_ARGUMENT = 4230;
-STATUS_FORBIDDEN_MASSIVE_ACTION = 4240;
 STATUS_FORBIDDEN_FIELD = 4250;
 
 STATUS_UNABLE_DISCONNECT_USER = 5110;

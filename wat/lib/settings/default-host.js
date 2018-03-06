@@ -6,10 +6,10 @@ Wat.I.listFields[qvdObj] = {
         'display': true,
         'fields': [],
         'acls': [
-            'host.delete-massive.',
-            'host.update-massive.block',
-            'host.update-massive.stop-vms',
-            'host.update-massive.properties'
+            'host.delete.',
+            'host.update.block',
+            'host.update.stop-vms',
+            'host.update.properties'
         ],
         'aclsLogic': 'OR',
         'fixed': true,
@@ -367,7 +367,7 @@ Wat.I.selectedActions[qvdObj] = {
     },
     'block': {
         'text': 'Block',
-        'acls': 'host.update-massive.block',
+        'acls': 'host.update.block',
         'iconClass': 'fa fa-lock',
         'visibilityCondition': {
             'type': 'eq',
@@ -377,7 +377,7 @@ Wat.I.selectedActions[qvdObj] = {
     },
     'unblock': {
         'text': 'Unblock',
-        'acls': 'host.update-massive.block',
+        'acls': 'host.update.block',
         'iconClass': 'fa fa-unlock-alt',
         'visibilityCondition': {
             'type': 'eq',
@@ -387,7 +387,7 @@ Wat.I.selectedActions[qvdObj] = {
     },
     'stop_all': {
         'text': 'Stop all VMs',
-        'acls': 'vm.update-massive.state',
+        'acls': 'vm.update.state',
         'iconClass': 'fa fa-stop',
         'visibilityCondition': {
             'type': 'ne',
@@ -397,7 +397,7 @@ Wat.I.selectedActions[qvdObj] = {
     },
     'delete': {
         'text': 'Delete',
-        'acls': 'host.delete-massive.',
+        'acls': 'host.delete.',
         'iconClass': 'fa fa-trash',
         'darkButton': true
     }

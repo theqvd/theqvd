@@ -6,10 +6,10 @@ Wat.I.listFields[qvdObj] = {
         'display': true,
         'fields': [],
         'acls': [
-            'osf.delete-massive.',
-            'osf.update-massive.memory',
-            'osf.update-massive.user-storage',
-            'osf.update-massive.properties'
+            'osf.delete.',
+            'osf.update.memory',
+            'osf.update.user-storage',
+            'osf.update.properties'
         ],
         'aclsLogic': 'OR',
         'fixed': true,
@@ -364,7 +364,7 @@ Wat.I.selectedActions[qvdObj] = {
     },
     'delete': {
         'text': 'Delete',
-        'acls': 'osf.delete-massive.',
+        'acls': 'osf.delete.',
         'iconClass': 'fa fa-trash',
         'darkButton': true
     }

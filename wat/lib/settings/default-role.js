@@ -5,7 +5,7 @@ Wat.I.listFields[qvdObj] = {
     'checks': {
         'display': true,
         'fields': [],
-        'acls': 'role.delete-massive.',
+        'acls': 'role.delete.',
         'fixed': true,
         'text': '',
         'sortable': false,
@@ -236,7 +236,7 @@ Wat.I.selectedActions[qvdObj] = {
     },
     'delete': {
         'text': 'Delete',
-        'acls': 'role.delete-massive.',
+        'acls': 'role.delete.',
         'iconClass': 'fa fa-trash',
         'darkButton': true
     }

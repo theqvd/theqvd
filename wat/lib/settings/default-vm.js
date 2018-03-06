@@ -639,7 +639,7 @@ Wat.I.selectedActions[qvdObj] = {
     },
     'start': {
         'text': 'Start',
-        'acls': 'vm.update-massive.state',
+        'acls': 'vm.update.state',
         'iconClass': 'fa fa-play',
         'visibilityCondition': {
             'type': 'eq',
@@ -649,7 +649,7 @@ Wat.I.selectedActions[qvdObj] = {
     },
     'stop': {
         'text': 'Stop',
-        'acls': 'vm.update-massive.state',
+        'acls': 'vm.update.state',
         'iconClass': 'fa fa-stop',
         'visibilityCondition': {
             'type': 'eq',
@@ -659,7 +659,7 @@ Wat.I.selectedActions[qvdObj] = {
     },
     'block': {
         'text': 'Block',
-        'acls': 'vm.update-massive.block',
+        'acls': 'vm.update.block',
         'iconClass': 'fa fa-lock',
         'visibilityCondition': {
             'type': 'eq',
@@ -669,7 +669,7 @@ Wat.I.selectedActions[qvdObj] = {
     },
     'unblock': {
         'text': 'Unblock',
-        'acls': 'vm.update-massive.block',
+        'acls': 'vm.update.block',
         'iconClass': 'fa fa-unlock-alt',
         'visibilityCondition': {
             'type': 'eq',
@@ -679,7 +679,7 @@ Wat.I.selectedActions[qvdObj] = {
     },
     'disconnect': {
         'text': 'Disconnect user',
-        'acls': 'vm.update-massive.disconnect-user',
+        'acls': 'vm.update.disconnect-user',
         'iconClass': 'fa fa-plug',
         'visibilityCondition': {
             'type': 'eq',
@@ -700,7 +700,7 @@ Wat.I.selectedActions[qvdObj] = {
     },
     'delete': {
         'text': 'Delete',
-        'acls': 'vm.delete-massive.',
+        'acls': 'vm.delete.',
         'iconClass': 'fa fa-trash',
         'darkButton': true
     },

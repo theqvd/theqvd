@@ -1,5 +1,5 @@
 <table>
-    <% if (Wat.C.checkACL('administrator.update-massive.description')) { %>
+    <% if (Wat.C.checkACL('administrator.update.description')) { %>
     <tr>
         <td>
             <span data-i18n="Description"></span>

@@ -10,11 +10,11 @@ Wat.C.aclGroups.administratorEdit = [
 ];
 
 Wat.C.aclGroups.administratorMassiveEdit = [
-    'administrator.update-massive.description'
+    'administrator.update.description'
 ];
 
 Wat.C.aclGroups.administratorMassiveActions = [
-    'administrator.delete-massive.',
+    'administrator.delete.',
 ];
 // Massive actions include massive edit ACLs
 $.merge(Wat.C.aclGroups.administratorMassiveActions, Wat.C.aclGroups.administratorMassiveEdit);
@@ -29,11 +29,11 @@ Wat.C.aclGroups.roleEdit = [
 ];
 
 Wat.C.aclGroups.roleMassiveEdit = [
-    'role.update-massive.description'
+    'role.update.description'
 ];
 
 Wat.C.aclGroups.roleMassiveActions = [
-    'role.delete-massive.',
+    'role.delete.',
 ];
 // Massive actions include massive edit ACLs
 $.merge(Wat.C.aclGroups.roleMassiveActions, Wat.C.aclGroups.roleMassiveEdit);
@@ -52,7 +52,7 @@ Wat.C.aclGroups.tenantMassiveEdit = [
 ];
 
 Wat.C.aclGroups.tenantMassiveActions = [
-    'tenant.delete-massive.',
+    'tenant.delete.',
 ];
 
 Wat.C.aclGroups.tenantDiEmbeddedInfo = [
@@ -90,14 +90,14 @@ Wat.C.aclGroups.userInfo = [
 ];
 
 Wat.C.aclGroups.userMassiveEdit = [
-    'user.update-massive.properties',
-    'role.update-massive.description'
+    'user.update.properties',
+    'role.update.description'
 ];
 
 Wat.C.aclGroups.userMassiveActions = [
-    'user.delete-massive.',
-    'user.update-massive.block',
-    'vm.update-massive.disconnect-user'
+    'user.delete.',
+    'user.update.block',
+    'vm.update.disconnect-user'
 ];
 // Massive actions include massive edit ACLs
 $.merge(Wat.C.aclGroups.userMassiveActions, Wat.C.aclGroups.userMassiveEdit);
@@ -128,17 +128,17 @@ Wat.C.aclGroups.vmEdit = [
 ];
 
 Wat.C.aclGroups.vmMassiveEdit = [
-    'vm.update-massive.di-tag',
-    'vm.update-massive.expiration',
-    'vm.update-massive.properties',
-    'vm.update-massive.description'
+    'vm.update.di-tag',
+    'vm.update.expiration',
+    'vm.update.properties',
+    'vm.update.description'
 ];
 
 Wat.C.aclGroups.vmMassiveActions = [
-    'vm.delete-massive.',
-    'vm.update-massive.block',
-    'vm.update-massive.disconnect-user',
-    'vm.update-massive.state'
+    'vm.delete.',
+    'vm.update.block',
+    'vm.update.disconnect-user',
+    'vm.update.state'
 ];
 
 Wat.C.aclGroups.vmRemoteAdminDetails = [
@@ -174,13 +174,13 @@ Wat.C.aclGroups.hostEdit = [
 ];
 
 Wat.C.aclGroups.hostMassiveEdit = [
-    'host.update-massive.properties',
-    'host.update-massive.description'
+    'host.update.properties',
+    'host.update.description'
 ];
 
 Wat.C.aclGroups.hostMassiveActions = [
-    'host.delete-massive.',
-    'host.update-massive.block'
+    'host.delete.',
+    'host.update.block'
 ];
 // Massive actions include massive edit ACLs
 $.merge(Wat.C.aclGroups.hostMassiveActions, Wat.C.aclGroups.hostMassiveEdit);
@@ -205,14 +205,14 @@ Wat.C.aclGroups.osfEdit = [
 ];
 
 Wat.C.aclGroups.osfMassiveEdit = [
-    'osf.update-massive.memory',
-    'osf.update-massive.user-storage',
-    'osf.update-massive.properties',
-    'osf.update-massive.description'
+    'osf.update.memory',
+    'osf.update.user-storage',
+    'osf.update.properties',
+    'osf.update.description'
 ];
 
 Wat.C.aclGroups.osfMassiveActions = [
-    'osf.delete-massive.'
+    'osf.delete.'
 ];
 
 Wat.C.aclGroups.osfDiEmbeddedInfo = [
@@ -249,15 +249,15 @@ Wat.C.aclGroups.diInfo = [
 ];
 
 Wat.C.aclGroups.diMassiveEdit = [
-    'di.update-massive.tags-add',
-    'di.update-massive.tags-delete',
-    'di.update-massive.properties',
-    'di.update-massive.description'
+    'di.update.tags-add',
+    'di.update.tags-delete',
+    'di.update.properties',
+    'di.update.description'
 ];
 
 Wat.C.aclGroups.diMassiveActions = [
-    'di.delete-massive.',
-    'di.update-massive.block'
+    'di.delete.',
+    'di.update.block'
 ];
 // Massive actions include massive edit ACLs
 $.merge(Wat.C.aclGroups.diMassiveActions, Wat.C.aclGroups.diMassiveEdit);

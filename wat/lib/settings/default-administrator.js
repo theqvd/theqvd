@@ -5,7 +5,7 @@ Wat.I.listFields[qvdObj] = {
     'checks': {
         'display': true,
         'fields': [],
-        'acls': 'administrator.delete-massive.',
+        'acls': 'administrator.delete.',
         'fixed': true,
         'text': '',
         'fixed': true,
@@ -241,7 +241,7 @@ Wat.I.selectedActions[qvdObj] = {
     },
     'delete': {
         'text': 'Delete',
-        'acls': 'administrator.delete-massive.',
+        'acls': 'administrator.delete.',
         'iconClass': 'fa fa-trash',
         'darkButton': true,
         'visibilityCondition': {

@@ -6,11 +6,11 @@ Wat.I.listFields[qvdObj] = {
         'display': true,
         'fields': [],
         'acls': [
-            'di.delete-massive.',
-            'di.update-massive.block',
-            'di.update-massive.tags-add',
-            'di.update-massive.tags-delete',
-            'di.update-massive.properties'
+            'di.delete.',
+            'di.update.block',
+            'di.update.tags-add',
+            'di.update.tags-delete',
+            'di.update.properties'
         ],
         'aclsLogic': 'OR',
         'fixed': true,
@@ -501,7 +501,7 @@ Wat.I.selectedActions[qvdObj] = {
     }, 
     'block': {
         'text': 'Block',
-        'acls': 'di.update-massive.block',
+        'acls': 'di.update.block',
         'iconClass': 'fa fa-lock',
         'visibilityCondition': {
             'type': 'eq',
@@ -511,7 +511,7 @@ Wat.I.selectedActions[qvdObj] = {
     },
     'unblock': {
         'text': 'Unblock',
-        'acls': 'di.update-massive.block',
+        'acls': 'di.update.block',
         'iconClass': 'fa fa-unlock-alt',
         'visibilityCondition': {
             'type': 'eq',
@@ -532,7 +532,7 @@ Wat.I.selectedActions[qvdObj] = {
     },
     'delete': {
         'text': 'Delete',
-        'acls': 'di.delete-massive.',
+        'acls': 'di.delete.',
         'iconClass': 'fa fa-trash',
         'darkButton': true
     }

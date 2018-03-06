@@ -1,5 +1,5 @@
 <table>
-    <% if (Wat.C.checkACL('osf.update-massive.description')) { %>
+    <% if (Wat.C.checkACL('osf.update.description')) { %>
     <tr data-tab-field="general">
         <td>
             <span data-i18n="Description"></span>

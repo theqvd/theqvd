@@ -75,7 +75,7 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
         $(that.editorContainer).html(that.template);
         
         var enabledProperties = $.inArray(that.qvdObj, QVD_OBJS_WITH_PROPERTIES) != -1;
-        var enabledEditProperties = Wat.C.checkACL(that.qvdObj + '.update-massive.properties');
+        var enabledEditProperties = Wat.C.checkACL(that.qvdObj + '.update.properties');
         
         if (enabledProperties && enabledEditProperties) {
             var filters = {};
@@ -322,7 +322,7 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
             case 'update':
                 switch(Wat.CurrentView.viewKind) {
                     case 'list':
-                        var updatePropertiesACL = this.qvdObj + '.update-massive.properties';
+                        var updatePropertiesACL = this.qvdObj + '.update.properties';
                         break;
                     case 'details':
                         var updatePropertiesACL = this.qvdObj + '.update.properties';
@@ -360,7 +360,7 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
         
         var arguments = {};
         
-        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL(this.qvdObj + '.update-massive.properties')) {
+        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL(this.qvdObj + '.update.properties')) {
             arguments['__properties_changes__'] = properties;
         }
         
@@ -368,7 +368,7 @@ Wat.Views.EditorView = Wat.Views.MainView.extend({
         
         var description = context.find('textarea[name="description"]').val();
         
-        if (Wat.I.isMassiveFieldChanging("description") && Wat.C.checkACL(this.qvdObj + '.update-massive.description')) {
+        if (Wat.I.isMassiveFieldChanging("description") && Wat.C.checkACL(this.qvdObj + '.update.description')) {
             arguments["description"] = description;
         }
         

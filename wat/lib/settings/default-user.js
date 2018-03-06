@@ -276,7 +276,7 @@ Wat.I.selectedActions[qvdObj] = {
     },
     'block': {
         'text': 'Block',
-        'acls': 'user.update-massive.block',
+        'acls': 'user.update.block',
         'iconClass': 'fa fa-lock',
         'visibilityCondition': {
             'type': 'eq',
@@ -286,7 +286,7 @@ Wat.I.selectedActions[qvdObj] = {
     },
     'unblock': {
         'text': 'Unblock',
-        'acls': 'user.update-massive.block',
+        'acls': 'user.update.block',
         'iconClass': 'fa fa-unlock-alt',
         'visibilityCondition': {
             'type': 'eq',
@@ -296,7 +296,7 @@ Wat.I.selectedActions[qvdObj] = {
     },
     'disconnect_all': {
         'text': 'Disconnect',
-        'acls': 'vm.update-massive.disconnect-user',
+        'acls': 'vm.update.disconnect-user',
         'iconClass': 'fa fa-plug',
         'visibilityCondition': {
             'type': 'ne',
@@ -306,7 +306,7 @@ Wat.I.selectedActions[qvdObj] = {
     },
     'delete': {
         'text': 'Delete',
-        'acls': 'user.delete-massive.',
+        'acls': 'user.delete.',
         'iconClass': 'fa fa-trash',
         'darkButton': true
     }

@@ -222,7 +222,7 @@ Wat.Views.VMEditorView = Wat.Views.EditorView.extend({
         
         var arguments = {};
         
-        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('vm.update-massive.properties')) {
+        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('vm.update.properties')) {
             arguments["__properties_changes__"] = properties;
         }
         
@@ -233,15 +233,15 @@ Wat.Views.VMEditorView = Wat.Views.EditorView.extend({
         
         var filters = {"id": id};
         
-        if (Wat.I.isMassiveFieldChanging("description") && Wat.C.checkACL('vm.update-massive.description')) {
+        if (Wat.I.isMassiveFieldChanging("description") && Wat.C.checkACL('vm.update.description')) {
             arguments["description"] = description;
         }
         
-        if (Wat.I.isMassiveFieldChanging("di_tag") && Wat.C.checkACL('vm.update-massive.di-tag')) {
+        if (Wat.I.isMassiveFieldChanging("di_tag") && Wat.C.checkACL('vm.update.di-tag')) {
             arguments["di_tag"] = di_tag;
         }
         
-        if (Wat.C.checkACL('vm.update-massive.expiration')) {
+        if (Wat.C.checkACL('vm.update.expiration')) {
             var expiration_soft = context.find('input[name="expiration_soft"]').val();
             var expiration_hard = context.find('input[name="expiration_hard"]').val();
 

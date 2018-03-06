@@ -248,7 +248,7 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
         
         var arguments = {};
         
-        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('osf.update-massive.properties')) {
+        if (!$.isEmptyObject(properties.set) && Wat.C.checkACL('osf.update.properties')) {
             arguments["__properties_changes__"] = properties;
         }
         
@@ -260,15 +260,15 @@ Wat.Views.OSFEditorView = Wat.Views.EditorView.extend({
         
         var filters = {"id": id};
         
-        if (Wat.I.isMassiveFieldChanging("description") && Wat.C.checkACL(this.qvdObj + '.update-massive.description')) {
+        if (Wat.I.isMassiveFieldChanging("description") && Wat.C.checkACL(this.qvdObj + '.update.description')) {
             arguments["description"] = description;
         }
         
-        if (Wat.I.isMassiveFieldChanging("memory") && Wat.C.checkACL('osf.update-massive.memory')) {
+        if (Wat.I.isMassiveFieldChanging("memory") && Wat.C.checkACL('osf.update.memory')) {
             arguments["memory"] = memory;
         }
         
-        if (Wat.I.isMassiveFieldChanging("user_storage") && Wat.C.checkACL('osf.update-massive.user-storage')) {
+        if (Wat.I.isMassiveFieldChanging("user_storage") && Wat.C.checkACL('osf.update.user-storage')) {
             arguments["user_storage"] = user_storage;
         }
         
