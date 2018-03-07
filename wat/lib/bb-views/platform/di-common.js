@@ -157,20 +157,28 @@ Wat.Common.BySection.di = {
         this.dialogConf.buttonClasses = ['fa fa-ban js-button-cancel', 'fa fa-save js-button-update'];
         
         this.enabledProperties = false;
-        this.dialogConf.fillCallback = this.fillEditor;
+        this.dialogConf.fillCallback = function (target, that) {
+            // Add general editor
+            var template = _.template(
+                        Wat.TPL.editorAffectedVM, {
+                        }
+                    );
+            
+            $(target).html(template);
+            
+            // Add list of affected VMs
+            var template = _.template(
+                        Wat.TPL.editorAffectedVMList, {
+                            affectedVMs: affectedVMs
+                        }
+                    );
+
+            $('.bb-affected-vms-list').html(template);
+
+            Wat.I.enableDataPickers();
+        };
         
         Wat.I.dialog(this.dialogConf, this);
-        
-        // Add specific parts of editor to dialog
-        var template = _.template(
-                    Wat.TPL.editorAffectedVMList, {
-                        affectedVMs: affectedVMs
-                    }
-                );
-
-        $('.bb-affected-vms-list').html(template);
-        
-        Wat.I.enableDataPickers();
     },
     
     // Hook to be called after create an element
