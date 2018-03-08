@@ -77,32 +77,37 @@ Wat.Views.VMListView = Wat.Views.ListView.extend({
         // Virtual machine form include a date time picker control, so we need enable it
         Wat.I.enableDataPickers();
         
-        var osfId = FILTER_ALL;
-        // If there are returned more than 1 OSFs, it will restrict tag selection to head and default
-        if($.unique(that.retrievedData.rows).length == 1) {
-            osfId = that.retrievedData.rows[0];
-            $('.js-advice-various-osfs').hide();
-        }
-        else {
-            $('.js-advice-various-osfs').show();
-        }
-        
-        var params = {
-            'actionAuto': 'tag',
-            'startingOptions': {
-                '' : $.i18n.t('No changes'),
-                'default' : 'default',
-                'head' : 'head'
-            },
-            'selectedId': '',
-            'controlName': 'di_tag',
-            'filters': {
-                'osf_id': osfId
-            },
-            'nameAsId': true,
-            'chosenType': 'advanced100'
-        };
-        
-        Wat.A.fillSelect(params);
+        Wat.A.performAction('osf_get_list', {}, {vm_id: that.selectedItems},{},function (result) {
+            var osfIds = result.retrievedData.rows.map(function (field) { 
+                return field.id 
+            });
+            
+            var params = {
+                'startingOptions': {
+                    '' : $.i18n.t('No changes'),
+                    'default' : 'default',
+                    'head' : 'head'
+                },
+                'selectedId': '',
+                'chosenType': 'advanced100',
+                'controlName': 'di_tag',
+            };
+            
+            // If there are returned more than 1 OSFs, it will restrict tag selection to head and default
+            if(osfIds.length == 1) {
+                $('.js-advice-various-osfs').hide();
+                
+                params.actionAuto = 'tag';
+                params.filters = {
+                    'osf_id': osfIds[0]
+                };
+                params.nameAsId = true;
+            }
+            else {
+                $('.js-advice-various-osfs').show();
+            }
+
+            Wat.A.fillSelect(params);
+        }, that, ['id']);
     },
 });
