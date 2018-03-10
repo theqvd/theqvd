@@ -350,6 +350,10 @@ sub _load_host_row {
 
 sub _check_address {
     my $self = shift;
+    unless ($self->_cfg('internal.hkd.address_check.enabled')) {
+        DEBUG "Disable the internal address_check";
+        return $self->_on_done;
+    }
     DEBUG "checking the node has configured IP $self->{address}";
     my $address_q = quotemeta $self->{address};
     my $ifaces = `ip -f inet addr show`;
@@ -390,10 +394,11 @@ sub _check_bridge_fw {
     $self->_on_done;
 }
 
-my %hypervisor_class = map { $_ => __PACKAGE__ . '::Hypervisor::' . uc $_ } qw(kvm lxc nothing);
 
 sub _start_hypervisor {
     my $self = shift;
+
+    my %hypervisor_class = map { $_ => __PACKAGE__ . '::Hypervisor::' . uc $_ } (split /,/,$self->_cfg('internal.hkd.hypervisor_list'));
 
     my $hypervisor = $self->_cfg('vm.hypervisor');
     my $hypervisor_class = $hypervisor_class{$hypervisor} // croak "unsupported hypervisor $hypervisor";

@@ -708,6 +708,12 @@ internal.hkd.cluster.node.timeout = 600
 # following time, it aborts the HKD
 internal.hkd.agent.ticker.timeout = 450
 
+# List of Hypervisors supported
+internal.hkd.hypervisor_list = kvm,lxc,nothing
+
+# Allow the disabling of network ranges
+internal.hkd.address_check.enabled = 1
+
 internal.vm.port.x = 5000
 internal.vm.port.vma = 3030
 internal.vm.port.ssh = 22
