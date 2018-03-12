@@ -19,7 +19,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
     viewKind: 'admin',
     currentTokensPrefix: '',
     
-    currentSearch: {},
+    currentSearch: '',
     
     breadcrumbs: {
         'screen': 'Home',
@@ -264,7 +264,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
 
                 var search = $(e.target).val();
 
-                Wat.C.currentSearch = search;
+                Wat.CurrentView.currentSearch = search;
 
                 if (search == '') {
                     $('.lateral-menu-option').eq(0).trigger('click');
@@ -318,7 +318,7 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
             }
 
             // Restore current Search to empty
-            Wat.C.currentSearch = '';
+            Wat.CurrentView.currentSearch = '';
 
             // Get new hash from data-prefix attribute of clicked menu option
             var newHash = '#/config/' + $(e.target).attr('data-prefix');
@@ -520,11 +520,11 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
                 Wat.A.performAction('config_get', {}, filter, {}, that.processPrefixes, that);
             }
             else if ($.inArray(that.currentTokensPrefix, that.prefixes) != -1) {
-                if (!$.isEmptyObject(Wat.C.currentSearch)) {
+                if (Wat.CurrentView.currentSearch) {
                     // Search substrings into key and operative_value
                     filter['-or'] = [
-                        "key", {'~': '%' + Wat.C.currentSearch + '%'},
-                        "operative_value", {'~': '%' + Wat.C.currentSearch + '%'}
+                        "key", {'~': '%' + Wat.CurrentView.currentSearch + '%'},
+                        "operative_value", {'~': '%' + Wat.CurrentView.currentSearch + '%'}
                     ];
                 }
                 else {
