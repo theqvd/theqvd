@@ -19,7 +19,7 @@ $.each(configTokens, function (iTok, tok) {
     var isDefault = tok.is_default;
 
     var tokenSplitted = token.split('.');
-    var prefix = tokenSplitted[0];
+    var prefix = token != tokenSplitted ? tokenSplitted[0] : 'unclassified';
 %>
     <tr class="js-token-row token-row" data-prefix="<%= prefix %>">
         <td>
