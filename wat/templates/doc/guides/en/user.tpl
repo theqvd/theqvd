@@ -1982,39 +1982,9 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Setting of custom properties in the creation process of users.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete users (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">user.delete-massive.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of users massively.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete users</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">user.delete.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of users one by one.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter users by blocking status</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">user.filter.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of users list by disk image&#8217;s blocking status</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter users by creator</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">user.filter.created-by</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of users list by administrator who created it</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter users by creation date</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">user.filter.creation-date</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of users list by date when it was created</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter users by name</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">user.filter.name</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of users list by user&#8217;s name.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter users by properties</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">user.filter.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of users list by desired custom property.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of users.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to user&#8217;s details view</strong></p></td>
@@ -2102,29 +2072,14 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Total of users in current tenant or all system for superadministrators.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Block-Unblock users (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">user.update-massive.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of users massively.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update user&#8217;s description (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">user.update-massive.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of users massively.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update properties when update users (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">user.update-massive.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in user&#8217;s massive update process.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Block-Unblock users</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">user.update.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of users one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of users.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update user&#8217;s description</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">user.update.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of users one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of users.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update user&#8217;s password</strong></p></td>
@@ -2134,7 +2089,7 @@ width:100%;
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update properties when update users</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">user.update.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in user&#8217;s one by one update process.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in user&#8217;s update process.</p></td>
 </tr>
 </tbody>
 </table>
@@ -2172,59 +2127,9 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Setting of custom properties in the creation process of virtual machines.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete virtual machines (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.delete-massive.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of virtual machines massively.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete virtual machines</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">vm.delete.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of virtual machines one by one.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter virtual machines by creator</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.created-by</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of virtual machines list by administrator who created it</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter virtual machines by creation date</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.creation-date</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of virtual machines list by date when it was created</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter virtual machines by expiration date</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.expiration-date</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of virtual machines list by date when it will expire. This is refered to the hard expiration.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter virtual machines by host</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.host</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of virtual machines list by host where the virtual machines are running.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter virtual machines by name</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.name</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of virtual machines list by virtual machine&#8217;s name</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter virtual machines by OS Flavour</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.osf</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of virtual machines list by OS flavour assigned to the virtual machine.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter virtual machines by properties</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of virtual machines list by desired custom property.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter virtual machines by running state</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.state</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of virtual machines list by virtual machine&#8217;s state (stopped/started)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter virtual machines by user</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.user</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of virtual machines list by user who the virtual machines belong.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of virtual machines.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to virtual machine&#8217;s details view</strong></p></td>
@@ -2362,64 +2267,29 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Total of virtual machines in current tenant or all system for superadministrators.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Block-Unblock virtual machines (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update-massive.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of virtual machines massively.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update virtual machine&#8217;s description (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update-massive.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of virtual machines massively.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update virtual machine&#8217;s tag (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update-massive.di-tag</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the disk image&#8217;s tag setted on virtual machines massively.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Disconnect user from virtual machine (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update-massive.disconnect-user</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Disconnect the user connected to virtual machines massively.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update virtual machine&#8217;s expiration (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update-massive.expiration</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the expiration date times of virtual machines massively.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update properties when update virtual machines (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update-massive.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in virtual machines&#8217;s massive update process.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Start-Stop virtual machines (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update-massive.state</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Start/Stop virtual machines massively.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Block-Unblock virtual machines</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of virtual machines one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of virtual machines.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update virtual machine&#8217;s description</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of virtual machines one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of virtual machines.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update virtual machine&#8217;s tag</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update.di-tag</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the disk image&#8217;s tag setted on virtual machines one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the disk image&#8217;s tag setted on virtual machines.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Disconnect user from virtual machine</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update.disconnect-user</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Disconnect the user connected to virtual machines one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Disconnect the user connected to virtual machines.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update virtual machine&#8217;s expiration</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update.expiration</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the expiration date times of virtual machines one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the expiration date times of virtual machines.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update virtual machine&#8217;s name</strong></p></td>
@@ -2429,12 +2299,12 @@ width:100%;
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update properties when update virtual machines</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in virtual machines&#8217;s one by one update process.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in virtual machines&#8217;s update process.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Start-Stop virtual machines</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update.state</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Start/Stop virtual machines one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Start/Stop virtual machines.</p></td>
 </tr>
 </tbody>
 </table>
@@ -2467,49 +2337,9 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Setting of custom properties in the creation process of hosts.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete nodes (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.delete-massive.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of hosts massively.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete nodes</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">host.delete.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of hosts one by one.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter nodes by blocking status</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.filter.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of hosts list by disk image&#8217;s blocking status</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter nodes by creator</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.filter.created-by</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of hosts list by administrator who created it</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter nodes by creation date</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.filter.creation-date</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of hosts list by date when it was created</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter nodes by name</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.filter.name</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of hosts list by host&#8217;s name</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter nodes by properties</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.filter.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of hosts list by desired custom property.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter nodes by running state</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.filter.state</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of hosts list by running state.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter nodes by virtual machines</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.filter.vm</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of hosts list by virtual machine that is running in the host.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of hosts.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to node&#8217;s details view</strong></p></td>
@@ -2612,26 +2442,6 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Top 5 of hosts with most running virtual machines.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Block-Unblock nodes (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.update-massive.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of hosts massively.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update node&#8217;s description (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.update-massive.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of the hosts massively.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update properties when update nodes (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.update-massive.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in node&#8217;s massive update process.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Stop all virtual machines of a node (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.update-massive.stop-vms</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Stop all the virtual machines of hosts massively.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update node&#8217;s address</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">host.update.address</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Update the IP address of the hosts.</p></td>
@@ -2639,12 +2449,12 @@ width:100%;
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Block-Unblock nodes</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">host.update.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of hosts one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of hosts.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update node&#8217;s description</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">host.update.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of the hosts one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of the hosts.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update node&#8217;s name</strong></p></td>
@@ -2654,12 +2464,12 @@ width:100%;
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update properties when update nodes</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">host.update.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in node&#8217;s one by one update process.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in node&#8217;s update process.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Stop all virtual machines of a node</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">host.update.stop-vms</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Stop all the virtual machines of hosts one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Stop all the virtual machines of hosts.</p></td>
 </tr>
 </tbody>
 </table>
@@ -2702,44 +2512,9 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Setting of user storage in the creation process of OS flavours.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete OS Flavours (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.delete-massive.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of OS flavours massively.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete OS Flavours</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">osf.delete.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of OS flavours one by one.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter OS Flavours by creator</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.filter.created-by</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of OS flavours list by administrator who created it</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter OS Flavours by creation date</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.filter.creation-date</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of OS flavours list by date when it was created</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter OS Flavours by disk image</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.filter.di</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of OS flavours list by disk image&#8217;s that belong to the OSF.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter OS Flavours by name</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.filter.name</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of OS flavours list by OSF&#8217;s name.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter OS Flavours by properties</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.filter.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of OSF flavours list by desired custom property.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter OS Flavours by virtual machine</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.filter.vm</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of OS flavours list by virtual machines assigned to the OSFs.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of OS flavours.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to OS Flavour&#8217;s details view</strong></p></td>
@@ -2862,34 +2637,14 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Total of OS flavours in current tenant or all system for superadministrators.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update OS Flavour&#8217;s description (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update-massive.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of OSF flavours massively.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update OS Flavour&#8217;s memory (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update-massive.memory</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the memory of OSF flavours massively.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update properties when update OSFs (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update-massive.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in OSF&#8217;s massive update process.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update OS Flavour&#8217;s user storage (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update-massive.user-storage</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the memory of OSF flavours massively.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update OS Flavour&#8217;s description</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of OSF flavours one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of OSF flavours.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update OS Flavour&#8217;s memory</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update.memory</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the memory of OSF flavours one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the memory of OSF flavours.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update OS Flavour&#8217;s name</strong></p></td>
@@ -2899,12 +2654,12 @@ width:100%;
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update properties when update OSFs</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in OSF&#8217;s one by one update process.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in OSF&#8217;s update process.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update OS Flavour&#8217;s user storage</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update.user-storage</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the user storage of OSF flavours one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the user storage of OSF flavours.</p></td>
 </tr>
 </tbody>
 </table>
@@ -2952,44 +2707,9 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Setting of version in the creation process of disk images. Without this ACL, the system will set it automatically with a string based on the timestamp and an order digit.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete disk images (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.delete-massive.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of disk images massively.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete disk images</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.delete.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of disk images one by one.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter disk images by blocking status</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.filter.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of disk images list by disk image&#8217;s blocking status</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter disk images by creator</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.filter.created-by</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of disk images list by administrator who created it</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter disk images by creation date</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.filter.creation-date</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of disk images list by date when it was created</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter disk images by DI&#8217;s name</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.filter.disk-image</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of disk images list by disk image&#8217;s name</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter disk images by OS Flavour</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.filter.osf</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of disk images list by OS flavour</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter disk images by properties</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.filter.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of disk images list by desired custom property.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of disk images.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to disk image&#8217;s details view</strong></p></td>
@@ -3092,29 +2812,9 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Total of disk images in current tenant or all system for superadministrators.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Block-Unblock disk images (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.update-massive.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of disk images massively.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update disk image&#8217;s description (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.update-massive.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of disk images massively.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update properties when update disk images (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.update-massive.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in disk image&#8217;s massive update process.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update disk image&#8217;s tags (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.update-massive.tags</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the tags (create and delete) of disk images massively.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Block-Unblock disk images</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.update.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of disk images one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of disk images.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Set disk images as default</strong></p></td>
@@ -3124,17 +2824,17 @@ width:100%;
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update disk image&#8217;s description</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.update.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of disk images one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of disk images.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update properties when update disk images</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.update.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in disk image&#8217;s one by one update process.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update properties in disk image&#8217;s update process.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update disk image&#8217;s tags</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.update.tags</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the tags (create and delete) of disk images one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the tags (create and delete) of disk images.</p></td>
 </tr>
 </tbody>
 </table>
@@ -3170,26 +2870,6 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete administrators</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.delete-massive.</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of WAT administrators massively.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete administrators (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.delete.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of WAT administrators one by one.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter administrators by creator</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.filter.created-by</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of administrators list by administrator who created it</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter administrators by creation date</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.filter.creation-date</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of administrators list by date when it were created</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter administrators by name</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.filter.name</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of administrators list by administrator&#8217;s name</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to administrator&#8217;s details view</strong></p></td>
@@ -3239,17 +2919,7 @@ width:100%;
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>See administrator&#8217;s Roles</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.see.roles</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Assigned roles to the WAT administrator</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update administrator&#8217;s description (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.update-massive.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of administrators massively.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update administrator&#8217;s language (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.update-massive.language</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the language of administrators massively.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Assigned roles to the WAT administrator.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Assign-Unassign administrator&#8217;s roles</strong></p></td>
@@ -3259,12 +2929,12 @@ width:100%;
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update administrator&#8217;s description</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.update.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of administrators one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of administrators.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update administrator&#8217;s language</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.update.language</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the language of administrators one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the language of administrators.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Change administrator&#8217;s password</strong></p></td>
@@ -3297,29 +2967,9 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Creation of roles including initial setting for name.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete roles (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">role.delete-massive.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of roles massively.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete roles</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">role.delete.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of roles one by one.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter roles by creator</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">role.filter.created-by</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of roles list by administrator who created it</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter roles by creation date</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">role.filter.creation-date</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of roles list by date when it was created</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter roles by name</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">role.filter.name</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of roles list by role&#8217;s name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of roles.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to role&#8217;s details view</strong></p></td>
@@ -3367,11 +3017,6 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Inherited roles of a role.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update role&#8217;s description (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">role.update-massive.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of roles massively.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Assign-Unassign role&#8217;s ACLs</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">role.update.assign-acl</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Add/Remove acl on role.</p></td>
@@ -3384,7 +3029,7 @@ width:100%;
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update role&#8217;s description</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">role.update.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of roles one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of roles.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update role&#8217;s name</strong></p></td>
@@ -5216,7 +4861,7 @@ On the left side there is a <em>settings</em> tab that displays a lateral menu w
 <div id="footnotes"><hr></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-09-19 12:52:41 CEST
+Last updated 2018-02-13 13:45:52 CET
 </div>
 </div>
 </body>

@@ -120,6 +120,11 @@ Wat.I.docSections = {
         es: '_permisos_administrador_rol_acl',
         guide: 'introduction'
     },
+    roles_management: {
+        en: '_roles_management',
+        es: '_gestión_de_roles',
+        guide: 'user',
+    },
     image_update: { 
         en: '_image_update',
         es: '_actualización_de_imagen',

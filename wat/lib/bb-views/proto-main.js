@@ -411,7 +411,7 @@ Wat.Views.MainView = Backbone.View.extend({
 
         dialogConf.buttons = {
             "Read full documentation": function (e) {
-                Wat.I.closeDialog($(this));
+                $('.js-button-close').trigger('click');
                 window.location = '#documentation';
             },
             Close: function (e) {

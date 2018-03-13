@@ -1147,7 +1147,49 @@ The <strong>multitenant guide</strong> where we find on the one hand, a theoreti
 <h3 id="_properties_multitenant">5.5. Properties (multitenant)</h3>
 <div class="paragraph"><p>If we are in the multitenant mode and we are the super administrator, we will have access in <em>Properties</em> to the management of all the tenant&#8217;s properties. Thus, so as to classify them, there is one more available filter with the tenant which the display properties belong to. These tenants include the supertenant <em>*</em>, which can also have its own properties.</p></div>
 <div class="paragraph"><p>Since it is possible to have specific multitenant properties <em>*</em>, in the detail and list views of the elements, if we are super administrators, we may see the tenant properties apart from the supertenant. It is important to consider that the latter will not be visible for that tenant administrators, but only the super administrators will be able to see them.</p></div>
-<div class="paragraph"><p><strong>In the case of the nodes</strong>, as they do not belong to any tenant but they can have different properties in each of the tenants including the supertenant <em>*</em>, <strong>the view will be simplified</strong>. Every administrator will see the properties of the tenant Nodes which it belongs to. This also includes the super administrator, who will only see the supertenant&#8217;s Nodes properties <em>*</em>.</p></div>
+<div class="paragraph"><p>In addition, in the multitenant mode <strong>the Nodes can have custom propierties</strong> too. The nodes, as they do not belong to any tenant, they only can have properties in the supertenant <em>\*</em>, accordingly the will be managed and visible by a super administrator.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_qvd_configuration_multitenant">5.6. QVD Configuration (multitenant)</h3>
+<div class="paragraph"><p>If we are in the multitenant mode and we are the super administrator, we will have access in <em>QVD Configuration</em> to some additional actions.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Parameters creation
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>It is possible to add <strong>new parameters</strong>.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_config_create.png" alt="screenshot_config_create.png" width="960px">
+</span></p></div>
+<div class="paragraph"><p>When a parameter is created, it will be situated in the category that corresponds depending on the beginning of its name.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_config_created.png" alt="screenshot_config_created.png" width="960px">
+</span></p></div>
+<div class="paragraph"><p>If the category does not exist, it will be created in the menu.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_config_custom.png" alt="screenshot_config_custom.png" width="960px">
+</span></p></div>
+<div class="paragraph"><p>If the name of the parameter do not contain dots, it will take part of the special category <em>unclassified</em>.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_config_unclassified.png" alt="screenshot_config_unclassified.png" width="960px">
+</span></p></div>
+</div></div>
+</dd>
+<dt class="hdlist1">
+Deleting parameters
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>The parameters added after the installation can be deleted. By clicking on the "Delete" button next to the text box, it will be marked as deleted. This action can be undone with the button that appears under the text box, or deleted permanently with the "Save all" button.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_config_delete.png" alt="screenshot_config_delete.png" width="960px">
+</span></p></div>
+</div></div>
+</dd>
+</dl></div>
 </div>
 </div>
 </div>
@@ -1155,9 +1197,12 @@ The <strong>multitenant guide</strong> where we find on the one hand, a theoreti
 <h2 id="_multitenant_first_steps">6. Multitenant first steps</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>If it is the first time we activate the multitenant mode, we can log on with the super administrator which comes by default with the system . Its credentials are:</p></div>
-<div class="paragraph"><p>User: superadmin
-Password superadmin
-The first thing we will do is to <strong>change the password</strong>.</p></div>
+<div class="literalblock">
+<div class="content monospaced">
+<pre>User: superadmin@*
+Password: superadmin</pre>
+</div></div>
+<div class="paragraph"><p>The first thing we will do is to <strong>change the password</strong>.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 Powers of <em>superadmin</em>
@@ -1262,34 +1307,9 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Creation of tenants including initial settings for name.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete tenants (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.delete-massive.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of tenants massively.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Delete tenants</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.delete.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of tenants one by one</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter tenants by blocking status</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.filter.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of tenants list by blocking status</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter tenants by creator</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.filter.created-by</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of tenants list by administrator who created it</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter tenants by creation date</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.filter.creation-date</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of tenants list by date when it was created</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filter tenants by name</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.filter.name</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filter of tenants list by tenant&#8217;s name</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Deletion of tenants</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Access to tenant&#8217;s details view</strong></p></td>
@@ -1387,44 +1407,24 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">User state (connected/disconnected)) of the virtual machines shown in tenant details view</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Block-Unblock tenants (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.update-massive.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of tenants masively.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update tenant&#8217;s block size (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.update-massive.blocksize</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the block size in lists pagination of tenants massively.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update tenant&#8217;s description (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.update-massive.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of tenants massively.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update tenant&#8217;s language (massive)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.update-massive.language</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the language of tenants massively.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Block-Unblock tenants</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.update.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of tenants one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the blocking state (blocked/unblocked) of tenants.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update tenant&#8217;s block size</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.update.blocksize</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the block size in lists pagination of tenants one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the block size in lists pagination of tenants.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update tenant&#8217;s description</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.update.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of tenants one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the description of tenants.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update tenant&#8217;s language</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.update.language</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the language of tenants one by one.</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Update the language of tenants.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Update tenant&#8217;s name</strong></p></td>
@@ -1506,7 +1506,7 @@ Tenants Eraser
 <div class="paragraph"><p>In the multitenant set-up there is also the recovery administrator with the same credential that the multitenant one:</p></div>
 <div class="literalblock">
 <div class="content monospaced">
-<pre>User: batman
+<pre>User: batman@*
 Password: (Consult the support team)</pre>
 </div></div>
 <div class="paragraph"><p>In this case, there will be small differences in comparison with the one there is in the monotenant mode.</p></div>
@@ -1517,7 +1517,7 @@ Password: (Consult the support team)</pre>
 <div id="footnotes"><hr></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-02-14 15:33:45 CET
+Last updated 2018-03-12 13:11:47 CET
 </div>
 </div>
 </body>

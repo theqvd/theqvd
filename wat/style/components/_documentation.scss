@@ -574,6 +574,11 @@
     @media print {
       body.manpage div#toc { display: none; }
     }
+}
 
-
+div.doc-dialog-wrapper {
+    padding: 0 20px;
+    td {
+        white-space: normal !important;
+    }
 }

@@ -2022,39 +2022,9 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Ajustes de las propiedades personalizables durante el proceso de creación de usuarios.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminar usuarios (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">user.delete-massive.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Eliminación masiva de usuarios.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminar usuarios</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">user.delete.</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Eliminación de usuarios uno a uno.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtro de usuarios por estado de bloqueo</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">user.filter.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtro de la lista de usuarios por el estado de bloqueo de la imagen del disco</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtro de usuarios por creador</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">user.filter.created-by</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtro de la lista de usuarios por administrador que la creó</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtro de usuarios por fecha de creación</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">user.filter.creation-date</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtro de la lista de usuarios por fecha en la que se creó</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtro de usuarios por nombre</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">user.filter.name</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtro de la lista de usuarios por nombre del usuario.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar usuarios por propiedades</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">user.filter.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtro de la lista de usuarios por propiedad personalizable deseada.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Acceso a la vista detallada del usuario</strong></p></td>
@@ -2142,21 +2112,6 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Total de usuarios en el usuario actual o todo el sistema por superadministradores.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Bloqueo-Desbloqueo usuarios (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">user.update-massive.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualización del bloqueo (bloqueo/desbloqueo) masivo de los usuarios.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualización de la descripción del usuario (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">user.update-massive.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualización masiva de la descripción del usuario.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualización de las propiedades durante la actualización de los usuarios (masiva)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">user.update-massive.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualización de propiedades en el proceso de actualización masiva del usuario.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Bloqueo-Desbloqueo de usuarios</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">user.update.block</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar el estado de bloqueo de los usuarios (bloqueado/desbloqueado) uno a uno.</p></td>
@@ -2212,59 +2167,9 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Ajustes de las propiedades personalizables en el proceso de creación de las máquinas virtuales.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminación máquinas virtuales (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.delete-massive.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Eliminación de máquinas virtuales masivamente.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminación máquinas virtuañes</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">vm.delete.</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Eliminación de máquinas virtuales una a una</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar máquinas virtuales por creador</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.created-by</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de máquinas virtuales por administrador que la creó</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar máquinas virtuales por fecha de creación</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.creation-date</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de máquinas virtuales por fecha en la que fue creada</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar máquinas virtuales por fecha de expiración</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.expiration-date</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtar lista de máquinas virtuales por fecha en la que expiraráof virtual machines list by date when it will expire. Esto se refiere a la expiración hard.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar máquinas virtuales por host</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.host</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de máquinas virtuales por host cuando estas esten en funcionamiento.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar máquinas virtuales por nombre</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.name</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de máquinas virtuales por su nombre.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar máquinas virtuales por OS Flavour</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.osf</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de máquinas virtuales por OS flavour asignado a la máquina virtual.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar máquinas virtuales por propiedades</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de máquinas virtuales por propiedad personalizable deseada.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar máquinas virtuales por estado de funcionamiento</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.state</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de máquinas virtuales por el estado de la máquina virtua (parado/iniciado)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar máquinas virtuales por usuario</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.filter.user</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de máquinas virtuales por usuario a quien pertenece la máquina virtual.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Acceso a la vista detallada de la máquina virtual</strong></p></td>
@@ -2402,41 +2307,6 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Número total de máquinas virtuales en el usuario actual o en todo el sistema por superadministradores.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Bloqueo-Desbloqueo de las máquinas virtuales (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update-massive.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar estado de bloqueo (bloqueado/desbloqueado) de las máquinas virtuales masivamente.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar descripción de las máquinas virtuales (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update-massive.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar descripción de las máquinas virtuales masivamente.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar etiqueta de las máquinas virtuales (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update-massive.di-tag</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar la etiqueta de la imagen del disco establecida en las máquinas virtuales masivamente.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Desconectar al usuario de la máquina virtual (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update-massive.disconnect-user</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Desconectar usuario conectado a las máquinas virtuales masivamente.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar expiración de las máquinas virtuales (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update-massive.expiration</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar las fechas de expiración de las máquinas virtuales masivamente.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar propiedades al actualizar las máquinas virtuales (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update-massive.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar propiedades de las máquinas virtuales durante el proceso masivo de actualización de las máquinas virtuales.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Iniciar-Parar máquinas virtuales (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update-massive.state</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Iniciar/Parar máquinas virtuales masivamente.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Bloquear-Desbloquear máquinas virtuales</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">vm.update.block</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar el estado de bloqueo (bloqueado/desbloqueado) de las máquinas virtuales una a una.</p></td>
@@ -2507,49 +2377,9 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Ajustes de propiedades personalizables en el proceso de creación de los host.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminación de nodos (masiva)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.delete-massive.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Eliminación masiva de hosts.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminar nodos</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">host.delete.</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Eliminación de hosts uno a uno.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar nodos por estado de bloqueo</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.filter.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de hosts por el estado de bloqueo de la imagen del disco.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar nodos por creador</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.filter.created-by</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de hosts por host que la creó.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar nodos por fecha de creación</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.filter.creation-date</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Fitrar lista de hosts por fecha en la que fue creado.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar nodos por nombre</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.filter.name</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de hosts por nombre del host.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar nodos por propiedades</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.filter.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de hosts por propiedad personalizable deseada.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar nodos por estado de funcionamiento</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.filter.state</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de hosts por estado de funcionamiento.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar nodos por máquinas virtuales</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.filter.vm</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de hosts por máquina virtual del host en funcionamiento.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Acceso a la vista detallada de nodos</strong></p></td>
@@ -2652,26 +2482,6 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Top 5 de hosts con mayor número de máquinas virtuales en funcionamiento.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Bloqueo-Desbloqueo de nodos (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.update-massive.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualización del estado de bloqueo (bloqueo/desbloqueo) masivo de hosts.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualización de la descripción de nodos (masiva)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.update-massive.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualización masiva de la descripción de los hosts.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar propiedades al actualizar nodos (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.update-massive.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar propiedades en el proceso de actualización masivo del nodo.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Detener todas las máquinas virtuales del nodo (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">host.update-massive.stop-vms</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Detención masiva de las máquinas virtuales del host.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar dirección del nodo</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">host.update.address</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar la dirección IP de los hosts.</p></td>
@@ -2742,44 +2552,9 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Establecer almacenaje del usuario en el proceso de creación de los OS flavour.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminar OS Flavours (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.delete-massive.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Eliminación masiva de los OS flavours.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminar OS Flavours</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">osf.delete.</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Eliminación de los OS flavours uno a uno.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar OS Flavours por creador</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.filter.created-by</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de OS por administrador que lo creó.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar OS Flavours por fecha de creación</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.filter.creation-date</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de los OS flavours por fecha en la que se creó</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar OS Flavours por imagen del disco</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.filter.di</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de los OS flavours por imagen del disco que pertenece al OSF.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar OS Flavours por nombre</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.filter.name</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de los OS flavours por nombre OSF.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar OS Flavours por propiedades</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.filter.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de los OSF flavours por propiedad personalizable deseada.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar OS Flavours por máquina virtual</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.filter.vm</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de los OS flavours por máquina virtual asignada al OSFs.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Acceso a la vista detallada de OS Flavour</strong></p></td>
@@ -2873,73 +2648,58 @@ width:100%;
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver estado de bloqueo de las máquinas virtuales de OS Flavour</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.vm-list-block  IInformación de bloqueo de las máquinas virtuales mostrada osf en vista detallada</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver expiración de las máquinas virtuales del OS Flavour</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.vm-list-block</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Información de bloqueo de las máquinas virtuales mostrada osf en vista detallada</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>osf.see.vm-list-expiration</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver expiración de las máquinas virtuales del OS Flavour</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.vm-list-expiration</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Información de expiration de las máquinas virtuales mostrada en osf en vista detallada</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver estado de funcionamiento de las máquinas virtuales de OS Flavour</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>osf.see.vm-list-state</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver estado de funcionamiento de las máquinas virtuales de OS Flavour</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.vm-list-state</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Estado (parado/iniciado) de las máquinas virtuales mostrado en osf en vista detallada</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver estado del usuario de las máquinas virtuales de OS Flavour</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>osf.see.vm-list-user-state</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver estado del usuario de las máquinas virtuales de OS Flavour</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.vm-list-user-state</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Estado del usuario (conectado/desconectado) de las máquinas virtuales mostrado en osf en vista detallada</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver número de máquinas virtuales de OS Flavour</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>osf.see.vms-info</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver número de máquinas virtuales de OS Flavour</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.see.vms-info</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Número de máquinas virtuales que están utilizando una imagen del Disco de cada OS flavour</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver estadística del número de OS Flavour</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>osf.stats.summary</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver estadística del número de OS Flavour</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.stats.summary</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Total de OS flavours en el usuario actual o todo el sistema por superadministradores.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar la descripción de OS Flavour (masivo)</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>osf.update-massive.description</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar de forma masiva la descripción de OSF.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar la memoria de OS Flavour (masivo)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>osf.update-massive.memory</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar masivamente la memoria de OSF flavour.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar propiedades al actualizar OSFs (masivo)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>osf.update-massive.properties</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar propiedades de forma masiva en OSF&#8217;s en el proceso de actualización.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar el almacenaje de usuario de OS Flavour (masivo)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>osf.update-massive.user-storage</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar memoria de OSF flavours de forma masiva.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar descripción de OS Flavour</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>osf.update.description</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar descripción de OS Flavour</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update.description</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar la descripción de los OSF flavours una a una.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar memoria de OS Flavour</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>osf.update.memory</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar memoria de OS Flavour</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update.memory</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar memoria de OSF flavours una a una.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar nombre de OS Flavour</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>osf.update.name</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar nombre de OS Flavour</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update.name</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar el nombre de OSF flavour.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar propiedades al actualizar OSFs</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>osf.update.properties</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar propiedades al actualizar OSFs</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update.properties</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar propiedades en OSF&#8217;s una a una durante un proces de actualización.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar el almacenaje de usuario de OS Flavour</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar el almacenaje de usuario de OS Flavour</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">osf.update.user-storage</p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar el almacenaje de usuario de OSF flavours uno a uno.</p></td>
 </tr>
 </tbody>
 </table>
@@ -2987,190 +2747,135 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Ajuste de la versión en el proceso de creación de imágenes del disco. Sin este ACL, el sistema lo establecerá automáticamente como una base fija en el timestamp y una serie de dígitos.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminación de imágenes del disco (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.delete-massive.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Eliminación masiva deá imágenes del disco</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminar imágenes del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminación masiva deá imágenes del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Eliminar imágenes del disco</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.delete.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Eliminación de imágenes del disco una a una.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar imágenes del disco por estado de bloqueo</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.filter.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de imágenes del disco por estado de bloqueo</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar imágenes del disco por creador</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.filter.created-by</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista imágenes del disco por administrador que la creó</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar imágenes del disco por fecha de creación</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.filter.creation-date</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de imágenes del disco por fecha en la que fue creada</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar imágenes del disco por nombre de DI</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.filter.disk-image</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de imágenes del disco por nombre de imágen del disco</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar imágenes del disco por OS Flavour</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.filter.osf</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de imágenes del disco por OS flavour</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar imágenes del disco por propiedades</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.filter.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de imágenes del disco por propiedad personalizable deseada.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Acceso a la vista detallada de imágenes del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminación de imágenes del disco una a una.</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Acceso a la vista detallada de imágenes del disco</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.see-details.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Este ACL garantiza el acceso a la vista detallada. El dato mínimo es la imágen del disco.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Acceso a la sección principal de imágenes del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Este ACL garantiza el acceso a la vista detallada. El dato mínimo es la imágen del disco.</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Acceso a la sección principal de imágenes del disco</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.see-main.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Este ACL garantiza el acceso a la lista. El dato mínimo es la disk_image</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver estado de bloqueo de la imágen del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Este ACL garantiza el acceso a la lista. El dato mínimo es la disk_image</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver estado de bloqueo de la imágen del disco</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Estado de bloqueo de las imágenes del disco</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver creador de la imagen del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Estado de bloqueo de las imágenes del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver creador de la imagen del disco</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.created-by</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Administrador Wat que creó una imagen del disco</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver fecha de creación de la imagen del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Administrador Wat que creó una imagen del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver fecha de creación de la imagen del disco</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.creation-date</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Fecha en la que se creó una imagen del disco</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver imagen del disco por defecto de OSF</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Fecha en la que se creó una imagen del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver imagen del disco por defecto de OSF</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.default</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Si una imagen de disco es establecida como imagen por defecto en el OSF al que pertenece</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver descripción de la imagen del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Si una imagen de disco es establecida como imagen por defecto en el OSF al que pertenece</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver descripción de la imagen del disco</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Descripción de imágenes del disco.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver la última imagen de disco creada de OSF</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Descripción de imágenes del disco.</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver la última imagen de disco creada de OSF</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.head</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Si una imagen de disco es la última en ser creada en el OSF al que pertenece</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver ID de la imagen del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Si una imagen de disco es la última en ser creada en el OSF al que pertenece</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver ID de la imagen del disco</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.id</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Base de datos identificativo de las imágenes del disco. Útil para realizar llamadas desde CLI.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver imagen del disco de OS Flavour</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Base de datos identificativo de las imágenes del disco. Útil para realizar llamadas desde CLI.</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver imagen del disco de OS Flavour</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.osf</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">El OS Flavour asociado a las imágenes del disco.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver propiedades de imagen del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>El OS Flavour asociado a las imágenes del disco.</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver propiedades de imagen del disco</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Propiedades personalizables de las imágenes del disco.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver etiquetas de imagen del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Propiedades personalizables de las imágenes del disco.</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver etiquetas de imagen del disco</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.tags</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Las etiquetas de las imágenes del disco</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver version de imagen del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Las etiquetas de las imágenes del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver version de imagen del disco</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.version</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Versión de las imágenes del disco</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver máquinas virtuales de la imagen del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Versión de las imágenes del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver máquinas virtuales de la imagen del disco</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.vm-list</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Máquinas virtuales usando esta imagen en vista. Esta vista contendrá: nombre y etiqueta de cada mv</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver estado de bloqueo de la lista de las máquinas virtuales de DI</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Máquinas virtuales usando esta imagen en vista. Esta vista contendrá: nombre y etiqueta de cada mv</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver estado de bloqueo de la lista de las máquinas virtuales de DI</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.vm-list-block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Información de bloqueo de las máquinas virtuales mostrada en la vista detallada de DI</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver expiración de la lista de mvs de DI</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Información de bloqueo de las máquinas virtuales mostrada en la vista detallada de DI</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver expiración de la lista de mvs de DI</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.vm-list-expiration</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Información de expiración de las máquinas virtuales mostradas en la vista detallada de DI.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver estado de funcionamiento de la lista de máquinas virtuales de DI</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Información de expiración de las máquinas virtuales mostradas en la vista detallada de DI.</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver estado de funcionamiento de la lista de máquinas virtuales de DI</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.vm-list-state</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Estado (parado/iniciado) de las máquinas virtuales mostradas en vista detallada de DI</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver estado de usuario de la lista de MV de DI</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Estado (parado/iniciado) de las máquinas virtuales mostradas en vista detallada de DI</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver estado de usuario de la lista de MV de DI</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.see.vm-list-user-state</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Estado de usuario (conectado/desconectado) de las máquinas virtuales mostradas en vista detallada de DI.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver estadística del número de imágenes del disco bloqueadas</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Estado de usuario (conectado/desconectado) de las máquinas virtuales mostradas en vista detallada de DI.</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver estadística del número de imágenes del disco bloqueadas</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.stats.blocked</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Total de imágenes de disco bloqueadas en el usuario actual o todo el sistema por
-superadministradores.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver estadística del número de imágenes del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Total de imágenes de disco bloqueadas en el usuario actual o todo el sistema por
+superadministradores.</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Ver estadística del número de imágenes del disco</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.stats.summary</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Total de imágenes del disco en el usuario actual o en todo el sistema por superadministradores.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Bloqueo-Desbloqueo de imágenes del disco (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.update-massive.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar estado de bloqueo (bloqueado/desbloqueado) de las imágenes del disco de forma masiva.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar la descripción de la imagen del disco (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.update-massive.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar la descripción de las imágenes del disco de forma masiva.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar propiedades al actualizar imágenes del disco (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.update-massive.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar propiedades en el proceso de actualización de imágenes del disco de forma masiva.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar etiquetas de la imagen del disco (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">di.update-massive.tags</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualización de etiquetas (crear y eliminar) de las imágenes del disco de forma masiva.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Bloqueo-Desbloqueo de imágenes del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Total de imágenes del disco en el usuario actual o en todo el sistema por superadministradores.</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Bloqueo-Desbloqueo de imágenes del disco</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.update.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar el estado de bloqueo (bloqueado/desbloqueado) de las imágenes del disco una a una.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Establecer imágenes del disco por defecto</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar el estado de bloqueo (bloqueado/desbloqueado) de las imágenes del disco una a una.</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Establecer imágenes del disco por defecto</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.update.default</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Establecer por defecto una imagen del disco en OS flavour donde pertenece.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar la descripción de la imagen del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Establecer por defecto una imagen del disco en OS flavour donde pertenece.</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar la descripción de la imagen del disco</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.update.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualización de la de la descripción de las imágenes del disco una a una.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar propiedades al actualizar imágenes del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualización de la de la descripción de las imágenes del disco una a una.</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar propiedades al actualizar imágenes del disco</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.update.properties</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar propiedades en el proceso de actualización de las imágenes del disco una a una.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar etiquetas de las imágenes del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar propiedades en el proceso de actualización de las imágenes del disco una a una.</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar etiquetas de las imágenes del disco</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.update.tags</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar las etiquetas (crear y eliminar) de las imágenes del disco una a una.</p></td>
 </tr>
 </tbody>
 </table>
@@ -3203,29 +2908,9 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Ajuste de idioma en el proceso de creación de administradores.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminar administradores</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.delete-massive.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Eliminación masiva de administradores WAT.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminar administradores (masivo)</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.delete.</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Eliminación de administradores WAT uno a uno.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar administradores por creador</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.filter.created-by</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de administradores por administrador que lo creó</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar administradores por fecha de creación</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.filter.creation-date</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de administradores por fecha en la que fue creado</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar administradores por nombre</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.filter.name</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de administradores por nombre de administrador</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Acceso a la vista detallada de administradores</strong></p></td>
@@ -3278,16 +2963,6 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Roles asignados al administrador WAT</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar descripción del administrador (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.update-massive.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualización masiva de administradores.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar idioma del administrador (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.update-massive.language</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualización masiva del idioma de los administradores.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Asignar-Desvincular roles del administrador</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.update.assign-role</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Asignar roles a los administradores WAT para dárselos a sus ACLs.</p></td>
@@ -3333,29 +3008,9 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Creación de roles incluyendo los ajustes iniciales para el nombre.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminar roles (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">role.delete-massive.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Eliminación masiva de roles.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminación de roles</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">role.delete.</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Eliminación de roles uno a uno.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar roles por creador</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">role.filter.created-by</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de roles por administrador que lo creó</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar roles por fecha de creación</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">role.filter.creation-date</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de roles por fecha en la que se creó</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar roles por nombre</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">role.filter.name</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar lista de roles por nombre del rol</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Acceso a la vista detallada de roles</strong></p></td>
@@ -3403,29 +3058,24 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Roles heredados de un rol.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar de la descripción del rol (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">role.update-massive.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualización masiva de la descripción de los roles.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Asignar-Desvincular ACLs del rol</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualización masiva de la descripción de los roles.</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Asignar-Desvincular ACLs del rol</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">role.update.assign-acl</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Añadir/Quitar acl al rol.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Asignar-Desvincular roles heredados del rol</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Añadir/Quitar acl al rol.</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Asignar-Desvincular roles heredados del rol</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">role.update.assign-role</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Gestión de la herencia de roles añadiendo roles a otros.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar descripción del rol</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Gestión de la herencia de roles añadiendo roles a otros.</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar descripción del rol</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">role.update.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar la descripción de los roles una a una.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar nombre del rol</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar la descripción de los roles una a una.</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar nombre del rol</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">role.update.name</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar los nombres de los roles.</p></td>
 </tr>
 </tbody>
 </table>
@@ -4782,7 +4432,7 @@ Total Master
 <td class="icon">
 <img src="/images/doc_images/icons//important.png" alt="Important">
 </td>
-<td class="content">Los elementos con propiedades personalizadas son: Usuarios, Máquinas virtuales, Nodos, OSFs e Imágenes de disco.</td>
+<td class="content">Los elementos con propiedades personalizadas son: Usuarios, Máquinas virtuales, OSFs e Imágenes de disco.</td>
 </tr></table>
 </div>
 <div class="dlist"><dl>
@@ -5256,7 +4906,7 @@ En el lado izquierdo hay una pestaña de <em>Ajustes</em> que despliega un menú
 <div id="footnotes"><hr></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-02-14 15:33:46 CET
+Last updated 2018-03-08 13:58:44 CET
 </div>
 </div>
 </body>

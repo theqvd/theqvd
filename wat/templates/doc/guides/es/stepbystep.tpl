@@ -2182,10 +2182,33 @@ Proporcionando la URL de una imagen, que se descargará y alojará en el servido
 </li>
 </ul></div>
 <div class="paragraph"><p>A diferencia de la creación del resto de elementos, la de las imágenes de disco requieren tiempo al suponer la copia física de ficheros de gran tamaño.</p></div>
-<div class="paragraph"><p>Por ello, al crear una imagen de disco aparecerá una pantalla de carga con una gráfica de progreso de creación.</p></div>
+<div class="paragraph"><p>Dependiendo de la forma en que la imagen es creada, su proceso de creación es diferente:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Desde directorio <em>staging</em> o URL:
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Al crear una imagen desde el servidor o desde una URL externa, la imagen en proceso de creación aparecerá en el listado con una barra de progreso. Hasta que la no finalice no se podrá utilizar, pero la interfaz no se bloqueará, pudiendo seguir trabajando e incluso cerrando el WAT mientras la imagen es creada.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/screenshot_di_creating.png" alt="screenshot_di_creating.png" width="960px">
+<img src="/images/doc_images/screenshot_di_creating_staging_url.png" alt="screenshot_di_creating_staging_url.png" width="960px">
 </span></p></div>
+</div></div>
+</li>
+<li>
+<p>
+Desde nuestra computadora:
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Al crear una imagen de disco subiendo el fichero desde nuestra computadora, aparecerá una pantalla de carga con una gráfica de progreso de creación y la interfaz quedará bloqueada hasta que termine.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_di_creating_computer.png" alt="screenshot_di_creating_computer.png" width="960px">
+</span></p></div>
+</div></div>
+</li>
+</ul></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -2809,7 +2832,7 @@ Edición
 </div>
 <div class="sect2">
 <h3 id="_propiedades">5.5. Propiedades</h3>
-<div class="paragraph"><p>En este apartado gestionaremos las propiedades personalizadas por cada elemento de QVD. Así, podremos crear propiedades extras para los elementos que soportan esta funcionalidad: Usuarios, Máquinas virtuales, Nodos, OSFs e Imágenes de disco.</p></div>
+<div class="paragraph"><p>En este apartado gestionaremos las propiedades personalizadas por cada elemento de QVD. Así, podremos crear propiedades extras para los elementos que soportan esta funcionalidad: Usuarios, Máquinas virtuales, OSFs e Imágenes de disco.</p></div>
 <div class="paragraph"><p>Una propiedad personalizada en los Usuarios, por ejemplo, aparecerá en todos los usuarios del sistema como un campo más. Tanto en su vista detalle, como en sus formularios de creación y edición. También podría aparecer en la vista de listado como una columna y/o filtro específicos si se configurase desde la sección de <em>Vistas</em>.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
@@ -2853,11 +2876,11 @@ Puede ser común establecer la misma propiedad en diferentes tipos de elementos 
 <div class="sect2">
 <h3 id="_configuración_de_qvd">6.1. Configuración de QVD</h3>
 <div class="paragraph"><p><strong>Los parámetros de QVD están distribuídos</strong> por varios ficheros de configuración y la base de datos. <strong>Desde el WAT</strong>, estos parámetros se muestran de <strong>forma centralizada</strong>, siendo editables cómodamente sin importar su procedencia.</p></div>
+<div class="paragraph"><p>Los parámetros están clasificados por categorías. Dichas categorías corresponden con el primer segmento del nombre de los parámetros, osea lo inmediatamente anterior al primer punto.</p></div>
+<div class="paragraph"><p><em>Por ejemplo, los parámetros que comienzan con “admin.” estarán englobados en la categoría “admin”, como vemos en la captura.</em></p></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/screenshot_config.png" alt="screenshot_config.png" width="960px">
 </span></p></div>
-<div class="paragraph"><p>Los parámetros están clasificados por categorías. Dichas categorías corresponden con el primer segmento del nombre de los parámetros, osea lo inmediatamente anterior al primer punto.</p></div>
-<div class="paragraph"><p><em>Por ejemplo, los parámetros que comienzan con “admin.” estarán englobados en la categoría “admin”, como vemos en la captura.</em></p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 Navegación y búsqueda
@@ -2872,29 +2895,27 @@ Navegación y búsqueda
 </div></div>
 </dd>
 <dt class="hdlist1">
-Creación de parámetros
+Edición de parámetros
 </dt>
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>Se pueden añadir <strong>parámetros nuevos</strong>, que se situarán en la categoría que corresponda con el inicio de su nombre.</p></div>
+<div class="paragraph"><p>El valor de los parámetros puede ser editado escribiendo en su caja de texto.</p></div>
+<div class="paragraph"><p>Cuando cambiamos el valor de un parámetro, solamente se marcará como cambiado y aparecerá un botón para deshacer el cambio debajo de la caja de texto.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/screenshot_config_custom.png" alt="screenshot_config_custom.png" width="960px">
+<img src="/images/doc_images/screenshot_config_edit.png" alt="screenshot_config_edit.png" width="960px">
 </span></p></div>
-<div class="paragraph"><p>Si no existe la categoría se creará en el menú, y si el nombre del parámetro no contiene puntos formará parte de la categoría especial <em>unclassified</em>.</p></div>
+<div class="paragraph"><p>Es posible modificar más de un parámetro y salvar todos a la vez.</p></div>
+<div class="paragraph"><p>Para hacer efectivos los cambios haremos click en el botón "Salvar todo".</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
-Eliminado y restauración de parámetros
+Restauración de parámetros
 </dt>
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>Los parámetros añadidos tras la instalación, podrán eliminarse.</p></div>
-<div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/screenshot_config_delete.png" alt="screenshot_config_delete.png" width="960px">
-</span></p></div>
-<div class="paragraph"><p>Y los que venían de serie, podrán restaurarse al valor por defecto.</p></div>
+<div class="paragraph"><p>Los parámetros que han sido modificados se distinguen por tener un botón "Valor por defecto" junto a la caja de texto. Haciendo click en ese botón se podrá volver al valor por defecto. Al igual que al modificar un parámetro, se podrá deshacer la acción antes de hacer efectivo el cambio con el botón "Salvar todo".</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/screenshot_config_restore.png" alt="screenshot_config_restore.png" width="960px">
 </span></p></div>
@@ -2969,7 +2990,7 @@ Ambos parámetros se pueden definir como <em>por defecto</em> adoptando así la 
 <div id="footnotes"><hr></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-02-14 15:33:46 CET
+Last updated 2018-02-13 13:45:52 CET
 </div>
 </div>
 </body>

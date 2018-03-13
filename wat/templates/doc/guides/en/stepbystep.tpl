@@ -2117,10 +2117,33 @@ By providing an image URL which will be downloaded and hosted on the server:
 </li>
 </ul></div>
 <div class="paragraph"><p>Unlike the creation of the rest of the elements, disk images need more time as they are the physical copy of large files.</p></div>
-<div class="paragraph"><p>Thus, when we create a disk image, an upload  screen will show with a creating progress chart.</p></div>
+<div class="paragraph"><p>Depending on the way of the image creation, the process is different:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+From the <em>staging</em> directory or URL:
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>When we create a disk image from the server or from an external URL, the image in creation will appear on the list with a progress bar. Until the end of this progress, it won&#8217;t be able to be used, but the interface will not be blocked. Will be possible still working in other sections and even close the administration panel while the image is in creation.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/screenshot_di_creating.png" alt="screenshot_di_creating.png" width="960px">
+<img src="/images/doc_images/screenshot_di_creating_staging_url.png" alt="screenshot_di_creating_staging_url.png" width="960px">
 </span></p></div>
+</div></div>
+</li>
+<li>
+<p>
+From our computer:
+</p>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>When we create a disk image uploading the disk image from our computer, an upload screen will show with a creating progress chart and the interface will be blocked until it finish.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_di_creating_computer.png" alt="screenshot_di_creating_computer.png" width="960px">
+</span></p></div>
+</div></div>
+</li>
+</ul></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -2746,7 +2769,7 @@ Edition
 <h3 id="_properties">5.5. Properties</h3>
 <div class="literalblock">
 <div class="content monospaced">
-<pre>In this section we will manage the custom properties of every QVD element. In this way, we will be able to create extras properties for the elements that support this functionality: Users, Virtual Machines, Nodes, OSFs and Disk Images.</pre>
+<pre>In this section we will manage the custom properties of every QVD element. In this way, we will be able to create extras properties for the elements that support this functionality: Users, Virtual Machines, OSFs and Disk Images.</pre>
 </div></div>
 <div class="paragraph"><p>A custom property in the Users, for example, will appear in all the users of the system as one more field. Not only in its detail view, but also in its forms of creation and edition. It might also appear in the list view as a column and/or specific filter if it was set up from the section of <em>Views</em>.</p></div>
 <div class="dlist"><dl>
@@ -2790,15 +2813,15 @@ It might be common to establish the same property in different types of QVD elem
 </span></p></div>
 <div class="sect2">
 <h3 id="_qvd_configuration">6.1. QVD configuration</h3>
-<div class="paragraph"><p>The parameters of QVD are distributed in several configuration files and the database. From WAT these parameters are shown in a centrally way, where they can be edited easily regardless its backgrounds.</p></div>
+<div class="paragraph"><p><strong>The parameters of QVD are distributed</strong> in several configuration files and the database. From WAT these parameters are shown in a <strong>centrally way</strong>, where they can be edited easily regardless its backgrounds.</p></div>
+<div class="paragraph"><p>The parameters are clasified in categories. These categories correspond with the first segment of the name of the parameter, it means inmediately preceding the first dot.</p></div>
+<div class="paragraph"><p><em>For example, the parameters that start with "admin" will be included in the "admin" category, as we can see in the snapshot.</em></p></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/screenshot_config.png" alt="screenshot_config.png" width="960px">
 </span></p></div>
-<div class="paragraph"><p>The parameters are clasified in categories. These categories correspond with the first segment of the name of the parameter, it means inmediately preceding the first stop.</p></div>
-<div class="paragraph"><p><em>For example, the parameters that start with "admin" will be included in the "admin" category, as we can see in the snapshot.</em></p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-Navigation and research
+Navigation and search
 </dt>
 <dd>
 <div class="openblock">
@@ -2810,29 +2833,28 @@ Navigation and research
 </div></div>
 </dd>
 <dt class="hdlist1">
-Parameters creation
+Paremeters edition
 </dt>
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>It is possible to add <strong>new parameters</strong>, that will be situated in the category that corresponds depending on the beginning of its name.</p></div>
+<div class="paragraph"><p>The value of the parameters can be edited by writing in its text box.</p></div>
+<div class="paragraph"><p>When we change the value of a parameter, it will only be marked as changed and a button will appear below the text box to undo the change.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/screenshot_config_custom.png" alt="screenshot_config_custom.png" width="960px">
+<img src="/images/doc_images/screenshot_config_edit.png" alt="screenshot_config_edit.png" width="960px">
 </span></p></div>
-<div class="paragraph"><p>If the category does not exist it will be created in the menu, and if the name of the parameter do not contain stops it will take part of the special category <em>unclassified</em>.</p></div>
+<div class="paragraph"><p>It is possible to modify more than one parameter and save all at once.</p></div>
+<div class="paragraph"><p>To solidify the changes we will click on the "Save all" button.</p></div>
 </div></div>
 </dd>
 <dt class="hdlist1">
-Deleting and restoring parameters
+Restoring parameters
 </dt>
 <dd>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>The parameters added after the installation can be deleted.</p></div>
-<div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/screenshot_config_delete.png" alt="screenshot_config_delete.png" width="960px">
-</span></p></div>
-<div class="paragraph"><p>And the ones that were standard will be able to be restored to the default value.</p></div>
+<div class="paragraph"><p>The parameters that have been modified are distinguished by having a "Default value" button next to the text box. Clicking that button it&#8217;s possible back to the default value.
+As when you modify a parameter, this action can be undone before solidify the change with the "Save all" button.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/screenshot_config_restore.png" alt="screenshot_config_restore.png" width="960px">
 </span></p></div>
@@ -2903,7 +2925,7 @@ Both parameters can be defined as <em>by default</em> thus adopting the WAT gene
 <div id="footnotes"><hr></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-02-14 15:33:45 CET
+Last updated 2018-02-13 13:45:52 CET
 </div>
 </div>
 </body>

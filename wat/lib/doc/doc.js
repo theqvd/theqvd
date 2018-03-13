@@ -33,7 +33,15 @@ Wat.D = {
             return;
         }
         
-        target.html(target.html() + string);  
+        // When multitenant guide is addesd too, it will be always in second place
+        switch(docParams.guide) {
+            case 'multitenant':
+                target.append(string);
+                break;
+            default:
+                target.prepend(string);
+                break;
+        }
 
         if (toc) {
             asciidoc.toc(3);
@@ -60,12 +68,9 @@ Wat.D = {
             target: target
         };
         
-        if (guide == 'multitenant' && !Wat.C.isSuperadmin()) {
-            this.fillTemplateString (null, target, toc, docParams);
-            return;
+        if (guide != 'multitenant' || Wat.C.isSuperadmin()) {
+            this.getDocBody(docParams, this.processDocBody);
         }
-        
-        this.getDocBody(docParams, this.processDocBody);
     },
     
     processDocSection: function (docParams) {  

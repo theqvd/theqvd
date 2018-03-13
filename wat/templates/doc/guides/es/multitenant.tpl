@@ -1153,7 +1153,49 @@ La <strong>guía multitenant</strong> donde encontraremos, por una parte una des
 <h3 id="_propiedades_multitenant">5.5. Propiedades (multitenant)</h3>
 <div class="paragraph"><p>Si estamos en modo multitenant y somos superadministrador, en <em>Propiedades</em> tendremos acceso a la gestión de todas las propiedades de todos los tenants. Por lo tanto, para clasificarlas está disponible un filtro más con el tenant al que pertenecen las propiedades en pantalla. Estos tenants incluyen el supertenant <em>*</em>, que también puede tener sus propias propiedades.</p></div>
 <div class="paragraph"><p>Al poder haber propiedades específicas del supertenant <em>*</em>, en las vistas de listado y detalle de los elementos, si somos superadministradores, puede que veamos las propiedades del tenant y además las del supertenant. Conviene tener en cuenta que estas últimas no serán visibles para los administradores de ese tenant, sino que solo las podrán ver los superadministradores.</p></div>
-<div class="paragraph"><p><strong>En el caso de los Nodos</strong>, al no pertenecer a ningún tenant pero sí poder tener propiedades diferentes en cada uno de los tenants incluído el supertenant <em>*</em>, <strong>la vista será simplificada</strong>. Cada administrador verá las propiedades de Nodos del tenant al que pertenece. Esto se extiende tambien al superadministrador, que sólamente verá las propiedades de Nodos del supertenant <em>*</em>.</p></div>
+<div class="paragraph"><p>Además, en modo multitenant <strong>los Nodos también tendrán propiedades personalizadas</strong>. Los Nodos, al no pertenecer a ningún tenant, solamente podrán tener propiedades en el supertenant <em>\*</em>, y por lo tanto serán solo administradas y visibles por un superadministrador.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_configuración_de_qvd_multitenant">5.6. Configuración de QVD (multitenant)</h3>
+<div class="paragraph"><p>Si estamos en modo multitenant y somos superadministrador, en <em>Configuración de QVD</em> podremos realizar algunas acciones adicionales.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Creación de parámetros
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Se pueden añadir <strong>parámetros nuevos</strong>.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_config_create.png" alt="screenshot_config_create.png" width="960px">
+</span></p></div>
+<div class="paragraph"><p>Al crear un parametro se situará en la categoría que corresponda con el inicio de su nombre.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_config_created.png" alt="screenshot_config_created.png" width="960px">
+</span></p></div>
+<div class="paragraph"><p>Si la categoría no existe, se creará en el menú.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_config_custom.png" alt="screenshot_config_custom.png" width="960px">
+</span></p></div>
+<div class="paragraph"><p>Si el nombre del parámetro no contiene puntos, formará parte de la categoría especial <em>unclassified</em>.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_config_unclassified.png" alt="screenshot_config_unclassified.png" width="960px">
+</span></p></div>
+</div></div>
+</dd>
+<dt class="hdlist1">
+Eliminado de parámetros
+</dt>
+<dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Los parámetros añadidos tras la instalación, podrán eliminarse. Al hacer click en el botón "Eliminar" junto a la caja de texto, se marcará como eliminado. Esta acción se podrá deshacer con el botón que aparece bajo la caja de texto, o eliminarlo de forma definitiva con el botón "Salvar todo".</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/screenshot_config_delete.png" alt="screenshot_config_delete.png" width="960px">
+</span></p></div>
+</div></div>
+</dd>
+</dl></div>
 </div>
 </div>
 </div>
@@ -1163,7 +1205,7 @@ La <strong>guía multitenant</strong> donde encontraremos, por una parte una des
 <div class="paragraph"><p>Si es la primera vez que activamos el modo multitenant, podremos iniciar sesión con el superadministrador que viene por defecto en el sistema. Sus credenciales son:</p></div>
 <div class="literalblock">
 <div class="content monospaced">
-<pre>Usuario: superadmin
+<pre>Usuario: superadmin@*
 Contraseña: superadmin</pre>
 </div></div>
 <div class="paragraph"><p>Lo primero que haremos será <strong>cambiar la contraseña</strong>.</p></div>
@@ -1271,34 +1313,9 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Crear tenants incluyendo la configuración inicial por nombre.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminar tenants (masivamente)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.delete-massive.</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">eliminar masivamente los tenants.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminar tenants</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.delete.</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Eliminación de tenants uno por uno.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar los tenants bloqueando su estatus</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.filter.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar listado de tenants bloqueando sus estatus</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar tenants por creador</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.filter.created-by</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtro del listado de tenants por el administrador que lo creo</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar tenants por fecha de creación</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.filter.creation-date</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar el listado de tenants por la fecha cuando fue creado</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Filtrar tenants por nombre</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.filter.name</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Filtrar el listado de tenants por el nombre del tenant.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Acceso a la vista de los detalles del tenant</strong></p></td>
@@ -1394,26 +1411,6 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Ver el estado de usuario de las máquinas virtuales del tenant</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.see.vm-list-user-state</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Estado del usuario (conectado/desconectado) de las máquinas virtuales que aparece en la vista detallada del tenant</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Tenants bloqueados y desbloqueados (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.update-massive.block</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar masivamente el estado de bloqueo (bloqueado/desbloqueado)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar el tamaño del bloque del tenant (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.update-massive.blocksize</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar el tamaño del bloque en el listado de paginación de los tenants masivamente.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar la descripción del tenant (masiva)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.update-massive.description</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar masivamente la descripción de los tenants.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualizar el lidioma del tenant (masivo)</strong></p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">tenant.update-massive.language</p></td>
-<td class="tableblock halign-left valign-top" ><p class="tableblock">Actualizar el idioma de los tenant de forma masiva.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Tenants bloqueados-desbloqueados</strong></p></td>
@@ -1515,7 +1512,7 @@ Tenants Eraser
 <div class="paragraph"><p>En una configuración multitenant también existirá el administrador de recuperación con las mismas credenciales que en monotenant:</p></div>
 <div class="literalblock">
 <div class="content monospaced">
-<pre>Usuario: batman
+<pre>Usuario: batman@*
 Contraseña: (Consulte al equipo de soporte)</pre>
 </div></div>
 <div class="paragraph"><p>En este caso tendrá ligeras diferencias con el que tendremos en modo monotenant.</p></div>
@@ -1526,7 +1523,7 @@ Contraseña: (Consulte al equipo de soporte)</pre>
 <div id="footnotes"><hr></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-02-14 15:33:46 CET
+Last updated 2018-03-13 10:16:05 CET
 </div>
 </div>
 </body>

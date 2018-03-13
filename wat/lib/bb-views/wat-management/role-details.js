@@ -8,7 +8,8 @@ Wat.Views.RoleDetailsView = Wat.Views.DetailsView.extend({
     
     relatedDoc: {
         permissions_introduction: "Permissions introduction",
-        permissions_guide: "Permissions guide"
+        permissions_guide: "Permissions guide",
+        roles_management: "Roles management"
     },
 
     initialize: function (params) {

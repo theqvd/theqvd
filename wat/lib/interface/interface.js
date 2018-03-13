@@ -876,7 +876,7 @@ Wat.I = {
 
         dialogConf.buttons = {
             "Read full documentation": function (e) {
-                Wat.I.closeDialog($(this));
+                $('.js-button-close').trigger('click');
                 window.location = '#documentation/' + guideSection[0].guide;
             },
             Close: function (e) {
@@ -888,12 +888,12 @@ Wat.I = {
 
         dialogConf.fillCallback = function (target, that) {
             // Back scroll of the div to top position
-            target.html('');
+            target.html('<div class="bb-doc-dialog-wrapper doc-dialog-wrapper"></div>');
             $('.js-dialog-container').animate({scrollTop:0});
 
             // Fill div with section documentation
             $.each (guideSection, function (iGS, gS) {
-                Wat.D.fillDocSection(gS.guide, gS.section, undefined, undefined, target);
+                Wat.D.fillDocSection(gS.guide, gS.section, undefined, undefined, target.find('.bb-doc-dialog-wrapper'));
             });
         };
 

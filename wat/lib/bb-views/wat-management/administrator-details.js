@@ -5,8 +5,7 @@ Wat.Views.AdminDetailsView = Wat.Views.DetailsView.extend({
     
     relatedDoc: {
         permissions_introduction: "Permissions introduction",
-        permissions_guide: "Permissions guide",
-        permissions_guide_multitenant: "Permissions guide (multitenant)"
+        permissions_guide: "Permissions guide"
     },
 
     initialize: function (params) {
