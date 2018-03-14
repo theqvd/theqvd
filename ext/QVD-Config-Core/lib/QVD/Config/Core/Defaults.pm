@@ -78,6 +78,10 @@ path.run.lxc = ${path.run}/lxc
 path.storage.overlayfs = ${path.storage.btrfs.root}/overlayfs
 path.storage.rootfs = ${path.storage.btrfs.root}/rootfs
 
+# storage directories for K8S
+path.run.kubernetes = ${path.run}/kubernetes
+
+
 ## paths for SSL certificates and CAs
 path.l7r.ssl = ${path.run}/l7r/ssl
 path.l7r.ssl.key = ${path.l7r.ssl}/key.pem
@@ -195,6 +199,8 @@ command.slaveclient = ${path.qvd.bin}/qvd-slaveclient
 
 @mswin@command.gsprint = gsview/gsprint.exe
 @mswin@command.ghostscript = ghostscript/bin/gswin32.exe
+
+command.kubectl = kubectl
 
 # VMA commands
 command.lpadmin = /usr/sbin/lpadmin
@@ -800,6 +806,9 @@ internal.hkd.lxc.killer.umount.timeout = 100
 internal.hkd.lxc.acquire.untar.lock.delay = 2
 
 internal.hkd.command.timeout.lxc-stop = 30
+internal.hkd.command.timeout.kubectl-get = 30
+internal.hkd.command.timeout.kubectl-create = 30
+internal.hkd.command.timeout.kubectl-delete = 30
 internal.hkd.agent.dhcpdhandler.delay = 2
 
 internal.hkd.debugger.run = 0
