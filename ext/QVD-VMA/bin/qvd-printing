@@ -106,7 +106,7 @@ if ($params{'qvd.hook.on_printing'} eq 'connected') {
                                duplex => _json_boolean($ptr->{duplex}),
                                color => _json_boolean($ptr->{color}))) {
 		    for my $cmd ([$lpadmin, -p => $qvd_id, -v => 'tea4cups://', -P => $ppd_fn,
-				  -D => $ptr->{name}, -L => "QVD Client"],
+				  -D => $ptr->{name}, -L => "QVD-Client"],
 				 [$cupsenable, $qvd_id],
 				 [$cupsaccept, $qvd_id]) {
 			DEBUG "Running cmd @$cmd";

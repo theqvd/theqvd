@@ -1,2 +1,0 @@
-load-module module-native-protocol-tcp listen=127.0.0.1 auth-anonymous=1
-load-module module-waveout

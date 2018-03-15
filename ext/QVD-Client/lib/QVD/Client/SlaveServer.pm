@@ -26,7 +26,7 @@ use File::Spec;
 use URI::Split qw(uri_split);
 use URI;
 use QVD::Client::SlaveServer::Nsplugin;
-use QVD::Client::USB::USBIP;
+
 
 $SIG{PIPE} = sub { die "SIGPIPE"; };
 
@@ -258,6 +258,7 @@ sub handle_usbip {
 sub handle_usbip_devices {
 	my ($self, $method, $url, $headers) = @_;
 
+	require QVD::Client::USB::USBIP;
 	my $usb = QVD::Client::USB::USBIP->new();
 	my @ids;
 

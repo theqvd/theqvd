@@ -13,7 +13,6 @@ use FindBin;
 use Encode;
 use POSIX qw(setlocale);
 use QVD::Client::USB qw/list_devices get_busid/;
-use Linux::USBIP;
 
 use constant EVT_LIST_OF_VM_LOADED => Wx::NewEventType;
 use constant EVT_CONNECTION_ERROR  => Wx::NewEventType;
@@ -273,6 +272,7 @@ sub new {
         ########################
 
         if ( !$WINDOWS && !$DARWIN ) {
+            require Linux::USBIP;
             $settings_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Enable USB redirection")),Wx::GBPosition->new(10,0), Wx::GBSpan->new(1,1), wxLEFT, 10);
             $self->{usb_redirection} = Wx::CheckBox->new($settings_panel, -1, "", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, wxDefaultValidator, "checkBox");
             $self->{usb_redirection}->SetValue( core_cfg("client.usb.enable" ) );

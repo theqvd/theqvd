@@ -43,18 +43,30 @@ BEGIN {
 
     $app_dir = core_cfg('path.client.installation', 0);
     unless ($app_dir) {
+		###################################################################
+		# WARNING: This gets used in the slaveserver, so debug prints on
+		# STDOUT will interfere with the HTTP protocol. 
+		###################################################################
+		
+		#print STDERR "Determining application directory. Binary path is $0\n";
         my ($drive, $dir, $file) = File::Spec->splitpath(File::Spec->rel2abs($0));
-        my $bin_dir;
-
-        if ($WINDOWS) {
-            $bin_dir = File::Spec->catpath($drive, $dir);
-            $app_dir = $bin_dir;
-        }
-        else {
-            $bin_dir = $dir;
-            my @dirs = File::Spec->splitdir($bin_dir);
-            $app_dir = File::Spec->catdir( @dirs[0..$#dirs-1] );
-        }
+		
+		#print STDERR "Drive: '$drive'; dir '$dir'; file '$file'\n";
+        my $bin_dir = File::Spec->catpath($drive, $dir);
+		
+		#print STDERR "Directory of the binary: $bin_dir\n";
+        my @dirs = File::Spec->splitdir($bin_dir);
+		
+		# Remove the last path component.
+		# splitdir leaves a final / that gets counted as a path component, so things
+		# get parsed like this:
+		#
+		# /home/qindel/qvd-src/ext/QVD-Client/bin/qvd-gui-client.pl        # $0
+		# /home/qindel/qvd-src/ext/QVD-Client/bin/      qvd-gui-client.pl  # $bin_dir and $file
+		# /home /qindel /qvd-src /ext /QVD-Client /bin /
+        $app_dir = File::Spec->catdir( @dirs[0..$#dirs-2] );
+		
+		#print STDERR "Final app_dir: '$app_dir'\n";
     }
 
     # Fix bad log levels
