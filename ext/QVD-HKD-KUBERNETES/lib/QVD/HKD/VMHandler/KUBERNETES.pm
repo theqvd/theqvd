@@ -56,7 +56,14 @@ use Class::StateMachine::Declarative
                                                        substates => [ allocating_home_fs      => { enter => '_allocate_home_fs' },
                                                                       create_kubernetes       => { enter => '_create_kubernetes' },
                                                                       running_prestart_hook   => { enter => '_run_prestart_hook' },
-                                                                      launching               => { enter => '_start_kubernetes' } ] },
+                                                                      launching               => { enter => '_start_kubernetes' },
+                                                                      # Update the IP and save it
+                                                                      update_vm_ip       => { enter => '_update_vm_ip' },
+
+                                                                      calculating_attrs  => { enter => '_calculate_attrs' },
+                                                                      saving_runtime_row => { enter => '_save_runtime_row' },
+
+                                                           ] },
 
                                   waiting_for_vma => { enter => '_start_vma_monitor',
                                                        transitions => { _on_alive           => 'running',
@@ -173,9 +180,15 @@ use Class::StateMachine::Declarative
 sub _calculate_attrs {
     my $self = shift;
 
+    DEBUG "QVD::HKD::VMHandler::_calculate_attrs";
     $self->SUPER::_calculate_attrs;
 
     $self->{kubernetes_name} = "qvd-$self->{vm_id}";
+
+# TODO recalculate
+#                 'rpc_service' => 'http://10.0.0.254:3030/vma',
+#                 'ip' => '10.0.0.254',
+
     # my $homefs_parent = $self->_cfg('path.storage.homefs');
     # $homefs_parent =~ s|/*$|/|;
     #  if ($self->_cfg('vm.container.home.per.user')) {
@@ -194,6 +207,7 @@ sub _calculate_attrs {
 sub _allocate_home_fs {
     my $self = shift;
 
+    DEBUG "QVD::HKD::VMHandler::_allocate_home_fs";
     # TODO, for now no home allocation
     # my $homefs = $self->{home_fs};
     # defined $homefs or return $self->_on_done;
@@ -210,6 +224,10 @@ sub _allocate_home_fs {
 
 sub _create_kubernetes {
     my $self = shift;
+
+
+    DEBUG "QVD::HKD::VMHandler::_allocate_home_fs";
+
     my $kubernetes_name = $self->{kubernetes_name};
     
     my $kubernetes_root = $self->_cfg('path.run.kubernetes');
@@ -240,19 +258,17 @@ sub _create_kubernetes {
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: qvd-deployment-1
+  name: "qvd-deployment-$self->{vm_id}"
   labels:
-    app: qvd
-    qvdid: "1"
+    qvdid: "$self->{vm_id}"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      qvdid: "1"
+      qvdid: "$self->{vm_id}"
   template:
     metadata:
       labels:
-        app: qvd
         qvdid: "$self->{vm_id}"
     spec:
       hostname: $kubernetes_name
@@ -275,19 +291,85 @@ spec:
           timeoutSeconds: 5
 EOC
 
-
 #    print $cfg_fh $self->_cfg('internal.vm.lxc.conf.extra'), "\n";
 #    close $cfg_fh;
 
     $self->_on_done;
 }
 
+my $ip;
+ 
+sub _vm_ip_obtained {
+    my $self = shift;
 
+    my $ipno = qr/
+       2(?:5[0-5] | [0-4]\d)
+       |
+       1\d\d
+       |
+       [1-9]?\d
+    /x;
+
+    if ( $ip =~ /^($ipno\.){3}$ipno$/ ) {
+        DEBUG "_vm_ip_obtained: IP=$ip";
+        $self->{ip} = $ip;
+        $self->{rpc_service} = sprintf("http://%s:%d/vma", $self->{ip}, $self->{vma_port});
+        return $self->_on_done;
+    }
+
+    ERROR "_vm_ip_obtained: Invalid IP=$ip";
+    $self->_on_error;
+}
+
+sub _update_vm_ip {
+    my $self = shift;
+
+    DEBUG "_update_vm_ip";
+    my @kubernetes_cmd = ('kubectl', 'get', 'pod', '-l', 'qvdid='.$self->{vm_id},
+                          '-o', "jsonpath='{.items[*].status.podIP}");
+    $ip = '';
+    $self->_run_cmd({ 
+                      '<' => '/dev/null',
+                      '>' => \$ip,
+                      '2>' => \$ip,
+                      on_done => weak_method_callback($self, '_vm_ip_obtained'),
+                    },
+                    @kubernetes_cmd
+        );
+
+                       # '<' => '/dev/null',
+                       # '>' => $hv_out,
+                       # '2>' => $hv_out,
+
+    # $self->_run_cmd( { save_pid_to => 'vm_pid',
+    #                    ignore_errors => 1,
+    #                    outlives_state => 1,
+    #                    on_done => weak_method_callback($self, '_on_lxc_done'),
+    #                    '<' => '/dev/null',
+    #                    '>' => $hv_out,
+    #                    '2>' => $hv_out,
+    #                  },
+    #                  @lxc_cmd);
+    # TODO run to get ip address
+#'
+#                           weak_method_callback($self, '_on_kubernetes_done');
+#                       },
+
+#    $self->_on_done;
+
+}
 
 sub _start_kubernetes {
     my $self = shift;
 
-    INFO "start_kubernetes";
+    DEBUG "start_kubernetes";
+
+    my $kubernetes_name = $self->{kubernetes_name};
+    
+    my $kubernetes_root = $self->_cfg('path.run.kubernetes');
+    my $kubernetes_dir = "$kubernetes_root/$kubernetes_name";
+
+    my $fn = "$kubernetes_dir/config";
 
     # kubernetes_cmd
     # TODO kubectl create -f pod
@@ -307,13 +389,13 @@ sub _start_kubernetes {
 	# $self->{di_description}
 	# );
 
-#    DEBUG "Running kubernetes:".join(" ", @kubernetes_cmd);
-#     $self->_run_cmd( { outlives_state => 1,
-# # In LXC errors are ignored???
-# #                      ignore_errors => 1,
-#                        on_done => weak_method_callback($self, '_on_kubernetes_done'),
-# 		      },
-# 	@kubernetes_cmd );
+    my @kubernetes_cmd = ('kubectl', 'create', '-f', $fn);
+
+    DEBUG "Running kubernetes:".join(" ", @kubernetes_cmd);
+    $self->_run_cmd( { kill_after => $self->_cfg('internal.hkd.command.timeout.kubectl-create'),
+                       run_and_forget => 1,
+                     },
+                     @kubernetes_cmd );
 
     $self->_on_done;
 }
@@ -321,6 +403,8 @@ sub _start_kubernetes {
 sub _check_kubernetes {
     my $self = shift;
 
+
+    DEBUG "_check_kubernetes";
     # TODO check that pod is running
     # kubectl get pod...
     # kubectl get pod -l app=qvddb -o jsonpath='{.items[*].status.podIP}'
@@ -329,7 +413,7 @@ sub _check_kubernetes {
 
     my $hv_out = $self->_hypervisor_output_redirection;
 
-    $self->_run_cmd( { kill_after => $self->_cfg('internal.hkd.command.timeout.kubernetes-get'),
+    $self->_run_cmd( { kill_after => $self->_cfg('internal.hkd.command.timeout.kubectl-get'),
                        '<' => '/dev/null',
                        '>' => $hv_out,
                        '2>' => $hv_out
@@ -343,41 +427,45 @@ sub _check_kubernetes {
 sub _stop_kubernetes {
     my $self = shift;
 
-    my @kubernetes_cmd = ('kubernetes', 'stop', $self->{kubernetes_name} );
+    DEBUG "_stop_kubernetes";
+    # my @kubernetes_cmd = ('kubectl', 'stop', $self->{kubernetes_name} );
 
-    $self->_run_cmd( { kill_after => $self->_cfg('internal.hkd.command.timeout.kubernetes-kill'),
-                       ignore_errors => 1,
-                       run_and_forget => 1
-                     },
-                     @kubernetes_cmd
-	           );
+    # $self->_run_cmd( { kill_after => $self->_cfg('internal.hkd.command.timeout.kubernetes-kill'),
+    #                    ignore_errors => 1,
+    #                    run_and_forget => 1
+    #                  },
+    #                  @kubernetes_cmd
+	#            );
 
     $self->_on_done;
 }
 
 sub _check_dirty_flag {
     my $self = shift;
-    if ($self->_cfg("internal.hkd.kubernetes.does.not.cleanup")) {
-        $debug and $self->_debug("going dirty because internal.hkd.kubernetes.does.not.cleanup is set");
-        return $self->_on_error;
-    }
+
+    # if ($self->_cfg("internal.hkd.kubernetes.does.not.cleanup")) {
+    #     $debug and $self->_debug("going dirty because internal.hkd.kubernetes.does.not.cleanup is set");
+    #     return $self->_on_error;
+    # }
+
     return $self->_on_done;
 }
 
 sub _kill_kubernetes {
     my $self = shift;
 
+    DEBUG "_kill_kubernetes";
     # Delete pod and/or service
     # kubectl delete service ...
     # kubectl delete pod -> Get POD IP
-    my @kubernetes_cmd = ('kubernetes', 'kill', $self->{kubernetes_name} );
+    # my @kubernetes_cmd = ('kubernetes', 'kill', $self->{kubernetes_name} );
 
-    $self->_run_cmd( { kill_after => $self->_cfg('internal.hkd.command.timeout.kubernetes-kill'),
-                       ignore_errors => 1,
-		       run_and_forget => 1
-                     },
-		     @kubernetes_cmd
-	           );
+    # $self->_run_cmd( { kill_after => $self->_cfg('internal.hkd.command.timeout.kubectl-kill'),
+    #                    ignore_errors => 1,
+	# 	       run_and_forget => 1
+    #                  },
+	# 	     @kubernetes_cmd
+	#            );
 
     $self->_on_done;
 }
@@ -385,14 +473,16 @@ sub _kill_kubernetes {
 sub _destroy_kubernetes {
     my $self = shift;
 
+
+    DEBUG "_destroy_kubernetes";
     # kubectl delete pod -> Get POD IP
     
-    my @kubernetes_cmd = ('kubernetes', 'rm', $self->{kubernetes_name} );
-    $self->_run_cmd( { kill_after => $self->_cfg('internal.hkd.command.timeout.kubernetes-rm'),
-		       ignore_errors => 1
-		     },
-		     @kubernetes_cmd
-	           );
+    # my @kubernetes_cmd = ('kubernetes', 'rm', $self->{kubernetes_name} );
+    # $self->_run_cmd( { kill_after => $self->_cfg('internal.hkd.command.timeout.kubernetes-rm'),
+	# 	       ignore_errors => 1
+	# 	     },
+	# 	     @kubernetes_cmd
+	#            );
 
     $self->_on_done;
 }

@@ -31,11 +31,6 @@ sub new {
     $self
 }
 
-sub ok {
-    my $self = shift;
-    $self->SUPER::ok
-}
-
 sub _check_kubernetes_prereq {
     my $self = shift;
 

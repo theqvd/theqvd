@@ -792,6 +792,15 @@ internal.hkd.kvm.timeout.on_state.zombie.reap.waiting_for_kvm = 120
 internal.hkd.kvm.timeout.on_state.zombie.reap.delaying = 60
 internal.hkd.kvm.timeout.on_state.zombie.db.delaying = 60
 
+internal.hkd.kubernetes.timeout.on_state.starting.setup.delaying_untar.delaying = 60
+internal.hkd.kubernetes.timeout.on_state.stopping.shutdown.waiting_for_kubernetes = 180
+internal.hkd.kubernetes.timeout.on_state.stopping.stop.waiting_for_kubernetes = 120
+internal.hkd.kubernetes.timeout.on_state.zombie.config.delaying = 60
+internal.hkd.kubernetes.timeout.on_state.zombie.reap.waiting_for_kubernetes = 120
+internal.hkd.kubernetes.timeout.on_state.zombie.reap.delaying = 60
+internal.hkd.kubernetes.timeout.on_state.zombie.db.delaying = 60
+
+
 internal.hkd.vmhandler.vma.failed.max_count.on.starting = 40
 internal.hkd.vmhandler.vma.failed.max_count.on.running = 10
 
@@ -809,6 +818,7 @@ internal.hkd.command.timeout.lxc-stop = 30
 internal.hkd.command.timeout.kubectl-get = 30
 internal.hkd.command.timeout.kubectl-create = 30
 internal.hkd.command.timeout.kubectl-delete = 30
+internal.hkd.command.timeout.kubectl-kill = 30
 internal.hkd.agent.dhcpdhandler.delay = 2
 
 internal.hkd.debugger.run = 0
