@@ -21,6 +21,7 @@ use QVD::HKD::Helpers qw(mkpath);
 
 use parent qw(QVD::HKD::VMHandler);
 
+
 use Class::StateMachine::Declarative
     __any__   => { ignore => [qw(_on_cmd_start on_expired _on_kubernetes_done)],
                    delay => [qw(on_hkd_kill
@@ -58,13 +59,21 @@ use Class::StateMachine::Declarative
                                                                       running_prestart_hook   => { enter => '_run_prestart_hook' },
                                                                       launching               => { enter => '_start_kubernetes' },
                                                                       # Update the IP and save it
-                                                                      update_vm_ip       => { enter => '_update_vm_ip' },
-
+                                                                      wait_for_kubernetes     => { enter => '_wait_for_kubernetes',
+                                                                                                   substates => [
+                                                                                                                     _on_waiting         => { enter => '_wait_for_kubernetes' },
+                                                                                                                     _on_running         => { enter => 'starting/setup/calculating_attrs' },
+                                                                                                                     _on_dead            => { enter => 'stopping/stop' },
+                                                                                                                     on_cmd_stop         => { enter => 'stopping/stop' },
+                                                                                                                     _on_kubernetes_done => { enter => 'stopping/cleanup' },
+                                                                                                                     on_hkd_kill         => { enter => 'stopping/stop' },
+                                                                                                                     _on_goto_debug      => { enter => 'debugging' }
+                                                                                                                ]
+                                                                                                 },
                                                                       calculating_attrs  => { enter => '_calculate_attrs' },
                                                                       saving_runtime_row => { enter => '_save_runtime_row' },
 
                                                            ] },
-
                                   waiting_for_vma => { enter => '_start_vma_monitor',
                                                        transitions => { _on_alive           => 'running',
                                                                         _on_dead            => 'stopping/stop',
@@ -297,10 +306,21 @@ EOC
     $self->_on_done;
 }
 
+
+
+# Wait until the system is up
+sub _wait_for_kubernetes {
+    my $self = shift;
+    DEBUG "_wait_for_kubernetes";
+    $self->_update_vm_ip;  
+}
+
 my $ip;
- 
 sub _vm_ip_obtained {
     my $self = shift;
+
+    chomp $ip;
+    DEBUG "_vm_ip_obtained: IP=$ip";
 
     my $ipno = qr/
        2(?:5[0-5] | [0-4]\d)
@@ -317,8 +337,9 @@ sub _vm_ip_obtained {
         return $self->_on_done;
     }
 
+    # TODO setup timer and go to _on_error
     ERROR "_vm_ip_obtained: Invalid IP=$ip";
-    $self->_on_error;
+    $self->_update_vm_ip;
 }
 
 sub _update_vm_ip {
@@ -326,36 +347,16 @@ sub _update_vm_ip {
 
     DEBUG "_update_vm_ip";
     my @kubernetes_cmd = ('kubectl', 'get', 'pod', '-l', 'qvdid='.$self->{vm_id},
-                          '-o', "jsonpath='{.items[*].status.podIP}");
+                          '-o', "jsonpath={.items[*].status.podIP}");
     $ip = '';
     $self->_run_cmd({ 
                       '<' => '/dev/null',
                       '>' => \$ip,
                       '2>' => \$ip,
-                      on_done => weak_method_callback($self, '_vm_ip_obtained'),
+                      on_done => sub { $self->_vm_ip_obtained },
                     },
                     @kubernetes_cmd
         );
-
-                       # '<' => '/dev/null',
-                       # '>' => $hv_out,
-                       # '2>' => $hv_out,
-
-    # $self->_run_cmd( { save_pid_to => 'vm_pid',
-    #                    ignore_errors => 1,
-    #                    outlives_state => 1,
-    #                    on_done => weak_method_callback($self, '_on_lxc_done'),
-    #                    '<' => '/dev/null',
-    #                    '>' => $hv_out,
-    #                    '2>' => $hv_out,
-    #                  },
-    #                  @lxc_cmd);
-    # TODO run to get ip address
-#'
-#                           weak_method_callback($self, '_on_kubernetes_done');
-#                       },
-
-#    $self->_on_done;
 
 }
 
