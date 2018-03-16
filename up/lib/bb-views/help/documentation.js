@@ -74,20 +74,10 @@ Up.Views.DocView = Up.Views.MainView.extend({
         $(this.el).html(this.template);
         
         this.printBreadcrumbs(this.breadcrumbs, '');
-
-        if (this.currentSearchKey) {
-            var that = this;
-            
-            // Little delay to give time to render interface
-            setTimeout(function () {
-                that.searchDoc(that.currentSearchKey);
-            }, 300);
-        }
-        else {
-            this.fillDocumentation();
-        }
-
-        Up.T.translateAndShow();       
+        
+        this.fillDocumentation();
+        
+        Up.T.translateAndShow();
     },
     
     // Fill guide doc content

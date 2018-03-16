@@ -76,9 +76,7 @@ Up.C = {
     
     getDocGuides: function () {
         guides = {
-            'introduction': 'Introduction',
-            'stepbystep': 'WAT Step by step', 
-            'user': 'User guide'
+            'user': 'User manual'
         };
         
         return guides;

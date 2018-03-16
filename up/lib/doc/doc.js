@@ -2,15 +2,8 @@ Up.D = {
     // Get a documentation guide from template and return <body> of this document to be ebeded in WAT
     // Params:
     //      selectedGuide: guide name.
-    getDocBody: function (docParams, callBack) {        
-        // Load language
-        var lan = $.i18n.options.lng;
-        
-        if ($.inArray(lan, DOC_AVAILABLE_LANGUAGES) === -1) {
-            lan = DOC_DEFAULT_LANGUAGE;
-        }
-        
-        var templates = Up.I.T.getTemplateList('docSection', {lan: lan, guide: docParams.guide});
+    getDocBody: function (docParams, callBack) {
+        var templates = Up.I.T.getTemplateList('docSection', {lan: Up.C.account.language, guide: docParams.guide});
         
         Up.A.getTemplates(templates, callBack, docParams);
     },
