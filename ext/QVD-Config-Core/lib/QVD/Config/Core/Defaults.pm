@@ -799,7 +799,7 @@ internal.hkd.kubernetes.timeout.on_state.zombie.config.delaying = 60
 internal.hkd.kubernetes.timeout.on_state.zombie.reap.waiting_for_kubernetes = 120
 internal.hkd.kubernetes.timeout.on_state.zombie.reap.delaying = 60
 internal.hkd.kubernetes.timeout.on_state.zombie.db.delaying = 60
-
+internal.hkd.kubernetes.delay.after.check = 1
 
 internal.hkd.vmhandler.vma.failed.max_count.on.starting = 40
 internal.hkd.vmhandler.vma.failed.max_count.on.running = 10

@@ -23,7 +23,7 @@ use parent qw(QVD::HKD::VMHandler);
 
 
 use Class::StateMachine::Declarative
-    __any__   => { ignore => [qw(_on_cmd_start on_expired _on_kubernetes_done)],
+    __any__   => { ignore => [qw(_on_cmd_start on_expired)],
                    delay => [qw(on_hkd_kill
                                 _on_cmd_stop)],
                    on => { on_hkd_stop => 'on_hkd_kill' },
@@ -46,8 +46,7 @@ use Class::StateMachine::Declarative
 
                                   clean_old       => { transitions => { _on_error => 'zombie/reap',
                                                                         on_hkd_kill => 'stopping/db' },
-                                                       substates => [ killing_kubernetes     => { enter => '_kill_kubernetes' },
-                                                                      destroying_kubernetes  => { enter => '_destroy_kubernetes' } ] },
+                                                       substates => [ destroy_kubernetes     => { enter => '_destroy_kubernetes' }, ] },
 
                                   heavy           => { enter => '_heavy_down',
                                                        transitions => { _on_error    => 'stopping/db',
@@ -65,7 +64,6 @@ use Class::StateMachine::Declarative
                                                                                                                      _on_running         => { enter => 'starting/setup/calculating_attrs' },
                                                                                                                      _on_dead            => { enter => 'stopping/stop' },
                                                                                                                      on_cmd_stop         => { enter => 'stopping/stop' },
-                                                                                                                     _on_kubernetes_done => { enter => 'stopping/cleanup' },
                                                                                                                      on_hkd_kill         => { enter => 'stopping/stop' },
                                                                                                                      _on_goto_debug      => { enter => 'debugging' }
                                                                                                                 ]
@@ -78,12 +76,10 @@ use Class::StateMachine::Declarative
                                                        transitions => { _on_alive           => 'running',
                                                                         _on_dead            => 'stopping/stop',
                                                                         _on_cmd_stop        => 'stopping/stop',
-                                                                        _on_kubernetes_done => 'stopping/cleanup',
                                                                         on_hkd_kill         => 'stopping/stop',
                                                                         _on_goto_debug      => 'debugging' } } ] },
 
     running   => { advance => '_on_done',
-                   delay => [qw(_on_kubernetes_done)],
                    transitions => { _on_error => 'stopping/stop' },
                    substates => [ saving_state           => { enter => '_save_state' },
                                   updating_stats         => { enter => '_incr_run_ok' },
@@ -93,7 +89,6 @@ use Class::StateMachine::Declarative
                                                               ignore      => [qw(_on_alive)],
                                                               transitions => { _on_dead            => 'stopping/stop',
                                                                                _on_cmd_stop        => 'stopping/shutdown',
-                                                                               _on_kubernetes_done => 'stopping/cleanup',
                                                                                on_hkd_kill         => 'stopping/stop',
                                                                                _on_goto_debug      => 'debugging',
                                                                                on_expired          => 'expiring' } },
@@ -101,7 +96,6 @@ use Class::StateMachine::Declarative
                                                               transitions => { _on_done => 'monitoring' } } ] },
 
     debugging => { advance => '_on_done',
-                   delay => [qw(_on_kubernetes_done)],
                    transitions => { _on_error => 'stopping/stop' },
                    substates => [ saving_state => { enter => '_save_state' },
                                   unheavy      => { enter => '_heavy_up' },
@@ -110,35 +104,30 @@ use Class::StateMachine::Declarative
                                                                   _on_goto_debug)],
                                                     transitions => { _on_alive           => 'running',
                                                                      _on_cmd_stop        => 'stopping/stop',
-                                                                     _on_kubernetes_done => 'stopping/cleanup',
                                                                      on_hkd_kill         => 'stopping/stop' } } ] },
 
     stopping  => { advance => '_on_done',
                    transitions => { _on_error => 'zombie/reap' },
-                   delay => [qw(_on_kubernetes_done)],
                    substates => [ shutdown => { transitions => { on_hkd_kill => 'stop' },
                                                 substates => [ saving_state    => { enter => '_save_state' },
                                                                heavy           => { enter => '_heavy_down' },
                                                                shuttingdown    => { enter => '_shutdown',
-                                                                                    transitions => { _on_error           => 'stop',
-                                                                                                     _on_kubernetes_done => 'cleanup' } },
-                                                               waiting_for_kubernetes => { enter => '_set_state_timer',
-                                                                                    transitions => { _on_kubernetes_done  => 'cleanup',
-                                                                                                     _on_state_timeout    => 'stop' } } ] },
+                                                                                    transitions => { _on_error           => 'stop'
+                                                                                                   } },
+                                                               # Keeps waiting here See equivalent of wait_for_kubernetes
+                                                               # Until it disappears
+                                                               waiting_for_kubernetes => { enter => '_wait_for_kubernetes_end' } ] },
                                   stop     => { substates => [ saving_state       => { enter => '_save_state' },
                                                                heavy              => { enter => '_heavy_down' },
-                                                               running_stop       => { enter => '_stop_kubernetes' },
-                                                               waiting_for_kubernetes => { enter => '_set_state_timer',
-                                                                                    transitions => { _on_kubernetes_done      => 'cleanup',
-                                                                                                     _on_state_timeout => 'cleanup' } } ] },
-                                  cleanup  => { ignore => [qw(_on_kubernetes_done)], # FIXME: is there really a reason for that?
-                                                substates => [ saving_state           => { enter => '_save_state' },
+                                                               running_stop       => { enter => '_destroy_kubernetes' },
+                                                               # Keeps waiting here See equivalent of wait_for_kubernetes
+                                                               # Until it disappears
+                                                               waiting_for_kubernetes => { enter => '_wait_for_kubernetes_end' } ] },
+                                  cleanup  => { substates => [ saving_state           => { enter => '_save_state' },
                                                                checking_dirty         => { enter => '_check_dirty_flag' },
                                                                heavy                  => { enter => '_heavy_down' },
-                                                               killing_kubernetes     => { enter => '_kill_kubernetes' },
-                                                               running_poststop_hook  => { enter => '_run_poststop_hook',
-                                                                                           transitions => { _on_error => 'destroying_kubernetes' } },
-                                                               destroying_kubernetes      => { enter => '_destroy_kubernetes' } ] },
+                                                               destroy_kubernetes     => { enter => '_destroy_kubernetes' },
+                                                               running_poststop_hook  => { enter => '_run_poststop_hook' }, ] },
 
                                   db       => { enter => '_clear_runtime_row',
                                                 transitions => { _on_error => 'zombie/db',
@@ -147,7 +136,6 @@ use Class::StateMachine::Declarative
     stopped => { enter => '_on_stopped' },
 
     zombie  => { advance => '_on_done',
-                 delay => [qw(_on_kubernetes_done)],
                  ignore => [qw(on_hkd_stop)],
                  transitions => { on_hkd_kill => 'stopped' },
                  substates => [ config => { transitions => { _on_error => 'delaying' },
@@ -164,13 +152,6 @@ use Class::StateMachine::Declarative
                                                            dirty                  => { enter => '_check_dirty_flag',
                                                                                        transitions => { _on_error => '/dirty' } },
                                                            heavy                  => { enter => '_heavy_down' },
-                                                           checking_kubernetes    => { enter => '_check_kubernetes',
-                                                                                      transitions => { _on_error => 'killing_kubernetes' } },
-                                                           stopping_kubernetes    => { enter => '_stop_kubernetes' },
-                                                           waiting_for_kubernetes => { enter => '_set_state_timer',
-                                                                                       transitions => { _on_kubernetes_done   => 'killing_kubernetes',
-                                                                                                        _on_state_timeout => 'killing_kubernetes'} },
-                                                           killing_kubernetes     => { enter => '_kill_kubernetes' },
                                                            destroying_kubernetes  => { enter => '_destroy_kubernetes',
                                                                                        transitions => { _on_error => 'unheavy'  } },
                                                            unheavy                => { enter => '_heavy_up' },
@@ -193,6 +174,7 @@ sub _calculate_attrs {
     $self->SUPER::_calculate_attrs;
 
     $self->{kubernetes_name} = "qvd-$self->{vm_id}";
+    $self->{kubernetes_deployment} = "qvd-deployment-$self->{vm_id}";
 
 # TODO recalculate
 #                 'rpc_service' => 'http://10.0.0.254:3030/vma',
@@ -228,7 +210,6 @@ sub _allocate_home_fs {
 
     $self->_on_done
 }
-
 
 
 sub _create_kubernetes {
@@ -267,7 +248,7 @@ sub _create_kubernetes {
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: "qvd-deployment-$self->{vm_id}"
+  name: "$self->{kubernetes_deployment}"
   labels:
     qvdid: "$self->{vm_id}"
 spec:
@@ -308,6 +289,26 @@ EOC
 
 
 
+sub _wait_for_kubernetes_end {
+    my $self = shift;
+    DEBUG "_wait_for_kubernetes_end";
+
+    my @kubernetes_cmd = ('kubectl', 'get', 'deployment', "$self->{kubernetes_deployment}");
+    my $hv_out = $self->_hypervisor_output_redirection;
+
+    $self->_run_cmd( { kill_after => $self->_cfg('internal.hkd.command.timeout.kubectl-get'),
+                       on_done => weak_method_callback($self, '_on_error'),
+                       on_error => weak_method_callback($self, '_on_done'),
+                       '<' => '/dev/null',
+                       '>' => $hv_out,
+                       '2>' => $hv_out
+                     },
+                     @kubernetes_cmd
+        );
+
+
+}
+
 # Wait until the system is up
 sub _wait_for_kubernetes {
     my $self = shift;
@@ -339,7 +340,7 @@ sub _vm_ip_obtained {
 
     # TODO setup timer and go to _on_error
     ERROR "_vm_ip_obtained: Invalid IP=$ip";
-    $self->_update_vm_ip;
+    $self->_call_after($self->_cfg('internal.hkd.kubernetes.delay.after.check'), '_update_vm_ip');
 }
 
 sub _update_vm_ip {
@@ -371,24 +372,6 @@ sub _start_kubernetes {
     my $kubernetes_dir = "$kubernetes_root/$kubernetes_name";
 
     my $fn = "$kubernetes_dir/config";
-
-    # kubernetes_cmd
-    # TODO kubectl create -f pod
-    # my @kubernetes_cmd = (
-	# 'kubernetes', 'run',
-	# '--name', $self->{kubernetes_name},
-	# '--rm',
-	# '--hostname', $self->{name},
-	# "--add-host=$self->{name}:$self->{ip}",
-	# "--cpu-shares=$default_cpushares",
-	# "--memory-reservation=$memory",
-	# "--cpuset-cpus=$cpuset_cpus",
-	# '--network',  $self->_cfg('vm.network.bridge'),
-	# '--ip', $self->{ip},
-	# '--mac-address', $self->{mac},
-	# '-v', $self->{home_fs}.":".$self->{home_fs_mnt},
-	# $self->{di_description}
-	# );
 
     my @kubernetes_cmd = ('kubectl', 'create', '-f', $fn);
 
@@ -425,22 +408,6 @@ sub _check_kubernetes {
     $self->_on_done;
 }
 
-sub _stop_kubernetes {
-    my $self = shift;
-
-    DEBUG "_stop_kubernetes";
-    # my @kubernetes_cmd = ('kubectl', 'stop', $self->{kubernetes_name} );
-
-    # $self->_run_cmd( { kill_after => $self->_cfg('internal.hkd.command.timeout.kubernetes-kill'),
-    #                    ignore_errors => 1,
-    #                    run_and_forget => 1
-    #                  },
-    #                  @kubernetes_cmd
-	#            );
-
-    $self->_on_done;
-}
-
 sub _check_dirty_flag {
     my $self = shift;
 
@@ -452,23 +419,10 @@ sub _check_dirty_flag {
     return $self->_on_done;
 }
 
-sub _kill_kubernetes {
+
+sub _shutdown {
     my $self = shift;
-
-    DEBUG "_kill_kubernetes";
-    # Delete pod and/or service
-    # kubectl delete service ...
-    # kubectl delete pod -> Get POD IP
-    # my @kubernetes_cmd = ('kubernetes', 'kill', $self->{kubernetes_name} );
-
-    # $self->_run_cmd( { kill_after => $self->_cfg('internal.hkd.command.timeout.kubectl-kill'),
-    #                    ignore_errors => 1,
-	# 	       run_and_forget => 1
-    #                  },
-	# 	     @kubernetes_cmd
-	#            );
-
-    $self->_on_done;
+    $self->_destroy_kubernetes;
 }
 
 sub _destroy_kubernetes {
@@ -476,14 +430,15 @@ sub _destroy_kubernetes {
 
 
     DEBUG "_destroy_kubernetes";
-    # kubectl delete pod -> Get POD IP
-    
-    # my @kubernetes_cmd = ('kubernetes', 'rm', $self->{kubernetes_name} );
-    # $self->_run_cmd( { kill_after => $self->_cfg('internal.hkd.command.timeout.kubernetes-rm'),
-	# 	       ignore_errors => 1
-	# 	     },
-	# 	     @kubernetes_cmd
-	#            );
+
+    my @kubernetes_cmd = ('kubectl', 'delete', 'deployment', '-l', 'qvdid='.$self->{vm_id} );
+
+    $self->_run_cmd( { kill_after => $self->_cfg('internal.hkd.command.timeout.kubectl-kill'),
+                       ignore_errors => 1,
+                       run_and_forget => 1
+                     },
+                     @kubernetes_cmd
+	           );
 
     $self->_on_done;
 }
