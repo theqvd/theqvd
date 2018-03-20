@@ -5,6 +5,10 @@ set -e
 case "$1" in
     configure)
     update-rc.d qvd-vma defaults
+    echo -n "
+directory : /var/run/qvd/qvd4cups
+preehook_raw : /usr/lib/qvd/bin/qvd-send-printjob
+" >> /etc/cups/tea4cups.conf
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
