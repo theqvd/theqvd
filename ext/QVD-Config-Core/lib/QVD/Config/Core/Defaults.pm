@@ -549,6 +549,7 @@ vm.lxc.hooks.allow = 0
 vm.lxc.redirect.allow = 0
 
 internal.vm.lxc.conf.extra=
+internal.vm.kubernetes.conf.extra=
 
 ## whether to keep overlay images from one session to the next
 vm.overlay.persistent = 0
@@ -799,7 +800,7 @@ internal.hkd.kubernetes.timeout.on_state.zombie.config.delaying = 60
 internal.hkd.kubernetes.timeout.on_state.zombie.reap.waiting_for_kubernetes = 120
 internal.hkd.kubernetes.timeout.on_state.zombie.reap.delaying = 60
 internal.hkd.kubernetes.timeout.on_state.zombie.db.delaying = 60
-internal.hkd.kubernetes.delay.after.check = 1
+internal.hkd.kubernetes.delay.after.check = 10
 
 internal.hkd.vmhandler.vma.failed.max_count.on.starting = 40
 internal.hkd.vmhandler.vma.failed.max_count.on.running = 10
