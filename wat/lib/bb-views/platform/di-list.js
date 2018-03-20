@@ -14,10 +14,10 @@ Wat.Views.DIListView = Wat.Views.ListView.extend({
     renderList: function (params) {
         Wat.Views.ListView.prototype.renderList.apply(this, [params]);
         
-        this.execModelFunctions();
-        
         this.renderInfo();
         this.renderProgressBars();
+        
+        this.execModelFunctions();
         
         Wat.T.translate();
     },
