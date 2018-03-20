@@ -22,6 +22,8 @@ use QVD::HKD::Helpers qw(mkpath);
 use parent qw(QVD::HKD::VMHandler);
 
 
+# TODO check status of container on start and on stop
+
 use Class::StateMachine::Declarative
     __any__   => { ignore => [qw(_on_cmd_start on_expired)],
                    delay => [qw(on_hkd_kill
@@ -46,7 +48,9 @@ use Class::StateMachine::Declarative
 
                                   clean_old       => { transitions => { _on_error => 'zombie/reap',
                                                                         on_hkd_kill => 'stopping/db' },
-                                                       substates => [ destroy_kubernetes     => { enter => '_destroy_kubernetes' }, ] },
+                                                       substates => [ destroy_kubernetes  => { enter => '_destroy_kubernetes' }, 
+                                                                      _on_waiting         => { enter => '_wait_for_kubernetes_end' },
+                                                                    ] },
 
                                   heavy           => { enter => '_heavy_down',
                                                        transitions => { _on_error    => 'stopping/db',
@@ -174,23 +178,6 @@ sub _calculate_attrs {
     $self->SUPER::_calculate_attrs;
 
     $self->{kubernetes_name} = "qvd-$self->{vm_id}";
-    $self->{kubernetes_deployment} = "qvd-deployment-$self->{vm_id}";
-
-# TODO recalculate
-#                 'rpc_service' => 'http://10.0.0.254:3030/vma',
-#                 'ip' => '10.0.0.254',
-
-    # my $homefs_parent = $self->_cfg('path.storage.homefs');
-    # $homefs_parent =~ s|/*$|/|;
-    #  if ($self->_cfg('vm.container.home.per.user')) {
-	# $self->{home_fs} = "$homefs_parent$self->{login}";
-	# $self->{home_fs_mnt} = "/home/$self->{login}";
-    # }
-    # else {
-	# $self->{home_fs} = "$homefs_parent$self->{vm_id}-fs";
-	# $self->{home_fs_mnt} = "/home";
-    # }
-
 
     $self->_on_done;
 }
@@ -240,49 +227,38 @@ sub _create_kubernetes {
         return $self->_on_error;
     }
 
-    # TODO
-    #my $docker_image = $self->di_path.':'.$self->di_version;
-
     # FIXME: make this template-able or configurable in some way
     print $cfg_fh <<EOC;
-apiVersion: apps/v1beta2
-kind: Deployment
+apiVersion: v1
+kind: Pod
 metadata:
-  name: "$self->{kubernetes_deployment}"
+  name: "$self->{kubernetes_name}"
   labels:
+    app: qvdvm
     qvdid: "$self->{vm_id}"
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      qvdid: "$self->{vm_id}"
-  template:
-    metadata:
-      labels:
-        qvdid: "$self->{vm_id}"
-    spec:
-      hostname: $kubernetes_name
-      containers:
-      - name: $kubernetes_name
-        image: theqvd/qvdimage-minimal-ubuntu-1604
-        livenessProbe:
-          httpGet:
-            path: /vma/ping
-            port: 3030
-          initialDelaySeconds: 5
-          periodSeconds: 3600
-          timeoutSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /vma/ping
-            port: 3030
-          initialDelaySeconds: 10
-          periodSeconds: 5
-          timeoutSeconds: 5
+  hostname: "$self->{kubernetes_name}"
+  containers:
+  - name: "$self->{kubernetes_name}"
+    image: "$self->{di_path}"
+    livenessProbe:
+      httpGet:
+        path: /vma/ping
+        port: 3030
+      initialDelaySeconds: 5
+      periodSeconds: 3600
+      timeoutSeconds: 5
+    readinessProbe:
+      httpGet:
+        path: /vma/ping
+        port: 3030
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      timeoutSeconds: 5
 EOC
 
-#    print $cfg_fh $self->_cfg('internal.vm.lxc.conf.extra'), "\n";
-#    close $cfg_fh;
+    print $cfg_fh $self->_cfg('internal.vm.kubernetes.conf.extra')."\n";
+    close $cfg_fh;
 
     $self->_on_done;
 }
@@ -293,7 +269,7 @@ sub _wait_for_kubernetes_end {
     my $self = shift;
     DEBUG "_wait_for_kubernetes_end";
 
-    my @kubernetes_cmd = ('kubectl', 'get', 'deployment', "$self->{kubernetes_deployment}");
+    my @kubernetes_cmd = ('kubectl', 'get', 'pod', "$self->{kubernetes_name}");
     my $hv_out = $self->_hypervisor_output_redirection;
 
     $self->_run_cmd( { kill_after => $self->_cfg('internal.hkd.command.timeout.kubectl-get'),
@@ -347,13 +323,14 @@ sub _update_vm_ip {
     my $self = shift;
 
     DEBUG "_update_vm_ip";
-    my @kubernetes_cmd = ('kubectl', 'get', 'pod', '-l', 'qvdid='.$self->{vm_id},
-                          '-o', "jsonpath={.items[*].status.podIP}");
+    my @kubernetes_cmd = ('kubectl', 'get', 'pod', "$self->{kubernetes_name}",
+                          '-o', "jsonpath={.status.podIP}");
     $ip = '';
     $self->_run_cmd({ 
                       '<' => '/dev/null',
                       '>' => \$ip,
                       '2>' => \$ip,
+                      ignore_errors => 1,
                       on_done => sub { $self->_vm_ip_obtained },
                     },
                     @kubernetes_cmd
@@ -393,7 +370,7 @@ sub _check_kubernetes {
     # kubectl get pod...
     # kubectl get pod -l app=qvddb -o jsonpath='{.items[*].status.podIP}'
 
-    my @kubernetes_cmd = ('kubectl', 'get', 'pod', '-l', 'qvdid='.$self->{vm_id});
+    my @kubernetes_cmd = ('kubectl', 'get', 'pod', "$self->{kubernetes_name}");
 
     my $hv_out = $self->_hypervisor_output_redirection;
 
@@ -422,6 +399,8 @@ sub _check_dirty_flag {
 
 sub _shutdown {
     my $self = shift;
+
+    DEBUG "_shutdown -> _destroy_kubernetes";
     $self->_destroy_kubernetes;
 }
 
@@ -431,7 +410,7 @@ sub _destroy_kubernetes {
 
     DEBUG "_destroy_kubernetes";
 
-    my @kubernetes_cmd = ('kubectl', 'delete', 'deployment', '-l', 'qvdid='.$self->{vm_id} );
+    my @kubernetes_cmd = ('kubectl', 'delete', 'pod', "$self->{kubernetes_name}" );
 
     $self->_run_cmd( { kill_after => $self->_cfg('internal.hkd.command.timeout.kubectl-kill'),
                        ignore_errors => 1,

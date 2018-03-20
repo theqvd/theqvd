@@ -24,6 +24,8 @@ sub new_vm_handler {
 sub new {
     my $class = shift;
     my $self = $class->SUPER::new(@_);
+    # TODO handle authentication to the cluster (create .kube ...)
+
     # TODO should we check here for kubernetes version?
     # Check that network settings and firewall settings are disabled
     # Check that Token, namespace and API url is defined
