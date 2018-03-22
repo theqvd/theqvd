@@ -439,11 +439,9 @@ sub _run_hook {
 
 sub _on_vma_monitor_failed {
     my $self = shift;
-    # TODO refresh pod ip from kubernetes
+    # TODO refresh pod ip from kubernetes. Probably not necessary as the session
+    # is lost anyway
     $debug and $self->_debug("Invoking QVD::HKD::VMHandler::KUBERNETES vma_monitor_failed for vm '$self->{vm_id}' and ip '$self->{ip}'");
-
-    # TODO refresh pod ip from kubernetes
-    # Optionally refresh ip
 
     $self->SUPER::_on_vma_monitor_failed;
 }

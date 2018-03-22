@@ -201,6 +201,7 @@ command.slaveclient = ${path.qvd.bin}/qvd-slaveclient
 @mswin@command.ghostscript = ghostscript/bin/gswin32.exe
 
 command.kubectl = kubectl
+#command.kubectl.args.extra =
 
 # VMA commands
 command.lpadmin = /usr/sbin/lpadmin
@@ -693,6 +694,22 @@ vma.default.client.link = adsl
 ## unused
 hkd.vm.starting.max = 6
 
+## Kubernetes API URL
+hkd.vm.kubernetes.api-host-env=KUBERNETES_SERVICE_HOST
+hkd.vm.kubernetes.api-port-env=KUBERNETES_SERVICE_PORT_HTTPS
+## Kubernetes API cacert
+hkd.vm.kubernetes.api-cacert-file=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+## Kubernetes default cluster name
+hkd.vm.kubernetes.cluster-name=kubernetes
+## Kubernetes namespace
+hkd.vm.kubernetes.namespace=theqvd
+## Kubernetes default user
+hkd.vm.kubernetes.user=qvdhkd
+## Kubernetes authentication token. token takes precedence over token-file
+hkd.vm.kubernetes.token=
+## Kubernetes authentication token
+hkd.vm.kubernetes.token-file=/var/run/secrets/kubernetes.io/serviceaccount/token
+
 # internal parameters, do not change!!!
 internal.l7r.timeout.vm_start = 270
 internal.l7r.timeout.vm_stop = 270
@@ -817,6 +834,7 @@ internal.hkd.lxc.acquire.untar.lock.delay = 2
 
 internal.hkd.command.timeout.lxc-stop = 30
 internal.hkd.command.timeout.kubectl-get = 30
+internal.hkd.command.timeout.kubectl-config = 30
 internal.hkd.command.timeout.kubectl-create = 30
 internal.hkd.command.timeout.kubectl-delete = 30
 internal.hkd.command.timeout.kubectl-kill = 30
