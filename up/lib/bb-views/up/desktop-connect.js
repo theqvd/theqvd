@@ -86,39 +86,35 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
               
         $('.bb-super-wrapper').html(template + noVNCIncludes);
         
+        UI.afterLoadingScripts = function () {
+            Util.Debug = Util.Info = Util.Warn = Util.Error = function () {};
+
+            var level = 'debug';
+            switch (level) {
+                case 'debug':
+                    Util.Debug = function (msg) { UI.log('DEBUG', msg); };
+                case 'info':
+                    Util.Info  = function (msg) { UI.log('INFO', msg); };
+                case 'warn':
+                    Util.Warn  = function (msg) { UI.log('WARN', msg); };
+                case 'error':
+                    Util.Error = function (msg) { UI.log('ERROR', msg); };
+                case 'none':
+                    break;
+            }
+            
+            UI.connect();
+        }
+        
+        $( window ).resize(function() {
+            UI.onresize();
+        });
+        
         $('.error-loading').hide();
         Up.I.loadingBlock($.i18n.t('progress:Loading your Desktop'));
         Up.I.updateProgressMessage('Connecting with server', 'plug');
         
         Up.T.translate();
-        
-        var loopCheck = setInterval(function () {
-            if(typeof $D == "function") {
-                Util.Debug = Util.Info = Util.Warn = Util.Error = function () {};
-
-                var level = 'debug';
-                switch (level) {
-                    case 'debug':
-                        Util.Debug = function (msg) { UI.log('DEBUG', msg); };
-                    case 'info':
-                        Util.Info  = function (msg) { UI.log('INFO', msg); };
-                    case 'warn':
-                        Util.Warn  = function (msg) { UI.log('WARN', msg); };
-                    case 'error':
-                        Util.Error = function (msg) { UI.log('ERROR', msg); };
-                    case 'none':
-                        break;
-                }
-
-                UI.connect();
-
-                $( window ).resize(function() {
-                    UI.onresize();
-                });
-                
-                clearInterval(loopCheck);
-            }
-        }, 400);
     },
     
     

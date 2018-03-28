@@ -16,7 +16,13 @@ var UI;
     "use strict";
 
     // Load supporting scripts
-    window.onscriptsload = function () { UI.load(); };
+    window.onscriptsload = function () { 
+        UI.load(); 
+        if (UI.afterLoadingScripts) {
+            UI.afterLoadingScripts();
+        }
+    };
+    
     Util.load_scripts(["webutil.js", "base64.js", "websock.js", "des.js",
                        "keysymdef.js", "keyboard.js", "input.js", "display.js",
                        "rfb.js", "keysym.js", "inflator.js"]);
