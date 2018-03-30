@@ -50,6 +50,7 @@ sub _k8s_token {
 
 
     my $token = $self->_cfg('hkd.vm.kubernetes.token');
+    DEBUG "kubernetes token hkd.vm.kubernetes.token: ".(defined($token) ? "is defined" : "<undef>");
     unless ($token) {
         my $filename = $self->_cfg('hkd.vm.kubernetes.token-file');
         open(my $fh, '<', $filename) or die "cannot open file $filename";
@@ -58,6 +59,8 @@ sub _k8s_token {
             $token = <$fh>;
         }
         close($fh);
+        DEBUG "kubernetes token hkd.vm.kubernetes.token-file=$filename: ".(defined($token) ? $token : "<undef>");
+
     }
     $token;
 }
