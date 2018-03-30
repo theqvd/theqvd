@@ -228,6 +228,7 @@ sub _create_kubernetes {
     }
 
     # FIXME: make this template-able or configurable in some way
+    my $nodename = $self->_cfg('nodename');
     print $cfg_fh <<EOC;
 apiVersion: v1
 kind: Pod
@@ -236,6 +237,7 @@ metadata:
   labels:
     app: qvdvm
     qvdid: "$self->{vm_id}"
+    qvdhkd: "$nodename"
 spec:
   hostname: "$self->{kubernetes_name}"
   containers:
