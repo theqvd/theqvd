@@ -7,6 +7,7 @@ use warnings;
 
 use QVD::Log;
 use QVD::Config;
+use QVD::Config::Core;
 
 use Errno qw(EAGAIN);
 use Fcntl ();
