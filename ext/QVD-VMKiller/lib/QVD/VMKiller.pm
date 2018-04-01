@@ -6,10 +6,7 @@ use strict;
 use warnings;
 
 use QVD::Log;
-use QVD::Config::Core;
-
-use QVD::VMKiller::KVM;
-use QVD::VMKiller::LXC;
+use QVD::Config;
 
 use Errno qw(EAGAIN);
 use Fcntl ();
@@ -20,9 +17,14 @@ sub kill_dangling_vms {
     sysopen my $hkd_lock_fh, $hkd_lock_fn, Fcntl::O_CREAT()|Fcntl::O_RDWR()
         or LOGDIE "Unable to open file '$hkd_lock_fn'";
 
+    my %vmkiller_class = map { $_ => __PACKAGE__ . '::' . uc $_ } (split /,/,cfg('internal.hkd.hypervisor_list'));
+    my $hypervisor = cfg('vm.hypervisor');
+    my $vmkiller_class = $vmkiller_class{$hypervisor} // LOGDIE "unsupported hypervisor $hypervisor";
+    eval "require $vmkiller_class; 1" or LOGDIE "unable to load module $vmkiller_class:\n$@";
+
     if (flock($hkd_lock_fh, Fcntl::LOCK_EX() | Fcntl::LOCK_NB())) {
         INFO "Looking for dangling VMs";
-        "QVD::VMKiller::$_"->kill_dangling_vms for qw(KVM LXC);
+        $vmkiller_class->kill_dangling_vms;
     }
     else {
         if ($! == Errno::EAGAIN()) {
