@@ -83,7 +83,7 @@ sub _get_running_qvdhkd_pods {
     my $listofpods = _qx('kubectl', 'get', 'pods',
                          '-l', 'app=qvdhkd',
                          '-o', 'jsonpath={.items..metadata.name}');
-    my @listofpods = split / /, $listofpods;
+    my @listofpods = split ' ', $listofpods;
     DEBUG '_get_running_qvdhkd_pods <$listofpods>: '.join(',',@listofpods);
     \@listofpods;
 }
