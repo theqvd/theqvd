@@ -81,7 +81,8 @@ sub _get_registered_qvd_nodes {
 
 sub _get_running_qvdhkd_pods {
     my @listofpods = _qx('kubectl', 'get', 'pods',
-                         '-l', 'app=qvdhkd');
+                         '-l', 'app=qvdhkd',
+                         '-o', 'jsonpath={.items..metadata.name}');
     DEBUG '_get_running_qvdhkd_pods: '.join(',',@listofpods);
     \@listofpods;
 }
