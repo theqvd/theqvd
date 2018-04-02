@@ -154,23 +154,11 @@ sub _delete_dangling_hkd {
     my $qvdnodes = _get_registered_qvd_nodes;
     my $qvdhkdpods = _get_running_qvdhkd_pods;
 
-    my ($qvdnodes_running, $qvdnodes_not_running, $hkd_pods_not_registered) = _calculate_differences($qvdnodes, $qvdhkdpods);
-    WARN "The following qvdhkd pods are running but are not registered as qvd hosts. Perhaps they are just starting:".join(',', @$hkd_pods_not_registered)
-        if (@$hkd_pods_not_registered);
-    _delete_from_db_not_running_qvdhkd($qvdnodes_not_running);
-
+    my ($qvdnodes_running, $hkd_pods_running_but_not_registered, $nodes_registered_but_not_running) = _calculate_differences($qvdnodes, $qvdhkdpods);
+    WARN "The following qvdhkd pods are running but are not registered as qvd hosts. Perhaps they are just starting:".join(',', @$hkd_pods_running_but_not_registered)
+        if (@$hkd_pods_running_but_not_registered);
+    _delete_from_db_not_running_qvdhkd($nodes_registered_but_not_running);
     
-    # kubectl get pods -l app=qvdvm -ao jsonpath={range .items[*]}{@.metadata.name}{" "}{@.metadata.labels.qvdhkd}{"\n"}{end}
-    # qvd-10000 qvdhkd-5swhv
-    # qvd-10001 qvdhkd-77jbj
-    # Get Host list
-    # kubectl get pods -l 'app=qvdhkd' -ao jsonpath='{.items..>
-    # kubectl get pods -l app=qvdhkd -ao jsonpath={.items..metadata.name}
-    # qvdhkd-4pjm5 qvdhkd-5swhv qvdhkd-77jbj
-    # check if hkd pod exists
-    # If it not exists:
-    # Delete the relevant hkd -> qa4
-    # Delete all related pods -> kubectl
     DEBUG "End: _delete_dangling_hkd";
     1;
 }
