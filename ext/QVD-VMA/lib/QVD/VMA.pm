@@ -55,6 +55,7 @@ my $printing_conf   = cfg('internal.vma.printing.config');
 my $slave_conf      = cfg('internal.vma.slave.config');
 my $nxagent_conf    = cfg('internal.vma.nxagent.config');
 my $pulse_conf      = cfg('internal.vma.pulseaudio.config');
+my $tolerance_checks     = cfg('internal.vma.nxagent.tolerancechecks');
 
 my $nxagent_args_extra   = cfg('command.nxagent.args.extra');
 my $x_session_args_extra = cfg('command.x-session.args.extra');
@@ -724,7 +725,7 @@ sub _make_nxagent_config {
 
     push @nx_args, 'media=1' if $enable_audio;
     push @nx_args, 'slave=1' if $enable_slave;
-    push @nx_args, 'tolerancechecks=risky';
+    push @nx_args, "tolerancechecks=$tolerance_checks" if $tolerance_checks;
     push @nx_args, $props{'qvd.client.nxagent.extra_args'} if ($props{'qvd.client.nxagent.extra_args'});
 
     if ($enable_printing && $props{'qvd.client.printing.enabled'}) {

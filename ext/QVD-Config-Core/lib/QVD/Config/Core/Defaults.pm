@@ -718,6 +718,7 @@ internal.vma.printing.config = ${path.run}/printing.conf
 internal.vma.slave.config = ${path.run}/slave.conf
 internal.vma.nxagent.config = ${path.run}/nxagent.conf
 internal.vma.pulseaudio.config = ${path.run}/default.pa
+internal.vma.nxagent.tolerancechecks = risky
 
 # TODO: some of these DB settings may not be used anymore, cleanup them!
 internal.database.client.connect.timeout = 20
