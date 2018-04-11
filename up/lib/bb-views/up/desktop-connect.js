@@ -25,6 +25,14 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
                 that.getSetup();
             }
         });
+
+        // Create a cookie to communicate to desktop list view that the desktop is being connecting
+        $.cookie('connectingDesktop-' + that.id, true, {expires: 1, path: '/'});
+
+        // If window is closed, delete the connecting cookie
+        $(window).on("beforeunload", function() {
+            $.removeCookie('connectingDesktop-' + that.id, {path: '/'});
+        });
     },
     
     changeUserState: function (data) {
@@ -37,6 +45,8 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
                 Up.I.updateProgressMessage('Waking up virtual machine', 'sun-o');
                 break;
             case 'connected':
+                // When desktop is finally connected, connecting cookie is deleted
+                $.removeCookie('connectingDesktop-' + data.id, {path: '/'});
                 Up.I.loadingUnblock();
                 Up.I.stopProgress();
                 $('.noVNC_canvas').show();

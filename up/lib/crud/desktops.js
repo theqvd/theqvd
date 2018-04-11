@@ -39,7 +39,7 @@ Up.CRUD.desktops = {
     connectDesktopClassic: function (selectedId, desktopSetup, token) {
         var that = this;
         
-        this.startConnectionTimeout(selectedId);
+        this.startConnectionTimeoutClassic(selectedId);
         
         var options = {
             "client.ssl.options.SSL_version": "TLSv1_2",
@@ -91,6 +91,8 @@ Up.CRUD.desktops = {
     },
     
     connectDesktopHTML5: function (selectedId, desktopSetup, token) {
+        this.startConnectionTimeoutHTML5(selectedId);
+
         open('#desktops/' + selectedId + '/connect/' + token);
     },
     

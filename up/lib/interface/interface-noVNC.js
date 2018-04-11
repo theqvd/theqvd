@@ -191,7 +191,6 @@ var UI;
                 UI.rfb = new RFB({'target': $D('noVNC_canvas'),
                                   'onUpdateState': UI.updateState,
                                   'onXvpInit': UI.updateXvpVisualState,
-                                  'onClipboard': UI.clipReceive,
                                   'onFBUComplete': UI.FBUComplete,
                                   'onFBResize': UI.updateViewDragClient,
                                   'onDesktopName': UI.updateDocumentTitle});
@@ -652,6 +651,10 @@ var UI;
                 $('.connection-closed').show();
                 UI.disableFullscreen();
                 Up.I.loadingUnblock();
+                
+                // Delete connection cookie
+                var vmId = $('#noVNC_vmId').val();
+                $.removeCookie('connectingDesktop-' + vmId, {path: '/'});
             }
         },
 
@@ -683,12 +686,6 @@ var UI;
         // Display the desktop name in the document title
         updateDocumentTitle: function(rfb, name) {
             $('.ui-dialog-titlebar').html($('.ui-dialog-titlebar').html() + ' - ' + name);
-        },
-
-        clipReceive: function(rfb, text) {
-            Util.Debug(">> UI.clipReceive: " + text.substr(0,40) + "...");
-            $D('noVNC_clipboard_text').value = text;
-            Util.Debug("<< UI.clipReceive");
         },
 
         connect: function() {
@@ -738,11 +735,6 @@ var UI;
 
             UI.rfb.get_keyboard().set_focused(true);
             UI.rfb.get_mouse().set_focused(true);
-        },
-
-        clipClear: function() {
-            $D('noVNC_clipboard_text').value = "";
-            UI.rfb.clipboardPasteFrom("");
         },
 
         clipSend: function() {

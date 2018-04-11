@@ -143,6 +143,15 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
     },
     
     setDesktopState: function (id, newState) {
+        // If newState is stable, store on model.
+        switch (newState) {
+            case 'connected':
+            case 'disconnected':
+                var desktopModel = Up.CurrentView.collection.findWhere({id: parseInt(id)});
+                desktopModel.set('lastStableState', newState);
+                break;
+        }
+        
         var cellDiv = $('.js-grid-cell[data-id="' + id + '"]');
         
         $(cellDiv).removeClass('grid-disconnected js-grid-disconnected grid-connected js-grid-connected grid-connecting js-grid-connecting grid-reconnecting js-grid-reconnecting');
@@ -230,7 +239,7 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
         model.set('state', newState);
     },
     
-    startConnectionTimeout: function (id) {
+    startConnectionTimeoutClassic: function (id) {
         var that = this;
         
         that.connectionTimeouts[id] = {};
@@ -256,6 +265,26 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
                 return;
             }
         }, 1000);
+    },
+    
+    startConnectionTimeoutHTML5: function (id) {
+        var that = this;
+        
+        // Wait some time for cookie connection creation
+        setTimeout(function () {
+            // Check one time per second if connection cookie exists
+            var interval = setInterval(function () {
+                // When connection cookie being deleted, restore last stable state
+                if (!$.cookie('connectingDesktop-' + id)) {
+                    var desktopModel = Up.CurrentView.collection.findWhere({id: parseInt(id)});
+                    if (desktopModel) {
+                        that.setDesktopState(id, desktopModel.get('lastStableState'));
+                    }
+
+                    clearInterval(interval);
+                }
+            }, 1000);
+        }, 3000);
     },
     
     activeWorkspaceFromDesktops: function (e) {
