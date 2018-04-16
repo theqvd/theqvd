@@ -90,3 +90,8 @@ DOC_DEFAULT_LANGUAGE = 'es';
 
 // Settings available on HTML5 client
 HTML5_SETTINGS = ['client', 'fullscreen'];
+
+
+// Connection level
+CL_NOT_READY = 0;
+CL_READY = 1;

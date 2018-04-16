@@ -142,6 +142,13 @@ Up.Views.DesktopsView = Up.Views.ListView.extend({
         });
     },
     
+    setVMState: function (id, newVMState) {
+        // Store on model
+        
+        var desktopModel = Up.CurrentView.collection.findWhere({id: parseInt(id)});
+        desktopModel.set('vm_state', newVMState);
+    },
+    
     setDesktopState: function (id, newState) {
         // If newState is stable, store on model.
         switch (newState) {

@@ -2,6 +2,8 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
     qvdObj: 'desktop',
     liveFields: [],
 
+    connectionLevel: CL_NOT_READY,
+
     relatedDoc: {
     },
     
@@ -12,17 +14,30 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
         that.token = params.token;
         that.id = params.id;
         
-        Up.WS.openWebsocket('desktops', this.changeUserState);
-        
         $('.bb-super-wrapper').html(HTML_LOADING);
         this.model = new Up.Models.Desktop(params);
         Up.Views.MainView.prototype.initialize.apply(this, [params]);
         $('.loading').hide();
-        
+
         // Fetch model data, then get desktop setup and connection template
         this.model.fetch({ 
             complete: function () {
-                that.getSetup();
+                Up.WS.openWebsocket('desktops', that.changeUserState);
+
+                var connectInterval = setInterval(function () {
+                    switch (that.model.get('vm_state')) {
+                        case 'stopped':
+                        case 'running':
+                            clearInterval(connectInterval);
+                            that.connectionLevel = CL_READY;
+                            
+                            that.getSetupTemplatesAndRender();
+                            break;
+                        default:
+                            Up.I.loadingBlock($.i18n.t('progress:Loading your Desktop'));
+                            Up.I.updateProgressMessage('Waiting for stable desktop state', 'hourglass-half');
+                    }
+                }, 1000);
             }
         });
 
@@ -39,25 +54,29 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
         if (data.id != Up.CurrentView.id) {
             return;
         }
-        
-        switch (data.user_state) {
-            case 'connecting':
-                Up.I.updateProgressMessage('Waking up virtual machine', 'sun-o');
-                break;
-            case 'connected':
-                // When desktop is finally connected, connecting cookie is deleted
-                $.removeCookie('connectingDesktop-' + data.id, {path: '/'});
-                Up.I.loadingUnblock();
-                Up.I.stopProgress();
-                $('.noVNC_canvas').show();
 
-                Up.WS.closeAllWebsockets();
-                break;
+        Up.CurrentView.model.set('vm_state', data.vm_state);
+        
+        if (Up.CurrentView.connectionLevel == CL_READY) {
+            switch (data.user_state) {
+                case 'connecting':
+                    Up.I.updateProgressMessage('Waking up virtual machine', 'sun-o');
+                    break;
+                case 'connected':
+                    // When desktop is finally connected, connecting cookie is deleted
+                    $.removeCookie('connectingDesktop-' + data.id, {path: '/'});
+                    Up.I.loadingUnblock();
+                    Up.I.stopProgress();
+                    $('.noVNC_canvas').show();
+
+                    Up.WS.closeAllWebsockets();
+                    break;
+            }
         }
     },
     
     // Get combined setup from specific settings and current workspace
-    getSetup: function () {
+    getSetupTemplatesAndRender: function () {
         var that = this;
         
         Up.A.performAction('desktops/' + this.model.get('id') + '/setup', {}, function (e) {
