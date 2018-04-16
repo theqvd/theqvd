@@ -651,7 +651,7 @@ group {
                 sub {
                     my $vm_id = shift;
                     my $vm = rs( 'VM' )->single( { id => $vm_id } );
-                    return { id => $vm->id, user_state => $vm->vm_runtime->user_state };
+                    return { id => $vm->id, user_state => $vm->vm_runtime->user_state, vm_state => $vm->vm_runtime->vm_state };
                 }
             );
         };
@@ -839,6 +839,7 @@ sub vm_to_desktop_hash {
         name => $vm->name,
         alias => defined($desktop) ? $desktop->alias : undef,
         state => $vm->vm_runtime->user_state,
+        vm_state => $vm->vm_runtime->vm_state,
         settings_enabled => defined($desktop) ? $desktop->active : 0,
         settings => element_settings($desktop),
     };

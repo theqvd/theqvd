@@ -129,7 +129,7 @@ sub get_triggers
             name => 'vm_desktop_changed_trigger',
             when => 'AFTER',
             events => [qw/UPDATE/],
-            fields    => [qw/user_state/],
+            fields    => [qw/vm_state user_state/],
             on_table  => 'vm_runtimes',
             condition => undef,
             procedure => 'vm_runtime_desktop_changed_notify',
