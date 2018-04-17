@@ -9,7 +9,7 @@ use 5.010;
 
 use File::Spec;
 use URI::Escape qw(uri_unescape);
-use QVD::Config::Core qw(core_cfg);
+use QVD::Config::Core qw(core_cfg set_core_cfg);
 use QVD::Log;
 
 BEGIN {
