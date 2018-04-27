@@ -66,6 +66,10 @@ BEGIN {
 		# /home /qindel /qvd-src /ext /QVD-Client /bin /
         $app_dir = File::Spec->catdir( @dirs[0..$#dirs-2] );
 		
+		if ( $WINDOWS && !-d "$app_dir/pixmaps" ) {
+			#print STDERR "Win32, running from installed location\n";
+			$app_dir = File::Spec->catdir( @dirs[0..$#dirs-1] );
+		}
 		#print STDERR "Final app_dir: '$app_dir'\n";
     }
 

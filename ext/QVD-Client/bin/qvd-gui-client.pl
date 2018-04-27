@@ -26,14 +26,21 @@ BEGIN {
     }
 }
 
+INFO "Client starting";
+
+INFO "User dir: $user_dir";
+INFO "App dir : $app_dir";
+
 our $orig_display = $ENV{DISPLAY};
 our $user_certs_dir = File::Spec->rel2abs(core_cfg('path.ssl.ca.personal'), $user_dir);
 mkdir $user_certs_dir;
 INFO "user_certs_dir: $user_certs_dir";
 
 our $pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps'), $app_dir);
+DEBUG "pixmaps_dir, first attempt: $pixmaps_dir";
+
 $pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps.alt'), $app_dir) unless -d $pixmaps_dir;
-INFO "pixmaps_dir: $pixmaps_dir";
+INFO "pixmaps_dir, final value: $pixmaps_dir";
 
 $SIG{PIPE} = 'IGNORE';
 
