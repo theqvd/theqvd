@@ -709,6 +709,10 @@ hkd.vm.kubernetes.user=qvdhkd
 hkd.vm.kubernetes.token=
 ## Kubernetes authentication token
 hkd.vm.kubernetes.token-file=/var/run/secrets/kubernetes.io/serviceaccount/token
+## Kubernetes VM using fuse. Mount /dev/fuse inside container. Requires privileged account
+hkd.vm.kubernetes.usefuse=1
+## Kubernetes VM use privileged container. Required for fuse, review security requirements.
+hkd.vm.kubernetes.useprivilegedcontainer=1
 
 # internal parameters, do not change!!!
 internal.l7r.timeout.vm_start = 270
