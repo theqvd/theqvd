@@ -259,6 +259,25 @@ spec:
       timeoutSeconds: 5
 EOC
 
+    if ($self->_cfg('hkd.vm.kubernetes.useprivilegedcontainer')) {
+    print $cfg_fh <<EOC2;
+    securityContext:
+      privileged: true
+EOC2
+    }
+
+    if ($self->_cfg('hkd.vm.kubernetes.usefuse')) {
+    print $cfg_fh <<EOC3;
+    volumeMounts:
+      - mountPath: /dev/fuse
+        name: dev-fuse
+  volumes:
+    - name: dev-fuse
+      hostPath:
+        path: /dev/fuse
+EOC3
+    }
+
     print $cfg_fh $self->_cfg('internal.vm.kubernetes.conf.extra')."\n";
     close $cfg_fh;
 

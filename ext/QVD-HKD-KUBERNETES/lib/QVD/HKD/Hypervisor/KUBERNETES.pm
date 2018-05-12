@@ -137,9 +137,10 @@ sub _check_kubernetes_prereq {
 sub _valid_kubernetes_settings {
     my $self = shift;
 
-    LOGDIE "If you set hkd.vm.kubernetes.usefuse you need also to set hkd.vm.kubernetes.useprivilegedcontainer"
-        if ($self->_cfg('hkd.vm.kubernetes.usefuse') &&
-            ! $self->_cfg('hkd.vm.kubernetes.useprivilegedcontainer'));
+    if ($self->_cfg('hkd.vm.kubernetes.usefuse') &&
+        ! $self->_cfg('hkd.vm.kubernetes.useprivilegedcontainer')) {
+        LOGDIE "If you set hkd.vm.kubernetes.usefuse you need also to set hkd.vm.kubernetes.useprivilegedcontainer";
+    }
 
 
     # TODO validate that there is
