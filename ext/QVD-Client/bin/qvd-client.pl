@@ -26,6 +26,8 @@ BEGIN {
     }
 
     our $user_certs_dir = File::Spec->rel2abs(core_cfg('path.ssl.ca.personal'), $user_dir);
+
+    our $orig_display = $ENV{DISPLAY};
 }
 
 use strict;
@@ -74,9 +76,14 @@ GetOptions \%opts,
     '--help',
     or die "getopt";
 
+$opts{'username'} //= core_cfg('client.user.name');
+$opts{'password'} //= core_cfg('client.user.password');
+$opts{'host'} //= core_cfg('client.host.name');
 $opts{'port'} //= core_cfg('client.host.port');
 $opts{'ssl'} //= 1;
 $opts{'ssl-errors'} //= 'ask';
+$opts{'usb'} //= 0;
+
 
 
 if ( $opts{help} ) {

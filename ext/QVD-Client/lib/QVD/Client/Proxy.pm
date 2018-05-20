@@ -328,7 +328,7 @@ sub _get_httpc {
 
         $args{SSL_ca_path} = \@ca_paths;
 
-        DEBUG "SSL CA file: " . $args{SSL_ca_file};
+        DEBUG "SSL CA file: " . ($args{SSL_ca_file} // '');
         DEBUG "SSL CA path: " . join(':', @{$args{SSL_ca_path}});
 
         DEBUG "Parsing OCSP mode";
@@ -338,7 +338,7 @@ sub _get_httpc {
         $args{SSL_fail_on_ocsp}     = 0;
         $args{SSL_fail_on_hostname} = 0;
 
-        DEBUG "SSL CA file: " . $args{SSL_ca_file};
+        DEBUG "SSL CA file: " . ($args{SSL_ca_file} // 'undef');
         DEBUG "SSL CA path: " . join(':', @{$args{SSL_ca_path}});
 
         my $use_cert = core_cfg('client.ssl.use_cert');

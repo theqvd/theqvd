@@ -43,11 +43,10 @@ my $success = eval {
 if (!$success) {
     ERROR($@) if $@;
     my $user = core_cfg('client.user.name');
-    my $pass = core_cfg('client.user.pass');
+    my $pass = core_cfg('client.user.password');
     my $host = core_cfg('client.host.name');
-    my $port = 8443;
-    @ARGV = ($user, $pass, $host, $port);
-    push @ARGV, $file;
+    my $port = core_cfg('client.host.port');
+    @ARGV = ('--file', $file);
     local $@;
     unless (defined do "$Bin/qvd-client.pl") {
         if ($@) {
