@@ -18,7 +18,7 @@ use Fcntl ();
 use Fcntl::Packer ();
 use Method::WeakCallback qw(weak_method_callback);
 use QVD::HKD::Helpers qw(mkpath);
-
+use Mojo::Template;
 use parent qw(QVD::HKD::VMHandler);
 
 
@@ -220,67 +220,28 @@ sub _create_kubernetes {
     }
 
     my $fn = "$kubernetes_dir/config";
-    DEBUG "Saving kubernetes configuration to '$fn'";
+
     open my $cfg_fh, '>', $fn;
     unless ($cfg_fh) {
         ERROR "Unable to create file '$fn': $!";
         return $self->_on_error;
     }
 
-    # FIXME: make this template-able or configurable in some way
+    DEBUG "Saving kubernetes configuration to '$fn'";
+
     my $nodename = $self->_cfg('nodename');
-    print $cfg_fh <<EOC;
-apiVersion: v1
-kind: Pod
-metadata:
-  name: "$self->{kubernetes_name}"
-  labels:
-    app: qvdvm
-    qvdid: "$self->{vm_id}"
-    qvdhkd: "$nodename"
-spec:
-  hostname: "$self->{kubernetes_name}"
-  containers:
-  - name: "$self->{kubernetes_name}"
-    image: "$self->{di_path}"
-    livenessProbe:
-      httpGet:
-        path: /vma/ping
-        port: 3030
-      initialDelaySeconds: 5
-      periodSeconds: 3600
-      timeoutSeconds: 5
-    readinessProbe:
-      httpGet:
-        path: /vma/ping
-        port: 3030
-      initialDelaySeconds: 10
-      periodSeconds: 5
-      timeoutSeconds: 5
-EOC
+    my $template = $self->_cfg('internal.vm.kubernetes.pod.template');
+    my $mt = Mojo::Template->new;
+    my $output = $mt->render($template, $self);
 
-    if ($self->_cfg('hkd.vm.kubernetes.useprivilegedcontainer')) {
-    print $cfg_fh <<EOC2;
-    securityContext:
-      privileged: true
-EOC2
+    print $cfg_fh $output;
+
+    my $closeresult = close $cfg_fh;
+    unless ($closeresult) {
+        ERROR "Unable to close file '$fn': $!";
+        return $self->_on_error;
     }
-
-    if ($self->_cfg('hkd.vm.kubernetes.usefuse')) {
-    print $cfg_fh <<EOC3;
-    volumeMounts:
-      - mountPath: /dev/fuse
-        name: dev-fuse
-  volumes:
-    - name: dev-fuse
-      hostPath:
-        path: /dev/fuse
-EOC3
-    }
-
-    print $cfg_fh $self->_cfg('internal.vm.kubernetes.conf.extra')."\n";
-    close $cfg_fh;
-
+    DEBUG "Saved kubernetes configuration to '$fn': $output";
     $self->_on_done;
 }
 

@@ -550,7 +550,6 @@ vm.lxc.hooks.allow = 0
 vm.lxc.redirect.allow = 0
 
 internal.vm.lxc.conf.extra=
-internal.vm.kubernetes.conf.extra=
 
 ## whether to keep overlay images from one session to the next
 vm.overlay.persistent = 0
@@ -713,6 +712,72 @@ hkd.vm.kubernetes.token-file=/var/run/secrets/kubernetes.io/serviceaccount/token
 hkd.vm.kubernetes.usefuse=1
 ## Kubernetes VM use privileged container. Required for fuse, review security requirements.
 hkd.vm.kubernetes.useprivilegedcontainer=1
+# Mojo::Template format for pod creation
+internal.vm.kubernetes.pod.template=% my $self = shift; \n\
+  { \n\
+  "kind": "Pod", \n\
+  "apiVersion": "v1", \n\
+  "metadata": { \n\
+    "name": "<%= $self->{kubernetes_name} %>", \n\
+    "labels": { \n\
+      "app": "qvdvm",\n\
+      "qvdid": "<%= $self->{vm_id} %>", \n\
+      "qvdhkd": "<%= $self->{kubernetes_name} %>" \n\
+    } \n\
+  }, \n\
+  "spec": {\n\
+    "hostname": "<%= $self->{kubernetes_name} %>", \n\
+    "containers": [ \n\
+      { \n\
+        "name": "<%= $self->{kubernetes_name} %>", \n\
+        "image": "<%= $self->{di_path} %>", \n\
+        "livenessProbe": { \n\
+          "httpGet": { \n\
+            "path": "/vma/ping", \n\
+            "port": 3030 \n\
+          }, \n\
+          "initialDelaySeconds": 5, \n\
+          "periodSeconds": 3600, \n\
+          "timeoutSeconds": 5 \n\
+        }, \n\
+        "readinessProbe": { \n\
+          "httpGet": { \n\
+             "path": "/vma/ping", \n\
+             "port": 3030 \n\
+          }, \n\
+          "initialDelaySeconds": 10, \n\
+          "periodSeconds": 5, \n\
+          "timeoutSeconds": 5 \n\
+        } \n\
+% if ($self->_cfg('hkd.vm.kubernetes.useprivilegedcontainer')) { \n\
+        , \n\
+        "securityContext": { \n\
+          "privileged": true \n\
+        } \n\
+% } \n\
+%  if ($self->_cfg('hkd.vm.kubernetes.usefuse')) { \n\
+        , \
+        "volumeMounts": [ \n\
+          { \n\
+            "mountPath": "/dev/fuse", \n\
+            "name": "dev-fuse" \n\
+          } \n\
+        ] \n\
+      } \n\
+    ], \n\
+    "volumes": [\n\
+      { "name": "dev-fuse", \n\
+        "hostPath": { \n\
+          "path": "/dev/fuse" \n\
+         } \n\
+      } \n\
+    ] \n\
+% } else { \n\
+      } \n\
+    ] \n\
+% } \n\
+  } \n\
+  }
 
 # internal parameters, do not change!!!
 internal.l7r.timeout.vm_start = 270
