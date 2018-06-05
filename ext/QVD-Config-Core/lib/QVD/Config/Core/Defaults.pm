@@ -725,7 +725,7 @@ internal.vm.kubernetes.pod.template=% my $self = shift; \n\
 \      "labels": { \n\
 \        "app": "qvdvm",\n\
 \        "qvdid": "<%= $self->{vm_id} %>", \n\
-\        "qvdhkd": "<%= $self->{kubernetes_name} %>" \n\
+\        "qvdhkd": "<%= $self->_cfg('nodename') %>" \n\
 \      } \n\
 \    }, \n\
 \    "spec": {\n\
