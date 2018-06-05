@@ -337,6 +337,9 @@ client.ssl.allow_ocsp_error=0
 ## the certificate. Set to 0 to disable.
 client.ssl.error_timeout=5
 
+## Configuration for command line qvd-client.pl
+client.client.ssl-errors=ask
+
 ## SSL_ocsp_mode in the IO::Socket::SSL manpage. The value is a list
 ## of the following, separated by a |
 ##     SSL_OCSP_NO_STAPLE
@@ -714,70 +717,70 @@ hkd.vm.kubernetes.usefuse=1
 hkd.vm.kubernetes.useprivilegedcontainer=1
 # Mojo::Template format for pod creation
 internal.vm.kubernetes.pod.template=% my $self = shift; \n\
-  { \n\
-  "kind": "Pod", \n\
-  "apiVersion": "v1", \n\
-  "metadata": { \n\
-    "name": "<%= $self->{kubernetes_name} %>", \n\
-    "labels": { \n\
-      "app": "qvdvm",\n\
-      "qvdid": "<%= $self->{vm_id} %>", \n\
-      "qvdhkd": "<%= $self->{kubernetes_name} %>" \n\
-    } \n\
-  }, \n\
-  "spec": {\n\
-    "hostname": "<%= $self->{kubernetes_name} %>", \n\
-    "containers": [ \n\
-      { \n\
-        "name": "<%= $self->{kubernetes_name} %>", \n\
-        "image": "<%= $self->{di_path} %>", \n\
-        "livenessProbe": { \n\
-          "httpGet": { \n\
-            "path": "/vma/ping", \n\
-            "port": 3030 \n\
-          }, \n\
-          "initialDelaySeconds": 5, \n\
-          "periodSeconds": 3600, \n\
-          "timeoutSeconds": 5 \n\
-        }, \n\
-        "readinessProbe": { \n\
-          "httpGet": { \n\
-             "path": "/vma/ping", \n\
-             "port": 3030 \n\
-          }, \n\
-          "initialDelaySeconds": 10, \n\
-          "periodSeconds": 5, \n\
-          "timeoutSeconds": 5 \n\
-        } \n\
+\  { \n\
+\    "kind": "Pod", \n\
+\    "apiVersion": "v1", \n\
+\    "metadata": { \n\
+\      "name": "<%= $self->{kubernetes_name} %>", \n\
+\      "labels": { \n\
+\        "app": "qvdvm",\n\
+\        "qvdid": "<%= $self->{vm_id} %>", \n\
+\        "qvdhkd": "<%= $self->{kubernetes_name} %>" \n\
+\      } \n\
+\    }, \n\
+\    "spec": {\n\
+\    "hostname": "<%= $self->{kubernetes_name} %>", \n\
+\    "containers": [ \n\
+\      { \n\
+\        "name": "<%= $self->{kubernetes_name} %>", \n\
+\        "image": "<%= $self->{di_path} %>", \n\
+\        "livenessProbe": { \n\
+\          "httpGet": { \n\
+\            "path": "/vma/ping", \n\
+\            "port": 3030 \n\
+\          }, \n\
+\          "initialDelaySeconds": 5, \n\
+\          "periodSeconds": 3600, \n\
+\          "timeoutSeconds": 5 \n\
+\        }, \n\
+\        "readinessProbe": { \n\
+\           "httpGet": { \n\
+\             "path": "/vma/ping", \n\
+\             "port": 3030 \n\
+\          }, \n\
+\          "initialDelaySeconds": 10, \n\
+\          "periodSeconds": 5, \n\
+\          "timeoutSeconds": 5 \n\
+\        } \n\
 % if ($self->_cfg('hkd.vm.kubernetes.useprivilegedcontainer')) { \n\
-        , \n\
-        "securityContext": { \n\
-          "privileged": true \n\
-        } \n\
+\        , \n\
+\        "securityContext": { \n\
+\          "privileged": true \n\
+\        } \n\
 % } \n\
 %  if ($self->_cfg('hkd.vm.kubernetes.usefuse')) { \n\
-        , \
-        "volumeMounts": [ \n\
-          { \n\
-            "mountPath": "/dev/fuse", \n\
-            "name": "dev-fuse" \n\
-          } \n\
-        ] \n\
-      } \n\
-    ], \n\
-    "volumes": [\n\
-      { "name": "dev-fuse", \n\
-        "hostPath": { \n\
-          "path": "/dev/fuse" \n\
-         } \n\
-      } \n\
-    ] \n\
+\        , \
+\        "volumeMounts": [ \n\
+\          { \n\
+\            "mountPath": "/dev/fuse", \n\
+\            "name": "dev-fuse" \n\
+\          } \n\
+\        ] \n\
+\      } \n\
+\    ], \n\
+\    "volumes": [\n\
+\      { "name": "dev-fuse", \n\
+\        "hostPath": { \n\
+\          "path": "/dev/fuse" \n\
+\         } \n\
+\      } \n\
+\    ] \n\
 % } else { \n\
-      } \n\
-    ] \n\
+\      } \n\
+\    ] \n\
 % } \n\
-  } \n\
-  }
+\  } \n\
+\  }
 
 # internal parameters, do not change!!!
 internal.l7r.timeout.vm_start = 270
