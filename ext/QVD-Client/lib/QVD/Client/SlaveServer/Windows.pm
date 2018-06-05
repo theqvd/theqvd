@@ -73,8 +73,8 @@ sub _print_file {
     my ($drive, $path) = File::Spec->splitpath($ghostscript_exe, 1);
     my @gs_exe_path= File::Spec->splitdir($path);
     my $gs_path = File::Spec->catdir(@gs_exe_path[0..$#gs_exe_path - 2]);
-    my $ghostscript_lib = shortpathL(File::Spec->catpath($drive, $gs_path, 'lib')) // do {
-        ERROR "Unable to locate Ghostscript library directory";
+    my $ghostscript_lib = shortpathL(File::Spec->catpath($drive, $gs_path, 'lib')) || do {
+        ERROR "Unable to locate Ghostscript library directory under '$gs_path'";
         $self->throw_http_error(HTTP_INTERNAL_SERVER_ERROR, "Ghostscript installation is broken");
     };
 
@@ -98,7 +98,10 @@ sub _print_file {
             Win32::Process::Create($child, $cmd, $line, 0,
                                    NORMAL_PRIORITY_CLASS | CREATE_NO_WINDOW,
                                    "c:\\")
-                    or $self->throw_http_error(HTTP_INTERNAL_SERVER_ERROR, $^E);
+                    or do {
+                        ERROR "Process creation failed: '$^E'";
+                        $self->throw_http_error(HTTP_INTERNAL_SERVER_ERROR, $^E);
+                    };
             $child->Wait(INFINITE);
             $child->GetExitCode(my $code);
             if ($code) {

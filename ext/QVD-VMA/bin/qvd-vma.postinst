@@ -7,7 +7,7 @@ case "$1" in
     update-rc.d qvd-vma defaults
     echo -n "
 directory : /var/run/qvd/qvd4cups
-preehook_raw : /usr/lib/qvd/bin/qvd-send-printjob
+prehook_raw : /usr/lib/qvd/bin/qvd-send-printjob
 " >> /etc/cups/tea4cups.conf
     ;;
 
