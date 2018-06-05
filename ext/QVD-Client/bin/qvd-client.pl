@@ -37,18 +37,30 @@ use Proc::Background;
 use Getopt::Long;
 use JSON;
 
+our ($user_config_filename);
+
 BEGIN {
+    $user_config_filename = ($ENV{HOME} || $ENV{APPDATA}).'/.qvd/client.conf';
+    if (exists($ENV{QVDCLIENTCONFIG})) {
+        my $configfile = $ENV{QVDCLIENTCONFIG};
+        if (-f $configfile) {
+            $user_config_filename = $configfile;
+        } else {
+            print STDERR "Ignoring config file defined in QVDCLIENTCONFIG env variable <$configfile> defaulting to <$user_config_filename>\n";
+        }
+    }
+
     $QVD::Config::USE_DB = 0;
     @QVD::Config::Core::FILES = (
         '/etc/qvd/client.conf',
-        ($ENV{HOME} || $ENV{APPDATA}).'/.qvd/client.conf',
-        'qvd-client.conf',
+        $user_config_filename
     );
 
     # FIXME NX_CLIENT is used for showing the user information on things
     # like broken connection, perhaps we should show them to the user
     # instead of ignoring them? 
     $ENV{NX_CLIENT} = '/bin/false';
+
 }
 
 use QVD::Config::Core qw(set_core_cfg core_cfg);
@@ -76,12 +88,12 @@ GetOptions \%opts,
     '--help',
     or die "getopt";
 
-$opts{'username'} //= core_cfg('client.user.name');
-$opts{'password'} //= core_cfg('client.user.password');
-$opts{'host'} //= core_cfg('client.host.name');
-$opts{'port'} //= core_cfg('client.host.port');
+$opts{'username'} //= $ENV{QVDLOGIN} // core_cfg('client.user.name');
+$opts{'password'} //= $ENV{QVDPASSWORD} // core_cfg('client.user.password');
+$opts{'host'} //= $ENV{QVDHOST} // core_cfg('client.host.name');
+$opts{'port'} //= $ENV{QVDPORT} // core_cfg('client.host.port');
 $opts{'ssl'} //= 1;
-$opts{'ssl-errors'} //= 'ask';
+$opts{'ssl-errors'} //= $ENV{QVDSSLERRORS} // 'ask';
 $opts{'usb'} //= 0;
 
 
