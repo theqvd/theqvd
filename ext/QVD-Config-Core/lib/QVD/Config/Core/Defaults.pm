@@ -712,9 +712,13 @@ hkd.vm.kubernetes.token=
 ## Kubernetes authentication token
 hkd.vm.kubernetes.token-file=/var/run/secrets/kubernetes.io/serviceaccount/token
 ## Kubernetes VM using fuse. Mount /dev/fuse inside container. Requires privileged account
-hkd.vm.kubernetes.usefuse=1
+hkd.vm.kubernetes.usefuse=0
 ## Kubernetes VM use privileged container. Required for fuse, review security requirements.
-hkd.vm.kubernetes.useprivilegedcontainer=1
+hkd.vm.kubernetes.useprivilegedcontainer=0
+## Kubernetes VM using nfs home with subpath. Mount nfsserver + subpath inside container. Requires privileged account
+hkd.vm.kubernetes.home.usepvc_with_subpath=0
+## Kubernetes VM using nfs home with subpath. See the user guide on how to create the PV and associated PVC
+hkd.vm.kubernetes.home.pvcname=
 # Mojo::Template format for pod creation
 internal.vm.kubernetes.pod.template=% my $self = shift; \n\
 \  { \n\
@@ -758,22 +762,46 @@ internal.vm.kubernetes.pod.template=% my $self = shift; \n\
 \          "privileged": true \n\
 \        } \n\
 % } \n\
-%  if ($self->_cfg('hkd.vm.kubernetes.usefuse')) { \n\
+%  if ($self->_cfg('hkd.vm.kubernetes.usefuse') || $self->_cfg('hkd.vm.kubernetes.home.usepvc_with_subpath') ) { \n\
 \        , \
 \        "volumeMounts": [ \n\
+%  if ($self->_cfg('hkd.vm.kubernetes.usefuse') ) { \n\
 \          { \n\
 \            "mountPath": "/dev/fuse", \n\
 \            "name": "dev-fuse" \n\
 \          } \n\
+% } \n\
+%  if ($self->_cfg('hkd.vm.kubernetes.usefuse') && $self->_cfg('hkd.vm.kubernetes.home.usepvc_with_subpath')) { \n\
+\          , \n\
+% } \n\
+%  if ($self->_cfg('hkd.vm.kubernetes.home.usepvc_with_subpath') ) { \n\
+\          { \n\
+\            "mountPath": "/home/<%= $self->{login} %>", \n\
+\            "name": "<%= $self->_cfg(hkd.vm.kubernetes.home.pvcname) %>", \n\
+\            "subPath": "<%= $self->{login} %>" \n\
+\          } \n\
+% } \n\
 \        ] \n\
 \      } \n\
 \    ], \n\
 \    "volumes": [\n\
+%  if ($self->_cfg('hkd.vm.kubernetes.usefuse') ) { \n\
 \      { "name": "dev-fuse", \n\
 \        "hostPath": { \n\
 \          "path": "/dev/fuse" \n\
 \         } \n\
 \      } \n\
+% } \n\
+%  if ($self->_cfg('hkd.vm.kubernetes.usefuse') && $self->_cfg('hkd.vm.kubernetes.home.usepvc_with_subpath')) { \n\
+\     , \n\
+% } \n\
+%  if ($self->_cfg('hkd.vm.kubernetes.home.usepvc_with_subpath') ) { \n\
+\      { "name": "<%= $self->_cfg(hkd.vm.kubernetes.home.pvcname) %>", \n\
+\        "persistentVolumeClaim": { \n\
+\          "claimName": "<%= $self->_cfg(hkd.vm.kubernetes.home.pvcname) %>" \n\
+\         } \n\
+\      } \n\
+% } \n\
 \    ] \n\
 % } else { \n\
 \      } \n\
