@@ -721,7 +721,7 @@ hkd.vm.kubernetes.home.usepvc_with_subpath=0
 hkd.vm.kubernetes.home.pvcname=
 # Mojo::Template format for pod creation
 internal.vm.kubernetes.pod.template=% my $self = shift; \n\
-\  { \n\
+{ \n\
 \    "kind": "Pod", \n\
 \    "apiVersion": "v1", \n\
 \    "metadata": { \n\
@@ -808,7 +808,7 @@ internal.vm.kubernetes.pod.template=% my $self = shift; \n\
 \    ] \n\
 % } \n\
 \  } \n\
-\  }
+}
 
 # internal parameters, do not change!!!
 internal.l7r.timeout.vm_start = 270
