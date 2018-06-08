@@ -777,7 +777,7 @@ internal.vm.kubernetes.pod.template=% my $self = shift; \n\
 %  if ($self->_cfg('hkd.vm.kubernetes.home.usepvc_with_subpath') ) { \n\
 \          { \n\
 \            "mountPath": "/home/<%= $self->{login} %>", \n\
-\            "name": "<%= $self->_cfg(hkd.vm.kubernetes.home.pvcname) %>", \n\
+\            "name": "<%= $self->_cfg('hkd.vm.kubernetes.home.pvcname') %>", \n\
 \            "subPath": "<%= $self->{login} %>" \n\
 \          } \n\
 % } \n\
