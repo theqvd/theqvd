@@ -796,9 +796,9 @@ internal.vm.kubernetes.pod.template=% my $self = shift; \n\
 \     , \n\
 % } \n\
 %  if ($self->_cfg('hkd.vm.kubernetes.home.usepvc_with_subpath') ) { \n\
-\      { "name": "<%= $self->_cfg(hkd.vm.kubernetes.home.pvcname) %>", \n\
+\      { "name": "<%= $self->_cfg('hkd.vm.kubernetes.home.pvcname') %>", \n\
 \        "persistentVolumeClaim": { \n\
-\          "claimName": "<%= $self->_cfg(hkd.vm.kubernetes.home.pvcname) %>" \n\
+\          "claimName": "<%= $self->_cfg('hkd.vm.kubernetes.home.pvcname') %>" \n\
 \         } \n\
 \      } \n\
 % } \n\
