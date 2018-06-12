@@ -240,6 +240,12 @@ EOP
 *DefaultResolution: 600dpi
 *Resolution 600dpi/600 DPI: "<</HWResolution[600 600]/cupsBitsPerColor 8/cupsRowCount 0/cupsRowFeed 0/cupsRowStep 0/cupsColorSpace 3>>setpagedevice"
 *CloseUI: *Resolution
+*OpenUI *QVDMargins: Boolean
+*DefaultQVDMargins: True
+*OrderDependency: 10 AnySetup *QVDMargins
+*QVDMargins True: "<</BeginPage{-12 -15 translate}>>setpagedevice"
+*QVDMargins False: "<</BeginPage{0 0 translate}>>setpagedevice"
+*CloseUI: *QVDMargins
 *DefaultFont: Courier
 *Font AvantGarde-Book: Standard "(1.05)" Standard ROM
 *Font AvantGarde-BookOblique: Standard "(1.05)" Standard ROM
