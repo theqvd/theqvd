@@ -929,6 +929,8 @@ sub _run {
                     # probably deal with it.
                     ERROR "Local PulseAudio is not running";
                 } else {
+                    # System PulseAudio is running
+
                     if ( $self->{compress_audio} ) {
                         DEBUG "Checking whether system PA supports Opus";
 
@@ -957,6 +959,14 @@ sub _run {
                         } else {
                             ERROR "Cannot start a pulseaudio with opus compression enabled";
                         }
+                    } else {
+                        DEBUG "System PA is running, but audio compression is not enabled";
+                        WARN  "Setting up uncompressed pulseaudio pass-through.";
+                        WARN  "Bandwidth usage will be high. Usage of qvd-pulseaudio is higly recommended.";
+
+                        $syspa->cmd("load-module", "module-native-protocol-tcp",
+                                    "auth-anonymous=1", "listen=127.0.0.1", "port=4713");
+
                     }
                 }
             }
