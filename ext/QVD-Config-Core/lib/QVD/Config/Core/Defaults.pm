@@ -719,6 +719,8 @@ hkd.vm.kubernetes.useprivilegedcontainer=0
 hkd.vm.kubernetes.home.usepvc_with_subpath=0
 ## Kubernetes VM using nfs home with subpath. See the user guide on how to create the PV and associated PVC
 hkd.vm.kubernetes.home.pvcname=
+## Set Environment variables for the Pod VM, for each of the VM, User, DI and OSF properties. Enabling this incures an extra overhead per pod creation in the number of searches to the DB.
+hkd.vm.kubernetes.vm.properties_as_environment_vars=
 # Mojo::Template format for pod creation
 internal.vm.kubernetes.pod.template=% my $self = shift; \n\
 { \n\
@@ -738,6 +740,12 @@ internal.vm.kubernetes.pod.template=% my $self = shift; \n\
 \      { \n\
 \        "name": "<%= $self->{kubernetes_name} %>", \n\
 \        "image": "<%= $self->{di_path} %>", \n\
+% if (%{ $self->{vm_properties} }) { \n\
+% my $propstojson = join(", \n           ", map { '{ "'.$_.'" : "'.$self->{vm_properties}->{$_}.'" }' } (keys %{ $self->{vm_properties}})); \n\
+\        "env": { \n\
+\          <%= $propstojson %> \n\
+\        }, \n\
+% } \n\
 \        "livenessProbe": { \n\
 \          "httpGet": { \n\
 \            "path": "/vma/ping", \n\

@@ -20,6 +20,7 @@ use Method::WeakCallback qw(weak_method_callback);
 use QVD::HKD::Helpers qw(mkpath);
 use Mojo::Template;
 use parent qw(QVD::HKD::VMHandler);
+use QVD::DB::Simple;
 
 
 # TODO check status of container on start and on stop
@@ -178,6 +179,20 @@ sub _calculate_attrs {
     $self->SUPER::_calculate_attrs;
 
     $self->{kubernetes_name} = "qvd-$self->{vm_id}";
+    $self->{vm_properties} = {};
+
+    # Be aware that enabling
+    if ($self->_cfg('hkd.vm.kubernetes.vm.properties_as_environment_vars')) {
+        my $vmlist = rs(VM)->search({id => $self->{vm_id}});
+        if ($vm->count == 1) {
+            my $vm = $vmlist->first;
+            my %props = $vm->combined_properties;
+            $self->{vm_properties} = \%props;
+        } else {
+            ERROR "Internal error: VM not found for vm_id $self->{vm_id} when enabling hkd.vm.kubernetes.vm.properties_as_environment_vars";
+        }
+    }
+
 
     $self->_on_done;
 }
