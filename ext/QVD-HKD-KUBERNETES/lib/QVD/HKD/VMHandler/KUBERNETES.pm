@@ -184,7 +184,7 @@ sub _calculate_attrs {
     # Be aware that enabling
     if ($self->_cfg('hkd.vm.kubernetes.vm.properties_as_environment_vars')) {
         my $vmlist = rs(VM)->search({id => $self->{vm_id}});
-        if ($vm->count == 1) {
+        if ($vmlist->count == 1) {
             my $vm = $vmlist->first;
             my %props = $vm->combined_properties;
             $self->{vm_properties} = \%props;
