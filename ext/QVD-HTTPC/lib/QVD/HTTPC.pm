@@ -16,7 +16,6 @@ use Socket qw(IPPROTO_TCP TCP_NODELAY);
 
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::HTTP::Headers qw(header_lookup);
-use QVD::Config;
 
 my $CRLF = "\r\n";
 

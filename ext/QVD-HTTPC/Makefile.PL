@@ -17,7 +17,6 @@ WriteMakefile(
     PREREQ_PM => {
         'IO::Socket::SSL' => 0,
         'Net::SSLeay' => 0,
-        'QVD::Config' => 0,
         'QVD::HTTP::Headers' => 0,
         'QVD::HTTP::StatusCodes' => 0,
         'URI' => 0,
