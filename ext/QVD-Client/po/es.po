@@ -89,10 +89,6 @@ msgstr "Recordar contraseña"
 msgid "Restart session"
 msgstr "Reinicio de sesión"
 
-#: Frame.pm:367
-msgid "Terms of use"
-msgstr "Condiciones del servicio"
-
 #: Frame.pm:471
 msgid "You don't have any virtual machine available"
 msgstr "No tiene ninguna máquina virtual disponible"
