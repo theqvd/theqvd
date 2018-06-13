@@ -741,7 +741,7 @@ internal.vm.kubernetes.pod.template=% my $self = shift; \n\
 \        "name": "<%= $self->{kubernetes_name} %>", \n\
 \        "image": "<%= $self->{di_path} %>", \n\
 % if (%{ $self->{vm_properties} }) { \n\
-% my $propstojson = join(", ", map { '{ "'.$_.'" : "'.$self->{vm_properties}->{$_}.'" }' } (keys %{ $self->{vm_properties}})); \n\
+% my $propstojson = join(", ", map { '{ "name": "'.$_.'", "value": "'.$self->{vm_properties}->{$_}.'" }' } (keys %{ $self->{vm_properties}})); \n\
 \        "env": [ \n\
 \          <%= $propstojson %> \n\
 \        ], \n\
