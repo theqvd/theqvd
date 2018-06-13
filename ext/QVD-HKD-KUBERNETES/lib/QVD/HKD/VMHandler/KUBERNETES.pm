@@ -181,13 +181,14 @@ sub _calculate_attrs {
     $self->{kubernetes_name} = "qvd-$self->{vm_id}";
     $self->{vm_properties} = {};
 
-    # Be aware that enabling
+    # This incurres extra searches on VM startup
     if ($self->_cfg('hkd.vm.kubernetes.vm.properties_as_environment_vars')) {
         my $vmlist = rs(VM)->search({id => $self->{vm_id}});
         if ($vmlist->count == 1) {
             my $vm = $vmlist->first;
             my %props = $vm->combined_properties;
             $self->{vm_properties} = \%props;
+            DEBUG "hkd.vm.kubernetes.vm.properties_as_environment_vars is enabled. Setting vm_properties=".join(",", map { "$_=$props{$_}" } (keys %props));
         } else {
             ERROR "Internal error: VM not found for vm_id $self->{vm_id} when enabling hkd.vm.kubernetes.vm.properties_as_environment_vars";
         }
