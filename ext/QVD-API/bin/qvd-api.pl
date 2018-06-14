@@ -863,7 +863,7 @@ sub get_input_json
         deep_utf8_decode($json);
     }
     else {
-        $json =  { map { $_ => b($c->param($_))->encode('UTF-8')->to_string } keys($c->req->params->to_hash) };
+        $json =  { map { $_ => b($c->param($_))->encode('UTF-8')->to_string } keys(%{$c->req->params->to_hash}) };
         eval
         {
             convert_json_to_hash($json, "filters");
