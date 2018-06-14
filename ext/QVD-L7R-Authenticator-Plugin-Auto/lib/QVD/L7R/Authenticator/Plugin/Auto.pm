@@ -10,13 +10,15 @@ use QVD::Admin;
 
 use parent qw(QVD::L7R::Authenticator::Plugin);
 
-my $osf_id = cfg('auth.auto.osf_id');
-my $di_tag = cfg('auth.auto.di_tag', 0) // 'default';
-my $maxvms = cfg('auth.auto.max_vms', 0) // 5;
-
 sub after_authenticate_basic {
     my ($plugin, $auth, $normalized_login) = @_;
-    my $user = rs(User)->search({login => $normalized_login})->first;
+    my $tenant_id = $auth->{tenant_id};
+
+    my $osf_id = cfg('auth.auto.osf_id', $tenant_id);
+    my $di_tag = cfg('auth.auto.di_tag', $tenant_id, 0) // 'default';
+    my $maxvms = cfg('auth.auto.max_vms', $tenant_id, 0) // 5;
+
+    my $user = rs(User)->search({login => $normalized_login, tenant_id => $tenant_id})->first;
     my $user_id;
 
     if ($user) {
@@ -24,7 +26,7 @@ sub after_authenticate_basic {
     }
     else {
 	INFO "Auto provisioning user $normalized_login";
-	my $user_id_obj = rs(User)->create({ login => $normalized_login})
+	my $user_id_obj = rs(User)->create({ login => $normalized_login, tenant_id => $tenant_id })
 	    // die "Unable to provision user $normalized_login";
         $user_id = $user_id_obj->id;
     }
