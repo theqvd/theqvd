@@ -442,6 +442,9 @@ l7r.options.SSL_cipher_list = HIGH:!aNULL:!MD5:!RC4:!3DES:!DES:!MEDIUM:!LOW:!EXP
 hkd.user.umask = 0022
 ## user to run hkd as
 hkd.as_user = root
+## group to run hkd as
+hkd.as_group = nogroup
+@centos@hkd.as_group = nobody
 ## path to the hkd PID file
 hkd.pid_file = ${path.run}/qvd-hkd.pid
 

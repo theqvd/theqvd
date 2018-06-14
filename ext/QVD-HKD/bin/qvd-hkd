@@ -47,6 +47,7 @@ unless (-d $path_run) {
 
 $App::Daemon::pidfile = core_cfg('hkd.pid_file');
 $App::Daemon::as_user = core_cfg('hkd.as_user');
+$App::Daemon::as_group = core_cfg('hkd.as_group');
 $App::Daemon::background = 0 if $foreground;
 
 ## require the module before daemonizing—otherwise syntax errors end up nowhere since STDERR is closed
