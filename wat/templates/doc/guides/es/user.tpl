@@ -2747,7 +2747,7 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Ajuste de la versión en el proceso de creación de imágenes del disco. Sin este ACL, el sistema lo establecerá automáticamente como una base fija en el timestamp y una serie de dígitos.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminación masiva deá imágenes del disco</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminación de imágenes del disco</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Eliminar imágenes del disco</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">di.delete.</p></td>
 </tr>
@@ -2908,7 +2908,7 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Ajuste de idioma en el proceso de creación de administradores.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminar administradores (masivo)</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Eliminar administradores</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">administrator.delete.</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Eliminación de administradores WAT uno a uno.</p></td>
 </tr>
@@ -3058,7 +3058,7 @@ width:100%;
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Roles heredados de un rol.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualización masiva de la descripción de los roles.</strong></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><strong>Actualización de la descripción de los roles.</strong></p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">Asignar-Desvincular ACLs del rol</p></td>
 <td class="tableblock halign-left valign-top" ><p class="tableblock">role.update.assign-acl</p></td>
 </tr>

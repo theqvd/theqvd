@@ -621,7 +621,7 @@
     "See user state of VM's list of DI's": "Ver estado de usuario en MVs asociadas a imagen de disco", 
     "See statistics of number of blocked disk images": "Ver estadística del número de imágenes de disco bloqueadas", 
     "See statistics of number of disk images": "Ver estadística del número de imágenes de disco", 
-    "Block-Unblock disk images": "Bloquear-Desbloquear imágenes de disco (masivo)", 
+    "Block-Unblock disk images": "Bloquear-Desbloquear imágenes de disco", 
     "Set disk images as default": "Establecer una imagen de disco como predeterminada", 
     "Update disk image's description": "Actualizar descripción de imágenes de disco",
     "Update properties when update disk images": "Actualizar propiedades al actualizar imágenes de disco",
