@@ -615,6 +615,11 @@ vma.printing.enable = 0
 ## path to the VMA PID file
 vma.pid_file = /var/run/qvd/vma.pid
 
+## User and group for App::Daemon
+vma.as_user = root
+vma.as_group = nogroup
+@centos@vma.as_group = nobody
+
 ## KVM: disk drive will be visible as: 0=hda, 1=hdb, 2=hdc... (parameter 'index' within -drive in KVM)
 vm.kvm.home.drive.index = 1
 ## optional: device that contains the homes, as seen from within the VM

@@ -13,7 +13,8 @@ use QVD::Config::Core;
 
 use App::Daemon qw(daemonize);
 $App::Daemon::pidfile = core_cfg('vma.pid_file');
-$App::Daemon::as_user = 'root';
+$App::Daemon::as_user = core_cfg('vma.as_user');
+$App::Daemon::as_group = core_cfg('vma.as_group');
 
 $ENV{PATH} = join(':', $ENV{PATH}, '/sbin/');
 
