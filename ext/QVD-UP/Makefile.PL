@@ -34,5 +34,6 @@ WriteMakefile(
         'QVD::UP::H5GW::DockerManager' => 0,
         'QVD::UP::H5GW::SessionManager' => 0,
         'QVD::VMProxy' => 0,
+        'List::MoreUtils' => 0,
     },
 );
