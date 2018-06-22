@@ -15,7 +15,7 @@ use IO::Socket::Forwarder qw(forward_sockets);
 use QVD::Config;
 use QVD::Log;
 use QVD::DB::Simple;
-use QVD::HTTP::Headers qw(header_lookup header_eq_check);
+use QVD::HTTP::Headers qw(header_lookup header_eq_check header_find);
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::URI qw(uri_query_split);
 use QVD::SimpleRPC::Client;
@@ -301,6 +301,14 @@ sub stop_vm_processor {
     $l7r->send_http_response_with_body(HTTP_OK, 'text/plain', [], "Machine stopped\r\n");
 }
 
+sub _set_auth_headers {
+    my ($auth, $headers) = @_;
+    foreach my $hdr ( header_find($headers, qr/^Auth-/) ) {
+        my $val =  decode_base64(header_lookup($headers, $hdr));
+        $auth->set_additional_header($hdr, $val);
+    }
+}
+
 sub _authenticate_user {
     my ($l7r, $headers) = @_;
     my $this_host = this_host; $this_host // $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, 'Host is not registered in the database');
@@ -324,9 +332,11 @@ sub _authenticate_user {
     if (defined $auth and
         $auth->recheck_authentication($login, $passwd, $token)) 
     {
+        _set_auth_headers($auth, $headers);
         return $auth;
     } else {
         $auth = QVD::L7R::Authenticator->new;
+        _set_auth_headers($auth, $headers);
         txn_do { $this_host->counters->incr_auth_attempts; };
         
         my $is_authenticated = 0;

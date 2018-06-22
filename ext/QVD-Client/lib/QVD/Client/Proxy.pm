@@ -553,14 +553,30 @@ sub connect_to_vm {
 
 print "auth: ".$auth."\n";
 print "auth-type: ".$auth_type."\n";
-    
+
+    my $headers = [
+        "Authorization: $auth_type $auth",
+        "Accept: application/json"
+    ];
+
+    for my $var ( grep(/^auth_vars\./, keys %$opts) ) {
+        my $sanitized_name = $var;
+        if ( !defined $opts->{$var} ) {
+            DEBUG "Variable $var is undefined, not sending";
+            next;
+        }
+        $sanitized_name =~ s/^auth_vars\.//;
+        $sanitized_name =~ s/[^A-Za-z0-9_-]/_/g;
+        push @$headers, "Auth-${sanitized_name}: " . encode_base64( $opts->{$var}, '' );
+
+        DEBUG "Header to send to L7R: $var [$sanitized_name] => '" . $opts->{$var} . "'";
+    }
+
+
     INFO("Sending $auth_type auth");
     $httpc->send_http_request(
         GET => '/qvd/list_of_vm?'.$q,
-        headers => [
-            "Authorization: $auth_type $auth",
-            "Accept: application/json"
-        ],
+        headers => $headers
     );
 
     my ($code, $msg, $response_headers, $body) = $httpc->read_http_response();

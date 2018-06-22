@@ -139,6 +139,19 @@ sub authenticate_basic_2f_split {
     return $passwd; # by default, no 2FA.
 }
 
+sub set_additional_header {
+    my ($auth, $header, $value) = @_;
+    DEBUG "Set authentication header: '$header' => '$value'";
+
+    $auth->{headers} //= {};
+    $auth->{headers}->{$header} = $value;
+}
+
+sub recheck_authentication_basic {
+    my ($auth, $login, $passwd, $l7r) = @_;
+    $auth->{login} eq $login and $auth->{passwd} eq $passwd;
+}
+
 sub authenticate_basic {
     my ($auth, $login, $passwd, $l7r) = @_;
 

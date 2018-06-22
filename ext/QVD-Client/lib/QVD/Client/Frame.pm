@@ -533,6 +533,19 @@ sub OnClickConnect {
         token           => core_cfg('client.auto_connect.token','')
     );
 
+    if ( core_cfg('client.auth_env_share.enable') ) {
+        DEBUG "Environment forwarding enabled";
+        my $var;
+        my $num = 0;
+        while( $var = core_cfg("client.auth_env_share.list.$num", 0 ) ) {
+            DEBUG "Var: $var";
+            # shared hashes can't be nested, so we're forced to use a flat
+            # structure here.
+            $connect_info{"auth_vars.${var}"} = $ENV{$var};
+            $num++;
+        }
+    }
+
     my $u = $self->{username}->GetValue;
     $u =~ s/^\s*//; $u =~ s/\s*$//;
     $self->{username}->SetValue ($u);

@@ -406,6 +406,10 @@ client.usb.share_list =
 ## display kill vm session checkbox
 client.kill_vm.display = 0
 
+# List of environment variables to share with L7R for authentication purposes
+client.auth_env_share.enable = 0
+client.auth_env_share.list.0 =
+
 ## umask for the L7R process
 l7r.user.umask = 0022
 ## whether L7R accepts SSL incoming connections or not
