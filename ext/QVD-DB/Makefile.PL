@@ -39,6 +39,7 @@ WriteMakefile(
         'SQL::Translator'             => 0,
         'Sort::Versions'              => '1.5',
         'Try::Tiny'                   => 0,
+        'List::MoreUtils'             => 0,
     },
     dist           => {
         COMPRESS => 'gzip -9f',
