@@ -21,6 +21,7 @@ NAME=qvd-vma
 DESC="QVD VMA"
 
 RUNDIR=/var/run/qvd
+QVD4CUPSDIR=/var/run/qvd/qvd4cups
 PIDFILE=/var/run/qvd/vma.pid
 
 test -x $DAEMON || exit 5
@@ -114,6 +115,11 @@ start_server() {
 # Create rundir dir if does not exists
 	if [ ! -d $RUNDIR ] ; then 
 	    mkdir $RUNDIR
+	fi
+
+# Create qvd4cupsdir dir if does not exists
+	if [ ! -d $QVD4CUPSDIR ] ; then 
+	    mkdir $QVD4CUPSDIR
 	fi
 
 # Start the process using the wrapper

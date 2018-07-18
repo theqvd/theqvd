@@ -27,6 +27,7 @@ NAME=qvd-vma
 DESC="QVD VMA"
 PIDFILE=/var/run/qvd/vma.pid
 RUNDIR=/var/run/qvd
+QVD4CUPSDIR=/var/run/qvd/qvd4cups
 SCRIPTNAME=/etc/init.d/$NAME
 CONFIG=/etc/qvd/vma.conf
 
@@ -59,6 +60,10 @@ do_start()
 	# Create RUNDIR if does not exist
 	if [ ! -d $RUNDIR ] ; then 
 		mkdir $RUNDIR
+	fi
+	# Create qvd4cupsdir dir if does not exists
+	if [ ! -d $QVD4CUPSDIR ] ; then 
+	    mkdir $QVD4CUPSDIR
 	fi
 	# Return
 	#   0 if daemon has been started
