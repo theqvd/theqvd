@@ -31,7 +31,6 @@ sub header_find {
         my @ret;
         foreach my $hdr (@$headers) {
             my ($h) = $hdr =~ /(.*?)\s*:/;
-            print "H: $h\n";
             push @ret, $h if ( $h =~ $regexp );
         }
 
