@@ -1,4 +1,4 @@
-# **OVERVIEW**
+# OVERVIEW
 ========
 QVD (Quality Virtual Desktop) is a highly scalable, cost effective, easy to manage, open source VDI solution developed by Qindel Group, 
 built on top of Linux.
