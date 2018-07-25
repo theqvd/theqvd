@@ -329,38 +329,38 @@ sub _authenticate_user {
     }
 
     my $auth = $l7r->{_auth};
-    if (defined $auth and
-        $auth->recheck_authentication($login, $passwd, $token)) 
-    {
+    if (defined $auth) {
         _set_auth_headers($auth, $headers);
-        return $auth;
-    } else {
-        $auth = QVD::L7R::Authenticator->new;
-        _set_auth_headers($auth, $headers);
-        txn_do { $this_host->counters->incr_auth_attempts; };
-        
-        my $is_authenticated = 0;
-        if (defined($login) && defined($passwd)) {
-            $is_authenticated = $auth->authenticate_basic( $login, $passwd, $l7r );
-            ERROR "Failed login attempt from user $login" unless $is_authenticated;
-        } elsif (defined($token)){
-            $is_authenticated = $auth->authenticate_bearer( $token, $l7r );
-            ERROR "Failed login attempt with token $token" unless $is_authenticated;
+        if ($auth->recheck_authentication($login, $passwd, $token)) {
+            return $auth;
         }
-        
-        if($is_authenticated) {
-            my $client = $l7r->{server}->{client};
-            my $peerhost = eval { $client->peerhost() } // 'unknown';
-            my $peerport = eval { $client->peerport() } // 'unknown';
-            INFO "Accepted connection from user $login from ip:port ${peerhost}:$peerport";
-            $l7r->{_auth} = $auth;
-            my $user = $auth->{user};
-            unless ($user->blocked) {
-                txn_do { $this_host->counters->incr_auth_ok };
-                return $auth
-            }
-            ERROR "User $login is blocked";
+    }
+
+    $auth = QVD::L7R::Authenticator->new;
+    _set_auth_headers($auth, $headers);
+    txn_do { $this_host->counters->incr_auth_attempts; };
+
+    my $is_authenticated = 0;
+    if (defined($login) && defined($passwd)) {
+        $is_authenticated = $auth->authenticate_basic( $login, $passwd, $l7r );
+        ERROR "Failed login attempt from user $login" unless $is_authenticated;
+    } elsif (defined($token)){
+        $is_authenticated = $auth->authenticate_bearer( $token, $l7r );
+        ERROR "Failed login attempt with token $token" unless $is_authenticated;
+    }
+
+    if($is_authenticated) {
+        my $client = $l7r->{server}->{client};
+        my $peerhost = eval { $client->peerhost() } // 'unknown';
+        my $peerport = eval { $client->peerport() } // 'unknown';
+        INFO "Accepted connection from user $login from ip:port ${peerhost}:$peerport";
+        $l7r->{_auth} = $auth;
+        my $user = $auth->{user};
+        unless ($user->blocked) {
+            txn_do { $this_host->counters->incr_auth_ok };
+            return $auth
         }
+        ERROR "User $login is blocked";
     }
 
     $l7r->throw_http_error(HTTP_UNAUTHORIZED, ['WWW-Authenticate: Basic realm="QVD"']);
