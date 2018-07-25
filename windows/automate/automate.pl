@@ -6,35 +6,68 @@ use 5.010;
 use YAML;
 use Path::Tiny;
 use Getopt::Long;
-use Log::Any::Adapter;
+use Log::Log4perl qw(:easy);
 use HTTP::Tiny;
 use Win32::ShellQuote ();
 
 BEGIN { *w32q = \&Win32::ShellQuote::quote_system_string }
 
 
+my %log_levels = (
+	trace   => $TRACE,
+	debug   => $DEBUG,
+	info    => $INFO,
+	warning => $WARN,
+	error   => $ERROR,
+	fatal   => $FATAL
+);
+
+
+
 my $this_path = path($0)->realpath->parent;
 my $cfg_fn = $this_path->child('automate.yaml');
-my $log_fn; # = $this_path->child('log.txt');
-my $log_level = 'info';
+my $log_fn = $this_path->child('log.txt');
+my $log_level = 'debug';
+my $console_level = 'info';
 my $wd;
 my @skip;
 my @do;
+my @orig_args = @ARGV;
+my $cmd_help;
 
 GetOptions('config|cfg|f=s'   => \$cfg_fn,
            'log-level|ll|l=s' => \$log_level,
+	   'console-level|cl=s' => \$console_level,
            'workdir|wd|w=s'   => \$wd,
            'skip|K=s'         => \@skip,
-           'do|D=s'           => \@do)
+           'do|D=s'           => \@do,
+           'log-file|L=s'     => \$log_fn,
+           'help|h'           => \$cmd_help)
     or die "Error in command line arguments\n";
 
-if (defined $log_fn) {
-    Log::Any::Adapter->set(File => $log_fn, log_level => $log_level);
+if ( $cmd_help ) {
+	print_help();
+	exit(0);
 }
-else {
-    Log::Any::Adapter->set(Stderr => log_level => $log_level);
+
+my @log_config = (
+  { level    => parse_log_level($console_level),
+    file     => "STDERR",
+    layout   => '%m%n' } );
+
+if ( defined $log_fn ) {
+	push @log_config, {
+		level    => parse_log_level($log_level),
+		file     => ">>$log_fn",
+		layout   => '%d %p - %m%n'
+	};
 }
-my $log = Log::Any->get_logger;
+
+Log::Log4perl->easy_init(@log_config);
+
+my $log = Log::Log4perl->get_logger;
+$log->info("=" x 60);
+$log->info("Starting with arguments: " . join(', ', @orig_args));
 
 sub logdie {
     my $msg = join ': ', @_;
@@ -53,12 +86,17 @@ my $downloads = $wd->child('download');
 my $src = $wd->child('src');
 my $out = $wd->child('out');
 
+$log->info("Source dir: $src");
+$log->info("Out dir: $out");
+
 @do = @{$cfg->{run}{do}} unless @do;
 
 my %skip = map { lc($_) => 1 } @skip;
 my %do = map { lc($_) => 1 } @do;
 
 my $ua = HTTP::Tiny->new();
+
+
 
 setup_skel();
 setup_msys();
@@ -82,6 +120,36 @@ build_qvd_client();
 build_qvd_automate();
 
 exit(0);
+
+sub print_help {
+	print <<HELP;
+$0 [options]
+Automate QVD Client packaging
+
+Options:
+	-w, --config conf        Config file
+	-l, --log-level level    Log file level
+	--console-level          Console log level
+	-w, --workdir dir        Working directory
+        -K, --skip               List of tasks to skip
+	-D, --do                 List of tasks to do
+	-L, --log-file file      Log file
+	--help                   This text
+
+Valid log levels: trace, debug, info, warning, error, fatal
+
+HELP
+}
+
+sub parse_log_level {
+	my ($str) = @_;
+	$str = lc($str);
+	if ( exists $log_levels{$str} ) {
+		return $log_levels{$str};
+	} else {
+		die "Unknown log level '$str'";
+	}
+}
 
 sub posix_quote {
     state $noquote_class = '.\\w/\\-@,:';
@@ -658,7 +726,7 @@ sub next_temp {
 }
 
 sub build_from_repos {
-    my ($name, $this, $parent) = @_;
+    my ($name, $this, $parent, $child_num) = @_;
     $this //= $cfg->{build}{$name};
     my $build = $this->{build};
     my $commands = $build->{commands};
@@ -680,6 +748,9 @@ sub build_from_repos {
         $env = $build->{env} //= 'mingw32';
     }
 
+    $log->debug("Processing '$longname': Child " . ($child_num//-1) . " parent " . ($parent // "(none)"));
+
+
     my $tempdir = path($this->{tempdir} //= next_temp($longname)->stringify);
 
     my $envname = uc($longname =~ s/[\W]+/_/gr);
@@ -693,9 +764,6 @@ sub build_from_repos {
     $ENV{"${envname}_SRCDIR_MSYS"} = w32_path_to_msys($srcdir->canonpath);
     $ENV{"${envname}_TEMPDIR_MSYS"} = w32_path_to_msys($tempdir->canonpath);
 
-    #use Data::Dumper;
-    #$log->debug("This: ".Dumper($this)."\nArgs: ".Dumper(\@_)."\nEnv: ".Dumper(\%ENV));
-
     if (-d $tempdir) {
     SKIP: {
             skip_for "build-$longname-temp-remove";
@@ -705,9 +773,26 @@ sub build_from_repos {
     }
 
  SKIP: {
-        skip_for "build-$longname-out-remove";
-        rmtree($outdir);
-        $outdir->mkpath;
+	if ( $parent && ($child_num > 0) ) {
+		# In automate.yaml, if we're inside the 'children' section, and not the
+		# first child in the list, we skip cleaning. Eg:
+		# nxproxy:
+		#     [...]
+		#     children:
+		#         - name: nxcomp
+		#         - name: nxproxy
+		#
+		# We'll do cleaning when handling the 'nxcomp' child, but skip it for
+		# 'nxproxy' and any following ones. This ensures that while the process
+		# starts from a clean slate, that the nxcomp binaries are not deleted
+		# when nxproxy starts being built.
+
+		$log->info("Task is child #${child_num}, not cleaning");
+	} else {
+		skip_for "build-$longname-out-remove";
+		rmtree($outdir);
+		$outdir->mkpath;
+	}
     }
     if (my $repo = $this->{repository}) {
         my $repo_url = $this->{repository}{url};
@@ -811,8 +896,10 @@ sub build_from_repos {
     }
 
     if (my $children = $this->{children}) {
+	my $child_num = 0;
+
         for my $child (@$children) {
-            build_from_repos($child->{name}, $child, $this);
+            build_from_repos($child->{name}, $child, $this, $child_num++);
         }
     }
 }
