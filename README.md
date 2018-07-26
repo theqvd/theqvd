@@ -1,5 +1,4 @@
 # OVERVIEW
-========
 QVD (Quality Virtual Desktop) is a highly scalable, cost effective, easy to manage, open source VDI solution developed by Qindel Group, 
 built on top of Linux.
 
@@ -9,14 +8,12 @@ We maintain a copy of our source code in GitHub for your benefit, while our main
 
 
 # **FOR THE OPEN SOURCE COMMUNITY**
-=============================
 QVD has three different editions: Developer, Self-Support and Enterprise. 
 You are now in the GitHub channel of QVD which is for Developer edition users. It is a free edition aimed at those with a developer profile, 
 self-employed or employed, who have the knowledge and the necessary time to deploy QVD and update it on their own.
 
 
 # **STRUCTURE**
-=========
 Here you will find:
 
  +- doc     - Documentation
@@ -32,17 +29,14 @@ Here you will find:
 
 
 # **DOCUMENTATION**
-=============
 Administration manual and installation guide can be found here: http://www.theqvd.com/documentation
 
 
 # **PACKAGES**
-========
 Please visit our download section for rpms, debs, and virtual appliance, and demo images: http://www.theqvd.com/download
 
 
 # **SUPPORT**
-=======
 Please raise an issue here in GitHub if you find any bugs, or have any feature requests.
 
 If you need to have dedicated professional support, require help on the installation and maintenance of the VDI infrastructure, 
