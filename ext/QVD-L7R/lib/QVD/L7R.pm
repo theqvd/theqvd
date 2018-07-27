@@ -304,8 +304,11 @@ sub stop_vm_processor {
 sub _set_auth_headers {
     my ($auth, $headers) = @_;
     foreach my $hdr ( header_find($headers, qr/^Auth-/) ) {
-        my $val =  decode_base64(header_lookup($headers, $hdr));
-        $auth->set_additional_header($hdr, $val);
+        my ($name) = $hdr =~ /^Auth-(.*)$/;
+        $name = pack("H*", $name);
+
+        my $val  = decode_base64(header_lookup($headers, $hdr));
+        $auth->set_additional_header($name, $val);
     }
 }
 

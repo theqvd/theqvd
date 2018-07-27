@@ -566,7 +566,7 @@ print "auth-type: ".$auth_type."\n";
             next;
         }
         $sanitized_name =~ s/^auth_vars\.//;
-        $sanitized_name =~ s/[^A-Za-z0-9_-]/_/g;
+        $sanitized_name = unpack("H*", $sanitized_name);
         push @$headers, "Auth-${sanitized_name}: " . encode_base64( $opts->{$var}, '' );
 
         DEBUG "Header to send to L7R: $var [$sanitized_name] => '" . $opts->{$var} . "'";
