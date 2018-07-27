@@ -129,23 +129,24 @@ else {
 
 my @tenant_filter = ($admin_tenant_id == 0 ? (tenant_id => $tenant_id) : ());
 
-# Property id lookup. The API doesn't have a way allowing us to do it
-# efficiently. We have to retrieve all the properties and then search
-# the one we are looking for.
-my $property_id;
-OUT: for my $i (0, 1) {
-    $res = call_api('user_get_property_list');
-    for my $row (@{$res->json('/rows')}) {
-        if ($row->{key} eq $property_key and
-            ($admin_tenant_id != 0 or $row->{tenant_id} eq $tenant_id)) {
-            $property_id = $row->{id};
-            $debug and warn "retrieved property_id: $property_id\n";
-            last OUT;
-        }
+# Make sure the property exists in the database and belongs to Users, otherwise create it
+$res = call_api('property_get_list',
+    filters => { key => $property_key,
+                 @tenant_filter } );
+
+my $row = @{$res->json('/rows')}[0];
+
+if ( $row ) {
+    if ( $row->{in_user} ) {
+        $debug and warn "Property key $property_key exists in tenant $tenant_id\n";
+    }else{
+        my $res = call_api('user_create_property_list',
+                           arguments => { property_id => $row->{id} });
+        $debug and warn "Property key $property_key exists in tenant $tenant_id but had to be assigned to Users\n";
     }
-
-    $i and die "user property $property_key has not been registered in database\n";
-
+}
+else{
+    $debug and warn "Creating key: $property_key for tenant $tenant_id\n";
     my $res = call_api('property_create',
                        arguments => { key => $property_key,
                                       description => 'Secret key for TOTP authentication',
@@ -186,7 +187,7 @@ $res = call_api('user_get_list',
 my $id = $res->json('/rows/0/id') or die "User lookup failed";
 call_api('user_update',
          filters => {id => $id},
-         arguments => {__properties_changes__ => {set => {$property_id => $secret32}}});
+         arguments => {__properties_changes__ => {set => {$property_key => $secret32}}});
 
 print qq(secret32: "$secret32", otpauth: $otpauth\n) unless $quiet;
 
