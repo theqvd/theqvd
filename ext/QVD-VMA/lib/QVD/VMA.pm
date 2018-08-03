@@ -956,6 +956,8 @@ sub SimpleRPC_x_state {
 }
 
 sub SimpleRPC_poweroff {
+    my $self=shift;
+    my $httpd=shift;
     INFO "shutting system down";
     _poweroff;
     $httpd->server_close; # In case the VMA was not killed by init 0, v.g. docker
