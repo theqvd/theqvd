@@ -573,15 +573,24 @@ Wat.C = {
                 } 
                 
                 if (isJSON) {
-                $.each(configTokens, function (token, value) {
-                    Wat.C.setConfigToken(token, value);
-                });
-                
-                // Check cross-origin
-                Wat.C.checkCrossOrigin();
-                    
-                // After read configuration file, we will set API address
-                Wat.C.initApiAddress();
+                    $.each(configTokens, function (token, value) {
+                        Wat.C.setConfigToken(token, value);
+                    });
+
+                    // If Api URL is not setted, assume WAT URL
+                    if (!Wat.C.apiUrl)  {
+                        Wat.C.apiUrl = window.location.origin;
+
+                        if (!window.location.port) {
+                            Wat.C.apiUrl += ':443';
+                        }
+                    }
+
+                    // Check cross-origin
+                    Wat.C.checkCrossOrigin();
+                        
+                    // After read configuration file, we will set API address
+                    Wat.C.initApiAddress();
                 }
                 
                 // Remember login from cookies to recover session if was setted previously

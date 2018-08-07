@@ -10,3 +10,5 @@ This config file has the following format (without final slash):
     }
 
 This is a JSON formated parameters to get the API Address and Port.
+
+If apiUrl parameter is empty string, system will asume that API URL is the same as the WAT URL.
