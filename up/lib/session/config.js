@@ -305,6 +305,15 @@ Up.C = {
                         Up.C.setConfigToken(token, value);
                     });
 
+                    // If Api URL is not setted, assume WAT URL
+                    if (!Up.C.apiUrl)  {
+                        Up.C.apiUrl = window.location.origin;
+
+                        if (!window.location.port) {
+                            Up.C.apiUrl += ':443';
+                        }
+                    }
+
                     // After read configuration file, we will set API address
                     Up.C.initApiAddress();
                 }
