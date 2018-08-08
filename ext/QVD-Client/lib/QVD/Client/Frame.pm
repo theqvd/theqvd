@@ -272,15 +272,17 @@ sub new {
         ########################
 
         if ( !$WINDOWS && !$DARWIN ) {
-            require Linux::USBIP;
-            $settings_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Enable USB redirection")),Wx::GBPosition->new(10,0), Wx::GBSpan->new(1,1), wxLEFT, 10);
-            $self->{usb_redirection} = Wx::CheckBox->new($settings_panel, -1, "", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, wxDefaultValidator, "checkBox");
-            $self->{usb_redirection}->SetValue( core_cfg("client.usb.enable" ) );
-            $settings_sizer->Add($self->{usb_redirection},Wx::GBPosition->new(10,1), Wx::GBSpan->new(1,1),wxALL,0);
+            if ( try_load_usbip() ) {
+                $settings_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("Enable USB redirection")),Wx::GBPosition->new(10,0), Wx::GBSpan->new(1,1), wxLEFT, 10);
+                $self->{usb_redirection} = Wx::CheckBox->new($settings_panel, -1, "", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, wxDefaultValidator, "checkBox");
+               $self->{usb_redirection}->SetValue( core_cfg("client.usb.enable" ) );
+                $settings_sizer->Add($self->{usb_redirection},Wx::GBPosition->new(10,1), Wx::GBSpan->new(1,1),wxALL,0);
 
-            $self->{usbip_device_list} = Wx::CheckListBox->new($settings_panel, -1, wxDefaultPosition, [400,130] ,  [] , wxLB_EXTENDED|wxLB_NEEDED_SB , wxDefaultValidator, "usbip_devices");
-            $settings_sizer->Add($self->{usbip_device_list},Wx::GBPosition->new(11,0), Wx::GBSpan->new(1,4), wxLEFT|wxRIGHT|wxEXPAND , 10);
-
+               $self->{usbip_device_list} = Wx::CheckListBox->new($settings_panel, -1, wxDefaultPosition, [400,130] ,  [] , wxLB_EXTENDED|wxLB_NEEDED_SB , wxDefaultValidator, "usbip_devices");
+                $settings_sizer->Add($self->{usbip_device_list},Wx::GBPosition->new(11,0), Wx::GBSpan->new(1,4), wxLEFT|wxRIGHT|wxEXPAND , 10);
+            } else {
+                $settings_sizer->Add(Wx::StaticText->new($settings_panel, -1, $self->_t("USB redirection functionality not installed.")),Wx::GBPosition->new(10,0), Wx::GBSpan->new(1,1), wxLEFT, 10);
+            }
 
         }
 
@@ -1131,6 +1133,18 @@ sub OnSetEnvironment {
     cond_signal $set_env;
 }
 
+sub try_load_usbip {
+    eval {
+        require Linux::USBIP;
+    };
+    if ( $@ ) {
+        DEBUG "try_load_usbip: Got: $@";
+        return 0;
+    }
+
+    return 1;
+}
+
 sub load_usb_devices {
     my ($self) = shift;
     
@@ -1477,7 +1491,7 @@ sub start_device_sharing {
 sub stop_device_sharing {
     my ($self) = @_;
 
-    if (core_cfg('client.slave.enable') && core_cfg('client.usb.enable')) {
+    if (core_cfg('client.slave.enable') && core_cfg('client.usb.enable') && try_load_usbip ) {
 
         my $usbip = Linux::USBIP->new();
 
