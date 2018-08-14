@@ -36,9 +36,9 @@ Authors:
 
 %prep
 rm -Rf %{buildroot}/usr
-mkdir -p %{buildroot}/usr/lib/qvd/bin
 
 %install
+mkdir -p %{buildroot}/usr/lib/qvd/bin
 cp %{sourcedir}/qvd-vma-slaveserver-usbip %{buildroot}/usr/lib/qvd/bin
 
 %files 
