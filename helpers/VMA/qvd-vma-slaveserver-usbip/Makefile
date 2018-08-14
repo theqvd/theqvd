@@ -9,12 +9,11 @@ qvd-vma-slaveserver-usbip: qvd-vma-slaveserver-usbip.c
 
 deb: check-env qvd-vma-slaveserver-usbip
 	mkdir -p build/usr/lib/qvd/bin/
-	mkdir debian-package/
+	mkdir -p debian-package/
 	cp -R DEBIAN build/
 	echo "Version: $(QVD_VERSION)-$(QVD_RELEASE)" >> build/DEBIAN/control
 	cp qvd-vma-slaveserver-usbip build/usr/lib/qvd/bin/
-	chown -R root:root build
-	dpkg-deb --build build debian-package
+	fakeroot -- bash -c 'chown -R root:root build && dpkg-deb --build build debian-package'
 
 .PHONY: rpm
 
