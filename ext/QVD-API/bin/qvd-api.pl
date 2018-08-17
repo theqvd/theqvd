@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/lib/qvd/bin/perl
 
 BEGIN {
 	$QVD::Config::USE_DB = 1;
@@ -122,9 +122,8 @@ app->hook(after_render => sub {
 
 # Intended to store log info about the API
 
-app->log( Mojo::Log->new(
-    path  => app->qvd_admin4_api->_cfg('log.api.filename'),
-    level => app->qvd_admin4_api->_cfg('api.log.level') ) );
+app->log->level( app->qvd_admin4_api->_cfg('api.log.level') );
+app->log->path( app->qvd_admin4_api->_cfg('log.api.filename') );
 
 # Package that implements an ad hoc transport system for the sessions manager (MojoX::Session) 
 # According to MojoX::Session specifications, it must provide methods intended to get the session
@@ -165,17 +164,6 @@ under sub {
     my $c = shift;
         
     $c->app->log->debug("PARAMS: " . Mojo::JSON::to_json($c->get_input_json));
-
-    my $stdout_file = $c->qvd_admin4_api->_cfg('api.stdout.filename');
-    my $stderr_file = $c->qvd_admin4_api->_cfg('api.stderr.filename');
-    if (defined($stdout_file)) {
-        open STDOUT, ">>", $stdout_file if defined($stdout_file);
-        STDOUT->autoflush(1);
-    }
-    if (defined($stderr_file)) {
-        open STDERR, ">>", $stderr_file if defined($stderr_file);
-        STDOUT->autoflush(1);
-    }
 
     return 1;
 };
