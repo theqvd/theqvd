@@ -1,3 +1,0 @@
-#!/bin/bash
-
-chmod 4755 /usr/lib/qvd/bin/qvd-vma-slaveserver-usbip
