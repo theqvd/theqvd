@@ -1,0 +1,16 @@
+Source: qvd-vma-slaveserver-usbip
+Section: misc
+Priority: optional
+Maintainer: QVD Team <qvd@qindel.com>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.9.7
+Homepage: http://qindel.com
+Vcs-Git: https://github.com/theqvd/theqvd
+
+Package: qvd-vma-slaveserver-usbip
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: VMA helper for usbip functionality
+ Helper for providing usbip functionality for the
+ QVD VDI solution.
+

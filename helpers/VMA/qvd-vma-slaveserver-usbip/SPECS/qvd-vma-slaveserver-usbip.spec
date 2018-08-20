@@ -21,27 +21,31 @@
 Name:           qvd-vma-slaveserver-usbip
 Url:            http://theqvd.com
 Version:        %{qvd_version}
-Release:        %{release}
+Release:        %{qvd_release}
 Summary:        VMA helper for usbip functionality
 License:        Artistic License; GPL v2 or later
 Group:          Development/Languages/C
 AutoReqProv:    on
+Source0:        qvd-vma-slaveserver-usbip-%{qvd_version}.tar.gz
 
 %description
 VMA helper for usbip functionality
 
 Authors:
 --------
-    The QVD Team <qvd@qindel.com> 
+    The QVD Team <qvd@qindel.com>
 
 %prep
-rm -Rf %{buildroot}/usr
+%setup
+
+%build
+make
 
 %install
-mkdir -p %{buildroot}/usr/lib/qvd/bin
-cp %{sourcedir}/qvd-vma-slaveserver-usbip %{buildroot}/usr/lib/qvd/bin
+rm -rf "%{buildroot}"
+make install DESTDIR=%{buildroot}
 
-%files 
+%files
 %defattr(4755,root,root)
 
 /usr/lib/qvd/bin/qvd-vma-slaveserver-usbip

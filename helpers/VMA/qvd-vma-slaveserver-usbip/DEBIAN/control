@@ -1,5 +1,0 @@
-Package: qvd-vma-slaveserver-usbip
-Priority: optional
-Maintainer: The QVD Team <qvd@qindel.com>
-Architecture: amd64
-Description: QVD-VMA's slaveserver usbip scripts
