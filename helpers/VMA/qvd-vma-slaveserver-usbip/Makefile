@@ -34,6 +34,8 @@ help:
 deb: check-env qvd-vma-slaveserver-usbip $(deb_tarfile)
 	dch --newversion "$(QVD_VERSION)-$(QVD_RELEASE)" "Release $(QVD_VERSION)-$(QVD_RELEASE)"
 	debuild -us -uc
+	mkdir -p debian-package
+	cp ../*deb debian-package/
 
 .PHONY: tar
 
