@@ -9,7 +9,7 @@ rpmbuild = $(HOME)/rpmbuild
 
 versioned_dir=qvd-vma-slaveserver-usbip-$(QVD_VERSION)
 tarfile_name=$(versioned_dir).tar.gz
-deb_tarfile_name=qvd-vma-slaveserver-usbip_$(QVD_VERSION).orig.tar.gz
+deb_tarfile_name=qvd-vma-slaveserver-usbip_$(QVD_RELEASE)-$(DISTRIBUTION)-$(ORIG_BUILD_NUMBER).orig.tar.gz
 tarfile=../$(tarfile_name)
 deb_tarfile=../$(deb_tarfile_name)
 
@@ -32,7 +32,7 @@ help:
 .PHONY: deb
 
 deb: check-env qvd-vma-slaveserver-usbip $(deb_tarfile)
-	dch --newversion "$(QVD_VERSION)-$(QVD_RELEASE)" "Release $(QVD_VERSION)-$(QVD_RELEASE)"
+	dch --newversion "$(QVD_RELEASE)-$(DISTRIBUTION)-$(ORIG_BUILD_NUMBER)-$(ORIG_COMMIT)" "Release $(QVD_RELEASE)-$(DISTRIBUTION)-$(ORIG_BUILD_NUMBER)-$(ORIG_COMMIT)" --distribution "$(DISTRIBUTION)"
 	debuild -us -uc
 	mkdir -p debian-package
 	cp ../*deb debian-package/
@@ -55,7 +55,7 @@ $(deb_tarfile): $(tarfile)
 rpm: check-env tar
 	mkdir -p rpm-package $(rpmbuild)/BUILD $(rpmbuild)/BUILDROOT $(rpmbuild)/RPMS $(rpmbuild)/SOURCES $(rpmbuild)/SRPMS
 	cp $(tarfile) $(rpmbuild)/SOURCES/
-	rpmbuild -D '_topdir $(rpmbuild)' -D 'sourcedir $(datadir)' -D 'qvd_version $(QVD_VERSION)' -D 'qvd_release $(QVD_RELEASE)' -bb SPECS/qvd-vma-slaveserver-usbip.spec
+	rpmbuild -D '_topdir $(rpmbuild)' -D 'sourcedir $(datadir)' -D 'qvd_version $(QVD_VERSION)' -D 'qvd_release $(ORIG_BUILD_NUMBER)_$(ORIG_COMMIT)' -bb SPECS/qvd-vma-slaveserver-usbip.spec
 	cp $(rpmbuild)/RPMS/x86_64/qvd-vma-slaveserver-usbip*.rpm rpm-package/
 
 .PHONY: packages
