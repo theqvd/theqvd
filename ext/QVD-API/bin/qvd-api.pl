@@ -524,6 +524,9 @@ sub generate_di {
         QVD::API::Exception->new(code => 1100)->throw
             unless defined($di_obj);
         
+        # Update path to add id prefix
+        $di_obj->update({path => $di_obj->id . '-' . $di_obj->path});
+        
         my $osd_id = $di_obj->osf->osd_id;
         my $di_name = $di_obj->path;
         
