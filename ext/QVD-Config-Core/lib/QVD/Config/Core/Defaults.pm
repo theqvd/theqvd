@@ -522,6 +522,17 @@ log.up.api.filename = ${path.log}/qvd-up-api.log
 ## log verbosity (FATAL, ERROR, WARN, INFO, DEBUG or TRACE)
 log.level = INFO
 
+## preset for the log system:
+##     file   - logging to a file in /var/log/$application
+##     stdout - output all log data on stdout
+##     stderr - output all log data on stderr
+##     custom - read Log::Log4perl config from the file specified in log.config
+log.preset = file
+log.config =
+log.pattern = %d %P %p %F %L - %m%n
+
+
+
 ## these two seem to be unused
 admin.ssh.opt.StrictHostKeyChecking = no
 admin.ssh.opt.UserKnownHostsFile = /dev/null
