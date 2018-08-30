@@ -107,6 +107,8 @@ sub run
 
     unshift @args, 'di';
     my $parsing = $self->parse_string(@args);
+    my $di_type = $parsing->arguments->{'di_type'} // 'staging';
+    delete $parsing->arguments->{'di_type'};
 
     if ($parsing->command eq 'get')
     {
@@ -115,7 +117,7 @@ sub run
     elsif ($parsing->command eq 'create')
     {
         my $res = $self->ask_api_standard(
-            $self->get_app->cache->get('api_staging_path'),
+            $self->get_app->cache->get('api_' . $di_type . '_path'),
             $self->make_api_query($parsing)
         );
         $self->print_table($res,$parsing);

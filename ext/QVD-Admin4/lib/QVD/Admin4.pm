@@ -145,6 +145,7 @@ sub init {
 	my $api_info_path = "$api_default_path/info";
 	my $api_di_upload_path = "$api_default_path/di/upload";
 	my $api_staging_path = "$api_default_path/di/staging";
+	my $api_docker_path = "$api_default_path/di/docker";
 	
 	# Created a web client
 	my $user_agent = Mojo::UserAgent->new();
@@ -174,6 +175,7 @@ sub init {
 	$self->cache->set( api_info_path => $api_info_path );
 	$self->cache->set( api_di_upload_path => $api_di_upload_path );
 	$self->cache->set( api_staging_path => $api_staging_path );
+	$self->cache->set( api_docker_path => $api_docker_path );
 	$self->cache->set( login => undef ); # No default credentials provided
 	$self->cache->set( tenant_name => undef );
 	$self->cache->set( password => undef );
