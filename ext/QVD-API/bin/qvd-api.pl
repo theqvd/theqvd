@@ -460,6 +460,7 @@ sub api_public_information {
         version => { database => $c->qvd_admin4_api->database_version },
         public_configuration => cfg_tree('api.public'),
         auth => { separators => [ split('', cfg('l7r.auth.plugin.default.separators')) ] },
+        hypervisor => cfg('vm.hypervisor')
     };
     
     return $response;
