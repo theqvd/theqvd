@@ -541,13 +541,20 @@ Wat.Views.ConfigQvdView = Wat.Views.MainView.extend({
             }
 
             if (that.retrievedData.rows) {
-                // Any time one token were deleted or any api.pulblic.* token were created/updated, refresh public configuration from API and render footer
+                // Any time one token were deleted or any api.public.* token were created/updated, refresh public configuration from API and render footer
                 if (!that.retrievedData.rows[0] || that.retrievedData.rows[0].key.substring(0,11) == 'api.public.') {
                     Wat.A.apiInfo(function (that) {
                         // Store public configuration 
                         Wat.C.publicConfig = that.retrievedData.public_configuration || {};
 
                         Wat.I.renderFooter();
+                    }, that);
+                }
+                // Any time hypervisor were updated, memory info is updated
+                if (!that.retrievedData.rows[0] || that.retrievedData.rows[0].key == 'vm.hypervisor') {
+                    Wat.A.apiInfo(function (that) {
+                        // Store hypervisor 
+                        Wat.C.hypervisor = that.retrievedData.hypervisor;
                     }, that);
                 }
             }

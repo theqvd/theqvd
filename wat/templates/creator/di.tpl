@@ -16,13 +16,14 @@
         <td data-i18n="Software preview"></td>
         <td class="bb-os-configuration"></td>
     </tr>
-    <tr class="js-custom-image-row" data-tab-field="image">
+    <tr class="js-custom-image-row js-custom-image-row--selector" data-tab-field="image">
         <td data-i18n="Image's source"></td>
         <td>
             <select class="" id="images_source" name="images_source" data-any-selected>
                 <option value="computer" data-i18n="Your computer"></option>
                 <option value="staging" data-i18n="Staging directory"></option>
                 <option value="url" data-i18n="URL"></option>
+                <option value="docker" style="display: none"></option>
             </select>
         </td>
     </tr>
@@ -44,6 +45,12 @@
         <td data-i18n="Disk image's URL"></td>
         <td>
             <input type="text" name="disk_image_url" class="col-width-100" data-required></select>
+        </td>
+    </tr>
+    <tr class="image_docker_row js-custom-image-row js-custom-image-row--source" data-tab-field="image">
+        <td data-i18n="Docker registry URL"></td>
+        <td>
+            <input type="text" name="docker_url" class="col-width-100" data-required></select>
         </td>
     </tr>
     <% 

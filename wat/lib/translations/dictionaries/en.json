@@ -124,6 +124,7 @@
     "Do not close or refresh the window": "Do not close or refresh the window",
     "Do you need help?": "Do you need help?",
     "Documentation": "Documentation",
+    "Docker registry URL": "Docker registry URL",
     "Downloading image from given URL to images folder in server": "Downloading image from given URL to images folder in server",
     "Each administrator will be able to customize his own views overriding this configuration": "Each administrator will be able to customize his own views overriding this configuration",
     "Edit": "Edit",

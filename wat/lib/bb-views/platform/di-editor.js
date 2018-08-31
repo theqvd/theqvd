@@ -33,6 +33,14 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
         
         Wat.Views.EditorView.prototype.renderCreate.apply(this, [target, that]);
         
+        // Configure DI methods
+        switch(Wat.C.hypervisor.toLowerCase()) {
+            case 'kubernetes':
+                $('select[name="images_source"]').val('docker');
+                break;
+            default:
+        }
+
         // Configure tags inputs
         Wat.I.tagsInputConfiguration();
         
@@ -245,6 +253,15 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
                     var diView = Wat.U.getViewFromQvdObj('di');
                     diView.model.setEndpoint('di/download');
                     diView.model.setExtraUrlArguments('&url="' + diskImageUrl + '"');
+                    
+                    diView.createModel(arguments, diView.fetchList);
+                    break;
+                case 'docker':
+                    var dockerUrl = context.find('input[name="docker_url"]').val();
+                    arguments["disk_image"] = dockerUrl;
+                    
+                    var diView = Wat.U.getViewFromQvdObj('di');
+                    diView.model.setEndpoint('di/docker');
                     
                     diView.createModel(arguments, diView.fetchList);
                     break;
@@ -512,19 +529,20 @@ Wat.Views.DIEditorView = Wat.Views.EditorView.extend({
         
         switch (selectedSource) {
             case 'computer':
+                $('.js-custom-image-row--source').hide();
                 $('.image_computer_row').show();
-                $('.image_staging_row').hide();
-                $('.image_url_row').hide();
                 break;
             case 'staging':
-                $('.image_computer_row').hide();
+                $('.js-custom-image-row--source').hide();
                 $('.image_staging_row').show();
-                $('.image_url_row').hide();
                 break;
             case 'url':
-                $('.image_computer_row').hide();
-                $('.image_staging_row').hide();
+                $('.js-custom-image-row--source').hide();
                 $('.image_url_row').show();
+                break;
+            case 'docker':
+                $('.js-custom-image-row--selector').hide();
+                $('.image_docker_row').show();
                 break;
         }
     },
