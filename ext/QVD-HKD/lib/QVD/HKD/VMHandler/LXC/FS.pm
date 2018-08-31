@@ -162,6 +162,7 @@ sub _analyze_os_image {
             return $self->_on_done;
         }
         elsif (defined (my $redirect = readlink "$basefs/redirect")) {
+            DEBUG "found 'redirect' symlink pointing to '$redirect'";
             if ($self->_cfg("vm.lxc.redirect.allow")) {
                 if ($follow) {
                     $self->{basefs} = $redirect;
