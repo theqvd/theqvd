@@ -318,6 +318,8 @@ our @ISA = qw(QVD::HTTPD::Impl Net::Server::INET);
 
 sub process_request {
     my $self = shift;
+    $QVD::Log::SOCKET_SECTION = 1;
+
     # We use stdin to read and write because the IO::Handle that
     # Net::Server::INET sets up doesn't work well. (But this also means this
     # module is not really compatible with INET.)
