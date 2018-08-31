@@ -95,19 +95,26 @@ use Log::Log4perl qw();
 if ( $preset eq "stdout" || $preset eq "stderr" ) {
     %config = (
                # Log4perl is strange. Can't use a sub ref, actually got to put the sub in a string.
-               'log4perl.filter.SocketFilter'       => 'sub { $QVD::Log::SOCKET_SECTION == 0 }',
-               'log4perl.appender.SCREEN'           => 'Log::Log4perl::Appender::Screen',
-               'log4perl.appender.SCREEN.stderr'    => ($preset eq "stderr"),
-               'log4perl.appender.SCREEN.utf8'      => 1,
-               'log4perl.appender.SCREEN.layout'    => 'Log::Log4perl::Layout::PatternLayout',
+               'log4perl.filter.SocketFilter'           => 'sub { $QVD::Log::SOCKET_SECTION == 0 }',
+               'log4perl.appender.SCREEN'               => 'Log::Log4perl::Appender::Screen',
+               'log4perl.appender.SCREEN.stderr'        => ($preset eq "stderr"),
+               'log4perl.appender.SCREEN.utf8'          => 1,
+               'log4perl.appender.SCREEN.layout'        => 'Log::Log4perl::Layout::PatternLayout',
                'log4perl.appender.SCREEN.layout.ConversionPattern'
-                                                    => $ENV{QVD_LOG_PATTERN} // core_cfg('log.pattern'),
-               'log4perl.appender.SCREEN.Filter'    => 'SocketFilter',
-               'log4perl.rootLogger'                => ($ENV{QVD_LOG_LEVEL} // core_cfg('log.level')) . ", SCREEN"
+                                                        => $ENV{QVD_LOG_PATTERN} // core_cfg('log.pattern'),
+               'log4perl.appender.SCREEN.Filter'        => 'SocketFilter',
+               'log4perl.appender.LOGFILE'              => 'Log::Dispatch::FileRotate',
+               'log4perl.appender.LOGFILE.mode'         => 'append',
+               'log4perl.appender.LOGFILE.DatePattern'  => 'yyyy-MM-dd',
+               'log4perl.appender.LOGFILE.size'         => '50',
+               'log4perl.appender.LOGFILE.max'          => '20',
+               'log4perl.appender.LOGFILE.layout'       => 'Log::Log4perl::Layout::PatternLayout',
+               'log4perl.appender.LOGFILE.layout.ConversionPattern'
+                                                        => $ENV{QVD_LOG_PATTERN} // core_cfg('log.pattern'),
+               'log4perl.appender.LOGFILE.filename'     => $logfile,
+               'log4perl.rootLogger'                    => ($ENV{QVD_LOG_LEVEL} // core_cfg('log.level')) . ", SCREEN, LOGFILE"
               );
     $CONSOLE = 1;
-    use Data::Dumper;
-#die Dumper([\%config]);
 } elsif ( $preset eq "custom" ) {
     my $log_config_file = $ENV{QVD_LOG_CONFIG_FILE} // core_cfg('log.config');
 
@@ -132,9 +139,8 @@ if ( $preset eq "stdout" || $preset eq "stderr" ) {
     	        'log4perl.rootLogger'                    => ($ENV{QVD_LOG_LEVEL} // core_cfg('log.level')) . ", LOGFILE"
     );
 }
-#%config = (%config,  map { $_ => core_cfg $_ } grep /^log4perl\./, core_cfg_all );
+%config = (%config,  map { $_ => core_cfg $_ } grep /^log4perl\./, core_cfg_all );
 
-#print Dumper([\%config]);
 Log::Log4perl::init_once(\%config);
 
 Log::Log4perl->wrapper_register(__PACKAGE__);
