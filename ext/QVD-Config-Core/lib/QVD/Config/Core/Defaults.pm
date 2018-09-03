@@ -492,7 +492,7 @@ up.api.session.expiration = 3600
 up.api.default.resolution = 1024x768x24
 
 up.api.docker.uri = http+unix://%2Fvar%2Frun%2Fdocker.sock
-up.api.docker.image.h5gw = registry.qindel.com:5000/qvd/qvd-nx2v-gateway:latest
+up.api.docker.image.h5gw = theqvd/qvd-nx2v-gateway:latest
 
 # QVD-Admin parameters
 # url of the API
