@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/lib/qvd/bin/perl
 use strict;
 
 BEGIN {
@@ -65,6 +65,8 @@ helper(register_channels => \&register_channels);
 my $api_url = cfg('up.api.url');
 my $cert_path = cfg('path.up.api.ssl.cert');
 my $key_path = cfg('path.up.api.ssl.key');
+my $path_run = cfg('path.run');
+unless ( -e $path_run and -d $path_run ) { mkdir $path_run; }
 die "Certificate $cert_path file does not exist" unless (-e $cert_path);
 die "Private key $key_path file does not exist" unless (-e $key_path);
 
