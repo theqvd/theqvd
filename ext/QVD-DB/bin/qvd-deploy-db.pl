@@ -138,7 +138,7 @@ sub populate_from_data {
 		my $data = shift @$data_list;
 		for my $tuple (@{$data}) {
 			# Assumes the constraints in the database are in deferred mode
-			rs( $schema )->create( $tuple );
+			rs( $schema )->update_or_create( $tuple );
 		}
 	}
 }
