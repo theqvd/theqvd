@@ -581,8 +581,6 @@ sub di_create
     $self->db->resultset('DI_Tag')->create({di_id => $di->id, tag => $di->version, fixed => 1});
     $self->db->resultset('DI_Tag')->create({di_id => $di->id, tag => 'head'});
     
-    $di->update({path => $di->id . '-' . $di->path});
-    
     $result;
 }
 

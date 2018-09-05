@@ -324,6 +324,10 @@ group {
     # DOWNLOAD OF DISK IMAGES
 
     any [qw(POST)] => '/api/di/download' => sub { shift->qvd_api_call(\&download_image_from_url_request) };
+
+    # REGISTER DOCKER IMAGES
+
+    any [qw(POST)] => '/api/di/docker' => sub { shift->qvd_api_call(\&register_docker_image) };
     
     # PUBLISH DISK IMAGE
 
@@ -568,6 +572,9 @@ sub copy_image_from_staging {
     # Get DI information
     my $di_obj = $c->qvd_admin4_api->_db->resultset('DI')->find({ id => $di_id });
     
+    # Update path to add id prefix
+    $di_obj->update({path => $di_obj->id . '-' . $di_obj->path});
+
     # Update status
     $c->qvd_admin4_api->qvd_api->di_state_update($di_id, 'uploading');
     $di_obj->di_runtime->update({ percentage => 0 });
@@ -644,13 +651,19 @@ sub upload_image_from_local {
                 
                 eval { $file->move_to($images_path .'/'. $di_id . '-'. $disk_image) };
                 
+                # Get DI information
+                my $di_obj = $c->qvd_admin4_api->_db->resultset('DI')->find({ id => $di_id });
+
                 if ($@) {
-                    $c->qvd_admin4_api->_db->resultset('DI')->find({ id => $di_id })->delete;
+                    $di_obj->delete;
                     $c->qvd_admin4_api->_db->resultset('Log')->find(
                         { object_id => $di_id, qvd_object => 'di' })->update(
                         { object_id => undef, object_name => undef, status => 2251});
                     $response = QVD::API::Exception->new(code => 2251)->json;
                 } else {
+                    # Update path to add id prefix
+                    $di_obj->update({path => $di_obj->id . '-' . $di_obj->path});
+
                     $c->qvd_admin4_api->qvd_api->di_state_update($di_id, 'ready');
                     $c->qvd_admin4_api->qvd_api->di_publish($di_id);
                 }
@@ -663,6 +676,23 @@ sub upload_image_from_local {
         $response = {status => 0};
     }
 
+    return $response;
+};
+
+sub register_docker_image {
+    my $controller = shift;
+    $controller->inactivity_timeout(30000);
+    my $json = $controller->get_input_json;
+    
+    # Create DI object in DB
+    my $response = $controller->process_api_query( $json );
+    if ($response->{status} != 0) {
+        QVD::API::Exception->new(code => $response->{status})->throw;
+    }
+    my $di_id = ${$response->{rows}}[0]->{id};
+    
+    $controller->qvd_admin4_api->qvd_api->di_state_update($di_id, 'published');
+    
     return $response;
 };
 
@@ -699,6 +729,9 @@ sub download_image_from_url {
     # Get DI information
     my $di_obj = $c->qvd_admin4_api->_db->resultset('DI')->find({ id => $di_id });
     
+    # Update path to add id prefix
+    $di_obj->update({path => $di_obj->id . '-' . $di_obj->path});
+
     # Update status
     $c->qvd_admin4_api->qvd_api->di_state_update($di_id, 'uploading');
     $di_obj->di_runtime->update({ percentage => 0 });
