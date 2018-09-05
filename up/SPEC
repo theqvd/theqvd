@@ -10,7 +10,7 @@ Source0:        qvd-up.tgz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 
-Requires: perl-QVD-UP-API
+Requires: perl-QVD-UP
 
 %description
 User Portal for qvd
