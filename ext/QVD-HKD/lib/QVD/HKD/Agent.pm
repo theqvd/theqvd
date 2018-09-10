@@ -20,7 +20,7 @@ use URI::Escape ();
 use Method::WeakCallback qw(weak_method_callback);
 use parent qw(Class::StateMachine);
 
-our $debug = 1;
+our $debug = 0;
 
 sub __caller_method {
     my $method = (caller 2)[3];

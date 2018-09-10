@@ -4,7 +4,7 @@ our $VERSION = '3.00';
 
 use 5.010;
 
-our $debug = 1;
+our $debug = 0;
 
 $Class::StateMachine::debug ||= 0;
 $AnyEvent::Pg::debug ||= 0;

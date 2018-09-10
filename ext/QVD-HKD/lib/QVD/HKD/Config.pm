@@ -1,7 +1,7 @@
 package QVD::HKD::Config;
 
 #BEGIN { *debug = \$QVD::HKD::debug }
-our $debug = 1;
+our $debug = 0;
 
 use strict;
 use warnings;
