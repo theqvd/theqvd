@@ -695,7 +695,8 @@ sub register_docker_image {
     }
     my $di_id = ${$response->{rows}}[0]->{id};
     
-    $controller->qvd_admin4_api->qvd_api->di_state_update($di_id, 'published');
+    $controller->qvd_admin4_api->qvd_api->di_state_update($di_id, 'ready');
+    $controller->qvd_admin4_api->qvd_api->di_publish($di_id);
     
     return $response;
 };
