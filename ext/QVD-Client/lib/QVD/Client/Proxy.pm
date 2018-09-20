@@ -970,12 +970,16 @@ sub _run {
                                 "sink_name=QVD", "server=tcp:127.0.0.1:52001",
                                 "sink=\@DEFAULT_SINK\@");
                         } else {
-                            ERROR "Cannot start a pulseaudio with opus compression enabled";
+                            ERROR "Cannot start a pulseaudio with opus compression enabled. Falling back to uncompressed audio.";
+                            WARN  "Bandwidth usage will be high. Usage of qvd-pulseaudio is highly recommended.";
+
+                            $syspa->cmd("load-module", "module-native-protocol-tcp",
+                                        "auth-anonymous=1", "listen=127.0.0.1", "port=4713");
                         }
                     } else {
                         DEBUG "System PA is running, but audio compression is not enabled";
                         WARN  "Setting up uncompressed pulseaudio pass-through.";
-                        WARN  "Bandwidth usage will be high. Usage of qvd-pulseaudio is higly recommended.";
+                        WARN  "Bandwidth usage will be high. Usage of qvd-pulseaudio is highly recommended.";
 
                         $syspa->cmd("load-module", "module-native-protocol-tcp",
                                     "auth-anonymous=1", "listen=127.0.0.1", "port=4713");
