@@ -551,9 +551,6 @@ sub connect_to_vm {
         $auth_type = "Basic";
     }
 
-print "auth: ".$auth."\n";
-print "auth-type: ".$auth_type."\n";
-
     my $headers = [
         "Authorization: $auth_type $auth",
         "Accept: application/json"
