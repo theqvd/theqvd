@@ -59,42 +59,6 @@ Up.I = {
         }
     },
     
-    enableDataPickers: function () {
-        var options = {
-            dayOfWeekStart: 1,
-            format:'Y-m-d H:i',
-            minDate: 0
-        };
-        
-        var optionsPast = {
-            dayOfWeekStart: 1,
-            lang: Up.C.account.language,
-            format:'Y-m-d',
-            maxDate: 0,
-            timepicker: false,
-            onSelectDate: function (content, target) {
-                $(target).trigger('input');
-            },
-            closeOnDateSelect: true
-        };
-        
-        if (Up.C.account.language != 'auto') {
-            var lan = Up.T.getLanguage(Up.C.account.language);
-            
-            // If lan is auto, change i18next macro by navigator language
-            if (lan == '__lng__') {
-                lan = navigator.language;
-            }
-            
-            options['lang'] = lan;
-            optionsPast['lang'] = lan;
-        }
-        
-        $('.datetimepicker').datetimepicker(options);
-        
-        $('.datepicker-past').datetimepicker(optionsPast);
-    },
-    
     renderMain: function () { 
         var that = this;
         
