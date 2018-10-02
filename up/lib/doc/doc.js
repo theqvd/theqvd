@@ -3,7 +3,8 @@ Up.D = {
     // Params:
     //      selectedGuide: guide name.
     getDocBody: function (docParams, callBack) {
-        var templates = Up.I.T.getTemplateList('docSection', {lan: Up.C.account.language, guide: docParams.guide});
+        var language = Up.T.getLanguage(Up.C.account.language);
+        var templates = Up.I.T.getTemplateList('docSection', {lan: language, guide: docParams.guide});
         
         Up.A.getTemplates(templates, callBack, docParams);
     },

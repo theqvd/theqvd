@@ -1,5 +1,6 @@
 // Translation setup and utilities
 Up.T = {
+    defaultLan: 'en',
     lan: '',
     loaded: false,
     
@@ -9,7 +10,6 @@ Up.T = {
         
         lan = this.getLanguage(lan);
         var that = this;
-        
         $.i18n.init({
             ns: {
                 namespaces: [
@@ -23,7 +23,7 @@ Up.T = {
             resGetPath: APP_PATH + 'lib/translations/dictionaries/' + lan + '/__ns__.json',
             useLocalStorage: false,
             debug: false,
-            fallbackLng: 'en',
+            fallbackLng: this.defaultLan,
         }, function () {
             that.loaded = true;
         });
@@ -32,10 +32,13 @@ Up.T = {
     },
     
     getLanguage: function (lan) {
-        // If language is not among the WAT supported languages, check the tenant language
-        if (lan == 'auto' || $.inArray(lan, Object.keys(UP_LANGUAGES)) == -1) {
-            // If language is not supported, set auto mode to detect it from browser
-            lan = '__lng__';
+        if (lan == 'auto') {
+            lan = navigator.language;
+        }
+        
+        // If language is not among the WAT supported languages, set default
+        if ($.inArray(lan, Object.keys(UP_LANGUAGES)) == -1) {
+            lan = this.defaultLan;
         }
 
         return lan;
