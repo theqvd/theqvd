@@ -770,8 +770,6 @@ select {
 }
 
 input[type="checkbox"], input[type="radio"] {
-  /* Trick for make checkboxes resizable on firefox */
-  -moz-appearance: none;
   width: 24px;
   height: 24px;
   -webkit-box-shadow: none;
