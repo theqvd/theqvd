@@ -220,6 +220,22 @@
         color: $col_whiter;
         word-break: break-all;
         height: 36px;
+        font-size: 11px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding-top: 3px;
+
+        &--id {
+            position: absolute;
+            top: -11px;
+            padding: 1px 1px;
+            left: 72px;
+            border-radius: 10px;
+            background: #999;
+            border: 2px solid #dddddd;
+            width: 65px;
+            text-align: center;
+        }
     }
     
     .vm-screenshot {

@@ -56,8 +56,6 @@
 
 @import "components/documentation";
 
-@include in(mobile) {
-    @import "components/mobile_layout";
-    @import "components/mobile_tables";
-    @import "components/mobile_settings";
-}
+@import "components/mobile_layout";
+@import "components/mobile_tables";
+@import "components/mobile_settings";
