@@ -18,7 +18,10 @@
                     <div class="grid-cell js-grid-cell <%= model.get('blocked') ? 'blocked js-blocked' : 'unblocked js-unblocked' %>" data-state="<%= model.get('state') %>" data-id="<%= model.get('id') %>">
                         <div class="grid-cell-area js-grid-cell-area js-desktop-connect-btn" data-id="<%= model.get('id') %>" data-i18n="[title]<%= titleString %>">
                             <div class="corner-image desktop"><img src="images/ladybird_white.png" data-id="<%= model.get('id') %>"></div>
-                            <div class="bigtext bold vm-name" data-id="<%= model.get('id') %>"><%= model.get('alias') ? model.get('alias') : model.get('name') %> <br>id: <%= model.get('id') %></div>
+                            <div class="bigtext bold vm-name" title="<%= model.get('alias') ? model.get('alias') : model.get('name') %>" data-id="<%= model.get('id') %>">
+                                <span class="vm-name--id">#<%= model.get('id') %></span>
+                                <%= model.get('alias') ? model.get('alias') : model.get('name') %>
+                            </div>
                             
                             <div class="js-vm-screenshot vm-screenshot <%= model.get('state') == 'connected' ? "" : "hidden" %> desktop" data-id="<%= model.get('id') %>" data-state="connected"></div>
                             <div class="js-vm-screenshot vm-screenshot-off <%= model.get('state') == 'connected' ? "hidden" : "" %> desktop" data-id="<%= model.get('id') %>" data-state="disconnected"></div>
