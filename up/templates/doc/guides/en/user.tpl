@@ -814,17 +814,17 @@ asciidoc.install(3);
 <div class="sect1">
 <h2 id="_introduction">1. Introduction</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The QVD user portal is a web tool to being connected to the QVD Virtual Desktops.</p></div>
+<div class="paragraph"><p>The QVD user portal is a web tool you can use to connect to QVD Virtual Desktops.</p></div>
 <div class="paragraph"><p>In addition to the desktops connection, an advanced configuration tool is provided, being able to save presets, and a work environment where being connected to different desktops without have to introduce the credentials every time.</p></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_connection_methods">2. Connection methods</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The User Portal have 2 methods to be connected to the Virtual Desktops.</p></div>
+<div class="paragraph"><p>The User Portal has two methods to connect to Virtual Desktops.</p></div>
 <div class="sect2">
 <h3 id="_heavy_client">2.1. Heavy client</h3>
-<div class="paragraph"><p>To use this method will be necessary to have installed the QVD client in the user computer. The User Portal will handle the background starting of the client, sending to it the configuration parameters.</p></div>
+<div class="paragraph"><p>To use this method it will be necessary to have the QVD client installed in the user computer. The User Portal will handle the background startup of the client, sending it the configuration parameters.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_html5_client">2.2. HTML5 client</h3>
@@ -941,7 +941,7 @@ The active configuration will be overwritted by those desktops whose connection 
 <h4 id="_active_configuration_2">4.2.1. Active configuration</h4>
 <div class="paragraph"><p>In the upper left there is a selection combo with the Workspace whose configuration will be the <em>Active configuration</em>.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/up_active_configuration_control.png" alt="up_active_configuration_control.png" width="600px">
+<img src="/images/doc_images/up_active_configuration_control.png" alt="up_active_configuration_control.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>The <em>Active configuration</em> will be the configuration used for the connection of the desktops without own settings.</p></div>
 <div class="paragraph"><p>The desktop own settings will be treated in the Connection settings section.</p></div>
@@ -996,7 +996,7 @@ The active configuration will be overwritted by those desktops whose connection 
 <h5 id="_interaction_areas">Interaction areas</h5>
 <div class="paragraph"><p>The Virtual Desktops are represented as boxes, in wich most of the surface will serve as connection button. The rest of the box, with rectangle shape on the bottom, have connection information and a settings button.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/up_desktop_areas.png" alt="up_desktop_areas.png" width="300px">
+<img src="/images/doc_images/up_desktop_areas.png" alt="up_desktop_areas.png">
 </span></p></div>
 <div class="ulist"><ul>
 <li>
@@ -1007,13 +1007,57 @@ The active configuration will be overwritted by those desktops whose connection 
 <div class="content">
 <div class="paragraph"><p>To being connected to a Virtual Desktop you have to click on any part of the box that represents the Desktop but the bottom rectangle. When we move the mouse over it we observe the appearance of the connection icon.</p></div>
 <div class="paragraph"><p>When you click on <em>Connect</em>, the desktop will change to the status <em>Connecting</em>  When the connection will be established, the status will change to <em>Connected</em>.</p></div>
-<div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/up_desktop_connect_flow.png" alt="up_desktop_connect_flow.png" width="960px">
-</span></p></div>
+<table class="tableblock frame-all grid-all"
+style="
+width:75%;
+">
+<col style="width:25%;">
+<col style="width:25%;">
+<col style="width:25%;">
+<col style="width:25%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><span class="image">
+<img src="/images/doc_images/up_desktop_box_disconnected.png" alt="up_desktop_box_disconnected.png">
+</span></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><span class="image">
+<img src="/images/doc_images/up_desktop_box_disconnected_over.png" alt="up_desktop_box_disconnected_over.png">
+</span></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><span class="image">
+<img src="/images/doc_images/up_desktop_box_connecting.png" alt="up_desktop_box_connecting.png">
+</span></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><span class="image">
+<img src="/images/doc_images/up_desktop_box_connected.png" alt="up_desktop_box_connected.png">
+</span></p></td>
+</tr>
+</tbody>
+</table>
 <div class="paragraph"><p>When the desktop is in status <em>Connected</em> the same area used to make the connection, will serve to the user to the user to <em>Reconnect</em> to the Desktop. In the same way, when you move the mouse over it we observe the appearance of the reconnection icon.</p></div>
-<div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/up_desktop_reconnect_flow.png" alt="up_desktop_reconnect_flow.png" width="960px">
-</span></p></div>
+<table class="tableblock frame-all grid-all"
+style="
+width:75%;
+">
+<col style="width:25%;">
+<col style="width:25%;">
+<col style="width:25%;">
+<col style="width:25%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><span class="image">
+<img src="/images/doc_images/up_desktop_box_connected.png" alt="up_desktop_box_connected.png">
+</span></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><span class="image">
+<img src="/images/doc_images/up_desktop_box_connected_over.png" alt="up_desktop_box_connected_over.png">
+</span></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><span class="image">
+<img src="/images/doc_images/up_desktop_box_reconnecting.png" alt="up_desktop_box_reconnecting.png">
+</span></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><span class="image">
+<img src="/images/doc_images/up_desktop_box_disconnected.png" alt="up_desktop_box_disconnected.png">
+</span></p></td>
+</tr>
+</tbody>
+</table>
 </div></div>
 </li>
 <li>
@@ -1024,7 +1068,7 @@ The active configuration will be overwritted by those desktops whose connection 
 <div class="content">
 <div class="paragraph"><p>In the lower left corner of the boxes that represent the Virtual Desktops there is a button to access to the desktop configuration settings.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/up_desktop_settings_hover.png" alt="up_desktop_settings_hover.png" width="300px">
+<img src="/images/doc_images/up_desktop_settings_hover.png" alt="up_desktop_settings_hover.png">
 </span></p></div>
 </div></div>
 </li>
@@ -1252,7 +1296,7 @@ Local
 <h4 id="_clone_existing_workspace">4.3.2. Clone existing Workspace</h4>
 <div class="paragraph"><p>This option is used to create a Workspace based on another.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/up_settings_button_clone.png" alt="up_settings_button_clone.png" width="300px">
+<img src="/images/doc_images/up_settings_button_clone.png" alt="up_settings_button_clone.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>As with the new Workspace button, a modal window will emerge containing the form with the Workspace attributes. In this case, the fields will be filled by default with the origin Workspace configuration.</p></div>
 <div class="paragraph"><p><span class="image">
@@ -1263,7 +1307,7 @@ Local
 <h4 id="_set_workspace_as_active">4.3.3. Set Workspace as active</h4>
 <div class="paragraph"><p>With this option a Workspace is setted as the configuration active of the User Portal.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/up_settings_button_active.png" alt="up_settings_button_active.png" width="300px">
+<img src="/images/doc_images/up_settings_button_active.png" alt="up_settings_button_active.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>This configuration will be used in the Virtual Desktops connection unless for the Desktops with own configuration enabled.</p></div>
 <div class="ulist"><ul>
@@ -1278,7 +1322,7 @@ Only one Workspace can be setted as active configuration.
 <h4 id="_delete_workspace">4.3.4. Delete Workspace</h4>
 <div class="paragraph"><p>With this option a Workspace will be deleted permanently.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/up_settings_button_delete.png" alt="up_settings_button_delete.png" width="300px">
+<img src="/images/doc_images/up_settings_button_delete.png" alt="up_settings_button_delete.png" width="960px">
 </span></p></div>
 <div class="ulist"><ul>
 <li>
@@ -1432,6 +1476,10 @@ etc
 <img src="/images/doc_images/up_section_help.png" alt="up_section_help.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>In addition it contains the version and license information.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/up_section_help_user_guide.png" alt="up_section_help_user_guide.png" width="960px">
+</span></p></div>
+<div class="paragraph"><p>The user guide is available within the portal</p></div>
 </div>
 </div>
 </div>
@@ -1439,7 +1487,8 @@ etc
 <div id="footnotes"><hr></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-02-14 13:43:25 CET
+Last updated
+ 2018-10-11 06:44:27 UTC
 </div>
 </div>
 </body>

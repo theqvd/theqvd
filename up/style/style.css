@@ -4561,7 +4561,7 @@ td {
 }
 
 .doc-text div.tableblock > table {
-  border: 1px solid #e3610c;
+  border: 0px;
 }
 
 .doc-text div.tableblock > table tbody tr:nth-child(even) {
@@ -4619,19 +4619,8 @@ td {
   margin-top: 0;
 }
 
-.doc-text table.tableblock {
-  border-width: 2px;
-  border-spacing: 0px;
-  border-style: solid;
-  border-color: #527bbd;
-  border-collapse: collapse;
-}
-
-.doc-text th.tableblock, .doc-text td.tableblock {
-  border-width: 1px;
-  padding: 4px;
-  border-style: solid;
-  border-color: #527bbd;
+.doc-text table.tableblock, .doc-text th.tableblock, .doc-text td.tableblock {
+  border: 0px;
 }
 
 .doc-text table.tableblock.frame-topbot {
