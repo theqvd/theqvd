@@ -814,22 +814,22 @@ asciidoc.install(3);
 <div class="sect1">
 <h2 id="_introduccion">1. Introducción</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>El portal de usuario de QVD es una herramienta web para conectarse a los Escritorios Virtuales de QVD.</p></div>
-<div class="paragraph"><p>Además de la conexión a los escritorios, también proporciona una utilidad avanzada de configuración, pudiendo guardar pre-configuraciones, y un entorno de trabajo en el que conectarse a diferentes escritorios sin tener que introducir las credenciales cada vez.</p></div>
+<div class="paragraph"><p>El <strong>portal de usuario</strong> de QVD es una herramienta web para conectarse a un escritorio virtual.</p></div>
+<div class="paragraph"><p>Además de la conexión a los escritorios, también proporciona una utilidad avanzada de configuración, pudiendo guardar pre-configuraciones, y un entorno de trabajo en el que conectarse a diferentes escritorios sin tener que reintroducir las credenciales.</p></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_metodos_de_conexion">2. Métodos de conexión</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>El User Portal tiene 2 métodos de conectarse a los Escritorios Virtuales.</p></div>
+<div class="paragraph"><p>El <strong>portal de usuario</strong> tiene <strong>dos</strong> formas de conectarse a los <em>escritorios virtuales</em>.</p></div>
 <div class="sect2">
 <h3 id="_cliente_pesado">2.1. Cliente pesado</h3>
-<div class="paragraph"><p>Para utilizar este método será necesario tener instalado el cliente de QVD en el ordenador del usuario. El User Portal se encargará de arrancar en segundo plano el cliente enviándole los parámetros de configuración.</p></div>
+<div class="paragraph"><p>Para utilizar este método será necesario tener instalado el cliente de QVD en el ordenador del usuario. El <strong>portal de usuario</strong> se encargará de arrancar en segundo plano el cliente enviándole los parámetros de configuración.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_cliente_html5">2.2. Cliente HTML5</h3>
 <div class="paragraph"><p>La conexión se realiza íntegramente con la aplicación web, sin necesidad de instalar componente alguno en el sistema.</p></div>
-<div class="paragraph"><p>Funcionalidades no disponibles en este modo:</p></div>
+<div class="paragraph"><p>Funcionalidades no disponibles actualmente en este modo:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -861,7 +861,7 @@ Impresión
 <div class="paragraph"><p>En esta sección veremos los diferentes elementos del Portal de Usuario.</p></div>
 <div class="sect2">
 <h3 id="_usuario">3.1. Usuario</h3>
-<div class="paragraph"><p>Es el Usuario de QVD con cuyas credenciales accede al Portal de Usuario para visualizar y conectarse a sus Escritorios Virtuales.</p></div>
+<div class="paragraph"><p>Es el Usuario de QVD con cuyas credenciales accede al Portal de Usuario para visualizar y conectarse a sus <em>escritorios virtuales</em>.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -872,7 +872,7 @@ Las credenciales son las mismas que utiliza en el Cliente pesado de QVD
 </div>
 <div class="sect2">
 <h3 id="_escritorios_virtuales">3.2. Escritorios virtuales</h3>
-<div class="paragraph"><p>Los Escritorios Virtuales son los escritorios asociados al usuario que accede al Portal de Usuario. Estos escritorios corresponden a Máquinas Virtuales desplegadas y administradas en QVD.</p></div>
+<div class="paragraph"><p>Los <em>escritorios virtuales</em> son los escritorios asociados al usuario que accede al Portal de Usuario. Estos escritorios corresponden a <em>máquinas virtuales</em> desplegadas y administradas en QVD.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_workspaces">3.3. Workspaces</h3>
@@ -881,28 +881,28 @@ Las credenciales son las mismas que utiliza en el Cliente pesado de QVD
 <div class="ulist"><ul>
 <li>
 <p>
-Por defecto, un usuario tiene siempre un Workspace predefinido.
+Por defecto, un usuario tiene siempre un <em>workspace</em> predefinido.
 </p>
 </li>
 <li>
 <p>
-Cada usuario puede crear y editar los Workspaces que desee.
+Cada usuario puede crear y editar los _workspaces_que desee.
 </p>
 </li>
 <li>
 <p>
-Siempre habrá un Workspace definido como activo. Siendo la <strong>Configuración activa</strong> que veremos en otro apartado.
+Siempre habrá un <em>workspace</em> definido como activo. Siendo la <strong>Configuración activa</strong> que veremos en otro apartado.
 </p>
 </li>
 </ul></div>
 </div>
 <div class="sect2">
 <h3 id="_configuracion_activa">3.4. Configuración activa</h3>
-<div class="paragraph"><p>La configuración activa del UP es un Workspace cuyos parámetros son utilizados en la conexión de los Escritorios Virtuales <strong>por defecto</strong>.</p></div>
+<div class="paragraph"><p>La configuración activa del UP es un <em>workspace</em> cuyos parámetros son utilizados en la conexión de los <em>escritorios virtuales</em> <strong>por defecto</strong>.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Se puede cambiar el Workspace establecido como configuración activa desde la pantalla de Escritorios Virtuales así como desde la pantalla de Ajustes.
+Se puede cambiar el <em>workspace</em> establecido como configuración activa desde la pantalla de <em>escritorios virtuales</em> así como desde la pantalla de Ajustes.
 </p>
 </li>
 <li>
@@ -928,27 +928,27 @@ La configuración activa se verá sobrescrita por aquellos escritorios que tenga
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/up_section_login.png" alt="up_section_login.png" width="960px">
 </span></p></div>
-<div class="paragraph"><p>Tras introducir correctamente las credenciales se tendrá acceso a la aplicación, siendo la sección de Escritorios Virtuales la página principal.</p></div>
+<div class="paragraph"><p>Tras introducir correctamente las credenciales se tendrá acceso a la aplicación, siendo la sección de <em>escritorios virtuales</em> la página principal.</p></div>
 <div class="paragraph"><p>A la izquierda se sitúa el menú con las diferentes secciones de la aplicación.</p></div>
 </div>
 <div class="sect2">
-<h3 id="_escritorios_virtuales_2">4.2. Escritorios Virtuales</h3>
-<div class="paragraph"><p>En esta sección se muestran los Escritorios Virtuales asociados en QVD al Usuario que inicia sesión.</p></div>
+<h3 id="_em_escritorios_virtuales_em">4.2. <em>escritorios virtuales</em></h3>
+<div class="paragraph"><p>En esta sección se muestran los <em>escritorios virtuales</em> asociados en QVD al Usuario que inicia sesión.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/up_section_desktops.png" alt="up_section_desktops.png" width="960px">
 </span></p></div>
 <div class="sect3">
 <h4 id="_configuracion_activa_2">4.2.1. Configuración activa</h4>
-<div class="paragraph"><p>En la parte superior izquierda se encuentra un combo de selección del Workspace cuya configuración será la <em>Configuración activa</em>.</p></div>
+<div class="paragraph"><p>En la parte superior izquierda se encuentra un combo de selección del <em>workspace</em> cuya configuración será la <em>Configuración activa</em>.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/up_active_configuration_control.png" alt="up_active_configuration_control.png" width="600px">
+<img src="/images/doc_images/up_active_configuration_control.png" alt="up_active_configuration_control.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>La <em>Configuración activa</em> será la configuración con la que se realizarán las conexiones de aquellos escritorios que no tengan una configuración propia.</p></div>
 <div class="paragraph"><p>La configuración propia de un escritorio la veremos en el apartado de ajustes de conexión.</p></div>
 </div>
 <div class="sect3">
 <h4 id="_lista_de_escritorios">4.2.2. Lista de escritorios</h4>
-<div class="paragraph"><p>La parte principal de esta sección es la lista de Escritorios Virtuales.</p></div>
+<div class="paragraph"><p>La parte principal de esta sección es la lista de <em>escritorios virtuales</em>.</p></div>
 <div class="paragraph"><p>Cada escritorio tiene <em>datos informativos</em> como su nombre, identificador y estado. Además dispone de <em>áreas de interacción</em> para realizar acciones como conectarse al escritorio o editar su configuración.</p></div>
 <div class="sect4">
 <h5 id="_datos_informativos">Datos informativos</h5>
@@ -994,9 +994,9 @@ La configuración activa se verá sobrescrita por aquellos escritorios que tenga
 </div>
 <div class="sect4">
 <h5 id="_areas_de_interacion">Áreas de interación</h5>
-<div class="paragraph"><p>Los Escritorios Virtuales están representados como cajas, en las cuales la mayoría de la superficie servirá como botón de conexión. El resto de la caja, con forma de rectángulo en la parte inferior, dispone de información de conexión y un botón de ajustes.</p></div>
+<div class="paragraph"><p>Los <em>escritorios virtuales</em> están representados como cajas, en las cuales la mayoría de la superficie servirá como botón de conexión. El resto de la caja, con forma de rectángulo en la parte inferior, dispone de información de conexión y un botón de ajustes.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/up_desktop_areas.png" alt="up_desktop_areas.png" width="300px">
+<img src="/images/doc_images/up_desktop_areas.png" alt="up_desktop_areas.png">
 </span></p></div>
 <div class="ulist"><ul>
 <li>
@@ -1005,15 +1005,59 @@ La configuración activa se verá sobrescrita por aquellos escritorios que tenga
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>Para conectarse a un Escritorio Virtual hay que hacer click en cualquier parte de la caja que representa el Escritorio excepto en el rectángulo inferior. Al pasar el ratón por encima observamos la aparición del icono de conexión.</p></div>
+<div class="paragraph"><p>Para conectarse a un <em>escritorio virtual</em> hay que hacer click en cualquier parte de la caja que representa el escritorio excepto en el rectángulo inferior. Al pasar el ratón por encima observamos la aparición del icono de conexión.</p></div>
 <div class="paragraph"><p>Al hacer click en <em>Conectar</em> el escritorio pasará a estado <em>Conectando</em>  En el momento en que se produzca la conexión el estado pasará a <em>Conectado</em>.</p></div>
-<div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/up_desktop_connect_flow.png" alt="up_desktop_connect_flow.png" width="960px">
-</span></p></div>
-<div class="paragraph"><p>Cuando el escritorio está en estado <em>Conectado</em> el mismo área que sirve para hacer la conexión, servirá para que el usuario se <em>Reconecte</em> al Escritorio. Igualmente, al pasar el ratón por encima observamos la aparición del icono de reconexión.</p></div>
-<div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/up_desktop_reconnect_flow.png" alt="up_desktop_reconnect_flow.png" width="960px">
-</span></p></div>
+<table class="tableblock frame-all grid-all"
+style="
+width:75%;
+">
+<col style="width:25%;">
+<col style="width:25%;">
+<col style="width:25%;">
+<col style="width:25%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><span class="image">
+<img src="/images/doc_images/up_desktop_box_disconnected.png" alt="up_desktop_box_disconnected.png">
+</span></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><span class="image">
+<img src="/images/doc_images/up_desktop_box_disconnected_over.png" alt="up_desktop_box_disconnected_over.png">
+</span></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><span class="image">
+<img src="/images/doc_images/up_desktop_box_connecting.png" alt="up_desktop_box_connecting.png">
+</span></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><span class="image">
+<img src="/images/doc_images/up_desktop_box_connected.png" alt="up_desktop_box_connected.png">
+</span></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph"><p>Cuando el escritorio está en estado <em>Conectado</em> el mismo área que sirve para hacer la conexión, servirá para que el usuario se <em>Reconecte</em> al escritorio. Igualmente, al pasar el ratón por encima observamos la aparición del icono de reconexión.</p></div>
+<table class="tableblock frame-all grid-all"
+style="
+width:75%;
+">
+<col style="width:25%;">
+<col style="width:25%;">
+<col style="width:25%;">
+<col style="width:25%;">
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><span class="image">
+<img src="/images/doc_images/up_desktop_box_connected.png" alt="up_desktop_box_connected.png">
+</span></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><span class="image">
+<img src="/images/doc_images/up_desktop_box_connected_over.png" alt="up_desktop_box_connected_over.png">
+</span></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><span class="image">
+<img src="/images/doc_images/up_desktop_box_reconnecting.png" alt="up_desktop_box_reconnecting.png">
+</span></p></td>
+<td class="tableblock halign-left valign-top" ><p class="tableblock"><span class="image">
+<img src="/images/doc_images/up_desktop_box_disconnected.png" alt="up_desktop_box_disconnected.png">
+</span></p></td>
+</tr>
+</tbody>
+</table>
 </div></div>
 </li>
 <li>
@@ -1022,9 +1066,9 @@ La configuración activa se verá sobrescrita por aquellos escritorios que tenga
 </p>
 <div class="openblock">
 <div class="content">
-<div class="paragraph"><p>En la esquina inferior izquierda de las cajas que representan los Escritorios Virtuales hay un botón para acceder a los ajustes de configuración del escritorio.</p></div>
+<div class="paragraph"><p>En la esquina inferior izquierda de las cajas que representan los <em>escritorios virtuales</em> hay un botón para acceder a los ajustes de configuración del escritorio.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/up_desktop_settings_hover.png" alt="up_desktop_settings_hover.png" width="300px">
+<img src="/images/doc_images/up_desktop_settings_hover.png" alt="up_desktop_settings_hover.png">
 </span></p></div>
 </div></div>
 </li>
@@ -1032,12 +1076,12 @@ La configuración activa se verá sobrescrita por aquellos escritorios que tenga
 </div>
 </div>
 <div class="sect3">
-<h4 id="_ajustes_de_conexion_de_un_escritorio_virtual">4.2.3. Ajustes de conexión de un Escritorio Virtual</h4>
-<div class="paragraph"><p>Cuando hacemos click en el botón de ajustes de conexión en un Escritorio Virtual se abrirá una ventana modal con diferentes opciones:</p></div>
+<h4 id="_ajustes_de_conexion_de_un_escritorio_virtual">4.2.3. Ajustes de conexión de un escritorio Virtual</h4>
+<div class="paragraph"><p>Cuando hacemos click en el botón de ajustes de conexión en un <em>escritorio virtual</em> se abrirá una ventana modal con diferentes opciones:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>Nombre</strong>: Con este campo, el usuario podrá personalizar el nombre del Escritorio. Este nombre será visible solamente por el usuario.
+<strong>Nombre</strong>: Con este campo, el usuario podrá personalizar el nombre del escritorio. Este nombre será visible solamente por el usuario.
 </p>
 </li>
 <li>
@@ -1148,12 +1192,12 @@ Local
 <img src="/images/doc_images/up_section_settings.png" alt="up_section_settings.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>En esta sección se encuentra la gestión de Workspaces.</p></div>
-<div class="paragraph"><p>Se dispone de un listado con los Workspaces asociados al usuario junto con opciones de creado, clonado, borrado y activación.</p></div>
-<div class="paragraph"><p>Por defecto viene un Workspace <strong>Default</strong> que se puede editar pero no se puede borrar.</p></div>
+<div class="paragraph"><p>Se dispone de un listado con los _workspaces_asociados al usuario junto con opciones de creado, clonado, borrado y activación.</p></div>
+<div class="paragraph"><p>Por defecto viene un <em>workspace</em> <strong>Default</strong> que se puede editar pero no se puede borrar.</p></div>
 <div class="sect3">
 <h4 id="_crear_nuevo_workspace">4.3.1. Crear nuevo Workspace</h4>
-<div class="paragraph"><p>En el inferior de la lista se encuentra un botón para crear un Workspace desde cero.</p></div>
-<div class="paragraph"><p>Al crear un Workspace aparecerá una ventana modal con los siguientes campos:</p></div>
+<div class="paragraph"><p>En el inferior de la lista se encuentra un botón para crear un <em>workspace</em> desde cero.</p></div>
+<div class="paragraph"><p>Al crear un <em>workspace</em> aparecerá una ventana modal con los siguientes campos:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1249,27 +1293,27 @@ Local
 </div>
 </div>
 <div class="sect3">
-<h4 id="_clonar_workspace_existente">4.3.2. Clonar Workspace existente</h4>
-<div class="paragraph"><p>Esta opción es para crear un Workspace a partir de otro.</p></div>
+<h4 id="_clonar_em_workspace_em_existente">4.3.2. Clonar <em>workspace</em> existente</h4>
+<div class="paragraph"><p>Esta opción es para crear un <em>workspace</em> a partir de otro.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/up_settings_button_clone.png" alt="up_settings_button_clone.png" width="300px">
+<img src="/images/doc_images/up_settings_button_clone.png" alt="up_settings_button_clone.png" width="960px">
 </span></p></div>
-<div class="paragraph"><p>Al igual que con el botón de crear nuevo Workspace, aparecerá una ventana modal con el formulario con los atributos del Workspace, solo que en este caso aparecerán por defecto rellenados con la configuración del Workspace origen de la clonación.</p></div>
+<div class="paragraph"><p>Al igual que con el botón de crear nuevo Workspace, aparecerá una ventana modal con el formulario con los atributos del Workspace, solo que en este caso aparecerán por defecto rellenados con la configuración del <em>workspace</em> origen de la clonación.</p></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/up_settings_clone.png" alt="up_settings_clone.png" width="960px">
 </span></p></div>
 </div>
 <div class="sect3">
-<h4 id="_establecer_workspace_como_activo">4.3.3. Establecer Workspace como activo</h4>
-<div class="paragraph"><p>Con esta opción se establece un Workspace como la configuración activa del User Portal.</p></div>
+<h4 id="_establecer_em_workspace_em_como_activo">4.3.3. Establecer <em>workspace</em> como activo</h4>
+<div class="paragraph"><p>Con esta opción se establece un <em>workspace</em> como la configuración activa del User Portal.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/up_settings_button_active.png" alt="up_settings_button_active.png" width="300px">
+<img src="/images/doc_images/up_settings_button_active.png" alt="up_settings_button_active.png" width="960px">
 </span></p></div>
-<div class="paragraph"><p>Esta configuración será la utilizada en la conexión por los Escritorios Virtuales salvo que tengan su configuración propia activada.</p></div>
+<div class="paragraph"><p>Esta configuración será la utilizada en la conexión por los <em>escritorios virtuales</em> salvo que tengan su configuración propia activada.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Sólo un Workspace puede estar establecido como configuración activa.
+Sólo un <em>workspace</em> puede estar establecido como configuración activa.
 </p>
 </li>
 </ul></div>
@@ -1278,17 +1322,17 @@ Sólo un Workspace puede estar establecido como configuración activa.
 <h4 id="_eliminar_workspace">4.3.4. Eliminar Workspace</h4>
 <div class="paragraph"><p>Con esta opción se eliminará permanentemente un Workspace.</p></div>
 <div class="paragraph"><p><span class="image">
-<img src="/images/doc_images/up_settings_button_delete.png" alt="up_settings_button_delete.png" width="300px">
+<img src="/images/doc_images/up_settings_button_delete.png" alt="up_settings_button_delete.png" width="960px">
 </span></p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Si se elimina el Workspace activo, pasará a ser activo el Workspace <em>Default</em>.
+Si se elimina el <em>workspace</em> activo, pasará a ser activo el <em>workspace</em> <em>Default</em>.
 </p>
 </li>
 <li>
 <p>
-El Workspace <em>Default</em> no dispone de esta opción al ser un Workspace proporcionado por la aplicación por defecto.
+El <em>workspace</em> <em>Default</em> no dispone de esta opción al ser un <em>workspace</em> proporcionado por la aplicación por defecto.
 </p>
 </li>
 </ul></div>
@@ -1432,6 +1476,10 @@ etc
 <img src="/images/doc_images/up_section_help.png" alt="up_section_help.png" width="960px">
 </span></p></div>
 <div class="paragraph"><p>Además se dispone la información de versionado y licencia.</p></div>
+<div class="paragraph"><p><span class="image">
+<img src="/images/doc_images/up_section_help_user_guide.png" alt="up_section_help_user_guide.png" width="960px">
+</span></p></div>
+<div class="paragraph"><p>La guía de usuario está disponible dentro del portal.</p></div>
 </div>
 </div>
 </div>
@@ -1439,7 +1487,8 @@ etc
 <div id="footnotes"><hr></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-02-14 13:44:44 CET
+Last updated
+ 2018-10-11 06:45:03 UTC
 </div>
 </div>
 </body>

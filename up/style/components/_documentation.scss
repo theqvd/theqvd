@@ -456,7 +456,7 @@
       margin-bottom: 1.5em;
     }
     div.tableblock > table {
-      border: 1px solid $col_brand;
+      border: 0px;
       tbody tr {
         @include alternate;
       }
@@ -506,20 +506,9 @@
     p.tableblock {
       margin-top: 0;
     }
-    table.tableblock {
-      border-width: 2px;
-      border-spacing: 0px;
-      border-style: solid;
-      border-color: #527bbd;
-      border-collapse: collapse;
+    table.tableblock, th.tableblock, td.tableblock {
+      border: 0px
     }
-    th.tableblock, td.tableblock {
-      border-width: 1px;
-      padding: 4px;
-      border-style: solid;
-      border-color: #527bbd;
-    }
-
     table.tableblock.frame-topbot {
       border-left-style: hidden;
       border-right-style: hidden;
