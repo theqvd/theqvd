@@ -74,6 +74,10 @@ my $pid = fork();
 if($pid == 0) {
     open (STDERR, '>>&', $fh);
     open (STDOUT, '>>&', $fh);
+system qq{echo "setxkbmap es" >/root/runit.sh; echo "$client_bin @client_args" >> /root/runit.sh; chmod 755 /root/runit.sh};     ## BUG: hardcoding "setxkbmap es" is not right
+#system qq{echo "setxkbmap es" >/root/runit.sh; echo "$client_bin @client_args &" >> /root/runit.sh; echo "/usr/bin/icewm" >>/root/runit.sh; chmod 755 /root/runit.sh};
+$client_bin = '/root/runit.sh';
+@client_args = ();
     exec("xinit", $client_bin, @client_args, "--", $xvfb_bin, @xvfb_args);
 } else {
     alarm 1;
@@ -93,6 +97,6 @@ if($pid == 0) {
 
 print $fh "[DEBUG] Launch x11vnc...\n";
 close($fh);
-my @x11vnc_args = ("-o", $x11vnc_log, "-v", "-flag", "/var/run/x11vnc.port", "-display", ":$displayID");
+my @x11vnc_args = ("-o", $x11vnc_log, "-v", "-flag", "/var/run/x11vnc.port", "-display", ":$displayID", "-skip_keycodes", "92,187,188");
 push @x11vnc_args, "-inetd" if ($stdio);
 exec("x11vnc",  @x11vnc_args );
