@@ -28,6 +28,7 @@ sub start_tunnel {
     push @cmd_args, ("--resolution", $_) if defined($_ = $options->{'resolution'});
     push @cmd_args, ("--stdio", "--wait-for-start-msg");
 
+    $log->info("About to start a container using the image '$docker_image'");
     $manager->create(
         $docker_image,
         {
