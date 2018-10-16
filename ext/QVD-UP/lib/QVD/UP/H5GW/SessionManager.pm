@@ -29,6 +29,7 @@ sub start_tunnel {
     push @cmd_args, ("--kb-layout", $_) if defined($_ = $options->{'kb_layout'});
     push @cmd_args, ("--stdio", "--wait-for-start-msg");
 
+    $log->info("About to start a container using the image '$docker_image'");
     $manager->create(
         $docker_image,
         {
