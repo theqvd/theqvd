@@ -26,6 +26,7 @@ sub start_tunnel {
     push @cmd_args, ("--password", $_) if defined($_ = $options->{'password'});
     push @cmd_args, ("--token", $_) if defined($_ = $options->{'token'});
     push @cmd_args, ("--resolution", $_) if defined($_ = $options->{'resolution'});
+    push @cmd_args, ("--kb-layout", $_) if defined($_ = $options->{'kb_layout'});
     push @cmd_args, ("--stdio", "--wait-for-start-msg");
 
     $manager->create(

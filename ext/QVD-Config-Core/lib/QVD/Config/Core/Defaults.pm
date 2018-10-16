@@ -490,6 +490,7 @@ up.api.websocket.timeout = 3600
 up.api.session.expiration = 3600
 
 up.api.default.resolution = 1024x768x24
+up.api.default.kb_layout = us
 
 up.api.docker.uri = http+unix://%2Fvar%2Frun%2Fdocker.sock
 up.api.docker.image.h5gw = theqvd/qvd-nx2v-gateway:latest
