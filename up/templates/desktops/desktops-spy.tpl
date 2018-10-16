@@ -7,6 +7,7 @@
 <input id="noVNC_apiPort" type="hidden" value="<%= apiPort %>" />
 <input id="noVNC_token" type="hidden" value="<%= token %>" />
 <input id="noVNC_fullScreen" type="hidden" value="<%= fullScreen %>" />
+<input id="noVNC_kbLayout" type="hidden" value="<%= kbLayout %>" />
     
 <div id="noVNC_screen" class="noVNC_screen">
     <div class="connection-closed"><i class="fa fa-warning" data-i18n="Connection closed"></i></div>

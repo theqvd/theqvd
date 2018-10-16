@@ -98,6 +98,8 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
     render: function () {
         var that = this;
         
+        var kbLayout = Up.U.getKeyboardLayoutCode(this.desktopSetup.settings.kb_layout.value);
+
         $('.bb-super-wrapper').css('padding', '0px');
         var template = _.template(
             Up.TPL.spy_desktops, {
@@ -107,7 +109,8 @@ Up.Views.DesktopConnectView = Up.Views.MainView.extend({
                 sid: Up.C.sid,
                 model: this.model,
                 token: this.token,
-                fullScreen: this.desktopSetup.settings.fullscreen.value
+                fullScreen: this.desktopSetup.settings.fullscreen.value,
+                kbLayout: kbLayout
             }
         );
         

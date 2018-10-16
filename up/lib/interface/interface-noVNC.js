@@ -695,13 +695,14 @@ var UI;
             var apiPort = $('#noVNC_apiPort').val();
             var token = $('#noVNC_token').val();
             var fullScreen = $('#noVNC_fullScreen').val();
+            var kbLayout = $('#noVNC_kbLayout').val();
             
             if (fullScreen == "1") {
                 $D("noVNC_canvas").onclick = UI.enableFullscreenWhenClickCanvas;
             }
 
             var resolution = screen.width + 'x' + screen.height + 'x' + screen.colorDepth;
-            var path = 'api/desktops/' + vmId + '/connect?token=' + token + '&resolution=' + resolution;
+            var path = 'api/desktops/' + vmId + '/connect?token=' + token + '&resolution=' + resolution + '&kb_layout=' + kbLayout;
 
             if (!UI.initRFB()) return;
 

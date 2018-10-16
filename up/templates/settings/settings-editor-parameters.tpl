@@ -62,7 +62,22 @@
             data-subfield="settings">
     </td>
 </tr>
-
+<tr class="js-form-field--settingrow <%= !settingsEnabled ? 'disabled-row' : '' %>" data-field-name="kb_layout" data-client-mode="html5">
+    <td>
+        <label data-i18n="Keyboard layout" for="kb_layout"></label>
+    </td>
+    <td>
+        <select name="kb_layout" class="js-form-field js-form-field--setting" <%= !settingsEnabled ? 'disabled="disabled"' : '' %> data-subfield="settings">
+            <%
+                $.each(UP_KB_LAYOUT__OPTIONS, function (code, name) {
+                    %>
+                    <option data-i18n="<%= name %>" value="<%= code %>" <%= settings.kb_layout.value == code ? 'selected' : '' %>><%= name %></option>
+                    <%
+                });
+            %>
+        </select>
+    </td>
+</tr>
 <tr class="js-form-field--settingrow <%= !settingsEnabled ? 'disabled-row' : '' %>" data-field-name="share_folders" data-client-mode="classic">
     <td>
         <label data-i18n="Share folders" for="share_folders"></label>

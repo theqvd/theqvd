@@ -33,6 +33,10 @@ Up.Models.Workspace = Up.Models.Model.extend({
             share_usb: {
                 list: [],
                 value : false
+            },
+            kb_layout: {
+                list: [],
+                value : 'auto'
             }
         }
     }
