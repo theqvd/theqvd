@@ -707,10 +707,7 @@ var UI;
 
             UI.rfb.set_encrypt(true);
             UI.rfb.set_true_color(true);
-            UI.rfb.set_local_cursor(UI.getSetting('cursor'));
-            UI.rfb.set_shared(UI.getSetting('shared'));
             UI.rfb.set_view_only(false);
-            UI.rfb.set_repeaterID(UI.getSetting('repeaterID'));
 
             UI.rfb.connect(apiHost, apiPort, password, path);
         },
