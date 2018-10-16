@@ -87,6 +87,7 @@ Up.Views.SettingsView = Up.Views.ListView.extend({
         $('.bb-settings-list').html(template);
         
         Up.I.Chosen.element($('select[name="connection"]'), 'single100');
+        Up.I.Chosen.element($('select[name="kb_layout"]'), 'advanced100');
         
         Up.T.translate();
     },

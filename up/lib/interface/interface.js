@@ -788,6 +788,7 @@ Up.I = {
         $('[data-client-mode="' + client + '"]').show();
         
         Up.I.Chosen.element($('select[name="connection"]'), 'single100');
+        Up.I.Chosen.element($('select[name="kb_layout"]'), 'advanced100');
         Up.I.Chosen.element($('select[name="client"]'), 'single100');
         
         Up.T.translate();

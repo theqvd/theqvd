@@ -217,5 +217,41 @@ Up.U = {
         var dFormatted = Up.U.getDate(d.getTime());
         
         return dFormatted;
+    },
+
+    // Get keyboard layout code (territory code) from UP configuration token kb_layout
+    getKeyboardLayoutCode: function (kbLayout) {
+        // English by default (United States)
+        var defaultLayout = 'us';
+
+        // If keyboard layout is auto-detected, get it from navigator API
+        if (kbLayout == 'auto') {
+            var navigatorLanguage = window.navigator.language;
+
+            // Navigator language can be in two formats: I.E.: es or es_ES.
+            // Clean navigator language to use territory code
+            switch (navigatorLanguage.length) {
+                case 2:
+                    // If language is in two chars format, use mapping object o transform some languages into its default territory
+                    if (LAN_MAPPING_SHORT_2_TERRITORY[navigatorLanguage]) {
+                        navigatorLanguage = LAN_MAPPING_SHORT_2_TERRITORY[navigatorLanguage];
+                    }
+                    break;
+                case 5:
+                    // If language is in fiver chars format, second segment will be the territory code
+                    navigatorLanguage = navigatorLanguage.substring(3).toLowerCase();
+                    break;
+            }
+
+            // If clean navigator language doesnt match with any countries, use default one
+            kbLayout = LAN_COUNTRIES[navigatorLanguage] ? navigatorLanguage : defaultLayout;
+        }
+        
+        // All latino american countries will use layout 'latam'
+        if ($.inArray(kbLayout, LAN_LATAM_CODES) != -1) {
+            kbLayout = 'latam';
+        }
+
+        return kbLayout;
     }
 }

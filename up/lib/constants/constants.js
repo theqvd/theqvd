@@ -61,16 +61,6 @@ HTML_MID_LOADING = '<div class="loading-mid"><i class="fa fa-gear fa-spin"></i><
 HTML_MID_LOADING_DELETE = '<div class="loading-mid"><i class="fa fa-trash fa-spin"></i></div>';
 HTML_SORT_ICON = '<i class="fa fa-sort sort-icon"></i>';
 
-// Languages
-UP_LANGUAGES = {
-    "en": "English",
-    "es": "Español"
-};
-
-UP_LANGUAGE_OPTIONS = $.extend({
-    "auto": "Auto-detected by browser"
-}, UP_LANGUAGES);
-
 // Block sizes
 WAT_BLOCK_SIZES = {
     "5": "5",
