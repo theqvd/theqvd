@@ -206,7 +206,8 @@ any [ qw(POST) ] => '/api/login' => sub {
             connection => { value => 'adsl' },
             share_usb => { value => 0 },
             share_folders => { value => 0 },
-            fullscreen => { value => 0 }
+            fullscreen => { value => 0 },
+            kb_layout => { value => 'auto' }
         };
         create_workspace($user_obj->id, 'Default', 1, $default_settings, 1)
     }
@@ -666,6 +667,7 @@ group {
                     {
                         token      => { mandatory => 1, type => 'STRING' },
                         resolution => { mandatory => 1, type => 'STRING' },
+                        kb_layout => { mandatory => 1, type => 'STRING' },
                     }
                 );
 
@@ -697,11 +699,13 @@ group {
                     my ($delay) = @_;
                     my $end = $delay->begin;
                     $c->app->log->debug("Create tunnel to L7R $l7r_address:$l7r_port");
+                    $c->app->log->debug("Keyboard layout: $json->{kb_layout}");
                     $broker->start_tunnel(
                         {
                             'vm_id' => $vm_id,
                             'token' => $json->{token},
                             'resolution' => $json->{resolution} // cfg('up.api.default.resolution'),
+                            'kb_layout' => $json->{kb_layout} // cfg('up.api.default.kb_layout'),
                         },
                         sub { $end->(); }
                     );
