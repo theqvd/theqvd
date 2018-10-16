@@ -48,28 +48,32 @@ sub cfg {
             $USE_DB or LOGDIE "Can't read per tenant configuration when DB access is disabled";
             my $row = QVD::DB::Simple::rs('Config')->search({tenant_id => $tenant, key => $key})->first;
             $value = $row->value if defined $row;
+            DEBUG "obtained value '$value' for key '$key' tenant_id '$tenant' obtained from database" if defined $value;
         }
 
         # If not found in the DB, get it from the ones cached in memory
         unless (defined $value) {
             $cfg || reload;
             $value = $cfg->{$key};
+            DEBUG "obtained value '$value' for key '$key' obtained from memory cache" if defined $value;
         }
     }
 
     # Finally try to get it from the default values
     unless (defined $value) {
         $value = core_cfg($key, 0);
+        DEBUG "obtained value '$value' for key '$key' obtained from the default values" if defined $value;
     }
 
     # Substitute any reference to another token in the configuration value
     if (defined $value) {
         $value =~ s/\$\{(.*?)\}/cfg($1, $tenant)/ge;
+        DEBUG sprintf "after dereferencing, value is '%s'", $value//'<undef>';
     }
     elsif ($mandatory) {
         # Raise an error if token is mandatory and not defined
         if ($mandatory) {
-            LOGDIE "mandatory configuration entry for $key missing";
+            LOGDIE "mandatory configuration entry for '$key' missing";
         }
     }
 
