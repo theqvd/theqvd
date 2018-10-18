@@ -59,13 +59,12 @@
         }
     }
     
-    .dialog-container {
-        overflow-y: auto;
-        padding: 0px;
-        max-height: 70vh !important;
-        height: auto;
-        padding: 10px 40px;
-    }
+    .dialog-container { 
+        overflow-y: auto; 
+        max-height: 70vh !important; 
+        height: auto; 
+        padding: 10px 40px 175px 40px; 
+    } 
 }
 
 .ui-widget-overlay {
