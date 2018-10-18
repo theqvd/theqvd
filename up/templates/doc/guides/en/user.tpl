@@ -1179,6 +1179,11 @@ Local
 <strong>Full screen visualization</strong>: This option will enable the browser full screen mode.
 </p>
 </li>
+<li>
+<p>
+<strong>Keyboard layout</strong>: This option allows configure the country which keyboard layout is required. By default it is auto-detected using the browser language.
+</p>
+</li>
 </ul></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/up_desktop_settings_enabled_html5.png" alt="up_desktop_settings_enabled_html5.png" width="960px">
@@ -1284,6 +1289,11 @@ Local
 <li>
 <p>
 <strong>Full screen visualization</strong>: This option will enable the browser full screen mode.
+</p>
+</li>
+<li>
+<p>
+<strong>Keyboard layout</strong>: This option allows configure the country which keyboard layout is required. By default it is auto-detected using the browser language.
 </p>
 </li>
 </ul></div>
