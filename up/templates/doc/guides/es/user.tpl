@@ -1179,6 +1179,11 @@ Local
 <strong>Visualización a pantalla completa</strong>: Esta opción activará la pantalla completa en el Navegador.
 </p>
 </li>
+<li>
+<p>
+<strong>Distribución de teclado</strong>: Esta opción permite configurar el país cuya distribución de teclado se desee. Por defecto se auto-detecta con el idioma del navegador.
+</p>
+</li>
 </ul></div>
 <div class="paragraph"><p><span class="image">
 <img src="/images/doc_images/up_desktop_settings_enabled_html5.png" alt="up_desktop_settings_enabled_html5.png" width="960px">
@@ -1284,6 +1289,11 @@ Local
 <li>
 <p>
 <strong>Visualización a pantalla completa</strong>: Esta opción activará la pantalla completa en el Navegador.
+</p>
+</li>
+<li>
+<p>
+<strong>Distribución de teclado</strong>: Esta opción permite configurar el país cuya distribución de teclado se desee. Por defecto se auto-detecta con el idioma del navegador.
 </p>
 </li>
 </ul></div>
