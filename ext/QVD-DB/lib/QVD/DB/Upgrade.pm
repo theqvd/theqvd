@@ -226,7 +226,9 @@ my $UPGRADE_SCHEMA = {
     '4.0' => {
         additional_actions => [
             \&migrate_dis_from_40_to_41
-        ]},
+        ]
+    },
+    '4.1' => {},
     'latest' => {}
 };
 
