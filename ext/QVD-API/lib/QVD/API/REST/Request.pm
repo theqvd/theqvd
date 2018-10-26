@@ -153,6 +153,11 @@ sub BUILD
     $self->set_order_by_in_request;
     $self->set_tables_to_join_in_request;
 
+    # Update queries have special join needs to avoid
+    # wrong affected rows in response message
+    $self->set_tables_to_join_in_delete_update_request
+        if $type_of_action =~ /^(delete|update)$/;
+
     # REQUEST CHECKS
 
     # Operative acls must be asked just for one role
@@ -634,7 +639,12 @@ sub set_tables_to_join_in_request
     
     $self->add_to_prefetch($_)
         for @{$self->qvd_object_model->dbix_prefetch_value};
-    
+}
+
+sub set_tables_to_join_in_delete_update_request
+{
+    my $self = shift;
+
     # Joining tables might returns duplicated rows, so they shall be ommited by adding distinct
     $self->modifiers->{distinct} = 1;
 }
