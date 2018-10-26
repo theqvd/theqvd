@@ -243,7 +243,7 @@ client.fullscreen =
 ## enable the Pulse audio server in the client
 client.audio.enable =
 ## enable audio compression with opus ##
-client.audio.compression.enable = 0
+client.audio.compression.enable = 1
 ## something regarding an NX channel
 client.printing.enable = 1
 ## Enable sharing client-side folders towards the VM
