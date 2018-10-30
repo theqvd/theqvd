@@ -1,6 +1,6 @@
 FROM debian:9.5
 
-RUN apt-get update && apt-get install -y curl wget x11-xserver-utils x11vnc xvfb xinit        net-tools x11-apps openssh-server vim less strace icewm wmctrl mousepad
+RUN apt-get update && apt-get install -y curl wget x11-xserver-utils x11vnc xvfb xinit
 
 COPY ["nx2v.pl", "/usr/bin/nx2v"]
 RUN chmod 777 /usr/bin/nx2v
