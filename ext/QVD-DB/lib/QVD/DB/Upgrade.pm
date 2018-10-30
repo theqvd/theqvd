@@ -99,6 +99,31 @@ sub qvd_db_upgrade {
 
 ### UPGRADE FUNCTIONS USING qvd-deploy-db.pl SCRIPT ### 
 
+sub migrate_dis_from_40_to_41 {
+    my $list_ref = shift;
+    my @new_list = ();
+    my @di_runtimes = ();
+
+    while(@$list_ref){
+        my $schema = shift @$list_ref;
+        my $data = shift @$list_ref;
+        if ($schema eq 'DI'){
+            for my $tuple (@{$data}) {
+                push @di_runtimes,
+                    {
+                        di_id    => $tuple->{'id'},
+                        state    => 'published',
+                        state_ts => 0
+                    };
+            }
+            push @new_list, 'DI_Runtime', \@di_runtimes;
+        }
+        push @new_list, $schema, $data;
+    }
+
+    return \@new_list;
+};
+
 sub migrate_properties_from_36_to_40 {
     my $list_ref = shift;
     my @new_list = ();
@@ -198,7 +223,10 @@ my $UPGRADE_SCHEMA = {
             \&migrate_properties_from_36_to_40
         ],
     },
-    '4.0' => {},
+    '4.0' => {
+        additional_actions => [
+            \&migrate_dis_from_40_to_41
+        ]},
     'latest' => {}
 };
 

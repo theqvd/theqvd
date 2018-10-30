@@ -138,7 +138,15 @@ sub populate_from_data {
 		my $data = shift @$data_list;
 		for my $tuple (@{$data}) {
 			# Assumes the constraints in the database are in deferred mode
+<<<<<<< HEAD
 			rs( $schema )->create( $tuple );
+=======
+<<<<<<< HEAD
+			rs( $schema )->update_or_create( $tuple );
+=======
+			rs( $schema )->find_or_create( $tuple );
+>>>>>>> d88b41e... Task #6038: Update migration script to upgrade 4.0.x to 4.1 version
+>>>>>>> 0214259... Task #6038: Update migration script to upgrade 4.0.x to 4.1 version
 		}
 	}
 }
