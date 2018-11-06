@@ -128,19 +128,6 @@ setup:
     command: DISM /Online /Enable-Feature /FeatureName:NetFx3 /All 
 
 build:
-  pulseaudio:
-    repository:
-      url: https://github.com/theqvd/pulseaudio.git
-      branch: opus
-    build:
-      env: mingw32
-      commands:
-        clean: git clean -dfx
-        bootstrap: NOCONFIGURE=1 ./bootstrap.sh
-        configure: ./configure --disable-nls --disable-rpath --disable-largefile --disable-memfd --disable-x11 --disable-tests --disable-oss-output --disable-oss-wrapper --disable-alsa --disable-esound --disable-solaris --disable-coreaudio-output --disable-glib2 --disable-gtk3 --disable-gconf --disable-avahi --disable-jack --disable-asyncns --disable-tcpwrap --disable-lirc --disable-dbus --disable-bluez4 --disable-bluez5 --disable-bluez5-ofono-headset --disable-bluez5-native-headset --disable-udev --disable-hal-compat --disable-ipv6 --disable-openssl --disable-systemd-daemon --disable-systemd-login --disable-systemd-journal --disable-manpages --disable-per-user-esound-socket --disable-default-build-tests --disable-legacy-database-entry-format --without-libiconv-prefix --without-libintl-prefix --prefix=$PULSEAUDIO_OUTDIR_MSYS
-        make: make
-        install: make install
-
   win-sftp-server:
     repository:
       url: https://github.com/salva/win-sftp-server.git

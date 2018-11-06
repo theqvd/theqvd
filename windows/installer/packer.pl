@@ -38,7 +38,7 @@ my $gsview = 'c:\\program files\\ghostgum\\gsview';
 my $ghostscript = bsd_glob('c:\\program files\\gs\\gs*');
 my $cygwin;
 my $cygdrive;
-my $qvd_version = '4.1';
+my $qvd_version = '4.2';
 my $installer_type = 'zip';
 my $output_dir;
 my $update;
@@ -104,15 +104,7 @@ else {
     my $mingw32_path = path($mingw32)->realpath;
     -d $mingw32_path or die "$mingw32 not found";
 
-    my ($pulseaudio_pulse_path) = $pulseaudio_path->child('lib')->children(qr/^pulse-/i);
-    $pulseaudio_pulse_path // die "PulseAudio modules path not found";
-
-    my @pulse_search_path = ($pulseaudio_path->child('bin'),
-                             $pulseaudio_path->child('lib', 'bin'),
-                             $pulseaudio_pulse_path->child('bin'),
-                             $pulseaudio_pulse_path->child('modules'),
-                             $mingw32_path->child('bin'),
-                            );
+	my @pulse_search_path = ($pulseaudio_path);
 
     my @extra_exes = ( { path => $nx_libs_path->child('libexec/nxproxy.exe'),
                          search_path => $nx_libs_path->child('bin'),
@@ -134,7 +126,7 @@ else {
                        { path => $ghostscript_path->child('bin', 'gswin32.exe'),
                          subdir => 'ghostscript/bin',
                          subsystem => 'windows' },
-                       { path => $pulseaudio_path->child('bin', 'pulseaudio.exe'),
+                       { path => $pulseaudio_path->child('pulseaudio.exe'),
                          subdir => 'pulseaudio',
                          subsystem => 'windows',
                          search_path => \@pulse_search_path },
@@ -143,7 +135,7 @@ else {
     my @extra_dlls = map( { path => $_,
                             subdir => 'pulseaudio',
                             search_path => \@pulse_search_path },
-                          $pulseaudio_pulse_path->child('modules')->children(qr/\.dll$/i) );
+                          $pulseaudio_path->children(qr/\.dll$/i) );
 
     my @extra_dirs = ( { path => $installer_path->child('pixmaps'), subdir => 'pixmaps' },
                        { path => $vcxsrv_path, subdir => 'vcxsrv' },
@@ -153,8 +145,7 @@ else {
 
     my @extra_files = map ( { path => $_,
                               subdir => 'pulseaudio' },
-                            $pulseaudio_path->child('etc', 'pulse')->children(qr/\.pa$/i),
-                            $qvd_src_path->child('windows', 'qvd.pa'));
+							 $pulseaudio_path->child('qvd.pa'));
 
     my @qvd_client_modules = qw(QVD::Client QVD::Config::Core QVD::Config
                                 QVD::HTTP QVD::HTTPC QVD::HTTPD
