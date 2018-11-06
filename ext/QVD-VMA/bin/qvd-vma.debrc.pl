@@ -1,19 +1,16 @@
 #! /bin/sh
 ### BEGIN INIT INFO
-# Provides:          skeleton
-# Required-Start:    $remote_fs $syslog
-# Required-Stop:     $remote_fs $syslog
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: Example initscript
-# Description:       This file should be used to construct scripts to be
-#                    placed in /etc/init.d.
+# Provides:          qvd-vma
+# Required-Start:    $network $local_fs $remote_fs
+# Required-Stop:     $null
+# Default-Start:     1 2 3 4 5
+# Default-Stop:      0 6
+# Short-Description: QVD Virtual Machine Agent
+# Description:       QVD Virtual Machine Agent
 ### END INIT INFO
 
-# Author: Foo Bar <foobar@baz.org>
+# Author: QVD Team <theqvd@qindel.com>
 #
-# Please remove the "Author" lines above and replace them
-# with your own name if you copy and modify this script.
 
 # Do NOT "set -e"
 
