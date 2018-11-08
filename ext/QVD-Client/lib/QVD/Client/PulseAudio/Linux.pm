@@ -7,7 +7,6 @@ use IO::Socket::UNIX;
 use Proc::Background;
 use Time::HiRes qw(sleep);
 
-my $BLACKHOLE_IP="240.0.0.1";
 
 
 sub new {
@@ -219,45 +218,7 @@ sub _read_output {
 	return $buf;
 }
 
-sub cmd {
-	my ($self, @data) = @_;
-	my $str = join(" ", @data);
-	DEBUG "Command: $str\n";
-
-	$self->_send("$str\n");
-
-	my $ret = $self->_read_output;
-	$self->_dbg("RECV: $ret\n");
-
-	return $ret;
-}
-
-sub version {
-	my ($self) = @_;
-	$self->_connect;
-	return $self->{version};
-}
 
 1;
 
-sub is_opus_supported {
-	my ($self) = @_;
-	my $retval;
 
-	my $ret = $self->cmd("load-module",
-	                      "module-tunnel-sink-new",
-	                      "sink_name=paopustest",
-	                      "server=tcp:$BLACKHOLE_IP:4713",
-	                      "sink=paopustestsink",
-	                      "compression=opus");
-	if ( $ret eq "" ) {
-		$ret = $self->cmd("list-sinks");
-		$retval = 1 if ( $ret =~ /^\s+compression\.opus\.complexity\s+=/m );
-
-		$self->cmd("unload-module", "module-tunnel-sink-new");
-	} elsif ( $ret !~ /Module load failed/ ) {
-		die "Unrecognized error from PA: $ret"
-	}
-
-	return $retval;
-}
