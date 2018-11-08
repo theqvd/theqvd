@@ -227,7 +227,7 @@ sub _set_fw_rules {
             DEBUG "Adding ebtables entry '@$rule'";
             if (system $ebtables => @$rule) {
                 $debug and $self->_debug("unable to add ebtables entry, rc: " . ($? >> 8));
-                DEBUG "Unable to add ebtables entry, rc: " . ($? >> 8);
+                ERROR "Unable to add ebtables entry, rc: " . ($? >> 8);
                 return $self->_on_error;
             }
         }
