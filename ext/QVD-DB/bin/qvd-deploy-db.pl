@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/lib/qvd/bin/perl
 
 use strict;
 use warnings;
@@ -92,7 +92,7 @@ sub get_data_from_file {
 
 				# Multiline value
 				if($multiline){
-					if($line =~ /(.*)\"(.*)/){
+					if($line =~ /(.*)\`(.*)/){
 						$multiline = 0;
 						$currAttribValues[-1] .= $1;
 						$line = $2;
@@ -100,7 +100,7 @@ sub get_data_from_file {
 						$currAttribValues[-1] .= "$line\n";
 					}
 				} else {
-					if($currAttribValues[-1] =~ /^\"(.*)(?<!\")$/) {
+					if($currAttribValues[-1] =~ /^\`(.*)(?<!\`)$/) {
 						$currAttribValues[-1] = "$1\n";
 						$multiline = 1;
 					}
@@ -138,15 +138,7 @@ sub populate_from_data {
 		my $data = shift @$data_list;
 		for my $tuple (@{$data}) {
 			# Assumes the constraints in the database are in deferred mode
-<<<<<<< HEAD
-			rs( $schema )->create( $tuple );
-=======
-<<<<<<< HEAD
-			rs( $schema )->update_or_create( $tuple );
-=======
 			rs( $schema )->find_or_create( $tuple );
->>>>>>> d88b41e... Task #6038: Update migration script to upgrade 4.0.x to 4.1 version
->>>>>>> 0214259... Task #6038: Update migration script to upgrade 4.0.x to 4.1 version
 		}
 	}
 }
@@ -203,7 +195,7 @@ sub create_tuples_file {
 	for my $table (get_table_list($dbh)) {
 		my ($schema) = grep { db->class($_)->table eq $table } db->sources;
 
-		$dbh->do("COPY $table TO STDOUT WITH DELIMITER AS E'\t' csv header");
+		$dbh->do("COPY $table TO STDOUT WITH DELIMITER AS E'\t' csv header QUOTE AS E'\`'");# FORCE QUOTE *");
 		my $data;
 		my @rows = ();
 		while ($dbh->pg_getcopydata($data) >= 0){
