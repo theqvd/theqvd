@@ -28,6 +28,11 @@ my $WINDOWS = ($^O eq 'MSWin32');
 my $DARWIN = ($^O eq 'darwin');
 my $NX_OS = "unknown";
 
+# Start of dynamically allocated port range, as per IANA:
+# https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml
+my $DYNAMIC_PORT_START = 49152;
+my $DYNAMIC_PORT_COUNT = 16383;
+
 if ( $LINUX ) {
 	$NX_OS = "linux";
 } elsif ( $WINDOWS ) {
@@ -885,7 +890,7 @@ sub _run {
 
     my %o;
     my $slave_port_file = $QVD::Client::App::user_dir.'/slave-port';
-    my ($nxproxy_proc, $x11_proc, $pa_proc, $qvd_pa);
+    my ($nxproxy_proc, $x11_proc, $pa_proc, $qvd_pa, $syspa, $modnum);
     eval {
         # Erase any previously set value. This is only for nxproxy, may break other things
         $self->{client_delegate}->proxy_set_environment( DYLD_LIBRARY_PATH => "" );
@@ -903,6 +908,9 @@ sub _run {
         # Call pulseaudio in Windows or Darwin
         if ( $self->{audio} ) {
             if ( $WINDOWS || $DARWIN ) {
+                # TODO: Make this variable like in the Linux branch
+                $self->{audio_port} = 4713;
+
                 my $pa_exe = File::Spec->rel2abs(core_cfg($WINDOWS
                         ? 'command.windows.pulseaudio'
                         : 'command.darwin.pulseaudio'),
@@ -928,9 +936,14 @@ sub _run {
                 WARN("Pulseaudio failed to start, ignoring error");
             } else {
                 # Linux
+                $self->{audio_port} = $self->_allocate_port;
+                $self->{audio_secondary_port} = $self->_allocate_port;
+
                 INFO "Sound enabled, running on Linux";
+                DEBUG "Primary audio port " . $self->{audio_port};
+                DEBUG "Secondary audio port " . $self->{audio_secondary_port};
     
-                my $syspa = QVD::Client::PulseAudio->new();
+                $syspa = QVD::Client::PulseAudio->new();
     
                 DEBUG "Checking system PulseAudio";
     
@@ -949,40 +962,40 @@ sub _run {
 
                         if ( $syspa->is_opus_supported ) {
                             INFO "System PA supports Opus, setting it up";
-                            $syspa->cmd("load-module", "module-native-protocol-tcp",
-                                "auth-anoymous=1", "listen=127.0.01", "port=4713");
+                            $modnum = $syspa->load_module("module-native-protocol-tcp",
+                                "auth-anoymous=1", "listen=127.0.0.1", "port=" . $self->{audio_port});
                         } elsif ( $syspa->is_qvd_pulseaudio_installed() ) {
                             # Chain our own PA
                             INFO "System PA does not support Opus, chaining QVDPA";
                             DEBUG "Setting up native protocol on local PA";
-                            $syspa->cmd("load-module", "module-native-protocol-tcp",
+                            $modnum = $syspa->load_module("module-native-protocol-tcp",
                                 "auth-anonymous=1",
                                 "listen=127.0.0.1",
-                                "port=52001");
+                                "port=" . $self->{audio_secondary_port});
         
                             $qvd_pa = QVD::Client::PulseAudio->start(
                                 env_func => sub { $self->{client_delegate}->proxy_set_environment(@_) }
                             );
         
-                            $qvd_pa->cmd("load-module", "module-native-protocol-tcp",
-                                "auth-anonymous=1", "listen=127.0.0.1", "port=4713");
-                            $qvd_pa->cmd("load-module", "module-tunnel-sink-new",
-                                "sink_name=QVD", "server=tcp:127.0.0.1:52001",
+                            $qvd_pa->load_module("module-native-protocol-tcp",
+                                "auth-anonymous=1", "listen=127.0.0.1", "port=" . $self->{audio_port});
+                            $qvd_pa->load_module("module-tunnel-sink-new",
+                                "sink_name=QVD", "server=tcp:127.0.0.1:" . $self->{audio_secondary_port},
                                 "sink=\@DEFAULT_SINK\@");
                         } else {
                             ERROR "Cannot start a pulseaudio with opus compression enabled. Falling back to uncompressed audio.";
                             WARN  "Bandwidth usage will be high. Usage of qvd-pulseaudio is highly recommended.";
 
-                            $syspa->cmd("load-module", "module-native-protocol-tcp",
-                                        "auth-anonymous=1", "listen=127.0.0.1", "port=4713");
+                            $modnum = $syspa->load_module("module-native-protocol-tcp",
+                                        "auth-anonymous=1", "listen=127.0.0.1", "port=" . $self->{audio_port});
                         }
                     } else {
                         DEBUG "System PA is running, but audio compression is not enabled";
                         WARN  "Setting up uncompressed pulseaudio pass-through.";
                         WARN  "Bandwidth usage will be high. Usage of qvd-pulseaudio is highly recommended.";
 
-                        $syspa->cmd("load-module", "module-native-protocol-tcp",
-                                    "auth-anonymous=1", "listen=127.0.0.1", "port=4713");
+                        $modnum = $syspa->load_module("module-native-protocol-tcp",
+                                                      "auth-anonymous=1", "listen=127.0.0.1", "port=" . $self->{audio_port});
 
                     }
                 }
@@ -1003,7 +1016,9 @@ sub _run {
                     WARN "Unable to detect PulseAudio configuration from \$PULSE_SERVER ($ps)";
                 }
             }
-            $o{media} //= 4713;
+            $o{media} //= $self->{audio_port};
+
+            DEBUG "NX media port is " . $o{media};
         }
 
         if ($self->{printing}) {
@@ -1121,10 +1136,19 @@ sub _run {
         $self->_stop_proc(PulseAudio => $pa_proc);
         $self->_stop_proc(X11 => $x11_proc);
 
-	if ($qvd_pa) {
-		$qvd_pa->stop;
-		undef $qvd_pa;
-	}
+        if ($syspa && $modnum) {
+            # TODO: Properly unload only what we loaded, as explained here:
+            # https://askubuntu.com/questions/355082/pulseaudio-loopback-unload-audio-output-devices
+
+            DEBUG "Unloading module-native-protocol-tcp with id $modnum from Pulseaudio";
+            $syspa->unload_module($modnum);
+        }
+
+        if ($qvd_pa) {
+            DEBUG "Stopping qvd-pulseaudio";
+            $qvd_pa->stop;
+            undef $qvd_pa;
+        }
     };
 
     die $@ if $@;
@@ -1133,5 +1157,31 @@ sub _run {
 
 }
 
+sub _allocate_port {
+    my $self = shift;
+    my $port;
+    my $sock;
+    my $retries;
+
+
+    DEBUG "Allocating port";
+    do {
+        if ( $retries++ > 100 ) {
+            die "Failed to allocate port!";
+        }
+
+        $port = $DYNAMIC_PORT_START + int(rand($DYNAMIC_PORT_COUNT));
+
+        DEBUG "Trying with port $port";
+        $sock = IO::Socket::SSL->new( LocalHost => '127.0.0.1',
+                                      LocalPort => $port,
+                                      Proto     => 'tcp',
+                                      Listen    => 1,
+                                      ReuseAddr => 1);
+    } while(!$sock);
+
+    $sock->shutdown(2);
+    return $port;
+}
 
 1;
