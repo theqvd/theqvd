@@ -99,6 +99,77 @@ sub qvd_db_upgrade {
 
 ### UPGRADE FUNCTIONS USING qvd-deploy-db.pl SCRIPT ### 
 
+sub migrate_up_settings_from_411_to_41x_42 {
+    my $list_ref = shift;
+    my @new_list = ();
+    my @ws_settings = ();
+    my %ws; # Workspaces with tuples in Workspace_Setting. Key: workspace_id. Value: 1 if kb_layout exists, -1 if not
+    my @ds_settings = ();
+    my %ds; # Desktops with tuples in Desktop_Setting. Key: desktop_id. Value: 1 if kb_layout exists, -1 if not
+
+    my $new_parameter = 'kb_layout';
+    my $new_value = 'auto';
+
+    while(@$list_ref){
+        my $schema = shift @$list_ref;
+        my $data = shift @$list_ref;
+
+        if ($schema eq 'Workspace_Setting'){
+            for my $tuple (@{$data}) {
+                if (!defined $ws{$tuple->{'workspace_id'}}) {
+                    $ws{$tuple->{'workspace_id'}} = 1;
+                }
+
+                if ($tuple->{'parameter'} eq $new_parameter) {
+                    $ws{$tuple->{'workspace_id'}} = -1;
+                }
+            }
+
+            for my $workspace_id (keys %ws) {
+                if ($ws{$workspace_id} == 1) {
+                    push @ws_settings,
+                        {
+                            workspace_id    => $workspace_id,
+                            parameter    => $new_parameter,
+                            value => $new_value
+                        };
+                }
+            }
+
+            push @new_list, 'Workspace_Setting', \@ws_settings;
+        }
+        
+        if ($schema eq 'Desktop_Setting'){
+            for my $tuple (@{$data}) {
+                if (!defined $ds{$tuple->{'desktop_id'}}) {
+                    $ds{$tuple->{'desktop_id'}} = 1;
+                }
+
+                if ($tuple->{'parameter'} eq $new_parameter) {
+                    $ds{$tuple->{'desktop_id'}} = -1;
+                }
+            }
+
+            for my $desktop_id (keys %ds) {
+                if ($ds{$desktop_id} == 1) {
+                    push @ds_settings,
+                        {
+                            desktop_id    => $desktop_id,
+                            parameter    => $new_parameter,
+                            value => $new_value
+                        };
+                }
+            }
+
+            push @new_list, 'Desktop_Setting', \@ds_settings;
+        }
+
+        push @new_list, $schema, $data;
+    }
+
+    return \@new_list;
+}
+
 sub migrate_dis_from_40_to_41 {
     my $list_ref = shift;
     my @new_list = ();
@@ -228,7 +299,11 @@ my $UPGRADE_SCHEMA = {
             \&migrate_dis_from_40_to_41
         ]
     },
-    '4.1' => {},
+    '4.1' => {
+        additional_actions => [
+            \&migrate_up_settings_from_411_to_41x_42
+        ]
+    },
     'latest' => {}
 };
 
