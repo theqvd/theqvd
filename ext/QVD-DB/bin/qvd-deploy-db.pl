@@ -8,6 +8,7 @@ use File::Basename;
 use QVD::DB::Simple;
 use QVD::DB::Upgrade qw(qvd_upgrade_db_data qvd_version_upgrade_available);
 use QVD::DB::Common qw(ENUMERATES INITIAL_VALUES);
+use Text::CSV;
 
 ### FUNCTIONS ###
 
@@ -47,84 +48,65 @@ sub display_error {
 
 # Throws an exception if something fails
 sub get_data_from_file {
-
-	my $data = [];
-
 	# Check flags
 	my %args = %{$_[0]};
 	my $filepath = $args{filepath};
 	my $verbose = (defined $args{verbose} and $args{verbose} > 0) ? 1 : 0;
 
+	my $csv = Text::CSV->new ( { sep_char => "\t", quote_char => "`" } ) 
+                or die "Cannot use CSV: ".Text::CSV->error_diag ();
+
 	print "- Checking $filepath ...\n";
+	open my $fh, "<:encoding(UTF8)", $filepath or die "Error opening $filepath: $!";
 
-	# Variables
-	open FILE, "<", $filepath or die "Cannot open file $filepath";
-	my @lines = <FILE>;
-
+	my $data = [];
 	my $currTableName = '';
 	my @currAttribNames = ();
 	my @currAttribValues = ();
 
-	# Check each line of data
-	my $multiline = 0;
-	while (@lines) {
-		my $line = shift @lines;
-		chomp($line);
+	while (my $row = $csv->getline($fh)) {
+	   # Remove empty lines
+           $csv->combine(@$row);
+	   if ($csv->string() eq '') {
+	       next;
+           }
 
-		# Remove empty lines
-		next if ($line =~ /^\s*$/ && !$multiline);
-
-		# Table reference
-		if ($line =~ /^#+\s*(\w+)\s*#+$/) {
-			$currTableName = $1;
-			push (@{$data}, $currTableName);
-			push (@{$data}, []);
-			@currAttribNames = ();
+	   if (@$row[0] =~ /^#+\s*(\w+)\s*#+$/) {
+ 		# Table name
+		$currTableName = $1;
+		push (@{$data}, $currTableName);
+		push (@{$data}, []);
+		@currAttribNames = ();
+	   } else {
+		# Attributes list
+		if (@currAttribNames == 0) {
+			@currAttribNames = @$row;
+			print "\n### $currTableName ###\n". join(', ', @currAttribNames) . "\n" if $verbose;
 		} else {
-			# Attributes list
-			if (@currAttribNames == 0) {
-				@currAttribNames = split(/\t/, $line, -1);
-				print "\n### $currTableName ###\n". join(', ', @currAttribNames) . "\n" if $verbose;
+			@currAttribValues = map {apply_function( $_ )} @$row;
+			for (@currAttribValues) {
+				s/<BR>/\n/g
+			}
+		
+			# Check number of attributes of each row
+			if (@currAttribValues != @currAttribNames) {
+				die "Number of attributes is different to number of values in line:\n" . $csv->string();
 			} else {
-				if(!$multiline) {
-					push ( @currAttribValues, map {apply_function( $_ )} split( /\t/, $line, -1 ) );
+				print( join( " | ", @currAttribValues )."\n" ) if $verbose;
+				my %currAttribHash = ();
+				@currAttribHash{@currAttribNames} = @currAttribValues;
+				while ( my ( $key, $val ) = each %currAttribHash ) {
+					delete $currAttribHash{$key} if ($val eq '\N' || $val eq '');
 				}
-
-				# Multiline value
-				if($multiline){
-					if($line =~ /(.*)\`(.*)/){
-						$multiline = 0;
-						$currAttribValues[-1] .= $1;
-						$line = $2;
-					} else {
-						$currAttribValues[-1] .= "$line\n";
-					}
-				} else {
-					if($currAttribValues[-1] =~ /^\`(.*)(?<!\`)$/) {
-						$currAttribValues[-1] = "$1\n";
-						$multiline = 1;
-					}
-				}
-
-				if(!$multiline) {
-					# Check number of attributes of each row
-					if (@currAttribValues != @currAttribNames) {
-						die "Number of attributes is different to number of values in line:\n$line";
-					} else {
-						print( join( " | ", @currAttribValues )."\n" ) if $verbose;
-						my %currAttribHash = ();
-						@currAttribHash{@currAttribNames} = @currAttribValues;
-						while ( my ( $key, $val ) = each %currAttribHash ) {
-							delete $currAttribHash{$key} if ($val eq '\N' || $val eq '');
-						}
-						@currAttribValues = ();
-						push (@{$data->[-1]}, \%currAttribHash);
-					}
-				}
+				
+				@currAttribValues = ();
+				push (@{$data->[-1]}, \%currAttribHash);
 			}
 		}
-
+           }
 	}
+
+	close $fh;
 
 	print "[OK]\n";
 
@@ -190,21 +172,26 @@ sub get_current_time {
 sub create_tuples_file {
 	my $output_file = shift;
 	open my $fh, ">", $output_file or die "Cannot open $output_file";
+	my $csv = Text::CSV->new({sep_char => "\t", quote_char => "`", eol => "\n" });
 
 	my $dbh = db->storage->dbh;
 	for my $table (get_table_list($dbh)) {
 		my ($schema) = grep { db->class($_)->table eq $table } db->sources;
 
-		$dbh->do("COPY $table TO STDOUT WITH DELIMITER AS E'\t' csv header QUOTE AS E'\`'");# FORCE QUOTE *");
-		my $data;
-		my @rows = ();
-		while ($dbh->pg_getcopydata($data) >= 0){
-			push(@rows, $data);
-		}
+		my $sth = $dbh->prepare("SELECT * FROM $table");
+		$sth->execute();
 
-		if(@rows > 1){
+		if ($sth->rows > 0) {
+			my $fields = $sth->{NAME};
+
 			print $fh "#### $schema ####\n";
-			print $fh join("", @rows);
+			$csv->print($fh, $fields);
+			while (my @row = $sth->fetchrow_array()) {
+				for (@row) {
+					s/\n//g if defined $_
+				}
+				$csv->print($fh, \@row);
+			}
 			print $fh "\n";
 		}
 	}
