@@ -142,7 +142,7 @@ sub deploy {
 	}
 
 	# Create DB version
-	$db->resultset('Version')->create({ component => 'schema', version => '4.0.0' });
+	$db->resultset('Version')->create({ component => 'schema', version => '4.1.2' });
 }
 
 sub erase {
