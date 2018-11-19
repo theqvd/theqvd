@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: QVD\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-27 15:21+0200\n"
-"PO-Revision-Date: 2017-04-27 15:22+0200\n"
+"POT-Creation-Date: 2018-11-23 09:22+0100\n"
+"PO-Revision-Date: 2018-11-23 09:25+0100\n"
 "Last-Translator: Vadim Troshchinskiy <vadim@qindel.es>\n"
 "Language-Team: QVD Team <qvd@qindel.com>\n"
 "Language: es\n"
@@ -20,98 +20,96 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.8.12\n"
+"X-Generator: Poedit 2.2\n"
 "X-Poedit-Basepath: ../lib/QVD/Client\n"
 "X-Poedit-KeywordsList: _t\n"
 "X-Poedit-SearchPath-0: Frame.pm\n"
+"X-Poedit-SearchPath-1: Proxy.pm\n"
 
-#: Frame.pm:174 Frame.pm:352
+#: Frame.pm:178 Frame.pm:359
 msgid "Connect"
 msgstr "Conectar"
 
-#: Frame.pm:183
+#: Frame.pm:187
 msgid "Settings"
 msgstr "Ajustes"
 
-#: Frame.pm:189
+#: Frame.pm:193
 msgid "Options"
 msgstr "Opciones"
 
-#: Frame.pm:193
+#: Frame.pm:197
 msgid "Enable audio"
 msgstr "Habilitar sonido"
 
-#: Frame.pm:198
+#: Frame.pm:202
 msgid "Enable printing"
 msgstr "Habilitar impresión"
 
-#: Frame.pm:203
+#: Frame.pm:207
 msgid "Full screen"
 msgstr "Pantalla completa"
 
-#: Frame.pm:211
+#: Frame.pm:215
 msgid "Connectivity"
 msgstr "Conectividad"
 
-#: Frame.pm:217
+#: Frame.pm:221
 msgid "Server"
 msgstr "Servidor"
 
-#: Frame.pm:223
+#: Frame.pm:227
 msgid "Connection type"
 msgstr "Tipo de enlace"
 
-#: Frame.pm:250
+#: Frame.pm:254
 msgid "Share"
 msgstr "Compartir"
 
-#: Frame.pm:254
+#: Frame.pm:258
 msgid "Enable shared folders"
 msgstr "Compartir carpetas"
 
-#: Frame.pm:259
+#: Frame.pm:263
 msgid "Add"
 msgstr "Añadir"
 
-#: Frame.pm:263
+#: Frame.pm:267
 msgid "Remove"
 msgstr "Quitar"
 
-#: Frame.pm:276
+#: Frame.pm:281
 msgid "Enable USB redirection"
 msgstr "Habilitar redirección USB"
 
-#: Frame.pm:317
+#: Frame.pm:289
+msgid "USB redirection functionality not installed."
+msgstr "La funcionalidad de redirección de USB no está instalada."
+
+#: Frame.pm:324
 msgid "Remember password"
 msgstr "Recordar contraseña"
 
-#: Frame.pm:358
+#: Frame.pm:365
 msgid "Restart session"
 msgstr "Reinicio de sesión"
 
-#: Frame.pm:471
+#: Frame.pm:483
 msgid "You don't have any virtual machine available"
 msgstr "No tiene ninguna máquina virtual disponible"
 
-#: Frame.pm:521
-msgid ""
-"The server has rejected your login. Please verify that your username and "
-"password are correct"
-msgstr ""
-"El servidor ha rechazado la conexión. Por favor compruebe que su nombre de "
-"usuario y contraseña sean correctos."
-
-#: Frame.pm:529
-#, perl-format
-msgid "Error establishing a SSL connection: %s"
+#: Frame.pm:669
+#, fuzzy
+#| msgid "Error establishing a SSL connection: %s"
+msgid "Error establishing a SSL connection"
 msgstr "Error estableciendo la conexión SSL: %s"
 
-#: Frame.pm:532
+#: Frame.pm:672
 #, perl-format
 msgid "Error when trying to connect to %s:"
 msgstr "Error al intentar a conectar a %s:"
 
-#: Frame.pm:533
+#: Frame.pm:673
 msgid ""
 "Make sure your connection settings are correct, and that the server is "
 "accepting connections."
@@ -119,48 +117,56 @@ msgstr ""
 "Compruebe su configuración de conexión y que el servidor esté aceptando "
 "conexiones."
 
-#: Frame.pm:617
+#: Frame.pm:681
+msgid ""
+"The server has rejected your login. Please verify that your username and "
+"password are correct"
+msgstr ""
+"El servidor ha rechazado la conexión. Por favor compruebe que su nombre de "
+"usuario y contraseña sean correctos."
+
+#: Frame.pm:686
 msgid "Connection error"
 msgstr "Error de conexión"
 
-#: Frame.pm:630
+#: Frame.pm:702
 msgid "Select virtual machine:"
 msgstr "Seleccione la máquina virtual:"
 
-#: Frame.pm:631
+#: Frame.pm:703
 msgid "Select virtual machine"
 msgstr "Seleccione la máquina virtual"
 
-#: Frame.pm:635
+#: Frame.pm:707
 msgid " (blocked)"
 msgstr " (bloqueada)"
 
-#: Frame.pm:687
+#: Frame.pm:764
 msgid "Invalid certificate"
 msgstr "Certificado invalido"
 
-#: Frame.pm:717
+#: Frame.pm:794
 msgid "Problems"
 msgstr "Problemas"
 
-#: Frame.pm:724
+#: Frame.pm:801
 msgid "Details"
 msgstr "Detalles"
 
-#: Frame.pm:730
+#: Frame.pm:807
 msgid "Results of the certificate check"
 msgstr "Resultados de la comprobación del certificado"
 
-#: Frame.pm:752
+#: Frame.pm:829
 #, perl-format
 msgid "Error #%s:"
 msgstr "Error #%s:"
 
-#: Frame.pm:755 Frame.pm:759
+#: Frame.pm:832 Frame.pm:836
 msgid "Unable to find issuer's certificate."
 msgstr "No se ha podido encontrar el certificado de la entidad"
 
-#: Frame.pm:756 Frame.pm:760 Frame.pm:764 Frame.pm:782 Frame.pm:785
+#: Frame.pm:833 Frame.pm:837 Frame.pm:841 Frame.pm:859 Frame.pm:862
 msgid ""
 "If you are using your own CA, see the documentation on how to make the "
 "client use your certificate."
@@ -168,48 +174,48 @@ msgstr ""
 "Si esta usando su propia CA, vea la documentación sobre como hacer que el "
 "cliente use su certificado."
 
-#: Frame.pm:763
+#: Frame.pm:840
 msgid "Unable to verify the first certificate"
 msgstr "No se ha podido comprobar el primer certificado"
 
-#: Frame.pm:767
+#: Frame.pm:844
 msgid "Root certificate not trusted."
 msgstr "No hay confianza en el certificado raíz."
 
-#: Frame.pm:770
+#: Frame.pm:847
 msgid "The certificate is not yet valid."
 msgstr "El certificado todavía no es válido."
 
-#: Frame.pm:771
+#: Frame.pm:848
 msgid "Make sure your clock is set correctly."
 msgstr "Asegúrese de que su reloj tiene la hora correcta."
 
-#: Frame.pm:774
+#: Frame.pm:851
 msgid "The certificate has expired."
 msgstr "El certificado ha expirado."
 
-#: Frame.pm:775
+#: Frame.pm:852
 #, perl-format
 msgid "Remind %s (%s) to renew the certificate"
 msgstr "Recuerde a %s (%s) que renueve el certificado."
 
-#: Frame.pm:778
+#: Frame.pm:855
 msgid "The certificate has been revoked."
 msgstr "El certificado ha sido revocado."
 
-#: Frame.pm:781
+#: Frame.pm:858
 msgid "The certificate is self-signed"
 msgstr "El certificado está auto-firmado."
 
-#: Frame.pm:784
+#: Frame.pm:861
 msgid "A certificate in the chain is self-signed"
 msgstr "Hay un certificado auto-firmado en la cadena."
 
-#: Frame.pm:809
+#: Frame.pm:886
 msgid "and"
 msgstr "y"
 
-#: Frame.pm:816
+#: Frame.pm:893
 #, perl-format
 msgid ""
 "Hostname verification failed.\n"
@@ -218,7 +224,7 @@ msgstr ""
 "Error de comprobación del dominio.\n"
 "El certificado solo es valido para %s"
 
-#: Frame.pm:817
+#: Frame.pm:894
 msgid ""
 "This certificate belongs to another host. This is a sign of either "
 "misconfiguration or an ongoing attempt to compromise security."
@@ -226,33 +232,33 @@ msgstr ""
 "Este certificado pertenece a otro dominio. Esto indica un problema de "
 "configuración o un intento de comprometer la seguridad."
 
-#: Frame.pm:826
+#: Frame.pm:903
 #, perl-format
 msgid "Insecure hash algorithm: %s"
 msgstr ""
 
-#: Frame.pm:827
+#: Frame.pm:904
 msgid ""
 "This certificate uses a deprecated and insecure hash algorithm. It should be "
 "replaced with a new one as soon as possible."
 msgstr ""
 
-#: Frame.pm:831
+#: Frame.pm:908
 #, perl-format
 msgid "Weak key: %s bits"
 msgstr ""
 
-#: Frame.pm:832
+#: Frame.pm:909
 msgid ""
 "This certificate uses a weak key and can be broken by brute force. It should "
 "be replaced with a stronger one as soon as possible."
 msgstr ""
 
-#: Frame.pm:836
+#: Frame.pm:913
 msgid "The certificate has been revoked"
 msgstr "El certificado ha sido revocado."
 
-#: Frame.pm:837
+#: Frame.pm:914
 msgid ""
 "The certificate has been revoked by its issuing authority. A new certificate "
 "is required."
@@ -260,170 +266,208 @@ msgstr ""
 "El certificado ha sido revocado por su autoridad. Es necesario un nuevo "
 "certificado."
 
-#: Frame.pm:840
+#: Frame.pm:917
 msgid "OCSP server internal error"
 msgstr ""
 
-#: Frame.pm:841
+#: Frame.pm:918
 msgid ""
 "The OCSP server returned an internal error. It wasn't possible to determine "
 "whether the certificate has been revoked. This may be a temporary error, and "
 "can be ignored."
 msgstr ""
 
-#: Frame.pm:844
+#: Frame.pm:921
 msgid "Failed to make OCSP request"
 msgstr ""
 
-#: Frame.pm:845
+#: Frame.pm:922
 msgid ""
 "It wasn't possible to contact the OCSP server to determine whether the "
 "certificate has been revoked. This is likely a temporary error, and can be "
 "ignored."
 msgstr ""
 
-#: Frame.pm:848
+#: Frame.pm:925
 msgid "OCSP signer certificate not found"
 msgstr ""
 
-#: Frame.pm:849
+#: Frame.pm:926
 msgid ""
 "The OCSP server uses an unrecognized certificate. This may be a "
 "misconfiguration, and can be ignored."
 msgstr ""
 
-#: Frame.pm:852
+#: Frame.pm:929
 msgid "OCSP server certificate lacks OCSP extension"
 msgstr ""
 
-#: Frame.pm:853
+#: Frame.pm:930
 msgid ""
 "The OCSP server uses an incorrect certificate. This is likely a "
 "misconfiguration, and can be ignored."
 msgstr ""
 
-#: Frame.pm:856
+#: Frame.pm:933
 msgid "OCSP CA not trusted"
 msgstr ""
 
-#: Frame.pm:857 Frame.pm:861
+#: Frame.pm:934 Frame.pm:938
 msgid ""
 "The OCSP server uses a certificate signed by an untrusted CA. This may be a "
 "misconfiguration, and can be ignored."
 msgstr ""
 
-#: Frame.pm:860
+#: Frame.pm:937
 msgid "OCSP answer signed with unrecognized certificate"
 msgstr ""
 
-#: Frame.pm:864
+#: Frame.pm:941
 msgid "Unrecognized OCSP problem"
 msgstr ""
 
-#: Frame.pm:865
+#: Frame.pm:942
 msgid "The OCSP server returned an unrecognized error code."
 msgstr ""
 
-#: Frame.pm:869
+#: Frame.pm:946
 msgid "Unrecognized SSL error."
 msgstr "Error SSL no reconocido."
 
-#: Frame.pm:892
+#: Frame.pm:968
 msgid "Certificate for"
 msgstr "Certificado para"
 
-#: Frame.pm:893
+#: Frame.pm:969
 msgid "Issued by"
 msgstr "Emitido por"
 
-#: Frame.pm:896
+#: Frame.pm:972
 msgid "Alternative names"
 msgstr "Nombres alternativos"
 
-#: Frame.pm:901
+#: Frame.pm:977
 msgid "Uses"
 msgstr "Usos"
 
-#: Frame.pm:904
+#: Frame.pm:980
 msgid "Bit length"
 msgstr "Longitud en bits"
 
-#: Frame.pm:905
+#: Frame.pm:981
 msgid "Signature algorithm"
 msgstr "Algoritmo de firma"
 
-#: Frame.pm:908
+#: Frame.pm:984
 msgid "Fingerprint"
 msgstr "Huella digital"
 
-#: Frame.pm:910
+#: Frame.pm:986
 msgid "Hash"
 msgstr "Hash"
 
-#: Frame.pm:911
+#: Frame.pm:987
 msgid "Serial"
 msgstr "Número de serie"
 
-#: Frame.pm:912
+#: Frame.pm:988
 msgid "Valid from"
 msgstr "Valido desde"
 
-#: Frame.pm:913
+#: Frame.pm:989
 msgid "Valid until"
 msgstr "Valido hasta"
 
-#: Frame.pm:923
+#: Frame.pm:999
 msgid "Recommendations:"
 msgstr "Recomendaciones:"
 
-#: Frame.pm:951
+#: Frame.pm:1027
 msgid "Accept temporarily"
 msgstr "Aceptar temporalmente"
 
-#: Frame.pm:955
+#: Frame.pm:1031
 msgid "Accept permanently"
 msgstr "Aceptar permanentemente"
 
-#: Frame.pm:962
+#: Frame.pm:1038
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: Frame.pm:1138
+#: Frame.pm:1183 Frame.pm:1189
+msgid "QVD Client"
+msgstr ""
+
+#: Frame.pm:1268
 msgid "Select the folder to share"
 msgstr ""
 
-#: Frame.pm:1290
+#: Frame.pm:1418
 msgid "Error saving configuration"
 msgstr "Error al guardar la configuración"
 
-#: Frame.pm:1402
+#: Frame.pm:1512
+#, fuzzy, perl-format
+#| msgid "Failed to mount remote folder %s at %s:"
+msgid "Failed to mount share %s:"
+msgstr "Error al montar carpeta remota %s en %s:"
+
+#: Frame.pm:1518 Frame.pm:1620
+msgid "File sharing error."
+msgstr "Error al compartir archivos"
+
+#: Frame.pm:1591 Frame.pm:1615
 #, perl-format
 msgid "Failed to mount remote folder %s at %s:"
 msgstr "Error al montar carpeta remota %s en %s:"
 
-#: Frame.pm:1404
+#: Frame.pm:1593 Frame.pm:1611
 #, perl-format
 msgid "Path %s was not found on the VM"
 msgstr "La ruta %s no ha sido encontrada en la máquina virtual"
 
-#: Frame.pm:1406
+#: Frame.pm:1595 Frame.pm:1612
 #, perl-format
 msgid "Path %s is forbidden on the VM"
 msgstr "La ruta %s está prohibida en la máquina virtual"
 
-#: Frame.pm:1408
+#: Frame.pm:1597 Frame.pm:1613
 msgid "VM lacks file sharing support. Please install the qvd-sshfs package."
 msgstr ""
 "La máquina virtual no tiene soporte para compartir archivos. Por favor "
 "instale el paquete qvd-sshfs."
 
-#: Frame.pm:1410
+#: Frame.pm:1599 Frame.pm:1614
 msgid "Unrecognized error, full error message follows:"
 msgstr "Error no reconocido. El mensaje de error completo sigue:"
 
-#: Frame.pm:1413
-msgid "File sharing error."
-msgstr "Error al compartir archivos"
+#: Proxy.pm:961
+msgid "PulseAudio is not running. Sound will not work."
+msgstr "PulseAudio no está corriendo. El sonido no funcionará."
+
+#: Proxy.pm:992
+msgid ""
+"Cannot start a pulseaudio with opus compression enabled.\n"
+"The system pulseaudio does not support compression, and qvd-pulseaudio is "
+"not installed.\n"
+"\n"
+"Falling back to uncompressed audio.\n"
+"Bandwidth usage will be high. Usage of qvd-pulseaudio is highly recommended."
+msgstr ""
+"No fue posible iniciar pulseaudio con compresión.\n"
+"El pulseaudio del sistema no soporta compresión, y el paquete qvd-pulseaudio "
+"no está instalado.\n"
+"\n"
+"Usando audio sin compresión.\n"
+"El uso de ancho de banda será alto. Se recomienda el uso de qvd-pulseaudio."
+
+#: Proxy.pm:1002
+msgid ""
+"Audio compression has been disabled by the user\n"
+"Bandwidth usage will be high. Usage of qvd-pulseaudio is higly recommended."
+msgstr ""
+"La compresión de audio ha sido desactivada por el usuario.\n"
+"El uso de ancho de banda será alto. Se recomienda el uso de qvd-pulseaudio."
 
 #~ msgid "Connection"
 #~ msgstr "Conexión"

@@ -202,6 +202,22 @@ sub proxy_unknown_cert {
     1;
 }
 
+sub proxy_alert {
+    my ($self, %args) = @_;
+
+    if ( $args{level} =~ /warn/ ) {
+        print STDERR "WARNING: ";
+    } elsif ( $args{level} =~ /err/ ) {
+        print STDERR "ERROR  : ";
+    } elsif ( $args{level} =~ /notice|info/ ) {
+        print STDERR "INFO   : ";
+    } else {
+        ERROR "Unknown alert level $args{level}";
+        print STDERR "ERROR  : ";
+    }
+
+    print STDERR $args->{message} . "\n";
+}
 
 sub format_cert {
     my ($self, $cert)  = @_;
