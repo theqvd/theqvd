@@ -19,6 +19,10 @@ use constant EVT_CONNECTION_ERROR  => Wx::NewEventType;
 use constant EVT_CONN_STATUS       => Wx::NewEventType;
 use constant EVT_UNKNOWN_CERT      => Wx::NewEventType;
 use constant EVT_SET_ENVIRONMENT   => Wx::NewEventType;
+use constant EVT_PROXY_ALERT       => Wx::NewEventType;
+
+
+
 
 use constant X509_V_OK                                        => 0;
 use constant X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT             => 2;
@@ -59,6 +63,7 @@ my $vm_id :shared;
 my %connect_info :shared;
 my $accept_cert :shared;
 my $set_env :shared;
+my $proxy_alert :shared;
 
 my $DEFAULT_PORT = core_cfg('client.host.port');
 my $USE_SSL      = core_cfg('client.use_ssl');
@@ -398,6 +403,8 @@ sub new {
     Wx::Event::EVT_COMMAND($self, -1, EVT_CONN_STATUS, \&OnConnectionStatusChanged);
     Wx::Event::EVT_COMMAND($self, -1, EVT_UNKNOWN_CERT, \&OnUnknownCert);
     Wx::Event::EVT_COMMAND($self, -1, EVT_SET_ENVIRONMENT, \&OnSetEnvironment);
+    Wx::Event::EVT_COMMAND($self, -1, EVT_PROXY_ALERT, \&OnAlert);
+
 
     Wx::Event::EVT_CLOSE($self, \&OnExit);
 
@@ -503,6 +510,15 @@ sub proxy_set_environment {
     cond_wait($set_env);
 }
 
+sub proxy_alert {
+    my $self = shift;
+    my %args = @_;
+    my $shared_args :shared = shared_clone(\%args);
+
+    lock($proxy_alert);
+    Wx::PostEvent($self, new Wx::PlThreadEvent(-1, EVT_PROXY_ALERT, $shared_args));
+    cond_wait($proxy_alert);
+}
 
 
 ################################################################################
@@ -1131,6 +1147,57 @@ sub OnSetEnvironment {
     lock $set_env;
     $set_env = 1;
     cond_signal $set_env;
+}
+
+sub OnAlert {
+    my ($self, $event) = @_;
+    my $args = $event->GetData();
+    DEBUG "Alert: start";
+
+
+    my $flags = wxOK;
+
+    if ( $args->{level} =~ /warn/i ) {
+        $flags |= wxICON_WARNING;
+        WARN "$args->{title}: $args->{message}";
+    } elsif ( $args->{level} =~ /err/i ) {
+        $flags |= wxICON_ERROR;
+        ERROR "$args->{title}: $args->{message}";
+    } elsif ( $args->{level} =~ /notice/i ) {
+        $flags |= wxICON_INFORMATION;
+        INFO "$args->{title}: $args->{message}";
+    } else {
+        $flags |= wxICON_ERROR;
+        ERROR "$args->{title}: $args->{message}";
+        ERROR "Unknown alert level '$args->{type}' for the previous message.";
+    }
+
+    my $type = $args->{type} // "notice";
+
+    if ( $^O =~ /linux/ || $type eq "dialog" ) {
+        # Wx::NotificationMessage currently pops up a rather odd and ugly
+        # window on Linux instead of using the actual notification capability
+        # of desktops like Gnome and KDE
+        my $dialog = Wx::MessageDialog->new($self,
+                                            $self->_t( $args->{message} ),
+                                            $self->_t( $args->{title} // "QVD Client" ),
+                                            $flags);
+        $dialog->ShowModal();
+        $dialog->Destroy();
+    } elsif ( $type eq "notice" ) {
+        my $tm = $self->_t( $args->{message} );
+        my $tt = $self->_t( $args->{title} // "QVD Client" );
+
+        my $notice = Wx::NotificationMessage->new($tm, $tt, $self, $flags);
+        $notice->Show();
+    } else {
+        ERROR "Unknown alert type '$type' for the previous message.";
+    }
+
+
+    lock $proxy_alert;
+    $proxy_alert = 1;
+    cond_signal $proxy_alert;
 }
 
 sub try_load_usbip {

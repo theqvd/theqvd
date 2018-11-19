@@ -891,6 +891,9 @@ sub _run {
     my %o;
     my $slave_port_file = $QVD::Client::App::user_dir.'/slave-port';
     my ($nxproxy_proc, $x11_proc, $pa_proc, $qvd_pa, $syspa, $modnum);
+    my $cli = $self->{client_delegate};
+
+
     eval {
         # Erase any previously set value. This is only for nxproxy, may break other things
         $self->{client_delegate}->proxy_set_environment( DYLD_LIBRARY_PATH => "" );
@@ -953,7 +956,9 @@ sub _run {
                     #
                     # For now, we don't handle this scenario, though QVDPA could
                     # probably deal with it.
-                    ERROR "Local PulseAudio is not running";
+
+                    $cli->proxy_alert( level   => 'error',
+                                       message => $self->_t("PulseAudio is not running. Sound will not work." ));
                 } else {
                     # System PulseAudio is running
 
@@ -983,16 +988,19 @@ sub _run {
                                 "sink_name=QVD", "server=tcp:127.0.0.1:" . $self->{audio_secondary_port},
                                 "sink=\@DEFAULT_SINK\@");
                         } else {
-                            ERROR "Cannot start a pulseaudio with opus compression enabled. Falling back to uncompressed audio.";
-                            WARN  "Bandwidth usage will be high. Usage of qvd-pulseaudio is highly recommended.";
+                            $cli->proxy_alert( level   => 'error',
+                                               message => $self->_t("Cannot start a pulseaudio with opus compression enabled.\n" .
+                                                          "The system pulseaudio does not support compression, and qvd-pulseaudio is not installed.\n\n". 
+                                                          "Falling back to uncompressed audio.\n" .
+                                                          "Bandwidth usage will be high. Usage of qvd-pulseaudio is highly recommended." ));
 
                             $modnum = $syspa->load_module("module-native-protocol-tcp",
                                         "auth-anonymous=1", "listen=127.0.0.1", "port=" . $self->{audio_port});
                         }
                     } else {
-                        DEBUG "System PA is running, but audio compression is not enabled";
-                        WARN  "Setting up uncompressed pulseaudio pass-through.";
-                        WARN  "Bandwidth usage will be high. Usage of qvd-pulseaudio is higly recommended.";
+                        $cli->proxy_alert( level   => 'warning',
+                                           message => $self->_t("Audio compression has been disabled by the user\n".
+                                                      "Bandwidth usage will be high. Usage of qvd-pulseaudio is higly recommended."));
 
                         $modnum = $syspa->load_module("module-native-protocol-tcp",
                                                       "auth-anonymous=1", "listen=127.0.0.1", "port=" . $self->{audio_port});
@@ -1182,6 +1190,14 @@ sub _allocate_port {
 
     $sock->shutdown(2);
     return $port;
+}
+
+# This useless function works as a marker for gettext, allowing it to find
+# translatable strings. No actual translation is done in this module, and
+# it's up to the caller (Frame.pm) to pass the string to the translator.
+
+sub _t {
+    return @_;
 }
 
 1;
