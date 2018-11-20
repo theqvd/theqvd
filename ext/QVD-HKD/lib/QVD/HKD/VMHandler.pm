@@ -45,11 +45,13 @@ sub new {
     my $vm_id = delete $opts{vm_id};
 
     my $dhcpd_handler = delete $opts{dhcpd_handler};
+    my $vhci_handler = delete $opts{vhci_handler};
     my $vm_lock_fh = delete $opts{vm_lock_fh};
     my $hypervisor = delete $opts{hypervisor};
     my $self = $class->SUPER::new(%opts);
     $self->{vm_id} = $vm_id;
     $self->{dhcpd_handler} = $dhcpd_handler;
+    $self->{vhci_handler} = $vhci_handler;
     $self->{vm_lock_fh} = $vm_lock_fh;
     $self->{hypervisor} = $hypervisor;
     $self;
@@ -130,6 +132,22 @@ sub _rm_from_dhcpd {
     my $self = shift;
     if (my $dhcpd_handler = $self->{dhcpd_handler}) {
         $dhcpd_handler->unregister_mac_and_ip($self->{vm_id});
+    }
+    $self->_on_done;
+}
+
+sub _request_vhci_hub {
+    my $self = shift;
+    if (my $vhci_handler = $self->{vhci_handler}) {
+        $vhci_handler->reserve_vhci_hub($self->{vm_id});
+    }
+    $self->_on_done;
+}
+
+sub _return_vhci_hub {
+    my $self = shift;
+    if (my $vhci_handler = $self->{vhci_handler}) {
+        $vhci_handler->release_vhci_hub($self->{vm_id});
     }
     $self->_on_done;
 }
