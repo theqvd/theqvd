@@ -60,6 +60,7 @@ use Class::StateMachine::Declarative
                                   setup           => { transitions => { _on_error   => 'stopping/cleanup' },
                                                        substates => [ allocating_home_fs      => { enter => '_allocate_home_fs' },
                                                                       configuring_dhcpd       => { enter => '_add_to_dhcpd' },
+                                                                      configuring_usbip       => { enter => '_request_vhci_hub' },
                                                                       creating_lxc            => { enter => '_create_lxc' },
                                                                       running_prestart_hook   => { enter => '_run_prestart_hook' },
                                                                       setting_fw_rules        => { enter => '_set_fw_rules' },
@@ -133,7 +134,8 @@ use Class::StateMachine::Declarative
                                                                running_poststop_hook  => { enter => '_run_poststop_hook',
                                                                                            transitions => { _on_error => 'destroying_lxc' } },
                                                                destroying_lxc         => { enter => '_destroy_lxc' },
-                                                               configuring_dhcpd      => { enter => '_rm_from_dhcpd' } ] },
+                                                               configuring_dhcpd      => { enter => '_rm_from_dhcpd' },
+                                                               configuring_usbip      => { enter => '_return_vhci_hub' } ] },
 
                                   os_fs    => { enter => '_unmount_filesystems' },
 
@@ -176,6 +178,7 @@ use Class::StateMachine::Declarative
                                                            unmounting_filesystems => { enter => '_unmount_filesystems' },
                                                            unheavy                => { enter => '_heavy_up' },
                                                            configuring_dhcpd      => { enter => '_rm_from_dhcpd' },
+                                                           configuring_usbip      => { enter => '_return_vhci_hub' },
                                                            '(delaying)'           => { enter => '_set_state_timer',
                                                                                        transitions => { _on_state_timeout => 'reap'} } ] },
 

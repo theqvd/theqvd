@@ -541,6 +541,9 @@ admin.ssh.opt.UserKnownHostsFile = /dev/null
 ## virtualization engine to use, either kvm or lxc
 vm.hypervisor = lxc
 
+## Use vhci hubs handler
+vm.lxc.use_vhci_hubs = 1
+
 ## COW fs to use with LXC
 vm.lxc.unionfs.type = overlayfs
 @sles-12@vm.lxc.unionfs.type = overlayfs

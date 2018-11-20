@@ -34,6 +34,7 @@ use QVD::HKD::Config;
 use QVD::HKD::Ticker;
 use QVD::HKD::ClusterMonitor;
 use QVD::HKD::DHCPDHandler;
+use QVD::HKD::VHCIHandler;
 use QVD::HKD::CommandHandler;
 use QVD::HKD::VMCommandHandler;
 use QVD::HKD::L7RListener;
@@ -475,6 +476,9 @@ sub _start_agents {
     $self->{dhcpd_handler} = QVD::HKD::DHCPDHandler->new(%opts)
         if $self->_cfg("vm.network.use_dhcp");
 
+    $self->{vhci_handler} = QVD::HKD::VHCIHandler->new(%opts)
+        if $self->_cfg("vm.hypervisor") eq "lxc" && $self->_cfg("vm.lxc.use_vhci_hubs");
+
     DEBUG 'Starting command handler';
     $self->{command_handler}->run;
 
@@ -497,6 +501,15 @@ sub _start_agents {
     else {
         $debug and $self->_debug("use_dhcp is off");
         INFO "DHCP server is administratively disabled, not running";
+    }
+
+    if ($self->{vhci_handler}) {
+        DEBUG 'Starting VHCI hubs handler';
+        $self->{vhci_handler}->run;
+    }
+    else {
+        $debug and $self->_debug("use_vhci_hubs is off");
+        INFO "VHCI hub handler is administratively disabled, not running";
     }
 
     $self->_on_done;
@@ -528,6 +541,7 @@ sub _start_later_agents {
 # is handled by specific code
 my @agent_names = qw(command_handler
                      dhcpd_handler
+                     vhci_handler
                      ticker
                      l7r_killer
                      expiration_monitor
@@ -634,6 +648,7 @@ sub _new_vm_handler {
                                             vm_lock_fh => $self->{vm_lock_fh},
                                             heavy => $self->{heavy},
                                             dhcpd_handler => $self->{dhcpd_handler},
+                                            vhci_handler => $self->{vhci_handler},
                                             on_stopped => sub { $self->_on_vm_stopped($vm_id) });
     $vm;
 }
