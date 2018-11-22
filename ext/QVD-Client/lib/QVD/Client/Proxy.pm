@@ -924,6 +924,7 @@ sub _run {
                     $QVD::Client::App::app_dir);
                 my $pa_log = File::Spec->rel2abs("pulseaudio.log", $QVD::Client::App::user_dir);
                 my @pa = ($pa_exe,
+                    '-n',
                     "--file=$pa_cfg",
                     '--log-level=debug',
                     '--high-priority=yes',
