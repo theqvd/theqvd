@@ -5,6 +5,8 @@ use warnings;
 
 use AnyEvent;
 use AnyEvent::Util;
+use File::Path;
+use Carp;
 
 use Data::Dumper;
 
@@ -22,7 +24,7 @@ use Class::StateMachine::Declarative
 
     running  => { transitions => { on_hkd_stop => 'stopping' } },
 
-    stopping => { enter => '_kill_cmd',
+    stopping => { jump => 'stopped',
                   transitions => { _on_done => 'stopped' },
                   ignore => [qw(on_hkd_stop)] },
 
@@ -35,12 +37,12 @@ sub new {
     my $sysfs_root = delete $opts{sysfs_root} // '/sys';
     $sysfs_root =~ s|(?<=.)/+||; # remove any trailing slashes
     DEBUG "sysfs_root = ".$sysfs_root;
-    $sysfs_root =~ /^\// or die "sysfs_root must point to an absolute directory";
+    $sysfs_root =~ /^\// or croak "sysfs_root must point to an absolute directory";
   
     my $platform_path = "$sysfs_root/devices/platform";
 
-    opendir my $vhci , $platform_path or die "Can't open vhci_hcd platform directory";
-    my %hubs = map { $_ => 0 } grep { /vhci_hcd.(\d+)/ } readdir( $vhci );
+    opendir my $vhci , $platform_path or croak "Can't open vhci_hcd platform directory";
+    my %hubs = map { $_ => -1 } grep { /vhci_hcd.(\d+)/ } readdir( $vhci );
 
     DEBUG "VHCI Handler launched with: " . ( keys %hubs ) . " hubs";
     $self->{hubs} = \%hubs;
@@ -50,11 +52,12 @@ sub new {
 
 sub reserve_vhci_hub {
     my ($self, $vm_id ) = @_;
+    my $dir = $self->_cfg('path.storage.devicefs') . "/QVD-$vm_id";
     my $pick;
 
     # find free port
     foreach my $hub ( keys %{$self->{hubs}} ){
-        if ($self->{hubs}->{$hub} == 0){
+        if ($self->{hubs}->{$hub} == -1){
             $pick = $hub;
             last;
         }
@@ -64,17 +67,25 @@ sub reserve_vhci_hub {
     $self->{hubs}->{$pick} = $vm_id;
     DEBUG "Assigned $pick to vm $vm_id";
     
-    # Make dark magic
+    # Clean just in case
+    if (-e $dir and -d $dir) {
+        rmtree $dir or croak "Can't clean directory structure: $dir";
+    }
+
+    # Create directory
+    mkdir $dir or croak "Can't create directory structure: $dir";
+    mkdir $dir."/".$pick or croak "Can't create directory structure: $dir/$pick";
     
-    
-    return;
+    return $dir;
 }
 
 sub release_vhci_hub {
     my ($self, $vm_id) = @_;
+    my $dir = $self->_cfg('path.storage.devicefs') . "/QVD-$vm_id";
     my $pick;
 
-    # Undo dark magic
+    # Cleanup
+    rmtree $dir or croak "Can't clean directory structure: $dir";
 
     # Find assigned hub
     foreach my $hub ( keys %{$self->{hubs}} ){
@@ -85,12 +96,11 @@ sub release_vhci_hub {
     }
     
     # Release hub
-    $self->{hubs}->{$pick} = 0;
+    $self->{hubs}->{$pick} = -1;
     DEBUG "Released $pick from vm $vm_id";
 
-    return;
+    return 1;
 
 }
-
 
 1;
