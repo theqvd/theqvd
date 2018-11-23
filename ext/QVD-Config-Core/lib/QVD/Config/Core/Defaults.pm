@@ -78,6 +78,9 @@ path.run.lxc = ${path.run}/lxc
 path.storage.overlayfs = ${path.storage.btrfs.root}/overlayfs
 path.storage.rootfs = ${path.storage.btrfs.root}/rootfs
 
+# Path for usbip fake sysfs mounts
+path.storage.devicefs = ${path.storage.root}/devicefs
+
 # storage directories for K8S
 path.run.kubernetes = ${path.run}/kubernetes
 
