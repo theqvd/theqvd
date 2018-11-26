@@ -19,6 +19,7 @@ use Fcntl::Packer ();
 use Method::WeakCallback qw(weak_method_callback);
 use QVD::HKD::Helpers qw(mkpath);
 use QVD::HKD::VMHandler::LXC::FS;
+use Mojo::Template;
 
 use parent qw(QVD::HKD::VMHandler);
 
@@ -362,67 +363,13 @@ EOML
 
     my $cpuset_cpus = join ',', @cpus;
 
-    # FIXME: make this template-able or configurable in some way
-    print $cfg_fh <<EOC;
-lxc.autodev=1
-lxc.hook.autodev=$qvd_lxc_autodev
-lxc.utsname=$self->{name}
-lxc.network.type=veth
-lxc.network.veth.pair=$iface
-lxc.network.name=eth0
-lxc.network.flags=up
-lxc.network.hwaddr=$self->{mac}
-lxc.network.link=$bridge
-lxc.console=$console
-lxc.tty=3
-lxc.pts=1
-lxc.rootfs=$self->{os_rootfs}
-lxc.mount.entry=$self->{home_fstab}
-lxc.pivotdir=qvd-pivot
-lxc.cgroup.cpu.shares=1024
-lxc.cgroup.cpuset.cpus=$cpuset_cpus
-$memory_limits
-#lxc.cap.drop=sys_module audit_control audit_write linux_immutable mknod net_admin net_raw sys_admin sys_boot sys_resource sys_time
 
-# Deny access to all devices, except...
-lxc.cgroup.devices.deny = a
-
-# Allow any mknod (but not using the node)
-lxc.cgroup.devices.allow = c *:* m
-lxc.cgroup.devices.allow = b *:* m
-# /dev/null and zero
-lxc.cgroup.devices.allow = c 1:3 rwm
-lxc.cgroup.devices.allow = c 1:5 rwm
-# consoles /dev/tty, /dev/console
-lxc.cgroup.devices.allow = c 5:1 rwm
-lxc.cgroup.devices.allow = c 5:0 rwm
-# /dev/{,u}random
-lxc.cgroup.devices.allow = c 1:9 rwm
-lxc.cgroup.devices.allow = c 1:8 rwm
-lxc.cgroup.devices.allow = c 136:* rwm
-lxc.cgroup.devices.allow = c 5:2 rwm
-# rtc
-lxc.cgroup.devices.allow = c 254:0 rwm
-#fuse
-lxc.cgroup.devices.allow = c 10:229 rwm
-#tun
-lxc.cgroup.devices.allow = c 10:200 rwm
-#full
-lxc.cgroup.devices.allow = c 1:7 rwm
-#hpet
-lxc.cgroup.devices.allow = c 10:228 rwm
-#kvm
-lxc.cgroup.devices.allow = c 10:232 rwm
-EOC
+    my $extra_lines;
 
     if (!$self->_cfg('vm.network.use_dhcp')) {
-        print $cfg_fh <<EOC;
-lxc.network.ipv4 = $self->{ip}/$self->{netmask_len}
-EOC
+        $extra_lines .= "lxc.network.ipv4 = " . $self->{ip} . "/" . $self->{netmask_len} . "\n";
         if ($lxc_version >= 0.8) {
-            print $cfg_fh <<EOC;
-lxc.network.ipv4.gateway = $self->{gateway}
-EOC
+            $extra_lines .= "lxc.network.ipv4.gateway = " . $self->{gateway} . "\n";
         }
     }
 
@@ -430,15 +377,40 @@ EOC
     if (defined $meta) {
 	my $config_extra = "$meta/lxc/config-extra";
 	if (-f $config_extra) {
-	    print $cfg_fh "lxc.extra=$config_extra\n"
+	    $extra_lines .= "lxc.extra=$config_extra\n"
 	}
 	my $fstab = "$meta/lxc/fstab";
 	if (-f $fstab) {
-	    print $cfg_fh "lxc.mount=$fstab\n";
+	    $extra_lines .= "lxc.mount=$fstab\n";
 	}
     }
 
-    print $cfg_fh $self->_cfg('internal.vm.lxc.conf.extra'), "\n";
+    $extra_lines .= $self->_cfg('internal.vm.lxc.conf.extra'), "\n";
+
+    # Fill in all values
+    # In Mojo::Template with vars=1, every key from the $args array-ref will be converted into a full variable
+    # So, you have to use key names that can be converted to variable names (no dots)
+    # Also, if you're not sure if one of the keys will have a value (and you want to check it inside the
+    # template), then you should use a sub-hash like down here ( so you can use defined($extra->{lines}) ).
+    my $args = {
+        lxc_hook_autodev => $qvd_lxc_autodev,
+        lxc_utsname => $self->{name},
+        lxc_network_veth_pair => $iface,
+        lxc_network_hwaddr => $self->{mac},
+        lxc_network_link => $bridge,
+        lxc_console => $console,
+        lxc_rootfs => $self->{os_rootfs},
+        lxc_mount_entry => $self->{home_fstab},
+        lxc_cgroup_cpuset_cpus => $cpuset_cpus,
+        memory_limits => $memory_limits,
+        # This is the extras sub-hash
+        extra => { lines => $extra_lines }
+    };
+
+    my $mt = Mojo::Template->new(vars=>1);
+    my $output = $mt->render_file($self->_cfg('vm.lxc.conf_template'),$args);
+
+    print $cfg_fh $output;
     close $cfg_fh;
 
     $self->_on_done;
