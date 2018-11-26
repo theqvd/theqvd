@@ -530,6 +530,9 @@ vm.hypervisor = lxc
 ## Use vhci hubs handler
 vm.lxc.use_vhci_hubs = 1
 
+## LXC Templates
+vm.lxc.conf_template = /etc/qvd/lxc.mt
+
 ## COW fs to use with LXC
 vm.lxc.unionfs.type = overlayfs
 @sles-12@vm.lxc.unionfs.type = overlayfs
