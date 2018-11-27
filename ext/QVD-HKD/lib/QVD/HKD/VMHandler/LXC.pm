@@ -629,4 +629,21 @@ sub _run {
 	return $ret;
 }
 
+sub _request_vhci_hub {
+    my $self = shift;
+    if (my $vhci_handler = $self->{vhci_handler}) {
+        $vhci_handler->reserve_vhci_hub($self->{vm_id});
+    }
+    $self->_on_done;
+}
+
+sub _return_vhci_hub {
+    my $self = shift;
+    if (my $vhci_handler = $self->{vhci_handler}) {
+        $vhci_handler->release_vhci_hub($self->{vm_id});
+    }
+    $self->_on_done;
+}
+
+
 1;

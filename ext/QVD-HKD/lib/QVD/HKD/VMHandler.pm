@@ -136,22 +136,6 @@ sub _rm_from_dhcpd {
     $self->_on_done;
 }
 
-sub _request_vhci_hub {
-    my $self = shift;
-    if (my $vhci_handler = $self->{vhci_handler}) {
-        $vhci_handler->reserve_vhci_hub($self->{vm_id});
-    }
-    $self->_on_done;
-}
-
-sub _return_vhci_hub {
-    my $self = shift;
-    if (my $vhci_handler = $self->{vhci_handler}) {
-        $vhci_handler->release_vhci_hub($self->{vm_id});
-    }
-    $self->_on_done;
-}
-
 sub _incr_run_attempts {
     my $self = shift;
     DEBUG "Increasing run attempts counter for VM '$self->{vm_id}'";
