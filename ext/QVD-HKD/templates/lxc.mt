@@ -18,6 +18,12 @@ lxc.cgroup.cpuset.cpus=<%= $lxc_cgroup_cpuset_cpus %>
 <%= $memory_limits %>
 #lxc.cap.drop=sys_module audit_control audit_write linux_immutable mknod net_admin net_raw sys_admin sys_boot sys_resource sys_time
 
+% if ( defined $extra->{vhci} ){
+lxc.mount.entry=/sys sys none defaults,bind
+lxc.mount.entry=<%= $extra->{vhci}->{directory} %> sys/devices/platform none defaults,bind
+lxc.mount.entry=/sys/devices/platform/<%= $extra->{vhci}->{hub} %> sys/devices/platform/<%= $extra->{vhci}->{hub} %> none defaults,bind
+% }
+
 # Deny access to all devices, except...
 lxc.cgroup.devices.deny = a
 

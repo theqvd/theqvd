@@ -528,7 +528,7 @@ admin.ssh.opt.UserKnownHostsFile = /dev/null
 vm.hypervisor = lxc
 
 ## Use vhci hubs handler
-vm.lxc.use_vhci_hubs = 1
+vm.lxc.use_vhci_hubs = 0
 
 ## LXC Templates
 vm.lxc.conf_template = /etc/qvd/lxc.mt

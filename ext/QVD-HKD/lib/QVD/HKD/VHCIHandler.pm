@@ -76,7 +76,7 @@ sub reserve_vhci_hub {
     mkdir $dir or croak "Can't create directory structure: $dir";
     mkdir $dir."/".$pick or croak "Can't create directory structure: $dir/$pick";
     
-    return $dir;
+    return ($dir,$pick);
 }
 
 sub release_vhci_hub {
