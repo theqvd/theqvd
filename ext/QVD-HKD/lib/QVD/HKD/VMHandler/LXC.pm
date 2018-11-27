@@ -363,6 +363,11 @@ EOML
 
     my $cpuset_cpus = join ',', @cpus;
 
+    my $vhci_mounts;
+    if ( $self->_cfg("vm.lxc.use_vhci_hubs") ){
+        $vhci_mounts->{directory} = $self->{vhci_directory};
+        $vhci_mounts->{hub} = $self->{vhci_hub};
+    }
 
     my $extra_lines;
 
@@ -404,7 +409,9 @@ EOML
         lxc_cgroup_cpuset_cpus => $cpuset_cpus,
         memory_limits => $memory_limits,
         # This is the extras sub-hash
-        extra => { lines => $extra_lines }
+        extra => { lines => $extra_lines,
+                   vhci => $vhci_mounts
+                 }
     };
 
     my $mt = Mojo::Template->new(vars=>1);
@@ -632,7 +639,7 @@ sub _run {
 sub _request_vhci_hub {
     my $self = shift;
     if (my $vhci_handler = $self->{vhci_handler}) {
-        $vhci_handler->reserve_vhci_hub($self->{vm_id});
+        ($self->{vhci_directory}, $self->{vhci_hub})= $vhci_handler->reserve_vhci_hub($self->{vm_id});
     }
     $self->_on_done;
 }
