@@ -24,6 +24,10 @@ lxc.mount.entry=<%= $extra->{vhci}->{directory} %> sys/devices/platform none def
 lxc.mount.entry=/sys/devices/platform/<%= $extra->{vhci}->{hub} %> sys/devices/platform/<%= $extra->{vhci}->{hub} %> none defaults,bind
 % }
 
+% if ( $lxc_version == '0.9' ){
+lxc.aa_profile = unconfined
+% }
+
 # Deny access to all devices, except...
 lxc.cgroup.devices.deny = a
 

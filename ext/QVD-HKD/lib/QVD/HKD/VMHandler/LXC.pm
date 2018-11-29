@@ -398,6 +398,7 @@ EOML
     # Also, if you're not sure if one of the keys will have a value (and you want to check it inside the
     # template), then you should use a sub-hash like down here ( so you can use defined($extra->{lines}) ).
     my $args = {
+        lxc_version => $lxc_version,
         lxc_hook_autodev => $qvd_lxc_autodev,
         lxc_utsname => $self->{name},
         lxc_network_veth_pair => $iface,
