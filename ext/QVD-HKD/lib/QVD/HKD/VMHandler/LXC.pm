@@ -390,7 +390,7 @@ EOML
 	}
     }
 
-    $extra_lines .= $self->_cfg('internal.vm.lxc.conf.extra'), "\n";
+    $extra_lines .= $self->_cfg('internal.vm.lxc.conf.extra')."\n";
 
     # Fill in all values
     # In Mojo::Template with vars=1, every key from the $args array-ref will be converted into a full variable
