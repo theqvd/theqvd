@@ -1,4 +1,4 @@
-package QVD::Client::PulseAudio::Linux;
+package QVD::Client::PulseAudio::Unix;
 use base 'QVD::Client::PulseAudio::Base';
 use QVD::Log;
 use QVD::Config::Core;
