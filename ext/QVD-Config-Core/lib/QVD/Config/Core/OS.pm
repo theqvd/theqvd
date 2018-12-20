@@ -54,6 +54,26 @@ sub detect_os {
                 $version = $major;
                 $revision = $minor;
             }
+        } elsif ( $^O =~ /darwin/i ) {
+            my $major;
+            my @vers = `/usr/bin/sw_vers`;
+            die "Failed to run /usr/bin/sw_vers, return code $? $!" if ($?);
+            chomp @vers;
+
+            foreach my $line (@vers) {
+                if ( $line =~ /^ProductVersion:\s*(.*)$/ ) {
+                    ($major, $version, $revision) = split(/\./, $1);
+                    last;
+		}
+            }
+
+            if ( !defined $major) {
+                die "Failed to parse version info. Output was: " . join("\n", @vers);
+            } elsif ( $major == 10 ) {
+                $os = "osx";
+            } else {
+                die "Running on Darwin, but not OSX. Unrecognized major version '$major'. Please fix."
+            }
         }
 
         defined and s/\s+Linux$//i for ($os);
