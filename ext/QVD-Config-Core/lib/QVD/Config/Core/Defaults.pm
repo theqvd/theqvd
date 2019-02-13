@@ -126,6 +126,14 @@ path.qvd.etc = /usr/lib/qvd/etc
 path.usb.database = /usr/share/hwdata/usb.ids,/var/lib/usbutils/usb.ids
 path.usb.usbroot = /sys/bus/usb/devices
 
+path.qvd.root = /usr/lib/qvd
+
+path.pulseaudio.modules.base = lib64
+
+
+@osx@path.pulseaudio.modules.base = /usr/local/lib
+
+
 ## paths to external executables
 command.kvm = kvm
 @sles@command.kvm = qemu-kvm
