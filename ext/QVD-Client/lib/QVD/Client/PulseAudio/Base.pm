@@ -2,6 +2,8 @@ package QVD::Client::PulseAudio::Base;
 use QVD::Log;
 use warnings;
 use strict;
+use File::Basename;
+use File::Spec;
 
 my $BLACKHOLE_IP="240.0.0.1";
 
@@ -112,6 +114,42 @@ sub load_module {
 sub unload_module {
     my ($self, $mod) = @_;
     $self->cmd("unload-module", $mod);
+}
+
+# Write a new config file updating the module paths.
+# The function may perform any other required changes in the future
+sub rewrite_config_file {
+    my ($self, $source, $dest) = @_;
+
+    my $mod_path = $self->get_pulse_module_path();
+    my $mod_ext  = $self->get_pulse_module_extension();
+
+    open(my $in_fh, '<', $source) or die "Can't open $source: $!";
+    open(my $out_fh, '>', $dest) or die "Can't open $dest: $!";
+    while(my $line = <$in_fh>) {
+        chomp $line;
+
+        if ( $line =~ /(load-module|\.ifexists)\s+(\S+)(.*?)$/ ) {
+            my $command = $1;
+            my $file    = File::Spec->catfile($mod_path, basename($2) . $mod_ext);
+            my $args    = $3;
+
+            print $out_fh "$command $file $args\n";
+        } else {
+            print $out_fh "$line\n";
+        }
+    }
+    close $out_fh;
+    close $in_fh;
+}
+
+sub get_pulse_module_extension {
+    my ($self) = @_;
+    return "";
+}
+
+sub get_pulse_module_path {
+    my ($self) = @_;
 }
 
 1;
