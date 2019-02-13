@@ -11,6 +11,9 @@ sub new {
 	if ( $^O =~ /linux/ ) {
 		require QVD::Client::PulseAudio::Linux;
 		return  QVD::Client::PulseAudio::Linux->new(%params);
+    } elsif ( $^O =~ /darwin/ ) {
+        require QVD::Client::PulseAudio::Darwin;
+        return  QVD::Client::PulseAudio::Darwin->new(%params);
 	}
 
 	die "No implementation for OS '$^O'";
