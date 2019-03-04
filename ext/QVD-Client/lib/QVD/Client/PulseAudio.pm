@@ -9,8 +9,8 @@ sub new {
 	my $self = {};
 
 	if ( $^O =~ /linux/ ) {
-		require QVD::Client::PulseAudio::Linux;
-		return  QVD::Client::PulseAudio::Linux->new(%params);
+		require QVD::Client::PulseAudio::Unix;
+		return  QVD::Client::PulseAudio::Unix->new(%params);
     } elsif ( $^O =~ /darwin/ ) {
         require QVD::Client::PulseAudio::Darwin;
         return  QVD::Client::PulseAudio::Darwin->new(%params);
