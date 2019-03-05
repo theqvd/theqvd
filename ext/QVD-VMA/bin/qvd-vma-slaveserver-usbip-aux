@@ -32,7 +32,7 @@ getppid == $ppid or LOGDIE "Won't exec if I'm not nxagent's child";
 DEBUG "Reading device data";
 
 my $data = <STDIN>;
-$data or die "No device to attach";
+$data or LOGDIE "No device to attach";
 chomp $data;
 
 my ($devid, $speed) = split(' ',$data);
@@ -42,6 +42,6 @@ DEBUG "Attaching with Device Data: $data";
 my $usbip = Linux::USBIP->new();
 
 DEBUG "usbip->attach($socket, $devid, $speed)";
-$usbip->attach($socket, $devid, $speed) or die "Couldn't import device: ".$usbip->{error_msg};
+$usbip->attach($socket, $devid, $speed) or LOGDIE "Couldn't import device: ".$usbip->{error_msg};
 
 INFO "Device connected";
