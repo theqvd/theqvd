@@ -1,0 +1,85 @@
+#!/usr/lib/qvd/bin/perl
+
+use warnings;
+use strict;
+
+BEGIN {
+    $QVD::Config::USE_DB = 0;
+    @QVD::Config::Core::FILES = (
+        '/etc/qvd/client.conf',
+        $ENV{HOME}.'/.qvd/client.conf',
+        'qvd-client.conf',
+    );
+
+    # FIXME NX_CLIENT is used for showing the user information on things
+    # like broken connection, perhaps we should show them to the user
+    # instead of ignoring them? 
+    $ENV{NX_CLIENT} = '/bin/false';
+}
+
+use QVD::Config;
+use QVD::Config::Core qw(core_cfg set_core_cfg);
+use Linux::USBIP;
+use Socket qw/SOL_SOCKET SO_REUSEADDR SO_KEEPALIVE/;
+
+use QVD::Log;
+INFO "QVD-Client Slave Client started";
+$SIG{__WARN__} = sub { WARN "@_"; };
+
+# Some parameters
+my $socket = fileno STDIN;
+#my $run_path = core_cfg("path.run");
+my %actions = ( bind => \&bind,
+                unbind => \&unbind,
+                connect => \&connect,
+);
+
+# TODO: Some security check
+
+# Validate and run command
+my $cmd = shift @ARGV;
+my @args = @ARGV;
+
+unless ( defined($actions{$cmd}) ) { die "Invoked action is INVALID: $cmd";} 
+
+# Run command
+$actions{$cmd}->(@args);
+
+#Functions
+
+## Bind busid to usb_host driver
+sub bind{
+  my $busid = shift;
+
+  my $usbip = Linux::USBIP->new();
+  $usbip->bind($busid) 
+    or ERROR "Can't bind $busid: ".$usbip->{error_msg};
+}
+
+## Connect device to remote vhci_driver
+sub unbind{
+  my $busid = shift;
+
+  my $usbip = Linux::USBIP->new();
+  $usbip->unbind($busid) 
+    or ERROR "Can't unbind $busid: ".$usbip->{error_msg};
+}
+
+## Unbind busid from usb_host driver
+sub connect{
+  my $busid = shift;
+  my $socket = shift;
+
+  $sock->setsockopt(SOL_SOCKET,SO_REUSEADDR,1) or die "Cannot set socket options: SO_REUSEADDR";
+  $sock->setsockopt(SOL_SOCKET,SO_KEEPALIVE,1) or die "Cannot set socket options: SO_KEEPALIVE";
+
+  my $usbip = Linux::USBIP->new();
+  my $export_data = $usbip->export_dev($device,fileno $sock);
+  $export_data or die "Cannot export device: ".$usbip->{error_msg};
+
+  print $sock $export_data."\n";
+
+}
+
+
+

@@ -1560,12 +1560,12 @@ sub stop_device_sharing {
 
     if (core_cfg('client.slave.enable') && core_cfg('client.usb.enable') && try_load_usbip ) {
 
-        my $usbip = Linux::USBIP->new();
+        my $command_usbip = core_cfg('client.slave.command.qvd-client-slaveclient-usbip');
 
         INFO "USBIP sharing stopping";
         foreach my $busid (@{$self->{usbip_shared_buses}}) {
-            $usbip->unbind($busid) 
-              or ERROR "Can't unbind $busid: ".$usbip->{error_msg};
+            system($command_usbip,'unbind',$busid)
+              and ERROR "Can't unbind $busid";
             DEBUG "Device with busid: $busid was successfully unbound from usbip driver";
         }
 
