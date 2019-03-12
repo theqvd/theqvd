@@ -1563,10 +1563,12 @@ sub stop_device_sharing {
         my $command_usbip = core_cfg('client.slave.command.qvd-client-slaveclient-usbip');
 
         INFO "USBIP sharing stopping";
-        foreach my $busid (@{$self->{usbip_shared_buses}}) {
-            system($command_usbip,'unbind',$busid)
-              and ERROR "Can't unbind $busid";
-            DEBUG "Device with busid: $busid was successfully unbound from usbip driver";
+        while ( my $busid = shift @{$self->{usbip_shared_buses}}) {
+            if ( system($command_usbip,'unbind',$busid) ){
+              ERROR "Can't unbind $busid";
+            }else{
+              DEBUG "Device with busid: $busid was successfully unbound from usbip driver";
+            }
         }
 
     }
