@@ -195,7 +195,7 @@ sub _connect {
 sub _dbg {
 	my ($self, $text) = @_;
 #	print STDERR $text; #if ($self->{debug});
-	warn $text;
+	DEBUG $text;
 }
 
 sub _send {
