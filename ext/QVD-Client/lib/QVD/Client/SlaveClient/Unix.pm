@@ -6,8 +6,7 @@ use QVD::Config::Core qw(core_cfg);
 use QVD::HTTP::Headers qw(header_lookup);
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::Log;
-use Linux::USBIP;
-use Socket qw/SOL_SOCKET SO_REUSEADDR SO_KEEPALIVE/;
+use Fcntl;
 use strict;
 
 my $command_sftp_server = core_cfg('command.sftp-server');
@@ -111,10 +110,11 @@ sub handle_usbip {
 
     INFO "Starting usbip sharing for device: $device";
 
-    DEBUG "Binding and exporting usb device";
-    my $usbip = Linux::USBIP->new();
-    $usbip->bind($device) or die "Cannot bind device due to: ".$usbip->{error_msg};
+    my $command_usbip = core_cfg('client.slave.command.qvd-client-slaveclient-usbip');
 
+    DEBUG "Binding and exporting usb device";
+    system($command_usbip,'bind',$device)
+          and die "Can't bind $device";
 
     DEBUG "Requesting protocol switch";
     my ($code, $msg, $headers, $data) =
@@ -133,13 +133,12 @@ sub handle_usbip {
 
 
     my $sock = $self->{httpc}->{socket};
-    $sock->setsockopt(SOL_SOCKET,SO_REUSEADDR,1) or die "Cannot set socket options: SO_REUSEADDR";
-    $sock->setsockopt(SOL_SOCKET,SO_KEEPALIVE,1) or die "Cannot set socket options: SO_KEEPALIVE";
-
-    my $export_data = $usbip->export_dev($device,fileno $sock);
-    $export_data or die "Cannot export device: ".$usbip->{error_msg};
-
-    print $sock $export_data."\n";
+    # Perl, by default, sets close_on_exec on all filehandles. 
+    # We need to unset it for a file descriptor we're sending to an exec'ed command.
+    my $flags = fcntl $sock, F_GETFD, 0 or die "fcntl F_GETFD: $!";
+    fcntl $sock, F_SETFD, $flags & ~FD_CLOEXEC or die "fcntl F_SETFD: $!";
+    system($command_usbip,'connect',$device,fileno $sock)
+          and die "Can't bind $device";
 
     DEBUG "Device exported and data sent to server";
    
