@@ -14,7 +14,7 @@ BEGIN {
     # FIXME NX_CLIENT is used for showing the user information on things
     # like broken connection, perhaps we should show them to the user
     # instead of ignoring them? 
-#    $ENV{NX_CLIENT} = '/bin/false';
+    $ENV{NX_CLIENT} = '/bin/false';
 }
 
 use QVD::Config;
