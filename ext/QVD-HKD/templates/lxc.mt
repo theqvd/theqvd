@@ -26,6 +26,8 @@ lxc.mount.entry=/sys/devices/platform/<%= $extra->{vhci}->{hub} %> sys/devices/p
 
 % if ( $lxc_version == '0.9' ){
 lxc.aa_profile = unconfined
+% } else {
+lxc.aa_profile = lxc-container-qvd
 % }
 
 # Deny access to all devices, except...
@@ -57,6 +59,10 @@ lxc.cgroup.devices.allow = c 1:7 rwm
 lxc.cgroup.devices.allow = c 10:228 rwm
 #kvm
 lxc.cgroup.devices.allow = c 10:232 rwm
+
+### USB sharing
+# /dev/video*
+lxc.cgroup.devices.allow = c 81:* rwm
 
 % if ( defined $extra->{lines} ){
 <%= $extra->{lines} %>
