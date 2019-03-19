@@ -1,0 +1,98 @@
+#!/usr/lib/qvd/bin/perl
+use warnings;
+use strict;
+use Getopt::Long;
+use File::Slurp;
+use File::Spec;
+use File::Basename qw(dirname);
+use File::Path qw(make_path);
+use QVD::Config::Core;
+
+BEGIN {
+	$QVD::Config::USE_DB = 0;
+	$QVD::Config::USE_DB = 0; # Avoid warning
+
+	@QVD::Config::Core::FILES = ("/etc/qvd/vma.conf");
+
+	set_core_cfg('log4perl.appender.LOGFILE', 'Log::Log4perl::Appender::File');
+#	set_core_cfg('log4perl.appender.LOGFILE.filename',
+}
+use QVD::Log;
+
+
+$ENV{PATH} = "/bin:/sbin:/usr/bin:/usr/sbin";
+my $help;
+
+GetOptions("help|h" => \$help) or die "Getopt failed: $!";
+
+my ($device, $syspath) = @ARGV;
+
+if ( $help || !$device || !$syspath ) {
+	print <<HELP;
+$0: QVD device creation helper
+Makes device files in /dev. Used with udev.
+
+Syntax: $0 [device file] [syspath]
+
+HELP
+	exit(1);
+
+}
+
+
+$syspath = "/sys/$syspath";
+
+
+DEBUG "Starting, device=$device; syspath=$syspath";
+
+
+if ( -f "$syspath/dev" ) {
+	DEBUG "/dev file present";
+
+	my $devdata = read_file("$syspath/dev");
+	chomp $devdata;
+	my ($major, $minor) = split(/:/, $devdata);
+	my $type = "c";
+
+
+	$type = "b" if ( is_block($syspath) );
+
+
+	DEBUG "Creating base path";
+	make_path( dirname( $device ) );
+
+	INFO "Creating device $device: type=$type; major=$major; minor=$minor";
+
+	if ( -e $device ) {
+		INFO "Device already exists, not changing it.";
+	} else {
+		system("mknod", $device, $type, $major, $minor) == 0
+			or LOGDIE "Failed to mknod $device, command returned with code $?";
+	}
+
+	DEBUG "mknod returned $?";
+}
+
+# USB flash key has a path like:
+# /devices/platform/vhci_hcd.20/usb42/42-2/42-2:1.0/host2/target2:0:0/2:0:0:0/block/sda/sda2
+# Use the /block/ bit to determine it's a block device. This works both for /block/sda and
+# /block/sda/sda2.
+#
+
+sub is_block {
+	my ($syspath) = @_;
+
+	DEBUG "Trying to determine whether it's a block device";
+	my @parts = File::Spec->splitdir($syspath);
+	my $count=0;
+	while(@parts && $count++ < 3) {
+		my $p = pop @parts;
+		if ( $p eq "block" ) {
+			DEBUG "Block device detected";
+			return 1;
+			last;
+		}
+	}
+
+	return 0;
+}
