@@ -112,9 +112,11 @@ sub handle_usbip {
 
     my $command_usbip = core_cfg('client.slave.command.qvd-client-slaveclient-usbip');
 
+
     DEBUG "Binding and exporting usb device";
-    system($command_usbip,'bind',$device)
-          and die "Can't bind $device";
+    my @cmd = ($command_usbip,'bind',$device);
+    system(@cmd)
+          and die "Can't bind $device. Command " . join(' ', @cmd) . " returned with code $?";
 
     DEBUG "Requesting protocol switch";
     my ($code, $msg, $headers, $data) =
@@ -137,8 +139,9 @@ sub handle_usbip {
     # We need to unset it for a file descriptor we're sending to an exec'ed command.
     my $flags = fcntl $sock, F_GETFD, 0 or die "fcntl F_GETFD: $!";
     fcntl $sock, F_SETFD, $flags & ~FD_CLOEXEC or die "fcntl F_SETFD: $!";
-    system($command_usbip,'connect',$device,fileno $sock)
-          and die "Can't bind $device";
+    my @cmd = ($command_usbip, 'connect', $device, fileno $sock);
+    system(@cmd)
+          and die "Can't bind $device. Command " . join(' ', @cmd) . " returned with code $?";
 
     DEBUG "Device exported and data sent to server";
    
