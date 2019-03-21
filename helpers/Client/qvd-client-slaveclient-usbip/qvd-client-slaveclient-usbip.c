@@ -9,5 +9,6 @@ int main( int argc, char ** argv, char ** envp )
               if( setuid(geteuid()) < 0 ) { perror( "setuid" ); exit(1); }
 //              envp = 0; /* blocks IFS attack on non-bash shells */
               execve( "/usr/lib/qvd/bin/qvd-client-slaveclient-usbip-aux", argv, envp );
+              perror("Failed to execute /usr/lib/qvd/bin/qvd-client-slaveclient-usbip-aux");
               return(1);
 }
