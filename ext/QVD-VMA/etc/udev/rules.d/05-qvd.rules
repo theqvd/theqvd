@@ -1,0 +1,6 @@
+# TODO: udev will sometime call the script without DEVNAME set.
+# See if it's possible to change the rules so that the script doesn't run at all.
+# Meanwhile the script handles that case by exiting without doing any work.
+ACTION=="add", KERNEL != "", PROGRAM = "/usr/lib/qvd/bin/qvd-create-device --from-env" 
+
+ACTION=="remove", KERNEL != "", PROGRAM = "/usr/lib/qvd/bin/qvd-create-device --from-env"
