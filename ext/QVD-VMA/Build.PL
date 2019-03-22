@@ -46,8 +46,9 @@ my $build = Module::Build->new(
         'Linux::USBIP' => 0,
     },
     etc_files=> {
-        "etc/vma_defaults.conf"  => "$vma_dst/qvd-vma",
-        "etc/vma.conf"           => "/etc/qvd/vma.conf",
+        "etc/vma_defaults.conf"         => "$vma_dst/qvd-vma",
+        "etc/vma.conf"                  => "/etc/qvd/vma.conf",
+        "etc/udev/rules.d/05-qvd.rules" => "/etc/udev/rules.d/05-qvd.rules",
     },
     install_path => { 'etc' => '/etc' },
 );
