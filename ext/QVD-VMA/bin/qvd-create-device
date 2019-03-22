@@ -6,71 +6,132 @@ use File::Slurp;
 use File::Spec;
 use File::Basename qw(dirname);
 use File::Path qw(make_path);
-use QVD::Config::Core;
 
 BEGIN {
 	$QVD::Config::USE_DB = 0;
 	$QVD::Config::USE_DB = 0; # Avoid warning
-
 	@QVD::Config::Core::FILES = ("/etc/qvd/vma.conf");
+}
 
+BEGIN {
+	use QVD::Config::Core;
+
+	# Override the normally used Log::Dispatch::FileRotate because
+	# it takes a very long time to initialize. This command can be run multiple
+	# times in quick succession, and this may result in devices taking a long
+	# time to appear in the virtual machine if it takes a long time to run.
 	set_core_cfg('log4perl.appender.LOGFILE', 'Log::Log4perl::Appender::File');
-#	set_core_cfg('log4perl.appender.LOGFILE.filename',
 }
 use QVD::Log;
 
 
 $ENV{PATH} = "/bin:/sbin:/usr/bin:/usr/sbin";
 my $help;
+my $create;
+my $delete;
+my $debug;
+my $from_env;
+my @orig_argv = @ARGV;
 
-GetOptions("help|h" => \$help) or die "Getopt failed: $!";
+GetOptions(
+	"help|h"     => \$help,
+	"create"     => \$create,
+	"delete"     => \$delete,
+	"debug|D"    => \$debug,
+	"from-env|E" => \$from_env )
+	or die "Getopt failed: $!";
 
 my ($device, $syspath) = @ARGV;
 
-if ( $help || !$device || !$syspath ) {
-	print <<HELP;
-$0: QVD device creation helper
-Makes device files in /dev. Used with udev.
+if ( $from_env ) {
+	# Take all the data from environment variables. Made for running from udev.
 
-Syntax: $0 [device file] [syspath]
+	$create=1 if ( ($ENV{ACTION} // "") eq "add" );
+	$delete=1 if ( ($ENV{ACTION} // "") eq "remove" );
 
-HELP
-	exit(1);
-
+	if ( $create ) {
+		if ( $ENV{DEVNAME} && $ENV{DEVPATH} ) {
+			$device  = $ENV{DEVNAME};
+			$syspath = $ENV{DEVPATH};
+		} else {
+			# udev may call this script without the DEVNAME at times. The udev
+			# rule for running this app may need some improvement, but meanwhile
+			# this is dealt with here. This message is harmless.
+			DEBUG "Can't create, either DEVNAME or DEVPATH missing";
+			exit(0);
+		}
+	} elsif ( $delete ) {
+		if ( $ENV{DEVNAME} ) {
+			$device = $ENV{DEVNAME};
+		} else {
+			DEBUG "Can't delete, DEVNAME missing";
+			exit(0);
+		}
+	} else {
+		ERROR "No mode selected, don't know what to do. ACTION is " . ($ENV{ACTION} // "(undef)");
+		exit(1);
+	}
 }
 
 
-$syspath = "/sys/$syspath";
+if ( $debug ) {
+	dump_env();
+}
+
+if ( $create && $device && $syspath ) {
+	DEBUG "Starting creation, device=$device; syspath=$syspath";
+	$syspath = "/sys/$syspath";
+
+	if ( -f "$syspath/dev" ) {
+		DEBUG "sysfs 'dev' file present";
+
+		my $devdata = read_file("$syspath/dev", err_mode => 'croak');
+		chomp $devdata;
+		my ($major, $minor) = split(/:/, $devdata);
+		my $type = "c";
 
 
-DEBUG "Starting, device=$device; syspath=$syspath";
+		$type = "b" if ( is_block($syspath) );
 
 
-if ( -f "$syspath/dev" ) {
-	DEBUG "/dev file present";
+		DEBUG "Creating base path";
+		make_path( dirname( $device ) );
 
-	my $devdata = read_file("$syspath/dev");
-	chomp $devdata;
-	my ($major, $minor) = split(/:/, $devdata);
-	my $type = "c";
+		INFO "Creating device $device: type=$type; major=$major; minor=$minor";
 
+		if ( -e $device ) {
+			INFO "Device $device already exists, not changing it.";
+		} else {
+			system("mknod", $device, $type, $major, $minor) == 0
+				or LOGDIE "Failed to mknod $device, command returned with code $?";
+		}
 
-	$type = "b" if ( is_block($syspath) );
-
-
-	DEBUG "Creating base path";
-	make_path( dirname( $device ) );
-
-	INFO "Creating device $device: type=$type; major=$major; minor=$minor";
-
-	if ( -e $device ) {
-		INFO "Device already exists, not changing it.";
+		DEBUG "mknod returned $?";
 	} else {
-		system("mknod", $device, $type, $major, $minor) == 0
-			or LOGDIE "Failed to mknod $device, command returned with code $?";
+		DEBUG "$syspath/dev not found";
 	}
+} elsif( $delete && $device ) {
+	DEBUG "Starting deletion, device=$device";
+	if ( -e $device ) {
 
-	DEBUG "mknod returned $?";
+		if ( unlink($device) ) {
+			INFO "Deleted $device";
+		} else {
+			ERROR "Failed to delete $device: $!";
+		}
+
+		my @parts = File::Spec->splitdir(dirname($device));
+		while(@parts) {
+			my $dir = File::Spec->catdir(@parts);
+			if ( rmdir( $dir ) ) {
+				DEBUG "Removed $dir";
+			}
+
+			pop @parts;
+		}
+	}
+} else {
+	show_help();
 }
 
 # USB flash key has a path like:
@@ -96,3 +157,36 @@ sub is_block {
 
 	return 0;
 }
+
+sub show_help {
+	print <<HELP;
+$0: QVD device creation helper
+Makes device files in /dev. Used with udev.
+
+Syntax: $0 [options] [device file] [syspath]
+
+Options:
+	--create    Create the indicated device
+	--delete    Delete the indicated device
+	--debug     Dump debug info to log (environment)
+	--from-env  Take action, device file and syspath from the envionment
+	            provided by udev.
+	--help      Shows this help
+
+HELP
+	exit(1);
+}
+
+sub dump_env {
+	require Cwd;
+
+	DEBUG "=== Debug dump ===";
+	DEBUG "Original ARGV  : " . join('; ', @orig_argv);
+	DEBUG "Working dir    : " . Cwd::getcwd();
+	DEBUG "=== Environment dump ===";
+	foreach my $var (keys %ENV) {
+		DEBUG "$var: $ENV{$var}";
+	}
+	DEBUG "=== End of dump ===";
+}
+
