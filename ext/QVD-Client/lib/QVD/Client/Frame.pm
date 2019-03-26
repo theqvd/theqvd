@@ -731,6 +731,8 @@ sub OnConnectionStatusChanged {
     if ($status eq 'CONNECTING') {
         $self->EnableControls(0);
         $self->{timer}->Start(50, 0);
+
+        $self->_clear_errors;
     } elsif ($status eq 'CONNECTED') {
         if (core_cfg('client.show.remember_password')) {
             # $self->{remember_pass} only exists when client.show.remember_password is set
@@ -742,6 +744,8 @@ sub OnConnectionStatusChanged {
         $self->start_file_sharing();
         $self->start_remote_mounts();
         $self->start_device_sharing();
+
+        $self->_show_errors;
     } elsif ($status eq 'CLOSED') {
         $self->{timer}->Stop();
         $self->stop_device_sharing();
@@ -1499,7 +1503,7 @@ sub start_file_sharing {
         return;
     }
     INFO "Exporting local shares into remote VM";
-    my @errors;
+
     for my $share (@{ $self->{shares} }) {
         INFO "Starting folder sharing for $share";
         local $@;
@@ -1510,14 +1514,8 @@ sub start_file_sharing {
         else {
             ERROR "Unable to mount share $share: [$code] $@";
             my $message = sprintf($self->_t("Failed to mount share %s:"), $share) . ' ' . $@;
-            push @errors, $message;
+            $self->_add_error($self->_t("File sharing"), $message); 
         }
-    }
-    if (@errors) {
-        my $dialog = Wx::MessageDialog->new($self, join("\n", @errors),
-                                            $self->_t("File sharing error."), wxOK | wxICON_ERROR);
-        $dialog->ShowModal();
-        $dialog->Destroy();
     }
 }
 
@@ -1540,10 +1538,34 @@ sub start_device_sharing {
                 my $client = QVD::Client::SlaveClient->new();
                 eval { $client->handle_usbip($busid) };
                     if ($@) {
+                        my $errmsg = $self->_t("Unknown USB/IP error");
+
                         if ($@ =~ 'ECONNREFUSED' || $@ =~ 'EPIPE' ) {
                             sleep 1;
                             next;
                         }
+
+                        if ( $@ =~ /Failed to bind/ ) {
+                            my ($err, $usbip_out) = split(/\n/, $@);
+
+                            DEBUG "USBIP command returned error: $err";
+                            DEBUG "Error message: $usbip_out";
+
+                            if ( $usbip_out =~ /not bound to usbip-host driver, but to (.*?):/ ) {
+                                $errmsg = $self->_t("Failed to connect device to USB/IP driver. USB/IP support may not be available.");
+                            } elsif ( $usbip_out =~ /already in use/ ) {
+                                $errmsg = $self->_t("Device is already in use by another application.");
+                            } elsif ( $usbip_out =~ /Unable to find an unused USB-IP port/ ) {
+                                $errmsg = $self->_t("Unable to find an USB-IP port. You need to use a kernel with the QVD patch.");
+                            } else {
+                                WARN "Didn't find a match for message";
+                                $errmsg = $self->_t("Unknown USP/IP problem: ") . $usbip_out;
+                            }
+                        } else {
+                            ERROR "Unidentified error in USBIP: $@";
+                        }
+
+                        $self->_add_error($self->_t("USB sharing"), sprintf($self->_t("Failed to share device %s: %s"), $devid, $errmsg));
                         ERROR $@;
                     } else {
                         push @{$self->{usbip_shared_buses}},$busid;
@@ -1582,7 +1604,6 @@ sub start_remote_mounts {
 		return;
 	}INFO "Starting remote mounts";
 
-	my @errors;
     for my $num (map /^client\.mount\.(\d+)\.remote$/, core_cfg_keys) {
         local $@;
 		my $remote_dir = core_cfg("client.mount.$num.remote", 0)// next;
@@ -1616,16 +1637,10 @@ sub start_remote_mounts {
                           $self->_t("Unrecognized error, full error message follows:")."\n\n$@");
             my $message = sprintf($self->_t("Failed to mount remote folder %s at %s:"),
                                   $remote_dir, $local_dir)." ".$reason;
-            push @errors, $message;
+
+            $self->_add_error($self->_t("Remote mounts", $message));
         }
     }
-    if (@errors) {my $dialog = Wx::MessageDialog->new($self, join("\n", @errors), $self->_t("File sharing error."), wxOK | wxICON_ERROR);
-				$dialog->ShowModal();
-				$dialog->Destroy();
-}
-			 else {
-				DEBUG"All remote mounts started";
-	}
 }
 
 sub get_osx_resolutions {
@@ -1723,4 +1738,48 @@ sub _add_advice {
 
     push @$aref, $advice;
 }
+
+
+sub _clear_errors {
+    my ($self) = @_;
+
+    DEBUG "Clearing error list";
+    $self->{errors} = {};
+}
+
+sub _add_error {
+    my ($self, $category, $error) = @_;
+
+    DEBUG "Adding error of category $category: $error";
+
+    $self->{errors} //= {};
+    $self->{errors}->{$category} //= [];
+    push @{ $self->{errors}->{$category} }, $error;
+}
+
+sub _show_errors {
+    my ($self) = @_;
+
+    my @lines;
+
+    DEBUG "Showing errors";
+    foreach my $category ( sort keys %{ $self->{errors} } ) {
+        foreach my $err ( @{ $self->{errors}->{$category} } ) {
+            push @lines, $err;
+        }
+    }
+
+    if ( @lines ) {
+        my $text = $self->_t("Errors during connection:") . "\n";
+        $text .= join("\n", @lines);
+
+        my $dialog = Wx::MessageDialog->new($self, $text,
+                                            $self->_t(""), wxOK | wxICON_ERROR);
+        $dialog->ShowModal();
+        $dialog->Destroy();
+    }
+
+    $self->_clear_errors;
+}
+
 1;
