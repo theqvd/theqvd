@@ -40,6 +40,16 @@ my %actions = ( bind => \&bind,
 my $cmd = shift @ARGV;
 my @args = @ARGV;
 
+
+DEBUG "Trying to load usbip-host module";
+system("modprobe", "usbip-host");
+
+if ( $? == 0 ) {
+	DEBUG "modprobe successful";
+} else {
+	WARN "modprobe returned $?";
+}
+
 DEBUG "Action: $cmd";
 unless ( defined($actions{$cmd}) ) { die "Invoked action is INVALID: $cmd";} 
 
