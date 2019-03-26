@@ -7,6 +7,7 @@ use QVD::HTTP::Headers qw(header_lookup);
 use QVD::HTTP::StatusCodes qw(:status_codes);
 use QVD::Log;
 use Fcntl;
+use IPC::Cmd qw(run);
 use strict;
 
 my $command_sftp_server = core_cfg('command.sftp-server');
@@ -115,8 +116,12 @@ sub handle_usbip {
 
     DEBUG "Binding and exporting usb device";
     my @cmd = ($command_usbip,'bind',$device);
-    system(@cmd)
-          and die "Can't bind $device. Command " . join(' ', @cmd) . " returned with code $?";
+    my ( $ret, $err_msg, $stdout_buf, $stderr_buf);
+
+    ( $ret, $err_msg, undef, $stdout_buf, $stderr_buf ) = run ( command => \@cmd );
+    if ( !$ret ) {
+        die "Failed to bind device $device: $err_msg\n" . join('\n', @$stderr_buf);
+    }
 
     DEBUG "Requesting protocol switch";
     my ($code, $msg, $headers, $data) =
@@ -139,9 +144,12 @@ sub handle_usbip {
     # We need to unset it for a file descriptor we're sending to an exec'ed command.
     my $flags = fcntl $sock, F_GETFD, 0 or die "fcntl F_GETFD: $!";
     fcntl $sock, F_SETFD, $flags & ~FD_CLOEXEC or die "fcntl F_SETFD: $!";
-    my @cmd = ($command_usbip, 'connect', $device, fileno $sock);
-    system(@cmd)
-          and die "Can't bind $device. Command " . join(' ', @cmd) . " returned with code $?";
+    @cmd = ($command_usbip, 'connect', $device, fileno $sock);
+
+    ( $ret, $err_msg, undef, $stdout_buf, $stderr_buf ) = run ( command => \@cmd );
+    if ( !$ret ) {
+        die "Failed to bind device $device: $err_msg\n" . join('\n', @$stderr_buf);
+    }
 
     DEBUG "Device exported and data sent to server";
    
