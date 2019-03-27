@@ -1557,6 +1557,8 @@ sub start_device_sharing {
                                 $errmsg = $self->_t("Device is already in use by another application.");
                             } elsif ( $usbip_out =~ /Unable to find an unused USB-IP port/ ) {
                                 $errmsg = $self->_t("Unable to find an USB-IP port. You need to use a kernel with the QVD patch.");
+                            } elsif ( $usbip_out =~ /driver\/unbind: No such file or directory/ ) {
+                                $errmsg = $self->_t("Unable to detach the device from the system");
                             } else {
                                 WARN "Didn't find a match for message";
                                 $errmsg = $self->_t("Unknown USP/IP problem: ") . $usbip_out;
@@ -1770,7 +1772,7 @@ sub _show_errors {
     }
 
     if ( @lines ) {
-        my $text = $self->_t("Errors during connection:") . "\n";
+        my $text = $self->_t("Errors during connection:") . "\n\n";
         $text .= join("\n", @lines);
 
         my $dialog = Wx::MessageDialog->new($self, $text,
