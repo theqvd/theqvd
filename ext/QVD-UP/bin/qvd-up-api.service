@@ -1,6 +1,7 @@
 [Unit]
 Description=QVD UP API service
-After=syslog.target network.target
+Wants=postgresql.service
+After=postgresql.service syslog.target network.target
 
 [Service]
 Type=forking

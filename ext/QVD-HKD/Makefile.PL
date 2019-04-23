@@ -48,6 +48,7 @@ WriteMakefile(
         bin/qvd-hkd.postinst
         bin/qvd-hkd.prerm
         bin/qvd-hkd.service
+	templates/lxc.mt
         ) ],
     AUTHOR        => 'QVD Team <qvd@qindel.com>',
 );
