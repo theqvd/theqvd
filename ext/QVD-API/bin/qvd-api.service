@@ -1,6 +1,6 @@
 [Unit]
 Description=QVD API service
-Want=postgresql.service
+Wants=postgresql.service
 After=postgresql.service syslog.target network.target
 
 [Service]
