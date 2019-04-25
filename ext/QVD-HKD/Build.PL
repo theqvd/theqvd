@@ -1,15 +1,26 @@
-use 5.010;
-use ExtUtils::MakeMaker;
+# IMPORTANT: if you delete this file your app will not work as
+# expected.  you have been warned
+use strict;
+use warnings;
+use Module::Build;
 
 my $SUF_VERSION = "";
 if  ( defined $ENV{BUILD_NUMBER} ) {
     $SUF_VERSION = '.' . $ENV{BUILD_NUMBER} ;
 }
 
-WriteMakefile(
-    NAME          => 'QVD::HKD',
-    VERSION       => '3.5'.$SUF_VERSION ,
-    PREREQ_PM     => {
+my $build = Module::Build->new(
+    module_name      => 'QVD::HKD',
+    dist_author      => 'QVD Team <qvd@qindel.com',
+    dist_version     => '3.5'.$SUF_VERSION,
+    dist_abstract    => 'QVD::HKD - House Keeping Daemon for the QVD Server.',
+    license          => 'gpl',
+
+    configure_requires => {
+        'Module::Build'                      => 0.38
+    },
+
+    requires => {
         'AnyEvent' => '5.34',
         'AnyEvent::Debug' => 0,
         'AnyEvent::HTTP' => '2.13',
@@ -39,16 +50,14 @@ WriteMakefile(
         'BSD::Resource' => '1.2910',
         'Mojo::Template' => '0'
     },
-    ABSTRACT      => 'lib/QVD/HKD.pm',
-    EXE_FILES     => [ qw(
-        bin/qvd-hkd
-        bin/qvd-lxc-autodev
-        bin/qvd-hkd.initrc.pl
-        bin/qvd-hkd.debrc.pl
-        bin/qvd-hkd.postinst
-        bin/qvd-hkd.prerm
-        bin/qvd-hkd.service
-	templates/lxc.mt
-        ) ],
-    AUTHOR        => 'QVD Team <qvd@qindel.com>',
+    etc_files=> {
+        "/etc/qvd/templates/lxc.mt"         => "/etc/qvd/templates/lxc.mt",
+    },
+    install_path => { 'etc' => '/etc' },
 );
+
+foreach my $ext (qw(fb tt png jar css gif js zip ico etc conf)) {
+    $build->add_build_element($ext);
+}
+
+$build->create_build_script();
