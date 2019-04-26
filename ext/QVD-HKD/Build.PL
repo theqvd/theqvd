@@ -51,7 +51,7 @@ my $build = Module::Build->new(
         'Mojo::Template' => '0'
     },
     etc_files=> {
-        "/etc/qvd/templates/lxc.mt"         => "/etc/qvd/templates/lxc.mt",
+        "etc/qvd/templates/lxc.mt" => "/etc/qvd/templates/lxc.mt",
     },
     install_path => { 'etc' => '/etc' },
 );
