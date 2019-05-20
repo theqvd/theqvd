@@ -1198,6 +1198,8 @@ sub _allocate_port {
 # it's up to the caller (Frame.pm) to pass the string to the translator.
 
 sub _t {
+    # Allow usage both as a method and as a function
+    shift if ( ref(@_[0]) =~ /^QVD::/ );
     return @_;
 }
 
