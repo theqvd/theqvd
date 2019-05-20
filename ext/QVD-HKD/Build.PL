@@ -48,7 +48,9 @@ my $build = Module::Build->new(
         'Socket' => '2.024',
         'URI::Escape' => 0,
         'BSD::Resource' => '1.2910',
-        'Mojo::Template' => '0'
+        'Mojo::Template' => '0',
+        'Socket::Netlink' => 0,
+        'Linux::Inotify2' => 0
     },
     etc_files=> {
         "etc/qvd/templates/lxc.mt" => "/etc/qvd/templates/lxc.mt",
