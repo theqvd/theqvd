@@ -1,5 +1,5 @@
-#lxc.autodev=1
-#lxc.hook.autodev=<%= $lxc_hook_autodev %>
+lxc.autodev=1
+lxc.hook.autodev=<%= $lxc_hook_autodev %>
 lxc.utsname=<%= $lxc_utsname %>
 lxc.network.type=veth
 lxc.network.veth.pair=<%= $lxc_network_veth_pair %>
