@@ -49,6 +49,9 @@ my $build = Module::Build->new(
         "etc/vma_defaults.conf"         => "$vma_dst/qvd-vma",
         "etc/vma.conf"                  => "/etc/qvd/vma.conf",
         "etc/udev/rules.d/05-qvd.rules" => "/etc/udev/rules.d/05-qvd.rules",
+        "etc/apparmor.d/lxc/lxc-qvd"    => "/etc/apparmor.d/lxc/lxc-qvd",
+        "etc/apparmor.d/abstractions/lxc/container-base-qvd"
+                                        => "/etc/apparmor.d/abstractions/lxc/container-base-qvd"
     },
     install_path => { 'etc' => '/etc' },
 );
