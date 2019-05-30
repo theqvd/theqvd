@@ -1,21 +1,3 @@
-qvd-client-slaveclient-usbip (4.2.0-xenial-0001-0000ffff) xenial; urgency=medium
-
-  * Release 4.2.0-xenial-0001-0000ffff
-
- -- QVD Team <qvd@qindel.com>  Tue, 26 Feb 2019 08:52:22 +0100
-
-qvd-client-slaveclient-usbip (4.2.0-xenial-0001-0000ffff) xenial; urgency=medium
-
-  * Release 4.2.0-xenial-0001-0000ffff
-
- -- QVD Team <qvd@qindel.com>  Tue, 26 Feb 2019 08:51:45 +0100
-
-qvd-client-slaveclient-usbip (4.2.0-xenial-0001-) xenial; urgency=medium
-
-  * Release 4.2.0-xenial-0001-
-
- -- QVD Team <qvd@qindel.com>  Tue, 26 Feb 2019 08:51:10 +0100
-
 qvd-client-slaveclient-usbip (3.4.1-1) unstable; urgency=medium
 
   * Initial release
