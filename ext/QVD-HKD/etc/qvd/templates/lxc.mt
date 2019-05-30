@@ -1,4 +1,5 @@
 lxc.autodev=1
+lxc.kmsg=0
 lxc.hook.autodev=<%= $lxc_hook_autodev %>
 lxc.utsname=<%= $lxc_utsname %>
 lxc.network.type=veth
