@@ -43,6 +43,14 @@ GetOptions(
 
 my ($device, $syspath) = @ARGV;
 
+my $cmd_mknod    = core_cfg('command.mknod');
+my $cmd_setfacl  = core_cfg('command.setfacl');
+my $acl_enable   = core_cfg('createdevice.acl.enable');
+my $acl_group    = core_cfg('createdevice.acl.group');
+my $acl_perms    = core_cfg('createdevice.acl.permissions');
+
+
+
 if ( $from_env ) {
 	# Take all the data from environment variables. Made for running from udev.
 
@@ -102,8 +110,15 @@ if ( $create && $device && $syspath ) {
 		if ( -e $device ) {
 			INFO "Device $device already exists, not changing it.";
 		} else {
-			system("mknod", $device, $type, $major, $minor) == 0
-				or LOGDIE "Failed to mknod $device, command returned with code $?";
+			run_cmd("mknod", $device, $type, $major, $minor) or LOGDIE "mknod failed";
+
+			if ( $acl_enable ) {
+				DEBUG "Setting ACLs for $device: Setting permissions to $acl_perms for group $acl_group";
+				run_cmd("setfacl", "-m", "g:$acl_group:$acl_perms", $device);
+			} else {
+				DEBUG "ACLs disabled";
+			}
+
 		}
 
 		DEBUG "mknod returned $?";
@@ -176,6 +191,27 @@ Options:
 HELP
 	exit(1);
 }
+
+sub run_cmd {
+	my (@cmd) = @_;
+	my $cmdstr = join(' ', @cmd);
+	DEBUG "Running: $cmdstr";
+
+	if ( system(@cmd) != 0 ) {
+		if ( $? == -1 ) {
+			ERROR "Failed to execute $cmdstr: $!";
+		} elsif ( $? & 127 ) {
+			ERROR "Command '$cmdstr' died with signal " . ($? & 127);
+		} else {
+			ERROR "Command '$cmdstr' exited with value " . $? >> 8;
+		}
+
+		return 0;
+	}
+
+	return 1;
+}
+
 
 sub dump_env {
 	require Cwd;

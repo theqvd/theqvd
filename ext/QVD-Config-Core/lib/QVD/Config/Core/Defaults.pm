@@ -220,6 +220,8 @@ command.cupsaccept = /usr/sbin/cupsaccept
 
 command.systemctl = /bin/systemctl
 command.init_d.cups = /etc/init.d/cups
+command.mknod = mknod
+command.setfacl = setfacl
 
 
 ## whether to remember password after successful connection
@@ -661,7 +663,7 @@ vma.user.shares.path = ~/Redirected
 
 ## default user name and groups it will belong to
 vma.user.default.name = qvd
-vma.user.default.groups =
+vma.user.default.groups = qvduser
 vma.default.lang = en_US.UTF-8
 vma.usb.usbip.debug = 0
 vma.usb.usbip.log = 0
@@ -853,3 +855,18 @@ wat.multitenant = 1
 ## Disk Image Generator (DIG) parameters
 api.proxy.dig.address = http://localhost:9000
 api.public.dig.enabled = 0
+
+## USBIP device ACLs
+##
+## When a device is created, an ACL is applied to the device file to
+## allow a particular group to have access to it. This allows the user
+## to for instance access a webcam shared over usbip.
+##
+## For this to work, the user in the VM/container must belong to this
+## group, meaning createdevice.acl.group must be set to one of the groups
+## in vma.user.default.groups
+
+createdevice.acl.enable=1
+createdevice.acl.group=qvduser
+createdevice.acl.permissions=rw
+
