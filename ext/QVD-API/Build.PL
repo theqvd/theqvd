@@ -1,20 +1,19 @@
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
-WriteMakefile(
-    NAME              => 'QVD::API',
-    AUTHOR            => 'QVD Team <qvd@qindel.es>',
-    VERSION	          => '4.0'.$ENV{BUILD_NUMBER},
-    ABSTRACT          => 'QVD::API',
-    EXE_FILES         => [
-        'bin/qvd-api.debrc.pl',
-        'bin/qvd-api.initrc.pl',
-        'bin/qvd-api.pl' ,
-        'bin/qvd-api.service'
-    ],
-    PREREQ_PM         => {
+use Module::Build;
+
+my $SUF_VERSION = "";
+if  ( defined $ENV{BUILD_NUMBER} ) {
+    $SUF_VERSION = '.' . $ENV{BUILD_NUMBER} ;
+}
+
+my $build = Module::Build->new(
+    module_name      => 'QVD::API',
+    dist_author      => 'QVD Team <qvd@qindel.com',
+    dist_version     => '4.2'.$SUF_VERSION,
+    dist_abstract    => 'QVD::API - The API of QVD',
+    license          => 'gpl',
+    requires => {
         'Clone' => 0,
         'Config::Properties' => 0,
         'Data::Page' => 0,
@@ -48,4 +47,12 @@ WriteMakefile(
         'TryCatch' => 0,
         'Try::Tiny' => 0,
     },
+    script_files => [ 'bin/qvd-api.debrc.pl', 'bin/qvd-api.initrc.pl', 'bin/qvd-api.pl' ],
+    etc_files => {
+        'etc/systemd/system/qvd-api.service' => 'etc/systemd/system/qvd-api.service'
+    },
+    install_path => { 'etc' => '/etc' },
 );
+
+$build->add_build_element ('etc');
+$build->create_build_script();
