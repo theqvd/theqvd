@@ -557,6 +557,7 @@ vm.lxc.unionfs.overlayfs.module.name = overlay
 @ubuntu-16.04.0@vm.lxc.unionfs.overlayfs.module.name = overlayfs
 @ubuntu-16.04.1@vm.lxc.unionfs.overlayfs.module.name = overlayfs
 @sles@vm.lxc.unionfs.overlayfs.module.name = overlayfs
+@sles-15@vm.lxc.unionfs.overlayfs.module.name = overlay
 
 # allow LXC DIs to have hooks for customization - disabled by default
 # because they run as root and can do anything on the host
