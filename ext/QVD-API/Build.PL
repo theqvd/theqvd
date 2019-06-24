@@ -47,12 +47,7 @@ my $build = Module::Build->new(
         'TryCatch' => 0,
         'Try::Tiny' => 0,
     },
-    script_files => [ 'bin/qvd-api.debrc.pl', 'bin/qvd-api.initrc.pl', 'bin/qvd-api.pl' ],
-    etc_files => {
-        'etc/systemd/system/qvd-api.service' => 'etc/systemd/system/qvd-api.service'
-    },
-    install_path => { 'etc' => '/etc' },
+    script_files => [ 'bin/qvd-api.debrc.pl', 'bin/qvd-api.initrc.pl', 'bin/qvd-api.pl', 'bin/qvd-api.service' ],
 );
 
-$build->add_build_element ('etc');
 $build->create_build_script();
