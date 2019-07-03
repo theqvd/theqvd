@@ -1,0 +1,20 @@
+/* -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*- */
+
+// QVD rules
+
+polkit.addRule(function(action, subject) {
+	polkit.log("action=" + action);
+	polkit.log("subject=" + subject);
+
+	// All QVD users must belong to the 'qvd' group.
+	// This is enforced by VMA.
+	if ( subject.isInGroup("qvd") ) {
+
+		// Grant access to the fingerprint reader
+		if ( action.id == "net.reactivated.fprint.device.enroll" ||
+		     action.id == "net.reactivated.fprint.device.verify" ) {
+			return polkit.Result.YES;
+		}
+	}
+});
+

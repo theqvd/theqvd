@@ -49,6 +49,7 @@ my $build = Module::Build->new(
         "etc/vma_defaults.conf"         => "$vma_dst/qvd-vma",
         "etc/vma.conf"                  => "/etc/qvd/vma.conf",
         "etc/udev/rules.d/05-qvd.rules" => "/etc/udev/rules.d/05-qvd.rules",
+        "etc/polkit-1/rules.d/51-qvd.rules" => "/etc/polkit-1/rules.d/51-qvd.rules"
     },
     install_path => { 'etc' => '/etc' },
 );
