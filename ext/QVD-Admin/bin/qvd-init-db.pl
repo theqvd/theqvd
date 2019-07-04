@@ -31,13 +31,13 @@ my %default_config = ( vmas_load_balance_algorithm => 'random',
                                                 # instead!
 
 		       hkd_pid_file => '/var/run/qvd/hkd.pid',
-		       hkd_log_file => '/var/log/qvd.log',
+		       hkd_log_file => '/var/log/qvd/qvd.log',
 
 		       l7r_pid_file => '/var/run/qvd/l7r.pid',
-		       l7r_log_file => '/var/log/qvd.log',
+		       l7r_log_file => '/var/log/qvd/qvd.log',
 
 		       rc_pid_file => '/var/run/qvd/rc.pid',
-		       rc_log_file => '/var/log/qvd.log',
+		       rc_log_file => '/var/log/qvd/qvd.log',
 
 		       base_storage_path => '/var/lib/qvd/storage',
 		       ro_storage_path => '/var/lib/qvd/storage/images',

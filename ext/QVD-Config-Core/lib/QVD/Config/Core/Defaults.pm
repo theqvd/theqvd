@@ -47,7 +47,7 @@ model.user.login.case-sensitive = 0
 ## directory where several configuration, state, pid and certificate files are stored
 path.run = /var/run/qvd
 ## where QVD logs are stored
-path.log = /var/log
+path.log = /var/log/qvd
 ## temporary files
 path.tmp = /var/tmp
 ## directory for API files
