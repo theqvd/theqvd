@@ -247,7 +247,7 @@ passwords won't be changed.
 
 =head1 AUTHOR
 
-David Serrano <david.serrano@qindel.com>
+Natalia Serrano <natalia.serrano@qindel.com>
 
 =head1 LICENSE
 

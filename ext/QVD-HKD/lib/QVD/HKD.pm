@@ -948,7 +948,7 @@ This module implements the main agent for the HKD daemon.
 
 =head1 AUTHOR
 
-Salvador Fandino, David Serrano.
+Salvador Fandino, Natalia Serrano.
 
 =head1 COPYRIGHT AND LICENSE
 
