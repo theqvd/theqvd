@@ -103,7 +103,11 @@ sub process_netlink {
         DEBUG "$k => $kv{$k}\n";
     }
 
-    $self->handle_new_device($event, \%kv);
+    eval {
+        $self->handle_new_device($event, \%kv);
+    };
+
+    ERROR "Failed to handle new device: $@" if ($@);
 }
 
 sub _get_device_type {
@@ -187,27 +191,71 @@ sub handle_new_device {
     my (undef, undef, undef, $vhci) = (@devpath_parts);
     my $dev_file;
     my $vm_id = $self->{vhci_to_vm}->{ $vhci };
-
+    my $permission = "";
 
 
     if ( $event eq "bind" || $event eq "add") {
         INFO "Connecting $args->{MAJOR}:$args->{MINOR} to VM $vm_id\n";
-        $dev_file = $self->cgroup_devices_path . "/lxc/qvd-$vm_id/devices.allow";
+        $permission = "allow";
     } elsif ( $event eq "unbind" || $event eq "remove" ) {
         INFO "Disconnecting $args->{MAJOR}:$args->{MINOR} from VM $vm_id\n";
-        $dev_file = $self->cgroup_devices_path . "/lxc/qvd-$vm_id/devices.deny";
+        $permission = "deny";
     }
 
     my $dev_type = _get_device_type($driver, $args->{MAJOR});
 
-    DEBUG "Writing rule for device $dev_type $args->{MAJOR}:$args->{MINOR} to $dev_file\n";
-    open(my $dev_fh, ">", $dev_file) or die "Can't write to $dev_file: $!";
-    print $dev_fh "c $args->{MAJOR}:$args->{MINOR} rwm\n";
-    close $dev_fh;
+    $self->_set_device_permission_recursive( $self->cgroup_devices_path . "/lxc/qvd-$vm_id",
+                                             $permission,
+                                             $dev_type, $args->{MAJOR}, $args->{MINOR} );
 
     DEBUG "Done.\n";
 }
 
+sub _set_device_permission_recursive {
+    my ($self, $basedir, $permission, $dev_type, $major, $minor) = @_;
+    DEBUG "_set_device_permission_recursive( basedir = '$basedir', permission = '$permission', dev_type = $dev_type, major = $major, minor = $minor)";
+
+    if ($permission !~ /^(allow|deny)$/) {
+        ERROR "Internal error: bad permission value";
+        return;
+    }
+
+    my $filename = "$basedir/devices.$permission";
+    my $rule     = "$dev_type $major:$minor rwm";
+
+    DEBUG "Trying to set rule '$rule' in '$filename'";
+
+    if ( open(my $dev_fh, '>', $filename) ) {
+        if ( ! print $dev_fh "$rule\n" ) {
+            ERROR "Failed to write rule '$rule' to '$filename': $!";
+        }
+        close $dev_fh;
+    } else {
+        ERROR "Failed to open '$filename' for writing rule '$rule': $!";
+    }
+
+    # deny permissions automatically propagate, so no need to recurse
+    # in that case.
+    return if ( $permission eq "deny" );
+
+    # allow permissions only affect the direct cgroup, and allow optionally
+    # to add an allow rule to its children. We want the rule to propagate
+    # fully, so we recurse into any children there are.
+    DEBUG "Applying allow rule recursively starting from '$basedir'";
+
+    if ( opendir(my $dh, $basedir) ) {
+        my @subdirs = grep { !/^\.{1,2}$/ && -d "$basedir/$_" } readdir( $dh );
+        closedir $dh;
+
+        foreach my $subdir ( @subdirs ) {
+            DEBUG "Recursing into '$basedir/$subdir'";
+            $self->_set_device_permission_recursive("$basedir/$subdir", $permission, $dev_type, $major, $minor);
+        }
+    } else {
+        ERROR "Failed to open dir '$basedir': $!";
+    }
+
+}
 sub watch_devicefs_dir {
     my ($self, $e) = @_;
     DEBUG "devicefs handler triggered";

@@ -641,23 +641,37 @@ sub _run {
 
 sub _request_vhci_hub {
     my $self = shift;
-    if (my $vhci_handler = $self->{vhci_handler}) {
-        ($self->{vhci_directory}, $self->{vhci_hub})= $vhci_handler->reserve_vhci_hub($self->{vm_id});
 
-        my $dm = QVD::HKD::VMHandler::LXC::DeviceMonitor->get_instance();
-        $dm->add_vhci_to_vm_mapping( $self->{vhci_hub}, $self->{vm_id} );
-    }
+    eval {
+        if (my $vhci_handler = $self->{vhci_handler}) {
+            ($self->{vhci_directory}, $self->{vhci_hub})= $vhci_handler->reserve_vhci_hub($self->{vm_id});
+
+            my $dm = QVD::HKD::VMHandler::LXC::DeviceMonitor->get_instance();
+            $dm->add_vhci_to_vm_mapping( $self->{vhci_hub}, $self->{vm_id} );
+        } else {
+            WARN "No VHCI handler!";
+        }
+    };
+    ERROR $@ if ($@);
+
     $self->_on_done;
 }
 
 sub _return_vhci_hub {
     my $self = shift;
-    if (my $vhci_handler = $self->{vhci_handler}) {
-        $vhci_handler->release_vhci_hub($self->{vm_id});
 
-        my $dm = QVD::HKD::VMHandler::LXC::DeviceMonitor->get_instance();
-        $dm->del_vhci_to_vm_mapping( $self->{vhci_hub} );
-    }
+    eval {
+        if (my $vhci_handler = $self->{vhci_handler}) {
+            $vhci_handler->release_vhci_hub($self->{vm_id});
+
+            my $dm = QVD::HKD::VMHandler::LXC::DeviceMonitor->get_instance();
+            $dm->del_vhci_to_vm_mapping( $self->{vhci_hub} );
+        } else {
+            WARN "No VHCI handler!";
+        }
+    };
+    ERROR $@ if ($@);
+
     $self->_on_done;
 }
 
