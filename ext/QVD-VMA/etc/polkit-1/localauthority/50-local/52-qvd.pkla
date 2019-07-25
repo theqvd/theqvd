@@ -1,0 +1,6 @@
+[Normal QVD Permissions]
+Identity=unix-group:qvd
+Action=net.reactivated.fprint.device.*
+ResultAny=yes
+ResultInactive=yes
+ResultActive=yes
