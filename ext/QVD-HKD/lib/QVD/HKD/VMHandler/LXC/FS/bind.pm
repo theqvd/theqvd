@@ -19,7 +19,7 @@ sub _remount_root_ro {
     my $self = shift;
 
     return $self->_on_done
-        unless $self->_cfg('vm.lxc.unionfs.bind.ro')
+        unless $self->_cfg('vm.lxc.unionfs.bind.ro');
 
     my $rootfs = $self->{rootfs};
     $self->_run_cmd({log_error => "Unable to remount root fs '$rootfs' as ro"},
