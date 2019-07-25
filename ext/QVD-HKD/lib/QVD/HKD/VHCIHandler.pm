@@ -44,6 +44,11 @@ sub new {
     opendir my $vhci , $platform_path or croak "Can't open vhci_hcd platform directory";
     my %hubs = map { $_ => -1 } grep { /vhci_hcd.(\d+)/ } readdir( $vhci );
 
+    my $devicefs = $self->_cfg('path.storage.devicefs');
+    unless ( -d $devicefs ){
+      mkdir $devicefs or croak "Can't create directory structure: $devicefs";
+    }
+
     DEBUG "VHCI Handler launched with: " . ( keys %hubs ) . " hubs";
     $self->{hubs} = \%hubs;
 

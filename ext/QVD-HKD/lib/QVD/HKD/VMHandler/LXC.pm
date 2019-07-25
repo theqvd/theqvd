@@ -19,6 +19,8 @@ use Fcntl::Packer ();
 use Method::WeakCallback qw(weak_method_callback);
 use QVD::HKD::Helpers qw(mkpath);
 use QVD::HKD::VMHandler::LXC::FS;
+use QVD::HKD::VMHandler::LXC::DeviceMonitor;
+
 use Mojo::Template;
 
 use parent qw(QVD::HKD::VMHandler);
@@ -340,7 +342,7 @@ sub _create_lxc {
         }
     }
     else {
-        $console = '/dev/null';
+        $console = 'none';
         DEBUG 'Console output will not be saved';
     }
 
@@ -641,6 +643,9 @@ sub _request_vhci_hub {
     my $self = shift;
     if (my $vhci_handler = $self->{vhci_handler}) {
         ($self->{vhci_directory}, $self->{vhci_hub})= $vhci_handler->reserve_vhci_hub($self->{vm_id});
+
+        my $dm = QVD::HKD::VMHandler::LXC::DeviceMonitor->get_instance();
+        $dm->add_vhci_to_vm_mapping( $self->{vhci_hub}, $self->{vm_id} );
     }
     $self->_on_done;
 }
@@ -649,6 +654,9 @@ sub _return_vhci_hub {
     my $self = shift;
     if (my $vhci_handler = $self->{vhci_handler}) {
         $vhci_handler->release_vhci_hub($self->{vm_id});
+
+        my $dm = QVD::HKD::VMHandler::LXC::DeviceMonitor->get_instance();
+        $dm->del_vhci_to_vm_mapping( $self->{vhci_hub} );
     }
     $self->_on_done;
 }

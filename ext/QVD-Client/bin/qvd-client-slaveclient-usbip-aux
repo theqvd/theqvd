@@ -4,7 +4,6 @@ use warnings;
 use strict;
 
 BEGIN {
-    $QVD::Config::USE_DB = 0;
     @QVD::Config::Core::FILES = (
         '/etc/qvd/client.conf',
         $ENV{HOME}.'/.qvd/client.conf',
@@ -17,7 +16,6 @@ BEGIN {
     $ENV{NX_CLIENT} = '/bin/false';
 }
 
-use QVD::Config;
 use QVD::Config::Core qw(core_cfg set_core_cfg);
 use Linux::USBIP;
 

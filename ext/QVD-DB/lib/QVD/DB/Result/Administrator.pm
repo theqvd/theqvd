@@ -2,6 +2,8 @@ package QVD::DB::Result::Administrator;
 use base qw/DBIx::Class/;
 use QVD::DB;
 use QVD::DB::AclsOverwriteList;
+use QVD::DB::Result::Tenant;
+
 
 __PACKAGE__->load_components(qw/Core/);
 __PACKAGE__->table('administrators');

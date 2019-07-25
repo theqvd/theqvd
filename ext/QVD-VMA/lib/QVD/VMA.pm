@@ -502,12 +502,6 @@ sub _fork_monitor {
                     _call_action_hook(connect => %props);
                     _make_nxagent_config(%props);
 
-                    # FIXME: This is needed while there is no QVD pulseaudio launched.
-                    # However QVD pulseaudio shall be launched in any case as a mixer of every
-                    # sound connection.
-                    if ($enable_audio && !$enable_audio_compression) {
-                        $ENV{PULSE_SERVER} = "tcp:localhost:".($display+7000)
-                    }
                     $ENV{NX_CLIENT} = $nxdiag;
                     $ENV{NX_SLAVE_CMD} = $command_slave if $command_slave;
                     # Keep QVD_SLAVE_CMD for retrocompatibility
@@ -577,14 +571,20 @@ sub _fork_monitor {
                         my $pa_port = $1;
                         DEBUG "Multimedia channel opened on port $pa_port";
 
-                        if ( $enable_audio && $enable_audio_compression ) {
+                        if ( $enable_audio ) {
                             if ( $pulse_proc ) {
+                                my @sink_args = ("sink_name=QVD_Audio", "server=tcp:127.0.0.1:$pa_port", "sink=\@DEFAULT_SINK\@");
+
+                                if ( $enable_audio_compression ) {
+                                    DEBUG "Audio compression enabled, using compression for the audio sink";
+                                    push @sink_args, "compression=opus";
+                                }
+
                                 DEBUG "PulseAudio already running under pid $pulse_proc, reestablishing channel";
-                                _bgrun({user => $props{'qvd.vm.user.name'}}, "pacmd", "load-module", "module-tunnel-sink-new", "sink_name=QVD_Audio",
-                                                                             "server=tcp:127.0.0.1:7100", "sink=\@DEFAULT_SINK\@", "compression=opus");
+                                _bgrun({user => $props{'qvd.vm.user.name'}}, "pacmd", "load-module", "module-tunnel-sink-new", @sink_args);
                             } else {
-                                DEBUG "PulseAudio not running, starting";
-                                $pulse_proc = _start_pulseaudio($pa_port, $props{'qvd.vm.user.name'});
+                                DEBUG "PulseAudio not running, starting " . ($enable_audio_compression ? "with compression" : "");
+                                $pulse_proc = _start_pulseaudio($pa_port, $props{'qvd.vm.user.name'}, $enable_audio_compression);
                             }
                         }
                     }
@@ -867,7 +867,7 @@ sub _start_usbip {
 }
 
 sub _start_pulseaudio {
-    my ($port, $user) = @_;
+    my ($port, $user, $compression) = @_;
     my $proc;
 
     INFO "Starting PulseAudio on port $port, user $user";
@@ -896,7 +896,13 @@ sub _start_pulseaudio {
 
         print $ofh "$buf\n";
         print $ofh "load-module module-tunnel-sink-new sink_name=QVD_Audio " .
-                   "server=tcp:127.0.0.1:$port sink=\@DEFAULT_SINK\@ compression=opus\n";
+                   "server=tcp:127.0.0.1:$port sink=\@DEFAULT_SINK\@";
+        if ( $compression ) {
+            print $ofh " compression=opus";
+            DEBUG "Audio compression enabled";
+        }
+
+        print $ofh "\n";
         close $ofh;
 
         my @cmd = (cfg('path.qvd.bin') . "/pulseaudio",

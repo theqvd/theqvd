@@ -1,0 +1,11 @@
+#!/usr/lib/qvd/bin/perl
+use strict;
+use QVD::HKD::VMHandler::LXC::DeviceMonitor;
+use AnyEvent;
+
+
+my $monitor = QVD::HKD::VMHandler::LXC::DeviceMonitor->get_instance();
+
+my $done = AnyEvent->condvar;
+
+$done->recv;

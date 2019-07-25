@@ -1,5 +1,6 @@
-#lxc.autodev=1
-#lxc.hook.autodev=<%= $lxc_hook_autodev %>
+lxc.autodev=1
+lxc.kmsg=0
+lxc.hook.autodev=<%= $lxc_hook_autodev %>
 lxc.utsname=<%= $lxc_utsname %>
 lxc.network.type=veth
 lxc.network.veth.pair=<%= $lxc_network_veth_pair %>
@@ -9,7 +10,7 @@ lxc.network.hwaddr=<%= $lxc_network_hwaddr %>
 lxc.network.link=<%= $lxc_network_link %>
 lxc.console=<%= $lxc_console %>
 lxc.tty=3
-lxc.pts=1
+lxc.pts=1024
 lxc.rootfs=<%= $lxc_rootfs %>
 lxc.mount.entry=<%= $lxc_mount_entry %>
 lxc.pivotdir=qvd-pivot

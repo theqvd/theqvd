@@ -223,6 +223,8 @@ command.cupsaccept = /usr/sbin/cupsaccept
 
 command.systemctl = /bin/systemctl
 command.init_d.cups = /etc/init.d/cups
+command.mknod = mknod
+command.setfacl = setfacl
 
 
 ## whether to remember password after successful connection
@@ -261,7 +263,7 @@ client.fullscreen =
 ## enable the Pulse audio server in the client
 client.audio.enable =
 ## enable audio compression with opus ##
-client.audio.compression.enable = 0
+client.audio.compression.enable = 1
 ## something regarding an NX channel
 client.printing.enable = 1
 ## Enable sharing client-side folders towards the VM
@@ -572,6 +574,7 @@ vm.lxc.unionfs.overlayfs.module.name = overlay
 @ubuntu-16.04.0@vm.lxc.unionfs.overlayfs.module.name = overlayfs
 @ubuntu-16.04.1@vm.lxc.unionfs.overlayfs.module.name = overlayfs
 @sles@vm.lxc.unionfs.overlayfs.module.name = overlayfs
+@sles-15@vm.lxc.unionfs.overlayfs.module.name = overlay
 
 # allow LXC DIs to have hooks for customization - disabled by default
 # because they run as root and can do anything on the host
@@ -678,7 +681,7 @@ vma.user.shares.path = ~/Redirected
 
 ## default user name and groups it will belong to
 vma.user.default.name = qvd
-vma.user.default.groups =
+vma.user.default.groups = qvduser
 vma.default.lang = en_US.UTF-8
 vma.usb.usbip.debug = 0
 vma.usb.usbip.log = 0
@@ -1012,3 +1015,18 @@ wat.multitenant = 1
 ## Disk Image Generator (DIG) parameters
 api.proxy.dig.address = http://localhost:9000
 api.public.dig.enabled = 0
+
+## USBIP device ACLs
+##
+## When a device is created, an ACL is applied to the device file to
+## allow a particular group to have access to it. This allows the user
+## to for instance access a webcam shared over usbip.
+##
+## For this to work, the user in the VM/container must belong to this
+## group, meaning createdevice.acl.group must be set to one of the groups
+## in vma.user.default.groups
+
+createdevice.acl.enable=1
+createdevice.acl.group=qvduser
+createdevice.acl.permissions=rw
+
