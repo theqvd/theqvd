@@ -251,11 +251,14 @@ sub connect_to_vm_processor {
         $l7r->_run_forwarder($vm, %params);
     };
     if ($@) {
-        chomp $@;
-        INFO "The requested virtual machine is not available: '$@'. Retry later". " VM_ID: $vm_id";
+        my $err = $@;
+        $err = $err->[1] if ( ref($err) eq "QVD::HTTPD::Exception" ); # Extract error message
+        chomp $err;
+
+        INFO "The requested virtual machine is not available: '$err'. Retry later". " VM_ID: $vm_id";
         $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE,
                           "The requested virtual machine is not available: ",
-                          "$@, retry later");
+                          "$err, retry later.");
     }
     DEBUG "Session ended". " VM_ID: $vm_id";
 }
@@ -476,8 +479,10 @@ sub _start_and_wait_for_vm {
         notify("qvd_cmd_for_vm_on_host$host_id");
     }
 
-    $l7r->_wait_for_vm($vm, 'running', $vm_start_timeout)
-        or LOGDIE "Unable to start VM " . $vm->id;
+    if (!$l7r->_wait_for_vm($vm, 'running', $vm_start_timeout)) {
+        $l7r->throw_http_error(HTTP_INTERNAL_SERVER_ERROR, "Failed to start virtual machine " . $vm->id);
+        LOGDIE "Unable to start VM " . $vm->id;
+    }
 }
 
 sub _stop_and_wait_for_vm {

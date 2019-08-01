@@ -313,13 +313,17 @@ sub _run_cmd {
     }
 
     my $pid;
-    my $w = eval { AnyEvent::Util::run_cmd([@prefix, @cmd, @args], '$$' => \$pid, @extra) };
+    my $output = "";
+
+    my $w = eval { AnyEvent::Util::run_cmd([@prefix, @cmd, @args], '$$' => \$pid, '>', \$output, '2>', \$output,  @extra) };
     if (defined(my $save_pid_to = $opts->{save_pid_to})) {
         $self->{$save_pid_to} = $pid;
     }
     if ($pid) {
-        DEBUG "Process $pid forked";
+        DEBUG "Process $pid forked for command '" . join(' ', @prefix, @cmd, @args) . "'";
         $self->{cmd_watcher}{$pid} = $w;
+        $self->{cmd_output}{$pid} = \$output;
+
         $self->{last_cmd_pid} = $pid;
         $w->cb(weak_method_callback($self, __run_cmd_callback => $opts, $pid));
         if (defined(my $after = $opts->{kill_after})) {
@@ -339,17 +343,29 @@ sub _run_cmd {
 sub __run_cmd_callback {
     my ($self, $opts, $pid, $var) = @_;
     my $rc = $var->recv;
-    if (($rc >> 8) == 126) {
-        WARN "Process $pid returned rc: $rc, it probably means that the binary was not found";
-    }
-    else {
+
+    my $retval   = $rc >> 8;
+    my $signal   = $rc & 127;
+    my $coredump = $rc & 128;
+
+    if ($retval == 126) {
+        ERROR "Process $pid returned with code $retval (rc: $rc), it probably means that the binary was not found";
+    } elsif ( $signal ) {
+        ERROR "Process $pid died with signal $signal" . ($coredump ? " and dumped core" : "");
+        ERROR "Process output:\n" . ${ $self->{cmd_output}{$pid} };
+    } elsif ( $retval ) {
+        WARN "Process $pid returned with code $retval";
+        WARN "Process output:\n" . ${ $self->{cmd_output}{$pid} };
+    } else {
         DEBUG "Process $pid returned rc: $rc";
+        DEBUG "Process output:\n" . ${ $self->{cmd_output}{$pid} };
     }
 
     my $last = $self->{last_cmd_pid};
     delete $self->{last_cmd_pid} if $last and $last == $pid;
     delete $self->{cmd_timer_watcher}{$pid};
     delete $self->{cmd_watcher}{$pid};
+    delete $self->{cmd_output}{$pid};
     if (defined(my $as = $opts->{save_pid_to})) {
         delete $self->{$as};
     }
