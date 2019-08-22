@@ -164,23 +164,17 @@ sub new {
     DEBUG "Locale path is $localepath";
     bindtextdomain("qvd-gui-client", $localepath);
 
-    if ( core_cfg('client.show.settings') ) {
-        $tab_ctl = Wx::Notebook->new($self, -1, wxDefaultPosition, wxDefaultSize, 0, "tab");
-        $self->{tab_ctl} = $tab_ctl;
-    }
+    $self->{tab_ctl} = $tab_ctl = Wx::Notebook->new($self, -1, wxDefaultPosition, wxDefaultSize, 0, "tab");
 
-    my $panel = $self->{panel} = Wx::Panel->new($tab_ctl // $self, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL ); # / broken highlighter
+    my $panel = $self->{panel} = Wx::Panel->new($tab_ctl, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL ); # / broken highlighter
 
     $panel->SetBackgroundColour(Wx::Colour->new(217,217,217));
 
+    $tab_ctl->AddPage( $panel, $self->_t("Connect") );
+    $tab_sizer = Wx::BoxSizer->new(wxVERTICAL);
+    $tab_sizer->Add($tab_ctl);
 
-    if ( $tab_ctl ) {
-        $tab_ctl->AddPage( $panel, $self->_t("Connect") );
-
-        $tab_sizer = Wx::BoxSizer->new(wxVERTICAL);
-        $tab_sizer->Add($tab_ctl);
-
-
+    if ( core_cfg('client.show.settings') ) {
         $settings_panel = Wx::Panel->new($tab_ctl, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
         $self->{settings_panel} = $settings_panel;
         $settings_panel->SetBackgroundColour(Wx::Colour->new(255,255,255));
@@ -382,13 +376,12 @@ sub new {
 
     $panel->SetSizer($ver_sizer);
 
-    if ( $tab_ctl ) {
-        $ver_sizer->Fit($tab_ctl);
-        $tab_sizer->Fit($self);
+    $ver_sizer->Fit($tab_ctl);
+    $tab_sizer->Fit($self);
+
+    if ( core_cfg('client.show.settings') ) {
         $self->OnClickSharedFolders();
         $self->OnClickUSBShare() if defined($self->{usb_redirection});
-    } else {
-        $ver_sizer->Fit($self);
     }
 
     $self->Center;
@@ -1230,7 +1223,7 @@ sub load_usb_devices {
         push @{$self->{usb_devices}} , $dev;
     }
 
-    $self->{usbip_device_list}->InsertItems( $self->{usb_devices}, 0 ) if ( defined $self->{tab_ctl} );
+    $self->{usbip_device_list}->InsertItems( $self->{usb_devices}, 0 ) if ( core_cfg('client.show.settings') );
 
 
 
@@ -1352,8 +1345,8 @@ sub DetectKeyboard {
 sub EnableControls {
     my ($self, $enabled) = @_;
     $self->{$_}->Enable($enabled) for qw(connect_button username password);
-    if (!core_cfg('client.force.link',      0)) { $self->{link}->Enable($enabled) if( $self->{tab_ctl}); }
-    if (!core_cfg('client.force.host.name', 0)) { $self->{host}->Enable($enabled) if( $self->{tab_ctl}); }
+    if (!core_cfg('client.force.link',      0)) { $self->{link}->Enable($enabled) if( core_cfg('client.show.settings') ); }
+    if (!core_cfg('client.force.host.name', 0)) { $self->{host}->Enable($enabled) if( core_cfg('client.show.settings') ); }
 }
 
 sub SaveConfiguration {
@@ -1470,7 +1463,7 @@ sub load_share_list {
         }
     }
  DEBUG "Shares: @{$self->{shares}}";
-    $self->update_share_list() if ( defined $self->{tab_ctl} );
+    $self->update_share_list() if ( core_cfg('client.show.settings') );
 
 }
 
