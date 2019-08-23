@@ -101,6 +101,9 @@ my %lang_codes = qw/
     0403 ca        040C fr        043A mt        2C0A es-ar
     /;
 
+my $version_string = sprintf "Release: %s\nGit commit: %s\nBuild: %s", (eval { require QVD::Client::Version; }) ?
+    ($QVD::Client::Version::QVD_RELEASE, $QVD::Client::Version::GIT_COMMIT, $QVD::Client::Version::BUILD_NUMBER) :
+    ("(running from source code)", "N/A", "N/A");
 
 sub new {
     my( $class, $parent, $id, $title, $pos, $size, $style, $name ) = @_;
