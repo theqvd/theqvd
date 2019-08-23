@@ -114,7 +114,7 @@ sub new {
     $size   = wxDefaultSize      unless defined $size;
     $name   = ""                 unless defined $name;
 
-    my ($tab_ctl, $tab_sizer, $settings_panel);
+    my ($tab_ctl, $tab_sizer, $settings_panel, $version_panel);
 
     $style = wxCAPTION|wxCLOSE_BOX|wxSYSTEM_MENU|wxMINIMIZE_BOX
         unless defined $style;
@@ -299,6 +299,20 @@ sub new {
 
 
     }
+
+    ############################### version tab
+
+    $self->{version_panel} = $version_panel = Wx::Panel->new($tab_ctl, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+    $version_panel->SetBackgroundColour(Wx::Colour->new(255,255,255));
+    $tab_ctl->AddPage( $version_panel, $self->_t("Version"));
+    my $version_sizer = Wx::BoxSizer->new(wxVERTICAL);
+    $version_panel->SetSizer($version_sizer);
+
+    $self->{version_textctrl} = Wx::TextCtrl->new($version_panel, -1, $version_string, wxDefaultPosition, [200, 200], wxTE_MULTILINE|wxTE_READONLY);
+    $self->{version_textctrl}->Disable;
+    $version_sizer->Add($self->{version_textctrl}, 0, wxALL|wxEXPAND, 10);
+
+    ###############################
 
     my $ver_sizer  = Wx::BoxSizer->new(wxVERTICAL);
 
