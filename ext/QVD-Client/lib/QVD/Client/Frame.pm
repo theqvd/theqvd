@@ -309,7 +309,6 @@ sub new {
     $version_panel->SetSizer($version_sizer);
 
     $self->{version_textctrl} = Wx::TextCtrl->new($version_panel, -1, $version_string, wxDefaultPosition, [200, 200], wxTE_MULTILINE|wxTE_READONLY);
-    $self->{version_textctrl}->Disable;
     $version_sizer->Add($self->{version_textctrl}, 0, wxALL|wxEXPAND, 10);
 
     ###############################
