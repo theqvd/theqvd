@@ -647,6 +647,7 @@ internal.vm.debug.enable = 0
 ## default values for newly created OSFs
 osf.default.memory = 256
 osf.default.overlay = 1
+osf.default.is_application = 0
 
 ## so that the VMA exports PULSE_SERVER before xinit invocation and passes the 'media=1' parameter to nxagent
 vma.audio.enable = 0

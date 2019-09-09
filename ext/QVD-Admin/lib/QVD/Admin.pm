@@ -16,6 +16,9 @@ use QVD::Log;
 
 my $osf_default_memory   = cfg('osf.default.memory');
 my $osf_default_overlay  = cfg('osf.default.overlay');
+my $osf_default_is_application = cfg('osf.default.is_application');
+
+
 
 my $images_path          = cfg('path.storage.images');
 my $case_sensitive_login = cfg('model.user.login.case-sensitive');
@@ -628,6 +631,7 @@ sub cmd_osf_add {
     $params{memory}      //= $osf_default_memory;
     $params{use_overlay} //= $osf_default_overlay;
     $params{tenant_id}   //= $self->_tenant_id('osf');
+    $params{is_application} //= $osf_default_is_application;
 
     #die "The required parameters are ".join(", ", @required_params)
     #    unless _set_equals([keys %params], \@required_params);

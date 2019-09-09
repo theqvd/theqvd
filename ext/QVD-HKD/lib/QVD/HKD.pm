@@ -122,7 +122,7 @@ use Class::StateMachine::Declarative
 
     exit           => { enter => '_say_goodbye' };
 
-my $schema_version = '4.1.2';
+my $schema_version = '4.3.0';
 
 sub _on_transient_db_error :OnState('running') {
     shift->{cluster_monitor}->on_transient_db_error
