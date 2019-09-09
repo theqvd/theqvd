@@ -11,7 +11,9 @@ __PACKAGE__->add_columns(
 	id          => { data_type => 'integer', is_auto_increment => 1 },
                           name        => { data_type => 'varchar(64)' },
 	description => { data_type => 'varchar(32768)', is_nullable => 1 },
-	memory      => { data_type => 'integer' }, use_overlay => { data_type => 'boolean' },
+	memory      => { data_type => 'integer' },
+	use_overlay => { data_type => 'boolean' },
+	is_application => { data_type => 'boolean', default_value => 'f' },
 	user_storage_size => { data_type => 'integer', is_nullable => 1 },
 	osd_id => { data_type => 'integer', is_nullable => 1 },
 );
