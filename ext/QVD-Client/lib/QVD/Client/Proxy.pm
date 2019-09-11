@@ -1199,7 +1199,7 @@ sub _allocate_port {
 
 sub _t {
     # Allow usage both as a method and as a function
-    shift if ( ref(@_[0]) =~ /^QVD::/ );
+    shift if ( ref($_[0]) =~ /^QVD::/ );
     return @_;
 }
 
