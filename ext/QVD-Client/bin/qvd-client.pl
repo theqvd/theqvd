@@ -1,4 +1,4 @@
-#!/usr/lib/qvd/bin/perl -w
+#!/usr/lib/qvd/bin/perl
 
 eval 'exec /usr/lib/qvd/bin/perl  -S $0 ${1+"$@"}'
     if 0; # not running under some shell
@@ -49,8 +49,9 @@ BEGIN {
             print STDERR "Ignoring config file defined in QVDCLIENTCONFIG env variable <$configfile> defaulting to <$user_config_filename>\n";
         }
     }
-
     $QVD::Config::USE_DB = 0;
+    $QVD::Config::USE_DB = 0;
+
     @QVD::Config::Core::FILES = (
         '/etc/qvd/client.conf',
         $user_config_filename
@@ -86,6 +87,10 @@ GetOptions \%opts,
     '--vm-id=s',
     '--ssl-errors=s',
     '--help',
+    '--list-vms',
+    '--list-apps',
+    '--no-header',
+    '--json'
     or die "getopt";
 
 $opts{'username'} //= $ENV{QVDLOGIN} // core_cfg('client.user.name');
@@ -112,6 +117,10 @@ QVD commandline client
 --ssl-errors       What to do in case of SSL errors. Valid values are:
                    'ask', 'continue' and 'abort'
 --help             Shows this text
+--list-vms         List VMs, and exit
+--list-apps        List applications, and exit
+--no-header        Don't show the header for --list-vms and --list-apps
+--json             Use JSON to dump the --list-vms and --list-apps data
 HELP
 
     exit(0);
@@ -141,6 +150,7 @@ my %connect_info = (
 );
 
 $connect_info{file} = $file if defined $file;
+$connect_info{list_apps} = $opts{'list-apps'};
 
 my $delegate = QVD::Client::CLI->new(file => $file, vm_id => $opts{'vm-id'});
 
@@ -235,7 +245,7 @@ sub proxy_alert {
         print STDERR "ERROR  : ";
     }
 
-    print STDERR $args->{message} . "\n";
+    print STDERR $args{message} . "\n";
 }
 
 sub format_cert {
@@ -280,12 +290,76 @@ sub format_org {
     return $ret;
 }
 
+sub list_vms {
+    my ($vm_data) = @_;
+
+    unless( $opts{'no-header'} ) {
+        print "You have ".@$vm_data. ($opts{'list-apps'} ? " applications" : " virtual machines"). ":\n\n";
+
+        print sprintf("\t%-7s %-10s %-39s %-10s\n", "Id", "State", "Name", "Blocked");
+        print (("=" x 74) . "\n");
+    }
+
+    foreach my $vm (sort { $a->{id} <=> $b->{id} } @$vm_data) {
+        print sprintf("\t%-7s %-10s %-39s %-10s\n", $vm->{id}, $vm->{state}, $vm->{name}, $vm->{blocked});
+    }
+}
+
 sub proxy_list_of_vm_loaded {
     my ($self, $vm_data) = @_;
     if (@$vm_data > 0) {
         return $self->{'vm_id'} if defined $self->{'vm_id'};
-        #print "You have ".@$vm_data." virtual machines.\n";
-        my $vm = $vm_data->[rand @$vm_data];
+
+        if ( $opts{'list-vms'} || $opts{'list-apps'} ) {
+
+            if ( $opts{json} ) {
+                require JSON::XS;
+                print JSON::XS::encode_json($vm_data) . "\n";
+            } else {
+                list_vms($vm_data);
+            }
+
+            return();
+        }
+
+        my $vm;
+        if ( @$vm_data > 1 ) {
+            my $count=0;
+            while(!$vm) {
+                if ( $count++ % 10 == 0 ) {
+                    list_vms($vm_data);
+                    print "\n";
+                }
+
+                print "Which VM would you like to connect to? Enter a VM name or id, or an empty line to quit: ";
+                my $vm_id = <STDIN>;
+                chomp $vm_id;
+                $vm_id =~ s/^\s+//;
+                $vm_id =~ s/\s+//;
+
+                return() if ( $vm_id eq  "");
+
+                my @vms;
+                if ( $vm_id =~ /^\d+/ ) {
+                    @vms = grep { $_->{id} == $vm_id } @$vm_data;
+                } else {
+                    # Try full match first, then partial match only if that doesn't work
+                    @vms = grep { $_->{name} =~/^$vm_id$/i }  @$vm_data;
+                    @vms = grep { $_->{name} =~/^$vm_id/i } @$vm_data unless (@vms);
+                }
+
+                if ( @vms == 0 ) {
+                    print "Nothing matched.\n\n";
+                } elsif ( @vms > 1 ) {
+                    print "Multiple matches: " . join(", ", map { $_->{name} } @vms) . "\n\n";
+                } else {
+                    $vm = $vms[0];
+                }
+            }
+        } else {
+            $vm = $vm_data->[0];
+        }
+
         INFO "Connecting to VM called ".$vm->{name}."\n";
         return $vm->{id};
     } else {

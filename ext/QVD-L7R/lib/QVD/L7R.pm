@@ -80,6 +80,8 @@ sub post_configure_hook {
                                      GET => '/qvd/authenticate_user');
     $l7r->set_http_request_processor(\&list_of_vm_processor,
                                      GET => '/qvd/list_of_vm');
+    $l7r->set_http_request_processor(\&list_of_applications_processor,
+                                     GET => '/qvd/list_of_applications');
     $l7r->set_http_request_processor(\&ping_processor,
                                      GET => '/qvd/ping');
     $l7r->set_http_request_processor(\&stop_vm_processor,
@@ -130,11 +132,27 @@ sub authenticate_user {
         $l7r->json->encode($response) );
 }
 
+
+
+sub list_of_applications_processor {
+    my ($l7r, $method, $url, $headers, ) = @_;
+    DEBUG 'method list_of_applications requested';
+
+    send_list_of_vm($l7r, $method, $url, $headers, is_application => 1);
+}
+
 sub list_of_vm_processor {
-    my ($l7r, $method, $url, $headers) = @_;
+    my ($l7r, $method, $url, $headers, ) = @_;
+    DEBUG 'method list_of_vm requested';
+
+    send_list_of_vm($l7r, $method, $url, $headers, is_application => 0);
+}
+
+sub send_list_of_vm {
+    my ($l7r, $method, $url, $headers, %opts) = @_;
     my $this_host = this_host; $this_host // $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, 'Host is not registered in the database');
     txn_do { $this_host->counters->incr_http_requests; };
-    DEBUG 'method list_of_vm requested';
+    DEBUG 'send_list_of_vm called with is_application=' . $opts{is_application};
     my $auth = $l7r->_authenticate_user($headers);
     if ($this_host->runtime->blocked) {
         INFO 'Server is blocked';
@@ -148,11 +166,12 @@ sub list_of_vm_processor {
     $auth->before_list_of_vms;
     my $user_id = $auth->{user}->id;
 
-    my @vm_list = ( map { { id      => $_->vm_id,
-                            state   => $_->vm_state,
-                            name    => $_->vm->name,
-                            blocked => $_->blocked } }
-                    map $_->vm_runtime,
+    my @vm_list = ( map { { id                => $_->vm_runtime->vm_id,
+                            state             => $_->vm_runtime->vm_state,
+                            name              => $_->vm_runtime->vm->name,
+                            blocked           => $_->vm_runtime->blocked,
+                            is_application    => $_->osf->is_application } }
+                    grep { $_->osf->is_application == $opts{is_application} }
                     $auth->list_of_vm($url, $headers) );
 
     if (@vm_list) {

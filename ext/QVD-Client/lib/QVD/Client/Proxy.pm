@@ -577,7 +577,7 @@ sub connect_to_vm {
 
     INFO("Sending $auth_type auth");
     $httpc->send_http_request(
-        GET => '/qvd/list_of_vm?'.$q,
+        GET => ($opts->{list_apps} ? '/qvd/list_of_applications' : '/qvd/list_of_vm?') . $q,
         headers => $headers
     );
 
