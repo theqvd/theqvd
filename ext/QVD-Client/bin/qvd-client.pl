@@ -186,6 +186,7 @@ package QVD::Client::CLI;
 use Cwd qw(abs_path);
 use QVD::Client::SlaveClient;
 use QVD::Log;
+use QVD::Config::Core qw(set_core_cfg core_cfg);
 
 sub new {
     my $class = shift;
@@ -376,6 +377,8 @@ sub create_icons {
 
         if ( open(my $fh, ">", "$desktop_dir/$icon_name") ) {
             print $fh "#!/usr/bin/env xdg-open\n";
+            print $fh "# This file was automatically created by the QVD client.\n";
+            print $fh "# Do not modify it, it will be overwritten.\n\n";
             print $fh "[Desktop Entry]\n";
             print $fh "Version=1.0\n";
             print $fh "Encoding=UTF-8\n";
