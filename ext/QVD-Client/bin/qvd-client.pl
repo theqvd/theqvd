@@ -75,11 +75,13 @@ BEGIN {
 
 use QVD::Client::Proxy;
 use QVD::Log;
+use MIME::Base64;
 my %opts;
 
 GetOptions \%opts,
     '--username=s',
     '--password=s',
+    '--token=s',
     '--host=s',
     '--port=s',
     '--file=s',
@@ -90,17 +92,27 @@ GetOptions \%opts,
     '--list-vms',
     '--list-apps',
     '--no-header',
-    '--json'
+    '--json',
+    '--create-icons',
     or die "getopt";
 
 $opts{'username'} //= $ENV{QVDLOGIN} // core_cfg('client.user.name');
 $opts{'password'} //= $ENV{QVDPASSWORD} // core_cfg('client.user.password');
+$opts{'token'} //= $ENV{QVDBEARERTOKEN};
 $opts{'host'} //= $ENV{QVDHOST} // core_cfg('client.host.name');
 $opts{'port'} //= $ENV{QVDPORT} // core_cfg('client.host.port');
 $opts{'ssl'} //= 1;
 $opts{'ssl-errors'} //= $ENV{QVDSSLERRORS} // 'ask';
 $opts{'usb'} //= 0;
 
+if ( $opts{'create-icons'} ) {
+    $opts{'list-apps'} = 1;
+}
+
+# Token was already used for connections from the website, and was passed already
+# encoded to the client. So we only encode it here.
+$opts{'origtoken'} = $opts{'token'};
+$opts{'token'} = encode_base64($opts{'token'}, '');
 
 
 if ( $opts{help} ) {
@@ -110,6 +122,7 @@ QVD commandline client
 
 --username         Login username
 --password         Login password
+--token            Login bearer token (used instead of password)
 --host             Server to connect to
 --port             Port QVD is running on
 --file             Open file in VM
@@ -305,10 +318,89 @@ sub list_vms {
     }
 }
 
+sub create_icons {
+    my ($vm_data) = @_;
+
+    my $desktop_dir;
+
+    if ( open(my $fh, '-|', "xdg-user-dir", "DESKTOP") ) {
+        $desktop_dir = <$fh>;
+        chomp $desktop_dir;
+        DEBUG "Obtained desktop dir from xdg-user-dir: '$desktop_dir'";
+    } else {
+        WARN "Failed to run xdg-user-dir: $!";
+        $desktop_dir = "$ENV{HOME}/Desktop";
+        WARN "Assuming the desktop is in '$desktop_dir'";
+    }
+
+    if ( ! -x $desktop_dir ) {
+        ERROR "Desktop directory '$desktop_dir' not found. Can't create icons";
+        return;
+    }
+
+    # Remove any existing QVD icon
+    my $dh;
+    opendir $dh, $desktop_dir;
+    while(my $de = readdir($dh)) {
+        next if ( $de eq "." || $de eq "..");
+        next unless ( -f "$desktop_dir/$de" );
+        next unless $de =~ /.desktop$/;
+
+        my $delete;
+
+        DEBUG "Checking if $desktop_dir/$de is a QVD icon";
+        if ( open(my $fh, "<", "$desktop_dir/$de") ) {
+            while(my $line = <$fh>) {
+                chomp $line;
+                $line =~ s/^\s+//;
+                $delete = 1 if ( $line =~ /^Keywords/i && $line =~ /QVD_Session/ );
+            }
+            close($fh);
+        } else {
+            ERROR "Failed to open $desktop_dir/$de: $!";
+        }
+
+        if ( $delete ) {
+            DEBUG "Deleting QVD icon $desktop_dir/$de";
+            unlink("$desktop_dir/$de");
+        }
+    }
+    closedir($dh);
+
+
+
+    foreach my $vm (@$vm_data) {
+        my $icon_name = $vm->{name} . ".desktop";
+        DEBUG "Writing icon $desktop_dir/$icon_name";
+
+        if ( open(my $fh, ">", "$desktop_dir/$icon_name") ) {
+            print $fh "#!/usr/bin/env xdg-open\n";
+            print $fh "[Desktop Entry]\n";
+            print $fh "Version=1.0\n";
+            print $fh "Encoding=UTF-8\n";
+            print $fh "Hidden=false\n";
+            print $fh "Type=Application\n";
+            print $fh "Keywords=QVD_Session\n";
+            print $fh "Terminal=false\n";
+            print $fh "Name=" . $vm->{name} . "\n";
+            print $fh "Path=/home/vadim/git/qvd-src\n";
+            print $fh "Exec=/home/vadim/git/qvd-src/run_client.pl --cli -- --host 192.168.122.216 --token $opts{origtoken} --vm-id " . $vm->{id} . "\n";
+            close $fh;
+        } else {
+            ERROR "Failed to create $desktop_dir/$icon_name: $!";
+        }
+    }
+}
+
 sub proxy_list_of_vm_loaded {
     my ($self, $vm_data) = @_;
     if (@$vm_data > 0) {
         return $self->{'vm_id'} if defined $self->{'vm_id'};
+
+        if ( $opts{'create-icons'} ) {
+            create_icons($vm_data);
+            return ();
+        }
 
         if ( $opts{'list-vms'} || $opts{'list-apps'} ) {
 
@@ -375,7 +467,7 @@ sub proxy_connection_status {
         $self->{error} = undef;
     }
     if ($status eq 'FORWARDING') {
-        $self->open_file($self->{file});
+        $self->open_file($self->{file}) if ( $self->{file} );
     }
 }
 
