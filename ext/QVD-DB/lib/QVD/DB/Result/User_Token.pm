@@ -13,6 +13,7 @@ __PACKAGE__->add_columns(
     vm_id          => { data_type => 'integer', is_nullable => 1 },
     expiration     => { data_type => 'integer' },
     auth_params_id => { data_type => 'integer', is_nullable => 1 },
+    multi_use      => { data_type => 'boolean', default_value => 0 }
 );
 
 __PACKAGE__->belongs_to(user => 'QVD::DB::Result::User', 'user_id');

@@ -8,9 +8,10 @@ use strict;
 use Carp;
 use feature 'switch';
 use URI::Split qw(uri_split);
-use MIME::Base64 'decode_base64';
+use MIME::Base64;
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
 use IO::Socket::Forwarder qw(forward_sockets);
+use Session::Token;
 
 use QVD::Config;
 use QVD::Log;
@@ -78,6 +79,8 @@ sub post_configure_hook {
                                      GET => '/qvd/connect_to_vm');
     $l7r->set_http_request_processor(\&authenticate_user,
                                      GET => '/qvd/authenticate_user');
+    $l7r->set_http_request_processor(\&create_auth_token,
+                                     GET => '/qvd/create_auth_token');
     $l7r->set_http_request_processor(\&list_of_vm_processor,
                                      GET => '/qvd/list_of_vm');
     $l7r->set_http_request_processor(\&list_of_applications_processor,
@@ -120,10 +123,11 @@ sub authenticate_user {
     $auth->before_list_of_vms;
     
     # Store auth paramaters if needed
-    my $store_auth_params = $params{store_auth} // 0;
+    my $store_auth_params = 1; # $params{store_auth} // 0;
     if($store_auth_params) {
         txn_do {
             my $uas = rs('User_Auth_Parameters')->create({ parameters => $l7r->json->encode($auth->{params}) });
+            $l7r->{uas} = $uas;
             $response->{auth_params_id} = $uas->id;
         };
     }
@@ -132,7 +136,38 @@ sub authenticate_user {
         $l7r->json->encode($response) );
 }
 
+sub create_auth_token {
+    my ($l7r, $method, $url, $headers) = @_;
 
+    my $auth = $l7r->_authenticate_user($headers);
+
+    my $query = (uri_split $url)[3];
+    my %params = uri_query_split $query;
+
+    my $response = {};
+
+    $auth->before_list_of_vms;
+
+    # Store auth paramaters if needed
+    txn_do {
+        my $uas = rs('User_Auth_Parameters')->create({ parameters => $l7r->json->encode($auth->{params}) });
+        $response->{auth_params_id} = $uas->id;
+
+        my $session_token = rs('User_Token')->create( {
+            token => generate_sid(),
+            expiration      => time + (3600*24),
+            user_id         => $auth->{user}->id,
+            vm_id           => undef,
+            auth_params_id  => $uas->id,
+            multi_use       => 1
+        });
+
+        $response->{auth_token} = encode_base64($session_token->token);
+    };
+
+    $l7r->send_http_response_with_body( HTTP_OK, 'application/json', [],
+                                        $l7r->json->encode($response) );
+}
 
 sub list_of_applications_processor {
     my ($l7r, $method, $url, $headers, ) = @_;
@@ -190,6 +225,10 @@ sub generate_slave_key {
     join "", map @alpha[rand @alpha], 0..63;
 }
 
+sub generate_sid {
+    return Session::Token->new(entropy => 256)->get;
+}
+
 sub connect_to_vm_processor {
     my ($l7r, $method, $url, $headers) = @_;
     my $this_host = this_host; $this_host // $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, 'Host is not registered in the database');
@@ -214,7 +253,7 @@ sub connect_to_vm_processor {
     my $vm_id = delete $params{id};
     if (defined $l7r->{session}) {
         $l7r->throw_http_error(HTTP_FORBIDDEN, "vm_id does not match with provided token")
-            unless $vm_id == $l7r->{session}->vm_id;
+            unless ($vm_id == $l7r->{session}->vm_id) || (!defined $l7r->{session}->vm_id);
     }
     
     unless (defined $vm_id)  {
@@ -250,6 +289,20 @@ sub connect_to_vm_processor {
     }
 
     my $slave_key = generate_slave_key();
+
+    my $uas = rs('User_Auth_Parameters')->create({ parameters => $l7r->json->encode($auth->{params}) });
+
+    my $session_auth = rs('User_Token')->create( {
+        token             => generate_sid(),
+        expiration        => time + (3600*24),
+        user_id           => $user_id,
+        vm_id             => undef,
+        auth_params_id    => $uas->id,
+        multi_use         => 1
+    });
+
+    $params{auth_token} = encode_base64($session_auth->token);
+
 
     eval {
         if (!$auth->allow_access_to_vm($vm->vm)) {
