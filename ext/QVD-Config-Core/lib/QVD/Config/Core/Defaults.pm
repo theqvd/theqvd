@@ -388,6 +388,8 @@ client.ssl.ocsp_mode=SSL_OCSP_TRY_STAPLE|SSL_OCSP_FAIL_HARD
 client.slave.command = ${path.qvd.bin}/qvd-client-slaveserver
 @mswin@client.slave.command = qvd-client-slaveserver
 @mswin@client.slave.wrapper = bin/qvd-slaveserver-wrapper.exe
+
+client.session_open.command = ${path.qvd.bin}/qvd-gui-client.pl
 client.slave.client = ${path.qvd.bin}/qvd-slaveclient
 # enable commands used for benchmarking and testing the functionality
 # of the slave channel

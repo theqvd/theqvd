@@ -348,28 +348,26 @@ sub create_icons {
         next unless ( -f "$desktop_dir/$de" );
         next unless $de =~ /.desktop$/;
 
-        my $delete;
-
         DEBUG "Checking if $desktop_dir/$de is a QVD icon";
         if ( open(my $fh, "<", "$desktop_dir/$de") ) {
             while(my $line = <$fh>) {
                 chomp $line;
                 $line =~ s/^\s+//;
-                $delete = 1 if ( $line =~ /^Keywords/i && $line =~ /QVD_Session/ );
+                if ( $line =~ /^Keywords.*QVD_Session/ ) {
+                    DEBUG "Removing QVD session icon $desktop_dir/$de";
+                    unlink("$desktop_dir/$de") or WARN "Can't remove $desktop_dir/$de: $!";
+                }
             }
             close($fh);
         } else {
             ERROR "Failed to open $desktop_dir/$de: $!";
         }
-
-        if ( $delete ) {
-            DEBUG "Deleting QVD icon $desktop_dir/$de";
-            unlink("$desktop_dir/$de");
-        }
     }
     closedir($dh);
 
 
+
+    my $client_bin = core_cfg('client.session_open.command');
 
     foreach my $vm (@$vm_data) {
         my $icon_name = $vm->{name} . ".desktop";
@@ -387,8 +385,7 @@ sub create_icons {
             print $fh "Keywords=QVD_Session\n";
             print $fh "Terminal=false\n";
             print $fh "Name=" . $vm->{name} . "\n";
-            print $fh "Path=/home/vadim/git/qvd-src\n";
-            print $fh "Exec=/home/vadim/git/qvd-src/run_client.pl --cli -- --host 192.168.122.216 --token $opts{origtoken} --vm-id " . $vm->{id} . "\n";
+            print $fh "Exec=$client_bin --host $opts{'host'} --port $opts{'port'} --token $opts{origtoken} --vm-id " . $vm->{id} . "\n";
             close $fh;
         } else {
             ERROR "Failed to create $desktop_dir/$icon_name: $!";
