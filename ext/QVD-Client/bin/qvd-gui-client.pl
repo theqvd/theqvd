@@ -11,6 +11,9 @@ use File::Spec;
 use URI::Escape qw(uri_unescape);
 use QVD::Config::Core qw(core_cfg set_core_cfg);
 use QVD::Log;
+use Getopt::Long;
+use MIME::Base64;
+
 
 BEGIN {
     for $ARGV (@ARGV) {
@@ -61,6 +64,69 @@ $SIG{__DIE__} = sub {
     }
 };
 
+INFO "Parsing options";
+my ($opt_host, $opt_port, $opt_vm_id, $opt_username, $opt_password, $opt_token);
+my ($help);
+
+GetOptions(
+    "host=s"      => \$opt_host,
+    "port=s"      => \$opt_port,
+    "vm-id=i"     => \$opt_vm_id,
+    "username=s"  => \$opt_username,
+    "password=s"  => \$opt_password,
+    "token=s"     => \$opt_token,
+    "help"        => \$help
+) or die "Getopt failed: $!";
+
+if ( $help ) {
+    print <<HELP;
+
+$0 [options]
+QVD graphical client
+
+--username         Login username
+--password         Login password
+--token            Login bearer token (used instead of password)
+--host             Server to connect to
+--port             Port QVD is running on
+--file             Open file in VM
+--ssl, --no-ssl    Enable or disable the use of SSL
+--ssl-errors       What to do in case of SSL errors. Valid values are:
+                   'ask', 'continue' and 'abort'
+--help             Shows this text
+--list-vms         List VMs, and exit
+--list-apps        List applications, and exit
+--no-header        Don't show the header for --list-vms and --list-apps
+--json             Use JSON to dump the --list-vms and --list-apps data
+HELP
+    exit(0);
+
+}
+
+set_if_arg("client.host.name", $opt_host);
+set_if_arg("client.host.port", $opt_port);
+set_if_arg("client.user.name", $opt_username);
+set_if_arg("client.user.password", $opt_password);
+set_if_arg("client.auto_connect.token", encode_base64($opt_token)) if ( defined $opt_token );
+set_if_arg("client.auto_connect.vm_id", $opt_vm_id);
+
+if ( $opt_token && $opt_vm_id ) {
+    INFO "Token and VM id provided, client will auto-connect";
+    set_core_cfg("client.auto_connect", 1);
+}
+
+sub set_if_arg {
+    my ($setting, $value) = @_;
+
+    if ( defined $value ) {
+        chomp $value;
+
+        INFO "Changing setting '$setting' to value '$value' from command line argument";
+        set_core_cfg($setting, $value);
+    }
+}
+
+
 use QVD::Client::Frame;
 use parent 'Wx::App';
 
@@ -98,12 +164,21 @@ SCRIPT
 sub should_autoconnect {
     core_cfg('client.auto_connect', 0);
 }
+
+
 package main;
 
 use QVD::Log;
+use Getopt::Long;
+use QVD::Config::Core;
+
+
 
 Wx::InitAllImageHandlers();
 my $app = QVD::Client::App->new();
+
+
+
 
 DEBUG("Starting main loop");
 $app->MainLoop();
