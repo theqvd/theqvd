@@ -845,24 +845,42 @@ sub _fw_rules {
     my $netnodes = $self->netnodes;
     my $netvms   = $self->netvms;
 
-    my @rules = ( # forbind opening TCP connections from the VMs to the hosts:
-                 [FORWARD => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-p' => 'tcp', '--syn', '-j' => 'DROP'],
-                 [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', '--syn', '-j', 'DROP'],
+    my @rules;
 
-                 # otherwise, allow traffic between the hosts and the VMs:
-                 [FORWARD => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-p' => 'tcp', '-j', 'ACCEPT'],
-                 [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', '-j', 'ACCEPT'],
+    if ( $self->_cfg('internal.vm.network.firewall.allow_login_from_vm')) {
+        push @rules,
+            [INPUT   => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-p' => 'tcp', '--dport' => $self->_cfg('l7r.port'), '-j', 'ACCEPT'],
+            [INPUT   => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-p' => 'icmp', '--icmp-type' => 'echo-request', '-j', 'ACCEPT'];
+    }
 
-                 # allow DHCP and DNS traffic between the VMs and this host:
-                 [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-p' => 'udp', '-m' => 'multiport', '--dports' => '67,53', '-j', 'ACCEPT'],
-                 [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', '--dport' => '53',    '-j', 'ACCEPT'],
+    if ( $self->_cfg('internal.vm.network.firewall.protect_host') ) {
+        # forbid opening TCP connections from the VMs to the hosts:
+        push @rules,
+            [FORWARD => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-p' => 'tcp', '--syn', '-j' => 'DROP'],
+            [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', '--syn', '-j', 'DROP'];
+    }
 
-                 # disallow non-tcp protocols between the VMs and the hosts:
-                 [FORWARD => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-j', 'DROP'],
-                 [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-j', 'DROP'],
+    # otherwise, allow traffic between the hosts and the VMs:
+    push @rules,
+        [FORWARD => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-p' => 'tcp', '-j', 'ACCEPT'],
+        [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', '-j', 'ACCEPT'];
 
-                 # forbid traffic between virtual machines:
-                 [FORWARD => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netvms, '-j', 'DROP'] );
+    # allow DHCP and DNS traffic between the VMs and this host:
+    push @rules,
+        [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-p' => 'udp', '-m' => 'multiport', '--dports' => '67,53', '-j', 'ACCEPT'],
+        [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-p' => 'tcp', '--dport' => '53',    '-j', 'ACCEPT'];
+
+    if ( $self->_cfg('internal.vm.network.firewall.protect_host') ) {
+        # disallow non-tcp protocols between the VMs and the hosts:
+        push @rules,
+            [FORWARD => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netnodes, '-j', 'DROP'],
+            [INPUT   => -m => 'iprange', '--src-range' => $netvms, '-j', 'DROP'];
+    }
+
+    if ( $self->_cfg('internal.vm.network.firewall.protect_vms') ) {
+        # forbid traffic between virtual machines:
+        push @rules, [FORWARD => -m => 'iprange', '--src-range' => $netvms, '--dst-range' => $netvms, '-j', 'DROP'];
+    }
 
     my $nat_iface = $self->_cfg('vm.network.firewall.nat.iface');
     push @rules, [-t => 'nat', POSTROUTING => -m => 'iprange', '--src-range' => $netvms, -o => $nat_iface, -j => 'MASQUERADE']

@@ -640,6 +640,23 @@ internal.vm.network.dhcp-hostsfile=${path.run}/dhcp-hostsfile
 
 # enable firewall rules
 internal.vm.network.firewall.enable = 1
+
+# if set to 1, the firewall will deny access from the VM to the host.
+# Disabling this is highly discouraged, as it will allow full access
+# from the VM to the host.
+internal.vm.network.firewall.protect_host = 1
+
+# If set to 1, the firewall will deny access from one VM to others.
+# Disabling this is highly discouraged.
+internal.vm.network.firewall.protect_vms = 1
+
+# If set to 1, the firewall will permit QVD connections originating from
+# a VM. This is a more reasonable setting than protect_host = 0 and should
+# allow for most scenarios. Only connections on the QVD port and ping will
+# be permitted if this is set to 1.
+internal.vm.network.firewall.allow_login_from_vm = 0
+
+
 vm.network.firewall.nat.iface =
 
 ## not sure about this one
