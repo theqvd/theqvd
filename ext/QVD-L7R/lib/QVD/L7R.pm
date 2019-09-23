@@ -301,7 +301,8 @@ sub connect_to_vm_processor {
         multi_use         => 1
     });
 
-    $params{auth_token} = encode_base64($session_auth->token);
+    $params{auth_token}   = $session_auth->token;
+    $params{host_address} = $this_host->address;
 
 
     eval {
