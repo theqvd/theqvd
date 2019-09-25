@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/lib/qvd/bin/perl
 
 package QVD::Client::App;
 use strict;
