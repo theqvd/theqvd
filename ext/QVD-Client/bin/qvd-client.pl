@@ -386,6 +386,8 @@ sub create_icons {
             print $fh "Terminal=false\n";
             print $fh "Name=" . $vm->{name} . "\n";
             print $fh "Exec=$client_bin --host $opts{'host'} --port $opts{'port'} --token $opts{origtoken} --vm-id " . $vm->{id} . "\n";
+
+            chmod 0755, $fh or WARN "Can't change permission for $desktop_dir/$icon_name: $!";
             close $fh;
         } else {
             ERROR "Failed to create $desktop_dir/$icon_name: $!";
