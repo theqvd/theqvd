@@ -72,7 +72,7 @@ use QVD::Log;
 use Getopt::Long;
 use QVD::Config::Core;
 use MIME::Base64;
-use QVD::Config::Core qw(core_cfg set_core_cfg);
+use QVD::Config::Core qw(core_cfg set_core_cfg core_load_config);
 
 INFO "Client starting";
 INFO "User dir: $user_dir";
@@ -100,7 +100,7 @@ $SIG{__DIE__} = sub {
 };
 
 INFO "Parsing options";
-my ($opt_host, $opt_port, $opt_vm_id, $opt_username, $opt_password, $opt_token, $opt_ssl);
+my ($opt_host, $opt_port, $opt_vm_id, $opt_username, $opt_password, $opt_token, $opt_ssl, @opt_config_files);
 my ($help);
 
 GetOptions(
@@ -111,7 +111,8 @@ GetOptions(
     "password=s"  => \$opt_password,
     "token=s"     => \$opt_token,
     "ssl!"        => \$opt_ssl,
-    "help"        => \$help
+    "help"        => \$help,
+    "config=s"    => \@opt_config_files
 ) or die "Getopt failed: $!";
 
 if ( $help ) {
@@ -128,9 +129,23 @@ QVD graphical client
 --file             Open file in VM
 --ssl, --no-ssl    Enable or disable the use of SSL
 --help             Shows this text
+--config           Loads the indicated config file
 HELP
     exit(0);
 
+}
+
+# Load additional config files. We accept both the --config argument, and the
+# old way of just specifying a config file as an argument without any parameters
+foreach my $conf (@opt_config_files, @ARGV) {
+    if ( -e $conf ) {
+        INFO "Loading additional config file $conf";
+        core_load_config($conf);
+
+        # When using a custom config file, we save our config into it.
+        # Use the last one.
+        $QVD::Client::Setup::user_config_fn = $conf;
+    }
 }
 
 for $ARGV (@ARGV) {

@@ -27,12 +27,13 @@ BEGIN {
                                     : File::Spec->join((getpwuid $>)[7] // $ENV{HOME}, '.qvd'));
     mkdir($user_dir);
 
-    $user_config_fn = $ARGV[0] || File::Spec->join($user_dir, 'client.conf');
+    $user_config_fn = File::Spec->join($user_dir, 'client.conf');
 
     no warnings;
     $QVD::Config::USE_DB = 0;
     @QVD::Config::Core::FILES = (($WINDOWS ? () : ('/etc/qvd/client.conf')),
                                   $user_config_fn);
+
 }
 
 # we can load the configuration now:
