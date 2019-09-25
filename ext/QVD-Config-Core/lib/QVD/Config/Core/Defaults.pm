@@ -207,6 +207,7 @@ command.usbsrv = /usr/local/bin/usbsrv
 command.usbclnt = /usr/local/bin/usbclnt
 command.usbip = /usr/bin/usbip
 command.slaveclient = ${path.qvd.bin}/qvd-slaveclient
+command.qvd-client = ${path.qvd.bin}/qvd-client.pl
 
 @mswin@command.gsprint = gsview/gsprint.exe
 @mswin@command.ghostscript = ghostscript/bin/gswin32.exe
@@ -685,6 +686,10 @@ vma.pid_file = /var/run/qvd/vma.pid
 vma.as_user = root
 vma.as_group = nogroup
 @centos@vma.as_group = nobody
+
+# If set to 1, enables the creation of app desktop icons
+# The server must be configured to allow VM to host access for this to work.
+vma.apps.desktop_icons.enable = 0
 
 ## KVM: disk drive will be visible as: 0=hda, 1=hdb, 2=hdc... (parameter 'index' within -drive in KVM)
 vm.kvm.home.drive.index = 1

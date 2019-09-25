@@ -71,6 +71,7 @@ my $slaveclient     = cfg('command.slaveclient');
 
 my $mount           = cfg('command.mount');
 my $umount          = cfg('command.umount');
+my $qvd_client      = cfg('command.qvd-client');
 
 my $default_user_name   = cfg('vma.user.default.name');
 my $default_user_groups = cfg('vma.user.default.groups');
@@ -134,6 +135,7 @@ my %nx2x = ( initiating   => 'starting',
 
 my %running   = map { $_ => 1 } qw(listening connected suspending suspended);
 my %connected = map { $_ => 1 } qw(listening connected);
+
 
 
 sub _open_log {
@@ -621,7 +623,10 @@ sub _fork_monitor {
             }
 
         };
-        DEBUG $@ if $@;
+        if ( $@ ) {
+            ERROR "Error in VMA monitor: $@";
+        }
+
         _delete_nxagent_state_and_pid_and_call_hook;
     }
 }
@@ -744,6 +749,11 @@ sub _start_session {
     my ($state, $pid) = _state;
     my (%props) = _fill_props @_;
     DEBUG "starting session in state $state, pid $pid";
+
+    if ( cfg('vma.apps.desktop_icons.enable') ) {
+        _start_desktop_app_icons( $props{'auth_token'}, $props{'host_address'}, $props{'qvd.vm.user.name'} );
+    }
+
     given ($state) {
         when ('suspended') {
             _call_action_hook(pre_connect => %props);
@@ -927,6 +937,29 @@ sub _start_pulseaudio {
     return $proc;
 }
 
+sub _start_desktop_app_icons {
+    my ($token, $host, $user) = @_;
+
+    if (!$token) {
+        ERROR "Can't start icon creation: no token provided. Server too old?";
+        return;
+    }
+
+    if (!$host) {
+        ERROR "Can't start icon creation: no host provided. Server too old?";
+        return;
+    }
+
+    INFO "Starting icon creation for user $user. Server is $host; token is $token";
+
+    my $proc = _bgrun({ user => $user }, $qvd_client, "--token", $token, "--host", $host, "--ssl-errors=continue", "--create-icons");
+    if (!$proc) {
+        ERROR "Failed to run $qvd_client";
+    }
+
+    return $proc;
+}
+
 sub _stop_process {
     my ($pid, $name) = @_;
     return unless ($pid);
@@ -1001,6 +1034,8 @@ sub _bgrun {
 
     local $SIG{CHLD};
     undef $SIG{CHLD};
+
+    DEBUG sprintf("_bgrun: opts=%s; command=%s", join(',', %$opts), join(' ', @cmd));
 
     my $pid = fork();
     if ( !$pid ) {
