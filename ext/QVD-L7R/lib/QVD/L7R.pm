@@ -123,7 +123,7 @@ sub authenticate_user {
     $auth->before_list_of_vms;
     
     # Store auth paramaters if needed
-    my $store_auth_params = 1; # $params{store_auth} // 0;
+    my $store_auth_params = $params{store_auth} // 0;
     if($store_auth_params) {
         txn_do {
             my $uas = rs('User_Auth_Parameters')->create({ parameters => $l7r->json->encode($auth->{params}) });
@@ -253,7 +253,7 @@ sub connect_to_vm_processor {
     my $vm_id = delete $params{id};
     if (defined $l7r->{session}) {
         $l7r->throw_http_error(HTTP_FORBIDDEN, "vm_id does not match with provided token")
-            unless ($vm_id == $l7r->{session}->vm_id) || (!defined $l7r->{session}->vm_id);
+            if (defined $l7r->{session}->vm_id) && ($vm_id != $l7r->{session}->vm_id);
     }
     
     unless (defined $vm_id)  {
