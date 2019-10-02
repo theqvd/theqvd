@@ -157,6 +157,7 @@ my %connect_info = (
     printing      => core_cfg('client.printing.enable'),
     geometry      => core_cfg('client.geometry'),
     fullscreen    => core_cfg('client.fullscreen'),
+    usb_impl      => core_cfg('client.usb.implementation'),
     keyboard      => 'pc105/es',
     kill_vm       => 0,
     %opts,
