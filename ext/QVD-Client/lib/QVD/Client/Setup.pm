@@ -8,7 +8,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw($WINDOWS $DARWIN $user_dir $app_dir $user_config_fn);
 
-our ($WINDOWS, $DARWIN, $user_dir, $app_dir, $user_config_fn);
+our ($WINDOWS, $DARWIN, $LINUX, $user_dir, $app_dir, $user_config_fn);
 
 use File::Spec;
 use Cwd;
@@ -18,6 +18,7 @@ BEGIN {
 
     $WINDOWS = ($^O eq 'MSWin32');
     $DARWIN = ($^O eq 'darwin');
+    $LINUX = ($^O eq "linux");
 
     # Make sure cups service is online (in El Capitan , cups is not running until used)
     if ( $DARWIN ){ system('/usr/sbin/cupsctl >/dev/null 2>&1'); }
@@ -86,5 +87,27 @@ use QVD::Log;
 
 INFO "user_dir: $user_dir";
 INFO "app_dir: $app_dir";
+
+if ( $LINUX ) {
+	# When run inside a QVD session without using a terminal (when launched from a desktop
+	# icon, for instance), the QVD client can inherit the sockets used by nxagent.
+	#
+	# The result of that is that nxagent output becomes mixed with the qvdclient output,
+	# which confuses VMA because the client launches nxproxy.
+	#
+	# To ensure this doesn't happen, we turn off console output when there isn't a console.
+	if ( readlink("/proc/self/fd/0") !~ /^\/dev/ ) {
+		INFO "stdin is not a terminal, closing";
+		open(STDIN, "<", "/dev/null");
+	}
+	if ( readlink("/proc/self/fd/1") !~ /^\/dev/ ) {
+		INFO "stdout is not a terminal, closing";
+		open(STDOUT, ">", "/dev/null");
+	}
+	if ( readlink("/proc/self/fd/2") !~ /^\/dev/ ) {
+		INFO "stderr is not a terminal, closing";
+		open(STDERR, ">", "/dev/null");
+	}
+}
 
 1;
