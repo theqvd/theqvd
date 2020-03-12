@@ -55,6 +55,9 @@ my $build = Module::Build->new(
     },
     etc_files=> {
         "etc/qvd/templates/lxc.mt" => "/etc/qvd/templates/lxc.mt",
+        "etc/apparmor.d/lxc/lxc-qvd"    => "/etc/apparmor.d/lxc/lxc-qvd",
+        "etc/apparmor.d/abstractions/lxc/container-base-qvd"
+                                        => "/etc/apparmor.d/abstractions/lxc/container-base-qvd"
     },
     install_path => { 'etc' => '/etc' },
 );
