@@ -1,6 +1,8 @@
 lxc.autodev=1
-lxc.kmsg=0
 lxc.hook.autodev=<%= $lxc_hook_autodev %>
+
+% if ( $lxc_version < '2.1'){
+lxc.kmsg=0
 lxc.utsname=<%= $lxc_utsname %>
 lxc.network.type=veth
 lxc.network.veth.pair=<%= $lxc_network_veth_pair %>
@@ -12,8 +14,22 @@ lxc.console=<%= $lxc_console %>
 lxc.tty=3
 lxc.pts=1024
 lxc.rootfs=<%= $lxc_rootfs %>
-lxc.mount.entry=<%= $lxc_mount_entry %>
 lxc.pivotdir=qvd-pivot
+% } else {
+lxc.uts.name=<%= $lxc_utsname %>
+lxc.net.0.type=veth
+lxc.net.0.veth.pair=<%= $lxc_network_veth_pair %>
+lxc.net.0.name=eth0
+lxc.net.0.flags=up
+lxc.net.0.hwaddr=<%= $lxc_network_hwaddr %>
+lxc.net.0.link=<%= $lxc_network_link %>
+lxc.console.path=<%= $lxc_console %>
+lxc.tty.max=3
+lxc.pty.max=1024
+lxc.rootfs.path=<%= $lxc_rootfs %>
+% }
+
+lxc.mount.entry=<%= $lxc_mount_entry %>
 lxc.cgroup.cpu.shares=1024
 lxc.cgroup.cpuset.cpus=<%= $lxc_cgroup_cpuset_cpus %>
 <%= $memory_limits %>
@@ -27,8 +43,10 @@ lxc.mount.entry=/sys/devices/platform/<%= $extra->{vhci}->{hub} %> sys/devices/p
 
 % if ( $lxc_version == '0.9' ){
 lxc.aa_profile = unconfined
-% } else {
+% } elsif ( $lxc_version < '2.1' ) {
 lxc.aa_profile = lxc-container-qvd
+% } else {
+lxc.apparmor.profile = lxc-container-qvd
 % }
 
 # Deny access to all devices, except...

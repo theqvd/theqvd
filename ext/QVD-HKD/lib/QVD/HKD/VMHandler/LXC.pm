@@ -374,10 +374,15 @@ EOML
     my $extra_lines;
 
     if (!$self->_cfg('vm.network.use_dhcp')) {
-        $extra_lines .= "lxc.network.ipv4 = " . $self->{ip} . "/" . $self->{netmask_len} . "\n";
-        if ($lxc_version >= 0.8) {
-            $extra_lines .= "lxc.network.ipv4.gateway = " . $self->{gateway} . "\n";
-        }
+        if ($lxc_version < 2.1) {
+            $extra_lines .= "lxc.network.ipv4 = " . $self->{ip} . "/" . $self->{netmask_len} . "\n";
+            if ($lxc_version >= 0.8) {
+                $extra_lines .= "lxc.network.ipv4.gateway = " . $self->{gateway} . "\n";
+            }
+        } else {
+          $extra_lines .= "lxc.net.0.ipv4.address = " . $self->{ip} . "/" . $self->{netmask_len} . "\n";
+          $extra_lines .= "lxc.net.0.ipv4.gateway = " . $self->{gateway} . "\n";
+       }
     }
 
     my $meta = $self->{os_fs}->image_metadata_dir;
