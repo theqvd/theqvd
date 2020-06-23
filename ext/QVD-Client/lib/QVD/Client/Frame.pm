@@ -371,7 +371,7 @@ sub new {
     $self->{progress_bar}->SetValue(0);
     $ver_sizer->Add($self->{progress_bar}, 0, wxEXPAND, 0);
 
-    $ver_sizer->Add( Wx::HyperlinkCtrl->new( $panel , -1, 'Qindel Group '.chr(169).' 2018','http://theqvd.com',wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL , ''), 0 , wxALIGN_CENTER_HORIZONTAL, 5 );
+    $ver_sizer->Add( Wx::HyperlinkCtrl->new( $panel , -1, 'Qindel Group '.chr(169).' 2020','http://theqvd.com',wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL , ''), 0 , wxALIGN_CENTER_HORIZONTAL, 5 );
 
     $self->SetTitle("QVD");
     my $icon = Wx::Icon->new();
