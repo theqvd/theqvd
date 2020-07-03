@@ -670,6 +670,10 @@ vma.usb.usbip.debug = 0
 vma.usb.usbip.log = 0
 vma.sshfs.extra_args = -o idmap=user -o atomic_o_trunc
 
+vma.x11vnc.confirm.enabled=1
+vma.x11vnc.confirm.command=zenity --question --text="Servicedesk intenta establecer un acceso remoto. Aceptar la ayuda?"
+vma.x11vnc.extra_args=
+
 # When using LXC if this flag is set, QVD will assume that the home
 # directories are not per virtual machine but per user and that they
 # follow the typical NFS home structure.

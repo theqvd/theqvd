@@ -46,7 +46,13 @@ my $nxagent         = cfg('command.nxagent');
 my $nxdiag          = cfg('command.nxdiag');
 my $x_session       = cfg('command.x-session');
 my $xinit           = cfg('command.xinit');
-my $x11vnc          = cfg('command.x11vnc');
+
+my $x11vnc             = cfg('command.x11vnc');
+my $x11vnc_confirm     = cfg('vma.x11vnc.confirm.enabled');
+my $x11vnc_confirm_cmd = cfg('vma.x11vnc.confirm.command');
+my $x11vnc_extra_args  = cfg('vma.x11vnc.extra_args');
+
+
 my $enable_audio    = cfg('vma.audio.enable');
 my $enable_slave    = cfg('vma.slave.enable');
 my $command_slave   = cfg('vma.slave.command');
@@ -815,6 +821,15 @@ sub _vnc_connect {
 
     $httpd->send_http_response(QVD::HTTP::StatusCodes::HTTP_SWITCHING_PROTOCOLS);
 
+    my @x11vnc_args = ( "-display", ":$display", "-inetd");
+    push @x11vnc_args, $x11vnc_extra_args if ($x11vnc_extra_args);
+
+    if ($x11vnc_confirm) {
+        push @x11vnc_args, "-accept", $x11vnc_confirm_cmd;
+    }
+
+    DEBUG "Will start X11VNC with arguments: " . join(' ', @x11vnc_args);
+
     eval {
         POSIX::dup2(fileno($log), 2);
 
@@ -824,7 +839,7 @@ sub _vnc_connect {
         POSIX::dup2(fileno($httpd->{server}{client}), 0);
         POSIX::dup2(fileno($httpd->{server}{client}), 1);
 
-        exec($x11vnc, -display => ":$display", '-inetd')
+        exec($x11vnc, @x11vnc_args)
     };
 
     print {$log} "Unable to start x11vnc: " . ($@ || $!);
