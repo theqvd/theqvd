@@ -251,7 +251,7 @@ sub json {
 
 sub throw_http_error {
     shift;
-    DEBUG "throwing error " . (ref $_[1] ? "$_[0] [@{$_[1]}] @_[2..$#_]" : "@_");
+    ERROR "throwing HTTP error " . (ref $_[1] ? "$_[0] [@{$_[1]}] @_[2..$#_]" : "@_");
     die QVD::HTTPD::Exception->new(@_);
 }
 
