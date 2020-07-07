@@ -1,0 +1,208 @@
+#!/usr/bin/env python3
+from systemd import journal
+import argparse
+import subprocess
+import gettext
+import os
+import gi
+import signal
+gi.require_version("Gtk", "3.0")
+gi.require_version('AppIndicator3', '0.1')
+gi.require_version('Notify', '0.7')
+
+from gi.repository import Gtk as gtk, AppIndicator3 as appindicator, Notify as notify, GdkPixbuf as pixbuf
+
+
+notification = None
+parent_pid = 0
+log_stream = journal.stream('qvdspy-notifier')
+
+gettext.bindtextdomain('qvdspy-notifier', '/usr/lib/qvd/locale')
+gettext.textdomain('qvdspy-notifier')
+_ = gettext.gettext
+
+
+
+
+def log(s):
+    global log_stream
+    log_stream.write(s)
+    log_stream.write("\n")
+
+
+def qvd_allow(a,b,c):
+    global parent_pid
+
+    log("User allowed the connection")
+    cmd = [__file__, "--systray", "--parent", str(parent_pid)]
+
+    log("Starting systray icon, command {}".format(cmd))
+    subprocess.run(cmd)
+    exit(0)
+
+def qvd_deny(a,b,c):
+    log("User denied the connection")
+    exit(1)
+
+
+def find_pixmap(filename):
+    dirs = []
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+
+    dirs.append( os.path.join(script_dir, "ext/QVD-Client/pixmaps") )
+    dirs.append( os.path.join(script_dir, "windows/installer/pixmaps") )
+
+    dirs.append( os.path.join(script_dir, "../../../ext/QVD-Client/pixmaps") )
+    dirs.append( os.path.join(script_dir, "../../../windows/installer/pixmaps" ) )
+
+    dirs.append( "/usr/lib/qvd/pixmaps" )
+
+    for d in dirs:
+        full_path = os.path.join(d, filename)
+        if os.path.exists(full_path):
+            log("Icon {} found at {}".format(filename, full_path))
+            return full_path
+
+    log("Failed to find icon {} in {}".format(filename, dirs))
+ 
+def find_parent():
+    pid = os.getppid()
+    log("PPID is {}".format(pid))
+
+    try:
+
+        while pid != 1:
+            log("Checking pid {}".format(pid))
+            exe = os.readlink("/proc/{}/exe".format(pid))
+            log("Parent process exe is {}".format(exe))
+
+            exe_base = os.path.basename(exe)
+            log("Parent basename is {}".format(exe_base))
+
+            if "vnc" in exe_base.lower():
+                log("Parent is a VNC process")
+                return pid
+            else:
+                log("Parent is not a VNC process, will try going higher.")
+
+            with open("/proc/{}/status".format(pid)) as f:
+                for ln, line in enumerate(f):
+                    parts = line.split(':')
+
+                    if parts[0] == "PPid":
+                        log("Found parent: {}".format(parts[1]))
+                        pid = int(parts[1])
+
+    except OSError as ose:
+        log("Exception when trying to find parent: {}".format(ose))
+        return 0
+
+    log("Not running under VNC, won't kill it")
+    return 0
+
+
+def start_indicator():
+    pid = os.fork()
+    if ( pid != 0 ):
+        return 0
+
+    systray_image = find_pixmap('qvdspy.svg') or find_pixmap('qvdspy.png') or find_pixmap('qvd.svg')
+
+    indicator = appindicator.Indicator.new("qvdspy", "", appindicator.IndicatorCategory.APPLICATION_STATUS)
+
+    indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
+    indicator.set_menu(menu())
+    indicator.set_title(_("QVD remote view"))
+    indicator.set_icon_full(systray_image, "QVD")
+    gtk.main()
+
+def show_notification():
+    systray_image = find_pixmap('qvd.svg')
+    notification_image = find_pixmap('qvd.svg')
+    notify.init("QVD")
+
+
+    notification = notify.Notification.new(_("The QVD administrator would like to see your screen."))
+
+    notification.add_action(
+        "action_allow",
+        _("Allow"),
+        qvd_allow,
+        None # Arguments
+    )
+
+    notification.add_action(
+        "action_deny",
+        _("Deny"),
+        qvd_deny,
+        None # Arguments
+    )
+
+    notification.set_image_from_pixbuf( pixbuf.Pixbuf.new_from_file(notification_image) )
+    notification.set_timeout(0)
+    notification.show()
+    gtk.main()
+    exit(0)
+
+def main():
+    global notification
+    global parent_pid
+
+    log("Starting")
+
+    parser = argparse.ArgumentParser(description='QVD Spy notifier')
+    parser.add_argument('--systray', action='store_true', help="Start systray icon")
+    parser.add_argument('--parent', type=int, help="Parent PID")
+
+    args = parser.parse_args()
+
+    if args.parent is not None:
+        log("Getting parent from commandline: {}".format(args.parent))
+        parent_pid = args.parent
+    else:
+        parent_pid = find_parent()
+
+    if args.systray:
+        log("Showing systray")
+        start_indicator()
+        exit(0)
+    else:
+        log("Showing connection request")
+        show_notification()
+
+    exit(0)
+
+def menu():
+    qvd_menu = gtk.Menu()
+
+    exittray = gtk.MenuItem(label = _('Disconnect'))
+    exittray.connect('activate', quit)
+    qvd_menu.append(exittray)
+
+    qvd_menu.show_all()
+    return qvd_menu
+
+def quit(_):
+    global parent_pid
+    global notification
+
+    log("Quitting")
+    
+    try:
+        if parent_pid != 0:
+            log("Terminating parent pid {}".format(parent_pid))
+            os.kill(parent_pid, signal.SIGKILL)
+
+        if notification is not None:
+            log("Removing notification")
+            notification.close()
+
+    except Exception as e:
+        log("Unexpected error: {}".format(e))
+
+    log("Done.")
+    gtk.main_quit()
+    exit(0)
+
+if __name__ == "__main__":
+    main()
