@@ -51,7 +51,7 @@ my $build = Module::Build->new(
         'URI::Escape' => 0,
         'BSD::Resource' => '1.2910',
         'Mojo::Template' => '0',
-        'Linux::Inotify2' => 0
+        'Linux::Inotify2' => '0',
         'Socket::Netlink' => '0.05'
     },
     etc_files=> {
