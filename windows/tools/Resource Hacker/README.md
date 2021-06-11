@@ -1,6 +1,6 @@
 ----------------------------------------------
 
-Resource Hacker™ - Version 3.5.2
+Resource Hackerâ„¢ - Version 3.5.2
 
 19 November 2009.
 Copyright 1999-2009 Angus Johnson
@@ -17,7 +17,7 @@ Win9x, WinNT, Win2000 and WinXP, Vista & Win7.
 Summary:
 ----------------------------------------------
 
-Resource Hacker™ has been designed to:
+Resource Hackerâ„¢ has been designed to:
 
 1. View resources in Win32 executable files 
 (*.exe, *.dll, *.cpl, *.ocx) and in Win32 
@@ -63,7 +63,7 @@ application's size.
 Note regarding WinXP - Win7 and Visual Styles:
 ----------------------------------------------
 
-  * Adding a manifest resource to Resource Hacker™
+  * Adding a manifest resource to Resource Hackerâ„¢
   will cause intermittent problems when viewing
   or editing dialogs - so I don't recommend it :)  
 
@@ -71,9 +71,9 @@ Note regarding WinXP - Win7 and Visual Styles:
 Known limitations:
 ----------------------------------------------
 
-1. Resource Hacker™ will not read 16bit executables. 
+1. Resource Hackerâ„¢ will not read 16bit executables. 
 
-2. Resource Hacker™ is currently compiled with 
+2. Resource Hackerâ„¢ is currently compiled with 
 Delphi 3.02. When decompiling and recompiling 
 Borland's Delphi forms in applications compiled 
 with later version of Delphi, there may be errors 
@@ -83,14 +83,14 @@ keyword 'inline' not being recognized. While
 decompiling, the 'inline' keyword will be replaced 
 by 'object' and, if manually corrected before 
 recompiling, 'inline' will be rejected by the 
-Resource Hacker™ compiler.
+Resource Hackerâ„¢ compiler.
 
 3. To reduce the size of application files, some 
 applications are "packed" or "compressed" using 
 an EXE compressor after they have been compiled. 
 This has a side-effect of making it more difficult 
 to view and modify resources. When a "compressed" 
-executable is viewed with Resource Hacker™, only 
+executable is viewed with Resource Hackerâ„¢, only 
 resource types and names will be visible but not 
 the actual resources.
 
@@ -98,7 +98,7 @@ the actual resources.
 Licence Agreement:
 ----------------------------------------------
 
-This Resource Hacker™ software is released as 
+This Resource Hackerâ„¢ software is released as 
 freeware provided that you agree to the 
 following terms and conditions: 
 
@@ -109,7 +109,7 @@ following terms and conditions:
   2. This software is not to be used in any way to 
   illegally modify software. 
 
-DISCLAIMER: A user of this Resource Hacker™ 
+DISCLAIMER: A user of this Resource Hackerâ„¢ 
 software acknowledges that he or she is 
 receiving this software on an "as is" basis 
 and the user is not relying on the accuracy 
