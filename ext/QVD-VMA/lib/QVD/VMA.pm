@@ -766,6 +766,7 @@ sub _start_session {
             DEBUG "awaking nxagent";
             _save_slave_config(%props);
             _save_printing_config(%props);
+	    _set_timezone(%props);
             _save_nxagent_state_and_call_hook 'initiating';
             _make_nxagent_config(%props);
             kill HUP => $pid;
@@ -780,6 +781,7 @@ sub _start_session {
             _call_action_hook(pre_connect => %props);
             _save_slave_config(%props);
             _save_printing_config(%props);
+	    _set_timezone(%props);
             DEBUG "Forking monitor";
             _fork_monitor(%props);
         }
@@ -996,6 +998,14 @@ sub _stop_process {
         waitpid($pid, 0);
     }
 
+}
+
+sub _set_timezone {
+    my %args = @_;
+    my $timezone = $args{'qvd.client.timezone'};
+    INFO "Syncing with qvd client timezone to $timezone";
+    my @cmd = ("timedatectl", "set-timezone", "$timezone");
+    system(@cmd) == 0 or ERROR "Failed to set timezone $timezone " . join (' ', @cmd) . ": $?";
 }
 
 ################################ RPC methods ######################################
