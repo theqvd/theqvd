@@ -259,15 +259,22 @@ sub _remove_fw_rules {
             for (`$ebtables -L $chain --Ln`) {
                 chomp;
                 if ($_ =~ $j) {
-                    my ($n) = split /\./;
+                    my $n = (split / /, $_)[0];
                     $debug and $self->_debug("deleting rule $_");
                     DEBUG "Deleting rule '$_'";
-                    if (system $ebtables => -D => $chain, $n) {
+                    if (system $ebtables => -D => $chain => $n) {
                         $debug and $self->_debug("unable to delete rule, rc: " . ($? << 8));
                         WARN "Unable to delete ebtable";
                     }
                 }
             }
+
+	    DEBUG "flushing ebtables $target chain rules";
+            if (system $ebtables => -F => $target) {
+                $debug and $self->_debug("unable to flush rules in chain $target, rc: " . ($? << 8));
+                WARN "Unable to flush rules in chain '$target', rc: " . ($? << 8);
+            }
+
             DEBUG "deleting ebtables chain $target";
             if (system $ebtables => -X => $target) {
                 $debug and $self->_debug("unable to delete chain $target, rc: " . ($? << 8));
