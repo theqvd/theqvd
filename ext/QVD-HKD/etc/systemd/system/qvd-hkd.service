@@ -6,6 +6,7 @@ After=syslog.target network.target
 Type=forking
 PIDFile=/var/run/qvd/qvd-hkd.pid
 EnvironmentFile=-/etc/sysconfig/qvd-hkd
+ExecStartPre=/usr/sbin/aa-complain /etc/apparmor.d/lxc/lxc-qvd
 ExecStart=/usr/lib/qvd/bin/qvd-hkd
 
 [Install]
