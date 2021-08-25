@@ -55,7 +55,7 @@ my $build = Module::Build->new(
         'Socket::Netlink' => '0.05'
     },
     etc_files=> {
-        "etc/systemd/system/qvd-hkd.service" => "/etc/systemd/system/qvd-hkd.service",
+	"etc/systemd/system/qvd-hkd.service" => "/etc/systemd/system/qvd-hkd.service",
         "etc/qvd/templates/lxc.mt" => "/etc/qvd/templates/lxc.mt",
         "etc/apparmor.d/lxc/lxc-qvd"    => "/etc/apparmor.d/lxc/lxc-qvd",
         "etc/apparmor.d/abstractions/lxc/container-base-qvd"
