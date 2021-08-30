@@ -1,7 +1,9 @@
 # Do not load this file.  Rather, load /etc/apparmor.d/lxc-containers, which
 # will source all profiles under /etc/apparmor.d/lxc
+#include <tunables/global>
 
 profile lxc-container-qvd flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
   #include <abstractions/lxc/container-base-qvd>
 
   # the container may never be allowed to mount devpts.  If it does, it
