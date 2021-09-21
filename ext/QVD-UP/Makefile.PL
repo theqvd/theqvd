@@ -12,7 +12,7 @@ WriteMakefile(
         'bin/qvd-up-api.debrc.pl',
         'bin/qvd-up-api.initrc.pl',
         'bin/qvd-up-api.pl' ,
-        'bin/qvd-up-api.service'
+        'bin/system/qvd-up-api.service'
     ],
     PREREQ_PM         => {
         'HTTP::BrowserDetect' => 0,
