@@ -14,7 +14,7 @@ WriteMakefile(
     AUTHOR        => 'QVD Team <qvd@qindel.es>',
     VERSION	     => '3.5'.$SUF_VERSION ,
     ABSTRACT      => 'QVD::Admin',
-    EXE_FILES     => [ 'bin/qvd-admin.pl'],
+    EXE_FILES     => [ qw(bin/qvd-admin.pl bin/qvd-spy) ],
     PL_FILES      => {},
     PREREQ_PM     => {
         'DateTime' => 0,
