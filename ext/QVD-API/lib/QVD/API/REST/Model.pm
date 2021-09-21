@@ -4,7 +4,6 @@ use warnings;
 use Moo;
 use QVD::Config::Network qw(nettop_n netstart_n net_aton net_ntoa);
 use QVD::Config;
-use File::Basename qw(basename);
 use QVD::DB::Simple qw(db);
 use QVD::DB::Common qw(ENUMERATES);
 use QVD::API::Exception;
@@ -1278,8 +1277,6 @@ my $FIELDS_TO_DBIX_FORMAT_MAPPER =
 
 my $VALUES_NORMALIZATOR = 
 	{
-    DI => { disk_image => \&basename_disk_image},
-
     User => { name => \&normalize_name, 
 	      password => \&password_to_token },
 
@@ -2034,7 +2031,6 @@ sub type_of_action_log_style
 
 sub get_default_memory { cfg('osf.default.memory'); }
 sub get_default_overlay { cfg('osf.default.overlay'); }
-sub basename_disk_image { my $self = shift; basename(+shift); };
 
 sub password_to_token 
 {

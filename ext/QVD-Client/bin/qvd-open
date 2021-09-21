@@ -14,11 +14,18 @@ BEGIN {
 
     $user_config_filename = File::Spec->join($user_dir, 'client.conf');
 
+    if (exists($ENV{QVDCLIENTCONFIG})) {
+        my $configfile = $ENV{QVDCLIENTCONFIG};
+        if (-f $configfile) {
+            $user_config_filename = $configfile;
+        } else {
+            print STDERR "Ignoring config file defined in QVDCLIENTCONFIG env variable <$configfile> defaulting to <$user_config_filename>\n";
+        }
+    }
     #no warnings;
     $QVD::Config::USE_DB = 0;
     @QVD::Config::Core::FILES = ( '/etc/qvd/client.conf',
                                   $user_config_filename );
-
 }
 
 use QVD::Config::Core qw(set_core_cfg core_cfg);
@@ -42,12 +49,7 @@ my $success = eval {
 };
 if (!$success) {
     ERROR($@) if $@;
-    my $user = core_cfg('client.user.name');
-    my $pass = core_cfg('client.user.pass');
-    my $host = core_cfg('client.host.name');
-    my $port = 8443;
-    @ARGV = ($user, $pass, $host, $port);
-    push @ARGV, $file;
+    @ARGV = ('--file', $file);
     local $@;
     unless (defined do "$Bin/qvd-client.pl") {
         if ($@) {

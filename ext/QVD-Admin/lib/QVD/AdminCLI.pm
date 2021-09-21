@@ -31,7 +31,7 @@ my %syntax_check_cbs = (
         add => sub {
             my ($errors, $args) = @_;
             $$errors++, warn "Syntax error: parameter 'name' is mandatory\n", unless exists $args->{'name'};
-            delete @$args{qw/name memory use_overlay user_storage_size/};
+            delete @$args{qw/name memory use_overlay user_storage_size is_application/};
         },
     },
     di => {
@@ -729,13 +729,14 @@ sub help_osf_add {
     print <<EOT
 osf add: Adds operating systems flavours.
 usage: osf add name=string [memory=size] [use_overlay=boolean]
-                [user_storage_size=size]
+                [user_storage_size=size] [is_application=boolean]
 
     The disk_image is copied to the read-only storage area.
     The default values for the optional parameters are:
         memory=256 
         use_overlay=y
         user_storage_size=undef (no user storage)
+        is_application=n
 
 Valid options:
     -q [--quiet]         : don't print the command message
@@ -770,13 +771,13 @@ EOT
 sub cmd_osf_list {
     my ($self) = @_;
     my $rs = $self->get_resultset('osf')->search({}, {order_by => 'id'});
-    my @header = qw(Id Name RAM Overlay UserHD);
+    my @header = qw(Id Name RAM Overlay UserHD IsApplication);
     my @body;
     eval {
         while (my $osf = $rs->next) {
-            my @row = map { defined($_) ? $_ : '-' } map { $osf->$_ } qw(id name memory use_overlay user_storage_size);
-            ## translate use_overlay from (0,1) to (no,yes)
-            $row[-2] = { 0 => 'no', 1 => 'yes' }->{$row[-2]};
+            my @row = map { defined($_) ? $_ : '-' } map { $osf->$_ } qw(id name memory use_overlay user_storage_size is_application);
+            ## translate use_overlay and is_application from (0,1) to (no,yes)
+            $row[$_] = { 0 => 'no', 1 => 'yes' }->{$row[$_]} for (-3, -1);
             push(@body, \@row);
         }
     };

@@ -126,6 +126,9 @@ Wat.L = {
         // Store tenant mode
         Wat.C.multitenant = parseInt(that.retrievedData.multitenant);
 
+        // Store hypervisor
+        Wat.C.hypervisor = that.retrievedData.hypervisor;
+
         // Store public configuration
         Wat.C.publicConfig = that.retrievedData.public_configuration || {};
         

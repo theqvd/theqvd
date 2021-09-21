@@ -1,0 +1,7 @@
+UPDATE versions SET version = '4.3.0' WHERE component = 'schema';
+
+ALTER TABLE osfs ADD COLUMN is_application BOOLEAN DEFAULT 'f' NOT NULL;
+
+ALTER TABLE user_tokens ADD COLUMN multi_use BOOLEAN DEFAULT FALSE NOT NULL;
+
+

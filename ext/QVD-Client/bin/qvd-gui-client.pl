@@ -1,35 +1,20 @@
-#!/usr/bin/perl
+#!/usr/lib/qvd/bin/perl
 
 package QVD::Client::App;
-use QVD::Client::Setup;
-
 use strict;
 use warnings;
 use 5.010;
 
+use QVD::Client::Setup;
 use File::Spec;
 use URI::Escape qw(uri_unescape);
 use QVD::Config::Core qw(core_cfg set_core_cfg);
 use QVD::Log;
 
-BEGIN {
-    for $ARGV (@ARGV) {
-        my @args = ($ARGV);
-        if( $ARGV =~ /^qvd:(.*)$/ ) {
-            @args = split(/\s+/, uri_unescape($1));
-        }
-        for my $arg (@args) {
-            if (my ($k, $v) = $arg =~ /^\s*([\w\.]+)\s*[:=\s]\s*(.*?)\s*$/) {
-                set_core_cfg($k, $v);
-            }
-        }
-    }
-}
 
-INFO "Client starting";
+use QVD::Client::Frame;
+use parent 'Wx::App';
 
-INFO "User dir: $user_dir";
-INFO "App dir : $app_dir";
 
 our $orig_display = $ENV{DISPLAY};
 our $user_certs_dir = File::Spec->rel2abs(core_cfg('path.ssl.ca.personal'), $user_dir);
@@ -42,27 +27,6 @@ DEBUG "pixmaps_dir, first attempt: $pixmaps_dir";
 $pixmaps_dir = File::Spec->rel2abs(core_cfg('path.client.pixmaps.alt'), $app_dir) unless -d $pixmaps_dir;
 INFO "pixmaps_dir, final value: $pixmaps_dir";
 
-$SIG{PIPE} = 'IGNORE';
-
-$SIG{__WARN__} = sub {
-    local $Log::Log4perl::caller_depth =
-          $Log::Log4perl::caller_depth + 1;
-    WARN "@_";
-};
-
-$SIG{__DIE__} = sub {
-    local $Log::Log4perl::caller_depth =
-          $Log::Log4perl::caller_depth + 1;
-
-    if ( $^S ) {
-        DEBUG "die called inside eval: @_";
-    } else {
-        LOGDIE "@_";
-    }
-};
-
-use QVD::Client::Frame;
-use parent 'Wx::App';
 
 sub OnInit {
     my $self = shift;
@@ -98,9 +62,117 @@ SCRIPT
 sub should_autoconnect {
     core_cfg('client.auto_connect', 0);
 }
-package main;
 
+
+package main;
+use strict;
+use warnings;
+use QVD::Client::Setup;
 use QVD::Log;
+use Getopt::Long;
+use QVD::Config::Core;
+use MIME::Base64;
+use QVD::Config::Core qw(core_cfg set_core_cfg core_load_config);
+
+INFO "Client starting";
+INFO "User dir: $user_dir";
+INFO "App dir : $app_dir";
+
+
+
+$SIG{PIPE} = 'IGNORE';
+
+$SIG{__WARN__} = sub {
+    local $Log::Log4perl::caller_depth =
+          $Log::Log4perl::caller_depth + 1;
+    WARN "@_";
+};
+
+$SIG{__DIE__} = sub {
+    local $Log::Log4perl::caller_depth =
+          $Log::Log4perl::caller_depth + 1;
+
+    if ( $^S ) {
+        DEBUG "die called inside eval: @_";
+    } else {
+        LOGDIE "@_";
+    }
+};
+
+INFO "Parsing options";
+my ($opt_host, $opt_port, $opt_vm_id, $opt_username, $opt_password, $opt_token, $opt_ssl, @opt_config_files);
+my ($help);
+
+GetOptions(
+    "host=s"      => \$opt_host,
+    "port=s"      => \$opt_port,
+    "vm-id=i"     => \$opt_vm_id,
+    "username=s"  => \$opt_username,
+    "password=s"  => \$opt_password,
+    "token=s"     => \$opt_token,
+    "ssl!"        => \$opt_ssl,
+    "help"        => \$help,
+    "config=s"    => \@opt_config_files
+) or die "Getopt failed: $!";
+
+if ( $help ) {
+    print <<HELP;
+
+$0 [options]
+QVD graphical client
+
+--username         Login username
+--password         Login password
+--token            Login bearer token (used instead of password)
+--host             Server to connect to
+--port             Port QVD is running on
+--file             Open file in VM
+--ssl, --no-ssl    Enable or disable the use of SSL
+--help             Shows this text
+--config           Loads the indicated config file
+HELP
+    exit(0);
+
+}
+
+# Load additional config files. We accept both the --config argument, and the
+# old way of just specifying a config file as an argument without any parameters
+foreach my $conf (@opt_config_files, @ARGV) {
+    if ( -e $conf ) {
+        INFO "Loading additional config file $conf";
+        core_load_config($conf);
+
+        # When using a custom config file, we save our config into it.
+        # Use the last one.
+        $QVD::Client::Setup::user_config_fn = $conf;
+    }
+}
+
+for $ARGV (@ARGV) {
+    my @args = ($ARGV);
+    if( $ARGV =~ /^qvd:(.*)$/ ) {
+        @args = split(/\s+/, uri_unescape($1));
+    }
+    for my $arg (@args) {
+        if (my ($k, $v) = $arg =~ /^\s*([\w\.]+)\s*[:=\s]\s*(.*?)\s*$/) {
+            set_core_cfg($k, $v);
+        }
+    }
+}
+
+set_if_arg("client.host.name", $opt_host);
+set_if_arg("client.host.port", $opt_port);
+set_if_arg("client.user.name", $opt_username);
+set_if_arg("client.user.password", $opt_password);
+set_if_arg("client.auto_connect.token", encode_base64($opt_token)) if ( defined $opt_token );
+set_if_arg("client.auto_connect.vm_id", $opt_vm_id);
+set_if_arg("client.use_ssl", $opt_ssl); 
+
+if ( $opt_token && $opt_vm_id ) {
+    INFO "Token and VM id provided, client will auto-connect";
+    set_core_cfg("client.auto_connect", 1);
+}
+
 
 Wx::InitAllImageHandlers();
 my $app = QVD::Client::App->new();
@@ -112,6 +184,19 @@ INFO("Exiting");
 # TODO: Investigate why ordered exit from within Frame.pm ends up in SEGFAULT.
 use POSIX;
 POSIX::_exit(0);
+
+sub set_if_arg {
+    my ($setting, $value) = @_;
+
+    if ( defined $value ) {
+        chomp $value;
+
+        INFO "Changing setting '$setting' to value '$value' from command line argument";
+        set_core_cfg($setting, $value);
+    }
+}
+
+
 __END__
 
 =head1 NAME

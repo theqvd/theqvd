@@ -302,35 +302,41 @@ my $token_re = qr/[!#\$%&'*+\-\.0-9a-zA-Z]+/;
 sub read_http_response_head {
     my $self = shift;
     my $socket = $self->{socket};
+
     while (defined(my $line = $self->_readline)) {
-	next if $line =~ /^\s*$/;
-	if (my ($version, $code, $msg) =
-	    $line =~ m{^(HTTP/\S+)\s+(\d+)(?:\s+(\S.*?))?\s*$}) {
-	    $version eq 'HTTP/1.1'
-		or return HTTP_VERSION_NOT_SUPPORTED_BY_CLIENT;
-	    my @headers;
-	    while (defined(my $line = $self->_readline)) {
-		given($line) {
-		    when (/^($token_re)\s*:\s*(.*?)\s*$/o) {
-			push @headers, "${1}:${2}";
-		    }
-		    when (/^\s+(.*?)\s+$/) {
-			@headers or return HTTP_BAD_RESPONSE;
-			$headers[-1] .= " " . $1;
-		    }
-		    when (/^$/) {
-			# end of headers
-			last;
-		    }
-		    default {
-			return HTTP_BAD_RESPONSE;
-		    }
-		}
-	    }
-	    return ($code, $msg, \@headers);
-	}
-	last;
+        next if $line =~ /^\s*$/;
+
+        if (my ($version, $code, $msg) = $line =~ m{^(HTTP/\S+)\s+(\d+)(?:\s+(\S.*?))?\s*$}) {
+            $version eq 'HTTP/1.1' or return HTTP_VERSION_NOT_SUPPORTED_BY_CLIENT;
+
+            my @headers;
+            while (defined(my $line = $self->_readline)) {
+                my $matched;
+                if ($line =~ /^($token_re)\s*:\s*(.*?)\s*$/o) {
+                    push @headers, "${1}:${2}";
+                    $matched=1;
+                }
+
+                if ($line =~ /^\s+(.*?)\s+$/) {
+                    @headers or return HTTP_BAD_RESPONSE;
+                    $headers[-1] .= " " . $1;
+                    $matched=1;
+                }
+
+                if ($line =~ /^$/) {
+                    # end of headers
+                    last;
+                }
+
+                return HTTP_BAD_RESPONSE unless ($matched);
+            }
+
+            return ($code, $msg, \@headers);
+        }
+
+        last;
     }
+
     return HTTP_BAD_RESPONSE;
 }
 

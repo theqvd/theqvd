@@ -9,6 +9,16 @@ use File::Basename qw(basename);
 
 our $VERSION = '0.01';
 
+# Set to 1 by QVD::Log if we're using 'stdout' or 'stderr' output. This is intended to be used to suppress
+# log output in places where stdout is a socket.
+our $CONSOLE = 0;
+
+# Set to 1 by users of QVD::Log when they are in a section of code that connects stdout to a socket.
+# This will have the effect of suppressing log output while this variable is set.
+#
+# Log output will be SILENTLY DISCARDED while it's set.
+our $SOCKET_SECTION = 0;
+
 our $DAEMON_NAME;
 # warn "DAEMON_NAME is " . ($DAEMON_NAME // '<undef>');
 
@@ -77,21 +87,60 @@ unless (open my $fd, '>>', $logfile) {
 }
 
 # print STDERR "logging to $logfile\n";
-
-my %config = ( 'log4perl.appender.LOGFILE'          => 'Log::Dispatch::FileRotate',
-	       'log4perl.appender.LOGFILE.mode'     => 'append',
-	       'log4perl.appender.LOGFILE.DatePattern'
-	                           => 'yyyy-MM-dd',
-	       'log4perl.appender.LOGFILE.size'     => '50',
-	       'log4perl.appender.LOGFILE.max'      => '20',
-	       'log4perl.appender.LOGFILE.layout'   => 'Log::Log4perl::Layout::PatternLayout',
-	       'log4perl.appender.LOGFILE.layout.ConversionPattern'
-                                                    => '%d %P %p %F %L - %m%n',
-	       'log4perl.appender.LOGFILE.filename' => $logfile,
-	       'log4perl.rootLogger'                => core_cfg('log.level') . ", LOGFILE",
-	       map { $_ => core_cfg $_ } grep /^log4perl\./, core_cfg_all );
-
+my %config;
+my $preset = lc( $ENV{QVD_LOG_PRESET} // core_cfg('log.preset') );
 use Log::Log4perl qw();
+
+
+if ( $preset eq "stdout" || $preset eq "stderr" ) {
+    %config = (
+               # Log4perl is strange. Can't use a sub ref, actually got to put the sub in a string.
+               'log4perl.filter.SocketFilter'           => 'sub { $QVD::Log::SOCKET_SECTION == 0 }',
+               'log4perl.appender.SCREEN'               => 'Log::Log4perl::Appender::Screen',
+               'log4perl.appender.SCREEN.stderr'        => ($preset eq "stderr"),
+               'log4perl.appender.SCREEN.utf8'          => 1,
+               'log4perl.appender.SCREEN.layout'        => 'Log::Log4perl::Layout::PatternLayout',
+               'log4perl.appender.SCREEN.layout.ConversionPattern'
+                                                        => $ENV{QVD_LOG_PATTERN} // core_cfg('log.pattern'),
+               'log4perl.appender.SCREEN.Filter'        => 'SocketFilter',
+               'log4perl.appender.LOGFILE'              => 'Log::Dispatch::FileRotate',
+               'log4perl.appender.LOGFILE.mode'         => 'append',
+               'log4perl.appender.LOGFILE.DatePattern'  => 'yyyy-MM-dd',
+               'log4perl.appender.LOGFILE.size'         => '50',
+               'log4perl.appender.LOGFILE.max'          => '20',
+               'log4perl.appender.LOGFILE.layout'       => 'Log::Log4perl::Layout::PatternLayout',
+               'log4perl.appender.LOGFILE.layout.ConversionPattern'
+                                                        => $ENV{QVD_LOG_PATTERN} // core_cfg('log.pattern'),
+               'log4perl.appender.LOGFILE.filename'     => $logfile,
+               'log4perl.rootLogger'                    => ($ENV{QVD_LOG_LEVEL} // core_cfg('log.level')) . ", SCREEN, LOGFILE"
+              );
+    $CONSOLE = 1;
+} elsif ( $preset eq "custom" ) {
+    my $log_config_file = $ENV{QVD_LOG_CONFIG_FILE} // core_cfg('log.config');
+
+    if ( $log_config_file ) {
+        Log::Log4perl::init_once($log_config_file);
+    } else {
+        die "Log type is set to 'custom', but no config file was specified.\n" .
+            "Please define log.config or use the QVD_LOG_CONFIG_FILE environment variable.";
+    }
+} else {
+    # Officially, 'file', but we fall through into here if nothing matches
+
+    %config = ( 'log4perl.appender.LOGFILE'              => 'Log::Dispatch::FileRotate',
+    	        'log4perl.appender.LOGFILE.mode'         => 'append',
+    	        'log4perl.appender.LOGFILE.DatePattern'  => 'yyyy-MM-dd',
+    	        'log4perl.appender.LOGFILE.size'         => '50',
+    	        'log4perl.appender.LOGFILE.max'          => '20',
+    	        'log4perl.appender.LOGFILE.layout'       => 'Log::Log4perl::Layout::PatternLayout',
+    	        'log4perl.appender.LOGFILE.layout.ConversionPattern'
+                                                         => $ENV{QVD_LOG_PATTERN} // core_cfg('log.pattern'),
+    	        'log4perl.appender.LOGFILE.filename'     => $logfile,
+    	        'log4perl.rootLogger'                    => ($ENV{QVD_LOG_LEVEL} // core_cfg('log.level')) . ", LOGFILE"
+    );
+}
+%config = (%config,  map { $_ => core_cfg $_ } grep /^log4perl\./, core_cfg_all );
+
 Log::Log4perl::init_once(\%config);
 
 Log::Log4perl->wrapper_register(__PACKAGE__);
@@ -154,6 +203,56 @@ log4perl.appender.Mailer.to      = qvd@theqvd.com
 log4perl.appender.Mailer.subject = Alert for QVD system
 log4perl.appender.Mailer.layout  = SimpleLayout
 log4perl.logger.QVD = DEBUG, Mailer
+
+=head1 ENVIRONMENT VARIABLES
+
+=over
+
+=item QVD_LOG_PRESET
+
+Same as log.preset, sets up a predefined logging configuration. The following options are available:
+
+=over
+
+=item stdout: Dump all log output on stdout
+
+=item stderr: Dump all log output on stderr
+
+=item file: Create a log file, with a filename chosen based on $DAEMON
+
+=item custom: Use an external Log::Log4perl configuration file
+
+=back
+
+By default 'file' is used.
+
+=item QVD_LOG_CONFIG
+
+Log::Log4perl configuration file for when the 'custom' log preset is being used. Ignored otherwise.
+
+=item QVD_LOG_LEVEL
+
+Minimum logging level. Available ones are: TRACE, DEBUG, INFO, WARN, ERROR, FATAL
+
+=item QVD_LOG_PATTERN
+
+Log::Log4perl::Layout::PatternLayout logging pattern.
+
+=back
+
+=head1 VARIABLES
+
+=over
+
+=item $CONSOLE
+
+Set to 1 when the preset is 'stdout' or 'stderr', and logging is being done to the console. This does not work if console logging is manually defined via the 'custom' preset. This is intended to be checked by external code that uses STDOUT for other purposes, and for instance suppress logging to avoid a conflict.
+
+=item $SOCKET_SECTION
+
+Can be set to a true value by the user of QVD::Log to suppress logging to the console in 'stdout' and 'stderr' mode. This is intended to be used in parts of the code where STDOUT is a socket, and writing to it would cause corruption.
+
+=back
 
 =head1 AUTHOR
 

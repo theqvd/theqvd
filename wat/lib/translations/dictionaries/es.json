@@ -126,6 +126,7 @@
     "Do not close or refresh the window": "No cierres o refresques la ventana",
     "Do you need help?": "¿Necesitas ayuda?",
     "Documentation": "Documentación",
+    "Docker registry URL": "URL de registro Docker",
     "Downloading image from given URL to images folder in server": "Descargando imagen de la URL proporcionada al directorio de imágenes en el servidor",
     "Each administrator will be able to customize his own views overriding this configuration": "Cada administrador podrá personalizar sus propias vistas sobreescribiendo esta configuración",
     "Edit": "Editar",

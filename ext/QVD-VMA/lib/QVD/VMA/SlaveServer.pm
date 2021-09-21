@@ -21,7 +21,7 @@ BEGIN {
         unless defined core_cfg('client.log.filename', 0);
     set_core_cfg('log.level', 'DEBUG');
     $QVD::Log::DAEMON_NAME = 'vma-slaveserver';
-
+    $QVD::Log::SOCKET_SECTION = 1;
 }
 
 use QVD::Log;

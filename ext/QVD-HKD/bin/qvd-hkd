@@ -15,14 +15,16 @@ use strict;
 use warnings;
 
 use Getopt::Long;
-my ($config_file, $foreground);
+my ($config_file, $foreground, $qvdhkddebug);
 BEGIN {
     # we parse command line arguments before loading QVD::Config::Core
     # in order to allow for changing the configuration file name
     $config_file = '/etc/qvd/node.conf';
     $foreground = 0;
     GetOptions("config-file|f=s" => \$config_file,
-               "X"               => \$foreground);
+               "X"               => \$foreground,
+               "D"               => \$qvdhkddebug
+              );
     @QVD::Config::Core::FILES = $config_file;
 }
 
@@ -52,6 +54,7 @@ $App::Daemon::background = 0 if $foreground;
 
 ## require the module before daemonizing—otherwise syntax errors end up nowhere since STDERR is closed
 require QVD::HKD;
+$Class::StateMachine::debug ||= -1 if $qvdhkddebug;
 daemonize;
 umask oct $umask;
 
@@ -63,4 +66,3 @@ my $ok = eval {
 };
 
 $ok or LOGDIE "Exception: $@";
-

@@ -1,4 +1,4 @@
-#!/usr/lib/qvd/bin/perl -w
+#!/usr/lib/qvd/bin/perl
 
 eval 'exec /usr/lib/qvd/bin/perl  -S $0 ${1+"$@"}'
     if 0; # not running under some shell
@@ -26,6 +26,8 @@ BEGIN {
     }
 
     our $user_certs_dir = File::Spec->rel2abs(core_cfg('path.ssl.ca.personal'), $user_dir);
+
+    our $orig_display = $ENV{DISPLAY};
 }
 
 use strict;
@@ -35,18 +37,31 @@ use Proc::Background;
 use Getopt::Long;
 use JSON;
 
+our ($user_config_filename);
+
 BEGIN {
+    $user_config_filename = ($ENV{HOME} || $ENV{APPDATA}).'/.qvd/client.conf';
+    if (exists($ENV{QVDCLIENTCONFIG})) {
+        my $configfile = $ENV{QVDCLIENTCONFIG};
+        if (-f $configfile) {
+            $user_config_filename = $configfile;
+        } else {
+            print STDERR "Ignoring config file defined in QVDCLIENTCONFIG env variable <$configfile> defaulting to <$user_config_filename>\n";
+        }
+    }
     $QVD::Config::USE_DB = 0;
+    $QVD::Config::USE_DB = 0;
+
     @QVD::Config::Core::FILES = (
         '/etc/qvd/client.conf',
-        ($ENV{HOME} || $ENV{APPDATA}).'/.qvd/client.conf',
-        'qvd-client.conf',
+        $user_config_filename
     );
 
     # FIXME NX_CLIENT is used for showing the user information on things
     # like broken connection, perhaps we should show them to the user
     # instead of ignoring them? 
     $ENV{NX_CLIENT} = '/bin/false';
+
 }
 
 use QVD::Config::Core qw(set_core_cfg core_cfg);
@@ -60,11 +75,13 @@ BEGIN {
 
 use QVD::Client::Proxy;
 use QVD::Log;
+use MIME::Base64;
 my %opts;
 
 GetOptions \%opts,
     '--username=s',
     '--password=s',
+    '--token=s',
     '--host=s',
     '--port=s',
     '--file=s',
@@ -72,11 +89,30 @@ GetOptions \%opts,
     '--vm-id=s',
     '--ssl-errors=s',
     '--help',
+    '--list-vms',
+    '--list-apps',
+    '--no-header',
+    '--json',
+    '--create-icons',
     or die "getopt";
 
-$opts{'port'} //= core_cfg('client.host.port');
+$opts{'username'} //= $ENV{QVDLOGIN} // core_cfg('client.user.name');
+$opts{'password'} //= $ENV{QVDPASSWORD} // core_cfg('client.user.password');
+$opts{'token'} //= $ENV{QVDBEARERTOKEN};
+$opts{'host'} //= $ENV{QVDHOST} // core_cfg('client.host.name');
+$opts{'port'} //= $ENV{QVDPORT} // core_cfg('client.host.port');
 $opts{'ssl'} //= 1;
-$opts{'ssl-errors'} //= 'ask';
+$opts{'ssl-errors'} //= $ENV{QVDSSLERRORS} // 'ask';
+$opts{'usb'} //= 0;
+
+if ( $opts{'create-icons'} ) {
+    $opts{'list-apps'} = 1;
+}
+
+# Token was already used for connections from the website, and was passed already
+# encoded to the client. So we only encode it here.
+$opts{'origtoken'} = $opts{'token'};
+$opts{'token'} = encode_base64($opts{'token'}, '');
 
 
 if ( $opts{help} ) {
@@ -86,6 +122,7 @@ QVD commandline client
 
 --username         Login username
 --password         Login password
+--token            Login bearer token (used instead of password)
 --host             Server to connect to
 --port             Port QVD is running on
 --file             Open file in VM
@@ -93,6 +130,10 @@ QVD commandline client
 --ssl-errors       What to do in case of SSL errors. Valid values are:
                    'ask', 'continue' and 'abort'
 --help             Shows this text
+--list-vms         List VMs, and exit
+--list-apps        List applications, and exit
+--no-header        Don't show the header for --list-vms and --list-apps
+--json             Use JSON to dump the --list-vms and --list-apps data
 HELP
 
     exit(0);
@@ -116,12 +157,14 @@ my %connect_info = (
     printing      => core_cfg('client.printing.enable'),
     geometry      => core_cfg('client.geometry'),
     fullscreen    => core_cfg('client.fullscreen'),
+    usb_impl      => core_cfg('client.usb.implementation'),
     keyboard      => 'pc105/es',
     kill_vm       => 0,
     %opts,
 );
 
 $connect_info{file} = $file if defined $file;
+$connect_info{list_apps} = $opts{'list-apps'};
 
 my $delegate = QVD::Client::CLI->new(file => $file, vm_id => $opts{'vm-id'});
 
@@ -143,6 +186,7 @@ package QVD::Client::CLI;
 use Cwd qw(abs_path);
 use QVD::Client::SlaveClient;
 use QVD::Log;
+use QVD::Config::Core qw(set_core_cfg core_cfg);
 
 sub new {
     my $class = shift;
@@ -216,7 +260,7 @@ sub proxy_alert {
         print STDERR "ERROR  : ";
     }
 
-    print STDERR $args->{message} . "\n";
+    print STDERR $args{message} . "\n";
 }
 
 sub format_cert {
@@ -261,12 +305,156 @@ sub format_org {
     return $ret;
 }
 
+sub list_vms {
+    my ($vm_data) = @_;
+
+    unless( $opts{'no-header'} ) {
+        print "You have ".@$vm_data. ($opts{'list-apps'} ? " applications" : " virtual machines"). ":\n\n";
+
+        print sprintf("\t%-7s %-10s %-39s %-10s\n", "Id", "State", "Name", "Blocked");
+        print (("=" x 74) . "\n");
+    }
+
+    foreach my $vm (sort { $a->{id} <=> $b->{id} } @$vm_data) {
+        print sprintf("\t%-7s %-10s %-39s %-10s\n", $vm->{id}, $vm->{state}, $vm->{name}, $vm->{blocked});
+    }
+}
+
+sub create_icons {
+    my ($vm_data) = @_;
+
+    my $desktop_dir;
+
+    if ( open(my $fh, '-|', "xdg-user-dir", "DESKTOP") ) {
+        $desktop_dir = <$fh>;
+        chomp $desktop_dir;
+        DEBUG "Obtained desktop dir from xdg-user-dir: '$desktop_dir'";
+    } else {
+        WARN "Failed to run xdg-user-dir: $!";
+        $desktop_dir = "$ENV{HOME}/Desktop";
+        WARN "Assuming the desktop is in '$desktop_dir'";
+    }
+
+    if ( ! -x $desktop_dir ) {
+        ERROR "Desktop directory '$desktop_dir' not found. Can't create icons";
+        return;
+    }
+
+    # Remove any existing QVD icon
+    my $dh;
+    opendir $dh, $desktop_dir;
+    while(my $de = readdir($dh)) {
+        next if ( $de eq "." || $de eq "..");
+        next unless ( -f "$desktop_dir/$de" );
+        next unless $de =~ /.desktop$/;
+
+        DEBUG "Checking if $desktop_dir/$de is a QVD icon";
+        if ( open(my $fh, "<", "$desktop_dir/$de") ) {
+            while(my $line = <$fh>) {
+                chomp $line;
+                $line =~ s/^\s+//;
+                if ( $line =~ /^Keywords.*QVD_Session/ ) {
+                    DEBUG "Removing QVD session icon $desktop_dir/$de";
+                    unlink("$desktop_dir/$de") or WARN "Can't remove $desktop_dir/$de: $!";
+                }
+            }
+            close($fh);
+        } else {
+            ERROR "Failed to open $desktop_dir/$de: $!";
+        }
+    }
+    closedir($dh);
+
+
+
+    my $client_bin = core_cfg('client.session_open.command');
+
+    foreach my $vm (@$vm_data) {
+        my $icon_name = $vm->{name} . ".desktop";
+        DEBUG "Writing icon $desktop_dir/$icon_name";
+
+        if ( open(my $fh, ">", "$desktop_dir/$icon_name") ) {
+            print $fh "#!/usr/bin/env xdg-open\n";
+            print $fh "# This file was automatically created by the QVD client.\n";
+            print $fh "# Do not modify it, it will be overwritten.\n\n";
+            print $fh "[Desktop Entry]\n";
+            print $fh "Version=1.0\n";
+            print $fh "Encoding=UTF-8\n";
+            print $fh "Hidden=false\n";
+            print $fh "Type=Application\n";
+            print $fh "Keywords=QVD_Session\n";
+            print $fh "Terminal=false\n";
+            print $fh "Name=" . $vm->{name} . "\n";
+            print $fh "Exec=$client_bin --host $opts{'host'} --port $opts{'port'} --token $opts{origtoken} --vm-id " . $vm->{id} . "\n";
+
+            chmod 0755, $fh or WARN "Can't change permission for $desktop_dir/$icon_name: $!";
+            close $fh;
+        } else {
+            ERROR "Failed to create $desktop_dir/$icon_name: $!";
+        }
+    }
+}
+
 sub proxy_list_of_vm_loaded {
     my ($self, $vm_data) = @_;
     if (@$vm_data > 0) {
         return $self->{'vm_id'} if defined $self->{'vm_id'};
-        #print "You have ".@$vm_data." virtual machines.\n";
-        my $vm = $vm_data->[rand @$vm_data];
+
+        if ( $opts{'create-icons'} ) {
+            create_icons($vm_data);
+            return ();
+        }
+
+        if ( $opts{'list-vms'} || $opts{'list-apps'} ) {
+
+            if ( $opts{json} ) {
+                require JSON::XS;
+                print JSON::XS::encode_json($vm_data) . "\n";
+            } else {
+                list_vms($vm_data);
+            }
+
+            return();
+        }
+
+        my $vm;
+        if ( @$vm_data > 1 ) {
+            my $count=0;
+            while(!$vm) {
+                if ( $count++ % 10 == 0 ) {
+                    list_vms($vm_data);
+                    print "\n";
+                }
+
+                print "Which VM would you like to connect to? Enter a VM name or id, or an empty line to quit: ";
+                my $vm_id = <STDIN>;
+                chomp $vm_id;
+                $vm_id =~ s/^\s+//;
+                $vm_id =~ s/\s+//;
+
+                return() if ( $vm_id eq  "");
+
+                my @vms;
+                if ( $vm_id =~ /^\d+/ ) {
+                    @vms = grep { $_->{id} == $vm_id } @$vm_data;
+                } else {
+                    # Try full match first, then partial match only if that doesn't work
+                    @vms = grep { $_->{name} =~/^$vm_id$/i }  @$vm_data;
+                    @vms = grep { $_->{name} =~/^$vm_id/i } @$vm_data unless (@vms);
+                }
+
+                if ( @vms == 0 ) {
+                    print "Nothing matched.\n\n";
+                } elsif ( @vms > 1 ) {
+                    print "Multiple matches: " . join(", ", map { $_->{name} } @vms) . "\n\n";
+                } else {
+                    $vm = $vms[0];
+                }
+            }
+        } else {
+            $vm = $vm_data->[0];
+        }
+
         INFO "Connecting to VM called ".$vm->{name}."\n";
         return $vm->{id};
     } else {
@@ -282,7 +470,7 @@ sub proxy_connection_status {
         $self->{error} = undef;
     }
     if ($status eq 'FORWARDING') {
-        $self->open_file($self->{file});
+        $self->open_file($self->{file}) if ( $self->{file} );
     }
 }
 

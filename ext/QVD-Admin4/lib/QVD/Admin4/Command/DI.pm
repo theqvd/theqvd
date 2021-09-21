@@ -15,7 +15,8 @@ sub usage_text {
   di new <ARGUMENTS>
   
   For example: 
-  di new disk_image=image.tgz, osf_id=10000 (Creates a DI with disk_image 'image.tgz' for osf with id 10000) 
+  di new di_type=staging, disk_image=image.tgz, osf_id=10000 (Creates a DI with disk_image 'image.tgz' for osf with id 10000) 
+  di new di_type=docker, disk_image=registry.qindel.com:5000/theqvd/example, osf_id=10000 (Creates a DI from docker registry for osf with id 10000) 
 
 == GETTING DIs
 
@@ -86,6 +87,8 @@ sub usage_text {
   although some combinations may not be allowed and an error will be prompted:
   
   id            (ID of the Disk Image)
+  disk_image    (Image filename when di_type is staging, Docker registry when di_type is docker)
+  di_type       (Disk image type used in DI creation. Possible values: staging|docker. By default if not provided: staging)
   tenant_name   (Name of the tenant the Disk Image belongs to)
   tenant_id     (ID of the tenant the Disk Image belongs to)
   name          (Name of the Disk Image)
@@ -107,6 +110,8 @@ sub run
 
     unshift @args, 'di';
     my $parsing = $self->parse_string(@args);
+    my $di_type = $parsing->arguments->{'di_type'} // 'staging';
+    delete $parsing->arguments->{'di_type'};
 
     if ($parsing->command eq 'get')
     {
@@ -115,7 +120,7 @@ sub run
     elsif ($parsing->command eq 'create')
     {
         my $res = $self->ask_api_standard(
-            $self->get_app->cache->get('api_staging_path'),
+            $self->get_app->cache->get('api_' . $di_type . '_path'),
             $self->make_api_query($parsing)
         );
         $self->print_table($res,$parsing);

@@ -207,9 +207,13 @@ command.usbsrv = /usr/local/bin/usbsrv
 command.usbclnt = /usr/local/bin/usbclnt
 command.usbip = /usr/bin/usbip
 command.slaveclient = ${path.qvd.bin}/qvd-slaveclient
+command.qvd-client = ${path.qvd.bin}/qvd-client.pl
 
 @mswin@command.gsprint = gsview/gsprint.exe
 @mswin@command.ghostscript = ghostscript/bin/gswin32.exe
+
+command.kubectl = kubectl
+#command.kubectl.args.extra =
 
 # VMA commands
 command.lpadmin = /usr/sbin/lpadmin
@@ -347,6 +351,9 @@ client.ssl.allow_ocsp_error=0
 ## the certificate. Set to 0 to disable.
 client.ssl.error_timeout=5
 
+## Configuration for command line qvd-client.pl
+client.client.ssl-errors=ask
+
 ## SSL_ocsp_mode in the IO::Socket::SSL manpage. The value is a list
 ## of the following, separated by a |
 ##     SSL_OCSP_NO_STAPLE
@@ -382,6 +389,8 @@ client.ssl.ocsp_mode=SSL_OCSP_TRY_STAPLE|SSL_OCSP_FAIL_HARD
 client.slave.command = ${path.qvd.bin}/qvd-client-slaveserver
 @mswin@client.slave.command = qvd-client-slaveserver
 @mswin@client.slave.wrapper = bin/qvd-slaveserver-wrapper.exe
+
+client.session_open.command = ${path.qvd.bin}/qvd-gui-client.pl
 client.slave.client = ${path.qvd.bin}/qvd-slaveclient
 # enable commands used for benchmarking and testing the functionality
 # of the slave channel
@@ -533,6 +542,17 @@ log.up.api.filename = ${path.log}/qvd-up-api.log
 ## log verbosity (FATAL, ERROR, WARN, INFO, DEBUG or TRACE)
 log.level = INFO
 
+## preset for the log system:
+##     file   - logging to a file in /var/log/$application
+##     stdout - output all log data on stdout
+##     stderr - output all log data on stderr
+##     custom - read Log::Log4perl config from the file specified in log.config
+log.preset = file
+log.config =
+log.pattern = %d %P %p %F %L - %m%n
+
+
+
 ## these two seem to be unused
 admin.ssh.opt.StrictHostKeyChecking = no
 admin.ssh.opt.UserKnownHostsFile = /dev/null
@@ -621,6 +641,23 @@ internal.vm.network.dhcp-hostsfile=${path.run}/dhcp-hostsfile
 
 # enable firewall rules
 internal.vm.network.firewall.enable = 1
+
+# if set to 1, the firewall will deny access from the VM to the host.
+# Disabling this is highly discouraged, as it will allow full access
+# from the VM to the host.
+internal.vm.network.firewall.protect_host = 1
+
+# If set to 1, the firewall will deny access from one VM to others.
+# Disabling this is highly discouraged.
+internal.vm.network.firewall.protect_vms = 1
+
+# If set to 1, the firewall will permit QVD connections originating from
+# a VM. This is a more reasonable setting than protect_host = 0 and should
+# allow for most scenarios. Only connections on the QVD port and ping will
+# be permitted if this is set to 1.
+internal.vm.network.firewall.allow_login_from_vm = 0
+
+
 vm.network.firewall.nat.iface =
 
 ## not sure about this one
@@ -630,6 +667,7 @@ internal.vm.debug.enable = 0
 ## default values for newly created OSFs
 osf.default.memory = 256
 osf.default.overlay = 1
+osf.default.is_application = 0
 
 ## so that the VMA exports PULSE_SERVER before xinit invocation and passes the 'media=1' parameter to nxagent
 vma.audio.enable = 0
@@ -648,6 +686,10 @@ vma.pid_file = /var/run/qvd/vma.pid
 vma.as_user = root
 vma.as_group = nogroup
 @centos@vma.as_group = nobody
+
+# If set to 1, enables the creation of app desktop icons
+# The server must be configured to allow VM to host access for this to work.
+vma.apps.desktop_icons.enable = 0
 
 ## KVM: disk drive will be visible as: 0=hda, 1=hdb, 2=hdc... (parameter 'index' within -drive in KVM)
 vm.kvm.home.drive.index = 1
@@ -715,6 +757,128 @@ vma.default.client.link = adsl
 ## unused
 hkd.vm.starting.max = 6
 
+## Kubernetes API URL
+hkd.vm.kubernetes.api-host-env=KUBERNETES_SERVICE_HOST
+hkd.vm.kubernetes.api-port-env=KUBERNETES_SERVICE_PORT_HTTPS
+## Kubernetes API cacert
+hkd.vm.kubernetes.api-cacert-file=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+## Kubernetes default cluster name
+hkd.vm.kubernetes.cluster-name=kubernetes
+## Kubernetes namespace
+hkd.vm.kubernetes.namespace=theqvd
+## Kubernetes default user
+hkd.vm.kubernetes.user=qvdhkd
+## Kubernetes authentication token. token takes precedence over token-file
+hkd.vm.kubernetes.token=
+## Kubernetes authentication token
+hkd.vm.kubernetes.token-file=/var/run/secrets/kubernetes.io/serviceaccount/token
+## Kubernetes VM using fuse. Mount /dev/fuse inside container. Requires privileged account
+hkd.vm.kubernetes.usefuse=0
+## Kubernetes VM use privileged container. Required for fuse, review security requirements.
+hkd.vm.kubernetes.useprivilegedcontainer=0
+## Kubernetes VM using nfs home with subpath. Mount nfsserver + subpath inside container. Requires privileged account
+hkd.vm.kubernetes.home.usepvc_with_subpath=0
+## Kubernetes VM using nfs home with subpath. See the user guide on how to create the PV and associated PVC
+hkd.vm.kubernetes.home.pvcname=
+## Set Environment variables for the Pod VM, for each of the VM, User, DI and OSF properties. Enabling this incures an extra overhead per pod creation in the number of searches to the DB.
+hkd.vm.kubernetes.vm.properties_as_environment_vars=
+# Mojo::Template format for pod creation
+internal.vm.kubernetes.pod.template=% my $self = shift; \n\
+{ \n\
+\    "kind": "Pod", \n\
+\    "apiVersion": "v1", \n\
+\    "metadata": { \n\
+\      "name": "<%= $self->{kubernetes_name} %>", \n\
+\      "labels": { \n\
+\        "app": "qvdvm",\n\
+\        "qvdid": "<%= $self->{vm_id} %>", \n\
+\        "qvdhkd": "<%= $self->_cfg('nodename') %>" \n\
+\      } \n\
+\    }, \n\
+\    "spec": {\n\
+\    "hostname": "<%= $self->{kubernetes_name} %>", \n\
+\    "containers": [ \n\
+\      { \n\
+\        "name": "<%= $self->{kubernetes_name} %>", \n\
+\        "image": "<%= $self->{di_path} %>", \n\
+% if (%{ $self->{vm_properties} }) { \n\
+% my $propstojson = join(", ", map { '{ "name": "'.$_.'", "value": "'.$self->{vm_properties}->{$_}.'" }' } (keys %{ $self->{vm_properties}})); \n\
+\        "env": [ \n\
+\          <%= $propstojson %> \n\
+\        ], \n\
+% } \n\
+\        "livenessProbe": { \n\
+\          "httpGet": { \n\
+\            "path": "/vma/ping", \n\
+\            "port": 3030 \n\
+\          }, \n\
+\          "initialDelaySeconds": 5, \n\
+\          "periodSeconds": 3600, \n\
+\          "timeoutSeconds": 5 \n\
+\        }, \n\
+\        "readinessProbe": { \n\
+\           "httpGet": { \n\
+\             "path": "/vma/ping", \n\
+\             "port": 3030 \n\
+\          }, \n\
+\          "initialDelaySeconds": 10, \n\
+\          "periodSeconds": 5, \n\
+\          "timeoutSeconds": 5 \n\
+\        } \n\
+% if ($self->_cfg('hkd.vm.kubernetes.useprivilegedcontainer')) { \n\
+\        , \n\
+\        "securityContext": { \n\
+\          "privileged": true \n\
+\        } \n\
+% } \n\
+%  if ($self->_cfg('hkd.vm.kubernetes.usefuse') || $self->_cfg('hkd.vm.kubernetes.home.usepvc_with_subpath') ) { \n\
+\        , \
+\        "volumeMounts": [ \n\
+%  if ($self->_cfg('hkd.vm.kubernetes.usefuse') ) { \n\
+\          { \n\
+\            "mountPath": "/dev/fuse", \n\
+\            "name": "dev-fuse" \n\
+\          } \n\
+% } \n\
+%  if ($self->_cfg('hkd.vm.kubernetes.usefuse') && $self->_cfg('hkd.vm.kubernetes.home.usepvc_with_subpath')) { \n\
+\          , \n\
+% } \n\
+%  if ($self->_cfg('hkd.vm.kubernetes.home.usepvc_with_subpath') ) { \n\
+\          { \n\
+\            "mountPath": "/home/<%= $self->{login} %>", \n\
+\            "name": "<%= $self->_cfg('hkd.vm.kubernetes.home.pvcname') %>", \n\
+\            "subPath": "<%= $self->{login} %>" \n\
+\          } \n\
+% } \n\
+\        ] \n\
+\      } \n\
+\    ], \n\
+\    "volumes": [\n\
+%  if ($self->_cfg('hkd.vm.kubernetes.usefuse') ) { \n\
+\      { "name": "dev-fuse", \n\
+\        "hostPath": { \n\
+\          "path": "/dev/fuse" \n\
+\         } \n\
+\      } \n\
+% } \n\
+%  if ($self->_cfg('hkd.vm.kubernetes.usefuse') && $self->_cfg('hkd.vm.kubernetes.home.usepvc_with_subpath')) { \n\
+\     , \n\
+% } \n\
+%  if ($self->_cfg('hkd.vm.kubernetes.home.usepvc_with_subpath') ) { \n\
+\      { "name": "<%= $self->_cfg('hkd.vm.kubernetes.home.pvcname') %>", \n\
+\        "persistentVolumeClaim": { \n\
+\          "claimName": "<%= $self->_cfg('hkd.vm.kubernetes.home.pvcname') %>" \n\
+\         } \n\
+\      } \n\
+% } \n\
+\    ] \n\
+% } else { \n\
+\      } \n\
+\    ] \n\
+% } \n\
+\  } \n\
+}
+
 # internal parameters, do not change!!!
 internal.l7r.timeout.vm_start = 270
 internal.l7r.timeout.vm_stop = 270
@@ -736,6 +900,12 @@ internal.hkd.cluster.node.timeout = 600
 # if the ticker agent is not able to tick the database for the
 # following time, it aborts the HKD
 internal.hkd.agent.ticker.timeout = 450
+
+# List of Hypervisors supported
+internal.hkd.hypervisor_list = kvm,lxc,nothing
+
+# Allow the disabling of network ranges
+internal.hkd.address_check.enabled = 1
 
 internal.vm.port.x = 5000
 internal.vm.port.vma = 3030
@@ -809,6 +979,15 @@ internal.hkd.kvm.timeout.on_state.zombie.reap.waiting_for_kvm = 120
 internal.hkd.kvm.timeout.on_state.zombie.reap.delaying = 60
 internal.hkd.kvm.timeout.on_state.zombie.db.delaying = 60
 
+internal.hkd.kubernetes.timeout.on_state.starting.setup.delaying_untar.delaying = 60
+internal.hkd.kubernetes.timeout.on_state.stopping.shutdown.waiting_for_kubernetes = 180
+internal.hkd.kubernetes.timeout.on_state.stopping.stop.waiting_for_kubernetes = 120
+internal.hkd.kubernetes.timeout.on_state.zombie.config.delaying = 60
+internal.hkd.kubernetes.timeout.on_state.zombie.reap.waiting_for_kubernetes = 120
+internal.hkd.kubernetes.timeout.on_state.zombie.reap.delaying = 60
+internal.hkd.kubernetes.timeout.on_state.zombie.db.delaying = 60
+internal.hkd.kubernetes.delay.after.check = 10
+
 internal.hkd.vmhandler.vma.failed.max_count.on.starting = 40
 internal.hkd.vmhandler.vma.failed.max_count.on.running = 10
 
@@ -823,6 +1002,11 @@ internal.hkd.lxc.killer.umount.timeout = 100
 internal.hkd.lxc.acquire.untar.lock.delay = 2
 
 internal.hkd.command.timeout.lxc-stop = 30
+internal.hkd.command.timeout.kubectl-get = 30
+internal.hkd.command.timeout.kubectl-config = 30
+internal.hkd.command.timeout.kubectl-create = 30
+internal.hkd.command.timeout.kubectl-delete = 30
+internal.hkd.command.timeout.kubectl-kill = 30
 internal.hkd.agent.dhcpdhandler.delay = 2
 
 internal.hkd.debugger.run = 0

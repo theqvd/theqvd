@@ -101,6 +101,9 @@ my %lang_codes = qw/
     0403 ca        040C fr        043A mt        2C0A es-ar
     /;
 
+my $version_string = sprintf "Release: %s\nGit commit: %s\nBuild: %s", (eval { require QVD::Client::Version; }) ?
+    ($QVD::Client::Version::QVD_RELEASE, $QVD::Client::Version::GIT_COMMIT, $QVD::Client::Version::BUILD_NUMBER) :
+    ("(running from source code)", "N/A", "N/A");
 
 sub new {
     my( $class, $parent, $id, $title, $pos, $size, $style, $name ) = @_;
@@ -111,7 +114,7 @@ sub new {
     $size   = wxDefaultSize      unless defined $size;
     $name   = ""                 unless defined $name;
 
-    my ($tab_ctl, $tab_sizer, $settings_panel);
+    my ($tab_ctl, $tab_sizer, $settings_panel, $version_panel);
 
     $style = wxCAPTION|wxCLOSE_BOX|wxSYSTEM_MENU|wxMINIMIZE_BOX
         unless defined $style;
@@ -164,23 +167,17 @@ sub new {
     DEBUG "Locale path is $localepath";
     bindtextdomain("qvd-gui-client", $localepath);
 
-    if ( core_cfg('client.show.settings') ) {
-        $tab_ctl = Wx::Notebook->new($self, -1, wxDefaultPosition, wxDefaultSize, 0, "tab");
-        $self->{tab_ctl} = $tab_ctl;
-    }
+    $self->{tab_ctl} = $tab_ctl = Wx::Notebook->new($self, -1, wxDefaultPosition, wxDefaultSize, 0, "tab");
 
-    my $panel = $self->{panel} = Wx::Panel->new($tab_ctl // $self, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL ); # / broken highlighter
+    my $panel = $self->{panel} = Wx::Panel->new($tab_ctl, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL ); # / broken highlighter
 
     $panel->SetBackgroundColour(Wx::Colour->new(217,217,217));
 
+    $tab_ctl->AddPage( $panel, $self->_t("Connect") );
+    $tab_sizer = Wx::BoxSizer->new(wxVERTICAL);
+    $tab_sizer->Add($tab_ctl);
 
-    if ( $tab_ctl ) {
-        $tab_ctl->AddPage( $panel, $self->_t("Connect") );
-
-        $tab_sizer = Wx::BoxSizer->new(wxVERTICAL);
-        $tab_sizer->Add($tab_ctl);
-
-
+    if ( core_cfg('client.show.settings') ) {
         $settings_panel = Wx::Panel->new($tab_ctl, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
         $self->{settings_panel} = $settings_panel;
         $settings_panel->SetBackgroundColour(Wx::Colour->new(255,255,255));
@@ -303,6 +300,19 @@ sub new {
 
     }
 
+    ############################### version tab
+
+    $self->{version_panel} = $version_panel = Wx::Panel->new($tab_ctl, -1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+    $version_panel->SetBackgroundColour(Wx::Colour->new(255,255,255));
+    $tab_ctl->AddPage( $version_panel, $self->_t("Version"));
+    my $version_sizer = Wx::BoxSizer->new(wxVERTICAL);
+    $version_panel->SetSizer($version_sizer);
+
+    $self->{version_textctrl} = Wx::TextCtrl->new($version_panel, -1, $version_string, wxDefaultPosition, [200, 200], wxTE_MULTILINE|wxTE_READONLY);
+    $version_sizer->Add($self->{version_textctrl}, 0, wxALL|wxEXPAND, 10);
+
+    ###############################
+
     my $ver_sizer  = Wx::BoxSizer->new(wxVERTICAL);
 
     my $bm_logo_big = Wx::Bitmap->new(File::Spec->join($QVD::Client::App::pixmaps_dir, 'qvd-big.png'),
@@ -382,13 +392,12 @@ sub new {
 
     $panel->SetSizer($ver_sizer);
 
-    if ( $tab_ctl ) {
-        $ver_sizer->Fit($tab_ctl);
-        $tab_sizer->Fit($self);
+    $ver_sizer->Fit($tab_ctl);
+    $tab_sizer->Fit($self);
+
+    if ( core_cfg('client.show.settings') ) {
         $self->OnClickSharedFolders();
         $self->OnClickUSBShare() if defined($self->{usb_redirection});
-    } else {
-        $ver_sizer->Fit($self);
     }
 
     $self->Center;
@@ -731,6 +740,8 @@ sub OnConnectionStatusChanged {
     if ($status eq 'CONNECTING') {
         $self->EnableControls(0);
         $self->{timer}->Start(50, 0);
+
+        $self->_clear_errors;
     } elsif ($status eq 'CONNECTED') {
         if (core_cfg('client.show.remember_password')) {
             # $self->{remember_pass} only exists when client.show.remember_password is set
@@ -742,6 +753,8 @@ sub OnConnectionStatusChanged {
         $self->start_file_sharing();
         $self->start_remote_mounts();
         $self->start_device_sharing();
+
+        $self->_show_errors;
     } elsif ($status eq 'CLOSED') {
         $self->{timer}->Stop();
         $self->stop_device_sharing();
@@ -1226,7 +1239,7 @@ sub load_usb_devices {
         push @{$self->{usb_devices}} , $dev;
     }
 
-    $self->{usbip_device_list}->InsertItems( $self->{usb_devices}, 0 ) if ( defined $self->{tab_ctl} );
+    $self->{usbip_device_list}->InsertItems( $self->{usb_devices}, 0 ) if ( core_cfg('client.show.settings') );
 
 
 
@@ -1348,8 +1361,8 @@ sub DetectKeyboard {
 sub EnableControls {
     my ($self, $enabled) = @_;
     $self->{$_}->Enable($enabled) for qw(connect_button username password);
-    if (!core_cfg('client.force.link',      0)) { $self->{link}->Enable($enabled) if( $self->{tab_ctl}); }
-    if (!core_cfg('client.force.host.name', 0)) { $self->{host}->Enable($enabled) if( $self->{tab_ctl}); }
+    if (!core_cfg('client.force.link',      0)) { $self->{link}->Enable($enabled) if( core_cfg('client.show.settings') ); }
+    if (!core_cfg('client.force.host.name', 0)) { $self->{host}->Enable($enabled) if( core_cfg('client.show.settings') ); }
 }
 
 sub SaveConfiguration {
@@ -1466,7 +1479,7 @@ sub load_share_list {
         }
     }
  DEBUG "Shares: @{$self->{shares}}";
-    $self->update_share_list() if ( defined $self->{tab_ctl} );
+    $self->update_share_list() if ( core_cfg('client.show.settings') );
 
 }
 
@@ -1499,7 +1512,7 @@ sub start_file_sharing {
         return;
     }
     INFO "Exporting local shares into remote VM";
-    my @errors;
+
     for my $share (@{ $self->{shares} }) {
         INFO "Starting folder sharing for $share";
         local $@;
@@ -1510,14 +1523,8 @@ sub start_file_sharing {
         else {
             ERROR "Unable to mount share $share: [$code] $@";
             my $message = sprintf($self->_t("Failed to mount share %s:"), $share) . ' ' . $@;
-            push @errors, $message;
+            $self->_add_error($self->_t("File sharing"), $message); 
         }
-    }
-    if (@errors) {
-        my $dialog = Wx::MessageDialog->new($self, join("\n", @errors),
-                                            $self->_t("File sharing error."), wxOK | wxICON_ERROR);
-        $dialog->ShowModal();
-        $dialog->Destroy();
     }
 }
 
@@ -1540,10 +1547,36 @@ sub start_device_sharing {
                 my $client = QVD::Client::SlaveClient->new();
                 eval { $client->handle_usbip($busid) };
                     if ($@) {
+                        my $errmsg = $self->_t("Unknown USB/IP error");
+
                         if ($@ =~ 'ECONNREFUSED' || $@ =~ 'EPIPE' ) {
                             sleep 1;
                             next;
                         }
+
+                        if ( $@ =~ /Failed to bind/ ) {
+                            my ($err, $usbip_out) = split(/\n/, $@);
+
+                            DEBUG "USBIP command returned error: $err";
+                            DEBUG "Error message: $usbip_out";
+
+                            if ( $usbip_out =~ /not bound to usbip-host driver, but to (.*?):/ ) {
+                                $errmsg = $self->_t("Failed to connect device to USB/IP driver. USB/IP support may not be available.");
+                            } elsif ( $usbip_out =~ /already in use/ ) {
+                                $errmsg = $self->_t("Device is already in use by another application.");
+                            } elsif ( $usbip_out =~ /Unable to find an unused USB-IP port/ ) {
+                                $errmsg = $self->_t("Unable to find an USB-IP port. You need to use a kernel with the QVD patch.");
+                            } elsif ( $usbip_out =~ /driver\/unbind: No such file or directory/ ) {
+                                $errmsg = $self->_t("Unable to detach the device from the system");
+                            } else {
+                                WARN "Didn't find a match for message";
+                                $errmsg = $self->_t("Unknown USP/IP problem: ") . $usbip_out;
+                            }
+                        } else {
+                            ERROR "Unidentified error in USBIP: $@";
+                        }
+
+                        $self->_add_error($self->_t("USB sharing"), sprintf($self->_t("Failed to share device %s: %s"), $devid, $errmsg));
                         ERROR $@;
                     } else {
                         push @{$self->{usbip_shared_buses}},$busid;
@@ -1582,7 +1615,6 @@ sub start_remote_mounts {
 		return;
 	}INFO "Starting remote mounts";
 
-	my @errors;
     for my $num (map /^client\.mount\.(\d+)\.remote$/, core_cfg_keys) {
         local $@;
 		my $remote_dir = core_cfg("client.mount.$num.remote", 0)// next;
@@ -1616,16 +1648,10 @@ sub start_remote_mounts {
                           $self->_t("Unrecognized error, full error message follows:")."\n\n$@");
             my $message = sprintf($self->_t("Failed to mount remote folder %s at %s:"),
                                   $remote_dir, $local_dir)." ".$reason;
-            push @errors, $message;
+
+            $self->_add_error($self->_t("Remote mounts", $message));
         }
     }
-    if (@errors) {my $dialog = Wx::MessageDialog->new($self, join("\n", @errors), $self->_t("File sharing error."), wxOK | wxICON_ERROR);
-				$dialog->ShowModal();
-				$dialog->Destroy();
-}
-			 else {
-				DEBUG"All remote mounts started";
-	}
 }
 
 sub get_osx_resolutions {
@@ -1723,4 +1749,48 @@ sub _add_advice {
 
     push @$aref, $advice;
 }
+
+
+sub _clear_errors {
+    my ($self) = @_;
+
+    DEBUG "Clearing error list";
+    $self->{errors} = {};
+}
+
+sub _add_error {
+    my ($self, $category, $error) = @_;
+
+    DEBUG "Adding error of category $category: $error";
+
+    $self->{errors} //= {};
+    $self->{errors}->{$category} //= [];
+    push @{ $self->{errors}->{$category} }, $error;
+}
+
+sub _show_errors {
+    my ($self) = @_;
+
+    my @lines;
+
+    DEBUG "Showing errors";
+    foreach my $category ( sort keys %{ $self->{errors} } ) {
+        foreach my $err ( @{ $self->{errors}->{$category} } ) {
+            push @lines, $err;
+        }
+    }
+
+    if ( @lines ) {
+        my $text = $self->_t("Errors during connection:") . "\n\n";
+        $text .= join("\n", @lines);
+
+        my $dialog = Wx::MessageDialog->new($self, $text,
+                                            $self->_t(""), wxOK | wxICON_ERROR);
+        $dialog->ShowModal();
+        $dialog->Destroy();
+    }
+
+    $self->_clear_errors;
+}
+
 1;

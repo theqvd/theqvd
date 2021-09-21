@@ -18,8 +18,6 @@ use QVD::HKD::Config::Network qw(netmask_len);
 
 use parent qw(QVD::HKD::Agent);
 
-my %hypervisor_class = map { $_ => __PACKAGE__ . '::' . uc $_ } qw(kvm lxc nothing);
-
 my $off = 0;
 sub _allocate_tcp_port {
     my $self = shift;
@@ -154,15 +152,13 @@ sub _search_di {
     $self->_query( { save_to_self => [qw(di_id di_path use_overlay user_storage_size memory)] },
                    <<'SQL', @$self{qw(osf_id di_tag)});
 select dis.id, dis.path, osfs.use_overlay, osfs.user_storage_size, memory
-    from di_tags, dis, osfs, di_runtimes
+    from di_tags, dis, osfs
     where
         dis.osf_id = osfs.id            and
         di_tags.di_id = dis.id          and
         dis.blocked = false             and
         osfs.id = $1                    and
-        di_tags.tag = $2                and
-        di_runtimes.di_id = dis.id      and
-        di_runtimes.state = 'published'
+        di_tags.tag = $2               
 SQL
 }
 

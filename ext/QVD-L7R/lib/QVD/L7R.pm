@@ -8,9 +8,10 @@ use strict;
 use Carp;
 use feature 'switch';
 use URI::Split qw(uri_split);
-use MIME::Base64 'decode_base64';
+use MIME::Base64;
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
 use IO::Socket::Forwarder qw(forward_sockets);
+use Session::Token;
 
 use QVD::Config;
 use QVD::Log;
@@ -78,8 +79,12 @@ sub post_configure_hook {
                                      GET => '/qvd/connect_to_vm');
     $l7r->set_http_request_processor(\&authenticate_user,
                                      GET => '/qvd/authenticate_user');
+    $l7r->set_http_request_processor(\&create_auth_token,
+                                     GET => '/qvd/create_auth_token');
     $l7r->set_http_request_processor(\&list_of_vm_processor,
                                      GET => '/qvd/list_of_vm');
+    $l7r->set_http_request_processor(\&list_of_applications_processor,
+                                     GET => '/qvd/list_of_applications');
     $l7r->set_http_request_processor(\&ping_processor,
                                      GET => '/qvd/ping');
     $l7r->set_http_request_processor(\&stop_vm_processor,
@@ -122,6 +127,7 @@ sub authenticate_user {
     if($store_auth_params) {
         txn_do {
             my $uas = rs('User_Auth_Parameters')->create({ parameters => $l7r->json->encode($auth->{params}) });
+            $l7r->{uas} = $uas;
             $response->{auth_params_id} = $uas->id;
         };
     }
@@ -130,11 +136,58 @@ sub authenticate_user {
         $l7r->json->encode($response) );
 }
 
-sub list_of_vm_processor {
+sub create_auth_token {
     my ($l7r, $method, $url, $headers) = @_;
+
+    my $auth = $l7r->_authenticate_user($headers);
+
+    my $query = (uri_split $url)[3];
+    my %params = uri_query_split $query;
+
+    my $response = {};
+
+    $auth->before_list_of_vms;
+
+    # Store auth paramaters if needed
+    txn_do {
+        my $uas = rs('User_Auth_Parameters')->create({ parameters => $l7r->json->encode($auth->{params}) });
+        $response->{auth_params_id} = $uas->id;
+
+        my $session_token = rs('User_Token')->create( {
+            token => generate_sid(),
+            expiration      => time + (3600*24),
+            user_id         => $auth->{user}->id,
+            vm_id           => undef,
+            auth_params_id  => $uas->id,
+            multi_use       => 1
+        });
+
+        $response->{auth_token} = encode_base64($session_token->token);
+    };
+
+    $l7r->send_http_response_with_body( HTTP_OK, 'application/json', [],
+                                        $l7r->json->encode($response) );
+}
+
+sub list_of_applications_processor {
+    my ($l7r, $method, $url, $headers, ) = @_;
+    DEBUG 'method list_of_applications requested';
+
+    send_list_of_vm($l7r, $method, $url, $headers, is_application => 1);
+}
+
+sub list_of_vm_processor {
+    my ($l7r, $method, $url, $headers, ) = @_;
+    DEBUG 'method list_of_vm requested';
+
+    send_list_of_vm($l7r, $method, $url, $headers, is_application => 0);
+}
+
+sub send_list_of_vm {
+    my ($l7r, $method, $url, $headers, %opts) = @_;
     my $this_host = this_host; $this_host // $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE, 'Host is not registered in the database');
     txn_do { $this_host->counters->incr_http_requests; };
-    DEBUG 'method list_of_vm requested';
+    DEBUG 'send_list_of_vm called with is_application=' . $opts{is_application};
     my $auth = $l7r->_authenticate_user($headers);
     if ($this_host->runtime->blocked) {
         INFO 'Server is blocked';
@@ -148,11 +201,12 @@ sub list_of_vm_processor {
     $auth->before_list_of_vms;
     my $user_id = $auth->{user}->id;
 
-    my @vm_list = ( map { { id      => $_->vm_id,
-                            state   => $_->vm_state,
-                            name    => $_->vm->name,
-                            blocked => $_->blocked } }
-                    map $_->vm_runtime,
+    my @vm_list = ( map { { id                => $_->vm_runtime->vm_id,
+                            state             => $_->vm_runtime->vm_state,
+                            name              => $_->vm_runtime->vm->name,
+                            blocked           => $_->vm_runtime->blocked,
+                            is_application    => $_->osf->is_application } }
+                    grep { $_->osf->is_application == $opts{is_application} }
                     $auth->list_of_vm($url, $headers) );
 
     if (@vm_list) {
@@ -169,6 +223,10 @@ sub generate_slave_key {
     # between slave server and client
     my @alpha = ("A".."Z", "a".."z", "0".."9");
     join "", map @alpha[rand @alpha], 0..63;
+}
+
+sub generate_sid {
+    return Session::Token->new(entropy => 256)->get;
 }
 
 sub connect_to_vm_processor {
@@ -195,7 +253,7 @@ sub connect_to_vm_processor {
     my $vm_id = delete $params{id};
     if (defined $l7r->{session}) {
         $l7r->throw_http_error(HTTP_FORBIDDEN, "vm_id does not match with provided token")
-            unless $vm_id == $l7r->{session}->vm_id;
+            if (defined $l7r->{session}->vm_id) && ($vm_id != $l7r->{session}->vm_id);
     }
     
     unless (defined $vm_id)  {
@@ -232,6 +290,21 @@ sub connect_to_vm_processor {
 
     my $slave_key = generate_slave_key();
 
+    my $uas = rs('User_Auth_Parameters')->create({ parameters => $l7r->json->encode($auth->{params}) });
+
+    my $session_auth = rs('User_Token')->create( {
+        token             => generate_sid(),
+        expiration        => time + (3600*24),
+        user_id           => $user_id,
+        vm_id             => undef,
+        auth_params_id    => $uas->id,
+        multi_use         => 1
+    });
+
+    $params{auth_token}   = $session_auth->token;
+    $params{host_address} = $this_host->address;
+
+
     eval {
         if (!$auth->allow_access_to_vm($vm->vm)) {
             INFO "User $user_id has tried to access VM $vm_id but (s)he isn't allowed to";
@@ -251,11 +324,14 @@ sub connect_to_vm_processor {
         $l7r->_run_forwarder($vm, %params);
     };
     if ($@) {
-        chomp $@;
-        INFO "The requested virtual machine is not available: '$@'. Retry later". " VM_ID: $vm_id";
+        my $err = $@;
+        $err = $err->[1] if ( ref($err) eq "QVD::HTTPD::Exception" ); # Extract error message
+        chomp $err;
+
+        INFO "The requested virtual machine is not available: '$err'. Retry later". " VM_ID: $vm_id";
         $l7r->throw_http_error(HTTP_SERVICE_UNAVAILABLE,
                           "The requested virtual machine is not available: ",
-                          "$@, retry later");
+                          "$err, retry later.");
     }
     DEBUG "Session ended". " VM_ID: $vm_id";
 }
@@ -476,8 +552,10 @@ sub _start_and_wait_for_vm {
         notify("qvd_cmd_for_vm_on_host$host_id");
     }
 
-    $l7r->_wait_for_vm($vm, 'running', $vm_start_timeout)
-        or LOGDIE "Unable to start VM " . $vm->id;
+    if (!$l7r->_wait_for_vm($vm, 'running', $vm_start_timeout)) {
+        $l7r->throw_http_error(HTTP_INTERNAL_SERVER_ERROR, "Failed to start virtual machine " . $vm->id);
+        LOGDIE "Unable to start VM " . $vm->id;
+    }
 }
 
 sub _stop_and_wait_for_vm {
