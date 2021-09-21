@@ -6,6 +6,9 @@ import gettext
 import os
 import gi
 import signal
+import dbus
+import dbus.service
+
 gi.require_version("Gtk", "3.0")
 gi.require_version('AppIndicator3', '0.1')
 gi.require_version('Notify', '0.7')
@@ -21,6 +24,17 @@ gettext.bindtextdomain('qvdspy-notifier', '/usr/lib/qvd/locale')
 gettext.textdomain('qvdspy-notifier')
 _ = gettext.gettext
 
+
+
+class QVDSpyNotifierService(dbus.service.Object):
+    def __init__(self):
+        self.bus = dbus.SessionBus()
+        name = dbus.service.BusName("com.qindel.QVDSpyNotifier", bus = self.bus)
+        super().__init__(name, "/QVDSpyNotifier")
+
+    @dbus.service.method("com.qindel.QVDSpyNotifier", out_signature="")
+    def Quit(self):
+        exit(0)
 
 
 
@@ -64,7 +78,7 @@ def find_pixmap(filename):
             return full_path
 
     log("Failed to find icon {} in {}".format(filename, dirs))
- 
+
 def find_parent():
     pid = os.getppid()
     log("PPID is {}".format(pid))
@@ -102,9 +116,32 @@ def find_parent():
 
 
 def start_indicator():
+    global dbus
+
     pid = os.fork()
     if ( pid != 0 ):
         return 0
+
+    import dbus.mainloop.glib
+    from gi.repository import GLib
+    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+ 
+    bus = dbus.SessionBus()
+    done = False
+
+    while True:
+        try:
+            current_indicator = bus.get_object('com.qindel.QVDSpyNotifier', '/QVDSpyNotifier')
+            if current_indicator:
+                log("Quitting existing instance")
+                current_indicator.Quit()
+            else:
+                done = True
+        except dbus.exceptions.DBusException:
+            log("No more instances found, continuing")
+            break;
+
+    service = QVDSpyNotifierService()
 
     systray_image = find_pixmap('qvdspy.svg') or find_pixmap('qvdspy.png') or find_pixmap('qvd.svg')
 
@@ -117,6 +154,7 @@ def start_indicator():
     gtk.main()
 
 def show_notification():
+
     systray_image = find_pixmap('qvd.svg')
     notification_image = find_pixmap('qvd.svg')
     notify.init("QVD")
@@ -187,7 +225,7 @@ def quit(_):
     global notification
 
     log("Quitting")
-    
+
     try:
         if parent_pid != 0:
             log("Terminating parent pid {}".format(parent_pid))
