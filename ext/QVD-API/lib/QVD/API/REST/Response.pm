@@ -57,12 +57,14 @@ sub _process_element
     my ($self, $element) = @_;
 
     my $result = {};
-    
+    $self->{has_property_cache} //= {};
+
     for my $field (@{$self->_get_field_list})
     {
-        if ($self->qvd_object_model->has_property($field))
+        if ($self->{has_property_cache}->{$field} || $self->qvd_object_model->has_property($field))
         {
             $result->{$field} = $self->_get_property_value($element, $field);
+            $self->{has_property_cache}->{$field} = 1;
         }
         else
         {
