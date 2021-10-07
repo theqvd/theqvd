@@ -86,7 +86,7 @@ sub _get_dbix_object_value
 
     my $dbix_field_key = $self->qvd_object_model->map_field_to_dbix_format($field);
     my ($table,$column) = $dbix_field_key =~ /^(.+)\.(.+)$/;
-    
+
     if($table eq 'me') {
         return $dbix_object->$column;
     } elsif ($table eq 'view') {
@@ -95,7 +95,12 @@ sub _get_dbix_object_value
         # whose result was saved in the 'extra'
         return ($self->data->{extra}->{$dbix_object->id}->$column);
     } else {
-        return $dbix_object->$table->$column;
+        my $table_obj = $dbix_object->$table;
+        if (!$table_obj) {
+            warn("Failed to get table object for table $table from $dbix_object. Wanted to get value of $column");
+            return;
+        }
+        return $table_obj->$column;
     }
     return ($dbix_object->$table,$column);
 }
