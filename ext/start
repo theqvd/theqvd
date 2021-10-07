@@ -1,0 +1,87 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Getopt::Long;
+use File::Basename;
+use Time::HiRes qw(gettimeofday tv_interval);
+use Term::ANSIColor;
+
+my ($opt_profile, $opt_4k, $profile_name);
+
+GetOptions(
+    "profile"        => \$opt_profile,
+    "4k"             => \$opt_4k,
+    "profile-name=s" => \$profile_name
+
+) or die "Getopt failed";
+
+my @extra_args;
+my $own_name = basename($0);
+my $profile_output;
+
+my $aliases = {
+    'api'    => ['QVD-API/bin/qvd-api.pl', 'daemon'],
+    'qa4'    => ['-CAL', 'QVD-Admin4/bin/qa4'],
+    'client' => ['QVD-Client/bin/qvd-client.pl']
+};
+
+if ( $own_name eq "start" ) {
+    die "You must symlink this to the name of a tool";
+}
+
+$own_name =~ s/^start_//;
+
+if ( !exists $aliases->{$own_name} ) {
+    die "Unrecognized name: $own_name. Please edit the script to add it";
+}
+
+if ( $opt_profile ) {
+    $profile_output = "${own_name}-nytprof.out";
+    $profile_name //= $own_name;
+    push @extra_args, "-d:NYTProf";
+    $ENV{NYTPROF}="file=${profile_output}";
+    unlink($profile_output);
+    info("*** Writing profiling data to: ${profile_output}\n");
+}
+
+
+my $script = $aliases->{$own_name};
+
+$ENV{MOJO_INACTIVITY_TIMEOUT}=600;
+
+#perl -d:NYTProf '-Mlib::glob=*/lib' QVD-API/bin/qvd-api.pl daemon
+$SIG{INT} = 'IGNORE';
+my @command = ("perl", '-Mlib::glob=*/lib', @extra_args, @$script, @ARGV); # or die "Failed to exec perl: $!";
+
+info("*** Running: " . join(' ', @command) . "\n");
+my $t0 = [gettimeofday];
+system(@command);
+my $elapsed = tv_interval($t0, [gettimeofday]);
+
+info("*** Process exited after $elapsed seconds with return code $?\n");
+
+if ( $profile_output ) {
+    my @profile_args;
+    if ( $opt_4k ) {
+        push @profile_args, "-flamewidth", "3000";
+    }
+    info("*** Processing profile...");
+    mkdir("profiles");
+    system("nytprofhtml", "--file", $profile_output, "--delete", @profile_args, "--out", "profiles/${profile_name}");
+}
+
+info("*** Done.");
+
+if ( $profile_output ) {
+    info("Profile output in: $profile_output");
+}
+
+info("\n\n");
+
+
+sub info {
+    my ($text) = @_;
+    print STDERR color('bold cyan');
+    print STDERR $text;
+    print STDERR color('reset');
+}
