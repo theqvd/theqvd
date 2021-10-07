@@ -53,6 +53,9 @@ __PACKAGE__->might_have(token => 'QVD::DB::Result::User_Token', 'vm_id');
 __PACKAGE__->has_one(creation_log_entry => 'QVD::DB::Result::Log',
     \&creation_log_entry_join_condition, {join_type => 'LEFT'});
 
+
+my $mac_prefix;
+
 sub creation_log_entry_join_condition
 {
     my $args = shift;
@@ -235,8 +238,11 @@ sub vm_mac
     my $self = shift;
     my $ip = $self->ip // return;
     my (undef, @hex) = map sprintf('%02x', $_), split /\./, $ip;
-    use QVD::Config;
-    my $mac_prefix = cfg('vm.network.mac.prefix');
+    if (!defined $mac_prefix) {
+        use QVD::Config;
+        $mac_prefix = cfg('vm.network.mac.prefix');
+    }
+
     join(':', $mac_prefix, @hex);
 }
 
