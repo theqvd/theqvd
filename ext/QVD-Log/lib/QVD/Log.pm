@@ -172,7 +172,7 @@ Log::Log4perl::easy_closure_create(__PACKAGE__, 'LOGDIE',
                                    $logger);
 
 use Exporter qw(import);
-our @EXPORT = qw(DEBUG WARN INFO ERROR LOGDIE $logger);
+our @EXPORT = qw(DEBUG WARN INFO ERROR LOGDIE FATAL TRACE $logger);
 
 1;
 
