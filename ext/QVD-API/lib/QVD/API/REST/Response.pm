@@ -132,12 +132,19 @@ sub _get_field_list
     }
     else
     {
-        @available_fields = $self->qvd_object_model->available_fields;
+        if ( $self->{field_cache} ) {
+            @available_fields = @{ $self->{field_cache} };
+        } else {
+
+            @available_fields = $self->qvd_object_model->available_fields;
         
-        my $admin = $self->qvd_object_model->current_qvd_administrator;
-        # This grep deletes from the output fields the admin doesn't have acls for
-        @available_fields = grep  { $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_field($_)) }
-            @available_fields;
+            my $admin = $self->qvd_object_model->current_qvd_administrator;
+            # This grep deletes from the output fields the admin doesn't have acls for
+            @available_fields = grep  { $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_field($_)) }
+                @available_fields;
+
+            $self->{field_cache} = \@available_fields;
+        }
     }
 
     return \@available_fields;
