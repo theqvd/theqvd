@@ -261,6 +261,8 @@ sub remaining_time_until_expiration_soft
 sub remaining_time_until
 {
     my ($self,$then) = @_;
+    # We may be called withhout $then, probably for VMs without an expiration time
+    return unless (defined $then);
     my @TIME_UNITS = qw(months days hours minutes seconds);
     my %time_difference;
     @time_difference{@TIME_UNITS} = $then->subtract_datetime(DateTime->now( time_zone => 'UTC' ))->in_units(@TIME_UNITS);
