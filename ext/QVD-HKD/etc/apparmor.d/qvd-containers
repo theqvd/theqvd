@@ -1,0 +1,3 @@
+# This file load the qvd apparmor profile
+
+#include <qvd/lxc-qvd>
