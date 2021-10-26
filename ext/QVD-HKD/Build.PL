@@ -57,8 +57,8 @@ my $build = Module::Build->new(
     etc_files=> {
 	"etc/systemd/system/qvd-hkd.service"                 => "/etc/systemd/system/qvd-hkd.service",
         "etc/qvd/templates/lxc.mt"                           => "/etc/qvd/templates/lxc.mt",
-        "etc/apparmor.d/lxc/lxc-qvd"                         => "/etc/apparmor.d/lxc/lxc-qvd",
-        "etc/apparmor.d/abstractions/lxc/container-base-qvd" => "/etc/apparmor.d/abstractions/lxc/container-base-qvd"
+        "etc/apparmor.d/qvd/lxc-qvd"                         => "/etc/apparmor.d/qvd/lxc-qvd",
+        "etc/apparmor.d/abstractions/qvd/container-base-qvd" => "/etc/apparmor.d/abstractions/qvd/container-base-qvd"
     },
     install_path => { 'etc' => '/etc' },
 );
