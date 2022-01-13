@@ -57,7 +57,7 @@ windows/script.iss
 
 # Generated files
 windows/installer/qvd-client*.exe
-
+*.msi
 MANIFEST
 
 *.bak
@@ -76,6 +76,10 @@ ext/QVD-VMA/META\.yml
 
 # Backup files
 *~
+*.swp
+*.swo
+*.swn
+*.orig
 
 windows/installer/Xming/COPYING
 ext/execute.sh

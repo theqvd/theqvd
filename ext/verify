@@ -1,0 +1,309 @@
+#!/usr/bin/perl -w
+use strict;
+use IPC::Run3;
+use Getopt::Long;
+use File::Find;
+use Term::ANSIColor;
+use IO::Select;
+use Sys::CPU;
+use Socket;
+use POSIX ":sys_wait_h";
+use JSON::XS;
+use Cwd;
+
+
+my ($opt_autoinstall);
+
+GetOptions(
+    "install-missing!" => \$opt_autoinstall
+
+) or die "getopt failed: $!";
+
+sub info {
+    print color('bold white');
+    print @_;
+    print color('reset');
+}
+
+sub ok {
+    print color('bold green');
+    print @_;
+    print color('reset');
+}
+
+sub err {
+    print color('bold red');
+    print @_;
+    print color('reset');
+}
+
+
+
+
+
+$| = 1;
+my @files;
+
+
+info("Building file list... ");
+foreach my $f (@ARGV) {
+    if ( -d $f ) {
+        find({ wanted => sub {
+            if ( -f $_ && $_ =~ /\.(pl|pm)$/ ) {
+                push @files, $_;
+            }
+            }, no_chdir => 1}, $f);
+    } else {
+        push @files, $f;
+    }
+}
+
+info( (scalar @files) . " source files found\n");
+
+
+my $cores = Sys::CPU::cpu_count();
+my %children;
+my $terminate = 0;
+
+info("Found $cores CPU cores\n");
+
+
+my $restart = 1;
+VERIFY: while($restart) {
+    undef $restart;
+
+
+    $SIG{CHLD} = sub {
+        my $pid = waitpid(-1, WNOHANG);
+        if ( exists $children{$pid} ) {
+            # Don't create entry in hash if we catch
+            # somebody else's child
+            $children{$pid}->{dead} = 1;
+        }
+    };
+
+    $SIG{INT} = sub { $terminate = 1; };
+    $SIG{TERM} = sub { $terminate = 1; };
+
+
+    my @queue = @files;
+    my $select = IO::Select->new();
+    my $error_count = 0;
+    my $ok_count = 0;
+    my %missing_modules;
+    my %files_with_errors;
+
+    %children = ();
+
+    info("Verifying " . (scalar @queue) . " files... ");
+    while (@queue || keys(%children)) {
+
+        while( @queue && (keys %children < $cores) ) {
+    #        info("🚀");
+            socketpair(my $reader, my $writer, AF_UNIX, SOCK_STREAM, PF_UNSPEC);
+            $reader->autoflush(1);
+            $writer->autoflush(1);
+            shutdown($reader, 1);
+            shutdown($writer, 0);
+
+            # Remove item from queue
+            my $filename = shift @queue;
+
+            my $pid = fork();
+            if ( $pid == 0 ) {
+                # Child
+                $0 = "$0 [$filename]";
+                close $reader;
+                $SIG{CHLD} = 'DEFAULT';
+       #         syswrite($writer, "hello, world!");
+                syswrite($writer, verify_file($filename));
+                exit(0);
+            } else {
+                # Parent
+                close $writer;
+
+                $children{$pid} = {
+                    socket => $reader,
+                    data   => "",
+                    dead   => 0,
+                    file   => $filename
+                };
+    #            print("START: $pid\n");
+                $select->add($reader);
+            }
+        }
+
+        my @ready = $select->can_read(1);
+
+        if ( $terminate ) {
+            err("Aborting!\n");
+
+            $SIG{CHLD} = 'DEFAULT';
+            kill 'KILL', keys %children;
+            foreach my $pid (keys %children) {
+                waitpid($pid, WNOHANG);
+            }
+
+            exit(2);
+        }
+
+        foreach my $socket (@ready) {
+            my ($pid, $data);
+            ($pid) = grep { $children{$_}->{socket} == $socket } keys %children;
+            my $bytes = sysread($socket, $data, 512);
+            $children{$pid}->{data} .= $data;
+
+    #        print("SOCK READ: pid $pid, sock $socket, $bytes bytes: $data, ERR: $!\n");
+        }
+
+        my @remove;
+
+        foreach my $pid (keys %children) {
+            my $child = $children{$pid};
+
+            if ( $child->{dead} ) {
+    #           print("DEAD: $pid\n");
+                my $data;
+                eval {
+                    $data = decode_json($child->{data});
+                };
+    #            print "DATA: $child->{data}\n";
+                if ( $@ ) {
+                    err("!");
+                }
+
+    #            print "RET: $data->{retval}. OK: $data->{ok}\n";
+                if ( $data->{ok} ) {
+                    ok("✓");
+                    $ok_count++;
+                } else {
+                    $error_count++;
+                    if ( $data->{missing_module} ) {
+                        my $mod = $data->{missing_module};
+                        $missing_modules{$mod} //= { };
+                        $missing_modules{$mod}->{$child->{file}} = 1;
+                        err("🔎");
+                    } else {
+                        err("❌");
+                        $files_with_errors{$child->{file}} = $data;
+                    }
+                }
+                my $sock = $children{$pid}->{socket};
+                $select->remove($sock);
+                close $sock;
+
+                push @remove, $pid;
+            }
+        }
+
+        foreach my $p (@remove) {
+            delete $children{$p};
+        }
+
+    }
+    info("\n");
+
+    # We're done with progress management, make sure the handler
+    # won't interfere with system below
+    $SIG{CHLD} = 'DEFAULT';
+
+    if ( %missing_modules ) {
+        info("\n");
+        err("Missing modules:\n");
+        foreach my $mod (sort keys %missing_modules) {
+            print "\t$mod\n";
+            foreach my $srcfile ( keys %{$missing_modules{$mod}} ) {
+                print "\t\t$srcfile\n";
+            }
+        }
+
+        if ( $opt_autoinstall ) {
+            info("\nWill now install the missing modules\n");
+            foreach my $mod (sort keys %missing_modules) {
+
+                # workaround for issues with sshfs, which doesn't like us being in a
+                # sshfs directory.
+                my $cwd = getcwd;
+                chdir("/");
+                system("sudo", "cpanm", $mod);
+                chdir($cwd);
+            }
+
+            # We'll probably have a whole bunch of errors due to missing modules, so
+            # skip dumping them on the console if we had to install anything.
+            $restart = 1;
+            next VERIFY;
+        }
+    }
+
+    if ( %files_with_errors ) {
+        err("\nFiles with errors:\n");
+        foreach my $file (sort keys %files_with_errors) {
+            my $data = $files_with_errors{$file};
+
+            print "\t$file:\n";
+            print "\t\tReturn value: $data->{retval}\n";
+
+            if ( $data->{stdout} ) {
+                print "\t\tstdout:\n";
+                print indent_text(3, $data->{stdout}) . "\n";
+            }
+
+            if ( $data->{stderr} ) {
+                print "\t\tstderr:\n";
+                print indent_text(3, $data->{stderr}) . "\n";
+            }
+
+        }
+    }
+}
+
+
+sub verify_file {
+    my ($file) = @_;
+    my @args;
+
+    my $ret = {
+        ok     => 0,
+        stdout => "",
+        stderr => ""
+
+    };
+
+    if ( $file =~ /.pl$/ ) {
+        push @args, "-c";
+    }
+
+    my ($out, $err);
+
+    # Force english to parse Perl's errors
+    $ENV{LC_ALL} = "en_US.UTF-8";
+
+    run3(["perl", "-Mlib::glob=*/lib", @args, $file], undef, \$out, \$err);
+
+    $ret->{retval} = $?;
+    if ( ($?>>8) == 0 ) {
+        $ret->{ok} = 1;
+    }
+
+    $ret->{stdout} = $out;
+    $ret->{stderr} = $err;
+
+    if ( $err =~ /you may need to install the (.*?) module/ || $err =~ /Base class package \"(.*?)\" is empty/ ) {
+        $ret->{ok} = 0;
+        $ret->{missing_module} = $1;
+    }
+
+    return encode_json($ret);
+}
+
+sub indent_text {
+    my ($levels, $text) = @_;
+    my @lines = split(/\n/, $text);
+    my $ret = "";
+    foreach my $line (@lines) {
+        $ret .= ("\t" x $levels) . "┃ $line\n";
+    }
+
+    return $ret;
+}

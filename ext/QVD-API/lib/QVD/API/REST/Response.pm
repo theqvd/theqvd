@@ -57,12 +57,14 @@ sub _process_element
     my ($self, $element) = @_;
 
     my $result = {};
-    
+    $self->{has_property_cache} //= {};
+
     for my $field (@{$self->_get_field_list})
     {
-        if ($self->qvd_object_model->has_property($field))
+        if ($self->{has_property_cache}->{$field} || $self->qvd_object_model->has_property($field))
         {
             $result->{$field} = $self->_get_property_value($element, $field);
+            $self->{has_property_cache}->{$field} = 1;
         }
         else
         {
@@ -84,7 +86,7 @@ sub _get_dbix_object_value
 
     my $dbix_field_key = $self->qvd_object_model->map_field_to_dbix_format($field);
     my ($table,$column) = $dbix_field_key =~ /^(.+)\.(.+)$/;
-    
+
     if($table eq 'me') {
         return $dbix_object->$column;
     } elsif ($table eq 'view') {
@@ -93,7 +95,12 @@ sub _get_dbix_object_value
         # whose result was saved in the 'extra'
         return ($self->data->{extra}->{$dbix_object->id}->$column);
     } else {
-        return $dbix_object->$table->$column;
+        my $table_obj = $dbix_object->$table;
+        if (!$table_obj) {
+            warn("Failed to get table object for table $table from $dbix_object. Wanted to get value of $column");
+            return;
+        }
+        return $table_obj->$column;
     }
     return ($dbix_object->$table,$column);
 }
@@ -125,12 +132,19 @@ sub _get_field_list
     }
     else
     {
-        @available_fields = $self->qvd_object_model->available_fields;
+        if ( $self->{field_cache} ) {
+            @available_fields = @{ $self->{field_cache} };
+        } else {
+
+            @available_fields = $self->qvd_object_model->available_fields;
         
-        my $admin = $self->qvd_object_model->current_qvd_administrator;
-        # This grep deletes from the output fields the admin doesn't have acls for
-        @available_fields = grep  { $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_field($_)) }
-            @available_fields;
+            my $admin = $self->qvd_object_model->current_qvd_administrator;
+            # This grep deletes from the output fields the admin doesn't have acls for
+            @available_fields = grep  { $admin->re_is_allowed_to($self->qvd_object_model->get_acls_for_field($_)) }
+                @available_fields;
+
+            $self->{field_cache} = \@available_fields;
+        }
     }
 
     return \@available_fields;

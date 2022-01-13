@@ -53,6 +53,9 @@ __PACKAGE__->might_have(token => 'QVD::DB::Result::User_Token', 'vm_id');
 __PACKAGE__->has_one(creation_log_entry => 'QVD::DB::Result::Log',
     \&creation_log_entry_join_condition, {join_type => 'LEFT'});
 
+
+my $mac_prefix;
+
 sub creation_log_entry_join_condition
 {
     my $args = shift;
@@ -235,8 +238,11 @@ sub vm_mac
     my $self = shift;
     my $ip = $self->ip // return;
     my (undef, @hex) = map sprintf('%02x', $_), split /\./, $ip;
-    use QVD::Config;
-    my $mac_prefix = cfg('vm.network.mac.prefix');
+    if (!defined $mac_prefix) {
+        use QVD::Config;
+        $mac_prefix = cfg('vm.network.mac.prefix');
+    }
+
     join(':', $mac_prefix, @hex);
 }
 
@@ -255,6 +261,8 @@ sub remaining_time_until_expiration_soft
 sub remaining_time_until
 {
     my ($self,$then) = @_;
+    # We may be called withhout $then, probably for VMs without an expiration time
+    return unless (defined $then);
     my @TIME_UNITS = qw(months days hours minutes seconds);
     my %time_difference;
     @time_difference{@TIME_UNITS} = $then->subtract_datetime(DateTime->now( time_zone => 'UTC' ))->in_units(@TIME_UNITS);
