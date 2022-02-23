@@ -72,6 +72,7 @@ path.storage.check = ${path.storage.homes}/.rw_check
 path.storage.basefs = ${path.storage.root}/basefs
 path.storage.homefs = ${path.storage.root}/homefs
 path.storage.btrfs.root = ${path.storage.root}
+path.storage.xfs.root = ${path.storage.root}
 
 path.run.lxc = ${path.run}/lxc
 
@@ -568,6 +569,8 @@ vm.lxc.conf_template = /etc/qvd/templates/lxc.mt
 
 ## COW fs to use with LXC
 vm.lxc.unionfs.type = overlayfs
+@rocky-8.5@vm.lxc.unionfs.type = xfs
+@sles-15@vm.lxc.unionfs.type = btrfs
 @sles-12@vm.lxc.unionfs.type = overlayfs
 @sles-11@vm.lxc.unionfs.type = unionfs-fuse
 vm.lxc.unionfs.bind.ro = 1
@@ -577,7 +580,8 @@ vm.lxc.unionfs.overlayfs.module.name = overlay
 @ubuntu-16.04.0@vm.lxc.unionfs.overlayfs.module.name = overlayfs
 @ubuntu-16.04.1@vm.lxc.unionfs.overlayfs.module.name = overlayfs
 @sles@vm.lxc.unionfs.overlayfs.module.name = overlayfs
-@sles-15@vm.lxc.unionfs.overlayfs.module.name = overlay
+@sles-15@vm.lxc.unionfs.overlayfs.module.name = btrfs
+@rocky-8.5@vm.lxc.unionfs.overlayfs.module.name = xfs
 
 # allow LXC DIs to have hooks for customization - disabled by default
 # because they run as root and can do anything on the host
