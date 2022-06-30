@@ -52,14 +52,17 @@ sub new {
     my $cli = shift;
     my %opts = @_;
     my $self = {
-        client_delegate => $cli,
-        audio           => delete $opts{audio},
-        compress_audio  => core_cfg('client.audio.compression.enable'),
-        extra           => delete $opts{extra},
-        printing        => delete $opts{printing},
-        usb             => delete $opts{usb},
-        usb_impl        => delete $opts{usb_impl},
-        opts            => \%opts,
+        client_delegate        => $cli,
+        audio                  => delete $opts{audio},
+        compress_audio         => core_cfg('client.audio.compression.enable'),
+        redirect_audio         => core_cfg('client.audio.redirect.enable'),
+        redirect_audio_server  => core_cfg('client.audio.redirect.server'),
+        redirect_audio_port    => core_cfg('client.audio.redirect.port'),
+        extra                  => delete $opts{extra},
+        printing               => delete $opts{printing},
+        usb                    => delete $opts{usb},
+        usb_impl               => delete $opts{usb_impl},
+        opts                   => \%opts,
     };
     
     bless $self, $class;
@@ -333,7 +336,7 @@ sub _get_httpc {
 
         $args{SSL_ca_path} = \@ca_paths;
 
-        DEBUG "SSL CA file: " . ($args{SSL_ca_file} // '');
+        DEBUG "SSL CA file: " . $args{SSL_ca_file};
         DEBUG "SSL CA path: " . join(':', @{$args{SSL_ca_path}});
 
         DEBUG "Parsing OCSP mode";
@@ -343,7 +346,7 @@ sub _get_httpc {
         $args{SSL_fail_on_ocsp}     = 0;
         $args{SSL_fail_on_hostname} = 0;
 
-        DEBUG "SSL CA file: " . ($args{SSL_ca_file} // 'undef');
+        DEBUG "SSL CA file: " . $args{SSL_ca_file};
         DEBUG "SSL CA path: " . join(':', @{$args{SSL_ca_path}});
 
         my $use_cert = core_cfg('client.ssl.use_cert');
@@ -577,7 +580,7 @@ sub connect_to_vm {
 
     INFO("Sending $auth_type auth");
     $httpc->send_http_request(
-        GET => ($opts->{list_apps} ? '/qvd/list_of_applications' : '/qvd/list_of_vm?') . $q,
+        GET => '/qvd/list_of_vm?'.$q,
         headers => $headers
     );
 
@@ -672,6 +675,9 @@ sub connect_to_vm {
         'qvd.client.usb.enabled'        => $self->{usb},
         'qvd.client.usb.implementation' => $self->{usb_impl},
         'qvd.client.audio.compression.enable' => $self->{compress_audio},
+        'qvd.client.audio.redirect.enable'    => $self->{redirect_audio},
+        'qvd.client.audio.redirect.server'    => $self->{redirect_audio_server},
+        'qvd.client.audio.redirect.port'      => $self->{redirect_audio_port},
     );
 
     if ( $WINDOWS ) {
@@ -982,6 +988,13 @@ sub _run {
                             $qvd_pa = QVD::Client::PulseAudio->start(
                                 env_func => sub { $self->{client_delegate}->proxy_set_environment(@_) }
                             );
+
+                            if ( $self->{redirect_audio} ) {
+                               INFO "Redirecting sound to server:  $self->{redirect_audio_server}, port: $self->{redirect_audio_port}";
+                               $qvd_pa->load_module("module-tunnel-sink-new",
+                                   "server=" . $self->{redirect_audio_server} . ":" . $self->{redirect_audio_port}, 
+                                   "sink_name=Thinclient");
+                            }
         
                             $qvd_pa->load_module("module-native-protocol-tcp",
                                 "auth-anonymous=1", "listen=127.0.0.1", "port=" . $self->{audio_port});
@@ -1199,7 +1212,7 @@ sub _allocate_port {
 
 sub _t {
     # Allow usage both as a method and as a function
-    shift if ( ref($_[0]) =~ /^QVD::/ );
+    shift if ( ref(@_[0]) =~ /^QVD::/ );
     return @_;
 }
 
