@@ -35,6 +35,8 @@ Authors:
 --------
     The QVD Team <qvd@qindel.com>
 
+%global debug_package %{nil}
+
 %prep
 %setup
 
