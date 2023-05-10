@@ -3,10 +3,10 @@ Version:        %{qvd_version}
 Release:        %{release}
 Summary:        Pruebas de empaquetado para SLES12
 
-Group:        	Productivity/Networking/Web/Utilities
+Group:          Productivity/Networking/Web/Utilities
 License:        GPL 3
 URL:            http://theqvd.com
-Source0:       	qvd-wat.tgz
+Source0:        qvd-wat.tgz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 
@@ -15,26 +15,25 @@ Requires: perl-QVD-API
 %description
 Web Administration Tool for qvd
 
-%global debug_package %{nil}
-
 %prep
-
 %setup -q
 
+
 %build
+
 make %{?_smp_mflags}
+
 
 %install
 rm -rf $RPM_BUILD_ROOT
+make install DESTDIR=$RPM_BUILD_ROOT
 
 # Some files got ambiguous python shebangs, we fix them after everything else is done
 pathfix.py -pni "%{__python3} %{py3_shbang_opts}" %{buildroot}/usr/lib/qvd/wat/lib/thirds/noVNC/utils/*
 
-make install DESTDIR=$RPM_BUILD_ROOT
 
 %clean
 rm -rf $RPM_BUILD_ROOT
-
 
 %files
 /usr/lib/qvd/wat
