@@ -30,7 +30,7 @@ make %{?_smp_mflags}
 rm -rf $RPM_BUILD_ROOT
 
 # Some files got ambiguous python shebangs, we fix them after everything else is done
-pathfix.py -pni "%{__python3} %{py3_shbang_opts}" %{buildroot}%{python3_sitearch} %{buildroot}%{_bindir}/*
+pathfix.py -pni "%{__python3} %{py3_shbang_opts}" %{buildroot}%{python3_sitearch} %{buildroot}/lib/thirds/noVNC/utils/*
 make install DESTDIR=$RPM_BUILD_ROOT
 
 
