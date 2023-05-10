@@ -18,17 +18,15 @@ Web Administration Tool for qvd
 %global debug_package %{nil}
 
 %prep
-%setup -q
-
-
-%build
-
-make %{?_smp_mflags}
-
-%install
 # Some files got ambiguous python shebangs, we fix them after everything else is done
 pathfix.py -pni "%{__python3} %{py3_shbang_opts}" %{buildroot}/usr/lib/qvd/wat/lib/thirds/noVNC/utils/*
 
+%setup -q
+
+%build
+make %{?_smp_mflags}
+
+%install
 rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 
