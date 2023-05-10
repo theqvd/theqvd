@@ -24,10 +24,12 @@ Web Administration Tool for qvd
 %build
 
 make %{?_smp_mflags}
+make install DESTDIR=$RPM_BUILD_ROOT
 
 # Some files got ambiguous python shebangs, we fix them after everything else is done
-pathfix.py -pni "%{__python3} %{py3_shbang_opts}" %{buildroot}%{python3_sitearch} %{buildroot}/lib/thirds/noVNC/utils/*
-make install DESTDIR=$RPM_BUILD_ROOT
+#pathfix.py -pni "%{__python3} %{py3_shbang_opts}" %{buildroot}%{python3_sitearch} %{buildroot}/lib/thirds/noVNC/utils/*
+
+find . -type d -name noVNC
 
 %install
 rm -rf $RPM_BUILD_ROOT
