@@ -21,7 +21,7 @@ Web Administration Tool for qvd
 
 %setup -q
 # Some files got ambiguous python shebangs, we fix them after everything else is done
-pathfix.py -pni "%{__python3} %{py3_shbang_opts}" %{buildroot}/usr/lib/qvd/wat/lib/thirds/noVNC/utils/*
+#pathfix.py -pni "%{__python3} %{py3_shbang_opts}" %{buildroot}/usr/lib/qvd/wat/lib/thirds/noVNC/utils/*
 
 %build
 make %{?_smp_mflags}
