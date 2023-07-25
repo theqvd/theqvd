@@ -59,7 +59,8 @@ my $build = Module::Build->new(
         "etc/qvd/templates/lxc.mt"                           => "/etc/qvd/templates/lxc.mt",
 	"etc/apparmor.d/qvd-containers"                      => "/etc/apparmor.d/qvd-containers",
         "etc/apparmor.d/qvd/lxc-qvd"                         => "/etc/apparmor.d/qvd/lxc-qvd",
-        "etc/apparmor.d/abstractions/qvd/container-base-qvd" => "/etc/apparmor.d/abstractions/qvd/container-base-qvd"
+        "etc/apparmor.d/abstractions/qvd/container-base-qvd" => "/etc/apparmor.d/abstractions/qvd/container-base-qvd",
+        "etc/lxc/lxc.conf"                                   => "/etc/lxc/lxc.conf"
     },
     install_path => { 'etc' => '/etc' },
 );
