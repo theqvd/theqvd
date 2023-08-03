@@ -54,4 +54,8 @@ my $build = Module::Build->new(
     script_files => [ 'bin/qvd-api.debrc.pl', 'bin/qvd-api.initrc.pl', 'bin/qvd-api.pl' ],
 );
 
+foreach my $ext (qw(fb tt png jar css gif js zip ico etc conf)) {
+    $build->add_build_element($ext);
+}
+
 $build->create_build_script();
