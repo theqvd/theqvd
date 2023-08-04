@@ -232,8 +232,8 @@ command.setfacl = setfacl
 
 
 # zfs commands
-command.zfs = /sbin/zfs
-command.zpool = /sbin/zpool
+command.zfs = /usr/sbin/zfs
+command.zpool = /usr/sbin/zpool
 
 ## whether to remember password after successful connection
 client.remember_password = 0
