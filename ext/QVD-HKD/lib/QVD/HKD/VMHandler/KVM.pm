@@ -280,9 +280,10 @@ sub _start_kvm {
                      -name => "qvd/$self->{vm_id}/$self->{name}");
 
     my $use_virtio = $self->_cfg('vm.kvm.virtio');
-    my $nic = "nic,macaddr=$self->{mac},vlan=0";
-    $nic .= ',model=virtio' if $use_virtio;
-    push @kvm_args, (-net => $nic, -net => 'tap,vlan=0,fd=3');
+    my $nic = "tap,id=qvdnet0,fd=3";
+    my $netdev = "netdev=qvdnet0,mac=$self->{mac}";
+    $netdev = "virtio-net-pci,netdev=qvdnet0,mac=$self->{mac}" if $use_virtio;
+    push @kvm_args, (-netdev => $nic, -device => $netdev);
 
     if ($self->_cfg('vm.serial.capture')) {
         if ($self->{serial_port}) {
