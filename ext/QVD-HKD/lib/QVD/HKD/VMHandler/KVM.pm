@@ -318,7 +318,7 @@ sub _start_kvm {
     my $hda = "file=$self->{os_image_path}";
     $hda =~ s/,/,,/g;
     $hda .= ',index=0,media=disk';
-    $hda .= ',if=virtio,boot=on' if $use_virtio;
+    $hda .= ',if=virtio' if $use_virtio;
     $hda .= ',readonly' unless $self->{use_overlay};
     push @kvm_args, -drive => $hda;
 
