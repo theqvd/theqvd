@@ -22,13 +22,16 @@ sub new_vm_handler {
 sub new {
     my $class = shift;
     my $self = $class->SUPER::new(@_);
-    $self->_config_cgroups or LOGDIE "Wrong cgroup configuration detected";
+    my $cgroups_version = $self->_cgroups_version;
+    ($cgroups_version eq "cgroup2") ? $self->_config_cgroups : LOGDIE "Wrong cgroup2 configuration detected";
+    INFO "Detected cgroups version: $cgroups_version";
     $self
 }
 
 sub on_config_changed {
     my $self = shift;
-    $self->_config_cgroups;
+    my $cgroups_version = $self->_cgroups_version;
+    ($cgroups_version eq "cgroup2") ? $self->_config_cgroups : LOGDIE "Wrong cgroup2 configuration detected"; 
 }
 
 sub cgroup_control_path {
@@ -37,50 +40,11 @@ sub cgroup_control_path {
     $paths->{$control};
 }
 
-sub swapcount_enabled { shift->{swapcount} }
+#sub swapcount_enabled { shift->{swapcount} }
 
 sub ok {
     my $self = shift;
     $self->{cgroup_control_paths} and $self->SUPER::ok
-}
-
-
-sub _check_cgroup_fs {
-    my ($self, $path) = @_;
-    my $mi = Linux::Proc::Mountinfo->read;
-    my @parts = File::Spec->splitdir(File::Spec->rel2abs($path));
-    while (1) {
-        my $dir = realpath(File::Spec->join(@parts) // '') // next;
-        DEBUG("looking for a cgroup filesystem at $dir");
-        if (defined(my $mie = $mi->at($dir))) {
-            if ($mie->fs_type eq 'cgroup') {
-                return 1;
-            }
-        }
-        pop(@parts) // return;
-    }
-}
-
-sub _search_cgroup_control {
-    my ($self, $control) = @_;
-    my $base = $self->_cfg("path.cgroup");
-    if (opendir my $dh, $base) {
-        while (defined (my $entry = readdir $dh)) {
-            if ($entry =~ /(?:^|,)\Q$control\E(?:,|$)/) {
-                my $path = "$base/$entry/lxc";
-                if ($self->_check_cgroup_fs($path)) {
-                    DEBUG "cgroups $control path found at '$path'";
-                    return $path;
-                }
-            }
-        }
-    }
-    else {
-        ERROR "Can't open directory '$base'";
-    }
-
-    ERROR "Unable to find cgroup control $control";
-    ()
 }
 
 sub _recreate_lxc_cpuset_cpus {
@@ -89,14 +53,14 @@ sub _recreate_lxc_cpuset_cpus {
 
     my $cpuset_path = $self->{cgroup_control_paths}{cpuset};
     my $available = $self->_cfg_optional('vm.lxc.cpuset.available');
-    my $fn = "$cpuset_path/cpuset.cpus";
+    my $fn = "$cpuset_path/cpuset.cpus.effective"; 
 
     unless (defined $available) {
         # Workaround for SLES not filling /sys/fs/cgroup/cpuset/lxc/cpuset.cpus correctly:
         if (open my $fh, '<', $fn) {
             DEBUG "cpuset.cpus fileno: ".fileno($fh);
             while (<$fh>) {
-                # If a specific set of cpus has not been given an the file is not empty we don't touch it!
+                # If a specific set of cpus has not been given an the file /is not empty we don't touch it!
                 if (/\d/) {
                     close $fh;
                     return;
@@ -115,53 +79,114 @@ sub _recreate_lxc_cpuset_cpus {
     ERROR "Unable to recreate $fn: $!";
 }
 
+sub _cgroups_version {
+    my $self = shift;
+    my $mnts = Linux::Proc::Mountinfo->read;
+    my $cgroups_path = $self->_cfg("path.cgroup");
+    my $cgroups_mnt = $mnts->at($cgroups_path);
+    my $cgroups_version = $cgroups_mnt->fs_type;
+
+    INFO $cgroups_mnt->mount_source . " is mounted at " . $cgroups_mnt->mount_point . " as " . $cgroups_mnt->fs_type;
+
+    return $cgroups_version;
+}
+
 sub _config_cgroups {
     my $self = shift;
+    my %path;
+    my $path = $self->_cfg("path.cgroup");
 
     delete $self->{cgroup_control_paths};
 
-    my %path;
+    my $lxc_conf_file = $self->_cfg("lxc.conf.file");
+    open (my $lxc_conf, "<", $lxc_conf_file) or die "Couldn't open $lxc_conf_file file: $!";
+   
+    my %conf;
+    my ($pattern);
+    while (<$lxc_conf>) {
+        chomp;
+        if ($_ =~ /^lxc.cgroup.pattern/) {
+            my ($key, $value) = split(/=/, $_);
+	    $value =~ s/ //g;
+            DEBUG "Load from lxc config: $key= $value";
+	    ($pattern) = $value =~ /(.*)?\//;
+        }
+    }
+    close $lxc_conf;
+
+    if (! -d "$path/$pattern") { 
+        mkdir("$path/$pattern") or die "Unable to create cgroup subcontrol $pattern: $!";
+	DEBUG "Cgroup subcontrol $pattern created.";
+    }
+
+    INFO "Searching cgroup controllers...";
+    my $loaded_controllers = "$path/cgroup.controllers";
+    open (my $fh, $loaded_controllers) or die "Couldn't open file: $loaded_controllers: $!";
+    my @controllers = <$fh>;
+    close $fh;
+    
+    my $loaded_subcontrollers = "$path/$pattern/cgroup.controllers";
+    open (my $fi, $loaded_subcontrollers) or die "Couldn't open file: $loaded_subcontrollers: $!";
+    my @subcontrollers = <$fi>;
+    close $fi;
+
     for my $control (qw(memory cpu cpuset)) {
-        my $path = $self->_cfg_optional("path.cgroup.$control.lxc");
-        if (defined $path) {
-            $self->_check_cgroup_fs($path)
-                or LOGDIE "'$path' does not lay inside a cgroup filesystem";
-        }
-        else {
-            $path = $self->_search_cgroup_control($control) // return;
+        if (/$control/ ~~ @controllers) {
+            INFO "Controller $control is loaded into cgroup filesystem.";
+	    if (/$control/ ~~ @subcontrollers) {
+               INFO "Controller $control is loaded for $pattern subcontrol.";
+	    } else {   
+               INFO "Controller $control is not loaded for $pattern subcontrol, loading...";
+	       open(FH, '>', "$path/cgroup.subtree_control") or die $!;
+               say FH "+$control";
+	       close(FH);
+	    } 
+        } else {
+            die "Controller $control is not loaded into cgroup filesystem.";
         }
 
-        # the 'lxc' part of the path may not exist yet, so we create it here:
-        unless (-d $path or mkdir $path) {
-            ERROR "Directory $path does not exist and cannot be created either: $!";
-            return;
-        }
-
-        $path{$control} = $path;
+	$path{$control} = "$path/$pattern";
     }
 
     $self->{cgroup_control_paths} = \%path;
+    $self->_load_lxc_cpuset_cpus;
 
-    # swapcount is not checked on config reloads
-    $self->{swapcount} //= do {
-        my $on = -f "$path{memory}/memory.memsw.limit_in_bytes";
-        $on or WARN "Memory limits can not be set. The argument 'swapaccount=1' must be passed to the kernel at boot time";
-        $on
-    };
+    1;
+}
+
+sub _load_lxc_cpuset_cpus {
+    my $self = shift;
+    my $path = $self->cgroup_control_path('cpuset');
+
+    DEBUG "Using cgroup path: $path to manage cpuset control.";
 
     $self->{cpus} //= do {
         my %cpu;
-        my $fn = "$path{cpuset}/../cpuset.cpus";
-        open my $fh, '<', $fn or LOGDIE "Unable to open '$fn'";
+        my $fn;
+        my $custom_cpuset_range = $self->_cfg_optional("vm.lxc.cpuset.range");
+
+        if (defined $custom_cpuset_range) {
+            $fn = "$path/cpuset.cpus";
+            if (open my $fh, '>', $fn) {
+                DEBUG "set custom cpuset range: $custom_cpuset_range to $fn";
+                say $fh $_ for "$custom_cpuset_range";
+                close $fh;
+            }
+        } else {
+            $fn = "$path/../cpuset.cpus.effective";
+            DEBUG "Loading all available vCPUs from $fn";		
+        }       
+
+	open my $fh, '<', $fn or LOGDIE "Unable to open '$fn'";
         my $line = <$fh> // LOGDIE "Unable to read cpuset from '$fn'";
         for my $range (split /\s*,\s*/, $line) {
             my ($a, $b) = $range =~ /^(\d+)(?:-(\d+))?$/ or LOGDIE "Invalid cpuset range '$range' found";
             $b //= $a;
+	    DEBUG "vCPUs range: $range";
             $cpu{$_} = 0 for $a..$b;
         }
         \%cpu;
     };
-
     $self->_recreate_lxc_cpuset_cpus;
 
     1;
@@ -207,4 +232,3 @@ sub release_cpuset {
 }
 
 1;
-

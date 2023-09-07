@@ -357,7 +357,7 @@ sub _create_lxc {
 lxc.cgroup.memory.limit_in_bytes=${memory}M
 lxc.cgroup.memory.memsw.limit_in_bytes=${memory}M
 EOML
-    $memory_limits =~ s/^/# /mg unless $self->{hypervisor}->swapcount_enabled;
+    #$memory_limits =~ s/^/# /mg unless $self->{hypervisor}->swapcount_enabled;
 
     my $cpuset_size = $self->_cfg('vm.lxc.cpuset.size');
     my @cpus = $self->{hypervisor}->reserve_cpuset($cpuset_size);
@@ -414,8 +414,8 @@ EOML
         lxc_console => $console,
         lxc_rootfs => $self->{os_rootfs},
         lxc_mount_entry => $self->{home_fstab},
-        lxc_cgroup_cpuset_cpus => $cpuset_cpus,
-        memory_limits => $memory_limits,
+	lxc_cgroup_cpuset_cpus => $cpuset_cpus,
+	memory_limits => $memory_limits,
         # This is the extras sub-hash
         extra => { lines => $extra_lines,
                    vhci => $vhci_mounts
@@ -483,40 +483,23 @@ sub _check_dirty_flag {
 
 sub _kill_lxc {
     my $self = shift;
-    my @pids;
     my $cgroup_cpu_lxc = $self->{hypervisor}->cgroup_control_path('cpu');
     unless (defined $cgroup_cpu_lxc) {
         ERROR "Can't clean container processes because cgroup is missconfigured";
         return $self->_on_error;
     }
 
-    my $fn = "$cgroup_cpu_lxc/$self->{lxc_name}/cgroup.procs";
-    if (open my $fh, '<', $fn) {
-        chomp(@pids = <$fh>);
+    my $fn = "$cgroup_cpu_lxc/$self->{lxc_name}/cgroup.kill";
+    if (open my $fh, '>', $fn) {
+	INFO "Killing container $self->{lxc_name} ...";
+        say $fh "1" or DEBUG "Cgroup couldn't kill container $self->{lxc_name}'s processes: $!";
+        DEBUG "All processes killed";
     }
     else {
         $debug and $self->_debug("unable to open $fn: $!");
-        INFO "Unable to open '$fn': $!";
-    }
-    my $vm_pid = $self->{vm_pid};
-    push @pids, $vm_pid if defined $vm_pid;
-    if (@pids) {
-        $debug and $self->_debug("killing zombie processes and then trying again, pids: @pids");
-        DEBUG "Killing zombie processes and then trying again, PIDs: @pids";
-        if ($self->{killer_count}++ > $self->_cfg('internal.hkd.lxc.killer.retries')) {
-            $debug and $self->_debug("too many retries, no more killing, peace!");
-            WARN "Too many retries when killing cointainer processes: @pids";
-            # $self->_abort_cmd($vm_pid);
-            return $self->_on_error;
-        }
-        kill KILL => @pids;
-        $self->_call_after(2 => '_kill_lxc');
-    }
-    else {
-        $debug and $self->_debug("all processes killed");
-        DEBUG "All processes killed";
-        return $self->_on_done;
-    }
+        INFO "Unable to open '$fn': $!, container $self->{lxc_name} does not exist yet!!";
+    }   	    
+    return $self->_on_done;
 }
 
 sub _release_cpuset {
