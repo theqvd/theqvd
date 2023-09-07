@@ -1,5 +1,6 @@
 lxc.autodev=1
 lxc.hook.autodev=<%= $lxc_hook_autodev %>
+lxc.init.cmd = /sbin/init systemd.unified_cgroup_hierarchy
 
 % if ( $lxc_version < '2.1'){
 lxc.kmsg=0
