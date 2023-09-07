@@ -119,6 +119,9 @@ path.hypervisor.captures = ${path.tmp}/qvd
 path.cgroup = /sys/fs/cgroup
 # path.cgroup.cpu.lxc = ${path.cgroup}/cpu/lxc
 
+# LXC default config file
+lxc.conf.file = /etc/lxc/lxc.conf
+
 path.client.pixmaps = pixmaps
 path.client.pixmaps.alt = /usr/share/pixmaps
 
