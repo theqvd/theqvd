@@ -34,6 +34,10 @@ sub detect_os {
                     $version = $osr{version_id};
                     $revision = ($osr{version} =~ /^\s*$version\.(\d+)/) ? $1 : 0;
                 }
+                elsif (grep { $osr{id} eq $_ } qw{rhel rocky}) {
+                    $os = $osr{id};
+                    ($version, $revision) = split /\./, $osr{version_id};
+                }
                 else {
                     if ($osr{version_id} =~ /^(\d+)(?:\.(\d+))?/) {
                         $version = $1;

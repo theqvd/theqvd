@@ -33,6 +33,11 @@ $defaults->setProperty('config.os.revision', $os{revision});
 
 __DATA__
 
+## Get OS name, version and revision
+os.name = ${config.os}
+os.version = ${config.os.version}
+os.revision = ${config.os.revision}
+
 ## name of this machine
 # nodename =
 
@@ -176,8 +181,7 @@ command.lxc-stop = ${path.qvd.bin}/lxc-stop
 command.lxc-wait = ${path.qvd.bin}/lxc-wait
 command.version.lxc = 1.1
 
-
-# LXC bin paths for Ubuntu 22.04
+# LXC bin paths for Ubuntu 22.04 Jammy Jellyfish
 @ubuntu-22.04@command.lxc-destroy = /usr/bin/lxc-destroy
 @ubuntu-22.04@command.lxc-console = /usr/bin/lxc-console
 @ubuntu-22.04@command.lxc-create = /usr/bin/lxc-create
@@ -185,6 +189,24 @@ command.version.lxc = 1.1
 @ubuntu-22.04@command.lxc-stop = /usr/bin/lxc-stop
 @ubuntu-22.04@command.lxc-wait = /usr/bin/lxc-wait
 @ubuntu-22.04@command.version.lxc = 5.0.0
+
+# LXC bin paths for Red Hat Enterprice Linux >= 9
+@rhel-9@command.lxc-destroy = /usr/bin/lxc-destroy
+@rhel-9@command.lxc-console = /usr/bin/lxc-console
+@rhel-9@command.lxc-create = /usr/bin/lxc-create
+@rhel-9@command.lxc-start = /usr/bin/lxc-start
+@rhel-9@command.lxc-stop = /usr/bin/lxc-stop
+@rhel-9@command.lxc-wait = /usr/bin/lxc-wait
+@rhel-9@command.version.lxc = 4.0.12
+
+# LXC bin paths for Rocky Linux >= 9
+@rocky-9@command.lxc-destroy = /usr/bin/lxc-destroy
+@rocky-9@command.lxc-console = /usr/bin/lxc-console
+@rocky-9@command.lxc-create = /usr/bin/lxc-create
+@rocky-9@command.lxc-start = /usr/bin/lxc-start
+@rocky-9@command.lxc-stop = /usr/bin/lxc-stop
+@rocky-9@command.lxc-wait = /usr/bin/lxc-wait
+@rocky-9@command.version.lxc = 4.0.12
 
 @sles-11@command.version.lxc = 0.7
 @sles-12@command.version.lxc = 1.0
@@ -655,7 +677,7 @@ vm.network.ip.start=10.0.0.100
 ## QVD private network netmask. There's no sensible default value
 #vm.network.ip.netmask=255.255.0.0
 vm.network.netmask=255.255.0.0
-vm.network.use_dhcp = 1
+vm.network.use_dhcp = 0
 
 # high bytes of the MAC address, the IP is used for the low bytes.
 vm.network.mac.prefix = 54:52:00
