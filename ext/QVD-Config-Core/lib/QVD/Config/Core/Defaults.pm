@@ -175,6 +175,17 @@ command.lxc-start = ${path.qvd.bin}/lxc-start
 command.lxc-stop = ${path.qvd.bin}/lxc-stop
 command.lxc-wait = ${path.qvd.bin}/lxc-wait
 command.version.lxc = 1.1
+
+
+# LXC bin paths for Ubuntu 22.04
+@ubuntu-22.04@command.lxc-destroy = /usr/bin/lxc-destroy
+@ubuntu-22.04@command.lxc-console = /usr/bin/lxc-console
+@ubuntu-22.04@command.lxc-create = /usr/bin/lxc-create
+@ubuntu-22.04@command.lxc-start = /usr/bin/lxc-start
+@ubuntu-22.04@command.lxc-stop = /usr/bin/lxc-stop
+@ubuntu-22.04@command.lxc-wait = /usr/bin/lxc-wait
+@ubuntu-22.04@command.version.lxc = 5.0.0
+
 @sles-11@command.version.lxc = 0.7
 @sles-12@command.version.lxc = 1.0
 command.ebtables = ebtables
