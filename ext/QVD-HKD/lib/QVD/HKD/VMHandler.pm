@@ -38,6 +38,15 @@ sub _ip_to_mac {
     join(':', $mac_prefix, @hex);
 }
 
+sub _gen_random_mac_suffix {
+    my $self = shift;
+    my $mac_suffix; $mac_suffix .= sprintf("%x", rand 16) for 1..6;
+    $mac_suffix =~ s/(..)/$1:/g;
+    $mac_suffix =~ s/:$//r;
+    my $mac_prefix = $self->_cfg('vm.network.mac.prefix');
+    join(':', $mac_prefix, $mac_suffix);
+}
+
 sub new {
     my ($class, %opts) = @_;
     my $vm_id = delete $opts{vm_id};
@@ -113,7 +122,14 @@ sub _calculate_attrs {
     $self->{mon_port}    = $self->_cfg('internal.vm.monitor.redirect') ? $self->_allocate_tcp_port : 0;
     $self->{gateway}     = $self->_cfg('vm.network.gateway');
     $self->{netmask_len} = $self->netmask_len;
-    $self->{mac}         = $self->_ip_to_mac($self->{ip});
+
+    
+    # When you need to run lxc containers inside a hypervisor like VMware you must configure lxc.net.type as macvlan. 
+    if ( $self->_cfg('vm.lxc.net.type') eq "macvlan" ) {
+      $self->{mac}         = $self->_gen_random_mac_suffix();
+    } else {	    
+      $self->{mac}         = $self->_ip_to_mac($self->{ip});
+    }
 
     $self->{rpc_service} = sprintf("http://%s:%d/vma", $self->{ip}, $self->{vma_port});
 }
