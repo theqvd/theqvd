@@ -633,6 +633,9 @@ vm.lxc.hooks.allow = 0
 # control of the host
 vm.lxc.redirect.allow = 0
 
+# LXC network type
+vm.lxc.net.type = veth
+
 internal.vm.lxc.conf.extra=
 
 ## whether to keep overlay images from one session to the next
