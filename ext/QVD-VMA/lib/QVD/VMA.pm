@@ -582,6 +582,7 @@ sub _fork_monitor {
                         if ( $enable_audio ) {
                             if ( $pulse_proc ) {
                                 my @sink_args = ("sink_name=QVD_Audio", "server=tcp:127.0.0.1:$pa_port", "sink=\@DEFAULT_SINK\@");
+                                my @source_args = ("source_name=QVD_Microphone", "server=tcp:127.0.0.1:$pa_port");
 
                                 if ( $enable_audio_compression ) {
                                     DEBUG "Audio compression enabled, using compression for the audio sink";
@@ -590,6 +591,7 @@ sub _fork_monitor {
 
                                 DEBUG "PulseAudio already running under pid $pulse_proc, reestablishing channel";
                                 _bgrun({user => $props{'qvd.vm.user.name'}}, "pacmd", "load-module", "module-tunnel-sink-new", @sink_args);
+                                _bgrun({user => $props{'qvd.vm.user.name'}}, "pacmd", "load-module", "module-tunnel-source-new", @source_args);
                             } else {
                                 DEBUG "PulseAudio not running, starting " . ($enable_audio_compression ? "with compression" : "");
                                 $pulse_proc = _start_pulseaudio($pa_port, $props{'qvd.vm.user.name'}, $enable_audio_compression);
@@ -929,6 +931,11 @@ sub _start_pulseaudio {
             DEBUG "Audio compression enabled";
         }
 
+        # Load pulseaudio module for input sound (microphone).
+        print $ofh "\n";
+        print $ofh "load-module module-tunnel-source-new source_name=QVD_Microphone " .
+                   "server=tcp:127.0.0.1:$port";
+
         print $ofh "\n";
         close $ofh;
 
@@ -1082,6 +1089,7 @@ sub _suspend_pulseaudio {
     if ( $pid ) {
         DEBUG "Suspending PulseAudio for user $user";
         _bgrun({user => $user}, "pacmd", "unload-module", "module-tunnel-sink-new");
+        _bgrun({user => $user}, "pacmd", "unload-module", "module-tunnel-source-new");
     } else {
         DEBUG "PulseAudio not running, not suspending";
     }
