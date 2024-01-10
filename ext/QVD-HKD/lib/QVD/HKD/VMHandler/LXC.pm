@@ -236,8 +236,14 @@ sub _calculate_attrs {
         my $homefs_parent = $self->_cfg('path.storage.homefs');
         $homefs_parent =~ s|/*$|/|;
         if ($self->_cfg('vm.lxc.home.per.user')) {
-            $self->{home_fs} = "$homefs_parent$self->{login}";
-            $self->{home_fs_mnt} = "$self->{os_rootfs}/home/$self->{login}";
+            if($self->_cfg('vm.lxc.home.mirror')) {
+               $self->{home_fs} = "$self->{user_home}";
+               $self->{home_fs_mnt} = "$self->{os_rootfs}$self->{user_home}";
+            }
+            else {
+               $self->{home_fs} = "$homefs_parent$self->{login}";
+               $self->{home_fs_mnt} = "$self->{os_rootfs}/home/$self->{login}";
+            }
         }
         else {
             $self->{home_fs} = "$homefs_parent$self->{vm_id}-fs";

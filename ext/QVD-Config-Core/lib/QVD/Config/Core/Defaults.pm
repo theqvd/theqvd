@@ -774,6 +774,10 @@ vma.x11vnc.extra_args=
 # that is the same used on the NFS.
 vm.lxc.home.per.user = 0
 
+# If vm.lxc.home.per.user = 1, you can mount the user home from NFS volume
+# mounted on a qvdhost as the same path inside the lxc container
+vm.lxc.home.mirror = 0
+
 ## umask for the VMA
 vma.user.umask = 0022
 
