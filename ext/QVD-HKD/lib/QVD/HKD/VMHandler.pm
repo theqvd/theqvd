@@ -94,10 +94,12 @@ sub _load_row {
     $self->_query({save_to_self => 1}, <<'EOQ', $self->{vm_id});
 select name, user_id, osf_id,
        di_tag, ip, storage,
-       login
-  from vms, users
+       login, parameters
+  from vms, users, user_auth_parameters
   where vms.id = $1
     and users.id = vms.user_id
+    and user_auth_parameters.id in
+  (select max(auth_params_id) from user_tokens where vm_id = vms.id)
 EOQ
 }
 
@@ -123,7 +125,6 @@ sub _calculate_attrs {
     $self->{gateway}     = $self->_cfg('vm.network.gateway');
     $self->{netmask_len} = $self->netmask_len;
 
-    
     # When you need to run lxc containers inside a hypervisor like VMware you must configure lxc.net.type as macvlan. 
     if ( $self->_cfg('vm.lxc.net.type') eq "macvlan" ) {
       $self->{mac}         = $self->_gen_random_mac_suffix();
@@ -132,6 +133,13 @@ sub _calculate_attrs {
     }
 
     $self->{rpc_service} = sprintf("http://%s:%d/vma", $self->{ip}, $self->{vma_port});
+
+    # Load vm session parameters, these parameters are necessary at some point
+    my $parameters = decode_json($self->{parameters});
+    $self->{user_name} = $parameters->{'qvd.vm.user.name'};
+    $self->{user_home} = $parameters->{'qvd.vm.user.home'};
+    $self->{user_uid} = $parameters->{'qvd.vm.user.uid'};
+    $self->{user_gid} = $parameters->{'qvd.vm.user.gid'};
 }
 
 sub _add_to_dhcpd {

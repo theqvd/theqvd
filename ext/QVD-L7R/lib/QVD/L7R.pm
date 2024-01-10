@@ -296,7 +296,7 @@ sub connect_to_vm_processor {
         token             => generate_sid(),
         expiration        => time + (3600*24),
         user_id           => $user_id,
-        vm_id             => undef,
+        vm_id             => $vm_id,
         auth_params_id    => $uas->id,
         multi_use         => 1
     });
