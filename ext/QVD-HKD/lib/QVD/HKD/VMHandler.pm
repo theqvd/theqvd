@@ -127,7 +127,7 @@ sub _calculate_attrs {
     $self->{netmask_len} = $self->netmask_len;
 
     # When you need to run lxc containers inside a hypervisor like VMware you must configure lxc.net.type as macvlan. 
-    if ( $self->_cfg('vm.lxc.net.type') eq "macvlan" ) {
+    if ( $self->_cfg('vm.hypervisor') eq "lxc" && $self->_cfg('vm.lxc.net.type') eq "macvlan" ) {
       $self->{mac}         = $self->_gen_random_mac_suffix();
     } else {	    
       $self->{mac}         = $self->_ip_to_mac($self->{ip});
