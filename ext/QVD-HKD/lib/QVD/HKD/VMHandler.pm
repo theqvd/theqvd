@@ -10,6 +10,7 @@ use POSIX;
 use AnyEvent;
 use AnyEvent::Util;
 use Linux::Proc::Net::TCP;
+use JSON;
 use QVD::Log;
 use Carp;
 use Method::WeakCallback qw(weak_method_callback);
