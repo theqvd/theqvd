@@ -23,7 +23,7 @@ sub new {
     my $class = shift;
     my $self = $class->SUPER::new(@_);
     my $cgroups_version = $self->_cgroups_version;
-    $cgroups_version eq "cgroup2") ? $self->_config_cgroups : LOGDIE "The filesystem mounted at $self->_cfg("path.cgroup") is not a cgroup v2 filesystem.";
+    $cgroups_version eq "cgroup2") ? $self->_config_cgroups : LOGDIE "The filesystem mounted at $self->_cfg('path.cgroup') is not a cgroup v2 filesystem.";
     INFO "Detected cgroups version: $cgroups_version";
     $self
 }
@@ -31,7 +31,7 @@ sub new {
 sub on_config_changed {
     my $self = shift;
     my $cgroups_version = $self->_cgroups_version;
-    ($cgroups_version eq "cgroup2") ? $self->_config_cgroups : LOGDIE "The filesystem mounted at $self->_cfg("path.cgroup") is not a cgroup v2 filesystem."; 
+    ($cgroups_version eq "cgroup2") ? $self->_config_cgroups : LOGDIE "The filesystem mounted at $self->_cfg('path.cgroup') is not a cgroup v2 filesystem."; 
 }
 
 sub cgroup_control_path {
