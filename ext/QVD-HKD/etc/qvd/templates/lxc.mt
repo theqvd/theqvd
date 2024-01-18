@@ -5,8 +5,6 @@ lxc.init.cmd = /sbin/init systemd.unified_cgroup_hierarchy
 % if ( $lxc_version < '2.1'){
 lxc.kmsg=0
 lxc.utsname=<%= $lxc_utsname %>
-lxc.network.type=veth
-lxc.network.veth.pair=<%= $lxc_network_veth_pair %>
 lxc.network.name=eth0
 lxc.network.flags=up
 lxc.network.hwaddr=<%= $lxc_network_hwaddr %>
@@ -18,8 +16,6 @@ lxc.rootfs=<%= $lxc_rootfs %>
 lxc.pivotdir=qvd-pivot
 % } else {
 lxc.uts.name=<%= $lxc_utsname %>
-lxc.net.0.type=veth
-lxc.net.0.veth.pair=<%= $lxc_network_veth_pair %>
 lxc.net.0.name=eth0
 lxc.net.0.flags=up
 lxc.net.0.hwaddr=<%= $lxc_network_hwaddr %>

@@ -357,13 +357,13 @@ sub _create_lxc {
 
     my $lxc_version = $self->_cfg('command.version.lxc');
     my $qvd_lxc_autodev = $self->_cfg('command.qvd-lxc-autodev');
+    my $lxc_network_type = $self->_cfg('vm.lxc.net.type');
 
     my $memory = $self->{memory};
     my $memory_limits = <<EOML;
 lxc.cgroup.memory.limit_in_bytes=${memory}M
 lxc.cgroup.memory.memsw.limit_in_bytes=${memory}M
 EOML
-    #$memory_limits =~ s/^/# /mg unless $self->{hypervisor}->swapcount_enabled;
 
     my $cpuset_size = $self->_cfg('vm.lxc.cpuset.size');
     my @cpus = $self->{hypervisor}->reserve_cpuset($cpuset_size);
@@ -381,13 +381,27 @@ EOML
 
     if (!$self->_cfg('vm.network.use_dhcp')) {
         if ($lxc_version < 2.1) {
-            $extra_lines .= "lxc.network.ipv4 = " . $self->{ip} . "/" . $self->{netmask_len} . "\n";
-            if ($lxc_version >= 0.8) {
-                $extra_lines .= "lxc.network.ipv4.gateway = " . $self->{gateway} . "\n";
+            $extra_lines .= "lxc.network.type = " . $lxc_network_type . "\n";
+
+            if ($lxc_network_type eq "veth") {
+                 $extra_lines .= "lxc.network.veth.pair = " . $lxc_network_veth_pair . "\n";
+            } elsif ($lxc_network_type eq "macvlan") {
+                 $extra_lines .= "lxc.network.macvlan.mode = bridge" . "\n";
             }
+
+            $extra_lines .= "lxc.network.ipv4 = " . $self->{ip} . "/" . $self->{netmask_len} . "\n";
+            $extra_lines .= "lxc.network.ipv4.gateway = " . $self->{gateway} . "\n";
         } else {
-          $extra_lines .= "lxc.net.0.ipv4.address = " . $self->{ip} . "/" . $self->{netmask_len} . "\n";
-          $extra_lines .= "lxc.net.0.ipv4.gateway = " . $self->{gateway} . "\n";
+            $extra_lines .= "lxc.net.0.type = " . $lxc_network_type . "\n";
+ 
+            if ($lxc_network_type eq "veth") {
+                 $extra_lines .= "lxc.net.0.veth.pair = " . $lxc_network_veth_pair . "\n";
+            } elsif ($lxc_network_type eq "macvlan") {
+                 $extra_lines .= "lxc.net.0.macvlan.mode = bridge" . "\n";
+            }            
+
+            $extra_lines .= "lxc.net.0.ipv4.address = " . $self->{ip} . "/" . $self->{netmask_len} . "\n";
+            $extra_lines .= "lxc.net.0.ipv4.gateway = " . $self->{gateway} . "\n";
        }
     }
 
