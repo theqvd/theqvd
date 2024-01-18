@@ -253,7 +253,7 @@ sub _calculate_attrs {
 
     my $iface = $self->{iface} =
         $self->_cfg('internal.vm.network.device.prefix') . $self->{vm_id};
-    # $self->_cfg('internal.vm.network.device.prefix') . $self->{vm_id} . 'r' . int(rand 10000);
+        #$self->_cfg('internal.vm.network.device.prefix') . $self->{vm_id} . 'r' . int(rand 10000);
 
     DEBUG("attributes for VM $self->{vm_id}: "
           . join(', ', map($_ . '=' . ($self->{$_} // '<undef>'),
@@ -379,30 +379,19 @@ EOML
 
     my $extra_lines;
 
+    # LXC Network configs
+    my $lxc_network_type = $self->_cfg('vm.lxc.net.type');
+    my $lxc_network_type_options;
+
+    if ($lxc_network_type eq "veth") {
+        $lxc_network_type_options = "lxc.net.0.veth.pair=${iface}";
+    } elsif ($lxc_network_type eq "macvlan") {
+        $lxc_network_type_options = "lxc.net.0.macvlan.mode=bridge";
+    }
+
     if (!$self->_cfg('vm.network.use_dhcp')) {
-        if ($lxc_version < 2.1) {
-            $extra_lines .= "lxc.network.type = " . $lxc_network_type . "\n";
-
-            if ($lxc_network_type eq "veth") {
-                 $extra_lines .= "lxc.network.veth.pair = " . $lxc_network_veth_pair . "\n";
-            } elsif ($lxc_network_type eq "macvlan") {
-                 $extra_lines .= "lxc.network.macvlan.mode = bridge" . "\n";
-            }
-
-            $extra_lines .= "lxc.network.ipv4 = " . $self->{ip} . "/" . $self->{netmask_len} . "\n";
-            $extra_lines .= "lxc.network.ipv4.gateway = " . $self->{gateway} . "\n";
-        } else {
-            $extra_lines .= "lxc.net.0.type = " . $lxc_network_type . "\n";
- 
-            if ($lxc_network_type eq "veth") {
-                 $extra_lines .= "lxc.net.0.veth.pair = " . $lxc_network_veth_pair . "\n";
-            } elsif ($lxc_network_type eq "macvlan") {
-                 $extra_lines .= "lxc.net.0.macvlan.mode = bridge" . "\n";
-            }            
-
-            $extra_lines .= "lxc.net.0.ipv4.address = " . $self->{ip} . "/" . $self->{netmask_len} . "\n";
-            $extra_lines .= "lxc.net.0.ipv4.gateway = " . $self->{gateway} . "\n";
-       }
+         $extra_lines .= "lxc.net.0.ipv4.address = " . $self->{ip} . "/" . $self->{netmask_len} . "\n";
+         $extra_lines .= "lxc.net.0.ipv4.gateway = " . $self->{gateway} . "\n";
     }
 
     my $meta = $self->{os_fs}->image_metadata_dir;
@@ -428,7 +417,8 @@ EOML
         lxc_version => $lxc_version,
         lxc_hook_autodev => $qvd_lxc_autodev,
         lxc_utsname => $self->{name},
-        lxc_network_veth_pair => $iface,
+        lxc_network_type => $lxc_network_type,
+        lxc_network_type_options => $lxc_network_type_options,
         lxc_network_hwaddr => $self->{mac},
         lxc_network_link => $bridge,
         lxc_console => $console,

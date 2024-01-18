@@ -1,21 +1,9 @@
 lxc.autodev=1
 lxc.hook.autodev=<%= $lxc_hook_autodev %>
 lxc.init.cmd = /sbin/init systemd.unified_cgroup_hierarchy
-
-% if ( $lxc_version < '2.1'){
-lxc.kmsg=0
-lxc.utsname=<%= $lxc_utsname %>
-lxc.network.name=eth0
-lxc.network.flags=up
-lxc.network.hwaddr=<%= $lxc_network_hwaddr %>
-lxc.network.link=<%= $lxc_network_link %>
-lxc.console=<%= $lxc_console %>
-lxc.tty=3
-lxc.pts=1024
-lxc.rootfs=<%= $lxc_rootfs %>
-lxc.pivotdir=qvd-pivot
-% } else {
 lxc.uts.name=<%= $lxc_utsname %>
+lxc.net.0.type=<%= $lxc_network_type %>
+<%= $lxc_network_type_options %>
 lxc.net.0.name=eth0
 lxc.net.0.flags=up
 lxc.net.0.hwaddr=<%= $lxc_network_hwaddr %>
@@ -24,8 +12,6 @@ lxc.console.path=<%= $lxc_console %>
 lxc.tty.max=3
 lxc.pty.max=1024
 lxc.rootfs.path=<%= $lxc_rootfs %>
-% }
-
 lxc.mount.entry=<%= $lxc_mount_entry %>
 lxc.cgroup.cpu.shares=1024
 lxc.cgroup.cpuset.cpus=<%= $lxc_cgroup_cpuset_cpus %>
@@ -38,13 +24,7 @@ lxc.mount.entry=<%= $extra->{vhci}->{directory} %> sys/devices/platform none def
 lxc.mount.entry=/sys/devices/platform/<%= $extra->{vhci}->{hub} %> sys/devices/platform/<%= $extra->{vhci}->{hub} %> none defaults,bind
 % }
 
-% if ( $lxc_version == '0.9' ){
-lxc.aa_profile = unconfined
-% } elsif ( $lxc_version < '2.1' ) {
-lxc.aa_profile = lxc-container-qvd
-% } else {
 lxc.apparmor.profile = lxc-container-qvd
-% }
 
 # Deny access to all devices, except...
 lxc.cgroup.devices.deny = a

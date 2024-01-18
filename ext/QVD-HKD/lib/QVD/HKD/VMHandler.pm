@@ -41,9 +41,7 @@ sub _ip_to_mac {
 
 sub _gen_random_mac_suffix {
     my $self = shift;
-    my $mac_suffix; $mac_suffix .= sprintf("%x", rand 16) for 1..6;
-    $mac_suffix =~ s/(..)/$1:/g;
-    $mac_suffix =~ s/:$//r;
+    my $mac_suffix = join(":", map { sprintf "%0.2x",rand(256) }(1..3));
     my $mac_prefix = $self->_cfg('vm.network.mac.prefix');
     join(':', $mac_prefix, $mac_suffix);
 }
