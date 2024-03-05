@@ -155,6 +155,7 @@ use Class::StateMachine::Declarative
                  substates => [ config => { transitions => { _on_error => 'delaying' },
                                             substates => [ saving_state      => { enter => '_save_state',
                                                                                   on => { _on_error => '_on_done' } },
+                                                           loading_row       => { enter => '_load_row' },
                                                            calculating_attrs => { enter => '_calculate_attrs',
                                                                                   transitions => { _on_error => 'delaying' } },
                                                            '(delaying)'      => { enter => '_set_state_timer',
