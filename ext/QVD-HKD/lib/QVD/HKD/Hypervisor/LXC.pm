@@ -160,43 +160,39 @@ sub _load_lxc_cpuset_cpus {
 
     $self->{cpus} //= do {
         my %cpu;
-        my $line;
         my $custom_cpuset_range = $self->_cfg_optional("vm.lxc.cpuset.range");
-        my $fn1 = "$path/../cpuset.cpus.effective";
-        my $fn2 = "$path/cpuset.cpus";
 
-        open my $fh1, '<', $fn1 or LOGDIE "Unable to open '$fn1'";
-        my $available_cpuset_range = <$fh1> // LOGDIE "Unable to read cpuset from '$fn1'";
-        close $fh1;
+        my $fn = "$path/../cpuset.cpus.effective";
+        open my $fh, '<', $fn or LOGDIE "Unable to open file: $fn";
+        my $available_cpuset_range = <$fh> // LOGDIE "Unable to read cpuset from file: $fn";
+        close $fn;
 
         if (defined $custom_cpuset_range && $custom_cpuset_range =~ /^(\d+)(?:-(\d+))?$/) {
             my ($a1, $b1) = split /-/, $custom_cpuset_range;
             my ($a2, $b2) = split /-/, $available_cpuset_range;
             if ($a1 >= $a2 && $b1 <= $b2 && $a1 <= $b2) {
-                DEBUG "Setting up custom cpuset range: '$custom_cpuset_range' to cgroup file: $fn2";
-                $line //= $custom_cpuset_range;
+                $fn = "$path/cpuset.cpus";
+                open my $fh, '>', $fn or LOGDIE "Unable to open file: $fn";
+                DEBUG "Setting up custom cpuset range: $custom_cpuset_range to cgroup file: $fn";
+                say $fh $_ for "$custom_cpuset_range";
+                close $fh;
             } else {
-                DEBUG "Invalid custom cpuset range: '$custom_cpuset_range', loading all available vCPUs: '$available_cpuset_range'";
-                $line //= $available_cpuset_range;
+                DEBUG "Invalid custom cpuset range: $custom_cpuset_range => loading all available vCPUs: $available_cpuset_range";
             }
         } else {
-            $line //= $available_cpuset_range;
-            DEBUG "Loading all available vCPUs: '$available_cpuset_range'";
+            DEBUG "Loading all available vCPUs: $available_cpuset_range";
         }
 
+        open my $fh, '<', $fn or LOGDIE "Unable to open file: $fn";
+        my $line = <$fh> // LOGDIE "Unable to read cpuset from file: $fn";
         for my $range (split /\s*,\s*/, $line) {
-            my ($a, $b) = $range =~ /^(\d+)(?:-(\d+))?$/ or LOGDIE "Invalid cpuset range '$range' found";
+            my ($a, $b) = $range =~ /^(\d+)(?:-(\d+))?$/ or LOGDIE "Invalid cpuset range $range found";
             $b //= $a;
-            DEBUG "vCPUs range: '$range'";
+            DEBUG "vCPUs range: $range";
             $cpu{$_} = 0 for $a..$b;
-
         }
+        close $fh;
         \%cpu;
-
-        # We always set a valid icpuset range in the QVD cgroups cpuset file.
-        open my $fh2, '>', $fn2 or LOGDIE "Unable to open '$fn2'";
-        say $fh2 $_ for "$line";
-        close $fh2;
     };
     $self->_recreate_lxc_cpuset_cpus;
 
